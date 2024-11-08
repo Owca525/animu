@@ -1,0 +1,70 @@
+/* Dark-green */
+:root  {
+    --color-primary-100: #25c22a;
+    --color-primary-200: #4fc947;
+    --color-primary-300: #6bd160;
+    --color-primary-400: #84d877;
+    --color-primary-500: #9adf8e;
+    --color-primary-600: #b0e6a4;
+
+    --color-surface-100: #121212;
+    --color-surface-200: #282828;
+    --color-surface-300: #3f3f3f;
+    --color-surface-400: #575757;
+    --color-surface-500: #717171;
+    --color-surface-600: #8b8b8b;
+
+    --color-surface-mixed-100: #192117;
+    --color-surface-mixed-200: #2e362c;
+    --color-surface-mixed-300: #454c43;
+    --color-surface-mixed-400: #5d635b;
+    --color-surface-mixed-500: #757b74;
+    --color-surface-mixed-600: #8f948e;
+}
+
+* {
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+}
+
+body {
+    background-color: var(--color-surface-mixed-100);
+    margin: 0px;
+    padding: 0px;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.container {
+    margin: 8px;
+}
+
+input[type="text"] {
+    background-color: var(--color-surface-mixed-200);
+    font-size: large;
+    border: none;
+    outline: none;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 4px;
+    width: auto;
+    height: 40px;
+    max-width: 400px;
+    transition: background-color 0.3s ease;
+}
+input[type="text"]:hover {
+    background-color: var(--color-surface-mixed-300);
+}
+
+input[type="button"] {
+    background-color: var(--color-surface-mixed-200);
+    font-size: large;
+    border: none;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    width: 140px;
+}
+input[type="button"]:hover {
+    background-color: var(--color-surface-mixed-300);
+}
