@@ -1,0 +1,6 @@
+Frontend (html/javascript/css):
+    - Stworzenie Głównej strony
+    - Stworzenie Wyszukiwarki
+    - Stworzenie Playera
+Backend (rust):
+    - Wsparcie pluginów
