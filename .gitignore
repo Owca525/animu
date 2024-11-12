@@ -22,3 +22,4 @@ node_modules/@tauri-apps/cli-linux-x64-gnu/cli.linux-x64-gnu.node
 node_modules/@tauri-apps/cli-linux-x64-gnu/package.json
 node_modules/@tauri-apps/cli-linux-x64-gnu/README.md
 package-lock.json
+node_modules
