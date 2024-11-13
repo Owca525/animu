@@ -4,3 +4,5 @@ Frontend (html/javascript/css):
     - Stworzenie Playera
 Backend (rust):
     - Wsparcie pluginów
+    - Zrobienie żeby nie pokazywało przycisku inspect
+    - Zakrycie elementów przeglądarki

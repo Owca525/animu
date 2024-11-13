@@ -20,6 +20,9 @@
     --color-surface-mixed-400: #5d635b;
     --color-surface-mixed-500: #757b74;
     --color-surface-mixed-600: #8f948e;
+
+    --background: #2d2d2d;
+    --second-color: #414141;
 }
 
 * {
@@ -28,43 +31,72 @@
 }
 
 body {
-    background-color: var(--color-surface-mixed-100);
+    background-color: var(--background);
     margin: 0px;
     padding: 0px;
     max-width: 100%;
     max-height: 100%;
 }
 
-.container {
-    margin: 8px;
+.header {
+    background-color: var(--second-color);
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding-left: 2%;
+}
+
+.text {
+    display: flex;
+    text-align: center;
+    font-size: 28px;
 }
 
 input[type="text"] {
-    background-color: var(--color-surface-mixed-200);
-    font-size: large;
     border: none;
     outline: none;
-    padding-left: 10px;
-    padding-right: 10px;
-    border-radius: 4px;
-    width: auto;
-    height: 40px;
+    padding: 12px;
+    width: 100%;
     max-width: 400px;
-    transition: background-color 0.3s ease;
-}
-input[type="text"]:hover {
-    background-color: var(--color-surface-mixed-300);
+    border-radius: 4px;
+    background-color: var(--background);
 }
 
-input[type="button"] {
-    background-color: var(--color-surface-mixed-200);
-    font-size: large;
-    border: none;
-    padding: 8px;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-    width: 140px;
+.container {
+    padding: 16px;
+    padding-top: 1em;
+    width: 97%;
+    height: 100%;
 }
-input[type="button"]:hover {
-    background-color: var(--color-surface-mixed-300);
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: baseline;
+    gap: 8px;
+    width: 100%;
+    height: auto;
+}
+
+img {
+    max-width: 200px;
+    max-height: 290px;
+    border-radius: 4px;
+}
+
+.card {
+    max-width: 220px;
+    max-height: 350px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-direction: column;
+    padding: 4px;
+    border-radius: 4px;
+}
+.card:hover {
+    background-color: var(--second-color);
 }

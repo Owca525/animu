@@ -1,9 +1,10 @@
 
 mod allmanga;
 
+// Z poziomu Frontend jest odbierany tekst w formie zmiennej "name" a potem uruchamia get_search gdzie zwraca dane znowu do frontend
 #[tauri::command]
 async fn get_search(name: &str) -> Result<String, String> {
-    allmanga::get_search(name).await
+    allmanga::get_search_anime(name).await
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

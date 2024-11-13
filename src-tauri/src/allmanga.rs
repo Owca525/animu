@@ -1,11 +1,13 @@
 use reqwest::Client;
 
+// Hashe są indyfikatorem dla danego urządzenia muszą być kiedy jest wysyłany request do api allmanga
 static HASH_SEARCH: &str = "06327bc10dd682e1ee7e07b6db9c16e9ad2fd56c1b769e47513128cd5c9fc77a";
 static HASH_INFO: &str = "9d7439c90f203e534ca778c4901f9aa2d3ad42c06243ab2c5e6b79612af32028";
 static HASH_PLAYER: &str = "5f1a64b73793cc2234a389cf3a8f93ad82de7043017dd551f38f65b89daa65e0";
 static API_WEB: &str = "https://api.allanime.day";
 
-pub async fn get_search(name: &str) -> Result<String, String> {
+// wysyła POST do api allmanga z danymi "name" i jest zwracany dict konwertowany na String
+pub async fn get_search_anime(name: &str) -> Result<String, String> {
     let client = Client::new();
     let variables = "{'search':{'query':'".to_string() + &name + "'},'limit':26,'page':1,'translationType':'sub','countryOrigin':'ALL'}";
     let extensions = "{'persistedQuery':{'version':1,'sha256Hash': '".to_string() + HASH_SEARCH + "'}}";
