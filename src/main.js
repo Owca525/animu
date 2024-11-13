@@ -1,9 +1,10 @@
 const { invoke } = window.__TAURI__.core;
 
 async function fetchData() {
-  try {
-    const input = document.getElementById('search_text')
-    const name = input.value
+  const input = document.getElementById('search_text')
+  const name = input.value
+
+  if(name != "") try {
     const response = await invoke('get_search', {"name": name});
     const cleanedJsonString = response.slice(1, -1);
     console.log(cleanedJsonString)
