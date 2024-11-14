@@ -32,6 +32,7 @@ pub async fn get_search_anime(name: &str) -> Result<String, String> {
     }
 }
 
+// wysyła request GET do api allmanga i odbiera zaszyfrowane linki
 pub async fn extracting_urls(id: &str, ep: &str) -> Result<String, String> {
     let client = Client::new();
     let variables = "{'showId':'".to_string() + &id + "','translationType':'sub','episodeString':'" + &ep + "}";
@@ -48,7 +49,10 @@ pub async fn extracting_urls(id: &str, ep: &str) -> Result<String, String> {
     match response {
         Ok(resp) => {
             match resp.text().await {
-                Ok(text) => Ok(text),
+                Ok(text) => {
+                    println!("{}", text);
+                    Ok(text)
+                },
                 Err(err) => Err(err.to_string()),
             }
         }
