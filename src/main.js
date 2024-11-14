@@ -22,12 +22,22 @@ function create_card(anime) {
   card_div.appendChild(card_img);
   card_div.appendChild(card_text)
 
+  card_div.addEventListener("click", function() {
+    const anime_id = anime._id;
+    fetch_episode_list(anime_id);
+  });
+
   document.getElementById("card-container").appendChild(card_div)
 };
 
-async function fetchData() {
-  const input = document.getElementById('search_text')
-  const name = input.value
+async function fetch_episode_list(id) {
+  const response = await invoke("get_episode_list", {"id": id});
+  console.log(response);
+};
+
+async function fetch_search_anime() {
+  const input = document.getElementById('search_text');
+  const name = input.value;
 
   if (name != "") try {
     const response = await invoke('get_search', {"name": name});
@@ -40,12 +50,12 @@ async function fetchData() {
     });
   } catch (error) {
     console.error(error);
-  }
-}
+  };
+};
 
 document.getElementById("search_text").addEventListener("keypress", function(event) {
     if (event.key == "Enter") {
       document.getElementById("card-container").innerHTML = "";
-      fetchData()
-    }
+      fetch_search_anime();
+    };
 });
