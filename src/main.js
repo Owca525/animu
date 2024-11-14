@@ -31,7 +31,7 @@ function create_card(anime) {
 };
 
 async function fetch_episode_list(id) {
-  const response = await invoke("get_episode_list", {"id": id});
+  const response = await invoke("get_anime_data", {"id": id});
   console.log(response);
 };
 

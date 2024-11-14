@@ -14,14 +14,14 @@ async fn get_episode_url(id: &str, ep: &str) -> Result<String, String> {
 
 // Wymagane jest danie id anime i powinno zwrócić dict z listą odcinków
 #[tauri::command]
-async fn get_episode_list(id: &str) -> Result<String, String> {
-    allmanga::extracting_episode_list(id).await
+async fn get_anime_data(id: &str) -> Result<String, String> {
+    allmanga::extracting_anime_data(id).await
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![get_search, get_episode_list, get_episode_url])
+        .invoke_handler(tauri::generate_handler![get_search, get_anime_data, get_episode_url])
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");
 }

@@ -60,10 +60,10 @@ pub async fn extracting_urls(id: &str, ep: &str) -> Result<String, String> {
     }
 }
 
-// wysyła do api allmanga metodą GET i odpowiedzi powinna być lista odcinków
-pub async fn extracting_episode_list(id: &str) -> Result<String, String> {
+// wysyła do api allmanga metodą GET i odpowiedzi powinno być dict z danymi anime
+pub async fn extracting_anime_data(id: &str) -> Result<String, String> {
     let client = Client::new();
-    let variables = "{'_id':f'".to_string() + &id + "'}";
+    let variables = "{'_id':'".to_string() + &id + "'}";
     let extensions = "{'persistedQuery':{'version':1,'sha256Hash': '".to_string() + HASH_INFO + "'}}";
     let url = API_WEB.to_string() + "/api?variables=" + &variables + "&extensions=" + &extensions;
 
@@ -77,7 +77,10 @@ pub async fn extracting_episode_list(id: &str) -> Result<String, String> {
     match response {
         Ok(resp) => {
             match resp.text().await {
-                Ok(text) => Ok(text),
+                Ok(text) => {
+                    println!("{}",text);
+                    Ok(text)
+                },
                 Err(err) => Err(err.to_string()),
             }
         }
