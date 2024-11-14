@@ -1,3 +1,4 @@
+#![allow(unused)]
 use reqwest::Client;
 
 // Hashe są indyfikatorem dla danego urządzenia muszą być kiedy jest wysyłany request do api allmanga
