@@ -39,12 +39,13 @@ body {
 }
 
 .header {
+    z-index: 1;
     background-color: var(--second-color);
     padding: 8px;
     display: flex;
     align-items: center;
     gap: 28px;
-    padding-left: 2%;
+    padding-left: 2em;
 }
 
 .text {
@@ -70,6 +71,7 @@ input[type="text"] {
     height: 100%;
 }
 .card-container {
+    z-index: 0;
     display: flex;
     flex-wrap: wrap;
     justify-content: baseline;
@@ -84,7 +86,27 @@ img {
     border-radius: 4px;
 }
 
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+}
+
+.card_img {
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 .card {
+    z-index: 1;
     max-width: 220px;
     max-height: 350px;
     width: 100%;
@@ -98,5 +120,36 @@ img {
     border-radius: 4px;
 }
 .card:hover {
+    background-color: var(--second-color);
+}
+
+.sidebar {
+    z-index: 2;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 180px;
+    background-color: black;
+    gap: 8px;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none;
+}
+.sidebar-button {
+    font-size: larger;
+    padding: 8px;
+    padding-left: 1.5em;
+}
+.sidebar-button:hover {
+    background-color: var(--second-color);
+}
+.sidebar-text {
+    padding-left: 1em;
+    font-size: large;
+}
+#menu {
+    padding: 8px;
+}
+#menu:hover {
     background-color: var(--second-color);
 }

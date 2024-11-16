@@ -4,23 +4,43 @@ function create_card(anime) {
   console.log(anime)
   var title = anime.name;
   if (title.length > 30) {
-    title = title.substring(0, 30) + "...";
+    title = title.substring(0, 43) + "...";
   }
 
   var card_div = document.createElement("div");
   card_div.className = "card";
-  card_div.title = title;
+  card_div.title = anime.name;
   var card_img = document.createElement("div");
   card_img.className = "card-img";
+  var spinner = document.createElement("span");
+  spinner.className = "material-symbols-outlined";
+  spinner.id = "spinner";
+  spinner.textContent = "progress_activity";
   var img = document.createElement("img");
   img.src = anime.thumbnail;
+  img.onerror = function () {
+      var placeholder = document.createElement("div");
+      placeholder.textContent = "Error Loading Img";
+      placeholder.style.width = "200px";
+      placeholder.style.height = "290px";
+      placeholder.style.display = "flex";
+      placeholder.style.justifyContent = "center";
+      placeholder.style.alignItems = "center";
+
+      img.replaceWith(placeholder);
+  };
+  //img.onload = function() {
+  //  document.getElementById("spinner").style.display = "none";
+  //  img.display = "none";
+  //};
   var card_text = document.createElement("div");
   card_text.className = "text-card";
   card_text.textContent = title;
 
   card_img.appendChild(img);
+  //card_img.appendChild(spinner);
   card_div.appendChild(card_img);
-  card_div.appendChild(card_text)
+  card_div.appendChild(card_text);
 
   card_div.addEventListener("click", function() {
     const anime_id = anime._id;
@@ -58,4 +78,18 @@ document.getElementById("search_text").addEventListener("keypress", function(eve
       document.getElementById("card-container").innerHTML = "";
       fetch_search_anime();
     };
+});
+
+document.querySelector("html").addEventListener("click", function() {
+  $(".sidebar").css("display", "none")
+});
+document.querySelector(".header").addEventListener("click", function() {
+  $(".sidebar").css("display", "none")
+});
+document.querySelector(".container").addEventListener("click", function() {
+  $(".sidebar").css("display", "none")
+});
+
+document.querySelector("#menu").addEventListener("click", function() {
+  $(".sidebar").css("display", "flex")
 });
