@@ -1,15 +1,5 @@
 const { invoke } = window.__TAURI__.core;
 
-function change_to_player(anime_id) {
-  document.querySelector(".container").style.display = "none";
-  var player = document.querySelector(".data-container");
-  player.style.display = "";
-  // TODO: naprawić dlaczego daje "status promise"
-  var anime_data = fetch_anime_information(anime_id);
-  console.log(anime_data)
-  player.innerHTML = anime_data;
-}
-
 function create_card(anime) {
   console.log(anime);
   var title = anime.name;
@@ -54,7 +44,7 @@ function create_card(anime) {
 
   card_div.addEventListener("click", function () {
     const anime_id = anime._id;
-    change_to_player(anime_id);
+    fetch_anime_information(anime_id);
   });
   document.querySelector(".card-container").appendChild(card_div);
 }
@@ -72,8 +62,16 @@ async function set_recent_anime() {
 }
 
 async function fetch_anime_information(id) {
-  const response = await invoke("get_anime_data", { "id": id });
-  return JSON.parse(response);
+  try {
+    const response = await invoke("get_anime_data", { "id": id });
+    const jsonObject = JSON.parse(response);
+    document.querySelector(".container").style.display = "none";
+    var player = document.querySelector(".data-container");
+    player.style.display = "";
+    console.log(jsonObject)
+    console.log(JSON.stringify(jsonObject))
+    player.innerHTML = JSON.stringify(jsonObject);
+  } catch (error) {}
 }
 
 async function fetch_search_anime() {
@@ -121,7 +119,19 @@ document
       fetch_search_anime();
     }
 });
-
+document.getElementById("test").addEventListener("click", function(){
+  $(".sidebar").css("display", "none");
+  $(".data-container").css("display", "");
+  $(".settings-container").css("display", "none");
+  $(".container").css("display", "none");
+})
+async function get_extracted_urls(id, ep) {
+  const response = await invoke("get_episode_url", { "id": id, "ep": ep });
+  console.log(response)
+}
+document.getElementById("test2").addEventListener("click", function(){
+  get_extracted_urls("bLM8BaZEH2XaS3iRu", "1")
+})
 document.querySelector("#menu").addEventListener("click", function () {
   $(".sidebar").css("display", "flex");
 });
