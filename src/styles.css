@@ -1,155 +1,211 @@
 /* Dark-green */
-:root  {
-    --color-primary-100: #25c22a;
-    --color-primary-200: #4fc947;
-    --color-primary-300: #6bd160;
-    --color-primary-400: #84d877;
-    --color-primary-500: #9adf8e;
-    --color-primary-600: #b0e6a4;
+:root {
+  --color-primary-100: #25c22a;
+  --color-primary-200: #4fc947;
+  --color-primary-300: #6bd160;
+  --color-primary-400: #84d877;
+  --color-primary-500: #9adf8e;
+  --color-primary-600: #b0e6a4;
 
-    --color-surface-100: #121212;
-    --color-surface-200: #282828;
-    --color-surface-300: #3f3f3f;
-    --color-surface-400: #575757;
-    --color-surface-500: #717171;
-    --color-surface-600: #8b8b8b;
+  --color-surface-100: #121212;
+  --color-surface-200: #282828;
+  --color-surface-300: #3f3f3f;
+  --color-surface-400: #575757;
+  --color-surface-500: #717171;
+  --color-surface-600: #8b8b8b;
 
-    --color-surface-mixed-100: #192117;
-    --color-surface-mixed-200: #2e362c;
-    --color-surface-mixed-300: #454c43;
-    --color-surface-mixed-400: #5d635b;
-    --color-surface-mixed-500: #757b74;
-    --color-surface-mixed-600: #8f948e;
+  --color-surface-mixed-100: #192117;
+  --color-surface-mixed-200: #2e362c;
+  --color-surface-mixed-300: #454c43;
+  --color-surface-mixed-400: #5d635b;
+  --color-surface-mixed-500: #757b74;
+  --color-surface-mixed-600: #8f948e;
 
-    --background: #2d2d2d;
-    --second-color: #414141;
+  --background: #2d2d2d;
+  --second-color: #414141;
 }
 
 * {
-    font-family: Arial, Helvetica, sans-serif;
-    color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
 }
 
+.main-container,
+html,
 body {
-    background-color: var(--background);
-    margin: 0px;
-    padding: 0px;
-    max-width: 100%;
-    max-height: 100%;
+  background-color: var(--background);
+  margin: 0px;
+  padding: 0px;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .header {
-    z-index: 1;
-    background-color: var(--second-color);
-    padding: 8px;
-    display: flex;
-    align-items: center;
-    gap: 28px;
-    padding-left: 2em;
+  z-index: 1;
+  background-color: var(--second-color);
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding-left: 2em;
+  position: fixed;
+  width: 100%;
 }
 
 .text {
-    display: flex;
-    text-align: center;
-    font-size: 28px;
+  display: flex;
+  text-align: center;
+  font-size: 28px;
 }
 
 input[type="text"] {
-    border: none;
-    outline: none;
-    padding: 12px;
-    width: 100%;
-    max-width: 400px;
-    border-radius: 4px;
-    background-color: var(--background);
+  border: none;
+  outline: none;
+  padding: 12px;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 4px;
+  background-color: var(--background);
 }
 
 .container {
-    padding: 16px;
-    padding-top: 1em;
-    width: 97%;
-    height: 100%;
+  padding: 16px;
+  padding-top: 5em;
+  width: 97%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0px;
+}
+.main-text {
+  display: flex;
+  width: 100%;
+  font-size: x-large;
+  padding-left: 1.5em;
 }
 .card-container {
-    z-index: 0;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: baseline;
-    gap: 8px;
-    width: 100%;
-    height: auto;
+  z-index: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: baseline;
+  gap: 8px;
+  width: 100%;
+  height: auto;
 }
 
 img {
-    max-width: 200px;
-    max-height: 290px;
-    border-radius: 4px;
+  max-width: 200px;
+  max-height: 290px;
+  border-radius: 4px;
+  display: block;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .spinner {
-    animation: spin 1s linear infinite;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .card_img {
-    z-index: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  object-fit: cover;
 }
 .card {
-    z-index: 1;
-    max-width: 220px;
-    max-height: 350px;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    flex-direction: column;
-    padding: 4px;
-    border-radius: 4px;
+  z-index: 1;
+  width: 220px;
+  max-height: 350px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-direction: column;
+  padding: 4px;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
 }
 .card:hover {
-    background-color: var(--second-color);
+  background-color: var(--second-color);
+}
+.card-text {
+    word-wrap: break-word;
+    overflow: hidden; 
 }
 
 .sidebar {
-    z-index: 2;
-    position: fixed;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 180px;
-    background-color: black;
-    gap: 8px;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: none;
+  z-index: 2;
+  position: fixed;
+  flex-direction: column;
+  height: 100%;
+  width: 200px;
+  background-color: black;
+  gap: 8px;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: none;
 }
 .sidebar-button {
-    font-size: larger;
-    padding: 8px;
-    padding-left: 1.5em;
+  font-size: larger;
+  align-items: center;
+  padding: 8px;
+  padding-left: 1.2em;
+  display: flex;
+  gap: 8px;
 }
 .sidebar-button:hover {
-    background-color: var(--second-color);
+  background-color: var(--second-color);
 }
 .sidebar-text {
-    padding-left: 1em;
-    font-size: large;
+  padding-left: 1em;
+  font-size: large;
 }
 #menu {
-    padding: 8px;
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: var(--second-color);
 }
 #menu:hover {
-    background-color: var(--second-color);
+  background-color: var(--background);
+}
+
+a {
+  text-decoration: none;
+}
+
+.scroll { 
+    overflow-y: hidden;
+    overflow-x: auto;
+    height: 350px;
+    display: grid;
+    grid-auto-flow: column;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+    gap: 26px;
+}
+
+.data-container {
+    padding-top: 5em;
+}
+.settings-container {
+    padding-top: 5em;
 }

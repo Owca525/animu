@@ -1,7 +1,17 @@
 const { invoke } = window.__TAURI__.core;
 
+function change_to_player(anime_id) {
+  document.querySelector(".container").style.display = "none";
+  var player = document.querySelector(".data-container");
+  player.style.display = "";
+  // TODO: naprawić dlaczego daje "status promise"
+  var anime_data = fetch_anime_information(anime_id);
+  console.log(anime_data)
+  player.innerHTML = anime_data;
+}
+
 function create_card(anime) {
-  console.log(anime)
+  console.log(anime);
   var title = anime.name;
   if (title.length > 30) {
     title = title.substring(0, 43) + "...";
@@ -13,22 +23,22 @@ function create_card(anime) {
   var card_img = document.createElement("div");
   card_img.className = "card-img";
   var spinner = document.createElement("span");
-  spinner.className = "material-symbols-outlined";
-  spinner.id = "spinner";
+  spinner.className = "material-symbols-outlined spinner";
   spinner.textContent = "progress_activity";
   var img = document.createElement("img");
   img.src = anime.thumbnail;
   img.onerror = function () {
-      var placeholder = document.createElement("div");
-      placeholder.textContent = "Error Loading Img";
-      placeholder.style.width = "200px";
-      placeholder.style.height = "290px";
-      placeholder.style.display = "flex";
-      placeholder.style.justifyContent = "center";
-      placeholder.style.alignItems = "center";
+    var placeholder = document.createElement("div");
+    placeholder.textContent = "Error Loading Img";
+    placeholder.style.width = "200px";
+    placeholder.style.height = "290px";
+    placeholder.style.display = "flex";
+    placeholder.style.justifyContent = "center";
+    placeholder.style.alignItems = "center";
 
-      img.replaceWith(placeholder);
+    img.replaceWith(placeholder);
   };
+  // TODO: naprawienie żeby usuwało spinner kiedy załaduje zdjęcie
   //img.onload = function() {
   //  document.getElementById("spinner").style.display = "none";
   //  img.display = "none";
@@ -42,54 +52,99 @@ function create_card(anime) {
   card_div.appendChild(card_img);
   card_div.appendChild(card_text);
 
-  card_div.addEventListener("click", function() {
+  card_div.addEventListener("click", function () {
     const anime_id = anime._id;
-    fetch_episode_list(anime_id);
+    change_to_player(anime_id);
   });
+  document.querySelector(".card-container").appendChild(card_div);
+}
+// TODO: naprawienie żeby img i text nie przenikał przez cardy
+//set_recent_anime()
+async function set_recent_anime() {
+  const response = await invoke("get_recent_anime");
+  const cleanedJsonString = response.slice(1, -1);
+  const jsonObject = JSON.parse("{" + cleanedJsonString);
 
-  document.getElementById("card-container").appendChild(card_div)
-};
+  var anime_data = jsonObject.data.shows.edges;
+  anime_data.forEach((element) => {
+    create_card(element);
+  });
+}
 
-async function fetch_episode_list(id) {
-  const response = await invoke("get_anime_data", {"id": id});
-  console.log(response);
-};
+async function fetch_anime_information(id) {
+  const response = await invoke("get_anime_data", { "id": id });
+  return JSON.parse(response);
+}
 
 async function fetch_search_anime() {
-  const input = document.getElementById('search_text');
+  const input = document.getElementById("search_text");
   const name = input.value;
 
-  if (name != "") try {
-    const response = await invoke('get_search', {"name": name});
-    const cleanedJsonString = response.slice(1, -1);
-    const jsonObject = JSON.parse("{" + cleanedJsonString);
+  if (name != "")
+    try {
+      const response = await invoke("get_search", { name: name });
+      const cleanedJsonString = response.slice(1, -1);
+      const jsonObject = JSON.parse("{" + cleanedJsonString);
 
-    var anime_data = jsonObject.data.shows.edges;
-    anime_data.forEach(element => {
+      var anime_data = jsonObject.data.shows.edges;
+      remove_loading();
+      anime_data.forEach((element) => {
         create_card(element);
-    });
-  } catch (error) {
-    console.error(error);
-  };
-};
+      });
+    } catch (error) {
+      console.error(error);
+    }
+}
 
-document.getElementById("search_text").addEventListener("keypress", function(event) {
+function remove_loading() {
+  document.querySelector(".container").classList.remove("loading");
+  document.querySelector(".container").innerHTML = "";
+  var cards = document.createElement("div");
+  cards.className = "card-container";
+  document.querySelector(".container").appendChild(cards);
+}
+
+function set_loading() {
+  document.querySelector(".container").classList.add("loading");
+  var spinner = document.createElement("span");
+  spinner.className = "material-symbols-outlined spinner";
+  spinner.textContent = "progress_activity";
+  document.querySelector(".container").appendChild(spinner);
+}
+
+document
+  .getElementById("search_text")
+  .addEventListener("keypress", function (event) {
     if (event.key == "Enter") {
-      document.getElementById("card-container").innerHTML = "";
+      document.querySelector(".container").innerHTML = "";
+      set_loading();
       fetch_search_anime();
-    };
+    }
 });
 
-document.querySelector("html").addEventListener("click", function() {
-  $(".sidebar").css("display", "none")
+document.querySelector("#menu").addEventListener("click", function () {
+  $(".sidebar").css("display", "flex");
 });
-document.querySelector(".header").addEventListener("click", function() {
-  $(".sidebar").css("display", "none")
+document.querySelector(".home").addEventListener("click", function () {
+  $(".sidebar").css("display", "none");
+  $(".data-container").css("display", "none");
+  $(".settings-container").css("display", "none");
+  $(".container").css("display", "");
 });
-document.querySelector(".container").addEventListener("click", function() {
-  $(".sidebar").css("display", "none")
+document.querySelector(".container").addEventListener("click", function () {
+  if (document.querySelector(".sidebar").style.display != "") {
+    $(".sidebar").css("display", "none");
+  }
 });
-
-document.querySelector("#menu").addEventListener("click", function() {
-  $(".sidebar").css("display", "flex")
+document.querySelector(".plugins").addEventListener("click", function () {
+  $(".sidebar").css("display", "none");
+  $(".container").css("display", "none");
+  $(".data-container").css("display", "none");
+  $(".settings-container").css("display", "");
+});
+document.querySelector(".settings").addEventListener("click", function () {
+  $(".sidebar").css("display", "none");
+  $(".container").css("display", "none");
+  $(".data-container").css("display", "none");
+  $(".settings-container").css("display", "");
 });

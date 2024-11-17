@@ -10,24 +10,53 @@ static API_WEB: &str = "https://api.allanime.day";
 // wysyła GET do api allmanga z danymi "name" i jest zwracany dict konwertowany na String
 pub async fn get_search_anime(name: &str) -> Result<String, String> {
     let client = Client::new();
-    let variables = "{'search':{'query':'".to_string() + &name + "'},'limit':26,'page':1,'translationType':'sub','countryOrigin':'ALL'}";
-    let extensions = "{'persistedQuery':{'version':1,'sha256Hash': '".to_string() + HASH_SEARCH + "'}}";
+    let variables = "{'search':{'query':'".to_string()
+        + &name
+        + "'},'limit':26,'page':1,'translationType':'sub','countryOrigin':'ALL'}";
+    let extensions =
+        "{'persistedQuery':{'version':1,'sha256Hash': '".to_string() + HASH_SEARCH + "'}}";
     let url = API_WEB.to_string() + "/api?variables=" + &variables + "&extensions=" + &extensions;
 
     let response = client
         .get(url.replace("'", "\""))
-        .header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0")
+        .header(
+            "User-Agent",
+            "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0",
+        )
         .header("Referer", "https://allmanga.to/")
         .send()
         .await;
 
     match response {
-        Ok(resp) => {
-            match resp.text().await {
-                Ok(text) => Ok(text),
-                Err(err) => Err(err.to_string()),
-            }
-        }
+        Ok(resp) => match resp.text().await {
+            Ok(text) => Ok(text),
+            Err(err) => Err(err.to_string()),
+        },
+        Err(err) => Err(err.to_string()),
+    }
+}
+
+pub async fn fetch_recent_anime() -> Result<String, String> {
+    let client = Client::new();
+    let variables = "{'search':{'sortBy':'Recent'},'limit':26,'page':1,'translationType':'sub','countryOrigin':'ALL'}";
+    let extensions = "{'persistedQuery':{'version':1,'sha256Hash': '".to_string() + HASH_SEARCH + "'}}";
+    let url = API_WEB.to_string() + "/api?variables=" + &variables + "&extensions=" + &extensions;
+
+    let response = client
+        .get(url.replace("'", "\""))
+        .header(
+            "User-Agent",
+            "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0",
+        )
+        .header("Referer", "https://allmanga.to/")
+        .send()
+        .await;
+
+    match response {
+        Ok(resp) => match resp.text().await {
+            Ok(text) => Ok(text),
+            Err(err) => Err(err.to_string()),
+        },
         Err(err) => Err(err.to_string()),
     }
 }
@@ -41,21 +70,22 @@ pub async fn extracting_urls(id: &str, ep: &str) -> Result<String, String> {
 
     let response = client
         .get(url.replace("'", "\""))
-        .header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0")
+        .header(
+            "User-Agent",
+            "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0",
+        )
         .header("Referer", "https://allmanga.to/")
         .send()
         .await;
 
     match response {
-        Ok(resp) => {
-            match resp.text().await {
-                Ok(text) => {
-                    println!("{}", text);
-                    Ok(text)
-                },
-                Err(err) => Err(err.to_string()),
+        Ok(resp) => match resp.text().await {
+            Ok(text) => {
+                println!("{}", text);
+                Ok(text)
             }
-        }
+            Err(err) => Err(err.to_string()),
+        },
         Err(err) => Err(err.to_string()),
     }
 }
@@ -69,21 +99,19 @@ pub async fn extracting_anime_data(id: &str) -> Result<String, String> {
 
     let response = client
         .get(url.replace("'", "\""))
-        .header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0")
+        .header( "User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0",)
         .header("Referer", "https://allmanga.to/")
         .send()
         .await;
 
     match response {
-        Ok(resp) => {
-            match resp.text().await {
-                Ok(text) => {
-                    println!("{}",text);
-                    Ok(text)
-                },
-                Err(err) => Err(err.to_string()),
+        Ok(resp) => match resp.text().await {
+            Ok(text) => {
+                println!("{}", text);
+                Ok(text)
             }
-        }
+            Err(err) => Err(err.to_string()),
+        },
         Err(err) => Err(err.to_string()),
     }
 }
