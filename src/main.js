@@ -65,12 +65,28 @@ async function fetch_anime_information(id) {
   try {
     const response = await invoke("get_anime_data", { "id": id });
     const jsonObject = JSON.parse(response);
+    const showData = jsonObject["data"]["show"];
     document.querySelector(".container").style.display = "none";
     var player = document.querySelector(".data-container");
     player.style.display = "";
     console.log(jsonObject)
     console.log(JSON.stringify(jsonObject))
-    player.innerHTML = JSON.stringify(jsonObject);
+    //player.innerHTML = JSON.stringify(jsonObject);
+    document.querySelector("#thumbnail").src = showData["thumbnail"]
+    document.querySelector(".header-text").innerHTML = showData["name"]
+    document.querySelector(".description").innerHTML = showData["description"]
+    // Nie działa zmiana video
+    /*
+    const jsonUrls = get_extracted_urls(showData["_id"], "1")
+    document.querySelector("#video").src = "huh"
+    for(url in jsonUrls["data"]["episode"]["sourceUrls"]) {
+        console.log(url)
+        if(url["streamerId"] == "allanime") {
+          document.querySelector("#video").src = url["sourceUrl"]
+          console.log(url["sourceUrl"])
+          break;
+        }
+    } */
   } catch (error) {}
 }
 
