@@ -72,9 +72,22 @@ async function fetch_anime_information(id) {
     console.log(jsonObject)
     console.log(JSON.stringify(jsonObject))
     //player.innerHTML = JSON.stringify(jsonObject);
+    //zamiana danych na prawidłowe
     document.querySelector("#thumbnail").src = showData["thumbnail"]
     document.querySelector(".header-text").innerHTML = showData["name"]
     document.querySelector(".description").innerHTML = showData["description"]
+    //Ilość odcinków
+    var i = 0;
+    const episodes = document.querySelector(".episodes");
+    console.log("Ilość odcinków: %d", showData["episodeCount"]);
+    while(i < showData["episodeCount"]) {
+      let ep = document.createElement("a")
+      ep.href = "#";
+      ep.className = "episode"
+      ep.innerHTML = "Episode " + (i+1).toString()
+      episodes.appendChild(ep)
+      i++;
+    }
     // Nie działa zmiana video
     /*
     const jsonUrls = get_extracted_urls(showData["_id"], "1")
