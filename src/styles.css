@@ -256,7 +256,6 @@ a {
   overflow-y: auto;
   overflow-x: hidden;
   display: flex;
-  justify-content: center;
   align-items: center;
   flex-direction: column;
   padding: 8px;
