@@ -61,6 +61,23 @@ async function set_recent_anime() {
   });
 }
 
+async function preaper_urls(urls) {
+  urls.forEach(element => {
+    if (element.startsWith("{")) {
+      var dict = JSON.parse(element)
+      urls.push(dict.links[0].link)
+      var num = urls.indexOf(element)
+      console.log(num)
+      urls.splice(num, 1)
+    }
+  });
+  return urls;
+}
+
+function change_player(url) {
+
+}
+
 async function fetch_anime_information(id) {
   try {
     const response = await invoke("get_anime_data", { "id": id });
@@ -80,8 +97,43 @@ async function fetch_anime_information(id) {
       ep.href = "#";
       ep.className = "episode";
       ep.innerHTML = "Episode " + element;
-      document.querySelector(".episodes").appendChild(ep)
+      document.querySelector(".episodes").appendChild(ep);
     });
+    const list = await invoke("get_episode_url", { "id": id, "ep": episode_list[0] });
+    if (list[0] == "500") {
+      // TODO: dodać zabezpieczenia do playera jeśli wywali error
+    }
+    var urls = await preaper_urls(eval(list));
+    console.log(urls)
+    urls.forEach(element => {
+      var url_button = document.createElement("a");
+      url_button.href = "#"
+      url_button.className = "player-selector"
+      if (element.includes("ok.ru")) {
+        url_button.innerHTML = "ok.ru"
+        url_button.addEventListener("click", function() {
+          const url = element;
+          change_player(url);
+        });
+        document.querySelector(".urls-player").appendChild(url_button)
+      }
+      if (element.includes("mp4upload.com")) {
+        url_button.innerHTML = "mp4upload"
+        url_button.addEventListener("click", function() {
+          const url = element;
+          change_player(url);
+        });
+        document.querySelector(".urls-player").appendChild(url_button)
+      }
+      if (element.includes("myanime.sharepoint.com")) {
+        url_button.innerHTML = "myanime"
+        url_button.addEventListener("click", function() {
+          const url = element;
+          change_player(url);
+        });
+        document.querySelector(".urls-player").appendChild(url_button)
+      }
+    })
     // Nie działa zmiana video
     /*
     const jsonUrls = get_extracted_urls(showData["_id"], "1")
@@ -142,19 +194,6 @@ document
       fetch_search_anime();
     }
 });
-document.getElementById("test").addEventListener("click", function(){
-  $(".sidebar").css("display", "none");
-  $(".data-container").css("display", "");
-  $(".settings-container").css("display", "none");
-  $(".container").css("display", "none");
-})
-async function get_extracted_urls(id, ep) {
-  const response = await invoke("get_episode_url", { "id": id, "ep": ep });
-  console.log(response)
-}
-document.getElementById("test2").addEventListener("click", function(){
-  get_extracted_urls("bLM8BaZEH2XaS3iRu", "1")
-})
 document.querySelector("#menu").addEventListener("click", function () {
   $(".sidebar").css("display", "flex");
 });

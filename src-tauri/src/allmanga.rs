@@ -66,7 +66,6 @@ pub async fn fetch_recent_anime() -> Result<String, String> {
 
 async fn fetch_url(url: &str) -> Result<String, String> {
     let client = Client::new();
-    println!("{}", url);
     let response = client
         .get(url.replace("'", "\""))
         .header(
@@ -86,22 +85,20 @@ async fn fetch_url(url: &str) -> Result<String, String> {
     }
 }
 
+fn decode_text(text_string: &str, replacements: &HashMap<&str, &str>) -> String {
+    let re = Regex::new(r"(?s)..").unwrap();
+    let mut text_string = re.replace_all(text_string, |caps: &regex::Captures| {
+        format!("{}\n", &caps[0])
+    }).to_string();
 
-fn decode_text(text: &str, replacements: &HashMap<&str, &str>) -> String {
-    let mut processed_text = String::new();
-    for chunk in text.as_bytes().chunks(2) {
-        let chunk_str = std::str::from_utf8(chunk).unwrap_or("");
-        processed_text.push_str(chunk_str);
-        processed_text.push('\n');
-    }
-
-    let mut result = processed_text.clone();
     for (pattern, replacement) in replacements {
-        let regex = Regex::new(pattern).expect("Invalid regex");
-        result = regex.replace_all(&result, *replacement).to_string();
+        let re = Regex::new(pattern).unwrap();
+        text_string = re.replace_all(&text_string, *replacement).to_string();
     }
 
-    result.replace('\n', "").replace("/clock", "/clock.json")
+    text_string = text_string.replace('\n', "").replace("/clock", "/clock.json");
+    
+    text_string
 }
 
 fn find_url(url: &str, source_name: &str, source_names: &[&str]) -> String {
@@ -113,38 +110,39 @@ fn find_url(url: &str, source_name: &str, source_names: &[&str]) -> String {
 }
 
 async fn search_urls(dict: &str) -> String {
-    let source_names = vec!["Sak", "S-mp4", "Luf-mp4", "Mp4", "Ok"];
-    let replacements: HashMap<&str, &str> = HashMap::from([
-        ("^01$", "9"),
-        ("^08$", "0"),
-        ("^05$", "="),
-        ("^0a$", "2"),
-        ("^0b$", "3"),
-        ("^0c$", "4"),
-        ("^07$", "?"),
-        ("^00$", "8"),
-        ("^5c$", "d"),
-        ("^0f$", "7"),
-        ("^5e$", "f"),
-        ("^17$", "/"),
-        ("^54$", "l"),
-        ("^09$", "1"),
-        ("^48$", "p"),
-        ("^4f$", "w"),
-        ("^0e$", "6"),
-        ("^5b$", "c"),
-        ("^5d$", "e"),
-        ("^0d$", "5"),
-        ("^53$", "k"),
-        ("^1e$", "&"),
-        ("^5a$", "b"),
-        ("^59$", "a"),
-        ("^4a$", "r"),
-        ("^4c$", "t"),
-        ("^4e$", "v"),
-        ("^57$", "o"),
-        ("^51$", "i"),
-    ]);
+    let source_names = vec!["Sak", "S-mp4", "Mp4", "Ok"]; // TODO: add to player support m3u8 "Luf-mp4"
+    let replacements: HashMap<&str, &str> = [
+        (r"01", "9"),
+        (r"08", "0"),
+        (r"05", "="),
+        (r"0a", "2"),
+        (r"0b", "3"),
+        (r"0c", "4"),
+        (r"07", "?"),
+        (r"00", "8"),
+        (r"5c", "d"),
+        (r"0f", "7"),
+        (r"5e", "f"),
+        (r"17", "/"),
+        (r"54", "l"),
+        (r"09", "1"),
+        (r"48", "p"),
+        (r"4f", "w"),
+        (r"0e", "6"),
+        (r"5b", "c"),
+        (r"5d", "e"),
+        (r"0d", "5"),
+        (r"53", "k"),
+        (r"1e", "&"),
+        (r"5a", "b"),
+        (r"59", "a"),
+        (r"4a", "r"),
+        (r"4c", "t"),
+        (r"4e", "v"),
+        (r"57", "o"),
+        (r"51", "i"),
+    ].iter().cloned().collect();
+    let mut tmp: Vec<String> = ["500".to_string()].to_vec();
 
     let parsed: HashMap<String, Value> = serde_json::from_str(dict).expect("");
     if let Some(source_urls) = parsed
@@ -153,7 +151,7 @@ async fn search_urls(dict: &str) -> String {
         .and_then(|episode| episode.get("sourceUrls"))
         .and_then(|urls| urls.as_array())
     {
-        let urls: Vec<String> = source_urls
+        let mut urls: Vec<String> = source_urls
             .iter()
             .filter_map(|entry| {
                 let url = entry.get("sourceUrl")?.as_str()?;
@@ -161,20 +159,27 @@ async fn search_urls(dict: &str) -> String {
                 Some(find_url(url, source_name, &source_names))
             })
             .filter(|url| !url.is_empty())
+            .clone()
             .collect();
 
         let decoded_urls: Vec<String> = urls
             .iter()
             .filter(|url| url.starts_with("--"))
-            .map(|url| format!("http://allanime.day/apivtwo/clock.json?id={}", decode_text(&url[2..], &replacements)))
+            .map(|url| format!("http://allanime.day{}", decode_text(&url[2..], &replacements)))
             .collect();
-
+        
+        urls.retain(|s| !s.starts_with("--"));
+        
         for url in decoded_urls {
-            println!("{:?}", fetch_url(&url).await);
+            let data = match fetch_url(&url).await {
+                Ok(s) => s,
+                Err(e) => { e }
+            };
+            urls.push(data);
         }
+        tmp = urls;
     }
-    
-    return dict.to_string();
+    format!("{:?}", tmp)
 }
 
 // wysyła request GET do api allmanga i odbiera zaszyfrowane linki
