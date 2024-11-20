@@ -75,7 +75,72 @@ async function preaper_urls(urls) {
 }
 
 function change_player(url) {
+  document.querySelector(".player").innerHTML = "";
+  const video = document.createElement("iframe");
+  video.width = "854";
+  video.height = "480";
+  video.frameborder = "0";
+  video.allowFullscreen = true;
+  if (url.includes("myanime.sharepoint.com")) {
+    const video = document.createElement("video");
+    const source = document.createElement("source");
+    video.width = "854";
+    video.height = "480";
+    video.controls = true;
+    source.src = url;
+    source.id = "video";
+    source.type = "video/mp4"
+    video.appendChild(source);
+    document.querySelector(".player").appendChild(video);
+    return
+  }
+  if (url.includes("ok.ru")) {
+    video.src = url;
+  }
+  if (url.includes("mp4upload.com")) {
+    video.src = url;
+  }
+  document.querySelector(".player").appendChild(video);
+}
 
+async function preaper_episode(id, ep) {
+  document.querySelector(".urls-player").innerHTML = "";
+  const list = await invoke("get_episode_url", { "id": id, "ep": ep });
+  if (list[0] == "500") {
+    // TODO: dodać zabezpieczenia do playera jeśli wywali error
+  }
+  var urls = await preaper_urls(eval(list));
+  console.log(urls)
+  urls.forEach(element => {
+    var url_button = document.createElement("a");
+    url_button.href = "#"
+    url_button.className = "player-selector"
+    if (element.includes("myanime.sharepoint.com")) {
+      url_button.innerHTML = "myanime"
+      url_button.addEventListener("click", function() {
+        const url = element;
+        change_player(url);
+      });
+      document.querySelector(".urls-player").appendChild(url_button)
+      change_player(url);
+    }
+    if (element.includes("ok.ru")) {
+      url_button.innerHTML = "ok.ru"
+      url_button.addEventListener("click", function() {
+        const url = element;
+        change_player(url);
+      });
+      document.querySelector(".urls-player").appendChild(url_button)
+    }
+    if (element.includes("mp4upload.com")) {
+      url_button.innerHTML = "mp4upload"
+      url_button.addEventListener("click", function() {
+        const url = element;
+        change_player(url);
+      });
+      document.querySelector(".urls-player").appendChild(url_button)
+    }
+  })
 }
 
 async function fetch_anime_information(id) {
@@ -97,43 +162,14 @@ async function fetch_anime_information(id) {
       ep.href = "#";
       ep.className = "episode";
       ep.innerHTML = "Episode " + element;
+      ep.addEventListener("click", function() {
+        const ep = element
+        const id_anime = id;
+        preaper_episode(id_anime, ep)
+      })
       document.querySelector(".episodes").appendChild(ep);
     });
-    const list = await invoke("get_episode_url", { "id": id, "ep": episode_list[0] });
-    if (list[0] == "500") {
-      // TODO: dodać zabezpieczenia do playera jeśli wywali error
-    }
-    var urls = await preaper_urls(eval(list));
-    console.log(urls)
-    urls.forEach(element => {
-      var url_button = document.createElement("a");
-      url_button.href = "#"
-      url_button.className = "player-selector"
-      if (element.includes("ok.ru")) {
-        url_button.innerHTML = "ok.ru"
-        url_button.addEventListener("click", function() {
-          const url = element;
-          change_player(url);
-        });
-        document.querySelector(".urls-player").appendChild(url_button)
-      }
-      if (element.includes("mp4upload.com")) {
-        url_button.innerHTML = "mp4upload"
-        url_button.addEventListener("click", function() {
-          const url = element;
-          change_player(url);
-        });
-        document.querySelector(".urls-player").appendChild(url_button)
-      }
-      if (element.includes("myanime.sharepoint.com")) {
-        url_button.innerHTML = "myanime"
-        url_button.addEventListener("click", function() {
-          const url = element;
-          change_player(url);
-        });
-        document.querySelector(".urls-player").appendChild(url_button)
-      }
-    })
+    await preaper_episode(id, episode_list[0])
     // Nie działa zmiana video
     /*
     const jsonUrls = get_extracted_urls(showData["_id"], "1")
