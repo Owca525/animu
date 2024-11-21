@@ -1,5 +1,23 @@
 const { invoke } = window.__TAURI__.core;
 
+var title = "";
+
+function set_theme(theme) {
+  document.body.setAttribute("class", theme)
+}
+
+if (localStorage.getItem('theme') == null) {
+  localStorage.setItem("theme", "light");
+  set_theme(localStorage.getItem("theme"));
+} else {
+  set_theme(localStorage.getItem("theme"));
+  if (localStorage.getItem("theme") == "light") {
+    document.querySelector("#change-theme").textContent = "dark_mode"
+  } else {
+    document.querySelector("#change-theme").textContent = "light_mode"
+  };
+}
+
 function create_card(anime) {
   console.log(anime);
   var title = anime.name;
@@ -75,23 +93,14 @@ async function preaper_urls(urls) {
 }
 
 function change_player(url) {
-  document.querySelector(".player").innerHTML = "";
+  document.querySelector("#video-container").innerHTML = "";
   const video = document.createElement("iframe");
-  video.width = "854";
-  video.height = "480";
+  video.width = "640";
+  video.height = "360";
   video.frameborder = "0";
   video.allowFullscreen = true;
   if (url.includes("myanime.sharepoint.com")) {
-    const video = document.createElement("video");
-    const source = document.createElement("source");
-    video.width = "854";
-    video.height = "480";
-    video.controls = true;
-    source.src = url;
-    source.id = "video";
-    source.type = "video/mp4"
-    video.appendChild(source);
-    document.querySelector(".player").appendChild(video);
+    createVideoPlayer("#video-container", url, title)
     return
   }
   if (url.includes("ok.ru")) {
@@ -100,7 +109,7 @@ function change_player(url) {
   if (url.includes("mp4upload.com")) {
     video.src = url;
   }
-  document.querySelector(".player").appendChild(video);
+  document.querySelector("#video-container").appendChild(video);
 }
 
 async function preaper_episode(id, ep) {
@@ -121,8 +130,8 @@ async function preaper_episode(id, ep) {
         const url = element;
         change_player(url);
       });
+      change_player(element);
       document.querySelector(".urls-player").appendChild(url_button)
-      change_player(url);
     }
     if (element.includes("ok.ru")) {
       url_button.innerHTML = "ok.ru"
@@ -157,6 +166,7 @@ async function fetch_anime_information(id) {
     document.querySelector(".description").innerHTML = showData["description"]
     const episode_list = showData.availableEpisodesDetail.sub;
     episode_list.reverse();
+    title = showData["name"];
     episode_list.forEach(element => {
       let ep = document.createElement("a");
       ep.href = "#";
@@ -170,18 +180,6 @@ async function fetch_anime_information(id) {
       document.querySelector(".episodes").appendChild(ep);
     });
     await preaper_episode(id, episode_list[0])
-    // Nie działa zmiana video
-    /*
-    const jsonUrls = get_extracted_urls(showData["_id"], "1")
-    document.querySelector("#video").src = "huh"
-    for(url in jsonUrls["data"]["episode"]["sourceUrls"]) {
-        console.log(url)
-        if(url["streamerId"] == "allanime") {
-          document.querySelector("#video").src = url["sourceUrl"]
-          console.log(url["sourceUrl"])
-          break;
-        }
-    } */
   } catch (error) {}
 }
 
@@ -221,9 +219,7 @@ function set_loading() {
   document.querySelector(".container").appendChild(spinner);
 }
 
-document
-  .getElementById("search_text")
-  .addEventListener("keypress", function (event) {
+document.getElementById("search_text").addEventListener("keypress", function (event) {
     if (event.key == "Enter") {
       document.querySelector(".container").innerHTML = "";
       set_loading();
@@ -255,4 +251,19 @@ document.querySelector(".settings").addEventListener("click", function () {
   $(".container").css("display", "none");
   $(".data-container").css("display", "none");
   $(".settings-container").css("display", "");
+});
+
+console.log(window.matchMedia('(prefers-color-scheme: dark)').matches)
+
+// Change theme
+document.querySelector("#change-theme").addEventListener("click", function() {
+  if (localStorage.getItem("theme") == "light") {
+    set_theme("dark");
+    localStorage.setItem("theme", "dark");
+    this.textContent = "light_mode"
+  } else {
+    set_theme("light");
+    localStorage.setItem("theme", "light");
+    this.textContent = "dark_mode"
+  };
 });
