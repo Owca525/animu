@@ -291,7 +291,6 @@ a {
   display: flex;
   justify-content: start;
   width: 100%;
-  background-color: var(--primary-300);
   height: auto;
   padding: 1em;
 }
