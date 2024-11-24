@@ -1,91 +1,112 @@
 .light {
-  --text: #09100c;
+  --text: #0c0c0d;
 
-  --background-50: #ecf9f1;
-  --background-100: #d9f2e3;
-  --background-200: #b3e6c7;
-  --background-300: #8cd9ab;
-  --background-400: #66cc8f;
-  --background-500: #40bf73;
-  --background-600: #33995c;
-  --background-700: #267345;
+  --background-50: #f1f1f4;
+  --background-100: #e2e4e9;
+  --background-200: #c5c9d3;
+  --background-300: #a9aebc;
+  --background-400: #8c92a6;
+  --background-500: #6f7790;
+  --background-600: #595f73;
+  --background-700: #434856;
+  --background-800: #2c303a;
+  --background-900: #16181d;
+  --background-950: #0b0c0e;
 
-  --primary-50: #eafaf1;
-  --primary-100: #d5f6e3;
-  --primary-200: #abedc7;
-  --primary-300: #82e3aa;
-  --primary-400: #58da8e;
-  --primary-500: #2ed172;
-  --primary-600: #25a75b;
-  --primary-700: #1c7d44;
-  --primary-800: #12542e;
+  --primary-50: #f0f0f5;
+  --primary-100: #e0e2eb;
+  --primary-200: #c1c4d7;
+  --primary-300: #a2a7c3;
+  --primary-400: #8489ae;
+  --primary-500: #656c9a;
+  --primary-600: #51567b;
+  --primary-700: #3c415d;
+  --primary-800: #282b3e;
+  --primary-900: #14161f;
+  --primary-950: #0a0b0f;
 
-  --secondary-50: #e8fdf1;
-  --secondary-100: #d1fae2;
-  --secondary-200: #a3f5c5;
-  --secondary-300: #75f0a8;
-  --secondary-400: #46ec8b;
-  --secondary-500: #18e76e;
-  --secondary-600: #13b958;
-  --secondary-700: #0f8a42;
-  --secondary-800: #0a5c2c;
+  --secondary-50: #eeeff6;
+  --secondary-100: #dee0ed;
+  --secondary-200: #bdc0db;
+  --secondary-300: #9ca1c9;
+  --secondary-400: #7a82b8;
+  --secondary-500: #5962a6;
+  --secondary-600: #474f85;
+  --secondary-700: #363b63;
+  --secondary-800: #242742;
+  --secondary-900: #121421;
+  --secondary-950: #090a11;
 
-  --accent-50: #e5fff0;
-  --accent-100: #ccffe1;
-  --accent-200: #99ffc4;
-  --accent-300: #66ffa6;
-  --accent-400: #33ff88;
-  --accent-500: #00ff6a;
-  --accent-600: #00cc55;
-  --accent-700: #009940;
-  --accent-800: #00662b;
+  --accent-50: #edeef7;
+  --accent-100: #dcdeef;
+  --accent-200: #b8bde0;
+  --accent-300: #959cd0;
+  --accent-400: #717bc1;
+  --accent-500: #4e59b1;
+  --accent-600: #3e488e;
+  --accent-700: #2f366a;
+  --accent-800: #1f2447;
+  --accent-900: #101223;
+  --accent-950: #080912;
 }
 .dark {
-  --text: #eff6f1;
+  --text: #f2f2f3;
 
-  --background-50: #06130b;
-  --background-100: #0d2617;
-  --background-200: #194d2e;
-  --background-300: #267345;
-  --background-400: #33995c;
-  --background-500: #40bf73;
-  --background-600: #66cc8f;
-  --background-700: #8cd9ab;
+  --background-50: #0b0c0e;
+  --background-100: #16181d;
+  --background-200: #2c303a;
+  --background-300: #434856;
+  --background-400: #595f73;
+  --background-500: #6f7790;
+  --background-600: #8c92a6;
+  --background-700: #a9aebc;
+  --background-800: #c5c9d3;
+  --background-900: #e2e4e9;
+  --background-950: #f1f1f4;
 
-  --primary-50: #05150b;
-  --primary-100: #092a17;
-  --primary-200: #12542e;
-  --primary-300: #1c7d44;
-  --primary-400: #25a75b;
-  --primary-500: #2ed172;
-  --primary-600: #58da8e;
-  --primary-700: #82e3aa;
-  --primary-800: #abedc7;
+  --primary-50: #0a0b0f;
+  --primary-100: #14161f;
+  --primary-200: #282b3e;
+  --primary-300: #3c415d;
+  --primary-400: #51567b;
+  --primary-500: #656c9a;
+  --primary-600: #8489ae;
+  --primary-700: #a2a7c3;
+  --primary-800: #c1c4d7;
+  --primary-900: #e0e2eb;
+  --primary-950: #f0f0f5;
 
-  --secondary-50: #02170b;
-  --secondary-100: #052e16;
-  --secondary-200: #0a5c2c;
-  --secondary-300: #0f8a42;
-  --secondary-400: #13b958;
-  --secondary-500: #18e76e;
-  --secondary-600: #46ec8b;
-  --secondary-700: #75f0a8;
-  --secondary-800: #a3f5c5;
+  --secondary-50: #090a11;
+  --secondary-100: #121421;
+  --secondary-200: #242742;
+  --secondary-300: #363b63;
+  --secondary-400: #474f85;
+  --secondary-500: #5962a6;
+  --secondary-600: #7a82b8;
+  --secondary-700: #9ca1c9;
+  --secondary-800: #bdc0db;
+  --secondary-900: #dee0ed;
+  --secondary-950: #eeeff6;
 
-  --accent-50: #001a0b;
-  --accent-100: #003315;
-  --accent-200: #00662b;
-  --accent-300: #009940;
-  --accent-400: #00cc55;
-  --accent-500: #00ff6a;
-  --accent-600: #33ff88;
-  --accent-700: #66ffa6;
-  --accent-800: #99ffc4;
+  --accent-50: #080912;
+  --accent-100: #101223;
+  --accent-200: #1f2447;
+  --accent-300: #2f366a;
+  --accent-400: #3e488e;
+  --accent-500: #4e59b1;
+  --accent-600: #717bc1;
+  --accent-700: #959cd0;
+  --accent-800: #b8bde0;
+  --accent-900: #dcdeef;
+  --accent-950: #edeef7;
+
 }
 
 * {
   font-family: Arial, Helvetica, sans-serif;
   color: var(--text);
+  margin: 0px;
+  padding: 0px;
 }
 
 .main-container,
@@ -128,16 +149,14 @@ input[type="text"] {
 }
 
 .container {
-  padding: 16px;
+  padding: 18px;
   padding-top: 5em;
-  width: 97%;
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   gap: 16px;
-  margin: 0px;
 }
 .main-text {
   display: flex;
@@ -171,6 +190,7 @@ img {
 
 .spinner {
   animation: spin 1s linear infinite;
+  color: white;
 }
 
 @keyframes spin {
@@ -189,11 +209,21 @@ img {
   align-items: center;
   object-fit: cover;
 }
+.error-img {
+  width: 200px;
+  height: 290px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--background-200);
+  border-radius: 4px;
+  box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.2);
+}
 .card {
   z-index: 1;
   width: 220px;
   max-height: 350px;
-  height: 100%;
+  height: auto;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -249,12 +279,11 @@ a {
 .scroll {
   overflow-y: hidden;
   overflow-x: auto;
-  height: 350px;
+  max-height: 350px;
+  height: auto;
   display: grid;
   grid-auto-flow: column;
-  white-space: nowrap;
-  flex-wrap: nowrap;
-  gap: 26px;
+  justify-content: start;
 }
 
 .settings-container {
@@ -276,87 +305,99 @@ a {
   cursor: pointer;
 }
 
-/* player */
-.data-container {
+.information-container {
+  z-index: 100;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
-  width: 98.8%;
-  padding-top: 5em;
-  gap: 8px;
-}
-
-.information {
-  display: flex;
-  justify-content: start;
   width: 100%;
-  height: auto;
+  height: 100%;
+  position: absolute;
+}
+.box-information {
+  background-color: var(--background-200);
   padding: 1em;
-}
-.information-img {
-  margin-bottom: -10em;
-  max-width: 200px;
-  max-height: 290px;
-  margin-left: 1em;
-}
-.text-information {
+  padding-left: 1.5em;
+  padding-right: 1.5em;
+  border-radius: 4px;
+  gap: 1em;
   display: flex;
-  justify-content: start;
+  align-items: start;
   flex-direction: column;
-  margin-left: 1em;
-  gap: 12px;
-  overflow: hidden;
+  max-width: 70%;
+}
+.box-top {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+}
+.box-text {
+  margin-top: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+.box-episodes {
+  display: flex;
+  flex-wrap: wrap;
+  overflow: auto;
+  gap: 8px;
+  max-height: 10em;
+}
+.episode {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  background-color: var(--primary-300);
+  cursor: pointer;
+  box-shadow: 0.5px 0.5px 20px rgba(0, 0, 0, 0.1);
+}
+.text-episode {
+  font-size: larger;
+  font-weight: 600;
 }
 .header-text {
   font-size: 24px;
   font-weight: 600;
 }
 
+/* player */
 .player-container {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-}
-.episodes {
-  border-color: #121212;
-  border-style: solid;
-  width: 160px;
-  height: 360px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-}
-.episode {
-  font-size: large;
-  padding: 8px;
-  width: 100%;
-}
-.episode:hover {
-  background-color: var(--accent-300);
-}
-.urls-player {
-  margin-top: 4px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 18px;
+  height: 100%;
+  z-index: 120;
+  position: absolute;
 }
 
-.none {
-  flex: 1;
-  display: flex;
-  padding-left: 1em;
-  justify-content: left;
-  align-items: center;
-}
 #video-container {
-  border-radius: 8px;
-  box-shadow: 0.5px 0.5px 20px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover
 }
-video {
-  border-radius: 8px;
+
+.control:hover {
+  color: var(--accent-800);
+}
+
+.set-back {
+  cursor: pointer;
+  font-size: large;
+  padding: 8px;
+  border-radius: 4px;
+  color: white;
+}
+.set-back:hover {
+  color: var(--accent-800);
+  background-color: rgb(0, 0, 0, 0.5);
 }

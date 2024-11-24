@@ -1,4 +1,5 @@
 let hideTimer;
+let settings_on;
 
 function run_events() {
     const video = document.querySelector('#video');
@@ -10,6 +11,45 @@ function run_events() {
     const currentTimeDisplay = document.querySelector('#current-time');
     const durationDisplay = document.querySelector('#duration');
     const volumeSlider = document.querySelector('#volume-slider');
+    const progress = document.getElementById('progress');
+    const thumb = document.getElementById('thumb');
+    const show = document.querySelector(".show-time");
+    const loader = document.querySelector('.loader');
+    const menu = document.querySelector(".settings-player");
+    const settings_container = document.querySelector(".settings-container")
+    const menu_resolution = document.querySelector(".res");
+    const menu_url = document.querySelector(".url");
+
+    // TODO: Fix this
+    menu_url.addEventListener("click", function() {
+        document.querySelector(".main-settings").style.display = "none";
+        this.style.display = "";
+    });
+
+    menu_resolution.addEventListener("click", function() {
+        document.querySelector(".main-settings").style.display = "none";
+        this.style.display = "";
+    });
+    
+    container.addEventListener("click", function() {
+        settings_on = false;
+        document.querySelector(".main-settings").style.display = "none";
+    });
+
+    settings_container.addEventListener("click", function(event) {
+        event.stopPropagation();
+    });
+
+    menu.addEventListener("click", function(event) {
+        event.stopPropagation();
+        if (document.querySelector(".main-settings").style.display == "none") {
+            document.querySelector(".main-settings").style.display = "";
+            settings_on = true;
+        } else {
+            document.querySelector(".main-settings").style.display = "none";
+            settings_on = false;
+        };
+    });
 
     playPauseButton.addEventListener('click', function() {
         if (video.paused) {
@@ -26,8 +66,10 @@ function run_events() {
     });
     
     video.addEventListener('timeupdate', function() {
-        currentTimeDisplay.textContent = formatTime(video.currentTime);
-        seekBar.value = (video.currentTime / video.duration) * 100;
+        const percent = (video.currentTime / video.duration) * 100;
+        currentTimeDisplay.innerHTML = formatTime(video.currentTime)
+        progress.style.width = percent + '%';
+        thumb.style.left = percent + '%';
     });
     video.addEventListener("click", function() {
         if (video.paused) {
@@ -38,6 +80,22 @@ function run_events() {
             playPauseButton.textContent = 'play_arrow';
         }
     })
+
+    video.addEventListener('loadstart', () => {
+        loader.style.display = 'block';
+    });
+    
+    video.addEventListener('loadeddata', () => {
+        loader.style.display = 'none';
+    });
+
+    video.addEventListener('waiting', () => {
+        loader.style.display = 'block';
+    });
+    
+    video.addEventListener('playing', () => {
+        loader.style.display = 'none';
+    });
     
     seekBar.addEventListener('input', function() {
         const value = seekBar.value * video.duration / 100;
@@ -76,25 +134,56 @@ function run_events() {
             fullscreenButton.textContent = "crop_free";
         }
     });
+
+    seekBar.addEventListener('click', (event) => {
+        const rect = seekBar.getBoundingClientRect();
+        const offsetX = event.clientX - rect.left;
+        const totalWidth = rect.width;
+        const percent = offsetX / totalWidth;
+        const newTime = percent * video.duration;
+        video.currentTime = newTime;
+    });
+    
+    seekBar.addEventListener('mousemove', (event) => {
+        const rect = seekBar.getBoundingClientRect();
+        const offsetX = event.clientX - rect.left;
+        const totalWidth = rect.width;
+        const percent = offsetX / totalWidth;
+        const newTime = percent * video.duration;
+        if (!isNaN(newTime)) {
+            show.style.display = "";
+            show.style.left = ((percent * 100) - 1.2) + "%";
+            show.innerHTML = formatTime(newTime);
+        }
+        thumb.style.display = 'block';
+    });
+    
+    seekBar.addEventListener('mouseleave', () => {
+        show.style.display = 'none';
+    });
     
     function showElement() {
         document.querySelector(".controls").classList.remove('hidden');
         document.querySelector(".fade-effect").classList.remove('hidden');
-        document.querySelector(".episode-range").classList.remove('hidden');
         document.querySelector(".title").classList.remove('hidden');
+        document.querySelector(".set-back").classList.remove('hidden');
+        document.querySelector(".seek-bar-container").classList.remove('hidden');
     }
     
     function hideElement() {
         document.querySelector(".controls").classList.add('hidden');
         document.querySelector(".fade-effect").classList.add('hidden');
-        document.querySelector(".episode-range").classList.add('hidden');
         document.querySelector(".title").classList.add('hidden');
+        document.querySelector(".set-back").classList.add('hidden');
+        document.querySelector(".seek-bar-container").classList.add('hidden');
     }
     
     container.addEventListener('mousemove', function() {
         showElement();
-        clearTimeout(hideTimer);
-        hideTimer = setTimeout(hideElement, 500);
+        if (settings_on != true) {
+            clearTimeout(hideTimer);
+            hideTimer = setTimeout(hideElement, 500);
+        }
     });
     hideTimer = setTimeout(hideElement, 500);
     
