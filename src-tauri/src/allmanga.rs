@@ -110,7 +110,7 @@ fn find_url(url: &str, source_name: &str, source_names: &[&str]) -> String {
 }
 
 async fn search_urls(dict: &str) -> String {
-    let source_names = vec!["Sak", "S-mp4", "Luf-mp4"]; // "Mp4" "Ok"
+    let source_names = vec!["Sak", "S-mp4"]; // "Mp4" "Ok" 3party players / Luf-mp4 add support m3u8
     let replacements: HashMap<&str, &str> = [
         (r"01", "9"),
         (r"08", "0"),

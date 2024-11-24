@@ -1,7 +1,5 @@
 const { invoke } = window.__TAURI__.core;
 
-var title = "";
-
 function set_theme(theme) {
   document.body.setAttribute("class", theme);
 }
@@ -19,8 +17,10 @@ if (localStorage.getItem("theme") == null) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+  var title = "";
   run_events();
-  set_recent_anime();
+  // Zalecane mieć to skomentowane
+  //set_recent_anime();
 
   // Eventy
   document.querySelector(".set-back").addEventListener("click", function () {
@@ -175,13 +175,52 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   // player section
+  function change_url(url) {
+    const video = document.getElementById("video");
+    if (element.includes("m3u8")) {
+      // TODO: add support m3u8 format
+    } else {
+      video.src = url;
+    }
+  }
+
   async function set_player(id_anime, ep) {
-    document.querySelector(".player-container").style.display = "";
-    document.querySelector(".information-container").style.display = "none";
-    const response = await invoke("get_episode_url", { "id": id_anime, "ep": ep });
-    console.log(response)
+    try {
+      document.querySelector(".player-container").style.display = "";
+      document.querySelector(".information-container").style.display = "none";
+      const response = await invoke("get_episode_url", { "id": id_anime, "ep": ep });
+      var urls = [];
+      console.log(response)
+      console.log(JSON.parse(response))
+      JSON.parse(response).forEach(element => {
+        urls.push(JSON.parse(element)["links"][0]["link"]);
+      });
+      document.querySelector("#video").src = urls[0];
+      document.querySelector(".title").innerHTML = title + " Episode: " + ep;
+      urls.forEach(element => {
+        var button = document.createElement("div");
+        button.className = "setting-button";
+        if (element.includes("m3u8")) {
+          button.innerHTML = "m3u8";
+          button.addEventListener("click", function() {
+            const url = element;
+            change_url(url);
+          });
+          document.querySelector(".urls").appendChild(button);
+        }
+        if (element.includes("myanime")) {
+          button.innerHTML = "Myanime";
+          button.addEventListener("click", function() {
+            const url = element;
+            change_url(url);
+          });
+          document.querySelector(".urls").appendChild(button);
+        }
+      })
+    } catch (error) {
+      console.log(error)
+    }
   };
-  // end
 
   // information
   async function fetch_anime_information(id) {
@@ -219,6 +258,7 @@ document.addEventListener("DOMContentLoaded", function () {
       box_img.appendChild(img);
 
       document.querySelector(".header-text").innerHTML = showData["name"];
+      title = showData["name"];
       document.querySelector(".description").innerHTML =
         showData["description"];
       const episode_list = showData.availableEpisodesDetail.sub;
@@ -236,7 +276,9 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelector(".box-episodes").appendChild(ep);
       });
       //await preaper_episode(id, episode_list[0])
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
   }
   // img function
   function remove_loading() {

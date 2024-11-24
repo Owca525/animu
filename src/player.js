@@ -17,23 +17,24 @@ function run_events() {
     const loader = document.querySelector('.loader');
     const menu = document.querySelector(".settings-player");
     const settings_container = document.querySelector(".settings-container")
-    const menu_resolution = document.querySelector(".res");
+    const menu_resolution = document.querySelector(".resolution");
     const menu_url = document.querySelector(".url");
 
-    // TODO: Fix this
-    menu_url.addEventListener("click", function() {
+    menu_url.addEventListener("click", function(event) {
         document.querySelector(".main-settings").style.display = "none";
-        this.style.display = "";
+        document.querySelector(".urls").style.display = "";
     });
 
-    menu_resolution.addEventListener("click", function() {
+    menu_resolution.addEventListener("click", function(event) {
         document.querySelector(".main-settings").style.display = "none";
-        this.style.display = "";
+        document.querySelector(".res").style.display = "";
     });
     
     container.addEventListener("click", function() {
         settings_on = false;
         document.querySelector(".main-settings").style.display = "none";
+        document.querySelector(".urls").style.display = "none";
+        document.querySelector(".res").style.display = "none";
     });
 
     settings_container.addEventListener("click", function(event) {
@@ -47,6 +48,8 @@ function run_events() {
             settings_on = true;
         } else {
             document.querySelector(".main-settings").style.display = "none";
+            document.querySelector(".urls").style.display = "none";
+            document.querySelector(".res").style.display = "none";
             settings_on = false;
         };
     });
