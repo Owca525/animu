@@ -20,7 +20,7 @@ if (localStorage.getItem("theme") == null) {
 
 document.addEventListener("DOMContentLoaded", function () {
   run_events();
-  //set_recent_anime();
+  set_recent_anime();
 
   // Eventy
   document.querySelector(".set-back").addEventListener("click", function () {
