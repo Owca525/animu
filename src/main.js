@@ -139,6 +139,7 @@ document.addEventListener("DOMContentLoaded", function () {
     card_img.className = "card-img";
     const img = document.createElement("img");
     img.src = anime.thumbnail;
+    img.style.display = "none";
     const load = document.createElement("div");
     load.className = "error-img";
     const spinner = document.createElement("div");
@@ -156,6 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
     card_img.appendChild(load);
     img.onload = function () {
       load.style.display = "none";
+      img.style.display = "";
     };
     var card_text = document.createElement("div");
     card_text.className = "text-card";
@@ -173,24 +175,10 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   // player section
-  async function preaper_urls(urls) {
-    urls.forEach((element) => {
-      if (element.startsWith("{")) {
-        var dict = JSON.parse(element);
-        urls.push(dict.links[0].link);
-        var num = urls.indexOf(element);
-        console.log(num);
-        urls.splice(num, 1);
-      }
-    });
-    return urls;
-  };
-
   async function set_player(id_anime, ep) {
     document.querySelector(".player-container").style.display = "";
     document.querySelector(".information-container").style.display = "none";
     const response = await invoke("get_episode_url", { "id": id_anime, "ep": ep });
-    // TODO: Make player work 
     console.log(response)
   };
   // end
