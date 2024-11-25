@@ -1,6 +1,17 @@
 let hideTimer;
 let settings_on;
 
+function reset_player() {
+    const progress = document.getElementById('progress');
+    const currentTimeDisplay = document.querySelector('#current-time');
+    const durationDisplay = document.querySelector('#duration');
+    const video = document.querySelector('#video');
+    video.pause();
+    progress.style.width = "0%";
+    currentTimeDisplay.innerHTML = "0:00";
+    durationDisplay.innerHTML = "0:00";
+}
+
 function run_events() {
     const video = document.querySelector('#video');
     const playPauseButton = document.querySelector('#play-pause');
@@ -27,7 +38,6 @@ function run_events() {
         document.querySelector(".title").innerHTML = "";
         video.pause();
         video.src = "";
-        newTime.style.left = "0%";
     });
 
     menu_url.addEventListener("click", function(event) {
@@ -84,6 +94,7 @@ function run_events() {
         progress.style.width = percent + '%';
         thumb.style.left = percent + '%';
     });
+
     video.addEventListener("click", function() {
         if (video.paused) {
             video.play();
@@ -112,7 +123,6 @@ function run_events() {
     
     seekBar.addEventListener('input', function() {
         const value = seekBar.value * video.duration / 100;
-        console.log(value)
         video.currentTime = value;
     });
     
@@ -128,7 +138,14 @@ function run_events() {
     }
     
     video.addEventListener('loadedmetadata', function() {
+        reset_player();
         durationDisplay.textContent = formatTime(video.duration);
+        // video.play();
+        // if (video.paused) {
+        //     playPauseButton.textContent = 'Pause';
+        // } else {
+        //     playPauseButton.textContent = 'play_arrow';
+        // }
     });
     
     fullscreenButton.addEventListener('click', function() {

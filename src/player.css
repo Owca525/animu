@@ -218,3 +218,8 @@ video {
 .setting-button:hover {
     background-color: #3c415d;
 }
+
+.disabled-button {
+    cursor: default;
+    color: gray;
+}

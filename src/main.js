@@ -18,6 +18,7 @@ if (localStorage.getItem("theme") == null) {
 
 document.addEventListener("DOMContentLoaded", function () {
   var title = "";
+  var episodes = [];
   run_events();
   // Zalecane mieć to skomentowane
   set_recent_anime();
@@ -181,18 +182,48 @@ document.addEventListener("DOMContentLoaded", function () {
 
   async function set_player(id_anime, ep) {
     try {
+      var urls = [];
       document.querySelector(".player-container").style.display = "";
       document.querySelector(".container").style.display = "none";
       document.querySelector(".information-container").style.display = "none";
+      
       const response = await invoke("get_episode_url", { "id": id_anime, "ep": ep });
-      var urls = [];
-      console.log(response)
-      console.log(JSON.parse(response))
       JSON.parse(response).forEach(element => {
         urls.push(JSON.parse(element)["links"][0]["link"]);
       });
+
+      const prev = document.querySelector(".previous");
+      const next = document.querySelector(".next");
+
       document.querySelector("#video").src = urls[0];
       document.querySelector(".title").innerHTML = title + " Episode: " + ep;
+
+      var prev_episode = episodes[episodes.indexOf(ep) - 1]
+      var next_episode = episodes[episodes.indexOf(ep) + 1]
+      if (prev_episode == undefined) {
+        prev.style.cursor = "default";
+        prev.style.color = "gray";
+      } else {
+        prev.style.cursor = "pointer";
+        prev.style.color = "white";
+        prev.addEventListener("click", function() {
+          set_player(id_anime, prev_episode);
+          next.title = "Preview Episode: " + prev_episode;
+        });
+      }
+      if (episodes[episodes.indexOf(ep) + 1] == undefined) {
+        next.style.cursor = "default";
+        next.style.color = "gray";
+        next.title = "No more episodes"
+      } else {
+        next.style.cursor = "pointer";
+        next.style.color = "white";
+        next.addEventListener("click", function() {
+          set_player(id_anime, next_episode);
+          next.title = "Next Episode: " + next_episode;
+        });
+      }
+
       urls.forEach(element => {
         var button = document.createElement("div");
         button.className = "setting-button";
@@ -260,6 +291,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const episode_list = showData.availableEpisodesDetail.sub;
       episode_list.reverse();
       title = showData["name"];
+      episodes = episode_list;
       episode_list.forEach((element) => {
         let ep = document.createElement("div");
         ep.className = "episode";
