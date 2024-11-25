@@ -10,6 +10,8 @@
     "withGlobalTauri": true,
     "windows": [
       {
+        "fullscreen": false,
+        "resizable": true,
         "title": "animu",
         "width": 1500,
         "height": 800

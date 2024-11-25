@@ -20,6 +20,16 @@ function run_events() {
     const menu_resolution = document.querySelector(".resolution");
     const menu_url = document.querySelector(".url");
 
+    document.querySelector(".set-back").addEventListener("click", function () {
+        document.querySelector(".container").style.display = "";
+        document.querySelector(".player-container").style.display = "none";
+        document.querySelector(".information-container").style.display = "none";
+        document.querySelector(".title").innerHTML = "";
+        video.pause();
+        video.src = "";
+        newTime.style.left = "0%";
+    });
+
     menu_url.addEventListener("click", function(event) {
         document.querySelector(".main-settings").style.display = "none";
         document.querySelector(".urls").style.display = "";

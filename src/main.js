@@ -20,14 +20,9 @@ document.addEventListener("DOMContentLoaded", function () {
   var title = "";
   run_events();
   // Zalecane mieć to skomentowane
-  //set_recent_anime();
+  set_recent_anime();
 
   // Eventy
-  document.querySelector(".set-back").addEventListener("click", function () {
-    document.querySelector(".player-container").style.display = "none";
-    document.querySelector(".information-container").style.display = "";
-  });
-
   document
     .getElementById("search_text")
     .addEventListener("keypress", function (event) {
@@ -187,6 +182,7 @@ document.addEventListener("DOMContentLoaded", function () {
   async function set_player(id_anime, ep) {
     try {
       document.querySelector(".player-container").style.display = "";
+      document.querySelector(".container").style.display = "none";
       document.querySelector(".information-container").style.display = "none";
       const response = await invoke("get_episode_url", { "id": id_anime, "ep": ep });
       var urls = [];
