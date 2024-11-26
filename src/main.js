@@ -16,6 +16,11 @@ if (localStorage.getItem("theme") == null) {
   }
 }
 
+function removeAllEventListeners(element) {
+  const newElement = element.cloneNode(true);
+  element.parentNode.replaceChild(newElement, element);
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   var title = "";
   var episodes = [];
@@ -188,16 +193,18 @@ document.addEventListener("DOMContentLoaded", function () {
       document.querySelector(".information-container").style.display = "none";
       
       const response = await invoke("get_episode_url", { "id": id_anime, "ep": ep });
+      reset_player();
       JSON.parse(response).forEach(element => {
         urls.push(JSON.parse(element)["links"][0]["link"]);
       });
 
       const prev = document.querySelector(".previous");
       const next = document.querySelector(".next");
+      $(".previous").off()
+      $(".next").off()
 
       document.querySelector("#video").src = urls[0];
       document.querySelector(".title").innerHTML = title + " Episode: " + ep;
-      set_player_mode(true);
 
       var prev_episode = episodes[episodes.indexOf(ep) - 1]
       var next_episode = episodes[episodes.indexOf(ep) + 1]
@@ -208,7 +215,8 @@ document.addEventListener("DOMContentLoaded", function () {
         prev.style.cursor = "pointer";
         prev.style.color = "white";
         prev.addEventListener("click", function() {
-          set_player(id_anime, prev_episode);
+          const id = id_anime;
+          set_player(id, prev_episode);
           next.title = "Preview Episode: " + prev_episode;
         });
       }
@@ -220,7 +228,8 @@ document.addEventListener("DOMContentLoaded", function () {
         next.style.cursor = "pointer";
         next.style.color = "white";
         next.addEventListener("click", function() {
-          set_player(id_anime, next_episode);
+          const id = id_anime;
+          set_player(id, next_episode);
           next.title = "Next Episode: " + next_episode;
         });
       }

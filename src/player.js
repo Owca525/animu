@@ -7,13 +7,11 @@ function reset_player() {
     const currentTimeDisplay = document.querySelector('#current-time');
     const durationDisplay = document.querySelector('#duration');
     const video = document.querySelector('#video');
-    const title = document.querySelector('.title');
     video.pause();
     progress.style.width = "0%";
     currentTimeDisplay.innerHTML = "0:00";
     durationDisplay.innerHTML = "0:00";
     thumb.style.left = '0%';
-    title.innerHTML = "";
 }
 
 function run_events() {
@@ -217,9 +215,9 @@ function run_events() {
         showElement();
         if (settings_on != true) {
             clearTimeout(hideTimer);
-            hideTimer = setTimeout(hideElement, 500);
+            hideTimer = setTimeout(hideElement, 1000);
         }
     });
-    hideTimer = setTimeout(hideElement, 500);
+    hideTimer = setTimeout(hideElement, 1000);
     
 }
