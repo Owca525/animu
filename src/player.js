@@ -163,9 +163,22 @@ function run_events() {
     video.addEventListener('waiting', () => {
         loader.style.display = 'none';
     });
+
+    video.addEventListener('canplay', () => {
+        loader.style.display = 'none';
+    });
     
     video.addEventListener('playing', () => {
         loader.style.display = 'none';
+    });
+
+    video.addEventListener('ended', () => {
+        loader.style.display = 'none';
+    });
+    video.addEventListener('seeked', function() {
+        if (!video.paused) {
+            loader.style.display = 'none';
+        }
     });
     
     seekBar.addEventListener('input', function() {
