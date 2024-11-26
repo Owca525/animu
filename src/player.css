@@ -42,7 +42,7 @@ video {
     z-index: 1;
     z-index: 0;
     height: 100%;
-    background-color: var(--primary-400);
+    background-color: #5962a6;
     width: 0;
     border-radius: 5px;
     display: flex;
@@ -56,7 +56,7 @@ video {
     position: absolute;
     width: 10px;
     height: 10px;
-    background-color: var(--primary-400);
+    background-color: #5962a6;
     border-radius: 50%;
     transform: translate(-50%, -50%);
     bottom: -7px;
@@ -178,9 +178,9 @@ video {
 }
 
 .loader {
+    position: absolute;
     z-index: 1;
     font-size: larger;
-    position: absolute;
     top: 49%;
     left: 49%;
     width: 40px;

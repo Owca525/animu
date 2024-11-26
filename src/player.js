@@ -7,10 +7,13 @@ function reset_player() {
     const currentTimeDisplay = document.querySelector('#current-time');
     const durationDisplay = document.querySelector('#duration');
     const video = document.querySelector('#video');
+    const title = document.querySelector('.title');
     video.pause();
     progress.style.width = "0%";
     currentTimeDisplay.innerHTML = "0:00";
     durationDisplay.innerHTML = "0:00";
+    thumb.style.left = '0%';
+    title.innerHTML = "";
 }
 
 function run_events() {
@@ -116,7 +119,7 @@ function run_events() {
     });
 
     video.addEventListener('waiting', () => {
-        loader.style.display = 'block';
+        loader.style.display = 'none';
     });
     
     video.addEventListener('playing', () => {
@@ -219,95 +222,4 @@ function run_events() {
     });
     hideTimer = setTimeout(hideElement, 500);
     
-}
-function createVideoPlayer(element, src, video_title) {
-    const video = document.createElement('video');
-    video.id = 'video';
-    video.src = src;
-
-    const episodeRange = document.createElement('div');
-    episodeRange.className = 'episode-range';
-
-    const currentTime = document.createElement('span');
-    currentTime.id = 'current-time';
-    currentTime.textContent = '0:00';
-
-    const seekBar = document.createElement('input');
-    seekBar.type = 'range';
-    seekBar.id = 'seek-bar';
-    seekBar.value = '0';
-    seekBar.step = '1';
-
-    const duration = document.createElement('span');
-    duration.id = 'duration';
-    duration.textContent = '0:00';
-
-    episodeRange.appendChild(currentTime);
-    episodeRange.appendChild(seekBar);
-    episodeRange.appendChild(duration);
-
-    const controls = document.createElement('div');
-    controls.className = 'controls';
-
-    const videoControls = document.createElement('div');
-    videoControls.className = 'video-controls';
-
-    const skipPrevious = document.createElement('span');
-    skipPrevious.className = 'material-symbols-outlined control';
-    skipPrevious.textContent = 'skip_previous';
-
-    const playPause = document.createElement('span');
-    playPause.id = 'play-pause';
-    playPause.className = 'material-symbols-outlined control';
-    playPause.textContent = 'play_arrow';
-
-    const skipNext = document.createElement('span');
-    skipNext.className = 'material-symbols-outlined control';
-    skipNext.textContent = 'skip_next';
-
-    videoControls.appendChild(skipPrevious);
-    videoControls.appendChild(playPause);
-    videoControls.appendChild(skipNext);
-
-    const volumeControls = document.createElement('div');
-    volumeControls.className = 'volume-controls';
-
-    const mute = document.createElement('span');
-    mute.id = 'mute';
-    mute.className = 'material-symbols-outlined control';
-    mute.textContent = 'volume_up';
-
-    const volumeSlider = document.createElement('input');
-    volumeSlider.type = 'range';
-    volumeSlider.id = 'volume-slider';
-    volumeSlider.value = '25';
-    volumeSlider.step = '1';
-    volumeSlider.min = '0';
-    volumeSlider.max = '100';
-
-    const fullscreen = document.createElement('span');
-    fullscreen.id = 'fullscreen';
-    fullscreen.className = 'material-symbols-outlined control';
-    fullscreen.textContent = 'crop_free';
-
-    volumeControls.appendChild(mute);
-    volumeControls.appendChild(volumeSlider);
-    volumeControls.appendChild(fullscreen);
-
-    controls.appendChild(videoControls);
-    controls.appendChild(volumeControls);
-
-    const title = document.createElement('div');
-    title.className = 'title';
-    title.textContent = video_title;
-
-    const fadeEffect = document.createElement('div');
-    fadeEffect.className = 'fade-effect';
-
-    document.querySelector(element).appendChild(video);
-    document.querySelector(element).appendChild(episodeRange);
-    document.querySelector(element).appendChild(controls);
-    document.querySelector(element).appendChild(title);
-    document.querySelector(element).appendChild(fadeEffect);
-    run_events()
 }
