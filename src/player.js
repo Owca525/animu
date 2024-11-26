@@ -33,6 +33,62 @@ function run_events() {
     const menu_resolution = document.querySelector(".resolution");
     const menu_url = document.querySelector(".url");
 
+    document.addEventListener('keydown', function(event) {
+        if (video.style.display != "none") {
+            console.log(event.key);
+            switch (event.key) {
+                case ' ':
+                    event.preventDefault();
+                    pause_control();
+                    break;
+                case 'ArrowRight':
+                    video.currentTime += 5;
+                    break
+                case 'ArrowLeft':
+                    video.currentTime -= 5;
+                    break;
+                case "ArrowUp":
+                    video.currentTime += 80;
+                    break;
+                case "ArrowDown":
+                    video.currentTime += 80;
+                    break;
+                case "f":
+                    set_fullscreen()
+                    break;
+                case "F":
+                    set_fullscreen()
+                    break;
+            }
+        }
+    });
+
+    function pause_control() {
+        if (video.paused) {
+            video.play();
+            playPauseButton.textContent = 'Pause';
+        } else {
+            video.pause();
+            playPauseButton.textContent = 'play_arrow';
+        }
+    }
+    function set_fullscreen() {
+        const videoContainer = document.getElementById('video-container');
+        document.querySelector(".title").style.bottom = "95%";
+        document.querySelector(".title").style.left = "1%";
+        fullscreenButton.textContent = "fullscreen_exit";
+        if (!document.fullscreenElement) {
+            videoContainer.requestFullscreen().catch(err => {
+                console.error(`${err.message} (${err.name})`);
+            });
+        } else {
+            document.exitFullscreen();
+            document.querySelector(".title").style.bottom = "90%";
+            document.querySelector(".title").style.left = "2%";
+            fullscreenButton.textContent = "crop_free";
+        }
+    }
+
     document.querySelector(".set-back").addEventListener("click", function () {
         document.querySelector(".container").style.display = "";
         document.querySelector(".player-container").style.display = "none";
@@ -78,13 +134,7 @@ function run_events() {
     });
 
     playPauseButton.addEventListener('click', function() {
-        if (video.paused) {
-            video.play();
-            playPauseButton.textContent = 'Pause';
-        } else {
-            video.pause();
-            playPauseButton.textContent = 'play_arrow';
-        }
+        pause_control()
     });
     
     volumeSlider.addEventListener('input', function() {
@@ -99,13 +149,7 @@ function run_events() {
     });
 
     video.addEventListener("click", function() {
-        if (video.paused) {
-            video.play();
-            playPauseButton.textContent = 'Pause';
-        } else {
-            video.pause();
-            playPauseButton.textContent = 'play_arrow';
-        }
+        pause_control();
     })
 
     video.addEventListener('loadstart', () => {
@@ -141,31 +185,11 @@ function run_events() {
     }
     
     video.addEventListener('loadedmetadata', function() {
-        reset_player();
         durationDisplay.textContent = formatTime(video.duration);
-        // video.play();
-        // if (video.paused) {
-        //     playPauseButton.textContent = 'Pause';
-        // } else {
-        //     playPauseButton.textContent = 'play_arrow';
-        // }
     });
     
     fullscreenButton.addEventListener('click', function() {
-        const videoContainer = document.getElementById('video-container');
-        document.querySelector(".title").style.bottom = "95%";
-        document.querySelector(".title").style.left = "1%";
-        fullscreenButton.textContent = "fullscreen_exit";
-        if (!document.fullscreenElement) {
-            videoContainer.requestFullscreen().catch(err => {
-                console.error(`${err.message} (${err.name})`);
-            });
-        } else {
-            document.exitFullscreen();
-            document.querySelector(".title").style.bottom = "90%";
-            document.querySelector(".title").style.left = "2%";
-            fullscreenButton.textContent = "crop_free";
-        }
+        set_fullscreen();
     });
 
     seekBar.addEventListener('click', (event) => {
