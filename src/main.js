@@ -65,6 +65,13 @@ document.addEventListener("DOMContentLoaded", function () {
     $(".settings-container").css("display", "");
   });
 
+
+  document.querySelector(".scroll").addEventListener('wheel', (event) => {
+    if (event.deltaY !== 0) {
+        document.querySelector(".scroll").scrollLeft += event.deltaY;
+    }
+  });
+
   // Change theme
   document
     .querySelector("#change-theme")
@@ -87,7 +94,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
   document
-    .querySelector(".box-information")
+    .querySelector(".box")
     .addEventListener("click", function (event) {
       event.stopPropagation();
     });
