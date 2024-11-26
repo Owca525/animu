@@ -109,7 +109,6 @@
   padding: 0px;
 }
 
-.main-container,
 html,
 body {
   background-color: var(--background-100);
@@ -156,6 +155,7 @@ input[type="text"] {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  margin: 0 auto;
   gap: 16px;
 }
 .main-text {
@@ -168,7 +168,8 @@ input[type="text"] {
   z-index: 0;
   display: flex;
   flex-wrap: wrap;
-  justify-content: baseline;
+  justify-content: flex-start;
+  margin: 20px 0;
   gap: 8px;
   width: 100%;
   height: auto;
@@ -186,6 +187,7 @@ img {
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 84vh;
 }
 
 .spinner {
@@ -232,7 +234,7 @@ img {
   padding: 4px;
   border-radius: 4px;
   overflow: hidden;
-  gap: 4px;
+  gap: 8px;
   cursor: pointer;
 }
 .card:hover {
@@ -293,8 +295,11 @@ a {
 #menu {
   border: none;
   padding: 8px;
+  background-color: var(--primary-200);
   border-radius: 4px;
-  background-color: var(--primary-300);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--primary-300);
   box-shadow: 0.5px 0.5px 20px rgba(0, 0, 0, 0.1);
 }
 #menu:hover {
@@ -307,45 +312,65 @@ a {
 
 .information-container {
   z-index: 100;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
   height: 100%;
-  position: absolute;
+  position: fixed;
   overflow: hidden;
 }
-.box-information {
-  background-color: var(--background-200);
-  padding: 1em;
-  padding-left: 1.5em;
-  padding-right: 1.5em;
-  border-radius: 4px;
-  gap: 1em;
-  display: flex;
-  align-items: start;
-  flex-direction: column;
-  max-width: 70%;
-}
-.box-top {
+
+.box {
   display: flex;
   justify-content: center;
+  align-items: start;
   gap: 1em;
 }
 .box-text {
-  margin-top: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: var(--background-200);
+  padding: 12px;
+  border-radius: 2px;
+  max-width: 800px;
+  max-height: 400px;
+  box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.5);
+}
+.box-info {
   display: flex;
   flex-direction: column;
   gap: 1em;
 }
+
+.box-episode {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  background-color: var(--background-200);
+  border-radius: 2px;
+  padding: 12px;
+  box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.5);
+}
+
 .box-episodes {
   display: flex;
   flex-wrap: wrap;
   overflow: auto;
   gap: 8px;
   max-height: 10em;
+  max-width: 800px;
 }
+
+.box-img {
+  background-color: var(--background-200);
+  padding: 8px;
+  border-radius: 2px;
+  box-shadow: 0.5px 0.5px 20px rgba(0, 0, 0, 0.5);
+}
+
 .episode {
   display: flex;
   justify-content: center;
@@ -356,7 +381,8 @@ a {
   border-radius: 4px;
   background-color: var(--primary-300);
   cursor: pointer;
-  box-shadow: 0.5px 0.5px 20px rgba(0, 0, 0, 0.1);
+  position: relative;
+  box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.2);
 }
 .text-episode {
   font-size: larger;

@@ -1,5 +1,6 @@
 let hideTimer;
 let settings_on;
+let player_mode = false;
 
 function reset_player() {
     const progress = document.getElementById('progress');
@@ -34,6 +35,7 @@ function run_events() {
     document.querySelector(".set-back").addEventListener("click", function () {
         document.querySelector(".container").style.display = "";
         document.querySelector(".player-container").style.display = "none";
+        window.removeEventListener("keypress", function(event) {})
         document.querySelector(".information-container").style.display = "none";
         document.querySelector(".title").innerHTML = "";
         video.pause();

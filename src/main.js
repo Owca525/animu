@@ -197,6 +197,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       document.querySelector("#video").src = urls[0];
       document.querySelector(".title").innerHTML = title + " Episode: " + ep;
+      set_player_mode(true);
 
       var prev_episode = episodes[episodes.indexOf(ep) - 1]
       var next_episode = episodes[episodes.indexOf(ep) + 1]
@@ -285,9 +286,7 @@ document.addEventListener("DOMContentLoaded", function () {
       box_img.appendChild(img);
 
       document.querySelector(".header-text").innerHTML = showData["name"];
-      title = showData["name"];
-      document.querySelector(".description").innerHTML =
-        showData["description"];
+      document.querySelector(".description").innerHTML = showData["description"];
       const episode_list = showData.availableEpisodesDetail.sub;
       episode_list.reverse();
       title = showData["name"];
