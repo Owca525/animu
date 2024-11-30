@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "test": "tauri dev ",
+    "dev": "tauri dev ",
     "build:linux": "npx tauri build --target x86_64-unknown-linux-gnu",
     "build:windows": "npx tauri build --target x86_64-pc-windows-msvc",
     "build": "npm run build:linux && npm run build:windows"
