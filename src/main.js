@@ -205,19 +205,15 @@ document.addEventListener("DOMContentLoaded", function () {
         urls.push(JSON.parse(element)["links"][0]["link"]);
       });
 
-      const prev = document.querySelector(".previous");
+      recreate_player(urls[0], title + " Episode: " + ep)
       const next = document.querySelector(".next");
-      $(".previous").off()
-      $(".next").off()
-
-      document.querySelector("#video").src = urls[0];
-      document.querySelector(".title").innerHTML = title + " Episode: " + ep;
+      const prev = document.querySelector(".previous");
 
       var prev_episode = episodes[episodes.indexOf(ep) - 1]
       var next_episode = episodes[episodes.indexOf(ep) + 1]
       if (prev_episode == undefined) {
         prev.style.cursor = "default";
-        prev.style.color = "gray";
+        prev.style.color = "rgb(78, 78, 78)";
       } else {
         prev.style.cursor = "pointer";
         prev.style.color = "white";
@@ -229,7 +225,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       if (episodes[episodes.indexOf(ep) + 1] == undefined) {
         next.style.cursor = "default";
-        next.style.color = "gray";
+        next.style.color = "rgb(78, 78, 78)";
         next.title = "No more episodes"
       } else {
         next.style.cursor = "pointer";

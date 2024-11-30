@@ -179,7 +179,7 @@ video {
 
 .loader {
     position: absolute;
-    z-index: 1;
+    z-index: 200;
     font-size: larger;
     top: 49%;
     left: 49%;
