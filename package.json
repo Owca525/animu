@@ -13,17 +13,18 @@
     "build": "npm run build:linux && npm run build:windows"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "@tauri-apps/api": "^2",
-    "@tauri-apps/plugin-shell": "^2"
+    "@tauri-apps/plugin-shell": "^2",
+    "material-icons": "^1.13.12",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.2.1",
     "typescript": "^5.2.2",
-    "vite": "^5.3.1",
-    "@tauri-apps/cli": "^2"
+    "vite": "^5.3.1"
   }
 }
