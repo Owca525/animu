@@ -1,9 +1,0 @@
-Frontend (html/javascript/css):
-    - Stworzenie Głównej strony: Done
-    - Stworzenie Wyszukiwarki: Done
-    - Stworzenie Playera
-    - Zrobienie Settings
-Backend (rust):
-    - Wsparcie pluginów
-    - Zrobienie żeby nie pokazywało przycisku inspect: Done
-    - Zakrycie elementów przeglądarki

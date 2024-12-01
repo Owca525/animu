@@ -1,18 +1,29 @@
 {
   "name": "animu",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "tauri dev ",
+    "webdev": "vite",
+    "preview": "vite preview",
+    "dev": "tauri dev",
+    "build:typescript": "tsc && vite build",
     "build:linux": "npx tauri build --target x86_64-unknown-linux-gnu",
     "build:windows": "npx tauri build --target x86_64-pc-windows-msvc",
     "build": "npm run build:linux && npm run build:windows"
   },
-  "devDependencies": {
-    "@tauri-apps/cli": "^2"
-  },
   "dependencies": {
-    "tauri": "^0.15.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-shell": "^2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5.2.2",
+    "vite": "^5.3.1",
+    "@tauri-apps/cli": "^2"
   }
 }

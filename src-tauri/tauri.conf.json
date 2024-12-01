@@ -2,17 +2,18 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "animu",
   "version": "0.1.0",
-  "identifier": "com.owcadev.app",
+  "identifier": "com.animu.owcadev",
   "build": {
-    "frontendDist": "../src"
+    "beforeDevCommand": "npm run webdev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
   },
   "app": {
-    "withGlobalTauri": true,
     "windows": [
       {
-        "fullscreen": false,
+        "title": "Animu",
         "resizable": true,
-        "title": "animu",
         "width": 1500,
         "height": 800
       }
