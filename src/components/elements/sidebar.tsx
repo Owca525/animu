@@ -6,13 +6,13 @@ export default function sidebar() {
       <div className="top-sidebar">
         <Button value="arrow_forward" />
         <div className="border"></div>
-        <Button value="schedule" />
-        <Button value="history" />
+        <Button value="schedule" title="Recent Anime" className="active"/>
+        <Button value="history" title="History" />
       </div>
       <div className="bottom-sidebar">
         <div className="border"></div>
-        <Button value="extension" />
-        <Button value="settings" />
+        <Button value="extension" title="Extension" />
+        <Button value="settings" title="Settings" />
       </div>
     </div>
   );

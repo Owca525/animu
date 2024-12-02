@@ -3,14 +3,18 @@
 import "./App.css";
 import Sidebar from "./components/elements/sidebar";
 import Header from "./components/elements/headers";
-import Content from "./components/elements/content";
+import Content from "./containers/main-content";
 
 function App() {
+  const customData = [
+    { title: 'Title', img: 'img/url/src' },
+  ];
+
   return (
     <main className="container">
       <Sidebar />
       <Header />
-      <Content />
+      <Content title="Recent Anime" data={customData} />
     </main>
   );
 }
