@@ -231,10 +231,12 @@ body {
 }
 
 /* card */
-.card {
+.prevcard {
   min-width: 150px;
   max-height: 310px;
   height: auto;
+}
+.card {
   display: flex;
   align-items: center;
   flex-direction: column;
