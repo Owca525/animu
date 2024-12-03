@@ -3,7 +3,7 @@
 import "./App.css";
 import Sidebar from "./components/elements/sidebar";
 import Header from "./components/elements/headers";
-import Content from "./containers/main-content";
+import Content from "./pages/main-content";
 
 function App() {
   const customData = [
