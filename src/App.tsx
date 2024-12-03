@@ -2,7 +2,7 @@
 import "./App.css";
 import Sidebar from "./components/elements/sidebar";
 import Header from "./components/elements/headers";
-import Content from "./containers/main-content";
+import Content from "./pages/main-content";
 import { ContainerProps } from "./utils/interface";
 import { get_recent } from "./utils/backend";
 import { useEffect, useState } from "react";
