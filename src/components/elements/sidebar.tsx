@@ -1,6 +1,7 @@
 import Button from "../ui/icon-button"
+import { SidebarProps } from "../../utils/interface"
 
-export default function sidebar() {
+const Sidebar: React.FC<SidebarProps> = ({ onButtonClick }) =>  {
   return (
     <div className="sidebar-mini">
       <div className="top-sidebar">
@@ -17,3 +18,5 @@ export default function sidebar() {
     </div>
   );
 };
+
+export default Sidebar;

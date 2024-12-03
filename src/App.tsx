@@ -1,20 +1,47 @@
-// import { useState } from "react";
 // import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 import Sidebar from "./components/elements/sidebar";
 import Header from "./components/elements/headers";
 import Content from "./containers/main-content";
+import { ContainerProps } from "./utils/interface";
+import { get_recent } from "./utils/backend";
+import { useEffect, useState } from "react";
 
 function App() {
-  const customData = [
-    { title: 'Title', img: 'img/url/src' },
-  ];
+  const [data, setData] = useState<ContainerProps>({ title: "", data: [] });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const recentData = await get_recent();
+      setData({
+        title: "Recent Anime",
+        data: recentData,
+      });
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
+  const handleButtonClick = (newData: ContainerProps) => {
+    setData(newData);
+  };
+
+  if (loading) {
+    return (
+      <main className="container">
+        <Sidebar onButtonClick={handleButtonClick} />
+        <Header />
+      </main>
+    );
+  }
 
   return (
     <main className="container">
-      <Sidebar />
+      <Sidebar onButtonClick={handleButtonClick} />
       <Header />
-      <Content title="Recent Anime" data={customData} />
+      <Content title={data.title} data={data.data} />
     </main>
   );
 }
