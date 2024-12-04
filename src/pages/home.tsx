@@ -23,6 +23,7 @@ function home() {
   }, []);
 
   const handleButtonClick = (newData: ContainerProps) => {
+    console.log(newData)
     setData(newData);
   };
 
