@@ -2,6 +2,7 @@ import Button from "../ui/icon-button"
 import { SidebarProps } from "../../utils/interface"
 import { get_recent } from "../../utils/backend"
 import "../../css/elements/sidebar.css"
+import { Link } from "react-router-dom";
 // className="active"
 
 const Sidebar: React.FC<SidebarProps> = ({ onButtonClick }) =>  {
@@ -16,7 +17,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onButtonClick }) =>  {
       <div className="bottom-sidebar">
         <div className="border"></div>
         <Button value="extension" title="Extension" onClick={() => console.log("asdasdasd")} />
-        <Button value="settings" title="Settings" onClick={() => console.log("asdasd")} />
+        <Link to={"/settings"}>
+          <Button value="settings" title="Settings" onClick={() => console.log("asdasd")} />
+        </Link>
       </div>
     </div>
   );
