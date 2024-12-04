@@ -18,6 +18,22 @@ export const Information: React.FC<Props> = ({title, showPopup, toggle}) => {
     };
 
     useEffect(() => {
+        const handleKeyDown = (event:any) => {
+          if (event.key === 'Escape') {
+            toggle();
+          }
+        };
+      
+        if(showPopup){
+            document.addEventListener('keydown', handleKeyDown);
+        } else document.removeEventListener('keydown', handleKeyDown)
+      
+        return () => {
+          document.removeEventListener('keydown', handleKeyDown);
+        };
+      }, [showPopup]);
+
+    useEffect(() => {
         if(showPopup) {
             document.addEventListener('click', handleClickOutside);
         }
@@ -27,23 +43,11 @@ export const Information: React.FC<Props> = ({title, showPopup, toggle}) => {
         }
     }, [showPopup])
 
-    useEffect(() => {
-        const handleKeyDown = (event: any) => {
-            if(event.key === 'Escape') {
-                toggle();
-            }
-        }
-
-        document.addEventListener('keydown', handleKeyDown)
-
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown)
-        }
-    }, [])
+    
 
     return (
-        <div className="modal-backdrop" style={{display: showPopup ? "flex" : "none"}} ref={modalRef}>
-            <div className="modal-content">
+        <div className="modal-backdrop" style={{visibility: showPopup ? "visible" : "hidden"}} >
+            <div className="modal-content" ref= {modalRef}>
                 {title}
             </div>
         </div>

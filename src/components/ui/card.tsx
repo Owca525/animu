@@ -29,8 +29,10 @@ const Card: React.FC<CardProps> = ({ title, img }) => {
   }
 
   useEffect(() => {
+    if(!showInf){
       document.addEventListener('click', handleClick);
-      
+    } else document.removeEventListener('click', handleClick)
+
     return () => {
       document.removeEventListener('click', handleClick);
     }
