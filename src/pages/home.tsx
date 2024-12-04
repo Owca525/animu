@@ -1,9 +1,9 @@
 import Sidebar from "../components/elements/sidebar";
-import Header from "../components/elements/headers";
 import Content from "../components/elements/main-content";
 import { ContainerProps } from "../utils/interface";
 import { get_recent } from "../utils/backend";
 import { useEffect, useState } from "react";
+import Header from "../components/elements/headers";
 
 function home() {
   const [data, setData] = useState<ContainerProps>({ title: "", data: [] });
@@ -31,7 +31,7 @@ function home() {
     return (
       <main className="container">
         <Sidebar onButtonClick={handleButtonClick} />
-        <Header />
+        <Header/>
       </main>
     );
   }
@@ -39,7 +39,7 @@ function home() {
   return (
     <main className="container">
       <Sidebar onButtonClick={handleButtonClick} />
-      <Header />
+      <Header/>
       <Content title={data.title} data={data.data} />
     </main>
   );
