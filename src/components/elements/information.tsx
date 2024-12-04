@@ -82,7 +82,7 @@ export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, t
         <div className="box-info">
           <div className="box-text">
             <div className="header-text">{data.title}</div>
-            <div className="description">{data.description}</div>
+            <div className="description" dangerouslySetInnerHTML={{ __html: data.description }}></div>
           </div>
           <div className="box-episode">
             <div className="text-episode">Availble Episodes:</div>
