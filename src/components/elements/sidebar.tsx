@@ -1,6 +1,7 @@
 import Button from "../ui/icon-button"
 import { SidebarProps } from "../../utils/interface"
 import { get_recent } from "../../utils/backend"
+import "../../css/elements/sidebar.css"
 // className="active"
 
 const Sidebar: React.FC<SidebarProps> = ({ onButtonClick }) =>  {

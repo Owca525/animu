@@ -1,0 +1,28 @@
+.icon-button {
+  background-color: var(--primary-200);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-color: var(--primary-800);
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 4px;
+  color: var(--primary-800);
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+.icon-button:hover {
+  background-color: var(--primary-800);
+  color: var(--primary-200);
+  border-color: var(--primary-200);
+}
+.active {
+  background-color: var(--primary-800);
+  color: var(--primary-200);
+  border-color: var(--primary-200);
+}
+.active:hover {
+  background-color: var(--primary-200);
+  border-color: var(--primary-800);
+  color: var(--primary-800);
+}

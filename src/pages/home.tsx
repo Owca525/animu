@@ -1,9 +1,11 @@
 import Sidebar from "../components/elements/sidebar";
 import Content from "../components/elements/main-content";
+import Header from "../components/elements/headers";
+import "../css/pages/home.css";
+
 import { ContainerProps } from "../utils/interface";
 import { get_recent } from "../utils/backend";
 import { useEffect, useState } from "react";
-import Header from "../components/elements/headers";
 
 function home() {
   const [data, setData] = useState<ContainerProps>({ title: "", data: [] });

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Information } from "../elements/information";
+import "../../css/ui/card.css";
 
 interface CardProps {
   title: string;
