@@ -3,11 +3,12 @@ import { Information } from "../elements/information";
 import "../../css/ui/card.css";
 
 interface CardProps {
+  id_anime: string;
   title: string;
   img: string;
 }
 
-const Card: React.FC<CardProps> = ({ title, img }) => {
+const Card: React.FC<CardProps> = ({ id_anime, title, img }) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const[showInf, setShowInf] = useState<boolean>(false);
@@ -56,7 +57,7 @@ const Card: React.FC<CardProps> = ({ title, img }) => {
         </div>
         <div className="card-title">{title}</div>
       </div>
-      <Information title={title} showPopup={showInf} toggle={toggleShow}/>
+      <Information id_anime={id_anime} showPopup={showInf} toggle={toggleShow}/>
     </div>
   );
 };

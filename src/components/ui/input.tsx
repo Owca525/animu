@@ -1,5 +1,4 @@
 import { FC } from "react";
-import "../../css/ui/input.css";
 
 interface inputprops extends React.HtmlHTMLAttributes<HTMLInputElement> {
   placeholder?: string;

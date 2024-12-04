@@ -9,7 +9,7 @@ const Container: React.FC<ContainerProps> = ({ title, data = [], className = ""}
       <div className="title">{title}</div>
       <div className="card-container">
         {data.length > 0 ? (
-          data.map((card) => <Card title={card.title} img={card.img} />)
+          data.map((card) => <Card id_anime={card.id} title={card.title} img={card.img} />)
         ) : (
           <div className="no-data-message">Nothing Found...</div>
         )}

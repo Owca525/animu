@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { InformationData } from "../utils/interface"
 
 export async function get_recent(): Promise<{ id: string, title: string; img: string; }[]> {
     var anime: { id: string; title: string; img: string; }[] = [];
@@ -15,4 +16,13 @@ export async function get_recent(): Promise<{ id: string, title: string; img: st
     });
 
     return anime
+}
+
+export async function get_information(id: string): Promise<InformationData> {
+    const resp: string = await invoke("get_anime_data", { id: id})
+    const info = JSON.parse(resp);
+    console.log("info anime: ", info)
+    const episode_list = info["data"]["show"]["availableEpisodesDetail"]["sub"];
+    episode_list.reverse();
+    return { id: info["data"]["show"]["_id"], title: info["data"]["show"]["name"], description: info["data"]["show"]["description"], img: info["data"]["show"]["thumbnail"], episodes: episode_list}
 }

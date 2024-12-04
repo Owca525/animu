@@ -1,14 +1,18 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { InformationProps, InformationData } from "../../utils/interface";
+import { get_information } from "../../utils/backend";
 import "../../css/elements/information.css";
 
-interface Props {
-  title: string;
-  showPopup: boolean;
-  toggle: () => void;
-}
-
-export const Information: React.FC<Props> = ({ title, showPopup, toggle }) => {
+export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, toggle, }) => {
   const modalRef: any = useRef();
+  const [data, setData] = useState<InformationData>({ id: "", title: "", description: "", img: "", episodes: [] });
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    const anime_data = await get_information(id_anime);
+    setData(anime_data);
+    setLoading(false);
+  };
 
   const handleClickOutside = (event: any) => {
     if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -35,6 +39,7 @@ export const Information: React.FC<Props> = ({ title, showPopup, toggle }) => {
   useEffect(() => {
     if (showPopup) {
       document.addEventListener("click", handleClickOutside);
+      fetchData();
     }
 
     return () => {
@@ -42,13 +47,54 @@ export const Information: React.FC<Props> = ({ title, showPopup, toggle }) => {
     };
   }, [showPopup]);
 
+  // Loading animation
+  if (loading) {
+    return (
+      <div className="modal-backdrop" style={{ visibility: showPopup ? "visible" : "hidden" }}>
+      <div className="box" ref={modalRef}>
+        <div className="box-img" style={{width: "200px", height: "290px", display: "flex", justifyContent: "center", alignItems: "center"}}>
+          <div className="animation material-symbols-outlined" style={{animation: "spin 1s linear infinite"}}>
+            progress_activity
+          </div>
+        </div>
+        <div className="box-info">
+          <div className="box-text" style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+            <div className="description material-symbols-outlined" style={{animation: "spin 1s linear infinite"}}>progress_activity</div>
+          </div>
+          <div className="box-episode">
+            <div className="text-episode">Availble Episodes:</div>
+            <div className="box-episodes material-symbols-outlined" style={{display: "flex", justifyContent: "center", animation: "spin 1s linear infinite"}}>
+              progress_activity
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    )
+  }
+
   return (
-    <div
-      className="modal-backdrop"
-      style={{ visibility: showPopup ? "visible" : "hidden" }}
-    >
-      <div className="modal-content" ref={modalRef}>
-        {title}
+    <div className="modal-backdrop" style={{ visibility: showPopup ? "visible" : "hidden" }}>
+      <div className="box" ref={modalRef}>
+        <div className="box-img">
+          <img src={data.img} />
+        </div>
+        <div className="box-info">
+          <div className="box-text">
+            <div className="header-text">{data.title}</div>
+            <div className="description">{data.description}</div>
+          </div>
+          <div className="box-episode">
+            <div className="text-episode">Availble Episodes:</div>
+            <div className="box-episodes">
+              {data.episodes.length > 0 ? (
+                data.episodes.map((ep) => <div className="episode">{ep}</div>)
+              ) : (
+                <div className="no-data-message">No Episodes</div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
