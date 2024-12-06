@@ -2,11 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { InformationProps, InformationData } from "../../utils/interface";
 import { get_information } from "../../utils/backend";
 import "../../css/elements/information.css";
+import { useNavigate } from "react-router-dom";
 
 export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, toggle, }) => {
   const modalRef: any = useRef();
   const [data, setData] = useState<InformationData>({ id: "", title: "", description: "", img: "", episodes: [] });
   const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   const fetchData = async () => {
     const anime_data = await get_information(id_anime);
@@ -88,7 +91,7 @@ export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, t
             <div className="text-episode">Availble Episodes:</div>
             <div className="box-episodes">
               {data.episodes.length > 0 ? (
-                data.episodes.map((ep) => <div className="episode">{ep}</div>)
+                data.episodes.map((ep) => <div className="episode" onClick={() => navigate("/player", {state: {ep: ep}})}>{ep}</div>)
               ) : (
                 <div className="no-data-message">No Episodes</div>
               )}
