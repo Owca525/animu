@@ -8,8 +8,8 @@ export async function get_recent(): Promise<{ id: string, title: string; img: st
     console.log(recent)
     var tmp = await recent.data.shows.edges;
     tmp.forEach((element: any) => {
-        var tmpimg: string = element["thumbnail"]
-        if (tmpimg.startsWith("https") != true) {
+        let tmpimg: string = element["thumbnail"]
+        if (tmpimg != null && tmpimg.startsWith("https") != true) {
             tmpimg = "https://wp.youtube-anime.com/aln.youtube-anime.com/" + tmpimg;
         };
         anime.push({ id: element["_id"], title: element["name"], img: tmpimg})
