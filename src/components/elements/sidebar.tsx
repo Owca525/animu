@@ -2,10 +2,12 @@ import Button from "../ui/icon-button"
 import { SidebarProps } from "../../utils/interface"
 import { get_recent } from "../../utils/backend"
 import "../../css/elements/sidebar.css"
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 // className="active"
 
 const Sidebar: React.FC<SidebarProps> = ({ onButtonClick }) =>  {
+  const navigate = useNavigate();
+  
   return (
     <div className="sidebar-mini">
       <div className="top-sidebar">
@@ -18,7 +20,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onButtonClick }) =>  {
         <div className="border"></div>
         <Button value="extension" title="Extension" onClick={() => console.log("asdasdasd")} />
         <Link to={"/settings"}>
-          <Button value="settings" title="Settings" onClick={() => console.log("asdasd")} />
+          <Button value="settings" title="Settings" onClick={() => navigate("/settings")} />
         </Link>
       </div>
     </div>
