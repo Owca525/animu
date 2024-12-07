@@ -24,15 +24,15 @@ function home() {
     fetchData();
   }, []);
 
-  const handleButtonClick = (newData: ContainerProps) => {
+  const change_content = (newData: ContainerProps) => {
     console.log(newData)
-    setData(newData);
+    setData(newData)
   };
 
   if (loading) {
     return (
       <main className="container">
-        <Sidebar onButtonClick={handleButtonClick} />
+        <Sidebar change_content={change_content} />
         <Header/>
       </main>
     );
@@ -40,7 +40,7 @@ function home() {
 
   return (
     <main className="container">
-      <Sidebar onButtonClick={handleButtonClick} />
+      <Sidebar change_content={change_content} />
       <Header/>
       <Content title={data.title} data={data.data} />
     </main>

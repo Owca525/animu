@@ -19,5 +19,5 @@ export interface InformationData {
 }
 
 export interface SidebarProps {
-  onButtonClick: (data: ContainerProps) => void;
+  change_content: (data: ContainerProps) => void;
 }

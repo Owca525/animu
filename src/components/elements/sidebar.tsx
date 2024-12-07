@@ -5,7 +5,7 @@ import "../../css/elements/sidebar.css"
 import { Link, useNavigate } from "react-router-dom";
 // className="active"
 
-const Sidebar: React.FC<SidebarProps> = ({ onButtonClick }) =>  {
+const Sidebar: React.FC<SidebarProps> = ({ change_content }) =>  {
   const navigate = useNavigate();
   
   return (
@@ -13,8 +13,8 @@ const Sidebar: React.FC<SidebarProps> = ({ onButtonClick }) =>  {
       <div className="top-sidebar">
         <Button value="arrow_forward" />
         <div className="border"></div>
-        <Button value="schedule" title="Recent Anime" onClick={async () => onButtonClick({ title: "Recent Anime", data: await get_recent() })}/>
-        <Button value="history" title="History" onClick={() => onButtonClick({ title: "History" })}/>
+        <Button value="schedule" title="Recent Anime" onClick={async () => change_content({ title: "Recent Anime", data: await get_recent() })}/>
+        <Button value="history" title="History" onClick={() => change_content({ title: "History" })}/>
       </div>
       <div className="bottom-sidebar">
         <div className="border"></div>
