@@ -3,7 +3,8 @@ import { useLocation } from "react-router-dom";
 
 export const Player = () => {
     const location = useLocation();
-    const {ep} = location.state;
+    const { id, title, episodes, ep} = location.state;
+    console.log(id, title, episodes)
 
     return (
         <div>

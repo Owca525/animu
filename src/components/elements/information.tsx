@@ -13,6 +13,7 @@ export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, t
 
   const fetchData = async () => {
     const anime_data = await get_information(id_anime);
+    console.log(anime_data)
     setData(anime_data);
     setLoading(false);
   };
@@ -91,7 +92,7 @@ export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, t
             <div className="text-episode">Availble Episodes:</div>
             <div className="box-episodes">
               {data.episodes.length > 0 ? (
-                data.episodes.map((ep) => <div className="episode" onClick={() => navigate("/player", {state: {ep: ep}})}>{ep}</div>)
+                data.episodes.map((ep) => <div className="episode" onClick={() => navigate("/player", {state: { id: data.id, title: data.title, episodes: data.episodes, ep: ep }})}>{ep}</div>)
               ) : (
                 <div className="no-data-message">No Episodes</div>
               )}
