@@ -6,11 +6,12 @@ interface buttonprops extends React.HtmlHTMLAttributes<HTMLButtonElement> {
   value?: string;
   title?: string;
   className?: string;
+  onClick?: () => void;
 }
 
-const button: FC<buttonprops> = ({ value = "", title, className }) => {
+const button: FC<buttonprops> = ({ value = "", title, className, onClick }) => {
   return (
-    <button title={title} className={className} dangerouslySetInnerHTML={{__html: value}}></button>
+    <button title={title} className={className} dangerouslySetInnerHTML={{__html: value}} onClick={onClick} ></button>
   );
 };
 

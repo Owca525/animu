@@ -1,4 +1,4 @@
-import Button from "../ui/icon-button"
+import Button from "../ui/button"
 import { SidebarProps } from "../../utils/interface"
 import { get_recent } from "../../utils/backend"
 import "../../css/elements/sidebar.css"
