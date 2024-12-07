@@ -4,7 +4,7 @@ import Header from "../components/elements/headers";
 import "../css/pages/home.css";
 
 import { ContainerProps } from "../utils/interface";
-import { get_recent } from "../utils/backend";
+import { get_recent, get_search } from "../utils/backend";
 import { useEffect, useState } from "react";
 
 function home() {
@@ -25,15 +25,25 @@ function home() {
   }, []);
 
   const change_content = (newData: ContainerProps) => {
-    console.log(newData)
     setData(newData)
+  };
+
+  const handleInputChange = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key == "Enter") {
+      var search = event.currentTarget.value;
+      const results = async () => {
+        const data = await get_search(search);
+        change_content({ title: `Searching: ${search}`, data: data});
+      };
+      results();
+    }
   };
 
   if (loading) {
     return (
       <main className="container">
         <Sidebar change_content={change_content} />
-        <Header/>
+        <Header onInputChange={handleInputChange}/>
       </main>
     );
   }
@@ -41,7 +51,7 @@ function home() {
   return (
     <main className="container">
       <Sidebar change_content={change_content} />
-      <Header/>
+      <Header onInputChange={handleInputChange}/>
       <Content title={data.title} data={data.data} />
     </main>
   );
