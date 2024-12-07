@@ -1,8 +1,8 @@
-import "../css/pages/settings.css";
+import "../../css/pages/settings.css";
 
 export const Settings = () => {
     return (
-        <div>
+        <div className="container">
             
         </div>
     )

@@ -1,5 +1,5 @@
 import { FC } from "react";
-import "../../css/ui/icon-button.css";
+import "../../css/ui/button.css";
 // import { ContainerProps } from "../../utils/interface"
 
 interface buttonprops extends React.HtmlHTMLAttributes<HTMLButtonElement> {
@@ -8,17 +8,9 @@ interface buttonprops extends React.HtmlHTMLAttributes<HTMLButtonElement> {
   className?: string;
 }
 
-const button: FC<buttonprops> = ({ value, title, className }) => {
+const button: FC<buttonprops> = ({ value = "", title, className }) => {
   return (
-    <input
-      title={title}
-      className={className + " material-symbols-outlined icon-button"}
-      value={value}
-      type="button"
-      style={{
-        WebkitAppearance: "none",
-      }}
-    />
+    <button title={title} className={className} dangerouslySetInnerHTML={{__html: value}}></button>
   );
 };
 

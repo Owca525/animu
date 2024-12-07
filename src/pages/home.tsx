@@ -1,5 +1,5 @@
 import Sidebar from "../components/elements/sidebar";
-import Content from "../components/elements/main-content";
+import Content from "../components/elements/card-content";
 import Header from "../components/elements/headers";
 import "../css/pages/home.css";
 
