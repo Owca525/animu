@@ -2,7 +2,7 @@ import Button from "../ui/button"
 import { SidebarProps } from "../../utils/interface"
 import { get_recent } from "../../utils/backend"
 import "../../css/elements/sidebar.css"
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 // className="active"
 
 const Sidebar: React.FC<SidebarProps> = ({ change_content }) =>  {
@@ -19,9 +19,7 @@ const Sidebar: React.FC<SidebarProps> = ({ change_content }) =>  {
       <div className="bottom-sidebar">
         <div className="border"></div>
         <Button value='<div class="material-symbols-outlined text-button">extension</div>' className="icon-button" title="Extension" onClick={() => console.log("asdasdasd")} />
-        <Link to={"/settings"}>
-          <Button value='<div class="material-symbols-outlined text-button">settings</div>' className="icon-button" title="Settings" onClick={() => navigate("/settings")} />
-        </Link>
+        <Button value='<div class="material-symbols-outlined text-button">settings</div>' className="icon-button" title="Settings" onClick={() => navigate("/settings")} />
       </div>
     </div>
   );
