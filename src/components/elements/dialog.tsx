@@ -9,6 +9,9 @@ interface dialogProps {
 }
 
 const dialog: React.FC<dialogProps> = ({ type, header_text, text }) => {
+    if (type == "error") {
+
+    }
     return (
         <div className="dialog-container">
             <div className="dialog">
