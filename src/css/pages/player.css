@@ -1,0 +1,149 @@
+.video-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: black;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.video-player {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mask {
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 1) 50%,
+    rgba(0, 0, 0, 0.5)
+  );
+}
+
+.video-overlay {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  color: white;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.time-slider {
+  width: 100%;
+  pointer-events: all;
+}
+
+.time-display {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 5px 10px;
+  border-radius: 5px;
+  pointer-events: all;
+}
+
+.video-top {
+  margin-top: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+.video-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.bottom-section {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 4px;
+  padding-right: 4px;
+  margin-bottom: 8px;
+}
+.left,
+.right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.player-buttons {
+  pointer-events: all;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(0, 0, 0, 0);
+  border: none;
+  color: white;
+  font-size: xx-large;
+  border-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.player-buttons:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.player-title {
+  pointer-events: all;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.seek-bar {
+  pointer-events: all;
+  position: relative;
+  width: 100%;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  margin-bottom: 4px;
+  border-radius: 5px;
+}
+
+.progress {
+  height: 100%;
+  background-color: #5962a6;
+  width: 0;
+  border-radius: 5px;
+  display: flex;
+}
+
+.thumb {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background-color: #5962a6;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  bottom: -11px;
+}
+
+.loading-player {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: black;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 64px;
+  animation: spin 1s linear infinite;
+}

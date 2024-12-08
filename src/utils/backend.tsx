@@ -43,3 +43,14 @@ export async function get_search(name: string): Promise<{ id: string, title: str
 
     return anime
 }
+
+export async function get_player_anime(id: string, ep: string | number): Promise<{ players: any[] }> {
+    var player_urls: any[] = [];
+    const resp: string = await invoke("get_episode_url", { id: id, ep: ep });
+    const players = JSON.parse(resp);
+    players.forEach((element: any) => {
+        element = JSON.parse(element)["links"][0]["link"];
+        player_urls.push(element)
+    })
+    return { players: player_urls };
+}

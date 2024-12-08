@@ -1,7 +1,7 @@
 import Sidebar from "../components/elements/sidebar";
 import Content from "../components/elements/card-content";
 import Header from "../components/elements/headers";
-import Dialog from "../components/elements/dialog";
+// import Dialog from "../components/elements/dialog";
 import "../css/pages/home.css";
 
 import { ContainerProps } from "../utils/interface";
