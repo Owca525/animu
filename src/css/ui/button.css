@@ -16,8 +16,9 @@ button{
   width: 40px;
   height: 40px;
 }
-.icon-button:hover {
+.backlight:hover {
   background-color: var(--primary-800);
+  color: var(--primary-200);
   border-color: var(--primary-200);
 }
 .text-button:hover {

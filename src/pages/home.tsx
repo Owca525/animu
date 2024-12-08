@@ -1,6 +1,7 @@
 import Sidebar from "../components/elements/sidebar";
 import Content from "../components/elements/card-content";
 import Header from "../components/elements/headers";
+import Dialog from "../components/elements/dialog";
 import "../css/pages/home.css";
 
 import { ContainerProps } from "../utils/interface";
@@ -53,6 +54,7 @@ function home() {
       <Sidebar change_content={change_content} />
       <Header onInputChange={handleInputChange}/>
       <Content title={data.title} data={data.data} />
+      {/* <Dialog type="error" header_text="Error" text="test" /> */}
     </main>
   );
 }
