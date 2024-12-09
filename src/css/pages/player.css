@@ -127,13 +127,13 @@
 }
 
 .thumb {
-  position: absolute;
+  position: relative;
+  bottom: 3px;
   width: 14px;
   height: 14px;
   background-color: #5962a6;
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  bottom: -11px;
 }
 
 .loading-player {

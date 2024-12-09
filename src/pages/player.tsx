@@ -98,6 +98,9 @@ export const Player = () => {
       if (progressRef.current) {
         progressRef.current.style.width = `${percent}%`;
       }
+      if(thumbRef.current) {
+        thumbRef.current.style.left = `${percent}%`
+      }
     }
   };
 
@@ -166,12 +169,6 @@ export const Player = () => {
         });
       }
       setIsPlaying(!isPlaying);
-    }
-  };
-
-  const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      setCurrentTime(videoRef.current.currentTime);
     }
   };
 
@@ -272,7 +269,7 @@ export const Player = () => {
         // src="https://myanime.sharepoint.com/sites/chartlousty/_layouts/15/download.aspx?share=EVZlwR4K-rxAjiIfQl8LlqABTqXsPyuX0-1oALcfV_62lQ"
         src={playerUrl}
         className={isVisible ? "video-player mask" : "video-player"}
-        onTimeUpdate={handleTimeUpdate}
+        onTimeUpdate={updateProgress}
         onLoadedMetadata={handleLoadedMetadata}
         onClick={togglePlay}
       />
@@ -293,7 +290,7 @@ export const Player = () => {
         <div className="video-bottom">
           <div className="seek-bar" ref={seekbar} onClick={handleSeekBarClick}>
             <div className="progress" ref={progressRef}></div>
-            <div className="thumb" ref={thumbRef}></div>
+            <div className="thumb" ref={thumbRef}/>
             <div className="show-time"></div>
           </div>
           <div className="bottom-section">
