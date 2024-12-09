@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "../css/pages/player.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { get_player_anime } from "../utils/backend";
+import Dialog from "../components/elements/dialog";
 // import Dialog from "../components/elements/dialog";
 
 export const Player = () => {
@@ -24,11 +25,20 @@ export const Player = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isError, setErrorDialog] = useState({ error: false, information: "" });
 
   const set_player = async () => {
-    const recentData = await get_player_anime(id, ep);
-    setPlayerUrl(recentData["players"][0]);
-    setLoadingPlayer(false);
+    try {
+      const recentData = await get_player_anime(id, ep);
+      setPlayerUrl(recentData["players"][0]);
+    } catch (error) {
+      setErrorDialog({
+        error: true,
+        information: "failed get data from allmanga",
+      });
+    } finally {
+      setLoadingPlayer(false);
+    }
   };
 
   useEffect(() => {
@@ -44,22 +54,11 @@ export const Player = () => {
     }
 
     const video = videoRef.current;
-    const container = containerRef.current;
-    if (video && container) {
+    console.log(video)
+    if (video) {
       const handleError = () => {
         console.error("Video playback error occurred.");
         video.load();
-      };
-      const updateProgress = () => {
-        const percent = (video.currentTime / video.duration) * 100;
-        setCurrentTime(video.currentTime);
-
-        if (progressRef.current) {
-          progressRef.current.style.width = `${percent}%`;
-        }
-        if (thumbRef.current) {
-          thumbRef.current.style.left = `${percent}%`;
-        }
       };
 
       const handleMouseMove = () => {
@@ -70,23 +69,37 @@ export const Player = () => {
         hideTimer.current = setTimeout(hideElement, 1000);
       };
 
-      container.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mousemove", handleMouseMove);
       hideTimer.current = setTimeout(hideElement, 1000);
 
-      video.addEventListener("error", handleError);
+      // TODO: FIX THIS SHIT :CCCCC (idk why this events can't work properly, sometime work or not)
       video.addEventListener("timeupdate", updateProgress);
+      video.addEventListener("loadedmetadata", handleLoadedMetadata);
+      video.addEventListener("error", handleError);
       window.addEventListener("keydown", keybinds);
       return () => {
         video.removeEventListener("error", handleError);
         video.removeEventListener("timeupdate", updateProgress);
-        window.addEventListener("keydown", keybinds);
-        container.removeEventListener("mousemove", handleMouseMove);
+        video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+        window.removeEventListener("keydown", keybinds);
+        window.removeEventListener("mousemove", handleMouseMove);
         if (hideTimer.current) {
           clearTimeout(hideTimer.current);
         }
       };
     }
   }, []);
+
+  const updateProgress = () => {
+    if (videoRef.current) {
+      const percent = (videoRef.current.currentTime / videoRef.current.duration) * 100;
+      setCurrentTime(videoRef.current.currentTime);
+
+      if (progressRef.current) {
+        progressRef.current.style.width = `${percent}%`;
+      }
+    }
+  };
 
   const setPreviusEpisode = () => {
     setLoadingPlayer(true);
@@ -117,6 +130,15 @@ export const Player = () => {
   if (isLoadingPlayer) {
     return (
       <div className="video-container">
+        {isError.error ? (
+          <Dialog
+            type="error"
+            header_text="Error with player"
+            text={isError.information}
+          />
+        ) : (
+          ""
+        )}
         <div className="loading-player material-symbols-outlined">
           progress_activity
         </div>
