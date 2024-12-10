@@ -41,10 +41,23 @@ export const Player = () => {
     }
   };
 
+  const handleMouseMove = () => {
+    showElement();
+    if (hideTimer.current) {
+      clearTimeout(hideTimer.current);
+    }
+    hideTimer.current = setTimeout(hideElement, 1000);
+  };
+
+  const remove_events = () => {
+    if (hideTimer.current) {
+      clearTimeout(hideTimer.current);
+    }
+  }
+
   useEffect(() => {
-    console.log(ep);
     if (episode != ep) {
-      console.log(isLoadingPlayer);
+      remove_events()
       setLoadingPlayer(true);
       set_player();
       setEpisode(ep);
@@ -53,41 +66,9 @@ export const Player = () => {
       set_player();
     }
 
-    const video = videoRef.current;
-    console.log(video);
-    if (video) {
-      // video.preload = "metadata";
-      const handleError = () => {
-        console.error("Video playback error occurred.");
-        video.load();
-      };
-
-      const handleMouseMove = () => {
-        showElement();
-        if (hideTimer.current) {
-          clearTimeout(hideTimer.current);
-        }
-        hideTimer.current = setTimeout(hideElement, 1000);
-      };
-
-      window.addEventListener("mousemove", handleMouseMove);
-      hideTimer.current = setTimeout(hideElement, 1000);
-
-      // TODO: FIX THIS SHIT :CCCCC (idk why this events can't work properly, sometime work or not)
-      video.addEventListener("timeupdate", updateProgress);
-      video.addEventListener("error", handleError);
-      window.addEventListener("keydown", keybinds);
-      return () => {
-        video.removeEventListener("error", handleError);
-        video.removeEventListener("timeupdate", updateProgress);
-        window.removeEventListener("keydown", keybinds);
-        window.removeEventListener("mousemove", handleMouseMove);
-        if (hideTimer.current) {
-          clearTimeout(hideTimer.current);
-        }
-      };
-    }
-  }, []);
+    // TODO: Fix keybinds, when useffect load is error: ReferenceError: Cannot access uninitialized variable in window addEventListener
+    // window.addEventListener("keydown", keybinds);
+  }, [episode, ep]);
 
   const updateProgress = () => {
     if (videoRef.current) {
@@ -289,7 +270,7 @@ export const Player = () => {
   }
 
   return (
-    <div className="video-container" ref={containerRef}>
+    <div className="video-container" ref={containerRef} onMouseMove={handleMouseMove}>
       {isError.error ? (
         <Dialog
           type="error"
@@ -309,6 +290,7 @@ export const Player = () => {
         onLoadedMetadata={handleLoadedMetadata}
         onClick={togglePlay}
         onError={(error) => videoErrorHandler(error)}
+        preload="metadata"
       />
 
       <div className={isVisible ? "video-overlay" : "video-overlay hidden"}>
