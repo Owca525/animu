@@ -24,7 +24,11 @@ export async function get_information(id: string): Promise<InformationData> {
     console.log("info anime: ", info)
     const episode_list = info["data"]["show"]["availableEpisodesDetail"]["sub"];
     episode_list.reverse();
-    return { id: info["data"]["show"]["_id"], title: info["data"]["show"]["name"], description: info["data"]["show"]["description"], img: info["data"]["show"]["thumbnail"], episodes: episode_list}
+    var tmpimg = info["data"]["show"]["thumbnail"];
+    if (tmpimg != null && tmpimg.startsWith("https") != true) {
+        tmpimg = "https://wp.youtube-anime.com/aln.youtube-anime.com/" + tmpimg;
+    };
+    return { id: info["data"]["show"]["_id"], title: info["data"]["show"]["name"], description: info["data"]["show"]["description"], img: tmpimg, episodes: episode_list}
 }
 
 export async function get_search(name: string): Promise<{ id: string, title: string; img: string; }[]> {
