@@ -23,6 +23,7 @@ export const Player = () => {
   const [playerUrl, setPlayerUrl] = useState("");
   const [isShowTime, setShowTime] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+  const [isWaitingPlayer, setWaitingPlayer] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -323,10 +324,13 @@ export const Player = () => {
         onError={(error) => videoErrorHandler(error)}
         preload="metadata"
         onKeyDownCapture={(event) => keybinds(event.nativeEvent)}
+        onLoadStart={() => setWaitingPlayer(true)}
+        onCanPlay={() => setWaitingPlayer(false)}
+        onWaiting={() => setWaitingPlayer(true)}
       />
 
-      <div className={isVisible ? "video-overlay" : "video-overlay hidden"}>
-        <div className="video-top">
+      <div className="video-overlay">
+        <div className={isVisible ? "video-top" : "video-top hidden"}>
           <button
             className="material-symbols-outlined player-buttons"
             onClick={() => navigate("/")}
@@ -337,8 +341,10 @@ export const Player = () => {
             {`Episode: ${ep} of ${title}`}
           </div>
         </div>
-        <div className="video-center"></div>
-        <div className="video-bottom">
+        <div className={(isVisible ? "video-center " : "video-center player-waiting-max ") + (isWaitingPlayer ? "" : "hidden")}>
+          <div className="player-waiting material-symbols-outlined">progress_activity</div>
+        </div>
+        <div className={isVisible ? "video-bottom" : "video-bottom hidden"} >
           <div className={isShowTime ? "show-time" : "show-time hidden" } ref={showtimeRef}></div>
           <div className="seek-bar" ref={seekbar} onClick={handleSeekBarClick} onMouseMove={(event) => handleSeekBarMouseMove(event)} onMouseLeave={() => handleSeekBarMouseLeave()}>
             <div className="progress" ref={progressRef}></div>

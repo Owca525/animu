@@ -58,6 +58,11 @@
   gap: 1em;
 }
 
+.video-center {
+  display: flex;
+  justify-content: center;
+}
+
 .video-bottom {
   display: flex;
   flex-direction: column;
@@ -147,6 +152,18 @@
   align-items: center;
   font-size: 64px;
   animation: spin 1s linear infinite;
+}
+
+.player-waiting {
+  font-size: 72px;
+  animation: spin 1s linear infinite;
+  color: rgb(150, 150, 150);
+}
+.player-waiting-max {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
 .disabled {
