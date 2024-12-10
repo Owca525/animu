@@ -11,7 +11,7 @@ interface CardProps {
 const Card: React.FC<CardProps> = ({ id_anime, title, img }) => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const[showInf, setShowInf] = useState<boolean>(false);
+  const [showInf, setShowInf] = useState<boolean>(false);
 
   const cardRef: any = useRef();
 
@@ -41,8 +41,7 @@ const Card: React.FC<CardProps> = ({ id_anime, title, img }) => {
   }, [showInf])
 
   return (
-    <div className="prevcard" ref={cardRef}>
-      <div className="card" title={title}>
+      <div className="card" title={title} ref={cardRef}>
         <div className="card-img">
           {!isImageLoaded && !hasError && (
             <div className="material-symbols-outlined placeholder">
@@ -56,9 +55,8 @@ const Card: React.FC<CardProps> = ({ id_anime, title, img }) => {
           />
         </div>
         <div className="card-title">{title}</div>
+        <Information id_anime={id_anime} showPopup={showInf} toggle={toggleShow}/>
       </div>
-      <Information id_anime={id_anime} showPopup={showInf} toggle={toggleShow}/>
-    </div>
   );
 };
 

@@ -270,7 +270,7 @@ export const Player = () => {
   }
 
   return (
-    <div className="video-container" ref={containerRef} onMouseMove={handleMouseMove}>
+    <div className="video-container" ref={containerRef} onMouseMove={handleMouseMove} >
       {isError.error ? (
         <Dialog
           type="error"
@@ -291,6 +291,7 @@ export const Player = () => {
         onClick={togglePlay}
         onError={(error) => videoErrorHandler(error)}
         preload="metadata"
+        onKeyDownCapture={(event) => keybinds(event.nativeEvent)}
       />
 
       <div className={isVisible ? "video-overlay" : "video-overlay hidden"}>

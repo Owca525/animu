@@ -1,7 +1,7 @@
 import React from "react";
 import Card from "../ui/card";
 import { ContainerProps } from "../../utils/interface"
-import "../../css/elements/main-content.css";
+import "../../css/elements/card-content.css";
 
 const Container: React.FC<ContainerProps> = ({ title, data = [], className = ""}) => {
   return (

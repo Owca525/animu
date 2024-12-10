@@ -1,15 +1,12 @@
-.prevcard {
-  min-width: 160px;
-  max-height: 310px;
-  height: auto;
-}
 .card {
+  margin-top: 4px;
   display: flex;
   align-items: center;
   flex-direction: column;
+  height: min-content;
   overflow: hidden;
   padding: 6px;
-  gap: 4px;
+  gap: 8px;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
