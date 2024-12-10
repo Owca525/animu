@@ -46,7 +46,7 @@ export const Player = () => {
     if (hideTimer.current) {
       clearTimeout(hideTimer.current);
     }
-    hideTimer.current = setTimeout(hideElement, 1000);
+    hideTimer.current = setTimeout(hideElement, 2000);
   };
 
   const remove_events = () => {
@@ -303,7 +303,7 @@ export const Player = () => {
             arrow_back
           </button>
           <div className="player-title ">
-            {"Episode: " + ep + " of " + title}
+            {`Episode: ${ep} of ${title}`}
           </div>
         </div>
         <div className="video-center"></div>
@@ -316,10 +316,9 @@ export const Player = () => {
           <div className="bottom-section">
             <div className="left">
               <button
-                className="material-symbols-outlined player-buttons"
-                // TODO: Adding protection to the episode
+                className={episodes[episodes.indexOf(ep) - 1] == undefined ? "material-symbols-outlined player-buttons disabled" : "material-symbols-outlined player-buttons"}
                 title={
-                  "Previous: " + episodes[episodes.indexOf(ep) - 1] + " Episode"
+                  episodes[episodes.indexOf(ep) - 1] == undefined ? "" : `Previous: ${episodes[episodes.indexOf(ep) - 1]} Episode`
                 }
                 onClick={setPreviusEpisode}
               >
@@ -333,9 +332,9 @@ export const Player = () => {
                 {isPlaying ? "pause" : "play_arrow"}
               </button>
               <button
-                className="material-symbols-outlined player-buttons"
+                className={episodes[episodes.indexOf(ep) + 1] == undefined ? "material-symbols-outlined player-buttons disabled" : "material-symbols-outlined player-buttons"}
                 title={
-                  "Next: " + episodes[episodes.indexOf(ep) + 1] + " Episode"
+                  episodes[episodes.indexOf(ep) + 1] == undefined ? "" : `Next: ${episodes[episodes.indexOf(ep) + 1]} Episode`
                 }
                 onClick={setNextEpisode}
               >

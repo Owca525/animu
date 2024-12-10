@@ -148,3 +148,8 @@
   font-size: 64px;
   animation: spin 1s linear infinite;
 }
+
+.disabled {
+  color: gray;
+  pointer-events: none;
+}
