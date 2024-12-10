@@ -34,7 +34,7 @@ export const Player = () => {
     } catch (error) {
       setErrorDialog({
         error: true,
-        information: "failed get data from allmanga",
+        information: "Failed get data from allmanga",
       });
     } finally {
       setLoadingPlayer(false);
@@ -54,8 +54,9 @@ export const Player = () => {
     }
 
     const video = videoRef.current;
-    console.log(video)
+    console.log(video);
     if (video) {
+      // video.preload = "metadata";
       const handleError = () => {
         console.error("Video playback error occurred.");
         video.load();
@@ -74,13 +75,11 @@ export const Player = () => {
 
       // TODO: FIX THIS SHIT :CCCCC (idk why this events can't work properly, sometime work or not)
       video.addEventListener("timeupdate", updateProgress);
-      video.addEventListener("loadedmetadata", handleLoadedMetadata);
       video.addEventListener("error", handleError);
       window.addEventListener("keydown", keybinds);
       return () => {
         video.removeEventListener("error", handleError);
         video.removeEventListener("timeupdate", updateProgress);
-        video.removeEventListener("loadedmetadata", handleLoadedMetadata);
         window.removeEventListener("keydown", keybinds);
         window.removeEventListener("mousemove", handleMouseMove);
         if (hideTimer.current) {
@@ -92,14 +91,15 @@ export const Player = () => {
 
   const updateProgress = () => {
     if (videoRef.current) {
-      const percent = (videoRef.current.currentTime / videoRef.current.duration) * 100;
+      const percent =
+        (videoRef.current.currentTime / videoRef.current.duration) * 100;
       setCurrentTime(videoRef.current.currentTime);
 
       if (progressRef.current) {
         progressRef.current.style.width = `${percent}%`;
       }
-      if(thumbRef.current) {
-        thumbRef.current.style.left = `${percent}%`
+      if (thumbRef.current) {
+        thumbRef.current.style.left = `${percent}%`;
       }
     }
   };
@@ -138,6 +138,7 @@ export const Player = () => {
             type="error"
             header_text="Error with player"
             text={isError.information}
+            onClick={() => navigate("/")}
           />
         ) : (
           ""
@@ -262,8 +263,43 @@ export const Player = () => {
     }
   };
 
+  const videoErrorHandler = (event: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+    const error = event.currentTarget.error;
+    var message: string;
+
+    if (error) {
+      switch (error.code) {
+        case error.MEDIA_ERR_ABORTED:
+          message = "The playback was aborted.";
+          break;
+        case error.MEDIA_ERR_NETWORK:
+          message = "A network error occurred while fetching the video.";
+          break;
+        case error.MEDIA_ERR_DECODE:
+          message = "An error occurred while decoding the video.";
+          break;
+        case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+          message = "The video format or source is not supported.";
+          break;
+        default:
+          message = "An unknown error occurred.";
+      }
+      setErrorDialog({ error: true, information: message })
+    }
+  }
+
   return (
     <div className="video-container" ref={containerRef}>
+      {isError.error ? (
+        <Dialog
+          type="error"
+          header_text="Error with player"
+          text={isError.information}
+          onClick={() => navigate("/")}
+        />
+      ) : (
+        ""
+      )}
       <video
         ref={videoRef}
         // src="https://myanime.sharepoint.com/sites/chartlousty/_layouts/15/download.aspx?share=EVZlwR4K-rxAjiIfQl8LlqABTqXsPyuX0-1oALcfV_62lQ"
@@ -272,6 +308,7 @@ export const Player = () => {
         onTimeUpdate={updateProgress}
         onLoadedMetadata={handleLoadedMetadata}
         onClick={togglePlay}
+        onError={(error) => videoErrorHandler(error)}
       />
 
       <div className={isVisible ? "video-overlay" : "video-overlay hidden"}>
@@ -290,7 +327,7 @@ export const Player = () => {
         <div className="video-bottom">
           <div className="seek-bar" ref={seekbar} onClick={handleSeekBarClick}>
             <div className="progress" ref={progressRef}></div>
-            <div className="thumb" ref={thumbRef}/>
+            <div className="thumb" ref={thumbRef} />
             <div className="show-time"></div>
           </div>
           <div className="bottom-section">

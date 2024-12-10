@@ -10,10 +10,10 @@
 }
 .dialog {
     background-color: var(--primary-200);
-    min-width: 40%;
-    min-height: 30%;
-    max-width: 80%;
-    max-height: 60%;
+    min-width: 30%;
+    min-height: 20%;
+    max-width: 60%;
+    max-height: 40%;
     padding: 16px;
     border-radius: 4px;
     display: flex;
@@ -23,7 +23,7 @@
 .dialog-space {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 1em;
 }
 .dialog-Header {
     font-size: x-large;

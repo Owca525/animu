@@ -6,9 +6,10 @@ interface dialogProps {
     type: string;
     header_text: string;
     text: string;
+    onClick: () => void;
 }
 
-const dialog: React.FC<dialogProps> = ({ type, header_text, text }) => {
+const dialog: React.FC<dialogProps> = ({ type, header_text, text, onClick }) => {
     if (type == "error") {
 
     }
@@ -19,7 +20,7 @@ const dialog: React.FC<dialogProps> = ({ type, header_text, text }) => {
                     <div className="dialog-Header">{header_text}</div>
                     <div className="dialog-text">{text}</div>
                 </div>
-                <div className="dialog-buttons"><Button value="Okay" className="dialog-button"/></div>
+                <div className="dialog-buttons"><Button value="Okay" className="dialog-button" onClick={onClick}/></div>
             </div>
         </div>
     )
