@@ -22,3 +22,8 @@
   height: 100vh;
   animation: spin 1s linear infinite;
 }
+.message-content {
+  display: flex;
+  justify-content: center;
+  height: 70vh;
+}
