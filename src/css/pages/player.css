@@ -153,3 +153,14 @@
   color: gray;
   pointer-events: none;
 }
+
+.show-time {
+  padding: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+  bottom: 80px;
+  background-color: rgba(0, 0, 0, 0.8);
+  width: min-content;
+  border-radius: 4px;
+  position: absolute;
+}

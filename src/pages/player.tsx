@@ -15,11 +15,13 @@ export const Player = () => {
   const seekbar = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
+  const showtimeRef = useRef<HTMLDivElement | null>(null);
   const hideTimer = useRef<NodeJS.Timeout | null>(null);
   const [volume, setVolume] = useState<number>(0.25);
   const [episode, setEpisode] = useState(ep);
   const [isLoadingPlayer, setLoadingPlayer] = useState(true);
   const [playerUrl, setPlayerUrl] = useState("");
+  const [isShowTime, setShowTime] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -76,10 +78,8 @@ export const Player = () => {
         (videoRef.current.currentTime / videoRef.current.duration) * 100;
       setCurrentTime(videoRef.current.currentTime);
 
-      if (progressRef.current) {
+      if (progressRef.current && thumbRef.current && isShowTime == false) {
         progressRef.current.style.width = `${percent}%`;
-      }
-      if (thumbRef.current) {
         thumbRef.current.style.left = `${percent}%`;
       }
     }
@@ -239,10 +239,41 @@ export const Player = () => {
       const totalWidth = rect.width;
       const percent = offsetX / totalWidth;
       const newTime = percent * video.duration;
-      video.currentTime = newTime;
-      setCurrentTime(newTime);
+      if (!isNaN(newTime)) {
+        video.currentTime = newTime;
+        setCurrentTime(newTime);
+      }
     }
   };
+
+  const handleSeekBarMouseMove = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const seekBar = seekbar.current;
+    const video = videoRef.current;
+    const showtime = showtimeRef.current;
+    if (seekBar && video && showtime && progressRef.current && thumbRef.current) {
+      const rect = seekBar.getBoundingClientRect();
+      const offsetX = event.clientX - rect.left;
+      const totalWidth = rect.width;
+      const percent = offsetX / totalWidth;
+      const newTime = percent * video.duration;
+      if (!isNaN(newTime) && newTime > 0) {
+        setShowTime(true);
+        showtime.innerHTML = formatTime(newTime)
+        showtime.style.left = `${percent * 96.5}%`;
+        progressRef.current.style.width = `${percent * 100}%`;
+        thumbRef.current.style.left = `${percent * 100}%`;
+      }
+    }
+  };
+
+  const handleSeekBarMouseLeave = () => {
+    setShowTime(false);
+    if (videoRef.current && progressRef.current && thumbRef.current) {
+      const percent = (videoRef.current.currentTime / videoRef.current.duration) * 100
+      progressRef.current.style.width = `${percent}%`;
+      thumbRef.current.style.left = `${percent}%`;
+    }
+  }
 
   const videoErrorHandler = (event: React.SyntheticEvent<HTMLVideoElement, Event>) => {
     const error = event.currentTarget.error;
@@ -308,10 +339,10 @@ export const Player = () => {
         </div>
         <div className="video-center"></div>
         <div className="video-bottom">
-          <div className="seek-bar" ref={seekbar} onClick={handleSeekBarClick}>
+          <div className={isShowTime ? "show-time" : "show-time hidden" } ref={showtimeRef}></div>
+          <div className="seek-bar" ref={seekbar} onClick={handleSeekBarClick} onMouseMove={(event) => handleSeekBarMouseMove(event)} onMouseLeave={() => handleSeekBarMouseLeave()}>
             <div className="progress" ref={progressRef}></div>
             <div className="thumb" ref={thumbRef} />
-            <div className="show-time"></div>
           </div>
           <div className="bottom-section">
             <div className="left">
