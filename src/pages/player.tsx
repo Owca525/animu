@@ -56,7 +56,7 @@ export const Player = () => {
     if (hideTimer.current) {
       clearTimeout(hideTimer.current);
     }
-  }
+  };
 
   const change_time = (time: number) => {
     if (videoRef.current) {
@@ -69,32 +69,34 @@ export const Player = () => {
       }
     }
   };
-  let spaceBool = false;
-  
-  const handleSpace = () => {
-    console.log(spaceBool + "han");
-    
-    if(videoRef.current) {
-      if(spaceBool) {
-        videoRef.current.pause()
-        spaceBool = false;
-        setIsPlaying(false);
-      } else {
-        videoRef.current.play()
-        spaceBool = true;
-        setIsPlaying(true)
+
+  const enterFullscreen = () => {
+    if (containerRef.current) {
+      if (containerRef.current.requestFullscreen) {
+        containerRef.current.requestFullscreen();
+        setIsFullscreen(true);
+      } else if ((containerRef.current as any).webkitRequestFullscreen) {
+        (containerRef.current as any).webkitRequestFullscreen();
+        setIsFullscreen(true);
+      } else if ((containerRef.current as any).msRequestFullscreen) {
+        (containerRef.current as any).msRequestFullscreen();
+        setIsFullscreen(true);
+      }
+      if (isFullscreen) {
+        document.exitFullscreen();
+        setIsFullscreen(false);
       }
     }
-  }
+  };
 
   const keybinds = (event: KeyboardEvent) => {
     if (videoRef.current) {
       var time_now = videoRef.current.currentTime;
       switch (event.key.toLowerCase()) {
         case " ":
-          handleSpace()
+          togglePlay();
           break;
-        case "arrowright": 
+        case "arrowright":
           change_time((time_now += 5));
           break;
         case "arrowleft":
@@ -112,32 +114,24 @@ export const Player = () => {
     }
   };
 
-  const togglePlay = () => {  
-    
-    
-    // TODO: Fix why space don't stop video in function togglePlay and keybinds
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-        setIsPlaying(false);
-        spaceBool = false
-      } else {
-        videoRef.current.play().catch((error) => {
-          console.error("Play error:", error);
-        });
-        setIsPlaying(true);
-        spaceBool = true
-      }
-
-      console.log(spaceBool + "tog");
-      
+  const togglePlay = () => {
+    const video = videoRef.current;
+    if (video) {
+      setIsPlaying((prevIsPlaying: boolean) => {
+        if (prevIsPlaying) {
+          video.pause();
+          return false;
+        } else {
+          video.play();
+          return true;
+        }
+      });
     }
-    
   };
 
   useEffect(() => {
     if (episode != ep) {
-      remove_events()
+      remove_events();
       setLoadingPlayer(true);
       set_player();
       setEpisode(ep);
@@ -145,13 +139,10 @@ export const Player = () => {
       setLoadingPlayer(true);
       set_player();
     }
-  
-    if(videoRef) {
-      document.addEventListener("keydown", keybinds);
-    } else document.removeEventListener("keydown", keybinds)
 
-    // TODO: Fix keybinds, when useffect load is error: ReferenceError: Cannot access uninitialized variable in window addEventListener
-    // window.addEventListener("keydown", keybinds);
+    if (videoRef) {
+      document.addEventListener("keydown", keybinds);
+    } else document.removeEventListener("keydown", keybinds);
   }, [episode, ep, videoRef]);
 
   const updateProgress = () => {
@@ -222,30 +213,9 @@ export const Player = () => {
     }
   };
 
-  
-
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
       setDuration(videoRef.current.duration);
-    }
-  };
-
-  const enterFullscreen = () => {
-    if (containerRef.current) {
-      if (containerRef.current.requestFullscreen) {
-        containerRef.current.requestFullscreen();
-        setIsFullscreen(true);
-      } else if ((containerRef.current as any).webkitRequestFullscreen) {
-        (containerRef.current as any).webkitRequestFullscreen();
-        setIsFullscreen(true);
-      } else if ((containerRef.current as any).msRequestFullscreen) {
-        (containerRef.current as any).msRequestFullscreen();
-        setIsFullscreen(true);
-      }
-      if (isFullscreen) {
-        document.exitFullscreen();
-        setIsFullscreen(false);
-      }
     }
   };
 
@@ -254,8 +224,6 @@ export const Player = () => {
     const secs = Math.floor(seconds % 60);
     return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
   };
-
-  
 
   const showElement = () => {
     setIsVisible(true);
@@ -281,11 +249,19 @@ export const Player = () => {
     }
   };
 
-  const handleSeekBarMouseMove = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleSeekBarMouseMove = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
     const seekBar = seekbar.current;
     const video = videoRef.current;
     const showtime = showtimeRef.current;
-    if (seekBar && video && showtime && progressRef.current && thumbRef.current) {
+    if (
+      seekBar &&
+      video &&
+      showtime &&
+      progressRef.current &&
+      thumbRef.current
+    ) {
       const rect = seekBar.getBoundingClientRect();
       const offsetX = event.clientX - rect.left;
       const totalWidth = rect.width;
@@ -293,7 +269,7 @@ export const Player = () => {
       const newTime = percent * video.duration;
       if (!isNaN(newTime) && newTime > 0) {
         setShowTime(true);
-        showtime.innerHTML = formatTime(newTime)
+        showtime.innerHTML = formatTime(newTime);
         showtime.style.left = `${percent * 96.5}%`;
         progressRef.current.style.width = `${percent * 100}%`;
         thumbRef.current.style.left = `${percent * 100}%`;
@@ -304,13 +280,16 @@ export const Player = () => {
   const handleSeekBarMouseLeave = () => {
     setShowTime(false);
     if (videoRef.current && progressRef.current && thumbRef.current) {
-      const percent = (videoRef.current.currentTime / videoRef.current.duration) * 100
+      const percent =
+        (videoRef.current.currentTime / videoRef.current.duration) * 100;
       progressRef.current.style.width = `${percent}%`;
       thumbRef.current.style.left = `${percent}%`;
     }
-  }
+  };
 
-  const videoErrorHandler = (event: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+  const videoErrorHandler = (
+    event: React.SyntheticEvent<HTMLVideoElement, Event>
+  ) => {
     const error = event.currentTarget.error;
     var message: string;
 
@@ -331,12 +310,16 @@ export const Player = () => {
         default:
           message = "An unknown error occurred.";
       }
-      setErrorDialog({ error: true, information: message })
+      setErrorDialog({ error: true, information: message });
     }
-  } 
+  };
 
   return (
-    <div className="video-container" ref={containerRef} onMouseMove={handleMouseMove} >
+    <div
+      className="video-container"
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+    >
       {isError.error ? (
         <Dialog
           type="error"
@@ -370,25 +353,45 @@ export const Player = () => {
           >
             arrow_back
           </button>
-          <div className="player-title ">
-            {`Episode: ${ep} of ${title}`}
+          <div className="player-title ">{`Episode: ${ep} of ${title}`}</div>
+        </div>
+        <div
+          className={
+            (isVisible ? "video-center " : "video-center player-waiting-max ") +
+            (isWaitingPlayer ? "" : "hidden")
+          }
+        >
+          <div className="player-waiting material-symbols-outlined">
+            progress_activity
           </div>
         </div>
-        <div className={(isVisible ? "video-center " : "video-center player-waiting-max ") + (isWaitingPlayer ? "" : "hidden")}>
-          <div className="player-waiting material-symbols-outlined">progress_activity</div>
-        </div>
-        <div className={isVisible ? "video-bottom" : "video-bottom hidden"} >
-          <div className={isShowTime ? "show-time" : "show-time hidden" } ref={showtimeRef}></div>
-          <div className="seek-bar" ref={seekbar} onClick={handleSeekBarClick} onMouseMove={(event) => handleSeekBarMouseMove(event)} onMouseLeave={() => handleSeekBarMouseLeave()}>
+        <div className={isVisible ? "video-bottom" : "video-bottom hidden"}>
+          <div
+            className={isShowTime ? "show-time" : "show-time hidden"}
+            ref={showtimeRef}
+          ></div>
+          <div
+            className="seek-bar"
+            ref={seekbar}
+            onClick={handleSeekBarClick}
+            onMouseMove={(event) => handleSeekBarMouseMove(event)}
+            onMouseLeave={() => handleSeekBarMouseLeave()}
+          >
             <div className="progress" ref={progressRef}></div>
             <div className="thumb" ref={thumbRef} />
           </div>
           <div className="bottom-section">
             <div className="left">
               <button
-                className={episodes[episodes.indexOf(ep) - 1] == undefined ? "material-symbols-outlined player-buttons disabled" : "material-symbols-outlined player-buttons"}
+                className={
+                  episodes[episodes.indexOf(ep) - 1] == undefined
+                    ? "material-symbols-outlined player-buttons disabled"
+                    : "material-symbols-outlined player-buttons"
+                }
                 title={
-                  episodes[episodes.indexOf(ep) - 1] == undefined ? "" : `Previous: ${episodes[episodes.indexOf(ep) - 1]} Episode`
+                  episodes[episodes.indexOf(ep) - 1] == undefined
+                    ? ""
+                    : `Previous: ${episodes[episodes.indexOf(ep) - 1]} Episode`
                 }
                 onClick={setPreviusEpisode}
               >
@@ -402,9 +405,15 @@ export const Player = () => {
                 {isPlaying ? "pause" : "play_arrow"}
               </button>
               <button
-                className={episodes[episodes.indexOf(ep) + 1] == undefined ? "material-symbols-outlined player-buttons disabled" : "material-symbols-outlined player-buttons"}
+                className={
+                  episodes[episodes.indexOf(ep) + 1] == undefined
+                    ? "material-symbols-outlined player-buttons disabled"
+                    : "material-symbols-outlined player-buttons"
+                }
                 title={
-                  episodes[episodes.indexOf(ep) + 1] == undefined ? "" : `Next: ${episodes[episodes.indexOf(ep) + 1]} Episode`
+                  episodes[episodes.indexOf(ep) + 1] == undefined
+                    ? ""
+                    : `Next: ${episodes[episodes.indexOf(ep) + 1]} Episode`
                 }
                 onClick={setNextEpisode}
               >
