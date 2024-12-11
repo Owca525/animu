@@ -3,18 +3,21 @@ import { SidebarProps } from "../../utils/interface"
 import { get_recent } from "../../utils/backend"
 import "../../css/elements/sidebar.css"
 import { useNavigate } from "react-router-dom";
+// import { useState } from "react";
 // className="active"
 
-const Sidebar: React.FC<SidebarProps> = ({ change_content }) =>  {
+const Sidebar: React.FC<SidebarProps> = ({ change_content }) => {
   const navigate = useNavigate();
-  
+
+  // const [isMaxSidebar, setIsMaxSidebar] = useState(false);
+
   return (
     <div className="sidebar-mini">
       <div className="top-sidebar">
-        <Button value='<div class="material-symbols-outlined text-button">arrow_forward</div>' className="icon-button" />
+        <Button value='<div class="material-symbols-outlined text-button">arrow_forward</div>' className="icon-button" title="Show Full Sidebar" />
         <div className="border"></div>
-        <Button value='<div class="material-symbols-outlined text-button">schedule</div>' className="icon-button" title="Recent Anime" onClick={async () => change_content({ title: "Recent Anime", data: await get_recent() })}/>
-        <Button value='<div class="material-symbols-outlined text-button">history</div>' className="icon-button" title="History" onClick={() => change_content({ title: "History" })}/>
+        <Button value='<div class="material-symbols-outlined text-button">schedule</div>' className="icon-button" title="Recent Anime" onClick={async () => change_content({ title: "Recent Anime", data: await get_recent() })} />
+        <Button value='<div class="material-symbols-outlined text-button">history</div>' className="icon-button" title="History" onClick={() => change_content({ title: "History" })} />
       </div>
       <div className="bottom-sidebar">
         <div className="border"></div>

@@ -43,7 +43,7 @@ function home() {
   if (loading) {
     return (
       <main className="container">
-        <Sidebar change_content={change_content} />
+        <Sidebar change_content={change_content}/>
         <Header onInputChange={handleInputChange}/>
         <div className="content loading-home">
           <div className="loading material-symbols-outlined">progress_activity</div>

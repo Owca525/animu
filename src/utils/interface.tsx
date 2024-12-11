@@ -20,4 +20,5 @@ export interface InformationData {
 
 export interface SidebarProps {
   change_content: (data: ContainerProps) => void;
+  // data: { top: { value: string, class: string, title?: string, onClick?: () => void }[], bottom: { value: string, class: string, title?: string, onClick?: () => void }[] }
 }
