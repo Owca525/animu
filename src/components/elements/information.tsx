@@ -25,7 +25,7 @@ export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, t
   };
 
   useEffect(() => {
-    const handleKeyDown = (event: any) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         toggle();
       }

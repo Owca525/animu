@@ -58,6 +58,83 @@ export const Player = () => {
     }
   }
 
+  const change_time = (time: number) => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        togglePlay();
+        videoRef.current.currentTime = time;
+        togglePlay();
+      } else {
+        videoRef.current.currentTime = time;
+      }
+    }
+  };
+  let spaceBool = false;
+  
+  const handleSpace = () => {
+    console.log(spaceBool + "han");
+    
+    if(videoRef.current) {
+      if(spaceBool) {
+        videoRef.current.pause()
+        spaceBool = false;
+        setIsPlaying(false);
+      } else {
+        videoRef.current.play()
+        spaceBool = true;
+        setIsPlaying(true)
+      }
+    }
+  }
+
+  const keybinds = (event: KeyboardEvent) => {
+    if (videoRef.current) {
+      var time_now = videoRef.current.currentTime;
+      switch (event.key.toLowerCase()) {
+        case " ":
+          handleSpace()
+          break;
+        case "arrowright": 
+          change_time((time_now += 5));
+          break;
+        case "arrowleft":
+          change_time((time_now -= 5));
+          break;
+        case "arrowup":
+          change_time((time_now += 80));
+          break;
+        case "arrowdown":
+          change_time((time_now -= 80));
+          break;
+        case "f":
+          enterFullscreen();
+      }
+    }
+  };
+
+  const togglePlay = () => {  
+    
+    
+    // TODO: Fix why space don't stop video in function togglePlay and keybinds
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+        spaceBool = false
+      } else {
+        videoRef.current.play().catch((error) => {
+          console.error("Play error:", error);
+        });
+        setIsPlaying(true);
+        spaceBool = true
+      }
+
+      console.log(spaceBool + "tog");
+      
+    }
+    
+  };
+
   useEffect(() => {
     if (episode != ep) {
       remove_events()
@@ -68,10 +145,14 @@ export const Player = () => {
       setLoadingPlayer(true);
       set_player();
     }
+  
+    if(videoRef) {
+      document.addEventListener("keydown", keybinds);
+    } else document.removeEventListener("keydown", keybinds)
 
     // TODO: Fix keybinds, when useffect load is error: ReferenceError: Cannot access uninitialized variable in window addEventListener
     // window.addEventListener("keydown", keybinds);
-  }, [episode, ep]);
+  }, [episode, ep, videoRef]);
 
   const updateProgress = () => {
     if (videoRef.current) {
@@ -141,19 +222,7 @@ export const Player = () => {
     }
   };
 
-  const togglePlay = () => {
-    // TODO: Fix why space don't stop video in function togglePlay and keybinds
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play().catch((error) => {
-          console.error("Play error:", error);
-        });
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
+  
 
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
@@ -186,42 +255,7 @@ export const Player = () => {
     return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  const change_time = (time: number) => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        togglePlay();
-        videoRef.current.currentTime = time;
-        togglePlay();
-      } else {
-        videoRef.current.currentTime = time;
-      }
-    }
-  };
-
-  const keybinds = (event: KeyboardEvent) => {
-    if (videoRef.current) {
-      var time_now = videoRef.current.currentTime;
-      switch (event.key.toLowerCase()) {
-        case " ":
-          togglePlay();
-          break;
-        case "arrowright":
-          change_time((time_now += 5));
-          break;
-        case "arrowleft":
-          change_time((time_now -= 5));
-          break;
-        case "arrowup":
-          change_time((time_now += 80));
-          break;
-        case "arrowdown":
-          change_time((time_now -= 80));
-          break;
-        case "f":
-          enterFullscreen();
-      }
-    }
-  };
+  
 
   const showElement = () => {
     setIsVisible(true);
@@ -299,7 +333,7 @@ export const Player = () => {
       }
       setErrorDialog({ error: true, information: message })
     }
-  }
+  } 
 
   return (
     <div className="video-container" ref={containerRef} onMouseMove={handleMouseMove} >
@@ -323,7 +357,6 @@ export const Player = () => {
         onClick={togglePlay}
         onError={(error) => videoErrorHandler(error)}
         preload="metadata"
-        onKeyDownCapture={(event) => keybinds(event.nativeEvent)}
         onLoadStart={() => setWaitingPlayer(true)}
         onCanPlay={() => setWaitingPlayer(false)}
         onWaiting={() => setWaitingPlayer(true)}
