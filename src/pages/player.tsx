@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "../css/pages/player.css";
 import { useLocation, useNavigate } from "react-router-dom";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { get_player_anime } from "../utils/backend";
 import Dialog from "../components/elements/dialog";
 // import Dialog from "../components/elements/dialog";
@@ -70,26 +71,30 @@ export const Player = () => {
     }
   };
 
-  const enterFullscreen = () => {
-    if (containerRef.current) {
-      if (containerRef.current.requestFullscreen) {
-        containerRef.current.requestFullscreen();
-        setIsFullscreen(true);
-      } else if ((containerRef.current as any).webkitRequestFullscreen) {
-        (containerRef.current as any).webkitRequestFullscreen();
-        setIsFullscreen(true);
-      } else if ((containerRef.current as any).msRequestFullscreen) {
-        (containerRef.current as any).msRequestFullscreen();
-        setIsFullscreen(true);
-      }
-      if (isFullscreen) {
-        document.exitFullscreen();
-        setIsFullscreen(false);
-      }
+  // Temporaly 
+  var currentisFullscreen = false;
+  const enterFullscreenKeybinds = async () => {
+    if (currentisFullscreen) {
+      await getCurrentWindow().setFullscreen(false);
+      currentisFullscreen = false;
+      return false
+    } else {
+      await getCurrentWindow().setFullscreen(true);
+      currentisFullscreen = true;
+      return true
+    }
+  };
+  const enterFullscreen = async () => {
+    if (isFullscreen) {
+      await getCurrentWindow().setFullscreen(false);
+      return false
+    } else {
+      await getCurrentWindow().setFullscreen(true);
+      return true
     }
   };
 
-  const keybinds = (event: KeyboardEvent) => {
+  const keybinds = async (event: KeyboardEvent) => {
     if (videoRef.current) {
       var time_now = videoRef.current.currentTime;
       switch (event.key.toLowerCase()) {
@@ -109,7 +114,7 @@ export const Player = () => {
           change_time((time_now -= 80));
           break;
         case "f":
-          enterFullscreen();
+          setIsFullscreen(await enterFullscreenKeybinds());
       }
     }
   };
@@ -447,7 +452,7 @@ export const Player = () => {
                 settings
               </button>
               <button
-                onClick={enterFullscreen}
+                onClick={async () => setIsFullscreen(await enterFullscreen())}
                 className="material-symbols-outlined player-buttons"
                 title="Fullscreen"
               >
