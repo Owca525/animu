@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import "../css/pages/player.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { get_player_anime } from "../utils/backend";
 import Dialog from "../components/elements/dialog";
-// import Dialog from "../components/elements/dialog";
+import "../css/pages/player.css";
 
 export const Player = () => {
   const location = useLocation();
@@ -319,6 +318,11 @@ export const Player = () => {
     }
   };
 
+  const exitFullscreen = async () => {
+    await getCurrentWindow().setFullscreen(false);
+    navigate("/");
+  }
+
   return (
     <div
       className="video-container"
@@ -354,7 +358,7 @@ export const Player = () => {
         <div className={isVisible ? "video-top" : "video-top hidden"}>
           <button
             className="material-symbols-outlined player-buttons"
-            onClick={() => navigate("/")}
+            onClick={async () => await exitFullscreen()}
           >
             arrow_back
           </button>

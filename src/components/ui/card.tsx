@@ -44,13 +44,19 @@ const Card: React.FC<CardProps> = ({ id_anime, title, img }) => {
       <div className="card" title={title} ref={cardRef}>
         <div className="card-img">
           {!isImageLoaded && !hasError && (
-            <div className="material-symbols-outlined placeholder">
+            <div className="material-symbols-outlined placeholder" style={{ animation: "spin 1s linear infinite" }}>
               progress_activity
+            </div>
+          )}
+          {hasError && (
+            <div className="material-symbols-outlined placeholder" title="img can't load">
+              error
             </div>
           )}
           <img
             onLoad={handleImageLoad}
-            className={`card-image ${isImageLoaded ? "loaded" : "hidden"}`}
+            onError={() => setHasError(true)}
+            className={`card-image ${isImageLoaded && !hasError ? "loaded" : "hidden"}`}
             src={img}
           />
         </div>
