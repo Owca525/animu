@@ -40,6 +40,13 @@ const Card: React.FC<CardProps> = ({ id_anime, title, img }) => {
     }
   }, [showInf])
 
+  const shortText = (text: string) => {
+    if (text.length > 58) {
+      return text.slice(0, 58) + "...";
+    }
+    return text;
+  }
+
   return (
       <div className="card" title={title} ref={cardRef}>
         <div className="card-img">
@@ -60,7 +67,7 @@ const Card: React.FC<CardProps> = ({ id_anime, title, img }) => {
             src={img}
           />
         </div>
-        <div className="card-title">{title}</div>
+        <div className="card-title">{shortText(title)}</div>
         <Information id_anime={id_anime} showPopup={showInf} toggle={toggleShow}/>
       </div>
   );

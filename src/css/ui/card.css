@@ -41,7 +41,7 @@
   word-wrap: break-word;
   overflow: hidden;
   padding: 1px;
-  text-align: center;
+  text-align: start;
 }
 .placeholder {
   width: 190px;
