@@ -1,15 +1,15 @@
 {
-  "version": "",
+  "version": "0.1.0",
   "notes": "",
-  "pub_date": "",
+  "pub_date": "2024-12-12T21:34:06Z",
   "platforms": {
     "linux-x86_64": {
-      "signature": "",
-      "url": ""
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRQ29SaFVZcmNNZjJGSVVCaDVCMW9SWDJJUm54ZXA5NkFSazdCN3lYT0MvOWs0a3F5bDRFT2FrcUJmUkVQYi9UdHVrZjlSUEphZndXdCszUEVjS1hBZ3QyM0kwRU5jY1E4PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM0MDM4MTQ3CWZpbGU6YW5pbXVfMC4xLjBfYW1kNjQuQXBwSW1hZ2UKQlNqMU83OVpoaHU5QnEzWlo5MlJ0dDQySXNQanB2NXdyZ0xWTFBPRTBwS29FTm1JUnpKOHgxUVl0ZllXUHY2WFV2YlBwMnUzK0IzM1dYUndVT3ErQXc9PQo=",
+      "url": "https://github.com/Owca525/animu/releases/download/v0.1.0/animu_0.1.0_amd64.AppImage"
     },
     "windows-x86_64": {
-      "signature": "",
-      "url": ""
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRQ29SaFVZcmNNZjdQQTY3VUdsbVk4M2owZHR3UUFOY0NIaDViakljbUJXVWZiU1BZSnQwbDZaZUZtZlJWc09tRERwZjNMb0Q0K3M1WGhINkVWNGg2ZUxHaUdxNjBLV2drPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM0MDM4NjA2CWZpbGU6YW5pbXVfMC4xLjBfeDY0X2VuLVVTLm1zaQowMWlOc0o0cVRRT1JvWXBhTThoYzZLdlZ0NFJyZVI4THEvUFk0NFN4ZXE5elhOSjFnRXVGTjFPaUxpdS9WM1hvTTZIU2ptMTBPQjYwem1HZVd2NEVBQT09Cg==",
+      "url": "https://github.com/Owca525/animu/releases/download/v0.1.0/animu_0.1.0_x64_en-US.msi"
     }
   }
 }
