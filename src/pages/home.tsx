@@ -15,7 +15,7 @@ function home() {
   const [data, setData] = useState<ContainerProps>({ title: "", data: [] });
   const [loading, setLoading] = useState(true);
   const [updateNotification, setUpdateNotification] = useState(false);
-  const [notificationData, setNotificationData] = useState([{ title: "", information: "", onClick: () => ""}])
+  const [notificationData, setNotificationData] = useState<{ title: string; information: string; onClick?: () => void }[]>([{ title: "", information: ""}])
   const [isUpdate, setisUpdate] = useState(false);
 
   const checkUpdate = async () => {

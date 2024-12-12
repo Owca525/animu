@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../../css/elements/notifiaction.css";
-
-interface NotificationProps {
-  data: { title: string; information: string; onClick?: () => void }[];
-}
+import { NotificationProps } from "../../utils/interface";
 
 const Notification: React.FC<NotificationProps> = ({ data }) => {
   const [visibleNotifications, setVisibleNotifications] = useState<boolean[]>(

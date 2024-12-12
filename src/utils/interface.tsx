@@ -22,3 +22,7 @@ export interface SidebarProps {
   change_content: (data: ContainerProps) => void;
   // data: { top: { value: string, class: string, title?: string, onClick?: () => void }[], bottom: { value: string, class: string, title?: string, onClick?: () => void }[] }
 }
+
+export interface NotificationProps {
+  data: { title: string; information: string; onClick?: () => void }[];
+}
