@@ -23,6 +23,7 @@
     }
   },
   "bundle": {
+    "createUpdaterArtifacts": true,
     "active": true,
     "targets": "all",
     "icon": [
@@ -32,5 +33,17 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "updater": {
+      "dialog": true,
+      "windows": {
+        "installMode": "passive"
+      },
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdGMENCNzYyNTQxOEExMDIKUldRQ29SaFVZcmNNZjI0Y3J0V3F4TXRVdmZDMXphUHVaU0tsVDJoM1NSMkhmU3YwUkQ3OEtkb24K",
+      "endpoints": [
+        "https://raw.githubusercontent.com/Owca525/animu/refs/heads/main/latest.json"
+      ]
+    }
   }
 }

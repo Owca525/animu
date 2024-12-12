@@ -1,7 +1,7 @@
 #![allow(unused)]
+use regex::Regex;
 use reqwest::Client;
 use serde_json::Value;
-use regex::Regex;
 use std::collections::HashMap;
 
 // Hashe są indyfikatorem dla danego urządzenia muszą być kiedy jest wysyłany request do api allmanga
@@ -42,7 +42,8 @@ pub async fn get_search_anime(name: &str) -> Result<String, String> {
 pub async fn fetch_recent_anime() -> Result<String, String> {
     let client = Client::new();
     let variables = "{'search':{'sortBy':'Recent'},'limit':26,'page':1,'translationType':'sub','countryOrigin':'ALL'}";
-    let extensions = "{'persistedQuery':{'version':1,'sha256Hash': '".to_string() + HASH_SEARCH + "'}}";
+    let extensions =
+        "{'persistedQuery':{'version':1,'sha256Hash': '".to_string() + HASH_SEARCH + "'}}";
     let url = API_WEB.to_string() + "/api?variables=" + &variables + "&extensions=" + &extensions;
 
     let response = client
@@ -87,17 +88,21 @@ async fn fetch_url(url: &str) -> Result<String, String> {
 
 fn decode_text(text_string: &str, replacements: &HashMap<&str, &str>) -> String {
     let re = Regex::new(r"(?s)..").unwrap();
-    let mut text_string = re.replace_all(text_string, |caps: &regex::Captures| {
-        format!("{}\n", &caps[0])
-    }).to_string();
+    let mut text_string = re
+        .replace_all(text_string, |caps: &regex::Captures| {
+            format!("{}\n", &caps[0])
+        })
+        .to_string();
 
     for (pattern, replacement) in replacements {
         let re = Regex::new(pattern).unwrap();
         text_string = re.replace_all(&text_string, *replacement).to_string();
     }
 
-    text_string = text_string.replace('\n', "").replace("/clock", "/clock.json");
-    
+    text_string = text_string
+        .replace('\n', "")
+        .replace("/clock", "/clock.json");
+
     text_string
 }
 
@@ -141,7 +146,10 @@ async fn search_urls(dict: &str) -> String {
         (r"4e", "v"),
         (r"57", "o"),
         (r"51", "i"),
-    ].iter().cloned().collect();
+    ]
+    .iter()
+    .cloned()
+    .collect();
     let mut tmp: Vec<String> = ["500".to_string()].to_vec();
 
     let parsed: HashMap<String, Value> = serde_json::from_str(dict).expect("");
@@ -165,15 +173,20 @@ async fn search_urls(dict: &str) -> String {
         let decoded_urls: Vec<String> = urls
             .iter()
             .filter(|url| url.starts_with("--"))
-            .map(|url| format!("http://allanime.day{}", decode_text(&url[2..], &replacements)))
+            .map(|url| {
+                format!(
+                    "http://allanime.day{}",
+                    decode_text(&url[2..], &replacements)
+                )
+            })
             .collect();
-        
+
         urls.retain(|s| !s.starts_with("--"));
-        
+
         for url in decoded_urls {
             let data = match fetch_url(&url).await {
                 Ok(s) => s,
-                Err(e) => { e }
+                Err(e) => e,
             };
             urls.push(data);
         }
@@ -185,8 +198,13 @@ async fn search_urls(dict: &str) -> String {
 // wysyła request GET do api allmanga i odbiera zaszyfrowane linki
 pub async fn extracting_urls(id: &str, ep: &str) -> Result<String, String> {
     let client = Client::new();
-    let variables = "{'showId':'".to_string() + &id + "','translationType':'sub','episodeString':'" + &ep + "'}";
-    let extensions = "{'persistedQuery':{'version':1,'sha256Hash': '".to_string() + HASH_PLAYER + "'}}";
+    let variables = "{'showId':'".to_string()
+        + &id
+        + "','translationType':'sub','episodeString':'"
+        + &ep
+        + "'}";
+    let extensions =
+        "{'persistedQuery':{'version':1,'sha256Hash': '".to_string() + HASH_PLAYER + "'}}";
     let url = API_WEB.to_string() + "/api?variables=" + &variables + "&extensions=" + &extensions;
 
     let response = client
@@ -201,9 +219,7 @@ pub async fn extracting_urls(id: &str, ep: &str) -> Result<String, String> {
 
     match response {
         Ok(resp) => match resp.text().await {
-            Ok(text) => {
-                Ok(search_urls(&text).await)
-            }
+            Ok(text) => Ok(search_urls(&text).await),
             Err(err) => Err(err.to_string()),
         },
         Err(err) => Err(err.to_string()),
@@ -214,12 +230,16 @@ pub async fn extracting_urls(id: &str, ep: &str) -> Result<String, String> {
 pub async fn extracting_anime_data(id: &str) -> Result<String, String> {
     let client = Client::new();
     let variables = "{'_id':'".to_string() + &id + "'}";
-    let extensions = "{'persistedQuery':{'version':1,'sha256Hash': '".to_string() + HASH_INFO + "'}}";
+    let extensions =
+        "{'persistedQuery':{'version':1,'sha256Hash': '".to_string() + HASH_INFO + "'}}";
     let url = API_WEB.to_string() + "/api?variables=" + &variables + "&extensions=" + &extensions;
 
     let response = client
         .get(url.replace("'", "\""))
-        .header( "User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0",)
+        .header(
+            "User-Agent",
+            "Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0",
+        )
         .header("Referer", "https://allmanga.to/")
         .send()
         .await;
