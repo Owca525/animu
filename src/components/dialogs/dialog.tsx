@@ -1,5 +1,5 @@
 import React from "react";
-import "../../css/elements/dialog.css"
+import "../../css/dialogs/dialog.css"
 import Button from "../ui/button";
 
 interface dialogProps {

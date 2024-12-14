@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "../../css/elements/notifiaction.css";
+import "../../css/dialogs/notifiaction.css";
 import { NotificationProps } from "../../utils/interface";
 
 const Notification: React.FC<NotificationProps> = ({ data }) => {

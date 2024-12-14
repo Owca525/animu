@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { check, Update } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import Button from "../ui/button";
-import "../../css/elements/update.css";
+import "../../css/dialogs/update.css";
 
 const UpdateComponent: React.FC = () => {
   const [data, setdata] = useState<any>({
