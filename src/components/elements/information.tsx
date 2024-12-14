@@ -8,8 +8,15 @@ export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, t
   const modalRef: any = useRef();
   const [data, setData] = useState<InformationData>({ id: "", title: "", description: "", img: "", episodes: [] });
   const [loading, setLoading] = useState(true);
+  const [imghasError, setimgHasError] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   const navigate = useNavigate();
+
+  const handleImageLoad = () => {
+    setIsImageLoaded(true);
+    setimgHasError(false);
+  };
 
   const fetchData = async () => {
     const anime_data = await get_information(id_anime);
@@ -81,7 +88,17 @@ export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, t
     <div className="modal-backdrop" style={{ visibility: showPopup ? "visible" : "hidden" }}>
       <div className="box" ref={modalRef}>
         <div className="box-img">
-          <img src={data.img} />
+          {!isImageLoaded && !imghasError && (
+            <div className="material-symbols-outlined placeholder" style={{ animation: "spin 1s linear infinite" }}>
+              progress_activity
+            </div>
+          )}
+          {imghasError && (
+            <div className="material-symbols-outlined placeholder" title="img can't load">
+              error
+            </div>
+          )}
+          <img src={data.img} onLoad={handleImageLoad} onError={() => setimgHasError(true)} className={`${isImageLoaded && !imghasError ? "loaded" : "hidden"}`} />
         </div>
         <div className="box-info">
           <div className="box-text">
