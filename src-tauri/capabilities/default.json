@@ -12,6 +12,24 @@
     "updater:allow-download-and-install",
     "process:allow-restart",
     "updater:allow-download",
-    "updater:allow-install"
+    "updater:allow-install",
+    "fs:allow-app-meta",
+    "fs:allow-app-meta-recursive",
+    "fs:allow-app-read",
+    "fs:allow-app-read-recursive",
+    "fs:allow-app-write",
+    "fs:allow-app-write-recursive",
+    "fs:allow-appcache-meta",
+    "fs:allow-appcache-meta-recursive",
+    "fs:allow-appcache-read",
+    "fs:allow-appcache-read-recursive",
+    "fs:allow-appcache-write",
+    "fs:allow-appcache-write-recursive",
+    "fs:allow-config-meta",
+    "fs:allow-config-meta-recursive",
+    "fs:allow-config-read",
+    "fs:allow-config-read-recursive",
+    "fs:allow-config-write",
+    "fs:allow-config-write-recursive"
   ]
 }
