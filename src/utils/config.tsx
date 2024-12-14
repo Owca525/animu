@@ -10,6 +10,7 @@ import ini from "ini";
 const defaultConfig = {
   general: {
     hoverSidebar: true,
+    scale: 1
   },
   player: {
     volume: 0.25,

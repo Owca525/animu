@@ -1,0 +1,15 @@
+.keybind-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-size: larger;
+}
+.keybind-space {
+  font-size: large;
+  background-color: var(--primary-200);
+  padding: 6px;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 4px;
+}

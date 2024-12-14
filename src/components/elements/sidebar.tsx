@@ -3,12 +3,12 @@ import { SidebarProps } from "../../utils/interface";
 import "../../css/elements/sidebar.css";
 import { useState } from "react";
 
-const Sidebar: React.FC<SidebarProps> = ({ top, bottom }) => {
+const Sidebar: React.FC<SidebarProps> = ({ class: className, top, bottom }) => {
 
   const [isMaxSidebar, setIsMaxSidebar] = useState(false);
 
   return (
-    <div className={isMaxSidebar ? "sidebar-max" : "sidebar-mini"} onMouseEnter={() => setIsMaxSidebar(true)} onMouseLeave={() => setIsMaxSidebar(false)}>
+    <div className={isMaxSidebar ? "sidebar-max " + className : "sidebar-mini " + className} onMouseEnter={() => setIsMaxSidebar(true)} onMouseLeave={() => setIsMaxSidebar(false)}>
       <div className="top-sidebar">
         <Button
           value={isMaxSidebar ? '<div class="material-symbols-outlined text-button">arrow_back</div>Minimize' : '<div class="material-symbols-outlined text-button">arrow_forward</div>'}

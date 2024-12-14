@@ -1,20 +1,63 @@
 .settings-container {
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 1em;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: start;
+  gap: 1em;
 }
 
-.message {
-    font-size: xx-large;
-    font-weight: 500;
+.settings-content,
+.settings-general,
+.settings-space {
+  display: flex;
+  align-items: start;
+  flex-direction: column;
 }
 
-.back-button {
-    width: 6em;
-    height: 2em;
-    font-size: large;
+.settings-content {
+  width: 100%;
+  height: 100vh;
+  gap: 1em;
+}
+
+.settings-header {
+  margin-top: 0.5em;
+  font-size: xx-large;
+  font-weight: 600;
+}
+
+.settings-general {
+  gap: 1em;
+}
+
+.settings-space {
+  gap: 0.5em;
+}
+
+.sidebar-first {
+  z-index: 0;
+  position: relative;
+  height: 98.9%;
+}
+
+.text {
+  font-size: x-large;
+  font-weight: 500;
+}
+
+.same-space {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5em;
+  font-size: larger;
+}
+
+.number {
+  appearance: none;
+  border: none;
+  background-color: var(--primary-200);
+  font-size: larger;
+  width: 50px;
+  border-radius: 4px;
 }

@@ -1,6 +1,5 @@
 import { FC } from "react";
 import "../../css/ui/button.css";
-// import { ContainerProps } from "../../utils/interface"
 
 interface buttonprops extends React.HtmlHTMLAttributes<HTMLButtonElement> {
   value?: string;

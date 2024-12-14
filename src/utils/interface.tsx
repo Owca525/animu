@@ -25,14 +25,10 @@ interface ListItem {
   onClick?: () => Promise<void>;
 }
 
-export interface SidebarListProps {
-  top: ListItem[];
-  bottom: ListItem[]
-}
-
 export interface SidebarProps {
   top: ListItem[];
-  bottom: ListItem[]
+  bottom: ListItem[];
+  class?: string;
 }
 
 export interface NotificationProps {
