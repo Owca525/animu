@@ -8,13 +8,22 @@ button{
   border-radius: 4px;
   cursor: pointer;
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
-  transition: background-color 0.1s ease;
+  transition: all 0.1s ease;
 }
-.icon-button {
+.button-icon {
   width: 40px;
   height: 40px;
+  font-size: 0px;
+}
+
+.button-icon-text {
+  width: 80%;
+  height: 40px;
+  display: flex;
+  justify-content: start;
+  gap: 1em;
 }
 
 button .text-button {

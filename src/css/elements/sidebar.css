@@ -10,6 +10,7 @@
   justify-content: space-between;
   padding-top: 8px;
   gap: 8px;
+  transition: width 0.2s ease;
 }
 .border {
   border-color: var(--background-100);
@@ -31,7 +32,25 @@
   align-items: center;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
 }
 .bottom-sidebar {
   padding-bottom: 16px;
+}
+
+
+.sidebar-max {
+  background-color: var(--primary-200);
+  z-index: 1001;
+  height: 100vh;
+  width: 200px;
+  position: fixed;
+  display: flex;
+  align-items: start;
+  justify-content: start;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-top: 8px;
+  gap: 8px;
+  transition: width 0.1s ease;
 }

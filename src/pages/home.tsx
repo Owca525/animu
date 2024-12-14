@@ -7,27 +7,66 @@ import "../css/pages/home.css";
 import { ContainerProps } from "../utils/interface";
 import { get_recent, get_search } from "../utils/backend";
 import { useEffect, useState } from "react";
-import { check } from '@tauri-apps/plugin-updater';
+import { check } from "@tauri-apps/plugin-updater";
 import Notification from "../components/dialogs/notification";
 import Update from "../components/dialogs/update";
+import { useNavigate } from "react-router-dom";
 
 function home() {
+  const navigate = useNavigate();
   const [data, setData] = useState<ContainerProps>({ title: "", data: [] });
   const [loading, setLoading] = useState(true);
   const [updateNotification, setUpdateNotification] = useState(false);
-  const [notificationData, setNotificationData] = useState<{ title: string; information: string; onClick?: () => void }[]>([{ title: "", information: ""}])
+  const [notificationData, setNotificationData] = useState<
+    { title: string; information: string; onClick?: () => void }[]
+  >([{ title: "", information: "" }]);
   const [isUpdate, setisUpdate] = useState(false);
+
+  const sidebarHomeTopData = [
+    {
+      value: '<div class="material-symbols-outlined text-button">schedule</div>Recent Anime',
+      class: "icon-button",
+      title: "Recent Anime",
+      onClick: async () => change_content({ title: "Recent Anime", data: await get_recent() }),
+    },
+    {
+      value: '<div class="material-symbols-outlined text-button">history</div>History',
+      class: "icon-button",
+      title: "History",
+      onClick: async () => change_content({ title: "History" }),
+    }
+  ];
+
+  const sidebarHomeBottomData = [
+    {
+      value: '<div class="material-symbols-outlined text-button">extension</div>Extension',
+      class: "icon-button",
+      title: "Extension",
+    },
+    {
+      value: '<div class="material-symbols-outlined text-button">settings</div>Settings',
+      class: "icon-button",
+      title: "Settings",
+      onClick: async () => navigate("/settings"),
+    }
+  ];
 
   const checkUpdate = async () => {
     const update = await check();
     if (update && update.available) {
       setUpdateNotification(true);
-      setNotificationData([{ title: "New Update", information: `Hey is new update ${update.version} wait to download, click notification`, onClick: () => setisUpdate(true) }])
+      setNotificationData([
+        {
+          title: "New Update Availble",
+          information: `Hey is new update ${update.version} wait to download, click notification`,
+          onClick: () => setisUpdate(true),
+        },
+      ]);
     }
   };
 
   useEffect(() => {
-    checkUpdate()
+    checkUpdate();
 
     const fetchData = async () => {
       const recentData = await get_recent();
@@ -42,7 +81,7 @@ function home() {
   }, []);
 
   const change_content = (newData: ContainerProps) => {
-    setData(newData)
+    setData(newData);
   };
 
   const handleInputChange = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -50,7 +89,7 @@ function home() {
       var search = event.currentTarget.value;
       const results = async () => {
         const data = await get_search(search);
-        change_content({ title: `Searching: ${search}`, data: data});
+        change_content({ title: `Searching: ${search}`, data: data });
       };
       results();
     }
@@ -61,10 +100,12 @@ function home() {
       <main className="container">
         {updateNotification ? <Notification data={notificationData} /> : ""}
         {isUpdate ? <Update /> : ""}
-        <Sidebar change_content={change_content}/>
-        <Header onInputChange={handleInputChange}/>
+        <Sidebar top={sidebarHomeTopData} bottom={sidebarHomeBottomData} />
+        <Header onInputChange={handleInputChange} />
         <div className="content loading-home">
-          <div className="loading material-symbols-outlined">progress_activity</div>
+          <div className="loading material-symbols-outlined">
+            progress_activity
+          </div>
         </div>
       </main>
     );
@@ -74,8 +115,8 @@ function home() {
     <main className="container">
       {updateNotification ? <Notification data={notificationData} /> : ""}
       {isUpdate ? <Update /> : ""}
-      <Sidebar change_content={change_content} />
-      <Header onInputChange={handleInputChange}/>
+      <Sidebar top={sidebarHomeTopData} bottom={sidebarHomeBottomData} />
+      <Header onInputChange={handleInputChange} />
       <Content title={data.title} data={data.data} />
       {/* <Dialog type="error" header_text="Error" text="test" /> */}
     </main>

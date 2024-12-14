@@ -18,11 +18,24 @@ export interface InformationData {
   episodes: Array<string>;
 }
 
+interface ListItem {
+  value: string;
+  class?: string;
+  title: string;
+  onClick?: () => Promise<void>;
+}
+
+export interface SidebarListProps {
+  top: ListItem[];
+  bottom: ListItem[]
+}
+
 export interface SidebarProps {
-  change_content: (data: ContainerProps) => void;
-  // data: { top: { value: string, class: string, title?: string, onClick?: () => void }[], bottom: { value: string, class: string, title?: string, onClick?: () => void }[] }
+  top: ListItem[];
+  bottom: ListItem[]
 }
 
 export interface NotificationProps {
   data: { title: string; information: string; onClick?: () => void }[];
 }
+

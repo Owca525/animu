@@ -1,28 +1,48 @@
-import Button from "../ui/button"
-import { SidebarProps } from "../../utils/interface"
-import { get_recent } from "../../utils/backend"
-import "../../css/elements/sidebar.css"
-import { useNavigate } from "react-router-dom";
-// import { useState } from "react";
-// className="active"
+import Button from "../ui/button";
+import { SidebarProps } from "../../utils/interface";
+import "../../css/elements/sidebar.css";
+import { useState } from "react";
 
-const Sidebar: React.FC<SidebarProps> = ({ change_content }) => {
-  const navigate = useNavigate();
+const Sidebar: React.FC<SidebarProps> = ({ top, bottom }) => {
 
-  // const [isMaxSidebar, setIsMaxSidebar] = useState(false);
+  const [isMaxSidebar, setIsMaxSidebar] = useState(false);
 
   return (
-    <div className="sidebar-mini">
+    <div className={isMaxSidebar ? "sidebar-max" : "sidebar-mini"} onMouseEnter={() => setIsMaxSidebar(true)} onMouseLeave={() => setIsMaxSidebar(false)}>
       <div className="top-sidebar">
-        <Button value='<div class="material-symbols-outlined text-button">arrow_forward</div>' className="icon-button" title="Show Full Sidebar" />
+        <Button
+          value={isMaxSidebar ? '<div class="material-symbols-outlined text-button">arrow_back</div>Minimize' : '<div class="material-symbols-outlined text-button">arrow_forward</div>'}
+          className="icon-button"
+          title={isMaxSidebar ? "Minimize" : "Maximize"}
+          type={isMaxSidebar ? "icon-text" : "icon"}
+          onClick={() => setIsMaxSidebar((prevState) => !prevState)}
+        />
         <div className="border"></div>
-        <Button value='<div class="material-symbols-outlined text-button">schedule</div>' className="icon-button" title="Recent Anime" onClick={async () => change_content({ title: "Recent Anime", data: await get_recent() })} />
-        <Button value='<div class="material-symbols-outlined text-button">history</div>' className="icon-button" title="History" onClick={() => change_content({ title: "History" })} />
+        {top.length > 0
+          ? top.map((button) => (
+              <Button
+                value={button.value}
+                className={button.class}
+                title={button.title}
+                type={isMaxSidebar ? "icon-text" : "icon"}
+                onClick={button.onClick}
+              />
+            ))
+          : ""}
       </div>
       <div className="bottom-sidebar">
         <div className="border"></div>
-        <Button value='<div class="material-symbols-outlined text-button">extension</div>' className="icon-button" title="Extension" onClick={() => console.log("asdasdasd")} />
-        <Button value='<div class="material-symbols-outlined text-button">settings</div>' className="icon-button" title="Settings" onClick={() => navigate("/settings")} />
+        {bottom.length > 0
+          ? bottom.map((button) => (
+              <Button
+                value={button.value}
+                className={button.class}
+                title={button.title}
+                type={isMaxSidebar ? "icon-text" : "icon"}
+                onClick={button.onClick}
+              />
+            ))
+          : ""}
       </div>
     </div>
   );
