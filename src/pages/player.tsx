@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { get_player_anime } from "../utils/backend";
-import Dialog from "../components/elements/dialog";
+import Dialog from "../components/dialogs/dialog";
 import "../css/pages/player.css";
 
 export const Player = () => {

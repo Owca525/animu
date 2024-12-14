@@ -8,8 +8,8 @@ import { ContainerProps } from "../utils/interface";
 import { get_recent, get_search } from "../utils/backend";
 import { useEffect, useState } from "react";
 import { check } from '@tauri-apps/plugin-updater';
-import Notification from "../components/elements/notification";
-import Update from "../components/elements/update";
+import Notification from "../components/dialogs/notification";
+import Update from "../components/dialogs/update";
 
 function home() {
   const [data, setData] = useState<ContainerProps>({ title: "", data: [] });
