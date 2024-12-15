@@ -15,15 +15,13 @@ export const Settings = () => {
 
   const sidebarSettingsTopData = [
     {
-      value:
-        '<div class="material-symbols-outlined text-button">manufacturing</div>General',
+      value: '<div class="material-symbols-outlined text-button">manufacturing</div>General',
       class: "icon-button",
       title: "General",
       onClick: async () => setsettingPage("general"),
     },
     {
-      value:
-        '<div class="material-symbols-outlined text-button">movie</div>Player',
+      value: '<div class="material-symbols-outlined text-button">movie</div>Player',
       class: "icon-button",
       title: "Player",
       onClick: async () => setsettingPage("player"),
@@ -32,39 +30,17 @@ export const Settings = () => {
 
   const sidebarSettingsBottomData = [
     {
-      value:
-        '<div class="material-symbols-outlined text-button">folder</div>Config Folder',
+      value: '<div class="material-symbols-outlined text-button">folder</div>Config Folder',
       class: "icon-button",
       title: "Config Folder",
     },
     {
-      value:
-        '<div class="material-symbols-outlined text-button">home</div>Home',
+      value: '<div class="material-symbols-outlined text-button">home</div>Home',
       class: "icon-button",
       title: "Home",
       onClick: async () => navigate("/"),
     },
   ];
-
-  // const preaperPageElement = (config: any, page: string) => {
-  //   if (page == "general" && generalRef.current) {
-  //     const keys = config.general
-  //     for (let i = 0; i < keys.length; i++) {
-  //       const element = document.createElement("div")
-  //       element.className = "settings-space"
-  //       const headerSpace = document.createElement("div")
-  //       headerSpace.className = "text"
-  //       headerSpace.innerHTML = `${keys[i]}:`
-  //       element.appendChild(headerSpace)
-  //       console.log(element)
-  //     }
-  //   }
-  // }
-
-  // const createElement = (page: string) => {
-  //   readConfig().then((config) => preaperPageElement(config, page))
-  //   return ""
-  // }
 
   if (settingPage == "general") {
     return (
@@ -92,13 +68,7 @@ export const Settings = () => {
   if (settingPage == "player") {
     return (
       <div className="settings-container">
-        <Sidebar
-          top={sidebarSettingsTopData}
-          bottom={sidebarSettingsBottomData}
-          class="sidebar-first"
-          onlyMax={true}
-          showVersion={true}
-        />
+        <Sidebar top={sidebarSettingsTopData} bottom={sidebarSettingsBottomData} class="sidebar-first" onlyMax={true} showVersion={true} />
         <div className="settings-content">
           <div className="settings-header">Player Settings</div>
           <div className="settings-general" ref={playerRef}>
@@ -106,49 +76,19 @@ export const Settings = () => {
               <div className="text">General:</div>
               <Checkbox title="AutoPlay" classContainer="small-text" />
               <div className="same-space">
-                Volume
-                <input
-                  type="text"
-                  value={25}
-                  className="number"
-                  placeholder="25"
-                />
+                Volume <input type="text" value={25} className="number" placeholder="25"/>
               </div>
               <div className="same-space">
-                Long Time Skip Forward
-                <input
-                  type="text"
-                  value={80}
-                  className="number"
-                  placeholder="80"
-                />
+                Long Time Skip Forward <input type="text" value={80} className="number" placeholder="80" />
               </div>
               <div className="same-space">
-                Long Time Skip Back
-                <input
-                  type="text"
-                  value={80}
-                  className="number"
-                  placeholder="80"
-                />
+                Long Time Skip Back <input type="text" value={80} className="number" placeholder="80" />
               </div>
               <div className="same-space">
-                Time Skip Forward
-                <input
-                  type="text"
-                  value={5}
-                  className="number"
-                  placeholder="5"
-                />
+                Time Skip Forward <input type="text" value={5} className="number" placeholder="5" />
               </div>
               <div className="same-space">
-                Time Skip Back
-                <input
-                  type="text"
-                  value={5}
-                  className="number"
-                  placeholder="5"
-                />
+                Time Skip Back <input type="text" value={5} className="number" placeholder="5" />
               </div>
             </div>
             <div className="settings-space">
