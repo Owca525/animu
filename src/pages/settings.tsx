@@ -2,14 +2,18 @@ import { useNavigate } from "react-router-dom";
 // import Button from "../components/ui/button";
 import "../css/pages/settings.css";
 import Sidebar from "../components/elements/sidebar";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Checkbox from "../components/ui/checkbox";
 import Keybind from "../components/dialogs/keybind";
+import { readConfig } from "../utils/config";
+import { SettingsConfig } from "../utils/interface";
 // import { readConfig } from "../utils/config";
 
 export const Settings = () => {
   const navigate = useNavigate();
   const [settingPage, setsettingPage] = useState<string>("general");
+  const [config, setConfig] = useState<SettingsConfig | undefined>(undefined);
+  const [isLoading, setisLoading] = useState<boolean>(true);
   const generalRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<HTMLDivElement>(null);
 
@@ -42,6 +46,48 @@ export const Settings = () => {
     },
   ];
 
+  useEffect(() => {
+    readConfig().then((tmpConfig) => {
+      setConfig(tmpConfig);
+    });
+  }, []);
+
+
+  useEffect(() => {
+    console.log(config)
+    if (config !== undefined) {
+      setisLoading(false)
+    }
+  }, [config]);
+
+  if (isLoading) {
+    return (
+      <div className="settings-container">
+        <Sidebar top={sidebarSettingsTopData} bottom={sidebarSettingsBottomData} class="sidebar-first" onlyMax={true} showVersion={true} />
+        <div className="settings-content settings-loading">
+          <div className="loading settings-loading-animation material-symbols-outlined">
+            progress_activity
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const getKeybind = (key: any) => {
+    if (key == " ") {
+      return "space"
+    } 
+    return key
+  }
+
+  const changeVariable = (variable: any, value: any) => {
+    if (variable) {
+      variable = value
+    }
+  }
+
+
+  // TODO: fix why can't write in input
   if (settingPage == "general") {
     return (
       <div className="settings-container">
@@ -51,12 +97,12 @@ export const Settings = () => {
           <div className="settings-general" ref={generalRef} >
             <div className="settings-space">
               <div className="text">Sidebar:</div>
-              <Checkbox title="Hover Sidebar" />
+              <Checkbox title="Hover Sidebar" checked={config?.General.SideBar.HoverSidebar} />
             </div>
             <div className="settings-space">
               <div className="text">Window:</div>
               <div className="same-space">
-                Scale: <input type="text" value={1} className="number" placeholder="1" />
+                Scale: <input type="text" value={config?.General.windows.Scale} className="number" placeholder="1" />
               </div>
             </div>
           </div>
@@ -74,32 +120,33 @@ export const Settings = () => {
           <div className="settings-general" ref={playerRef}>
             <div className="settings-space">
               <div className="text">General:</div>
-              <Checkbox title="AutoPlay" classContainer="small-text" />
+              <Checkbox title="AutoPlay" classContainer="small-text" checked={config?.Player.general.Autoplay} />
               <div className="same-space">
-                Volume <input type="text" value={25} className="number" placeholder="25"/>
+                Volume <input type="text" value={config?.Player.general.Volume} className="number" placeholder="25" />
+              </div>
+
+              <div className="same-space">
+                Long Time Skip Forward <input type="text" value={config?.Player.general.LongTimeSkipForward} className="number" placeholder="80" onChange={(event) => changeVariable(config?.Player.general.LongTimeSkipForward, event.currentTarget.value)} />
               </div>
               <div className="same-space">
-                Long Time Skip Forward <input type="text" value={80} className="number" placeholder="80" />
+                Long Time Skip Back <input type="text" value={config?.Player.general.LongTimeSkipBack} className="number" placeholder="80" />
               </div>
               <div className="same-space">
-                Long Time Skip Back <input type="text" value={80} className="number" placeholder="80" />
+                Time Skip Forward <input type="text" value={config?.Player.general.TimeSkipRight} className="number" placeholder="5" />
               </div>
               <div className="same-space">
-                Time Skip Forward <input type="text" value={5} className="number" placeholder="5" />
-              </div>
-              <div className="same-space">
-                Time Skip Back <input type="text" value={5} className="number" placeholder="5" />
+                Time Skip Back <input type="text" value={config?.Player.general.TimeSkipLeft} className="number" placeholder="5" />
               </div>
             </div>
             <div className="settings-space">
               <div className="text">Keybinds:</div>
-              <Keybind title="Pause:" value="Space" changeKey={() => console.log()} />
-              <Keybind title="Fullscreen:" value="F" changeKey={() => console.log()} />
-              <Keybind title="Exit Player:" value="ESC" changeKey={() => console.log()} />
-              <Keybind title="Long Skip forward:" value="ArrowUp" changeKey={() => console.log()} />
-              <Keybind title="Long Skip Back:" value="ArrowDown" changeKey={() => console.log()} />
-              <Keybind title="Skip Forward:" value="ArrowLeft" changeKey={() => console.log()} />
-              <Keybind title="Skip back:" value="ArrowRight" changeKey={() => console.log()} />
+              <Keybind title="Pause:" value={getKeybind(config?.Player.keybinds.Pause)} changeKey={() => console.log()} />
+              <Keybind title="Fullscreen:" value={getKeybind(config?.Player.keybinds.Fullscreen)} changeKey={() => console.log()} />
+              <Keybind title="Exit Player:" value={getKeybind(config?.Player.keybinds.ExitPlayer)} changeKey={() => console.log()} />
+              <Keybind title="Long Skip forward:" value={getKeybind(config?.Player.keybinds.LongTimeSkipForward)} changeKey={() => console.log()} />
+              <Keybind title="Long Skip Back:" value={getKeybind(config?.Player.keybinds.LongTimeSkipBack)} changeKey={() => console.log()} />
+              <Keybind title="Skip Forward:" value={getKeybind(config?.Player.keybinds.TimeSkipRight)} changeKey={() => console.log()} />
+              <Keybind title="Skip back:" value={getKeybind(config?.Player.keybinds.TimeSkipLeft)} changeKey={() => console.log()} />
             </div>
           </div>
         </div>

@@ -77,3 +77,15 @@
   padding: 8px;
   border-radius: 4px;
 }
+
+.settings-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 90vh;
+  margin-left: 25em;
+}
+.settings-loading-animation {
+  font-size: xx-large;
+}

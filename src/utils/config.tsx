@@ -6,17 +6,18 @@ import {
   readTextFile,
 } from "@tauri-apps/plugin-fs";
 import ini from "ini";
+import { SettingsConfig } from "./interface";
 
-const defaultConfig = {
-  general: {
-    Sidebar: {
+const defaultConfig: SettingsConfig = {
+  General: {
+    SideBar: {
       HoverSidebar: true,
     },
     windows: {
       Scale: 1
     },
   },
-  player: {
+  Player: {
     general: {
       Autoplay: true,
       Volume: 25,
@@ -36,11 +37,11 @@ const defaultConfig = {
     },
   },
 };
-export async function readConfig() {
+export async function readConfig(): Promise<SettingsConfig | undefined> {
   const appConfigDirPath = await appConfigDir();
   try {
     const content = await readTextFile(appConfigDirPath + "/config.ini");
-    return ini.parse(content);
+    return ini.parse(content) as SettingsConfig;
   } catch (error) {}
 }
 

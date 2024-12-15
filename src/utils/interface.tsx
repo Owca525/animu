@@ -36,3 +36,37 @@ export interface SidebarProps {
 export interface NotificationProps {
   data: { title: string; information: string; onClick?: () => void }[];
 }
+
+interface SettingsConfigGeneral {
+  SideBar: {
+    HoverSidebar: boolean,
+  };
+  windows: {
+    Scale: number
+  };
+}
+
+interface SettingsConfigPlayer {
+  general: {
+    Autoplay: boolean,
+    Volume: number,
+    LongTimeSkipForward: number,
+    LongTimeSkipBack: number,
+    TimeSkipLeft: number,
+    TimeSkipRight: number,
+  },
+  keybinds: {
+    Pause: string,
+    LongTimeSkipForward: string,
+    LongTimeSkipBack: string,
+    TimeSkipLeft: string,
+    TimeSkipRight: string,
+    Fullscreen: string,
+    ExitPlayer: string,
+  },
+}
+
+export interface SettingsConfig {
+  General: SettingsConfigGeneral
+  Player: SettingsConfigPlayer
+}
