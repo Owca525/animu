@@ -54,3 +54,9 @@
   gap: 8px;
   transition: width 0.1s ease;
 }
+
+.sidebar-version {
+  font-size: larger;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}

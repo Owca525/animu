@@ -9,23 +9,30 @@ import ini from "ini";
 
 const defaultConfig = {
   general: {
-    hoverSidebar: true,
-    scale: 1
+    Sidebar: {
+      HoverSidebar: true,
+    },
+    windows: {
+      Scale: 1
+    },
   },
   player: {
-    volume: 0.25,
-    upTime: 80,
-    downTime: 80,
-    leftTime: 5,
-    rightTime: 5,
+    general: {
+      Autoplay: true,
+      Volume: 25,
+      LongTimeSkipForward: 80,
+      LongTimeSkipBack: 80,
+      TimeSkipLeft: 5,
+      TimeSkipRight: 5,
+    },
     keybinds: {
-      pause: " ",
-      changeTimeUp: "arrowright",
-      changeTimeDown: "arrowleft",
-      changeTimeLeft: "arrowup",
-      changeTimeRight: "arrowdown",
-      fullscreen: "f",
-      exitPlayer: "esc",
+      Pause: " ",
+      LongTimeSkipForward: "arrowright",
+      LongTimeSkipBack: "arrowleft",
+      TimeSkipLeft: "arrowup",
+      TimeSkipRight: "arrowdown",
+      Fullscreen: "f",
+      ExitPlayer: "esc",
     },
   },
 };

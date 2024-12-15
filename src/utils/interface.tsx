@@ -29,9 +29,10 @@ export interface SidebarProps {
   top: ListItem[];
   bottom: ListItem[];
   class?: string;
+  onlyMax?: boolean;
+  showVersion?: boolean;
 }
 
 export interface NotificationProps {
   data: { title: string; information: string; onClick?: () => void }[];
 }
-

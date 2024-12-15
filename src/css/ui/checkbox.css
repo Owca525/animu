@@ -1,8 +1,8 @@
 .checkbox-container {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  font-size: larger;
+  width: 100%;
   gap: 0.5em;
 }
 

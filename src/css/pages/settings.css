@@ -15,28 +15,35 @@
 }
 
 .settings-content {
+  position: relative;
   width: 100%;
-  height: 100vh;
   gap: 1em;
+  padding: 1em;
+  margin-right: 20%;
+  margin-left: 15em;
 }
 
 .settings-header {
-  margin-top: 0.5em;
+  margin-top: 0.2em;
   font-size: xx-large;
   font-weight: 600;
 }
 
 .settings-general {
-  gap: 1em;
+  gap: 0.5em;
+  width: 100%;
 }
 
 .settings-space {
   gap: 0.5em;
+  padding: 0.8em;
+  border-radius: 8px;
+  width: 100%;
 }
 
 .sidebar-first {
   z-index: 0;
-  position: relative;
+  position: fixed;
   height: 98.9%;
 }
 
@@ -45,19 +52,28 @@
   font-weight: 500;
 }
 
+.small-text {
+  font-size: medium;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
 .same-space {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5em;
+  justify-content: space-between;
+  align-items: start;
   font-size: larger;
+  width: 100%;
+  font-size: medium;
+  gap: 1em;
 }
 
 .number {
   appearance: none;
   border: none;
   background-color: var(--primary-200);
-  font-size: larger;
+  font-size: large;
   width: 50px;
+  padding: 8px;
   border-radius: 4px;
 }
