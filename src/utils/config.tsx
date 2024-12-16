@@ -13,9 +13,6 @@ const defaultConfig: SettingsConfig = {
     SideBar: {
       HoverSidebar: true,
     },
-    windows: {
-      Scale: 1
-    },
   },
   Player: {
     general: {
@@ -47,8 +44,9 @@ export async function readConfig(): Promise<SettingsConfig | undefined> {
 
 export async function saveConfig(content: any) {
   const appConfigDirPath = await appConfigDir();
+  const data = ini.stringify(content);
   try {
-    await writeTextFile(appConfigDirPath + "/config.ini", content);
+    await writeTextFile(appConfigDirPath + "/config.ini", data);
   } catch (error) {}
 }
 

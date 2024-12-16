@@ -30,6 +30,7 @@ export interface SidebarProps {
   bottom: ListItem[];
   class?: string;
   onlyMax?: boolean;
+  sidebarHover?: boolean | undefined;
   showVersion?: boolean;
 }
 
@@ -40,9 +41,6 @@ export interface NotificationProps {
 interface SettingsConfigGeneral {
   SideBar: {
     HoverSidebar: boolean,
-  };
-  windows: {
-    Scale: number
   };
 }
 

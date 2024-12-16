@@ -4,17 +4,20 @@ import Header from "../components/elements/headers";
 // import Dialog from "../components/elements/dialog";
 import "../css/pages/home.css";
 
-import { ContainerProps } from "../utils/interface";
+import { ContainerProps, SettingsConfig } from "../utils/interface";
 import { get_recent, get_search } from "../utils/backend";
 import { useEffect, useState } from "react";
 import { check } from "@tauri-apps/plugin-updater";
 import Notification from "../components/dialogs/notification";
 import Update from "../components/dialogs/update";
 import { useNavigate } from "react-router-dom";
+import { readConfig } from "../utils/config";
 
 function home() {
   const navigate = useNavigate();
+
   const [data, setData] = useState<ContainerProps>({ title: "", data: [] });
+  const [config, setConfig] = useState<SettingsConfig | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [updateNotification, setUpdateNotification] = useState(false);
   const [notificationData, setNotificationData] = useState<
@@ -77,8 +80,14 @@ function home() {
       setLoading(false);
     };
 
+    readConfig().then((tmpConfig) => {
+      setConfig(tmpConfig);
+    });
+
     fetchData();
   }, []);
+
+  useEffect(() => {}, [config]);
 
   const change_content = (newData: ContainerProps) => {
     setData(newData);
@@ -95,12 +104,12 @@ function home() {
     }
   };
 
-  if (loading) {
+  if (loading && config) {
     return (
       <main className="container">
         {updateNotification ? <Notification data={notificationData} /> : ""}
         {isUpdate ? <Update /> : ""}
-        <Sidebar top={sidebarHomeTopData} bottom={sidebarHomeBottomData} />
+        <Sidebar top={sidebarHomeTopData} bottom={sidebarHomeBottomData} sidebarHover={config.General.SideBar.HoverSidebar} />
         <Header onInputChange={handleInputChange} />
         <div className="content loading-home">
           <div className="loading material-symbols-outlined">
@@ -111,16 +120,18 @@ function home() {
     );
   }
 
-  return (
-    <main className="container">
-      {updateNotification ? <Notification data={notificationData} /> : ""}
-      {isUpdate ? <Update /> : ""}
-      <Sidebar top={sidebarHomeTopData} bottom={sidebarHomeBottomData} />
-      <Header onInputChange={handleInputChange} />
-      <Content title={data.title} data={data.data} />
-      {/* <Dialog type="error" header_text="Error" text="test" /> */}
-    </main>
-  );
+  if (config) {
+    return (
+      <main className="container">
+        {updateNotification ? <Notification data={notificationData} /> : ""}
+        {isUpdate ? <Update /> : ""}
+        <Sidebar top={sidebarHomeTopData} bottom={sidebarHomeBottomData} sidebarHover={config.General.SideBar.HoverSidebar} />
+        <Header onInputChange={handleInputChange} />
+        <Content title={data.title} data={data.data} />
+        {/* <Dialog type="error" header_text="Error" text="test" /> */}
+      </main>
+    );
+  }
 }
 
 export default home;

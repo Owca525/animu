@@ -4,11 +4,14 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { get_player_anime } from "../utils/backend";
 import Dialog from "../components/dialogs/dialog";
 import "../css/pages/player.css";
+import { SettingsConfig } from "../utils/interface";
+import { readConfig } from "../utils/config";
 
 export const Player = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { id, title, episodes, ep } = location.state;
+  const [config, setConfig] = useState<SettingsConfig | undefined>(undefined);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -18,6 +21,8 @@ export const Player = () => {
   const showtimeRef = useRef<HTMLDivElement | null>(null);
   const hideTimer = useRef<NodeJS.Timeout | null>(null);
   const [volume, setVolume] = useState<number>(0.25);
+  const [isVolumeSet, setisVolumeSet] = useState<boolean>(false);
+  const [isVolumeVideoSet, setisVolumeVideoSet] = useState<boolean>(false);
   const [episode, setEpisode] = useState(ep);
   const [isLoadingPlayer, setLoadingPlayer] = useState(true);
   const [playerUrl, setPlayerUrl] = useState("");
@@ -41,6 +46,10 @@ export const Player = () => {
       });
     } finally {
       setLoadingPlayer(false);
+      const cfg = await readConfig();
+      if (cfg && cfg.Player.general.Autoplay) {
+        setIsPlaying(true);
+      }
     }
   };
 
@@ -94,26 +103,30 @@ export const Player = () => {
   };
 
   const keybinds = async (event: KeyboardEvent) => {
-    if (videoRef.current) {
+    if (videoRef.current && config) {
       var time_now = videoRef.current.currentTime;
       switch (event.key.toLowerCase()) {
-        case " ":
+        case config.Player.keybinds.Pause.toLowerCase():
           togglePlay();
           break;
-        case "arrowright":
-          change_time((time_now += 5));
+        case config.Player.keybinds.TimeSkipRight.toLowerCase():
+          change_time((time_now += config.Player.general.TimeSkipRight));
           break;
-        case "arrowleft":
-          change_time((time_now -= 5));
+        case config.Player.keybinds.TimeSkipLeft.toLowerCase():
+          change_time((time_now -= config.Player.general.TimeSkipLeft));
           break;
-        case "arrowup":
-          change_time((time_now += 80));
+        case config.Player.keybinds.LongTimeSkipForward.toLowerCase():
+          change_time((time_now += config.Player.general.LongTimeSkipForward));
           break;
-        case "arrowdown":
-          change_time((time_now -= 80));
+        case config.Player.keybinds.LongTimeSkipBack.toLowerCase():
+          change_time((time_now -= config.Player.general.LongTimeSkipBack));
           break;
-        case "f":
+        case config.Player.keybinds.Fullscreen.toLowerCase():
           setIsFullscreen(await enterFullscreenKeybinds());
+          break;
+        case config.Player.keybinds.ExitPlayer.toLowerCase():
+          exitPlayer();
+          break;
       }
     }
   };
@@ -134,6 +147,10 @@ export const Player = () => {
   };
 
   useEffect(() => {
+    readConfig().then((tmpConfig) => {
+      setConfig(tmpConfig);
+    });
+
     if (episode != ep) {
       remove_events();
       setLoadingPlayer(true);
@@ -148,6 +165,22 @@ export const Player = () => {
       document.addEventListener("keydown", keybinds);
     } else document.removeEventListener("keydown", keybinds);
   }, [episode, ep, videoRef]);
+
+  useEffect(() => {
+    console.log(config)
+    if (isVolumeSet == false) {
+      setVolumeConfig()
+    }
+  }, [config]);
+
+  const setVolumeConfig = () => {
+    if (config) {
+      setVolume(() => {
+        setisVolumeSet(true)
+        return config.Player.general.Volume / 100
+      })
+    }
+  }
 
   const updateProgress = () => {
     if (videoRef.current) {
@@ -318,7 +351,12 @@ export const Player = () => {
     }
   };
 
-  const exitFullscreen = async () => {
+  if (config && videoRef.current && isVolumeVideoSet == false) {
+    videoRef.current.volume = config.Player.general.Volume / 100
+    setisVolumeVideoSet(true)
+  }
+
+  const exitPlayer = async () => {
     await getCurrentWindow().setFullscreen(false);
     navigate("/");
   }
@@ -347,6 +385,7 @@ export const Player = () => {
         onTimeUpdate={updateProgress}
         onLoadedMetadata={handleLoadedMetadata}
         onClick={togglePlay}
+        autoPlay={isPlaying}
         onError={(error) => videoErrorHandler(error)}
         preload="metadata"
         onLoadStart={() => setWaitingPlayer(true)}
@@ -356,10 +395,7 @@ export const Player = () => {
 
       <div className="video-overlay">
         <div className={isVisible ? "video-top" : "video-top hidden"}>
-          <button
-            className="material-symbols-outlined player-buttons"
-            onClick={async () => await exitFullscreen()}
-          >
+          <button className="material-symbols-outlined player-buttons" onClick={async () => await exitPlayer()}>
             arrow_back
           </button>
           <div className="player-title ">{`Episode: ${ep} of ${title}`}</div>
@@ -375,10 +411,7 @@ export const Player = () => {
           </div>
         </div>
         <div className={isVisible ? "video-bottom" : "video-bottom hidden"}>
-          <div
-            className={isShowTime ? "show-time" : "show-time hidden"}
-            ref={showtimeRef}
-          ></div>
+          <div className={isShowTime ? "show-time" : "show-time hidden"} ref={showtimeRef}></div>
           <div
             className="seek-bar"
             ref={seekbar}
@@ -393,39 +426,20 @@ export const Player = () => {
             <div className="left">
               <button
                 className={
-                  episodes[episodes.indexOf(ep) - 1] == undefined
-                    ? "material-symbols-outlined player-buttons disabled"
-                    : "material-symbols-outlined player-buttons"
+                  episodes[episodes.indexOf(ep) - 1] == undefined ? "material-symbols-outlined player-buttons disabled" : "material-symbols-outlined player-buttons"
                 }
                 title={
-                  episodes[episodes.indexOf(ep) - 1] == undefined
-                    ? ""
-                    : `Previous: ${episodes[episodes.indexOf(ep) - 1]} Episode`
+                  episodes[episodes.indexOf(ep) - 1] == undefined ? "" : `Previous: ${episodes[episodes.indexOf(ep) - 1]} Episode`
                 }
-                onClick={setPreviusEpisode}
-              >
+                onClick={setPreviusEpisode}>
                 skip_previous
               </button>
-              <button
-                onClick={togglePlay}
-                className="material-symbols-outlined player-buttons"
-                title={isPlaying ? "Pause" : "Play"}
-              >
+              <button onClick={togglePlay} className="material-symbols-outlined player-buttons" title={isPlaying ? "Pause" : "Play"}>
                 {isPlaying ? "pause" : "play_arrow"}
               </button>
               <button
-                className={
-                  episodes[episodes.indexOf(ep) + 1] == undefined
-                    ? "material-symbols-outlined player-buttons disabled"
-                    : "material-symbols-outlined player-buttons"
-                }
-                title={
-                  episodes[episodes.indexOf(ep) + 1] == undefined
-                    ? ""
-                    : `Next: ${episodes[episodes.indexOf(ep) + 1]} Episode`
-                }
-                onClick={setNextEpisode}
-              >
+                className={episodes[episodes.indexOf(ep) + 1] == undefined ? "material-symbols-outlined player-buttons disabled" : "material-symbols-outlined player-buttons"}
+                title={episodes[episodes.indexOf(ep) + 1] == undefined ? "" : `Next: ${episodes[episodes.indexOf(ep) + 1]} Episode`}onClick={setNextEpisode}>
                 skip_next
               </button>
               <div className="time-display">
@@ -433,33 +447,10 @@ export const Player = () => {
               </div>
             </div>
             <div className="right">
-              <button
-                className="material-symbols-outlined player-buttons"
-                title="Volume"
-              >
-                volume_up
-              </button>
-              <input
-                id="volume"
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={volume}
-                style={{ pointerEvents: "all" }}
-                onChange={handleVolumeChange}
-              />
-              <button
-                className="material-symbols-outlined player-buttons"
-                title="Settings"
-              >
-                settings
-              </button>
-              <button
-                onClick={async () => setIsFullscreen(await enterFullscreen())}
-                className="material-symbols-outlined player-buttons"
-                title="Fullscreen"
-              >
+              <button className="material-symbols-outlined player-buttons" title="Volume">volume_up</button>
+              <input id="volume" type="range" min="0" max="1" step="0.01" value={volume} style={{ pointerEvents: "all" }} onChange={handleVolumeChange}/>
+              <button className="material-symbols-outlined player-buttons" title="Settings">settings</button>
+              <button onClick={async () => setIsFullscreen(await enterFullscreen())} className="material-symbols-outlined player-buttons" title="Fullscreen">
                 {isFullscreen ? "fullscreen_exit" : "fullscreen"}
               </button>
             </div>

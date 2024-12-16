@@ -4,7 +4,7 @@ import "../../css/elements/sidebar.css";
 import { useEffect, useState } from "react";
 import { getVersion } from "@tauri-apps/api/app";
 
-const Sidebar: React.FC<SidebarProps> = ({ class: className, top, bottom, onlyMax = false, showVersion = false}) => {
+const Sidebar: React.FC<SidebarProps> = ({ class: className, top, bottom, onlyMax = false, showVersion = false, sidebarHover = true }) => {
   const [isMaxSidebar, setIsMaxSidebar] = useState(false);
   const [version, setversion] = useState<any>();
 
@@ -38,8 +38,17 @@ const Sidebar: React.FC<SidebarProps> = ({ class: className, top, bottom, onlyMa
     getAndSetVersion();
   })
 
+  const setMax = () => {
+    if (isMaxSidebar) {
+      setIsMaxSidebar(false)
+    }
+    if (!isMaxSidebar && sidebarHover) {
+      setIsMaxSidebar(true)
+    }
+  }
+
   return (
-    <div className={changeClass()} onMouseEnter={() => setIsMaxSidebar(true)} onMouseLeave={() => setIsMaxSidebar(false)}>
+    <div className={changeClass()} onMouseEnter={() => setMax()} onMouseLeave={() => setMax()}>
       <div className="top-sidebar">
         {showVersion && (
           <div className="sidebar-version">Animu v{version}</div>

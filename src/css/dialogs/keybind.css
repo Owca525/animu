@@ -16,4 +16,13 @@
   padding-left: 8px;
   padding-right: 8px;
   border-radius: 4px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--primary-200);
+  transform: all 0.2s ease;
+}
+
+.keybind-active {
+  background-color: var(--primary-300);
+  border-color: var(--primary-900);
 }
