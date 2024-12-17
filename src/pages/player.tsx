@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { info, error } from '@tauri-apps/plugin-log';
 
 import { get_player_anime } from "../utils/backend";
 import { SettingsConfig } from "../utils/interface";
@@ -46,10 +47,12 @@ const Player = () => {
     try {
       const recentData = await get_player_anime(id, ep);
       setPlayerUrl(recentData["players"][0]);
-    } catch (error) {
+      info(`Player url: ${recentData["players"][0]}`)
+    } catch (Error) {
+      error("Extraction Urls: " + Error)
       setErrorDialog({
         error: true,
-        information: "Failed get data from allmanga: " + error,
+        information: "Failed get data from allmanga: " + Error,
       });
     } finally {
       setLoadingPlayer(false);
@@ -70,6 +73,7 @@ const Player = () => {
     setDataPlayer();
   }, [ep])
 
+  // TODO: fix bug why videRef.current is null but videoRef don't
   // Checking config and player if load then set config to player and add event
   useEffect(() => {
     console.log(videoRef)
@@ -127,7 +131,7 @@ const Player = () => {
           video.pause();
           return false;
         } else {
-          video.play();
+          video.play().catch((Error) => error("Error with playing video: " + Error));
           return true;
         }
       });
@@ -210,26 +214,27 @@ const Player = () => {
   };
 
   const videoErrorHandler = (event: React.SyntheticEvent<HTMLVideoElement, Event>) => {
-    const error = event.currentTarget.error;
+    const Error = event.currentTarget.error;
     var message: string;
 
-    if (error) {
-      switch (error.code) {
-        case error.MEDIA_ERR_ABORTED:
+    if (Error) {
+      switch (Error.code) {
+        case Error.MEDIA_ERR_ABORTED:
           message = "The playback was aborted.";
           break;
-        case error.MEDIA_ERR_NETWORK:
+        case Error.MEDIA_ERR_NETWORK:
           message = "A network error occurred while fetching the video.";
           break;
-        case error.MEDIA_ERR_DECODE:
+        case Error.MEDIA_ERR_DECODE:
           message = "An error occurred while decoding the video.";
           break;
-        case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+        case Error.MEDIA_ERR_SRC_NOT_SUPPORTED:
           message = "The video format or source is not supported.";
           break;
         default:
           message = "An unknown error occurred.";
       }
+      error("Error player: " + message)
       setErrorDialog({ error: true, information: message });
     }
   };

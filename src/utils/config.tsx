@@ -1,4 +1,5 @@
 import { appConfigDir } from "@tauri-apps/api/path";
+import { error } from '@tauri-apps/plugin-log';
 import {
   exists,
   mkdir,
@@ -40,7 +41,7 @@ export async function readConfig(): Promise<SettingsConfig | undefined> {
   try {
     const content = await readTextFile(appConfigDirPath + "/config.ini");
     return ini.parse(content) as SettingsConfig;
-  } catch (error) {}
+  } catch (Error) { error(`Error in readConfig: ${Error}`) }
 }
 
 export async function saveConfig(content: any) {
@@ -48,7 +49,7 @@ export async function saveConfig(content: any) {
   const data = ini.stringify(content);
   try {
     await writeTextFile(appConfigDirPath + "/config.ini", data);
-  } catch (error) {}
+  } catch (Error) { error(`Error in saveConfig: ${Error}`) }
 }
 
 async function createConfig() {
@@ -56,16 +57,18 @@ async function createConfig() {
   const content = ini.stringify(defaultConfig);
   try {
     await writeTextFile(appConfigDirPath + "/config.ini", content);
-  } catch (error) {}
+  } catch (Error) { error(`Error in createConfig: ${Error}`) }
 }
 
 export async function checkConfig() {
-  const appConfigDirPath = await appConfigDir();
-  if ((await exists(appConfigDirPath)) == false) {
-    await mkdir(appConfigDirPath);
-    await createConfig();
-  }
-  if ((await exists(appConfigDirPath + "/config.ini")) == false) {
-    await createConfig();
-  }
+  try {
+    const appConfigDirPath = await appConfigDir();
+    if ((await exists(appConfigDirPath)) == false) {
+      await mkdir(appConfigDirPath);
+      await createConfig();
+    }
+    if ((await exists(appConfigDirPath + "/config.ini")) == false) {
+      await createConfig();
+    }
+  } catch (Error) { error(`Error in checkConfig: ${Error}`) }
 }
