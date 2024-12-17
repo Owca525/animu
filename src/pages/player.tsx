@@ -226,10 +226,9 @@ export const Player = () => {
       <div className="video-container">
         {isError.error ? (
           <Dialog
-            type="error"
             header_text="Error with player"
             text={isError.information}
-            onClick={() => navigate("/")}
+            buttons={[{ title: "Okay", onClick: () => navigate("/") }]}
           />
         ) : (
           ""
@@ -368,11 +367,10 @@ export const Player = () => {
       onMouseMove={handleMouseMove}
     >
       {isError.error ? (
-        <Dialog
-          type="error"
+          <Dialog
           header_text="Error with player"
           text={isError.information}
-          onClick={() => navigate("/")}
+          buttons={[{ title: "Okay", onClick: () => navigate("/") }]}
         />
       ) : (
         ""

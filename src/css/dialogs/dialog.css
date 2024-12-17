@@ -11,9 +11,9 @@
 .dialog {
     background-color: var(--primary-200);
     min-width: 30%;
-    min-height: 20%;
+    min-height: 10%;
     max-width: 60%;
-    max-height: 40%;
+    max-height: 20%;
     padding: 16px;
     border-radius: 4px;
     display: flex;
