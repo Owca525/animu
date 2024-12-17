@@ -14,9 +14,12 @@ const keybind: React.FC<keybindsProps> = ({ title, value, changeKey }) => {
   const handleKeyDown = (event: KeyboardEvent) => {
     if (isListening) {
       if (event.key == " ") {
-        setKeyPressed("space");
+        setKeyPressed("Space");
       } else {
         setKeyPressed(event.key);
+      }
+      if (event.key.length == 1) {
+        setKeyPressed(event.key.toUpperCase())
       }
       changeKey(event.key);
       setIsListening(false);

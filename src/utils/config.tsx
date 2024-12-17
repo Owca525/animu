@@ -25,12 +25,12 @@ const defaultConfig: SettingsConfig = {
     },
     keybinds: {
       Pause: " ",
-      LongTimeSkipForward: "arrowright",
-      LongTimeSkipBack: "arrowleft",
-      TimeSkipLeft: "arrowup",
-      TimeSkipRight: "arrowdown",
-      Fullscreen: "f",
-      ExitPlayer: "esc",
+      LongTimeSkipForward: "ArrowUp",
+      LongTimeSkipBack: "ArrowDown",
+      TimeSkipLeft: "ArrowLeft",
+      TimeSkipRight: "ArrowRight",
+      Fullscreen: "F",
+      ExitPlayer: "Escape",
     },
   },
 };

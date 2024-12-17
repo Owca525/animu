@@ -74,10 +74,13 @@ export const Settings = () => {
     )
   }
 
-  const getKeybind = (key: any) => {
+  const getKeybind = (key: string) => {
     if (key == " ") {
-      return "space"
-    } 
+      return "Space"
+    }
+    if (key.length == 1) {
+      return key.toUpperCase()
+    }
     return key
   }
 
