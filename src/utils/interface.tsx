@@ -47,6 +47,7 @@ interface SettingsConfigGeneral {
 interface SettingsConfigPlayer {
   general: {
     Autoplay: boolean,
+    AutoFullscreen: boolean,
     Volume: number,
     LongTimeSkipForward: number,
     LongTimeSkipBack: number,

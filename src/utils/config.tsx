@@ -17,6 +17,7 @@ const defaultConfig: SettingsConfig = {
   Player: {
     general: {
       Autoplay: true,
+      AutoFullscreen: false,
       Volume: 25,
       LongTimeSkipForward: 80,
       LongTimeSkipBack: 80,

@@ -157,7 +157,7 @@
 .player-waiting {
   font-size: 72px;
   animation: spin 1s linear infinite;
-  color: rgb(150, 150, 150);
+  color: rgb(230, 230, 230);
 }
 .player-waiting-max {
   display: flex;

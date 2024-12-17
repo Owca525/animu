@@ -134,10 +134,10 @@ const Settings = () => {
             <div className="settings-space">
               <div className="text">General:</div>
               <Checkbox title="AutoPlay" classContainer="small-text" checked={config.Player.general.Autoplay} onClick={(event) => handleChange("Player.general.Autoplay", event.currentTarget.checked)}/>
-              <div className="same-space">
+              <Checkbox title="Auto Fullscreen" classContainer="small-text" checked={config.Player.general.AutoFullscreen} onClick={(event) => handleChange("Player.general.AutoFullscreen", event.currentTarget.checked)}/>
+              <div className="same-space" style={{ marginTop: "10px" }}>
                 Default Volume <input type="text" className="number" placeholder="25" value={config.Player.general.Volume} onChange={(event) => handleChange("Player.general.Volume", event.currentTarget.value)} />
               </div>
-
               <div className="same-space">
                 Long Time Skip Forward <input type="text" value={config.Player.general.LongTimeSkipForward} className="number" placeholder="80" onChange={(event) => handleChange("Player.general.LongTimeSkipForward", event.currentTarget.value)} />
               </div>
