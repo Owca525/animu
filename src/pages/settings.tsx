@@ -9,7 +9,7 @@ import { readConfig, saveConfig } from "../utils/config";
 import { SettingsConfig } from "../utils/interface";
 // import { readConfig } from "../utils/config";
 
-export const Settings = () => {
+const Settings = () => {
   const navigate = useNavigate();
   const [settingPage, setsettingPage] = useState<string>("general");
   const [config, setConfig] = useState<SettingsConfig | undefined>(undefined);
@@ -167,3 +167,5 @@ export const Settings = () => {
     );
   }
 };
+
+export default Settings;

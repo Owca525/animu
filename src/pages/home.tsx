@@ -20,9 +20,7 @@ function home() {
   const [config, setConfig] = useState<SettingsConfig | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [updateNotification, setUpdateNotification] = useState(false);
-  const [notificationData, setNotificationData] = useState<
-    { title: string; information: string; onClick?: () => void }[]
-  >([{ title: "", information: "" }]);
+  const [notificationData, setNotificationData] = useState<{ title: string; information: string; onClick?: () => void }[]>([{ title: "", information: "" }]);
   const [isUpdate, setisUpdate] = useState(false);
 
   const sidebarHomeTopData = [
@@ -112,7 +110,7 @@ function home() {
         <Sidebar top={sidebarHomeTopData} bottom={sidebarHomeBottomData} sidebarHover={config.General.SideBar.HoverSidebar} />
         <Header onInputChange={handleInputChange} />
         <div className="content loading-home">
-          <div className="loading material-symbols-outlined">
+          <div className="card-content-loading loading material-symbols-outlined">
             progress_activity
           </div>
         </div>

@@ -121,6 +121,11 @@ body {
   height: 100%;
 }
 
+.loading {
+  font-size: xx-large;
+  animation: spin 1s linear infinite;
+}
+
 .hidden {
   display: none;
 }

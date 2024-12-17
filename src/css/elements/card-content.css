@@ -15,12 +15,11 @@
   justify-content: start;
   grid-template-columns: repeat(auto-fit, minmax(150px, max-content));
 }
-.loading {
+.card-content-loading {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  animation: spin 1s linear infinite;
 }
 .message-content {
   display: flex;

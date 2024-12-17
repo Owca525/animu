@@ -64,13 +64,13 @@ export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, t
       <div className="modal-backdrop" style={{ visibility: showPopup ? "visible" : "hidden" }}>
       <div className="box" ref={modalRef}>
         <div className="box-img" style={{width: "200px", height: "290px", display: "flex", justifyContent: "center", alignItems: "center"}}>
-          <div className="animation material-symbols-outlined" style={{animation: "spin 1s linear infinite"}}>
+          <div className="loading material-symbols-outlined">
             progress_activity
           </div>
         </div>
         <div className="box-info">
           <div className="box-text" style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-            <div className="description material-symbols-outlined" style={{animation: "spin 1s linear infinite"}}>progress_activity</div>
+            <div className="description loading material-symbols-outlined">progress_activity</div>
           </div>
           <div className="box-episode">
             <div className="text-episode">Availble Episodes:</div>
@@ -89,7 +89,7 @@ export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, t
       <div className="box" ref={modalRef}>
         <div className="box-img">
           {!isImageLoaded && !imghasError && (
-            <div className="material-symbols-outlined placeholder" style={{ animation: "spin 1s linear infinite" }}>
+            <div className="material-symbols-outlined placeholder loading">
               progress_activity
             </div>
           )}
