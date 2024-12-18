@@ -105,6 +105,10 @@ const Player = () => {
   };
 
   const exitPlayer = async () => {
+    if (config && config.General.Window.AutoFullscreen) {
+      navigate("/");
+      return
+    }
     await getCurrentWindow().setFullscreen(false);
     navigate("/");
   }

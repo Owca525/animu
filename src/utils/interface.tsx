@@ -44,6 +44,7 @@ interface SettingsConfigGeneral {
   };
   Window: {
     AutoMaximize: boolean,
+    AutoFullscreen: boolean,
   }
 }
 

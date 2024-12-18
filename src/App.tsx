@@ -23,6 +23,9 @@ function App() {
     if (cfg && cfg.General.Window.AutoMaximize) {
       await getCurrentWindow().maximize()
     }
+    if (cfg && cfg.General.Window.AutoFullscreen) {
+      await getCurrentWindow().setFullscreen(cfg.General.Window.AutoFullscreen)
+    }
   }, [])
 
   // Load config

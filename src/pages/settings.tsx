@@ -121,6 +121,7 @@ const Settings = () => {
             <div className="settings-space">
               <div className="text">Window:</div>
               <Checkbox title="Auto Maximize" checked={config.General.Window.AutoMaximize} onClick={(event) => handleChange("General.Window.AutoMaximize", event.currentTarget.checked)}/>
+              <Checkbox title="Auto Fullscreen, Warning you can't exit fullscreen in main window" checked={config.General.Window.AutoFullscreen} onClick={(event) => handleChange("General.Window.AutoFullscreen", event.currentTarget.checked)}/>
             </div>
           </div>
         </div>

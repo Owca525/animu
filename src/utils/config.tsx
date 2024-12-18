@@ -16,6 +16,7 @@ const defaultConfig: SettingsConfig = {
     },
     Window: {
       AutoMaximize: false,
+      AutoFullscreen: false,
     }
   },
   Player: {
