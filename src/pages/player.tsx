@@ -340,8 +340,8 @@ const Player = () => {
         onError={(error) => videoErrorHandler(error)}
         preload="metadata"
         muted={isMuted}
-        onLoadStart={() => setWaitingPlayer(true)}
         onCanPlay={() => setWaitingPlayer(false)}
+        onPlay={() => setWaitingPlayer(false)}
         onPlaying={() => setWaitingPlayer(false)}
         onWaiting={() => setWaitingPlayer(true)}
       />
