@@ -18,13 +18,9 @@ Installation of required libraries
 ```bash
 npm install
 ```
-Project compilation on linux
+Project compilation
 ```bash
-npm run build:linux
-```
-Project compilation on windows
-```bash
-npm run build:windows
+npm run tauri build
 ```
 Run developer version
 ```bash
