@@ -181,3 +181,28 @@
   border-radius: 4px;
   position: absolute;
 }
+
+.volume-container {
+  display: flex;
+  align-items: center;
+  width: 40px;
+  transition: width 150ms ease-in-out;
+  gap: 0.5em;
+}
+
+.volume-bar {
+  height: 6px;
+  border-radius: 5px;
+
+  opacity: 0;
+  width: 0;
+  transition: width 150ms ease-in-out;
+}
+
+.volume-container:hover .volume-bar {
+  width: 200px;
+  opacity: 1;
+}
+.volume-container:hover {
+  width: 200px;
+}

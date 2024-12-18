@@ -34,6 +34,7 @@ const Player = () => {
   const [duration, setDuration] = useState<number>(0);
 
   const [isPlayerLoading, setLoadingPlayer] = useState<boolean>(true);
+  const [isMuted, setMuted] = useState<boolean>(false);
   const [isShowTime, setShowTime] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const [isWaitingPlayer, setWaitingPlayer] = useState<boolean>(true);
@@ -122,6 +123,14 @@ const Player = () => {
       }
     }
   };
+
+  const setMutedToPlayer = () => {
+    if (isMuted) {
+      setMuted(false)
+    } else {
+      setMuted(true)
+    }
+  }
 
   const togglePlay = () => {
     const video = videoRef.current;
@@ -331,7 +340,6 @@ const Player = () => {
 
       <video
         ref={videoRef}
-        // src="https://myanime.sharepoint.com/sites/chartlousty/_layouts/15/download.aspx?share=EVZlwR4K-rxAjiIfQl8LlqABTqXsPyuX0-1oALcfV_62lQ"
         src={playerUrl}
         className={isVisible ? "video-player mask" : "video-player"}
         onTimeUpdate={updateProgress}
@@ -340,6 +348,7 @@ const Player = () => {
         autoPlay={isPlaying}
         onError={(error) => videoErrorHandler(error)}
         preload="metadata"
+        muted={isMuted}
         onLoadStart={() => setWaitingPlayer(true)}
         onCanPlay={() => setWaitingPlayer(false)}
         onWaiting={() => setWaitingPlayer(true)}
@@ -394,13 +403,15 @@ const Player = () => {
                 title={episodes[episodes.indexOf(ep) + 1] == undefined ? "" : `Next: ${episodes[episodes.indexOf(ep) + 1]} Episode`} onClick={() => setNewEpisode("next")}>
                 skip_next
               </button>
+              <div className="volume-container">
+                <button className="material-symbols-outlined player-buttons volume-button" title="Volume" onClick={setMutedToPlayer}>{isMuted ? "volume_off" : "volume_up"}</button>
+                <input className="volume-bar" id="volume" type="range" min="0" max="1" step="0.01" value={volume} style={{ pointerEvents: "all" }} onChange={handleVolumeChange} />
+              </div>
               <div className="time-display">
                 {formatTime(currentTime)} / {formatTime(duration)}
               </div>
             </div>
             <div className="right">
-              <button className="material-symbols-outlined player-buttons" title="Volume">volume_up</button>
-              <input id="volume" type="range" min="0" max="1" step="0.01" value={volume} style={{ pointerEvents: "all" }} onChange={handleVolumeChange} />
               <button className="material-symbols-outlined player-buttons" title="Settings">settings</button>
               <button onClick={async () => await enterFullscreen()} className="material-symbols-outlined player-buttons" title="Fullscreen">
                 {isFullscreen ? "fullscreen_exit" : "fullscreen"}
