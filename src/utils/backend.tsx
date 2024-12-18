@@ -10,7 +10,7 @@ export async function get_recent(): Promise<{ id: string, title: string; img: st
     tmp.forEach((element: any) => {
         let tmpimg: string = element["thumbnail"]
         if (tmpimg != null && tmpimg.startsWith("https") != true) {
-            tmpimg = "https://wp.youtube-anime.com/aln.youtube-anime.com/" + tmpimg;
+            tmpimg = "https://wp.youtube-anime.com/aln.youtube-anime.com/" + tmpimg + "?w=250";
         };
         anime.push({ id: element["_id"], title: element["name"], img: tmpimg})
     });
