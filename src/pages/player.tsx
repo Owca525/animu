@@ -342,6 +342,7 @@ const Player = () => {
         muted={isMuted}
         onLoadStart={() => setWaitingPlayer(true)}
         onCanPlay={() => setWaitingPlayer(false)}
+        onPlaying={() => setWaitingPlayer(false)}
         onWaiting={() => setWaitingPlayer(true)}
       />
 
