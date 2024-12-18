@@ -86,7 +86,7 @@ dependencies = [
 
 [[package]]
 name = "animu"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "regex",
  "reqwest 0.11.27",
