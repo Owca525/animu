@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { getCurrentWebview } from '@tauri-apps/api/webview';
 import 'material-symbols';
 
 // Pages
@@ -25,6 +26,9 @@ function App() {
     }
     if (cfg && cfg.General.Window.AutoFullscreen) {
       await getCurrentWindow().setFullscreen(cfg.General.Window.AutoFullscreen)
+    }
+    if (cfg) {
+      await getCurrentWebview().setZoom(parseFloat(cfg.General.Window.Zoom.toString()))
     }
   }, [])
 

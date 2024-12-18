@@ -122,6 +122,9 @@ const Settings = () => {
               <div className="text">Window:</div>
               <Checkbox title="Auto Maximize" checked={config.General.Window.AutoMaximize} onClick={(event) => handleChange("General.Window.AutoMaximize", event.currentTarget.checked)}/>
               <Checkbox title="Auto Fullscreen, Warning you can't exit fullscreen in main window" checked={config.General.Window.AutoFullscreen} onClick={(event) => handleChange("General.Window.AutoFullscreen", event.currentTarget.checked)}/>
+              <div className="same-space" style={{ marginTop: "10px" }}>
+                Zoom <input type="text" className="number" placeholder="1.0" value={config.General.Window.Zoom} onChange={(event) => handleChange("General.Window.Zoom", event.currentTarget.value)} />
+              </div>
             </div>
           </div>
         </div>

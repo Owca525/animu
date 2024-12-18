@@ -17,6 +17,7 @@ const defaultConfig: SettingsConfig = {
     Window: {
       AutoMaximize: false,
       AutoFullscreen: false,
+      Zoom: 1.0,
     }
   },
   Player: {

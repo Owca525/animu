@@ -32,6 +32,7 @@
     "fs:allow-config-write",
     "fs:allow-config-write-recursive",
     "log:default",
-    "core:window:allow-maximize"
+    "core:window:allow-maximize",
+    "core:webview:allow-set-webview-zoom"
   ]
 }
