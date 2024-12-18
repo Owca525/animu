@@ -1,15 +1,15 @@
 {
-  "version": "0.2.0",
-  "notes": "",
-  "pub_date": "2024-12-16T19:34:08Z",
+  "version": "0.2.1",
+  "notes": "**Added:** \n - Auto Fullscreen \n - Auto Maximize \n - Zoom \n- Config migration \n **Fixed:** \n - Player Keybinds \n - Folder Config button \n - Sidebar always maximize in home \n - Infinite loading animation in player \n - Config load ",
+  "pub_date": "2024-12-18T17:36:46Z",
   "platforms": {
     "linux-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRQ29SaFVZcmNNZjZNM281c2hvWW8xZGFYMG4rU1FhcjEzVFJJOUZLSmV3ck1tem1DU2hWdUxSTW5NY0kzVE8vb3pVNVRVdU9SbGUrMUNvOU9ZTWhkSHJGakFETGp5UGdjPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM0MzczNTA0CWZpbGU6YW5pbXVfMC4yLjBfYW1kNjQuQXBwSW1hZ2UKZXJ2OC94WWFkMzdnRGxpanBlVDJqSlVJajF2MjJCMDltamsrY0tJd0NBM3VVbjlIcTZTbkpHMTBjR1IyZGt1SlFRTUVTNVphZjFxTHh2cXIrUnlJQmc9PQo=",
-      "url": "https://github.com/Owca525/animu/releases/download/v0.2.0/animu_0.2.0_amd64.AppImage"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRQ29SaFVZcmNNZjRBckdPMGtPNVMzNHQwMTRnV2JVVm94S3cvZk0yd0RFWlY0d3BpQ0pMandWRTFnSm1lZHRMTGtLNDVPSU45dXlqM0FROFFQSXkwN2NFYmVFeEM3SUFRPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM0NTQyNDEzCWZpbGU6YW5pbXVfMC4yLjFfYW1kNjQuQXBwSW1hZ2UKVm42N2p3cjhhbURndVZxUk9CVDd3T0lLNWRTOFI5OXBkeXJad2NFZkx0SHYrOG5LaXV1YUVzVlRUcytESFRVeklQSHozcTZvbWNqYW5qelBkU1hhRFE9PQo=",
+      "url": "https://github.com/Owca525/animu/releases/download/v0.2.1/animu_0.2.1_amd64.AppImage"
     },
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRQ29SaFVZcmNNZnkvTDhZQi9xanhFUVVER0l6UkY4Q1RpUUhNRDBleHN6ZFBvcXovTldDY1Z0RHFTcnBYSndZTkY5cHNvQVltaFFHdE9rTmVZamdVWWZKM0JSdjBiUkFVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM0Mzc2MjkwCWZpbGU6YW5pbXVfMC4yLjBfeDY0X2VuLVVTLm1zaQpCQXdVRE1ndXo3ajVwNklvcUNjSTdrT1V2Y01LT2dKYTRZVXpZNjBrY3B1c1NCTmduN2xNRTZXSjdoZ3JJYmtxd094TUUwSXpVNy9RR1JZbWtRYUhCdz09Cg==",
-      "url": "https://github.com/Owca525/animu/releases/download/v0.2.0/animu_0.2.0_x64_en-US.msi"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRQ29SaFVZcmNNZjcyOFRwL25ncFVadHpLRlZHYUk4RC9JbE9qZE55UHR5MkpNMUx6QXNCL2NJdW1GMkpmYnFNdWE3M3lnSTdEb1pFalY3b3llQmRrTXFKdUxvNEVsZ3dvPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM0NTQyNjE3CWZpbGU6YW5pbXVfMC4yLjFfeDY0X2VuLVVTLm1zaQpYeTdIVjJmK0JsbDRjdzVTUWFnQnBaNUpRQW0rVzM1NXQvY3k4Y3hENTVac1hXRXM1dHdVNDNwSUNDdGJja1J3Q0NRRHJnazZYVEZib095bTRZZFdBdz09Cg==",
+      "url": "https://github.com/Owca525/animu/releases/download/v0.2.1/animu_0.2.1_x64_en-US.msi"
     }
   }
 }
