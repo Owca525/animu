@@ -292,16 +292,20 @@ const Player = () => {
           togglePlay();
           break;
         case config.Player.keybinds.TimeSkipRight.toLowerCase():
-          change_time((time_now += config.Player.general.TimeSkipRight));
+          console.log(config.Player.keybinds.TimeSkipRight, config.Player.general.TimeSkipRight)
+          change_time(time_now += parseInt(config.Player.general.TimeSkipRight.toString()));
           break;
         case config.Player.keybinds.TimeSkipLeft.toLowerCase():
-          change_time((time_now -= config.Player.general.TimeSkipLeft));
+          console.log(config.Player.keybinds.TimeSkipLeft, config.Player.general.TimeSkipLeft)
+          change_time(time_now -= parseInt(config.Player.general.TimeSkipLeft.toString()));
           break;
         case config.Player.keybinds.LongTimeSkipForward.toLowerCase():
-          change_time((time_now += config.Player.general.LongTimeSkipForward));
+          console.log(config.Player.keybinds.LongTimeSkipForward, config.Player.general.LongTimeSkipForward)
+          change_time(time_now += parseInt(config.Player.general.LongTimeSkipForward.toString()));
           break;
         case config.Player.keybinds.LongTimeSkipBack.toLowerCase():
-          change_time((time_now -= config.Player.general.LongTimeSkipBack));
+          console.log(config.Player.keybinds.LongTimeSkipBack, config.Player.general.LongTimeSkipBack)
+          change_time(time_now -= parseInt(config.Player.general.LongTimeSkipBack.toString()));
           break;
         case config.Player.keybinds.Fullscreen.toLowerCase():
           await enterFullscreen()
