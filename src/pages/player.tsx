@@ -71,16 +71,14 @@ const Player = () => {
     setDataPlayer();
   }, [ep])
 
-  // TODO: fix bug why videRef.current is null but videoRef don't
   // Checking config and player if load then set config to player and add event
   useEffect(() => {
-    console.log(videoRef)
-    console.log(videoRef.current)
     if (config && videoRef.current) {
       setIsPlaying(config.Player.general.Autoplay)
-      getCurrentWindow().setFullscreen(config.Player.general.AutoFullscreen)
       videoRef.current.autoplay = config.Player.general.Autoplay;
-      videoRef.current.volume = config.Player.general.Volume / 100
+      videoRef.current.volume = parseInt(config.Player.general.Volume.toString()) / 100
+      setVolume(parseInt(config.Player.general.Volume.toString()) / 100)
+      getCurrentWindow().setFullscreen(config.Player.general.AutoFullscreen)
     }
 
     // set event to detect keyboard
