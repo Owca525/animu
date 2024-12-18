@@ -20,11 +20,11 @@ const Player = () => {
   const [config, setConfig] = useState<SettingsConfig | undefined>(undefined);
 
   // ref for html object
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const seekbar = useRef<HTMLDivElement>(null);
-  const progressRef = useRef<HTMLDivElement>(null);
-  const thumbRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const seekbar = useRef<HTMLDivElement | null>(null);
+  const progressRef = useRef<HTMLDivElement | null>(null);
+  const thumbRef = useRef<HTMLDivElement | null>(null);
   const showtimeRef = useRef<HTMLDivElement | null>(null);
   const hideTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -33,7 +33,6 @@ const Player = () => {
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
 
-  const [isPlayerLoading, setLoadingPlayer] = useState<boolean>(true);
   const [isMuted, setMuted] = useState<boolean>(false);
   const [isShowTime, setShowTime] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(true);
@@ -41,7 +40,7 @@ const Player = () => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
-  const [playerUrl, setPlayerUrl] = useState<string>("");
+  const [playerUrl, setPlayerUrl] = useState<string | undefined>(undefined);
   const [isError, setErrorDialog] = useState({ error: false, information: "" });
 
   const setDataPlayer = async () => {
@@ -55,9 +54,7 @@ const Player = () => {
         error: true,
         information: "Failed get data from allmanga: " + Error,
       });
-    } finally {
-      setLoadingPlayer(false);
-    }
+    } finally {}
   };
 
   // Set Config
@@ -178,7 +175,10 @@ const Player = () => {
     if (type == "next") {
       episode = episode + 1
     }
-    setLoadingPlayer(true);
+    setPlayerUrl(undefined)
+    setWaitingPlayer(true)
+    setDuration(0)
+    setCurrentTime(0)
     navigate("/player", {
       state: {
         id: id,
@@ -317,20 +317,20 @@ const Player = () => {
     }
   };
 
-  if (isPlayerLoading) {
-    return (
-      <div className="video-container">
-        {isError.error ? (
-          <Dialog
-            header_text="Error with player"
-            text={isError.information}
-            buttons={[{ title: "Okay", onClick: () => navigate("/") }]}
-          />
-        ) : ("")}
-        <div className="loading-player material-symbols-outlined">progress_activity</div>
-      </div>
-    );
-  }
+  // if (isPlayerLoading) {
+  //   return (
+  //     <div className="video-container">
+  //       {isError.error ? (
+  //         <Dialog
+  //           header_text="Error with player"
+  //           text={isError.information}
+  //           buttons={[{ title: "Okay", onClick: () => navigate("/") }]}
+  //         />
+  //       ) : ("")}
+  //       <div className="loading-player material-symbols-outlined">progress_activity</div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="video-container" ref={containerRef} onMouseMove={handleMouseMove}>
@@ -338,7 +338,7 @@ const Player = () => {
         <Dialog
           header_text="Error with player"
           text={isError.information}
-          buttons={[{ title: "Okay", onClick: () => navigate("/") }]}
+          buttons={[{ title: "Okay", onClick: () => exitPlayer() }]}
         />
       ) : ("")}
 
