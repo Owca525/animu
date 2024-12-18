@@ -1,13 +1,15 @@
 import { useNavigate } from "react-router-dom";
-// import Button from "../components/ui/button";
-import "../css/pages/settings.css";
-import Sidebar from "../components/elements/sidebar";
+import { open } from '@tauri-apps/plugin-shell';
+import { appConfigDir } from "@tauri-apps/api/path";
 import { useEffect, useRef, useState } from "react";
-import Checkbox from "../components/ui/checkbox";
-import Keybind from "../components/dialogs/keybind";
+
 import { readConfig, saveConfig } from "../utils/config";
 import { SettingsConfig } from "../utils/interface";
-// import { readConfig } from "../utils/config";
+import Sidebar from "../components/elements/sidebar";
+import Checkbox from "../components/ui/checkbox";
+import Keybind from "../components/dialogs/keybind";
+
+import "../css/pages/settings.css";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -37,6 +39,7 @@ const Settings = () => {
       value: '<div class="material-symbols-outlined text-button">folder</div>Config Folder',
       class: "icon-button",
       title: "Config Folder",
+      onClick: async () => await open(await appConfigDir())
     },
     {
       value: '<div class="material-symbols-outlined text-button">home</div>Home',
