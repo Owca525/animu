@@ -73,7 +73,7 @@ export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, t
             <div className="description loading material-symbols-outlined">progress_activity</div>
           </div>
           <div className="box-episode">
-            <div className="text-episode">Availble Episodes:</div>
+            <div className="text-episode">Available Episodes:</div>
             <div className="box-episodes material-symbols-outlined" style={{display: "flex", justifyContent: "center", animation: "spin 1s linear infinite"}}>
               progress_activity
             </div>
