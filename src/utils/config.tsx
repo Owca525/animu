@@ -1,5 +1,5 @@
 import { appConfigDir } from "@tauri-apps/api/path";
-import { error } from '@tauri-apps/plugin-log';
+import { error, info } from '@tauri-apps/plugin-log';
 import {
   exists,
   mkdir,
@@ -63,12 +63,15 @@ async function createConfig() {
 export async function checkConfig() {
   try {
     const appConfigDirPath = await appConfigDir();
+    info(`Config Path: ${appConfigDirPath}`)
     if ((await exists(appConfigDirPath)) == false) {
       await mkdir(appConfigDirPath);
       await createConfig();
+      info(`Created new path and config`)
     }
     if ((await exists(appConfigDirPath + "/config.ini")) == false) {
       await createConfig();
+      info(`Created new config`)
     }
-  } catch (Error) { error(`Error in checkConfig: ${Error}`) }
+  } catch (Error) { error(`Error with loading config: ${Error}`) }
 }
