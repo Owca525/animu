@@ -41,12 +41,28 @@ const defaultConfig: SettingsConfig = {
     },
   },
 };
+
+function deepMerge(target: any, source: any): any {
+  for (const key in source) {
+    if (source[key] && typeof source[key] === 'object') {
+      if (!target[key]) {
+        target[key] = {};
+      }
+      deepMerge(target[key], source[key]);
+    } else {
+      target[key] = source[key];
+    }
+  }
+  return target;
+}
+
 export async function readConfig(): Promise<SettingsConfig | undefined> {
   const appConfigDirPath = await appConfigDir();
   try {
     const content = await readTextFile(appConfigDirPath + "/config.ini");
-    return ini.parse(content) as SettingsConfig;
-  } catch (Error) { error(`Error in readConfig: ${Error}`) }
+    const loadedConfig = ini.parse(content) as SettingsConfig;
+    return deepMerge(defaultConfig, loadedConfig);
+  } catch (Error) { error(`Error in readConfig: ${Error}`); return defaultConfig; }
 }
 
 export async function saveConfig(content: any) {
