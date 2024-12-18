@@ -42,6 +42,9 @@ interface SettingsConfigGeneral {
   SideBar: {
     HoverSidebar: boolean,
   };
+  Window: {
+    AutoMaximize: boolean,
+  }
 }
 
 interface SettingsConfigPlayer {

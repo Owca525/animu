@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import 'material-symbols';
 
 // Pages
@@ -8,7 +9,7 @@ import Settings from "./pages/settings";
 import Player from "./pages/player";
 
 // config
-import { checkConfig } from "./utils/config";
+import { checkConfig, readConfig } from "./utils/config";
 
 function App() {
   const [configIsLoading, setConfigIsLoading] = useState<boolean>(true)
@@ -16,6 +17,18 @@ function App() {
   useEffect(() => {
     checkConfig().then(() => setConfigIsLoading(false))
   })
+
+  const loadConfig = useCallback(async () => {
+    const cfg = await readConfig();
+    if (cfg && cfg.General.Window.AutoMaximize) {
+      await getCurrentWindow().maximize()
+    }
+  }, [])
+
+  // Load config
+  useEffect(() => {
+    loadConfig();
+  }, [loadConfig])
 
   if (configIsLoading) {
     return (

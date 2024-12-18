@@ -118,6 +118,10 @@ const Settings = () => {
               <div className="text">Sidebar:</div>
               <Checkbox title="Hover Sidebar" checked={config.General.SideBar.HoverSidebar} onClick={(event) => handleChange("General.SideBar.HoverSidebar", event.currentTarget.checked)}/>
             </div>
+            <div className="settings-space">
+              <div className="text">Window:</div>
+              <Checkbox title="Auto Maximize" checked={config.General.Window.AutoMaximize} onClick={(event) => handleChange("General.Window.AutoMaximize", event.currentTarget.checked)}/>
+            </div>
           </div>
         </div>
       </div>

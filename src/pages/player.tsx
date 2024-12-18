@@ -317,21 +317,6 @@ const Player = () => {
     }
   };
 
-  // if (isPlayerLoading) {
-  //   return (
-  //     <div className="video-container">
-  //       {isError.error ? (
-  //         <Dialog
-  //           header_text="Error with player"
-  //           text={isError.information}
-  //           buttons={[{ title: "Okay", onClick: () => navigate("/") }]}
-  //         />
-  //       ) : ("")}
-  //       <div className="loading-player material-symbols-outlined">progress_activity</div>
-  //     </div>
-  //   );
-  // }
-
   return (
     <div className="video-container" ref={containerRef} onMouseMove={handleMouseMove}>
       {isError.error ? (

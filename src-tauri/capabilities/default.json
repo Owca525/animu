@@ -31,6 +31,7 @@
     "fs:allow-config-read-recursive",
     "fs:allow-config-write",
     "fs:allow-config-write-recursive",
-    "log:default"
+    "log:default",
+    "core:window:allow-maximize"
   ]
 }

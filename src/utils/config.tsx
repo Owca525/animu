@@ -14,6 +14,9 @@ const defaultConfig: SettingsConfig = {
     SideBar: {
       HoverSidebar: true,
     },
+    Window: {
+      AutoMaximize: false,
+    }
   },
   Player: {
     general: {
