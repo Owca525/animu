@@ -36,7 +36,7 @@ const Sidebar: React.FC<SidebarProps> = ({ class: className, top, bottom, onlyMa
 
   useEffect(() => {
     getAndSetVersion();
-  })
+  }, [])
 
   const setMax = () => {
     if (isMaxSidebar) {
