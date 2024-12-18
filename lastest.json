@@ -1,0 +1,15 @@
+{
+  "version": "0.2.2",
+  "notes": "Change: \n - Information Section have better scale \n - Reduce loading animation bug \n Bug Fix: \n - Fixed most of img dosen't load ",
+  "pub_date": "2024-12-18T22:50:24Z",
+  "platforms": {
+    "linux-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRQ29SaFVZcmNNZncwdFJiclNNclBCdmd3TXl3aVYwWFc1YU5ScnZpcGs4RUlwRVNhbCtqdXhYMUVBODdXOFUzMW5mZ1RxUThjVGd6MERkNEhEeWpRcWk0UHFLU3lpT1E4PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM0NTU3NzAyCWZpbGU6YW5pbXVfMC4yLjJfYW1kNjQuQXBwSW1hZ2UKVjFPMW9aZEFPVUhxWWNhbU5xOFNBQ2t5QTZib3BLRWo0MG1sRHlvczVKNjZhYjFORE0rUUY5V1o0cDYyQkhxRUFlYjJZRHRXYUUrTGVvSk5od1R2Q2c9PQo=",
+      "url": "https://github.com/Owca525/animu/releases/download/v0.2.2/animu_0.2.2_amd64.AppImage"
+    },
+    "windows-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRQ29SaFVZcmNNZjQ0TXlqN2FqYnZZek5rd0lnS01peFFrWGNRRkk4b0h0VzBxNkhYTWs4TTBuSlRQQllia1ZWWU5SbUV5Sk9aMEJRbDFvOUxGOC9lV3p2ZSszeXB2WVFNPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM0NTU4MjgwCWZpbGU6YW5pbXVfMC4yLjJfeDY0X2VuLVVTLm1zaQpsRDlVQWhVOXJCMitYTFFJam4zZVo5TUx0NG1jSXplVDVtdHZ1WW5RUFAxaitWaXBrdW5FR3lzYmwzYWNaeGZ3MG8rWlNzZzByQXhsblRRT09jL3hEUT09Cg==",
+      "url": "https://github.com/Owca525/animu/releases/download/v0.2.2/animu_0.2.2_x64_en-US.msi"
+    }
+  }
+}
