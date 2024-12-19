@@ -1,6 +1,14 @@
+
+export interface CardProps {
+  id: string;
+  title: string;
+  img: string;
+  player?: { episodes: number[], episode: number, time: number | string }
+}
+
 export interface ContainerProps {
   title: string;
-  data?: { id: string; title: string; img: string }[];
+  data?: CardProps[];
   className?: string;
 }
 
@@ -59,6 +67,10 @@ interface SettingsConfigPlayer {
     TimeSkipLeft: number | string,
     TimeSkipRight: number | string,
   },
+  History: {
+    MinimalTimeSave: number | string;
+    MaximizeTimeSave: number | string;
+  }
   keybinds: {
     Pause: string,
     LongTimeSkipForward: string,

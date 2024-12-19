@@ -30,6 +30,10 @@ const defaultConfig: SettingsConfig = {
       TimeSkipLeft: 5,
       TimeSkipRight: 5,
     },
+    History: {
+      MinimalTimeSave: 20,
+      MaximizeTimeSave: 90,
+    },
     keybinds: {
       Pause: " ",
       LongTimeSkipForward: "ArrowUp",

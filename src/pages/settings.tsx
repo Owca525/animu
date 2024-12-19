@@ -163,6 +163,15 @@ const Settings = () => {
               </div>
             </div>
             <div className="settings-space">
+              <div className="text">History:</div>
+              <div className="same-space">
+                Minimal Time Save <input type="text" value={config.Player.History.MinimalTimeSave} className="number" placeholder="5" onChange={(event) => handleChange("Player.History.MinimalTimeSave", event.currentTarget.value)}/> 
+              </div>
+              <div className="same-space">
+                Maximize Time Save <input type="text" value={config.Player.History.MaximizeTimeSave} className="number" placeholder="5" onChange={(event) => handleChange("Player.History.MaximizeTimeSave", event.currentTarget.value)}/> 
+              </div>
+            </div>
+            <div className="settings-space">
               <div className="text">Keybinds:</div>
               <Keybind title="Pause:" value={getKeybind(config.Player.keybinds.Pause)} changeKey={(key) => handleChange("Player.keybinds.Pause", key)} />
               <Keybind title="Fullscreen:" value={getKeybind(config.Player.keybinds.Fullscreen)} changeKey={(key) => handleChange("Player.keybinds.Fullscreen", key)} />

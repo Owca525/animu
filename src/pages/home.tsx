@@ -13,6 +13,7 @@ import Notification from "../components/dialogs/notification";
 import Update from "../components/dialogs/update";
 import { useNavigate } from "react-router-dom";
 import { readConfig } from "../utils/config";
+import { ReadHistory } from "../utils/history";
 
 function home() {
   const navigate = useNavigate();
@@ -35,8 +36,8 @@ function home() {
     {
       value: '<div class="material-symbols-outlined text-button">history</div>History',
       class: "icon-button",
-      title: "History",
-      onClick: async () => change_content({ title: "History" }),
+      title: "Continue Watch",
+      onClick: async () => change_content({ title: "Continue Watch", data: await (await ReadHistory()).history }),
     }
   ];
 
@@ -90,7 +91,7 @@ function home() {
   useEffect(() => {}, [config]);
 
   const change_content = (newData: ContainerProps) => {
-    if (newData.data && newData.data[0].title == "error") {
+    if (newData.data && newData.data.length != 0 && newData.data[0].title == "error") {
       seterror({ error: true, note: "Error getting information from allmanga" })
       setData({ title: "Recent Anime" })
       return

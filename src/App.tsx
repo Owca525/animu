@@ -11,12 +11,14 @@ import Player from "./pages/player";
 
 // config
 import { checkConfig, readConfig } from "./utils/config";
+import { CheckHistory } from "./utils/history";
 
 function App() {
   const [configIsLoading, setConfigIsLoading] = useState<boolean>(true)
 
   useEffect(() => {
     checkConfig().then(() => setConfigIsLoading(false))
+    CheckHistory()
   })
 
   const loadConfig = useCallback(async () => {

@@ -9,12 +9,13 @@ import { readConfig } from "../utils/config";
 import Dialog from "../components/dialogs/dialog";
 
 import "../css/pages/player.css";
+import { DeleteFromHistory, SaveHistory } from "../utils/history";
 
 const Player = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { id, title, episodes, ep } = location.state;
+  const { id, title, episodes, ep, time, img } = location.state;
 
   // Loaded Config
   const [config, setConfig] = useState<SettingsConfig | undefined>(undefined);
@@ -71,9 +72,22 @@ const Player = () => {
     setDataPlayer();
   }, [ep])
 
+  useEffect(() => {
+    if (config && videoRef.current && currentTime >= parseInt(config.Player.History.MinimalTimeSave.toString()) && currentTime <= (duration - parseInt(config.Player.History.MaximizeTimeSave.toString()))) {
+      console.log("Save")
+      SaveHistory({ id: id, title: title, img: img, player: { episodes: episodes, episode: ep, time: currentTime } })
+    } else {
+      console.log("remove")
+      DeleteFromHistory({ id: id, title: title, img: img, player: { episodes: episodes, episode: ep, time: currentTime } })
+    }
+  }, [currentTime])
+
   // Checking config and player if load then set config to player and add event
   useEffect(() => {
     if (config && videoRef.current) {
+      videoRef.current.currentTime = time;
+      setCurrentTime(time)
+
       setIsPlaying(config.Player.general.Autoplay)
       videoRef.current.autoplay = config.Player.general.Autoplay;
       videoRef.current.volume = parseInt(config.Player.general.Volume.toString()) / 100

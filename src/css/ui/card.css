@@ -51,3 +51,7 @@
   align-items: center;
   font-size: xx-large;
 }
+
+.card-continue-info {
+  color: gray;
+}

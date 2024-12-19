@@ -2,13 +2,11 @@ import React, { useState, useRef, useEffect } from "react";
 import { Information } from "../elements/information";
 import "../../css/ui/card.css";
 
-interface CardProps {
-  id_anime: string;
-  title: string;
-  img: string;
-}
+import { CardProps } from "../../utils/interface"
+import { useNavigate } from "react-router-dom";
 
-const Card: React.FC<CardProps> = ({ id_anime, title, img }) => {
+const Card: React.FC<CardProps> = ({ id, title, img, player = null }) => {
+  const navigate = useNavigate();
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [showInf, setShowInf] = useState<boolean>(false);
@@ -31,7 +29,7 @@ const Card: React.FC<CardProps> = ({ id_anime, title, img }) => {
   }
 
   useEffect(() => {
-    if(!showInf){
+    if(!showInf && player == null){
       document.addEventListener('click', handleClick);
     } else document.removeEventListener('click', handleClick)
 
@@ -41,14 +39,24 @@ const Card: React.FC<CardProps> = ({ id_anime, title, img }) => {
   }, [showInf])
 
   const shortText = (text: string) => {
+    if (player && text.length > 40) {
+      return text.slice(0, 40) + "...";
+    }
     if (text.length > 58) {
       return text.slice(0, 58) + "...";
     }
     return text;
   }
 
+  const ContinueWatch = () => {
+    if (player) {
+      navigate("/player", {state: { id: id, title: title, episodes: player.episodes, ep: player.episode, time: player.time, img: img }})
+    }
+  }
+
   return (
-      <div className="card" title={title} ref={cardRef}>
+      <div className="card" title={title} ref={cardRef} onClick={ContinueWatch}>
+        <Information id_anime={id} showPopup={showInf} toggle={toggleShow}/>
         <div className="card-img">
           {!isImageLoaded && !hasError && (
             <div className="material-symbols-outlined placeholder" style={{ animation: "spin 1s linear infinite" }}>
@@ -68,7 +76,7 @@ const Card: React.FC<CardProps> = ({ id_anime, title, img }) => {
           />
         </div>
         <div className="card-title">{shortText(title)}</div>
-        <Information id_anime={id_anime} showPopup={showInf} toggle={toggleShow}/>
+        {player ? <div className="card-continue-info">Continue Episode {player.episode}</div> : ""}
       </div>
   );
 };
