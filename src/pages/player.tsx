@@ -73,11 +73,10 @@ const Player = () => {
   }, [ep])
 
   useEffect(() => {
+    setWaitingPlayer(false)
     if (config && videoRef.current && currentTime >= parseInt(config.Player.History.MinimalTimeSave.toString()) && currentTime <= (duration - parseInt(config.Player.History.MaximizeTimeSave.toString()))) {
-      console.log("Save")
       SaveHistory({ id: id, title: title, img: img, player: { episodes: episodes, episode: ep, time: currentTime } })
     } else {
-      console.log("remove")
       DeleteFromHistory({ id: id, title: title, img: img, player: { episodes: episodes, episode: ep, time: currentTime } })
     }
   }, [currentTime])
@@ -354,9 +353,7 @@ const Player = () => {
         onError={(error) => videoErrorHandler(error)}
         preload="metadata"
         muted={isMuted}
-        onCanPlay={() => setWaitingPlayer(false)}
-        onPlay={() => setWaitingPlayer(false)}
-        onPlaying={() => setWaitingPlayer(false)}
+        onLoad={() => setWaitingPlayer(true)}
         onWaiting={() => setWaitingPlayer(true)}
       />
 

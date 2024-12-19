@@ -37,7 +37,7 @@ function home() {
       value: '<div class="material-symbols-outlined text-button">history</div>History',
       class: "icon-button",
       title: "Continue Watch",
-      onClick: async () => change_content({ title: "Continue Watch", data: await (await ReadHistory()).history }),
+      onClick: async () => change_content({ title: "Continue Watch", data: (await ReadHistory()).history }),
     }
   ];
 
