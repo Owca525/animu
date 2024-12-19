@@ -15,8 +15,8 @@
 }
 .card-img {
   background-color: var(--primary-200);
-  max-width: 190px;
-  max-height: 250px;
+  max-width: 220px;
+  max-height: 280px;
   width: auto;
   height: auto;
   display: flex;
@@ -36,7 +36,7 @@
   opacity: 1;
 }
 .card-title {
-  max-width: 200px;
+  max-width: 220px;
   width: 100%;
   word-wrap: break-word;
   overflow: hidden;
@@ -44,8 +44,8 @@
   text-align: start;
 }
 .placeholder {
-  width: 190px;
-  height: 200px;
+  width: 220px;
+  height: 220px;
   display: flex;
   justify-content: center;
   align-items: center;
