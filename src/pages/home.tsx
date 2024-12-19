@@ -1,7 +1,8 @@
 import Sidebar from "../components/elements/sidebar";
 import Content from "../components/elements/card-content";
 import Header from "../components/elements/headers";
-// import Dialog from "../components/elements/dialog";
+import Dialog from "../components/dialogs/dialog";
+import { exit } from '@tauri-apps/plugin-process';
 import "../css/pages/home.css";
 
 import { ContainerProps, SettingsConfig } from "../utils/interface";
@@ -22,6 +23,7 @@ function home() {
   const [updateNotification, setUpdateNotification] = useState(false);
   const [notificationData, setNotificationData] = useState<{ title: string; information: string; onClick?: () => void }[]>([{ title: "", information: "" }]);
   const [isUpdate, setisUpdate] = useState(false);
+  const [error, seterror] = useState<{ error: boolean, note: string }>()
 
   const sidebarHomeTopData = [
     {
@@ -71,7 +73,7 @@ function home() {
 
     const fetchData = async () => {
       const recentData = await get_recent();
-      setData({
+      change_content({
         title: "Recent Anime",
         data: recentData,
       });
@@ -88,6 +90,11 @@ function home() {
   useEffect(() => {}, [config]);
 
   const change_content = (newData: ContainerProps) => {
+    if (newData.data && newData.data[0].title == "error") {
+      seterror({ error: true, note: "Error getting information from allmanga" })
+      setData({ title: "Recent Anime" })
+      return
+    }
     setData(newData);
   };
 
@@ -123,10 +130,10 @@ function home() {
       <main className="container">
         {updateNotification ? <Notification data={notificationData} /> : ""}
         {isUpdate ? <Update /> : ""}
+        {error?.error ? <Dialog header_text="Connection Error" text={error.note} buttons={[{ title: "Exit", onClick: () => exit(0) }, { title: "Reload", onClick: () => navigate("/") }]}/> : ""}
         <Sidebar top={sidebarHomeTopData} bottom={sidebarHomeBottomData} sidebarHover={config.General.SideBar.HoverSidebar} />
         <Header onInputChange={handleInputChange} />
         <Content title={data.title} data={data.data} />
-        {/* <Dialog type="error" header_text="Error" text="test" /> */}
       </main>
     );
   }

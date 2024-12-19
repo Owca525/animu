@@ -1,25 +1,30 @@
 import { invoke } from "@tauri-apps/api/core";
 import { InformationData } from "../utils/interface"
+import { error } from '@tauri-apps/plugin-log';
 
 export async function get_recent(): Promise<{ id: string, title: string; img: string; }[]> {
-    var anime: { id: string; title: string; img: string; }[] = [];
-    const response: string = await invoke("get_recent_anime");
-    const recent = JSON.parse(response);
-    console.log("recent:", recent)
-    var tmp = await recent["data"]["shows"]["edges"];
-    tmp.forEach((element: any) => {
-        let tmpimg: string = element["thumbnail"]
-        if (tmpimg != null && tmpimg.startsWith("https") != true) {
-            tmpimg = "https://wp.youtube-anime.com/aln.youtube-anime.com/" + tmpimg + "?w=250";
-        };
-        anime.push({ id: element["_id"], title: element["name"], img: tmpimg})
-    });
-
-    return anime
+    try {
+        var anime: { id: string; title: string; img: string; }[] = [];
+        const response: string = await invoke("get_recent_anime");
+        const recent = JSON.parse(response);
+        console.log("recent:", recent)
+        var tmp = await recent["data"]["shows"]["edges"];
+        tmp.forEach((element: any) => {
+            let tmpimg: string = element["thumbnail"]
+            if (tmpimg != null && tmpimg.startsWith("https") != true) {
+                tmpimg = "https://wp.youtube-anime.com/aln.youtube-anime.com/" + tmpimg + "?w=250";
+            };
+            anime.push({ id: element["_id"], title: element["name"], img: tmpimg })
+        });
+        return anime
+    } catch (Error) {
+        error(`Error in get_recent: ${Error}`)
+        return [{ id: "", title: "error", img: "" }]
+    }
 }
 
 export async function get_information(id: string): Promise<InformationData> {
-    const resp: string = await invoke("get_anime_data", { id: id})
+    const resp: string = await invoke("get_anime_data", { id: id })
     const info = JSON.parse(resp);
     console.log("info anime: ", info)
     const episode_list = info["data"]["show"]["availableEpisodesDetail"]["sub"];
@@ -28,7 +33,7 @@ export async function get_information(id: string): Promise<InformationData> {
     if (tmpimg != null && tmpimg.startsWith("https") != true) {
         tmpimg = "https://wp.youtube-anime.com/aln.youtube-anime.com/" + tmpimg;
     };
-    return { id: info["data"]["show"]["_id"], title: info["data"]["show"]["name"], description: info["data"]["show"]["description"], img: tmpimg, episodes: episode_list}
+    return { id: info["data"]["show"]["_id"], title: info["data"]["show"]["name"], description: info["data"]["show"]["description"], img: tmpimg, episodes: episode_list }
 }
 
 export async function get_search(name: string): Promise<{ id: string, title: string; img: string; }[]> {
@@ -42,7 +47,7 @@ export async function get_search(name: string): Promise<{ id: string, title: str
         if (tmpimg != null && tmpimg.startsWith("https") != true) {
             tmpimg = "https://wp.youtube-anime.com/aln.youtube-anime.com/" + tmpimg;
         };
-        anime.push({ id: element["_id"], title: element["name"], img: tmpimg})
+        anime.push({ id: element["_id"], title: element["name"], img: tmpimg })
     });
 
     return anime
