@@ -11,10 +11,9 @@ const DefaultHistory: { history: CardProps[] } = {
     history: [],
 }
 
-const appConfigDirPath = await appConfigDir();
-
 export async function CheckHistory() {
     try {
+        const appConfigDirPath = await appConfigDir();
         if (await exists(appConfigDirPath + "/history.json") == false) {
             await writeTextFile(appConfigDirPath + "/history.json", JSON.stringify(DefaultHistory))
             info("history file make")
@@ -26,6 +25,7 @@ export async function CheckHistory() {
 
 export async function SaveHistory(save: CardProps) {
     try {
+        const appConfigDirPath = await appConfigDir();
         const file = await readTextFile(appConfigDirPath + "/history.json")
         const data = JSON.parse(file) as { history: CardProps[] }
         const index = data.history.findIndex(item => item.player?.episode === save.player?.episode)
@@ -39,6 +39,7 @@ export async function SaveHistory(save: CardProps) {
 
 export async function DeleteFromHistory(data: CardProps) {
     try {
+        const appConfigDirPath = await appConfigDir();
         const file = await readTextFile(appConfigDirPath + "/history.json")
         const list = JSON.parse(file) as { history: CardProps[] }
         const index = list.history.findIndex(item => item.player?.episode === data.player?.episode)
@@ -51,6 +52,7 @@ export async function DeleteFromHistory(data: CardProps) {
 
 export async function ReadHistory(): Promise<{ history: CardProps[] }> {
     try {
+        const appConfigDirPath = await appConfigDir();
         const file = await readTextFile(appConfigDirPath + "/history.json")
         return JSON.parse(file) as { history: CardProps[] }
     } catch (Error) {
