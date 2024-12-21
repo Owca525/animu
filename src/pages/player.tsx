@@ -172,18 +172,32 @@ const Player = () => {
     hideTimer.current = setTimeout(hideElement, 2000);
   };
 
+  const clearPlayer = () => {
+    if (videoRef.current && progressRef.current && thumbRef.current){
+      progressRef.current.style.width = `0%`;
+      thumbRef.current.style.left = `0%`;
+      setPlayerUrl(undefined)
+      videoRef.current.pause()
+      setWaitingPlayer(true)
+      setDuration(0)
+      setCurrentTime(0)
+      updateProgress()
+    }
+  }
+
   const setNewEpisode = (type: string) => {
     var episode = episodes.indexOf(ep)
+    console.log("before", episode, episodes[episode])
     if (type == "prev") {
       episode = episode - 1
     }
     if (type == "next") {
       episode = episode + 1
     }
-    setPlayerUrl(undefined)
-    setWaitingPlayer(true)
-    setDuration(0)
-    setCurrentTime(0)
+    // console.log("after", episode, episodes[episode])
+    // console.log("before", playerUrl, duration, currentTime)
+    clearPlayer()
+    // console.log("after", playerUrl, duration, currentTime)
     navigate("/player", {
       state: {
         id: id,

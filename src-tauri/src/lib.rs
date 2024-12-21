@@ -1,3 +1,4 @@
+use tauri::Manager;
 mod allmanga;
 
 // Z poziomu Frontend jest odbierany tekst w formie zmiennej "name" a potem uruchamia get_search gdzie zwraca dane znowu do frontend
@@ -24,6 +25,13 @@ async fn get_anime_data(id: &str) -> Result<String, String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .setup(|app| {
+            #[cfg(debug_assertions)]
+            {
+                app.get_webview_window("main").unwrap().open_devtools();
+            }
+            Ok(())
+          })
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_log::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
