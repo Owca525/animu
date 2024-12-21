@@ -1,6 +1,6 @@
 [package]
 name = "animu"
-version = "0.2.3"
+version = "0.2.4"
 description = "Simple Application To Watch Anime"
 authors = ["Owca525", "DawoleQ"]
 edition = "2021"

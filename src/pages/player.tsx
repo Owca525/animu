@@ -187,7 +187,7 @@ const Player = () => {
 
   const setNewEpisode = (type: string) => {
     var episode = episodes.indexOf(ep)
-    console.log("before", episode, episodes[episode])
+    // console.log("before", episode, episodes[episode])
     if (type == "prev") {
       episode = episode - 1
     }
