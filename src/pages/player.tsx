@@ -1,15 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { info, error } from '@tauri-apps/plugin-log';
 
 import { get_player_anime } from "../utils/backend";
-import { SettingsConfig } from "../utils/interface";
-import { readConfig } from "../utils/config";
 import Dialog from "../components/dialogs/dialog";
 
 import "../css/pages/player.css";
 import { DeleteFromHistory, SaveHistory } from "../utils/history";
+import { configContext } from "../utils/context";
 
 const Player = () => {
   const location = useLocation();
@@ -17,8 +16,8 @@ const Player = () => {
 
   const { id, title, episodes, ep, time, img } = location.state;
 
-  // Loaded Config
-  const [config, setConfig] = useState<SettingsConfig | undefined>(undefined);
+  // Loading Config from context
+  const config = useContext(configContext);
 
   // ref for html object
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -58,20 +57,11 @@ const Player = () => {
     } finally {}
   };
 
-  // Set Config
-  const loadConfig = useCallback(async () => {
-    setConfig(await readConfig());
-  }, [])
-
-  // Load config
-  useEffect(() => {
-    loadConfig();
-  }, [loadConfig])
-
   useEffect(() => {
     setDataPlayer();
   }, [ep])
 
+  // Saving history
   useEffect(() => {
     setWaitingPlayer(false)
     if (config && videoRef.current && currentTime >= parseInt(config.Player.History.MinimalTimeSave.toString()) && currentTime <= (duration - parseInt(config.Player.History.MaximizeTimeSave.toString()))) {

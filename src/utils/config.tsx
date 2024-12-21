@@ -9,7 +9,7 @@ import {
 import ini from "ini";
 import { SettingsConfig } from "./interface";
 
-const defaultConfig: SettingsConfig = {
+export const defaultConfig: SettingsConfig = {
   General: {
     SideBar: {
       HoverSidebar: true,

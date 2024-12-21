@@ -61,36 +61,18 @@ const Settings = () => {
     if (config !== undefined) {
       setisLoading(false)
     }
-
   }, [config]);
 
-  if (isLoading) {
-    return (
-      <div className="settings-container">
-        <Sidebar top={sidebarSettingsTopData} bottom={sidebarSettingsBottomData} class="sidebar-first" onlyMax={true} showVersion={true} />
-        <div className="settings-content settings-loading">
-          <div className="loading settings-loading-animation material-symbols-outlined">
-            progress_activity
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   const getKeybind = (key: string) => {
-    if (key == " ") {
-      return "Space"
-    }
-    if (key.length == 1) {
-      return key.toUpperCase()
-    }
+    if (key == " ") return "Space"
+    if (key.length == 1) return key.toUpperCase()
     return key
   }
 
   const handleChange = (path: string, value: string | number | boolean) => {
     setConfig((prevConfig) => {
       if (!prevConfig) return prevConfig;
-  
+
       const keys = path.split(".");
       const newConfig = { ...prevConfig };
 
@@ -105,47 +87,50 @@ const Settings = () => {
       }
 
       current[keys[keys.length - 1]] = value;
-  
+
       return newConfig;
     });
   };
 
-  if (settingPage == "general" && config) {
-    return (
-      <div className="settings-container">
-        <Sidebar top={sidebarSettingsTopData} bottom={sidebarSettingsBottomData} class="sidebar-first" onlyMax={true} showVersion={true} />
+  return isLoading ? (
+    <div className="settings-container">
+      <Sidebar top={sidebarSettingsTopData} bottom={sidebarSettingsBottomData} class="sidebar-first" onlyMax={true} showVersion={true} />
+      <div className="settings-content settings-loading">
+        <div className="loading settings-loading-animation material-symbols-outlined">
+          progress_activity
+        </div>
+      </div>
+    </div>
+  ) : (
+    <div className="settings-container">
+      <Sidebar top={sidebarSettingsTopData} bottom={sidebarSettingsBottomData} class="sidebar-first" onlyMax={true} showVersion={true} />
+      {settingPage == "general" && config ? (
         <div className="settings-content">
           <div className="settings-header">General Settings</div>
           <div className="settings-general" ref={generalRef} >
             <div className="settings-space">
               <div className="text">Sidebar:</div>
-              <Checkbox title="Hover Sidebar" checked={config.General.SideBar.HoverSidebar} onClick={(event) => handleChange("General.SideBar.HoverSidebar", event.currentTarget.checked)}/>
+              <Checkbox title="Hover Sidebar" checked={config.General.SideBar.HoverSidebar} onClick={(event) => handleChange("General.SideBar.HoverSidebar", event.currentTarget.checked)} />
             </div>
             <div className="settings-space">
               <div className="text">Window:</div>
-              <Checkbox title="Auto Maximize" checked={config.General.Window.AutoMaximize} onClick={(event) => handleChange("General.Window.AutoMaximize", event.currentTarget.checked)}/>
-              <Checkbox title="Auto Fullscreen, Warning you can't exit fullscreen in main window" checked={config.General.Window.AutoFullscreen} onClick={(event) => handleChange("General.Window.AutoFullscreen", event.currentTarget.checked)}/>
+              <Checkbox title="Auto Maximize" checked={config.General.Window.AutoMaximize} onClick={(event) => handleChange("General.Window.AutoMaximize", event.currentTarget.checked)} />
+              <Checkbox title="Auto Fullscreen, Warning you can't exit fullscreen in main window" checked={config.General.Window.AutoFullscreen} onClick={(event) => handleChange("General.Window.AutoFullscreen", event.currentTarget.checked)} />
               <div className="same-space" style={{ marginTop: "10px" }}>
                 Zoom <input type="text" className="number" placeholder="1.0" value={config.General.Window.Zoom} onChange={(event) => handleChange("General.Window.Zoom", event.currentTarget.value)} />
               </div>
             </div>
           </div>
         </div>
-      </div>
-    );
-  }
-
-  if (settingPage == "player" && config) {
-    return (
-      <div className="settings-container">
-        <Sidebar top={sidebarSettingsTopData} bottom={sidebarSettingsBottomData} class="sidebar-first" onlyMax={true} showVersion={true} />
+      ) : ""}
+      {settingPage == "player" && config ? (
         <div className="settings-content">
           <div className="settings-header">Player Settings</div>
           <div className="settings-general" ref={playerRef}>
             <div className="settings-space">
               <div className="text">General:</div>
-              <Checkbox title="AutoPlay" classContainer="small-text" checked={config.Player.general.Autoplay} onClick={(event) => handleChange("Player.general.Autoplay", event.currentTarget.checked)}/>
-              <Checkbox title="Auto Fullscreen" classContainer="small-text" checked={config.Player.general.AutoFullscreen} onClick={(event) => handleChange("Player.general.AutoFullscreen", event.currentTarget.checked)}/>
+              <Checkbox title="AutoPlay" classContainer="small-text" checked={config.Player.general.Autoplay} onClick={(event) => handleChange("Player.general.Autoplay", event.currentTarget.checked)} />
+              <Checkbox title="Auto Fullscreen" classContainer="small-text" checked={config.Player.general.AutoFullscreen} onClick={(event) => handleChange("Player.general.AutoFullscreen", event.currentTarget.checked)} />
               <div className="same-space" style={{ marginTop: "10px" }}>
                 Default Volume <input type="text" className="number" placeholder="25" value={config.Player.general.Volume} onChange={(event) => handleChange("Player.general.Volume", event.currentTarget.value)} />
               </div>
@@ -159,16 +144,16 @@ const Settings = () => {
                 Time Skip Forward <input type="text" value={config.Player.general.TimeSkipRight} className="number" placeholder="5" onChange={(event) => handleChange("Player.general.TimeSkipRight", event.currentTarget.value)} />
               </div>
               <div className="same-space">
-                Time Skip Back <input type="text" value={config.Player.general.TimeSkipLeft} className="number" placeholder="5" onChange={(event) => handleChange("Player.general.TimeSkipLeft", event.currentTarget.value)}/> 
+                Time Skip Back <input type="text" value={config.Player.general.TimeSkipLeft} className="number" placeholder="5" onChange={(event) => handleChange("Player.general.TimeSkipLeft", event.currentTarget.value)} />
               </div>
             </div>
             <div className="settings-space">
               <div className="text">History:</div>
               <div className="same-space">
-                Minimal Time Save <input type="text" value={config.Player.History.MinimalTimeSave} className="number" placeholder="5" onChange={(event) => handleChange("Player.History.MinimalTimeSave", event.currentTarget.value)}/> 
+                Minimal Time Save <input type="text" value={config.Player.History.MinimalTimeSave} className="number" placeholder="5" onChange={(event) => handleChange("Player.History.MinimalTimeSave", event.currentTarget.value)} />
               </div>
               <div className="same-space">
-                Maximize Time Save <input type="text" value={config.Player.History.MaximizeTimeSave} className="number" placeholder="5" onChange={(event) => handleChange("Player.History.MaximizeTimeSave", event.currentTarget.value)}/> 
+                Maximize Time Save <input type="text" value={config.Player.History.MaximizeTimeSave} className="number" placeholder="5" onChange={(event) => handleChange("Player.History.MaximizeTimeSave", event.currentTarget.value)} />
               </div>
             </div>
             <div className="settings-space">
@@ -183,9 +168,9 @@ const Settings = () => {
             </div>
           </div>
         </div>
-      </div>
-    );
-  }
+      ) : ""}
+    </div>
+  )
 };
 
 export default Settings;

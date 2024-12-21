@@ -12,26 +12,32 @@ import Player from "./pages/player";
 // config
 import { checkConfig, readConfig } from "./utils/config";
 import { CheckHistory } from "./utils/history";
+import { configContext } from "./utils/context";
+import { SettingsConfig } from "./utils/interface";
 
 function App() {
   const [configIsLoading, setConfigIsLoading] = useState<boolean>(true)
-
-  useEffect(() => {
-    checkConfig().then(() => setConfigIsLoading(false))
-    CheckHistory()
-  })
+  const [config, setConfig] = useState<SettingsConfig | undefined>(undefined)
 
   const loadConfig = useCallback(async () => {
-    const cfg = await readConfig();
-    if (cfg && cfg.General.Window.AutoMaximize) {
+    await checkConfig();
+    setConfig(await readConfig());
+
+    if (config && config.General.Window.AutoMaximize) {
       await getCurrentWindow().maximize()
     }
-    if (cfg && cfg.General.Window.AutoFullscreen) {
-      await getCurrentWindow().setFullscreen(cfg.General.Window.AutoFullscreen)
+    if (config && config.General.Window.AutoFullscreen) {
+      await getCurrentWindow().setFullscreen(config.General.Window.AutoFullscreen)
     }
-    if (cfg) {
-      await getCurrentWebview().setZoom(parseFloat(cfg.General.Window.Zoom.toString()))
+    if (config) {
+      await getCurrentWebview().setZoom(parseFloat(config.General.Window.Zoom.toString()))
     }
+
+    setConfigIsLoading(false)
+  }, [])
+
+  useEffect(() => {
+    CheckHistory()
   }, [])
 
   // Load config
@@ -39,22 +45,20 @@ function App() {
     loadConfig();
   }, [loadConfig])
 
-  if (configIsLoading) {
-    return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-        <div className="loading material-symbols-outlined">progress_activity</div>
-      </div>
-    )
-  }
-
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/player" element={<Player />} />
-        <Route path="/settings" element={<Settings />} />
-      </Routes>
-    </Router>
+  return configIsLoading ? (
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+      <div className="loading material-symbols-outlined">progress_activity</div>
+    </div>
+  ) : (
+    <configContext.Provider value={config}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/player" element={<Player />} />
+          <Route path="/settings" element={<Settings />} />
+        </Routes>
+      </Router>
+    </configContext.Provider>
   );
 }
 
