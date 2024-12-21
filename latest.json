@@ -1,11 +1,12 @@
+
 {
-  "version": "0.2.3",
-  "notes": "Change <br/> - The card image is larger <br/> - Removing temporarily appimage <br/> Added <br/> - Continue Watching",
-  "pub_date": "2024-12-18T22:50:24Z",
+  "version": "0.2.4",
+  "notes": "FIXING<br/>- Player cannot correctly change episode anime<br/>- Sidebar always maximize<br/><br/>Full Changelog: https://github.com/Owca525/animu/compare/v0.2.3...v0.2.4",
+  "pub_date": "2024-12-21T14:59:23Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVRQ29SaFVZcmNNZjNocndHRDdkVmZhMkg5dHowak5BWFhRdEFESTljY3pUWkxOTDVXVWd2V09XWHQ5aG9BRkJvVEdwKzYvTWJLNStwczNpOXNKT2d4MDFwZ2M4RkNsR0E0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzM0NjMxNjkxCWZpbGU6YW5pbXVfMC4yLjNfeDY0X2VuLVVTLm1zaQo3bTFtd2Jqb1NPa0dYeFlkckkxUXUybFZIcis0bjdkNUtsOHEyZDlvYWd1UkJBb1VuR0d6NTZNYU9sUnZwVkhuOGc3Z3FNcUcyMXVSL25icW5CZHlDUT09Cg==",
-      "url": "https://github.com/Owca525/animu/releases/download/v0.2.3/animu_0.2.3_x64_en-US.msi"
+      "signature": "65f4dbbf6c00206af03394eddcc0d4084f0bba77344b3d114e04cb490e90bf8d",
+      "url": "https://github.com/Owca525/animu/releases/download/v0.2.4/animu_0.2.4_x64_en-US.msi"
     }
   }
 }
