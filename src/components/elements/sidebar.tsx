@@ -38,17 +38,20 @@ const Sidebar: React.FC<SidebarProps> = ({ class: className, top, bottom, onlyMa
     getAndSetVersion();
   }, [])
 
-  const setMax = () => {
-    if (isMaxSidebar) {
-      setIsMaxSidebar(false)
+  const handleMouseEnter = () => {
+    if (!isMaxSidebar) {
+      setIsMaxSidebar(true);
     }
-    if (!isMaxSidebar && sidebarHover) {
-      setIsMaxSidebar(true)
+  };
+  
+  const handleMouseLeave = () => {
+    if (isMaxSidebar && sidebarHover) {
+      setIsMaxSidebar(false);
     }
-  }
+  };
 
   return (
-    <div className={changeClass()} onMouseEnter={() => setMax()} onMouseLeave={() => setMax()}>
+    <div className={changeClass()} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <div className="top-sidebar">
         {showVersion && (
           <div className="sidebar-version">Animu v{version}</div>
