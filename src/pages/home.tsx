@@ -3,7 +3,9 @@ import Content from "../components/elements/card-content";
 import Header from "../components/elements/headers";
 import Dialog from "../components/dialogs/dialog";
 import { exit } from '@tauri-apps/plugin-process';
+import { useTranslation } from 'react-i18next';
 import "../css/pages/home.css";
+
 
 import { ContainerProps } from "../utils/interface";
 import { get_recent, get_search } from "../utils/backend";
@@ -20,6 +22,9 @@ function home() {
 
   const config = useContext(configContext);
 
+  // Language
+  const {t} = useTranslation();
+
   const [notificationData, setNotificationData] = useState<{ title: string; information: string; onClick?: () => void }[]>([{ title: "", information: "" }]);
   const [data, setData] = useState<ContainerProps>({ title: "", data: [] });
   const [error, seterror] = useState<{ error: boolean, note: string }>()
@@ -30,29 +35,29 @@ function home() {
 
   const sidebarHomeTopData = [
     {
-      value: '<div class="material-symbols-outlined text-button">schedule</div>Recent Anime',
+      value: '<div class="material-symbols-outlined text-button">schedule</div>' + t("sidebar.RecentAnime"),
       class: "icon-button",
-      title: "Recent Anime",
-      onClick: async () => change_content({ title: "Recent Anime", data: await get_recent() }),
+      title: t("sidebar.RecentAnime"),
+      onClick: async () => change_content({ title: t("sidebar.RecentAnime"), data: await get_recent() }),
     },
     {
-      value: '<div class="material-symbols-outlined text-button">history</div>History',
+      value: '<div class="material-symbols-outlined text-button">history</div>'+t("sidebar.ContinueWatching"),
       class: "icon-button",
-      title: "Continue Watch",
-      onClick: async () => change_content({ title: "Continue Watch", data: (await ReadHistory()).history }),
+      title: t("sidebar.ContinueWatching"),
+      onClick: async () => change_content({ title: t("sidebar.ContinueWatching"), data: (await ReadHistory()).history }),
     }
   ];
 
   const sidebarHomeBottomData = [
     {
-      value: '<div class="material-symbols-outlined text-button">extension</div>Extension',
+      value: '<div class="material-symbols-outlined text-button">extension</div>' + t("sidebar.Extensions"),
       class: "icon-button",
-      title: "Extension",
+      title: t("sidebar.Extensions"),
     },
     {
-      value: '<div class="material-symbols-outlined text-button">settings</div>Settings',
+      value: '<div class="material-symbols-outlined text-button">settings</div>' + t("sidebar.settings"),
       class: "icon-button",
-      title: "Settings",
+      title: t("sidebar.settings"),
       onClick: async () => navigate("/settings"),
     }
   ];
@@ -63,8 +68,8 @@ function home() {
       setUpdateNotification(true);
       setNotificationData([
         {
-          title: "New Update Availble",
-          information: `Hey is new update ${update.version} wait to download, click notification`,
+          title: t("update.title"),
+          information: t("update.information", {version: update.version}),
           onClick: () => setisUpdate(true),
         },
       ]);
@@ -76,7 +81,7 @@ function home() {
 
     const fetchData = async () => {
       change_content({
-        title: "Recent Anime",
+        title: t("sidebar.RecentAnime"),
         data: await get_recent(),
       });
       setLoading(false);
@@ -88,7 +93,7 @@ function home() {
   const change_content = (newData: ContainerProps) => {
     if (newData.data && newData.data.length != 0 && newData.data[0].title == "error") {
       seterror({ error: true, note: "Error getting information from allmanga" })
-      setData({ title: "Recent Anime" })
+      setData({ title: t("sidebar.RecentAnime") })
       return
     }
     setData(newData);
@@ -99,7 +104,7 @@ function home() {
       var search = event.currentTarget.value;
       const results = async () => {
         const data = await get_search(search);
-        change_content({ title: `Searching: ${search}`, data: data });
+        change_content({ title: t("header.activeSearch", { name: search }), data: data });
       };
       results();
     }
@@ -110,7 +115,7 @@ function home() {
       <main className="container">
         {updateNotification ? <Notification data={notificationData} /> : ""}
         {isUpdate ? <Update /> : ""}
-        {error?.error ? <Dialog header_text="Connection Error" text={error.note} buttons={[{ title: "Exit", onClick: () => exit(0) }, { title: "Reload", onClick: () => navigate("/") }]} /> : ""}
+        {error?.error ? <Dialog header_text={t("error.connection")} text={error.note} buttons={[{ title: t("general.exit"), onClick: () => exit(0) }, { title: t("general.reload"), onClick: () => navigate("/") }]} /> : ""}
         <Sidebar top={sidebarHomeTopData} bottom={sidebarHomeBottomData} sidebarHover={config.General.SideBar.HoverSidebar} />
         <Header onInputChange={handleInputChange} />
         {loading ? (

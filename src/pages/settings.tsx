@@ -10,9 +10,13 @@ import Checkbox from "../components/ui/checkbox";
 import Keybind from "../components/dialogs/keybind";
 
 import "../css/pages/settings.css";
+import { useTranslation } from "react-i18next";
 
 const Settings = () => {
   const navigate = useNavigate();
+
+  const {t} = useTranslation();
+
   const [settingPage, setsettingPage] = useState<string>("general");
   const [config, setConfig] = useState<SettingsConfig | undefined>(undefined);
   const [isLoading, setisLoading] = useState<boolean>(true);
@@ -21,30 +25,30 @@ const Settings = () => {
 
   const sidebarSettingsTopData = [
     {
-      value: '<div class="material-symbols-outlined text-button">manufacturing</div>General',
+      value: '<div class="material-symbols-outlined text-button">manufacturing</div>' + t("settings.sidebar.General"),
       class: "icon-button",
-      title: "General",
+      title: t("settings.sidebar.General"),
       onClick: async () => setsettingPage("general"),
     },
     {
-      value: '<div class="material-symbols-outlined text-button">movie</div>Player',
+      value: '<div class="material-symbols-outlined text-button">movie</div>' + t("settings.sidebar.Player"),
       class: "icon-button",
-      title: "Player",
+      title: t("settings.sidebar.Player"),
       onClick: async () => setsettingPage("player"),
     },
   ];
 
   const sidebarSettingsBottomData = [
     {
-      value: '<div class="material-symbols-outlined text-button">folder</div>Config Folder',
+      value: '<div class="material-symbols-outlined text-button">folder</div>' + t("settings.sidebar.ConfigFolder"),
       class: "icon-button",
-      title: "Config Folder",
+      title: t("settings.sidebar.ConfigFolder"),
       onClick: async () => await open(await appConfigDir())
     },
     {
-      value: '<div class="material-symbols-outlined text-button">home</div>Home',
+      value: '<div class="material-symbols-outlined text-button">home</div>' + t("settings.sidebar.Home"),
       class: "icon-button",
-      title: "Home",
+      title: t("settings.sidebar.Home"),
       onClick: async () => navigate("/"),
     },
   ];
@@ -106,18 +110,18 @@ const Settings = () => {
       <Sidebar top={sidebarSettingsTopData} bottom={sidebarSettingsBottomData} class="sidebar-first" onlyMax={true} showVersion={true} />
       {settingPage == "general" && config ? (
         <div className="settings-content">
-          <div className="settings-header">General Settings</div>
+          <div className="settings-header">{t("settings.headers.general")}</div>
           <div className="settings-general" ref={generalRef} >
             <div className="settings-space">
-              <div className="text">Sidebar:</div>
-              <Checkbox title="Hover Sidebar" checked={config.General.SideBar.HoverSidebar} onClick={(event) => handleChange("General.SideBar.HoverSidebar", event.currentTarget.checked)} />
+              <div className="text">{t("settings.general.Sidebar")}</div>
+              <Checkbox title={t("settings.general.HoverSidebar")} checked={config.General.SideBar.HoverSidebar} onClick={(event) => handleChange("General.SideBar.HoverSidebar", event.currentTarget.checked)} />
             </div>
             <div className="settings-space">
-              <div className="text">Window:</div>
-              <Checkbox title="Auto Maximize" checked={config.General.Window.AutoMaximize} onClick={(event) => handleChange("General.Window.AutoMaximize", event.currentTarget.checked)} />
-              <Checkbox title="Auto Fullscreen, Warning you can't exit fullscreen in main window" checked={config.General.Window.AutoFullscreen} onClick={(event) => handleChange("General.Window.AutoFullscreen", event.currentTarget.checked)} />
+              <div className="text">{t("settings.general.Window")}</div>
+              <Checkbox title={t("settings.general.AutoMaximize")} checked={config.General.Window.AutoMaximize} onClick={(event) => handleChange("General.Window.AutoMaximize", event.currentTarget.checked)} />
+              <Checkbox title={t("settings.general.AutoFullscreen")} checked={config.General.Window.AutoFullscreen} onClick={(event) => handleChange("General.Window.AutoFullscreen", event.currentTarget.checked)} />
               <div className="same-space" style={{ marginTop: "10px" }}>
-                Zoom <input type="text" className="number" placeholder="1.0" value={config.General.Window.Zoom} onChange={(event) => handleChange("General.Window.Zoom", event.currentTarget.value)} />
+                {t("settings.general.Zoom")} <input type="text" className="number" placeholder="1.0" value={config.General.Window.Zoom} onChange={(event) => handleChange("General.Window.Zoom", event.currentTarget.value)} />
               </div>
             </div>
           </div>
@@ -125,46 +129,46 @@ const Settings = () => {
       ) : ""}
       {settingPage == "player" && config ? (
         <div className="settings-content">
-          <div className="settings-header">Player Settings</div>
+          <div className="settings-header">{t("settings.headers.player")}</div>
           <div className="settings-general" ref={playerRef}>
             <div className="settings-space">
-              <div className="text">General:</div>
-              <Checkbox title="AutoPlay" classContainer="small-text" checked={config.Player.general.Autoplay} onClick={(event) => handleChange("Player.general.Autoplay", event.currentTarget.checked)} />
-              <Checkbox title="Auto Fullscreen" classContainer="small-text" checked={config.Player.general.AutoFullscreen} onClick={(event) => handleChange("Player.general.AutoFullscreen", event.currentTarget.checked)} />
+              <div className="text">{t("settings.sidebar.General") + ":"}</div>
+              <Checkbox title={t("settings.player.autoPlay")} classContainer="small-text" checked={config.Player.general.Autoplay} onClick={(event) => handleChange("Player.general.Autoplay", event.currentTarget.checked)} />
+              <Checkbox title={t("settings.general.AutoFullscreen")} classContainer="small-text" checked={config.Player.general.AutoFullscreen} onClick={(event) => handleChange("Player.general.AutoFullscreen", event.currentTarget.checked)} />
               <div className="same-space" style={{ marginTop: "10px" }}>
-                Default Volume <input type="text" className="number" placeholder="25" value={config.Player.general.Volume} onChange={(event) => handleChange("Player.general.Volume", event.currentTarget.value)} />
+                {t("settings.player.DefaultVolume")} <input type="text" className="number" placeholder="25" value={config.Player.general.Volume} onChange={(event) => handleChange("Player.general.Volume", event.currentTarget.value)} />
               </div>
               <div className="same-space">
-                Long Time Skip Forward <input type="text" value={config.Player.general.LongTimeSkipForward} className="number" placeholder="80" onChange={(event) => handleChange("Player.general.LongTimeSkipForward", event.currentTarget.value)} />
+                {t("settings.player.LongTimeSkipForward")} <input type="text" value={config.Player.general.LongTimeSkipForward} className="number" placeholder="80" onChange={(event) => handleChange("Player.general.LongTimeSkipForward", event.currentTarget.value)} />
               </div>
               <div className="same-space">
-                Long Time Skip Back <input type="text" value={config.Player.general.LongTimeSkipBack} className="number" placeholder="80" onChange={(event) => handleChange("Player.general.LongTimeSkipBack", event.currentTarget.value)} />
+                {t("settings.player.LongTimeSkipBack")} <input type="text" value={config.Player.general.LongTimeSkipBack} className="number" placeholder="80" onChange={(event) => handleChange("Player.general.LongTimeSkipBack", event.currentTarget.value)} />
               </div>
               <div className="same-space">
-                Time Skip Forward <input type="text" value={config.Player.general.TimeSkipRight} className="number" placeholder="5" onChange={(event) => handleChange("Player.general.TimeSkipRight", event.currentTarget.value)} />
+                {t("settings.player.TimeSkipForward")} <input type="text" value={config.Player.general.TimeSkipRight} className="number" placeholder="5" onChange={(event) => handleChange("Player.general.TimeSkipRight", event.currentTarget.value)} />
               </div>
               <div className="same-space">
-                Time Skip Back <input type="text" value={config.Player.general.TimeSkipLeft} className="number" placeholder="5" onChange={(event) => handleChange("Player.general.TimeSkipLeft", event.currentTarget.value)} />
+                {t("settings.player.TimeSkipBack")} <input type="text" value={config.Player.general.TimeSkipLeft} className="number" placeholder="5" onChange={(event) => handleChange("Player.general.TimeSkipLeft", event.currentTarget.value)} />
               </div>
             </div>
             <div className="settings-space">
-              <div className="text">History:</div>
+              <div className="text">{t("sidebar.History") + ":"}</div>
               <div className="same-space">
-                Minimal Time Save <input type="text" value={config.Player.History.MinimalTimeSave} className="number" placeholder="5" onChange={(event) => handleChange("Player.History.MinimalTimeSave", event.currentTarget.value)} />
+                {t("settings.player.MinimalTimeSave")} <input type="text" value={config.Player.History.MinimalTimeSave} className="number" placeholder="5" onChange={(event) => handleChange("Player.History.MinimalTimeSave", event.currentTarget.value)} />
               </div>
               <div className="same-space">
-                Maximize Time Save <input type="text" value={config.Player.History.MaximizeTimeSave} className="number" placeholder="5" onChange={(event) => handleChange("Player.History.MaximizeTimeSave", event.currentTarget.value)} />
+                {t("settings.player.MaximizeTimeSave")} <input type="text" value={config.Player.History.MaximizeTimeSave} className="number" placeholder="5" onChange={(event) => handleChange("Player.History.MaximizeTimeSave", event.currentTarget.value)} />
               </div>
             </div>
             <div className="settings-space">
-              <div className="text">Keybinds:</div>
-              <Keybind title="Pause:" value={getKeybind(config.Player.keybinds.Pause)} changeKey={(key) => handleChange("Player.keybinds.Pause", key)} />
-              <Keybind title="Fullscreen:" value={getKeybind(config.Player.keybinds.Fullscreen)} changeKey={(key) => handleChange("Player.keybinds.Fullscreen", key)} />
-              <Keybind title="Exit Player:" value={getKeybind(config.Player.keybinds.ExitPlayer)} changeKey={(key) => handleChange("Player.keybinds.ExitPlayer", key)} />
-              <Keybind title="Long Skip forward:" value={getKeybind(config.Player.keybinds.LongTimeSkipForward)} changeKey={(key) => handleChange("Player.keybinds.LongTimeSkipForward", key)} />
-              <Keybind title="Long Skip Back:" value={getKeybind(config.Player.keybinds.LongTimeSkipBack)} changeKey={(key) => handleChange("Player.keybinds.LongTimeSkipBack", key)} />
-              <Keybind title="Skip Forward:" value={getKeybind(config.Player.keybinds.TimeSkipRight)} changeKey={(key) => handleChange("Player.keybinds.TimeSkipRight", key)} />
-              <Keybind title="Skip back:" value={getKeybind(config.Player.keybinds.TimeSkipLeft)} changeKey={(key) => handleChange("Player.keybinds.TimeSkipLeft", key)} />
+              <div className="text">{t("settings.player.Keybinds")}</div>
+              <Keybind title={t("settings.player.Pause")} value={getKeybind(config.Player.keybinds.Pause)} changeKey={(key) => handleChange("Player.keybinds.Pause", key)} />
+              <Keybind title={t("settings.player.Fullscreen")} value={getKeybind(config.Player.keybinds.Fullscreen)} changeKey={(key) => handleChange("Player.keybinds.Fullscreen", key)} />
+              <Keybind title={t("settings.player.ExitPlayer")} value={getKeybind(config.Player.keybinds.ExitPlayer)} changeKey={(key) => handleChange("Player.keybinds.ExitPlayer", key)} />
+              <Keybind title={t("settings.player.LongTimeSkipForward")} value={getKeybind(config.Player.keybinds.LongTimeSkipForward)} changeKey={(key) => handleChange("Player.keybinds.LongTimeSkipForward", key)} />
+              <Keybind title={t("settings.player.LongTimeSkipBack")} value={getKeybind(config.Player.keybinds.LongTimeSkipBack)} changeKey={(key) => handleChange("Player.keybinds.LongTimeSkipBack", key)} />
+              <Keybind title={t("settings.player.TimeSkipForward")} value={getKeybind(config.Player.keybinds.TimeSkipRight)} changeKey={(key) => handleChange("Player.keybinds.TimeSkipRight", key)} />
+              <Keybind title={t("settings.player.TimeSkipBack")} value={getKeybind(config.Player.keybinds.TimeSkipLeft)} changeKey={(key) => handleChange("Player.keybinds.TimeSkipLeft", key)} />
             </div>
           </div>
         </div>

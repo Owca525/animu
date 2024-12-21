@@ -9,12 +9,15 @@ import Dialog from "../components/dialogs/dialog";
 import "../css/pages/player.css";
 import { DeleteFromHistory, SaveHistory } from "../utils/history";
 import { configContext } from "../utils/context";
+import { useTranslation } from "react-i18next";
 
 const Player = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
   const { id, title, episodes, ep, time, img } = location.state;
+
+  const {t} = useTranslation();
 
   // Loading Config from context
   const config = useContext(configContext);
@@ -52,7 +55,7 @@ const Player = () => {
       error("Extraction Urls: " + Error)
       setErrorDialog({
         error: true,
-        information: "Failed get data from allmanga: " + Error,
+        information: t("errors.extractionError", { error: Error }),
       });
     } finally {}
   };
@@ -248,19 +251,19 @@ const Player = () => {
     if (Error) {
       switch (Error.code) {
         case Error.MEDIA_ERR_ABORTED:
-          message = "The playback was aborted.";
+          message = t("player.errors.MEDIA_ERR_ABORTED");
           break;
         case Error.MEDIA_ERR_NETWORK:
-          message = "A network error occurred while fetching the video.";
+          message = t("player.errors.MEDIA_ERR_NETWORK");
           break;
         case Error.MEDIA_ERR_DECODE:
-          message = "An error occurred while decoding the video.";
+          message = t("player.errors.MEDIA_ERR_DECODE");
           break;
         case Error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-          message = "The video format or source is not supported.";
+          message = t("player.errors.MEDIA_ERR_SRC_NOT_SUPPORTED");
           break;
         default:
-          message = "An unknown error occurred.";
+          message = t("player.errors.default");
       }
       error("Error player: " + message)
       setErrorDialog({ error: true, information: message });
@@ -342,7 +345,7 @@ const Player = () => {
         <Dialog
           header_text="Error with player"
           text={isError.information}
-          buttons={[{ title: "Okay", onClick: () => exitPlayer() }]}
+          buttons={[{ title: t("general.ok"), onClick: () => exitPlayer() }]}
         />
       ) : ("")}
 
@@ -366,7 +369,7 @@ const Player = () => {
           <button className="material-symbols-outlined player-buttons" onClick={async () => await exitPlayer()}>
             arrow_back
           </button>
-          <div className="player-title ">{`Episode: ${ep} of ${title}`}</div>
+          <div className="player-title ">{t("player.TitleEpisode", { ep: ep, name: title })}</div>
         </div>
         <div
           className={
@@ -397,21 +400,26 @@ const Player = () => {
                   episodes[episodes.indexOf(ep) - 1] == undefined ? "material-symbols-outlined player-buttons disabled" : "material-symbols-outlined player-buttons"
                 }
                 title={
-                  episodes[episodes.indexOf(ep) - 1] == undefined ? "" : `Previous: ${episodes[episodes.indexOf(ep) - 1]} Episode`
+                  episodes[episodes.indexOf(ep) - 1] == undefined ? "" : t("player.previous", { ep: episodes[episodes.indexOf(ep) - 1] })
                 }
                 onClick={() => setNewEpisode("prev")}>
                 skip_previous
               </button>
-              <button onClick={togglePlay} className="material-symbols-outlined player-buttons" title={isPlaying ? "Pause" : "Play"}>
+              <button onClick={togglePlay} className="material-symbols-outlined player-buttons" title={isPlaying ? t("player.Pause") : t("player.play")}>
                 {isPlaying ? "pause" : "play_arrow"}
               </button>
               <button
-                className={episodes[episodes.indexOf(ep) + 1] == undefined ? "material-symbols-outlined player-buttons disabled" : "material-symbols-outlined player-buttons"}
-                title={episodes[episodes.indexOf(ep) + 1] == undefined ? "" : `Next: ${episodes[episodes.indexOf(ep) + 1]} Episode`} onClick={() => setNewEpisode("next")}>
+                className={
+                  episodes[episodes.indexOf(ep) + 1] == undefined ? "material-symbols-outlined player-buttons disabled" : "material-symbols-outlined player-buttons"
+                }
+                title={
+                  episodes[episodes.indexOf(ep) + 1] == undefined ? "" : t("player.next", { ep: episodes[episodes.indexOf(ep) + 1] })
+                } 
+                onClick={() => setNewEpisode("next")}>
                 skip_next
               </button>
               <div className="volume-container">
-                <button className="material-symbols-outlined player-buttons volume-button" title="Volume" onClick={setMutedToPlayer}>{isMuted ? "volume_off" : "volume_up"}</button>
+                <button className="material-symbols-outlined player-buttons volume-button" title={t("player.Volume")} onClick={setMutedToPlayer}>{isMuted ? "volume_off" : "volume_up"}</button>
                 <input className="volume-bar" id="volume" type="range" min="0" max="1" step="0.01" value={volume} style={{ pointerEvents: "all" }} onChange={handleVolumeChange} />
               </div>
               <div className="time-display">
@@ -419,8 +427,8 @@ const Player = () => {
               </div>
             </div>
             <div className="right">
-              <button className="material-symbols-outlined player-buttons" title="Settings">settings</button>
-              <button onClick={async () => await enterFullscreen()} className="material-symbols-outlined player-buttons" title="Fullscreen">
+              <button className="material-symbols-outlined player-buttons" title={t("sidebar.settings")}>settings</button>
+              <button onClick={async () => await enterFullscreen()} className="material-symbols-outlined player-buttons" title={t("settings.player.Fullscreen")}>
                 {isFullscreen ? "fullscreen_exit" : "fullscreen"}
               </button>
             </div>

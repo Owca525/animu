@@ -3,9 +3,13 @@ import { InformationProps, InformationData } from "../../utils/interface";
 import { get_information } from "../../utils/backend";
 import "../../css/elements/information.css";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, toggle, }) => {
   const modalRef: any = useRef();
+
+  const {t} = useTranslation();
+
   const [data, setData] = useState<InformationData>({ id: "", title: "", description: "", img: "", episodes: [] });
   const [loading, setLoading] = useState(true);
   const [imghasError, setimgHasError] = useState(false);
@@ -73,7 +77,7 @@ export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, t
             <div className="description loading material-symbols-outlined">progress_activity</div>
           </div>
           <div className="box-episode">
-            <div className="text-episode">Available Episodes:</div>
+            <div className="text-episode">{t("information.episodes")}</div>
             <div className="box-episodes material-symbols-outlined" style={{display: "flex", justifyContent: "center", animation: "spin 1s linear infinite"}}>
               progress_activity
             </div>
@@ -106,12 +110,12 @@ export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, t
             <div className="description" dangerouslySetInnerHTML={{ __html: data.description }}></div>
           </div>
           <div className="box-episode">
-            <div className="text-episode">Availble Episodes:</div>
+            <div className="text-episode">{t("information.episodes")}</div>
             <div className="box-episodes">
               {data.episodes.length > 0 ? (
                 data.episodes.map((ep) => <div className="episode" onClick={() => navigate("/player", {state: { id: data.id, title: data.title, episodes: data.episodes, ep: ep, time: 0, img: data.img }})}>{ep}</div>)
               ) : (
-                <div className="no-data-message">No Episodes</div>
+                <div className="no-data-message">{t("information.emptyEpisodes")}</div>
               )}
             </div>
           </div>

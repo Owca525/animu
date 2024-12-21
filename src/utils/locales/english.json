@@ -1,0 +1,89 @@
+{
+  "general": {
+    "exit": "Exit",
+    "reload": "Reload",
+    "ok": "okay"
+  },
+  "header": {
+    "search": "Search Anime...",
+    "activeSearch": "Searching: {{name}}"
+  },
+  "information": {
+    "episodes": "Availble Episodes:",
+    "emptyEpisodes": "No Episodes"
+  },
+  "update": {
+    "title": "New Update Availble",
+    "information": "Hey is new update {{version}} wait to download, click notification",
+    "downloadUpdate": "Download Update {{version}}",
+    "downloadingUpdate": "Downloading Update {{version}}",
+    "status": {
+        "download": "Download",
+        "finish": "Finished download, now installing",
+        "install": "Install Done restart application..."
+    }
+  },
+  "player": {
+    "TitleEpisode": "Episode: {{ep}} of {{name}}",
+    "Volume": "Volume",
+    "next": "Next {{ep}} episode",
+    "previous": "Previous {{ep}} episode",
+    "Pause": "Pause",
+    "play": "Play",
+    "errors": {
+      "extractionError": "Failed Extraction Player Urls: {{error}}",
+      "MEDIA_ERR_ABORTED": "The playback was aborted.",
+      "MEDIA_ERR_NETWORK": "A network error occurred while fetching the video.",
+      "MEDIA_ERR_DECODE": "An error occurred while decoding the video.",
+      "MEDIA_ERR_SRC_NOT_SUPPORTED": "The video format or source is not supported.",
+      "default": "An unknown error occurred."
+    }
+  },
+  "sidebar": {
+    "Minimize": "Minimize",
+    "Maximize": "Maximize",
+    "RecentAnime": "Recent Anime",
+    "ContinueWatching": "Continue Watching",
+    "History": "History",
+    "Extensions": "Extensions",
+    "settings": "Settings"
+  },
+  "settings": {
+    "headers": {
+      "general": "General Settings",
+      "player": "Player Settings"
+    },
+    "sidebar": {
+      "General": "General",
+      "Player": "Player",
+      "ConfigFolder": "Config Folder",
+      "Home": "Home"
+    },
+    "general": {
+      "Sidebar": "Sidebar:",
+      "HoverSidebar": "Hover Sidebar",
+      "Window": "Window:",
+      "AutoMaximize": "Auto Maximize",
+      "AutoFullscreen": "Auto Fullscreen",
+      "Zoom": "Zoom"
+    },
+    "player": {
+      "autoPlay": "Auto Play",
+      "DefaultVolume": "Default Volume",
+      "LongTimeSkipForward": "Long Time Skip Forward",
+      "LongTimeSkipBack": "Long Time Skip Back",
+      "TimeSkipForward": "Time Skip Forward",
+      "TimeSkipBack": "Time Skip Back",
+      "MinimalTimeSave": "Minimal Time ignore",
+      "MaximizeTimeSave": "Maximize Time ignore",
+      "Keybinds": "Keybinds:",
+      "Pause": "Pause",
+      "Fullscreen": "Fullscreen",
+      "ExitPlayer": "Exit Player"
+    }
+  },
+  "errors": {
+    "connection": "Connection Error",
+    "emptyMessage": "Where did it all go?"
+  }
+}

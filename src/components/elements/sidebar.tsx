@@ -3,10 +3,13 @@ import { SidebarProps } from "../../utils/interface";
 import "../../css/elements/sidebar.css";
 import { useEffect, useState } from "react";
 import { getVersion } from "@tauri-apps/api/app";
+import { useTranslation } from "react-i18next";
 
 const Sidebar: React.FC<SidebarProps> = ({ class: className, top, bottom, onlyMax = false, showVersion = false, sidebarHover = true }) => {
   const [isMaxSidebar, setIsMaxSidebar] = useState(false);
   const [version, setversion] = useState<any>();
+
+  const {t} = useTranslation();
 
   const changeClass = () => {
     if (onlyMax) {
@@ -60,11 +63,11 @@ const Sidebar: React.FC<SidebarProps> = ({ class: className, top, bottom, onlyMa
           <Button
             value={
               isMaxSidebar
-                ? '<div class="material-symbols-outlined text-button">arrow_back</div>Minimize'
+                ? '<div class="material-symbols-outlined text-button">arrow_back</div>' + t("sidebar.Minimize")
                 : '<div class="material-symbols-outlined text-button">arrow_forward</div>'
             }
             className="icon-button"
-            title={isMaxSidebar ? "Minimize" : "Maximize"}
+            title={isMaxSidebar ? t("sidebar.Minimize") : t("sidebar.Maximize")}
             type={isMaxSidebar ? "icon-text" : "icon"}
             onClick={() => setIsMaxSidebar((prevState) => !prevState)}
           />

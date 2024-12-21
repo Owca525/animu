@@ -1,0 +1,88 @@
+{
+  "general": {
+    "exit": "Wyjście",
+    "reload": "Przeładować"
+  },
+  "header": {
+    "search": "Szukanie Anime...",
+    "activeSearch": "Wyszukano: {{name}}"
+  },
+  "information": {
+    "episodes": "Dostępne Odcinki:",
+    "emptyEpisodes": "Nie ma Odcinków"
+  },
+  "update": {
+    "title": "Nowa Aktualizacja jest dostępna",
+    "information": "Hej Nowy update {{version}} Czeka na pobranie, kliknij notyfikacje żeby aktualizować",
+    "downloadUpdate": "Pobieranie Aktualizacji {{version}}",
+    "downloadingUpdate": "Pobieranie Aktualizacji {{version}}",
+    "status": {
+        "download": "Pobieranie",
+        "finish": "Pobieranie Powiodło się, Teraz instalacja",
+        "install": "Zaintalowano, Nastąpi restart aplikacji..."
+    }
+  },
+  "player": {
+    "TitleEpisode": "Odcinek: {{ep}} z {{name}}",
+    "Volume": "Volume",
+    "next": "Następny odcinek {{ep}}",
+    "previous": "Po przedni odcinek {{ep}}",
+    "Pause": "Pauza",
+    "play": "Graj",
+    "errors": {
+      "extractionError": "Nieudane wyodrębnianie adresów URL odtwarzacza: {{error}}",
+      "MEDIA_ERR_ABORTED": "Odtwarzanie zostało przerwane.",
+      "MEDIA_ERR_NETWORK": "Wystąpił błąd sieciowy podczas pobierania filmu.",
+      "MEDIA_ERR_DECODE": "Wystąpił błąd podczas dekodowania wideo.",
+      "MEDIA_ERR_SRC_NOT_SUPPORTED": "Format wideo lub źródło nie jest obsługiwane.",
+      "default": "Wystąpił nieznany błąd."
+    }
+  },
+  "sidebar": {
+    "Minimize": "Zminimalizuj",
+    "Maximize": "Zmaksymalizuj",
+    "RecentAnime": "Najnowsze anime",
+    "ContinueWatching": "Kontynuuj oglądanie",
+    "History": "Historia",
+    "Extensions": "Pluginy",
+    "settings": "Ustawienia"
+  },
+  "settings": {
+    "headers": {
+      "general": "Ogólne Ustawienia",
+      "player": "Ustawienia Odtwarzacza"
+    },
+    "sidebar": {
+      "General": "Ogólne",
+      "Player": "Odtwarzacz",
+      "ConfigFolder": "Folder Konfiguracji",
+      "Home": "Home"
+    },
+    "general": {
+      "Sidebar": "Sidebar:",
+      "HoverSidebar": "Najedź na Sidebar",
+      "Window": "Okno:",
+      "AutoMaximize": "Automatycznie Zmaksymalizuj",
+      "AutoFullscreen": "Automatyczny Pełny Ekran",
+      "Zoom": "Przybliżenie"
+    },
+    "player": {
+      "autoPlay": "Automatyczne odtwarzanie",
+      "DefaultVolume": "Domyślna głośność",
+      "LongTimeSkipForward": "Długie przeskoki do przodu",
+      "LongTimeSkipBack": "Długie przeskoki do tyłu",
+      "TimeSkipForward": "Przeskok w czasie do przodu",
+      "TimeSkipBack": "Przeskok w czasie do tyłu",
+      "MinimalTimeSave": "Minimalny czas ignorowania",
+      "MaximizeTimeSave": "Zmaksymalizowany czas ignorowania",
+      "Keybinds": "Skróty Klawiszowe:",
+      "Pause": "Pauza",
+      "Fullscreen": "Pełny Ekran",
+      "ExitPlayer": "Wyjście z Odtwarzacza"
+    }
+  },
+  "errors": {
+    "connection": "Błąd połączenia",
+    "emptyMessage": "Gdzie to wszystko poszło?"
+  }
+}

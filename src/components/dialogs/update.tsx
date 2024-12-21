@@ -3,14 +3,18 @@ import { check, Update } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 import Button from "../ui/button";
 import "../../css/dialogs/update.css";
+import { useTranslation } from "react-i18next";
 
 const UpdateComponent: React.FC = () => {
   const [data, setdata] = useState<any>({
-    title: "New Update 0.2.0",
-    note: "First release<br/><br/>**Full Changelog**: https://github.com/Owca525/animu/commits/v0.1.0",
+    title: "",
+    note: "",
   });
+
+  const {t} = useTranslation();
+
   const [progress, setProgress] = useState({ mb: 0, procent: 0.0 });
-  const [status, setStatus] = useState<string>("Status: Download");
+  const [status, setStatus] = useState<string>("Status: " + t("update.status.download"));
   const [isDownloadUpdate, setDownloadUpdate] = useState<boolean>(false);
   const [update, setUpdate] = useState<Update>();
   const [isVisible, setIsVisible] = useState<boolean>(true);
@@ -31,7 +35,7 @@ const UpdateComponent: React.FC = () => {
   const checkUpdate = async () => {
     const update = await check();
     if (update) {
-      setdata({ title: "Download Update " + update.version, note: update.body });
+      setdata({ title: t("update.downloadUpdate", { version: update.version }), note: update.body });
       setUpdate(update);
     }
   };
@@ -41,7 +45,7 @@ const UpdateComponent: React.FC = () => {
       return;
     }
     setDownloadUpdate(true);
-    setdata({ title: "Downloading Update " + update.version, note: update.body });
+    setdata({ title: t("update.downloadingUpdate", { version: update.version }), note: update.body });
   
     let contentLength = 0;
     let downloaded = 0;
@@ -62,14 +66,14 @@ const UpdateComponent: React.FC = () => {
             }
             break;
           case "Finished":
-            setStatus(`Status: Finished download, now installing`);
+            setStatus(`Status: ` + t("update.status.finish"));
             break;
           default:
             break;
         }
       }
     );
-    setStatus("Status: Install Done restart application...")
+    setStatus("Status: " + t("update.status.install"))
     await relaunch();
   };
 
