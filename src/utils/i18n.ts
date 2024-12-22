@@ -7,7 +7,7 @@ import LangPolish from "./locales/polish.json"
 i18n
   .use(initReactI18next)
   .init({
-    lng: 'pl',
+    lng: 'en',
     fallbackLng: "en",
     debug: true,
     resources: {

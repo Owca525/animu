@@ -1,0 +1,309 @@
+.light {
+  --text: #0c0c0d;
+
+  --background-50: #f1f1f4;
+  --background-100: #e2e4e9;
+  --background-200: #c5c9d3;
+  --background-300: #a9aebc;
+  --background-400: #8c92a6;
+  --background-500: #6f7790;
+  --background-600: #595f73;
+  --background-700: #434856;
+  --background-800: #2c303a;
+  --background-900: #16181d;
+  --background-950: #0b0c0e;
+
+  --primary-50: #f0f0f5;
+  --primary-100: #e0e2eb;
+  --primary-200: #c1c4d7;
+  --primary-300: #a2a7c3;
+  --primary-400: #8489ae;
+  --primary-500: #656c9a;
+  --primary-600: #51567b;
+  --primary-700: #3c415d;
+  --primary-800: #282b3e;
+  --primary-900: #14161f;
+  --primary-950: #0a0b0f;
+
+  --secondary-50: #eeeff6;
+  --secondary-100: #dee0ed;
+  --secondary-200: #bdc0db;
+  --secondary-300: #9ca1c9;
+  --secondary-400: #7a82b8;
+  --secondary-500: #5962a6;
+  --secondary-600: #474f85;
+  --secondary-700: #363b63;
+  --secondary-800: #242742;
+  --secondary-900: #121421;
+  --secondary-950: #090a11;
+
+  --accent-50: #edeef7;
+  --accent-100: #dcdeef;
+  --accent-200: #b8bde0;
+  --accent-300: #959cd0;
+  --accent-400: #717bc1;
+  --accent-500: #4e59b1;
+  --accent-600: #3e488e;
+  --accent-700: #2f366a;
+  --accent-800: #1f2447;
+  --accent-900: #101223;
+  --accent-950: #080912;
+}
+
+.dark {
+  --text: #f2f2f3;
+
+  --background-50: #0b0c0e;
+  --background-100: #16181d;
+  --background-200: #2c303a;
+  --background-300: #434856;
+  --background-400: #595f73;
+  --background-500: #6f7790;
+  --background-600: #8c92a6;
+  --background-700: #a9aebc;
+  --background-800: #c5c9d3;
+  --background-900: #e2e4e9;
+  --background-950: #f1f1f4;
+
+  --primary-50: #0a0b0f;
+  --primary-100: #14161f;
+  --primary-200: #282b3e;
+  --primary-300: #3c415d;
+  --primary-400: #51567b;
+  --primary-500: #656c9a;
+  --primary-600: #8489ae;
+  --primary-700: #a2a7c3;
+  --primary-800: #c1c4d7;
+  --primary-900: #e0e2eb;
+  --primary-950: #f0f0f5;
+
+  --secondary-50: #090a11;
+  --secondary-100: #121421;
+  --secondary-200: #242742;
+  --secondary-300: #363b63;
+  --secondary-400: #474f85;
+  --secondary-500: #5962a6;
+  --secondary-600: #7a82b8;
+  --secondary-700: #9ca1c9;
+  --secondary-800: #bdc0db;
+  --secondary-900: #dee0ed;
+  --secondary-950: #eeeff6;
+
+  --accent-50: #080912;
+  --accent-100: #101223;
+  --accent-200: #1f2447;
+  --accent-300: #2f366a;
+  --accent-400: #3e488e;
+  --accent-500: #4e59b1;
+  --accent-600: #717bc1;
+  --accent-700: #959cd0;
+  --accent-800: #b8bde0;
+  --accent-900: #dcdeef;
+  --accent-950: #edeef7;
+}
+
+/* main */
+* {
+  color: var(--text);
+}
+
+body {
+  background-color: var(--background-100);
+}
+
+/* dialog */
+.dialog {
+  background-color: var(--primary-200);
+}
+
+/* keybinds */
+.keybind-space {
+  background-color: var(--primary-300);
+  border-color: var(--primary-200);
+}
+
+.keybind-space:hover {
+  border-color: var(--primary-500);
+}
+
+.keybind-active {
+  background-color: var(--primary-300);
+  border-color: var(--primary-900);
+}
+
+/* notification */
+.notification {
+  background-color: var(--primary-300);
+}
+
+/* update */
+.update-container {
+  background-color: rgb(0, 0, 0, 0.7);
+}
+
+.center-update {
+  background-color: var(--primary-200);
+}
+
+/* header */
+.header {
+  background-color: var(--primary-200);
+}
+
+/* information */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.box-text {
+  background-color: var(--background-200);
+  box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.5);
+}
+
+.box-episode {
+  background-color: var(--background-200);
+  box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.5);
+}
+
+.box-img {
+  background-color: var(--background-200);
+  box-shadow: 0.5px 0.5px 20px rgba(0, 0, 0, 0.5);
+}
+
+.episode {
+  background-color: var(--primary-300);
+  box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* sidebar */
+.sidebar-mini {
+  background-color: var(--primary-200);
+}
+.border {
+  border-color: var(--background-100);
+}
+
+.border-settings {
+  border-color: var(--background-100);
+}
+
+.sidebar-max {
+  background-color: var(--primary-200);
+}
+
+/* player */
+.video-container {
+  background: black;
+}
+.mask {
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 1) 50%,
+    rgba(0, 0, 0, 0.5)
+  );
+}
+
+.video-overlay {
+  color: white;
+}
+
+.time-display {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.player-buttons {
+  background-color: rgba(0, 0, 0, 0);
+  color: white;
+  border-color: white;
+}
+
+.player-buttons:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.player-title {
+  color: white;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.seek-bar {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.progress {
+  background-color: #5962a6;
+}
+
+.thumb {
+  background-color: #5962a6;
+}
+.player-waiting {
+  color: rgb(230, 230, 230);
+}
+.disabled {
+  color: gray;
+}
+
+.show-time {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* settings */
+.settings-space {
+  background-color: var(--primary-200);
+}
+
+.number {
+  background-color: var(--primary-300);
+  border-color: var(--primary-200);
+}
+.number:hover {
+  border-color: var(--primary-500);
+}
+
+/* buttons */
+button{
+  background-color: var(--primary-200);
+  color: var(--primary-800);
+  border-color: var(--primary-800);
+}
+
+.backlight:hover{
+  background-color: var(--primary-800);
+  color: var(--primary-200);
+  border-color: var(--primary-50);
+}
+
+.active {
+  background-color: var(--primary-800);
+  color: var(--primary-200);
+  border-color: var(--primary-50);
+}
+.active:hover {
+  background-color: var(--primary-200);
+  border-color: var(--primary-800);
+  color: var(--primary-800);
+}
+
+/* card */
+.card:hover {
+  background-color: var(--primary-200);
+}
+.card-img {
+  background-color: var(--primary-200);
+  box-shadow: 1px 1px 20px rgb(0, 0, 0, 0.3);
+}
+
+/* checkboxy */
+.checkbox {
+  background-color: var(--secondary-300);
+  box-shadow: inset 0 0 5px rgb(0, 0, 0, 0.2);
+}
+.checkbox:checked {
+  background-color: var(--secondary-500);
+}
+.checkbox::before {
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgb(0, 0, 0, 0.2);
+}

@@ -49,10 +49,6 @@
     "settings": "Settings"
   },
   "settings": {
-    "headers": {
-      "general": "General Settings",
-      "player": "Player Settings"
-    },
     "sidebar": {
       "General": "General",
       "Player": "Player",
@@ -60,9 +56,9 @@
       "Home": "Home"
     },
     "general": {
-      "Sidebar": "Sidebar:",
+      "Sidebar": "Sidebar",
       "HoverSidebar": "Hover Sidebar",
-      "Window": "Window:",
+      "Window": "Window",
       "AutoMaximize": "Auto Maximize",
       "AutoFullscreen": "Auto Fullscreen",
       "Zoom": "Zoom"
@@ -76,7 +72,7 @@
       "TimeSkipBack": "Time Skip Back",
       "MinimalTimeSave": "Minimal Time ignore",
       "MaximizeTimeSave": "Maximize Time ignore",
-      "Keybinds": "Keybinds:",
+      "Keybinds": "Keybinds",
       "Pause": "Pause",
       "Fullscreen": "Fullscreen",
       "ExitPlayer": "Exit Player"

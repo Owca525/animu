@@ -33,6 +33,8 @@
     "fs:allow-config-write-recursive",
     "log:default",
     "core:window:allow-maximize",
-    "core:webview:allow-set-webview-zoom"
+    "core:webview:allow-set-webview-zoom",
+    "core:window:allow-set-title",
+    "core:window:allow-set-title-bar-style"
   ]
 }

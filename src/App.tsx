@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getCurrentWebview } from '@tauri-apps/api/webview';
+import { getVersion } from "@tauri-apps/api/app";
 import 'material-symbols';
 
 // Pages
@@ -15,11 +16,15 @@ import { CheckHistory } from "./utils/history";
 import { configContext } from "./utils/context";
 import { SettingsConfig } from "./utils/interface";
 
+// Color palette
+import "./css/colors/purpleAnimu.css"
+
 function App() {
   const [configIsLoading, setConfigIsLoading] = useState<boolean>(true)
   const [config, setConfig] = useState<SettingsConfig | undefined>(undefined)
 
   const loadConfig = useCallback(async () => {
+    await getCurrentWindow().setTitle("Animu v" + await getVersion())
     await checkConfig();
     setConfig(await readConfig());
 

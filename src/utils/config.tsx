@@ -14,6 +14,9 @@ export const defaultConfig: SettingsConfig = {
     SideBar: {
       HoverSidebar: true,
     },
+    Theme: {
+      color: "purpleAnimu"
+    },
     Window: {
       AutoMaximize: false,
       AutoFullscreen: false,
@@ -32,7 +35,7 @@ export const defaultConfig: SettingsConfig = {
     },
     History: {
       MinimalTimeSave: 20,
-      MaximizeTimeSave: 90,
+      MaximizeTimeSave: 120,
     },
     keybinds: {
       Pause: " ",

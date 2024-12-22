@@ -48,10 +48,6 @@
     "settings": "Ustawienia"
   },
   "settings": {
-    "headers": {
-      "general": "Ogólne Ustawienia",
-      "player": "Ustawienia Odtwarzacza"
-    },
     "sidebar": {
       "General": "Ogólne",
       "Player": "Odtwarzacz",
@@ -59,9 +55,9 @@
       "Home": "Home"
     },
     "general": {
-      "Sidebar": "Sidebar:",
+      "Sidebar": "Sidebar",
       "HoverSidebar": "Najedź na Sidebar",
-      "Window": "Okno:",
+      "Window": "Okno",
       "AutoMaximize": "Automatycznie Zmaksymalizuj",
       "AutoFullscreen": "Automatyczny Pełny Ekran",
       "Zoom": "Przybliżenie"
@@ -75,7 +71,7 @@
       "TimeSkipBack": "Przeskok w czasie do tyłu",
       "MinimalTimeSave": "Minimalny czas ignorowania",
       "MaximizeTimeSave": "Zmaksymalizowany czas ignorowania",
-      "Keybinds": "Skróty Klawiszowe:",
+      "Keybinds": "Skróty Klawiszowe",
       "Pause": "Pauza",
       "Fullscreen": "Pełny Ekran",
       "ExitPlayer": "Wyjście z Odtwarzacza"

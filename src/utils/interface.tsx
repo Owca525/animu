@@ -50,6 +50,9 @@ interface SettingsConfigGeneral {
   SideBar: {
     HoverSidebar: boolean,
   };
+  Theme: {
+    color: string
+  }
   Window: {
     AutoMaximize: boolean,
     AutoFullscreen: boolean,

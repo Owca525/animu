@@ -9,7 +9,6 @@
     background-color: rgb(0,0,0, 0.5);
 }
 .dialog {
-    background-color: var(--primary-200);
     min-width: 30%;
     min-height: 10%;
     max-width: 60%;

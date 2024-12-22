@@ -59,6 +59,9 @@ const Sidebar: React.FC<SidebarProps> = ({ class: className, top, bottom, onlyMa
         {showVersion && (
           <div className="sidebar-version">Animu v{version}</div>
         )}
+        {showVersion && (
+          <div className="border"></div>
+        )}
         {!onlyMax && (
           <Button
             value={

@@ -15,7 +15,8 @@
         "title": "Animu",
         "resizable": true,
         "width": 1500,
-        "height": 800
+        "height": 800,
+        "backgroundColor": "#ffffff"
       }
     ],
     "security": {

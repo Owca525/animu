@@ -2,12 +2,9 @@
   width: 100%;
   height: 100vh;
   display: flex;
-  align-items: start;
-  gap: 1em;
+  justify-content: start;
 }
 
-.settings-content,
-.settings-general,
 .settings-space {
   display: flex;
   align-items: start;
@@ -15,12 +12,13 @@
 }
 
 .settings-content {
-  position: relative;
   width: 100%;
-  gap: 1em;
+  height: 100vh;
   padding: 1em;
-  margin-right: 20%;
-  margin-left: 15em;
+  margin-left: 12em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .settings-header {
@@ -32,13 +30,21 @@
 .settings-general {
   gap: 0.5em;
   width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .settings-space {
   gap: 0.5em;
-  padding: 0.8em;
-  border-radius: 8px;
+  padding: 1.5em;
+  border-radius: 14px;
+  max-width: 90%;
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .sidebar-first {
@@ -58,7 +64,7 @@
 .same-space {
   display: flex;
   justify-content: space-between;
-  align-items: start;
+  align-items: center;
   font-size: larger;
   width: 100%;
   font-size: medium;
@@ -68,11 +74,17 @@
 .number {
   appearance: none;
   border: none;
-  background-color: var(--primary-200);
+  outline: none;
+  text-align: center;
   font-size: large;
-  width: 50px;
+  max-width: 20%;
+  min-width: 8%;
+  width: 0%;
   padding: 8px;
   border-radius: 4px;
+  border-style: solid;
+  border-width: 2px;
+  transition: border-color 100ms ease;
 }
 
 .settings-loading {
@@ -85,4 +97,10 @@
 }
 .settings-loading-animation {
   font-size: xx-large;
+}
+
+.border-settings {
+  border-style: solid;
+  border-width: 1px;
+  width: 95%;
 }
