@@ -59,6 +59,8 @@
       "Sidebar": "Sidebar",
       "HoverSidebar": "Hover Sidebar",
       "Window": "Window",
+      "theme": "Theme",
+      "language": "Language",
       "AutoMaximize": "Auto Maximize",
       "AutoFullscreen": "Auto Fullscreen",
       "Zoom": "Zoom"

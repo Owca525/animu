@@ -47,12 +47,9 @@ export interface NotificationProps {
 }
 
 interface SettingsConfigGeneral {
-  SideBar: {
-    HoverSidebar: boolean,
-  };
-  Theme: {
-    color: string
-  }
+  HoverSidebar: boolean,
+  language: string,
+  color: string
   Window: {
     AutoMaximize: boolean,
     AutoFullscreen: boolean,

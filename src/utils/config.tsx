@@ -11,12 +11,9 @@ import { SettingsConfig } from "./interface";
 
 export const defaultConfig: SettingsConfig = {
   General: {
-    SideBar: {
-      HoverSidebar: true,
-    },
-    Theme: {
-      color: "purpleAnimu"
-    },
+    HoverSidebar: true,
+    language: "en",
+    color: "purpleAnimu",
     Window: {
       AutoMaximize: false,
       AutoFullscreen: false,

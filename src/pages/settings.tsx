@@ -12,11 +12,12 @@ import Input from "../components/ui/input-settings"
 
 import "../css/pages/settings.css";
 import { useTranslation } from "react-i18next";
+import Dropdown from "../components/ui/dropdown";
 
 const Settings = () => {
   const navigate = useNavigate();
 
-  const {t} = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const [settingPage, setsettingPage] = useState<string>("general");
   const [config, setConfig] = useState<SettingsConfig | undefined>(undefined);
@@ -53,6 +54,17 @@ const Settings = () => {
       onClick: async () => navigate("/"),
     },
   ];
+
+  const language = [
+    { label: "English", value: "en", onClick: () => changeLang("en") },
+    { label: "Polish", value: "pl", onClick: () => changeLang("pl")  },
+  ]
+
+  // const theme = [
+  //   { label: "purpleAnimu", value: "purpleAnimu", onClick: () => console.log("purpleAnimu") },
+  //   { label: "catppuccin", value: "catppuccin", onClick: () => console.log("catppuccin") },
+  //   { label: "gruvbox", value: "gruvbox", onClick: () => console.log("gruvbox") },
+  // ]
 
   function checkCurrentPage(page: string): string {
     if (page == settingPage) return "active"
@@ -104,6 +116,20 @@ const Settings = () => {
     });
   };
 
+  const checkLang = (lang: string) => {
+    console.log(lang)
+    for (let i = 0; i < language.length; i++) {
+      const element = language[i];
+      if (element.value == lang) return element.label
+    }
+    return ""
+  }
+
+  const changeLang = (lang: string) => {
+    i18n.changeLanguage(lang)
+    handleChange("General.language", lang)
+  }
+
   return isLoading ? (
     <div className="settings-container">
       <Sidebar top={sidebarSettingsTopData} bottom={sidebarSettingsBottomData} class="sidebar-first" onlyMax={true} showVersion={true} />
@@ -121,8 +147,16 @@ const Settings = () => {
         <div className="settings-content">
           <div className="settings-general" ref={generalRef} >
             <div className="settings-space">
-              <div className="text">{t("settings.general.Sidebar")}</div>
-              <Checkbox title={t("settings.general.HoverSidebar")} checked={config.General.SideBar.HoverSidebar} onClick={(event) => handleChange("General.SideBar.HoverSidebar", event.currentTarget.checked)} />
+              <div className="text">{t("settings.sidebar.General")}</div>
+              <Checkbox title={t("settings.general.HoverSidebar")} checked={config.General.HoverSidebar} onClick={(event) => handleChange("General.HoverSidebar", event.currentTarget.checked)} />
+              <div className="border-settings"></div>
+              <div className="same-space">
+                {t("settings.general.language")} <Dropdown options={language} placeholder={checkLang(config.General.language)} />
+              </div>
+              {/* <div className="border-settings"></div>
+              <div className="same-space">
+                {t("settings.general.theme")}  <Dropdown options={theme} placeholder="purpleAnimu" />
+              </div> */}
             </div>
             <div className="settings-space">
               <div className="text">{t("settings.general.Window")}</div>

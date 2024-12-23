@@ -58,6 +58,8 @@
       "Sidebar": "Sidebar",
       "HoverSidebar": "Najedź na Sidebar",
       "Window": "Okno",
+      "theme": "Wygląd",
+      "language": "Język",
       "AutoMaximize": "Automatycznie Zmaksymalizuj",
       "AutoFullscreen": "Automatyczny Pełny Ekran",
       "Zoom": "Przybliżenie"

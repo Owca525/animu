@@ -18,16 +18,20 @@ import { SettingsConfig } from "./utils/interface";
 
 // Color palette
 import "./css/colors/purpleAnimu.css"
+import { useTranslation } from "react-i18next";
 
 function App() {
   const [configIsLoading, setConfigIsLoading] = useState<boolean>(true)
   const [config, setConfig] = useState<SettingsConfig | undefined>(undefined)
 
+  const { i18n } = useTranslation();
+
   const loadConfig = useCallback(async () => {
     await getCurrentWindow().setTitle("Animu v" + await getVersion())
     await checkConfig();
     setConfig(await readConfig());
-
+    const config = await readConfig()
+    
     if (config && config.General.Window.AutoMaximize) {
       await getCurrentWindow().maximize()
     }
@@ -35,6 +39,7 @@ function App() {
       await getCurrentWindow().setFullscreen(config.General.Window.AutoFullscreen)
     }
     if (config) {
+      i18n.changeLanguage(config.General.language)
       await getCurrentWebview().setZoom(parseFloat(config.General.Window.Zoom.toString()))
     }
 

@@ -116,7 +116,7 @@ function home() {
         {updateNotification ? <Notification data={notificationData} /> : ""}
         {isUpdate ? <Update /> : ""}
         {error?.error ? <Dialog header_text={t("error.connection")} text={error.note} buttons={[{ title: t("general.exit"), onClick: () => exit(0) }, { title: t("general.reload"), onClick: () => navigate("/") }]} /> : ""}
-        <Sidebar top={sidebarHomeTopData} bottom={sidebarHomeBottomData} sidebarHover={config.General.SideBar.HoverSidebar} />
+        <Sidebar top={sidebarHomeTopData} bottom={sidebarHomeBottomData} sidebarHover={config.General.HoverSidebar} />
         <Header onInputChange={handleInputChange} />
         {loading ? (
           <div className="content loading-home">
