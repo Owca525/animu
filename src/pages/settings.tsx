@@ -17,6 +17,7 @@ import { readConfig, saveConfig } from "../utils/config";
 import { SettingsConfig } from "../utils/interface";
 
 import "../css/pages/settings.css";
+import HelpIcon from "../components/ui/helpIcon";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -171,11 +172,11 @@ const Settings = () => {
             </div>
             <div className="settings-space">
               <div className="text">{t("settings.general.Window")}</div>
-              <Checkbox title={t("settings.general.AutoMaximize")} checked={config.General.Window.AutoMaximize} onClick={(event) => handleChange("General.Window.AutoMaximize", event.currentTarget.checked)} />
+              <Checkbox helpDescription={t("tips.gAutoMaximize")} title={t("settings.general.AutoMaximize")} checked={config.General.Window.AutoMaximize} onClick={(event) => handleChange("General.Window.AutoMaximize", event.currentTarget.checked)} />
               <div className="border-settings"></div>
-              <Checkbox title={t("settings.general.AutoFullscreen")} checked={config.General.Window.AutoFullscreen} onClick={(event) => handleChange("General.Window.AutoFullscreen", event.currentTarget.checked)} />
+              <Checkbox helpDescription={t("tips.gAutoFullscreen")} title={t("settings.general.AutoFullscreen")} checked={config.General.Window.AutoFullscreen} onClick={(event) => handleChange("General.Window.AutoFullscreen", event.currentTarget.checked)} />
               <div className="border-settings"></div>
-              <Input title={t("settings.general.Zoom")} placeholder="1.0" value={config.General.Window.Zoom} type="" onChange={(event) => handleChange("General.Window.Zoom", event.currentTarget.value)} />
+              <Input helpDescription={t("tips.gZoom")} title={t("settings.general.Zoom")} placeholder="1.0" value={config.General.Window.Zoom} type="" onChange={(event) => handleChange("General.Window.Zoom", event.currentTarget.value)} />
             </div>
           </div>
         </div>
@@ -189,9 +190,9 @@ const Settings = () => {
             </div>
             <div className="settings-space">
               <div className="text">{t("sidebar.ContinueWatching")}</div>
-              <Input title={t("settings.player.MinimalTimeSave")} placeholder="5" value={config.History.continue.MinimalTimeSave} type="s" onChange={(event) => handleChange("History.continue.MinimalTimeSave", event.currentTarget.value)} />
+              <Input helpDescription={t("tips.hContinueMinimal")} title={t("settings.player.MinimalTimeSave")} placeholder="5" value={config.History.continue.MinimalTimeSave} type="s" onChange={(event) => handleChange("History.continue.MinimalTimeSave", event.currentTarget.value)} />
               <div className="border-settings"></div>
-              <Input title={t("settings.player.MaximizeTimeSave")} placeholder="120" value={config.History.continue.MaximizeTimeSave} type="s" onChange={(event) => handleChange("History.continue.MaximizeTimeSave", event.currentTarget.value)} />
+              <Input helpDescription={t("tips.hContinueMax")} title={t("settings.player.MaximizeTimeSave")} placeholder="120" value={config.History.continue.MaximizeTimeSave} type="s" onChange={(event) => handleChange("History.continue.MaximizeTimeSave", event.currentTarget.value)} />
             </div>
           </div>
         </div>
@@ -203,17 +204,17 @@ const Settings = () => {
               <div className="text">{t("settings.sidebar.General")}</div>
               <Checkbox title={t("settings.player.autoPlay")} checked={config.Player.general.Autoplay} onClick={(event) => handleChange("Player.general.Autoplay", event.currentTarget.checked)} />
               <div className="border-settings"></div>
-              <Checkbox title={t("settings.general.AutoFullscreen")} checked={config.Player.general.AutoFullscreen} onClick={(event) => handleChange("Player.general.AutoFullscreen", event.currentTarget.checked)} />
+              <Checkbox helpDescription={t("tips.pAutoFullscreen")} title={t("settings.general.AutoFullscreen")} checked={config.Player.general.AutoFullscreen} onClick={(event) => handleChange("Player.general.AutoFullscreen", event.currentTarget.checked)} />
               <div className="border-settings"></div>
-              <Input title={t("settings.player.DefaultVolume")} placeholder="25" value={config.Player.general.Volume} type="%" onChange={(event) => handleChange("Player.general.Volume", event.currentTarget.value)} />
+              <Input helpDescription={t("tips.pSkip")} title={t("settings.player.DefaultVolume")} placeholder="25" value={config.Player.general.Volume} type="%" onChange={(event) => handleChange("Player.general.Volume", event.currentTarget.value)} />
               <div className="border-settings"></div>
-              <Input title={t("settings.player.LongTimeSkipForward")} placeholder="80" value={config.Player.general.LongTimeSkipForward} type="s" onChange={(event) => handleChange("Player.general.LongTimeSkipForward", event.currentTarget.value)} />
+              <Input helpDescription={t("tips.pSkip")} title={t("settings.player.LongTimeSkipForward")} placeholder="80" value={config.Player.general.LongTimeSkipForward} type="s" onChange={(event) => handleChange("Player.general.LongTimeSkipForward", event.currentTarget.value)} />
               <div className="border-settings"></div>
-              <Input title={t("settings.player.LongTimeSkipBack")} placeholder="80" value={config.Player.general.LongTimeSkipBack} type="s" onChange={(event) => handleChange("Player.general.LongTimeSkipBack", event.currentTarget.value)} />
+              <Input helpDescription={t("tips.pSkip")} title={t("settings.player.LongTimeSkipBack")} placeholder="80" value={config.Player.general.LongTimeSkipBack} type="s" onChange={(event) => handleChange("Player.general.LongTimeSkipBack", event.currentTarget.value)} />
               <div className="border-settings"></div>
-              <Input title={t("settings.player.TimeSkipForward")} placeholder="5" value={config.Player.general.TimeSkipRight} type="s" onChange={(event) => handleChange("Player.general.TimeSkipRight", event.currentTarget.value)} />
+              <Input helpDescription={t("tips.pSkip")} title={t("settings.player.TimeSkipForward")} placeholder="5" value={config.Player.general.TimeSkipRight} type="s" onChange={(event) => handleChange("Player.general.TimeSkipRight", event.currentTarget.value)} />
               <div className="border-settings"></div>
-              <Input title={t("settings.player.TimeSkipBack")} placeholder="5" value={config.Player.general.TimeSkipLeft} type="s" onChange={(event) => handleChange("Player.general.TimeSkipLeft", event.currentTarget.value)} />
+              <Input helpDescription={t("tips.pSkip")} title={t("settings.player.TimeSkipBack")} placeholder="5" value={config.Player.general.TimeSkipLeft} type="s" onChange={(event) => handleChange("Player.general.TimeSkipLeft", event.currentTarget.value)} />
             </div>
             <div className="settings-space">
               <div className="text">{t("settings.player.Keybinds")}</div>

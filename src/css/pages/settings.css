@@ -104,3 +104,10 @@
   border-width: 1px;
   width: 95%;
 }
+
+.text-space {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}

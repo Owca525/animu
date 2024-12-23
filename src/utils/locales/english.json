@@ -84,5 +84,14 @@
   "errors": {
     "connection": "Connection Error",
     "emptyMessage": "Where did it all go?"
+  },
+  "tips": {
+    "gAutoMaximize": "Autmatic Maximize Window when start application",
+    "gAutoFullscreen": "Automatic Fullscreen appllication when start, Warning This is project for gamescope",
+    "gZoom": "This zoom full application for example 1.0 is normal but if you but 2 then application scale is 2 times",
+    "pSkip": "This skip video selected time",
+    "pAutoFullscreen": "This automatic fullscreen player when load video",
+    "hContinueMinimal": "This make if for example 20 seconds don't watch then don't save in continue watch",
+    "hContinueMax": "This work like minimal but this delete time from durration video for example if video has 23:00 and this selected 120s then stop save 21 minut in continue watching"
   }
 }

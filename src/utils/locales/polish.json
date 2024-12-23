@@ -83,5 +83,14 @@
   "errors": {
     "connection": "Błąd połączenia",
     "emptyMessage": "Gdzie to wszystko poszło?"
+  },
+  "tips": {
+    "gAutoMaximize": "Automatycznie maksymalizuje kiedy włącza się",
+    "gAutoFullscreen": "Automatycznie ustawia pełny ekran na starcie, Uwaga To jest zaprojektowane dla gamescope",
+    "gZoom": "To zmiania przybliżenie aplikacji",
+    "pSkip": "To pomija czas odtwarzania",
+    "pAutoFullscreen": "To daje pełny ekran kiedy odtwarzacza się załaduje",
+    "hContinueMinimal": "To jest minimalny czas zapisywany do kontynacji oglądania",
+    "hContinueMax": "To jest maksymalny czas zapisywania do kontynacji oglądania ale jest usuwany czasu odtwarzacza"
   }
 }
