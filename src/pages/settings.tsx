@@ -17,7 +17,6 @@ import { readConfig, saveConfig } from "../utils/config";
 import { SettingsConfig } from "../utils/interface";
 
 import "../css/pages/settings.css";
-import HelpIcon from "../components/ui/helpIcon";
 
 const Settings = () => {
   const navigate = useNavigate();
