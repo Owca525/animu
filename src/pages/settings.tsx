@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { open } from '@tauri-apps/plugin-shell';
 import { appConfigDir } from "@tauri-apps/api/path";
 import { useEffect, useRef, useState } from "react";
+import { getCurrentWebview } from "@tauri-apps/api/webview";
 
 import { readConfig, saveConfig } from "../utils/config";
 import { SettingsConfig } from "../utils/interface";
@@ -82,6 +83,7 @@ const Settings = () => {
     saveConfig(config);
     if (config !== undefined) {
       setisLoading(false)
+      getCurrentWebview().setZoom(parseFloat(config.General.Window.Zoom.toString()))
     }
   }, [config]);
 
@@ -164,7 +166,7 @@ const Settings = () => {
               <div className="border-settings"></div>
               <Checkbox title={t("settings.general.AutoFullscreen")} checked={config.General.Window.AutoFullscreen} onClick={(event) => handleChange("General.Window.AutoFullscreen", event.currentTarget.checked)} />
               <div className="border-settings"></div>
-              <Input title={t("settings.general.Zoom")} placeholder="1.0" value={config.General.Window.Zoom} type="%" onChange={(event) => handleChange("General.Window.Zoom", event.currentTarget.value)}/>
+              <Input title={t("settings.general.Zoom")} placeholder="1.0" value={config.General.Window.Zoom} type="" onChange={(event) => handleChange("General.Window.Zoom", event.currentTarget.value)}/>
             </div>
           </div>
         </div>
