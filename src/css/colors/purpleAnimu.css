@@ -307,3 +307,21 @@ button{
   background-color: #fff;
   box-shadow: 0 2px 5px rgb(0, 0, 0, 0.2);
 }
+
+/* dropdown menu */
+.dropdown-item:hover {
+  background-color: var(--primary-400);
+}
+
+.dropdown-button {
+background-color: var(--primary-300);
+border-color: var(--primary-200);
+}
+.dropdown-button:hover {
+border-color: var(--primary-500);
+}
+
+.dropdown-menu {
+  background-color: var(--primary-300);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
