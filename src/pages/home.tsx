@@ -1,21 +1,25 @@
+import { exit } from '@tauri-apps/plugin-process';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { check } from "@tauri-apps/plugin-updater";
+
+// Components
+import Notification from "../components/dialogs/notification";
+import Update from "../components/dialogs/update";
 import Sidebar from "../components/elements/sidebar";
 import Content from "../components/elements/card-content";
 import Header from "../components/elements/headers";
 import Dialog from "../components/dialogs/dialog";
-import { exit } from '@tauri-apps/plugin-process';
-import { useTranslation } from 'react-i18next';
-import "../css/pages/home.css";
 
-
+// utils
 import { ContainerProps } from "../utils/interface";
 import { get_recent, get_search } from "../utils/backend";
-import { useContext, useEffect, useState } from "react";
-import { check } from "@tauri-apps/plugin-updater";
-import Notification from "../components/dialogs/notification";
-import Update from "../components/dialogs/update";
-import { useNavigate } from "react-router-dom";
-import { ReadHistory } from "../utils/history";
+import { ReadContinue } from "../utils/continueWatch";
 import { configContext } from "../utils/context";
+
+import "../css/pages/home.css";
+import { ReadHistory } from '../utils/history';
 
 function home() {
   const navigate = useNavigate();
@@ -44,7 +48,13 @@ function home() {
       value: '<div class="material-symbols-outlined text-button">history</div>'+t("sidebar.ContinueWatching"),
       class: "icon-button",
       title: t("sidebar.ContinueWatching"),
-      onClick: async () => change_content({ title: t("sidebar.ContinueWatching"), data: (await ReadHistory()).history }),
+      onClick: async () => change_content({ title: t("sidebar.ContinueWatching"), data: (await ReadContinue()).continue }),
+    },
+    {
+      value: '<div class="material-symbols-outlined text-button">history</div>'+t("sidebar.History"),
+      class: "icon-button",
+      title: t("sidebar.History"),
+      onClick: async () => change_content({ title: t("sidebar.History"), data: (await ReadHistory()).history }),
     }
   ];
 
@@ -86,7 +96,6 @@ function home() {
       });
       setLoading(false);
     };
-
     fetchData();
   }, []);
 

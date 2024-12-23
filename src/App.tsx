@@ -13,7 +13,7 @@ import Player from "./pages/player";
 
 // config
 import { checkConfig, readConfig } from "./utils/config";
-import { CheckHistory } from "./utils/history";
+import { CheckContinue } from "./utils/continueWatch";
 import { configContext } from "./utils/context";
 import { SettingsConfig } from "./utils/interface";
 
@@ -47,7 +47,7 @@ function App() {
   }, [])
 
   useEffect(() => {
-    CheckHistory()
+    CheckContinue()
     setTheme("dark")
   }, [])
 

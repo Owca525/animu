@@ -73,6 +73,7 @@
       "TimeSkipBack": "Przeskok w czasie do tyłu",
       "MinimalTimeSave": "Minimalny czas ignorowania",
       "MaximizeTimeSave": "Zmaksymalizowany czas ignorowania",
+      "historysave": "Maksymalny limit zapisywania histori",
       "Keybinds": "Skróty Klawiszowe",
       "Pause": "Pauza",
       "Fullscreen": "Pełny Ekran",

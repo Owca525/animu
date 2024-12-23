@@ -6,6 +6,7 @@ import {
   readTextFile,
 } from "@tauri-apps/plugin-fs";
 import { CardProps } from "./interface";
+import { readConfig } from "./config";
 
 const DefaultHistory: { history: CardProps[] } = {
     history: [],
@@ -25,10 +26,12 @@ export async function CheckHistory() {
 
 export async function SaveHistory(save: CardProps) {
     try {
+        const config = await readConfig()
         const appConfigDirPath = await appConfigDir();
         const file = await readTextFile(appConfigDirPath + "/history.json")
         const data = JSON.parse(file) as { history: CardProps[] }
-        const index = data.history.findIndex(item => item.player?.episode === save.player?.episode)
+        const index = data.history.findIndex(item => item.id === save.id)
+        if (config && (await ReadHistory()).history.length >= parseInt(config.History.history.maxSave.toString())) data.history.pop()
         data.history.splice(index, 1)
         data.history.push(save)
         await writeTextFile(appConfigDirPath + "/history.json", JSON.stringify(data))
@@ -42,7 +45,7 @@ export async function DeleteFromHistory(data: CardProps) {
         const appConfigDirPath = await appConfigDir();
         const file = await readTextFile(appConfigDirPath + "/history.json")
         const list = JSON.parse(file) as { history: CardProps[] }
-        const index = list.history.findIndex(item => item.player?.episode === data.player?.episode)
+        const index = list.history.findIndex(item => item.id === data.id)
         list.history.splice(index, 1)
         await writeTextFile(appConfigDirPath + "/history.json", JSON.stringify(list))
     } catch (Error) {

@@ -74,6 +74,7 @@
       "TimeSkipBack": "Time Skip Back",
       "MinimalTimeSave": "Minimal Time ignore",
       "MaximizeTimeSave": "Maximize Time ignore",
+      "historysave": "Max limit history save",
       "Keybinds": "Keybinds",
       "Pause": "Pause",
       "Fullscreen": "Fullscreen",

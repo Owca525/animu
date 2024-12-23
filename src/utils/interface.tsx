@@ -67,10 +67,6 @@ interface SettingsConfigPlayer {
     TimeSkipLeft: number | string,
     TimeSkipRight: number | string,
   },
-  History: {
-    MinimalTimeSave: number | string;
-    MaximizeTimeSave: number | string;
-  }
   keybinds: {
     Pause: string,
     LongTimeSkipForward: string,
@@ -82,7 +78,18 @@ interface SettingsConfigPlayer {
   },
 }
 
+interface SettingsConfigHistory {
+  history: {
+    maxSave: number | string
+  }
+  continue: {
+    MinimalTimeSave: number | string;
+    MaximizeTimeSave: number | string;
+  }
+}
+
 export interface SettingsConfig {
   General: SettingsConfigGeneral
   Player: SettingsConfigPlayer
+  History: SettingsConfigHistory
 }

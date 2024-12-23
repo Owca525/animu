@@ -2,14 +2,18 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { info, error } from '@tauri-apps/plugin-log';
+import { useTranslation } from "react-i18next";
 
+// utils
+import { DeleteFromcontinue, SaveContinue } from "../utils/continueWatch";
+import { configContext } from "../utils/context";
 import { get_player_anime } from "../utils/backend";
+
+// Components
 import Dialog from "../components/dialogs/dialog";
 
 import "../css/pages/player.css";
-import { DeleteFromHistory, SaveHistory } from "../utils/history";
-import { configContext } from "../utils/context";
-import { useTranslation } from "react-i18next";
+import { SaveHistory } from "../utils/history";
 
 const Player = () => {
   const location = useLocation();
@@ -67,10 +71,10 @@ const Player = () => {
   // Saving history
   useEffect(() => {
     setWaitingPlayer(false)
-    if (config && videoRef.current && currentTime >= parseInt(config.Player.History.MinimalTimeSave.toString()) && currentTime <= (duration - parseInt(config.Player.History.MaximizeTimeSave.toString()))) {
-      SaveHistory({ id: id, title: title, img: img, player: { episodes: episodes, episode: ep, time: currentTime } })
+    if (config && videoRef.current && currentTime >= parseInt(config.History.continue.MinimalTimeSave.toString()) && currentTime <= (duration - parseInt(config.History.continue.MaximizeTimeSave.toString()))) {
+      SaveContinue({ id: id, title: title, img: img, player: { episodes: episodes, episode: ep, time: currentTime } })
     } else {
-      DeleteFromHistory({ id: id, title: title, img: img, player: { episodes: episodes, episode: ep, time: currentTime } })
+      DeleteFromcontinue({ id: id, title: title, img: img, player: { episodes: episodes, episode: ep, time: currentTime } })
     }
   }, [currentTime])
 
@@ -93,6 +97,10 @@ const Player = () => {
       window.removeEventListener("keydown", keybinds);
     };
   }, [config, videoRef.current])
+
+  useEffect(() => {
+    SaveHistory({ id: id, img: img, title: title })
+  }, [])
 
   const showElement = () => {
     setIsVisible(true);

@@ -30,10 +30,6 @@ export const defaultConfig: SettingsConfig = {
       TimeSkipLeft: 5,
       TimeSkipRight: 5,
     },
-    History: {
-      MinimalTimeSave: 20,
-      MaximizeTimeSave: 120,
-    },
     keybinds: {
       Pause: " ",
       LongTimeSkipForward: "ArrowUp",
@@ -43,6 +39,15 @@ export const defaultConfig: SettingsConfig = {
       Fullscreen: "F",
       ExitPlayer: "Escape",
     },
+  },
+  History: {
+    history: {
+      maxSave: 20
+    },
+    continue: {
+      MinimalTimeSave: 20,
+      MaximizeTimeSave: 120,
+    }
   },
 };
 

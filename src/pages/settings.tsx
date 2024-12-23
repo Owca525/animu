@@ -3,17 +3,20 @@ import { open } from '@tauri-apps/plugin-shell';
 import { appConfigDir } from "@tauri-apps/api/path";
 import { useEffect, useRef, useState } from "react";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
+import { useTranslation } from "react-i18next";
 
-import { readConfig, saveConfig } from "../utils/config";
-import { SettingsConfig } from "../utils/interface";
+// Components
 import Sidebar from "../components/elements/sidebar";
 import Checkbox from "../components/ui/checkbox";
 import Keybind from "../components/dialogs/keybind";
 import Input from "../components/ui/input-settings"
+import Dropdown from "../components/ui/dropdown";
+
+// utils
+import { readConfig, saveConfig } from "../utils/config";
+import { SettingsConfig } from "../utils/interface";
 
 import "../css/pages/settings.css";
-import { useTranslation } from "react-i18next";
-import Dropdown from "../components/ui/dropdown";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -39,6 +42,12 @@ const Settings = () => {
       title: t("settings.sidebar.Player"),
       onClick: async () => setsettingPage("player"),
     },
+    {
+      value: '<div class="material-symbols-outlined text-button">history</div>' + t("sidebar.History"),
+      class: "icon-button " + checkCurrentPage("history"),
+      title: t("sidebar.History"),
+      onClick: async () => setsettingPage("history"),
+    },
   ];
 
   var sidebarSettingsBottomData = [
@@ -58,7 +67,7 @@ const Settings = () => {
 
   const language = [
     { label: "English", value: "en", onClick: () => changeLang("en") },
-    { label: "Polish", value: "pl", onClick: () => changeLang("pl")  },
+    { label: "Polish", value: "pl", onClick: () => changeLang("pl") },
   ]
 
   // const theme = [
@@ -166,7 +175,23 @@ const Settings = () => {
               <div className="border-settings"></div>
               <Checkbox title={t("settings.general.AutoFullscreen")} checked={config.General.Window.AutoFullscreen} onClick={(event) => handleChange("General.Window.AutoFullscreen", event.currentTarget.checked)} />
               <div className="border-settings"></div>
-              <Input title={t("settings.general.Zoom")} placeholder="1.0" value={config.General.Window.Zoom} type="" onChange={(event) => handleChange("General.Window.Zoom", event.currentTarget.value)}/>
+              <Input title={t("settings.general.Zoom")} placeholder="1.0" value={config.General.Window.Zoom} type="" onChange={(event) => handleChange("General.Window.Zoom", event.currentTarget.value)} />
+            </div>
+          </div>
+        </div>
+      ) : ""}
+      {settingPage == "history" && config ? (
+        <div className="settings-content">
+          <div className="settings-general" ref={playerRef}>
+            <div className="settings-space">
+              <div className="text">{t("sidebar.History")}</div>
+              <Input title={t("settings.player.historysave")} placeholder="20" value={config.History.history.maxSave} type="" onChange={(event) => handleChange("History.history.maxSave", event.currentTarget.value)} />
+            </div>
+            <div className="settings-space">
+              <div className="text">{t("sidebar.ContinueWatching")}</div>
+              <Input title={t("settings.player.MinimalTimeSave")} placeholder="5" value={config.History.continue.MinimalTimeSave} type="s" onChange={(event) => handleChange("History.continue.MinimalTimeSave", event.currentTarget.value)} />
+              <div className="border-settings"></div>
+              <Input title={t("settings.player.MaximizeTimeSave")} placeholder="120" value={config.History.continue.MaximizeTimeSave} type="s" onChange={(event) => handleChange("History.continue.MaximizeTimeSave", event.currentTarget.value)} />
             </div>
           </div>
         </div>
@@ -180,21 +205,15 @@ const Settings = () => {
               <div className="border-settings"></div>
               <Checkbox title={t("settings.general.AutoFullscreen")} checked={config.Player.general.AutoFullscreen} onClick={(event) => handleChange("Player.general.AutoFullscreen", event.currentTarget.checked)} />
               <div className="border-settings"></div>
-              <Input title={t("settings.player.DefaultVolume")} placeholder="25" value={config.Player.general.Volume} type="%" onChange={(event) => handleChange("Player.general.Volume", event.currentTarget.value)}/>
+              <Input title={t("settings.player.DefaultVolume")} placeholder="25" value={config.Player.general.Volume} type="%" onChange={(event) => handleChange("Player.general.Volume", event.currentTarget.value)} />
               <div className="border-settings"></div>
-              <Input title={t("settings.player.LongTimeSkipForward")} placeholder="80" value={config.Player.general.LongTimeSkipForward} type="s" onChange={(event) => handleChange("Player.general.LongTimeSkipForward", event.currentTarget.value)}/>
+              <Input title={t("settings.player.LongTimeSkipForward")} placeholder="80" value={config.Player.general.LongTimeSkipForward} type="s" onChange={(event) => handleChange("Player.general.LongTimeSkipForward", event.currentTarget.value)} />
               <div className="border-settings"></div>
-              <Input title={t("settings.player.LongTimeSkipBack")} placeholder="80" value={config.Player.general.LongTimeSkipBack} type="s" onChange={(event) => handleChange("Player.general.LongTimeSkipBack", event.currentTarget.value)}/>
+              <Input title={t("settings.player.LongTimeSkipBack")} placeholder="80" value={config.Player.general.LongTimeSkipBack} type="s" onChange={(event) => handleChange("Player.general.LongTimeSkipBack", event.currentTarget.value)} />
               <div className="border-settings"></div>
-              <Input title={t("settings.player.TimeSkipForward")} placeholder="5" value={config.Player.general.TimeSkipRight} type="s" onChange={(event) => handleChange("Player.general.TimeSkipRight", event.currentTarget.value)}/>
+              <Input title={t("settings.player.TimeSkipForward")} placeholder="5" value={config.Player.general.TimeSkipRight} type="s" onChange={(event) => handleChange("Player.general.TimeSkipRight", event.currentTarget.value)} />
               <div className="border-settings"></div>
-              <Input title={t("settings.player.TimeSkipBack")} placeholder="5" value={config.Player.general.TimeSkipLeft} type="s" onChange={(event) => handleChange("Player.general.TimeSkipLeft", event.currentTarget.value)}/>
-            </div>
-            <div className="settings-space">
-              <div className="text">{t("sidebar.History")}</div>
-              <Input title={t("settings.player.MinimalTimeSave")} placeholder="5" value={config.Player.History.MinimalTimeSave} type="s" onChange={(event) => handleChange("Player.History.MinimalTimeSave", event.currentTarget.value)}/>
-              <div className="border-settings"></div>
-              <Input title={t("settings.player.MaximizeTimeSave")} placeholder="120" value={config.Player.History.MaximizeTimeSave} type="s" onChange={(event) => handleChange("Player.History.MaximizeTimeSave", event.currentTarget.value)}/>
+              <Input title={t("settings.player.TimeSkipBack")} placeholder="5" value={config.Player.general.TimeSkipLeft} type="s" onChange={(event) => handleChange("Player.general.TimeSkipLeft", event.currentTarget.value)} />
             </div>
             <div className="settings-space">
               <div className="text">{t("settings.player.Keybinds")}</div>
