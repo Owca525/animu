@@ -42,7 +42,7 @@ const Sidebar: React.FC<SidebarProps> = ({ class: className, top, bottom, onlyMa
   }, [])
 
   const handleMouseEnter = () => {
-    if (!isMaxSidebar) {
+    if (!isMaxSidebar && sidebarHover) {
       setIsMaxSidebar(true);
     }
   };

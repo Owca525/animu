@@ -2,7 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getCurrentWebview } from '@tauri-apps/api/webview';
-import { getVersion } from "@tauri-apps/api/app";
+import { getVersion, setTheme } from "@tauri-apps/api/app";
+import { useTranslation } from "react-i18next";
 import 'material-symbols';
 
 // Pages
@@ -17,8 +18,7 @@ import { configContext } from "./utils/context";
 import { SettingsConfig } from "./utils/interface";
 
 // Color palette
-import "./css/colors/purpleAnimu.css"
-import { useTranslation } from "react-i18next";
+import"./css/colors/purpleAnimu.css"
 
 function App() {
   const [configIsLoading, setConfigIsLoading] = useState<boolean>(true)
@@ -29,9 +29,9 @@ function App() {
   const loadConfig = useCallback(async () => {
     await getCurrentWindow().setTitle("Animu v" + await getVersion())
     await checkConfig();
-    setConfig(await readConfig());
     const config = await readConfig()
-    
+    setConfig(config)
+
     if (config && config.General.Window.AutoMaximize) {
       await getCurrentWindow().maximize()
     }
@@ -48,6 +48,7 @@ function App() {
 
   useEffect(() => {
     CheckHistory()
+    setTheme("dark")
   }, [])
 
   // Load config

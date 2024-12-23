@@ -35,6 +35,7 @@
     "core:window:allow-maximize",
     "core:webview:allow-set-webview-zoom",
     "core:window:allow-set-title",
-    "core:window:allow-set-title-bar-style"
+    "core:window:allow-set-title-bar-style",
+    "core:app:allow-set-app-theme"
   ]
 }
