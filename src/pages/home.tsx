@@ -85,7 +85,7 @@ function home() {
         {
           title: t("update.title"),
           information: t("update.information", {version: update.version}),
-          onClick: () => setisUpdate(true),
+          onClick: () => console.log(), // setisUpdate(true)
         },
       ]);
     }
