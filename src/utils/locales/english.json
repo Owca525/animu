@@ -99,5 +99,9 @@
     "pAutoFullscreen": "This automatic fullscreen player when load video",
     "hContinueMinimal": "This make if for example 20 seconds don't watch then don't save in continue watch",
     "hContinueMax": "This work like minimal but this delete time from durration video for example if video has 23:00 and this selected 120s then stop save 21 minut in continue watching"
+  },
+  "lang": {
+    "english": "English",
+    "polish": "Polish"
   }
 }
