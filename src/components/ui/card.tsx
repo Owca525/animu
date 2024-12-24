@@ -56,7 +56,9 @@ const Card: React.FC<CardProps> = ({ id, title, img, player = null }) => {
 
   return (
       <div className="card" title={title} ref={cardRef} onClick={ContinueWatch}>
-        <Information id_anime={id} showPopup={showInf} toggle={toggleShow}/>
+        <div title="" style={{ cursor: "default" }}>
+          <Information id_anime={id} showPopup={showInf} toggle={toggleShow}/>
+        </div>
         <div className="card-img">
           {!isImageLoaded && !hasError && (
             <div className="material-symbols-outlined placeholder" style={{ animation: "spin 1s linear infinite" }}>
