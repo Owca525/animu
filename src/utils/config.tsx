@@ -14,6 +14,7 @@ export const defaultConfig: SettingsConfig = {
     HoverSidebar: true,
     language: "en",
     color: "purpleAnimu",
+    cardSize: "medium",
     Window: {
       AutoMaximize: false,
       AutoFullscreen: false,

@@ -50,6 +50,7 @@ interface SettingsConfigGeneral {
   HoverSidebar: boolean,
   language: string,
   color: string
+  cardSize: string
   Window: {
     AutoMaximize: boolean,
     AutoFullscreen: boolean,

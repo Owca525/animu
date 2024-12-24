@@ -182,11 +182,11 @@ const Settings = () => {
             <div className="settings-space">
               <div className="text">{t("settings.general.theme")}</div>
               <div className="same-space">
-                {t("settings.general.theme")}  <Dropdown options={theme} placeholder="purpleAnimu" />
+                {t("settings.general.theme")}  <Dropdown options={theme} placeholder={config.General.color} />
               </div>
               {/* <div className="border-settings"></div>
               <div className="same-space">
-                {t("settings.general.cardSize")}  <Dropdown options={cardSize} placeholder="purpleAnimu" />
+                {t("settings.general.cardSize")}  <Dropdown options={cardSize} placeholder={config.General.cardSize} />
               </div> */}
             </div>
             <div className="settings-space">
