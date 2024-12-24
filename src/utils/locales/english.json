@@ -63,7 +63,13 @@
       "language": "Language",
       "AutoMaximize": "Auto Maximize",
       "AutoFullscreen": "Auto Fullscreen",
-      "Zoom": "Zoom"
+      "Zoom": "Zoom",
+      "cardSize": "Card Size",
+      "cards": {
+        "small": "small",
+        "medium": "medium",
+        "big": "big"
+      }
     },
     "player": {
       "autoPlay": "Auto Play",

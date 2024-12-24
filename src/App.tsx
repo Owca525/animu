@@ -18,7 +18,9 @@ import { configContext } from "./utils/context";
 import { SettingsConfig } from "./utils/interface";
 
 // Color palette
-import"./css/colors/purpleAnimu.css"
+import "./css/colors/purpleAnimu.css"
+import "./css/colors/gruvbox.css"
+import "./css/colors/catppuccin.css"
 
 function App() {
   const [configIsLoading, setConfigIsLoading] = useState<boolean>(true)
@@ -31,6 +33,11 @@ function App() {
     await checkConfig();
     const config = await readConfig()
     setConfig(config)
+
+    const container = document.querySelector("#root")
+    if (container && config) {
+      container.className = config.General.color
+    }
 
     if (config && config.General.Window.AutoMaximize) {
       await getCurrentWindow().maximize()

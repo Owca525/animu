@@ -70,10 +70,16 @@ const Settings = () => {
     { label: "Polish", value: "pl", onClick: () => changeLang("pl") },
   ]
 
-  // const theme = [
-  //   { label: "purpleAnimu", value: "purpleAnimu", onClick: () => console.log("purpleAnimu") },
-  //   { label: "catppuccin", value: "catppuccin", onClick: () => console.log("catppuccin") },
-  //   { label: "gruvbox", value: "gruvbox", onClick: () => console.log("gruvbox") },
+  const theme = [
+    { label: "purpleAnimu", value: "purpleAnimu", onClick: () => changeTheme("purpleAnimu") },
+    { label: "catppuccin", value: "catppuccin", onClick: () => changeTheme("catppuccin") },
+    { label: "gruvbox", value: "gruvbox", onClick: () => changeTheme("gruvbox") },
+  ]
+
+  // const cardSize = [
+  //   { label: t("settings.general.cards.small"), value: "small", onClick: () => console.log("purpleAnimu") },
+  //   { label: t("settings.general.cards.medium"), value: "medium", onClick: () => console.log("catppuccin") },
+  //   { label: t("settings.general.cards.big"), value: "big", onClick: () => console.log("gruvbox") },
   // ]
 
   function checkCurrentPage(page: string): string {
@@ -127,6 +133,14 @@ const Settings = () => {
     });
   };
 
+  const changeTheme = (theme: string) => {
+    handleChange("General.color", theme)
+    const container = document.querySelector("#root")
+    if (container && config) {
+      container.className = theme
+    }
+  }
+
   const checkLang = (lang: string) => {
     console.log(lang)
     for (let i = 0; i < language.length; i++) {
@@ -164,9 +178,15 @@ const Settings = () => {
               <div className="same-space">
                 {t("settings.general.language")} <Dropdown options={language} placeholder={checkLang(config.General.language)} />
               </div>
-              {/* <div className="border-settings"></div>
+            </div>
+            <div className="settings-space">
+              <div className="text">{t("settings.general.theme")}</div>
               <div className="same-space">
                 {t("settings.general.theme")}  <Dropdown options={theme} placeholder="purpleAnimu" />
+              </div>
+              {/* <div className="border-settings"></div>
+              <div className="same-space">
+                {t("settings.general.cardSize")}  <Dropdown options={cardSize} placeholder="purpleAnimu" />
               </div> */}
             </div>
             <div className="settings-space">

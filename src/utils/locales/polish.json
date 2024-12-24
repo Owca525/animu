@@ -62,7 +62,13 @@
       "language": "Język",
       "AutoMaximize": "Automatycznie Zmaksymalizuj",
       "AutoFullscreen": "Automatyczny Pełny Ekran",
-      "Zoom": "Przybliżenie"
+      "Zoom": "Przybliżenie",
+      "cardSize": "Wielkość kartów",
+      "cards": {
+        "small": "małe",
+        "medium": "średnie",
+        "big": "duże"
+      }
     },
     "player": {
       "autoPlay": "Automatyczne odtwarzanie",
