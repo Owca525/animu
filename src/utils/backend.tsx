@@ -1,8 +1,8 @@
 import { invoke } from "@tauri-apps/api/core";
-import { InformationData } from "../utils/interface"
+import { CardProps, InformationData } from "../utils/interface"
 import { error } from '@tauri-apps/plugin-log';
 
-export async function get_recent(): Promise<{ id: string, title: string; img: string; }[]> {
+export async function get_recent(): Promise<CardProps[]> {
     try {
         var anime: { id: string; title: string; img: string; }[] = [];
         const response: string = await invoke("get_recent_anime");

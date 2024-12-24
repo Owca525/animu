@@ -6,7 +6,7 @@ import { check } from "@tauri-apps/plugin-updater";
 
 // Components
 import Notification from "../components/dialogs/notification";
-import Update from "../components/dialogs/update";
+// import Update from "../components/dialogs/update";
 import Sidebar from "../components/elements/sidebar";
 import Content from "../components/elements/card-content";
 import Header from "../components/elements/headers";
@@ -35,7 +35,7 @@ function home() {
   const [error, seterror] = useState<{ error: boolean, note: string }>()
 
   const [loading, setLoading] = useState(true);
-  const [isUpdate, setisUpdate] = useState(false);
+  // const [isUpdate, setisUpdate] = useState(false);
   const [updateNotification, setUpdateNotification] = useState(false);
 
   const sidebarHomeTopData = [
@@ -111,6 +111,7 @@ function home() {
       return
     }
     setData(newData);
+    setLoading(false)
   };
 
   const handleInputChange = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -129,7 +130,7 @@ function home() {
       <main className="container">
         <ContextMenu items={menuItems} />
         {updateNotification ? <Notification data={notificationData} /> : ""}
-        {isUpdate ? <Update /> : ""}
+        {/* {isUpdate ? <Update /> : ""} */}
         {error?.error ? <Dialog header_text={t("error.connection")} text={error.note} buttons={[{ title: t("general.exit"), onClick: () => exit(0) }, { title: t("general.reload"), onClick: () => navigate("/") }]} /> : ""}
         <Sidebar top={sidebarHomeTopData} bottom={sidebarHomeBottomData} sidebarHover={config.General.HoverSidebar} />
         <Header onInputChange={handleInputChange} />
