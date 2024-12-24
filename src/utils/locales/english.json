@@ -103,5 +103,8 @@
   "lang": {
     "english": "English",
     "polish": "Polish"
+  },
+  "contextMenu": {
+    "reload": "Reload"
   }
 }

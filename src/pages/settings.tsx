@@ -6,6 +6,7 @@ import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { useTranslation } from "react-i18next";
 
 // Components
+import ContextMenu from "../components/elements/context-menu";
 import Sidebar from "../components/elements/sidebar";
 import Checkbox from "../components/ui/checkbox";
 import Keybind from "../components/dialogs/keybind";
@@ -76,6 +77,10 @@ const Settings = () => {
     { label: "gruvbox", value: "gruvbox", onClick: () => changeTheme("gruvbox") },
   ]
 
+  const menuItems = [
+    { label: t("contextMenu.reload"), onClick: () => location.reload() }
+  ];
+
   // const cardSize = [
   //   { label: t("settings.general.cards.small"), value: "small", onClick: () => console.log("purpleAnimu") },
   //   { label: t("settings.general.cards.medium"), value: "medium", onClick: () => console.log("catppuccin") },
@@ -142,7 +147,6 @@ const Settings = () => {
   }
 
   const checkLang = (lang: string) => {
-    console.log(lang)
     for (let i = 0; i < language.length; i++) {
       const element = language[i];
       if (element.value == lang) return element.label
@@ -157,6 +161,7 @@ const Settings = () => {
 
   return isLoading ? (
     <div className="settings-container">
+      <ContextMenu items={menuItems} />
       <Sidebar top={sidebarSettingsTopData} bottom={sidebarSettingsBottomData} class="sidebar-first" onlyMax={true} showVersion={true} />
       <div className="settings-content settings-loading">
         <div className="loading settings-loading-animation material-symbols-outlined">
@@ -166,6 +171,7 @@ const Settings = () => {
     </div>
   ) : (
     <div className="settings-container">
+      <ContextMenu items={menuItems} />
       <div className="settings-shadow-element"></div>
       <Sidebar top={sidebarSettingsTopData} bottom={sidebarSettingsBottomData} class="sidebar-first" onlyMax={true} showVersion={true} />
       {settingPage == "general" && config ? (

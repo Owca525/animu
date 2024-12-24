@@ -20,6 +20,7 @@ import { configContext } from "../utils/context";
 
 import "../css/pages/home.css";
 import { ReadHistory } from '../utils/history';
+import ContextMenu from '../components/elements/context-menu';
 
 function home() {
   const navigate = useNavigate();
@@ -72,6 +73,10 @@ function home() {
     }
   ];
 
+  const menuItems = [
+    { label: t("contextMenu.reload"), onClick: () => location.reload() }
+  ];
+
   const checkUpdate = async () => {
     const update = await check();
     if (update && update.available) {
@@ -122,6 +127,7 @@ function home() {
   if (config) {
     return (
       <main className="container">
+        <ContextMenu items={menuItems} />
         {updateNotification ? <Notification data={notificationData} /> : ""}
         {isUpdate ? <Update /> : ""}
         {error?.error ? <Dialog header_text={t("error.connection")} text={error.note} buttons={[{ title: t("general.exit"), onClick: () => exit(0) }, { title: t("general.reload"), onClick: () => navigate("/") }]} /> : ""}

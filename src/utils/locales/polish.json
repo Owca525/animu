@@ -102,5 +102,8 @@
   "lang": {
     "english": "Angielski",
     "polish": "Polski"
+  },
+  "contextMenu": {
+    "reload": "Przeładuj"
   }
 }

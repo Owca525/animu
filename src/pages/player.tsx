@@ -11,15 +11,16 @@ import { get_player_anime } from "../utils/backend";
 
 // Components
 import Dialog from "../components/dialogs/dialog";
+import ContextMenu from "../components/elements/context-menu";
 
 import "../css/pages/player.css";
 import { SaveHistory } from "../utils/history";
 
 const Player = () => {
-  const location = useLocation();
+  const Currentlocation = useLocation();
   const navigate = useNavigate();
 
-  const { id, title, episodes, ep, time, img } = location.state;
+  const { id, title, episodes, ep, time, img } = Currentlocation.state;
 
   const {t} = useTranslation();
 
@@ -49,6 +50,10 @@ const Player = () => {
 
   const [playerUrl, setPlayerUrl] = useState<string | undefined>(undefined);
   const [isError, setErrorDialog] = useState({ error: false, information: "" });
+
+  const menuItems = [
+    { label: t("contextMenu.reload"), onClick: () => location.reload() }
+  ];
 
   const setDataPlayer = async () => {
     try {
@@ -349,6 +354,7 @@ const Player = () => {
 
   return (
     <div className="video-container" ref={containerRef} onMouseMove={handleMouseMove}>
+      <ContextMenu items={menuItems} />
       {isError.error ? (
         <Dialog
           header_text="Error with player"
