@@ -3,7 +3,8 @@ export interface CardProps {
   id: string;
   title: string;
   img: string;
-  player?: { episodes: number[], episode: number, time: number | string }
+  player?: { episodes: number[], episode: number, time: number | string },
+  text?: string
 }
 
 export interface ContainerProps {

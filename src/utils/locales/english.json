@@ -2,7 +2,9 @@
   "general": {
     "exit": "Exit",
     "reload": "Reload",
-    "ok": "okay"
+    "ok": "okay",
+    "LastWatch": "Last Watched Episode {{episode}}",
+    "LastContinue": "Continue Episode {{episode}}"
   },
   "header": {
     "search": "Search Anime...",

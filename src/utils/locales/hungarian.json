@@ -2,7 +2,9 @@
   "general": {
     "exit": "kilép",
     "reload": "újratölt",
-    "ok": "okay"
+    "ok": "okay",
+    "LastWatch": "utoljára megtekintett rész {{episode}}",
+    "LastContinue": "epizód folytatása {{episode}}"
   },
   "header": {
     "search": "Search Anime...",

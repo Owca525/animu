@@ -77,7 +77,7 @@ const Player = () => {
   useEffect(() => {
     setWaitingPlayer(false)
     if (config && videoRef.current && currentTime >= parseInt(config.History.continue.MinimalTimeSave.toString()) && currentTime <= (duration - parseInt(config.History.continue.MaximizeTimeSave.toString()))) {
-      SaveContinue({ id: id, title: title, img: img, player: { episodes: episodes, episode: ep, time: currentTime } })
+      SaveContinue({ id: id, title: title, img: img, player: { episodes: episodes, episode: ep, time: currentTime }, text: t("general.LastContinue", { episode: ep }) })
     } else {
       DeleteFromcontinue({ id: id, title: title, img: img, player: { episodes: episodes, episode: ep, time: currentTime } })
     }
@@ -104,7 +104,7 @@ const Player = () => {
   }, [config, videoRef.current])
 
   useEffect(() => {
-    SaveHistory({ id: id, img: img, title: title })
+    SaveHistory({ id: id, img: img, title: title, player: { episodes: episodes, episode: ep, time: currentTime }, text: t("general.LastWatch", { episode: ep }) })
   }, [])
 
   const showElement = () => {

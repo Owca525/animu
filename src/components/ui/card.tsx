@@ -5,7 +5,7 @@ import "../../css/ui/card.css";
 import { CardProps } from "../../utils/interface"
 import { useNavigate } from "react-router-dom";
 
-const Card: React.FC<CardProps> = ({ id, title, img, player = null }) => {
+const Card: React.FC<CardProps> = ({ id, title, img, player = null, text = null }) => {
   const navigate = useNavigate();
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -78,7 +78,7 @@ const Card: React.FC<CardProps> = ({ id, title, img, player = null }) => {
           />
         </div>
         <div className="card-title">{shortText(title)}</div>
-        {player ? <div className="card-continue-info">Continue Episode {player.episode}</div> : ""}
+        {text ? <div className="card-continue-info">{text}</div> : ""}
       </div>
   );
 };

@@ -1,7 +1,9 @@
 {
   "general": {
     "exit": "Wyjście",
-    "reload": "Przeładować"
+    "reload": "Przeładować",
+    "LastWatch": "Ostatni oglądany odcinek {{episode}}",
+    "LastContinue": "Kontynuuj Odcinek {{episode}}"
   },
   "header": {
     "search": "Szukanie Anime...",

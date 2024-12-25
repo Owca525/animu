@@ -12,7 +12,7 @@ const Container: React.FC<ContainerProps> = ({ title, data = [], className = ""}
       <div className="title">{title}</div>
       <div className={"card-container" + (data.length > 0 ? "" : " message-content")}>
         {data.length > 0 ? (
-          data.map((card) => <Card id={card.id} title={card.title} img={card.img} player={card.player} />)
+          data.map((card) => <Card id={card.id} title={card.title} img={card.img} player={card.player} text={card.text} />)
         ) : (
           <div className="no-data-message">{t("errors.emptyMessage")}</div>
         )}
