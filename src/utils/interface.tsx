@@ -77,6 +77,8 @@ interface SettingsConfigPlayer {
     TimeSkipRight: string,
     Fullscreen: string,
     ExitPlayer: string,
+    FrameSkipBack: string,
+    FrameSkipForward: string
   },
 }
 

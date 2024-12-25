@@ -85,7 +85,9 @@
       "Keybinds": "Skróty Klawiszowe",
       "Pause": "Pauza",
       "Fullscreen": "Pełny Ekran",
-      "ExitPlayer": "Wyjście z Odtwarzacza"
+      "ExitPlayer": "Wyjście z Odtwarzacza",
+      "FrameSkipBack": "Pominicięcie klatki do tyłu",
+      "FrameSkipForward": "Pominicięcie klatki do przodu"
     }
   },
   "errors": {

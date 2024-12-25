@@ -86,7 +86,9 @@
       "Keybinds": "Keybinds",
       "Pause": "Pause",
       "Fullscreen": "Telyes képernyő",
-      "ExitPlayer": "Lejátszóbol való kilépés"
+      "ExitPlayer": "Lejátszóbol való kilépés",
+      "FrameSkipBack": "visszalépés",
+      "FrameSkipForward": "előrelépés"
     }
   },
   "errors": {

@@ -327,6 +327,7 @@ const Player = () => {
   const keybinds = async (event: KeyboardEvent) => {
     if (videoRef.current && config) {
       var time_now = videoRef.current.currentTime;
+      console.log(event.key.toLowerCase())
       switch (event.key.toLowerCase()) {
         case config.Player.keybinds.Pause.toLowerCase():
           togglePlay();
@@ -352,6 +353,12 @@ const Player = () => {
           break;
         case config.Player.keybinds.ExitPlayer.toLowerCase():
           exitPlayer();
+          break;
+        case ".":
+          change_time(time_now += 0.0416);
+          break;
+        case ",":
+          change_time(time_now -= 0.0416);
           break;
       }
     }

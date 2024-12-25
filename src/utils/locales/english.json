@@ -86,7 +86,9 @@
       "Keybinds": "Keybinds",
       "Pause": "Pause",
       "Fullscreen": "Fullscreen",
-      "ExitPlayer": "Exit Player"
+      "ExitPlayer": "Exit Player",
+      "FrameSkipBack": "Frame Skip Back",
+      "FrameSkipForward": "Frame Skip Forward"
     }
   },
   "errors": {

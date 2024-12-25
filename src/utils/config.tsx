@@ -39,6 +39,8 @@ export const defaultConfig: SettingsConfig = {
       TimeSkipRight: "ArrowRight",
       Fullscreen: "F",
       ExitPlayer: "Escape",
+      FrameSkipBack: ",",
+      FrameSkipForward: "."
     },
   },
   History: {
