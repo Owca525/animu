@@ -28,14 +28,11 @@ export async function SaveContinue(save: CardProps) {
         const appConfigDirPath = await appConfigDir();
         const file = await readTextFile(appConfigDirPath + "/continueWatch.json")
         const data = JSON.parse(file) as { continue: CardProps[] }
-        console.log(data)
         const index = data.continue.findIndex(item => item.id === save.id)
-        console.log(data, index)
         if (index != -1) {
             data.continue.splice(index, 1)
         }
         data.continue.push(save)
-        console.log(data)
         await writeTextFile(appConfigDirPath + "/continueWatch.json", JSON.stringify(data))
     } catch (Error) {
         error(`Error in SaveContinue: ${Error}`)

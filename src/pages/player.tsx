@@ -304,6 +304,19 @@ const Player = () => {
     }
   };
 
+  const changeVolume = (value: number) => {
+    if (!videoRef.current) {
+      return
+    }
+
+    console.log(value)
+
+    if (value >= 0 && value <= 1) {
+      videoRef.current.volume = value
+      setVolume(value)
+    }
+  }
+
   const handleSeekBarMouseMove = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     const seekBar = seekbar.current;
     const video = videoRef.current;
@@ -327,7 +340,6 @@ const Player = () => {
   const keybinds = async (event: KeyboardEvent) => {
     if (videoRef.current && config) {
       var time_now = videoRef.current.currentTime;
-      console.log(event.key.toLowerCase())
       switch (event.key.toLowerCase()) {
         case config.Player.keybinds.Pause.toLowerCase():
           togglePlay();
@@ -354,11 +366,17 @@ const Player = () => {
         case config.Player.keybinds.ExitPlayer.toLowerCase():
           exitPlayer();
           break;
-        case ".":
+        case config.Player.keybinds.FrameSkipForward.toLowerCase():
           change_time(time_now += 0.0416);
           break;
-        case ",":
+        case config.Player.keybinds.FrameSkipBack.toLowerCase():
           change_time(time_now -= 0.0416);
+          break;
+        case config.Player.keybinds.VolumeDown.toLowerCase():
+          changeVolume(videoRef.current.volume - 0.01)
+          break;
+        case config.Player.keybinds.VolumeUp.toLowerCase():
+          changeVolume(videoRef.current.volume + 0.01)
           break;
       }
     }

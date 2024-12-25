@@ -253,6 +253,8 @@ const Settings = () => {
               <Keybind title={t("settings.player.TimeSkipBack")} value={getKeybind(config.Player.keybinds.TimeSkipLeft)} changeKey={(key) => handleChange("Player.keybinds.TimeSkipLeft", key)} />
               <Keybind title={t("settings.player.FrameSkipBack")} value={getKeybind(config.Player.keybinds.FrameSkipBack)} changeKey={(key) => handleChange("Player.keybinds.FrameSkipBack", key)} />
               <Keybind title={t("settings.player.FrameSkipForward")} value={getKeybind(config.Player.keybinds.FrameSkipForward)} changeKey={(key) => handleChange("Player.keybinds.FrameSkipForward", key)} />
+              <Keybind title={t("settings.player.VolumeUP")} value={getKeybind(config.Player.keybinds.VolumeUp)} changeKey={(key) => handleChange("Player.keybinds.VolumeUp", key)} />
+              <Keybind title={t("settings.player.VolumeDown")} value={getKeybind(config.Player.keybinds.VolumeDown)} changeKey={(key) => handleChange("Player.keybinds.VolumeDown", key)} />
             </div>
           </div>
         </div>

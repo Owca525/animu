@@ -78,7 +78,9 @@ interface SettingsConfigPlayer {
     Fullscreen: string,
     ExitPlayer: string,
     FrameSkipBack: string,
-    FrameSkipForward: string
+    FrameSkipForward: string,
+    VolumeUp: string,
+    VolumeDown: string
   },
 }
 

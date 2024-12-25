@@ -88,7 +88,9 @@
       "Fullscreen": "Telyes képernyő",
       "ExitPlayer": "Lejátszóbol való kilépés",
       "FrameSkipBack": "visszalépés",
-      "FrameSkipForward": "előrelépés"
+      "FrameSkipForward": "előrelépés",
+      "VolumeUP": "Hangerő növelése",
+      "VolumeDown": "Hangerő csökkentése"
     }
   },
   "errors": {

@@ -40,7 +40,9 @@ export const defaultConfig: SettingsConfig = {
       Fullscreen: "F",
       ExitPlayer: "Escape",
       FrameSkipBack: ",",
-      FrameSkipForward: "."
+      FrameSkipForward: ".",
+      VolumeDown: "9",
+      VolumeUp: "0"
     },
   },
   History: {

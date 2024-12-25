@@ -87,7 +87,9 @@
       "Fullscreen": "Pełny Ekran",
       "ExitPlayer": "Wyjście z Odtwarzacza",
       "FrameSkipBack": "Pominicięcie klatki do tyłu",
-      "FrameSkipForward": "Pominicięcie klatki do przodu"
+      "FrameSkipForward": "Pominicięcie klatki do przodu",
+      "VolumeUP": "Podwyszanie głośności",
+      "VolumeDown": "Zmiejszanie głośności"
     }
   },
   "errors": {
