@@ -78,7 +78,9 @@ const Player = () => {
 
   // Saving history
   useEffect(() => {
-    setWaitingPlayer(false)
+    if (videoRef.current) {
+      setWaitingPlayer(false)
+    }
     if (config && videoRef.current && currentTime >= parseInt(config.History.continue.MinimalTimeSave.toString()) && currentTime <= (duration - parseInt(config.History.continue.MaximizeTimeSave.toString()))) {
       SaveContinue({ id: id, title: title, img: img, player: { episodes: episodes, episode: ep, time: currentTime }, text: t("general.LastContinue", { episode: ep }) })
     } else {
@@ -286,6 +288,7 @@ const Player = () => {
   };
 
   const handleSeekBarClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    setWaitingPlayer(true)
     const seekBar = seekbar.current;
     const video = videoRef.current;
     if (seekBar && video) {
@@ -376,7 +379,7 @@ const Player = () => {
           onError={(error) => videoErrorHandler(error)}
           preload="metadata"
           muted={isMuted}
-          onLoad={() => setWaitingPlayer(true)}
+          onCanPlay={() => setWaitingPlayer(false)}
           onWaiting={() => setWaitingPlayer(true)}
         />
       )}
