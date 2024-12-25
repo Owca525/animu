@@ -3,6 +3,7 @@ import { initReactI18next } from 'react-i18next';
 
 import LangEnglish from "./locales/english.json"
 import LangPolish from "./locales/polish.json"
+import LangHungary from "./locales/hungarian.json"
 
 i18n
   .use(initReactI18next)
@@ -16,6 +17,9 @@ i18n
       },
       pl: {
         translation: LangPolish
+      },
+      hu: {
+        translation: LangHungary
       }
     }
   });

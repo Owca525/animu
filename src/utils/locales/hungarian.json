@@ -1,35 +1,35 @@
 {
   "general": {
-    "exit": "Exit",
-    "reload": "Reload",
+    "exit": "kilép",
+    "reload": "újratölt",
     "ok": "okay"
   },
   "header": {
     "search": "Search Anime...",
-    "activeSearch": "Searching: {{name}}"
+    "activeSearch": "keresés: {{name}}"
   },
   "information": {
-    "episodes": "Availble Episodes:",
-    "emptyEpisodes": "No Episodes"
+    "episodes": "elérhető részek:",
+    "emptyEpisodes": "nincs ilyen rész"
   },
   "update": {
-    "title": "New Update Availble",
-    "information": "Hey is new update {{version}} wait to download, click notification",
-    "downloadUpdate": "Download Update {{version}}",
-    "downloadingUpdate": "Downloading Update {{version}}",
+    "title": "Új frissítés elérhető",
+    "information": "Hey új frissítés elérhető {{version}} várd meg amíg letőlt, kattints az értesítésre",
+    "downloadUpdate": "Frissítés letőltése {{version}}",
+    "downloadingUpdate": "Frissítés letöltése {{version}}",
     "status": {
-        "download": "Download",
-        "finish": "Finished download, now installing",
-        "install": "Install Done restart application..."
+        "download": "Letöltés",
+        "finish": "Letőltés kész, Most telepítés",
+        "install": "Telepítés kész, Újraindítás..."
     }
   },
   "player": {
-    "TitleEpisode": "Episode: {{ep}} of {{name}}",
-    "Volume": "Volume",
-    "next": "Next {{ep}} episode",
-    "previous": "Previous {{ep}} episode",
-    "Pause": "Pause",
-    "play": "Play",
+    "TitleEpisode": "Rész: {{ep}} a {{name}}",
+    "Volume": "Hangerő",
+    "next": "Következő rész {{ep}} ",
+    "previous": "Előző rész {{ep}} ",
+    "Pause": "Megállít",
+    "play": "Lejátszás",
     "errors": {
       "extractionError": "Failed Extraction Player Urls: {{error}}",
       "MEDIA_ERR_ABORTED": "The playback was aborted.",
@@ -40,31 +40,31 @@
     }
   },
   "sidebar": {
-    "Minimize": "Minimize",
-    "Maximize": "Maximize",
-    "RecentAnime": "Recent Anime",
-    "ContinueWatching": "Continue Watching",
-    "History": "History",
+    "Minimize": "Kicsinyít",
+    "Maximize": "Nagyít",
+    "RecentAnime": "Amit nemrég néztél",
+    "ContinueWatching": "Folytatás",
+    "History": "Előzmények",
     "Extensions": "Extensions",
-    "settings": "Settings"
+    "settings": "Beállítások"
   },
   "settings": {
     "sidebar": {
-      "General": "General",
-      "Player": "Player",
+      "General": "Általános",
+      "Player": "Lejátszó",
       "ConfigFolder": "Config Folder",
       "Home": "Home"
     },
     "general": {
       "Sidebar": "Sidebar",
       "HoverSidebar": "Hover Sidebar",
-      "Window": "Window",
-      "theme": "Theme",
-      "language": "Language",
-      "AutoMaximize": "Auto Maximize",
-      "AutoFullscreen": "Auto Fullscreen",
+      "Window": "Ablak",
+      "theme": "Témák",
+      "language": "Nyelvek",
+      "AutoMaximize": "Auto maximalizálás",
+      "AutoFullscreen": "Auto telyes képernyő",
       "Zoom": "Zoom",
-      "cardSize": "Card Size",
+      "cardSize": "Ikonméret",
       "cards": {
         "small": "small",
         "medium": "medium",
@@ -72,19 +72,19 @@
       }
     },
     "player": {
-      "autoPlay": "Auto Play",
-      "DefaultVolume": "Default Volume",
-      "LongTimeSkipForward": "Long Time Skip Forward",
-      "LongTimeSkipBack": "Long Time Skip Back",
-      "TimeSkipForward": "Time Skip Forward",
-      "TimeSkipBack": "Time Skip Back",
+      "autoPlay": "Auto lejátszás",
+      "DefaultVolume": "Alap hangerő",
+      "LongTimeSkipForward": "Hosszú átlépés előrefele",
+      "LongTimeSkipBack": "Hosszú átlépés Hátra",
+      "TimeSkipForward": "Előreugrás",
+      "TimeSkipBack": "Hátraugrás",
       "MinimalTimeSave": "Minimal Time ignore",
       "MaximizeTimeSave": "Maximize Time ignore",
       "historysave": "Max limit history save",
       "Keybinds": "Keybinds",
       "Pause": "Pause",
-      "Fullscreen": "Fullscreen",
-      "ExitPlayer": "Exit Player"
+      "Fullscreen": "Telyes képernyő",
+      "ExitPlayer": "Lejátszóbol való kilépés"
     }
   },
   "errors": {
@@ -103,9 +103,9 @@
   "lang": {
     "english": "English",
     "polish": "Polish",
-    "hungary": "Hungary"
+    "hungary": "hungary"
   },
   "contextMenu": {
-    "reload": "Reload"
+    "reload": "újratölt"
   }
 }

@@ -69,6 +69,7 @@ const Settings = () => {
   const language = [
     { label: t("lang.english"), value: "en", onClick: () => changeLang("en") },
     { label: t("lang.polish"), value: "pl", onClick: () => changeLang("pl") },
+    { label: t("lang.hungary"), value: "hu", onClick: () => changeLang("hu") },
   ]
 
   const theme = [
