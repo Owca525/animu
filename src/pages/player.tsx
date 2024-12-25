@@ -104,7 +104,7 @@ const Player = () => {
   }, [config, videoRef.current])
 
   useEffect(() => {
-    SaveHistory({ id: id, img: img, title: title, player: { episodes: episodes, episode: ep, time: currentTime }, text: t("general.LastWatch", { episode: ep }) })
+    SaveHistory({ id: id, img: img, title: title, text: t("general.LastWatch", { episode: ep }) })
   }, [])
 
   const showElement = () => {

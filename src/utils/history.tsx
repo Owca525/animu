@@ -53,7 +53,9 @@ export async function DeleteFromHistory(data: CardProps) {
         const file = await readTextFile(appConfigDirPath + "/history.json")
         const list = JSON.parse(file) as { history: CardProps[] }
         const index = list.history.findIndex(item => item.id === data.id)
-        list.history.splice(index, 1)
+        if (index != -1) {
+            list.history.splice(index, 1)
+        }
         await writeTextFile(appConfigDirPath + "/history.json", JSON.stringify(list))
     } catch (Error) {
         error(`Error in SaveHistory: ${Error}`)

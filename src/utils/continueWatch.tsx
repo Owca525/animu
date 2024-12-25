@@ -28,9 +28,14 @@ export async function SaveContinue(save: CardProps) {
         const appConfigDirPath = await appConfigDir();
         const file = await readTextFile(appConfigDirPath + "/continueWatch.json")
         const data = JSON.parse(file) as { continue: CardProps[] }
-        const index = data.continue.findIndex(item => item.player?.episode === save.player?.episode)
-        data.continue.splice(index, 1)
+        console.log(data)
+        const index = data.continue.findIndex(item => item.id === save.id)
+        console.log(data, index)
+        if (index != -1) {
+            data.continue.splice(index, 1)
+        }
         data.continue.push(save)
+        console.log(data)
         await writeTextFile(appConfigDirPath + "/continueWatch.json", JSON.stringify(data))
     } catch (Error) {
         error(`Error in SaveContinue: ${Error}`)
@@ -43,7 +48,9 @@ export async function DeleteFromcontinue(data: CardProps) {
         const file = await readTextFile(appConfigDirPath + "/continueWatch.json")
         const list = JSON.parse(file) as { continue: CardProps[] }
         const index = list.continue.findIndex(item => item.player?.episode === data.player?.episode)
-        list.continue.splice(index, 1)
+        if (index != -1) {
+            list.continue.splice(index, 1)
+        }
         await writeTextFile(appConfigDirPath + "/continueWatch.json", JSON.stringify(list))
     } catch (Error) {
         error(`Error in DeleteFromcontinue: ${Error}`)
@@ -55,7 +62,7 @@ export async function ReadContinue(): Promise<CardProps[]> {
         const appConfigDirPath = await appConfigDir();
         const file = await readTextFile(appConfigDirPath + "/continueWatch.json")
         const data = JSON.parse(file) as { continue: CardProps[] }
-        return data.continue
+        return data.continue.reverse()
     } catch (Error) {
         error(`Error in ReadContinue: ${Error}`)
         return []
