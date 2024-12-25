@@ -43,19 +43,19 @@ function home() {
       value: '<div class="material-symbols-outlined text-button">schedule</div>' + t("sidebar.RecentAnime"),
       class: "icon-button",
       title: t("sidebar.RecentAnime"),
-      onClick: async () => change_content({ title: t("sidebar.RecentAnime"), data: await get_recent() }),
+      onClick: async () => change_content({ title: t("sidebar.RecentAnime"), data: await functionHandler(get_recent) }),
     },
     {
       value: '<div class="material-symbols-outlined text-button">history</div>'+t("sidebar.ContinueWatching"),
       class: "icon-button",
       title: t("sidebar.ContinueWatching"),
-      onClick: async () => change_content({ title: t("sidebar.ContinueWatching"), data: (await ReadContinue()).continue }),
+      onClick: async () => change_content({ title: t("sidebar.ContinueWatching"), data: await functionHandler(ReadContinue) }),
     },
     {
       value: '<div class="material-symbols-outlined text-button">history</div>'+t("sidebar.History"),
       class: "icon-button",
       title: t("sidebar.History"),
-      onClick: async () => change_content({ title: t("sidebar.History"), data: (await ReadHistory()).history }),
+      onClick: async () => change_content({ title: t("sidebar.History"), data: await functionHandler(ReadHistory) }),
     }
   ];
 
@@ -76,6 +76,12 @@ function home() {
   const menuItems = [
     { label: t("contextMenu.reload"), onClick: () => location.reload() }
   ];
+
+  const functionHandler = async (func: any): Promise<any> => {
+    setLoading(true)
+    const data = await func()
+    return data
+  }
 
   const checkUpdate = async () => {
     const update = await check();
@@ -118,6 +124,7 @@ function home() {
     if (event.key == "Enter") {
       var search = event.currentTarget.value;
       const results = async () => {
+        setLoading(true)
         const data = await get_search(search);
         change_content({ title: t("header.activeSearch", { name: search }), data: data });
       };

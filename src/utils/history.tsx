@@ -31,7 +31,7 @@ export async function SaveHistory(save: CardProps) {
         const file = await readTextFile(appConfigDirPath + "/history.json")
         const data = JSON.parse(file) as { history: CardProps[] }
         const index = data.history.findIndex(item => item.id === save.id)
-        if (config && (await ReadHistory()).history.length >= parseInt(config.History.history.maxSave.toString())) data.history.pop()
+        if (config && (await ReadHistory()).length >= parseInt(config.History.history.maxSave.toString())) data.history.pop()
         data.history.splice(index, 1)
         data.history.push(save)
         await writeTextFile(appConfigDirPath + "/history.json", JSON.stringify(data))
@@ -53,13 +53,14 @@ export async function DeleteFromHistory(data: CardProps) {
     }
 }
 
-export async function ReadHistory(): Promise<{ history: CardProps[] }> {
+export async function ReadHistory(): Promise<CardProps[]> {
     try {
         const appConfigDirPath = await appConfigDir();
         const file = await readTextFile(appConfigDirPath + "/history.json")
-        return JSON.parse(file) as { history: CardProps[] }
+        const data = JSON.parse(file) as { history: CardProps[] }
+        return data.history
     } catch (Error) {
         error(`Error in ReadHistory: ${Error}`)
-        return { history: [] }
+        return []
     }
 }

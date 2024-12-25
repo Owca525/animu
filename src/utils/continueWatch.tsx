@@ -50,13 +50,14 @@ export async function DeleteFromcontinue(data: CardProps) {
     }
 }
 
-export async function ReadContinue(): Promise<{ continue: CardProps[] }> {
+export async function ReadContinue(): Promise<CardProps[]> {
     try {
         const appConfigDirPath = await appConfigDir();
         const file = await readTextFile(appConfigDirPath + "/continueWatch.json")
-        return JSON.parse(file) as { continue: CardProps[] }
+        const data = JSON.parse(file) as { continue: CardProps[] }
+        return data.continue
     } catch (Error) {
         error(`Error in ReadContinue: ${Error}`)
-        return { continue: [] }
+        return []
     }
 }
