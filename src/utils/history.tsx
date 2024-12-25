@@ -26,14 +26,21 @@ export async function CheckHistory() {
 
 export async function SaveHistory(save: CardProps) {
     try {
+        await CheckHistory()
+
         const config = await readConfig()
         const appConfigDirPath = await appConfigDir();
         const file = await readTextFile(appConfigDirPath + "/history.json")
         const data = JSON.parse(file) as { history: CardProps[] }
         const index = data.history.findIndex(item => item.id === save.id)
-        if (config && (await ReadHistory()).length >= parseInt(config.History.history.maxSave.toString())) data.history.pop()
-        data.history.splice(index, 1)
+        console.log(data, index)
+        if (config && (await ReadHistory()).length >= parseInt(config.History.history.maxSave.toString())) {
+            console.log(parseInt(config.History.history.maxSave.toString()))
+            data.history.pop()
+        }
+        // data.history.splice(index, 1)
         data.history.push(save)
+        console.log(data)
         await writeTextFile(appConfigDirPath + "/history.json", JSON.stringify(data))
     } catch (Error) {
         error(`Error in SaveHistory: ${Error}`)
@@ -58,7 +65,7 @@ export async function ReadHistory(): Promise<CardProps[]> {
         const appConfigDirPath = await appConfigDir();
         const file = await readTextFile(appConfigDirPath + "/history.json")
         const data = JSON.parse(file) as { history: CardProps[] }
-        return data.history
+        return data.history.reverse()
     } catch (Error) {
         error(`Error in ReadHistory: ${Error}`)
         return []

@@ -8,13 +8,13 @@ import { useTranslation } from "react-i18next";
 import { DeleteFromcontinue, SaveContinue } from "../utils/continueWatch";
 import { configContext } from "../utils/context";
 import { get_player_anime } from "../utils/backend";
+import { SaveHistory } from "../utils/history";
 
 // Components
 import Dialog from "../components/dialogs/dialog";
 import ContextMenu from "../components/elements/context-menu";
 
 import "../css/pages/player.css";
-import { SaveHistory } from "../utils/history";
 
 const Player = () => {
   const Currentlocation = useLocation();

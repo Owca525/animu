@@ -21,6 +21,7 @@ import { SettingsConfig } from "./utils/interface";
 import "./css/colors/purpleAnimu.css"
 import "./css/colors/gruvbox.css"
 import "./css/colors/catppuccin.css"
+import { CheckHistory } from "./utils/history";
 
 function App() {
   const [configIsLoading, setConfigIsLoading] = useState<boolean>(true)
@@ -55,6 +56,7 @@ function App() {
 
   useEffect(() => {
     CheckContinue()
+    CheckHistory()
     setTheme("dark")
   }, [])
 
