@@ -22,7 +22,7 @@ const Player = () => {
 
   const { id, title, episodes, ep, time, img } = Currentlocation.state;
 
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   // Loading Config from context
   const config = useContext(configContext);
@@ -47,6 +47,8 @@ const Player = () => {
   const [isWaitingPlayer, setWaitingPlayer] = useState<boolean>(true);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [isPlayerDisable, setPLayerDisable] = useState<boolean>(true)
+  const [isConfigLoad, setConfigLoad] = useState<boolean>(false)
 
   const [playerUrl, setPlayerUrl] = useState<string | undefined>(undefined);
   const [isError, setErrorDialog] = useState({ error: false, information: "" });
@@ -66,10 +68,11 @@ const Player = () => {
         error: true,
         information: t("errors.extractionError", { error: Error }),
       });
-    } finally {}
+    } finally { }
   };
 
   useEffect(() => {
+    setPLayerDisable(false)
     setDataPlayer();
   }, [ep])
 
@@ -85,7 +88,7 @@ const Player = () => {
 
   // Checking config and player if load then set config to player and add event
   useEffect(() => {
-    if (config && videoRef.current) {
+    if (config && videoRef.current && isConfigLoad == false) {
       videoRef.current.currentTime = time;
       setCurrentTime(time)
 
@@ -94,6 +97,7 @@ const Player = () => {
       videoRef.current.volume = parseInt(config.Player.general.Volume.toString()) / 100
       setVolume(parseInt(config.Player.general.Volume.toString()) / 100)
       getCurrentWindow().setFullscreen(config.Player.general.AutoFullscreen)
+      setConfigLoad(true)
     }
 
     // set event to detect keyboard
@@ -101,10 +105,11 @@ const Player = () => {
     return () => {
       window.removeEventListener("keydown", keybinds);
     };
-  }, [config, videoRef.current])
+  }, [config, videoRef.current, isPlayerDisable])
 
   useEffect(() => {
     SaveHistory({ id: id, img: img, title: title, text: t("general.LastWatch", { episode: ep }) })
+    setPLayerDisable(false)
   }, [])
 
   const showElement = () => {
@@ -131,14 +136,16 @@ const Player = () => {
   }
 
   const updateProgress = () => {
-    if (videoRef.current) {
-      const percent = (videoRef.current.currentTime / videoRef.current.duration) * 100;
-      setCurrentTime(videoRef.current.currentTime);
+    if (!videoRef.current) {
+      return
+    }
 
-      if (progressRef.current && thumbRef.current && isShowTime == false) {
-        progressRef.current.style.width = `${percent}%`;
-        thumbRef.current.style.left = `${percent}%`;
-      }
+    const percent = (videoRef.current.currentTime / videoRef.current.duration) * 100;
+    setCurrentTime(videoRef.current.currentTime );
+
+    if (progressRef.current && thumbRef.current && isShowTime == false) {
+      progressRef.current.style.width = `${percent}%`;
+      thumbRef.current.style.left = `${percent}%`;
     }
   };
 
@@ -188,41 +195,37 @@ const Player = () => {
     hideTimer.current = setTimeout(hideElement, 2000);
   };
 
-  const clearPlayer = () => {
-    if (videoRef.current && progressRef.current && thumbRef.current){
-      progressRef.current.style.width = `0%`;
-      thumbRef.current.style.left = `0%`;
-      setPlayerUrl(undefined)
+  const clearPlayer = async () => {
+    if (videoRef.current) {
       videoRef.current.pause()
-      setWaitingPlayer(true)
-      setDuration(0)
-      setCurrentTime(0)
-      updateProgress()
+      videoRef.current.currentTime = 0
     }
+    setPLayerDisable(true)
+    setPlayerUrl(() => undefined)
+    setWaitingPlayer(() => true)
+    setDuration(() => 0)
+    setCurrentTime(() => 0)
+    updateProgress()
   }
 
-  const setNewEpisode = (type: string) => {
+  const setNewEpisode = async (type: string) => {
     var episode = episodes.indexOf(ep)
-    // console.log("before", episode, episodes[episode])
     if (type == "prev") {
       episode = episode - 1
     }
     if (type == "next") {
       episode = episode + 1
     }
-    // console.log("after", episode, episodes[episode])
-    // console.log("before", playerUrl, duration, currentTime)
-    clearPlayer()
-    // console.log("after", playerUrl, duration, currentTime)
+    await clearPlayer()
     navigate("/player", {
       state: {
         id: id,
         title: title,
         episodes: episodes,
         ep: episodes[episode],
+        time: 0
       },
     });
-    setDataPlayer();
   };
 
   const handleSeekBarMouseLeave = () => {
@@ -243,7 +246,6 @@ const Player = () => {
       setIsFullscreen(true);
     }
   };
-
 
   const change_time = (time: number) => {
     if (videoRef.current) {
@@ -362,21 +364,22 @@ const Player = () => {
           buttons={[{ title: t("general.ok"), onClick: () => exitPlayer() }]}
         />
       ) : ("")}
-
-      <video
-        ref={videoRef}
-        src={playerUrl}
-        className={isVisible ? "video-player mask" : "video-player"}
-        onTimeUpdate={updateProgress}
-        onLoadedMetadata={handleLoadedMetadata}
-        onClick={togglePlay}
-        autoPlay={isPlaying}
-        onError={(error) => videoErrorHandler(error)}
-        preload="metadata"
-        muted={isMuted}
-        onLoad={() => setWaitingPlayer(true)}
-        onWaiting={() => setWaitingPlayer(true)}
-      />
+      {isPlayerDisable ? "" : (
+        <video
+          ref={videoRef}
+          src={playerUrl}
+          className={isVisible ? "video-player mask" : "video-player"}
+          onTimeUpdate={updateProgress}
+          onLoadedMetadata={handleLoadedMetadata}
+          onClick={togglePlay}
+          autoPlay={isPlaying}
+          onError={(error) => videoErrorHandler(error)}
+          preload="metadata"
+          muted={isMuted}
+          onLoad={() => setWaitingPlayer(true)}
+          onWaiting={() => setWaitingPlayer(true)}
+        />
+      )}
 
       <div className="video-overlay">
         <div className={isVisible ? "video-top" : "video-top hidden"}>
@@ -416,7 +419,7 @@ const Player = () => {
                 title={
                   episodes[episodes.indexOf(ep) - 1] == undefined ? "" : t("player.previous", { ep: episodes[episodes.indexOf(ep) - 1] })
                 }
-                onClick={() => setNewEpisode("prev")}>
+                onClick={async () => await setNewEpisode("prev")}>
                 skip_previous
               </button>
               <button onClick={togglePlay} className="material-symbols-outlined player-buttons" title={isPlaying ? t("player.Pause") : t("player.play")}>
@@ -428,8 +431,8 @@ const Player = () => {
                 }
                 title={
                   episodes[episodes.indexOf(ep) + 1] == undefined ? "" : t("player.next", { ep: episodes[episodes.indexOf(ep) + 1] })
-                } 
-                onClick={() => setNewEpisode("next")}>
+                }
+                onClick={async () => await setNewEpisode("next")}>
                 skip_next
               </button>
               <div className="volume-container">
