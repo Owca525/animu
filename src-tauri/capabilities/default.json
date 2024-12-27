@@ -2,17 +2,14 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
-  "windows": ["main"],
+  "windows": [
+    "main"
+  ],
   "permissions": [
     "core:default",
     "shell:allow-open",
     "core:window:allow-set-fullscreen",
-    "updater:default",
-    "updater:allow-check",
-    "updater:allow-download-and-install",
     "process:allow-restart",
-    "updater:allow-download",
-    "updater:allow-install",
     "fs:allow-app-meta",
     "fs:allow-app-meta-recursive",
     "fs:allow-app-read",
