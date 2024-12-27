@@ -2,11 +2,9 @@ import { exit } from '@tauri-apps/plugin-process';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
-import { check } from "@tauri-apps/plugin-updater";
 
 // Components
 import Notification from "../components/dialogs/notification";
-// import Update from "../components/dialogs/update";
 import Sidebar from "../components/elements/sidebar";
 import Content from "../components/elements/card-content";
 import Header from "../components/elements/headers";
@@ -17,10 +15,12 @@ import { ContainerProps } from "../utils/interface";
 import { get_recent, get_search } from "../utils/backend";
 import { ReadContinue } from "../utils/continueWatch";
 import { configContext } from "../utils/context";
+import { checkUpdateAnimu } from '../utils/update';
 
 import "../css/pages/home.css";
 import { ReadHistory } from '../utils/history';
 import ContextMenu from '../components/elements/context-menu';
+import { open } from '@tauri-apps/plugin-shell';
 
 function home() {
   const navigate = useNavigate();
@@ -84,16 +84,14 @@ function home() {
   }
 
   const checkUpdate = async () => {
-    const update = await check();
-    if (update && update.available) {
-      setUpdateNotification(true);
-      setNotificationData([
-        {
-          title: t("update.title"),
-          information: t("update.information", {version: update.version}),
-          onClick: () => console.log(), // setisUpdate(true)
-        },
-      ]);
+    const update = await checkUpdateAnimu()
+    if (update.update) {
+      setUpdateNotification(update.update)
+      setNotificationData([{
+        title: t("update.title"),
+        information: t("update.information", {version: update.version}),
+        onClick: () => open(update.url)
+      }])
     }
   };
 
