@@ -1,0 +1,22 @@
+.notification-container {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 30%;
+  height: 100%;
+  z-index: 100000;
+  padding: 8px;
+}
+
+.notification {
+  display: flex;
+  justify-content: start;
+  flex-direction: column;
+  padding: 6px;
+  gap: 0.4em;
+  border-radius: 8px;
+}
+
+.notification-info {
+  font-size: small;
+}

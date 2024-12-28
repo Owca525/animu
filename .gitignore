@@ -27,3 +27,4 @@ package-lock.json
 src-tauri/Cargo.lock
 .vscode
 src/plugins/allmanga.ts
+out

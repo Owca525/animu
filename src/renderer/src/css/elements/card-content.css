@@ -1,0 +1,28 @@
+.title {
+  font-weight: 500;
+  font-size: x-large;
+}
+.content {
+  display: flex;
+  justify-content: start;
+  flex-direction: column;
+  margin-right: 1em;
+}
+.card-container {
+  margin-top: 12px;
+  gap: 1em;
+  display: grid;
+  justify-content: start;
+  grid-template-columns: repeat(auto-fit, minmax(170px, max-content));
+}
+.card-content-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.message-content {
+  display: flex;
+  justify-content: center;
+  height: 70vh;
+}
