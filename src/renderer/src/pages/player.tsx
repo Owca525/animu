@@ -458,7 +458,7 @@ const Player = () => {
       <ContextMenu items={menuItems} />
       {isError.error ? (
         <Dialog
-          header_text={t("erros.playerHeaderError")}
+          header_text={t("errors.playerHeaderError")}
           text={isError.information}
           buttons={[{ title: t('general.ok'), onClick: () => exitPlayer() }]}
         />
