@@ -100,11 +100,13 @@ export async function getInformation(id: string) {
   return null
 }
 
-export async function getPlayerUrls(id: string, episode: string): Promise<any> {
+export async function getPlayerUrls(id: string, episode: string): Promise<{ normal: any[], hls: any[] } | null> {
   let variables = `{"showId":"${id}","translationType":"sub","episodeString":"${episode}"}`
   let extensions = `{"persistedQuery":{"version":1,"sha256Hash": "${HASH_PLAYER}"}}`
   let url = API_WEB + `/api?variables=${variables}&extensions=${extensions}`
-  let finnalUrls: any = []
+  
+  let hlsUrls: any = []
+  let nromalUrls: any = []
 
   const resp = await sendRequest(url, header)
   if (!resp) {
@@ -125,9 +127,16 @@ export async function getPlayerUrls(id: string, episode: string): Promise<any> {
       'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0'
     })
     if (links) {
-      finnalUrls.push(await links.links[0].link)
+      links.links.forEach(element => {
+        if (element.hls) {
+          hlsUrls.push(element.link)
+        }
+        if (element.mp4) {
+          nromalUrls.push(element.link)
+        }
+      });
     }
   }
 
-  return finnalUrls
+  return { normal: nromalUrls, hls: hlsUrls }
 }

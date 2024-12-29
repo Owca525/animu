@@ -56,10 +56,10 @@ export async function get_search(
   return anime
 }
 
-export async function get_player_anime(id: string, ep: string | number): Promise<Array<string>> {
+export async function get_player_anime(id: string, ep: string | number): Promise<{ normal: any[], hls: any[] }> {
   const players = await getPlayerUrls(id, ep.toString())
   if (players) {
     return players
   }
-  return []
+  return { normal: [], hls: [] }
 }

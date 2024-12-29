@@ -24,6 +24,7 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^3.0.0",
     "electron-updater": "^6.1.7",
+    "hls.js": "^1.5.18",
     "i18next": "^24.2.0",
     "ini": "^5.0.0",
     "material-symbols": "^0.27.2",

@@ -1,6 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import Hls from "hls.js";
 
 // utils
 import { DeleteFromcontinue, SaveContinue } from '../utils/continueWatch'
@@ -56,7 +57,18 @@ const Player = () => {
   const setDataPlayer = async () => {
     try {
       let recentData = await get_player_anime(id, ep)
-      setPlayerUrl(recentData[0])
+      if (recentData.normal.length != 0) {
+        setPlayerUrl(recentData.normal[0])
+        checkUrl(recentData.normal[0])
+      }
+      if (recentData.hls.length != 0) {
+        setPlayerUrl(recentData.hls[1])
+        checkUrl(recentData.hls[1])
+      }
+      setErrorDialog({
+        error: true,
+        information: "player can't find playable link"
+      })
     } catch (Error) {
       setErrorDialog({
         error: true,
@@ -135,6 +147,49 @@ const Player = () => {
     const minutes = Math.floor(seconds / 60)
     const secs = Math.floor(seconds % 60)
     return `${minutes}:${secs < 10 ? '0' : ''}${secs}`
+  }
+
+  const checkUrl = (url: string) => {
+    if (url.endsWith("m3u8")) {
+      runHLS(url)
+      return
+    }
+    if (videoRef.current) {
+      videoRef.current.src = url
+    }
+  }
+
+  const runHLS = (url: string) => {
+    const hls = new Hls();
+
+    if (Hls.isSupported() && videoRef.current) {
+      hls.loadSource(url);
+      hls.attachMedia(videoRef.current);
+
+      hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
+        const resolutions = data.levels.map((level) => level.height);
+        console.log(resolutions)
+      });
+
+      hls.on(Hls.Events.ERROR, (_event, data) => {
+        if (data.fatal) {
+          switch (data.type) {
+            case Hls.ErrorTypes.NETWORK_ERROR:
+              console.error("Network error:", data);
+              hls.startLoad();
+              break;
+            case Hls.ErrorTypes.MEDIA_ERROR:
+              console.error("Media error:", data);
+              hls.recoverMediaError();
+              break;
+            default:
+              console.error("Fatal error:", data);
+              hls.destroy();
+              break;
+          }
+        }
+      });
+    }
   }
 
   const exitPlayer = async () => {
@@ -413,7 +468,6 @@ const Player = () => {
       ) : (
         <video
           ref={videoRef}
-          src={playerUrl}
           className={isVisible ? 'video-player mask' : 'video-player'}
           onTimeUpdate={updateProgress}
           onLoadedMetadata={handleLoadedMetadata}
