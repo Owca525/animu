@@ -95,7 +95,10 @@
   },
   "errors": {
     "connection": "Connection Error",
-    "emptyMessage": "Where did it all go?"
+    "emptyMessage": "Where did it all go?",
+    "playerCantFind": "Player can't find playable link",
+    "extractionError": "Player Failed extract links",
+    "playerHeaderError": "Error with player"
   },
   "tips": {
     "gAutoMaximize": "Autmatic Maximize Window when start application",

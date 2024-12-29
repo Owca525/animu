@@ -90,6 +90,7 @@ function home() {
   const menuItems = [{ label: t('contextMenu.reload'), onClick: () => location.reload() }]
 
   const functionHandler = async (func: any): Promise<any> => {
+    seterror({ error: false, note: "" })
     setLoading(true)
     const data = await func()
     return data
@@ -152,14 +153,14 @@ function home() {
         {/* {isUpdate ? <Update /> : ""} */}
         {error?.error ? (
           <Dialog
-            header_text={t('error.connection')}
+            header_text={t('errors.connection')}
             text={error.note}
             buttons={[
               {
                 title: t('general.exit'),
                 onClick: () => window.electron.ipcRenderer.invoke('exit')
               },
-              { title: t('general.reload'), onClick: () => navigate('/') }
+              { title: t('general.reload'), onClick: async () => change_content({ title: t('sidebar.RecentAnime'), data: await functionHandler(get_recent) })}
             ]}
           />
         ) : (

@@ -60,14 +60,16 @@ const Player = () => {
       if (recentData.normal.length != 0) {
         setPlayerUrl(recentData.normal[0])
         checkUrl(recentData.normal[0])
+        return
       }
       if (recentData.hls.length != 0) {
         setPlayerUrl(recentData.hls[1])
         checkUrl(recentData.hls[1])
+        return
       }
       setErrorDialog({
         error: true,
-        information: "player can't find playable link"
+        information: t("errors.playerCantFind")
       })
     } catch (Error) {
       setErrorDialog({
@@ -173,20 +175,22 @@ const Player = () => {
 
       hls.on(Hls.Events.ERROR, (_event, data) => {
         if (data.fatal) {
+          let message: string
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
-              console.error("Network error:", data);
+              message = t('player.errors.MEDIA_ERR_NETWORK')
               hls.startLoad();
               break;
             case Hls.ErrorTypes.MEDIA_ERROR:
-              console.error("Media error:", data);
+              message = t('player.errors.MEDIA_ERR_DECODE')
               hls.recoverMediaError();
               break;
             default:
-              console.error("Fatal error:", data);
+              message = t('player.errors.default')
               hls.destroy();
               break;
           }
+          setErrorDialog({ error: true, information: message })
         }
       });
     }
@@ -371,9 +375,7 @@ const Player = () => {
     if (!videoRef.current) {
       return
     }
-
-    console.log(value)
-
+    
     if (value >= 0 && value <= 1) {
       videoRef.current.volume = value
       setVolume(value)
@@ -456,7 +458,7 @@ const Player = () => {
       <ContextMenu items={menuItems} />
       {isError.error ? (
         <Dialog
-          header_text="Error with player"
+          header_text={t("erros.playerHeaderError")}
           text={isError.information}
           buttons={[{ title: t('general.ok'), onClick: () => exitPlayer() }]}
         />

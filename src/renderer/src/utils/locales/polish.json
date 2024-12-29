@@ -94,7 +94,10 @@
   },
   "errors": {
     "connection": "Błąd połączenia",
-    "emptyMessage": "Gdzie to wszystko poszło?"
+    "emptyMessage": "Gdzie to wszystko poszło?",
+    "playerCantFind": "Odtwarzacz nie może znależć linku który umożliwi oglądanie",
+    "extractionError": "Odtwarzacz nie mógł znależć linków",
+    "playerHeaderError": "Problem z Odtwarzaczem"
   },
   "tips": {
     "gAutoMaximize": "Automatycznie maksymalizuje kiedy włącza się",
