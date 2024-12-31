@@ -295,6 +295,7 @@ const Player = () => {
         id: id,
         title: currentTitle,
         episodes: episodes,
+        img: img,
         ep: episodes[episode],
         time: 0
       }
