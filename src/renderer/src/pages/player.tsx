@@ -375,7 +375,7 @@ const Player = () => {
     if (!videoRef.current) {
       return
     }
-    
+
     if (value >= 0 && value <= 1) {
       videoRef.current.volume = value
       setVolume(value)
@@ -410,25 +410,15 @@ const Player = () => {
           togglePlay()
           break
         case config.Player.keybinds.TimeSkipRight.toLowerCase():
-          console.log(config.Player.keybinds.TimeSkipRight, config.Player.general.TimeSkipRight)
           change_time((time_now += parseInt(config.Player.general.TimeSkipRight.toString())))
           break
         case config.Player.keybinds.TimeSkipLeft.toLowerCase():
-          console.log(config.Player.keybinds.TimeSkipLeft, config.Player.general.TimeSkipLeft)
           change_time((time_now -= parseInt(config.Player.general.TimeSkipLeft.toString())))
           break
         case config.Player.keybinds.LongTimeSkipForward.toLowerCase():
-          console.log(
-            config.Player.keybinds.LongTimeSkipForward,
-            config.Player.general.LongTimeSkipForward
-          )
           change_time((time_now += parseInt(config.Player.general.LongTimeSkipForward.toString())))
           break
         case config.Player.keybinds.LongTimeSkipBack.toLowerCase():
-          console.log(
-            config.Player.keybinds.LongTimeSkipBack,
-            config.Player.general.LongTimeSkipBack
-          )
           change_time((time_now -= parseInt(config.Player.general.LongTimeSkipBack.toString())))
           break
         case config.Player.keybinds.Fullscreen.toLowerCase():
@@ -515,21 +505,21 @@ const Player = () => {
           </div>
           <div className="bottom-section">
             <div className="left">
-              <button
-                className={
-                  episodes[episodes.indexOf(ep) - 1] == undefined
-                    ? 'material-symbols-outlined player-buttons disabled'
-                    : 'material-symbols-outlined player-buttons'
-                }
-                title={
-                  episodes[episodes.indexOf(ep) - 1] == undefined
-                    ? ''
-                    : t('player.previous', { ep: episodes[episodes.indexOf(ep) - 1] })
-                }
-                onClick={async () => await setNewEpisode('prev')}
-              >
-                skip_previous
-              </button>
+              {episodes[episodes.indexOf(ep) - 1] == undefined
+                ? "" :
+                (
+                  <button
+                  className='material-symbols-outlined player-buttons'
+                  title={
+                    episodes[episodes.indexOf(ep) - 1] == undefined
+                      ? ''
+                      : t('player.previous', { ep: episodes[episodes.indexOf(ep) - 1] })
+                  }
+                  onClick={async () => await setNewEpisode('prev')}>
+                  skip_previous
+                </button>
+                )
+              }
               <button
                 onClick={togglePlay}
                 className="material-symbols-outlined player-buttons"
@@ -537,46 +527,44 @@ const Player = () => {
               >
                 {isPlaying ? 'pause' : 'play_arrow'}
               </button>
-              <button
-                className={
-                  episodes[episodes.indexOf(ep) + 1] == undefined
-                    ? 'material-symbols-outlined player-buttons disabled'
-                    : 'material-symbols-outlined player-buttons'
-                }
-                title={
-                  episodes[episodes.indexOf(ep) + 1] == undefined
-                    ? ''
-                    : t('player.next', { ep: episodes[episodes.indexOf(ep) + 1] })
-                }
-                onClick={async () => await setNewEpisode('next')}
-              >
-                skip_next
-              </button>
-              <div className="volume-container">
-                <button
-                  className="material-symbols-outlined player-buttons volume-button"
-                  title={t('player.Volume')}
-                  onClick={setMutedToPlayer}
-                >
-                  {isMuted ? 'volume_off' : 'volume_up'}
+              {episodes[episodes.indexOf(ep) + 1] == undefined
+                ? "" : 
+                (
+                  <button
+                  className="material-symbols-outlined player-buttons"
+                  title={
+                    episodes[episodes.indexOf(ep) + 1] == undefined
+                      ? ''
+                      : t('player.next', { ep: episodes[episodes.indexOf(ep) + 1] })
+                  }
+                  onClick={async () => await setNewEpisode('next')}>
+                  skip_next
                 </button>
-                <input
-                  className="volume-bar"
-                  id="volume"
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.01"
-                  value={volume}
-                  style={{ pointerEvents: 'all' }}
-                  onChange={handleVolumeChange}
-                />
-              </div>
+                )
+              }
               <div className="time-display">
                 {formatTime(currentTime)} / {formatTime(duration)}
               </div>
             </div>
             <div className="right">
+              <button
+                className="material-symbols-outlined player-buttons volume-button"
+                title={t('player.Volume')}
+                onClick={setMutedToPlayer}
+              >
+                {isMuted ? 'volume_off' : 'volume_up'}
+              </button>
+              <input
+                className="volume-bar"
+                id="volume"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                style={{ pointerEvents: 'all' }}
+                onChange={handleVolumeChange}
+              />
               <button
                 className="material-symbols-outlined player-buttons"
                 title={t('sidebar.settings')}
