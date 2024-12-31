@@ -122,7 +122,7 @@ const Player = () => {
       videoRef.current.autoplay = config.Player.general.Autoplay
       videoRef.current.volume = parseInt(config.Player.general.Volume.toString()) / 100
       setVolume(parseInt(config.Player.general.Volume.toString()) / 100)
-      window.electron.ipcRenderer.invoke('setFullscreen', config.Player.general.AutoFullscreen)
+      if (config.Player.general.AutoFullscreen) enterFullscreen()
       setConfigLoad(true)
     }
 
