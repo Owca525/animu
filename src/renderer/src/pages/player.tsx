@@ -135,6 +135,7 @@ const Player = () => {
   useEffect(() => {
     SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: ep }) })
     setPLayerDisable(false)
+    handleMouseMove()
   }, [])
 
   const showElement = () => {
