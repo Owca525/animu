@@ -166,3 +166,7 @@
 .volume-container:hover {
   width: 200px;
 }
+
+.player-hide-cursor {
+  cursor: none;
+}

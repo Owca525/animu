@@ -454,7 +454,7 @@ const Player = () => {
   }
 
   return (
-    <div className="video-container" ref={containerRef} onMouseMove={handleMouseMove}>
+    <div className={isVisible ? "video-container" : "video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove}>
       <ContextMenu items={menuItems} />
       {isError.error ? (
         <Dialog
