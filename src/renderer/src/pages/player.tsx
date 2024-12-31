@@ -19,8 +19,7 @@ const Player = () => {
   const Currentlocation = useLocation()
   const navigate = useNavigate()
 
-  const { id, orginaltitle, episodes, ep, time, img } = Currentlocation.state
-  const title = decodeURIComponent(orginaltitle)
+  const { id, title, episodes, ep, time, img } = Currentlocation.state
 
   const { t } = useTranslation()
 
@@ -50,7 +49,8 @@ const Player = () => {
   const [isPlayerDisable, setPLayerDisable] = useState<boolean>(true)
   const [isConfigLoad, setConfigLoad] = useState<boolean>(false)
   const [isAlwaysDisable, setisAlwaysDisable] = useState<boolean>(false)
-
+  const [currentTitle, setTitle] = useState<string>(decodeURIComponent(title))
+  
   const [playerUrl, setPlayerUrl] = useState<string | undefined>(undefined)
   const [isError, setErrorDialog] = useState({ error: false, information: '' })
 
@@ -293,7 +293,7 @@ const Player = () => {
     navigate('/player', {
       state: {
         id: id,
-        title: title,
+        title: currentTitle,
         episodes: episodes,
         ep: episodes[episode],
         time: 0
@@ -497,7 +497,7 @@ const Player = () => {
           >
             arrow_back
           </button>
-          <div className="player-title ">{t('player.TitleEpisode', { ep: ep, name: title })}</div>
+          <div className="player-title ">{t('player.TitleEpisode', { ep: ep, name: currentTitle })}</div>
         </div>
         <div
           className={
