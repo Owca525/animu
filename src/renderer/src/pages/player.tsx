@@ -19,7 +19,8 @@ const Player = () => {
   const Currentlocation = useLocation()
   const navigate = useNavigate()
 
-  const { id, title, episodes, ep, time, img } = Currentlocation.state
+  const { id, orginaltitle, episodes, ep, time, img } = Currentlocation.state
+  const title = decodeURIComponent(orginaltitle)
 
   const { t } = useTranslation()
 
