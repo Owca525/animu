@@ -14,6 +14,7 @@ import Dialog from '../components/dialogs/dialog'
 import ContextMenu from '../components/elements/context-menu'
 
 import '../css/pages/player.css'
+import CustomSlider from '@renderer/components/ui/customSlider';
 
 const Player = () => {
   const Currentlocation = useLocation()
@@ -251,12 +252,11 @@ const Player = () => {
     }
   }
 
-  const handleVolumeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(event.target.value)
-    setVolume(newVolume)
+  const handleVolumeChange = (value: number) => {
+    setVolume(value)
 
     if (videoRef.current) {
-      videoRef.current.volume = newVolume
+      videoRef.current.volume = value / 100
     }
   }
 
@@ -571,7 +571,7 @@ const Player = () => {
               >
                 {isMuted ? 'volume_off' : 'volume_up'}
               </button>
-              <input
+              {/* <input
                 className="volume-bar"
                 id="volume"
                 type="range"
@@ -581,7 +581,8 @@ const Player = () => {
                 value={volume}
                 style={{ pointerEvents: 'all' }}
                 onChange={handleVolumeChange}
-              />
+              /> */}
+              <CustomSlider min={0} max={100} step={1} current={volume} size={200} onValueChange={handleVolumeChange}/>
               <button
                 className="material-symbols-outlined player-buttons"
                 title={t('sidebar.settings')}
