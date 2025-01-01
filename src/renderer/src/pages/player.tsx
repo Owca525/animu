@@ -266,7 +266,7 @@ const Player = () => {
     if (hideTimer.current) {
       clearTimeout(hideTimer.current)
     }
-    hideTimer.current = setTimeout(hideElement, 2000)
+    // hideTimer.current = setTimeout(hideElement, 2000)
   }
 
   const clearPlayer = async () => {
@@ -561,8 +561,7 @@ const Player = () => {
               )}
               <button
                 className="backlight material-symbols-outlined player-buttons"
-                title={t('sidebar.settings')}
-              >
+                title={t('sidebar.settings')}>
                 settings
               </button>
               <button

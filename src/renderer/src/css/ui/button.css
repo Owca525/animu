@@ -27,3 +27,17 @@ button {
 button .text-button {
   color: inherit;
 }
+
+.button-tip {
+  /* display: none; */
+  position: fixed;
+  bottom: 80px;
+  background-color: rgb(0, 0, 0, 0.6);
+  padding: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+  font-size: medium;
+  width: max-content;
+  font-weight: 500;
+  border-radius: 4px;
+}
