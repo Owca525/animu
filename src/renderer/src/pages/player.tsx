@@ -37,7 +37,7 @@ const Player = () => {
   const hideTimer = useRef<NodeJS.Timeout | null>(null)
 
   // Variable
-  const [volume, setVolume] = useState<number>(0.1)
+  const [volume, setVolume] = useState<number>(0)
   const [currentTime, setCurrentTime] = useState<number>(0)
   const [duration, setDuration] = useState<number>(0)
 
@@ -50,9 +50,9 @@ const Player = () => {
   const [isPlayerDisable, setPLayerDisable] = useState<boolean>(true)
   const [isConfigLoad, setConfigLoad] = useState<boolean>(false)
   const [isAlwaysDisable, setisAlwaysDisable] = useState<boolean>(false)
-  const [currentTitle, setTitle] = useState<string>(decodeURIComponent(title))
+  const [currentTitle, _setTitle] = useState<string>(decodeURIComponent(title))
   
-  const [playerUrl, setPlayerUrl] = useState<string | undefined>(undefined)
+  const [_playerUrl, setPlayerUrl] = useState<string | undefined>(undefined)
   const [isError, setErrorDialog] = useState({ error: false, information: '' })
 
   const menuItems = [{ label: t('contextMenu.reload'), onClick: () => location.reload() }]
@@ -122,8 +122,8 @@ const Player = () => {
 
       setIsPlaying(config.Player.general.Autoplay)
       videoRef.current.autoplay = config.Player.general.Autoplay
-      videoRef.current.volume = parseInt(config.Player.general.Volume.toString()) / 100
-      setVolume(parseInt(config.Player.general.Volume.toString()) / 100)
+
+      handleVolumeChange(parseInt(config.Player.general.Volume.toString()))
       if (config.Player.general.AutoFullscreen) enterFullscreen()
       setConfigLoad(true)
     }
@@ -571,18 +571,9 @@ const Player = () => {
               >
                 {isMuted ? 'volume_off' : 'volume_up'}
               </button>
-              {/* <input
-                className="volume-bar"
-                id="volume"
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={volume}
-                style={{ pointerEvents: 'all' }}
-                onChange={handleVolumeChange}
-              /> */}
-              <CustomSlider min={0} max={100} step={1} current={volume} size={200} onValueChange={handleVolumeChange}/>
+              {isConfigLoad && (
+                <CustomSlider min={0} max={100} step={1} current={volume} size={200} onValueChange={handleVolumeChange}/>
+              )}
               <button
                 className="material-symbols-outlined player-buttons"
                 title={t('sidebar.settings')}

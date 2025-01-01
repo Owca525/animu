@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useImperativeHandle } from "react";
 import "../../css/ui/customSlider.css"
 
 interface CustomSliderProps {
@@ -8,6 +8,7 @@ interface CustomSliderProps {
     step: number;
     size?: number;
     onValueChange?: (value: number) => void;
+    ValueChange?: () => number
 }
 
 const CustomSlider: React.FC<CustomSliderProps> = ({ min, max, current = 0, step, size = 100, onValueChange }) => {
@@ -29,6 +30,7 @@ const CustomSlider: React.FC<CustomSliderProps> = ({ min, max, current = 0, step
             }
         }
     };
+
 
     const handleClick = (e: React.MouseEvent) => {
         handleMouseMove(e);
