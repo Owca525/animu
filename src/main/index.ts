@@ -6,6 +6,8 @@ import icon from '../../resources/icon.png?asset'
 import fs from 'fs'
 
 function createWindow(): void {
+  var title = 'Animu v' + app.getVersion()
+
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1500,
@@ -18,8 +20,13 @@ function createWindow(): void {
       sandbox: false,
       webSecurity: false
     },
-    title: 'Animu v' + app.getVersion()
+    title: title
   })
+
+  if (process.env.NODE_ENV === 'development') {
+    mainWindow.setTitle(title + " developer")
+    mainWindow.webContents.openDevTools()
+  }
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
