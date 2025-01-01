@@ -266,7 +266,7 @@ const Player = () => {
     if (hideTimer.current) {
       clearTimeout(hideTimer.current)
     }
-    // hideTimer.current = setTimeout(hideElement, 2000)
+    hideTimer.current = setTimeout(hideElement, 2000)
   }
 
   const clearPlayer = async () => {
@@ -528,7 +528,8 @@ const Player = () => {
                       ? ''
                       : t('player.previous', { ep: episodes[episodes.indexOf(ep) - 1] })
                   }
-                    onClick={async () => await setNewEpisode('prev')} />
+                    onClick={async () => await setNewEpisode('prev')} 
+                    className="material-symbols-outlined player-buttons"/>
                 )
               }
               {isPlaying ?
