@@ -1,4 +1,4 @@
-import React, { useState, useRef, useImperativeHandle } from "react";
+import React, { useState, useRef } from "react";
 import "../../css/ui/customSlider.css"
 
 interface CustomSliderProps {

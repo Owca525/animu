@@ -219,7 +219,7 @@ body {
 }
 
 .player-buttons:hover {
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .player-title {
@@ -232,11 +232,11 @@ body {
 }
 
 .progress {
-  background-color: #5962a6;
+  background-color: var(--secondary-500);
 }
 
 .thumb {
-  background-color: #5962a6;
+  background-color: var(--secondary-500);
 }
 .player-waiting {
   color: rgb(230, 230, 230);

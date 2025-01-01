@@ -15,6 +15,7 @@ import ContextMenu from '../components/elements/context-menu'
 
 import '../css/pages/player.css'
 import CustomSlider from '@renderer/components/ui/customSlider';
+import Button from '@renderer/components/ui/button';
 
 const Player = () => {
   const Currentlocation = useLocation()
@@ -51,7 +52,7 @@ const Player = () => {
   const [isConfigLoad, setConfigLoad] = useState<boolean>(false)
   const [isAlwaysDisable, setisAlwaysDisable] = useState<boolean>(false)
   const [currentTitle, _setTitle] = useState<string>(decodeURIComponent(title))
-  
+
   const [_playerUrl, setPlayerUrl] = useState<string | undefined>(undefined)
   const [isError, setErrorDialog] = useState({ error: false, information: '' })
 
@@ -396,7 +397,7 @@ const Player = () => {
       const totalWidth = rect.width
       const percent = offsetX / totalWidth
       const newTime = percent * video.duration
-      if (!isNaN(newTime) && newTime > 0) {
+      if (!isNaN(newTime) && newTime > 0 && duration > newTime) {
         setShowTime(true)
         showtime.innerHTML = formatTime(newTime)
         showtime.style.left = `${percent * 96.5}%`
@@ -492,12 +493,7 @@ const Player = () => {
 
       <div className="video-overlay">
         <div className={isVisible ? 'video-top' : 'video-top hidden'}>
-          <button
-            className="material-symbols-outlined player-buttons"
-            onClick={async () => await exitPlayer()}
-          >
-            arrow_back
-          </button>
+          <Button value='arrow_back' className='material-symbols-outlined player-buttons' onClick={async () => await exitPlayer()} />
           <div className="player-title ">{t('player.TitleEpisode', { ep: ep, name: currentTitle })}</div>
         </div>
         <div
@@ -510,53 +506,42 @@ const Player = () => {
         </div>
         <div className={isVisible ? 'video-bottom' : 'video-bottom hidden'}>
           <div className={isShowTime ? 'show-time' : 'show-time hidden'} ref={showtimeRef}></div>
-          <div
-            className="seek-bar"
-            ref={seekbar}
-            onClick={handleSeekBarClick}
-            onMouseMove={(event) => handleSeekBarMouseMove(event)}
-            onMouseLeave={() => handleSeekBarMouseLeave()}
-          >
-            <div className="progress" ref={progressRef}></div>
-            <div className="thumb" ref={thumbRef} />
+          <div className="seek-bar-container">
+            <div
+              className="seek-bar"
+              ref={seekbar}
+              onClick={handleSeekBarClick}
+              onMouseMove={(event) => handleSeekBarMouseMove(event)}
+              onMouseLeave={() => handleSeekBarMouseLeave()}
+            >
+              <div className="progress" ref={progressRef}></div>
+              <div className="thumb" ref={thumbRef} />
+            </div>
           </div>
           <div className="bottom-section">
             <div className="left">
               {episodes[episodes.indexOf(ep) - 1] == undefined
                 ? "" :
                 (
-                  <button
-                  className='material-symbols-outlined player-buttons'
-                  title={
+                  <Button value='skip_previous' title={
                     episodes[episodes.indexOf(ep) - 1] == undefined
                       ? ''
                       : t('player.previous', { ep: episodes[episodes.indexOf(ep) - 1] })
                   }
-                  onClick={async () => await setNewEpisode('prev')}>
-                  skip_previous
-                </button>
+                    onClick={async () => await setNewEpisode('prev')} />
                 )
               }
-              <button
-                onClick={togglePlay}
-                className="material-symbols-outlined player-buttons"
-                title={isPlaying ? t('player.Pause') : t('player.play')}
-              >
-                {isPlaying ? 'pause' : 'play_arrow'}
-              </button>
+              {isPlaying ?
+                <Button value='pause' title={t('player.Pause')} className="material-symbols-outlined player-buttons" onClick={togglePlay} /> :
+                <Button value='play_arrow' title={t('player.play')} className="material-symbols-outlined player-buttons" onClick={togglePlay} />
+              }
               {episodes[episodes.indexOf(ep) + 1] == undefined
-                ? "" : 
+                ? "" :
                 (
-                  <button
-                  className="material-symbols-outlined player-buttons"
-                  title={
-                    episodes[episodes.indexOf(ep) + 1] == undefined
-                      ? ''
-                      : t('player.next', { ep: episodes[episodes.indexOf(ep) + 1] })
-                  }
-                  onClick={async () => await setNewEpisode('next')}>
-                  skip_next
-                </button>
+                  <Button value='skip_next' className='material-symbols-outlined player-buttons' title={episodes[episodes.indexOf(ep) + 1] == undefined
+                    ? ''
+                    : t('player.next', { ep: episodes[episodes.indexOf(ep) + 1] })
+                  } onClick={async () => await setNewEpisode('next')} />
                 )
               }
               <div className="time-display">
@@ -565,24 +550,24 @@ const Player = () => {
             </div>
             <div className="right">
               <button
-                className="material-symbols-outlined player-buttons volume-button"
+                className="backlight material-symbols-outlined player-buttons volume-button"
                 title={t('player.Volume')}
                 onClick={setMutedToPlayer}
               >
                 {isMuted ? 'volume_off' : 'volume_up'}
               </button>
               {isConfigLoad && (
-                <CustomSlider min={0} max={100} step={1} current={volume} size={200} onValueChange={handleVolumeChange}/>
+                <CustomSlider min={0} max={100} step={1} current={volume} size={200} onValueChange={handleVolumeChange} />
               )}
               <button
-                className="material-symbols-outlined player-buttons"
+                className="backlight material-symbols-outlined player-buttons"
                 title={t('sidebar.settings')}
               >
                 settings
               </button>
               <button
                 onClick={async () => await enterFullscreen()}
-                className="material-symbols-outlined player-buttons"
+                className="backlight material-symbols-outlined player-buttons"
                 title={t('settings.player.Fullscreen')}
               >
                 {isFullscreen ? 'fullscreen_exit' : 'fullscreen'}

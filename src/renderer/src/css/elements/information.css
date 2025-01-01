@@ -34,11 +34,13 @@ img {
   max-width: 800px;
   max-height: 800px;
   min-height: 150px;
+  user-select: text;
 }
 .box-info {
   display: flex;
   flex-direction: column;
   gap: 1em;
+  user-select: text;
 }
 
 .box-episode {
@@ -77,8 +79,14 @@ img {
 .text-episode {
   font-size: larger;
   font-weight: 600;
+  user-select: text;
 }
 .header-text {
   font-size: 24px;
   font-weight: 600;
+  user-select: text;
+}
+
+.description {
+  user-select: text;
 }
