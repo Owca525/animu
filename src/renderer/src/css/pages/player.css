@@ -47,6 +47,11 @@
   display: flex;
   align-items: center;
   gap: 1em;
+  transition: opacity 200ms ease;
+}
+
+.mask {
+  transition: mask-image 200ms ease;
 }
 
 .video-center {
@@ -60,6 +65,7 @@
   gap: 10px;
   padding-left: 12px;
   padding-right: 12px;
+  transition: opacity 200ms ease;
 }
 
 .bottom-section {
@@ -103,7 +109,7 @@
   cursor: pointer;
   margin-bottom: 4px;
   border-radius: 5px;
-  transition: height 100ms ease;
+  transition: height 200ms ease;
 }
 
 .seek-bar-container {
@@ -129,7 +135,7 @@
 
 .thumb {
   position: relative;
-  bottom: 4px;
+  bottom: 5px;
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -141,12 +147,6 @@
 .player-waiting {
   font-size: 72px;
   animation: spin 1s linear infinite;
-}
-.player-waiting-max {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
 }
 
 .disabled {
@@ -161,6 +161,7 @@
   width: min-content;
   border-radius: 4px;
   position: absolute;
+  transition: opacity 100ms ease;
 }
 
 .volume-bar {
@@ -179,4 +180,43 @@
 
 .player-hide-cursor {
   cursor: none;
+}
+
+.button-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.player-settings-container {
+  pointer-events: all;
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  padding: 0.5em;
+  border-radius: 8px;
+  min-width: 200px;
+  width: 20%;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.player-settings-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.player-settings-button:hover {
+  background-color: gray;
+}
+
+.player-settings-button-text {
+  font-size: larger;
+}
+
+.player-hidden {
+  opacity: 0;
+  pointer-events: none;
 }

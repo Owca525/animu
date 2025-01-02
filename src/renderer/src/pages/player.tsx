@@ -51,8 +51,9 @@ const Player = () => {
   const [isPlayerDisable, setPLayerDisable] = useState<boolean>(true)
   const [isConfigLoad, setConfigLoad] = useState<boolean>(false)
   const [isAlwaysDisable, setisAlwaysDisable] = useState<boolean>(false)
-  const [currentTitle, _setTitle] = useState<string>(decodeURIComponent(title))
 
+  const [currentSettings, setSettings] = useState<string>("")
+  const [currentTitle, _setTitle] = useState<string>(decodeURIComponent(title))
   const [_playerUrl, setPlayerUrl] = useState<string | undefined>(undefined)
   const [isError, setErrorDialog] = useState({ error: false, information: '' })
 
@@ -492,20 +493,19 @@ const Player = () => {
       )}
 
       <div className="video-overlay">
-        <div className={isVisible ? 'video-top' : 'video-top hidden'}>
+        <div className={isVisible ? 'video-top' : 'video-top player-hidden'}>
           <Button value='arrow_back' className='material-symbols-outlined player-buttons' onClick={async () => await exitPlayer()} />
           <div className="player-title ">{t('player.TitleEpisode', { ep: ep, name: currentTitle })}</div>
         </div>
         <div
           className={
-            (isVisible ? 'video-center ' : 'video-center player-waiting-max ') +
-            (isWaitingPlayer ? '' : 'hidden')
+            "video-center " + (isWaitingPlayer ? '' : 'player-hidden')
           }
         >
           <div className="player-waiting material-symbols-outlined">progress_activity</div>
         </div>
-        <div className={isVisible ? 'video-bottom' : 'video-bottom hidden'}>
-          <div className={isShowTime ? 'show-time' : 'show-time hidden'} ref={showtimeRef}></div>
+        <div className={isVisible ? 'video-bottom' : 'video-bottom player-hidden'}>
+          <div className={isShowTime ? 'show-time' : 'show-time player-hidden'} ref={showtimeRef}></div>
           <div className="seek-bar-container">
             <div
               className="seek-bar"
@@ -528,8 +528,8 @@ const Player = () => {
                       ? ''
                       : t('player.previous', { ep: episodes[episodes.indexOf(ep) - 1] })
                   }
-                    onClick={async () => await setNewEpisode('prev')} 
-                    className="material-symbols-outlined player-buttons"/>
+                    onClick={async () => await setNewEpisode('prev')}
+                    className="material-symbols-outlined player-buttons" />
                 )
               }
               {isPlaying ?
@@ -560,6 +560,17 @@ const Player = () => {
               {isConfigLoad && (
                 <CustomSlider min={0} max={100} step={1} current={volume} size={200} onValueChange={handleVolumeChange} />
               )}
+              {/* <div className="player-settings-container">
+                <div className="player-settings-button">
+                  <span className='player-settings-button-text'>Urls</span> <span>myanime</span>
+                </div>
+                <div className="player-settings-button">
+                  <span className='player-settings-button-text'>Resolution</span> <span>1080p</span>
+                </div>
+                <div className="player-settings-button">
+                  <span className='player-settings-button-text'>Speed</span> <span>1</span>
+                </div>
+              </div> */}
               <button
                 className="backlight material-symbols-outlined player-buttons"
                 title={t('sidebar.settings')}>
