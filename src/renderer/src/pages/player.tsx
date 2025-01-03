@@ -52,8 +52,8 @@ const Player = () => {
   const [isConfigLoad, setConfigLoad] = useState<boolean>(false)
   const [isAlwaysDisable, setisAlwaysDisable] = useState<boolean>(false)
 
-  // const [currentSettings, setSettings] = useState<string>("")
-  // const [currentResolution, setResolution] = useState<string>("")
+  const [currentSettings, setcurrentSettings] = useState<string>("")
+  const [currentResolution, setResolution] = useState<string>("")
   const [currentTitle, _setTitle] = useState<string>(decodeURIComponent(title))
   const [playerUrl, setPlayerUrl] = useState<string | undefined>(undefined)
   const [isError, setErrorDialog] = useState({ error: false, information: '' })
@@ -276,7 +276,9 @@ const Player = () => {
     if (hideTimer.current) {
       clearTimeout(hideTimer.current)
     }
-    hideTimer.current = setTimeout(hideElement, 2000)
+    if (currentSettings == "") {
+      hideTimer.current = setTimeout(hideElement, 2000)
+    }
   }
 
   const clearPlayer = async () => {
@@ -471,6 +473,16 @@ const Player = () => {
     setWaitingPlayer(data)
   }
 
+  function setSettings(settings: string) {
+    if (settings == currentSettings) {
+      setcurrentSettings("")
+      handleMouseMove()
+      return
+    }
+    setcurrentSettings(settings)
+    handleMouseMove()
+  }
+
   return (
     <div className={isVisible ? "video-container" : "video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove}>
       <ContextMenu items={menuItems} />
@@ -569,20 +581,23 @@ const Player = () => {
               {isConfigLoad && (
                 <CustomSlider min={0} max={100} step={1} current={volume} size={200} onValueChange={handleVolumeChange} />
               )}
-              {/* <div className="player-settings-container">
-                <div className="player-settings-button">
-                  <span className='player-settings-button-text'>Urls</span> <span>myanime</span>
+              {currentSettings == "settings" && (
+                <div className="player-settings-container">
+                  <div className="player-settings-button">
+                    <span className='player-settings-button-text'>Urls</span> <span>myanime</span>
+                  </div>
+                  <div className="player-settings-button">
+                    <span className='player-settings-button-text'>Resolution</span> <span>1080p</span>
+                  </div>
+                  <div className="player-settings-button">
+                    <span className='player-settings-button-text'>Speed</span> <span>1</span>
+                  </div>
                 </div>
-                <div className="player-settings-button">
-                  <span className='player-settings-button-text'>Resolution</span> <span>1080p</span>
-                </div>
-                <div className="player-settings-button">
-                  <span className='player-settings-button-text'>Speed</span> <span>1</span>
-                </div>
-              </div> */}
+              )}
               <button
                 className="backlight material-symbols-outlined player-buttons"
-                title={t('sidebar.settings')}>
+                title={t('sidebar.settings')}
+                onClick={() => setSettings("settings")}>
                 settings
               </button>
               <button
