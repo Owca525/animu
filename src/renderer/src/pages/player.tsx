@@ -52,10 +52,10 @@ const Player = () => {
   const [isConfigLoad, setConfigLoad] = useState<boolean>(false)
   const [isAlwaysDisable, setisAlwaysDisable] = useState<boolean>(false)
 
-  const [currentSettings, setSettings] = useState<string>("")
-  const [currentResolution, setResolution] = useState<string>("")
+  // const [currentSettings, setSettings] = useState<string>("")
+  // const [currentResolution, setResolution] = useState<string>("")
   const [currentTitle, _setTitle] = useState<string>(decodeURIComponent(title))
-  const [_playerUrl, setPlayerUrl] = useState<string | undefined>(undefined)
+  const [playerUrl, setPlayerUrl] = useState<string | undefined>(undefined)
   const [isError, setErrorDialog] = useState({ error: false, information: '' })
 
   const menuItems = [{ label: t('contextMenu.reload'), onClick: () => location.reload() }]
@@ -63,20 +63,28 @@ const Player = () => {
   const setDataPlayer = async () => {
     try {
       let recentData = await get_player_anime(id, ep)
-      if (recentData.normal.length != 0) {
+      console.log(recentData)
+      if (recentData.normal.length == 0 && recentData.hls.length == 0) {
+        setErrorDialog({
+          error: true,
+          information: t("errors.playerCantFind")
+        })
+      }
+
+      if (isError.error) {
+        return
+      }
+
+      if (recentData.normal.length != 0 && playerUrl == undefined) {
         setPlayerUrl(recentData.normal[0])
         checkUrl(recentData.normal[0])
         return
       }
-      if (recentData.hls.length != 0) {
+      if (recentData.hls.length != 0 && playerUrl == undefined) {
         setPlayerUrl(recentData.hls[1])
         checkUrl(recentData.hls[1])
         return
       }
-      setErrorDialog({
-        error: true,
-        information: t("errors.playerCantFind")
-      })
     } catch (Error) {
       setErrorDialog({
         error: true,
@@ -470,7 +478,7 @@ const Player = () => {
         <Dialog
           header_text={t("errors.playerHeaderError")}
           text={isError.information}
-          buttons={[{ title: t('general.ok'), onClick: () => exitPlayer() }]}
+          buttons={[{ title: t('general.ok'), onClick: () => exitPlayer() }]} // { title: t('general.reload'), onClick: async () => await setDataPlayer() }
         />
       ) : (
         ''

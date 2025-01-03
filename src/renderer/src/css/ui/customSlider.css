@@ -40,7 +40,7 @@
 .slider-thumb {
     background-color: var(--secondary-500);
     position: relative;
-    top: -12px;
+    top: -15px;
     opacity: 0;
     width: 20px;
     height: 20px;
