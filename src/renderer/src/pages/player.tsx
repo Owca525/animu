@@ -53,6 +53,7 @@ const Player = () => {
   const [isAlwaysDisable, setisAlwaysDisable] = useState<boolean>(false)
 
   const [currentSettings, setSettings] = useState<string>("")
+  const [currentResolution, setResolution] = useState<string>("")
   const [currentTitle, _setTitle] = useState<string>(decodeURIComponent(title))
   const [_playerUrl, setPlayerUrl] = useState<string | undefined>(undefined)
   const [isError, setErrorDialog] = useState({ error: false, information: '' })
