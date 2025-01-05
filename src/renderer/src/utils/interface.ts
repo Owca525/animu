@@ -68,6 +68,10 @@ interface SettingsConfigPlayer {
     TimeSkipLeft: number | string
     TimeSkipRight: number | string
   }
+  screenShot: {
+    alwaysAsk: boolean
+    path: string
+  }
   keybinds: {
     Pause: string
     LongTimeSkipForward: string

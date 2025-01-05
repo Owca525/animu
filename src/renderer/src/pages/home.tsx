@@ -28,9 +28,7 @@ function home() {
   // Language
   const { t } = useTranslation()
 
-  const [notificationData, setNotificationData] = useState<
-    { title: string; information: string; onClick?: () => void }[]
-  >([{ title: '', information: '' }])
+  const [notificationData, setNotificationData] = useState<{ title: string; information: string; onClick?: () => void }[]>([{ title: '', information: '' }])
   const [data, setData] = useState<ContainerProps>({ title: '', data: [] })
   const [error, seterror] = useState<{ error: boolean; note: string }>()
 

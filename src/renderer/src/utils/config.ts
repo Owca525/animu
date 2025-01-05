@@ -23,6 +23,10 @@ export const defaultConfig: SettingsConfig = {
       TimeSkipLeft: 5,
       TimeSkipRight: 5
     },
+    screenShot: {
+      alwaysAsk: true,
+      path: await checkPcicutePath()
+    },
     keybinds: {
       Pause: ' ',
       LongTimeSkipForward: 'ArrowUp',
@@ -48,6 +52,15 @@ export const defaultConfig: SettingsConfig = {
       MaximizeTimeSave: 120
     }
   }
+}
+
+async function checkPcicutePath(): Promise<string> {
+  const path = await window.electron.ipcRenderer.invoke("getPatchPictures");
+  if (await window.electron.ipcRenderer.invoke("DirectoryExist", path + "/animu") ==  false) {
+    window.electron.ipcRenderer.invoke("mkdir", path + "/animu")
+    return path + "/animu"
+  }
+  return path + "/animu"
 }
 
 function deepMerge(target: any, source: any): any {
@@ -117,5 +130,7 @@ export async function checkConfig() {
     ) {
       await createConfig()
     }
+    await saveConfig(await readConfig())
+    console.log(await checkPcicutePath())
   } catch (Error) {}
 }

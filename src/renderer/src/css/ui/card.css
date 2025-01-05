@@ -39,7 +39,7 @@
   overflow: hidden;
   padding: 1px;
   align-items: center;
-  text-align: center;
+  text-align: start;
 }
 .placeholder {
   width: 220px;
@@ -52,4 +52,5 @@
 
 .card-continue-info {
   color: gray;
+  font-size: small;
 }

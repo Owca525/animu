@@ -70,6 +70,10 @@ function createWindow(): void {
     return mainWindow.isFullScreen()
   })
 
+  ipcMain.handle('getPatchPictures', (_event) => {
+    return app.getPath('pictures')
+  })
+
   ipcMain.handle('setZoom', (_event, option: number) => {
     mainWindow.webContents.setZoomLevel(option)
   })
@@ -136,9 +140,30 @@ function createWindow(): void {
     });
     if (!filePath.canceled) {
       fs.writeFile(filePath.filePath.toString(), data, (err) => {
-        if (err) throw err;
+        if (err) throw console.log(err);
       });
     }
+  })
+
+  ipcMain.handle('saveFilePictureDialog', async (_event, fileName: string, title: string, data: any) => {
+    const { filePath } = await dialog.showSaveDialog({
+      title: title,
+      defaultPath: fileName,
+      filters: [{ name: "png", extensions: ["png"] }],
+    });
+    if (filePath) {
+      const base64Data = data.replace(/^data:image\/png;base64,/, '');
+      fs.writeFile(filePath, base64Data, 'base64', (err) => {
+          if (err) console.log(err)
+      });
+    }
+  })
+
+  ipcMain.handle('saveFilePicture', async (_event, PatchName: string, data: any) => {
+    const base64Data = data.replace(/^data:image\/png;base64,/, '');
+    fs.writeFile(PatchName, base64Data, 'base64', (err) => {
+        if (err) console.log(err)
+    });
   })
 
   // HMR for renderer base on electron-vite cli.

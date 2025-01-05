@@ -12,6 +12,7 @@ import { SaveHistory } from '../utils/history'
 // Components
 import Dialog from '../components/dialogs/dialog'
 import ContextMenu from '../components/elements/context-menu'
+import Notification from '../components/dialogs/notification'
 
 import '../css/pages/player.css'
 import CustomSlider from '@renderer/components/ui/customSlider';
@@ -62,6 +63,7 @@ const Player = () => {
   const [currentTitle, _setTitle] = useState<string>(decodeURIComponent(title))
   const [playerUrl, setPlayerUrl] = useState<string | undefined>(undefined)
   const [isError, setErrorDialog] = useState({ error: false, information: '' })
+  const [notificationData, setNotificationData] = useState<{ title: string; information: string; onClick?: () => void }[]>([{ title: '', information: '' }])
 
   const menuItems = [{ label: t('contextMenu.reload'), onClick: () => location.reload() }]
 
@@ -293,18 +295,34 @@ const Player = () => {
   }
 
   const takeScreenshot = async () => {
-    if (videoRef.current && canvasRef.current) {
-      const context = canvasRef.current.getContext('2d');
-      if (context) {
-        canvasRef.current.width = videoRef.current.videoWidth;
-        canvasRef.current.height = videoRef.current.videoHeight;
-        context.drawImage(videoRef.current, 0, 0);
-        canvasRef.current.toBlob(async (blob) => {
-          if (blob) {
-            const buffer = Buffer.from(await blob.arrayBuffer());
-            await window.electron.ipcRenderer.invoke("saveFileWithDialog", "screenshot.png", buffer, "Save file", "PNG", ["png"])
-          }
-        })
+    if (!videoRef.current && !canvasRef.current && !config) {
+      return
+    }
+    const currentDate: Date = new Date();
+    const year: number = currentDate.getFullYear();
+    const month: number = currentDate.getMonth()+1;
+    const day: number = currentDate.getDate();
+    const hour: number = currentDate.getHours();
+    const minutes: number = currentDate.getMinutes();
+    const seconds: number = currentDate.getSeconds();
+
+    const formatedDate = `-${year}-${month}-${day}-${hour}-${minutes}-${seconds}`
+    const context = canvasRef.current.getContext('2d');
+    
+    if (context) {
+      canvasRef.current.width = videoRef.current.videoWidth;
+      canvasRef.current.height = videoRef.current.videoHeight;
+      context.drawImage(videoRef.current, 0, 0);
+      const screenshot = canvasRef.current.toDataURL('image/png');
+      
+      if (config && config.Player.screenShot.alwaysAsk) {
+        await window.electron.ipcRenderer.invoke("saveFilePictureDialog", `${config.Player.screenShot.path}/screenshot${formatedDate}.png`, "Save file", screenshot)
+        setNotificationData([{ title: "Screenshot saved", information: `screenshot saved in location: ${config.Player.screenShot.path}` }, { title: "Screenshot saved", information: `screenshot saved in location: ${config.Player.screenShot.path}` }])
+        return
+      } else {
+        await window.electron.ipcRenderer.invoke("saveFilePicture", `${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot)
+        setNotificationData([{ title: "Screenshot saved", information: `screenshot saved in location: ${config.Player.screenShot.path}` }, { title: "Screenshot saved", information: `screenshot saved in location: ${config.Player.screenShot.path}` }])
+        return
       }
     }
   };
@@ -561,6 +579,7 @@ const Player = () => {
   return (
     <div className={isVisible ? "video-container" : "video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove}>
       <ContextMenu items={menuItems} />
+      {/* {notificationData[0].title != "" ? <Notification data={notificationData} /> : ""} */}
       {isError.error ? (
         <Dialog
           header_text={t("errors.playerHeaderError")}
