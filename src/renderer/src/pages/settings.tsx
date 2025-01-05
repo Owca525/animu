@@ -383,6 +383,26 @@ const Settings = () => {
               />
             </div>
             <div className="settings-space">
+              <div className="text">{t('settings.screenshot.Screenshot')}</div>
+              <Checkbox
+                title={t('settings.screenshot.AlwaysAsk')}
+                checked={config.Player.screenShot.alwaysAsk}
+                onClick={(event) =>
+                  handleChange('Player.screenShot.alwaysAsk', event.currentTarget.checked)
+                }
+              />
+              <div className="border-settings"></div>
+              <Input
+                title={t('settings.screenshot.path')}
+                placeholder=""
+                value={config.Player.screenShot.path}
+                type=""
+                onChange={(event) =>
+                  handleChange('Player.screenShot.path', event.currentTarget.value)
+                }
+              />
+            </div>
+            <div className="settings-space">
               <div className="text">{t('settings.player.Keybinds')}</div>
               <Keybind
                 title={t('settings.player.Pause')}
@@ -438,6 +458,16 @@ const Settings = () => {
                 title={t('settings.player.VolumeDown')}
                 value={getKeybind(config.Player.keybinds.VolumeDown)}
                 changeKey={(key) => handleChange('Player.keybinds.VolumeDown', key)}
+              />
+              <Keybind
+                title={t('settings.player.VolumeMute')}
+                value={getKeybind(config.Player.keybinds.VolumeMute)}
+                changeKey={(key) => handleChange('Player.keybinds.VolumeMute', key)}
+              />
+              <Keybind
+                title={t('settings.player.Screenshot')}
+                value={getKeybind(config.Player.keybinds.ScreenShot)}
+                changeKey={(key) => handleChange('Player.keybinds.ScreenShot', key)}
               />
             </div>
           </div>

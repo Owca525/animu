@@ -73,6 +73,11 @@
         "big": "big"
       }
     },
+    "screenshot": {
+      "Screenshot": "Screenshots",
+      "AlwaysAsk": "Always ask for save a screenshot",
+      "path": "Save path to screenshots"
+    },
     "player": {
       "autoPlay": "Auto Play",
       "DefaultVolume": "Default Volume",
@@ -90,7 +95,9 @@
       "FrameSkipBack": "Frame Skip Back",
       "FrameSkipForward": "Frame Skip Forward",
       "VolumeUP": "Volume up",
-      "VolumeDown": "Volume Down"
+      "VolumeDown": "Volume Down",
+      "VolumeMute": "Volume Mute",
+      "Screenshot": "Make a Screenshot"
     }
   },
   "errors": {
