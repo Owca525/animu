@@ -36,6 +36,7 @@ const Player = () => {
   const thumbRef = useRef<HTMLDivElement | null>(null)
   const showtimeRef = useRef<HTMLDivElement | null>(null)
   const hideTimer = useRef<NodeJS.Timeout | null>(null)
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
   // Variable
   const [volume, setVolume] = useState<number>(0)
@@ -54,6 +55,10 @@ const Player = () => {
 
   const [currentSettings, setcurrentSettings] = useState<string>("")
   const [currentResolution, setResolution] = useState<string>("")
+  const [ListResolution, setListResolution] = useState<number[]>([])
+  const [ListUrls, setListUrls] = useState<{ url: string, res: string, hostname: string, hls: boolean }[]>([])
+  const [currentHost, setHost] = useState<string>("")
+  const [hls, setHls] = useState<Hls | null>(null);
   const [currentTitle, _setTitle] = useState<string>(decodeURIComponent(title))
   const [playerUrl, setPlayerUrl] = useState<string | undefined>(undefined)
   const [isError, setErrorDialog] = useState({ error: false, information: '' })
@@ -64,7 +69,7 @@ const Player = () => {
     try {
       let recentData = await get_player_anime(id, ep)
       console.log(recentData)
-      if (recentData.normal.length == 0 && recentData.hls.length == 0) {
+      if (recentData.length == 0) {
         setErrorDialog({
           error: true,
           information: t("errors.playerCantFind")
@@ -75,14 +80,9 @@ const Player = () => {
         return
       }
 
-      if (recentData.normal.length != 0 && playerUrl == undefined) {
-        setPlayerUrl(recentData.normal[0])
-        checkUrl(recentData.normal[0])
-        return
-      }
-      if (recentData.hls.length != 0 && playerUrl == undefined) {
-        setPlayerUrl(recentData.hls[1])
-        checkUrl(recentData.hls[1])
+      if (recentData.length != 0 && playerUrl == undefined) {
+        setListUrls(recentData)
+        checkUrl(recentData[0])
         return
       }
     } catch (Error) {
@@ -166,18 +166,29 @@ const Player = () => {
     return `${minutes}:${secs < 10 ? '0' : ''}${secs}`
   }
 
-  const checkUrl = (url: string) => {
-    if (url.endsWith("m3u8")) {
-      runHLS(url)
+  const checkUrl = (data: { url: string, res: string, hostname: string, hls: boolean }) => {
+    clearPlayer()
+    setPLayerDisable(false)
+    console.log(data)
+    if (data.hls) {
+      runHLS(data.url)
+      setHost(data.hostname)
       return
     }
     if (videoRef.current) {
-      videoRef.current.src = url
+      setResolution([parseInt(data.res)])
+      setHost(data.hostname)
+      videoRef.current.src = data.url
     }
   }
 
   const runHLS = (url: string) => {
-    const hls = new Hls();
+    const hls = new Hls({
+      capLevelToPlayerSize: true,
+      enableWorker: true,
+      liveSyncDurationCount: 3,
+      maxBufferLength: 30,
+    });
 
     if (Hls.isSupported() && videoRef.current) {
       hls.loadSource(url);
@@ -185,8 +196,32 @@ const Player = () => {
 
       hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
         const resolutions = data.levels.map((level) => level.height);
-        console.log(resolutions)
+        setListResolution(resolutions)
+        resolutions.reverse()
+        setResolution(resolutions[0].toString())
       });
+
+      // hls.on(Hls.Events.LEVEL_LOADING, (_) => {
+      //   console.log("Loading....")
+      // });
+      // hls.on(Hls.Events.LEVEL_LOADED, (_) => {
+      //   console.log("Done...")
+      // });
+      // hls.on(Hls.Events.LEVEL_SWITCHING, (_) => {
+      //   console.log("Change...")
+      // });
+      // hls.on(Hls.Events.LEVEL_UPDATED, (_) => {
+      //   console.log("LevelUpdate...")
+      // });
+      // hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
+      //   console.log(hls.loadLevel)
+      //   if (data.frag.level == hls.currentLevel) {
+      //     console.log("NewFragLoaded...")
+      //   } 
+      // });
+
+
+      setHls(hls)
 
       hls.on(Hls.Events.ERROR, (_event, data) => {
         if (data.fatal) {
@@ -256,6 +291,23 @@ const Player = () => {
       })
     }
   }
+
+  const takeScreenshot = async () => {
+    if (videoRef.current && canvasRef.current) {
+      const context = canvasRef.current.getContext('2d');
+      if (context) {
+        canvasRef.current.width = videoRef.current.videoWidth;
+        canvasRef.current.height = videoRef.current.videoHeight;
+        context.drawImage(videoRef.current, 0, 0);
+        canvasRef.current.toBlob(async (blob) => {
+          if (blob) {
+            const buffer = Buffer.from(await blob.arrayBuffer());
+            await window.electron.ipcRenderer.invoke("saveFileWithDialog", "screenshot.png", buffer, "Save file", "PNG", ["png"])
+          }
+        })
+      }
+    }
+  };
 
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
@@ -422,6 +474,7 @@ const Player = () => {
   const keybinds = async (event: KeyboardEvent) => {
     if (videoRef.current && config) {
       var time_now = videoRef.current.currentTime
+      console.log(event.key.toLowerCase())
       switch (event.key.toLowerCase()) {
         case config.Player.keybinds.Pause.toLowerCase():
           togglePlay()
@@ -460,6 +513,11 @@ const Player = () => {
         case config.Player.keybinds.VolumeUp.toLowerCase():
           changeVolume(videoRef.current.volume + 0.01)
           break
+        case config.Player.keybinds.ScreenShot.toLowerCase():
+          takeScreenshot()
+          break
+        case config.Player.keybinds.VolumeMute.toLowerCase():
+          break
       }
     }
   }
@@ -483,6 +541,23 @@ const Player = () => {
     handleMouseMove()
   }
 
+  function setSpeed(speed: string) {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = parseFloat(speed)
+      setSettings("settings")
+    }
+  }
+
+  function setRes(res: number | undefined) {
+    console.log(res)
+    if (res && hls) {
+      const levelIndex = hls.levels.findIndex(level => level.height === res);
+      console.log(levelIndex)
+      hls.currentLevel = levelIndex
+      setResolution(res)
+    }
+  }
+
   return (
     <div className={isVisible ? "video-container" : "video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove}>
       <ContextMenu items={menuItems} />
@@ -503,7 +578,7 @@ const Player = () => {
           className={isVisible ? 'video-player mask' : 'video-player'}
           onTimeUpdate={updateProgress}
           onLoadedMetadata={handleLoadedMetadata}
-          onClick={togglePlay}
+          onClick={() => { togglePlay(); setcurrentSettings("") }}
           autoPlay={isPlaying}
           onError={(error) => videoErrorHandler(error)}
           preload="metadata"
@@ -583,14 +658,81 @@ const Player = () => {
               )}
               {currentSettings == "settings" && (
                 <div className="player-settings-container">
-                  <div className="player-settings-button">
-                    <span className='player-settings-button-text'>Urls</span> <span>myanime</span>
+                  {ListUrls.length <= 1 ? (
+                    <div className="player-settings-button">
+                      <span className='player-settings-button-text' style={{ color: "gray" }} >Urls</span> <span style={{ color: "gray" }}>{currentHost}</span>
+                    </div>
+                  ) : (
+                    <div className="player-settings-button" onClick={() => setSettings("urls")}>
+                      <span className='player-settings-button-text'>Urls</span> <span>{currentHost}</span>
+                    </div>
+                  )}
+                  {ListResolution.length <= 1 ? (
+                    <div className="player-settings-button">
+                      <span className='player-settings-button-text' style={{ color: "gray" }}>Resolution</span> <span style={{ color: "gray" }}>{currentResolution + "p"}</span>
+                    </div>
+                  ) : (
+                    <div className="player-settings-button" onClick={() => setSettings("resolution")}>
+                      <span className='player-settings-button-text'>Resolution</span> <span>{currentResolution != "" ? currentResolution + "p" : ""}</span>
+                    </div>
+                  )}
+                  <div className="player-settings-button" onClick={() => setSettings("speed")}>
+                    <span className='player-settings-button-text'>Speed</span> <span>{videoRef.current?.playbackRate}</span>
                   </div>
-                  <div className="player-settings-button">
-                    <span className='player-settings-button-text'>Resolution</span> <span>1080p</span>
+                </div>
+              )}
+              {currentSettings == "urls" && (
+                <div className='player-settings-container'>
+                  <div className="player-settings-button-back" onClick={() => setSettings("settings")}>
+                    <span className="material-symbols-outlined">arrow_back</span><span>Urls</span>
                   </div>
-                  <div className="player-settings-button">
-                    <span className='player-settings-button-text'>Speed</span> <span>1</span>
+                  {ListUrls.map((data) => (
+                    <div className="player-settings-button" onClick={() => checkUrl(ListUrls[ListUrls.findIndex((item) => item.hostname === data.hostname)])}>
+                      <span>{data.hostname}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {currentSettings == "resolution" && (
+                <div className='player-settings-container'>
+                  <div className="player-settings-button-back" onClick={() => setSettings("settings")}>
+                    <span className="material-symbols-outlined">arrow_back</span><span>Resolution</span>
+                  </div>
+                  {ListResolution.map((data) => (
+                    <div className="player-settings-button" onClick={() => { setcurrentSettings(data.toLocaleString()); setRes(data) }}>
+                      <span>{data.toString() + "p"}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {currentSettings == "speed" && (
+                <div className='player-settings-container'>
+                  <div className="player-settings-button-back" onClick={() => setSettings("settings")}>
+                    <span className="material-symbols-outlined">arrow_back</span><span>Speed</span>
+                  </div>
+                  <div className="player-settings-button" onClick={() => setSpeed("0.25")}>
+                    <span>0.25</span>
+                  </div>
+                  <div className="player-settings-button" onClick={() => setSpeed("0.5")}>
+                    <span>0.5</span>
+                  </div>
+                  <div className="player-settings-button" onClick={() => setSpeed("0.75")}>
+                    <span>0.75</span>
+                  </div>
+                  <div className="player-settings-button" onClick={() => setSpeed("1")}>
+                    <span>1</span>
+                  </div>
+                  <div className="player-settings-button" onClick={() => setSpeed("1.25")}>
+                    <span>1.25</span>
+                  </div>
+                  <div className="player-settings-button" onClick={() => setSpeed("1.5")}>
+                    <span>1.5</span>
+                  </div>
+                  <div className="player-settings-button" onClick={() => setSpeed("1.75")}>
+                    <span>1.75</span>
+                  </div>
+                  <div className="player-settings-button" onClick={() => setSpeed("2")}>
+                    <span>2</span>
                   </div>
                 </div>
               )}
@@ -611,6 +753,7 @@ const Player = () => {
           </div>
         </div>
       </div>
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
     </div>
   )
 }

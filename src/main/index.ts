@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -126,6 +126,19 @@ function createWindow(): void {
 
   ipcMain.handle('exit', (_event) => {
     app.quit()
+  })
+
+  ipcMain.handle('saveFileWithDialog', async (_event, fileName: string, data: any, title: string, name: string, extensions: string[]) => {
+    const filePath = await dialog.showSaveDialog({
+      title: title,
+      defaultPath: fileName,
+      filters: [{ name: name, extensions: extensions }],
+    });
+    if (!filePath.canceled) {
+      fs.writeFile(filePath.filePath.toString(), data, (err) => {
+        if (err) throw err;
+      });
+    }
   })
 
   // HMR for renderer base on electron-vite cli.

@@ -34,7 +34,9 @@ export const defaultConfig: SettingsConfig = {
       FrameSkipBack: ',',
       FrameSkipForward: '.',
       VolumeDown: '9',
-      VolumeUp: '0'
+      VolumeUp: '0',
+      VolumeMute: "m",
+      ScreenShot: "f10"
     }
   },
   History: {

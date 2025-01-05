@@ -80,6 +80,8 @@ interface SettingsConfigPlayer {
     FrameSkipForward: string
     VolumeUp: string
     VolumeDown: string
+    VolumeMute: string
+    ScreenShot: string
   }
 }
 

@@ -211,8 +211,8 @@
   border-radius: 8px;
 }
 
-.player-settings-button:hover {
-  background-color: gray;
+.player-settings-button:hover, .player-settings-button-back:hover {
+  background-color: rgba(150, 150, 150, 0.3);
 }
 
 .player-settings-button-text {
@@ -222,4 +222,12 @@
 .player-hidden {
   opacity: 0;
   pointer-events: none;
+}
+
+.player-settings-button-back {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-radius: 8px;
+  gap: 8px;
 }

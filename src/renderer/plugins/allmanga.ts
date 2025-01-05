@@ -100,13 +100,12 @@ export async function getInformation(id: string) {
   return null
 }
 
-export async function getPlayerUrls(id: string, episode: string): Promise<{ normal: any[], hls: any[] } | null> {
+export async function getPlayerUrls(id: string, episode: string): Promise<{ url: string, res: string, hostname: string, hls: boolean }[] | null> {
   let variables = `{"showId":"${id}","translationType":"sub","episodeString":"${episode}"}`
   let extensions = `{"persistedQuery":{"version":1,"sha256Hash": "${HASH_PLAYER}"}}`
   let url = API_WEB + `/api?variables=${variables}&extensions=${extensions}`
   
-  let hlsUrls: any = []
-  let nromalUrls: any = []
+  let listUrls: { url: string, res: string, hostname: string, hls: boolean }[] = []
 
   const resp = await sendRequest(url, header)
   if (!resp) {
@@ -128,15 +127,26 @@ export async function getPlayerUrls(id: string, episode: string): Promise<{ norm
     })
     if (links) {
       links.links.forEach(element => {
-        if (element.hls) {
-          hlsUrls.push(element.link)
+        console.log(element)
+        if (!element.link) {
+          return
+        }
+        // const tmpObject = new URL(element.link)
+        // if (tmpObject.hostname == "ayvic.fast4speed.rsvp") {
+        //   element.link = element.link.replace("ayvic.fast4speed.rsvp/vic/", "")
+        // }
+
+        const urlObject = new URL(element.link);
+
+        if (element.hls && urlObject.hostname != "ayvic.fast4speed.rsvp") {
+          listUrls.push({ url: element.link, res: "all", hostname: urlObject.hostname, hls: true })
         }
         if (element.mp4) {
-          nromalUrls.push(element.link)
+          listUrls.push({ url: element.link, res: "1080", hostname: urlObject.hostname, hls: false })
         }
       });
     }
   }
 
-  return { normal: nromalUrls, hls: hlsUrls }
+  return listUrls
 }

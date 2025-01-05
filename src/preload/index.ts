@@ -12,6 +12,7 @@ if (process.contextIsolated) {
     // contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('api', api)
     contextBridge.exposeInMainWorld('electron', {
+      Buffer: require('buffer').Buffer,
       ipcRenderer: {
         invoke: (channel: string, ...args: any[]): Promise<any> =>
           ipcRenderer.invoke(channel, ...args)
