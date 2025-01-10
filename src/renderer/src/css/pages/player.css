@@ -222,6 +222,7 @@
 .player-hidden {
   opacity: 0;
   pointer-events: none;
+  cursor: default;
 }
 
 .player-settings-button-back {
@@ -230,4 +231,52 @@
   padding: 8px;
   border-radius: 8px;
   gap: 8px;
+}
+
+.up-Next-container {
+  position: fixed;
+  left: 1;
+  top: 1;
+  right: 30px;
+  bottom: 30px;
+  z-index: 2000;
+
+  width: clamp(20vw, 25vw, 30vw);
+
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  border-radius: 1em;
+}
+
+.up-Next-Anime, .up-Next-Title {
+  display: -webkit-box;
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.up-Next-Title {
+  font-size: clamp(1.2rem, 1.5vw, 2em);
+  font-weight: 500;
+}
+
+.up-Next-Anime {
+  max-width: 30svw;
+  font-size: clamp(0.8rem, 2vw, 1em);
+}
+
+.up-Next-Buttons {
+  display: flex;
+  justify-content: end;
+  gap: 1em;
+}
+
+.up-Next-Button {
+  font-size: clamp(0.5rem, 1.2vw, 1rem);
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 8px;
 }

@@ -64,6 +64,9 @@ const Player = () => {
   const [currentTitle, _setTitle] = useState<string>(decodeURIComponent(title))
   const [playerUrl, setPlayerUrl] = useState<string | undefined>(undefined)
   const [isError, setErrorDialog] = useState({ error: false, information: '' })
+  const [timeNextEpisode, setTimeNextEpisode] = useState<number>(30)
+  const [isUpNextEpisode, setUpNextEpisode] = useState<boolean>(false)
+  const [isHideUpNextEpisode, setHideUpNextEpisode] = useState<boolean>(false)
 
   const menuItems = [{ label: t('contextMenu.reload'), onClick: () => location.reload() }]
 
@@ -125,6 +128,20 @@ const Player = () => {
         player: { episodes: episodes, episode: ep, time: currentTime }
       })
     }
+
+    if (!config) {
+      return
+    }
+
+    if (duration != 0 && currentTime != 0) setTimeNextEpisode(((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + 30)
+
+    if (duration != 0 && currentTime != 0 && isHideUpNextEpisode == false && currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
+      setUpNextEpisode(true)
+    }
+    
+    if (duration != 0 && currentTime != 0 && (isHideUpNextEpisode == false && timeNextEpisode <= 0)) {
+      setNewEpisode("next")
+    }
   }, [currentTime])
 
   // Checking config and player if load then set config to player and add event
@@ -162,9 +179,15 @@ const Player = () => {
     setIsVisible(false)
   }
 
-  const formatTime = (seconds: number) => {
+  const formatTime = (seconds: number, type?: string): string => {
     const minutes = Math.floor(seconds / 60)
     const secs = Math.floor(seconds % 60)
+    switch (type) {
+      case "minutes":
+        return minutes.toString()
+      case "seconds":
+        return secs.toString()
+    }
     return `${minutes}:${secs < 10 ? '0' : ''}${secs}`
   }
 
@@ -299,7 +322,7 @@ const Player = () => {
 
     const currentDate: Date = new Date();
     const year: number = currentDate.getFullYear();
-    const month: number = currentDate.getMonth()+1;
+    const month: number = currentDate.getMonth() + 1;
     const day: number = currentDate.getDate();
     const hour: number = currentDate.getHours();
     const minutes: number = currentDate.getMinutes();
@@ -307,7 +330,7 @@ const Player = () => {
 
     const formatedDate = `-${year}-${month}-${day}-${hour}-${minutes}-${seconds}`
     const context = canvasRef.current.getContext('2d');
-    
+
     if (context == null) {
       toast.error(t("toast.screenshotFail"), notificationProps);
       return
@@ -317,7 +340,7 @@ const Player = () => {
     canvasRef.current.height = videoRef.current.videoHeight;
     context.drawImage(videoRef.current, 0, 0);
     const screenshot = canvasRef.current.toDataURL('image/png');
-    
+
     if (config.Player.screenShot.alwaysAsk) {
       var resp = await window.electron.ipcRenderer.invoke("saveFilePictureDialog", `${config.Player.screenShot.path}/screenshot${formatedDate}.png`, "Save file", screenshot)
     } else {
@@ -365,6 +388,9 @@ const Player = () => {
     setWaitingPlayer(() => true)
     setDuration(() => 0)
     setCurrentTime(() => 0)
+    setHideUpNextEpisode(() => false)
+    setUpNextEpisode(() => false)
+    setTimeNextEpisode(() => 30)
     updateProgress()
   }
 
@@ -612,7 +638,7 @@ const Player = () => {
       )}
 
       <div className="video-overlay">
-        <div className={isVisible ? 'video-top' : 'video-top player-hidden'}>
+        <div className={isUpNextEpisode == false ? isVisible ? 'video-top' : 'video-top player-hidden' : 'video-top'}>
           <Button value='arrow_back' className='material-symbols-outlined player-buttons' onClick={async () => await exitPlayer()} />
           <div className="player-title ">{t('player.TitleEpisode', { ep: ep, name: currentTitle })}</div>
         </div>
@@ -623,8 +649,8 @@ const Player = () => {
         >
           <div className="player-waiting material-symbols-outlined">progress_activity</div>
         </div>
-        <div className={isVisible ? 'video-bottom' : 'video-bottom player-hidden'}>
-          <div className={isShowTime ? 'show-time' : 'show-time player-hidden'} ref={showtimeRef}></div>
+        <div className={isVisible && isUpNextEpisode == false ? 'video-bottom' : 'video-bottom player-hidden'}>
+          <div className={isShowTime && isUpNextEpisode == false ? 'show-time' : 'show-time player-hidden'} ref={showtimeRef}></div>
           <div className="seek-bar-container">
             <div
               className="seek-bar"
@@ -778,6 +804,16 @@ const Player = () => {
       </div>
       <canvas ref={canvasRef} style={{ display: 'none' }} />
       <ToastContainer />
+      {isUpNextEpisode ? (
+        <div className="up-Next-container">
+          <div className="up-Next-Title">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>
+          <div className="up-Next-Anime">{t("player.upNext.titleAnime", { ep: episodes[episodes.indexOf(ep) + 1], title: title })}</div>
+          <div className="up-Next-Buttons">
+            <Button value={t("player.upNext.nextEp")} className='up-Next-Button' onClick={() => setNewEpisode("next")}/>
+            <Button value={t("player.upNext.hide")} className='up-Next-Button' onClick={() => {setHideUpNextEpisode(true); setUpNextEpisode(false)}} />
+          </div>
+        </div>
+      ) : ""}
     </div>
   )
 }
