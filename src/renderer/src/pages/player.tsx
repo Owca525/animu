@@ -243,7 +243,6 @@ const Player = () => {
       //   } 
       // });
 
-
       setHls(hls)
 
       hls.on(Hls.Events.ERROR, (_event, data) => {
@@ -263,7 +262,11 @@ const Player = () => {
               hls.destroy();
               break;
           }
-          setErrorDialog({ error: true, information: message })
+          if (ListUrls.length <= 1) {
+            setErrorDialog({ error: true, information: message })
+            return
+          }
+          toast.error(message, notificationProps);
         }
       });
     }
@@ -467,7 +470,11 @@ const Player = () => {
         default:
           message = t('player.errors.default')
       }
-      setErrorDialog({ error: true, information: message })
+      if (ListUrls.length <= 1) {
+        setErrorDialog({ error: true, information: message })
+        return
+      }
+      toast.error(message, notificationProps);
     }
   }
 
@@ -609,12 +616,11 @@ const Player = () => {
   return (
     <div className={isVisible ? "video-container" : "video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove}>
       <ContextMenu items={menuItems} />
-      {/* {notificationData[0].title != "" ? <Notification data={notificationData} /> : ""} */}
       {isError.error ? (
         <Dialog
           header_text={t("errors.playerHeaderError")}
           text={isError.information}
-          buttons={[{ title: t('general.ok'), onClick: () => exitPlayer() }]} // { title: t('general.reload'), onClick: async () => await setDataPlayer() }
+          buttons={[{ title: t('general.ok'), onClick: () => exitPlayer() }, { title: t('general.reload'), onClick: async () => {await setDataPlayer(); setErrorDialog({ error: false, information: '' })} }]} // { title: t('general.reload'), onClick: async () => await setDataPlayer() }
         />
       ) : (
         ''
