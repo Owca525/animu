@@ -252,10 +252,10 @@ const Settings = () => {
               <Input
                 helpDescription={t('tips.gZoom')}
                 title={t('settings.general.Zoom')}
-                placeholder="1.0"
-                value={config.General.Window.Zoom}
+                placeholder="0"
+                value={parseInt(config.General.Window.Zoom.toString())}
                 type=""
-                onChange={(event) => handleChange('General.Window.Zoom', event.currentTarget.value)}
+                onChange={(event) => handleChange('General.Window.Zoom', event.currentTarget.value == "" ? 0 : event.currentTarget.value)}
               />
             </div>
           </div>
