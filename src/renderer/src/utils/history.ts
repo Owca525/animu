@@ -26,50 +26,21 @@ export async function CheckHistory() {
 export async function SaveHistory(save: CardProps) {
   try {
     await CheckHistory()
+    const appConfigDirPath = await window.electron.ipcRenderer.invoke('appConfigDir')
 
     const config = await readConfig()
-    const appConfigDirPath = await window.electron.ipcRenderer.invoke('appConfigDir')
-    const file = await window.electron.ipcRenderer.invoke(
-      'ReadFile',
-      appConfigDirPath + '/history.json'
-    )
-    const data = JSON.parse(file) as { history: CardProps[] }
-    const index = data.history.findIndex((item) => item.id === save.id)
-    if (
-      config &&
-      (await ReadHistory()).length >= parseInt(config.History.history.maxSave.toString())
-    ) {
-      console.log(parseInt(config.History.history.maxSave.toString()))
-      data.history.pop()
-    }
-    if (index != -1) {
-      data.history.splice(index, 1)
-    }
-    data.history.push(save)
-    await window.electron.ipcRenderer.invoke(
-      'WriteFile',
-      appConfigDirPath + '/history.json',
-      JSON.stringify(data)
-    )
-  } catch (Error) {}
-}
+    let file = (await ReadHistory()).reverse()
 
-export async function DeleteFromHistory(data: CardProps) {
-  try {
-    const appConfigDirPath = await window.electron.ipcRenderer.invoke('appConfigDir')
-    const file = await window.electron.ipcRenderer.invoke(
-      'ReadFile',
-      appConfigDirPath + '/history.json'
-    )
-    const list = JSON.parse(file) as { history: CardProps[] }
-    const index = list.history.findIndex((item) => item.id === data.id)
-    if (index != -1) {
-      list.history.splice(index, 1)
-    }
+    const index = file.findIndex((item) => item.id === save.id)
+
+    if (config && file.length >= parseInt(config.History.history.maxSave.toString())) file.shift()
+    if (index != -1) file.splice(index, 1)
+    
+    file.push(save)
     await window.electron.ipcRenderer.invoke(
       'WriteFile',
       appConfigDirPath + '/history.json',
-      JSON.stringify(list)
+      JSON.stringify(file)
     )
   } catch (Error) {}
 }
@@ -81,8 +52,8 @@ export async function ReadHistory(): Promise<CardProps[]> {
       'ReadFile',
       appConfigDirPath + '/history.json'
     )
-    const data = JSON.parse(file) as { history: CardProps[] }
-    return data.history.reverse()
+    const data = JSON.parse(file) 
+    return data.reverse()
   } catch (Error) {
     return []
   }
