@@ -64,7 +64,6 @@ const Player = () => {
   const [currentTitle, _setTitle] = useState<string>(decodeURIComponent(title))
   const [playerUrl, setPlayerUrl] = useState<string | undefined>(undefined)
   const [isError, setErrorDialog] = useState({ error: false, information: '' })
-  const [notificationData, setNotificationData] = useState<{ title: string; information: string; onClick?: () => void }[]>([{ title: '', information: '' }])
 
   const menuItems = [{ label: t('contextMenu.reload'), onClick: () => location.reload() }]
 
@@ -170,9 +169,7 @@ const Player = () => {
   }
 
   const checkUrl = (data: { url: string, res: string, hostname: string, hls: boolean }) => {
-    clearPlayer()
     setPLayerDisable(false)
-    console.log(data)
     if (data.hls) {
       runHLS(data.url)
       setHost(data.hostname)
