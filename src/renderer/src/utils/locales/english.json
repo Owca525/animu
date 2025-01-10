@@ -14,16 +14,11 @@
     "episodes": "Availble Episodes:",
     "emptyEpisodes": "No Episodes"
   },
-  "update": {
-    "title": "New Update Availble",
-    "information": "Hey is new update {{version}} wait to download, click notification",
-    "downloadUpdate": "Download Update {{version}}",
-    "downloadingUpdate": "Downloading Update {{version}}",
-    "status": {
-      "download": "Download",
-      "finish": "Finished download, now installing",
-      "install": "Install Done restart application..."
-    }
+  "toast": {
+    "update": "Update {{version}} is avaible",
+    "config": "Config Saved!",
+    "screenshot": "Screenshot saved in {{path}}",
+    "screenshotFail": "Failed Saving screenshot"
   },
   "player": {
     "TitleEpisode": "Episode: {{ep}} of {{name}}",

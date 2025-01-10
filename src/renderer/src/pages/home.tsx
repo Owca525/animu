@@ -1,24 +1,25 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useContext, useEffect, useState } from 'react'
+import { toast, ToastContainer } from 'react-toastify';
 
 // Components
-import Notification from '../components/dialogs/notification'
 import Sidebar from '../components/elements/sidebar'
 import Content from '../components/elements/card-content'
 import Header from '../components/elements/headers'
 import Dialog from '../components/dialogs/dialog'
 
 // utils
-import { ContainerProps } from '../utils/interface'
+import { ContainerProps, notificationProps } from '../utils/interface'
 import { get_recent, get_search } from '../utils/backend'
 import { ReadContinue } from '../utils/continueWatch'
 import { configContext } from '../utils/context'
 import { checkUpdateAnimu } from '../utils/update'
 
-import '../css/pages/home.css'
 import { ReadHistory } from '../utils/history'
 import ContextMenu from '../components/elements/context-menu'
+import 'react-toastify/dist/ReactToastify.css';
+import '../css/pages/home.css'
 
 function home() {
   const navigate = useNavigate()
@@ -28,13 +29,11 @@ function home() {
   // Language
   const { t } = useTranslation()
 
-  const [notificationData, setNotificationData] = useState<{ title: string; information: string; onClick?: () => void }[]>([{ title: '', information: '' }])
   const [data, setData] = useState<ContainerProps>({ title: '', data: [] })
   const [error, seterror] = useState<{ error: boolean; note: string }>()
 
   const [loading, setLoading] = useState(true)
   // const [isUpdate, setisUpdate] = useState(false);
-  const [updateNotification, setUpdateNotification] = useState(false)
 
   const sidebarHomeTopData = [
     {
@@ -97,14 +96,11 @@ function home() {
   const checkUpdate = async () => {
     const update = await checkUpdateAnimu()
     if (update.update) {
-      setUpdateNotification(update.update)
-      setNotificationData([
-        {
-          title: t('update.title'),
-          information: t('update.information', { version: update.version }),
-          onClick: () => window.electron.ipcRenderer.invoke('open', update.url, 'url')
-        }
-      ])
+      const toastid = toast.info(t('toast.update', { version: update.version }), { 
+        ...notificationProps, 
+        onClick: async () => {window.electron.ipcRenderer.invoke('open', update.url, 'url'); toast.dismiss(toastid);},
+        autoClose: false,
+      });
     }
   }
 
@@ -147,8 +143,7 @@ function home() {
     return (
       <main className="container">
         <ContextMenu items={menuItems} />
-        {updateNotification ? <Notification data={notificationData} /> : ''}
-        {/* {isUpdate ? <Update /> : ""} */}
+        <ToastContainer />
         {error?.error ? (
           <Dialog
             header_text={t('errors.connection')}

@@ -42,10 +42,6 @@ export interface SidebarProps {
   showVersion?: boolean
 }
 
-export interface NotificationProps {
-  data: { title: string; information: string; onClick?: () => void }[]
-}
-
 interface SettingsConfigGeneral {
   HoverSidebar: boolean
   language: string
@@ -103,4 +99,11 @@ export interface SettingsConfig {
   General: SettingsConfigGeneral
   Player: SettingsConfigPlayer
   History: SettingsConfigHistory
+}
+
+export const notificationProps = {
+  closeOnClick: true,
+  autoClose: 3000,
+  pauseOnHover: true,
+  hideProgressBar: true
 }

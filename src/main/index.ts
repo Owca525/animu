@@ -145,7 +145,7 @@ function createWindow(): void {
     }
   })
 
-  ipcMain.handle('saveFilePictureDialog', async (_event, fileName: string, title: string, data: any) => {
+  ipcMain.handle('saveFilePictureDialog', async (_event, fileName: string, title: string, data: any): Promise<boolean> => {
     const { filePath } = await dialog.showSaveDialog({
       title: title,
       defaultPath: fileName,
@@ -156,14 +156,21 @@ function createWindow(): void {
       fs.writeFile(filePath, base64Data, 'base64', (err) => {
           if (err) console.log(err)
       });
+      return true
     }
+    return false
   })
 
-  ipcMain.handle('saveFilePicture', async (_event, PatchName: string, data: any) => {
+  ipcMain.handle('saveFilePicture', async (_event, PatchName: string, data: any): Promise<Boolean> => {
     const base64Data = data.replace(/^data:image\/png;base64,/, '');
+    let error: any = null
     fs.writeFile(PatchName, base64Data, 'base64', (err) => {
-        if (err) console.log(err)
+        if (err) console.log(err); error = err
     });
+    if (error) {
+      return false
+    }
+    return true
   })
 
   // HMR for renderer base on electron-vite cli.

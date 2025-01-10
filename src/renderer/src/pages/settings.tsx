@@ -12,9 +12,10 @@ import Dropdown from '../components/ui/dropdown'
 
 // utils
 import { readConfig, saveConfig } from '../utils/config'
-import { SettingsConfig } from '../utils/interface'
+import { notificationProps, SettingsConfig } from '../utils/interface'
 
 import '../css/pages/settings.css'
+import { toast, ToastContainer } from 'react-toastify'
 
 const Settings = () => {
   const navigate = useNavigate()
@@ -116,6 +117,7 @@ const Settings = () => {
         'setZoom',
         parseFloat(config.General.Window.Zoom.toString())
       )
+      toast.info(t("toast.config"), notificationProps);
     }
   }, [config])
 
@@ -475,6 +477,7 @@ const Settings = () => {
       ) : (
         ''
       )}
+    <ToastContainer />
     </div>
   )
 }

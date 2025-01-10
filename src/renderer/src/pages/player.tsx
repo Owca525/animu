@@ -12,11 +12,12 @@ import { SaveHistory } from '../utils/history'
 // Components
 import Dialog from '../components/dialogs/dialog'
 import ContextMenu from '../components/elements/context-menu'
-import Notification from '../components/dialogs/notification'
 
 import '../css/pages/player.css'
 import CustomSlider from '@renderer/components/ui/customSlider';
 import Button from '@renderer/components/ui/button';
+import { toast, ToastContainer } from 'react-toastify';
+import { notificationProps } from '@renderer/utils/interface';
 
 const Player = () => {
   const Currentlocation = useLocation()
@@ -55,7 +56,7 @@ const Player = () => {
   const [isAlwaysDisable, setisAlwaysDisable] = useState<boolean>(false)
 
   const [currentSettings, setcurrentSettings] = useState<string>("")
-  const [currentResolution, setResolution] = useState<string>("")
+  const [currentResolution, setResolution] = useState<string | number>("")
   const [ListResolution, setListResolution] = useState<number[]>([])
   const [ListUrls, setListUrls] = useState<{ url: string, res: string, hostname: string, hls: boolean }[]>([])
   const [currentHost, setHost] = useState<string>("")
@@ -178,7 +179,7 @@ const Player = () => {
       return
     }
     if (videoRef.current) {
-      setResolution([parseInt(data.res)])
+      setResolution(data.res)
       setHost(data.hostname)
       videoRef.current.src = data.url
     }
@@ -295,9 +296,10 @@ const Player = () => {
   }
 
   const takeScreenshot = async () => {
-    if (!videoRef.current && !canvasRef.current && !config) {
-      return
-    }
+    if (videoRef.current == null) return
+    if (canvasRef.current == null) return
+    if (config == null) return
+
     const currentDate: Date = new Date();
     const year: number = currentDate.getFullYear();
     const month: number = currentDate.getMonth()+1;
@@ -309,22 +311,27 @@ const Player = () => {
     const formatedDate = `-${year}-${month}-${day}-${hour}-${minutes}-${seconds}`
     const context = canvasRef.current.getContext('2d');
     
-    if (context) {
-      canvasRef.current.width = videoRef.current.videoWidth;
-      canvasRef.current.height = videoRef.current.videoHeight;
-      context.drawImage(videoRef.current, 0, 0);
-      const screenshot = canvasRef.current.toDataURL('image/png');
-      
-      if (config && config.Player.screenShot.alwaysAsk) {
-        await window.electron.ipcRenderer.invoke("saveFilePictureDialog", `${config.Player.screenShot.path}/screenshot${formatedDate}.png`, "Save file", screenshot)
-        setNotificationData([{ title: "Screenshot saved", information: `screenshot saved in location: ${config.Player.screenShot.path}` }, { title: "Screenshot saved", information: `screenshot saved in location: ${config.Player.screenShot.path}` }])
-        return
-      } else {
-        await window.electron.ipcRenderer.invoke("saveFilePicture", `${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot)
-        setNotificationData([{ title: "Screenshot saved", information: `screenshot saved in location: ${config.Player.screenShot.path}` }, { title: "Screenshot saved", information: `screenshot saved in location: ${config.Player.screenShot.path}` }])
-        return
-      }
+    if (context == null) {
+      toast.error(t("toast.screenshotFail"), notificationProps);
+      return
     }
+
+    canvasRef.current.width = videoRef.current.videoWidth;
+    canvasRef.current.height = videoRef.current.videoHeight;
+    context.drawImage(videoRef.current, 0, 0);
+    const screenshot = canvasRef.current.toDataURL('image/png');
+    
+    if (config.Player.screenShot.alwaysAsk) {
+      var resp = await window.electron.ipcRenderer.invoke("saveFilePictureDialog", `${config.Player.screenShot.path}/screenshot${formatedDate}.png`, "Save file", screenshot)
+    } else {
+      var resp = await window.electron.ipcRenderer.invoke("saveFilePicture", `${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot)
+    }
+    if (resp) {
+      toast.success(t("toast.screenshot", { path: config.Player.screenShot.path }), notificationProps);
+      return;
+    }
+    toast.error(t("toast.screenshotFail"), notificationProps);
+    return;
   };
 
   const handleLoadedMetadata = () => {
@@ -773,6 +780,7 @@ const Player = () => {
         </div>
       </div>
       <canvas ref={canvasRef} style={{ display: 'none' }} />
+      <ToastContainer />
     </div>
   )
 }
