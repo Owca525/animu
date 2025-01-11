@@ -636,7 +636,7 @@ const Player = () => {
           onClick={() => { togglePlay(); setcurrentSettings("") }}
           autoPlay={isPlaying}
           onError={(error) => videoErrorHandler(error)}
-          preload="metadata"
+          preload={config?.Player.general.playerLoadType}
           muted={isMuted}
           onCanPlay={() => setWaiting(false)}
           onWaiting={() => setWaiting(true)}

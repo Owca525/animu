@@ -90,6 +90,11 @@ const Settings = () => {
     { label: 'gruvbox', value: 'gruvbox', onClick: () => changeTheme('gruvbox') }
   ]
 
+  const playerType = [
+    { label: "metadata", value: 'metadata', onclick: () => handleChange('Player.general.playerLoadType', "metadata")},
+    { label: "auto", value: 'auto', onclick: () => handleChange('Player.general.playerLoadType', "auto") }
+  ]
+
   const menuItems = [{ label: t('contextMenu.reload'), onClick: () => location.reload() }]
 
   // const cardSize = [
@@ -214,7 +219,7 @@ const Settings = () => {
               />
               <div className="border-settings"></div>
               <div className="same-space">
-                {t('settings.general.language')}{' '}
+                {t('settings.general.language')}
                 <Dropdown options={language} placeholder={checkLang(config.General.language)} />
               </div>
             </div>
@@ -383,6 +388,11 @@ const Settings = () => {
                   handleChange('Player.general.TimeSkipLeft', event.currentTarget.value)
                 }
               />
+              <div className="border-settings"></div>
+              <div className="same-space">
+                Player preload type
+                <Dropdown options={playerType} placeholder={config.Player.general.playerLoadType} />
+              </div>
             </div>
             <div className="settings-space">
               <div className="text">{t('settings.screenshot.Screenshot')}</div>
