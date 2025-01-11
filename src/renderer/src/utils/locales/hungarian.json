@@ -28,12 +28,12 @@
     "Pause": "megállítás",
     "play": "lejátszás",
     "errors": {
-      "extractionError": "Failed Extracting Player Urls: {{error}}",
-      "MEDIA_ERR_ABORTED": "The playback was aborted.",
-      "MEDIA_ERR_NETWORK": "A network error occurred while fetching the video.",
-      "MEDIA_ERR_DECODE": "An error occurred while decoding the video.",
-      "MEDIA_ERR_SRC_NOT_SUPPORTED": "The video format or source is not supported.",
-      "default": "An unknown error occurred."
+      "extractionError": "A lejátszó URL-ek kibontása nem sikerült: {{error}}",
+      "MEDIA_ERR_ABORTED": "A lejátszás megszakadt.",
+      "MEDIA_ERR_NETWORK": "Hálózati hiba történt a videó lekérése közben.",
+      "MEDIA_ERR_DECODE": "Hiba történt a videó dekódolása közben.",
+      "MEDIA_ERR_SRC_NOT_SUPPORTED": "A videó formátuma vagy forrása nem támogatott.",
+      "default": "Ismeretlen hiba történt."
     },
     "upNext": {
       "title": "következő rész {{sec}} másodperc mulva kezdődik",
@@ -59,31 +59,31 @@
       "Home": "Home"
     },
     "general": {
-      "Sidebar": "Sidebar",
-      "HoverSidebar": "Hover Sidebar",
-      "Window": "Window",
-      "theme": "Theme",
-      "language": "Language",
-      "AutoMaximize": "Auto Maximize",
-      "AutoFullscreen": "Auto Fullscreen",
+      "Sidebar": "Oldalsáv",
+      "HoverSidebar": "lebegő oldalsáv",
+      "Window": "ablak",
+      "theme": "Téma",
+      "language": "nyelv",
+      "AutoMaximize": "Auto maximalizálás",
+      "AutoFullscreen": "Auto teljesképernyő",
       "Zoom": "Zoom"
     },
     "screenshot": {
-      "Screenshot": "Screenshots",
-      "AlwaysAsk": "Always ask where to save a screenshot",
-      "path": "Default Save path:"
+      "Screenshot": "képernyőfotó",
+      "AlwaysAsk": "mindig kérdezze meg",
+      "path": "alap mentési útvonal: "
     },
     "player": {
-      "autoPlay": "Auto Play",
-      "DefaultVolume": "Default Volume",
-      "LongTimeSkipForward": "Long Skip Forward",
-      "LongTimeSkipBack": "Long Skip Back",
-      "TimeSkipForward": "Short Skip Forward",
-      "TimeSkipBack": "Short Skip Back",
-      "MinimalTimeSave": "Minimal Time ignore",
-      "MaximizeTimeSave": "Maximize Time ignore",
-      "historysave": "Max limit history save",
-      "Keybinds": "Keybinds",
+      "autoPlay": "Auto lejátszás",
+      "DefaultVolume": "alap hangerő",
+      "LongTimeSkipForward": "hosszó előrelépés",
+      "LongTimeSkipBack": "hosszú hátralépés",
+      "TimeSkipForward": "rövid előrelépés",
+      "TimeSkipBack": "rövid hátralépés",
+      "MinimalTimeSave": "Minimum idő ignorencia",
+      "MaximizeTimeSave": "Maximum idő ignorencia",
+      "historysave": "meximum ennyit menthetsz előzménybe",
+      "Keybinds": "billentyű bind-ok",
       "Pause": "megállít",
       "Fullscreen": "teljes képernyő",
       "ExitPlayer": "lejátszóbol való kilépés",
@@ -97,31 +97,31 @@
   },
   "errors": {
     "connection": "Connection Error",
-    "emptyMessage": "Where did it all go?",
-    "playerCantFind": "Player can't find any playable link",
-    "extractionError": "Player Failed extract links: {{error}}",
-    "playerHeaderError": "Player Error"
+    "emptyMessage": "Hová tűnt az egész?",
+    "playerCantFind": "A lejátszó nem talál lejátszható linket",
+    "extractionError": "A lejátszó nem sikerült linkek kibontása: {{error}}",
+    "playerHeaderError": "lejátszó hiba"
   },
   "tips": {
-    "gAutoMaximize": "Automatically maximizes the window when application starts",
-    "gAutoFullscreen": "Automatically fullscreen the window when application starts, Warning: you can't exit fullscreen mode in the app",
-    "gZoom": "Change zoom scaling",
-    "pSkip": "This skips the video",
-    "pAutoFullscreen": "Automatically fullscreen a window when player loads the video",
-    "hContinueMinimal": "If an episode was watched for less than the minimal time it won't be saved in Continue Watching tab",
-    "hContinueMax": "If there is less seconds to the end of an episode than the max time it won't be saved in Continue Watching tab"
+    "gAutoMaximize": "Automatikusan maximalizálja az ablakot az alkalmazás indításakor",
+    "gAutoFullscreen": "Az ablak automatikus teljes képernyős megjelenítése az alkalmazás indításakor. Figyelmeztetés: az alkalmazásban nem lehet kilépni a teljes képernyős módból",
+    "gZoom": "Módosítsa a nagyítás mértékét",
+    "pSkip": "Ezzel átugorja a videót",
+    "pAutoFullscreen": "automatikus teljes képernyős ablak, amikor a lejátszó betölti a videót",
+    "hContinueMinimal": "Ha egy epizódot a minimálisnál rövidebb ideig néztek, akkor a rendszer nem menti el a Megtekintés folytatása lapon",
+    "hContinueMax": "Ha egy epizód végéig kevesebb másodperc van, mint a maximális idő, akkor a rendszer nem menti el a Megtekintés folytatása lapon"
   },
   "lang": {
-    "english": "English",
-    "polish": "Polish",
+    "english": "angol",
+    "polish": "lengyel",
     "hungary": "Magyar"
   },
   "contextMenu": {
-    "reload": "Reload"
+    "reload": "újratölt"
   },
   "updater": {
-    "new": "New Update {{ver}} is available",
-    "noAuto": "New Update {{ver}} is available, click to install",
-    "failed": "Failed to update."
+    "new": "új verzió {{ver}} elérhető",
+    "noAuto": "új verzió elérhető {{ver}} kattints hogy telepítsd",
+    "failed": "frissítés sikertelen"
   }
 }
