@@ -32,13 +32,16 @@ linux:
   target:
     - AppImage
     - deb
+    - pacman
   maintainer: electronjs.org
   category: AudioVideo
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
-  provider: generic
-  url: https://example.com/auto-updates
+  provider: github
+  owner: Owca525
+  repo: animu
+  releaseType: release
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/

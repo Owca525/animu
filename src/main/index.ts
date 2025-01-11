@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
 import fs from 'fs'
+import { autoUpdater } from 'electron-updater'
 
 function createWindow(): void {
   var title = 'Animu v' + app.getVersion()
@@ -36,6 +37,8 @@ function createWindow(): void {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
+
+  autoUpdater.checkForUpdatesAndNotify();
 
   ipcMain.handle(
     'fetch-data',
@@ -154,7 +157,7 @@ function createWindow(): void {
     if (filePath) {
       const base64Data = data.replace(/^data:image\/png;base64,/, '');
       fs.writeFile(filePath, base64Data, 'base64', (err) => {
-          if (err) console.log(err)
+        if (err) console.log(err)
       });
       return true
     }
@@ -165,7 +168,7 @@ function createWindow(): void {
     const base64Data = data.replace(/^data:image\/png;base64,/, '');
     let error: any = null
     fs.writeFile(PatchName, base64Data, 'base64', (err) => {
-        if (err) console.log(err); error = err
+      if (err) console.log(err); error = err
     });
     if (error) {
       return false
@@ -183,6 +186,22 @@ function createWindow(): void {
     return ""
   })
 
+  autoUpdater.on('error', (error) => {
+    console.log(error)
+  });
+
+  ipcMain.handle('getUpdate', async (_event): Promise<string> => {
+    let update: string | undefined = undefined
+    autoUpdater.on('update-available', (event) => {
+      update = event.version
+      console.log('Update available.');
+    });
+    if (update) {
+      return update
+    }
+    return ""
+  })
+
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -191,6 +210,11 @@ function createWindow(): void {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 }
+
+// autoUpdater.on('update-downloaded', (info) => {
+//   console.log('Update downloaded:', info);
+//   autoUpdater.quitAndInstall();
+// });
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
