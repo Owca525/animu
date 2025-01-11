@@ -11,11 +11,11 @@
     "activeSearch": "Searching: {{name}}"
   },
   "information": {
-    "episodes": "Availble Episodes:",
+    "episodes": "Available Episodes:",
     "emptyEpisodes": "No Episodes"
   },
   "toast": {
-    "update": "Update {{version}} is avaible",
+    "update": "Update {{version}} is Available",
     "config": "Config Saved!",
     "screenshot": "Screenshot saved in {{path}}",
     "screenshotFail": "Failed Saving screenshot"
@@ -28,7 +28,7 @@
     "Pause": "Pause",
     "play": "Play",
     "errors": {
-      "extractionError": "Failed Extraction Player Urls: {{error}}",
+      "extractionError": "Failed Extracting Player Urls: {{error}}",
       "MEDIA_ERR_ABORTED": "The playback was aborted.",
       "MEDIA_ERR_NETWORK": "A network error occurred while fetching the video.",
       "MEDIA_ERR_DECODE": "An error occurred while decoding the video.",
@@ -70,16 +70,16 @@
     },
     "screenshot": {
       "Screenshot": "Screenshots",
-      "AlwaysAsk": "Always ask for save a screenshot",
-      "path": "Save path:"
+      "AlwaysAsk": "Always ask where to save a screenshot",
+      "path": "Default Save path:"
     },
     "player": {
       "autoPlay": "Auto Play",
       "DefaultVolume": "Default Volume",
-      "LongTimeSkipForward": "Long Time Skip Forward",
-      "LongTimeSkipBack": "Long Time Skip Back",
-      "TimeSkipForward": "Time Skip Forward",
-      "TimeSkipBack": "Time Skip Back",
+      "LongTimeSkipForward": "Long Skip Forward",
+      "LongTimeSkipBack": "Long Skip Back",
+      "TimeSkipForward": "Short Skip Forward",
+      "TimeSkipBack": "Short Skip Back",
       "MinimalTimeSave": "Minimal Time ignore",
       "MaximizeTimeSave": "Maximize Time ignore",
       "historysave": "Max limit history save",
@@ -92,24 +92,24 @@
       "VolumeUP": "Volume up",
       "VolumeDown": "Volume Down",
       "VolumeMute": "Volume Mute",
-      "Screenshot": "Make a Screenshot"
+      "Screenshot": "Take a Screenshot"
     }
   },
   "errors": {
     "connection": "Connection Error",
     "emptyMessage": "Where did it all go?",
-    "playerCantFind": "Player can't find playable link",
+    "playerCantFind": "Player can't find any playable link",
     "extractionError": "Player Failed extract links: {{error}}",
-    "playerHeaderError": "Error with player"
+    "playerHeaderError": "Player Error"
   },
   "tips": {
-    "gAutoMaximize": "Autmatic Maximize Window when start application",
-    "gAutoFullscreen": "Automatic Fullscreen appllication when start, Warning This is project for gamescope",
-    "gZoom": "This zoom full application for example 1.0 is normal but if you but 2 then application scale is 2 times",
-    "pSkip": "This skip video selected time",
-    "pAutoFullscreen": "This automatic fullscreen player when load video",
-    "hContinueMinimal": "This make if for example 20 seconds don't watch then don't save in continue watch",
-    "hContinueMax": "This work like minimal but this delete time from durration video for example if video has 23:00 and this selected 120s then stop save 21 minut in continue watching"
+    "gAutoMaximize": "Automatically maximizes the window when application starts",
+    "gAutoFullscreen": "Automatically fullscreen the window when application starts, Warning: you can't exit fullscreen mode in the app",
+    "gZoom": "Change zoom scaling",
+    "pSkip": "This skips the video",
+    "pAutoFullscreen": "Automatically fullscreen a window when player loads the video",
+    "hContinueMinimal": "If an episode was watched for less than the minimal time it won't be saved in Continue Watching tab",
+    "hContinueMax": "If there is less seconds to the end of an episode than the max time it won't be saved in Continue Watching tab"
   },
   "lang": {
     "english": "English",
@@ -120,8 +120,8 @@
     "reload": "Reload"
   },
   "updater": {
-    "new": "New Update {{ver}} is avaible",
-    "noAuto": "New Update {{ver}} is avaible, click to install",
-    "failed": "Failed to download updater or something else."
+    "new": "New Update {{ver}} is available",
+    "noAuto": "New Update {{ver}} is available, click to install",
+    "failed": "Failed to update."
   }
 }
