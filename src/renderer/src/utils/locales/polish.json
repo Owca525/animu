@@ -123,5 +123,9 @@
     "new": "Nowa Aktualizacja {{ver}} jest Dostępna",
     "noAuto": "Nowa Aktualizacja {{ver}} jest Dostępna, Kliknij żeby zainstalować",
     "failed": "Nie udało się zaktualizować."
+  },
+  "status": {
+    "settings": "W ustawieniach",
+    "home": "Na stronie głównej"
   }
 }

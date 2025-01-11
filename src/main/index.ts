@@ -5,6 +5,11 @@ import icon from '../../resources/icon.png?asset'
 
 import fs from 'fs'
 import { autoUpdater } from 'electron-updater'
+import * as RPC from 'discord-rpc';
+
+const CLIENT_ID = '1320810160205070377';
+const rpc = new RPC.Client({ transport: 'ipc' });
+const runTime = new Date()
 
 function createWindow(): void {
   var title = 'Animu v' + app.getVersion()
@@ -202,6 +207,18 @@ function createWindow(): void {
     return ""
   })
 
+  ipcMain.handle('setActivity', (_event, details: string, state: string = "") => {
+    if (rpc) { 
+      rpc.setActivity({
+        details: details,
+        state: state,
+        startTimestamp: runTime,
+        largeImageKey: 'https://github.com/Owca525/animu/blob/electron/resources/icon.png?raw=true', 
+        instance: false,
+      });
+    }
+  })
+
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -231,6 +248,7 @@ app.whenReady().then(() => {
   })
 
   createWindow()
+  setupDiscordRPC()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
@@ -238,6 +256,20 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
+
+const setupDiscordRPC = () => {
+  RPC.register(CLIENT_ID);
+
+  rpc.on('ready', () => {
+    rpc.setActivity({
+      startTimestamp: runTime,
+      largeImageKey: 'https://github.com/Owca525/animu/blob/electron/resources/icon.png?raw=true',
+      instance: false,
+    });
+  });
+
+  rpc.login({ clientId: CLIENT_ID }).catch(console.error);
+};
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

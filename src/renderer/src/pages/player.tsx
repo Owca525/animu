@@ -142,6 +142,8 @@ const Player = () => {
     if (duration != 0 && currentTime != 0 && (isHideUpNextEpisode == false && timeNextEpisode <= 0)) {
       setNewEpisode("next")
     }
+
+    window.electron.ipcRenderer.invoke("setActivity", `${title} Episode ${ep}`, `${formatTime(currentTime)} / ${formatTime(duration)}`)
   }, [currentTime])
 
   // Checking config and player if load then set config to player and add event

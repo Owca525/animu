@@ -123,5 +123,9 @@
     "new": "új verzió {{ver}} elérhető",
     "noAuto": "új verzió elérhető {{ver}} kattints hogy telepítsd",
     "failed": "frissítés sikertelen"
+  },
+  "status": {
+    "settings": "A beállításokban",
+    "home": "Otthon"
   }
 }

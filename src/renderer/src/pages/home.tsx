@@ -115,6 +115,7 @@ function home() {
       setLoading(false)
     }
     fetchData()
+    window.electron.ipcRenderer.invoke("setActivity", undefined, t("status.home"))
   }, [])
 
   const change_content = (newData: ContainerProps) => {

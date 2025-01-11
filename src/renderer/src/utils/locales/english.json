@@ -123,5 +123,9 @@
     "new": "New Update {{ver}} is available",
     "noAuto": "New Update {{ver}} is available, click to install",
     "failed": "Failed to update."
+  },
+  "status": {
+    "settings": "In settings",
+    "home": "In home"
   }
 }

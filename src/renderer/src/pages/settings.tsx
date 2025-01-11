@@ -107,6 +107,8 @@ const Settings = () => {
     readConfig().then((tmpConfig) => {
       setConfig(tmpConfig)
     })
+
+    window.electron.ipcRenderer.invoke("setActivity", undefined, t("status.settings"))
   }, [])
 
   useEffect(() => {
