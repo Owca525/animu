@@ -98,12 +98,6 @@ const Settings = () => {
 
   const menuItems = [{ label: t('contextMenu.reload'), onClick: () => location.reload() }]
 
-  // const cardSize = [
-  //   { label: t("settings.general.cards.small"), value: "small", onClick: () => console.log("purpleAnimu") },
-  //   { label: t("settings.general.cards.medium"), value: "medium", onClick: () => console.log("catppuccin") },
-  //   { label: t("settings.general.cards.big"), value: "big", onClick: () => console.log("gruvbox") },
-  // ]
-
   function checkCurrentPage(page: string): string {
     if (page == settingPage) return 'active'
     else return ''
@@ -237,10 +231,6 @@ const Settings = () => {
                 {t('settings.general.theme')}{' '}
                 <Dropdown options={theme} placeholder={config.General.color} />
               </div>
-              {/* <div className="border-settings"></div>
-              <div className="same-space">
-                {t("settings.general.cardSize")}  <Dropdown options={cardSize} placeholder={config.General.cardSize} />
-              </div> */}
             </div>
             <div className="settings-space">
               <div className="text">{t('settings.general.Window')}</div>
