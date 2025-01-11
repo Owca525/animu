@@ -118,5 +118,10 @@
   },
   "contextMenu": {
     "reload": "Reload"
+  },
+  "updater": {
+    "new": "New Update {{ver}} is avaible",
+    "noAuto": "New Update {{ver}} is avaible, click to install",
+    "failed": "Failed to download updater or something else."
   }
 }
