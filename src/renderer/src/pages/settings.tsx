@@ -333,7 +333,6 @@ const Settings = () => {
               />
               <div className="border-settings"></div>
               <Input
-                helpDescription={t('tips.pSkip')}
                 title={t('settings.player.DefaultVolume')}
                 placeholder="25"
                 value={config.Player.general.Volume}
