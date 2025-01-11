@@ -10,7 +10,7 @@ The only problem is that my friend and I have no experience in creating such a p
 - Notifications when a new episode is released
 - User-friendly UI
 # How to Compile
-You need to have [Node,js](https://nodejs.org/en) installed. Then, clone the repository.
+You need to have [Node.js](https://nodejs.org/en) installed. Then, clone the repository.
 ```bash
 git clone https://github.com/Owca525/animu.git && cd ./animu
 ```
