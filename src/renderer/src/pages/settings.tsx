@@ -16,6 +16,7 @@ import { notificationProps, SettingsConfig } from '../utils/interface'
 
 import '../css/pages/settings.css'
 import { toast, ToastContainer } from 'react-toastify'
+import Button from '@renderer/components/ui/button'
 
 const Settings = () => {
   const navigate = useNavigate()
@@ -171,6 +172,13 @@ const Settings = () => {
       if (element.value == lang) return element.label
     }
     return ''
+  }
+
+  function changePathScreenshot(path: string) {
+    if (path == "") {
+      return
+    }
+    handleChange("Player.screenShot.path", path)
   }
 
   const changeLang = (lang: string) => {
@@ -404,15 +412,9 @@ const Settings = () => {
                 }
               />
               <div className="border-settings"></div>
-              <Input
-                title={t('settings.screenshot.path')}
-                placeholder=""
-                value={config.Player.screenShot.path}
-                type=""
-                onChange={(event) =>
-                  handleChange('Player.screenShot.path', event.currentTarget.value)
-                }
-              />
+              <div className="same-space">
+                <span style={{ marginTop: "10px", marginBottom: "10px" }}>{t("settings.screenshot.path")}<span className="curret-settings"> {config.Player.screenShot.path}</span></span> <Button value='Change path' className='settings-button' onClick={async () => changePathScreenshot(await window.electron.ipcRenderer.invoke("getLocation"))}/>
+              </div>
             </div>
             <div className="settings-space">
               <div className="text">{t('settings.player.Keybinds')}</div>

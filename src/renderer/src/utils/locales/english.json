@@ -77,7 +77,7 @@
     "screenshot": {
       "Screenshot": "Screenshots",
       "AlwaysAsk": "Always ask for save a screenshot",
-      "path": "Save path to screenshots"
+      "path": "Save path:"
     },
     "player": {
       "autoPlay": "Auto Play",

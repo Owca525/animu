@@ -111,3 +111,8 @@
   align-items: center;
   gap: 8px;
 }
+
+.settings-button {
+  font-size: medium;
+  padding: 8px;
+}

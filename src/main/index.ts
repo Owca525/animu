@@ -173,6 +173,16 @@ function createWindow(): void {
     return true
   })
 
+  ipcMain.handle('getLocation', async (_event): Promise<string> => {
+    const filePath = await dialog.showOpenDialog(mainWindow, {
+      properties: ['openDirectory']
+    })
+    if (filePath) {
+      return filePath.filePaths[0]
+    }
+    return ""
+  })
+
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
