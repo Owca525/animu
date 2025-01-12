@@ -480,7 +480,6 @@ const Settings = () => {
       ) : (
         ''
       )}
-    <ToastContainer />
     </div>
   )
 }

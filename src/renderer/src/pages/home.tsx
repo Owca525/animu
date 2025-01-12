@@ -144,7 +144,6 @@ function home() {
     return (
       <main className="container">
         <ContextMenu items={menuItems} />
-        <ToastContainer />
         {error?.error ? (
           <Dialog
             header_text={t('errors.connection')}

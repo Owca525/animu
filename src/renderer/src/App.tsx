@@ -19,6 +19,7 @@ import { CheckHistory } from './utils/history'
 import './css/colors/purpleAnimu.css'
 import './css/colors/gruvbox.css'
 import './css/colors/catppuccin.css'
+import { ToastContainer } from 'react-toastify'
 
 function App() {
   const [configIsLoading, setConfigIsLoading] = useState<boolean>(true)
@@ -71,15 +72,18 @@ function App() {
       <div className="loading material-symbols-outlined">progress_activity</div>
     </div>
   ) : (
-    <configContext.Provider value={config}>
-      <HashRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/player" element={<Player />} />
-          <Route path="/settings" element={<Settings />} />
-        </Routes>
-      </HashRouter>
-    </configContext.Provider>
+    <>
+      <ToastContainer />
+      <configContext.Provider value={config}>
+        <HashRouter>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/player" element={<Player />} />
+            <Route path="/settings" element={<Settings />} />
+          </Routes>
+        </HashRouter>
+      </configContext.Provider>
+    </>
   )
 }
 

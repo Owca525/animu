@@ -824,7 +824,6 @@ const Player = () => {
         </div>
       </div>
       <canvas ref={canvasRef} style={{ display: 'none' }} />
-      <ToastContainer />
       {isUpNextEpisode ? (
         <div className="up-Next-container">
           <div className="up-Next-Title">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>
