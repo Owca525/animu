@@ -12,20 +12,22 @@ import Player from './pages/player'
 import { checkConfig, readConfig } from './utils/config'
 import { CheckContinue } from './utils/continueWatch'
 import { configContext } from './utils/context'
-import { SettingsConfig } from './utils/interface'
+import { notificationProps, SettingsConfig } from './utils/interface'
 import { CheckHistory } from './utils/history'
 
 // Color palette
 import './css/colors/purpleAnimu.css'
 import './css/colors/gruvbox.css'
 import './css/colors/catppuccin.css'
-import { ToastContainer } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 
 function App() {
   const [configIsLoading, setConfigIsLoading] = useState<boolean>(true)
   const [config, setConfig] = useState<SettingsConfig | undefined>(undefined)
 
-  const { i18n } = useTranslation()
+  const [_updatePrecent, setupdatePrecent] = useState<number>(0)
+
+  const { t, i18n } = useTranslation()
 
   const loadConfig = useCallback(async () => {
     await checkConfig()
@@ -56,6 +58,16 @@ function App() {
   }, [])
 
   useEffect(() => {
+    window.electron.update.updateAvailable((_event, isAvailable, version) => {
+      if (isAvailable) {
+        toast.info(t('toast.update', { version: version }), { ...notificationProps, onClick: () => { window.electron.update.downloadUpdate(); toast.loading("Updated is downloading, application automatic quit and install update") } });
+      }
+    });
+
+    window.electron.update.updateProgress((_event, percent) => {
+      setupdatePrecent(percent);
+    });
+
     CheckContinue()
     CheckHistory()
   }, [])

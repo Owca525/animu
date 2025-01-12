@@ -122,7 +122,8 @@
   "updater": {
     "new": "Nowa Aktualizacja {{ver}} jest Dostępna",
     "noAuto": "Nowa Aktualizacja {{ver}} jest Dostępna, Kliknij żeby zainstalować",
-    "failed": "Nie udało się zaktualizować."
+    "failed": "Nie udało się zaktualizować.",
+    "updateProgress": "Aktualizacja się pobiera, automatycznie aplikacja się zamknie i zaintaluje"
   },
   "status": {
     "settings": "W ustawieniach",

@@ -15,7 +15,7 @@ import { readConfig, saveConfig } from '../utils/config'
 import { notificationProps, SettingsConfig } from '../utils/interface'
 
 import '../css/pages/settings.css'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 import Button from '@renderer/components/ui/button'
 
 const Settings = () => {

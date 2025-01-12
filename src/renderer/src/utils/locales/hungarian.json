@@ -122,7 +122,8 @@
   "updater": {
     "new": "új verzió {{ver}} elérhető",
     "noAuto": "új verzió elérhető {{ver}} kattints hogy telepítsd",
-    "failed": "frissítés sikertelen"
+    "failed": "frissítés sikertelen",
+    "updateProgress": "frissítés letöltése, alkalmazás autómatikusan bezáródik és a frissítés telepítődik"
   },
   "status": {
     "settings": "A beállításokban",

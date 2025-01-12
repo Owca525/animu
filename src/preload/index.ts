@@ -16,7 +16,12 @@ if (process.contextIsolated) {
       ipcRenderer: {
         invoke: (channel: string, ...args: any[]): Promise<any> =>
           ipcRenderer.invoke(channel, ...args)
-      }
+      },
+      update: {
+        updateAvailable: (callback) => ipcRenderer.on('update-available', callback),
+        updateProgress: (callback) => ipcRenderer.on('update-download-progress', callback),
+        downloadUpdate: () => ipcRenderer.send('downloadUpdate'),
+    }
     })
   } catch (error) {
     console.error(error)
@@ -27,3 +32,4 @@ if (process.contextIsolated) {
   // @ts-ignore (define in dts)
   window.api = api
 }
+

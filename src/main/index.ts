@@ -4,18 +4,20 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
 import fs from 'fs'
-import { autoUpdater } from 'electron-updater'
 import * as RPC from 'discord-rpc';
+import "./update"
 
 const CLIENT_ID = '1320810160205070377';
 const rpc = new RPC.Client({ transport: 'ipc' });
 const runTime = new Date()
 
+export let mainWindow: BrowserWindow | undefined
+
 function createWindow(): void {
   var title = 'Animu v' + app.getVersion()
 
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1500,
     height: 800,
     show: false,
@@ -35,15 +37,13 @@ function createWindow(): void {
   }
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+    if (mainWindow) mainWindow.show()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
-
-  autoUpdater.checkForUpdatesAndNotify();
 
   ipcMain.handle(
     'fetch-data',
@@ -67,15 +67,16 @@ function createWindow(): void {
   )
 
   ipcMain.handle('setMaximize', (_event) => {
-    mainWindow.maximize()
+    if (mainWindow) mainWindow.maximize()
   })
 
   ipcMain.handle('setFullscreen', (_event, option: boolean) => {
-    mainWindow.setFullScreen(option)
+    if (mainWindow) mainWindow.setFullScreen(option)
   })
 
   ipcMain.handle('isFullscreen', (_event) => {
-    return mainWindow.isFullScreen()
+    if (mainWindow) return mainWindow.isFullScreen()
+    return false
   })
 
   ipcMain.handle('getPatchPictures', (_event) => {
@@ -83,7 +84,7 @@ function createWindow(): void {
   })
 
   ipcMain.handle('setZoom', (_event, option: number) => {
-    mainWindow.webContents.setZoomLevel(option)
+    if (mainWindow) mainWindow.webContents.setZoomLevel(option)
   })
 
   ipcMain.handle('getVersion', (_event) => {
@@ -181,7 +182,8 @@ function createWindow(): void {
     return true
   })
 
-  ipcMain.handle('getLocation', async (_event): Promise<string> => {
+  ipcMain.on('getLocation', async (_event): Promise<string> => {
+    if (!mainWindow) return ""
     const filePath = await dialog.showOpenDialog(mainWindow, {
       properties: ['openDirectory']
     })
@@ -191,29 +193,13 @@ function createWindow(): void {
     return ""
   })
 
-  autoUpdater.on('error', (error) => {
-    console.log(error)
-  });
-
-  ipcMain.handle('getUpdate', async (_event): Promise<string> => {
-    let update: string | undefined = undefined
-    autoUpdater.on('update-available', (event) => {
-      update = event.version
-      console.log('Update available.');
-    });
-    if (update) {
-      return update
-    }
-    return ""
-  })
-
   ipcMain.handle('setActivity', (_event, details: string, state: string = "") => {
-    if (rpc) { 
+    if (rpc) {
       rpc.setActivity({
         details: details,
         state: state,
         startTimestamp: runTime,
-        largeImageKey: 'https://github.com/Owca525/animu/blob/electron/resources/icon.png?raw=true', 
+        largeImageKey: 'https://github.com/Owca525/animu/blob/electron/resources/icon.png?raw=true',
         instance: false,
       });
     }

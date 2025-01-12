@@ -16,7 +16,7 @@ import ContextMenu from '../components/elements/context-menu'
 import '../css/pages/player.css'
 import CustomSlider from '@renderer/components/ui/customSlider';
 import Button from '@renderer/components/ui/button';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { notificationProps } from '@renderer/utils/interface';
 
 const Player = () => {
