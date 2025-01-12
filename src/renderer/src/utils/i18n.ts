@@ -19,6 +19,9 @@ i18n.use(initReactI18next).init({
     hu: {
       translation: LangHungarian
     }
+  },
+  interpolation: {
+    escapeValue: false
   }
 })
 
