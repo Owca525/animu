@@ -133,11 +133,19 @@ const Player = () => {
       return
     }
 
-    if (duration != 0 && currentTime != 0) setTimeNextEpisode(((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + 30)
+    // setTimeNextEpisode(((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + 30)
 
-    if (duration != 0 && currentTime != 0 && isHideUpNextEpisode == false && currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
+    // if (duration != 0 && currentTime != 0 && episodes[episodes.indexOf(ep) + 1] != null) setTimeNextEpisode((prev) => prev -= 1)
+    // else setTimeNextEpisode(30)
+    
+    if (duration != 0 && currentTime != 0 && isHideUpNextEpisode == false && episodes[episodes.indexOf(ep) + 1] != null && currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
       setUpNextEpisode(true)
+      setTimeNextEpisode(((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + 30)
+    } else {
+      setTimeNextEpisode(30)
+      setUpNextEpisode(false)
     }
+    console.log(currentTime)
     
     if (duration != 0 && currentTime != 0 && (isHideUpNextEpisode == false && timeNextEpisode <= 0)) {
       setNewEpisode("next")
@@ -484,12 +492,17 @@ const Player = () => {
     setWaitingPlayer(true)
     const seekBar = seekbar.current
     const video = videoRef.current
+
     if (seekBar && video) {
       const rect = seekBar.getBoundingClientRect()
       const offsetX = event.clientX - rect.left
       const totalWidth = rect.width
       const percent = offsetX / totalWidth
       const newTime = percent * video.duration
+      if (!isNaN(newTime) && config && newTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
+        setHideUpNextEpisode(true)
+      }
+
       if (!isNaN(newTime)) {
         video.currentTime = newTime
         setCurrentTime(newTime)
