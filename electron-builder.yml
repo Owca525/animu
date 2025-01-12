@@ -32,7 +32,6 @@ linux:
   target:
     - AppImage
     - deb
-    - pacman
   maintainer: electronjs.org
   category: AudioVideo
 appImage:
