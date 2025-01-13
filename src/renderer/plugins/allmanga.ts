@@ -57,7 +57,7 @@ function decodeText(textString: string): string {
 }
 
 async function sendRequest(url: any, header: any) {
-  let data = await window.electron.ipcRenderer.invoke('fetch-data', { url, header })
+  let data = await window.api.request.get(url, header)
   if (data.success) {
     return data.data
   }

@@ -151,7 +151,7 @@ const Player = () => {
       setNewEpisode("next")
     }
 
-    window.electron.ipcRenderer.invoke("setActivity", `${title} Episode ${ep}`, `${formatTime(currentTime)} / ${formatTime(duration)}`)
+    window.api.rpc.setActivity(`${title} Episode ${ep}`, `${formatTime(currentTime)} / ${formatTime(duration)}`)
   }, [currentTime])
 
   // Checking config and player if load then set config to player and add event
@@ -287,7 +287,7 @@ const Player = () => {
       navigate('/')
       return
     }
-    window.electron.ipcRenderer.invoke('setFullscreen', false)
+    window.BrowserWindow.setFullscreen(false)
     navigate('/')
   }
 
@@ -354,10 +354,15 @@ const Player = () => {
     context.drawImage(videoRef.current, 0, 0);
     const screenshot = canvasRef.current.toDataURL('image/png');
 
+    if (screenshot == "data:,") {
+      toast.error(t("toast.screenshotFail"), notificationProps);
+      return
+    }
+
     if (config.Player.screenShot.alwaysAsk) {
-      var resp = await window.electron.ipcRenderer.invoke("saveFilePictureDialog", `${config.Player.screenShot.path}/screenshot${formatedDate}.png`, "Save file", screenshot)
+      var resp = await window.api.os.saveDialog(`${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot.replace(/^data:image\/png;base64,/, ''), `screenshot${formatedDate}.png`, "png", ["PNG"], "base64")
     } else {
-      var resp = await window.electron.ipcRenderer.invoke("saveFilePicture", `${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot)
+      var resp = await window.api.os.write(`${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot.replace(/^data:image\/png;base64,/, ''), "base64")
     }
     if (resp) {
       toast.success(t("toast.screenshot", { path: config.Player.screenShot.path }), notificationProps);
@@ -438,11 +443,11 @@ const Player = () => {
   }
 
   const enterFullscreen = async () => {
-    if (await window.electron.ipcRenderer.invoke('isFullscreen')) {
-      await window.electron.ipcRenderer.invoke('setFullscreen', false)
+    if (window.BrowserWindow.isFullscreen()) {
+      window.BrowserWindow.setFullscreen(false)
       setIsFullscreen(false)
     } else {
-      await window.electron.ipcRenderer.invoke('setFullscreen', true)
+      window.BrowserWindow.setFullscreen(true)
       setIsFullscreen(true)
     }
   }

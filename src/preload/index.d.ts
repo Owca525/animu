@@ -1,17 +1,80 @@
-import { ElectronAPI } from '@electron-toolkit/preload'
+import { ElectronAPI } from "@electron-toolkit/preload";
 
 declare global {
   interface Window {
+    api: {
+      open: (url: string) => Promise<void>;
+      update: {
+        updateAvailable: (
+          callback: (
+            event: Event,
+            isAvailable: boolean,
+            version: string
+          ) => void
+        ) => void;
+        updateProgress: (
+          callback: (event: Event, percent: number) => void
+        ) => void;
+        downloadUpdate: () => void;
+      };
+      request: {
+        get: (
+          url: string,
+          header: Record<string, string>
+        ) => Promise<{
+          success: boolean;
+          data?: any;
+          status?: number;
+          statusText?: string;
+          error?: unknown;
+        }>;
+      };
+      rpc: {
+        setActivity: (
+          details: string | undefined,
+          state: string | undefined
+        ) => void;
+      }
+      os: {
+        getPath: (
+          name:
+            | "home"
+            | "appData"
+            | "userData"
+            | "sessionData"
+            | "temp"
+            | "exe"
+            | "module"
+            | "desktop"
+            | "documents"
+            | "downloads"
+            | "music"
+            | "pictures"
+            | "videos"
+            | "recent"
+            | "logs"
+            | "crashDumps"
+        ) => Promise<string>;
+        exists: (path: string) => Promise<boolean>;
+        write: (path: string, data: string, format?: string) => Promise<boolean>
+        read: (path: string, format?: string) => Promise<any>;
+        mkdir: (path: string) => Promise<boolean>;
+        saveDialog: (fileName: string, data: any, title: string, name: string, extensions: string[], format?: string) => Promise<boolean>
+        openDialog: (path?: string, name?: string, extensions?: string[]) => Promise<string>
+      };
+    };
     electron: {
       ipcRenderer: {
-        invoke(channel: string, ...args: any[]): Promise<any>
-      },
-      update: {
-        updateAvailable: (callback: (event: Event, isAvailable: boolean, version: string) => void) => void;
-        updateProgress: (callback: (event: Event, percent: number) => void) => void;
-        downloadUpdate: () => void;
-      }
-    }
-    api: unknown
+        invoke(channel: string, ...args: any[]): Promise<any>;
+      };
+      version: () => string;
+    };
+    BrowserWindow: {
+      setMaximize: () => void;
+      setFullscreen: (option: boolean) => void;
+      isFullscreen: () => boolean;
+      setZoom: (zoom: number) => void;
+      exit: () => void;
+    };
   }
 }

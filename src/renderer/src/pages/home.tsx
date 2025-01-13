@@ -115,7 +115,7 @@ function home() {
       setLoading(false)
     }
     fetchData()
-    window.electron.ipcRenderer.invoke("setActivity", undefined, t("status.home"))
+    window.api.rpc.setActivity(undefined, t("status.home"))
   }, [])
 
   const change_content = (newData: ContainerProps) => {
@@ -151,7 +151,7 @@ function home() {
             buttons={[
               {
                 title: t('general.exit'),
-                onClick: () => window.electron.ipcRenderer.invoke('exit')
+                onClick: () => window.BrowserWindow.exit()
               },
               { title: t('general.reload'), onClick: async () => change_content({ title: t('sidebar.RecentAnime'), data: await functionHandler(get_recent) })}
             ]}

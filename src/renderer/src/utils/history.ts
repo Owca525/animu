@@ -1,60 +1,60 @@
-import { CardProps } from './interface'
-import { readConfig } from './config'
+import { CardProps } from "./interface";
+import { readConfig } from "./config";
 
 const DefaultHistory: { history: CardProps[] } = {
-  history: []
-}
+  history: [],
+};
 
 export async function CheckHistory() {
   try {
-    const appConfigDirPath = await window.electron.ipcRenderer.invoke('appConfigDir')
-    if (
-      (await window.electron.ipcRenderer.invoke(
-        'DirectoryExist',
-        appConfigDirPath + '/history.json'
-      )) == false
-    ) {
-      await window.electron.ipcRenderer.invoke(
-        'WriteFile',
-        appConfigDirPath + '/history.json',
+    const appConfigDirPath = await window.api.os.getPath("userData");
+    window.api.os.exists(appConfigDirPath + "/history.json");
+    if (await window.api.os.exists(appConfigDirPath + "/history.json") == false) {
+      window.api.os.write(
+        appConfigDirPath + "/history.json",
         JSON.stringify(DefaultHistory)
-      )
+      );
     }
-  } catch (Error) {}
+  } catch (Error) {
+    console.error(`${Error} in CheckHistory`);
+  }
 }
 
 export async function SaveHistory(save: CardProps) {
   try {
-    await CheckHistory()
-    const appConfigDirPath = await window.electron.ipcRenderer.invoke('appConfigDir')
+    await CheckHistory();
+    const appConfigDirPath = await window.api.os.getPath("userData");
 
-    const config = await readConfig()
-    let file = (await ReadHistory()).reverse()
+    const config = await readConfig();
+    let file = (await ReadHistory()).reverse();
 
-    const index = file.findIndex((item) => item.id === save.id)
+    const index = file.findIndex((item) => item.id === save.id);
 
-    if (config && file.length >= parseInt(config.History.history.maxSave.toString())) file.shift()
-    if (index != -1) file.splice(index, 1)
-    
-    file.push(save)
-    await window.electron.ipcRenderer.invoke(
-      'WriteFile',
-      appConfigDirPath + '/history.json',
-      JSON.stringify(file)
+    if (
+      config &&
+      file.length >= parseInt(config.History.history.maxSave.toString())
     )
-  } catch (Error) {}
+      file.shift();
+    if (index != -1) file.splice(index, 1);
+
+    file.push(save);
+    window.api.os.write(
+      appConfigDirPath + "/history.json",
+      JSON.stringify(file)
+    );
+  } catch (Error) {
+    console.error(`${Error} in SaveHistory`);
+  }
 }
 
 export async function ReadHistory(): Promise<CardProps[]> {
   try {
-    const appConfigDirPath = await window.electron.ipcRenderer.invoke('appConfigDir')
-    const file = await window.electron.ipcRenderer.invoke(
-      'ReadFile',
-      appConfigDirPath + '/history.json'
-    )
-    const data = JSON.parse(file) 
-    return data.reverse()
+    const appConfigDirPath = await window.api.os.getPath("userData");
+    const file = await window.api.os.read(appConfigDirPath + "/history.json");
+    const data = JSON.parse(file);
+    return data.reverse();
   } catch (Error) {
-    return []
+    console.error(`${Error} in ReadHistory`);
+    return [];
   }
 }

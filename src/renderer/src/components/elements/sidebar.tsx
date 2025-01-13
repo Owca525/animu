@@ -40,7 +40,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   }
 
   const getAndSetVersion = async () => {
-    setversion(await window.electron.ipcRenderer.invoke('getVersion'))
+    setversion(window.electron.version())
   }
 
   useEffect(() => {

@@ -62,12 +62,7 @@ const Settings = () => {
         t('settings.sidebar.ConfigFolder'),
       class: 'icon-button',
       title: t('settings.sidebar.ConfigFolder'),
-      onClick: async () =>
-        window.electron.ipcRenderer.invoke(
-          'open',
-          await window.electron.ipcRenderer.invoke('appConfigDir'),
-          'folder'
-        )
+      onClick: async () => await window.api.open(await window.api.os.getPath("userData"))
     },
     {
       value:
@@ -108,17 +103,14 @@ const Settings = () => {
       setConfig(tmpConfig)
     })
 
-    window.electron.ipcRenderer.invoke("setActivity", undefined, t("status.settings"))
+    window.api.rpc.setActivity(undefined, t("status.settings"))
   }, [])
 
   useEffect(() => {
     saveConfig(config)
     if (config !== undefined) {
       setisLoading(false)
-      window.electron.ipcRenderer.invoke(
-        'setZoom',
-        parseFloat(config.General.Window.Zoom.toString())
-      )
+      window.BrowserWindow.setZoom(parseFloat(config.General.Window.Zoom.toString()))
       toast.info(t("toast.config"), notificationProps);
     }
   }, [config])
@@ -404,7 +396,7 @@ const Settings = () => {
               />
               <div className="border-settings"></div>
               <div className="same-space">
-                <span style={{ marginTop: "10px", marginBottom: "10px" }}>{t("settings.screenshot.path")}<span className="curret-settings"> {config.Player.screenShot.path}</span></span> <Button value='Change path' className='settings-button' onClick={async () => changePathScreenshot(await window.electron.ipcRenderer.invoke("getLocation"))}/>
+                <span style={{ marginTop: "10px", marginBottom: "10px" }}>{t("settings.screenshot.path")}<span className="curret-settings"> {config.Player.screenShot.path}</span></span> <Button value='Change path' className='settings-button' onClick={async () => changePathScreenshot(await window.api.os.openDialog(undefined, undefined, ["openDirectory"]))}/>
               </div>
             </div>
             <div className="settings-space">

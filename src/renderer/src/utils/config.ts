@@ -1,17 +1,16 @@
-import ini from 'ini'
-import { SettingsConfig } from './interface'
+import ini from "ini";
+import { SettingsConfig } from "./interface";
 
 export const defaultConfig: SettingsConfig = {
   General: {
     HoverSidebar: true,
-    language: 'en',
-    color: 'purpleAnimu',
-    cardSize: 'medium',
+    language: "en",
+    color: "purpleAnimu",
     Window: {
       AutoMaximize: false,
       AutoFullscreen: false,
-      Zoom: 0
-    }
+      Zoom: 0,
+    },
   },
   Player: {
     general: {
@@ -22,116 +21,107 @@ export const defaultConfig: SettingsConfig = {
       LongTimeSkipForward: 80,
       LongTimeSkipBack: 80,
       TimeSkipLeft: 5,
-      TimeSkipRight: 5
+      TimeSkipRight: 5,
     },
     screenShot: {
       alwaysAsk: true,
-      path: await checkPcicutePath()
+      path: await checkPictureFolder(),
     },
     keybinds: {
-      Pause: ' ',
-      LongTimeSkipForward: 'ArrowUp',
-      LongTimeSkipBack: 'ArrowDown',
-      TimeSkipLeft: 'ArrowLeft',
-      TimeSkipRight: 'ArrowRight',
-      Fullscreen: 'F',
-      ExitPlayer: 'Escape',
-      FrameSkipBack: ',',
-      FrameSkipForward: '.',
-      VolumeDown: '9',
-      VolumeUp: '0',
+      Pause: " ",
+      LongTimeSkipForward: "ArrowUp",
+      LongTimeSkipBack: "ArrowDown",
+      TimeSkipLeft: "ArrowLeft",
+      TimeSkipRight: "ArrowRight",
+      Fullscreen: "F",
+      ExitPlayer: "Escape",
+      FrameSkipBack: ",",
+      FrameSkipForward: ".",
+      VolumeDown: "9",
+      VolumeUp: "0",
       VolumeMute: "m",
-      ScreenShot: "f10"
-    }
+      ScreenShot: "f10",
+    },
   },
   History: {
     history: {
-      maxSave: 20
+      maxSave: 20,
     },
     continue: {
       MinimalTimeSave: 20,
-      MaximizeTimeSave: 120
-    }
-  }
-}
+      MaximizeTimeSave: 100,
+    },
+  },
+};
 
-async function checkPcicutePath(): Promise<string> {
-  const path = await window.electron.ipcRenderer.invoke("getPatchPictures");
-  if (await window.electron.ipcRenderer.invoke("DirectoryExist", path + "/animu") ==  false) {
-    window.electron.ipcRenderer.invoke("mkdir", path + "/animu")
-    return path + "/animu"
+async function checkPictureFolder(): Promise<string> {
+  const path = await window.api.os.getPath("pictures");
+  if (await window.api.os.exists(path + "/animu") == false) {
+    window.api.os.mkdir(path + "/animu");
+    return path + "/animu";
   }
-  return path + "/animu"
+  return path + "/animu";
 }
 
 function deepMerge(target: any, source: any): any {
   for (const key in source) {
-    if (source[key] && typeof source[key] === 'object') {
+    if (source[key] && typeof source[key] === "object") {
       if (!target[key]) {
-        target[key] = {}
+        target[key] = {};
       }
-      deepMerge(target[key], source[key])
+      deepMerge(target[key], source[key]);
     } else {
-      target[key] = source[key]
+      target[key] = source[key];
     }
   }
-  return target
+  return target;
 }
 
 export async function readConfig(): Promise<SettingsConfig | undefined> {
-  const appConfigDirPath = await window.electron.ipcRenderer.invoke('appConfigDir')
+  const appConfigDirPath = await window.api.os.getPath("userData");
   try {
-    const content = await window.electron.ipcRenderer.invoke(
-      'ReadFile',
-      appConfigDirPath + '/config.ini'
-    )
-    const loadedConfig = ini.parse(content) as SettingsConfig
-    return deepMerge(defaultConfig, loadedConfig)
+    const content = await window.api.os.read(appConfigDirPath + "/config.ini");
+    console.log(content)
+    const loadedConfig = ini.parse(content) as SettingsConfig;
+    return deepMerge(defaultConfig, loadedConfig);
   } catch (Error) {
-    return defaultConfig
+    console.error(`${Error} in readConfig`);
+    return defaultConfig;
   }
 }
 
 export async function saveConfig(content: any) {
-  const appConfigDirPath = await window.electron.ipcRenderer.invoke('appConfigDir')
-  const data = ini.stringify(content)
+  const appConfigDirPath = await window.api.os.getPath("userData");
+  const data = ini.stringify(content);
   try {
-    await await window.electron.ipcRenderer.invoke(
-      'WriteFile',
-      appConfigDirPath + '/config.ini',
-      data
-    )
-  } catch (Error) {}
+    window.api.os.write(appConfigDirPath + "/config.ini", data);
+  } catch (Error) {
+    console.error(`${Error} in saveConfig`);
+  }
 }
 
 async function createConfig() {
-  const appConfigDirPath = await window.electron.ipcRenderer.invoke('appConfigDir')
-  const content = ini.stringify(defaultConfig)
+  const appConfigDirPath = window.api.os.getPath("userData");
+  const content = ini.stringify(defaultConfig);
   try {
-    await await window.electron.ipcRenderer.invoke(
-      'WriteFile',
-      appConfigDirPath + '/config.ini',
-      content
-    )
-  } catch (Error) {}
+    await window.api.os.write(appConfigDirPath + "/config.ini", content)
+  } catch (Error) {
+    console.error(`${Error} in createConfig`);
+  }
 }
 
 export async function checkConfig() {
   try {
-    const appConfigDirPath = await window.electron.ipcRenderer.invoke('appConfigDir')
-    if ((await window.electron.ipcRenderer.invoke('DirectoryExist', appConfigDirPath)) == false) {
-      await window.electron.ipcRenderer.invoke('mkdir', appConfigDirPath)
-      await createConfig()
+    const appConfigDirPath = await window.api.os.getPath("userData");
+    if (await window.api.os.exists(appConfigDirPath) == false) {
+      await window.api.os.mkdir(appConfigDirPath);
+      await createConfig();
     }
-    if (
-      (await window.electron.ipcRenderer.invoke(
-        'DirectoryExist',
-        appConfigDirPath + '/config.ini'
-      )) == false
-    ) {
-      await createConfig()
-    }
-    await saveConfig(await readConfig())
-    console.log(await checkPcicutePath())
-  } catch (Error) {}
+    if (await window.api.os.exists(appConfigDirPath + "/config.ini") == false)
+      await createConfig();
+    await saveConfig(await readConfig());
+    console.log(await checkPictureFolder());
+  } catch (Error) {
+    console.error(`${Error} in checkConfig`);
+  }
 }

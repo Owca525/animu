@@ -34,37 +34,29 @@ function App() {
     const config = await readConfig()
     setConfig(config)
 
+    if (config == null) return
     const container = document.querySelector('#root')
-    if (container && config) {
+    if (container) {
       container.className = config.General.color
     }
 
-    if (config && config.General.Window.AutoMaximize) {
-      await window.electron.ipcRenderer.invoke('setMaximize')
-    }
-    if (config) {
-      i18n.changeLanguage(config.General.language)
-      await window.electron.ipcRenderer.invoke(
-        'setZoom',
-        parseFloat(config.General.Window.Zoom.toString())
-      )
-      await window.electron.ipcRenderer.invoke(
-        'setFullscreen',
-        config.General.Window.AutoFullscreen
-      )
-    }
+    if (config.General.Window.AutoMaximize) window.BrowserWindow.setMaximize()
+
+    i18n.changeLanguage(config.General.language)
+    window.BrowserWindow.setZoom(parseFloat(config.General.Window.Zoom.toString()))
+    window.BrowserWindow.setFullscreen(config.General.Window.AutoFullscreen)
 
     setConfigIsLoading(false)
   }, [])
 
   useEffect(() => {
-    window.electron.update.updateAvailable((_event, isAvailable, version) => {
+    window.api.update.updateAvailable((_event, isAvailable, version) => {
       if (isAvailable) {
-        toast.info(t('toast.update', { version: version }), { ...notificationProps, onClick: () => { window.electron.update.downloadUpdate(); toast.loading("Updated is downloading, application automatic quit and install update") } });
+        toast.info(t('toast.update', { version: version }), { ...notificationProps, onClick: () => { window.api.update.downloadUpdate(); toast.loading("Updated is downloading, application automatic quit and install update") } });
       }
     });
 
-    window.electron.update.updateProgress((_event, percent) => {
+    window.api.update.updateProgress((_event, percent) => {
       setupdatePrecent(percent);
     });
 
