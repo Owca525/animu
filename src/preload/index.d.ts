@@ -67,7 +67,7 @@ declare global {
       ipcRenderer: {
         invoke(channel: string, ...args: any[]): Promise<any>;
       };
-      version: () => string;
+      version: () => Promise<string>;
     };
     BrowserWindow: {
       setMaximize: () => void;

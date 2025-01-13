@@ -56,7 +56,7 @@ if (process.contextIsolated) {
         invoke: (channel: string, ...args: any[]): Promise<any> =>
           ipcRenderer.invoke(channel, ...args),
       },
-      version: () => ipcRenderer.send("getVersion"),
+      version: () => ipcRenderer.invoke("getVersion"),
     });
     contextBridge.exposeInMainWorld("BrowserWindow", {
       setMaximize: () => ipcRenderer.send("setMaximize"),

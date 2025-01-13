@@ -39,10 +39,10 @@ ipcMain.handle('setActivity', (_event, details: string | undefined, state: strin
     }
 })
 
-ipcMain.handle('getVersion', (_event) => app.getVersion())
+ipcMain.handle('getVersion', (_event): String => app.getVersion())
 
 // open web browser if is url or is directory then open file manager
-ipcMain.handle('open', async (_event, url: string) => {
+ipcMain.handle('open', async (_event, url: string): Promise<void> => {
     if (validUrl(url)) await shell.openExternal(url)
     else await shell.openPath(url)
 })
