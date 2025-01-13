@@ -448,7 +448,7 @@ const Player = () => {
   }
 
   const enterFullscreen = async () => {
-    if (window.BrowserWindow.isFullscreen()) {
+    if (await window.BrowserWindow.isFullscreen()) {
       window.BrowserWindow.setFullscreen(false)
       setIsFullscreen(false)
     } else {

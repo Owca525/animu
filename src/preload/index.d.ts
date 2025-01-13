@@ -72,7 +72,7 @@ declare global {
     BrowserWindow: {
       setMaximize: () => void;
       setFullscreen: (option: boolean) => void;
-      isFullscreen: () => boolean;
+      isFullscreen: () => Promise<boolean>;
       setZoom: (zoom: number) => void;
       exit: () => void;
     };

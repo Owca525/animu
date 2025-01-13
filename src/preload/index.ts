@@ -62,7 +62,7 @@ if (process.contextIsolated) {
       setMaximize: () => ipcRenderer.send("setMaximize"),
       setFullscreen: (option: boolean) =>
         ipcRenderer.send("setFullscreen", option),
-      isFullscreen: () => ipcRenderer.send("isFullscreen"),
+      isFullscreen: () => ipcRenderer.invoke("isFullscreen"),
       setZoom: (zoom: number) => ipcRenderer.send("setZoom", zoom),
       exit: () => ipcRenderer.send("exit"),
     });
