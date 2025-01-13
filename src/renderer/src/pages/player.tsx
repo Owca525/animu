@@ -154,6 +154,11 @@ const Player = () => {
     window.api.rpc.setActivity(`${title} Episode ${ep}`, `${formatTime(currentTime)} / ${formatTime(duration)}`)
   }, [currentTime])
 
+  useEffect(() => {
+    console.log([currentResolution])
+    console.log(currentResolution.toString().length )
+  }, [currentResolution])
+
   // Checking config and player if load then set config to player and add event
   useEffect(() => {
     if (config && videoRef.current && isConfigLoad == false) {
@@ -744,11 +749,11 @@ const Player = () => {
                   )}
                   {ListResolution.length <= 1 ? (
                     <div className="player-settings-button">
-                      <span className='player-settings-button-text' style={{ color: "gray" }}>Resolution</span> <span style={{ color: "gray" }}>{currentResolution + "p"}</span>
+                      <span className='player-settings-button-text' style={{ color: "gray" }}>Resolution</span> <span style={{ color: "gray" }}>{currentResolution.toString().length >= 1 ? currentResolution + "p" : ""}</span>
                     </div>
                   ) : (
                     <div className="player-settings-button" onClick={() => setSettings("resolution")}>
-                      <span className='player-settings-button-text'>Resolution</span> <span>{currentResolution != "" ? currentResolution + "p" : ""}</span>
+                      <span className='player-settings-button-text'>Resolution</span> <span>{currentResolution.toString().length >= 1 ? currentResolution + "p" : ""}</span>
                     </div>
                   )}
                   <div className="player-settings-button" onClick={() => setSettings("speed")}>

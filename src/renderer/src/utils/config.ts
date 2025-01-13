@@ -81,7 +81,6 @@ export async function readConfig(): Promise<SettingsConfig | undefined> {
   const appConfigDirPath = await window.api.os.getPath("userData");
   try {
     const content = await window.api.os.read(appConfigDirPath + "/config.ini");
-    console.log(content)
     const loadedConfig = ini.parse(content) as SettingsConfig;
     return deepMerge(defaultConfig, loadedConfig);
   } catch (Error) {
@@ -120,7 +119,6 @@ export async function checkConfig() {
     if (await window.api.os.exists(appConfigDirPath + "/config.ini") == false)
       await createConfig();
     await saveConfig(await readConfig());
-    console.log(await checkPictureFolder());
   } catch (Error) {
     console.error(`${Error} in checkConfig`);
   }
