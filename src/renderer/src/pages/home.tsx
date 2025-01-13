@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useContext, useEffect, useState } from 'react'
-import { toast } from 'react-toastify';
 
 // Components
 import Sidebar from '../components/elements/sidebar'
@@ -10,11 +9,10 @@ import Header from '../components/elements/headers'
 import Dialog from '../components/dialogs/dialog'
 
 // utils
-import { ContainerProps, notificationProps } from '../utils/interface'
+import { ContainerProps } from '../utils/interface'
 import { get_recent, get_search } from '../utils/backend'
 import { ReadContinue } from '../utils/continueWatch'
 import { configContext } from '../utils/context'
-import { checkUpdateAnimu } from '../utils/update'
 
 import { ReadHistory } from '../utils/history'
 import ContextMenu from '../components/elements/context-menu'
@@ -93,20 +91,7 @@ function home() {
     return data
   }
 
-  const checkUpdate = async () => {
-    const update = await checkUpdateAnimu()
-    if (update.update) {
-      const toastid = toast.info(t('toast.update', { version: update.version }), { 
-        ...notificationProps, 
-        onClick: async () => {window.electron.ipcRenderer.invoke('open', update.url, 'url'); toast.dismiss(toastid);},
-        autoClose: false,
-      });
-    }
-  }
-
   useEffect(() => {
-    checkUpdate()
-
     const fetchData = async () => {
       change_content({
         title: t('sidebar.RecentAnime'),
