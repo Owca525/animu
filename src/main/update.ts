@@ -12,7 +12,7 @@ autoUpdater.on('update-available', (update) => {
 });
 
 autoUpdater.on("error", () => {
-    if (mainWindow) mainWindow.webContents.send('update-available', true, "0.4.0");
+    if (mainWindow) mainWindow.webContents.send('update-available', false);
 })
 
 ipcMain.on("downloadUpdate", () => {
@@ -20,4 +20,6 @@ ipcMain.on("downloadUpdate", () => {
     autoUpdater.quitAndInstall()
 })
 
-autoUpdater.checkForUpdatesAndNotify();
+autoUpdater.autoDownload = false
+
+autoUpdater.checkForUpdates();

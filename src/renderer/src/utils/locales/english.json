@@ -123,7 +123,9 @@
     "new": "New Update {{ver}} is available",
     "noAuto": "New Update {{ver}} is available, click to install",
     "failed": "Failed to update.",
-    "updateProgress": "Updated is downloading, application automatic quit and install update"
+    "updateProgress": "Updated is downloading, application automatic quit and install update",
+    "updateDownload": "Download Progress {{progress}}",
+    "updateDownloadSuccess": "Updated Download, please restart application"
   },
   "status": {
     "settings": "In settings",

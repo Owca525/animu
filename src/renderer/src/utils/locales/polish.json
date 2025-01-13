@@ -123,7 +123,8 @@
     "new": "Nowa Aktualizacja {{ver}} jest Dostępna",
     "noAuto": "Nowa Aktualizacja {{ver}} jest Dostępna, Kliknij żeby zainstalować",
     "failed": "Nie udało się zaktualizować.",
-    "updateProgress": "Aktualizacja się pobiera, automatycznie aplikacja się zamknie i zaintaluje"
+    "updateDownload": "Progres pobierania {{progress}}",
+    "updateDownloadSuccess": "Pobrano Aktualizacja, Proszę zresetować aplikacje"
   },
   "status": {
     "settings": "W ustawieniach",

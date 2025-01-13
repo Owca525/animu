@@ -25,7 +25,8 @@ function App() {
   const [configIsLoading, setConfigIsLoading] = useState<boolean>(true)
   const [config, setConfig] = useState<SettingsConfig | undefined>(undefined)
 
-  const [_updatePrecent, setupdatePrecent] = useState<number>(0)
+  const [updatePrecent, setupdatePrecent] = useState<number>(0)
+  const [updateNotification, setUpdateNotification] = useState<any>()
 
   const { t, i18n } = useTranslation()
 
@@ -52,7 +53,7 @@ function App() {
   useEffect(() => {
     window.api.update.updateAvailable((_event, isAvailable, version) => {
       if (isAvailable) {
-        toast.info(t('toast.update', { version: version }), { ...notificationProps, onClick: () => { window.api.update.downloadUpdate(); toast.loading("Updated is downloading, application automatic quit and install update") } });
+        toast.info(t('toast.update', { version: version }), { ...notificationProps, onClick: () => { window.api.update.downloadUpdate(); setUpdateNotification(toast.loading(`Download Progress ${updatePrecent.toFixed(1)}%`, notificationProps)) } });
       }
     });
 
@@ -68,6 +69,17 @@ function App() {
   useEffect(() => {
     loadConfig()
   }, [loadConfig])
+
+  useEffect(() => {
+    if (updateNotification == undefined) return
+
+    toast.update(updateNotification, { render: `Download Progress ${updatePrecent.toFixed(1)}%` })
+    if (updatePrecent.toFixed(0) == '100') {
+      toast.dismiss(updateNotification)
+      toast.success("Updated Download, please restart application", notificationProps)
+    }
+
+  }, [updatePrecent])
 
   return configIsLoading ? (
     <div
