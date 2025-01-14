@@ -24,6 +24,7 @@
   gap: 12px;
   padding: clamp(4px, 0.7vw, 12px);
   max-width: 800px;
+  min-width: 400px;
   max-height: 800px;
   min-height: 150px;
   user-select: text;
