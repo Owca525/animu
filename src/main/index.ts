@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, Menu } from 'electron'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { setupDiscordRPC } from './utils'
 import { join } from 'path'
@@ -43,6 +43,14 @@ function createWindow(): void {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
+
+  Menu.setApplicationMenu(null);
+
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if (input.key === 'F12' || (input.control && input.shift && input.key === 'I')) {
+        event.preventDefault();
+    }
+  });
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
