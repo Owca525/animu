@@ -115,7 +115,7 @@ export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, t
   return (
     <div className="modal-backdrop" style={{ visibility: showPopup ? 'visible' : 'hidden' }}>
       <div className="box" ref={modalRef}>
-        <div className="box-img">
+        <div>
           {!isImageLoaded && !imghasError && (
             <div className="material-symbols-outlined placeholder loading">progress_activity</div>
           )}
@@ -128,7 +128,7 @@ export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, t
             src={data.img}
             onLoad={handleImageLoad}
             onError={() => setimgHasError(true)}
-            className={`${isImageLoaded && !imghasError ? 'loaded' : 'hidden'}`}
+            className={`${isImageLoaded && !imghasError ? 'loaded box-img' : 'hidden box-img'}`}
           />
         </div>
         <div className="box-info">

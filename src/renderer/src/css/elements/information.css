@@ -10,13 +10,6 @@
   z-index: 1003;
 }
 
-img {
-  max-width: 200px;
-  max-height: 290px;
-  border-radius: 8px;
-  display: block;
-}
-
 .box {
   display: flex;
   justify-content: center;
@@ -29,8 +22,7 @@ img {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 12px;
-  border-radius: 2px;
+  padding: clamp(4px, 0.7vw, 12px);
   max-width: 800px;
   max-height: 800px;
   min-height: 150px;
@@ -46,47 +38,60 @@ img {
 .box-episode {
   display: flex;
   flex-direction: column;
-  gap: 1em;
+  gap: 1vw;
   border-radius: 2px;
-  padding: 12px;
+  padding: clamp(4px, 0.7vw, 12px);
 }
 
 .box-episodes {
   display: flex;
   flex-wrap: wrap;
   overflow: auto;
-  gap: 8px;
+  gap: 0.5vw;
   max-height: 10em;
   max-width: 800px;
 }
 
 .box-img {
-  padding: 8px;
-  border-radius: 2px;
+  width: clamp(5rem, 15vw, 14rem);
+  height: clamp(7rem, 20vw, 20rem);
+  display: block;
 }
 
 .episode {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 12px;
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
+  padding: .9vw;
+  font-size: clamp(8px, 1.2vw, 18px);
+  width: clamp(2px, 1vw, 10px);
+  height: clamp(2px, 1vw, 10px);
   cursor: pointer;
   position: relative;
 }
 .text-episode {
-  font-size: larger;
+  font-size: clamp(8px, 2vw, 18px);
   font-weight: 600;
   user-select: text;
+  line-clamp: 1;
 }
+
+.description, .header-text, .text-episode {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .header-text {
-  font-size: 24px;
+  font-size: clamp(8px, 2vw, 24px);
   font-weight: 600;
   user-select: text;
+  line-clamp: 1;
 }
 
 .description {
+  font-size: clamp(6px, 1.5vw, 16px);
   user-select: text;
+  line-break: normal;
+  line-clamp: 1;
 }

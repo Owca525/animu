@@ -156,6 +156,7 @@ body {
 }
 
 .box-text {
+  border-radius: 2px;
   background-color: var(--background-200);
   box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.5);
 }
@@ -166,11 +167,14 @@ body {
 }
 
 .box-img {
+  padding: 2px;
+  border-radius: 1em;
   background-color: var(--background-200);
   box-shadow: 0.5px 0.5px 20px rgba(0, 0, 0, 0.5);
 }
 
 .episode {
+  border-radius: 4px;
   background-color: var(--primary-300);
   box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.2);
 }
