@@ -20,7 +20,7 @@ if (process.contextIsolated) {
       },
       rpc: {
         setActivity: (details: string | undefined, state: string | undefined) =>
-          ipcRenderer.send("setActivity", details, state),
+          ipcRenderer.invoke("setActivity", details, state),
       },
       os: {
         getPath: (

@@ -33,7 +33,7 @@ declare global {
         setActivity: (
           details: string | undefined,
           state: string | undefined
-        ) => void;
+        ) => Promise<void>;
       }
       os: {
         getPath: (
