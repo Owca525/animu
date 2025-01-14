@@ -49,6 +49,7 @@ if (process.contextIsolated) {
         saveDialog: (fileName: string, data: any, title: string, name: string, extensions: string[], format?: string) => ipcRenderer.invoke("saveDialog", fileName, data, title, name, extensions, format),
         openDialog: (path?: string, name?: string, extensions?: string[]) => ipcRenderer.invoke("openDialog", path, name, extensions),
       },
+      getlistThemes: () => ipcRenderer.invoke("get-css-files")
     });
     contextBridge.exposeInMainWorld("electron", {
       Buffer: require("buffer").Buffer,

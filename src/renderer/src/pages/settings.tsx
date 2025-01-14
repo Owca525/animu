@@ -26,6 +26,9 @@ const Settings = () => {
   const [settingPage, setsettingPage] = useState<string>('general')
   const [config, setConfig] = useState<SettingsConfig | undefined>(undefined)
   const [isLoading, setisLoading] = useState<boolean>(true)
+
+  const [theme, setTheme] = useState<{ label: string; value: string; onClick: () => void; }[]>()
+
   const generalRef = useRef<HTMLDivElement>(null)
   const playerRef = useRef<HTMLDivElement>(null)
 
@@ -80,12 +83,6 @@ const Settings = () => {
     { label: t('lang.hungary'), value: 'hu', onClick: () => changeLang('hu') }
   ]
 
-  const theme = [
-    { label: 'purpleAnimu', value: 'purpleAnimu', onClick: () => changeTheme('purpleAnimu') },
-    { label: 'catppuccin', value: 'catppuccin', onClick: () => changeTheme('catppuccin') },
-    { label: 'gruvbox', value: 'gruvbox', onClick: () => changeTheme('gruvbox') }
-  ]
-
   const playerType = [
     { label: "metadata", value: 'metadata', onclick: () => handleChange('Player.general.playerLoadType', "metadata")},
     { label: "auto", value: 'auto', onclick: () => handleChange('Player.general.playerLoadType', "auto") }
@@ -102,6 +99,7 @@ const Settings = () => {
     readConfig().then((tmpConfig) => {
       setConfig(tmpConfig)
     })
+    checkThemes()
 
     window.api.rpc.setActivity(undefined, t("status.settings"))
   }, [])
@@ -115,17 +113,25 @@ const Settings = () => {
     }
   }, [config])
 
+  async function checkThemes() {
+    const themes = await window.api.getlistThemes()
+    setTheme(themes.map((elememnt) => {
+      let name = elememnt.filename.replace(".css", "")
+      return { label: name, value: name, onClick: () => changeTheme(name) }
+    }))
+  }
+
   const getKeybind = (key: string) => {
     if (key == ' ') return 'Space'
     if (key.length == 1) return key.toUpperCase()
     return key
   }
 
-  const handleChange = (path: string, value: string | number | boolean) => {
+  const handleChange = (path: string, value: string | number | boolean, remove?: string | undefined) => {
     setConfig((prevConfig) => {
       if (!prevConfig) return prevConfig
 
-      if (typeof value == 'string') value = value.replace('s', '').replace('%', '')
+      if (typeof value == 'string' && remove) value = value.replace(remove, '')
 
       const keys = path.split('.')
       const newConfig = { ...prevConfig }
@@ -146,12 +152,15 @@ const Settings = () => {
     })
   }
 
-  const changeTheme = (theme: string) => {
+  const changeTheme = async (theme: string) => {
     handleChange('General.color', theme)
-    const container = document.querySelector('#root')
-    if (container && config) {
-      container.className = theme
-    }
+    const themes = await window.api.getlistThemes()
+    themes.forEach((elememnt) => {
+      if (elememnt.filename.replace(".css", "") == theme) {
+        let link = document.getElementById("color-stylesheet") as HTMLLinkElement
+        if (link) link.href = elememnt.path
+      }
+    })
   }
 
   const checkLang = (lang: string) => {
@@ -332,7 +341,7 @@ const Settings = () => {
                 value={config.Player.general.Volume}
                 type="%"
                 onChange={(event) =>
-                  handleChange('Player.general.Volume', event.currentTarget.value)
+                  handleChange('Player.general.Volume', event.currentTarget.value, "%")
                 }
               />
               <div className="border-settings"></div>
@@ -343,7 +352,7 @@ const Settings = () => {
                 value={config.Player.general.LongTimeSkipForward}
                 type="s"
                 onChange={(event) =>
-                  handleChange('Player.general.LongTimeSkipForward', event.currentTarget.value)
+                  handleChange('Player.general.LongTimeSkipForward', event.currentTarget.value, "s")
                 }
               />
               <div className="border-settings"></div>

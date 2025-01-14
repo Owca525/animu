@@ -8,7 +8,7 @@ interface DropdownOption {
 }
 
 interface DropdownProps {
-  options: DropdownOption[]
+  options: DropdownOption[] | undefined
   placeholder: string
 }
 
@@ -33,7 +33,7 @@ const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '' }) => {
       <div className="dropdown-button" onClick={toggleDropdown}>
         {selectedOption ? selectedOption.label : placeholder}
       </div>
-      {isOpen && (
+      {isOpen && options && (
         <ul className="dropdown-menu" onMouseLeave={() => setIsOpen(false)}>
           {options.map((option) => (
             <li

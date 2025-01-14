@@ -16,9 +16,6 @@ import { notificationProps, SettingsConfig } from './utils/interface'
 import { CheckHistory } from './utils/history'
 
 // Color palette
-import './css/colors/purpleAnimu.css'
-import './css/colors/gruvbox.css'
-import './css/colors/catppuccin.css'
 import { toast, ToastContainer } from 'react-toastify'
 
 function App() {
@@ -42,6 +39,21 @@ function App() {
     }
 
     if (config.General.Window.AutoMaximize) window.BrowserWindow.setMaximize()
+
+    const themes = await window.api.getlistThemes()
+
+    let path: string = themes[0].path
+    for (let i = 0; i < themes.length; i++) {
+      const element = themes[i];
+      if (element.filename.replace(".css", "") == config.General.color) {
+        path = element.path
+      }
+    }
+    const link = document.createElement('link');
+    link.id = 'color-stylesheet';
+    link.rel = 'stylesheet';
+    link.href = path;
+    document.head.appendChild(link);
 
     i18n.changeLanguage(config.General.language)
     window.BrowserWindow.setZoom(parseFloat(config.General.Window.Zoom.toString()))

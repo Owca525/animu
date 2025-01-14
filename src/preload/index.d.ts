@@ -62,6 +62,7 @@ declare global {
         saveDialog: (fileName: string, data: any, title: string, name: string, extensions: string[], format?: string) => Promise<boolean>
         openDialog: (path?: string, name?: string, extensions?: string[]) => Promise<string>
       };
+      getlistThemes: () => Promise<{ path: string, filename: string, type: "user" | "official" }[]>
     };
     electron: {
       ipcRenderer: {

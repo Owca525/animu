@@ -1,6 +1,9 @@
 import { app, ipcMain, shell } from "electron"
 import * as RPC from 'discord-rpc';
 
+import fs from "fs";
+import path from "path";
+
 export const rpc = new RPC.Client({ transport: 'ipc' });
 
 // Client id for Discord Rich presence
@@ -46,6 +49,40 @@ ipcMain.handle('open', async (_event, url: string): Promise<void> => {
     if (validUrl(url)) await shell.openExternal(url)
     else await shell.openPath(url)
 })
+
+ipcMain.handle('get-css-files', async (): Promise<{ path: string, filename: string, type: "user" | "official" }[]> => {
+    // Directory for local css
+    const stylesDir = path.join(__dirname, '../../out/renderer/assets/colors');
+    const localList = await fs.promises.readdir(stylesDir).then(files => {
+        files = files.filter(file => file.endsWith('.css'));
+        return files.map((file) => `${stylesDir}/${file}`)
+    });
+
+    const configcss = checkConfigFolder()
+    if (configcss == undefined) return convertListTodict(localList, "official")
+    
+    // this prevent load user theme because in version dev this can't load, idk why. Show status 200 but no css data, maybe i fix someday
+    if (process.env.NODE_ENV === 'development') return convertListTodict(localList, "official")
+
+    // Direcotry for config/colors css
+    const customList = await fs.promises.readdir(configcss).then(files => {
+        files = files.filter(file => file.endsWith('.css'));
+        return files.map((file) => `${configcss}/${file}`)
+    });
+
+    return [...convertListTodict(localList, "official"), ...convertListTodict(customList, "user")]
+});
+
+function convertListTodict(list: string[], type: "user" | "official"): { path: string, filename: string, type: "user" | "official" }[] {
+    return list.map((element) => {
+        return { path: element, filename: path.basename(element), type: type }
+    })
+}
+
+function checkConfigFolder(): string | undefined {
+    if (fs.existsSync(`${app.getPath("userData")}/colors`)) return `${app.getPath("userData")}/colors`
+    return undefined
+}
 
 // Setup Discord Rich presence
 export function setupDiscordRPC(): void {
