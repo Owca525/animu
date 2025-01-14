@@ -45,7 +45,7 @@ export interface SidebarProps {
 interface SettingsConfigGeneral {
   HoverSidebar: boolean
   language: string
-  color: string
+  theme: string
   Window: {
     AutoMaximize: boolean
     AutoFullscreen: boolean

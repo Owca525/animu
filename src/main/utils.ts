@@ -52,7 +52,7 @@ ipcMain.handle('open', async (_event, url: string): Promise<void> => {
 
 ipcMain.handle('get-css-files', async (): Promise<{ path: string, filename: string, type: "user" | "official" }[]> => {
     // Directory for local css
-    const stylesDir = path.join(__dirname, '../../out/renderer/assets/colors');
+    const stylesDir = path.join(__dirname, '../../out/renderer/assets/themes');
     const localList = await fs.promises.readdir(stylesDir).then(files => {
         files = files.filter(file => file.endsWith('.css'));
         return files.map((file) => `${stylesDir}/${file}`)
@@ -64,7 +64,7 @@ ipcMain.handle('get-css-files', async (): Promise<{ path: string, filename: stri
     // this prevent load user theme because in version dev this can't load, idk why. Show status 200 but no css data, maybe i fix someday
     if (process.env.NODE_ENV === 'development') return convertListTodict(localList, "official")
 
-    // Direcotry for config/colors css
+    // Direcotry for config/theme css
     const customList = await fs.promises.readdir(configcss).then(files => {
         files = files.filter(file => file.endsWith('.css'));
         return files.map((file) => `${configcss}/${file}`)
@@ -80,7 +80,7 @@ function convertListTodict(list: string[], type: "user" | "official"): { path: s
 }
 
 function checkConfigFolder(): string | undefined {
-    if (fs.existsSync(`${app.getPath("userData")}/colors`)) return `${app.getPath("userData")}/colors`
+    if (fs.existsSync(`${app.getPath("userData")}/themes`)) return `${app.getPath("userData")}/themes`
     return undefined
 }
 

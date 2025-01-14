@@ -5,7 +5,7 @@ export const defaultConfig: SettingsConfig = {
   General: {
     HoverSidebar: true,
     language: "en",
-    color: "purpleAnimu",
+    theme: "purpleAnimu",
     Window: {
       AutoMaximize: false,
       AutoFullscreen: false,

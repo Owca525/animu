@@ -15,7 +15,6 @@ import { configContext } from './utils/context'
 import { notificationProps, SettingsConfig } from './utils/interface'
 import { CheckHistory } from './utils/history'
 
-// Color palette
 import { toast, ToastContainer } from 'react-toastify'
 
 function App() {
@@ -35,7 +34,7 @@ function App() {
     if (config == null) return
     const container = document.querySelector('#root')
     if (container) {
-      container.className = config.General.color
+      container.className = config.General.theme
     }
 
     if (config.General.Window.AutoMaximize) window.BrowserWindow.setMaximize()
@@ -45,12 +44,12 @@ function App() {
     let path: string = themes[0].path
     for (let i = 0; i < themes.length; i++) {
       const element = themes[i];
-      if (element.filename.replace(".css", "") == config.General.color) {
+      if (element.filename.replace(".css", "") == config.General.theme) {
         path = element.path
       }
     }
     const link = document.createElement('link');
-    link.id = 'color-stylesheet';
+    link.id = 'theme-stylesheet';
     link.rel = 'stylesheet';
     link.href = path;
     document.head.appendChild(link);

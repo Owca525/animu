@@ -153,11 +153,11 @@ const Settings = () => {
   }
 
   const changeTheme = async (theme: string) => {
-    handleChange('General.color', theme)
+    handleChange('General.theme', theme)
     const themes = await window.api.getlistThemes()
     themes.forEach((elememnt) => {
       if (elememnt.filename.replace(".css", "") == theme) {
-        let link = document.getElementById("color-stylesheet") as HTMLLinkElement
+        let link = document.getElementById("theme-stylesheet") as HTMLLinkElement
         if (link) link.href = elememnt.path
       }
     })
@@ -232,7 +232,7 @@ const Settings = () => {
               <div className="text">{t('settings.general.theme')}</div>
               <div className="same-space">
                 {t('settings.general.theme')}{' '}
-                <Dropdown options={theme} placeholder={config.General.color} />
+                <Dropdown options={theme} placeholder={config.General.theme} />
               </div>
             </div>
             <div className="settings-space">
