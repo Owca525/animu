@@ -1,0 +1,149 @@
+/* This is advance example file to make css theme for the anime */
+/* 
+    Note, if you want change some component for example button, you can search for "button section". Then show you all class button use.
+
+    Another note, if you put nothing in class or delete class. Nothing happen,
+    Because is loaded main css who has everything for the elements, but with this css you can change this element
+    and this take priority, when is loaded.
+*/
+
+:root {
+  /* You can put variables here */
+  /* --example: rgb(0, 0, 0); */
+}
+
+/* Button Section */
+/* This change all <button></button>. */
+button {
+}
+
+/*  This class is used on sidebar. */
+.button-icon {
+}
+
+/*  This class is used on sidebar when is hover. */
+.button-icon-text {
+}
+/*  This class is used on sidebar. */
+button .text-button {
+}
+
+/* Card Section */
+/* Cards is used in home, history, continue watch */
+/* Main container of the card */
+.card-container {
+}
+
+/* This class is for img */
+.card-image-container {
+}
+.card-image {
+}
+.card-image.loaded {
+}
+.card-image-placeholder {
+}
+
+/* This class is for text */
+.card-title {
+}
+.card-continue-watch-text {
+}
+
+/* Checkbox section */
+.checkbox-container {
+}
+
+.checkbox {
+}
+.checkbox::before {
+}
+
+.checkbox:checked:before {
+}
+
+/* Slider section */
+/* Slides is using in player */
+.slider-container {
+}
+
+.slider-background {
+}
+/* This is for change width slider */
+.slider-container:hover .slider-background {
+}
+/* This show and set position thumb */
+.slider-container:hover .slider-thumb {
+}
+/* This show text when slider is hover */
+.slider-container:hover .slider-text {
+}
+
+.slider-progress {
+}
+
+.slider-thumb {
+}
+
+.slider-text {
+}
+
+/* Dropdown section */
+/* this is use in settings */
+.dropdown-container {
+}
+.dropdown-button {
+}
+
+.dropdown-menu {
+}
+
+.dropdown-item {
+}
+
+/* Help Icon */
+/* This is for help user, is use in settings */
+.help-icon-container {
+}
+/* This is for icon size */
+.help-icon {
+}
+.help-icon-description {
+}
+
+/* dialog section */
+/* is using in home, player */
+.dialog-background {
+}
+.dialog-container {
+}
+.dialog-text {
+}
+.dialog-message {
+}
+.dialog-Header {
+}
+.dialog-button {
+}
+.dialog-buttons-container {
+}
+
+/* keybind section */
+.keybind-container {
+}
+.keybind-content {
+}
+.keybind-active {
+}
+
+/* card-content section */
+.title {
+}
+.content {
+}
+.card-container {
+}
+.card-content-loading {
+}
+.message-content {
+}

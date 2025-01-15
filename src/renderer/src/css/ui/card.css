@@ -1,4 +1,4 @@
-.card {
+.card-container {
   margin-top: 4px;
   display: flex;
   align-items: center;
@@ -12,7 +12,7 @@
   border-radius: 4px;
   transition: background-color 0.2s ease;
 }
-.card-img {
+.card-image-container {
   max-width: 200px;
   max-height: 280px;
   width: auto;
@@ -41,7 +41,7 @@
   align-items: center;
   text-align: start;
 }
-.placeholder {
+.card-image-placeholder {
   width: 220px;
   height: 220px;
   display: flex;
@@ -50,7 +50,7 @@
   font-size: xx-large;
 }
 
-.card-continue-info {
+.card-continue-watch-text {
   color: gray;
   font-size: small;
 }

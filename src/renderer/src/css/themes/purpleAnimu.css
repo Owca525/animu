@@ -112,17 +112,17 @@ body {
 }
 
 /* dialog */
-.dialog {
+.dialog-container {
   background-color: var(--primary-200);
 }
 
 /* keybinds */
-.keybind-space {
+.keybind-content {
   background-color: var(--primary-300);
   border-color: var(--primary-200);
 }
 
-.keybind-space:hover {
+.keybind-content:hover {
   border-color: var(--primary-500);
 }
 
@@ -294,9 +294,12 @@ button {
 .card:hover {
   background-color: var(--primary-200);
 }
-.card-img {
+.card-image-container {
   background-color: var(--primary-200);
   box-shadow: 1px 1px 20px rgb(0, 0, 0, 0.3);
+}
+.card-image-placeholder {
+  background-color: var(--primary-200);
 }
 
 /* checkboxy */

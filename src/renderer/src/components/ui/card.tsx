@@ -68,17 +68,17 @@ const Card: React.FC<CardProps> = ({ id, title, img, player = null, text = null 
       <div title="" style={{ cursor: 'default' }}>
         <Information id_anime={id} showPopup={showInf} toggle={toggleShow} />
       </div>
-      <div className="card-img">
+      <div className="card-image-container">
         {!isImageLoaded && !hasError && (
           <div
-            className="material-symbols-outlined placeholder"
+            className="material-symbols-outlined card-image-placeholder"
             style={{ animation: 'spin 1s linear infinite' }}
           >
             progress_activity
           </div>
         )}
         {hasError && (
-          <div className="material-symbols-outlined placeholder" title="img can't load">
+          <div className="material-symbols-outlined card-image-placeholder" title="img can't load">
             error
           </div>
         )}
@@ -90,7 +90,7 @@ const Card: React.FC<CardProps> = ({ id, title, img, player = null, text = null 
         />
       </div>
       <div className="card-title">{shortText(title)}</div>
-      {text ? <div className="card-continue-info">{text}</div> : ''}
+      {text ? <div className="card-continue-watch-text">{text}</div> : ''}
     </div>
   )
 }

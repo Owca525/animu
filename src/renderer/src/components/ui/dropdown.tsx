@@ -29,7 +29,7 @@ const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '' }) => {
   }
 
   return (
-    <div className="dropdown">
+    <div className="dropdown-container">
       <div className="dropdown-button" onClick={toggleDropdown}>
         {selectedOption ? selectedOption.label : placeholder}
       </div>

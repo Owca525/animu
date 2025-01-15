@@ -42,7 +42,7 @@ const keybind: React.FC<keybindsProps> = ({ title, value, changeKey }) => {
     <div className="keybind-container">
       {title}{' '}
       <div
-        className={isListening ? 'keybind-space keybind-active' : 'keybind-space'}
+        className={isListening ? 'keybind-content keybind-active' : 'keybind-content'}
         onClick={handleClick}
       >
         {keyPressed ? keyPressed : value}

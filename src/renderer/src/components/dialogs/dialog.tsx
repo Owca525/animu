@@ -10,13 +10,13 @@ interface dialogProps {
 
 const dialog: React.FC<dialogProps> = ({ header_text, text, buttons }) => {
   return (
-    <div className="dialog-container">
-      <div className="dialog">
-        <div className="dialog-space">
+    <div className="dialog-background">
+      <div className="dialog-container">
+        <div className="dialog-message">
           <div className="dialog-Header">{header_text}</div>
           <div className="dialog-text">{text}</div>
         </div>
-        <div className="dialog-buttons">
+        <div className="dialog-buttons-container">
           {buttons.map((button) => (
             <Button value={button.title} className="dialog-button" onClick={button.onClick} />
           ))}

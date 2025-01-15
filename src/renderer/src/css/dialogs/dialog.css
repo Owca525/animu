@@ -1,4 +1,4 @@
-.dialog-container {
+.dialog-background {
   width: 100%;
   height: 100%;
   z-index: 20000;
@@ -8,7 +8,7 @@
   position: fixed;
   background-color: rgb(0, 0, 0, 0.5);
 }
-.dialog {
+.dialog-container {
   min-width: 30%;
   min-height: 10%;
   max-width: 60%;
@@ -22,7 +22,7 @@
 .dialog-text {
   margin-bottom: 12px;
 }
-.dialog-space {
+.dialog-message {
   display: flex;
   flex-direction: column;
   gap: 1em;
@@ -37,7 +37,7 @@
   height: 40px;
   font-size: medium;
 }
-.dialog-buttons {
+.dialog-buttons-container {
   display: flex;
   gap: 4px;
   justify-content: end;
