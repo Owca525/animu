@@ -1,8 +1,8 @@
-.title {
+.content-title {
   font-weight: 500;
   font-size: x-large;
 }
-.content {
+.content-container {
   display: flex;
   justify-content: start;
   flex-direction: column;

@@ -151,11 +151,11 @@ body {
 }
 
 /* information */
-.modal-backdrop {
+.information-background {
   background-color: rgba(0, 0, 0, 0.6);
 }
 
-.box-text {
+.information-text {
   border-radius: 2px;
   background-color: var(--background-200);
   box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.5);
@@ -166,7 +166,7 @@ body {
   box-shadow: 1px 1px 20px rgba(0, 0, 0, 0.5);
 }
 
-.box-img {
+.information-image {
   padding: 2px;
   border-radius: 1em;
   background-color: var(--background-200);

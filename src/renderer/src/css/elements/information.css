@@ -1,4 +1,4 @@
-.modal-backdrop {
+.information-background {
   position: fixed;
   top: 0;
   left: 0;
@@ -10,7 +10,7 @@
   z-index: 1003;
 }
 
-.box {
+.information-container {
   display: flex;
   justify-content: center;
   align-items: start;
@@ -18,7 +18,7 @@
   margin-left: 2.5em;
   margin-right: 2.5em;
 }
-.box-text {
+.information-text {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -29,14 +29,14 @@
   min-height: 150px;
   user-select: text;
 }
-.box-info {
+.information-content {
   display: flex;
   flex-direction: column;
   gap: 1em;
   user-select: text;
 }
 
-.box-episode {
+.information-episode-container {
   display: flex;
   flex-direction: column;
   gap: 1vw;
@@ -44,7 +44,7 @@
   padding: clamp(4px, 0.7vw, 12px);
 }
 
-.box-episodes {
+.information-episodes-content {
   display: flex;
   flex-wrap: wrap;
   overflow: auto;
@@ -53,13 +53,13 @@
   max-width: 800px;
 }
 
-.box-img {
+.information-image {
   width: clamp(5rem, 15vw, 14rem);
   height: clamp(7rem, 20vw, 20rem);
   display: block;
 }
 
-.episode {
+.information-episode {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -70,14 +70,14 @@
   cursor: pointer;
   position: relative;
 }
-.text-episode {
+.information-text-episode {
   font-size: clamp(8px, 2vw, 18px);
   font-weight: 600;
   user-select: text;
   line-clamp: 1;
 }
 
-.description, .header-text, .text-episode {
+.information-description, .header-text, .text-episode {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -90,7 +90,7 @@
   line-clamp: 1;
 }
 
-.description {
+.information-description {
   font-size: clamp(6px, 1.5vw, 16px);
   user-select: text;
   line-break: normal;

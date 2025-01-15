@@ -137,13 +137,170 @@ button .text-button {
 }
 
 /* card-content section */
-.title {
+.content-title {
 }
-.content {
+.content-container {
 }
 .card-container {
 }
 .card-content-loading {
 }
 .message-content {
+}
+
+/* context-menu section */
+.context-menu {
+}
+.context-menu-item {
+}
+.context-menu-item:hover {
+}
+
+/* header section */
+.header {
+}
+
+/* information section */
+/* is used in home */
+.information-background {
+}
+.information-container {
+}
+.information-text {
+}
+.information-content {
+}
+.information-episode-container {
+}
+.information-episodes-content {
+}
+.information-image {
+}
+.information-episode {
+}
+.information-text-episode {
+}
+.information-description, .header-text, .text-episode {
+}
+.header-text {
+}
+.information-description {
+}
+
+/* sidebar section */
+.sidebar-mini {
+}
+.border {
+}
+.content {
+}
+.bottom-sidebar {
+} 
+.sidebar-max {
+}
+.sidebar-version {
+}
+
+/* home page section */
+.home {
+}
+.loading-home {
+}
+
+/* player page section */
+.video-container {
+}
+.video-player {
+}
+.video-overlay {
+}
+.time-slider {
+}
+.time-display {
+}
+.video-top {
+}
+.mask {
+}
+.video-center {
+}
+.video-bottom {
+}
+.bottom-section {
+}
+.player-buttons {
+}
+.player-title {
+}
+.seek-bar {
+}
+.seek-bar-container {
+}
+.progress {
+}
+.thumb {
+}
+.player-waiting {
+}
+.disabled {
+}
+.show-time {
+}
+.player-hide-cursor {
+}
+.button-container {
+}
+.player-settings-container {
+}
+.player-settings-button {
+}
+.player-settings-button-text {
+}
+.player-hidden {
+}
+.player-settings-button-back {
+}
+.up-Next-container {
+}
+.up-Next-Title {
+}
+.up-Next-Anime {
+}
+.up-Next-Buttons {
+}
+.up-Next-Button {
+}
+
+/* settings page section */
+.settings-container {
+}
+.settings-space {
+}
+.settings-content {
+}
+.settings-header {
+}
+.settings-general {
+}
+.settings-space {
+}
+.sidebar-first {
+}
+.text {
+}
+.small-text {
+}
+.same-space {
+}
+.number {
+}
+.settings-loading {
+}
+.settings-loading-animation {
+}
+.border-settings {
+}
+.text-space {
+}
+.settings-button {
 }

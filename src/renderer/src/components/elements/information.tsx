@@ -113,14 +113,14 @@ export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, t
   }
 
   return (
-    <div className="modal-backdrop" style={{ visibility: showPopup ? 'visible' : 'hidden' }}>
-      <div className="box" ref={modalRef}>
+    <div className="information-background" style={{ visibility: showPopup ? 'visible' : 'hidden' }}>
+      <div className="information-container" ref={modalRef}>
         <div>
           {!isImageLoaded && !imghasError && (
-            <div className="material-symbols-outlined placeholder loading">progress_activity</div>
+            <div className="material-symbols-outlined card-image-placeholder loading">progress_activity</div>
           )}
           {imghasError && (
-            <div className="material-symbols-outlined placeholder" title="img can't load">
+            <div className="material-symbols-outlined card-image-placeholder" title="img can't load">
               error
             </div>
           )}
@@ -128,24 +128,24 @@ export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, t
             src={data.img}
             onLoad={handleImageLoad}
             onError={() => setimgHasError(true)}
-            className={`${isImageLoaded && !imghasError ? 'loaded box-img' : 'hidden box-img'}`}
+            className={`${isImageLoaded && !imghasError ? 'loaded information-image' : 'hidden information-image'}`}
           />
         </div>
-        <div className="box-info">
-          <div className="box-text">
+        <div className="information-content">
+          <div className="information-text">
             <div className="header-text">{data.title}</div>
             <div
-              className="description"
+              className="information-description"
               dangerouslySetInnerHTML={{ __html: data.description }}
             ></div>
           </div>
-          <div className="box-episode">
-            <div className="text-episode">{t('information.episodes')}</div>
-            <div className="box-episodes">
+          <div className="information-episode-container">
+            <div className="information-text-episode">{t('information.episodes')}</div>
+            <div className="information-episodes-content">
               {data.episodes.length > 0 ? (
                 data.episodes.map((ep) => (
                   <div
-                    className="episode"
+                    className="information-episode"
                     onClick={() =>
                       navigate('/player', {
                         state: {

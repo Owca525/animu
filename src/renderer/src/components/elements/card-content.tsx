@@ -8,8 +8,8 @@ const Container: React.FC<ContainerProps> = ({ title, data = [], className = '' 
   const { t } = useTranslation()
 
   return (
-    <div className={className + ' content'}>
-      <div className="title">{title}</div>
+    <div className={className + ' content-container'}>
+      <div className="content-title">{title}</div>
       <div className={'card-container' + (data.length > 0 ? '' : ' message-content')}>
         {data.length > 0 ? (
           data.map((card) => (
