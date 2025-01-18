@@ -107,3 +107,9 @@ export const notificationProps = {
   pauseOnHover: true,
   hideProgressBar: true
 }
+
+export interface dialogProps {
+  header_text: string
+  text: string
+  buttons: { title: string; onClick: () => void }[]
+}

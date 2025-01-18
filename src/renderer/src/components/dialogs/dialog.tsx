@@ -1,12 +1,7 @@
 import React from 'react'
 import '../../css/dialogs/dialog.css'
 import Button from '../ui/button'
-
-interface dialogProps {
-  header_text: string
-  text: string
-  buttons: { title: string; onClick: () => void }[]
-}
+import { dialogProps } from '@renderer/utils/interface'
 
 const dialog: React.FC<dialogProps> = ({ header_text, text, buttons }) => {
   return (

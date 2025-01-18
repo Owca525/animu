@@ -11,11 +11,12 @@ import Player from './pages/player'
 // config
 import { checkConfig, readConfig } from './utils/config'
 import { CheckContinue } from './utils/continueWatch'
-import { configContext } from './utils/context'
+import { configContext } from './utils/context/small'
 import { notificationProps, SettingsConfig } from './utils/interface'
 import { CheckHistory } from './utils/history'
 
 import { toast, ToastContainer } from 'react-toastify'
+import { showDialog } from './utils/context/DialogContext'
 
 function App() {
   const [configIsLoading, setConfigIsLoading] = useState<boolean>(true)

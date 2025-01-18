@@ -166,3 +166,7 @@ button {
 .card-continue-watch-text {
   color: var(--text-gray);
 }
+.dialog-container {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}

@@ -5,12 +5,11 @@ import Hls from "hls.js";
 
 // utils
 import { DeleteFromcontinue, SaveContinue } from '../utils/continueWatch'
-import { configContext } from '../utils/context'
+import { configContext } from '../utils/context/small'
 import { get_player_anime } from '../utils/backend'
 import { SaveHistory } from '../utils/history'
 
 // Components
-import Dialog from '../components/dialogs/dialog'
 import ContextMenu from '../components/elements/context-menu'
 
 import '../css/pages/player.css'
@@ -18,6 +17,7 @@ import CustomSlider from '@renderer/components/ui/customSlider';
 import Button from '@renderer/components/ui/button';
 import { toast } from 'react-toastify';
 import { notificationProps } from '@renderer/utils/interface';
+import { closeDialog, dialogIsOpen, showDialog } from '@renderer/utils/context/DialogContext';
 
 const Player = () => {
   const Currentlocation = useLocation()
@@ -63,25 +63,22 @@ const Player = () => {
   const [hls, setHls] = useState<Hls | null>(null);
   const [currentTitle, _setTitle] = useState<string>(decodeURIComponent(title))
   const [playerUrl, setPlayerUrl] = useState<string | undefined>(undefined)
-  const [isError, setErrorDialog] = useState({ error: false, information: '' })
   const [timeNextEpisode, setTimeNextEpisode] = useState<number>(30)
   const [isUpNextEpisode, setUpNextEpisode] = useState<boolean>(false)
   const [isHideUpNextEpisode, setHideUpNextEpisode] = useState<boolean>(false)
 
   const menuItems = [{ label: t('contextMenu.reload'), onClick: () => location.reload() }]
+  const buttons = [{ title: t('general.ok'), onClick: () => exitPlayer() }, { title: t('general.reload'), onClick: async () => {await setDataPlayer(); closeDialog() }}]
 
   const setDataPlayer = async () => {
     try {
       let recentData = await get_player_anime(id, ep)
       console.log(recentData)
       if (recentData.length == 0) {
-        setErrorDialog({
-          error: true,
-          information: t("errors.playerCantFind")
-        })
+        showDialog({ header_text: t("errors.playerHeaderError"), text: t("errors.playerCantFind"), buttons: buttons })
       }
 
-      if (isError.error) {
+      if (dialogIsOpen()) {
         return
       }
 
@@ -91,10 +88,7 @@ const Player = () => {
         return
       }
     } catch (Error) {
-      setErrorDialog({
-        error: true,
-        information: t('errors.extractionError', { error: Error })
-      })
+      showDialog({ header_text: t("errors.playerHeaderError"), text: t('errors.extractionError', { error: Error }), buttons: buttons })
     } finally {
     }
   }
@@ -278,7 +272,7 @@ const Player = () => {
               break;
           }
           if (ListUrls.length <= 1) {
-            setErrorDialog({ error: true, information: message })
+            showDialog({ header_text: t("errors.playerHeaderError"), text: message, buttons: buttons })
             return
           }
           toast.error(message, notificationProps);
@@ -491,7 +485,7 @@ const Player = () => {
           message = t('player.errors.default')
       }
       if (ListUrls.length <= 1) {
-        setErrorDialog({ error: true, information: message })
+        showDialog({ header_text: t("errors.playerHeaderError"), text: message, buttons: buttons })
         return
       }
       toast.error(message, notificationProps);
@@ -641,15 +635,6 @@ const Player = () => {
   return (
     <div className={isVisible ? "video-container" : "video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove}>
       <ContextMenu items={menuItems} />
-      {isError.error ? (
-        <Dialog
-          header_text={t("errors.playerHeaderError")}
-          text={isError.information}
-          buttons={[{ title: t('general.ok'), onClick: () => exitPlayer() }, { title: t('general.reload'), onClick: async () => {await setDataPlayer(); setErrorDialog({ error: false, information: '' })} }]} // { title: t('general.reload'), onClick: async () => await setDataPlayer() }
-        />
-      ) : (
-        ''
-      )}
       {isPlayerDisable ? (
         ''
       ) : (

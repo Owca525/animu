@@ -6,19 +6,19 @@ import { useContext, useEffect, useState } from 'react'
 import Sidebar from '../components/elements/sidebar'
 import Content from '../components/elements/card-content'
 import Header from '../components/elements/headers'
-import Dialog from '../components/dialogs/dialog'
 
 // utils
 import { ContainerProps } from '../utils/interface'
 import { get_recent, get_search } from '../utils/backend'
 import { ReadContinue } from '../utils/continueWatch'
-import { configContext } from '../utils/context'
+import { configContext } from '../utils/context/small'
 
 import { ReadHistory } from '../utils/history'
 import ContextMenu from '../components/elements/context-menu'
 import 'react-toastify/dist/ReactToastify.css';
 import '../css/pages/home.css'
 import { Information } from '@renderer/components/elements/information'
+import { closeDialog, showDialog } from '@renderer/utils/context/DialogContext'
 
 function home() {
   const navigate = useNavigate()
@@ -29,7 +29,6 @@ function home() {
   const { t } = useTranslation()
 
   const [data, setData] = useState<ContainerProps>({ title: '', data: [] })
-  const [error, seterror] = useState<{ error: boolean; note: string }>()
 
   const [loading, setLoading] = useState(true)
   // const [isUpdate, setisUpdate] = useState(false);
@@ -86,7 +85,7 @@ function home() {
   const menuItems = [{ label: t('contextMenu.reload'), onClick: () => location.reload() }]
 
   const functionHandler = async (func: any): Promise<any> => {
-    seterror({ error: false, note: "" })
+    closeDialog()
     setLoading(true)
     const data = await func()
     return data
@@ -106,7 +105,11 @@ function home() {
 
   const change_content = (newData: ContainerProps) => {
     if (newData.data && newData.data.length != 0 && newData.data[0].title == 'error') {
-      seterror({ error: true, note: 'Error getting information from allmanga' })
+      showDialog({ header_text: t('errors.connection'), text: "Error getting information from allmanga", buttons: [
+        { title: t('general.exit'), onClick: () => window.BrowserWindow.exit() },
+        { title: t('general.reload'), onClick: async () => change_content({ title: t('sidebar.RecentAnime'), data: await functionHandler(get_recent) }) }
+      ]
+    })
       setData({ title: t('sidebar.RecentAnime') })
       return
     }
@@ -131,21 +134,6 @@ function home() {
       <main className="container">
         {/* <Information id_anime={"b3u5TprKSKHBPBcor"} showPopup={true} toggle={() => console.log} /> */}
         <ContextMenu items={menuItems} />
-        {error?.error ? (
-          <Dialog
-            header_text={t('errors.connection')}
-            text={error.note}
-            buttons={[
-              {
-                title: t('general.exit'),
-                onClick: () => window.BrowserWindow.exit()
-              },
-              { title: t('general.reload'), onClick: async () => change_content({ title: t('sidebar.RecentAnime'), data: await functionHandler(get_recent) })}
-            ]}
-          />
-        ) : (
-          ''
-        )}
         <Sidebar
           top={sidebarHomeTopData}
           bottom={sidebarHomeBottomData}
