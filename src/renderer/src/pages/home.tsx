@@ -66,13 +66,13 @@ function home() {
   ]
 
   const sidebarHomeBottomData = [
-    {
-      value:
-        '<div class="material-symbols-outlined text-button">extension</div>' +
-        t('sidebar.Extensions'),
-      class: 'icon-button',
-      title: t('sidebar.Extensions')
-    },
+    // {
+    //   value:
+    //     '<div class="material-symbols-outlined text-button">extension</div>' +
+    //     t('sidebar.Extensions'),
+    //   class: 'icon-button',
+    //   title: t('sidebar.Extensions')
+    // },
     {
       value:
         '<div class="material-symbols-outlined text-button">settings</div>' + t('sidebar.settings'),
