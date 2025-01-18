@@ -32,6 +32,8 @@ body {
 .hidden {
   opacity: 0;
   user-select: none;
+  width: 0px;
+  height: 0px;
 }
 
 ::-webkit-scrollbar {

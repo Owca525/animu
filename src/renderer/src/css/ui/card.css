@@ -67,6 +67,7 @@
 }
 
 .card-image-container {
+  position: relative;
   max-width: 180px;
   max-height: 250px;
   width: auto;
@@ -87,9 +88,10 @@
 }
 
 .card-image-placeholder {
+  position: relative;
   max-width: 200px;
   max-height: 220px;
-  width: 100%;
+  width: 90%;
   height: 100vb;
   display: flex;
   justify-content: center;
@@ -97,7 +99,7 @@
 }
 
 .card-title {
-  height: 95%;
+  height: 100%;
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
