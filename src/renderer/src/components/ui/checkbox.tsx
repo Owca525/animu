@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import '../../css/ui/checkbox.css'
-import HelpIcon from './helpIcon'
+import HelpIcon from '../../pages/settings/helpIcon'
 
 interface checkboxProps extends React.HtmlHTMLAttributes<HTMLInputElement> {
   title: string

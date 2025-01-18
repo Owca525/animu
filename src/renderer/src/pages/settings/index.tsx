@@ -3,16 +3,16 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 // Components
-import ContextMenu from '../components/elements/context-menu'
-import Sidebar from '../components/elements/sidebar'
-import Checkbox from '../components/ui/checkbox'
-import Keybind from '../components/dialogs/keybind'
-import Input from '../components/ui/input-settings'
-import Dropdown from '../components/ui/dropdown'
+import ContextMenu from '../../components/elements/context-menu'
+import Sidebar from '../../components/elements/sidebar'
+import Checkbox from '../../components/ui/checkbox'
+import Keybind from './keybind'
+import Input from './input-settings'
+import Dropdown from '../../components/ui/dropdown'
 
 // utils
-import { readConfig, saveConfig } from '../utils/config'
-import { notificationProps, SettingsConfig } from '../utils/interface'
+import { readConfig, saveConfig } from '../../utils/config'
+import { notificationProps, SettingsConfig } from '../../utils/interface'
 
 import '../css/pages/settings.css'
 import { toast } from 'react-toastify'

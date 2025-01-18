@@ -5,7 +5,7 @@ import 'material-symbols'
 
 // Pages
 import Home from './pages/home'
-import Settings from './pages/settings'
+import Settings from './pages/settings/index'
 import Player from './pages/player'
 
 // config
