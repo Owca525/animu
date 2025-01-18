@@ -10,7 +10,7 @@ const Container: React.FC<ContainerProps> = ({ title, data = [], className = '' 
   return (
     <div className={className + ' content-container'}>
       <div className="content-title">{title}</div>
-      <div className={'card-container' + (data.length > 0 ? '' : ' message-content')}>
+      <div className={'card-content-container' + (data.length > 0 ? '' : ' message-content')}>
         {data.length > 0 ? (
           data.map((card) => (
             <Card

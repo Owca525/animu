@@ -18,6 +18,7 @@ import { ReadHistory } from '../utils/history'
 import ContextMenu from '../components/elements/context-menu'
 import 'react-toastify/dist/ReactToastify.css';
 import '../css/pages/home.css'
+import { Information } from '@renderer/components/elements/information'
 
 function home() {
   const navigate = useNavigate()
@@ -128,6 +129,7 @@ function home() {
   if (config) {
     return (
       <main className="container">
+        {/* <Information id_anime={''} showPopup={false} > */}
         <ContextMenu items={menuItems} />
         {error?.error ? (
           <Dialog

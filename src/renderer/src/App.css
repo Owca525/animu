@@ -44,7 +44,6 @@ body {
 }
 
 .Toastify__toast {
-  background-color: var(--primary-200);
   border-radius: 8px;
   padding: 16px;
   color: var(--text);

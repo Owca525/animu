@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Information } from '../elements/information'
+// import { Information } from '../elements/information'
 import '../../css/ui/card.css'
 
 import { CardProps } from '../../utils/interface'
@@ -38,16 +38,6 @@ const Card: React.FC<CardProps> = ({ id, title, img, player = null, text = null 
     }
   }, [showInf])
 
-  const shortText = (text: string) => {
-    if (player && text.length > 40) {
-      return text.slice(0, 40) + '...'
-    }
-    if (text.length > 58) {
-      return text.slice(0, 58) + '...'
-    }
-    return text
-  }
-
   const ContinueWatch = () => {
     if (player) {
       navigate('/player', {
@@ -64,34 +54,33 @@ const Card: React.FC<CardProps> = ({ id, title, img, player = null, text = null 
   }
 
   return (
-    <div className="card" title={title} ref={cardRef} onClick={ContinueWatch}>
-      <div title="" style={{ cursor: 'default' }}>
-        <Information id_anime={id} showPopup={showInf} toggle={toggleShow} />
-      </div>
-      <div className="card-image-container">
-        {!isImageLoaded && !hasError && (
-          <div
-            className="material-symbols-outlined card-image-placeholder"
-            style={{ animation: 'spin 1s linear infinite' }}
-          >
-            progress_activity
-          </div>
-        )}
-        {hasError && (
-          <div className="material-symbols-outlined card-image-placeholder" title="img can't load">
-            error
-          </div>
-        )}
-        <img
-          onLoad={handleImageLoad}
-          onError={() => setHasError(true)}
-          className={`card-image ${isImageLoaded && !hasError ? 'loaded' : 'hidden'}`}
-          src={img}
-        />
-      </div>
-      <div className="card-title">{shortText(title)}</div>
-      {text ? <div className="card-continue-watch-text">{text}</div> : ''}
+    <div className="card-container" title={title} ref={cardRef} onClick={ContinueWatch}>
+    {/* <div title="" style={{ cursor: 'default' }}>
+    <Information id_anime={id} showPopup={showInf} toggle={toggleShow} />
+  </div> */}
+    <div className="card-image-container">
+      {!isImageLoaded && !hasError && (
+        <div
+          className="material-symbols-outlined card-image-placeholder"
+        >
+          <div className='material-symbols-outlined' style={{ animation: 'spin 1s linear infinite' }}>progress_activity</div>
+        </div>
+      )}
+      {hasError && (
+        <div className="material-symbols-outlined card-image-placeholder" title="img can't load">
+          <div className='material-symbols-outlined'>error</div>
+        </div>
+      )}
+      <img
+        onLoad={handleImageLoad}
+        onError={() => setHasError(true)}
+        className={`card-image ${isImageLoaded && !hasError ? 'loaded' : 'hidden'}`}
+        src={img}
+      />
     </div>
+    <div className="card-title">{title}</div>
+    {text ? <div className="card-continue-watch-text">{text}</div> : ''}
+  </div>
   )
 }
 

@@ -50,6 +50,10 @@ button .text-button {
 .card-continue-watch-text {
 }
 
+/* input section */
+.input {
+}
+
 /* Checkbox section */
 .checkbox-container {
 }
@@ -141,7 +145,7 @@ button .text-button {
 }
 .content-container {
 }
-.card-container {
+.card-content-container {
 }
 .card-content-loading {
 }

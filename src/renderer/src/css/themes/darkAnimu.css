@@ -1,0 +1,168 @@
+:root {
+  --text: #cfcfcf;
+  --text-gray: #8d8d8d;
+
+  /* Background */
+  --bg: #1e1e1e; /* First layer, background only */
+  --bg2: #232323; /* Second layer, use in sidebar, header */
+  --bg3: #2d2d2d; /* Thirt layer, use in button etc */
+  --bg4: #404040; /* Fourth layer, use in hover button etc */
+/* 
+  --accent0: #603572;
+  --accent1: #743a8c;
+  --accent2: #80409a;
+  --accent3: #8c51a3; */
+
+  --neutral1: #17964a;
+  --neutral2: #19a651;
+  --neutral3: #27ae5d;
+}
+
+* {
+  color: var(--text);
+}
+
+body {
+  background-color: var(--bg);
+}
+
+button {
+  border: none;
+  background-color: var(--bg3);
+  color: var(--text);
+  box-shadow: 0px 0px 10px rgb(0, 0, 0, 0.3);
+}
+
+.backlight:hover {
+  background-color: var(--bg4);
+  color: var(--text);
+}
+
+.active {
+  background-color: var(--bg4);
+}
+.active:hover {
+  background-color: none;
+}
+
+.sidebar-mini {
+  background-color: var(--bg2);
+}
+.border {
+  border-color: var(--bg4);
+}
+
+.border-settings {
+  border-color: var(--bg4);
+}
+
+.sidebar-max {
+  background-color: var(--bg2);
+}
+
+.input {
+  background-color: var(--bg3);
+  outline-color: var(--bg3);
+  outline-width: 2px;
+  outline-style: solid;
+  transition: outline 150ms ease;
+}
+.input:focus {
+  outline-color: var(--neutral1);
+}
+
+.header {
+  background-color: var(--bg2);
+}
+
+.settings-space {
+  background-color: var(--bg2);
+}
+
+.checkbox {
+  background-color: var(--bg3);
+  box-shadow: inset 0 0 5px rgb(0, 0, 0, 0.2);
+}
+.checkbox:checked {
+  background-color: var(--neutral1);
+}
+.checkbox::before {
+  background-color: var(--text);
+  box-shadow: 0 2px 5px rgb(0, 0, 0, 0.2);
+}
+
+.Toastify__toast {
+  background-color: var(--bg2);
+  border-radius: 12px;
+  color: var(--text);
+  border: 2px solid var(--bg4);
+}
+
+.number {
+  background-color: var(--bg3);
+  color: var(--text);
+  border: none;
+  transition: background-color 150ms ease;
+}
+.number:hover {
+  background-color: var(--bg4);
+}
+.number:focus {
+  outline: solid 2px var(--neutral1);
+}
+
+.dropdown-button {
+  border: none;
+  background-color: var(--bg3);
+  transition: background-color 150ms ease;
+}
+.dropdown-button:hover {
+  background-color: var(--bg4);
+}
+
+.dropdown-menu {
+  background-color: var(--bg3);
+}
+
+.dropdown-item {
+  background-color: var(--bg3);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.dropdown-item:hover {
+  background-color: var(--bg4);
+}
+
+.keybind-content {
+  background-color: var(--bg3);
+  border-color: var(--bg3);
+  transition:
+    background-color,
+    border-color 150ms ease;
+}
+
+.keybind-content:hover {
+  background-color: var(--bg4);
+}
+
+.keybind-active {
+  background-color: var(--bg4);
+  border-color: var(--neutral1);
+}
+
+.card-container {
+  border-radius: 8px;
+}
+.card-container:hover {
+  background-color: var(--bg4);
+}
+
+.card-image {
+  border-radius: 8px;
+}
+.card-image-placeholder {
+  background-color: var(--bg3);
+}
+
+.card-continue-watch-text {
+  color: var(--text-gray);
+}

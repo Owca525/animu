@@ -1,19 +1,18 @@
-.content-title {
+.title {
   font-weight: 500;
   font-size: x-large;
 }
 .content-container {
   display: flex;
-  justify-content: start;
   flex-direction: column;
-  margin-right: 1em;
+  margin-right: 2em;
+  margin-left: 6em;
 }
-.card-container {
-  margin-top: 12px;
-  gap: 1em;
+.card-content-container {
+  margin-top: 4em;
+  gap: clamp(14px, 1vw, 28px);
   display: grid;
-  justify-content: start;
-  grid-template-columns: repeat(auto-fit, minmax(170px, max-content));
+  grid-template-columns: repeat(auto-fit, minmax(150px, max-content));
 }
 .card-content-loading {
   display: flex;

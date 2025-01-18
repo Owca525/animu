@@ -294,10 +294,10 @@ button {
 .card:hover {
   background-color: var(--primary-200);
 }
-.card-image-container {
+/* .card-image-container {
   background-color: var(--primary-200);
   box-shadow: 1px 1px 20px rgb(0, 0, 0, 0.3);
-}
+} */
 .card-image-placeholder {
   background-color: var(--primary-200);
 }
