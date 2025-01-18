@@ -1,6 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'react-toastify';
 import Hls from "hls.js";
 
 // utils
@@ -8,26 +9,29 @@ import { DeleteFromcontinue, SaveContinue } from '../utils/continueWatch'
 import { configContext } from '../utils/context/small'
 import { get_player_anime } from '../utils/backend'
 import { SaveHistory } from '../utils/history'
+import { notificationProps } from '@renderer/utils/interface';
 
 // Components
 import ContextMenu from '../components/elements/context-menu'
-
-import '../css/pages/player.css'
 import CustomSlider from '@renderer/components/ui/customSlider';
 import Button from '@renderer/components/ui/button';
-import { toast } from 'react-toastify';
-import { notificationProps } from '@renderer/utils/interface';
+
+// Context
 import { closeDialog, dialogIsOpen, showDialog } from '@renderer/utils/context/DialogContext';
 
+// css
+import '../css/pages/player.css'
+
 const Player = () => {
-  const Currentlocation = useLocation()
   const navigate = useNavigate()
 
-  const { id, title, episodes, ep, time, img } = Currentlocation.state
+  // Taking Data from location
+  const { id, title, episodes, ep, time, img } = useLocation().state
 
+  // Translation 
   const { t } = useTranslation()
 
-  // Loading Config from context
+  // Taking Config from context
   const config = useContext(configContext)
 
   // ref for html object
@@ -147,11 +151,6 @@ const Player = () => {
 
     window.api.rpc.setActivity(`${title} Episode ${ep}`, `${formatTime(currentTime)} / ${formatTime(duration)}`)
   }, [currentTime])
-
-  useEffect(() => {
-    console.log([currentResolution])
-    console.log(currentResolution.toString().length )
-  }, [currentResolution])
 
   // Checking config and player if load then set config to player and add event
   useEffect(() => {
@@ -291,25 +290,19 @@ const Player = () => {
   }
 
   const updateProgress = () => {
-    if (!videoRef.current) {
-      return
-    }
-
-    const percent = (videoRef.current.currentTime / videoRef.current.duration) * 100
+    if (!videoRef.current) return
     setCurrentTime(videoRef.current.currentTime)
 
     if (progressRef.current && thumbRef.current && isShowTime == false) {
+      const percent = (videoRef.current.currentTime / videoRef.current.duration) * 100
       progressRef.current.style.width = `${percent}%`
       thumbRef.current.style.left = `${percent}%`
     }
   }
 
   const setMutedToPlayer = () => {
-    if (isMuted) {
-      setMuted(false)
-    } else {
-      setMuted(true)
-    }
+    if (isMuted) setMuted(false)
+    else setMuted(true)
   }
 
   const togglePlay = () => {
