@@ -78,7 +78,7 @@
 }
 
 .card-image {
-  height: 100%;
+  height: 21cap;
   width: 100%;
   object-fit: cover;
 }
@@ -90,8 +90,8 @@
 .card-image-placeholder {
   position: relative;
   max-width: 200px;
-  max-height: 220px;
-  width: 90%;
+  max-height: 240px;
+  width: 100%;
   height: 100vb;
   display: flex;
   justify-content: center;
