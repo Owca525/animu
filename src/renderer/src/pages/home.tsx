@@ -129,7 +129,7 @@ function home() {
   if (config) {
     return (
       <main className="container">
-        {/* <Information id_anime={''} showPopup={false} > */}
+        {/* <Information id_anime={"b3u5TprKSKHBPBcor"} showPopup={true} toggle={() => console.log} /> */}
         <ContextMenu items={menuItems} />
         {error?.error ? (
           <Dialog
