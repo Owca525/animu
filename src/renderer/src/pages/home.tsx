@@ -17,7 +17,6 @@ import { ReadHistory } from '../utils/history'
 import ContextMenu from '../components/elements/context-menu'
 import 'react-toastify/dist/ReactToastify.css';
 import '../css/pages/home.css'
-import { Information } from '@renderer/components/elements/information'
 import { closeDialog, showDialog } from '@renderer/utils/context/DialogContext'
 
 function home() {
@@ -132,7 +131,6 @@ function home() {
   if (config) {
     return (
       <main className="container">
-        {/* <Information id_anime={"b3u5TprKSKHBPBcor"} showPopup={true} toggle={() => console.log} /> */}
         <ContextMenu items={menuItems} />
         <Sidebar
           top={sidebarHomeTopData}

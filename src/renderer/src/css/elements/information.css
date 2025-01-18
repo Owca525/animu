@@ -69,7 +69,6 @@
   width: auto;
   margin-top: -50px;
   position: relative;
-
   border-radius: 12px;
 }
 
@@ -152,4 +151,12 @@
   display: flex;
   align-items: center;
   gap: 0.5em;
+}
+
+.information-image-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 180px;
+  height: 250px;
 }

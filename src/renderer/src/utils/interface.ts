@@ -12,17 +12,13 @@ export interface ContainerProps {
   className?: string
 }
 
-export interface InformationProps {
-  id_anime: string
-  showPopup: boolean
-  toggle: () => void
-}
-
 export interface InformationData {
   id: string
   title: string
   description: string
   img: string
+  banner: string
+
   episodes: Array<string>
 }
 

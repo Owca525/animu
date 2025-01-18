@@ -34,7 +34,8 @@ export async function get_information(id: string): Promise<InformationData> {
     title: info['show']['name'],
     description: info['show']['description'],
     img: tmpimg,
-    episodes: episode_list
+    episodes: episode_list,
+    banner: info['show']['banner']
   }
 }
 

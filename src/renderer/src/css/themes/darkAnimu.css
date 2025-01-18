@@ -170,3 +170,8 @@ button {
   background-color: var(--bg2);
   border-radius: 12px;
 }
+
+.information-image-placeholder {
+  background-color: var(--bg3);
+  border-radius: 12px;
+}

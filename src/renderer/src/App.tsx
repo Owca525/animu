@@ -16,7 +16,6 @@ import { notificationProps, SettingsConfig } from './utils/interface'
 import { CheckHistory } from './utils/history'
 
 import { toast, ToastContainer } from 'react-toastify'
-import { showDialog } from './utils/context/DialogContext'
 
 function App() {
   const [configIsLoading, setConfigIsLoading] = useState<boolean>(true)

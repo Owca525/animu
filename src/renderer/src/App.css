@@ -25,8 +25,13 @@ body {
   animation: spin 1s linear infinite;
 }
 
+.loaded {
+  opacity: 1;
+}
+
 .hidden {
-  display: none;
+  opacity: 0;
+  user-select: none;
 }
 
 ::-webkit-scrollbar {

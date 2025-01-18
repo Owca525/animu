@@ -85,9 +85,6 @@
   opacity: 0;
   transition: opacity 250ms ease-in-out;
 }
-.card-image.loaded {
-  opacity: 1;
-}
 
 .card-image-placeholder {
   max-width: 200px;

@@ -1,80 +1,117 @@
-import { useEffect, useRef, useState } from 'react'
-import { InformationProps, InformationData } from '../../utils/interface'
+import { useEffect, useReducer, useState } from 'react'
+import { InformationData } from '../../utils/interface'
 import { get_information } from '../../utils/backend'
 import '../../css/elements/information.css'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { hideInformation } from '@renderer/utils/context/InformationContext'
+import { closeDialog, showDialog } from '@renderer/utils/context/DialogContext'
 
-export const Information: React.FC<InformationProps> = ({ id_anime, showPopup, toggle }) => {
-  const modalRef: any = useRef()
+const htmlEntities = {
+  '&apos;': "'",
+  '&quot;': '"',
+  '&amp;': '&',
+  '&lt;': '<',
+  '&gt;': '>',
+  '&#x2014;': '—',
+  '&#x2013;': '–',
+};
 
+function decodeHtmlEntities(str) {
+  let decodedString = str.replace(/&[a-zA-Z0-9#]+;/g, (match) => {
+    return htmlEntities[match] || match;
+  });
+  decodedString = decodedString.replace(/<br\s*\/?>/gi, '\n');
+  decodedString = decodedString.replace(/<\/?[^>]+(>|$)/g, "");
+  return decodedString;
+}
+
+const initialImagesState = {
+  isCoverLoaded: false,
+  isCoverError: false,
+  isBannerLoaded: false,
+};
+
+const LoadingActionTypes = {
+  SET_IS_COVER_LOADED: 'SET_IS_COVER_LOADED',
+  SET_IS_COVER_ERROR: 'SET_IS_COVER_ERROR',
+  SET_IS_BANNER_LOADED: 'SET_IS_BANNER_LOADED',
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case LoadingActionTypes.SET_IS_COVER_LOADED:
+      return { ...state, isCoverLoaded: action.payload };
+    case LoadingActionTypes.SET_IS_COVER_ERROR:
+      return { ...state, isCoverError: action.payload };
+    case LoadingActionTypes.SET_IS_BANNER_LOADED:
+      return { ...state, isBannerLoaded: action.payload };
+    default:
+      return state;
+  }
+};
+
+export const Information: React.FC<{ anime_id: string }> = ({ anime_id }) => {
   const { t } = useTranslation()
+  const [state, dispatch] = useReducer(reducer, initialImagesState);
 
-  const [data, setData] = useState<InformationData>({
-    id: '',
-    title: '',
-    description: '',
-    img: '',
-    episodes: []
-  })
-  const [loading, setLoading] = useState(true)
-  const [imghasError, setimgHasError] = useState(false)
-  const [isImageLoaded, setIsImageLoaded] = useState(false)
-
+  const [data, setData] = useState<InformationData | undefined>()
   // const navigate = useNavigate()
-
-  // const handleImageLoad = () => {
-  //   setIsImageLoaded(true)
-  //   setimgHasError(false)
-  // }
+  const buttons = [
+    { title: t('general.ok'), onClick: () => { closeDialog(); hideInformation() } },
+    { title: t('general.reload'), onClick: async () => { await fetchData(); closeDialog() } }
+  ]
 
   const fetchData = async () => {
-    const anime_data = await get_information(id_anime)
+    const anime_data = await get_information(anime_id)
     console.log(anime_data)
-    // setData(anime_data)
-    // setLoading(false)
+    if (anime_data == null) {
+      showDialog({ header_text: "Error in information", text: "Error Fetch Data", buttons: buttons })
+      return
+    }
+    const container = document.querySelector(".container") as HTMLDivElement
+    if (container) container.style.display = "none"; container.scrollTop = 0
+    setData(anime_data)
   }
 
-  // const handleClickOutside = (event: any) => {
-  //   if (modalRef.current && !modalRef.current.contains(event.target)) {
-  //     toggle()
-  //   }
-  // }
+  const handleImageCoverLoad = () => {
+    dispatch({ type: LoadingActionTypes.SET_IS_COVER_LOADED, payload: true })
+    dispatch({ type: LoadingActionTypes.SET_IS_COVER_ERROR, payload: false })
+  }
 
   useEffect(() => {
-    // fetchData()
+    fetchData()
   }, [])
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        toggle()
-      }
-    }
-
-    if (showPopup) {
-      document.addEventListener('keydown', handleKeyDown)
-    } else document.removeEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [showPopup])
+  if (data == undefined) {
+    return (
+      <div className="information-background" style={{ backgroundColor: "rgb(0,0,0, 0.5)", position: "fixed" }}>
+        <div className="material-symbols-outlined loading">progress_activity</div>
+      </div>
+    )
+  }
 
   return (
-    <div className="information-background" style={{ visibility: showPopup ? 'visible' : 'hidden' }}> {/* style={{ visibility: showPopup ? 'visible' : 'hidden' }} */}
-      <div className="information-exit-button material-symbols-outlined">
+    <div className="information-background">
+      <div className="information-exit-button material-symbols-outlined" onClick={() => hideInformation()}>
         arrow_back
       </div>
-      <div className="information-banner"><img className='information-banner' src="https://s4.anilist.co/file/anilistcdn/media/anime/banner/150672-ISwoA0eS722H.jpg" /></div>
+      <div className="information-banner"><img className={`information-banner`} src={data.banner} /></div>
       <div className="informartion-fade"></div>
       <div className="information-content">
         <div className="information-top">
-          <div className="information-image"><img className='information-image' src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx150672-jguvEfP0vGfW.png" /></div>
+          <div className="information-image">
+            {state.isCoverLoaded == false && (
+              <div className="information-image-placeholder">
+                <div className='material-symbols-outlined loading'>progress_activity</div>
+              </div>
+            )}
+            <img onLoad={handleImageCoverLoad} className={`${state.isCoverLoaded && !state.isCoverError ? 'loaded' : 'hidden'} information-image`} onError={() => dispatch({ type: LoadingActionTypes.SET_IS_COVER_ERROR, payload: true })} src={data.img} />
+          </div>
           <div className="information-text">
-            <div className="information-header">Oshi no ko</div>
+            <div className="information-header">{data.title}</div>
             <div className="information-description">
-              When a pregnant young starlet appears in Gorou Amemiya’s countryside medical clinic, the doctor takes it upon himself to safely (and secretly) deliver Ai Hoshino’s child so she can make a scandal-free return to the stage. But no good deed goes unpunished, and on the eve of her delivery, he finds himself slain at the hands of Ai’s deluded stalker — and subsequently reborn as Ai’s child, Aquamarine Hoshino! The glitz and glamor of showbiz hide the dark underbelly of the entertainment industry, threatening to dull the shine of his favorite star. Can he help his new mother rise to the top of the charts? And what will he do when unthinkable disaster strikes?
+              {decodeHtmlEntities(data.description)}
             </div>
           </div>
         </div>
