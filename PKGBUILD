@@ -1,6 +1,6 @@
 
 pkgname=animu
-pkgver=0.4.2
+pkgver=0.4.4
 pkgrel=1
 pkgdesc="Simple Application To Watch Anime"
 arch=('x86_64')
@@ -9,7 +9,7 @@ license=('GNU')
 depends=('libxss' 'nss' 'glibc')
 options=('!strip' '!emptydirs')
 source_x86_64=("https://github.com/Owca525/animu/releases/download/v$pkgver/animu_"$pkgver"_amd64.deb")
-sha256sums_x86_64=('1578d6ab8ad2e7d43fd6c1d557507b8c1d0b92f60a97e61b203aa57802613141')
+sha256sums_x86_64=('66263462638aafd8a518f4b32a5b7c0c218d9f955aa2616c81cf110fc58fd681')
 
 package() {
 
