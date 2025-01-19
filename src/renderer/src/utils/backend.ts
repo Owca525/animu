@@ -20,10 +20,11 @@ export async function get_recent(): Promise<CardProps[]> {
   }
 }
 
-export async function get_information(id: string): Promise<InformationData> {
+export async function get_information(id: string): Promise<InformationData | null> {
   let episodeList: Array<{ type: string, avaibleEpisodes: number, listEpisodes: Array<number> }> = []
   let episodesVersion: Array<string> = ["sub", "dub", "raw"]
   const info = await getInformation(id)
+  if (info == null) return null
   console.log('info anime: ', info)
   episodesVersion.forEach((element) => {
     if (parseInt(info["show"]["availableEpisodes"][element]) != 0) {

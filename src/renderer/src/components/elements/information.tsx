@@ -61,7 +61,7 @@ export const Information: React.FC<{ anime_id: string }> = ({ anime_id }) => {
   const navigate = useNavigate()
   const buttons = [
     { title: t('general.ok'), onClick: () => { closeDialog(); hideInformation() } },
-    { title: t('general.reload'), onClick: async () => { await fetchData(); closeDialog() } }
+    { title: t('general.reload'), onClick: async () => { closeDialog(); await fetchData() } }
   ]
 
   const fetchData = async () => {
