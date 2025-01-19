@@ -53,22 +53,16 @@ ipcMain.handle('open', async (_event, url: string): Promise<void> => {
 ipcMain.handle('get-css-files', async (): Promise<{ path: string, filename: string, type: "user" | "official" }[]> => {
     // Directory for local css
     const stylesDir = path.join(__dirname, '../../out/renderer/assets/themes');
-    const localList = await fs.promises.readdir(stylesDir).then(files => {
-        files = files.filter(file => file.endsWith('.css'));
-        return files.map((file) => `${stylesDir}/${file}`)
-    });
+    const localList = await takeFileExtensionAndPath(stylesDir, '.css')
+
+    // this prevent load user theme because in version dev this can't load, idk why. Show status 200 but no css data, maybe i fix someday
+    if (process.env.NODE_ENV === 'development') return convertListTodict(await takeFileExtensionAndPath(path.join(__dirname, '../../src/renderer/src/css/themes'), '.css'), "official")
 
     const configcss = checkConfigFolder()
     if (configcss == undefined) return convertListTodict(localList, "official")
-    
-    // this prevent load user theme because in version dev this can't load, idk why. Show status 200 but no css data, maybe i fix someday
-    if (process.env.NODE_ENV === 'development') return convertListTodict(localList, "official")
 
     // Direcotry for config/theme css
-    const customList = await fs.promises.readdir(configcss).then(files => {
-        files = files.filter(file => file.endsWith('.css'));
-        return files.map((file) => `${configcss}/${file}`)
-    });
+    const customList = await takeFileExtensionAndPath(configcss, '.css')
 
     return [...convertListTodict(localList, "official"), ...convertListTodict(customList, "user")]
 });
@@ -82,6 +76,13 @@ function convertListTodict(list: string[], type: "user" | "official"): { path: s
 function checkConfigFolder(): string | undefined {
     if (fs.existsSync(`${app.getPath("userData")}/themes`)) return `${app.getPath("userData")}/themes`
     return undefined
+}
+
+async function takeFileExtensionAndPath(dir: string, format: string): Promise<string[]> {
+    return await fs.promises.readdir(dir).then(files => {
+        files = files.filter(file => file.endsWith(format));
+        return files.map((file) => `${dir}/${file}`)
+    });
 }
 
 // Setup Discord Rich presence
