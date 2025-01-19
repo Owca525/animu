@@ -282,10 +282,12 @@ const Player = () => {
 
   const exitPlayer = async () => {
     if (config && config.General.Window.AutoFullscreen) {
+      closeDialog()
       navigate('/')
       return
     }
     window.BrowserWindow.setFullscreen(false)
+    closeDialog()
     navigate('/')
   }
 
