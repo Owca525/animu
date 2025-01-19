@@ -407,12 +407,12 @@ const Player = () => {
   }
 
   const setNewEpisode = async (type: string) => {
-    var episode = episodes.indexOf(episode.ep)
+    let ep = episodes.indexOf(episode.ep)
     if (type == 'prev') {
-      episode = episode - 1
+      ep = ep - 1
     }
     if (type == 'next') {
-      episode = episode + 1
+      ep = ep + 1
     }
     await clearPlayer()
     navigate('/player', {
@@ -420,8 +420,8 @@ const Player = () => {
         id: id,
         title: currentTitle,
         episodes: episodes,
+        episode: { type: episode.type, ep: episodes[ep] },
         img: img,
-        ep: episodes[episode],
         time: 0
       }
     })
