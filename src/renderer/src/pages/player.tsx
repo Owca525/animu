@@ -26,7 +26,7 @@ const Player = () => {
   const navigate = useNavigate()
 
   // Taking Data from location
-  const { id, title, episodes, ep, time, img } = useLocation().state
+  const { id, title, episodes, episode, time, img } = useLocation().state
 
   // Translation 
   const { t } = useTranslation()
@@ -76,7 +76,7 @@ const Player = () => {
 
   const setDataPlayer = async () => {
     try {
-      let recentData = await get_player_anime(id, ep)
+      let recentData = await get_player_anime(id, episode)
       console.log(recentData)
       if (recentData.length == 0) {
         showDialog({ header_text: t("errors.playerHeaderError"), text: t("errors.playerCantFind"), buttons: buttons })
@@ -100,8 +100,8 @@ const Player = () => {
   useEffect(() => {
     setPLayerDisable(false)
     setDataPlayer()
-    SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: ep }) })
-  }, [ep])
+    SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) })
+  }, [episode])
 
   // Saving history
   useEffect(() => {
@@ -115,15 +115,15 @@ const Player = () => {
         id: id,
         title: title,
         img: img,
-        player: { episodes: episodes, episode: ep, time: currentTime },
-        text: t('general.LastContinue', { episode: ep })
+        player: { episodes: episodes, episode: episode, time: currentTime },
+        text: t('general.LastContinue', { episode: episode.ep })
       })
     } else {
       DeleteFromcontinue({
         id: id,
         title: title,
         img: img,
-        player: { episodes: episodes, episode: ep, time: currentTime }
+        player: { episodes: episodes, episode: episode, time: currentTime }
       })
     }
 
@@ -136,7 +136,7 @@ const Player = () => {
     // if (duration != 0 && currentTime != 0 && episodes[episodes.indexOf(ep) + 1] != null) setTimeNextEpisode((prev) => prev -= 1)
     // else setTimeNextEpisode(30)
     
-    if (duration != 0 && currentTime != 0 && isHideUpNextEpisode == false && episodes[episodes.indexOf(ep) + 1] != null && currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
+    if (duration != 0 && currentTime != 0 && isHideUpNextEpisode == false && episodes[episodes.indexOf(episode.ep) + 1] != null && currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
       setUpNextEpisode(true)
       setTimeNextEpisode(((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + 30)
     } else {
@@ -149,7 +149,7 @@ const Player = () => {
       setNewEpisode("next")
     }
 
-    window.api.rpc.setActivity(`${title} Episode ${ep}`, `${formatTime(currentTime)} / ${formatTime(duration)}`)
+    window.api.rpc.setActivity(`${title} Episode ${episode.ep}`, `${formatTime(currentTime)} / ${formatTime(duration)}`)
   }, [currentTime])
 
   // Checking config and player if load then set config to player and add event
@@ -174,7 +174,7 @@ const Player = () => {
   }, [config, videoRef.current, isPlayerDisable])
 
   useEffect(() => {
-    SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: ep }) })
+    SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) })
     setPLayerDisable(false)
     handleMouseMove()
   }, [])
@@ -405,7 +405,7 @@ const Player = () => {
   }
 
   const setNewEpisode = async (type: string) => {
-    var episode = episodes.indexOf(ep)
+    var episode = episodes.indexOf(episode.ep)
     if (type == 'prev') {
       episode = episode - 1
     }
@@ -649,7 +649,7 @@ const Player = () => {
       <div className="video-overlay">
         <div className={isUpNextEpisode == false ? isVisible ? 'video-top' : 'video-top player-hidden' : 'video-top'}>
           <Button value='arrow_back' className='material-symbols-outlined player-buttons' onClick={async () => await exitPlayer()} />
-          <div className="player-title ">{t('player.TitleEpisode', { ep: ep, name: currentTitle })}</div>
+          <div className="player-title ">{t('player.TitleEpisode', { ep: episode.ep, name: currentTitle })}</div>
         </div>
         <div
           className={
@@ -674,13 +674,13 @@ const Player = () => {
           </div>
           <div className="bottom-section">
             <div className="left">
-              {episodes[episodes.indexOf(ep) - 1] == undefined
+              {episodes[episodes.indexOf(episode.ep) - 1] == undefined
                 ? "" :
                 (
                   <Button value='skip_previous' title={
-                    episodes[episodes.indexOf(ep) - 1] == undefined
+                    episodes[episodes.indexOf(episode.ep) - 1] == undefined
                       ? ''
-                      : t('player.previous', { ep: episodes[episodes.indexOf(ep) - 1] })
+                      : t('player.previous', { ep: episodes[episodes.indexOf(episode.ep) - 1] })
                   }
                     onClick={async () => await setNewEpisode('prev')}
                     className="material-symbols-outlined player-buttons" />
@@ -690,12 +690,12 @@ const Player = () => {
                 <Button value='pause' title={t('player.Pause')} className="material-symbols-outlined player-buttons" onClick={togglePlay} /> :
                 <Button value='play_arrow' title={t('player.play')} className="material-symbols-outlined player-buttons" onClick={togglePlay} />
               }
-              {episodes[episodes.indexOf(ep) + 1] == undefined
+              {episodes[episodes.indexOf(episode.ep) + 1] == undefined
                 ? "" :
                 (
-                  <Button value='skip_next' className='material-symbols-outlined player-buttons' title={episodes[episodes.indexOf(ep) + 1] == undefined
+                  <Button value='skip_next' className='material-symbols-outlined player-buttons' title={episodes[episodes.indexOf(episode.ep) + 1] == undefined
                     ? ''
-                    : t('player.next', { ep: episodes[episodes.indexOf(ep) + 1] })
+                    : t('player.next', { ep: episodes[episodes.indexOf(episode.ep) + 1] })
                   } onClick={async () => await setNewEpisode('next')} />
                 )
               }
@@ -815,7 +815,7 @@ const Player = () => {
       {isUpNextEpisode ? (
         <div className="up-Next-container">
           <div className="up-Next-Title">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>
-          <div className="up-Next-Anime">{t("player.upNext.titleAnime", { ep: episodes[episodes.indexOf(ep) + 1], title: title })}</div>
+          <div className="up-Next-Anime">{t("player.upNext.titleAnime", { ep: episodes[episodes.indexOf(episode.ep) + 1], title: title })}</div>
           <div className="up-Next-Buttons">
             <Button value={t("player.upNext.nextEp")} className='up-Next-Button' onClick={() => setNewEpisode("next")}/>
             <Button value={t("player.upNext.hide")} className='up-Next-Button' onClick={() => {setHideUpNextEpisode(true); setUpNextEpisode(false)}} />

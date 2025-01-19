@@ -24,11 +24,12 @@ const Card: React.FC<CardProps> = ({ id, title, img, player = null, text = null 
           id: id,
           title: title,
           episodes: player.episodes,
-          ep: player.episode,
+          episode: player.episode,
           time: player.time,
           img: img
         }
       })
+      return
     }
     showIndormation({ anime_id: id })
   }

@@ -16,6 +16,7 @@ import { notificationProps, SettingsConfig } from './utils/interface'
 import { CheckHistory } from './utils/history'
 
 import { toast, ToastContainer } from 'react-toastify'
+import { InformationContext } from './utils/context/InformationContext'
 
 function App() {
   const { t, i18n } = useTranslation()
@@ -82,13 +83,15 @@ function App() {
     <>
       <ToastContainer />
       <configContext.Provider value={config}>
-        <HashRouter>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/player" element={<Player />} />
-            <Route path="/settings" element={<Settings />} />
-          </Routes>
-        </HashRouter>
+          <HashRouter>
+            <InformationContext>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/player" element={<Player />} />
+                <Route path="/settings" element={<Settings />} />
+              </Routes>
+            </InformationContext>
+          </HashRouter>
       </configContext.Provider>
     </>
   )

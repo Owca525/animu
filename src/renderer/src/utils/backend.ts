@@ -22,20 +22,25 @@ export async function get_recent(): Promise<CardProps[]> {
 
 export async function get_information(id: string): Promise<InformationData> {
   let episodeList: Array<{ type: string, avaibleEpisodes: number, listEpisodes: Array<number> }> = []
+  let episodesVersion: Array<string> = ["sub", "dub", "raw"]
   const info = await getInformation(id)
   console.log('info anime: ', info)
-  if (parseInt(info["show"]["availableEpisodes"]["sub"]) != 0) episodeList.push({ type: "sub", avaibleEpisodes: info["show"]["availableEpisodes"]["sub"], listEpisodes: info["show"]['availableEpisodesDetail']['sub'] })
-  if (parseInt(info["show"]["availableEpisodes"]["dub"]) != 0) episodeList.push({ type: "dub", avaibleEpisodes: info["show"]["availableEpisodes"]["dub"], listEpisodes: info["show"]['availableEpisodesDetail']['dub'] })
-  if (parseInt(info["show"]["availableEpisodes"]["raw"]) != 0) episodeList.push({ type: "raw", avaibleEpisodes: info["show"]["availableEpisodes"]["raw"], listEpisodes: info["show"]['availableEpisodesDetail']['raw'] })
+  episodesVersion.forEach((element) => {
+    if (parseInt(info["show"]["availableEpisodes"][element]) != 0) {
+      const list: Array<number> = info["show"]['availableEpisodesDetail'][element]
+      episodeList.push({ type: element, avaibleEpisodes: info["show"]["availableEpisodes"][element], listEpisodes: list.reverse() })
+    }
+  })
+  
   let tmpimg = info['show']['thumbnail']
   if (tmpimg != null && tmpimg.startsWith('https') != true) tmpimg = 'https://wp.youtube-anime.com/aln.youtube-anime.com/' + tmpimg
   return {
     id: info['show']['_id'],
     title: info['show']['name'],
     description: info['show']['description'],
-    img: tmpimg,
-    episodes: episodeList,
-    banner: info['show']['banner']
+    images: { banner: info['show']['banner'], cover: tmpimg },
+    information: { format: info['show']['type'], episodeDuration: info['show']['episodeDuration'], status: info['show']['status'], season: info['show']['season'], airedStart: info['show']['airedStart'], episodesCount: info['show']['episodeCount'], airedEnd: info['show']['airedEnd'] },
+    episodes: episodeList
   }
 }
 
@@ -57,8 +62,8 @@ export async function get_search(
   return anime
 }
 
-export async function get_player_anime(id: string, ep: string | number): Promise<{ url: string, res: string, hostname: string, hls: boolean }[]> {
-  const players = await getPlayerUrls(id, ep.toString())
+export async function get_player_anime(id: string, episode: { type: string, ep: string }): Promise<{ url: string, res: string, hostname: string, hls: boolean }[]> {
+  const players = await getPlayerUrls(id, episode.ep, episode.type)
   if (players) {
     return players
   }

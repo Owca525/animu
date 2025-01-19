@@ -174,3 +174,7 @@
 .information-episode-button:hover {
   outline: solid 2px var(--neutral1);
 }
+
+.information-episode-button:active {
+  background-color: var(--bg4);
+}

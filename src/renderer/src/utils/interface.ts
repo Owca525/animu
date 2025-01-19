@@ -2,7 +2,7 @@ export interface CardProps {
   id: string
   title: string
   img: string
-  player?: { episodes: number[]; episode: number; time: number | string }
+  player?: { episodes: number[]; episode: { type: string, ep: number }; time: number | string }
   text?: string
 }
 
@@ -12,13 +12,14 @@ export interface ContainerProps {
   className?: string
 }
 
+interface date { date?: number, hour?: number, minute?: number, month?: number, year?: number}
+
 export interface InformationData {
   id: string
   title: string
   description: string
-  img: string
-  banner: string
-
+  information: { format: string, episodeDuration: number, status: string, season: { quarter: string, year: number }, episodesCount: number, airedStart: date, airedEnd: date }
+  images: { banner: string, cover: string }
   episodes: Array<{ type: string, avaibleEpisodes: number, listEpisodes: Array<number> }>
 }
 

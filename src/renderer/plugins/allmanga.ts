@@ -100,8 +100,8 @@ export async function getInformation(id: string) {
   return null
 }
 
-export async function getPlayerUrls(id: string, episode: string): Promise<{ url: string, res: string, hostname: string, hls: boolean }[] | null> {
-  let variables = `{"showId":"${id}","translationType":"sub","episodeString":"${episode}"}`
+export async function getPlayerUrls(id: string, episode: string, type: string): Promise<{ url: string, res: string, hostname: string, hls: boolean }[] | null> {
+  let variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${episode}"}`
   let extensions = `{"persistedQuery":{"version":1,"sha256Hash": "${HASH_PLAYER}"}}`
   let url = API_WEB + `/api?variables=${variables}&extensions=${extensions}`
   
