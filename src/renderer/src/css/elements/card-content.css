@@ -1,4 +1,4 @@
-.title {
+.content-title {
   font-weight: 500;
   font-size: x-large;
 }
@@ -7,9 +7,11 @@
   flex-direction: column;
   margin-right: 2em;
   margin-left: 6em;
+  margin-top: 4.5em;
+  margin-bottom: 2em;
+  gap: 1em;
 }
 .card-content-container {
-  margin-top: 4em;
   gap: clamp(14px, 1vw, 28px);
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, max-content));

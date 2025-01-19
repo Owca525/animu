@@ -175,3 +175,93 @@ button {
   background-color: var(--bg3);
   border-radius: 12px;
 }
+
+.context-menu-item:hover {
+  background: var(--bg3);
+}
+
+.context-menu {
+  background: var(--bg2);
+}
+
+.information-episode-button:hover {
+  outline: solid 2px var(--neutral1);
+}
+
+.information-episode-button:active {
+  background-color: var(--bg4);
+}
+
+.information-episode-button {
+  background-color: var(--bg4);
+  border-radius: 6px;
+  outline-color: var(--bg4);
+  transition: outline 100ms ease;
+}
+
+.information-episodes {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+.information-anime-info {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+.information-anime-info-content {
+  background-color: var(--bg3);
+  border-radius: 12px;
+}
+
+.information-exit-button {
+  background-color: var(--bg2);
+}
+
+.information-exit-button:hover {
+  background-color: var(--bg4);
+  outline: solid 2px var(--neutral1);
+}
+
+.information-top {
+  background-color: var(--bg2);
+}
+
+.player-buttons {
+  background-color: rgba(0, 0, 0, 0.0);
+  box-shadow: none;
+  outline-color: rgba(0, 0, 0, 0.0);
+}
+
+.player-buttons:hover {
+  outline: solid 2px var(--neutral1);
+}
+
+.progress {
+  background-color: var(--neutral1);
+}
+
+.thumb, .slider-thumb, .slider-progress,.progress {
+  background-color: var(--neutral1);
+}
+
+.seek-bar {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.time-display, .player-title, .show-time {
+  background-color: rgb(30, 30, 30, 0.8);
+}
+
+.video-container {
+  background-color: rgba(0, 0, 0);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--bg2);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}

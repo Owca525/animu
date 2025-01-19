@@ -31,13 +31,13 @@ function decodeHtmlEntities(str) {
 const initialImagesState = {
   isCoverLoaded: false,
   isCoverError: false,
-  isBannerLoaded: false,
+  isBannerError: false,
 };
 
 const LoadingActionTypes = {
   SET_IS_COVER_LOADED: 'SET_IS_COVER_LOADED',
   SET_IS_COVER_ERROR: 'SET_IS_COVER_ERROR',
-  SET_IS_BANNER_LOADED: 'SET_IS_BANNER_LOADED',
+  SET_IS_BANNER_ERROR: 'SET_IS_BANNER_ERROR',
 };
 
 const reducer = (state, action) => {
@@ -46,7 +46,7 @@ const reducer = (state, action) => {
       return { ...state, isCoverLoaded: action.payload };
     case LoadingActionTypes.SET_IS_COVER_ERROR:
       return { ...state, isCoverError: action.payload };
-    case LoadingActionTypes.SET_IS_BANNER_LOADED:
+    case LoadingActionTypes.SET_IS_BANNER_ERROR:
       return { ...state, isBannerLoaded: action.payload };
     default:
       return state;
@@ -123,7 +123,11 @@ export const Information: React.FC<{ anime_id: string }> = ({ anime_id }) => {
       <div className="information-exit-button material-symbols-outlined" onClick={() => hideInformation()}>
         arrow_back
       </div>
-      <div className="information-banner"><img className={`information-banner`} src={data.images.banner} /></div>
+      <div className="information-banner">
+        {data.images.banner == null ? "" : (
+          <img onError={() => dispatch({ type: LoadingActionTypes.SET_IS_BANNER_ERROR, payload: true })} className={`information-banner ${state.isBannerError ? "hidden" : ""}`} src={data.images.banner} />
+        )}
+      </div>
       <div className="informartion-fade"></div>
       <div className="information-content">
         <div className="information-top">

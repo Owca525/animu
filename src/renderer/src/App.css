@@ -42,12 +42,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--primary-300);
   border-radius: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--primary-200);
 }
 
 .Toastify__toast {
