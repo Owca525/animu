@@ -87,17 +87,21 @@ export const Information: React.FC<{ anime_id: string }> = ({ anime_id }) => {
 
   function RunPlayer(ep: number, type: string) {
     if (data == undefined) return
-    navigate('/player', {
-      state: {
-        id: data.id,
-        title: data.title,
-        episodes: data.episodes,
-        episode: { type: type, ep: ep },
-        time: 0,
-        img: data.images.cover
+    data.episodes.forEach((element) => {
+      if (element.type == type){ 
+        navigate('/player', {
+          state: {
+            id: data.id,
+            title: data.title,
+            episodes: element.listEpisodes,
+            episode: { type: type, ep: ep },
+            time: 0,
+            img: data.images.cover
+          }
+        })
+        hideInformation()
       }
     })
-    hideInformation()
   }
 
   function makeButtons(episode: number[], type: string) {
