@@ -19,7 +19,7 @@ export interface InformationData {
   img: string
   banner: string
 
-  episodes: Array<string>
+  episodes: Array<{ type: string, avaibleEpisodes: number, listEpisodes: Array<number> }>
 }
 
 interface ListItem {

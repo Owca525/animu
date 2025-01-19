@@ -12,8 +12,6 @@ const InformationContext: React.FC<{ children: React.ReactNode }> = ({ children 
   showIndormation = (informationData: { anime_id: string }) => {
     setData(informationData);
     setIsShow(true);
-    const container = document.querySelector(".container") as HTMLDivElement
-    if (container) container.style.display = "none"
   };
 
   hideInformation = () => {

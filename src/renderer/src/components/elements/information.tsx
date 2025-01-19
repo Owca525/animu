@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { hideInformation } from '@renderer/utils/context/InformationContext'
 import { closeDialog, showDialog } from '@renderer/utils/context/DialogContext'
+import Drop from '../ui/drop'
 
 const htmlEntities = {
   '&apos;': "'",
@@ -83,6 +84,16 @@ export const Information: React.FC<{ anime_id: string }> = ({ anime_id }) => {
     fetchData()
   }, [])
 
+  function makeButtons(episode: number[]) {
+    return (
+      <div className='information-buttons-episode-container'>
+        {episode.map((num) => (
+          <div className='information-episode-button'>{num}</div>
+        ))}
+      </div>
+    )
+  }
+
   if (data == undefined) {
     return (
       <div className="information-background" style={{ backgroundColor: "rgb(0,0,0, 0.5)", position: "fixed" }}>
@@ -147,14 +158,9 @@ export const Information: React.FC<{ anime_id: string }> = ({ anime_id }) => {
             </div>
           </div>
           <div className="information-episodes">
-            <div className="information-episodes-content">
-              <div className="episodes-header">Dub</div>
-              <div className="episodes-header">12 episodes <div className="episodes-arrow material-symbols-outlined">arrow_drop_down</div></div>
-            </div>
-            <div className="information-episodes-content">
-              <div className="episodes-header">Sub</div>
-              <div className="episodes-header">13 episodes <div className="episodes-arrow material-symbols-outlined">arrow_drop_down</div></div>
-            </div>
+            {data.episodes.map((episode) => (
+              <Drop LeftHeader={episode.type} RightHeader={`${episode.avaibleEpisodes} episodes`} content={makeButtons(episode.listEpisodes)}/>
+            ))}
           </div>
         </div>
       </div>

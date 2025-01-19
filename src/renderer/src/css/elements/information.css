@@ -112,6 +112,7 @@
 
   background-color: var(--bg2);
   border-radius: 12px;
+  height: min-content;
 }
 
 .information-anime-info-content {
@@ -140,24 +141,36 @@
   gap: 0.5em;
 }
 
-.information-episodes-content {
-  display: flex;
-  justify-content: space-between;
-  padding: 12px;
-  background-color: var(--bg3);
-  border-radius: 12px;
-}
-
-.episodes-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-}
-
 .information-image-placeholder {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 180px;
   height: 250px;
+}
+
+.information-buttons-episode-container {
+  display: flex;
+  justify-content: start;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+
+.information-episode-button {
+  padding: 12px;
+  width: clamp(10px, 1.5vw, 20px);
+  height: clamp(10px, 1.5vw, 20px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+
+  background-color: var(--bg4);
+  border-radius: 6px;
+  outline-color: var(--bg4);
+  transition: outline 100ms ease;
+}
+
+.information-episode-button:hover {
+  outline: solid 2px var(--neutral1);
 }

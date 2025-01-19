@@ -21,20 +21,20 @@ export async function get_recent(): Promise<CardProps[]> {
 }
 
 export async function get_information(id: string): Promise<InformationData> {
+  let episodeList: Array<{ type: string, avaibleEpisodes: number, listEpisodes: Array<number> }> = []
   const info = await getInformation(id)
   console.log('info anime: ', info)
-  const episode_list = info['show']['availableEpisodesDetail']['sub']
-  episode_list.reverse()
-  var tmpimg = info['show']['thumbnail']
-  if (tmpimg != null && tmpimg.startsWith('https') != true) {
-    tmpimg = 'https://wp.youtube-anime.com/aln.youtube-anime.com/' + tmpimg
-  }
+  if (parseInt(info["show"]["availableEpisodes"]["sub"]) != 0) episodeList.push({ type: "sub", avaibleEpisodes: info["show"]["availableEpisodes"]["sub"], listEpisodes: info["show"]['availableEpisodesDetail']['sub'] })
+  if (parseInt(info["show"]["availableEpisodes"]["dub"]) != 0) episodeList.push({ type: "dub", avaibleEpisodes: info["show"]["availableEpisodes"]["dub"], listEpisodes: info["show"]['availableEpisodesDetail']['dub'] })
+  if (parseInt(info["show"]["availableEpisodes"]["raw"]) != 0) episodeList.push({ type: "raw", avaibleEpisodes: info["show"]["availableEpisodes"]["raw"], listEpisodes: info["show"]['availableEpisodesDetail']['raw'] })
+  let tmpimg = info['show']['thumbnail']
+  if (tmpimg != null && tmpimg.startsWith('https') != true) tmpimg = 'https://wp.youtube-anime.com/aln.youtube-anime.com/' + tmpimg
   return {
     id: info['show']['_id'],
     title: info['show']['name'],
     description: info['show']['description'],
     img: tmpimg,
-    episodes: episode_list,
+    episodes: episodeList,
     banner: info['show']['banner']
   }
 }
