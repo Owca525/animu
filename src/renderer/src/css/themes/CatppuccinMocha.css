@@ -7,18 +7,19 @@
   --bg2: #181825; /* Second layer, use in sidebar, header */
   --bg3: #313244; /* Thirt layer, use in button etc */
   --bg4: #45475a; /* Fourth layer, use in hover button etc */
-/* 
-  --accent0: #603572;
-  --accent1: #743a8c;
-  --accent2: #80409a;
-  --accent3: #8c51a3; */
 
+  /* accent */
   --neutral1: #cba6f7;
   --neutral2: #ca9ee6;
   --neutral3: #cea7e7;
+
+  /* Other */
+  --black: rgba(0, 0, 0);  /* is use in video container */
+  --notVisible: rgba(0, 0, 0, 0.0); /* is use in player button */
 }
 
 * {
+  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   color: var(--text);
 }
 
@@ -228,9 +229,9 @@ button {
 }
 
 .player-buttons {
-  background-color: rgba(0, 0, 0, 0.0);
+  background-color: var(--notVisible);
   box-shadow: none;
-  outline-color: rgba(0, 0, 0, 0.0);
+  outline-color: var(--notVisible);
 }
 
 .player-buttons:hover {
@@ -254,7 +255,7 @@ button {
 }
 
 .video-container {
-  background-color: rgba(0, 0, 0);
+  background-color: var(--black);
 }
 
 ::-webkit-scrollbar-thumb {
