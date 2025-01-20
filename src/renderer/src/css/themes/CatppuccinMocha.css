@@ -1,0 +1,275 @@
+:root {
+  --text: #cdd6f4;
+  --text-gray: #a6adc8;
+
+  /* Background */
+  --bg: #1e1e2e; /* First layer, background only */
+  --bg2: #181825; /* Second layer, use in sidebar, header */
+  --bg3: #313244; /* Thirt layer, use in button etc */
+  --bg4: #45475a; /* Fourth layer, use in hover button etc */
+/* 
+  --accent0: #603572;
+  --accent1: #743a8c;
+  --accent2: #80409a;
+  --accent3: #8c51a3; */
+
+  --neutral1: #cba6f7;
+  --neutral2: #ca9ee6;
+  --neutral3: #cea7e7;
+}
+
+* {
+  color: var(--text);
+}
+
+body {
+  background-color: var(--bg);
+}
+
+button {
+  border: none;
+  background-color: var(--bg3);
+  color: var(--text);
+  box-shadow: 0px 0px 10px rgb(0, 0, 0, 0.3);
+}
+
+.backlight:hover {
+  background-color: var(--bg4);
+  color: var(--text);
+}
+
+.active {
+  background-color: var(--bg4);
+}
+.active:hover {
+  background-color: none;
+}
+
+.sidebar-mini {
+  background-color: var(--bg2);
+}
+.border {
+  border-color: var(--bg4);
+}
+
+.border-settings {
+  border-color: var(--bg4);
+}
+
+.sidebar-max {
+  background-color: var(--bg2);
+}
+
+.input {
+  background-color: var(--bg3);
+  outline-color: var(--bg3);
+  outline-width: 2px;
+  outline-style: solid;
+  transition: outline 150ms ease;
+}
+.input:focus {
+  outline-color: var(--neutral1);
+}
+
+.header {
+  background-color: var(--bg2);
+}
+
+.settings-space {
+  background-color: var(--bg2);
+}
+
+.checkbox {
+  background-color: var(--bg3);
+  box-shadow: inset 0 0 5px rgb(0, 0, 0, 0.2);
+}
+.checkbox:checked {
+  background-color: var(--neutral1);
+}
+.checkbox::before {
+  background-color: var(--text);
+  box-shadow: 0 2px 5px rgb(0, 0, 0, 0.2);
+}
+
+.Toastify__toast {
+  background-color: var(--bg2);
+  border-radius: 12px;
+  color: var(--text);
+  border: 2px solid var(--bg4);
+}
+
+.number {
+  background-color: var(--bg3);
+  color: var(--text);
+  border: none;
+  transition: background-color 150ms ease;
+}
+.number:hover {
+  background-color: var(--bg4);
+}
+.number:focus {
+  outline: solid 2px var(--neutral1);
+}
+
+.dropdown-button {
+  border: none;
+  background-color: var(--bg3);
+  transition: background-color 150ms ease;
+}
+.dropdown-button:hover {
+  background-color: var(--bg4);
+}
+
+.dropdown-menu {
+  background-color: var(--bg3);
+}
+
+.dropdown-item {
+  background-color: var(--bg3);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.dropdown-item:hover {
+  background-color: var(--bg4);
+}
+
+.keybind-content {
+  background-color: var(--bg3);
+  border-color: var(--bg3);
+  transition:
+    background-color,
+    border-color 150ms ease;
+}
+
+.keybind-content:hover {
+  background-color: var(--bg4);
+}
+
+.keybind-active {
+  background-color: var(--bg4);
+  border-color: var(--neutral1);
+}
+
+.card-container {
+  border-radius: 8px;
+}
+.card-container:hover {
+  background-color: var(--bg4);
+}
+
+.card-image {
+  border-radius: 8px;
+}
+.card-image-placeholder {
+  background-color: var(--bg3);
+}
+
+.card-continue-watch-text {
+  color: var(--text-gray);
+}
+.dialog-container {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+.information-image-placeholder {
+  background-color: var(--bg3);
+  border-radius: 12px;
+}
+
+.context-menu-item:hover {
+  background: var(--bg3);
+}
+
+.context-menu {
+  background: var(--bg2);
+}
+
+.information-episode-button:hover {
+  outline: solid 2px var(--neutral1);
+}
+
+.information-episode-button:active {
+  background-color: var(--bg4);
+}
+
+.information-episode-button {
+  background-color: var(--bg4);
+  border-radius: 6px;
+  outline-color: var(--bg4);
+  transition: outline 100ms ease;
+}
+
+.information-episodes {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+.information-anime-info {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+.information-anime-info-content {
+  background-color: var(--bg3);
+  border-radius: 12px;
+}
+
+.information-exit-button {
+  background-color: var(--bg2);
+}
+
+.information-exit-button:hover {
+  background-color: var(--bg4);
+  outline: solid 2px var(--neutral1);
+}
+
+.information-top {
+  background-color: var(--bg2);
+}
+
+.player-buttons {
+  background-color: rgba(0, 0, 0, 0.0);
+  box-shadow: none;
+  outline-color: rgba(0, 0, 0, 0.0);
+}
+
+.player-buttons:hover {
+  outline: solid 2px var(--neutral1);
+}
+
+.progress {
+  background-color: var(--neutral1);
+}
+
+.thumb, .slider-thumb, .slider-progress,.progress {
+  background-color: var(--neutral1);
+}
+
+.seek-bar {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.time-display, .player-title, .show-time {
+  background-color: rgba(30, 29, 30, 0.8);
+}
+
+.video-container {
+  background-color: rgba(0, 0, 0);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--bg2);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+.information-background {
+  background-color: rgb(17, 17, 27, 1);
+}
+
+.information-fade {
+  background: linear-gradient(to bottom, rgba(17, 17, 27, 0) 10%, rgba(17, 17, 27, 1) 98%);
+}
