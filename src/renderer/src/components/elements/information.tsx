@@ -92,7 +92,7 @@ export const Information: React.FC<{ anime_id: string }> = ({ anime_id }) => {
         navigate('/player', {
           state: {
             id: data.id,
-            title: data.title,
+            title: decodeURIComponent(data.title),
             episodes: element.listEpisodes,
             episode: { type: type, ep: ep },
             time: 0,

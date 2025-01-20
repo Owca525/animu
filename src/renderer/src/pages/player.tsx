@@ -46,9 +46,8 @@ const Player = () => {
 
   // Variable
   const [volume, setVolume] = useState<number>(0)
-  const [currentTime, setCurrentTime] = useState<number>(0)
-  const [duration, setDuration] = useState<number>(0)
 
+  // States
   const [isMuted, setMuted] = useState<boolean>(false)
   const [isShowTime, setShowTime] = useState<boolean>(false)
   const [isVisible, setIsVisible] = useState<boolean>(true)
@@ -59,17 +58,23 @@ const Player = () => {
   const [isConfigLoad, setConfigLoad] = useState<boolean>(false)
   const [isAlwaysDisable, setisAlwaysDisable] = useState<boolean>(false)
 
-  const [currentSettings, setcurrentSettings] = useState<string>("")
-  const [currentResolution, setResolution] = useState<string | number>("")
-  const [ListResolution, setListResolution] = useState<number[]>([])
+  // Url
   const [ListUrls, setListUrls] = useState<{ url: string, res: string, hostname: string, hls: boolean }[]>([])
-  const [currentHost, setHost] = useState<string>("")
-  const [hls, setHls] = useState<Hls | null>(null);
-  const [currentTitle, _setTitle] = useState<string>(decodeURIComponent(title))
   const [playerUrl, setPlayerUrl] = useState<string | undefined>(undefined)
+  const [currentHost, setHost] = useState<string>("")
+
+  // Resolution
+  const [ListResolution, setListResolution] = useState<number[]>([])
+  const [currentResolution, setResolution] = useState<string | number>("")
+  const [currentSettings, setcurrentSettings] = useState<string>("")
+
+  // Up Next
   const [timeNextEpisode, setTimeNextEpisode] = useState<number>(30)
   const [isUpNextEpisode, setUpNextEpisode] = useState<boolean>(false)
   const [isHideUpNextEpisode, setHideUpNextEpisode] = useState<boolean>(false)
+
+  // Others
+  const [hls, setHls] = useState<Hls | null>(null);
 
   const menuItems = [{ label: t('contextMenu.reload'), onClick: () => location.reload() }]
   const buttons = [{ title: t('general.ok'), onClick: () => exitPlayer() }, { title: t('general.reload'), onClick: async () => {await setDataPlayer(); closeDialog() }}]
@@ -78,13 +83,9 @@ const Player = () => {
     try {
       let recentData = await get_player_anime(id, episode)
       console.log(recentData)
-      if (recentData.length == 0) {
-        showDialog({ header_text: t("errors.playerHeaderError"), text: t("errors.playerCantFind"), buttons: buttons })
-      }
 
-      if (dialogIsOpen()) {
-        return
-      }
+      if (recentData.length == 0) showDialog({ header_text: t("errors.playerHeaderError"), text: t("errors.playerCantFind"), buttons: buttons })
+      if (dialogIsOpen()) return
 
       if (recentData.length != 0 && playerUrl == undefined) {
         setListUrls(recentData)
@@ -93,29 +94,23 @@ const Player = () => {
       }
     } catch (Error) {
       showDialog({ header_text: t("errors.playerHeaderError"), text: t('errors.extractionError', { error: Error }), buttons: buttons })
-    } finally {
     }
   }
 
-  useEffect(() => {
-    setPLayerDisable(false)
-    setDataPlayer()
-    SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) })
-  }, [episode])
+  function saveContinueProgress() {
+    // Checking to save history
+    if (!config) return
+    if (!videoRef.current) return
 
-  // Saving history
-  useEffect(() => {
     if (
-      config &&
-      videoRef.current &&
-      currentTime >= parseInt(config.History.continue.MinimalTimeSave.toString()) &&
-      currentTime <= duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
+      videoRef.current.currentTime >= parseInt(config.History.continue.MinimalTimeSave.toString()) &&
+      videoRef.current.currentTime <= videoRef.current.duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
     ) {
       SaveContinue({
         id: id,
         title: title,
         img: img,
-        player: { episodes: episodes, episode: episode, time: currentTime },
+        player: { episodes: episodes, episode: episode, time: videoRef.current.currentTime },
         text: t('general.LastContinue', { episode: episode.ep })
       })
     } else {
@@ -123,19 +118,18 @@ const Player = () => {
         id: id,
         title: title,
         img: img,
-        player: { episodes: episodes, episode: episode, time: currentTime }
+        player: { episodes: episodes, episode: episode, time: videoRef.current.currentTime }
       })
     }
+  }
 
-    if (!config) {
-      return
-    }
+  function checkUpNext() {
+    // checking to show Up next communicat
+    if (!config) return
+    if (!videoRef.current) return
+    const duration = videoRef.current.duration
+    const currentTime = videoRef.current.currentTime
 
-    // setTimeNextEpisode(((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + 30)
-
-    // if (duration != 0 && currentTime != 0 && episodes[episodes.indexOf(ep) + 1] != null) setTimeNextEpisode((prev) => prev -= 1)
-    // else setTimeNextEpisode(30)
-    
     if (duration != 0 && currentTime != 0 && isHideUpNextEpisode == false && episodes[episodes.indexOf(episode.ep) + 1] != null && currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
       setUpNextEpisode(true)
       setTimeNextEpisode(((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + 30)
@@ -143,20 +137,16 @@ const Player = () => {
       setTimeNextEpisode(30)
       setUpNextEpisode(false)
     }
-    console.log(currentTime)
     
     if (duration != 0 && currentTime != 0 && (isHideUpNextEpisode == false && timeNextEpisode <= 0)) {
       setNewEpisode("next")
     }
-
-    window.api.rpc.setActivity(`${title} Episode ${episode.ep}`, `${formatTime(currentTime)} / ${formatTime(duration)}`)
-  }, [currentTime])
+  }
 
   // Checking config and player if load then set config to player and add event
   useEffect(() => {
     if (config && videoRef.current && isConfigLoad == false) {
       videoRef.current.currentTime = time
-      setCurrentTime(time)
 
       setIsPlaying(config.Player.general.Autoplay)
       videoRef.current.autoplay = config.Player.general.Autoplay
@@ -177,25 +167,13 @@ const Player = () => {
     SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) })
     setPLayerDisable(false)
     handleMouseMove()
+    setDataPlayer()
   }, [])
 
-  const showElement = () => {
-    setIsVisible(true)
-  }
-
-  const hideElement = () => {
-    setIsVisible(false)
-  }
-
-  const formatTime = (seconds: number, type?: string): string => {
+  const formatTime = (seconds: number | undefined): string => {
+    if (!seconds) return "0:00"
     const minutes = Math.floor(seconds / 60)
     const secs = Math.floor(seconds % 60)
-    switch (type) {
-      case "minutes":
-        return minutes.toString()
-      case "seconds":
-        return secs.toString()
-    }
     return `${minutes}:${secs < 10 ? '0' : ''}${secs}`
   }
 
@@ -232,25 +210,6 @@ const Player = () => {
         setResolution(resolutions[0].toString())
       });
 
-      // hls.on(Hls.Events.LEVEL_LOADING, (_) => {
-      //   console.log("Loading....")
-      // });
-      // hls.on(Hls.Events.LEVEL_LOADED, (_) => {
-      //   console.log("Done...")
-      // });
-      // hls.on(Hls.Events.LEVEL_SWITCHING, (_) => {
-      //   console.log("Change...")
-      // });
-      // hls.on(Hls.Events.LEVEL_UPDATED, (_) => {
-      //   console.log("LevelUpdate...")
-      // });
-      // hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
-      //   console.log(hls.loadLevel)
-      //   if (data.frag.level == hls.currentLevel) {
-      //     console.log("NewFragLoaded...")
-      //   } 
-      // });
-
       setHls(hls)
 
       hls.on(Hls.Events.ERROR, (_event, data) => {
@@ -281,19 +240,22 @@ const Player = () => {
   }
 
   const exitPlayer = async () => {
+    closeDialog()
     if (config && config.General.Window.AutoFullscreen) {
-      closeDialog()
       navigate('/')
       return
     }
     window.BrowserWindow.setFullscreen(false)
-    closeDialog()
     navigate('/')
   }
 
   const updateProgress = () => {
     if (!videoRef.current) return
-    setCurrentTime(videoRef.current.currentTime)
+    saveContinueProgress()
+    checkUpNext()
+
+    // Update RPC
+    window.api.rpc.setActivity(`${title} Episode ${episode.ep}`, `${formatTime(videoRef.current.currentTime)} / ${formatTime(videoRef.current.duration)}`)
 
     if (progressRef.current && thumbRef.current && isShowTime == false) {
       const percent = (videoRef.current.currentTime / videoRef.current.duration) * 100
@@ -366,12 +328,6 @@ const Player = () => {
     return;
   };
 
-  const handleLoadedMetadata = () => {
-    if (videoRef.current) {
-      setDuration(videoRef.current.duration)
-    }
-  }
-
   const handleVolumeChange = (value: number) => {
     setVolume(value)
 
@@ -380,8 +336,11 @@ const Player = () => {
     }
   }
 
+  // this is only for timeout
+  const hideElement = () => setIsVisible(false)
+
   const handleMouseMove = () => {
-    showElement()
+    setIsVisible(true)
     if (hideTimer.current) {
       clearTimeout(hideTimer.current)
     }
@@ -398,8 +357,6 @@ const Player = () => {
     setPLayerDisable(true)
     setPlayerUrl(() => undefined)
     setWaitingPlayer(() => true)
-    setDuration(() => 0)
-    setCurrentTime(() => 0)
     setHideUpNextEpisode(() => false)
     setUpNextEpisode(() => false)
     setTimeNextEpisode(() => 30)
@@ -408,23 +365,22 @@ const Player = () => {
 
   const setNewEpisode = async (type: string) => {
     let ep = episodes.indexOf(episode.ep)
-    if (type == 'prev') {
-      ep = ep - 1
-    }
-    if (type == 'next') {
-      ep = ep + 1
-    }
+    if (type == 'prev') ep = ep - 1
+    if (type == 'next') ep = ep + 1
     await clearPlayer()
     navigate('/player', {
       state: {
         id: id,
-        title: currentTitle,
+        title: title,
         episodes: episodes,
         episode: { type: episode.type, ep: episodes[ep] },
         img: img,
         time: 0
       }
     })
+    setPLayerDisable(false)
+    setDataPlayer()
+    SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) })
   }
 
   const handleSeekBarMouseLeave = () => {
@@ -447,15 +403,13 @@ const Player = () => {
   }
 
   const change_time = (time: number) => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        togglePlay()
-        videoRef.current.currentTime = time
-        togglePlay()
-      } else {
-        videoRef.current.currentTime = time
-      }
-    }
+    if (!videoRef.current) return
+
+    if (isPlaying) {
+      togglePlay()
+      videoRef.current.currentTime = time
+      togglePlay()
+    } else videoRef.current.currentTime = time
   }
 
   const videoErrorHandler = (event: React.SyntheticEvent<HTMLVideoElement, Event>) => {
@@ -498,21 +452,16 @@ const Player = () => {
       const totalWidth = rect.width
       const percent = offsetX / totalWidth
       const newTime = percent * video.duration
-      if (!isNaN(newTime) && config && newTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
+      if (!isNaN(newTime) && config && newTime > video.duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
         setHideUpNextEpisode(true)
       }
 
-      if (!isNaN(newTime)) {
-        video.currentTime = newTime
-        setCurrentTime(newTime)
-      }
+      if (!isNaN(newTime)) video.currentTime = newTime
     }
   }
 
   const changeVolume = (value: number) => {
-    if (!videoRef.current) {
-      return
-    }
+    if (!videoRef.current) return
 
     if (value >= 0 && value <= 1) {
       videoRef.current.volume = value
@@ -530,7 +479,7 @@ const Player = () => {
       const totalWidth = rect.width
       const percent = offsetX / totalWidth
       const newTime = percent * video.duration
-      if (!isNaN(newTime) && newTime > 0 && duration > newTime) {
+      if (!isNaN(newTime) && newTime > 0 && video.duration > newTime) {
         setShowTime(true)
         showtime.innerHTML = formatTime(newTime)
         showtime.style.left = `${percent * 96.5}%`
@@ -611,18 +560,14 @@ const Player = () => {
   }
 
   function setSpeed(speed: string) {
-    if (videoRef.current) {
-      videoRef.current.playbackRate = parseFloat(speed)
-      setSettings("settings")
-    }
+    if (!videoRef.current) return
+    videoRef.current.playbackRate = parseFloat(speed)
+    setSettings("settings")
   }
 
   function setRes(res: number | undefined) {
-    console.log(res)
     if (res && hls) {
-      const levelIndex = hls.levels.findIndex(level => level.height === res);
-      console.log(levelIndex)
-      hls.currentLevel = levelIndex
+      hls.currentLevel = hls.levels.findIndex(level => level.height === res);
       setResolution(res)
     }
   }
@@ -637,7 +582,6 @@ const Player = () => {
           ref={videoRef}
           className={isVisible ? 'video-player mask' : 'video-player'}
           onTimeUpdate={updateProgress}
-          onLoadedMetadata={handleLoadedMetadata}
           onClick={() => { togglePlay(); setcurrentSettings("") }}
           autoPlay={isPlaying}
           onError={(error) => videoErrorHandler(error)}
@@ -651,7 +595,7 @@ const Player = () => {
       <div className="video-overlay">
         <div className={isUpNextEpisode == false ? isVisible ? 'video-top' : 'video-top player-hidden' : 'video-top'}>
           <Button value='arrow_back' className='material-symbols-outlined player-buttons' onClick={async () => await exitPlayer()} />
-          <div className="player-title ">{t('player.TitleEpisode', { ep: episode.ep, name: currentTitle })}</div>
+          <div className="player-title ">{t('player.TitleEpisode', { ep: episode.ep, name: title })}</div>
         </div>
         <div
           className={
@@ -702,7 +646,7 @@ const Player = () => {
                 )
               }
               <div className="time-display">
-                {formatTime(currentTime)} / {formatTime(duration)}
+                {formatTime(videoRef.current?.currentTime)} / {formatTime(videoRef.current?.duration)}
               </div>
             </div>
             <div className="right">
