@@ -1,24 +1,25 @@
 :root {
-  --text: #cfcfcf;
-  --text-gray: #8d8d8d;
+  --text: #cfcfcf; /* is use on regular text */
+  --text-gray: #8d8d8d; /* is use in card continue watch */
 
   /* Background */
   --bg: #1e1e1e; /* First layer, background only */
   --bg2: #232323; /* Second layer, use in sidebar, header */
   --bg3: #2d2d2d; /* Thirt layer, use in button etc */
   --bg4: #404040; /* Fourth layer, use in hover button etc */
-/* 
-  --accent0: #603572;
-  --accent1: #743a8c;
-  --accent2: #80409a;
-  --accent3: #8c51a3; */
 
-  --neutral1: #17964a;
-  --neutral2: #19a651;
-  --neutral3: #27ae5d;
+  /* accent */
+  --neutral1: #17964a; /* is using on outline, border-color etc */ 
+  --neutral2: #19a651; /* not use */
+  --neutral3: #27ae5d; /* not use */
+
+  /* Other */
+  --black: rgba(0, 0, 0);  /* is use in video container */
+  --notVisible: rgba(0, 0, 0, 0.0); /* is use in player button */
 }
 
 * {
+  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   color: var(--text);
 }
 
@@ -228,17 +229,13 @@ button {
 }
 
 .player-buttons {
-  background-color: rgba(0, 0, 0, 0.0);
+  background-color: var(--notVisible);
   box-shadow: none;
-  outline-color: rgba(0, 0, 0, 0.0);
+  outline-color: var(--notVisible);
 }
 
 .player-buttons:hover {
   outline: solid 2px var(--neutral1);
-}
-
-.progress {
-  background-color: var(--neutral1);
 }
 
 .thumb, .slider-thumb, .slider-progress,.progress {
@@ -254,7 +251,7 @@ button {
 }
 
 .video-container {
-  background-color: rgba(0, 0, 0);
+  background-color: var(--black);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -264,4 +261,17 @@ button {
 
 ::-webkit-scrollbar-track {
   background: var(--bg);
+}
+
+.information-top {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+.information-fade {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 1%, var(--bg) 90%);
+}
+
+.information-background {
+  background-color: var(--bg);
 }
