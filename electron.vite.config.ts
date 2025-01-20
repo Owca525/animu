@@ -16,6 +16,17 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src')
       }
     },
+    build: {
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: false,
+        },
+        mangle: true,
+     },
+     reportCompressedSize: true,
+     cssCodeSplit: false
+    },
     plugins: [
       react(),
       viteStaticCopy({

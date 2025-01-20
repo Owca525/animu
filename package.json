@@ -32,7 +32,8 @@
     "material-symbols": "^0.27.2",
     "react-i18next": "^15.2.0",
     "react-router-dom": "^7.1.1",
-    "react-toastify": "^11.0.2"
+    "react-toastify": "^11.0.2",
+    "terser": "^5.37.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^2.0.0",

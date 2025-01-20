@@ -1,12 +1,14 @@
 import { Routes, Route, HashRouter } from 'react-router-dom'
-import { useCallback, useEffect, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import 'material-symbols'
 
 // Pages
-import Home from './pages/home'
-import Settings from './pages/settings/index'
-import Player from './pages/player'
+const Settings = lazy(() => import('./pages/settings/index'));
+const Player = lazy(() => import('./pages/player'));
+
+// I can't set home to lazy loading because css in card broke idk how, css is full loaded
+import Home from "./pages/home"
 
 // config
 import { checkConfig, readConfig } from './utils/config'
@@ -74,26 +76,32 @@ function App() {
   }, [])
 
   return config == undefined ? (
-    <div
-      style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}
-    >
-      <div className="loading material-symbols-outlined">progress_activity</div>
-    </div>
+    AppLoading()
   ) : (
     <>
       <ToastContainer />
       <configContext.Provider value={config}>
-          <HashRouter>
-            <InformationContext>
+        <HashRouter>
+          <InformationContext>
+            <Suspense fallback={AppLoading()}>
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/player" element={<Player />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>
-            </InformationContext>
-          </HashRouter>
+            </Suspense>
+          </InformationContext>
+        </HashRouter>
       </configContext.Provider>
     </>
+  )
+}
+
+function AppLoading() {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <div className="loading material-symbols-outlined">progress_activity</div>
+    </div>
   )
 }
 
