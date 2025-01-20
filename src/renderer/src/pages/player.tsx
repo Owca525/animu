@@ -21,6 +21,7 @@ import { closeDialog, dialogIsOpen, showDialog } from '@renderer/utils/context/D
 
 // css
 import '../css/pages/player.css'
+import useHotkeys from '@reecelucas/react-use-hotkeys';
 
 const Player = () => {
   const navigate = useNavigate()
@@ -154,12 +155,6 @@ const Player = () => {
       handleVolumeChange(parseInt(config.Player.general.Volume.toString()))
       if (config.Player.general.AutoFullscreen) enterFullscreen()
       setConfigLoad(true)
-    }
-
-    // set event to detect keyboard
-    window.addEventListener('keydown', keybinds)
-    return () => {
-      window.removeEventListener('keydown', keybinds)
     }
   }, [config, videoRef.current, isPlayerDisable])
 
@@ -488,6 +483,8 @@ const Player = () => {
       }
     }
   }
+
+  useHotkeys("*", (event) => keybinds(event));
 
   const keybinds = async (event: KeyboardEvent) => {
     if (videoRef.current && config) {

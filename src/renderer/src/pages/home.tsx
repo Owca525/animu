@@ -18,6 +18,8 @@ import ContextMenu from '../components/elements/context-menu'
 import 'react-toastify/dist/ReactToastify.css';
 import '../css/pages/home.css'
 import { closeDialog, showDialog } from '@renderer/utils/context/DialogContext'
+import useHotkeys from '@reecelucas/react-use-hotkeys'
+import { hideInformation, isInformationShow } from '@renderer/utils/context/InformationContext'
 
 function home() {
   const navigate = useNavigate()
@@ -127,6 +129,15 @@ function home() {
       results()
     }
   }
+
+  useHotkeys("Escape", () => {
+    if (isInformationShow()) hideInformation()
+    else showDialog({ header_text: "Animu", text: "Exit Animu?", buttons: [
+      { title: t('general.exit'), onClick: () => window.BrowserWindow.exit() },
+      { title: "Back", onClick: () => closeDialog() },
+    ]
+  })
+  });  
 
   if (config) {
     return (
