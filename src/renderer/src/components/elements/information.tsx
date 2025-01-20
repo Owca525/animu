@@ -132,7 +132,7 @@ export const Information: React.FC<{ anime_id: string }> = ({ anime_id }) => {
           <img onError={() => dispatch({ type: LoadingActionTypes.SET_IS_BANNER_ERROR, payload: true })} className={`information-banner ${state.isBannerError ? "hidden" : ""}`} src={data.images.banner} />
         )}
       </div>
-      <div className="informartion-fade"></div>
+      <div className="information-fade"></div>
       <div className="information-content">
         <div className="information-top">
           <div className="information-image">
