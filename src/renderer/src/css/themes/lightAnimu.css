@@ -1,17 +1,17 @@
 :root {
-  --text: #839496;
-  --text-gray: #778282;
+  --text: #1c1c21; /* is use on regular text */
+  --text-gray: #4a4d64; /* is use in card continue watch */
 
   /* Background */
-  --bg: #002b36; /* First layer, background only */
-  --bg2: #073642; /* Second layer, use in sidebar, header */
-  --bg3: #43555a; /* Thirt layer, use in button etc */
-  --bg4: #4f6066; /* Fourth layer, use in hover button etc */
+  --bg: #eff1f5; /* First layer, background only */
+  --bg2: #e6e9ef; /* Second layer, use in sidebar, header */
+  --bg3: #cccfd7; /* Thirt layer, use in button etc */
+  --bg4: #b7bbc6; /* Fourth layer, use in hover button etc */
 
   /* accent */
-  --neutral1: #b58900;
-  --neutral2: #c99700;
-  --neutral3: #dca501;
+  --neutral1: #72e15a; /* is using on outline, border-color etc */ 
+  --neutral2: #41c475; /* not use */
+  --neutral3: #30b063; /* not use */
 
   /* Other */
   --black: rgba(0, 0, 0);  /* is use in video container */
@@ -31,7 +31,7 @@ button {
   border: none;
   background-color: var(--bg3);
   color: var(--text);
-  box-shadow: 0px 0px 10px rgb(0, 0, 0, 0.3);
+  box-shadow: 0px 0px 10px rgb(0, 0, 0, 0.1);
 }
 
 .backlight:hover {
@@ -82,14 +82,14 @@ button {
 
 .checkbox {
   background-color: var(--bg3);
-  box-shadow: inset 0 0 5px rgb(0, 0, 0, 0.2);
+  box-shadow: inset 0 0 5px rgb(0, 0, 0, 0.1);
 }
 .checkbox:checked {
   background-color: var(--neutral1);
 }
 .checkbox::before {
   background-color: var(--text);
-  box-shadow: 0 2px 5px rgb(0, 0, 0, 0.2);
+  box-shadow: 0 2px 5px rgb(0, 0, 0, 0.1);
 }
 
 .Toastify__toast {
@@ -232,14 +232,12 @@ button {
   background-color: var(--notVisible);
   box-shadow: none;
   outline-color: var(--notVisible);
+  color: var(--bg);
 }
 
 .player-buttons:hover {
   outline: solid 2px var(--neutral1);
-}
-
-.progress {
-  background-color: var(--neutral1);
+  background-color: rgba(139, 158, 146, 0.683);
 }
 
 .thumb, .slider-thumb, .slider-progress,.progress {
@@ -251,7 +249,8 @@ button {
 }
 
 .time-display, .player-title, .show-time {
-  background-color: rgba(41, 41, 45, 0.8);
+  background-color: rgb(30, 30, 30, 0.8);
+  color: var(--bg);
 }
 
 .video-container {
@@ -267,10 +266,27 @@ button {
   background: var(--bg);
 }
 
-.information-background {
-  background-color: rgb(8, 37, 52);
+.information-top {
+  background-color: var(--bg2);
+  border-radius: 12px;
 }
 
 .information-fade {
-  background: linear-gradient(to bottom, rgb(8, 37, 52, 0) 10%, rgba(8, 37, 52, 1) 98%);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 3%, var(--bg) 97%);
+}
+
+.information-background {
+  background-color: var(--bg);
+}
+
+.player-settings-button {
+  color: var(--bg);
+}
+
+.player-settings-button-text {
+  color: var(--bg3);
+}
+
+.slider-text {
+  color: var(--bg);
 }

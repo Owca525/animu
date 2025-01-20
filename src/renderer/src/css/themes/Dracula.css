@@ -1,17 +1,17 @@
 :root {
-  --text: #839496;
-  --text-gray: #778282;
+  --text: #F8F8F2; /* is use on regular text */
+  --text-gray: #8d8d8d; /* is use in card continue watch */
 
   /* Background */
-  --bg: #002b36; /* First layer, background only */
-  --bg2: #073642; /* Second layer, use in sidebar, header */
-  --bg3: #43555a; /* Thirt layer, use in button etc */
-  --bg4: #4f6066; /* Fourth layer, use in hover button etc */
+  --bg: #282A36; /* First layer, background only */
+  --bg2: #2e303e; /* Second layer, use in sidebar, header */
+  --bg3: #44475A; /* Thirt layer, use in button etc */
+  --bg4: #6272A4; /* Fourth layer, use in hover button etc */
 
   /* accent */
-  --neutral1: #b58900;
-  --neutral2: #c99700;
-  --neutral3: #dca501;
+  --neutral1: #BD93F9; /* is using on outline, border-color etc */ 
+  --neutral2: #c4a8ec; /* not use */
+  --neutral3: #BD93F9; /* not use */
 
   /* Other */
   --black: rgba(0, 0, 0);  /* is use in video container */
@@ -238,10 +238,6 @@ button {
   outline: solid 2px var(--neutral1);
 }
 
-.progress {
-  background-color: var(--neutral1);
-}
-
 .thumb, .slider-thumb, .slider-progress,.progress {
   background-color: var(--neutral1);
 }
@@ -251,7 +247,7 @@ button {
 }
 
 .time-display, .player-title, .show-time {
-  background-color: rgba(41, 41, 45, 0.8);
+  background-color: rgb(30, 30, 30, 0.8);
 }
 
 .video-container {
@@ -267,10 +263,15 @@ button {
   background: var(--bg);
 }
 
-.information-background {
-  background-color: rgb(8, 37, 52);
+.information-top {
+  background-color: var(--bg2);
+  border-radius: 12px;
 }
 
 .information-fade {
-  background: linear-gradient(to bottom, rgb(8, 37, 52, 0) 10%, rgba(8, 37, 52, 1) 98%);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 1%, var(--bg) 90%);
+}
+
+.information-background {
+  background-color: var(--bg);
 }
