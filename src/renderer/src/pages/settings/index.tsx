@@ -12,12 +12,13 @@ import Dropdown from '../../components/ui/dropdown'
 
 // utils
 import { readConfig, saveConfig } from '../../utils/config'
-import { notificationProps, SettingsConfig } from '../../utils/interface'
+import { ListItem, notificationProps, SettingsConfig } from '../../utils/interface'
 
 import '../../css/pages/settings.css'
 import { toast } from 'react-toastify'
 import Button from '@renderer/components/ui/button'
 import useHotkeys from '@reecelucas/react-use-hotkeys'
+import { closeDialog, showDialog } from '@renderer/utils/context/DialogContext'
 
 const Settings = () => {
   const navigate = useNavigate()
@@ -27,13 +28,14 @@ const Settings = () => {
   const [settingPage, setsettingPage] = useState<string>('general')
   const [config, setConfig] = useState<SettingsConfig | undefined>(undefined)
   const [isLoading, setisLoading] = useState<boolean>(true)
+  const [newSidebarTop, setnewSidebarTop] = useState<ListItem[]>([])
 
   const [theme, setTheme] = useState<{ label: string; value: string; onClick: () => void; }[]>()
 
   const generalRef = useRef<HTMLDivElement>(null)
   const playerRef = useRef<HTMLDivElement>(null)
 
-  var sidebarSettingsTopData = [
+  let sidebarSettingsTopData: ListItem[] = [
     {
       value:
         '<div class="material-symbols-outlined text-button">manufacturing</div>' +
@@ -56,10 +58,11 @@ const Settings = () => {
       class: 'icon-button ' + checkCurrentPage('history'),
       title: t('sidebar.History'),
       onClick: async () => setsettingPage('history')
-    }
+    },
+    ...newSidebarTop
   ]
 
-  var sidebarSettingsBottomData = [
+  let sidebarSettingsBottomData = [
     {
       value:
         '<div class="material-symbols-outlined text-button">folder</div>' +
@@ -92,6 +95,7 @@ const Settings = () => {
   const menuItems = [{ label: t('contextMenu.reload'), onClick: () => location.reload() }]
 
   function checkCurrentPage(page: string): string {
+    console.log(page)
     if (page == settingPage) return 'active'
     else return ''
   }
@@ -154,6 +158,25 @@ const Settings = () => {
       return newConfig
     })
   }
+
+  const setDeveloper = () => {
+    setnewSidebarTop([{
+      value:
+        '<div class="material-symbols-outlined text-button">code</div>' +
+        "Developer",
+      class: 'icon-button ' + checkCurrentPage('developer'),
+      title: "Developer",
+      onClick: async () => setsettingPage('developer')
+    }])
+  }
+
+  useHotkeys("Control+Shift+d", () => {
+    showDialog({ header_text: "Animu", text: "Turn on Developer Mode?", buttons: [
+      { title: "No", onClick: () => closeDialog() },
+      { title: "Yes", onClick: () => {closeDialog(); setDeveloper()} },
+    ]
+  })
+  });
 
   const changeTheme = async (theme: string) => {
     handleChange('General.theme', theme)
@@ -484,6 +507,7 @@ const Settings = () => {
       ) : (
         ''
       )}
+      {settingPage == 'developer' && config ? "" : ""}
     </div>
   )
 }

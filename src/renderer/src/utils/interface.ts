@@ -23,7 +23,7 @@ export interface InformationData {
   episodes: Array<{ type: string, avaibleEpisodes: number, listEpisodes: Array<number> }>
 }
 
-interface ListItem {
+export interface ListItem {
   value: string
   class?: string
   title: string
