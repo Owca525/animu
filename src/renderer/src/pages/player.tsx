@@ -665,7 +665,7 @@ const Player = () => {
                     </div>
                   ) : (
                     <div className="player-settings-button" onClick={() => setSettings("urls")}>
-                      <span className='player-settings-button-text'>Urls</span> <span>{currentHost}</span>
+                      <span className='player-settings-button-text'>Urls</span> <span className="player-settings-button-text">{currentHost}</span>
                     </div>
                   )}
                   {ListResolution.length <= 1 ? (
@@ -674,22 +674,22 @@ const Player = () => {
                     </div>
                   ) : (
                     <div className="player-settings-button" onClick={() => setSettings("resolution")}>
-                      <span className='player-settings-button-text'>Resolution</span> <span>{currentResolution.toString().length >= 1 ? currentResolution + "p" : ""}</span>
+                      <span className='player-settings-button-text'>Resolution</span> <span className="player-settings-button-text">{currentResolution.toString().length >= 1 ? currentResolution + "p" : ""}</span>
                     </div>
                   )}
                   <div className="player-settings-button" onClick={() => setSettings("speed")}>
-                    <span className='player-settings-button-text'>Speed</span> <span>{videoRef.current?.playbackRate}</span>
+                    <span className='player-settings-button-text'>Speed</span> <span className="player-settings-button-text">{videoRef.current?.playbackRate}</span>
                   </div>
                 </div>
               )}
               {currentSettings == "urls" && (
                 <div className='player-settings-container'>
                   <div className="player-settings-button-back" onClick={() => setSettings("settings")}>
-                    <span className="material-symbols-outlined">arrow_back</span><span>Urls</span>
+                    <span className="material-symbols-outline player-settings-button-text">arrow_back</span><span className="player-settings-button-text">Urls</span>
                   </div>
                   {ListUrls.map((data) => (
                     <div className="player-settings-button" onClick={() => checkUrl(ListUrls[ListUrls.findIndex((item) => item.hostname === data.hostname)])}>
-                      <span>{data.hostname}</span>
+                      <span className="player-settings-button-text">{data.hostname}</span>
                     </div>
                   ))}
                 </div>
@@ -701,7 +701,7 @@ const Player = () => {
                   </div>
                   {ListResolution.map((data) => (
                     <div className="player-settings-button" onClick={() => { setcurrentSettings(data.toLocaleString()); setRes(data) }}>
-                      <span>{data.toString() + "p"}</span>
+                      <span className="player-settings-button-text">{data.toString() + "p"}</span>
                     </div>
                   ))}
                 </div>
@@ -709,31 +709,31 @@ const Player = () => {
               {currentSettings == "speed" && (
                 <div className='player-settings-container'>
                   <div className="player-settings-button-back" onClick={() => setSettings("settings")}>
-                    <span className="material-symbols-outlined">arrow_back</span><span>Speed</span>
+                    <span className="material-symbols-outlined">arrow_back</span><span className="player-settings-button-text">Speed</span>
                   </div>
                   <div className="player-settings-button" onClick={() => setSpeed("0.25")}>
-                    <span>0.25</span>
+                    <span className="player-settings-button-text">0.25</span>
                   </div>
                   <div className="player-settings-button" onClick={() => setSpeed("0.5")}>
-                    <span>0.5</span>
+                    <span className="player-settings-button-text">0.5</span>
                   </div>
                   <div className="player-settings-button" onClick={() => setSpeed("0.75")}>
-                    <span>0.75</span>
+                    <span className="player-settings-button-text">0.75</span>
                   </div>
                   <div className="player-settings-button" onClick={() => setSpeed("1")}>
-                    <span>1</span>
+                    <span className="player-settings-button-text">1</span>
                   </div>
                   <div className="player-settings-button" onClick={() => setSpeed("1.25")}>
-                    <span>1.25</span>
+                    <span className="player-settings-button-text">1.25</span>
                   </div>
                   <div className="player-settings-button" onClick={() => setSpeed("1.5")}>
-                    <span>1.5</span>
+                    <span className="player-settings-button-text">1.5</span>
                   </div>
                   <div className="player-settings-button" onClick={() => setSpeed("1.75")}>
-                    <span>1.75</span>
+                    <span className="player-settings-button-text">1.75</span>
                   </div>
                   <div className="player-settings-button" onClick={() => setSpeed("2")}>
-                    <span>2</span>
+                    <span className="player-settings-button-text">2</span>
                   </div>
                 </div>
               )}
