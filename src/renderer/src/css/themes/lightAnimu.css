@@ -1,0 +1,292 @@
+:root {
+  --text: #1c1c21; /* is use on regular text */
+  --text-gray: #4a4d64; /* is use in card continue watch */
+
+  /* Background */
+  --bg: #eff1f5; /* First layer, background only */
+  --bg2: #e6e9ef; /* Second layer, use in sidebar, header */
+  --bg3: #cccfd7; /* Thirt layer, use in button etc */
+  --bg4: #b7bbc6; /* Fourth layer, use in hover button etc */
+
+  /* accent */
+  --neutral1: #72e15a; /* is using on outline, border-color etc */ 
+  --neutral2: #41c475; /* not use */
+  --neutral3: #30b063; /* not use */
+
+  /* Other */
+  --black: rgba(0, 0, 0);  /* is use in video container */
+  --notVisible: rgba(0, 0, 0, 0.0); /* is use in player button */
+}
+
+* {
+  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  color: var(--text);
+}
+
+body {
+  background-color: var(--bg);
+}
+
+button {
+  border: none;
+  background-color: var(--bg3);
+  color: var(--text);
+  box-shadow: 0px 0px 10px rgb(0, 0, 0, 0.1);
+}
+
+.backlight:hover {
+  background-color: var(--bg4);
+  color: var(--text);
+}
+
+.active {
+  background-color: var(--bg4);
+}
+.active:hover {
+  background-color: none;
+}
+
+.sidebar-mini {
+  background-color: var(--bg2);
+}
+.border {
+  border-color: var(--bg4);
+}
+
+.border-settings {
+  border-color: var(--bg4);
+}
+
+.sidebar-max {
+  background-color: var(--bg2);
+}
+
+.input {
+  background-color: var(--bg3);
+  outline-color: var(--bg3);
+  outline-width: 2px;
+  outline-style: solid;
+  transition: outline 150ms ease;
+}
+.input:focus {
+  outline-color: var(--neutral1);
+}
+
+.header {
+  background-color: var(--bg2);
+}
+
+.settings-space {
+  background-color: var(--bg2);
+}
+
+.checkbox {
+  background-color: var(--bg3);
+  box-shadow: inset 0 0 5px rgb(0, 0, 0, 0.1);
+}
+.checkbox:checked {
+  background-color: var(--neutral1);
+}
+.checkbox::before {
+  background-color: var(--text);
+  box-shadow: 0 2px 5px rgb(0, 0, 0, 0.1);
+}
+
+.Toastify__toast {
+  background-color: var(--bg2);
+  border-radius: 12px;
+  color: var(--text);
+  border: 2px solid var(--bg4);
+}
+
+.number {
+  background-color: var(--bg3);
+  color: var(--text);
+  border: none;
+  transition: background-color 150ms ease;
+}
+.number:hover {
+  background-color: var(--bg4);
+}
+.number:focus {
+  outline: solid 2px var(--neutral1);
+}
+
+.dropdown-button {
+  border: none;
+  background-color: var(--bg3);
+  transition: background-color 150ms ease;
+}
+.dropdown-button:hover {
+  background-color: var(--bg4);
+}
+
+.dropdown-menu {
+  background-color: var(--bg3);
+}
+
+.dropdown-item {
+  background-color: var(--bg3);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.dropdown-item:hover {
+  background-color: var(--bg4);
+}
+
+.keybind-content {
+  background-color: var(--bg3);
+  border-color: var(--bg3);
+  transition:
+    background-color,
+    border-color 150ms ease;
+}
+
+.keybind-content:hover {
+  background-color: var(--bg4);
+}
+
+.keybind-active {
+  background-color: var(--bg4);
+  border-color: var(--neutral1);
+}
+
+.card-container {
+  border-radius: 8px;
+}
+.card-container:hover {
+  background-color: var(--bg4);
+}
+
+.card-image {
+  border-radius: 8px;
+}
+.card-image-placeholder {
+  background-color: var(--bg3);
+}
+
+.card-continue-watch-text {
+  color: var(--text-gray);
+}
+.dialog-container {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+.information-image-placeholder {
+  background-color: var(--bg3);
+  border-radius: 12px;
+}
+
+.context-menu-item:hover {
+  background: var(--bg3);
+}
+
+.context-menu {
+  background: var(--bg2);
+}
+
+.information-episode-button:hover {
+  outline: solid 2px var(--neutral1);
+}
+
+.information-episode-button:active {
+  background-color: var(--bg4);
+}
+
+.information-episode-button {
+  background-color: var(--bg4);
+  border-radius: 6px;
+  outline-color: var(--bg4);
+  transition: outline 100ms ease;
+}
+
+.information-episodes {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+.information-anime-info {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+.information-anime-info-content {
+  background-color: var(--bg3);
+  border-radius: 12px;
+}
+
+.information-exit-button {
+  background-color: var(--bg2);
+}
+
+.information-exit-button:hover {
+  background-color: var(--bg4);
+  outline: solid 2px var(--neutral1);
+}
+
+.information-top {
+  background-color: var(--bg2);
+}
+
+.player-buttons {
+  background-color: var(--notVisible);
+  box-shadow: none;
+  outline-color: var(--notVisible);
+  color: var(--bg);
+}
+
+.player-buttons:hover {
+  outline: solid 2px var(--neutral1);
+  background-color: rgba(139, 158, 146, 0.683);
+}
+
+.thumb, .slider-thumb, .slider-progress,.progress {
+  background-color: var(--neutral1);
+}
+
+.seek-bar {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.time-display, .player-title, .show-time {
+  background-color: rgb(30, 30, 30, 0.8);
+  color: var(--bg);
+}
+
+.video-container {
+  background-color: var(--black);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--bg2);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+.information-top {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+.information-fade {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 3%, var(--bg) 97%);
+}
+
+.information-background {
+  background-color: var(--bg);
+}
+
+.player-settings-button {
+  color: var(--bg);
+}
+
+.player-settings-button-text {
+  color: var(--bg3);
+}
+
+.slider-text {
+  color: var(--bg);
+}
