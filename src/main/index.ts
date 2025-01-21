@@ -49,7 +49,7 @@ function createWindow(): void {
   Menu.setApplicationMenu(null);
 
   mainWindow.webContents.on('before-input-event', (event, input) => {
-    if (input.key === 'F12' || (input.control && input.shift && input.key === 'I')) {
+    if ((input.control && input.shift && input.key === 'I')) {
         event.preventDefault();
     }
   });

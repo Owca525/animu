@@ -3,12 +3,18 @@ import * as RPC from 'discord-rpc';
 
 import fs from "fs";
 import path from "path";
+import { mainWindow } from ".";
 
 export const rpc = new RPC.Client({ transport: 'ipc' });
 
 // Client id for Discord Rich presence
 export const CLIENT_ID = '1320810160205070377';
 export const runTime = new Date()
+
+ipcMain.on("openDevTools", () => {
+    if (!mainWindow) return
+    mainWindow.webContents.openDevTools()
+})
 
 ipcMain.handle('fetch-data', async (_event, url: string, header: Record<string, string>): Promise<{ success: boolean; data?: any; status?: number; statusText?: string; error?: unknown; }> => {
     try {

@@ -66,6 +66,7 @@ if (process.contextIsolated) {
       isFullscreen: () => ipcRenderer.invoke("isFullscreen"),
       setZoom: (zoom: number) => ipcRenderer.send("setZoom", zoom),
       exit: () => ipcRenderer.send("exit"),
+      openDevTools: () => ipcRenderer.send("openDevTools")
     });
   } catch (error) {
     console.error(error);

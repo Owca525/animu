@@ -52,6 +52,11 @@ export const defaultConfig: SettingsConfig = {
       MaximizeTimeSave: 100,
     },
   },
+  Developer: {
+    DeveloperMode: false,
+    DevTools: false,
+    DevToolsOnStart: false
+  }
 };
 
 async function checkPictureFolder(): Promise<string> {

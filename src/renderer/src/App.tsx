@@ -19,6 +19,7 @@ import { CheckHistory } from './utils/history'
 
 import { toast, ToastContainer } from 'react-toastify'
 import { InformationContext } from './utils/context/InformationContext'
+import useHotkeys from '@reecelucas/react-use-hotkeys';
 
 function App() {
   const { t, i18n } = useTranslation()
@@ -51,6 +52,7 @@ function App() {
     // Set lang, zoom, fullscreen, maximize
     i18n.changeLanguage(config.General.language)
     if (config.General.Window.AutoMaximize) window.BrowserWindow.setMaximize()
+    if (config.Developer.DevToolsOnStart) window.BrowserWindow.openDevTools()
     window.BrowserWindow.setZoom(parseFloat(config.General.Window.Zoom.toString()))
     window.BrowserWindow.setFullscreen(config.General.Window.AutoFullscreen)
   }, [])
@@ -74,6 +76,10 @@ function App() {
     CheckHistory()
     loadConfig()
   }, [])
+
+  useHotkeys("F12", () => {
+    if (config && config.Developer.DevTools) window.BrowserWindow.openDevTools()
+  });
 
   return config == undefined ? (
     AppLoading()

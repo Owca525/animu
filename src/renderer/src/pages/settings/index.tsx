@@ -28,39 +28,37 @@ const Settings = () => {
   const [settingPage, setsettingPage] = useState<string>('general')
   const [config, setConfig] = useState<SettingsConfig | undefined>(undefined)
   const [isLoading, setisLoading] = useState<boolean>(true)
-  const [newSidebarTop, setnewSidebarTop] = useState<ListItem[]>([])
-
-  const [theme, setTheme] = useState<{ label: string; value: string; onClick: () => void; }[]>()
-
-  const generalRef = useRef<HTMLDivElement>(null)
-  const playerRef = useRef<HTMLDivElement>(null)
-
-  let sidebarSettingsTopData: ListItem[] = [
+  const [newSidebarTop, setnewSidebarTop] = useState<ListItem[]>([
     {
       value:
         '<div class="material-symbols-outlined text-button">manufacturing</div>' +
         t('settings.sidebar.General'),
-      class: 'icon-button ' + checkCurrentPage('general'),
+      class: 'icon-button ',
       title: t('settings.sidebar.General'),
+      page: "general",
       onClick: async () => setsettingPage('general')
     },
     {
       value:
         '<div class="material-symbols-outlined text-button">movie</div>' +
         t('settings.sidebar.Player'),
-      class: 'icon-button ' + checkCurrentPage('player'),
+      class: 'icon-button ',
       title: t('settings.sidebar.Player'),
+      page: "player",
       onClick: async () => setsettingPage('player')
     },
     {
       value:
         '<div class="material-symbols-outlined text-button">history</div>' + t('sidebar.History'),
-      class: 'icon-button ' + checkCurrentPage('history'),
+      class: 'icon-button ',
       title: t('sidebar.History'),
+      page: "history",
       onClick: async () => setsettingPage('history')
     },
-    ...newSidebarTop
   ]
+  )
+
+  const [theme, setTheme] = useState<{ label: string; value: string; onClick: () => void; }[]>()
 
   let sidebarSettingsBottomData = [
     {
@@ -88,16 +86,17 @@ const Settings = () => {
   ]
 
   const playerType = [
-    { label: "metadata", value: 'metadata', onclick: () => handleChange('Player.general.playerLoadType', "metadata")},
+    { label: "metadata", value: 'metadata', onclick: () => handleChange('Player.general.playerLoadType', "metadata") },
     { label: "auto", value: 'auto', onclick: () => handleChange('Player.general.playerLoadType', "auto") }
   ]
 
   const menuItems = [{ label: t('contextMenu.reload'), onClick: () => location.reload() }]
 
-  function checkCurrentPage(page: string): string {
-    console.log(page)
-    if (page == settingPage) return 'active'
-    else return ''
+  function checkCurrentPage(page: ListItem[]): ListItem[] {
+    return page.map((element) => {
+      if (element.page == settingPage) return { ...element, class: element.class + " active" }
+      return element
+    })
   }
 
   useEffect(() => {
@@ -109,15 +108,15 @@ const Settings = () => {
     window.api.rpc.setActivity(undefined, t("status.settings"))
   }, [])
 
-  useHotkeys("Escape", () => navigate("/")); 
+  useHotkeys("Escape", () => navigate("/"));
 
   useEffect(() => {
     saveConfig(config)
-    if (config !== undefined) {
-      setisLoading(false)
-      window.BrowserWindow.setZoom(parseFloat(config.General.Window.Zoom.toString()))
-      toast.info(t("toast.config"), notificationProps);
-    }
+    if (!config) return
+    setisLoading(false)
+    window.BrowserWindow.setZoom(parseFloat(config.General.Window.Zoom.toString()))
+    toast.info(t("toast.config"), notificationProps);
+    if (config.Developer.DeveloperMode) setDeveloper()
   }, [config])
 
   async function checkThemes() {
@@ -160,22 +159,33 @@ const Settings = () => {
   }
 
   const setDeveloper = () => {
-    setnewSidebarTop([{
+    const check: Array<boolean | undefined> = newSidebarTop.map((element) => {
+      if (element.page == "developer") return true
+      return undefined
+    })
+
+    if (check.filter(item => item !== undefined)[0]) return
+
+    setnewSidebarTop((prev) => [...prev,
+    {
       value:
         '<div class="material-symbols-outlined text-button">code</div>' +
         "Developer",
-      class: 'icon-button ' + checkCurrentPage('developer'),
+      class: 'icon-button ',
       title: "Developer",
+      page: "developer",
       onClick: async () => setsettingPage('developer')
     }])
+    if (config && config.Developer.DeveloperMode == false) handleChange('Developer.DeveloperMode', true)
   }
 
   useHotkeys("Control+Shift+d", () => {
-    showDialog({ header_text: "Animu", text: "Turn on Developer Mode?", buttons: [
-      { title: "No", onClick: () => closeDialog() },
-      { title: "Yes", onClick: () => {closeDialog(); setDeveloper()} },
-    ]
-  })
+    showDialog({
+      header_text: "Animu", text: "Turn on Developer Mode?", buttons: [
+        { title: "No", onClick: () => closeDialog() },
+        { title: "Yes", onClick: () => { closeDialog(); setDeveloper() } },
+      ]
+    })
   });
 
   const changeTheme = async (theme: string) => {
@@ -213,7 +223,7 @@ const Settings = () => {
     <div className="settings-container">
       <ContextMenu items={menuItems} />
       <Sidebar
-        top={sidebarSettingsTopData}
+        top={checkCurrentPage(newSidebarTop)}
         bottom={sidebarSettingsBottomData}
         class="sidebar-first"
         onlyMax={true}
@@ -230,7 +240,7 @@ const Settings = () => {
       <ContextMenu items={menuItems} />
       <div className="settings-shadow-element"></div>
       <Sidebar
-        top={sidebarSettingsTopData}
+        top={checkCurrentPage(newSidebarTop)}
         bottom={sidebarSettingsBottomData}
         class="sidebar-first"
         onlyMax={true}
@@ -238,7 +248,7 @@ const Settings = () => {
       />
       {settingPage == 'general' && config ? (
         <div className="settings-content">
-          <div className="settings-general" ref={generalRef}>
+          <div className="settings-general">
             <div className="settings-space">
               <div className="text">{t('settings.sidebar.General')}</div>
               <Checkbox
@@ -297,7 +307,7 @@ const Settings = () => {
       )}
       {settingPage == 'history' && config ? (
         <div className="settings-content">
-          <div className="settings-general" ref={playerRef}>
+          <div className="settings-general">
             <div className="settings-space">
               <div className="text">{t('sidebar.History')}</div>
               <Input
@@ -341,7 +351,7 @@ const Settings = () => {
       )}
       {settingPage == 'player' && config ? (
         <div className="settings-content">
-          <div className="settings-general" ref={playerRef}>
+          <div className="settings-general">
             <div className="settings-space">
               <div className="text">{t('settings.sidebar.General')}</div>
               <Checkbox
@@ -431,7 +441,7 @@ const Settings = () => {
               />
               <div className="border-settings"></div>
               <div className="same-space">
-                <span style={{ marginTop: "10px", marginBottom: "10px" }}>{t("settings.screenshot.path")}<span className="curret-settings"> {config.Player.screenShot.path}</span></span> <Button value='Change path' className='settings-button' onClick={async () => changePathScreenshot(await window.api.os.openDialog(undefined, undefined, ["openDirectory"]))}/>
+                <span style={{ marginTop: "10px", marginBottom: "10px" }}>{t("settings.screenshot.path")}<span className="curret-settings"> {config.Player.screenShot.path}</span></span> <Button value='Change path' className='settings-button' onClick={async () => changePathScreenshot(await window.api.os.openDialog(undefined, undefined, ["openDirectory"]))} />
               </div>
             </div>
             <div className="settings-space">
@@ -507,7 +517,36 @@ const Settings = () => {
       ) : (
         ''
       )}
-      {settingPage == 'developer' && config ? "" : ""}
+      {settingPage == 'developer' && config ?
+        <div className="settings-content">
+          <div className="settings-general">
+            <div className="settings-space">
+              <div className="text">DevTools</div>
+              <Checkbox
+                title="Turn on DevTools"
+                checked={config.Developer.DevTools}
+                onClick={(event) =>
+                  handleChange('Developer.DevTools', event.currentTarget.checked)
+                }
+              />
+              <div className="border-settings"></div>
+              <Checkbox
+                title="DevTools on start"
+                checked={config.Developer.DevToolsOnStart}
+                onClick={(event) =>
+                  handleChange('Developer.DevToolsOnStart', event.currentTarget.checked)
+                }
+              />
+            </div>
+            <div className="settings-space">
+              <div className="text">Other</div>
+              <div className="same-space">
+                CSS Test
+                <Button value='Test CSS' className='settings-button' onClick={() => console.log()}/>
+              </div>
+            </div>
+          </div>
+        </div> : ""}
     </div>
   )
 }

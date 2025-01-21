@@ -76,6 +76,7 @@ declare global {
       isFullscreen: () => Promise<boolean>;
       setZoom: (zoom: number) => void;
       exit: () => void;
+      openDevTools: () => void;
     };
   }
 }

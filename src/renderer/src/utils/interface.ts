@@ -27,6 +27,7 @@ export interface ListItem {
   value: string
   class?: string
   title: string
+  page?: string
   onClick?: () => Promise<void>
 }
 
@@ -96,6 +97,11 @@ export interface SettingsConfig {
   General: SettingsConfigGeneral
   Player: SettingsConfigPlayer
   History: SettingsConfigHistory
+  Developer: {
+    DeveloperMode: boolean
+    DevTools: boolean
+    DevToolsOnStart: boolean
+  }
 }
 
 export const notificationProps = {
