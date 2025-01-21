@@ -27,6 +27,10 @@ body {
   background-color: var(--bg);
 }
 
+::selection {
+  background-color: var(--neutral1);
+}
+
 button {
   border: none;
   background-color: var(--bg3);
@@ -104,6 +108,7 @@ button {
   color: var(--text);
   border: none;
   transition: background-color 150ms ease;
+  border-radius: 12px;
 }
 .number:hover {
   background-color: var(--bg4);
@@ -113,9 +118,10 @@ button {
 }
 
 .dropdown-button {
-  border: none;
   background-color: var(--bg3);
   transition: background-color 150ms ease;
+  border-color: var(--bg3);
+  border-radius: 12px;
 }
 .dropdown-button:hover {
   background-color: var(--bg4);
@@ -139,6 +145,7 @@ button {
   transition:
     background-color,
     border-color 150ms ease;
+  border-radius: 12px;
 }
 
 .keybind-content:hover {
@@ -274,4 +281,9 @@ button {
 
 .information-background {
   background-color: var(--bg);
+}
+
+.dropdown-container {
+  border: none;
+  outline: none;
 }

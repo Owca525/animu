@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 // Components
@@ -208,9 +208,7 @@ const Settings = () => {
   }
 
   function changePathScreenshot(path: string) {
-    if (path == "") {
-      return
-    }
+    if (path == "") return
     handleChange("Player.screenShot.path", path)
   }
 
