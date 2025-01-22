@@ -11,6 +11,7 @@ const DialogContext: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const [data, setData] = useState<dialogProps | null>();
 
   showDialog = (dialogData: dialogProps) => {
+    console.log(dialogData)
     setData(dialogData);
     setIsOpen(true);
   };
@@ -26,7 +27,7 @@ const DialogContext: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     <>
       {children}
       {isOpen && data && (
-        <Dialog header_text={data.header_text} text={data.text} buttons={data.buttons}/>
+        <Dialog header_text={data.header_text} text={data.text} buttons={data.buttons} type={data.type} content={data.content}/>
       )}
     </>
   );

@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export interface CardProps {
   id: string
   title: string
@@ -112,7 +114,9 @@ export const notificationProps = {
 }
 
 export interface dialogProps {
-  header_text: string
-  text: string
-  buttons: { title: string; onClick: () => void }[]
+  header_text?: string
+  text?: string
+  type?: "info" | "custom"
+  content?: ReactNode
+  buttons?: { title: string; onClick: () => void }[]
 }

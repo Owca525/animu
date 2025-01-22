@@ -9,6 +9,8 @@ import Checkbox from '../../components/ui/checkbox'
 import Keybind from './keybind'
 import Input from './input-settings'
 import Dropdown from '../../components/ui/dropdown'
+// import MainInput from "../../components/ui/input"
+// import CustomSlider from '@renderer/components/ui/customSlider'
 
 // utils
 import { readConfig, saveConfig } from '../../utils/config'
@@ -108,7 +110,7 @@ const Settings = () => {
     window.api.rpc.setActivity(undefined, t("status.settings"))
   }, [])
 
-  useHotkeys("Escape", () => navigate("/"));
+  useHotkeys("Escape", () => { closeDialog(); navigate("/") });
 
   useEffect(() => {
     saveConfig(config)
@@ -536,17 +538,36 @@ const Settings = () => {
                 }
               />
             </div>
-            <div className="settings-space">
+            {/* <div className="settings-space">
               <div className="text">Other</div>
               <div className="same-space">
                 CSS Test
-                <Button value='Test CSS' className='settings-button' onClick={() => console.log()}/>
+                <Button value='Test CSS' className='settings-button' onClick={() => showDialog({ type: "custom", content: DeveloperDialog() })} />
               </div>
-            </div>
+            </div> */}
           </div>
         </div> : ""}
     </div>
   )
 }
+
+// function DeveloperDialog() {
+//   return (
+//     <>
+//       <div className="dev-header">Css Test</div>
+//       <div className='dev-container'>
+//         <div className="dev-elements">
+//           <Button value='<div class="material-symbols-outlined text-button">code</div>' className='icon-button' type='icon' title='Sidebar Button' />
+//           <Button value='<div class="material-symbols-outlined text-button">code</div> Sidebar Button' className='icon-button' type='icon-text' title='Sidebar Button' />
+//           <Button value='<div class="material-symbols-outlined text-button">code</div>' className='player-buttons' type='icon' title='Player Button' />
+//         </div>
+//         <div className="dev-elements">
+//           <MainInput placeholder='Input from header'/>
+//           <CustomSlider min={0} max={100} current={0} step={0} />
+//         </div>
+//       </div>
+//     </>
+//   )
+// }
 
 export default Settings

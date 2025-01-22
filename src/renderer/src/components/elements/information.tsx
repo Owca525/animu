@@ -68,7 +68,7 @@ export const Information: React.FC<{ anime_id: string }> = ({ anime_id }) => {
     const anime_data = await get_information(anime_id)
     console.log(anime_data)
     if (anime_data == null) {
-      showDialog({ header_text: "Error in information", text: "Error Fetch Data", buttons: buttons })
+      showDialog({ header_text: "Error in information", text: "Error Fetch Data", buttons: buttons, type: "info" })
       return
     }
     const container = document.querySelector(".container") as HTMLDivElement

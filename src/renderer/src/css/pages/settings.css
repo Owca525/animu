@@ -116,3 +116,24 @@
   font-size: medium;
   padding: 8px;
 }
+
+.dev-container, .dev-elements {
+  display: flex;
+  gap: 0.5em;
+}
+
+.dev-container {
+  justify-content: start;
+  margin-right: 20px;
+}
+
+.dev-header {
+  font-size: large;
+  font-weight: 600;
+  margin-bottom: 1em;
+}
+
+.dev-elements {
+  width: 50%;
+  flex-direction: column;
+}

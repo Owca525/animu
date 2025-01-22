@@ -40,6 +40,6 @@
 }
 .dialog-buttons-container {
   display: flex;
-  gap: 4px;
+  gap: 0.5em;
   justify-content: end;
 }
