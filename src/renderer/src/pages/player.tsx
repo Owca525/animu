@@ -692,7 +692,7 @@ const Player = () => {
               {currentSettings == "urls" && (
                 <div className='player-settings-container'>
                   <div className="player-settings-button-back" onClick={() => setSettings("settings")}>
-                    <span className="material-symbols-outline player-settings-button-text">arrow_back</span><span className="player-settings-button-text">Urls</span>
+                    <span className="material-symbols-outlined player-settings-button-text">arrow_back</span><span className="player-settings-button-text">Urls</span>
                   </div>
                   {ListUrls.map((data) => (
                     <div className="player-settings-button" onClick={() => checkUrl(ListUrls[ListUrls.findIndex((item) => item.hostname === data.hostname)])}>
