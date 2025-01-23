@@ -1,6 +1,9 @@
 import { Routes, Route, HashRouter } from 'react-router-dom'
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { ToastContainer } from 'react-toastify'
+import { InformationContext } from './utils/context/InformationContext'
+import useHotkeys from '@reecelucas/react-use-hotkeys';
 import 'material-symbols'
 
 // Pages
@@ -14,18 +17,17 @@ import Home from "./pages/home"
 import { checkConfig, readConfig } from './utils/config'
 import { CheckContinue } from './utils/continueWatch'
 import { configContext } from './utils/context/small'
-import { notificationProps, SettingsConfig } from './utils/interface'
+import { SettingsConfig } from './utils/interface'
 import { CheckHistory } from './utils/history'
 
-import { toast, ToastContainer } from 'react-toastify'
-import { InformationContext } from './utils/context/InformationContext'
-import useHotkeys from '@reecelucas/react-use-hotkeys';
+// Update
+import { checkUpdate } from './utils/update'
+import { checkDate } from './utils/time'
 
 function App() {
   const { t, i18n } = useTranslation()
 
   const [config, setConfig] = useState<SettingsConfig | undefined>(undefined)
-  const [updateNotification, setUpdateNotification] = useState<any>()
 
   const loadConfig = useCallback(async () => {
     // Check and Load Config
@@ -37,12 +39,10 @@ function App() {
     // Load Theme
     const themes = await window.api.getlistThemes()
     let path: string = themes[0].path
-    for (let i = 0; i < themes.length; i++) {
-      const element = themes[i];
-      if (element.filename.replace(".css", "") == config.General.theme) {
-        path = element.path
-      }
-    }
+    themes.forEach((element) => {
+      if (element.filename.replace(".css", "") == config.General.theme) path = element.path
+    })
+
     const link = document.createElement('link');
     link.id = 'theme-stylesheet';
     link.rel = 'stylesheet';
@@ -55,23 +55,15 @@ function App() {
     if (config.Developer.DevToolsOnStart) window.BrowserWindow.openDevTools()
     window.BrowserWindow.setZoom(parseFloat(config.General.Window.Zoom.toString()))
     window.BrowserWindow.setFullscreen(config.General.Window.AutoFullscreen)
+    
+    // check update
+    if (config.update.enable == false) return
+    if (config.update.type == "start") checkUpdate(t, config)
+    if (config.update.type == "day" && checkDate(config.update.lastTime, "day")) checkUpdate(t, config)
+    if (config.update.type == "week" && checkDate(config.update.lastTime, "week")) checkUpdate(t, config)
   }, [])
 
   useEffect(() => {
-    window.api.update.updateAvailable((_event, isAvailable, version) => {
-      if (isAvailable) {
-        toast.info(t('toast.update', { version: version }), { ...notificationProps, onClick: () => { window.api.update.downloadUpdate(); setUpdateNotification(toast.loading(`Download Progress 0%`, notificationProps)) } });
-      }
-    });
-
-    window.api.update.updateProgress((_event, percent) => {
-      toast.update(updateNotification, { render: `Download Progress ${percent.toFixed(1)}%` })
-      if (percent.toFixed(0) == '100') {
-        toast.dismiss(updateNotification)
-        toast.success("Updated Download, please restart application", notificationProps)
-      }
-    });
-
     CheckContinue()
     CheckHistory()
     loadConfig()

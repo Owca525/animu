@@ -104,6 +104,11 @@ export interface SettingsConfig {
     DevTools: boolean
     DevToolsOnStart: boolean
   }
+  update: {
+    lastTime: string
+    type: "start" | "day" | "week" 
+    enable: boolean
+  }
 }
 
 export const notificationProps = {

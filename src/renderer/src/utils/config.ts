@@ -56,6 +56,11 @@ export const defaultConfig: SettingsConfig = {
     DeveloperMode: false,
     DevTools: false,
     DevToolsOnStart: false
+  },
+  update: {
+    lastTime: "0",
+    type: "start",
+    enable: true
   }
 };
 

@@ -13,3 +13,15 @@ export function convertDateToFormattedString(year: number | undefined, month: nu
     if (date == undefined) date = 0
     return new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(year, month, date, hour, minute));
 }
+
+export function checkDate(date: string, type: "week" | "day") {
+    const givenDate = new Date(date);
+    const currentDate = new Date();
+    const milliseconds = currentDate.getTime() - givenDate.getTime();
+    switch (type) {
+        case "week":
+            return milliseconds >= 7 * 24 * 60 * 60 * 1000;
+        case "day":
+            return milliseconds >= 24 * 60 * 60 * 1000;
+    }
+}

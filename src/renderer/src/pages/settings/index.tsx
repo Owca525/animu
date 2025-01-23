@@ -272,6 +272,26 @@ const Settings = () => {
               </div>
             </div>
             <div className="settings-space">
+              <div className="text">Updates</div>
+              <Checkbox
+                title="Updates"
+                checked={config.update.enable}
+                onClick={(event) =>
+                  handleChange('update.enable', event.currentTarget.checked)
+                }
+              />
+              <div className="same-space">
+                Check Update
+                <Dropdown options={[
+                  { label: "On Start", value: "On Start", onClick: () => handleChange('update.type', "start") },
+                  { label: "Every Day", value: "Every Day", onClick: () => handleChange('update.type', "day") },
+                  { label: "Week", value: "Week", onClick: () => handleChange('update.type', "week") }
+                  ]
+                } placeholder={config.update.type} 
+                />
+              </div>
+            </div>
+            <div className="settings-space">
               <div className="text">{t('settings.general.Window')}</div>
               <Checkbox
                 helpDescription={t('tips.gAutoMaximize')}
