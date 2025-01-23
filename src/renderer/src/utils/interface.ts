@@ -120,3 +120,10 @@ export interface dialogProps {
   content?: ReactNode
   buttons?: { title: string; onClick: () => void }[]
 }
+
+export interface playerUrlProps {
+  url: string, 
+  res: { resolution: string, url: string }[], 
+  hostname: string, 
+  hls: boolean
+}

@@ -1,3 +1,5 @@
+import { playerUrlProps } from "@renderer/utils/interface"
+
 const HASH_SEARCH = '06327bc10dd682e1ee7e07b6db9c16e9ad2fd56c1b769e47513128cd5c9fc77a'
 const HASH_INFO = '9d7439c90f203e534ca778c4901f9aa2d3ad42c06243ab2c5e6b79612af32028'
 const HASH_PLAYER = '5f1a64b73793cc2234a389cf3a8f93ad82de7043017dd551f38f65b89daa65e0'
@@ -8,7 +10,7 @@ const header = {
   Referer: 'https://allmanga.to/'
 }
 
-const source_names = ['Sak', 'S-mp4', 'Luf-mp4']
+const source_names = ['Sak', 'S-mp4', 'Luf-mp4', "Kir", "Default"]
 
 const replacements: { [key: string]: string } = {
   '01': '9',
@@ -100,24 +102,25 @@ export async function getInformation(id: string) {
   return null
 }
 
-export async function getPlayerUrls(id: string, episode: string, type: string): Promise<{ url: string, res: string, hostname: string, hls: boolean }[] | null> {
+export async function getPlayerUrls(id: string, episode: string, type: string): Promise<playerUrlProps[] | null> {
   let variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${episode}"}`
   let extensions = `{"persistedQuery":{"version":1,"sha256Hash": "${HASH_PLAYER}"}}`
   let url = API_WEB + `/api?variables=${variables}&extensions=${extensions}`
   
-  let listUrls: { url: string, res: string, hostname: string, hls: boolean }[] = []
+  let listUrls: playerUrlProps[] = []
 
   const resp = await sendRequest(url, header)
-  if (!resp) {
-    return null
-  }
+  if (!resp) return null
 
   const sources = resp.data.episode.sourceUrls
+  console.log(sources)
   const urls = sources
     .map((tmp: { sourceUrl: string; sourceName: string }) =>
       findUrl(tmp.sourceUrl, tmp.sourceName, source_names)
     )
     .filter((item: string) => item !== '')
+
+  console.log(urls)
 
   for (let i = 0; i < urls.length; i++) {
     const element = urls[i]
@@ -125,24 +128,19 @@ export async function getPlayerUrls(id: string, episode: string, type: string): 
     const links = await sendRequest(`http://allanime.day${url}`, {
       'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0'
     })
+    console.log(links)
     if (links) {
       links.links.forEach(element => {
         console.log(element)
-        if (!element.link) {
-          return
-        }
-        // const tmpObject = new URL(element.link)
-        // if (tmpObject.hostname == "ayvic.fast4speed.rsvp") {
-        //   element.link = element.link.replace("ayvic.fast4speed.rsvp/vic/", "")
-        // }
+        if (!element.link) return
 
         const urlObject = new URL(element.link);
 
         if (element.hls && urlObject.hostname != "ayvic.fast4speed.rsvp") {
-          listUrls.push({ url: element.link, res: "all", hostname: urlObject.hostname, hls: true })
+          listUrls.push({ url: element.link, res: [], hostname: urlObject.hostname, hls: true })
         }
         if (element.mp4) {
-          listUrls.push({ url: element.link, res: "1080", hostname: urlObject.hostname, hls: false })
+          listUrls.push({ url: element.link, res: [{ url: element.link, resolution: "1080" }], hostname: urlObject.hostname, hls: false })
         }
       });
     }

@@ -1,4 +1,4 @@
-import { CardProps, InformationData } from './interface'
+import { CardProps, InformationData, playerUrlProps } from './interface'
 import { SearchAnime, getRecentAnime, getInformation, getPlayerUrls } from '../../plugins/allmanga'
 
 export async function get_recent(): Promise<CardProps[]> {
@@ -63,10 +63,8 @@ export async function get_search(
   return anime
 }
 
-export async function get_player_anime(id: string, episode: { type: string, ep: string }): Promise<{ url: string, res: string, hostname: string, hls: boolean }[]> {
+export async function get_player_anime(id: string, episode: { type: string, ep: string }): Promise<playerUrlProps[]> {
   const players = await getPlayerUrls(id, episode.ep, episode.type)
-  if (players) {
-    return players
-  }
+  if (players) return players
   return []
 }

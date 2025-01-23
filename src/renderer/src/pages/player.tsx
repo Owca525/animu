@@ -2,14 +2,13 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify';
-import Hls from "hls.js";
 
 // utils
 import { DeleteFromcontinue, SaveContinue } from '../utils/continueWatch'
 import { configContext } from '../utils/context/small'
 import { get_player_anime } from '../utils/backend'
 import { SaveHistory } from '../utils/history'
-import { notificationProps } from '@renderer/utils/interface';
+import { notificationProps, playerUrlProps } from '@renderer/utils/interface';
 
 // Components
 import ContextMenu from '../components/elements/context-menu'
@@ -60,7 +59,7 @@ const Player = () => {
   const [isAlwaysDisable, setisAlwaysDisable] = useState<boolean>(false)
 
   // Url
-  const [ListUrls, setListUrls] = useState<{ url: string, res: string, hostname: string, hls: boolean }[]>([])
+  const [ListUrls, setListUrls] = useState<playerUrlProps[]>([])
   const [playerUrl, setPlayerUrl] = useState<string | undefined>(undefined)
   const [currentHost, setHost] = useState<string>("")
 
@@ -75,10 +74,10 @@ const Player = () => {
   const [isHideUpNextEpisode, setHideUpNextEpisode] = useState<boolean>(false)
 
   // Others
-  const [hls, setHls] = useState<Hls | null>(null);
+  const [hls, setHls] = useState<any>(null);
 
   const menuItems = [{ label: t('contextMenu.reload'), onClick: () => location.reload() }]
-  const buttons = [{ title: t('general.ok'), onClick: () => exitPlayer() }, { title: t('general.reload'), onClick: async () => {await setDataPlayer(); closeDialog() }}]
+  const buttons = [{ title: t('general.ok'), onClick: () => exitPlayer() }, { title: t('general.reload'), onClick: async () => { setDataPlayer(); closeDialog() }}]
 
   const setDataPlayer = async () => {
     try {
@@ -90,7 +89,7 @@ const Player = () => {
 
       if (recentData.length != 0 && playerUrl == undefined) {
         setListUrls(recentData)
-        checkUrl(recentData[0])
+        await checkUrl(recentData[0])
         return
       }
     } catch (Error) {
@@ -172,50 +171,58 @@ const Player = () => {
     return `${minutes}:${secs < 10 ? '0' : ''}${secs}`
   }
 
-  const checkUrl = (data: { url: string, res: string, hostname: string, hls: boolean }) => {
+  const checkUrl = async (data: playerUrlProps) => {
     setPLayerDisable(false)
+    if (!videoRef.current) return
+    const time = videoRef.current.currentTime
     if (data.hls) {
-      runHLS(data.url)
+      await runHLS(data.url)
       setHost(data.hostname)
       return
     }
-    if (videoRef.current) {
-      setResolution(data.res)
-      setHost(data.hostname)
-      videoRef.current.src = data.url
-    }
+    if (hls) hls.destroy()
+    
+    setResolution(data.res[0].resolution)
+    setHost(data.hostname)
+    videoRef.current.src = data.url
+    videoRef.current.currentTime = time
   }
 
-  const runHLS = (url: string) => {
-    const hls = new Hls({
+  const runHLS = async (url: string) => {
+    const hlsModule = (await import('hls.js')).default;
+
+    const hls = new hlsModule({
       capLevelToPlayerSize: true,
       enableWorker: true,
       liveSyncDurationCount: 3,
       maxBufferLength: 30,
     });
 
-    if (Hls.isSupported() && videoRef.current) {
+    if (hlsModule.isSupported() && videoRef.current) {
+      const time = videoRef.current.currentTime
       hls.loadSource(url);
       hls.attachMedia(videoRef.current);
 
-      hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
+      videoRef.current.currentTime = time
+
+      setHls(hls)
+
+      hls.on(hlsModule.Events.MANIFEST_PARSED, (_, data) => {
         const resolutions = data.levels.map((level) => level.height);
         setListResolution(resolutions)
         resolutions.reverse()
         setResolution(resolutions[0].toString())
       });
 
-      setHls(hls)
-
-      hls.on(Hls.Events.ERROR, (_event, data) => {
+      hls.on(hlsModule.Events.ERROR, (_event, data) => {
         if (data.fatal) {
           let message: string
           switch (data.type) {
-            case Hls.ErrorTypes.NETWORK_ERROR:
+            case hlsModule.ErrorTypes.NETWORK_ERROR:
               message = t('player.errors.MEDIA_ERR_NETWORK')
               hls.startLoad();
               break;
-            case Hls.ErrorTypes.MEDIA_ERROR:
+            case hlsModule.ErrorTypes.MEDIA_ERROR:
               message = t('player.errors.MEDIA_ERR_DECODE')
               hls.recoverMediaError();
               break;
