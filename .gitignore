@@ -28,3 +28,4 @@ src-tauri/Cargo.lock
 .vscode
 src/plugins/allmanga.ts
 out
+yarn.lock
