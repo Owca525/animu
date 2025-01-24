@@ -82,7 +82,6 @@ const Player = () => {
   const setDataPlayer = async () => {
     try {
       let recentData = await get_player_anime(id, episode)
-      console.log(recentData)
 
       if (recentData.length == 0) showDialog({ header_text: t("errors.playerHeaderError"), text: t("errors.playerCantFind"), buttons: buttons })
       if (dialogIsOpen()) return
@@ -138,9 +137,7 @@ const Player = () => {
       setUpNextEpisode(false)
     }
     
-    if (duration != 0 && currentTime != 0 && (isHideUpNextEpisode == false && timeNextEpisode <= 0)) {
-      setNewEpisode("next")
-    }
+    if (duration != 0 && currentTime != 0 && (isHideUpNextEpisode == false && timeNextEpisode <= 0)) setNewEpisode("next")
   }
 
   // Checking config and player if load then set config to player and add event
@@ -159,10 +156,8 @@ const Player = () => {
 
   useEffect(() => {
     SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) })
-    setPLayerDisable(false)
-    handleMouseMove()
     setDataPlayer()
-  }, [])
+  }, [episode])
 
   const formatTime = (seconds: number | undefined): string => {
     if (!seconds) return "0:00"
@@ -380,9 +375,6 @@ const Player = () => {
         time: 0
       }
     })
-    setPLayerDisable(false)
-    setDataPlayer()
-    SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) })
   }
 
   const handleSeekBarMouseLeave = () => {
@@ -496,7 +488,6 @@ const Player = () => {
   const keybinds = async (event: KeyboardEvent) => {
     if (videoRef.current && config) {
       var time_now = videoRef.current.currentTime
-      console.log(event.key.toLowerCase())
       switch (event.key.toLowerCase()) {
         case config.Player.keybinds.Pause.toLowerCase():
           togglePlay()

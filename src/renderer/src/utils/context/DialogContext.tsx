@@ -11,7 +11,6 @@ const DialogContext: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const [data, setData] = useState<dialogProps | null>();
 
   showDialog = (dialogData: dialogProps) => {
-    console.log(dialogData)
     setData(dialogData);
     setIsOpen(true);
   };

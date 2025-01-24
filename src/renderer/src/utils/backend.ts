@@ -5,7 +5,6 @@ export async function get_recent(): Promise<CardProps[]> {
   try {
     var anime: { id: string; title: string; img: string }[] = []
     const recent = await getRecentAnime()
-    console.log('recent:', recent)
     var tmp = await recent['shows']['edges']
     tmp.forEach((element: any) => {
       let tmpimg: string = element['thumbnail']
@@ -25,7 +24,6 @@ export async function get_information(id: string): Promise<InformationData | nul
   let episodesVersion: Array<string> = ["sub", "dub", "raw"]
   const info = await getInformation(id)
   if (info == null) return null
-  console.log('info anime: ', info)
   episodesVersion.forEach((element) => {
     if (parseInt(info["show"]["availableEpisodes"][element]) != 0) {
       const list: Array<number> = info["show"]['availableEpisodesDetail'][element]
@@ -50,7 +48,6 @@ export async function get_search(
 ): Promise<{ id: string; title: string; img: string }[]> {
   var anime: { id: string; title: string; img: string }[] = []
   const search = await SearchAnime(name)
-  console.log('seach', search)
   var tmp = await search['shows']['edges']
   tmp.forEach((element: any) => {
     let tmpimg: string = element['thumbnail']

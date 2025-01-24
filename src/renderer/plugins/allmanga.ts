@@ -113,14 +113,11 @@ export async function getPlayerUrls(id: string, episode: string, type: string): 
   if (!resp) return null
 
   const sources = resp.data.episode.sourceUrls
-  console.log(sources)
   const urls = sources
     .map((tmp: { sourceUrl: string; sourceName: string }) =>
       findUrl(tmp.sourceUrl, tmp.sourceName, source_names)
     )
     .filter((item: string) => item !== '')
-
-  console.log(urls)
 
   for (let i = 0; i < urls.length; i++) {
     const element = urls[i]
@@ -128,10 +125,8 @@ export async function getPlayerUrls(id: string, episode: string, type: string): 
     const links = await sendRequest(`http://allanime.day${url}`, {
       'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0'
     })
-    console.log(links)
     if (links) {
       links.links.forEach(element => {
-        console.log(element)
         if (!element.link) return
 
         const urlObject = new URL(element.link);

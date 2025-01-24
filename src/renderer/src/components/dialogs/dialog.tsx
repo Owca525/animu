@@ -4,7 +4,6 @@ import Button from '../ui/button'
 import { dialogProps } from '@renderer/utils/interface'
 
 const dialog: React.FC<dialogProps> = ({ header_text, text, buttons, type = "info", content = null }) => {
-  console.log(type)
   return (
     <div className="dialog-background">
       {type == "info" ? (
