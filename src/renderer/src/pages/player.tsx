@@ -54,12 +54,11 @@ const Player = () => {
   const [isWaitingPlayer, setWaitingPlayer] = useState<boolean>(true)
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false)
-  const [isPlayerDisable, setPLayerDisable] = useState<boolean>(true)
   const [isConfigLoad, setConfigLoad] = useState<boolean>(false)
   const [isAlwaysDisable, setisAlwaysDisable] = useState<boolean>(false)
 
   // Url
-  const [ListUrls, setListUrls] = useState<playerUrlProps[]>([])
+  const [ListUrls, setListUrls] = useState<playerUrlProps[] | undefined>(undefined)
   const [playerUrl, setPlayerUrl] = useState<string | undefined>(undefined)
   const [currentHost, setHost] = useState<string>("")
 
@@ -77,7 +76,7 @@ const Player = () => {
   const [hls, setHls] = useState<any>(null);
 
   const menuItems = [{ label: t('contextMenu.reload'), onClick: () => location.reload() }]
-  const buttons = [{ title: t('general.ok'), onClick: () => exitPlayer() }, { title: t('general.reload'), onClick: async () => { setDataPlayer(); closeDialog() }}]
+  const buttons = [{ title: t('general.ok'), onClick: () => exitPlayer() }, { title: t('general.reload'), onClick: async () => { setDataPlayer(); closeDialog() } }]
 
   const setDataPlayer = async () => {
     try {
@@ -136,7 +135,7 @@ const Player = () => {
       setTimeNextEpisode(30)
       setUpNextEpisode(false)
     }
-    
+
     if (duration != 0 && currentTime != 0 && (isHideUpNextEpisode == false && timeNextEpisode <= 0)) setNewEpisode("next")
   }
 
@@ -152,7 +151,12 @@ const Player = () => {
       if (config.Player.general.AutoFullscreen) enterFullscreen()
       setConfigLoad(true)
     }
-  }, [config, videoRef.current, isPlayerDisable])
+  }, [config, videoRef.current, ListUrls])
+
+  useEffect(() => {
+    SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) })
+    setDataPlayer()
+  }, [])
 
   useEffect(() => {
     SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) })
@@ -167,7 +171,6 @@ const Player = () => {
   }
 
   const checkUrl = async (data: playerUrlProps) => {
-    setPLayerDisable(false)
     if (!videoRef.current) return
     const time = videoRef.current.currentTime
     if (data.hls) {
@@ -176,7 +179,7 @@ const Player = () => {
       return
     }
     if (hls) hls.destroy()
-    
+
     setResolution(data.res[0].resolution)
     setHost(data.hostname)
     videoRef.current.src = data.url
@@ -226,7 +229,7 @@ const Player = () => {
               hls.destroy();
               break;
           }
-          if (ListUrls.length <= 1) {
+          if (ListUrls && ListUrls.length <= 1) {
             showDialog({ header_text: t("errors.playerHeaderError"), text: message, buttons: buttons })
             return
           }
@@ -351,7 +354,6 @@ const Player = () => {
       videoRef.current.pause()
       videoRef.current.currentTime = 0
     }
-    setPLayerDisable(true)
     setPlayerUrl(() => undefined)
     setWaitingPlayer(() => true)
     setHideUpNextEpisode(() => false)
@@ -427,7 +429,7 @@ const Player = () => {
         default:
           message = t('player.errors.default')
       }
-      if (ListUrls.length <= 1) {
+      if (ListUrls && ListUrls.length <= 1) {
         showDialog({ header_text: t("errors.playerHeaderError"), text: message, buttons: buttons })
         return
       }
@@ -570,9 +572,7 @@ const Player = () => {
   return (
     <div className={isVisible ? "video-container" : "video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove}>
       <ContextMenu items={menuItems} />
-      {isPlayerDisable ? (
-        ''
-      ) : (
+      {ListUrls && (
         <video
           ref={videoRef}
           className={isVisible ? 'video-player mask' : 'video-player'}
@@ -657,7 +657,7 @@ const Player = () => {
               )}
               {currentSettings == "settings" && (
                 <div className="player-settings-container">
-                  {ListUrls.length <= 1 ? (
+                  {ListUrls && ListUrls.length <= 1 ? (
                     <div className="player-settings-button">
                       <span className='player-settings-button-text' style={{ color: "gray" }} >Urls</span> <span style={{ color: "gray" }}>{currentHost}</span>
                     </div>
@@ -685,7 +685,7 @@ const Player = () => {
                   <div className="player-settings-button-back" onClick={() => setSettings("settings")}>
                     <span className="material-symbols-outlined player-settings-button-text">arrow_back</span><span className="player-settings-button-text">Urls</span>
                   </div>
-                  {ListUrls.map((data) => (
+                  {ListUrls && ListUrls.map((data) => (
                     <div className="player-settings-button" onClick={() => checkUrl(ListUrls[ListUrls.findIndex((item) => item.hostname === data.hostname)])}>
                       <span className="player-settings-button-text">{data.hostname}</span>
                     </div>
@@ -758,8 +758,8 @@ const Player = () => {
           <div className="up-Next-Title">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>
           <div className="up-Next-Anime">{t("player.upNext.titleAnime", { ep: episodes[episodes.indexOf(episode.ep) + 1], title: title })}</div>
           <div className="up-Next-Buttons">
-            <Button value={t("player.upNext.nextEp")} className='up-Next-Button' onClick={() => setNewEpisode("next")}/>
-            <Button value={t("player.upNext.hide")} className='up-Next-Button' onClick={() => {setHideUpNextEpisode(true); setUpNextEpisode(false)}} />
+            <Button value={t("player.upNext.nextEp")} className='up-Next-Button' onClick={() => setNewEpisode("next")} />
+            <Button value={t("player.upNext.hide")} className='up-Next-Button' onClick={() => { setHideUpNextEpisode(true); setUpNextEpisode(false) }} />
           </div>
         </div>
       ) : ""}
