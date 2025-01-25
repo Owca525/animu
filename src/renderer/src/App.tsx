@@ -15,13 +15,10 @@ import Home from "./pages/home"
 
 // config
 import { checkConfig, readConfig } from './utils/config'
-import { CheckContinue } from './utils/continueWatch'
 import { configContext } from './utils/context/small'
 import { SettingsConfig } from './utils/interface'
-import { CheckHistory } from './utils/history'
 
 // Update
-import { checkUpdate } from './utils/update'
 import { checkDate } from './utils/time'
 
 function App() {
@@ -55,17 +52,17 @@ function App() {
     if (config.Developer.DevToolsOnStart) window.BrowserWindow.openDevTools()
     window.BrowserWindow.setZoom(parseFloat(config.General.Window.Zoom.toString()))
     window.BrowserWindow.setFullscreen(config.General.Window.AutoFullscreen)
-    
+
     // check update
     if (config.update.enable == false) return
-    if (config.update.type == "start") checkUpdate(t, config)
-    if (config.update.type == "day" && checkDate(config.update.lastTime, "day")) checkUpdate(t, config)
-    if (config.update.type == "week" && checkDate(config.update.lastTime, "week")) checkUpdate(t, config)
+    import("./utils/update").then(({ checkUpdate }) => {
+      if (config.update.type == "start") checkUpdate(t, config)
+      if (config.update.type == "day" && checkDate(config.update.lastTime, "day")) checkUpdate(t, config)
+      if (config.update.type == "week" && checkDate(config.update.lastTime, "week")) checkUpdate(t, config)
+    })
   }, [])
 
   useEffect(() => {
-    CheckContinue()
-    CheckHistory()
     loadConfig()
   }, [])
 

@@ -5,9 +5,10 @@ const DefaultHistory: { history: CardProps[] } = {
   history: [],
 };
 
+const appConfigDirPath = await window.api.os.getPath("userData");
+
 export async function CheckHistory() {
   try {
-    const appConfigDirPath = await window.api.os.getPath("userData");
     window.api.os.exists(appConfigDirPath + "/history.json");
     if (await window.api.os.exists(appConfigDirPath + "/history.json") == false) {
       window.api.os.write(
@@ -23,7 +24,6 @@ export async function CheckHistory() {
 export async function SaveHistory(save: CardProps) {
   try {
     await CheckHistory();
-    const appConfigDirPath = await window.api.os.getPath("userData");
 
     const config = await readConfig();
     let file = (await ReadHistory()).reverse();
@@ -48,8 +48,8 @@ export async function SaveHistory(save: CardProps) {
 }
 
 export async function ReadHistory(): Promise<CardProps[]> {
+  await CheckHistory()
   try {
-    const appConfigDirPath = await window.api.os.getPath("userData");
     const file = await window.api.os.read(appConfigDirPath + "/history.json");
     const data = JSON.parse(file);
     return data.reverse();

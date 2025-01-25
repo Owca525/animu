@@ -13,7 +13,6 @@ import { get_recent, get_search } from '../utils/backend'
 import { ReadContinue } from '../utils/continueWatch'
 import { configContext } from '../utils/context/small'
 
-import { ReadHistory } from '../utils/history'
 import ContextMenu from '../components/elements/context-menu'
 import 'react-toastify/dist/ReactToastify.css';
 import '../css/pages/home.css'
@@ -62,7 +61,7 @@ function home() {
       class: 'icon-button',
       title: t('sidebar.History'),
       onClick: async () =>
-        change_content({ title: t('sidebar.History'), data: await functionHandler(ReadHistory) })
+        change_content({ title: t('sidebar.History'), data: await import("../utils/history").then(async ({ ReadHistory }) => await functionHandler(ReadHistory)) })
     }
   ]
 

@@ -7,7 +7,6 @@ import { toast } from 'react-toastify';
 import { DeleteFromcontinue, SaveContinue } from '../utils/continueWatch'
 import { configContext } from '../utils/context/small'
 import { get_player_anime } from '../utils/backend'
-import { SaveHistory } from '../utils/history'
 import { notificationProps, playerUrlProps } from '@renderer/utils/interface';
 
 // Components
@@ -154,12 +153,12 @@ const Player = () => {
   }, [config, videoRef.current, ListUrls])
 
   useEffect(() => {
-    SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) })
+    import("../utils/history").then(({ SaveHistory }) => SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) }))
     setDataPlayer()
   }, [])
 
   useEffect(() => {
-    SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) })
+    import("../utils/history").then(({ SaveHistory }) => SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) }))
     setDataPlayer()
   }, [episode])
 
@@ -382,6 +381,7 @@ const Player = () => {
   const handleSeekBarMouseLeave = () => {
     setShowTime(false)
     if (videoRef.current && progressRef.current && thumbRef.current) {
+      // videoRef.current.getVideoPlaybackQuality()
       const percent = (videoRef.current.currentTime / videoRef.current.duration) * 100
       progressRef.current.style.width = `${percent}%`
       thumbRef.current.style.left = `${percent}%`

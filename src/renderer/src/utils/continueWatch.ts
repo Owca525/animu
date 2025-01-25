@@ -4,9 +4,10 @@ const DefaultContinue: { continue: CardProps[] } = {
   continue: [],
 };
 
+const appConfigDirPath = await window.api.os.getPath("userData");
+
 export async function CheckContinue() {
   try {
-    const appConfigDirPath = await window.api.os.getPath("userData");
     window.api.os.exists(appConfigDirPath + "/continueWatch.json");
 
     if (
@@ -22,7 +23,7 @@ export async function CheckContinue() {
 
 export async function SaveContinue(save: CardProps) {
   try {
-    const appConfigDirPath = await window.api.os.getPath("userData");
+    await CheckContinue()
     const file = await window.api.os.read(appConfigDirPath + "/continueWatch.json");
     const data = JSON.parse(file) as { continue: CardProps[] };
     const index = data.continue.findIndex((item) => item.id === save.id);
@@ -36,7 +37,7 @@ export async function SaveContinue(save: CardProps) {
 
 export async function DeleteFromcontinue(data: CardProps) {
   try {
-    const appConfigDirPath = await window.api.os.getPath("userData");
+    await CheckContinue()
     window.api.os.read(appConfigDirPath + "/continueWatch.json")
     const file = await window.api.os.read(appConfigDirPath + "/continueWatch.json")
     const list = JSON.parse(file) as { continue: CardProps[] };
@@ -52,7 +53,7 @@ export async function DeleteFromcontinue(data: CardProps) {
 
 export async function ReadContinue(): Promise<CardProps[]> {
   try {
-    const appConfigDirPath = await window.api.os.getPath("userData");
+    await CheckContinue()
     const file = await window.api.os.read(appConfigDirPath + "/continueWatch.json")
     const data = JSON.parse(file) as { continue: CardProps[] };
     return data.continue.reverse();
