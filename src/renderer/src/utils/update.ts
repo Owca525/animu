@@ -10,7 +10,8 @@ export function checkUpdate(t: any, config: SettingsConfig | undefined) {
     });
     if (config) {
         const currentDate = new Date();
-        saveConfig(config.update.lastTime = currentDate.toString())
+        config.update.lastTime = currentDate.toString()
+        saveConfig(config)
     }
 }
 

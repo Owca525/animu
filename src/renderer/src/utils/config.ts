@@ -64,6 +64,8 @@ export const defaultConfig: SettingsConfig = {
   }
 };
 
+const appConfigDirPath = window.api.os.getPath("userData");
+
 async function checkPictureFolder(): Promise<string> {
   const path = await window.api.os.getPath("pictures");
   if (await window.api.os.exists(path + "/animu") == false) {
@@ -87,49 +89,42 @@ function deepMerge(target: any, source: any): any {
   return target;
 }
 
-export async function readConfig(): Promise<SettingsConfig | undefined> {
-  const appConfigDirPath = await window.api.os.getPath("userData");
-  try {
-    const content = await window.api.os.read(appConfigDirPath + "/config.ini");
-    const loadedConfig = ini.parse(content) as SettingsConfig;
-    return deepMerge(defaultConfig, loadedConfig);
-  } catch (Error) {
-    console.error(`${Error} in readConfig`);
-    return defaultConfig;
-  }
+export async function readConfig(): Promise<SettingsConfig> {
+  if (await checkConfig() == false) return defaultConfig
+  const content = await window.api.os.read(await appConfigDirPath + "/config.ini");
+  const loadedConfig = ini.parse(content) as SettingsConfig;
+  return deepMerge(defaultConfig, loadedConfig);
 }
 
 export async function saveConfig(content: any) {
-  const appConfigDirPath = await window.api.os.getPath("userData");
   const data = ini.stringify(content);
   try {
-    window.api.os.write(appConfigDirPath + "/config.ini", data);
+    window.api.os.write(await appConfigDirPath + "/config.ini", data);
   } catch (Error) {
     console.error(`${Error} in saveConfig`);
   }
 }
 
 async function createConfig() {
-  const appConfigDirPath = window.api.os.getPath("userData");
   const content = ini.stringify(defaultConfig);
   try {
-    await window.api.os.write(appConfigDirPath + "/config.ini", content)
+    await window.api.os.write(await appConfigDirPath + "/config.ini", content)
   } catch (Error) {
     console.error(`${Error} in createConfig`);
   }
 }
 
-export async function checkConfig() {
+export async function checkConfig(): Promise<boolean> {
   try {
-    const appConfigDirPath = await window.api.os.getPath("userData");
-    if (await window.api.os.exists(appConfigDirPath) == false) {
-      await window.api.os.mkdir(appConfigDirPath);
+    if (await window.api.os.exists(await appConfigDirPath) == false) {
+      await window.api.os.mkdir(await appConfigDirPath);
       await createConfig();
     }
-    if (await window.api.os.exists(appConfigDirPath + "/config.ini") == false)
+    if (await window.api.os.exists(await appConfigDirPath + "/config.ini") == false)
       await createConfig();
-    await saveConfig(await readConfig());
+    return true
   } catch (Error) {
     console.error(`${Error} in checkConfig`);
+    return false
   }
 }
