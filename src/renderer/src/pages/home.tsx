@@ -29,9 +29,7 @@ function home() {
   const { t } = useTranslation()
 
   const [data, setData] = useState<ContainerProps>({ title: '', data: [] })
-
   const [loading, setLoading] = useState(true)
-  // const [isUpdate, setisUpdate] = useState(false);
 
   const sidebarHomeTopData = [
     {
@@ -87,29 +85,28 @@ function home() {
   const functionHandler = async (func: any): Promise<any> => {
     closeDialog()
     setLoading(true)
-    const data = await func()
-    return data
+    return await func()
   }
 
   useEffect(() => {
-    const fetchData = async () => {
+    get_recent().then(( value ) => {
       change_content({
         title: t('sidebar.RecentAnime'),
-        data: await get_recent()
+        data: value
       })
       setLoading(false)
-    }
-    fetchData()
+    })
     window.api.rpc.setActivity(undefined, t("status.home"))
   }, [])
 
   const change_content = (newData: ContainerProps) => {
     if (newData.data && newData.data.length != 0 && newData.data[0].title == 'error') {
-      showDialog({ header_text: t('errors.connection'), text: "Error getting information from allmanga", buttons: [
-        { title: t('general.exit'), onClick: () => window.BrowserWindow.exit() },
-        { title: t('general.reload'), onClick: async () => change_content({ title: t('sidebar.RecentAnime'), data: await functionHandler(get_recent) }) }
-      ]
-    })
+      showDialog({
+        header_text: t('errors.connection'), text: "Error getting information from allmanga", buttons: [
+          { title: t('general.exit'), onClick: () => window.BrowserWindow.exit() },
+          { title: t('general.reload'), onClick: async () => change_content({ title: t('sidebar.RecentAnime'), data: await functionHandler(get_recent) }) }
+        ]
+      })
       setData({ title: t('sidebar.RecentAnime') })
       return
     }
@@ -120,23 +117,22 @@ function home() {
   const handleInputChange = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key == 'Enter') {
       var search = event.currentTarget.value
-      const results = async () => {
-        setLoading(true)
-        const data = await get_search(search)
+      setLoading(true)
+      get_search(search).then((data) => {
         change_content({ title: t('header.activeSearch', { name: search }), data: data })
-      }
-      results()
+      })
     }
   }
 
   useHotkeys("Escape", () => {
     if (isInformationShow()) hideInformation()
-    else showDialog({ header_text: "Animu", text: "Exit Animu?", buttons: [
-      { title: t('general.exit'), onClick: () => window.BrowserWindow.exit() },
-      { title: "Back", onClick: () => closeDialog() },
-    ]
-  })
-  });  
+    else showDialog({
+      header_text: "Animu", text: "Exit Animu?", buttons: [
+        { title: t('general.exit'), onClick: () => window.BrowserWindow.exit() },
+        { title: "Back", onClick: () => closeDialog() },
+      ]
+    })
+  });
 
   if (config) {
     return (
