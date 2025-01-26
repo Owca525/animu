@@ -1,0 +1,35 @@
+.seekBar-container {
+    max-width: 400px;
+    width: 35vw;
+    height: 6px;
+    background-color: var(--bg4);
+    position: relative;
+    cursor: pointer;
+    border-radius: 12px;
+}
+
+.seekbar-progress {
+    width: 0%;
+    height: 100%;
+    background-color: var(--neutral1);
+    border-radius: 12px;
+}
+
+.seekbar-thumb {
+    position: relative;
+    bottom: 3.5px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: var(--neutral1);
+    transform: translate(-50%, -50%);
+}
+
+.seekbar-box {
+    position: relative;
+    bottom: 60px;
+    background-color: rgb(30, 30, 30, 0.8);
+    width: min-content;
+    padding: 8px 12px;
+    border-radius: 12px;
+}

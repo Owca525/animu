@@ -54,7 +54,6 @@ const Player = () => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false)
   const [isConfigLoad, setConfigLoad] = useState<boolean>(false)
-  const [isAlwaysDisable, setisAlwaysDisable] = useState<boolean>(false)
 
   // Url
   const [ListUrls, setListUrls] = useState<playerUrlProps[] | undefined>(undefined)
@@ -513,14 +512,10 @@ const Player = () => {
           exitPlayer()
           break
         case config.Player.keybinds.FrameSkipForward.toLowerCase():
-          setisAlwaysDisable(true)
           change_time((time_now += 0.0416))
-          setisAlwaysDisable(false)
           break
         case config.Player.keybinds.FrameSkipBack.toLowerCase():
-          setisAlwaysDisable(true)
           change_time((time_now -= 0.0416))
-          setisAlwaysDisable(false)
           break
         case config.Player.keybinds.VolumeDown.toLowerCase():
           changeVolume(videoRef.current.volume - 0.01)
@@ -535,15 +530,6 @@ const Player = () => {
           break
       }
     }
-  }
-
-  // i made this shitty function because my friend has a problem making screen shot when change frame using keybind :(
-  const setWaiting = (data: boolean) => {
-    if (isAlwaysDisable) {
-      setWaitingPlayer(false)
-      return
-    }
-    setWaitingPlayer(data)
   }
 
   function setSettings(settings: string) {
@@ -582,8 +568,6 @@ const Player = () => {
           onError={(error) => videoErrorHandler(error)}
           preload={config?.Player.general.playerLoadType}
           muted={isMuted}
-          onCanPlay={() => setWaiting(false)}
-          onWaiting={() => setWaiting(true)}
         />
       )}
 

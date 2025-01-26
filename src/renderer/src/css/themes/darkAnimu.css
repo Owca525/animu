@@ -249,10 +249,6 @@ button {
   background-color: var(--neutral1);
 }
 
-.seek-bar {
-  background-color: rgba(255, 255, 255, 0.3);
-}
-
 .time-display, .player-title, .show-time {
   background-color: rgb(30, 30, 30, 0.8);
 }
@@ -286,4 +282,23 @@ button {
 .dropdown-container {
   border: none;
   outline: none;
+}
+
+.seekBar-container {
+  background-color: var(--bg4);
+  border-radius: 12px;
+}
+
+.seekbar-progress {
+  background-color: var(--neutral1);
+  border-radius: 12px;
+}
+
+.seekbar-thumb {
+  background-color: var(--neutral1);
+}
+
+.seekbar-box {
+  background-color: rgb(30, 30, 30, 0.8);
+  border-radius: 12px;
 }

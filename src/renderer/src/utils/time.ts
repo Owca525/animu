@@ -25,3 +25,10 @@ export function checkDate(date: string, type: "week" | "day") {
             return milliseconds >= 24 * 60 * 60 * 1000;
     }
 }
+
+export function formatTime(seconds: number | undefined): string {
+    if (!seconds) return "0:00"
+    const minutes = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`
+}
