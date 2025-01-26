@@ -1,31 +1,24 @@
 import { useEffect, useReducer, useState } from 'react'
-import { InformationData } from '../../utils/interface'
-import { get_information } from '../../utils/backend'
-import '../../css/elements/information.css'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+
+// utils
+import { InformationData } from '@renderer/utils/interface'
+import { get_information } from '@renderer/utils/backend'
+import { convertDateToFormattedString, convertMillisecondsToMinutes } from '@renderer/utils/time'
 import { hideInformation } from '@renderer/utils/context/InformationContext'
 import { closeDialog, showDialog } from '@renderer/utils/context/DialogContext'
+
+// Components
 import Drop from '../ui/drop'
-import { convertDateToFormattedString, convertMillisecondsToMinutes } from '@renderer/utils/time'
 
-const htmlEntities = {
-  '&apos;': "'",
-  '&quot;': '"',
-  '&amp;': '&',
-  '&lt;': '<',
-  '&gt;': '>',
-  '&#x2014;': '—',
-  '&#x2013;': '–',
-};
+// css
+import '../../css/elements/information.css'
 
-function decodeHtmlEntities(str) {
-  let decodedString = str.replace(/&[a-zA-Z0-9#]+;/g, (match) => {
-    return htmlEntities[match] || match;
-  });
-  decodedString = decodedString.replace(/<br\s*\/?>/gi, '\n');
-  decodedString = decodedString.replace(/<\/?[^>]+(>|$)/g, "");
-  return decodedString;
+function decodeHtmlEntities(str: string) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(str, 'text/html');
+  return doc.documentElement.textContent;
 }
 
 const initialImagesState = {
@@ -53,16 +46,23 @@ const reducer = (state, action) => {
   }
 };
 
-export const Information: React.FC<{ anime_id: string }> = ({ anime_id }) => {
-  const { t } = useTranslation()
-  const [state, dispatch] = useReducer(reducer, initialImagesState);
 
-  const [data, setData] = useState<InformationData | undefined>()
+export const Information: React.FC<{ anime_id: string }> = ({ anime_id }) => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
+
   const buttons = [
     { title: t('general.ok'), onClick: () => { closeDialog(); hideInformation() } },
     { title: t('general.reload'), onClick: async () => { closeDialog(); await fetchData() } }
   ]
+
+  const [state, dispatch] = useReducer(reducer, initialImagesState);
+  const [data, setData] = useState<InformationData | undefined>()
+
+  const handleImageCoverLoad = () => {
+    dispatch({ type: LoadingActionTypes.SET_IS_COVER_LOADED, payload: true })
+    dispatch({ type: LoadingActionTypes.SET_IS_COVER_ERROR, payload: false })
+  }
 
   const fetchData = async () => {
     const anime_data = await get_information(anime_id)
@@ -73,11 +73,6 @@ export const Information: React.FC<{ anime_id: string }> = ({ anime_id }) => {
     const container = document.querySelector(".container") as HTMLDivElement
     if (container) container.style.display = "none"; container.scrollTop = 0
     setData(anime_data)
-  }
-
-  const handleImageCoverLoad = () => {
-    dispatch({ type: LoadingActionTypes.SET_IS_COVER_LOADED, payload: true })
-    dispatch({ type: LoadingActionTypes.SET_IS_COVER_ERROR, payload: false })
   }
 
   useEffect(() => {
