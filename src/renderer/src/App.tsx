@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react'
 import { ToastContainer } from 'react-toastify'
 import { InformationContext } from './utils/context/InformationContext'
 import useHotkeys from '@reecelucas/react-use-hotkeys';
+import 'react-toastify/dist/ReactToastify.css';
 import 'material-symbols'
 
 // Pages

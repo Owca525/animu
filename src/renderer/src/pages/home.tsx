@@ -1,24 +1,23 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useContext, useEffect, useState } from 'react'
+import useHotkeys from '@reecelucas/react-use-hotkeys'
 
 // Components
 import Sidebar from '../components/elements/sidebar'
 import Content from '../components/elements/card-content'
 import Header from '../components/elements/headers'
+import ContextMenu from '../components/elements/context-menu'
+import { hideInformation, isInformationShow } from '@renderer/utils/context/InformationContext'
 
 // utils
 import { ContainerProps } from '../utils/interface'
 import { get_recent, get_search } from '../utils/backend'
 import { ReadContinue } from '../utils/continueWatch'
 import { configContext } from '../utils/context/small'
-
-import ContextMenu from '../components/elements/context-menu'
-import 'react-toastify/dist/ReactToastify.css';
-import '../css/pages/home.css'
 import { closeDialog, showDialog } from '@renderer/utils/context/DialogContext'
-import useHotkeys from '@reecelucas/react-use-hotkeys'
-import { hideInformation, isInformationShow } from '@renderer/utils/context/InformationContext'
+
+import '../css/pages/home.css'
 
 function home() {
   const navigate = useNavigate()
@@ -114,14 +113,11 @@ function home() {
     setLoading(false)
   }
 
-  const handleInputChange = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key == 'Enter') {
-      var search = event.currentTarget.value
-      setLoading(true)
-      get_search(search).then((data) => {
-        change_content({ title: t('header.activeSearch', { name: search }), data: data })
-      })
-    }
+  const handleInputChange = (value: string) => {
+    setLoading(true)
+    get_search(value).then((data) => {
+      change_content({ title: t('header.activeSearch', { name: value }), data: data })
+    })
   }
 
   useHotkeys("Escape", () => {

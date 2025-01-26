@@ -1,24 +1,22 @@
-import Input from '../ui/input'
+import Input from '../ui/TextInput'
 import '../../css/elements/headers.css'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 
 interface TextInputProps {
-  onInputChange?: (event: React.KeyboardEvent<HTMLInputElement>) => void
+  onInputChange?: (value: string) => void
 }
 
 const header: React.FC<TextInputProps> = ({ onInputChange }) => {
   const { t } = useTranslation()
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (onInputChange) {
-      onInputChange(event)
-    }
+  const handleKeyDown = (value: string) => {
+    if (onInputChange) onInputChange(value)
   }
 
   return (
     <div className="header">
-      <Input placeholder={t('header.search')} onKeyDown={handleKeyDown} />
+      <Input placeholder={t('header.search')} getInputText={handleKeyDown} />
     </div>
   )
 }
