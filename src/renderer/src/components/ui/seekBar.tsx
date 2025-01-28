@@ -1,18 +1,22 @@
 import { formatTime } from '@renderer/utils/time';
 import React, { useEffect, useRef, useState } from 'react';
 
+import "../../css/ui/seekBar.css"
+
 interface SeekBarProps {
   maxValue: number | undefined;
   currentValue: number | undefined;
   onSeek: (value: number) => void;
   type?: "value" | "float" | "time"
+  classes?: { container?: string, progress?: string, thumb?: string, box?: string }
 }
 
 const SeekBar: React.FC<SeekBarProps> = ({
   maxValue,
   currentValue,
   onSeek,
-  type = "value"
+  type = "value",
+  classes
 }) => {
   const [value, setValue] = useState(currentValue);
   const [drag, setdrage] = useState<boolean>(false);
@@ -64,7 +68,7 @@ const SeekBar: React.FC<SeekBarProps> = ({
     const newTime = (offsetX / rect.width) * maxValue;
     if (!(newTime >= 0 && newTime <= maxValue)) return
 
-    seekbarBox.current.style.left = `${Math.floor(newTime / maxValue * 92)}%`
+    seekbarBox.current.style.left = `${newTime / maxValue * 95.3}%`
     if (type === "value") seekbarBox.current.innerHTML = newTime.toFixed(0)
     if (type === "float") seekbarBox.current.innerHTML = newTime.toFixed(1)
     if (type === "time") seekbarBox.current.innerHTML = formatTime(newTime)
@@ -78,7 +82,7 @@ const SeekBar: React.FC<SeekBarProps> = ({
   return (
     <div
       ref={seekBarRef}
-      className='seekBar-container'
+      className={`seekBar-container ${classes?.container}`}
       onClick={setPosition}
       onMouseDown={() => setdrage(() => true)}
       onMouseUp={() => setdrage(() => false)}
@@ -88,13 +92,13 @@ const SeekBar: React.FC<SeekBarProps> = ({
     >
       <div
         ref={seekBarProgress}
-        className='seekbar-progress'
+        className={`seekbar-progress ${classes?.progress}`}
       />
       <div
         ref={seekbarThumb}
-        className='seekbar-thumb'
+        className={`seekbar-thumb ${classes?.thumb}`}
       />
-      <div ref={seekbarBox} style={show ? { display: "block" } : { display: "none" }} className='seekbar-box'></div>
+      <div ref={seekbarBox} style={show ? { display: "block" } : { display: "none" }} className={`seekbar-box ${classes?.box}`}></div>
     </div>
   );
 };

@@ -11,7 +11,6 @@ import { notificationProps, playerUrlProps } from '@renderer/utils/interface';
 
 // Components
 import ContextMenu from '../components/elements/context-menu'
-import CustomSlider from '@renderer/components/ui/customSlider';
 import Button from '@renderer/components/ui/button';
 
 // Context
@@ -20,6 +19,7 @@ import { closeDialog, dialogIsOpen, showDialog } from '@renderer/utils/context/D
 // css
 import '../css/pages/player.css'
 import useHotkeys from '@reecelucas/react-use-hotkeys';
+import SeekBar from '@renderer/components/ui/seekBar';
 
 const Player = () => {
   const navigate = useNavigate()
@@ -564,6 +564,8 @@ const Player = () => {
           className={isVisible ? 'video-player mask' : 'video-player'}
           onTimeUpdate={updateProgress}
           onClick={() => { togglePlay(); setcurrentSettings("") }}
+          onLoad={() => setWaitingPlayer(() => true)}
+          onCanPlay={() => setWaitingPlayer(() => false)}
           autoPlay={isPlaying}
           onError={(error) => videoErrorHandler(error)}
           preload={config?.Player.general.playerLoadType}
@@ -637,7 +639,7 @@ const Player = () => {
                 {isMuted ? 'volume_off' : 'volume_up'}
               </button>
               {isConfigLoad && (
-                <CustomSlider min={0} max={100} step={1} current={volume} size={200} onValueChange={handleVolumeChange} />
+                <SeekBar currentValue={volume} maxValue={100} onSeek={value => handleVolumeChange(value)} />
               )}
               {currentSettings == "settings" && (
                 <div className="player-settings-container">

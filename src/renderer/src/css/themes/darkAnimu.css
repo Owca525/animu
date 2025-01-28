@@ -302,3 +302,17 @@ button {
   background-color: rgb(30, 30, 30, 0.8);
   border-radius: 12px;
 }
+
+.player-seekbar {
+  background-color: rgb(50, 50, 50, 0.5);
+}
+
+.player-loading-container {
+  background-color: rgb(30, 30, 30, 0.8);
+  padding: 8px;
+  border-radius: 24px;
+}
+
+.player-settings-container {
+  background-color: rgb(30, 30, 30, 0.8);
+}

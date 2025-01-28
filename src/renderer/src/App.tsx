@@ -8,7 +8,7 @@ import 'material-symbols'
 
 // Pages
 const Settings = lazy(() => import('./pages/settings/index'));
-const Player = lazy(() => import('./pages/player'));
+const Player = lazy(() => import('./pages/player/index'));
 
 // I can't set home to lazy loading because css in card broke idk how, css is full loaded
 import Home from "./pages/home"
