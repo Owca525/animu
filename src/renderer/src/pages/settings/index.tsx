@@ -22,6 +22,11 @@ import Button from '@renderer/components/ui/button'
 import useHotkeys from '@reecelucas/react-use-hotkeys'
 import { closeDialog, showDialog } from '@renderer/utils/context/DialogContext'
 
+// function calculateZoomLevel(percentage: number): number {
+//   if (percentage < 50 || percentage > 300) return percentage
+//   return Math.log(percentage / 100) / Math.log(1.2);
+// }
+
 const Settings = () => {
   const navigate = useNavigate()
 
