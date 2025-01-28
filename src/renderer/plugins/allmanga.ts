@@ -111,6 +111,7 @@ export async function getPlayerUrls(id: string, episode: string, type: string): 
 
   const resp = await sendRequest(url, header)
   if (!resp) return null
+  if (resp.data.episode === null) return null
 
   const sources = resp.data.episode.sourceUrls
   const urls = sources

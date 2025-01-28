@@ -26,13 +26,15 @@ interface VideoPlayerProps {
     }
     time: number
     functions: {
-        prevButton: () => void
-        nextButton: () => void
+        prevButton: (value: "prev") => void
+        nextButton: (value: "next") => void
     }
     episodesUrl: playerUrlProps[]
+    volumeCacheFunc: (value: number) => void
+    PlayerVolume: number
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, episode, time, functions, episodesUrl }) => {
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, episode, time, functions, episodesUrl, volumeCacheFunc, PlayerVolume }) => {
     const navigate = useNavigate()
     // Translation 
     const { t } = useTranslation()
@@ -47,7 +49,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
     // Variable
-    const [volume, setVolume] = useState<number | undefined>(undefined)
+    const [volume, setVolume] = useState<number>(PlayerVolume)
     // const [duration, setduration] = useState<number>(0)
     const [currentTime, setcurrentTime] = useState<number>(0)
 
@@ -55,7 +57,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
     const [isMuted, setMuted] = useState<boolean>(false)
     const [isVisible, setIsVisible] = useState<boolean>(true)
     const [isWaitingPlayer, setWaitingPlayer] = useState<boolean>(true)
-    const [isPlaying, setIsPlaying] = useState<boolean>(false)
+    const [isPlaying, setIsPlaying] = useState<boolean>(config.Player.general.Autoplay)
     const [isFullscreen, setIsFullscreen] = useState<boolean>(false)
 
     // Resolution
@@ -71,7 +73,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
 
     useEffect(() => {
         checkUrl(episodesUrl[0])
-        handleVolume(config.Player.general.Volume)
+        console.log(episodesUrl)
         if (videoRef.current) videoRef.current.currentTime = time
     }, [])
 
@@ -171,6 +173,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
         if (!videoRef.current) return
         videoRef.current.volume = value / 100
         setVolume(() => value)
+        volumeCacheFunc(value)
     }
 
     function togglePlay() {
@@ -421,14 +424,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
                                 ? "" :
                                 (
                                     <Button value='skip_previous' title={t('player.previous', { ep: episodes[episodes.indexOf(episode.ep) - 1] })}
-                                        onClick={functions.prevButton}
+                                        onClick={() => functions.prevButton("prev")}
                                         className="material-symbols-outlined player-buttons" />
                                 )
                             }
                             <Button value={isPlaying ? "pause" : "play_arrow"} title={isPlaying ? t('player.Pause') : t('player.play')} className="material-symbols-outlined player-buttons" onClick={togglePlay} />
                             {episodes[episodes.indexOf(episode.ep) + 1] !== undefined
                                 ? (
-                                    <Button value='skip_next' className='material-symbols-outlined player-buttons' title={t('player.next', { ep: episodes[episodes.indexOf(episode.ep) + 1] })} onClick={functions.nextButton} />
+                                    <Button value='skip_next' className='material-symbols-outlined player-buttons' title={t('player.next', { ep: episodes[episodes.indexOf(episode.ep) + 1] })} onClick={() => functions.nextButton("next")} />
                                 ) : ""
                             }
                             <div className="time-display">
