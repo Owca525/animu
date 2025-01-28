@@ -9,7 +9,6 @@ import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
 import { useTranslation } from "react-i18next";
 
 async function fetchEpisodeData({ queryKey }): Promise<playerUrlProps[]> {
-    console.log("fetchEpisodeData", queryKey)
     return await get_player_anime(queryKey[0], queryKey[1])
 }
 
@@ -33,7 +32,6 @@ const player = () => {
             let ep = episodes.indexOf(old.episode.ep)
             if (type == 'prev') ep = ep - 1
             if (type == 'next') ep = ep + 1
-            console.log("setextractionData", ep)
             return {
                 id: old.id,
                 episode: { type: old.episode.type, ep: episodes[ep] }
