@@ -18,8 +18,8 @@ export const defaultConfig: SettingsConfig = {
       AutoFullscreen: false,
       playerLoadType: "metadata",
       Volume: 25,
-      LongTimeSkipForward: 80,
-      LongTimeSkipBack: 80,
+      LongTimeSkipForward: 85,
+      LongTimeSkipBack: 85,
       TimeSkipLeft: 5,
       TimeSkipRight: 5,
     },
@@ -45,7 +45,7 @@ export const defaultConfig: SettingsConfig = {
   },
   History: {
     history: {
-      maxSave: 20,
+      maxSave: 50,
     },
     continue: {
       MinimalTimeSave: 20,
