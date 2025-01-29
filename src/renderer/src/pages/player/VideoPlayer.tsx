@@ -67,6 +67,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
     // url
     const [currentHost, setHost] = useState<string>("")
 
+    // Up Next
+    const [timeNextEpisode, setTimeNextEpisode] = useState<number>(30)
+    const [isUpNextEpisode, setUpNextEpisode] = useState<boolean>(false)
+    const [isHideUpNextEpisode, setHideUpNextEpisode] = useState<boolean>(false)
+
     // other
     const [currentSettings, setcurrentSettings] = useState<string>("")
     const [hls, setHls] = useState<any>(null);
@@ -235,12 +240,29 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
         if (!videoRef.current) return
         saveContinueProgress()
         setcurrentTime(videoRef.current.currentTime)
-        // checkUpNext()
+        checkUpNext()
 
         // Update RPC
         window.api.rpc.setActivity(`${title} Episode ${episode.ep}`, `${formatTime(videoRef.current.currentTime)} / ${formatTime(videoRef.current.duration)}`)
     }
 
+    function checkUpNext() {
+        // checking to show Up next communicat
+        if (!config) return
+        if (!videoRef.current) return
+        const duration = videoRef.current.duration
+        const currentTime = videoRef.current.currentTime
+
+        if (duration != 0 && currentTime != 0 && isHideUpNextEpisode == false && episodes[episodes.indexOf(episode.ep) + 1] != null && currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
+            setUpNextEpisode(true)
+            setTimeNextEpisode(((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + 30)
+        } else {
+            setTimeNextEpisode(30)
+            setUpNextEpisode(false)
+        }
+
+        if (duration != 0 && currentTime != 0 && (isHideUpNextEpisode == false && timeNextEpisode <= 0)) functions.nextButton("next")
+    }
 
     function videoErrorHandler(event: React.SyntheticEvent<HTMLVideoElement, Event>) {
         const Error = event.currentTarget.error
@@ -404,7 +426,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
             />
 
             <div className="video-overlay">
-                <div className={isVisible ? 'video-top' : 'video-top player-hidden'}>
+                <div className={isUpNextEpisode == false ? isVisible ? 'video-top' : 'video-top player-hidden' : 'video-top'}>
                     <Button value='arrow_back' className='material-symbols-outlined player-buttons' onClick={async () => await exitPlayer()} />
                     <div className="player-title ">{t('player.TitleEpisode', { ep: episode.ep, name: title })}</div>
                 </div>
@@ -416,7 +438,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
                         <div className="player-waiting material-symbols-outlined">progress_activity</div>
                     </div>
                 </div>
-                <div className={isVisible ? 'video-bottom' : 'video-bottom player-hidden'}>
+                <div className={isVisible && isUpNextEpisode == false ? 'video-bottom' : 'video-bottom player-hidden'}>
                     <SeekBar currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => setTimeVideo(value)} type="time" classes={{ container: "player-seekbar" }} />
                     <div className="bottom-section">
                         <div className="player-left">
@@ -528,6 +550,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
                 </div>
             </div>
             <canvas ref={canvasRef} style={{ display: 'none' }} />
+            {isUpNextEpisode ? (
+                <div className="up-Next-container">
+                    <div className="up-Next-Title">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>
+                    <div className="up-Next-Anime">{t("player.upNext.titleAnime", { ep: episodes[episodes.indexOf(episode.ep) + 1], title: title })}</div>
+                    <div className="up-Next-Buttons">
+                        <Button value={t("player.upNext.nextEp")} className='up-Next-Button' onClick={() => functions.nextButton("next")} />
+                        <Button value={t("player.upNext.hide")} className='up-Next-Button' onClick={() => { setHideUpNextEpisode(true); setUpNextEpisode(false) }} />
+                    </div>
+                </div>
+            ) : ""}
         </div>
     )
 }
