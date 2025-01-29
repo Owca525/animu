@@ -36,4 +36,9 @@
   font-size: 1em;
   border-radius: 6px;
   transition: background-color 150ms ease;
+  display: -webkit-box;
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

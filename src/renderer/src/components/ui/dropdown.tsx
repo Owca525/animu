@@ -16,16 +16,12 @@ const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '' }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedOption, setSelectedOption] = useState<DropdownOption | null>(null)
 
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen)
-  }
+  const toggleDropdown = () => setIsOpen(prev => !prev)
 
   const handleOptionClick = (option: DropdownOption) => {
     setSelectedOption(option)
     setIsOpen(false)
-    if (option.onClick) {
-      option.onClick()
-    }
+    if (option.onClick) option.onClick()
   }
 
   return (
