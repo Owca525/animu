@@ -152,7 +152,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
                 const resolutions = data.levels.map((level) => level.height);
                 setListResolution(resolutions)
                 resolutions.reverse()
-                setResolution(resolutions[0].toString())
+                setRes(resolutions[0])
             });
 
             hls.on(hlsModule.Events.ERROR, (_event, data) => {
