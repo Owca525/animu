@@ -73,6 +73,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
 
     useEffect(() => {
         checkUrl(episodesUrl[0])
+        handleVolume(PlayerVolume)
         if (videoRef.current) videoRef.current.currentTime = time
     }, [])
 
