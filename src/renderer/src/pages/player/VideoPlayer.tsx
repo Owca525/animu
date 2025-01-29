@@ -84,6 +84,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
     const [hls, setHls] = useState<any>(null);
 
     useEffect(() => {
+        import("../../utils/history").then(({ SaveHistory }) => SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) }))
         checkUrl(episodesUrl[0])
         handleVolume(PlayerVolume)
         if (videoRef.current) videoRef.current.currentTime = time
