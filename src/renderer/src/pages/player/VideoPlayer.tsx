@@ -1,19 +1,23 @@
-import Button from "@renderer/components/ui/button"
-import SeekBar from "@renderer/components/ui/seekBar"
+import { useContext, useEffect, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
+import { useNavigate } from "react-router-dom"
+import { toast } from "react-toastify"
+import useHotkeys from "@reecelucas/react-use-hotkeys"
+
+// utils
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext"
 import { configContext } from "@renderer/utils/context/small"
 import { DeleteFromcontinue, SaveContinue } from "@renderer/utils/continueWatch"
 import { notificationProps, playerUrlProps } from "@renderer/utils/interface"
 import { formatTime } from "@renderer/utils/time"
-import { useContext, useEffect, useRef, useState } from "react"
-import { useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
-import { toast } from "react-toastify"
 
+// Components
+import Button from "@renderer/components/ui/button"
+import SeekBar from "@renderer/components/ui/seekBar"
 import NerdStats from "./nerdStats"
 
+// css
 import "../../css/pages/player.css"
-import useHotkeys from "@reecelucas/react-use-hotkeys"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
