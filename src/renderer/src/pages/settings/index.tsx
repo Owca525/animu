@@ -7,7 +7,7 @@ import ContextMenu from '../../components/elements/context-menu'
 import Sidebar from '../../components/elements/sidebar'
 import Checkbox from '../../components/ui/checkbox'
 import Keybind from './keybind'
-import Input from './input-settings'
+import Input from './SettingsInput'
 import Dropdown from '../../components/ui/dropdown'
 // import MainInput from "../../components/ui/input"
 // import CustomSlider from '@renderer/components/ui/customSlider'
@@ -140,11 +140,9 @@ const Settings = () => {
     return key
   }
 
-  const handleChange = (path: string, value: string | number | boolean, remove?: string | undefined) => {
+  const handleChange = (path: string, value: string | number | boolean) => {
     setConfig((prevConfig) => {
       if (!prevConfig) return prevConfig
-
-      if (typeof value == 'string' && remove) value = value.replace(remove, '')
 
       const keys = path.split('.')
       const newConfig = { ...prevConfig }
@@ -321,7 +319,6 @@ const Settings = () => {
                 title={t('settings.general.Zoom')}
                 placeholder="0"
                 value={parseInt(config.General.Window.Zoom.toString())}
-                type=""
                 onChange={(event) => handleChange('General.Window.Zoom', event.currentTarget.value == "" ? 0 : event.currentTarget.value)}
               />
             </div>
@@ -339,7 +336,6 @@ const Settings = () => {
                 title={t('settings.player.historysave')}
                 placeholder="20"
                 value={config.History.history.maxSave}
-                type=""
                 onChange={(event) =>
                   handleChange('History.history.maxSave', event.currentTarget.value)
                 }
@@ -352,7 +348,8 @@ const Settings = () => {
                 title={t('settings.player.MinimalTimeSave')}
                 placeholder="5"
                 value={config.History.continue.MinimalTimeSave}
-                type="s"
+                char="s"
+                type='number'
                 onChange={(event) =>
                   handleChange('History.continue.MinimalTimeSave', event.currentTarget.value)
                 }
@@ -363,7 +360,8 @@ const Settings = () => {
                 title={t('settings.player.MaximizeTimeSave')}
                 placeholder="120"
                 value={config.History.continue.MaximizeTimeSave}
-                type="s"
+                char="s"
+                type='number'
                 onChange={(event) =>
                   handleChange('History.continue.MaximizeTimeSave', event.currentTarget.value)
                 }
@@ -400,9 +398,10 @@ const Settings = () => {
                 title={t('settings.player.DefaultVolume')}
                 placeholder="25"
                 value={config.Player.general.Volume}
-                type="%"
+                char="%"
+                type='number'
                 onChange={(event) =>
-                  handleChange('Player.general.Volume', event.currentTarget.value, "%")
+                  handleChange('Player.general.Volume', event.currentTarget.value)
                 }
               />
               <div className="border-settings"></div>
@@ -411,9 +410,10 @@ const Settings = () => {
                 title={t('settings.player.LongTimeSkipForward')}
                 placeholder="80"
                 value={config.Player.general.LongTimeSkipForward}
-                type="s"
+                char="s"
+                type='number'
                 onChange={(event) =>
-                  handleChange('Player.general.LongTimeSkipForward', event.currentTarget.value, "s")
+                  handleChange('Player.general.LongTimeSkipForward', event.currentTarget.value)
                 }
               />
               <div className="border-settings"></div>
@@ -422,7 +422,8 @@ const Settings = () => {
                 title={t('settings.player.LongTimeSkipBack')}
                 placeholder="80"
                 value={config.Player.general.LongTimeSkipBack}
-                type="s"
+                char="s"
+                type='number'
                 onChange={(event) =>
                   handleChange('Player.general.LongTimeSkipBack', event.currentTarget.value)
                 }
@@ -433,7 +434,8 @@ const Settings = () => {
                 title={t('settings.player.TimeSkipForward')}
                 placeholder="5"
                 value={config.Player.general.TimeSkipRight}
-                type="s"
+                char="s"
+                type='number'
                 onChange={(event) =>
                   handleChange('Player.general.TimeSkipRight', event.currentTarget.value)
                 }
@@ -444,7 +446,8 @@ const Settings = () => {
                 title={t('settings.player.TimeSkipBack')}
                 placeholder="5"
                 value={config.Player.general.TimeSkipLeft}
-                type="s"
+                char="s"
+                type='number'
                 onChange={(event) =>
                   handleChange('Player.general.TimeSkipLeft', event.currentTarget.value)
                 }

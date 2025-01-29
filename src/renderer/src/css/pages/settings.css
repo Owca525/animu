@@ -71,20 +71,28 @@
   gap: 1em;
 }
 
-.number {
+.settings-input {
   appearance: none;
   border: none;
   outline: none;
-  text-align: center;
+  text-align: right;
   font-size: large;
-  max-width: 20%;
-  min-width: 8%;
-  width: 0%;
-  padding: 8px;
-  border-radius: 4px;
-  border-style: solid;
-  border-width: 2px;
+  width: 100%;
+  max-width: 5vw;
+  padding: 8px 0px;
   transition: border-color 100ms ease;
+}
+
+.settings-input-type {
+  font-size: large;
+  padding: 8px 8px 8px 0px;
+  max-width: 10%;
+}
+
+.settings-input-container {
+  display: flex;
+  align-items: end;
+  width: 10%;
 }
 
 .settings-loading {

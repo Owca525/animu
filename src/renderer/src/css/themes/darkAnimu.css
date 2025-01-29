@@ -103,18 +103,37 @@ button {
   border: 2px solid var(--bg4);
 }
 
-.number {
+.settings-input {
+  outline: none;
   background-color: var(--bg3);
   color: var(--text);
-  border: none;
   transition: background-color 150ms ease;
-  border-radius: 12px;
+  border-radius: 12px 0px 0px 12px;
+  border: 2px solid var(--bg3);
+  border-right: 0px;
 }
-.number:hover {
+.settings-input-type {
+  background-color: var(--bg3);
+  color: var(--text);
+  border-radius: 0px 12px 12px 0px;
+  text-align: center;
+  border: 2px solid var(--bg3);
+  border-width: 2px 2px 2px 0px;
+}
+.settings-input:hover {
   background-color: var(--bg4);
 }
-.number:focus {
-  outline: solid 2px var(--neutral1);
+.settings-input:hover + .settings-input-type {
+  background-color: var(--bg4);
+}
+.settings-input:focus {
+  border: solid 2px var(--neutral1);
+  border-width: 2px 0px 2px 2px;
+}
+
+.settings-input:focus + .settings-input-type {
+  border: solid 2px var(--neutral1);
+  border-width: 2px 2px 2px 0px;
 }
 
 .dropdown-button {
