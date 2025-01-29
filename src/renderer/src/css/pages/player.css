@@ -253,7 +253,7 @@
   padding: 8px;
 }
 
-.player-dev-container {
+.player-nerd-container {
   position: fixed;
   top: 200px;
   left: 0;
@@ -266,7 +266,7 @@
   gap: 4px;
   width: 250px;
 }
-.player-dev-element {
+.player-nerd-element {
   display: flex;
   justify-content: space-between;
   gap: 10px;

@@ -367,6 +367,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
                     takeScreenshot()
                     break
                 case config.Player.keybinds.VolumeMute.toLowerCase():
+                    // setMuted(prev => !prev)
                     break
             }
         }

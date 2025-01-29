@@ -9,12 +9,12 @@ interface nerdStatsProps {
 const nerdStats: React.FC<nerdStatsProps> = ({ video, volume, currentTime }) => {
     if (!video.current) return
     return (
-        <div className="player-dev-container">
-            <div className="player-dev-element">Frames: <span className="player-dev-element">{video.current.getVideoPlaybackQuality().totalVideoFrames}</span></div>
-            <div className="player-dev-element">Dropped Frames: <span className="player-dev-element">{video.current.getVideoPlaybackQuality().droppedVideoFrames}</span></div>
-            <div className="player-dev-element">Volume: <span className="player-dev-element">{volume}%</span></div>
-            <div className="player-dev-element">CurrentTime: <span className="player-dev-element">{currentTime}</span></div>
-            <div className="player-dev-element">Duration: <span className="player-dev-element">{video.current.duration}</span></div>
+        <div className="player-nerd-container">
+            <div className="player-nerd-element">Frames: <span className="player-nerd-element">{video.current.getVideoPlaybackQuality().totalVideoFrames}</span></div>
+            <div className="player-nerd-element">Dropped Frames: <span className="player-nerd-element">{video.current.getVideoPlaybackQuality().droppedVideoFrames}</span></div>
+            <div className="player-nerd-element">Volume: <span className="player-nerd-element">{volume}%</span></div>
+            <div className="player-nerd-element">CurrentTime: <span className="player-nerd-element">{currentTime}</span></div>
+            <div className="player-nerd-element">Duration: <span className="player-nerd-element">{video.current.duration}</span></div>
         </div>
     )
 }
