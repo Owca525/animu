@@ -10,6 +10,8 @@ import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 
+import NerdStats from "./nerdStats"
+
 import "../../css/pages/player.css"
 import useHotkeys from "@reecelucas/react-use-hotkeys"
 
@@ -74,6 +76,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
 
     // other
     const [currentSettings, setcurrentSettings] = useState<string>("")
+    const [showNerdStats, setshowNerdStats] = useState<boolean>(false)
     const [hls, setHls] = useState<any>(null);
 
     useEffect(() => {
@@ -319,7 +322,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
         } else videoRef.current.currentTime = time
     }
 
-    useHotkeys("*", (event) => keybinds(event));
+    useHotkeys("*", (event) => {
+        if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() == "d") setshowNerdStats((prev) => !prev)
+        keybinds(event)
+    });
     async function keybinds(event: KeyboardEvent) {
         if (videoRef.current && config) {
             var time_now = videoRef.current.currentTime
@@ -560,6 +566,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
                     </div>
                 </div>
             ) : ""}
+            {showNerdStats && (
+                <NerdStats video={videoRef} volume={volume} currentTime={currentTime}  />
+            )}
         </div>
     )
 }
