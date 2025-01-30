@@ -84,6 +84,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
     const [hls, setHls] = useState<any>(null);
 
     useEffect(() => {
+        import("../../utils/history").then(({ SaveHistory }) => SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) }))
         checkUrl(episodesUrl[0])
         handleVolume(PlayerVolume)
         if (videoRef.current) videoRef.current.currentTime = time
@@ -151,7 +152,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
                 const resolutions = data.levels.map((level) => level.height);
                 setListResolution(resolutions)
                 resolutions.reverse()
-                setResolution(resolutions[0].toString())
+                setRes(resolutions[0])
             });
 
             hls.on(hlsModule.Events.ERROR, (_event, data) => {
