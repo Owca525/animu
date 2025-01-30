@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react"
+import { lazy, useContext, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
@@ -14,7 +14,7 @@ import { formatTime } from "@renderer/utils/time"
 // Components
 import Button from "@renderer/components/ui/button"
 import SeekBar from "@renderer/components/ui/seekBar"
-import NerdStats from "./nerdStats"
+const NerdStats = lazy(() => import('./nerdStats'));
 
 // css
 import "../../css/pages/player.css"
