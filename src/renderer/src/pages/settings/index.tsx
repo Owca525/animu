@@ -287,6 +287,7 @@ const Settings = () => {
                   handleChange('update.enable', event.currentTarget.checked)
                 }
               />
+              <div className="border-settings"></div>
               <div className="same-space">
                 Check Update
                 <Dropdown options={[
