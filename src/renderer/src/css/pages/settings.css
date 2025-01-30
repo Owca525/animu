@@ -145,3 +145,34 @@
   width: 50%;
   flex-direction: column;
 }
+
+.settings-save-container {
+  position: fixed;
+  bottom: 0;
+  margin-left: 40vw;
+  margin-bottom: 30px;
+  z-index: 99999;
+  padding: 12px;
+  display: flex;
+  gap: 1em;
+
+  background-color: rgb(0, 0, 0, 0.8);
+  border-radius: 12px;
+}
+
+.settings-save-text {
+  font-size: larger;
+  font-weight: 500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.settings-save-buttons {
+  display: flex;
+  gap: 0.5em;
+}
+
+.settings-save-button {
+  font-size: large;
+  padding: 4px 12px;
+}

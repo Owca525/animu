@@ -21,6 +21,7 @@ import { SettingsConfig } from './utils/interface'
 // Update
 import { checkDate } from './utils/time'
 import i18n from './utils/i18n'
+import { calculateZoomLevel } from './utils/utils';
 
 const config = LoadConfig()
 
@@ -80,7 +81,7 @@ function LoadConfig(): SettingsConfig {
     i18n.changeLanguage(config.General.language)
     if (config.General.Window.AutoMaximize) window.BrowserWindow.setMaximize()
     if (config.Developer.DevToolsOnStart) window.BrowserWindow.openDevTools()
-    window.BrowserWindow.setZoom(parseFloat(config.General.Window.Zoom.toString()))
+    window.BrowserWindow.setZoom(calculateZoomLevel(parseFloat(config.General.Window.Zoom.toString())))
     window.BrowserWindow.setFullscreen(config.General.Window.AutoFullscreen)
     // check update
     if (config.update.enable == false) return

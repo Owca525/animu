@@ -9,7 +9,7 @@ export const defaultConfig: SettingsConfig = {
     Window: {
       AutoMaximize: false,
       AutoFullscreen: false,
-      Zoom: 0,
+      Zoom: 100,
     },
   },
   Player: {
