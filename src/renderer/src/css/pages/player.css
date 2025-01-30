@@ -271,3 +271,29 @@
   justify-content: space-between;
   gap: 10px;
 }
+
+.player-dev-container {
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 12px;
+  border-radius: 12px;
+  right: 0;
+  top: 0;
+  margin: 12px;
+  max-width: 30vw;
+  width: min-content;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.player-dev-header {
+  font-size: large;
+  font-weight: 600;
+}
+
+.player-dev-text {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}

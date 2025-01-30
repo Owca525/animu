@@ -14,7 +14,8 @@ import { formatTime } from "@renderer/utils/time"
 // Components
 import Button from "@renderer/components/ui/button"
 import SeekBar from "@renderer/components/ui/seekBar"
-const NerdStats = lazy(() => import('./nerdStats'));
+import NerdStats from "./nerdStats"
+const DeveloperStats = lazy(() => import('./developerStats'));
 
 // css
 import "../../css/pages/player.css"
@@ -573,7 +574,30 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
                 </div>
             ) : ""}
             {showNerdStats && (
-                <NerdStats video={videoRef} volume={volume} currentTime={currentTime}  />
+                <NerdStats video={videoRef} volume={volume} currentTime={currentTime} />
+            )}
+            {config.Developer.DevTools && (
+                <DeveloperStats
+                    isMuted={isMuted}
+                    isFullscreen={isFullscreen}
+                    isHideUpNextEpisode={isHideUpNextEpisode}
+                    isPlaying={isPlaying}
+                    isUpNextEpisode={isUpNextEpisode}
+                    isVisible={isVisible}
+                    isWaitingPlayer={isWaitingPlayer}
+                    ListResolution={ListResolution}
+                    currentHost={currentHost}
+                    currentResolution={currentResolution}
+                    currentSettings={currentSettings}
+                    hls={hls}
+                    time={time}
+                    timeNextEpisode={timeNextEpisode}
+                    episode={episode}
+                    episodes={episodes}
+                    episodesUrl={episodesUrl}
+                    showNerdStats={showNerdStats}
+                    PlayerVolume={PlayerVolume}
+                />
             )}
         </div>
     )
