@@ -28,6 +28,16 @@ const player = () => {
     const buttons = [{ title: t('general.ok'), onClick: () => navigate("/") }, { title: t('general.reload'), onClick: async () => { closeDialog(); refetch({ exact: true }) } }]
 
     function setNewEpisode(type: string) {
+        navigate('/player', {
+            state: {
+                id: id,
+                title: title,
+                episodes: episodes,
+                episode: episode,
+                time: 0,
+                img: img
+            }
+        })
         setextractionData((old) => {
             let ep = episodes.indexOf(old.episode.ep)
             if (type == 'prev') ep = ep - 1
