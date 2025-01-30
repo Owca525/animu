@@ -64,12 +64,13 @@ declare global {
       };
       getlistThemes: () => Promise<{ path: string, filename: string, type: "user" | "official" }[]>
     };
-    electron: {
+    backend: {
       ipcRenderer: {
         invoke(channel: string, ...args: any[]): Promise<any>;
       };
       version: () => Promise<string>;
     };
+    electronAPI: ElectronAPI
     BrowserWindow: {
       setMaximize: () => void;
       setFullscreen: (option: boolean) => void;

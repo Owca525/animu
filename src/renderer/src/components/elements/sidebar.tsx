@@ -17,46 +17,28 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const { t } = useTranslation()
 
-  const changeClass = () => {
-    if (onlyMax) {
-      return 'sidebar-max ' + className
-    }
-    if (isMaxSidebar) {
-      return 'sidebar-max ' + className
-    } else {
-      return 'sidebar-mini ' + className
-    }
+  const getAndSetVersion = async (): Promise<void> => setversion(await window.backend.version())
+
+  useEffect(() => { getAndSetVersion() }, [])
+
+  function changeClass(): string {
+    if (onlyMax) return `sidebar-max ${className}`
+    if (isMaxSidebar) return `sidebar-max ${className}`
+    else return `sidebar-mini ${className}`
   }
 
-  const changeClassButton = () => {
-    if (onlyMax) {
-      return 'icon-text'
-    }
-    if (isMaxSidebar) {
-      return 'icon-text'
-    } else {
-      return 'icon'
-    }
+  function changeClassButton(): "icon-text" | "icon" {
+    if (onlyMax) return 'icon-text'
+    if (isMaxSidebar) return 'icon-text'
+    else return 'icon'
   }
 
-  const getAndSetVersion = async () => {
-    setversion(await window.electron.version())
+  function handleMouseEnter(): void {
+    if (!isMaxSidebar && sidebarHover) setIsMaxSidebar(true)
   }
 
-  useEffect(() => {
-    getAndSetVersion()
-  }, [])
-
-  const handleMouseEnter = () => {
-    if (!isMaxSidebar && sidebarHover) {
-      setIsMaxSidebar(true)
-    }
-  }
-
-  const handleMouseLeave = () => {
-    if (isMaxSidebar && sidebarHover) {
-      setIsMaxSidebar(false)
-    }
+  function handleMouseLeave(): void {
+    if (isMaxSidebar && sidebarHover) setIsMaxSidebar(false)
   }
 
   return (

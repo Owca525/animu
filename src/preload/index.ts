@@ -51,7 +51,7 @@ if (process.contextIsolated) {
       },
       getlistThemes: () => ipcRenderer.invoke("get-css-files")
     });
-    contextBridge.exposeInMainWorld("electron", {
+    contextBridge.exposeInMainWorld("backend", {
       Buffer: require("buffer").Buffer,
       ipcRenderer: {
         invoke: (channel: string, ...args: any[]): Promise<any> =>
@@ -59,6 +59,7 @@ if (process.contextIsolated) {
       },
       version: () => ipcRenderer.invoke("getVersion"),
     });
+    contextBridge.exposeInMainWorld("electronAPI", electronAPI)
     contextBridge.exposeInMainWorld("BrowserWindow", {
       setMaximize: () => ipcRenderer.send("setMaximize"),
       setFullscreen: (option: boolean) =>
