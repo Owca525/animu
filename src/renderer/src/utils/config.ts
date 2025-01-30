@@ -96,12 +96,14 @@ export async function readConfig(): Promise<SettingsConfig> {
   return deepMerge(defaultConfig, loadedConfig);
 }
 
-export async function saveConfig(content: any) {
-  const data = ini.stringify(content);
+export async function saveConfig(content: any): Promise<boolean> {
   try {
+    const data = ini.stringify(content);
     window.api.os.write(await appConfigDirPath + "/config.ini", data);
+    return true
   } catch (Error) {
-    console.error(`${Error} in saveConfig`);
+    console.error(`Error in saveConfig`);
+    return false
   }
 }
 

@@ -117,12 +117,16 @@ const Settings = () => {
 
   useHotkeys("Escape", () => { closeDialog(); navigate("/") });
 
+  async function saveConf() {
+    if (await saveConfig(config)) toast.info(t("toast.config"), notificationProps);
+    else toast.error("Failed Save config", notificationProps);
+  }
+
   useEffect(() => {
-    saveConfig(config)
     if (!config) return
+    saveConf()
     setisLoading(false)
     window.BrowserWindow.setZoom(parseFloat(config.General.Window.Zoom.toString()))
-    toast.info(t("toast.config"), notificationProps);
     if (config.Developer.DeveloperMode) setDeveloper()
   }, [config])
 
