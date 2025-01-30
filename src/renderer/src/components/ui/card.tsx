@@ -10,7 +10,7 @@ const Card: React.FC<CardProps> = ({ id, title, img, player = null, text = null 
   const [isImageLoaded, setIsImageLoaded] = useState(false)
   const [hasError, setHasError] = useState(false)
 
-  const cardRef: any = useRef()
+  const cardRef: any = useRef(undefined)
 
   const handleImageLoad = () => {
     setIsImageLoaded(true)

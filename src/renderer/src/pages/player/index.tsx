@@ -2,11 +2,12 @@ import { get_player_anime } from "@renderer/utils/backend";
 import { playerUrlProps } from "@renderer/utils/interface";
 import { useQuery } from "react-query";
 import { useLocation, useNavigate } from "react-router-dom"
-import VideoPlayer from "./VideoPlayer";
-import { useContext, useState } from "react";
+import { lazy, useContext, useState } from "react";
 import { configContext } from "@renderer/utils/context/small";
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
 import { useTranslation } from "react-i18next";
+
+const VideoPlayer = lazy(() => import('./VideoPlayer'));
 
 async function fetchEpisodeData({ queryKey }): Promise<playerUrlProps[]> {
     return await get_player_anime(queryKey[0], queryKey[1])
