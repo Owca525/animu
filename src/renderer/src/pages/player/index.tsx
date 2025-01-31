@@ -26,7 +26,7 @@ const player = () => {
         fetchEpisodeData,
     );
 
-    const buttons = [{ title: t('general.ok'), onClick: () => navigate("/") }, { title: t('general.reload'), onClick: async () => { closeDialog(); refetch({ exact: true }) } }]
+    const buttons = [{ title: t('general.ok'), onClick: () => { closeDialog(); navigate("/") } }, { title: t('general.reload'), onClick: async () => { closeDialog(); refetch({ exact: true }) } }]
 
     function setNewEpisode(type: string) {
         navigate('/player', {
