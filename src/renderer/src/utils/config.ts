@@ -16,6 +16,7 @@ export const defaultConfig: SettingsConfig = {
     general: {
       Autoplay: true,
       AutoFullscreen: false,
+      AutoSkipEpisode: true,
       playerLoadType: "metadata",
       Volume: 25,
       LongTimeSkipForward: 85,

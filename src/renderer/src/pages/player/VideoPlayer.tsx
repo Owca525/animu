@@ -253,6 +253,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
 
         // Update RPC
         window.api.rpc.setActivity(`${title} Episode ${episode.ep}`, `${formatTime(videoRef.current.currentTime)} / ${formatTime(videoRef.current.duration)}`)
+        if (config.Player.general.AutoSkipEpisode && videoRef.current.duration == videoRef.current.currentTime) functions.nextButton("next")
     }
 
     function checkUpNext() {

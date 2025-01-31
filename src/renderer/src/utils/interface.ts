@@ -57,6 +57,7 @@ interface SettingsConfigPlayer {
   general: {
     Autoplay: boolean
     AutoFullscreen: boolean
+    AutoSkipEpisode: boolean
     Volume: number
     playerLoadType: string
     LongTimeSkipForward: number | string

@@ -419,6 +419,14 @@ const Settings = () => {
                   }
                 />
                 <div className="border-settings"></div>
+                <Checkbox
+                  title={"Auto skip episode"}
+                  checked={config.new.Player.general.AutoSkipEpisode}
+                  onClick={(event) =>
+                    handleChange('Player.general.AutoSkipEpisode', event.currentTarget.checked)
+                  }
+                />
+                <div className="border-settings"></div>
                 <Input
                   title={t('settings.player.DefaultVolume')}
                   placeholder="25"
