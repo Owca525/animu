@@ -4,6 +4,7 @@ import * as RPC from 'discord-rpc';
 import fs from "fs";
 import path from "path";
 import { mainWindow } from ".";
+import { exec } from "child_process";
 
 export const rpc = new RPC.Client({ transport: 'ipc' });
 
@@ -49,6 +50,24 @@ ipcMain.handle('setActivity', (_event, details: string | undefined, state: strin
 })
 
 ipcMain.handle('getVersion', (_event): String => app.getVersion())
+
+ipcMain.handle('runExternalPlayer', (_event, url: string, path: string, time: string, type: "mpv" | "vlc"): any => {
+    switch (type) {
+        case "mpv":
+            exec(`${path} --start=${time} ${url}`, (error, stdout, stderr) => {
+                if (error) console.error(error)
+                if (stderr) console.error(error)
+                console.log(stdout)
+            })
+            break;
+        case "vlc":
+            exec(``, (error, stdout, stderr) => {
+                if (error) console.error(error)
+                if (stderr) console.error(error)
+                console.log(stdout)
+            })
+    }
+})
 
 // open web browser if is url or is directory then open file manager
 ipcMain.handle('open', async (_event, url: string): Promise<void> => {
