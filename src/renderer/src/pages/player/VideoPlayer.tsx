@@ -263,8 +263,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
         const duration = videoRef.current.duration
         const currentTime = videoRef.current.currentTime
 
-        if (isVisible && currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) setHideUpNextEpisode(() => true)
-
         if (duration != 0 && currentTime != 0 && isHideUpNextEpisode == false && episodes[episodes.indexOf(episode.ep) + 1] != null && currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
             setUpNextEpisode(true)
             setTimeNextEpisode(((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + 30)
@@ -319,6 +317,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
         if (!videoRef.current) return
         videoRef.current.currentTime = value
         setcurrentTime(() => value)
+        if (!isNaN(value) && config && value > videoRef.current.duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
+            setHideUpNextEpisode(true)
+        }
     }
 
     function change_time(time: number) {
