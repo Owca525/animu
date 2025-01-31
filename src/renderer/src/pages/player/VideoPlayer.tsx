@@ -5,7 +5,7 @@ import { toast } from "react-toastify"
 import useHotkeys from "@reecelucas/react-use-hotkeys"
 
 // utils
-import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext"
+import { closeDialog } from "@renderer/utils/context/DialogContext"
 import { configContext } from "@renderer/utils/context/small"
 import { DeleteFromcontinue, SaveContinue } from "@renderer/utils/continueWatch"
 import { notificationProps, playerUrlProps } from "@renderer/utils/interface"
@@ -174,10 +174,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
                             hls.destroy();
                             break;
                     }
-                    if (episodesUrl.length <= 1) {
-                        showDialog({ header_text: t("errors.playerHeaderError"), text: message, buttons: [] })
-                        return
-                    }
                     toast.error(message, notificationProps);
                 }
             });
@@ -296,10 +292,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
                 default:
                     message = t('player.errors.default')
             }
-            if (ListResolution.length <= 1) {
-                showDialog({ header_text: t("errors.playerHeaderError"), text: message, buttons: [] })
-                return
-            }
             toast.error(message, notificationProps);
         }
     }
@@ -415,11 +407,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
             return
         }
 
-        if (config.Player.screenShot.alwaysAsk) {
-            var resp = await window.api.os.saveDialog(`${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot.replace(/^data:image\/png;base64,/, ''), `screenshot${formatedDate}.png`, "png", ["PNG"], "base64")
-        } else {
-            var resp = await window.api.os.write(`${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot.replace(/^data:image\/png;base64,/, ''), "base64")
-        }
+        if (config.Player.screenShot.alwaysAsk) var resp = await window.api.os.saveDialog(`${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot.replace(/^data:image\/png;base64,/, ''), `screenshot${formatedDate}.png`, "png", ["PNG"], "base64")
+        else var resp = await window.api.os.write(`${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot.replace(/^data:image\/png;base64,/, ''), "base64")
         if (resp) {
             toast.success(t("toast.screenshot", { path: config.Player.screenShot.path }), notificationProps);
             return;
