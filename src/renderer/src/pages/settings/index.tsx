@@ -79,7 +79,7 @@ const Settings = () => {
         t('settings.sidebar.Home'),
       class: 'icon-button',
       title: t('settings.sidebar.Home'),
-      onClick: async () => navigate('/')
+      onClick: async () => {navigate('/'); window.location.reload()}
     }
   ]
 
@@ -112,7 +112,7 @@ const Settings = () => {
     window.api.rpc.setActivity(undefined, t("status.settings"))
   }, [])
 
-  useHotkeys("Escape", () => { closeDialog(); navigate("/") });
+  useHotkeys("Escape", () => { closeDialog(); navigate("/"); window.location.reload() });
 
   async function saveConf() {
     if (!config) return
