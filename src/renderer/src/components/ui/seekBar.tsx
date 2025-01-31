@@ -61,7 +61,10 @@ const SeekBar: React.FC<SeekBarProps> = ({
   }
 
   function setPositionBox(event: React.MouseEvent<HTMLDivElement> | MouseEvent) {
-    if (!maxValue) return
+    if (!maxValue) {
+      setshow(() => false)
+      return
+    }
     if (!seekbarBox.current) return
     if (!seekBarRef.current) return
 
