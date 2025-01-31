@@ -21,8 +21,10 @@
 }
 
 .seekbar-box {
-    position: relative;
-    bottom: 60px;
+    position: absolute;
+    top: -40px;
+    left: var(--tooltip-x, 50%);
+    transform: translateX(-50%);
     width: min-content;
     padding: 8px 12px;
 }

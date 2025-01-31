@@ -9,6 +9,7 @@ interface SeekBarProps {
   onSeek: (value: number) => void;
   type?: "value" | "float" | "time"
   classes?: { container?: string, progress?: string, thumb?: string, box?: string }
+  screen?: boolean
 }
 
 const SeekBar: React.FC<SeekBarProps> = ({
@@ -16,7 +17,8 @@ const SeekBar: React.FC<SeekBarProps> = ({
   currentValue,
   onSeek,
   type = "value",
-  classes
+  classes,
+  screen = false
 }) => {
   const [value, setValue] = useState(currentValue);
   const [drag, setdrage] = useState<boolean>(false);
@@ -68,7 +70,12 @@ const SeekBar: React.FC<SeekBarProps> = ({
     const newTime = (offsetX / rect.width) * maxValue;
     if (!(newTime >= 0 && newTime <= maxValue)) return
 
-    seekbarBox.current.style.left = `${newTime / maxValue * 95.3}%`
+    seekbarBox.current.style.left = `${Math.round(newTime / maxValue * 100)}%`
+    if (screen) {
+      if (Math.round(newTime / maxValue * 100) > 98) seekbarBox.current.style.left = `98%`
+      if (Math.round(newTime / maxValue * 100) < 1.5) seekbarBox.current.style.left = `1.5%`
+    }
+
     if (type === "value") seekbarBox.current.innerHTML = newTime.toFixed(0)
     if (type === "float") seekbarBox.current.innerHTML = newTime.toFixed(1)
     if (type === "time") seekbarBox.current.innerHTML = formatTime(newTime)

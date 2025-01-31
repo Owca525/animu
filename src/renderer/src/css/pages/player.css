@@ -26,11 +26,6 @@
   pointer-events: none;
 }
 
-.time-slider {
-  width: 100%;
-  pointer-events: all;
-}
-
 .mask {
   mask-image: linear-gradient(
     to bottom,
