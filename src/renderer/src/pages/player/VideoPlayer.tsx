@@ -117,12 +117,20 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
         }
     }
 
+    function setNewUrl(host: string) {
+        if (episodesUrl.length <= 1) return
+        const value = episodesUrl.findIndex((value) => value.hostname == host)
+        if (value < 0) return
+        if (episodesUrl[value+1] == undefined) return
+        checkUrl(episodesUrl[value+1])
+    }
+
     async function checkUrl(data: playerUrlProps) {
         if (!videoRef.current) return
         const time = videoRef.current.currentTime
         if (data.hls) {
-            await runHLS(data.url)
-            setHost(data.hostname)
+            setHost(() => data.hostname)
+            await runHLS(data.url, data.hostname)
             return
         }
         if (hls) hls.destroy()
@@ -133,12 +141,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
         videoRef.current.currentTime = time
     }
 
-    async function runHLS(url: string) {
+    async function runHLS(url: string, host: string) {
         const hlsModule = (await import('hls.js')).default;
 
         const hls = new hlsModule({
-            capLevelToPlayerSize: true,
-            enableWorker: true,
             maxBufferLength: 30,
         });
 
@@ -164,7 +170,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
                     switch (data.type) {
                         case hlsModule.ErrorTypes.NETWORK_ERROR:
                             message = t('player.errors.MEDIA_ERR_NETWORK')
-                            hls.startLoad();
+                            hls.destroy()
+                            setNewUrl(host)
+                            // hls.startLoad();
                             break;
                         case hlsModule.ErrorTypes.MEDIA_ERROR:
                             message = t('player.errors.MEDIA_ERR_DECODE')
