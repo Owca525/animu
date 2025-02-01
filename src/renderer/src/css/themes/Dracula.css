@@ -275,3 +275,82 @@ button {
 .information-background {
   background-color: var(--bg);
 }
+
+.dropdown-container {
+  border: none;
+  outline: none;
+}
+
+.seekBar-container {
+  background-color: var(--bg4);
+  border-radius: 12px;
+}
+
+.seekbar-progress {
+  background-color: var(--neutral1);
+  border-radius: 12px;
+}
+
+.seekbar-thumb {
+  background-color: var(--neutral1);
+}
+
+.seekbar-box {
+  background-color: rgb(30, 30, 30, 0.8);
+  border-radius: 12px;
+}
+
+.player-seekbar {
+  background-color: rgb(50, 50, 50, 0.5);
+}
+
+.player-loading-container {
+  background-color: rgb(30, 30, 30, 0.8);
+  padding: 8px;
+  border-radius: 24px;
+}
+
+.player-settings-container {
+  background-color: rgb(30, 30, 30, 0.8);
+}
+
+.up-Next-container {
+  background-color: rgb(30, 30, 30, 0.8);
+}
+
+.player-dev-container {
+  background-color: rgb(30, 30, 30, 0.8);
+}
+
+.settings-input {
+  outline: none;
+  background-color: var(--bg3);
+  color: var(--text);
+  transition: background-color 150ms ease;
+  border-radius: 12px 0px 0px 12px;
+  border: 2px solid var(--bg3);
+  border-right: 0px;
+}
+.settings-input-type {
+  background-color: var(--bg3);
+  color: var(--text);
+  border-radius: 0px 12px 12px 0px;
+  text-align: center;
+  border: 2px solid var(--bg3);
+  border-width: 2px 2px 2px 0px;
+}
+.settings-input:hover {
+  background-color: var(--bg4);
+}
+.settings-input:hover + .settings-input-type {
+  background-color: var(--bg4);
+}
+.settings-input:focus {
+  border: solid 2px var(--neutral1);
+  border-width: 2px 0px 2px 2px;
+}
+
+.settings-input:focus + .settings-input-type {
+  border: solid 2px var(--neutral1);
+  border-width: 2px 2px 2px 0px;
+}
