@@ -6,6 +6,7 @@ import { lazy, useContext, useState } from "react";
 import { configContext } from "@renderer/utils/context/small";
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
 import { useTranslation } from "react-i18next";
+import useHotkeys from "@reecelucas/react-use-hotkeys";
 
 const VideoPlayer = lazy(() => import('./VideoPlayer'));
 
@@ -51,10 +52,16 @@ const player = () => {
         refetch({ exact: true })
     }
 
+    useHotkeys("Escape", () => {
+        navigate("/")
+    });
+
     if (isLoading) {
         return (
             <div className="video-container" style={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <div className="player-waiting material-symbols-outlined loading" style={{ maxHeight: "min-content" }}>progress_activity</div>
+                <div className="player-loading-container" style={{ maxHeight: "min-content" }}>
+                    <div className="player-waiting material-symbols-outlined">progress_activity</div>
+                </div>
             </div>
         )
     }
