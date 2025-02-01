@@ -354,3 +354,7 @@ button {
   border: solid 2px var(--neutral1);
   border-width: 2px 2px 2px 0px;
 }
+
+::selection {
+  background-color: var(--neutral1);
+}

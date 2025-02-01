@@ -373,3 +373,7 @@ button {
 .settings-save-text {
   color: white;
 }
+
+::selection {
+  background-color: var(--neutral1);
+}
