@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import useHotkeys from "@reecelucas/react-use-hotkeys";
 
 const VideoPlayer = lazy(() => import('./VideoPlayer'));
+// const ExternalPlayer = lazy(() => import('./externalPlayer'));
 
 async function fetchEpisodeData({ queryKey }): Promise<playerUrlProps[]> {
     return await get_player_anime(queryKey[0], queryKey[1])
@@ -70,6 +71,12 @@ const player = () => {
         showDialog({ header_text: t("errors.playerHeaderError"), text: t("errors.playerCantFind"), buttons: buttons })
         return
     }
+
+    // if (true) {
+    //     return (
+    //         <ExternalPlayer />
+    //     )
+    // }
 
     if (data) {
         return (
