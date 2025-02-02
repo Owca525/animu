@@ -89,7 +89,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
         checkUrl(episodesUrl[0])
         handleVolume(PlayerVolume)
         handleMouseMove()
-        if (config.Player.general.AutoFullscreen) enterFullscreen()
+        if (config.Player.general.AutoFullscreen) {
+            window.BrowserWindow.setFullscreen(true)
+            setIsFullscreen(true)
+        }
         if (videoRef.current) videoRef.current.currentTime = time
     }, [])
 
