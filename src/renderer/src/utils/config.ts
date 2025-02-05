@@ -56,7 +56,8 @@ export const defaultConfig: SettingsConfig = {
   Developer: {
     DeveloperMode: false,
     DevTools: false,
-    DevToolsOnStart: false
+    DevToolsOnStart: false,
+    playerDebug: false
   },
   update: {
     lastTime: "0",

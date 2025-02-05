@@ -104,6 +104,7 @@ export interface SettingsConfig {
     DeveloperMode: boolean
     DevTools: boolean
     DevToolsOnStart: boolean
+    playerDebug: boolean
   }
   update: {
     lastTime: string

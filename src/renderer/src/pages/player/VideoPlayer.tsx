@@ -582,7 +582,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
             {showNerdStats && (
                 <NerdStats video={videoRef} volume={volume} currentTime={currentTime} />
             )}
-            {config.Developer.DevTools && (
+            {config.Developer.playerDebug && (
                 <DeveloperStats
                     isMuted={isMuted}
                     isFullscreen={isFullscreen}

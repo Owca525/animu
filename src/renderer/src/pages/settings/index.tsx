@@ -598,6 +598,13 @@ const Settings = () => {
                     handleChange('Developer.DevToolsOnStart', event.currentTarget.checked)
                   }
                 />
+                <Checkbox
+                  title="PlayerDebug Stats"
+                  checked={config.new.Developer.playerDebug}
+                  onClick={(event) =>
+                    handleChange('Developer.playerDebug', event.currentTarget.checked)
+                  }
+                />
               </div>
               {/* <div className="settings-space">
               <div className="text">Other</div>
