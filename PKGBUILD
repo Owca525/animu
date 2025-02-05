@@ -1,6 +1,6 @@
 
 pkgname=animu
-pkgver=0.4.9
+pkgver=0.4.10
 pkgrel=1
 pkgdesc="Simple Application To Watch Anime"
 arch=('x86_64')
