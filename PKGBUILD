@@ -9,7 +9,7 @@ license=('GNU')
 depends=('libxss' 'nss' 'glibc')
 options=('!strip' '!emptydirs')
 source_x86_64=("https://github.com/Owca525/animu/releases/download/v$pkgver/animu_"$pkgver"_amd64.deb")
-sha256sums_x86_64=('c2737a06e3778bb530c7c7d24b1a1c68d61ced14f33928b66a0045a6cefcecc9')
+sha256sums_x86_64=('f5f9110d2158964d50fa738bfbec1465dfa38efd4d6c818dd9333e8a12a72acc')
 
 package() {
 
