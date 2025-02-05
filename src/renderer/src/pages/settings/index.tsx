@@ -598,6 +598,7 @@ const Settings = () => {
                     handleChange('Developer.DevToolsOnStart', event.currentTarget.checked)
                   }
                 />
+                <div className="border-settings"></div>
                 <Checkbox
                   title="PlayerDebug Stats"
                   checked={config.new.Developer.playerDebug}
