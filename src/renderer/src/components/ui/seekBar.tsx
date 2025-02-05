@@ -73,10 +73,10 @@ const SeekBar: React.FC<SeekBarProps> = ({
     const newTime = (offsetX / rect.width) * maxValue;
     if (!(newTime >= 0 && newTime <= maxValue)) return
 
-    seekbarBox.current.style.left = `${Math.round(newTime / maxValue * 100)}%`
+    seekbarBox.current.style.left = `${newTime / maxValue * 100}%`
     if (screen) {
-      if (Math.round(newTime / maxValue * 100) > 98) seekbarBox.current.style.left = `98%`
-      if (Math.round(newTime / maxValue * 100) < 1.5) seekbarBox.current.style.left = `1.5%`
+      if (newTime / maxValue * 100 > 98) seekbarBox.current.style.left = `98%`
+      if (newTime / maxValue * 100 < 1.5) seekbarBox.current.style.left = `1.5%`
     }
 
     if (type === "value") seekbarBox.current.innerHTML = newTime.toFixed(0)
