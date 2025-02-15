@@ -67,7 +67,7 @@ const player = () => {
         closeDialog()
     }
 
-    if (data && data.length === 0) {
+    if (data && data.length === 0 && isLoading == false) {
         showDialog({ header_text: t("errors.playerHeaderError"), text: t("errors.playerCantFind"), buttons: buttons })
     }
 
