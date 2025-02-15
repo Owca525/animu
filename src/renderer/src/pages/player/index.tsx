@@ -2,7 +2,7 @@ import { get_player_anime } from "@renderer/utils/backend";
 import { playerUrlProps } from "@renderer/utils/interface";
 import { useQuery } from "react-query";
 import { useLocation, useNavigate } from "react-router-dom"
-import { lazy, useContext, useState } from "react";
+import { lazy, Suspense, useContext, useState } from "react";
 import { configContext } from "@renderer/utils/context/small";
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
 import { useTranslation } from "react-i18next";
@@ -28,7 +28,7 @@ const player = () => {
         fetchEpisodeData,
     );
 
-    const buttons = [{ title: t('general.ok'), onClick: () => { closeDialog(); navigate("/") } }, { title: t('general.reload'), onClick: async () => { closeDialog(); refetch({ exact: true }) } }]
+    const buttons = [{ title: t('general.ok'), onClick: () => leave() }, { title: t('general.reload'), onClick: async () => { closeDialog(); refetch({ exact: true }) } }]
 
     function setNewEpisode(type: string) {
         navigate('/player', {
@@ -58,22 +58,17 @@ const player = () => {
     }
 
     useHotkeys("Escape", () => {
-        navigate("/")
+        leave()
     });
 
-    if (isLoading) {
-        return (
-            <div className="video-container" style={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-                <div className="player-loading-container" style={{ maxHeight: "min-content" }}>
-                    <div className="player-waiting material-symbols-outlined">progress_activity</div>
-                </div>
-            </div>
-        )
+    function leave() {
+        navigate("/")
+        window.BrowserWindow.setFullscreen(false)
+        closeDialog()
     }
 
     if (data && data.length === 0) {
         showDialog({ header_text: t("errors.playerHeaderError"), text: t("errors.playerCantFind"), buttons: buttons })
-        return
     }
 
     // if (true) {
@@ -82,9 +77,9 @@ const player = () => {
     //     )
     // }
 
-    if (data) {
+    if (data && data.length !== 0 && isLoading == false) {
         return (
-            <>
+            <Suspense fallback={loadingAnimation()}>
                 <VideoPlayer
                     id={id}
                     img={img}
@@ -97,10 +92,20 @@ const player = () => {
                     volumeCacheFunc={setPlayerVolume}
                     PlayerVolume={playerVolume}
                 />
-            </>
+            </Suspense>
         )
     }
-    return
+    return loadingAnimation()
+}
+
+function loadingAnimation() {
+    return (
+        <div className="video-container" style={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <div className="player-loading-container" style={{ maxHeight: "min-content" }}>
+                <div className="player-waiting material-symbols-outlined">progress_activity</div>
+            </div>
+        </div>
+    )
 }
 
 export default player
