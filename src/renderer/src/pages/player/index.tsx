@@ -45,6 +45,10 @@ const player = () => {
             let ep = episodes.indexOf(old.episode.ep)
             if (type == 'prev') ep = ep - 1
             if (type == 'next') ep = ep + 1
+            if (episodes[ep] === undefined) return {
+                id: old.id,
+                episode: old.episode
+            }
             return {
                 id: old.id,
                 episode: { type: old.episode.type, ep: episodes[ep] }
