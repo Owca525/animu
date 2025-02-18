@@ -30,6 +30,9 @@ const player = () => {
     const { data, isLoading, refetch } = useQuery(
         [extractionData.id, extractionData.episode, buttons],
         fetchEpisodeData,
+        {
+            refetchOnWindowFocus: false,
+        }
     );
 
     function setNewEpisode(type: string) {
