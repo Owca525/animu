@@ -4,15 +4,18 @@ import { useQuery } from "react-query";
 import { useLocation, useNavigate } from "react-router-dom"
 import { lazy, Suspense, useContext, useState } from "react";
 import { configContext } from "@renderer/utils/context/small";
-import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
+import { closeDialog, dialogIsOpen, showDialog } from "@renderer/utils/context/DialogContext";
 import { useTranslation } from "react-i18next";
 import useHotkeys from "@reecelucas/react-use-hotkeys";
+import i18n from "@renderer/utils/i18n";
 
 const VideoPlayer = lazy(() => import('./VideoPlayer'));
 // const ExternalPlayer = lazy(() => import('./externalPlayer'));
 
 async function fetchEpisodeData({ queryKey }): Promise<playerUrlProps[]> {
-    return await get_player_anime(queryKey[0], queryKey[1])
+    const data = await get_player_anime(queryKey[0], queryKey[1])
+    if (data.length == 0 && dialogIsOpen() == false) showDialog({ header_text: i18n.t("errors.playerHeaderError"), text: i18n.t("errors.playerCantFind"), buttons: queryKey[2] })
+    return data
 }
 
 const player = () => {
@@ -23,12 +26,11 @@ const player = () => {
 
     const [playerVolume, setPlayerVolume] = useState<number>(config.Player.general.Volume)
     const [extractionData, setextractionData] = useState<{ id: string, episode: { type: string, ep: number } }>({ id: id, episode: episode })
+    const buttons = [{ title: t('general.ok'), onClick: () => leave() }, { title: t('general.reload'), onClick: async () => { closeDialog(); refetch({ exact: true }) } }]
     const { data, isLoading, refetch } = useQuery(
-        [extractionData.id, extractionData.episode],
+        [extractionData.id, extractionData.episode, buttons],
         fetchEpisodeData,
     );
-
-    const buttons = [{ title: t('general.ok'), onClick: () => leave() }, { title: t('general.reload'), onClick: async () => { closeDialog(); refetch({ exact: true }) } }]
 
     function setNewEpisode(type: string) {
         navigate('/player', {
@@ -65,10 +67,6 @@ const player = () => {
         navigate("/")
         window.BrowserWindow.setFullscreen(false)
         closeDialog()
-    }
-
-    if (data && data.length === 0 && isLoading == false) {
-        showDialog({ header_text: t("errors.playerHeaderError"), text: t("errors.playerCantFind"), buttons: buttons })
     }
 
     // if (true) {
