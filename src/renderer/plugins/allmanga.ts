@@ -60,9 +60,7 @@ function decodeText(textString: string): string {
 
 async function sendRequest(url: any, header: any) {
   let data = await window.api.request.get(url, header)
-  if (data.success) {
-    return data.data
-  }
+  if (data.success) return data.data
   return null
 }
 
@@ -72,21 +70,19 @@ export async function SearchAnime(name: string) {
   let url = API_WEB + `/api?variables=${variables}&extensions=${extensions}`
 
   const resp = await sendRequest(url, header)
-  if (resp) {
-    return resp.data
-  }
+  console.log(resp)
+  if (resp) return resp.data
   return null
 }
 
 export async function getRecentAnime() {
-  let variables = `{"search":{"sortBy":"Recent"},"limit":26,"page":1,"translationType":"sub","countryOrigin":"ALL"}`
+  let variables = `{"search":{"sortBy":"Recent"},"limit":26,"page":1,"translationType":"sub","countryOrigin":"JP"}`
   let extensions = `{"persistedQuery":{"version":1,"sha256Hash": "${HASH_SEARCH}"}}`
   let url = API_WEB + `/api?variables=${variables}&extensions=${extensions}`
 
   const resp = await sendRequest(url, header)
-  if (resp) {
-    return resp.data
-  }
+  console.log(resp)
+  if (resp) return resp.data
   return null
 }
 
@@ -96,9 +92,8 @@ export async function getInformation(id: string) {
   let url = API_WEB + `/api?variables=${variables}&extensions=${extensions}`
 
   const resp = await sendRequest(url, header)
-  if (resp) {
-    return resp.data
-  }
+  console.log(resp)
+  if (resp) return resp.data
   return null
 }
 
@@ -110,6 +105,7 @@ export async function getPlayerUrls(id: string, episode: string, type: string): 
   let listUrls: playerUrlProps[] = []
 
   const resp = await sendRequest(url, header)
+  console.log(resp)
   if (!resp) return null
   if (resp.data.episode === null) return null
 
