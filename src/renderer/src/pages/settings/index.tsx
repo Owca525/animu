@@ -272,6 +272,7 @@ const Settings = () => {
                   if (!prev) return undefined
                   return { old: structuredClone(prev.old), new: structuredClone(prev.old) }
                 })
+                setisConfigChanges(() => false)
               }} />
               <Button value='save' className='settings-save-button' onClick={() => { saveConf(); setisConfigChanges(() => false) }} />
             </div>
