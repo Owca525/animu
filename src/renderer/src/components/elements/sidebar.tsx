@@ -3,6 +3,7 @@ import { SidebarProps } from '../../utils/interface'
 import '../../css/elements/sidebar.css'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import icon from "../../../../../resources/icon.png"
 
 const Sidebar: React.FC<SidebarProps> = ({
   class: className,
@@ -44,9 +45,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   return (
     <div className={changeClass()} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <div className="top-sidebar">
-        {showVersion && <div className="sidebar-version">Animu v{version}</div>}
-        {showVersion && <div className="border"></div>}
-        {!onlyMax && (
+        {showVersion && onlyMax && <div className="sidebar-version">Animu v{version}</div>}
+        {showVersion && !onlyMax && <img src={icon} className='AnimuIcon' title='Animu Icon' />}
+        {!onlyMax && !showVersion && (
           <Button
             value={
               isMaxSidebar
@@ -60,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             onClick={() => setIsMaxSidebar((prevState) => !prevState)}
           />
         )}
-        {!onlyMax && <div className="border"></div>}
+        <div className="border"></div>
         {top.length > 0
           ? top.map((button) => (
               <Button

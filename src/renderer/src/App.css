@@ -25,6 +25,11 @@ body {
   animation: spin 1s linear infinite;
 }
 
+.AnimuIcon {
+  width: 38px;
+  height: 38px;
+}
+
 .loaded {
   opacity: 1;
 }
