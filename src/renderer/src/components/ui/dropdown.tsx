@@ -36,6 +36,7 @@ const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '' }) => {
               key={option.value}
               className="dropdown-item"
               onClick={() => handleOptionClick(option)}
+              title={option.label}
             >
               {option.label}
             </li>
