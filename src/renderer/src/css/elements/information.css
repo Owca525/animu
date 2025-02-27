@@ -17,7 +17,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 70%;
+  height: 72%;
   object-fit: cover;
   z-index: 0;
 }
@@ -27,7 +27,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 50%;
+  height: 55%;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 10%, rgba(0, 0, 0, 1) 100%);
 }
 
@@ -36,9 +36,10 @@
   flex-direction: column;
   max-width: 80vw;
   width: 100%;
-  height: 100vh;
+  height: 90vh;
   z-index: 1;
-  margin-top: 30em;
+  margin: 40px;
+  margin-top: 30vw;
   gap: 1em;
 }
 
@@ -66,7 +67,18 @@
   max-height: 250px;
   height: auto;
   width: auto;
-  margin-top: -50px;
+  margin-top: -30px;
+  position: relative;
+  border-radius: 12px;
+}
+
+.information-image-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 180px;
+  height: 250px;
+  margin-top: -30px;
   position: relative;
   border-radius: 12px;
 }
@@ -136,14 +148,6 @@
   display: flex;
   flex-direction: column;
   gap: 0.5em;
-}
-
-.information-image-placeholder {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 180px;
-  height: 250px;
 }
 
 .information-buttons-episode-container {
