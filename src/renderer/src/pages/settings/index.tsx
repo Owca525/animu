@@ -241,6 +241,18 @@ const Settings = () => {
     handleChange('General.language', lang)
   }
 
+  function convertUpdateOption(text: string): string { 
+    switch (text){
+      case "start":
+        return "On Start"
+      case "day":
+        return "Every Day"
+      case "week":
+        return "Week"
+    }
+    return text
+  }
+
   return isLoading ? (
     <div className="settings-container">
       <ContextMenu items={menuItems} />
@@ -331,7 +343,7 @@ const Settings = () => {
                   { label: "Every Day", value: "Every Day", onClick: () => handleChange('update.type', "day") },
                   { label: "Week", value: "Week", onClick: () => handleChange('update.type', "week") }
                 ]
-                } placeholder={config.new.update.type}
+                } placeholder={convertUpdateOption(config.new.update.type)}
                 />
               </div>
             </div>
