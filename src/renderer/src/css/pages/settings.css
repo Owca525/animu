@@ -68,7 +68,6 @@
   text-align: right;
   font-size: large;
   width: 100%;
-  max-width: 5vw;
   padding: 8px 0px;
   transition: border-color 100ms ease;
 }
@@ -82,7 +81,8 @@
 .settings-input-container {
   display: flex;
   align-items: end;
-  width: 10%;
+  width: max-content;
+  max-width: 130px;
 }
 
 .settings-loading {
