@@ -13,7 +13,7 @@ import Dropdown from '../../components/ui/dropdown'
 // import CustomSlider from '@renderer/components/ui/customSlider'
 
 // utils
-import { readConfig, saveConfig } from '../../utils/config'
+import { checkPictureFolder, readConfig, saveConfig } from '../../utils/config'
 import { ListItem, notificationProps, SettingsConfig } from '../../utils/interface'
 
 import '../../css/pages/settings.css'
@@ -228,9 +228,12 @@ const Settings = () => {
     return ''
   }
 
-  function changePathScreenshot(path: string) {
-    if (path == "") return
-    handleChange("Player.screenShot.path", path)
+  async function changePathScreenshot(path: string) {
+    if (path) {
+      handleChange("Player.screenShot.path", path)
+      return
+    }
+    handleChange("Player.screenShot.path", await checkPictureFolder())
   }
 
   const changeLang = (lang: string) => {
@@ -510,7 +513,7 @@ const Settings = () => {
               />
               <div className="border-settings"></div>
               <div className="same-space">
-                <span style={{ marginTop: "10px", marginBottom: "10px" }}>{t("settings.screenshot.path")}<span className="curret-settings"> {config.new.Player.screenShot.path}</span></span> <Button value='Change path' className='settings-button' onClick={async () => changePathScreenshot(await window.api.os.openDialog(undefined, undefined, ["openDirectory"]))} />
+                <span style={{ marginTop: "10px", marginBottom: "10px" }}>{t("settings.screenshot.path")}<span className="curret-settings"> {config.new.Player.screenShot.path}</span></span> <Button value='Change path' className='settings-button' onClick={async () => await changePathScreenshot(await window.api.os.openDialog(undefined, undefined, ["openDirectory"]))} />
               </div>
             </div>
             <div className="settings-space">
@@ -646,3 +649,4 @@ const Settings = () => {
 // }
 
 export default Settings
+

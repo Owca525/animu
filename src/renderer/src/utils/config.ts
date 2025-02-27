@@ -68,7 +68,7 @@ export const defaultConfig: SettingsConfig = {
 
 const appConfigDirPath = window.api.os.getPath("userData");
 
-async function checkPictureFolder(): Promise<string> {
+export async function checkPictureFolder(): Promise<string> {
   const path = await window.api.os.getPath("pictures");
   if (await window.api.os.exists(path + "/animu") == false) {
     window.api.os.mkdir(path + "/animu");
