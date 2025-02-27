@@ -112,9 +112,9 @@
     "hContinueMax": "If there is less seconds to the end of an episode than the max time it won't be saved in Continue Watching tab"
   },
   "lang": {
-    "english": "English",
-    "polish": "Polish",
-    "hungary": "Hungarian"
+    "en": "English",
+    "pl": "Polish",
+    "hu": "Hungarian"
   },
   "contextMenu": {
     "reload": "Reload"

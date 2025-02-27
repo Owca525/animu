@@ -10,24 +10,26 @@ interface DropdownOption {
 interface DropdownProps {
   options: DropdownOption[] | undefined
   placeholder: string
+  placeholderChange?: () => string;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '' }) => {
+const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '', placeholderChange }) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [selectedOption, setSelectedOption] = useState<DropdownOption | null>(null)
+  const [text, setText] = useState<string>(placeholder)
 
   const toggleDropdown = () => setIsOpen(prev => !prev)
 
   const handleOptionClick = (option: DropdownOption) => {
-    setSelectedOption(option)
     setIsOpen(false)
     if (option.onClick) option.onClick()
+    setText(() => option.label)
+    if (placeholderChange) setText(() => placeholderChange())
   }
 
   return (
     <div className="dropdown-container">
       <div className="dropdown-button" onClick={toggleDropdown}>
-        {selectedOption ? selectedOption.label : placeholder}
+        {text}
       </div>
       {isOpen && options && (
         <ul className="dropdown-menu" onMouseLeave={() => setIsOpen(false)}>

@@ -112,9 +112,9 @@
     "hContinueMax": "Jeśli zostało mnie sekund do końca odcinka niż czas maksymalny to nie zostanie zapisany w oglądaj ponownie"
   },
   "lang": {
-    "english": "Angielski",
-    "polish": "Polski",
-    "hungary": "Węgierski"
+    "en": "Angielski",
+    "pl": "Polski",
+    "hu": "Węgierski"
   },
   "contextMenu": {
     "reload": "Przeładuj"

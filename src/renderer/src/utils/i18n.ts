@@ -8,7 +8,7 @@ import LangHungarian from './locales/hungarian.json'
 i18n.use(initReactI18next).init({
   lng: 'en',
   fallbackLng: 'en',
-  debug: true,
+  debug: false,
   resources: {
     en: {
       translation: LangEnglish

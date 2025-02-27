@@ -112,9 +112,9 @@
     "hContinueMax": "Ha egy epizód végéig kevesebb másodperc van, mint a maximális idő, akkor a rendszer nem menti el a Megtekintés folytatása lapon"
   },
   "lang": {
-    "english": "angol",
-    "polish": "lengyel",
-    "hungary": "Magyar"
+    "en": "angol",
+    "pl": "lengyel",
+    "hu": "Magyar"
   },
   "contextMenu": {
     "reload": "újratölt"

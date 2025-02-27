@@ -85,9 +85,9 @@ const Settings = () => {
   ]
 
   const language = [
-    { label: t('lang.english'), value: 'en', onClick: () => changeLang('en') },
-    { label: t('lang.polish'), value: 'pl', onClick: () => changeLang('pl') },
-    { label: t('lang.hungary'), value: 'hu', onClick: () => changeLang('hu') }
+    { label: t('lang.en'), value: 'en', onClick: () => changeLang('en') },
+    { label: t('lang.pl'), value: 'pl', onClick: () => changeLang('pl') },
+    { label: t('lang.hu'), value: 'hu', onClick: () => changeLang('hu') }
   ]
 
   const playerType = [
@@ -109,7 +109,6 @@ const Settings = () => {
       setConfig({ old: structuredClone(tmpConfig), new: structuredClone(tmpConfig) })
     })
     checkThemes()
-
     window.api.rpc.setActivity(undefined, t("status.settings"))
     handleResize()
     window.addEventListener('resize', handleResize);
@@ -220,14 +219,6 @@ const Settings = () => {
     })
   }
 
-  const checkLang = (lang: string) => {
-    for (let i = 0; i < language.length; i++) {
-      const element = language[i]
-      if (element.value == lang) return element.label
-    }
-    return ''
-  }
-
   async function changePathScreenshot(path: string) {
     if (path) {
       handleChange("Player.screenShot.path", path)
@@ -238,6 +229,8 @@ const Settings = () => {
 
   const changeLang = (lang: string) => {
     i18n.changeLanguage(lang)
+    console.log(i18n.t(`lang.${lang}`))
+    console.log(lang)
     handleChange('General.language', lang)
   }
 
@@ -316,7 +309,7 @@ const Settings = () => {
               <div className="border-settings"></div>
               <div className="same-space">
                 {t('settings.general.language')}
-                <Dropdown options={language} placeholder={checkLang(config.new.General.language)} />
+                <Dropdown options={language} placeholder={t(`lang.${i18n.language}`)} placeholderChange={() => t(`lang.${i18n.language}`)} />
               </div>
             </div>
             <div className="settings-space">
