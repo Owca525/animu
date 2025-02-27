@@ -262,17 +262,19 @@ const Settings = () => {
     <>
       {isConfigChanges && (
         <div className="settings-save-container">
-          <div className="settings-save-text">
-            Hey! config has changed, please save.
-          </div>
-          <div className="settings-save-buttons">
-            <Button value='reset' className='settings-save-button' onClick={() => {
-              setConfig((prev) => {
-                if (!prev) return undefined
-                return { old: structuredClone(prev.old), new: structuredClone(prev.old) }
-              })
-            }} />
-            <Button value='save' className='settings-save-button' onClick={() => { saveConf(); setisConfigChanges(() => false) }} />
+          <div className='settings-save-box'>
+            <div className="settings-save-text">
+              Hey! config has changed, please save.
+            </div>
+            <div className="settings-save-buttons">
+              <Button value='reset' className='settings-save-button' onClick={() => {
+                setConfig((prev) => {
+                  if (!prev) return undefined
+                  return { old: structuredClone(prev.old), new: structuredClone(prev.old) }
+                })
+              }} />
+              <Button value='save' className='settings-save-button' onClick={() => { saveConf(); setisConfigChanges(() => false) }} />
+            </div>
           </div>
         </div>
       )}

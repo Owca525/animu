@@ -139,15 +139,19 @@
 .settings-save-container {
   position: fixed;
   bottom: 0;
-  margin-left: 40vw;
-  margin-bottom: 30px;
+  right: 0;
+  left: 0;
   z-index: 99999;
+  display: flex;
+  justify-self: center;
+  padding: 12px;
+}
+
+.settings-save-box {
   padding: 12px;
   display: flex;
   gap: 1em;
-
-  background-color: rgb(0, 0, 0, 0.8);
-  border-radius: 12px;
+  width: max-content;
 }
 
 .settings-save-text {
