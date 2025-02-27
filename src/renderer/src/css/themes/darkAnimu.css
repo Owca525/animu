@@ -351,3 +351,6 @@ button {
 .settings-save-button {
   background-color: var(--bg4);
 }
+.settings-save-button:hover {
+  background-color: var(--bg3);
+}
