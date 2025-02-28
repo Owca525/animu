@@ -139,6 +139,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
         if (hls) hls.destroy()
 
         setResolution(data.res[0].resolution)
+        setListResolution(() => [parseInt(data.res[0].resolution)])
         setHost(data.hostname)
         videoRef.current.src = data.url
         videoRef.current.currentTime = time
