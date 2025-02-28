@@ -115,8 +115,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
 
     function setRes(res: number | undefined) {
         if (res && hls) {
-            hls.currentLevel = hls.levels.findIndex(level => level.height === res);
             setResolution(res)
+            hls.currentLevel = hls.levels.findIndex(level => level.height === res);
         }
     }
 
@@ -165,6 +165,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
                 setListResolution(resolutions)
                 resolutions.reverse()
                 setRes(resolutions[0])
+                setResolution(resolutions[0])
             });
 
             hls.on(hlsModule.Events.ERROR, (_event, data) => {
@@ -523,7 +524,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
                                         <span className="material-symbols-outlined player-settings-button-text">arrow_back</span><span className="player-settings-button-text">Urls</span>
                                     </div>
                                     {episodesUrl.map((data) => (
-                                        <div className="player-settings-button" onClick={() => checkUrl(episodesUrl[episodesUrl.findIndex((item) => item.hostname === data.hostname)])}>
+                                        <div className="player-settings-button" onClick={() => {checkUrl(episodesUrl[episodesUrl.findIndex((item) => item.hostname === data.hostname)]); setcurrentSettings("")}}>
                                             <span className="player-settings-button-text">{data.hostname}</span>
                                         </div>
                                     ))}
@@ -535,7 +536,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
                                         <span className="material-symbols-outlined">arrow_back</span><span>Resolution</span>
                                     </div>
                                     {ListResolution.map((data) => (
-                                        <div className="player-settings-button" onClick={() => { setcurrentSettings(data.toLocaleString()); setRes(data) }}>
+                                        <div className="player-settings-button" onClick={() => { setcurrentSettings("settings"); setRes(data) }}>
                                             <span className="player-settings-button-text">{data.toString() + "p"}</span>
                                         </div>
                                     ))}
