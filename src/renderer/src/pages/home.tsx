@@ -29,6 +29,7 @@ function home() {
 
   const [data, setData] = useState<ContainerProps>({ title: '', data: [] })
   const [loading, setLoading] = useState(true)
+  const [SidebarHover, setSidebarHover] = useState<boolean>(false)
 
   const sidebarHomeTopData = [
     {
@@ -88,7 +89,7 @@ function home() {
   }
 
   useEffect(() => {
-    get_recent().then(( value ) => {
+    get_recent().then((value) => {
       change_content({
         title: t('sidebar.RecentAnime'),
         data: value
@@ -130,26 +131,46 @@ function home() {
     })
   });
 
+  useHotkeys("Tab", (event) => {
+    event.preventDefault()
+    toogleHoverSidebar()
+  });
+
+  function toogleHoverSidebar() {
+    setSidebarHover((prev: boolean) => !prev)
+  }
+
+  function createSidebar() {
+    return (
+      <Sidebar
+        top={sidebarHomeTopData}
+        bottom={sidebarHomeBottomData}
+        sidebarHover={config.General.HoverSidebar}
+        class='home-sidebar'
+        onlyMax={SidebarHover}
+      />
+    )
+  }
+
   if (config) {
     return (
-      <main className="container">
+      <>
         <ContextMenu items={menuItems} />
-        <Sidebar
-          top={sidebarHomeTopData}
-          bottom={sidebarHomeBottomData}
-          sidebarHover={config.General.HoverSidebar}
-        />
-        <Header onInputChange={handleInputChange} />
-        {loading ? (
-          <div className="content loading-home">
-            <div className="card-content-loading loading material-symbols-outlined">
-              progress_activity
+        <main className="container">
+          <Header onInputChange={handleInputChange} className='home-header' onToggleHover={toogleHoverSidebar} />
+          {config.General.HideSidebar == false && <>{createSidebar()} <div className="fake-sidebar"></div></>}
+          {SidebarHover && createSidebar()}
+          {loading ? (
+            <div className="content loading-home">
+              <div className="card-content-loading loading material-symbols-outlined">
+                progress_activity
+              </div>
             </div>
-          </div>
-        ) : (
-          <Content title={data.title} data={data.data} />
-        )}
-      </main>
+          ) : (
+            <Content title={data.title} data={data.data} className='home-content' />
+          )}
+        </main>
+      </>
     )
   }
   return

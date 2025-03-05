@@ -44,6 +44,7 @@ export interface SidebarProps {
 
 interface SettingsConfigGeneral {
   HoverSidebar: boolean
+  HideSidebar: boolean
   language: string
   theme: string
   Window: {

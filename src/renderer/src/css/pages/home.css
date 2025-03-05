@@ -11,3 +11,28 @@
   justify-content: center;
   align-items: center;
 }
+
+.container {
+  width: 100%;
+  height: 100vh;
+
+  display: grid;
+  grid-template-rows: 1fr 100fr;
+  grid-template-columns: 1fr 100fr;
+  grid-template-areas: "header header" "sidebar content";
+}
+
+.home-header {
+  grid-area: header;
+}
+.home-sidebar {
+  grid-area: sidebar;
+}
+.fake-sidebar {
+  grid-area: sidebar;
+  width: 65px;
+  height: calc(100vh - 50px);
+}
+.home-content {
+  grid-area: content;
+}

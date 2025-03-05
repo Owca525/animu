@@ -4,6 +4,7 @@ import { SettingsConfig } from "./interface";
 export const defaultConfig: SettingsConfig = {
   General: {
     HoverSidebar: true,
+    HideSidebar: false,
     language: "en",
     theme: "darkAnimu",
     Window: {

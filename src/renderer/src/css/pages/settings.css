@@ -40,6 +40,9 @@
 
 .sidebar-first {
   position: relative;
+  height: 100vh;
+  margin: 0px;
+  padding-top: 10px;
 }
 
 .text {

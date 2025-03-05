@@ -5,11 +5,9 @@
 .content-container {
   display: flex;
   flex-direction: column;
-  margin-right: 2em;
-  margin-left: 6em;
-  margin-top: 4.5em;
-  margin-bottom: 2em;
+  padding: clamp(12px, 1vw, 20px);
   gap: 1em;
+  overflow: auto;
 }
 .card-content-container {
   gap: clamp(14px, 1vw, 28px);

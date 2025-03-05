@@ -2,7 +2,6 @@ import Button from '../ui/button'
 import { SidebarProps } from '../../utils/interface'
 import '../../css/elements/sidebar.css'
 import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import icon from "../../../../../resources/icon.png"
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -15,8 +14,6 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const [isMaxSidebar, setIsMaxSidebar] = useState(false)
   const [version, setversion] = useState<any>()
-
-  const { t } = useTranslation()
 
   const getAndSetVersion = async (): Promise<void> => setversion(await window.backend.version())
 
@@ -47,20 +44,6 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className="top-sidebar">
         {showVersion && onlyMax && <div className="sidebar-version">Animu v{version}</div>}
         {showVersion && !onlyMax && <img src={icon} className='AnimuIcon' title='Animu Icon' />}
-        {!onlyMax && !showVersion && (
-          <Button
-            value={
-              isMaxSidebar
-                ? '<div class="material-symbols-outlined text-button">arrow_back</div>' +
-                  t('sidebar.Minimize')
-                : '<div class="material-symbols-outlined text-button">arrow_forward</div>'
-            }
-            className="icon-button"
-            title={isMaxSidebar ? t('sidebar.Minimize') : t('sidebar.Maximize')}
-            type={isMaxSidebar ? 'icon-text' : 'icon'}
-            onClick={() => setIsMaxSidebar((prevState) => !prevState)}
-          />
-        )}
         <div className="border"></div>
         {top.length > 0
           ? top.map((button) => (

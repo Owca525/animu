@@ -307,6 +307,14 @@ const Settings = () => {
                 }
               />
               <div className="border-settings"></div>
+              <Checkbox
+                title={"Hide Sidebar"}
+                checked={config.new.General.HideSidebar}
+                onClick={(event) =>
+                  handleChange('General.HideSidebar', event.currentTarget.checked)
+                }
+              />
+              <div className="border-settings"></div>
               <div className="same-space">
                 {t('settings.general.language')}
                 <Dropdown options={language} placeholder={t(`lang.${i18n.language}`)} placeholderChange={() => t(`lang.${i18n.language}`)} />
