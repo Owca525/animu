@@ -18,6 +18,7 @@ import { configContext } from '../utils/context/small'
 import { closeDialog, showDialog } from '@renderer/utils/context/DialogContext'
 
 import '../css/pages/home.css'
+import { LoadingPluginOfficial } from '@renderer/utils/pluginLoader'
 
 function home() {
   const navigate = useNavigate()
@@ -97,6 +98,8 @@ function home() {
       setLoading(false)
     })
     window.api.rpc.setActivity(undefined, t("status.home"))
+
+    // LoadingPluginOfficial()
   }, [])
 
   const change_content = (newData: ContainerProps) => {
