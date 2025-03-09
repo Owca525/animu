@@ -122,7 +122,9 @@ export const Information: React.FC<{ anime_id: string }> = ({ anime_id }) => {
         arrow_back
       </div>
       <div className="information-banner">
-        {data.images.banner == null ? "" : (
+        {data.images.banner == null ? (
+          <img className={`information-banner`} style={{ filter: "blur(3px)" }} src={data.images.cover} />
+        ) : (
           <img onError={() => dispatch({ type: LoadingActionTypes.SET_IS_BANNER_ERROR, payload: true })} className={`information-banner ${state.isBannerError ? "hidden" : ""}`} src={data.images.banner} />
         )}
       </div>

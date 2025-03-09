@@ -18,7 +18,6 @@ import { configContext } from '../utils/context/small'
 import { closeDialog, showDialog } from '@renderer/utils/context/DialogContext'
 
 import '../css/pages/home.css'
-import { LoadingPluginOfficial } from '@renderer/utils/pluginLoader'
 
 function home() {
   const navigate = useNavigate()
