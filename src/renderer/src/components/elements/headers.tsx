@@ -17,10 +17,14 @@ const header: React.FC<HeaderProps> = ({ onInputChange, className, onToggleHover
     if (onInputChange) onInputChange(value)
   }
 
+  function handleInput(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key == "Enter") handleKeyDown(event.currentTarget.value)
+  }
+
   return (
     <div className={`header ${className}`}>
       <Button className='material-symbols-outlined button-sidebar-show' value='menu' onClick={onToggleHover} />
-      <Input placeholder={t('header.search')} getInputText={handleKeyDown} />
+      <Input placeholder={t('header.search')} getInputText={handleKeyDown} onKeyDown={handleInput} />
     </div>
   )
 }
