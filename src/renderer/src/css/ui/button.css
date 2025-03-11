@@ -7,12 +7,16 @@ button {
   display: flex;
   justify-content: space-around;
   align-items: center;
+  padding: 16px;
   transition: all 0.1s ease;
 }
 .button-icon {
   width: 40px;
   height: 40px;
   font-size: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .button-icon-text {

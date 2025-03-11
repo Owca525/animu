@@ -37,6 +37,10 @@ button {
   color: var(--text);
   box-shadow: 0px 0px 10px rgb(0, 0, 0, 0.3);
 }
+.button-sidebar-show {
+  background-color: var(--bg2);
+  box-shadow: none;
+}
 
 .backlight:hover {
   background-color: var(--bg4);
