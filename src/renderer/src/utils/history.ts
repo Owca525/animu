@@ -31,7 +31,7 @@ export async function SaveHistory(save: CardProps) {
     const index = file.findIndex((item) => item.id === save.id);
 
     if (
-      config &&
+      config && config.History.history.LimitedHistory &&
       file.length >= parseInt(config.History.history.maxSave.toString())
     )
       file.shift();

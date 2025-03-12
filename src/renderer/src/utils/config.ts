@@ -20,8 +20,8 @@ export const defaultConfig: SettingsConfig = {
       AutoSkipEpisode: true,
       playerLoadType: "metadata",
       Volume: 25,
-      LongTimeSkipForward: 85,
-      LongTimeSkipBack: 85,
+      LongTimeSkipForward: 90,
+      LongTimeSkipBack: 90,
       TimeSkipLeft: 5,
       TimeSkipRight: 5,
     },
@@ -47,6 +47,7 @@ export const defaultConfig: SettingsConfig = {
   },
   History: {
     history: {
+      LimitedHistory: false,
       maxSave: 50,
     },
     continue: {

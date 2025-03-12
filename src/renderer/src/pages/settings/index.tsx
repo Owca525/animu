@@ -386,6 +386,14 @@ const Settings = () => {
           <div className="settings-content">
             <div className="settings-space">
               <div className="text">{t('sidebar.History')}</div>
+              <Checkbox
+                title={"Limited Save History"}
+                checked={config.new.History.history.LimitedHistory}
+                onClick={(event) =>
+                  handleChange('History.history.LimitedHistory', event.currentTarget.checked)
+                }
+              />
+              <div className="border-settings"></div>
               <Input
                 title={t('settings.player.historysave')}
                 placeholder="20"

@@ -89,6 +89,7 @@ interface SettingsConfigPlayer {
 
 interface SettingsConfigHistory {
   history: {
+    LimitedHistory: boolean
     maxSave: number | string
   }
   continue: {
