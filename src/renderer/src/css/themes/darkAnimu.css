@@ -358,3 +358,11 @@ button {
 .settings-save-button:hover {
   background-color: var(--bg3);
 }
+/* 
+.card-deleteButton {
+  background-color: var(--bg3);
+  border-radius: 50%;
+}
+.card-deleteButton:hover {
+  background-color: var(--bg4);
+}  */
