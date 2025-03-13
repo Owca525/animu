@@ -264,10 +264,6 @@ button {
   outline-color: var(--notVisible);
 }
 
-.player-buttons:hover {
-  outline: solid 2px var(--neutral1);
-}
-
 .thumb, .slider-thumb, .slider-progress,.progress {
   background-color: var(--neutral1);
 }
@@ -366,3 +362,10 @@ button {
 .card-deleteButton:hover {
   background-color: var(--bg4);
 }  */
+
+.up-Next-Button {
+  background-color: var(--bg3);
+}
+.up-Next-Button:hover {
+  background-color: var(--bg4);
+}
