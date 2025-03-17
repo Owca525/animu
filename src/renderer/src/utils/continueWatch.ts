@@ -42,7 +42,7 @@ export async function DeleteFromcontinue(data: CardProps) {
     const file = await window.api.os.read(appConfigDirPath + "/continueWatch.json")
     const list = JSON.parse(file) as { continue: CardProps[] };
     const index = list.continue.findIndex(
-      (item) => item.player?.episode.ep === data.player?.episode.ep
+      (item) => item.player?.episode.ep === data.player?.episode.ep && item.id === data.id
     );
 
     if (index != -1) list.continue.splice(index, 1);
