@@ -68,6 +68,7 @@ interface SettingsConfigPlayer {
   }
   screenShot: {
     alwaysAsk: boolean
+    saveType: "File" | "Clip" | "Both"
     path: string
   }
   keybinds: {

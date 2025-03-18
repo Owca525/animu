@@ -27,6 +27,7 @@ export const defaultConfig: SettingsConfig = {
     },
     screenShot: {
       alwaysAsk: true,
+      saveType: "File",
       path: await checkPictureFolder(),
     },
     keybinds: {

@@ -420,6 +420,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
             toast.error(t("toast.screenshotFail"), notificationProps);
             return
         }
+        console.log(config.Player.screenShot.path == "Both")
+        if (config.Player.screenShot.saveType == "Clip" || config.Player.screenShot.saveType == "Both") {
+            const blob = await (await fetch(screenshot)).blob();
+            await navigator.clipboard.write([
+              new ClipboardItem({
+                'image/png': blob,
+              }),
+            ]);
+            toast.success("Image Saved To the Clipboard Succesfull", notificationProps);
+            if (config.Player.screenShot.saveType == "Clip") return
+        }
 
         if (config.Player.screenShot.alwaysAsk) var resp = await window.api.os.saveDialog(`${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot.replace(/^data:image\/png;base64,/, ''), `screenshot${formatedDate}.png`, "png", ["PNG"], "base64")
         else var resp = await window.api.os.write(`${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot.replace(/^data:image\/png;base64,/, ''), "base64")

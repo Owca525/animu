@@ -537,6 +537,15 @@ const Settings = () => {
               />
               <div className="border-settings"></div>
               <div className="same-space">
+                Save Type
+                <Dropdown options={[
+                  { label: "File", value: 'File', onClick: () => handleChange('Player.screenShot.saveType', "File") },
+                  { label: "Clipboard", value: 'Clipboard', onClick: () => handleChange('Player.screenShot.saveType', "Clip") },
+                  { label: "Both", value: "Both", onClick: () => handleChange('Player.screenShot.saveType', "Both") }
+                ]} placeholder={config.new.Player.screenShot.saveType} />
+              </div>
+              <div className="border-settings"></div>
+              <div className="same-space">
                 <span style={{ marginTop: "10px", marginBottom: "10px" }}>{t("settings.screenshot.path")}<span className="curret-settings"> {config.new.Player.screenShot.path}</span></span> <Button value='Change path' className='settings-button' onClick={async () => await changePathScreenshot(await window.api.os.openDialog(undefined, undefined, ["openDirectory"]))} />
               </div>
             </div>
