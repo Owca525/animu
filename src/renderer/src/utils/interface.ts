@@ -79,6 +79,8 @@ interface SettingsConfigPlayer {
     TimeSkipRight: string
     Fullscreen: string
     ExitPlayer: string
+    NextEpisode: string
+    PrevEpisode: string
     FrameSkipBack: string
     FrameSkipForward: string
     VolumeUp: string

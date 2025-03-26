@@ -38,6 +38,8 @@ export const defaultConfig: SettingsConfig = {
       TimeSkipRight: "ArrowRight",
       Fullscreen: "F",
       ExitPlayer: "Escape",
+      NextEpisode: "PageUp",
+      PrevEpisode: "PageDown",
       FrameSkipBack: ",",
       FrameSkipForward: ".",
       VolumeDown: "9",

@@ -586,6 +586,16 @@ const Settings = () => {
                 changeKey={(key) => handleChange('Player.keybinds.FrameSkipForward', key)}
               />
               <Keybind
+                title={"Next Episode"}
+                value={getKeybind(config.new.Player.keybinds.NextEpisode)}
+                changeKey={(key) => handleChange('Player.keybinds.NextEpisode', key)}
+              />
+              <Keybind
+                title={"Previus Episode"}
+                value={getKeybind(config.new.Player.keybinds.PrevEpisode)}
+                changeKey={(key) => handleChange('Player.keybinds.PrevEpisode', key)}
+              />
+              <Keybind
                 title={t('settings.player.VolumeUP')}
                 value={getKeybind(config.new.Player.keybinds.VolumeUp)}
                 changeKey={(key) => handleChange('Player.keybinds.VolumeUp', key)}

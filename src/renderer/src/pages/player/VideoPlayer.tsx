@@ -386,6 +386,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
                 case config.Player.keybinds.VolumeMute.toLowerCase():
                     setMuted(prev => !prev)
                     break
+                case config.Player.keybinds.NextEpisode.toLowerCase():
+                    functions.nextButton("next")
+                    break
+                case config.Player.keybinds.PrevEpisode.toLowerCase():
+                    functions.prevButton("prev")
+                    break
             }
         }
     }
