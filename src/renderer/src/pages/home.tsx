@@ -13,7 +13,7 @@ import { hideInformation, isInformationShow } from '@renderer/utils/context/Info
 // utils
 import { ContainerProps } from '../utils/interface'
 import { get_recent, get_search } from '../utils/backend'
-import { ReadContinue } from '../utils/continueWatch'
+import { ReadContinue } from '../utils/filesMange/continueWatch'
 import { configContext } from '../utils/context/small'
 import { closeDialog, showDialog } from '@renderer/utils/context/DialogContext'
 
@@ -58,7 +58,7 @@ function home() {
       class: 'icon-button',
       title: t('sidebar.History'),
       onClick: async () =>
-        change_content({ title: t('sidebar.History'), data: await import("../utils/history").then(async ({ ReadHistory }) => await functionHandler(ReadHistory)) })
+        change_content({ title: t('sidebar.History'), data: await import("../utils/filesMange/history").then(async ({ ReadHistory }) => await functionHandler(ReadHistory)) })
     }
   ]
 

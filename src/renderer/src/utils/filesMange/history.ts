@@ -1,4 +1,4 @@
-import { CardProps } from "./interface";
+import { CardProps } from "../interface";
 import { readConfig } from "./config";
 
 const DefaultHistory: { history: CardProps[] } = {

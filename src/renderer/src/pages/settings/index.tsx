@@ -13,7 +13,7 @@ import Dropdown from '../../components/ui/dropdown'
 // import CustomSlider from '@renderer/components/ui/customSlider'
 
 // utils
-import { checkPictureFolder, readConfig, saveConfig } from '../../utils/config'
+import { checkPictureFolder, readConfig, saveConfig } from '../../utils/filesMange/config'
 import { ListItem, notificationProps, SettingsConfig } from '../../utils/interface'
 
 import '../../css/pages/settings.css'

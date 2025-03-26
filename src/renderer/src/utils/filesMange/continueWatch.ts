@@ -1,4 +1,4 @@
-import { CardProps } from "./interface";
+import { CardProps } from "../interface";
 
 const DefaultContinue: { continue: CardProps[] } = {
   continue: [],

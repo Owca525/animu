@@ -15,7 +15,7 @@ const Player = lazy(() => import('./pages/player/index'));
 import Home from "./pages/home"
 
 // config
-import { defaultConfig, readConfig } from './utils/config'
+import { defaultConfig, readConfig } from './utils/filesMange/config'
 import { configContext } from './utils/context/small'
 import { SettingsConfig } from './utils/interface'
 

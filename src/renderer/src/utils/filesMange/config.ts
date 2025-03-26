@@ -1,5 +1,5 @@
 import ini from "ini";
-import { SettingsConfig } from "./interface";
+import { SettingsConfig } from "../interface";
 
 export const defaultConfig: SettingsConfig = {
   General: {

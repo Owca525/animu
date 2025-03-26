@@ -7,7 +7,7 @@ import useHotkeys from "@reecelucas/react-use-hotkeys"
 // utils
 import { closeDialog } from "@renderer/utils/context/DialogContext"
 import { configContext } from "@renderer/utils/context/small"
-import { DeleteFromcontinue, SaveContinue } from "@renderer/utils/continueWatch"
+import { DeleteFromcontinue, SaveContinue } from "@renderer/utils/filesMange/continueWatch"
 import { notificationProps, playerUrlProps } from "@renderer/utils/interface"
 import { formatTime } from "@renderer/utils/time"
 
@@ -85,7 +85,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ id, img, title, episodes, epi
     const [hls, setHls] = useState<any>(null);
 
     useEffect(() => {
-        import("../../utils/history").then(({ SaveHistory }) => SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) }))
+        import("../../utils/filesMange/history").then(({ SaveHistory }) => SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) }))
         checkUrl(episodesUrl[0])
         handleVolume(PlayerVolume)
         handleMouseMove()

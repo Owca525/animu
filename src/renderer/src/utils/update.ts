@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import { notificationProps, SettingsConfig } from "./interface";
-import { saveConfig } from "./config";
+import { saveConfig } from "./filesMange/config";
 
 export function checkUpdate(t: any, config: SettingsConfig | undefined) {
     window.api.update.updateAvailable((_event, isAvailable, version) => {

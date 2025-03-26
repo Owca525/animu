@@ -1,6 +1,6 @@
 import { createContext } from 'react'
 import { SettingsConfig } from '../interface'
-import { defaultConfig } from '../config'
+import { defaultConfig } from '../filesMange/config'
 
 // This file is for small context
 
