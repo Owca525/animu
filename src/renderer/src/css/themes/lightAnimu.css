@@ -18,6 +18,8 @@
   --notVisible: rgba(0, 0, 0, 0.0); /* is use in player button */
 }
 
+
+
 * {
   font-family: sans-serif;
   color: var(--text);
@@ -27,11 +29,19 @@ body {
   background-color: var(--bg);
 }
 
+::selection {
+  background-color: var(--neutral1);
+}
+
 button {
   border: none;
   background-color: var(--bg3);
   color: var(--text);
-  box-shadow: 0px 0px 10px rgb(0, 0, 0, 0.1);
+  box-shadow: 0px 0px 10px rgba(52, 52, 52, 0.1);
+}
+.button-sidebar-show {
+  background-color: var(--bg2);
+  box-shadow: none;
 }
 
 .backlight:hover {
@@ -82,14 +92,14 @@ button {
 
 .checkbox {
   background-color: var(--bg3);
-  box-shadow: inset 0 0 5px rgb(0, 0, 0, 0.1);
+  box-shadow: inset 0 0 5px rgb(0, 0, 0, 0.2);
 }
 .checkbox:checked {
   background-color: var(--neutral1);
 }
 .checkbox::before {
   background-color: var(--text);
-  box-shadow: 0 2px 5px rgb(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px rgb(0, 0, 0, 0.2);
 }
 
 .Toastify__toast {
@@ -99,23 +109,44 @@ button {
   border: 2px solid var(--bg4);
 }
 
-.number {
+.settings-input {
+  outline: none;
   background-color: var(--bg3);
   color: var(--text);
-  border: none;
   transition: background-color 150ms ease;
+  border-radius: 12px 0px 0px 12px;
+  border: 2px solid var(--bg3);
+  border-right: 0px;
 }
-.number:hover {
+.settings-input-type {
+  background-color: var(--bg3);
+  color: var(--text);
+  border-radius: 0px 12px 12px 0px;
+  text-align: center;
+  border: 2px solid var(--bg3);
+  border-width: 2px 2px 2px 0px;
+}
+.settings-input:hover {
   background-color: var(--bg4);
 }
-.number:focus {
-  outline: solid 2px var(--neutral1);
+.settings-input:hover + .settings-input-type {
+  background-color: var(--bg4);
+}
+.settings-input:focus {
+  border: solid 2px var(--neutral1);
+  border-width: 2px 0px 2px 2px;
+}
+
+.settings-input:focus + .settings-input-type {
+  border: solid 2px var(--neutral1);
+  border-width: 2px 2px 2px 0px;
 }
 
 .dropdown-button {
-  border: none;
   background-color: var(--bg3);
   transition: background-color 150ms ease;
+  border-color: var(--bg3);
+  border-radius: 12px;
 }
 .dropdown-button:hover {
   background-color: var(--bg4);
@@ -139,6 +170,7 @@ button {
   transition:
     background-color,
     border-color 150ms ease;
+  border-radius: 12px;
 }
 
 .keybind-content:hover {
@@ -232,25 +264,14 @@ button {
   background-color: var(--notVisible);
   box-shadow: none;
   outline-color: var(--notVisible);
-  color: var(--bg);
-}
-
-.player-buttons:hover {
-  outline: solid 2px var(--neutral1);
-  background-color: rgba(139, 158, 146, 0.683);
 }
 
 .thumb, .slider-thumb, .slider-progress,.progress {
   background-color: var(--neutral1);
 }
 
-.seek-bar {
-  background-color: rgba(255, 255, 255, 0.3);
-}
-
 .time-display, .player-title, .show-time {
   background-color: rgb(30, 30, 30, 0.8);
-  color: var(--bg);
 }
 
 .video-container {
@@ -272,23 +293,11 @@ button {
 }
 
 .information-fade {
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 3%, var(--bg) 97%);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 1%, var(--bg) 90%);
 }
 
 .information-background {
   background-color: var(--bg);
-}
-
-.player-settings-button {
-  color: var(--bg);
-}
-
-.player-settings-button-text {
-  color: var(--bg3);
-}
-
-.slider-text {
-  color: var(--bg);
 }
 
 .dropdown-container {
@@ -337,43 +346,28 @@ button {
   background-color: rgb(30, 30, 30, 0.8);
 }
 
-.settings-input {
-  outline: none;
-  background-color: var(--bg3);
-  color: var(--text);
-  transition: background-color 150ms ease;
-  border-radius: 12px 0px 0px 12px;
-  border: 2px solid var(--bg3);
-  border-right: 0px;
+.settings-save-box {
+  background-color: rgba(194, 207, 206, 0.8);
+  border-radius: 12px;
 }
-.settings-input-type {
-  background-color: var(--bg3);
-  color: var(--text);
-  border-radius: 0px 12px 12px 0px;
-  text-align: center;
-  border: 2px solid var(--bg3);
-  border-width: 2px 2px 2px 0px;
-}
-.settings-input:hover {
+.settings-save-button {
   background-color: var(--bg4);
 }
-.settings-input:hover + .settings-input-type {
+.settings-save-button:hover {
+  background-color: var(--bg3);
+}
+/* 
+.card-deleteButton {
+  background-color: var(--bg3);
+  border-radius: 50%;
+}
+.card-deleteButton:hover {
   background-color: var(--bg4);
-}
-.settings-input:focus {
-  border: solid 2px var(--neutral1);
-  border-width: 2px 0px 2px 2px;
-}
+}  */
 
-.settings-input:focus + .settings-input-type {
-  border: solid 2px var(--neutral1);
-  border-width: 2px 2px 2px 0px;
+.up-Next-Button {
+  background-color: rgb(46, 46, 46, 0.5);
 }
-
-.settings-save-text {
-  color: white;
-}
-
-::selection {
-  background-color: var(--neutral1);
+.up-Next-Button:hover {
+  background-color: rgb(64, 64, 64, 0.5);
 }
