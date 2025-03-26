@@ -364,8 +364,8 @@ button {
 }  */
 
 .up-Next-Button {
-  background-color: var(--bg3);
+  background-color: rgb(46, 46, 46, 0.5);
 }
 .up-Next-Button:hover {
-  background-color: var(--bg4);
+  background-color: rgb(64, 64, 64, 0.5);
 }

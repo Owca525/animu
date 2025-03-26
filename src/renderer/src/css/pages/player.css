@@ -104,6 +104,7 @@
   font-size: x-large;
   user-select: text;
   background-color: rgba(0, 0, 0, 0.8);
+  overflow: hidden;
 }
 
 .volume-seek {
@@ -226,13 +227,13 @@
 }
 
 .up-Next-Title {
-  font-size: clamp(1.2rem, 1.5vw, 2em);
+  font-size: clamp(1rem, 1.4vw, 2em);
   font-weight: 500;
 }
 
 .up-Next-Anime {
   max-width: 30svw;
-  font-size: clamp(0.8rem, 2vw, 1em);
+  font-size: clamp(0.8rem, 1vw, 1em);
 }
 
 .up-Next-Buttons {
@@ -242,8 +243,8 @@
 }
 
 .up-Next-Button {
-  font-size: clamp(0.5rem, 1.2vw, 1rem);
-  background-color: rgba(0, 0, 0, 0.8);
+  font-size: clamp(0.5rem, 1.1vw, .8rem);
+  background-color: rgba(0, 0, 0, 0.5);
   padding: 8px;
 }
 
