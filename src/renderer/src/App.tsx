@@ -2,6 +2,7 @@ import { Routes, Route, HashRouter } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 import { ToastContainer } from 'react-toastify'
 import { InformationContext } from './utils/context/InformationContext'
+import { Provider } from 'react-redux';
 import useHotkeys from '@reecelucas/react-use-hotkeys';
 import 'react-toastify/dist/ReactToastify.css';
 import 'material-symbols'
@@ -22,6 +23,7 @@ import { SettingsConfig } from './utils/interface'
 import { checkDate } from './utils/time'
 import i18n from './utils/i18n'
 import { calculateZoomLevel } from './utils/utils';
+import store from './utils/store';
 
 const config = LoadConfig()
 
@@ -35,17 +37,19 @@ function App() {
     <>
       <ToastContainer />
       <configContext.Provider value={config}>
-        <HashRouter>
-          <InformationContext>
-            <Suspense fallback={AppLoading()}>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/player" element={<Player />} />
-                <Route path="/settings" element={<Settings />} />
-              </Routes>
-            </Suspense>
-          </InformationContext>
-        </HashRouter>
+        <Provider store={store}>
+          <HashRouter>
+            <InformationContext>
+              <Suspense fallback={AppLoading()}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/player" element={<Player />} />
+                  <Route path="/settings" element={<Settings />} />
+                </Routes>
+              </Suspense>
+            </InformationContext>
+          </HashRouter>
+        </Provider>
       </configContext.Provider>
     </>
   )

@@ -18,6 +18,9 @@ import { configContext } from '../utils/context/small'
 import { closeDialog, showDialog } from '@renderer/utils/context/DialogContext'
 
 import '../css/pages/home.css'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '@renderer/utils/reducers'
+import { setHover } from '@renderer/utils/reducers/sidebar'
 
 function home() {
   const navigate = useNavigate()
@@ -29,7 +32,8 @@ function home() {
 
   const [data, setData] = useState<ContainerProps>({ title: '', data: [] })
   const [loading, setLoading] = useState(true)
-  const [SidebarHover, setSidebarHover] = useState<boolean>(false)
+  const dispatch = useDispatch();
+  const sidebarHover = useSelector((state: RootState) => state.sidebar.hover);
 
   const sidebarHomeTopData = [
     {
@@ -129,12 +133,8 @@ function home() {
 
   useHotkeys("Tab", (event) => {
     event.preventDefault()
-    toogleHoverSidebar()
+    dispatch(setHover(!sidebarHover))
   });
-
-  function toogleHoverSidebar() {
-    setSidebarHover((prev: boolean) => !prev)
-  }
 
   function createSidebar() {
     return (
@@ -143,7 +143,6 @@ function home() {
         bottom={sidebarHomeBottomData}
         sidebarHover={config.General.HoverSidebar}
         class='home-sidebar'
-        onlyMax={SidebarHover}
       />
     )
   }
@@ -153,9 +152,8 @@ function home() {
       <>
         <ContextMenu items={menuItems} />
         <main className="container">
-          <Header onInputChange={handleInputChange} className='home-header' onToggleHover={toogleHoverSidebar} />
-          {config.General.HideSidebar == false && <>{createSidebar()} <div className="fake-sidebar"></div></>}
-          {SidebarHover && createSidebar()}
+          <Header onInputChange={handleInputChange} className='home-header' />
+          {createSidebar()}
           {loading ? (
             <div className="content loading-home">
               <div className="card-content-loading loading material-symbols-outlined">

@@ -48,3 +48,21 @@
   padding-top: 0.5em;
   padding-bottom: 0.5em;
 }
+
+.sidebar-hidden {
+  z-index: 1001;
+  position: fixed;
+  margin-top: 3.75em;
+  height: calc(100vh - 50px);
+  width: 200px;
+  display: flex;
+  align-items: start;
+  justify-content: start;
+  flex-direction: column;
+  justify-content: space-between;
+  animation: hide 300ms forwards;
+}
+
+.sidebar-show { 
+  animation: show 300ms forwards;
+}
