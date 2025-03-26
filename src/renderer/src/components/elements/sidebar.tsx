@@ -26,8 +26,9 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const getAndSetVersion = async (): Promise<void> => setversion(await window.backend.version())
 
-  const handleClickOutside = (event: MouseEvent) => {
-    if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
+  const handleClickOutside = (event: MouseEvent) => { // "button-sidebar-show"
+    let data = event.target as HTMLElement
+    if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && data.classList.contains("button-sidebar-show") == false) {
       dispatch(setHover(false))
     }
   };
