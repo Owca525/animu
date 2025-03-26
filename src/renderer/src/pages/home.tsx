@@ -33,18 +33,14 @@ function home() {
 
   const sidebarHomeTopData = [
     {
-      value:
-        '<div class="material-symbols-outlined text-button">schedule</div>' +
-        t('sidebar.RecentAnime'),
+      icon: "schedule",
       class: 'icon-button',
       title: t('sidebar.RecentAnime'),
       onClick: async () =>
         change_content({ title: t('sidebar.RecentAnime'), data: await functionHandler(get_recent) })
     },
     {
-      value:
-        '<div class="material-symbols-outlined text-button">history</div>' +
-        t('sidebar.ContinueWatching'),
+      icon: "history",
       class: 'icon-button',
       title: t('sidebar.ContinueWatching'),
       onClick: async () =>
@@ -54,8 +50,7 @@ function home() {
         })
     },
     {
-      value:
-        '<div class="material-symbols-outlined text-button">history</div>' + t('sidebar.History'),
+      icon: "history",
       class: 'icon-button',
       title: t('sidebar.History'),
       onClick: async () =>
@@ -72,8 +67,7 @@ function home() {
     //   title: t('sidebar.Extensions')
     // },
     {
-      value:
-        '<div class="material-symbols-outlined text-button">settings</div>' + t('sidebar.settings'),
+      icon: "settings",
       class: 'icon-button',
       title: t('sidebar.settings'),
       onClick: async () => navigate('/settings')

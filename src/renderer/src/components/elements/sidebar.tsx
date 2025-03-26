@@ -19,6 +19,8 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   useEffect(() => { getAndSetVersion() }, [])
 
+  console.log(top)
+
   function changeClass(): string {
     if (onlyMax) return `sidebar-max ${className}`
     if (isMaxSidebar) return `sidebar-max ${className}`
@@ -48,7 +50,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         {top.length > 0
           ? top.map((button) => (
               <Button
-                value={button.value}
+                value={`<div class="material-symbols-outlined text-button">${button.icon}</div>${button.title}`}
                 className={button.class}
                 title={button.title}
                 type={changeClassButton()}
@@ -62,7 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         {bottom.length > 0
           ? bottom.map((button) => (
               <Button
-                value={button.value}
+                value={`<div class="material-symbols-outlined text-button">${button.icon}</div>${button.title}`}
                 className={button.class}
                 title={button.title}
                 type={changeClassButton()}

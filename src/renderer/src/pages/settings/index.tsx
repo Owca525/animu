@@ -35,26 +35,21 @@ const Settings = () => {
   const [hideSidebar, setHideSidebar] = useState<boolean>(false)
   const [newSidebarTop, setnewSidebarTop] = useState<ListItem[]>([
     {
-      value:
-        '<div class="material-symbols-outlined text-button">manufacturing</div>' +
-        t('settings.sidebar.General'),
+      icon: "manufacturing",
       class: 'icon-button ',
       title: t('settings.sidebar.General'),
       page: "general",
       onClick: async () => setsettingPage('general')
     },
     {
-      value:
-        '<div class="material-symbols-outlined text-button">movie</div>' +
-        t('settings.sidebar.Player'),
+      icon: "movie",
       class: 'icon-button ',
       title: t('settings.sidebar.Player'),
       page: "player",
       onClick: async () => setsettingPage('player')
     },
     {
-      value:
-        '<div class="material-symbols-outlined text-button">history</div>' + t('sidebar.History'),
+      icon: "history",
       class: 'icon-button ',
       title: t('sidebar.History'),
       page: "history",
@@ -67,17 +62,13 @@ const Settings = () => {
 
   let sidebarSettingsBottomData = [
     {
-      value:
-        '<div class="material-symbols-outlined text-button">folder</div>' +
-        t('settings.sidebar.ConfigFolder'),
+      icon: "folder",
       class: 'icon-button',
       title: t('settings.sidebar.ConfigFolder'),
       onClick: async () => await window.api.open(await window.api.os.getPath("userData"))
     },
     {
-      value:
-        '<div class="material-symbols-outlined text-button">home</div>' +
-        t('settings.sidebar.Home'),
+      icon: "home",
       class: 'icon-button',
       title: t('settings.sidebar.Home'),
       onClick: async () => { navigate('/'); window.location.reload() }
@@ -188,9 +179,7 @@ const Settings = () => {
 
     setnewSidebarTop((prev) => [...prev,
     {
-      value:
-        '<div class="material-symbols-outlined text-button">code</div>' +
-        "Developer",
+      icon: "code",
       class: 'icon-button ',
       title: "Developer",
       page: "developer",

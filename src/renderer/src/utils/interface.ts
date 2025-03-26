@@ -26,7 +26,7 @@ export interface InformationData {
 }
 
 export interface ListItem {
-  value: string
+  icon?: string
   class?: string
   title: string
   page?: string
