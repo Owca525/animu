@@ -19,6 +19,26 @@
 }
 
 
+.video-container {
+  background-color: var(--black);
+  --text: white;
+}
+
+button {
+  border: none;
+  background-color: var(--bg3);
+  color: var(--text);
+  box-shadow: 0px 0px 10px rgba(52, 52, 52, 0.1);
+}
+
+.settings-save-box {
+  background-color: rgba(194, 207, 206, 0.8);
+  border-radius: 12px;
+}
+
+
+
+
 
 * {
   font-family: sans-serif;
@@ -33,12 +53,6 @@ body {
   background-color: var(--neutral1);
 }
 
-button {
-  border: none;
-  background-color: var(--bg3);
-  color: var(--text);
-  box-shadow: 0px 0px 10px rgba(52, 52, 52, 0.1);
-}
 .button-sidebar-show {
   background-color: var(--bg2);
   box-shadow: none;
@@ -274,10 +288,6 @@ button {
   background-color: rgb(30, 30, 30, 0.8);
 }
 
-.video-container {
-  background-color: var(--black);
-}
-
 ::-webkit-scrollbar-thumb {
   background-color: var(--bg2);
   border-radius: 10px;
@@ -346,10 +356,6 @@ button {
   background-color: rgb(30, 30, 30, 0.8);
 }
 
-.settings-save-box {
-  background-color: rgba(194, 207, 206, 0.8);
-  border-radius: 12px;
-}
 .settings-save-button {
   background-color: var(--bg4);
 }

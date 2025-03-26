@@ -19,6 +19,13 @@
 }
 
 
+::selection {
+  background-color: #6c5204;
+}
+
+
+
+
 
 * {
   font-family: sans-serif;
@@ -27,10 +34,6 @@
 
 body {
   background-color: var(--bg);
-}
-
-::selection {
-  background-color: #6c5204;
 }
 
 button {
