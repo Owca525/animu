@@ -49,7 +49,6 @@ const Sidebar: React.FC<SidebarProps> = ({
       return "sidebar-hidden"
     }
 
-    if (sidebarData) return "sidebar-max"
     if (isMaxSidebar) return `sidebar-max ${className}`
     else return `sidebar-mini ${className}`
   }
@@ -62,7 +61,6 @@ const Sidebar: React.FC<SidebarProps> = ({
       return "icon"
     }
 
-    if (sidebarData) return "icon-text"
     if (isMaxSidebar) return 'icon-text'
     else return 'icon'
   }
@@ -77,7 +75,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {config.General.HideSidebar == false && onlyMax == false && <div className="fake-sidebar"></div>}
+      {config.General.HideSidebar == false && onlyMax == false && showVersion == false && <div className="fake-sidebar"></div>}
       <div className={changeClass()} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} ref={sidebarRef}>
         <div className="top-sidebar">
           {showVersion && onlyMax && <div className="sidebar-version">Animu v{version}</div>}
