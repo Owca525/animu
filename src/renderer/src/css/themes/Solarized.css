@@ -18,6 +18,15 @@
   --notVisible: rgba(0, 0, 0, 0.0); /* is use in player button */
 }
 
+
+::selection {
+  background-color: #6c5204;
+}
+
+
+
+
+
 * {
   font-family: sans-serif;
   color: var(--text);
@@ -32,6 +41,10 @@ button {
   background-color: var(--bg3);
   color: var(--text);
   box-shadow: 0px 0px 10px rgb(0, 0, 0, 0.3);
+}
+.button-sidebar-show {
+  background-color: var(--bg2);
+  box-shadow: none;
 }
 
 .backlight:hover {
@@ -99,23 +112,44 @@ button {
   border: 2px solid var(--bg4);
 }
 
-.number {
+.settings-input {
+  outline: none;
   background-color: var(--bg3);
   color: var(--text);
-  border: none;
   transition: background-color 150ms ease;
+  border-radius: 12px 0px 0px 12px;
+  border: 2px solid var(--bg3);
+  border-right: 0px;
 }
-.number:hover {
+.settings-input-type {
+  background-color: var(--bg3);
+  color: var(--text);
+  border-radius: 0px 12px 12px 0px;
+  text-align: center;
+  border: 2px solid var(--bg3);
+  border-width: 2px 2px 2px 0px;
+}
+.settings-input:hover {
   background-color: var(--bg4);
 }
-.number:focus {
-  outline: solid 2px var(--neutral1);
+.settings-input:hover + .settings-input-type {
+  background-color: var(--bg4);
+}
+.settings-input:focus {
+  border: solid 2px var(--neutral1);
+  border-width: 2px 0px 2px 2px;
+}
+
+.settings-input:focus + .settings-input-type {
+  border: solid 2px var(--neutral1);
+  border-width: 2px 2px 2px 0px;
 }
 
 .dropdown-button {
-  border: none;
   background-color: var(--bg3);
   transition: background-color 150ms ease;
+  border-color: var(--bg3);
+  border-radius: 12px;
 }
 .dropdown-button:hover {
   background-color: var(--bg4);
@@ -139,6 +173,7 @@ button {
   transition:
     background-color,
     border-color 150ms ease;
+  border-radius: 12px;
 }
 
 .keybind-content:hover {
@@ -234,24 +269,12 @@ button {
   outline-color: var(--notVisible);
 }
 
-.player-buttons:hover {
-  outline: solid 2px var(--neutral1);
-}
-
-.progress {
-  background-color: var(--neutral1);
-}
-
 .thumb, .slider-thumb, .slider-progress,.progress {
   background-color: var(--neutral1);
 }
 
-.seek-bar {
-  background-color: rgba(255, 255, 255, 0.3);
-}
-
 .time-display, .player-title, .show-time {
-  background-color: rgba(41, 41, 45, 0.8);
+  background-color: rgb(30, 30, 30, 0.8);
 }
 
 .video-container {
@@ -267,14 +290,18 @@ button {
   background: var(--bg);
 }
 
-.information-background {
-  background-color: rgb(8, 37, 52);
+.information-top {
+  background-color: var(--bg2);
+  border-radius: 12px;
 }
 
 .information-fade {
-  background: linear-gradient(to bottom, rgb(8, 37, 52, 0) 10%, rgba(8, 37, 52, 1) 98%);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 1%, var(--bg) 90%);
 }
 
+.information-background {
+  background-color: var(--bg);
+}
 
 .dropdown-container {
   border: none;
@@ -322,39 +349,28 @@ button {
   background-color: rgb(30, 30, 30, 0.8);
 }
 
-.settings-input {
-  outline: none;
-  background-color: var(--bg3);
-  color: var(--text);
-  transition: background-color 150ms ease;
-  border-radius: 12px 0px 0px 12px;
-  border: 2px solid var(--bg3);
-  border-right: 0px;
+.settings-save-box {
+  background-color: rgb(46, 46, 46, 0.8);
+  border-radius: 12px;
 }
-.settings-input-type {
-  background-color: var(--bg3);
-  color: var(--text);
-  border-radius: 0px 12px 12px 0px;
-  text-align: center;
-  border: 2px solid var(--bg3);
-  border-width: 2px 2px 2px 0px;
-}
-.settings-input:hover {
+.settings-save-button {
   background-color: var(--bg4);
 }
-.settings-input:hover + .settings-input-type {
+.settings-save-button:hover {
+  background-color: var(--bg3);
+}
+/* 
+.card-deleteButton {
+  background-color: var(--bg3);
+  border-radius: 50%;
+}
+.card-deleteButton:hover {
   background-color: var(--bg4);
-}
-.settings-input:focus {
-  border: solid 2px var(--neutral1);
-  border-width: 2px 0px 2px 2px;
-}
+}  */
 
-.settings-input:focus + .settings-input-type {
-  border: solid 2px var(--neutral1);
-  border-width: 2px 2px 2px 0px;
+.up-Next-Button {
+  background-color: rgb(46, 46, 46, 0.5);
 }
-
-::selection {
-  background-color: var(--neutral1);
+.up-Next-Button:hover {
+  background-color: rgb(64, 64, 64, 0.5);
 }
