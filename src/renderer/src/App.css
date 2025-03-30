@@ -60,6 +60,11 @@ input[type="number"]::-webkit-outer-spin-button {
   font-weight: 500;
 }
 
+.dialog-History-del {
+  width: max-content;
+  gap: 12px;
+}
+
 /* animation */
 @keyframes spin {
   0% {

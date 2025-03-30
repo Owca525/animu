@@ -19,6 +19,7 @@ const Container: React.FC<ContainerProps> = ({ title, data = [], className = '' 
               img={card.img}
               player={card.player}
               text={card.text}
+              deletion={card.deletion}
             />
           ))
         ) : (

@@ -1,5 +1,10 @@
-import { CardProps } from "../interface";
+import { toast } from "react-toastify";
+import { CardProps, notificationProps } from "../interface";
 import { readConfig } from "./config";
+import { showDialog } from "../context/DialogContext";
+import { createDeleteDialog } from "../utils";
+import { useContext } from "react";
+import { configContext } from "../context/small";
 
 const DefaultHistory: { history: CardProps[] } = {
   history: [],
@@ -47,12 +52,34 @@ export async function SaveHistory(save: CardProps) {
   }
 }
 
+export async function deleteHistory(event: MouseEvent, id: string) {
+  event.stopPropagation()
+  let data = await ReadHistory()
+  let index = data.findIndex((item) => item.id === id)
+  if (index == -1) {
+    toast.error("Anime not found", notificationProps);
+    return
+  }
+
+  let anime = data[index]
+  readConfig().then((config) => {
+    if (config.History.history.AlwaysAsk) {
+      showDialog({
+        type: "custom",
+        content: createDeleteDialog(anime.title, "History")
+      })
+    }
+  })
+}
+
 export async function ReadHistory(): Promise<CardProps[]> {
   await CheckHistory()
   try {
     const file = await window.api.os.read(appConfigDirPath + "/history.json");
-    const data = JSON.parse(file);
-    return data.reverse();
+    let data: CardProps[] = JSON.parse(file);
+    data = data.reverse();
+    console.log(data.map((value: CardProps) => { return { ...value, deletion: deleteHistory } }))
+    return data.map((value: CardProps) => { return { ...value, deletion: deleteHistory } })
   } catch (Error) {
     console.error(`${Error} in ReadHistory`);
     return [];

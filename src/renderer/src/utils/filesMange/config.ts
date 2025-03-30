@@ -52,6 +52,7 @@ export const defaultConfig: SettingsConfig = {
     history: {
       LimitedHistory: false,
       maxSave: 50,
+      AlwaysAsk: true
     },
     continue: {
       MinimalTimeSave: 20,

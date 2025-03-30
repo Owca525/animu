@@ -6,6 +6,7 @@ export interface CardProps {
   img: string
   player?: { episodes: number[]; episode: { type: string, ep: number }; time: number | string }
   text?: string
+  deletion?: (event: any, id: string) => void
 }
 
 export interface ContainerProps {
@@ -94,6 +95,7 @@ interface SettingsConfigHistory {
   history: {
     LimitedHistory: boolean
     maxSave: number | string
+    AlwaysAsk: boolean
   }
   continue: {
     MinimalTimeSave: number | string

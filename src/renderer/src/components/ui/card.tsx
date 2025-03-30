@@ -5,7 +5,7 @@ import { CardProps } from '../../utils/interface'
 import { useNavigate } from 'react-router-dom'
 import { showIndormation } from '@renderer/utils/context/InformationContext'
 
-const Card: React.FC<CardProps> = ({ id, title, img, player = null, text = null }) => {
+const Card: React.FC<CardProps> = ({ id, title, img, player = null, text = null, deletion }) => {
   const navigate = useNavigate()
   const [isImageLoaded, setIsImageLoaded] = useState(false)
   const [hasError, setHasError] = useState(false)
@@ -57,7 +57,8 @@ const Card: React.FC<CardProps> = ({ id, title, img, player = null, text = null 
         />
       </div>
       <div className="card-title">{title}</div>
-      {text ? <div className="card-continue-watch-text">{text}</div> : ''}
+      {text && <div className="card-continue-watch-text">{text}</div>}
+      {deletion && <div className="card-delete-icon material-symbols-outlined" onClick={(event) => deletion(event, id)}>close</div>}
     </div>
   )
 }
