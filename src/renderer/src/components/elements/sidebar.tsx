@@ -44,10 +44,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   function changeClass(): string {
     if (onlyMax) return `sidebar-max ${className}`
     if (showVersion) return `sidebar-mini ${className}`
-    if (config.General.HideSidebar) {
-      if (sidebarData) return "sidebar-max sidebar-show"
-      return "sidebar-hidden"
-    }
+    if (sidebarData) return "sidebar-max sidebar-show"
+    if (config.General.HideSidebar) return "sidebar-hidden"
 
     if (isMaxSidebar) return `sidebar-max ${className}`
     else return `sidebar-mini ${className}`
@@ -56,10 +54,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   function changeClassButton(): "icon-text" | "icon" {
     if (onlyMax) return 'icon-text'
     if (showVersion) return "icon"
-    if (config.General.HideSidebar) {
-      if (sidebarData) return "icon-text"
-      return "icon"
-    }
+    if (sidebarData) return "icon-text"
+    if (config.General.HideSidebar) return "icon"
 
     if (isMaxSidebar) return 'icon-text'
     else return 'icon'
