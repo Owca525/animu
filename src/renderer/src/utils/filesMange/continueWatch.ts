@@ -1,4 +1,8 @@
-import { CardProps } from "../interface";
+import { toast } from "react-toastify";
+import { CardProps, notificationProps } from "../interface";
+import { readConfig } from "./config";
+import { showDialog } from "../context/DialogContext";
+import { createDeleteDialog } from "../utils";
 
 const DefaultContinue: { continue: CardProps[] } = {
   continue: [],
@@ -35,6 +39,37 @@ export async function SaveContinue(save: CardProps) {
   } catch (Error) { console.error(Error) }
 }
 
+export async function DialogDeletionContinue(event: MouseEvent, id: string) {
+  event.stopPropagation()
+  let data = await ReadContinue()
+  let config = await readConfig()
+  let index = data.findIndex((item) => item.id === id)
+  if (index == -1) {
+    toast.error("Anime not found", notificationProps);
+    return
+  }
+
+  let anime = data[index]
+
+  try {
+    if (config.History.history.AlwaysAsk) {
+      showDialog({
+        type: "custom",
+        content: await createDeleteDialog(
+          anime.title, 
+          "Continue Watch",
+          () => DeleteFromcontinue(anime)
+        )
+      })
+    } else {
+      DeleteFromcontinue(anime)
+    }
+    toast.info("Anime succesfully delete from history", notificationProps);
+  } catch (error) {
+    toast.error(`Failing delete anime from history`, notificationProps);
+  }
+}
+
 export async function DeleteFromcontinue(data: CardProps) {
   try {
     await CheckContinue()
@@ -56,7 +91,7 @@ export async function ReadContinue(): Promise<CardProps[]> {
     await CheckContinue()
     const file = await window.api.os.read(appConfigDirPath + "/continueWatch.json")
     const data = JSON.parse(file) as { continue: CardProps[] };
-    return data.continue.reverse();
+    return data.continue.map((value: CardProps) => { return { ...value, deletion: DialogDeletionContinue } })
   } catch (Error) {
     console.error(`${Error} in ReadContinue`)
     return [];

@@ -61,7 +61,6 @@
   padding: 4px;
   margin-left: -12px;
   margin-top: -12px;
-  z-index: 2000;
 }
 .card-container:hover .card-delete-icon {
   display: block;

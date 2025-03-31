@@ -96,7 +96,6 @@ export async function ReadHistory(): Promise<CardProps[]> {
     const file = await window.api.os.read(appConfigDirPath + "/history.json");
     let data: CardProps[] = JSON.parse(file);
     data = data.reverse();
-    console.log(data.map((value: CardProps) => { return { ...value, deletion: DialogDeletionHistory } }))
     return data.map((value: CardProps) => { return { ...value, deletion: DialogDeletionHistory } })
   } catch (Error) {
     console.error(`${Error} in ReadHistory`);
