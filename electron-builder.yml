@@ -32,7 +32,7 @@ linux:
   target:
     - AppImage
     - deb
-  maintainer: electronjs.org
+  maintainer: https://github.com/Owca525
   category: AudioVideo
 appImage:
   artifactName: ${name}-${version}.${ext}
