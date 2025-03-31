@@ -97,6 +97,22 @@ function deepMerge(target: any, source: any): any {
   return target;
 }
 
+export async function saveOneConfig(path: string, value: string | number | boolean) {
+  const keys = path.split('.')
+  const newConfig = await readConfig()
+
+  let current: SettingsConfig = newConfig
+  for (let i = 0; i < keys.length - 1; i++) {
+    const key = keys[i]
+
+    if (!current[key]) current[key] = {}
+    current = current[key]
+  }
+  
+  current[keys[keys.length - 1]] = value
+  saveConfig(newConfig)
+}
+
 export async function readConfig(): Promise<SettingsConfig> {
   if (await checkConfig() == false) return defaultConfig
   const content = await window.api.os.read(await appConfigDirPath + "/config.ini");
@@ -104,7 +120,7 @@ export async function readConfig(): Promise<SettingsConfig> {
   return deepMerge(defaultConfig, loadedConfig);
 }
 
-export async function saveConfig(content: any): Promise<boolean> {
+export async function saveConfig(content: SettingsConfig): Promise<boolean> {
   try {
     const data = ini.stringify(content);
     window.api.os.write(await appConfigDirPath + "/config.ini", data);

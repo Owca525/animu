@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useContext, useEffect, useState } from 'react'
 import useHotkeys from '@reecelucas/react-use-hotkeys'
 
@@ -29,6 +29,7 @@ function home() {
 
   // Language
   const { t } = useTranslation()
+  const { state } = useLocation()
 
   const [data, setData] = useState<ContainerProps>({ title: '', data: [] })
   const [loading, setLoading] = useState(true)
@@ -41,7 +42,8 @@ function home() {
       class: 'icon-button',
       title: t('sidebar.RecentAnime'),
       onClick: async () =>
-        change_content({ title: t('sidebar.RecentAnime'), data: await functionHandler(get_recent) })
+        change_content({ title: t('sidebar.RecentAnime'), data: await functionHandler(get_recent) }),
+      type: "home"
     },
     {
       icon: "history",
@@ -51,14 +53,16 @@ function home() {
         change_content({
           title: t('sidebar.ContinueWatching'),
           data: await functionHandler(ReadContinue)
-        })
+        }),
+      type: "continue"
     },
     {
       icon: "history",
       class: 'icon-button',
       title: t('sidebar.History'),
       onClick: async () =>
-        change_content({ title: t('sidebar.History'), data: await import("../utils/filesMange/history").then(async ({ ReadHistory }) => await functionHandler(ReadHistory)) })
+        change_content({ title: t('sidebar.History'), data: await import("../utils/filesMange/history").then(async ({ ReadHistory }) => await functionHandler(ReadHistory)) }),
+      type: "history"
     }
   ]
 
@@ -87,13 +91,20 @@ function home() {
   }
 
   useEffect(() => {
-    get_recent().then((value) => {
-      change_content({
-        title: t('sidebar.RecentAnime'),
-        data: value
+    console.log(window.location.href)
+    if (state && state.category) {
+      sidebarHomeTopData.forEach((element) => {
+        if (element.type == state.category) element.onClick()
       })
-      setLoading(false)
-    })
+    } else {
+      get_recent().then((value) => {
+        change_content({
+          title: t('sidebar.RecentAnime'),
+          data: value
+        })
+        setLoading(false)
+      })
+    }
     window.api.rpc.setActivity(undefined, t("status.home"))
 
     // LoadingPluginOfficial()

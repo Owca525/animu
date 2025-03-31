@@ -41,6 +41,7 @@ export interface SidebarProps {
   onlyMax?: boolean
   sidebarHover?: boolean | undefined
   showVersion?: boolean
+  type?: boolean
 }
 
 interface SettingsConfigGeneral {

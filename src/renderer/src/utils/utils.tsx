@@ -2,6 +2,7 @@ import Button from "@renderer/components/ui/button"
 import Checkbox from "@renderer/components/ui/checkbox"
 import { JSX } from "react"
 import { closeDialog } from "./context/DialogContext"
+import { readConfig, saveOneConfig } from "./filesMange/config"
 
 export function calculateZoomLevel(percentage: number): number {
     if (isNaN(percentage)) return 0
@@ -12,7 +13,7 @@ export function calculateZoomLevel(percentage: number): number {
 //   return Math.floor(Math.pow(1.2, level) * 100)
 // }
 
-export function createDeleteDialog(animeName: string, type: string): JSX.Element {
+export async function createDeleteDialog(animeName: string, type: string, func: any): Promise<JSX.Element> {
     return (
         <>
             <div className="dialog-Header">Do you want delete this anime from {type}</div>
@@ -21,8 +22,12 @@ export function createDeleteDialog(animeName: string, type: string): JSX.Element
                 <Checkbox
                     title="Always ask"
                     classContainer="dialog-History-del "
+                    checked={(await readConfig()).History.history.AlwaysAsk}
+                    onClick={(event) => {
+                        saveOneConfig("History.history.AlwaysAsk", event.currentTarget.checked)
+                    }}
                 />
-                <Button value="Yes" className="dialog-button"/>
+                <Button value="Yes" className="dialog-button" onClick={() => {func(); closeDialog()}}/>
                 <Button value="No" className="dialog-button" onClick={closeDialog}/>
             </div>
         </>

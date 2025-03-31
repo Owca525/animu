@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import '../../css/ui/checkbox.css'
 import HelpIcon from '../../pages/settings/helpIcon'
 
@@ -19,12 +19,14 @@ const Checkbox: FC<checkboxProps> = ({
   checked = false,
   onClick,
   ref,
-  helpDescription
+  helpDescription,
 }) => {
+  const [check, setCheck] = useState<boolean>(checked)
   const handleClick = (e: React.MouseEvent<HTMLInputElement>) => {
-    if (onClick) {
-      onClick(e)
-    }
+    if (!onClick) return
+
+    onClick(e)
+    setCheck(e.currentTarget.checked)
   }
 
   return (
@@ -36,7 +38,7 @@ const Checkbox: FC<checkboxProps> = ({
       <input
         type="checkbox"
         className={classCheckbox + ' checkbox'}
-        checked={checked}
+        checked={check}
         onClick={handleClick}
         ref={ref}
       />
