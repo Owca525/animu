@@ -91,7 +91,7 @@ export async function ReadContinue(): Promise<CardProps[]> {
     await CheckContinue()
     const file = await window.api.os.read(appConfigDirPath + "/continueWatch.json")
     const data = JSON.parse(file) as { continue: CardProps[] };
-    return data.continue.map((value: CardProps) => { return { ...value, deletion: DialogDeletionContinue } })
+    return data.continue.map((value: CardProps) => { return { ...value, deletion: DialogDeletionContinue } }).reverse()
   } catch (Error) {
     console.error(`${Error} in ReadContinue`)
     return [];
