@@ -4,20 +4,20 @@ import { useContext, useEffect, useState } from 'react'
 import useHotkeys from '@reecelucas/react-use-hotkeys'
 
 // Components
-import Sidebar from '../components/elements/sidebar'
-import Content from '../components/elements/card-content'
-import Header from '../components/elements/headers'
-import ContextMenu from '../components/elements/context-menu'
+import Sidebar from '../../components/elements/sidebar'
+import Content from './content'
+import Header from '../../components/elements/headers'
+import ContextMenu from '../../components/elements/context-menu'
 import { hideInformation, isInformationShow } from '@renderer/utils/context/InformationContext'
 
 // utils
-import { ContainerProps } from '../utils/interface'
-import { get_recent, get_search } from '../utils/backend'
-import { ReadContinue } from '../utils/filesMange/continueWatch'
-import { configContext } from '../utils/context/small'
+import { ContainerProps } from './content'
+import { get_recent, get_search } from '../../utils/backend'
+import { ReadContinue } from '../../utils/filesMange/continueWatch'
+import { configContext } from '../../utils/context/small'
 import { closeDialog, showDialog } from '@renderer/utils/context/DialogContext'
 
-import '../css/pages/home.css'
+import '../../css/pages/home.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@renderer/utils/reducers'
 import { setHover } from '@renderer/utils/reducers/sidebar'
@@ -61,7 +61,7 @@ function home() {
       class: 'icon-button',
       title: t('sidebar.History'),
       onClick: async () =>
-        change_content({ title: t('sidebar.History'), data: await import("../utils/filesMange/history").then(async ({ ReadHistory }) => await functionHandler(ReadHistory)) }),
+        change_content({ title: t('sidebar.History'), data: await import("../../utils/filesMange/history").then(async ({ ReadHistory }) => await functionHandler(ReadHistory)) }),
       type: "history"
     }
   ]

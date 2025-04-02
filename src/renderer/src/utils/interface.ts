@@ -9,12 +9,6 @@ export interface CardProps {
   deletion?: (event: any, id: string) => void
 }
 
-export interface ContainerProps {
-  title: string
-  data?: CardProps[]
-  className?: string
-}
-
 interface date { date?: number, hour?: number, minute?: number, month?: number, year?: number}
 
 export interface InformationData {

@@ -12,7 +12,7 @@ const Settings = lazy(() => import('./pages/settings/index'));
 const Player = lazy(() => import('./pages/player/index'));
 
 // I can't set home to lazy loading because css in card broke idk how, css is full loaded
-import Home from "./pages/home"
+import Home from "./pages/home/home"
 
 // config
 import { defaultConfig, readConfig } from './utils/filesMange/config'

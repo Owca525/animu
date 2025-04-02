@@ -7,6 +7,7 @@
   cursor: pointer;
   gap: 0.5vw;
   padding: 4px;
+  scroll-snap-align: start;
 }
 
 .card-image-container {
@@ -17,16 +18,19 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  scroll-snap-align: start;
 }
 
 .card-image {
   height: 21cap;
   width: 100%;
   object-fit: cover;
+  scroll-snap-align: start;
 }
 .card-image {
   opacity: 0;
   transition: opacity 250ms ease-in-out;
+  scroll-snap-align: start;
 }
 
 .card-image-placeholder {
@@ -38,6 +42,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  scroll-snap-align: start;
 }
 
 .card-title {
@@ -46,6 +51,7 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  scroll-snap-align: start;
 }
 
 .card-continue-watch-text {
@@ -53,6 +59,7 @@
   border-radius: 12px;
   width: 100%;
   font-size: clamp(8px, 0.7em, 14px);
+  scroll-snap-align: start;
 }
 
 .card-delete-icon {

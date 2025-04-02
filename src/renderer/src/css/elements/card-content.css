@@ -9,6 +9,9 @@
   gap: 1em;
   overflow: auto;
 }
+.content {
+  overflow: auto;
+}
 .card-content-container {
   gap: clamp(14px, 1vw, 28px);
   display: grid;
@@ -24,4 +27,14 @@
   display: flex;
   justify-content: center;
   height: 70vh;
+}
+
+.card-content-container-horizont {
+  grid-auto-flow: column;
+  overflow: hidden;
+  overflow-x: auto;
+  width: max-content;
+  height: min-content;
+  scroll-snap-type: x mandatory;
+  box-sizing: border-box;
 }
