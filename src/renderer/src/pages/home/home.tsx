@@ -21,6 +21,8 @@ import '../../css/pages/home.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@renderer/utils/reducers'
 import { setHover } from '@renderer/utils/reducers/sidebar'
+import { CreateHomePage } from '@renderer/utils/anilistApi'
+import { useQuery } from 'react-query'
 
 function home() {
   const navigate = useNavigate()
@@ -31,8 +33,19 @@ function home() {
   const { t } = useTranslation()
   const { state } = useLocation()
 
-  const [data, setData] = useState<ContainerProps>({ title: '', data: [] })
-  const [loading, setLoading] = useState(true)
+  const [ func, setfunc ] = useState<() => Promise<any>>(() => CreateHomePage)
+  const { data, error, isLoading, refetch } = useQuery(
+      [func.toString()],
+      func,
+      {
+          refetchOnWindowFocus: false,
+          cacheTime: 0,
+      }
+  );
+
+  console.log(data)
+
+  // const [data, setData] = useState<ContainerProps>({ title: '', data: [] })
   const dispatch = useDispatch();
   const sidebarHover = useSelector((state: RootState) => state.sidebar.hover);
 
@@ -41,27 +54,21 @@ function home() {
       icon: "schedule",
       class: 'icon-button',
       title: t('sidebar.RecentAnime'),
-      onClick: async () =>
-        change_content({ title: t('sidebar.RecentAnime'), data: await functionHandler(get_recent) }),
+      onClick: async () => {setfunc(() => get_recent);refetch()},
       type: "home"
     },
     {
       icon: "history",
       class: 'icon-button',
       title: t('sidebar.ContinueWatching'),
-      onClick: async () =>
-        change_content({
-          title: t('sidebar.ContinueWatching'),
-          data: await functionHandler(ReadContinue)
-        }),
+      onClick: async () => {setfunc(() => ReadContinue);refetch()},
       type: "continue"
     },
     {
       icon: "history",
       class: 'icon-button',
       title: t('sidebar.History'),
-      onClick: async () =>
-        change_content({ title: t('sidebar.History'), data: await import("../../utils/filesMange/history").then(async ({ ReadHistory }) => await functionHandler(ReadHistory)) }),
+      onClick: async () => {await import("../../utils/filesMange/history").then(async ({ ReadHistory }) => setfunc(() => ReadHistory));refetch()},
       type: "history"
     }
   ]
@@ -84,29 +91,20 @@ function home() {
 
   const menuItems = [{ label: t('contextMenu.reload'), onClick: () => location.reload() }]
 
-  const functionHandler = async (func: any): Promise<any> => {
-    closeDialog()
-    setLoading(true)
-    return await func()
-  }
-
   useEffect(() => {
-    console.log(window.location.href)
     if (state && state.category) {
       sidebarHomeTopData.forEach((element) => {
         if (element.type == state.category) element.onClick()
       })
     } else {
-      get_recent().then((value) => {
-        change_content({
-          title: t('sidebar.RecentAnime'),
-          data: value
-        })
-        setLoading(false)
-      })
+      // get_recent().then((value) => {
+      //   change_content({
+      //     title: t('sidebar.RecentAnime'),
+      //     data: value
+      //   })
+      // })
     }
     window.api.rpc.setActivity(undefined, t("status.home"))
-
     // LoadingPluginOfficial()
   }, [])
 
@@ -115,18 +113,16 @@ function home() {
       showDialog({
         header_text: t('errors.connection'), text: "Error getting information from allmanga", buttons: [
           { title: t('general.exit'), onClick: () => window.BrowserWindow.exit() },
-          { title: t('general.reload'), onClick: async () => change_content({ title: t('sidebar.RecentAnime'), data: await functionHandler(get_recent) }) }
+          { title: t('general.reload'), onClick: async () => {setfunc(get_recent);closeDialog()} }
         ]
       })
-      setData({ title: t('sidebar.RecentAnime') })
+      // setData({ title: t('sidebar.RecentAnime') })
       return
     }
-    setData(newData)
-    setLoading(false)
+    // setData(newData)
   }
 
   const handleInputChange = (value: string) => {
-    setLoading(true)
     get_search(value).then((data) => {
       change_content({ title: t('header.activeSearch', { name: value }), data: data })
     })
@@ -147,38 +143,30 @@ function home() {
     dispatch(setHover(!sidebarHover))
   });
 
-  function createSidebar() {
-    return (
-      <Sidebar
-        top={sidebarHomeTopData}
-        bottom={sidebarHomeBottomData}
-        sidebarHover={config.General.HoverSidebar}
-        class='home-sidebar'
-      />
-    )
-  }
-
-  if (config) {
-    return (
-      <>
-        <ContextMenu items={menuItems} />
-        <main className="container">
-          <Header onInputChange={handleInputChange} className='home-header' />
-          {createSidebar()}
-          {loading ? (
-            <div className="content loading-home">
-              <div className="card-content-loading loading material-symbols-outlined">
-                progress_activity
-              </div>
+  return (
+    <>
+      <ContextMenu items={menuItems} />
+      <main className="container">
+        <Header onInputChange={handleInputChange} className='home-header' />
+        <Sidebar
+          top={sidebarHomeTopData}
+          bottom={sidebarHomeBottomData}
+          sidebarHover={config.General.HoverSidebar}
+          class='home-sidebar'
+        />
+        {isLoading ? (
+          <div className="content loading-home">
+            <div className="card-content-loading loading material-symbols-outlined">
+              progress_activity
             </div>
-          ) : (
-            <Content title={data.title} data={data.data} className='home-content' />
-          )}
-        </main>
-      </>
-    )
-  }
-  return
+          </div>
+        ) : (
+          // <Content title={"Test"} data={data} className='home-content' />
+          <></>
+        )}
+      </main>
+    </>
+  )
 }
 
 export default home

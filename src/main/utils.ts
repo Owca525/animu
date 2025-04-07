@@ -17,25 +17,6 @@ ipcMain.on("openDevTools", () => {
     mainWindow.webContents.openDevTools()
 })
 
-ipcMain.handle('fetch-data', async (_event, url: string, header: Record<string, string>): Promise<{ success: boolean; data?: any; status?: number; statusText?: string; error?: unknown; }> => {
-    try {
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: header
-        })
-
-        if (response.ok) {
-            const data = await response.json()
-            return { success: true, data }
-        } else {
-            return { success: false, status: response.status, statusText: response.statusText }
-        }
-    } catch (error) {
-        return { success: false, error: (error as Error).message }
-    }
-}
-)
-
 // Change activity in Discord Rich presence
 ipcMain.handle('setActivity', (_event, details: string | undefined, state: string | undefined) => {
     if (rpc) {

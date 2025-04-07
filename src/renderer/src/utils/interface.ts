@@ -1,23 +1,61 @@
 import { ReactNode } from "react";
 
 export interface CardProps {
-  id: string
-  title: string
-  img: string
-  player?: { episodes: number[]; episode: { type: string, ep: number }; time: number | string }
-  text?: string
+  AnimeID: string
+  data: AnimeData
+  player?: { 
+    id: string
+    episodes: number[]; 
+    episode: { 
+      type: string, 
+      ep: number 
+    }; 
+    time: number | string 
+  }
+  BottomText?: string
   deletion?: (event: any, id: string) => void
 }
 
-interface date { date?: number, hour?: number, minute?: number, month?: number, year?: number}
-
-export interface InformationData {
-  id: string
+export interface AnimeData {
+  averageScore: number | null
+  bannerImage: string | null
+  coverImage: string | null
+  description: string | null
+  duration: number | null
+  endDate: {
+    day: number
+    month: number
+    year: number
+  } | null
+  episodes: number | null
+  format: string | null
+  genres: Array<String> | null
+  isAdult: boolean
+  nextAiringEpisode: {
+    airingAt: number
+    episode: number
+    timeUntilAiring: number
+  } | null
+  popularity: number
+  season: string | null
+  seasonYear: number | null
+  startDate: {
+    day: number
+    month: number
+    year: number
+  } | null
+  status: string | null
+  studios: any
   title: string
-  description: string
-  information: { format: string, episodeDuration: number, status: string, season: { quarter: string, year: number }, episodesCount: number, airedStart: date, airedEnd: date }
-  images: { banner: string, cover: string }
-  episodes: Array<{ type: string, avaibleEpisodes: number, listEpisodes: Array<number> }>
+  type: string | null
+}
+
+// AnimeID is for anilist etc, playerID is for player
+export interface InformationData {
+  PlayerID: string | null
+  AnimeID: string | null
+  data: AnimeData
+  episodesList: Array<{ type: string, avaibleEpisodes: number, listEpisodes: Array<number> }> | null
 }
 
 export interface ListItem {

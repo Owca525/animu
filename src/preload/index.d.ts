@@ -28,6 +28,13 @@ declare global {
           statusText?: string;
           error?: unknown;
         }>;
+        post: (url: string, header: Record<string, string>, body?: { query: string, variables: Object }) => Promise<{
+          success: boolean;
+          data?: any;
+          status?: number;
+          statusText?: string;
+          error?: unknown;
+        }>;
       };
       rpc: {
         setActivity: (

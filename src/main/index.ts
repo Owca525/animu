@@ -9,6 +9,7 @@ import "./utils"
 import "./window"
 import "./os"
 import "./update"
+import "./request"
 
 export let mainWindow: BrowserWindow | undefined
 
