@@ -50,6 +50,13 @@ export interface AnimeData {
   type: string | null
 }
 
+export interface contentData {
+  title: string,
+  titleFunction?: () => void,
+  horizont?: boolean,
+  Cards: CardProps[] | null
+}
+
 // AnimeID is for anilist etc, playerID is for player
 export interface InformationData {
   PlayerID: string | null

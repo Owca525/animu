@@ -1,5 +1,5 @@
 import Content from "@renderer/pages/home/content";
-import { InformationData } from "./interface";
+import { CardProps, contentData } from "./interface";
 
 const graphicApi = `
 query(
@@ -132,26 +132,66 @@ const header = {
 
 const trendingAnime = { page: 1, sort: [ "TRENDING_DESC", "POPULARITY_DESC" ], type: "ANIME" }
 
-function Convert(convert: any): InformationData {
+function Convert(convert: any): CardProps {
   return {
     AnimeID: convert.id,
-    PlayerID: null,
     data: {
       ...convert,
       coverImage: convert.coverImage.large,
       title: convert.title.romaji
     },
-    episodesList: null
   }
 }
 
-export async function CreateHomePage() {
-    let data = await window.api.request.post("https://graphql.anilist.co", header, { query: graphicApi, variables: trendingAnime })
-    if (data.success) {
-      let convert = data.data.data.Page.media.map((value) => Convert(value))
-      return convert
-    } else {
-      console.log(data)
-      return data
+async function sendToApi(variable: any) {
+  let data = await window.api.request.post("https://graphql.anilist.co", header, { query: graphicApi, variables: variable })
+  if (data.success) {
+    return data.data.data.Page.media.map((value) => Convert(value))
+  }
+  return []
+}
+
+function getSeasonFromDate(date: Date) {
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  if (month >= 12 || month <= 2) {
+      return ["WINTER", year];
+  } else if (month >= 3 && month <= 5) {
+      return ["SPRING", year];
+  } else if (month >= 6 && month <= 8) {
+      return ["SUMMER", year];
+  } else if (month >= 9 && month <= 11) {
+      return ["FALL", year];
+  }
+  return [];
+}
+
+export async function CreateHomePage(): Promise<contentData[]> {
+  let season = getSeasonFromDate(new Date())
+  return [
+    {
+      title: "Trending Now",
+      Cards: await sendToApi(trendingAnime),
+      horizont: true
+    },
+    {
+      title: "All Time Popular",
+      Cards: await sendToApi({
+        page: 1, 
+        season: season[0],
+        seasonYear: season[1],
+        type: "ANIME"
+      }),
+      horizont: true
+    },
+    {
+      title: "All Time Popular",
+      Cards: await sendToApi({
+        page: 1, 
+        sort: "POPULARITY_DESC", 
+        type: "ANIME"
+      }),
+      horizont: true
     }
+  ]
 }

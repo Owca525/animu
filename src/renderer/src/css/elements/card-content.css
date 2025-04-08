@@ -7,7 +7,9 @@
   flex-direction: column;
   padding: clamp(12px, 1vw, 20px);
   gap: 1em;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: visible;
+  height: max-content;
 }
 .content {
   overflow: auto;
@@ -34,7 +36,7 @@
   overflow: hidden;
   overflow-x: auto;
   width: max-content;
-  height: min-content;
+  height: max-content;
   scroll-snap-type: x mandatory;
   box-sizing: border-box;
 }

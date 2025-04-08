@@ -51,10 +51,10 @@ function home() {
 
   const sidebarHomeTopData = [
     {
-      icon: "schedule",
+      icon: "home",
       class: 'icon-button',
       title: t('sidebar.RecentAnime'),
-      onClick: async () => {setfunc(() => get_recent);refetch()},
+      onClick: async () => {setfunc(() => CreateHomePage);refetch()},
       type: "home"
     },
     {
@@ -108,24 +108,10 @@ function home() {
     // LoadingPluginOfficial()
   }, [])
 
-  const change_content = (newData: ContainerProps) => {
-    if (newData.data && newData.data.length != 0 && newData.data[0].title == 'error') {
-      showDialog({
-        header_text: t('errors.connection'), text: "Error getting information from allmanga", buttons: [
-          { title: t('general.exit'), onClick: () => window.BrowserWindow.exit() },
-          { title: t('general.reload'), onClick: async () => {setfunc(get_recent);closeDialog()} }
-        ]
-      })
-      // setData({ title: t('sidebar.RecentAnime') })
-      return
-    }
-    // setData(newData)
-  }
-
   const handleInputChange = (value: string) => {
-    get_search(value).then((data) => {
-      change_content({ title: t('header.activeSearch', { name: value }), data: data })
-    })
+    // get_search(value).then((data) => {
+    //   change_content({ title: t('header.activeSearch', { name: value }), data: data })
+    // })
   }
 
   useHotkeys("Escape", () => {
@@ -161,8 +147,7 @@ function home() {
             </div>
           </div>
         ) : (
-          // <Content title={"Test"} data={data} className='home-content' />
-          <></>
+          <Content data={data} />
         )}
       </main>
     </>
