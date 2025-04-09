@@ -359,14 +359,14 @@ button {
 .settings-save-button:hover {
   background-color: var(--bg3);
 }
-/* 
-.card-deleteButton {
+
+.card-delete-icon {
   background-color: var(--bg3);
   border-radius: 50%;
 }
-.card-deleteButton:hover {
+.card-delete-icon:hover {
   background-color: var(--bg4);
-}  */
+} 
 
 .up-Next-Button {
   background-color: rgb(46, 46, 46, 0.5);
