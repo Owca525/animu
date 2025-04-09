@@ -9,15 +9,21 @@
   gap: 1em;
   overflow-x: hidden;
   overflow-y: visible;
-  height: max-content;
 }
 .content {
   overflow: auto;
+}
+.card-max-height {
+  height: max-content;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1vw, 20px);
 }
 .card-content-container {
   gap: clamp(14px, 1vw, 28px);
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(155px, max-content));
+  height: max-content;
 }
 .card-content-loading {
   display: flex;

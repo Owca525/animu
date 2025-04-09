@@ -14,7 +14,7 @@ const content: React.FC<ContainerProps> = ({ data }) => {
   return (
     <div className="content-container home-content">
       {data.map((value) => (
-        <>
+        <div className='card-max-height'>
           <div className="content-title">{value.title}</div>
           <div className={value.horizont ? "content" : ""}>
             <div className={'card-content-container ' + (value.horizont ? "card-content-container-horizont" : "")}>
@@ -33,7 +33,7 @@ const content: React.FC<ContainerProps> = ({ data }) => {
               )}
             </div>
           </div>
-        </>
+        </div>
       ))}
     </div>
   )

@@ -175,7 +175,7 @@ export async function CreateHomePage(): Promise<contentData[]> {
       horizont: true
     },
     {
-      title: "All Time Popular",
+      title: "Popular in this Season",
       Cards: await sendToApi({
         page: 1, 
         season: season[0],
