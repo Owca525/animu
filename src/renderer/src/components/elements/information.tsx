@@ -12,6 +12,7 @@ import Drop from '../ui/drop'
 
 // css
 import '../../css/elements/information.css'
+import { convertDateToFormattedString } from '@renderer/utils/time'
 
 function decodeHtmlEntities(str: string) {
   const parser = new DOMParser();
@@ -90,13 +91,6 @@ export const Information: React.FC<{ data: InformationData }> = ({ data }) => {
     )
   }
 
-  if (data == undefined) {
-    return (
-      <div className="information-background" style={{ backgroundColor: "rgb(0,0,0, 0.5)", position: "fixed" }}>
-        <div className="material-symbols-outlined loading">progress_activity</div>
-      </div>
-    )
-  }
   console.log(data)
   return (
     <div className="information-background">
@@ -154,18 +148,18 @@ export const Information: React.FC<{ data: InformationData }> = ({ data }) => {
                 <div className="information-anime-info-text">{data.data.status}</div>
               </div>
             )}
-            {/* {data.data.airedStart != undefined && (
+            {data.data.startDate != undefined && data.data.startDate.day != null && data.data.startDate.month != null && data.data.startDate.year != null ? (
               <div className="information-anime-info-content">
                 <div className="information-anime-info-header">Start Date</div>
-                <div className="information-anime-info-text">{convertDateToFormattedString(data.information.airedStart.year, data.information.airedStart.month, data.information.airedStart.hour, data.information.airedStart.minute, data.information.airedStart.date)}</div>
+                <div className="information-anime-info-text">{convertDateToFormattedString(data.data.startDate.year, data.data.startDate.month, 0,0,0)}</div>
               </div>
-            )}
-            {data.information.airedEnd != undefined && (
+            ) : ""}
+            {data.data.endDate != undefined && data.data.endDate.day != null && data.data.endDate.month != null && data.data.endDate.year != null ? (
               <div className="information-anime-info-content">
                 <div className="information-anime-info-header">End Date</div>
-                <div className="information-anime-info-text">{convertDateToFormattedString(data.information.airedEnd.year, data.information.airedEnd.month, data.information.airedEnd.hour, data.information.airedEnd.minute, data.information.airedEnd.date)}</div>
+                <div className="information-anime-info-text">{convertDateToFormattedString(data.data.endDate.year, data.data.endDate.month, 0,0,0)}</div>
               </div>
-            )} */}
+            ) : ""}
            {data.data.season != undefined && (
               <div className="information-anime-info-content">
                 <div className="information-anime-info-header">Season</div>
