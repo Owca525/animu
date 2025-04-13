@@ -31,7 +31,10 @@ const Card: React.FC<CardProps> = ({ AnimeID, data, player = null, BottomText = 
     //   })
     //   return
     // }
-    // showIndormation({ anime_id: id })
+    showIndormation({ data: {
+      AnimeID: AnimeID,
+      data: data
+    } })
   }
 
   return (

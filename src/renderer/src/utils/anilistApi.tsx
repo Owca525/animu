@@ -1,4 +1,3 @@
-import Content from "@renderer/pages/home/content";
 import { CardProps, contentData } from "./interface";
 
 const graphicApi = `

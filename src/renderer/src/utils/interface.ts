@@ -11,7 +11,7 @@ export interface CardProps {
       ep: number 
     }; 
     time: number | string 
-  }
+  } | null
   BottomText?: string
   deletion?: (event: any, id: string) => void
 }
@@ -59,10 +59,10 @@ export interface contentData {
 
 // AnimeID is for anilist etc, playerID is for player
 export interface InformationData {
-  PlayerID: string | null
+  PlayerID?: string | null
   AnimeID: string | null
   data: AnimeData
-  episodesList: Array<{ type: string, avaibleEpisodes: number, listEpisodes: Array<number> }> | null
+  episodesList?: Array<{ type: string, avaibleEpisodes: number, listEpisodes: Array<number> }> | null
 }
 
 export interface ListItem {

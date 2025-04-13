@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { Information } from "@renderer/components/elements/information";
+import { InformationData } from "../interface";
 
-let showIndormation: (data: { anime_id: string }) => void = () => {};
+let showIndormation: (data: { data: InformationData }) => void = () => {};
 let hideInformation: () => void = () => {};
 let isInformationShow: () => boolean = (): any => {};
 
 const InformationContext: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isShow, setIsShow] = useState(false);
-  const [data, setData] = useState<{ anime_id: string } | null>();
+  const [data, setData] = useState<{ data: InformationData } | null>();
 
-  showIndormation = (informationData: { anime_id: string }) => {
+  showIndormation = (informationData: { data: InformationData }) => {
     setData(informationData);
     setIsShow(true);
   };
@@ -27,7 +28,7 @@ const InformationContext: React.FC<{ children: React.ReactNode }> = ({ children 
     <>
       {children}
       {isShow && data && (
-        <Information anime_id={data.anime_id} />
+        <Information data={data.data} />
       )}
     </>
   );
