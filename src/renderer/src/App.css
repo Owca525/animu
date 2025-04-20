@@ -6,7 +6,25 @@
 body {
   width: 100vw;
   height: 100vh;
-  
+
   color: var(--text);
   background-color: var(--bg);
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+::-webkit-scrollbar {
+  z-index: 200;
+  width: 8px;
+  height: 12px;
+  background-color: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: var(--bg3);
 }
