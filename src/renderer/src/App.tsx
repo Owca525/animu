@@ -7,6 +7,9 @@ import 'material-symbols'
 import Home from "./pages/home/index"
 import Information from "./pages/information/index"
 
+// Temporally
+import "./themes/DarkAnimu.css"
+
 function App() {
   return (
     <>
