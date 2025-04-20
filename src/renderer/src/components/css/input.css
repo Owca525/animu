@@ -10,4 +10,14 @@
 
     background-color: var(--bg3);
     color: var(--text);
+    border: 2px solid var(--bg3);
+    transition: all 0.1s ease;
+}
+
+.input:hover {
+    border-color: var(--neutral1);
+}
+
+.input:focus {
+    border-color: var(--neutral1);
 }

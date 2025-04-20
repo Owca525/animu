@@ -19,7 +19,7 @@
 .home-header-left {
     justify-self: start;
     display: flex;
-    gap: clamp(4px, 1vw, 24px);
+    gap: clamp(12px, 2vw, 32px);
 }
 
 .home-header-right {
