@@ -1,0 +1,17 @@
+.button {
+    border: none;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    gap: clamp(4px, 1vw, 8px);
+    align-items: center;
+    padding: clamp(4px, 1vw, 10px);
+    transition: all 0.1s ease;
+    
+    background-color: var(--bg3);
+    border-color: var(--bg3);
+    color: var(--text);
+}

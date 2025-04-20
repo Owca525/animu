@@ -6,4 +6,7 @@
 body {
   width: 100vw;
   height: 100vh;
+  
+  color: var(--text);
+  background-color: var(--bg);
 }
