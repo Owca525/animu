@@ -16,7 +16,9 @@ function home() {
                     <Input placeholder="Search..." />
                 </div>
                 <div></div>
-                <div className="home-header-right"></div>
+                <div className="home-header-right">
+                    <Button onClick={() => navigate("/info")} content="test information"/>
+                </div>
             </div>
             <div className="home-container">
 
