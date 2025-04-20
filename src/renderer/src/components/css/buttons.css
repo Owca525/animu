@@ -5,12 +5,12 @@
     border-radius: 8px;
     cursor: pointer;
     display: flex;
-    justify-content: space-between;
-    gap: clamp(4px, 1vw, 8px);
+    justify-content: start;
     align-items: center;
+    gap: clamp(4px, 1vw, 12px);
     padding: clamp(4px, 1vw, 10px);
     transition: all 0.1s ease;
-    
+
     background-color: var(--bg3);
     border-color: var(--bg3);
     color: var(--text);

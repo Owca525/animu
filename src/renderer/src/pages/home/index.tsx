@@ -8,12 +8,31 @@ import Sidebar from "@renderer/components/sidebar"
 
 function home() {
     const navigate = useNavigate()
+
+    const sidebarData = {
+        top: [
+            {
+                icon: "home",
+                text: "Home",
+            },
+            {
+                icon: "history",
+                text: "History",
+            }
+        ],
+        bottom: [
+            {
+                icon: "settings",
+                text: "Settings",
+            }
+        ]
+    }
     
     return (
         <main className="home">
             <div className="home-header">
                 <div className="home-header-left">
-                    <Button icon="menu" />
+                    <Button icon="menu" /> {/* This is placeholder for working button in sidebar */}
                     <Input placeholder="Search..." />
                 </div>
                 <div></div>
@@ -24,7 +43,7 @@ function home() {
             <div className="home-container">
                 <div>dfsiufd</div>
             </div>
-            <Sidebar />
+            <Sidebar data={sidebarData} />
         </main>
     )
 }
