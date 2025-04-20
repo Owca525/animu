@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import "./home.css"
 import Button from "@renderer/components/buttons"
 import Input from "@renderer/components/input"
+import Sidebar from "@renderer/components/sidebar"
 
 function home() {
     const navigate = useNavigate()
@@ -21,8 +22,9 @@ function home() {
                 </div>
             </div>
             <div className="home-container">
-
+                <div>dfsiufd</div>
             </div>
+            <Sidebar />
         </main>
     )
 }
