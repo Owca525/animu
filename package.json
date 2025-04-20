@@ -13,7 +13,7 @@
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "copy:assets": "mkdir -p ./out/renderer/assets && cp -r ./src/renderer/src/css/themes ./out/renderer/assets",
     "start": "electron-vite preview",
-    "dev": "npm run copy:assets && electron-vite dev",
+    "dev": "electron-vite dev",
     "build": "npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "npm run build && electron-builder --dir",

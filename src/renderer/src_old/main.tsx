@@ -4,6 +4,8 @@ import App from './App'
 import './App.css'
 
 // Import language support
+import './utils/i18n'
+import { DialogContext } from './utils/context/DialogContext'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 const queryClient = new QueryClient({
@@ -17,8 +19,10 @@ const queryClient = new QueryClient({
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <App />
-    </QueryClientProvider>
+    <DialogContext>
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
+    </DialogContext>
   </React.StrictMode>
 )
