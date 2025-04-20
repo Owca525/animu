@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import 'material-symbols'
 
 import Home from "./pages/home/index"
+import Information from "./pages/information/index"
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Suspense fallback={AppLoading()}>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/info" element={<Information />} />
           </Routes>
         </Suspense>
       </HashRouter>
