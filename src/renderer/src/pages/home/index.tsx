@@ -43,7 +43,7 @@ function home() {
             <div className="home-container">
                 <div>dfsiufd</div>
             </div>
-            <Sidebar data={sidebarData} />
+            <Sidebar data={sidebarData}/>
         </main>
     )
 }

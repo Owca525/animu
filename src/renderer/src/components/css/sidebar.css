@@ -1,23 +1,32 @@
-.sidebar-container {
-    grid-area: sidebar;
-
-    height: 100%;
+.sidebar-container-max {
     width: clamp(50px, 20vw, 200px);
-    background-color: var(--bg2);
+}
 
+.sidebar-container-min {
+    width: clamp(50px, 7.3vw, 68px);
+}
+
+.sidebar-container-min, .sidebar-container-max  {
+    height: 100%;
     display: flex;
     align-items: center;
     flex-direction: column;
     justify-content: space-between;
     position: fixed;
+    background-color: var(--bg2);
+    grid-area: sidebar;
 }
 
 .sidebar-top, .sidebar-bottom {
-    margin: 12px;
-    width: 90%;
+    margin: 4px;
+    width: max-content;
     display: flex;
     flex-direction: column;
     gap: clamp(4px, 1vw, 12px);
+}
+
+.sidebar-max-button {
+    width: 90%;
 }
 
 .sidebar-bottom {
@@ -31,6 +40,7 @@
 
 .sidebar-hide-container {
     padding: 8px;
+    padding-left: 10px;
 }
 
 .sidebar-black-line {
