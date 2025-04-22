@@ -1,5 +1,6 @@
 import Button from "@renderer/components/buttons"
 import "./information.css"
+import { useNavigate } from "react-router-dom"
 
 const data = {
     "id": 178680,
@@ -51,6 +52,8 @@ const data = {
 }
 
 function information() {
+    const navigate = useNavigate()
+
     return (
         <main className="information">
             <div className="information-banner">
@@ -120,7 +123,7 @@ function information() {
                 </div>
             </div>
             
-            <Button icon="arrow_back" ButtonClass="information-exit-button" />
+            <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
 
         </main>
     )
