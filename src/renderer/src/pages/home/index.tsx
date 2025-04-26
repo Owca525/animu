@@ -32,7 +32,6 @@ function home() {
         <main className="home">
             <div className="home-header">
                 <div className="home-header-left">
-                    <Button icon="menu" /> {/* This is placeholder for working button in sidebar */}
                     <Input placeholder="Search..." />
                 </div>
                 <div></div>

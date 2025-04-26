@@ -31,7 +31,8 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, Hover, SidebarHide, data, h
                     <Button icon="menu" onClick={() => setHover((prev) => !prev)} />
                 </div>
             )}
-            <div className={sidebarHover ? "sidebar-container-max" : "sidebar-container-min"} style={sidebarHover == false && SidebarHide == true ? { display: "none" } : {}}>
+            {/*  style={sidebarHover == false && SidebarHide == true ? { display: "none" } : {}} */}
+            <div className={sidebarHover ? "sidebar-container-max" : "sidebar-container-min"}>
                 <div className={`sidebar-top ${sidebarHover ? "sidebar-max-button" : ""}`}>
                     {data.top.map((value) => <Button icon={value.icon} content={sidebarHover ? value.text : undefined} onClick={value.onClick} />)}
                 </div>
