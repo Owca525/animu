@@ -1,6 +1,7 @@
 import { useState } from "react"
 import Button from "./buttons"
 import "./css/sidebar.css"
+import useHotkeys from "@reecelucas/react-use-hotkeys"
 
 interface sidebarProps {
     showLogo?: boolean
@@ -22,6 +23,10 @@ interface sidebarProps {
 
 const Sidebar: React.FC<sidebarProps> = ({ showLogo, alwaysShow, data, hideButton }) => {
     const [sidebarHover, setHover] = useState<boolean>(false)
+
+    useHotkeys("Tab", () => {
+        setHover((prev) => !prev)
+    })
 
     return (
         <div className="sidebar-main-container">
