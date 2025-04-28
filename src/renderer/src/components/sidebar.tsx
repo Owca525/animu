@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Button from "./buttons"
 import "./css/sidebar.css"
 import useHotkeys from "@reecelucas/react-use-hotkeys"
@@ -23,6 +23,28 @@ interface sidebarProps {
 
 const Sidebar: React.FC<sidebarProps> = ({ showLogo, alwaysShow, data, hideButton }) => {
     const [sidebarHover, setHover] = useState<boolean>(false)
+    const sidebarRef = useRef<HTMLDivElement>(null);
+
+    const handleClickOutside = (event: MouseEvent) => {
+        let data = event.target as HTMLElement
+        console.log(event)
+        if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && data.classList.contains("material-symbols-outlined") == false) {
+            setHover((prev) => !prev)
+            return
+        }
+        if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && data.classList.contains("sidebar-hide-button") == false) {
+            setHover((prev) => !prev)
+            return
+        }
+        setHover(() => false)
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [])
 
     useHotkeys("Tab", () => {
         setHover((prev) => !prev)
@@ -32,10 +54,10 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, alwaysShow, data, hideButto
         <div className="sidebar-main-container">
             {hideButton ? "" : (
                 <div className="sidebar-hide-container">
-                    <Button icon="menu" onClick={() => setHover((prev) => !prev)} />
+                    <Button icon="menu" ButtonClass="sidebar-hide-button" />
                 </div>
             )}
-            <div className={"sidebar-container-max"} style={sidebarHover ? {} : { display: "none" }}>
+            <div className={"sidebar-container-max"} style={sidebarHover ? {} : { display: "none" }} ref={sidebarRef}>
                 <div className={`sidebar-top ${"sidebar-max-button"}`}>
                     {data.top.map((value) => <Button icon={value.icon} content={sidebarHover ? value.text : undefined} onClick={value.onClick} />)}
                 </div>
