@@ -28,11 +28,11 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, alwaysShow, data, hideButto
     const handleClickOutside = (event: MouseEvent) => {
         let data = event.target as HTMLElement
         console.log(event)
-        if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && data.classList.contains("material-symbols-outlined") == false) {
+        if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && data.classList.contains("material-symbols-outlined") == true) {
             setHover((prev) => !prev)
             return
         }
-        if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && data.classList.contains("sidebar-hide-button") == false) {
+        if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && data.classList.contains("sidebar-hide-button") == true) {
             setHover((prev) => !prev)
             return
         }
