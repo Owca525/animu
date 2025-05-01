@@ -1,0 +1,30 @@
+.card-container {
+    position: relative;
+    height: min-content;
+    max-width: 220px;
+    width: auto;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.card-image, .card-image-placeholder {
+    max-width: 260px;
+    max-height: 220px;
+    width: max-content;
+    height: max-content;
+    border-radius: 8px;
+    aspect-ratio: 2 / 3;
+}
+
+.card-title {
+    font-size: 1em;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+}

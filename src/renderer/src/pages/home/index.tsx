@@ -5,6 +5,7 @@ import "./home.css"
 import Button from "@renderer/components/buttons"
 import Input from "@renderer/components/input"
 import Sidebar from "@renderer/components/sidebar"
+import Container from "./components/container"
 
 function home() {
     const navigate = useNavigate()
@@ -40,7 +41,7 @@ function home() {
                 </div>
             </div>
             <div className="home-container">
-                <div>dfsiufd</div>
+                <Container title="Test" data={[]}/>
             </div>
             <Sidebar data={sidebarData}/>
         </main>

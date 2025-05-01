@@ -34,10 +34,24 @@ export interface AnimeData {
 
 export interface playerData {
     title: string
-    hls: boolean
     resolutions: {
         res: string
         url: string
         hostname: string
+        hls: boolean
     }[]
+}
+
+export interface cardData {
+    AnimeData: AnimeData
+    saveData?: playerData
+    deletionCard?: () => void
+    CardOnClick?: () => void
+}
+
+export interface containerData {
+    title: string
+    data: cardData[]
+    horizontal?: boolean
+    onScrollDownFunction?: () => void
 }
