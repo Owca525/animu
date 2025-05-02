@@ -1,3 +1,4 @@
+import { containerData, pluginFormat } from "@renderer/utils/GlobalInterface";
 
 const graphicApi = `
 query(
@@ -144,7 +145,7 @@ const trendingAnime = { page: 1, sort: [ "TRENDING_DESC", "POPULARITY_DESC" ], t
 async function sendToApi(variable: any) {
   let data = await window.api.request.post("https://graphql.anilist.co", header, { query: graphicApi, variables: variable })
   if (data.success) {
-    return data.data.data.Page.media.map((value) => Convert(value))
+    return data.data.data.Page.media
   }
   return []
 }
@@ -164,32 +165,38 @@ function getSeasonFromDate(date: Date) {
   return [];
 }
 
-export async function CreateHomePage(): Promise<contentData[]> {
+export async function CreateHomePage(): Promise<containerData[]> {
   let season = getSeasonFromDate(new Date())
   return [
     {
       title: "Trending Now",
-      Cards: await sendToApi(trendingAnime),
-      horizont: true
+      data: await sendToApi(trendingAnime),
+      horizontal: true
     },
     {
       title: "Popular in this Season",
-      Cards: await sendToApi({
+      data: await sendToApi({
         page: 1, 
         season: season[0],
         seasonYear: season[1],
         type: "ANIME"
       }),
-      horizont: true
+      horizontal: true
     },
     {
       title: "All Time Popular",
-      Cards: await sendToApi({
+      data: await sendToApi({
         page: 1, 
         sort: "POPULARITY_DESC", 
         type: "ANIME"
       }),
-      horizont: true
+      horizontal: true
     }
   ]
+}
+
+export const infoPlugin: pluginFormat = {
+  version: "0.1",
+  name: "AnilistApi",
+  author: "Owca525"
 }

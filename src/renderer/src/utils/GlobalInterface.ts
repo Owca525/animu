@@ -55,3 +55,17 @@ export interface containerData {
     horizontal?: boolean
     onScrollDownFunction?: () => void
 }
+
+export interface pluginFormat {
+    version: string
+    name: string
+    author: string
+    information?: {
+        search: (name: string) => void
+        home: () => void
+    } | null
+    player?: {
+        getUrls: () => playerData
+        listEpisodes: () => string[]
+    } | null
+}

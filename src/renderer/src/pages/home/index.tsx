@@ -6,9 +6,12 @@ import Button from "@renderer/components/buttons"
 import Input from "@renderer/components/input"
 import Sidebar from "@renderer/components/sidebar"
 import Container from "./components/container"
+import { useSelector } from "react-redux"
 
 function home() {
     const navigate = useNavigate()
+    const plugin = useSelector((plugin) => plugin);
+    console.log(plugin)
 
     const sidebarData = {
         top: [
