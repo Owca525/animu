@@ -1,19 +1,19 @@
 :root {
-  --text: #cfcfcf; /* is use on regular text */
-  --text-gray: #8d8d8d; /* is use in card continue watch */
+  --text: #cfcfcf; /* is used on regular text */
+  --text-gray: #8d8d8d; /* is used in card continue watch */
 
   /* Background */
   --bg: #1e1e1e; /* First layer, background only */
-  --bg2: #232323; /* Second layer, use in sidebar, header */
-  --bg3: rgb(46, 46, 46); /* Thirt layer, use in button etc */
-  --bg4: rgb(64, 64, 64); /* Fourth layer, use in hover button etc */
+  --bg2: #232323; /* Second layer, used in sidebar, header */
+  --bg3: rgb(46, 46, 46); /* Thirt layer, used in button etc */
+  --bg4: rgb(64, 64, 64); /* Fourth layer, used in hover button etc */
 
   /* accent */
   --neutral1: #17964a; /* is using on outline, border-color etc */
-  --neutral2: #19a651; /* not use */
-  --neutral3: #27ae5d; /* not use */
+  --neutral2: #19a651; /* not used */
+  --neutral3: #27ae5d; /* not used */
 
   /* Other */
-  --black: rgba(0, 0, 0); /* is use in video container */
-  --notVisible: rgba(0, 0, 0, 0); /* is use in player button */
+  --black: rgba(0, 0, 0); /* is used in video container */
+  --notVisible: rgba(0, 0, 0, 0); /* is used in player button */
 }
