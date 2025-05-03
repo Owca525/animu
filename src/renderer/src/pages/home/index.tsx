@@ -10,7 +10,7 @@ import { useSelector } from "react-redux"
 
 function home() {
     const navigate = useNavigate()
-    const plugin = useSelector((plugin) => plugin);
+    const plugin = useSelector((plugin: any) => plugin.plugin);
     console.log(plugin)
 
     const sidebarData = {
