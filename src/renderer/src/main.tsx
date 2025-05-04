@@ -22,7 +22,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <QueryClientProvider client={queryClient}>
       <Provider store={store}>
         <App />
-      </Provider>,
+      </Provider>
     </QueryClientProvider>
   </React.StrictMode>
 )
