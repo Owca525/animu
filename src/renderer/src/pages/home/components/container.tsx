@@ -1,13 +1,20 @@
 import { containerData } from "@renderer/utils/GlobalInterface"
 import "./css/container.css"
 import Card from "./card"
+import { useRef } from "react"
 
 const Container: React.FC<containerData> = ({ title, data, horizontal, onScrollDownFunction }) => {
-
+  const container = useRef<HTMLDivElement>(null)
+  function handleScroll(event) {
+    // if (container.current) {
+    //   container.current.scrollLeft += 30
+    //   console.log(container.current.scrollLeft, event.deltaY)
+    // }
+  }
   return (
     <div className="main-container">
         <div className="container-title">{title}</div>
-        <div className={horizontal ? "container-data-horizontal" : "container-data"}>
+        <div className={horizontal ? "container-data-horizontal" : "container-data"} onWheel={handleScroll} ref={container}>
             {data.map((card) => <Card AnimeData={card.AnimeData} saveData={card.saveData} deletionCard={card.deletionCard} />)}
         </div>
     </div>

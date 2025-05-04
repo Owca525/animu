@@ -23,4 +23,6 @@
     height: max-content;
     overflow: auto;
     overflow-y: hidden;
+
+    scroll-snap-type: x mandatory;
 }
