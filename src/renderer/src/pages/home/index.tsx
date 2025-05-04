@@ -39,6 +39,7 @@ function home() {
             {
                 icon: "settings",
                 text: "Settings",
+                onClick: () => navigate("/settings")
             }
         ]
     }
