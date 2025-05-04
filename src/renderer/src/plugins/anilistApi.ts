@@ -162,7 +162,21 @@ function getSeasonFromDate(date: Date) {
   return [];
 }
 
-export async function CreateHomePage(): Promise<containerData[]> {
+async function SearchAnilistApi(text: string) {
+  return [
+    {
+      title: `Searching: ${text}`,
+      data: await sendToApi({ 
+        page: 1,
+        search: text,
+        sort: "SEARCH_MATCH", 
+        type: "ANIME" 
+      })
+    },
+  ]
+}
+
+async function CreateHomePage(): Promise<containerData[]> {
   let season = getSeasonFromDate(new Date())
   return [
     {
@@ -202,6 +216,6 @@ export const infoPlugin: pluginFormat = {
   author: "Owca525",
   information: {
     home: CreateHomePage,
-    search: (text: string) => {console.log(text)}
+    search: SearchAnilistApi
   }
 }
