@@ -27,10 +27,6 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, alwaysShow, data, hideButto
 
     const handleClickOutside = (event: MouseEvent) => {
         let data = event.target as HTMLElement
-        if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && data.classList.contains("material-symbols-outlined") == true) {
-            setHover((prev) => !prev)
-            return
-        }
         if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && data.classList.contains("sidebar-hide-button") == true) {
             setHover((prev) => !prev)
             return
@@ -53,7 +49,7 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, alwaysShow, data, hideButto
         <div className="sidebar-main-container">
             {hideButton ? "" : (
                 <div className="sidebar-hide-container">
-                    <Button icon="menu" ButtonClass="sidebar-hide-button" />
+                    <Button icon="menu" iconClassName="sidebar-hide-button" />
                 </div>
             )}
             <div className={"sidebar-container-max"} style={sidebarHover ? {} : { display: "none" }} ref={sidebarRef}>

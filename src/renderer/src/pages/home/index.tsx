@@ -14,7 +14,6 @@ function home() {
     const navigate = useNavigate()
     const plugin = useSelector((plugin: any) => plugin.plugin.informationPlugin);
     const [ func, setfunc ] = useState<() => Promise<any>>(() => plugin.information.home)
-    console.log(func)
     const { data, error, isLoading, refetch } = useQuery(
         [func.toString()],
         func,
