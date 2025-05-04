@@ -26,6 +26,16 @@
     aspect-ratio: 2 / 3;
 }
 
+.card-image-placeholder {
+    width: max-content;
+    height: 220px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: var(--bg3);
+}
+
 .card-title {
     font-size: 1em;
     overflow: hidden;
