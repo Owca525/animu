@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom"
 
 // Home css
 import "./home.css"
-import Button from "@renderer/components/buttons"
 import Input from "@renderer/components/input"
 import Sidebar from "@renderer/components/sidebar"
 import Container from "./components/container"
