@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import "./css/input.css"
 
 interface InputProps {
@@ -10,6 +10,7 @@ interface InputProps {
 
 const Input: React.FC<InputProps> = ({ type = "text", InputClass, placeholder, onKeyDown }) => {
     const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
+    const inputRef = useRef<HTMLInputElement>(null)
 
     function handleData(event) {
         if (!onKeyDown) return
@@ -20,14 +21,14 @@ const Input: React.FC<InputProps> = ({ type = "text", InputClass, placeholder, o
         }
 
         const newTimeout = setTimeout(() => {
-            onKeyDown(event.currentTarget.value)
+            if (inputRef.current) onKeyDown(inputRef.current.value)
         }, 300);
 
         setDebounceTimeout(newTimeout);
     }
 
     return (
-        <input type={type} className={"input " + InputClass} placeholder={placeholder} onKeyDown={handleData} />
+        <input type={type} ref={inputRef} className={"input " + InputClass} placeholder={placeholder} onKeyDown={handleData} />
     )
 }
 

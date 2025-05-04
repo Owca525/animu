@@ -7,11 +7,22 @@ import Input from "@renderer/components/input"
 import Sidebar from "@renderer/components/sidebar"
 import Container from "./components/container"
 import { useSelector } from "react-redux"
+import { useQuery } from "react-query"
+import { useState } from "react"
 
 function home() {
     const navigate = useNavigate()
-    const plugin = useSelector((plugin: any) => plugin.plugin);
-    console.log(plugin)
+    const plugin = useSelector((plugin: any) => plugin.plugin.informationPlugin);
+    const [ func, setfunc ] = useState<() => Promise<any>>(() => plugin.information.home)
+    console.log(func)
+    const { data, error, isLoading, refetch } = useQuery(
+        [func.toString()],
+        func,
+        {
+            refetchOnWindowFocus: false,
+            cacheTime: 0,
+        }
+    );
 
     const sidebarData = {
         top: [
@@ -36,15 +47,19 @@ function home() {
         <main className="home">
             <div className="home-header">
                 <div className="home-header-left">
-                    <Input placeholder="Search..." />
+                    <Input placeholder="Search..." onKeyDown={(text) => setfunc(() => () => plugin.information.search(text))} />
                 </div>
                 <div></div>
                 <div className="home-header-right">
                     <Button onClick={() => navigate("/info")} content="test information"/>
                 </div>
             </div>
-            <div className="home-container">
-                <Container title="Test" data={[]}/>
+            <div className={isLoading ? "home-loading-container" : "home-container"}>
+                {
+                    isLoading ? <div className="material-symbols-outlined home-loading-animation">progress_activity</div> 
+                    : 
+                    data.map((element) => <Container title={element.title} data={element.data} horizontal={element.horizontal} onScrollDownFunction={element.onScrollDownFunction} />)
+                }
             </div>
             <Sidebar data={sidebarData}/>
         </main>

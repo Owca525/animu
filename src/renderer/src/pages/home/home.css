@@ -32,8 +32,21 @@
     margin: clamp(4px, 1vw, 8px);
 }
 
-.home-container {
+.home-container, .home-loading-container {
     grid-area: content;
     padding: 12px;
     overflow: auto;
+}
+
+.home-loading-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.home-loading-animation {
+    font-size: 3em;
+    animation: spin 1s linear infinite;
 }
