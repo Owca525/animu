@@ -50,9 +50,7 @@ function home() {
                     <Input placeholder="Search..." onKeyDown={(text) => setfunc(() => () => plugin.information.search(text))} />
                 </div>
                 <div></div>
-                <div className="home-header-right">
-                    <Button onClick={() => navigate("/info")} content="test information"/>
-                </div>
+                <div className="home-header-right"></div>
             </div>
             <div className={isLoading ? "home-loading-container" : "home-container"}>
                 {

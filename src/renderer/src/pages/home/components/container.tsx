@@ -8,7 +8,7 @@ const Container: React.FC<containerData> = ({ title, data, horizontal, onScrollD
     <div className="main-container">
         <div className="container-title">{title}</div>
         <div className={horizontal ? "container-data-horizontal" : "container-data"}>
-            {data.map((card) => <Card AnimeData={card.AnimeData} saveData={card.saveData} deletionCard={card.deletionCard} CardOnClick={card.CardOnClick} />)}
+            {data.map((card) => <Card AnimeData={card.AnimeData} saveData={card.saveData} deletionCard={card.deletionCard} />)}
         </div>
     </div>
   )

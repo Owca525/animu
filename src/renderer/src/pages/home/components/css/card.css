@@ -9,6 +9,12 @@
     align-items: center;
     flex-direction: column;
     gap: 4px;
+    padding: 4px;
+}
+
+.card-container:hover {
+    background-color: var(--bg4);
+    border-radius: 8px;
 }
 
 .card-image, .card-image-placeholder {
