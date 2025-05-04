@@ -28,6 +28,7 @@ function home() {
             {
                 icon: "home",
                 text: "Home",
+                onClick: () => setfunc(() => plugin.information.home)
             },
             {
                 icon: "history",
