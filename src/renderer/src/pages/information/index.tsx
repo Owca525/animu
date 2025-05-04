@@ -16,7 +16,7 @@ const data = {
         "month": 6,
         "day": 20
     },
-    "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/178680-9HupCDo647QU.jpg",
+    "bannerImage": "",
     "season": "SPRING",
     "seasonYear": 2025,
     "description": "The second season of <i>WIND BREAKER</i>.<br><br>\n\nWelcome back to Furin High School, an institution infamous for its population of brawny brutes who solve every conflict with a show of strength. Some of the students even formed a group, Bofurin, which protects the town. Haruka Sakura, a first-year student who moved in from out of town, is only interested in one thing: fighting his way to the top! <br><br>\n\n(Source: Crunchyroll, edited)",
@@ -57,7 +57,7 @@ function information() {
     return (
         <main className="information">
             <div className="information-banner">
-                <img src={data.bannerImage}></img>
+                <img className={(data.bannerImage ? "information-banner-image" : "information-banner-image-blur")} src={(data.bannerImage ? data.bannerImage : data.coverImage)}/>
             </div>
             
                 <div className="information-fade"></div>
