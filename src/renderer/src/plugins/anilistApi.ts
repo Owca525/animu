@@ -1,4 +1,4 @@
-import { containerData, pluginFormat } from "@renderer/utils/GlobalInterface";
+import { cardData, containerData, pluginFormat } from "@renderer/utils/GlobalInterface";
 
 const graphicApi = `
 query(
@@ -129,23 +129,20 @@ const header = {
   "Accept": "application/json",
 }
 
-const trendingAnime = { page: 1, sort: [ "TRENDING_DESC", "POPULARITY_DESC" ], type: "ANIME" }
-
-// function Convert(convert: any): CardProps {
-//   return {
-//     AnimeID: convert.id,
-//     data: {
-//       ...convert,
-//       coverImage: convert.coverImage.large,
-//       title: convert.title.romaji
-//     },
-//   }
-// }
+function Convert(convert: any): cardData {
+  return {
+    AnimeData: {
+      ...convert,
+      coverImage: convert.coverImage.large,
+      title: convert.title.romaji
+    },
+  }
+}
 
 async function sendToApi(variable: any) {
   let data = await window.api.request.post("https://graphql.anilist.co", header, { query: graphicApi, variables: variable })
   if (data.success) {
-    return data.data.data.Page.media
+    return data.data.data.Page.media.map((data) => Convert(data))
   }
   return []
 }
@@ -165,12 +162,30 @@ function getSeasonFromDate(date: Date) {
   return [];
 }
 
-export async function CreateHomePage(): Promise<containerData[]> {
+async function SearchAnilistApi(text: string) {
+  return [
+    {
+      title: `Searching: ${text}`,
+      data: await sendToApi({ 
+        page: 1,
+        search: text,
+        sort: "SEARCH_MATCH", 
+        type: "ANIME" 
+      })
+    },
+  ]
+}
+
+async function CreateHomePage(): Promise<containerData[]> {
   let season = getSeasonFromDate(new Date())
   return [
     {
       title: "Trending Now",
-      data: await sendToApi(trendingAnime),
+      data: await sendToApi({ 
+        page: 1, 
+        sort: [ "TRENDING_DESC", "POPULARITY_DESC" ], 
+        type: "ANIME" 
+      }),
       horizontal: true
     },
     {
@@ -198,5 +213,9 @@ export async function CreateHomePage(): Promise<containerData[]> {
 export const infoPlugin: pluginFormat = {
   version: "0.1",
   name: "AnilistApi",
-  author: "Owca525"
+  author: "Owca525",
+  information: {
+    home: CreateHomePage,
+    search: SearchAnilistApi
+  }
 }

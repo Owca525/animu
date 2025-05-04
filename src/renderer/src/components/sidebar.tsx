@@ -11,12 +11,12 @@ interface sidebarProps {
         top: {
             icon: string
             text: string
-            onClick?: () => void
+            onClick?: () => any
         }[]
         bottom: {
             icon: string
             text: string
-            onClick?: () => void
+            onClick?: () => any
         }[]
     }
 }
@@ -27,11 +27,8 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, alwaysShow, data, hideButto
 
     const handleClickOutside = (event: MouseEvent) => {
         let data = event.target as HTMLElement
-        if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && data.classList.contains("material-symbols-outlined") == true) {
-            setHover((prev) => !prev)
-            return
-        }
-        if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && data.classList.contains("sidebar-hide-button") == true) {
+        if (data.classList.contains("sidebar-button")) return
+        if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && data.classList.contains("sidebar-hide-button")) {
             setHover((prev) => !prev)
             return
         }
@@ -49,20 +46,27 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, alwaysShow, data, hideButto
         setHover((prev) => !prev)
     })
 
+    function hideSidebar(event, func) {
+        if (func) {
+            func(event)
+            setHover((prev) => !prev)
+        }
+    }
+
     return (
         <div className="sidebar-main-container">
             {hideButton ? "" : (
                 <div className="sidebar-hide-container">
-                    <Button icon="menu" ButtonClass="sidebar-hide-button" />
+                    <Button icon="menu" ButtonClass="sidebar-hide-button" iconClassName="sidebar-hide-button" />
                 </div>
             )}
             <div className={"sidebar-container-max"} style={sidebarHover ? {} : { display: "none" }} ref={sidebarRef}>
                 <div className={`sidebar-top ${"sidebar-max-button"}`}>
-                    {data.top.map((value) => <Button icon={value.icon} content={sidebarHover ? value.text : undefined} onClick={value.onClick} />)}
+                    {data.top.map((value) => <Button icon={value.icon} content={sidebarHover ? value.text : undefined} onClick={(event) => hideSidebar(event, value.onClick)} ButtonClass="sidebar-button" iconClassName="sidebar-button" />)}
                 </div>
                 <div className={`sidebar-bottom ${"sidebar-max-button"}`}>
                     <div className="sidebar-black-line"></div>
-                    {data.bottom.map((value) => <Button icon={value.icon} content={sidebarHover ? value.text : undefined} onClick={value.onClick} />)}
+                    {data.bottom.map((value) => <Button icon={value.icon} content={sidebarHover ? value.text : undefined} onClick={(event) => hideSidebar(event, value.onClick)} ButtonClass="sidebar-button" iconClassName="sidebar-button" />)}
                 </div>
             </div>
         </div>

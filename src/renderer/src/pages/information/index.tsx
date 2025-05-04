@@ -1,5 +1,6 @@
 import Button from "@renderer/components/buttons"
 import "./information.css"
+<<<<<<< HEAD
 import { useNavigate } from "react-router-dom"
 
 const data = {
@@ -50,14 +51,25 @@ const data = {
         ]
     }
 }
+=======
+import { useLocation, useNavigate } from "react-router-dom"
+import { AnimeData } from "@renderer/utils/GlobalInterface";
+>>>>>>> a53d3d53d6b4e45a922051b7d13b60028c23ee87
 
 function information() {
     const navigate = useNavigate()
+    const location = useLocation();
+    const data: AnimeData = location.state;
+    console.log(data)
 
     return (
         <main className="information">
             <div className="information-banner">
+<<<<<<< HEAD
                 <img className={(data.bannerImage ? "information-banner-image" : "information-banner-image-blur")} src={(data.bannerImage ? data.bannerImage : data.coverImage)}/>
+=======
+                <img className="information-banner-image" src={data.bannerImage}></img>
+>>>>>>> a53d3d53d6b4e45a922051b7d13b60028c23ee87
             </div>
             
                 <div className="information-fade"></div>

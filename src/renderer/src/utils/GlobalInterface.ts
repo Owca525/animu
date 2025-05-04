@@ -42,11 +42,15 @@ export interface playerData {
     }[]
 }
 
+export interface indentityPlayer {
+    animeID: string
+    pluginName: string
+}
+
 export interface cardData {
     AnimeData: AnimeData
-    saveData?: playerData
+    saveData?: indentityPlayer
     deletionCard?: () => void
-    CardOnClick?: () => void
 }
 
 export interface containerData {
