@@ -6,10 +6,11 @@ import { useRef } from "react"
 const Container: React.FC<containerData> = ({ title, data, horizontal, onScrollDownFunction }) => {
   const container = useRef<HTMLDivElement>(null)
   function handleScroll(event) {
-    // if (container.current) {
-    //   container.current.scrollLeft += 30
-    //   console.log(container.current.scrollLeft, event.deltaY)
-    // }
+    if (event.deltaY === 0) return;
+    if (container.current) {
+      container.current.scrollLeft += event.deltaY
+      console.log(container.current.scrollLeft, event.deltaY)
+    }
   }
   return (
     <div className="main-container">
