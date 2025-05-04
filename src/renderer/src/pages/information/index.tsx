@@ -12,7 +12,7 @@ function information() {
     return (
         <main className="information">
             <div className="information-banner">
-                <img src={data.bannerImage}></img>
+                <img className="information-banner-image" src={data.bannerImage}></img>
             </div>
             
                 <div className="information-fade"></div>
