@@ -16,3 +16,11 @@
     height: 100%;
     width: 100%;
 }
+
+.container-data-horizontal {
+    display: flex;
+    gap: 12px;
+    height: max-content;
+    overflow: auto;
+    overflow-y: hidden;
+}

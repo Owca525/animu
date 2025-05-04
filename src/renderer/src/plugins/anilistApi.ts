@@ -129,8 +129,6 @@ const header = {
   "Accept": "application/json",
 }
 
-const trendingAnime = { page: 1, sort: [ "TRENDING_DESC", "POPULARITY_DESC" ], type: "ANIME" }
-
 function Convert(convert: any): cardData {
   return {
     AnimeData: {
@@ -167,11 +165,15 @@ function getSeasonFromDate(date: Date) {
 export async function CreateHomePage(): Promise<containerData[]> {
   let season = getSeasonFromDate(new Date())
   return [
-    // {
-    //   title: "Trending Now",
-    //   data: await sendToApi(trendingAnime),
-    //   horizontal: true
-    // },
+    {
+      title: "Trending Now",
+      data: await sendToApi({ 
+        page: 1, 
+        sort: [ "TRENDING_DESC", "POPULARITY_DESC" ], 
+        type: "ANIME" 
+      }),
+      horizontal: true
+    },
     {
       title: "Popular in this Season",
       data: await sendToApi({
@@ -182,15 +184,15 @@ export async function CreateHomePage(): Promise<containerData[]> {
       }),
       horizontal: true
     },
-    // {
-    //   title: "All Time Popular",
-    //   data: await sendToApi({
-    //     page: 1, 
-    //     sort: "POPULARITY_DESC", 
-    //     type: "ANIME"
-    //   }),
-    //   horizontal: true
-    // }
+    {
+      title: "All Time Popular",
+      data: await sendToApi({
+        page: 1, 
+        sort: "POPULARITY_DESC", 
+        type: "ANIME"
+      }),
+      horizontal: true
+    }
   ]
 }
 
