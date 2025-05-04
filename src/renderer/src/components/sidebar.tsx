@@ -49,7 +49,7 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, alwaysShow, data, hideButto
         <div className="sidebar-main-container">
             {hideButton ? "" : (
                 <div className="sidebar-hide-container">
-                    <Button icon="menu" iconClassName="sidebar-hide-button" />
+                    <Button icon="menu" ButtonClass="sidebar-hide-button" iconClassName="sidebar-hide-button" />
                 </div>
             )}
             <div className={"sidebar-container-max"} style={sidebarHover ? {} : { display: "none" }} ref={sidebarRef}>
