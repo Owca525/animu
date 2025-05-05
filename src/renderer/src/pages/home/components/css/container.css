@@ -23,8 +23,12 @@
     gap: 12px;
     height: max-content;
     overflow: hidden;
+    overflow-x: scroll;
 
     scroll-snap-type: x mandatory;
+}
+.container-data-horizontal::-webkit-scrollbar {
+    display: none;
 }
 
 .container-left-skip-button, .container-right-skip-button {
