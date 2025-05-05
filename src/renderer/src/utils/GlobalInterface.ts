@@ -32,6 +32,12 @@ export interface AnimeData {
     type: string | null
 }
 
+export interface homeData {
+    data: containerData[]
+    isLoading: boolean
+    isError: boolean
+}
+
 export interface playerData {
     title: string
     resolutions: {

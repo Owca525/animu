@@ -1,4 +1,5 @@
 import { cardData, containerData, pluginFormat } from "@renderer/utils/GlobalInterface";
+import store from "@renderer/utils/store";
 
 const graphicApi = `
 query(
@@ -163,7 +164,8 @@ function getSeasonFromDate(date: Date) {
 }
 
 async function SearchAnilistApi(text: string) {
-  return [
+  store.dispatch({ type: "setLoadingHome", payload: { isLoading: true } })
+  store.dispatch({ type: "setAllHomeData", payload: { isLoading: false, isError: false, data: [
     {
       title: `Searching: ${text}`,
       data: await sendToApi({ 
@@ -172,13 +174,14 @@ async function SearchAnilistApi(text: string) {
         sort: "SEARCH_MATCH", 
         type: "ANIME" 
       })
-    },
-  ]
+    }
+  ]}})
 }
 
-async function CreateHomePage(): Promise<containerData[]> {
+async function CreateHomePage() {
   let season = getSeasonFromDate(new Date())
-  return [
+  store.dispatch({ type: "setLoadingHome", payload: { isLoading: true } })
+  store.dispatch({ type: "setAllHomeData", payload: { isLoading: false, isError: false, data: [
     {
       title: "Trending Now",
       data: await sendToApi({ 
@@ -208,6 +211,7 @@ async function CreateHomePage(): Promise<containerData[]> {
       horizontal: true
     }
   ]
+  }})
 }
 
 export const infoPlugin: pluginFormat = {

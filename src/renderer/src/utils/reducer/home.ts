@@ -1,17 +1,21 @@
-const initialState = {
-    loading: false,
-    error: false,
+import { homeData } from "../GlobalInterface";
+
+const initialState: homeData = {
+    isLoading: false,
+    isError: false,
     data: []
 };
 
 const userReducer = (state = initialState, action) => {
   switch (action.type) {
-    case "setPluginPlayer":
-      return { ...state, playerPlugin: action.payload };
-    case "setInformationPlugin":
-        return { ...state, informationPlugin: action.payload };
-    case "ResetLoadedPlugins":
-        return { informationPlugin: null, playerPlugin: null };
+    case "setAllHomeData":
+      return { ...state, ...action.payload };
+    case "setLoadingHome":
+      return { ...state, isLoading: action.payload };
+    case "setErrorHome":
+      return { ...state, isError: action.payload };
+    case "resetHomeData":
+        return { ...initialState };
     default:
       return state;
   }
