@@ -7,6 +7,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    position: relative;
 }
 
 .container-data {
@@ -21,8 +22,38 @@
     display: flex;
     gap: 12px;
     height: max-content;
-    overflow: auto;
-    overflow-y: hidden;
+    overflow: hidden;
 
     scroll-snap-type: x mandatory;
+}
+
+.container-left-skip-button, .container-right-skip-button {
+    width: max-content;
+    height: max-content;
+    z-index: 2;
+    margin-bottom: 25px;
+    position: absolute;
+    display: none;
+}
+
+.container-left-skip-button {
+    left: 0;
+}
+.container-right-skip-button{
+    right: 0;
+}
+
+.button-container {
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.button-container:hover .container-left-skip-button {
+    display: block;
+}
+
+.button-container:hover .container-right-skip-button {
+    display: block;
 }
