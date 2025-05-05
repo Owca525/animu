@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom"
 import { AnimeData } from "@renderer/utils/GlobalInterface";
 import Button from "@renderer/components/buttons";
+import "./information.css"
 
 function information() {
     const navigate = useNavigate()
