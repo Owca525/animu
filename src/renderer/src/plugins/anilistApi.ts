@@ -1,4 +1,4 @@
-import { cardData, containerData, pluginFormat } from "@renderer/utils/GlobalInterface";
+import { cardData, pluginFormat } from "@renderer/utils/GlobalInterface";
 import store from "@renderer/utils/store";
 
 const graphicApi = `

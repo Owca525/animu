@@ -5,15 +5,12 @@ import "./home.css"
 import Input from "@renderer/components/input"
 import Sidebar from "@renderer/components/sidebar"
 import Container from "./components/container"
-import { useDispatch, useSelector } from "react-redux"
-import { isError, useQuery } from "react-query"
-import { useEffect, useState } from "react"
+import { useSelector } from "react-redux"
+import { useEffect } from "react"
 import { homeData } from "@renderer/utils/GlobalInterface"
-import Button from "@renderer/components/buttons"
 
 function home() {
     const navigate = useNavigate()
-    const dispatch = useDispatch();
     const plugin = useSelector((plugin: any) => plugin.plugin.informationPlugin);
     const homeCache: homeData = useSelector((cache: any) => cache.home);
 
