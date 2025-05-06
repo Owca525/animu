@@ -10,6 +10,10 @@ import Settings from "./pages/settings/index"
 
 // Temporally
 import "./themes/DarkAnimu.css"
+import { checkConfig, readConfig } from './utils/config';
+import store from './utils/store';
+
+LoadConfig()
 
 function App() {
   return (
@@ -34,6 +38,13 @@ function AppLoading() {
       <div className="loading material-symbols-outlined">progress_activity</div>
     </div>
   )
+}
+
+async function LoadConfig() {
+  if (!await checkConfig()) return
+  const loadedConnfig = await readConfig()
+  console.log(loadedConnfig)
+  store.dispatch({ type: "setConfig", payload: loadedConnfig })
 }
 
 export default App

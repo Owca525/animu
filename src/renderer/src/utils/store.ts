@@ -3,10 +3,12 @@ import { combineReducers } from "redux";
 
 import pluginStore from "./reducer/plugins"
 import HomeData from "./reducer/home"
+import Config from "./reducer/config"
 
 const rootReducer = combineReducers({
     plugin: pluginStore,
-    home: HomeData
+    home: HomeData,
+    config: Config
 });
 
 const store = configureStore({

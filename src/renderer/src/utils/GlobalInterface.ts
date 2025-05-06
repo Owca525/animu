@@ -79,3 +79,74 @@ export interface pluginFormat {
         listEpisodes: () => string[]
     } | null
 }
+
+export interface SettingsConfig {
+    General: {
+        HoverSidebar: boolean
+        HideSidebar: boolean
+        language: string
+        theme: string
+        Window: {
+            AutoMaximize: boolean
+            AutoFullscreen: boolean
+            Zoom: number
+        }
+    }
+    Player: {
+        general: {
+            Autoplay: boolean
+            AutoFullscreen: boolean
+            AutoSkipEpisode: boolean
+            Volume: number
+            playerLoadType: string
+            LongTimeSkipForward: number | string
+            LongTimeSkipBack: number | string
+            TimeSkipLeft: number | string
+            TimeSkipRight: number | string
+        }
+        screenShot: {
+            alwaysAsk: boolean
+            saveType: "File" | "Clip" | "Both"
+            path: string
+        }
+        keybinds: {
+            Pause: string
+            LongTimeSkipForward: string
+            LongTimeSkipBack: string
+            TimeSkipLeft: string
+            TimeSkipRight: string
+            Fullscreen: string
+            ExitPlayer: string
+            NextEpisode: string
+            PrevEpisode: string
+            FrameSkipBack: string
+            FrameSkipForward: string
+            VolumeUp: string
+            VolumeDown: string
+            VolumeMute: string
+            ScreenShot: string
+        }
+    }
+    History: {
+        history: {
+            LimitedHistory: boolean
+            maxSave: number | string
+            AlwaysAsk: boolean
+        }
+        continue: {
+            MinimalTimeSave: number | string
+            MaximizeTimeSave: number | string
+        }
+    }
+    Developer: {
+        DeveloperMode: boolean
+        DevTools: boolean
+        DevToolsOnStart: boolean
+        playerDebug: boolean
+    }
+    update: {
+        lastTime: string
+        type: "start" | "day" | "week"
+        enable: boolean
+    }
+}

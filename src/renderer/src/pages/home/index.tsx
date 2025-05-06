@@ -14,8 +14,6 @@ function home() {
     const plugin = useSelector((plugin: any) => plugin.plugin.informationPlugin);
     const homeCache: homeData = useSelector((cache: any) => cache.home);
 
-    console.log(homeCache)
-
     const sidebarData = {
         top: [
             {

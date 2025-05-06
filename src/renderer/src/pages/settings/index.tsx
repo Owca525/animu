@@ -1,3 +1,5 @@
+import CheckBox from "./components/checkBox"
+import SettingsInput from "./components/settingsInput"
 import "./settings.css"
 
 function settings() {
@@ -6,16 +8,14 @@ function settings() {
         <main>
             <div className="settings-setting-container">
                 Test
-                <input className="checkbox" type="checkbox"></input>
+                <CheckBox />
             </div>
 
             <br></br>
 
             <div className="settings-setting-container">
                 Test
-                <div className="input-container">
-                    <input className="input-field" type="text"></input><div className="input-type">%</div>
-                </div>
+                <SettingsInput iconChar="s" />
             </div>
         </main>
     )
