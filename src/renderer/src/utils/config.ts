@@ -3,8 +3,8 @@ import { SettingsConfig } from "./GlobalInterface";
 
 export const defaultConfig: SettingsConfig = {
     General: {
-        HoverSidebar: true,
-        HideSidebar: false,
+        // HoverSidebar: true,
+        // HideSidebar: false,
         language: "en",
         theme: "darkAnimu",
         Window: {
@@ -67,7 +67,7 @@ export const defaultConfig: SettingsConfig = {
     },
     update: {
         lastTime: "0",
-        type: "start",
+        type: "On Start",
         enable: true
     },
 };

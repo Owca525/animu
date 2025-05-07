@@ -5,9 +5,10 @@ interface settingsInputProsps {
     type?: "number" | "text",
     iconChar?: string
     onKeyDown?: (text: string) => void
+    startValue?: string
 }
 
-const SettingsInput: React.FC<settingsInputProsps> = ({ type = "text", iconChar = "", onKeyDown }) => {
+const SettingsInput: React.FC<settingsInputProsps> = ({ type = "text", iconChar = "", onKeyDown, startValue }) => {
     const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
     const inputRef = useRef<HTMLInputElement>(null)
 
@@ -28,7 +29,7 @@ const SettingsInput: React.FC<settingsInputProsps> = ({ type = "text", iconChar 
 
     return (
         <div className="settings-input-container">
-            <input className="settings-input-field" type={type} onKeyDown={handleData} /><div className="settings-input-type">{iconChar}</div>
+            <input className="settings-input-field" type={type} value={startValue} onKeyDown={handleData} /><div className="settings-input-type">{iconChar}</div>
         </div>
     )
 }

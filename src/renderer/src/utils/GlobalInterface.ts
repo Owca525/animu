@@ -82,8 +82,8 @@ export interface pluginFormat {
 
 export interface SettingsConfig {
     General: {
-        HoverSidebar: boolean
-        HideSidebar: boolean
+        // HoverSidebar: boolean
+        // HideSidebar: boolean
         language: string
         theme: string
         Window: {
@@ -146,7 +146,7 @@ export interface SettingsConfig {
     }
     update: {
         lastTime: string
-        type: "start" | "day" | "week"
+        type: "On Start" | "Every Day" | "Every Week"
         enable: boolean
     }
 }
