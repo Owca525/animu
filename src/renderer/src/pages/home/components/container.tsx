@@ -19,8 +19,12 @@ const Container: React.FC<containerData> = ({ title, data, horizontal, onScrollD
     container.current.scrollLeft += num
   }
 
+  onScrollDownFunction = () => {
+    console.log('haiiii')
+  }
+
   return (
-    <div className="main-container">
+    <div className="main-container" onScroll={onScrollDownFunction}>
         <div className="container-title">{title}</div>
         <div className="button-container">
           {horizontal ? <Button icon="chevron_left" ButtonClass="container-left-skip-button" onClick={() => handleButtonScroll(-120)}/> : ""}
