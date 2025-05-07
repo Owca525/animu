@@ -5,6 +5,7 @@ import "./settings.css";
 import { useNavigate } from "react-router-dom";
 import Dropdown from "./components/dropDown";
 import { useState } from "react";
+import Button from "@renderer/components/buttons";
 
 function settings() {
     const navigate = useNavigate();
@@ -118,6 +119,118 @@ function settings() {
                             <div className="settings-setting-container">
                                 Zoom
                                 <SettingsInput iconChar="%" />
+                            </div>
+                        </div>
+                    </>
+                )}
+                {category == "player" && (
+                    <>
+                        <div className="settings-page-container">
+                            <div className="settings-page-title">General</div>
+                            <div className="settings-setting-container">
+                                Auto Play
+                                <CheckBox />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Auto Fullscreen
+                                <CheckBox />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Auto Skip Episodes
+                                <CheckBox />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Default Volume
+                                <SettingsInput iconChar="%" />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Long Skip Forward
+                                <SettingsInput iconChar="s" />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Long Skip Backward
+                                <SettingsInput iconChar="s" />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Short Skip Forward
+                                <SettingsInput iconChar="s" />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Short Skip Backward
+                                <SettingsInput iconChar="s" />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Player Preloard Type
+                                <Dropdown
+                                    options={[
+                                        { label: "Metadata" },
+                                        { label: "Auto" },
+                                    ]}
+                                    placeholder="Metadata"
+                                />
+                            </div>
+                        </div>
+                        <div className="settings-page-container">
+                            <div className="settings-page-title">ScreenShots</div>
+                            <div className="settings-setting-container">
+                                Always ask Where Save Screemshot
+                                <CheckBox />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Save type
+                                <Dropdown
+                                    options={[
+                                        { label: "File" },
+                                        { label: "Clipboard" },
+                                        { label: "Both" },
+                                    ]}
+                                    placeholder="File"
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                ScreenShot Save path
+                                <Button content="Change Location"/>
+                            </div>
+                        </div>
+                        <div className="settings-page-container">
+                            <div className="settings-page-title">Keybinds</div>
+                        </div>
+                    </>
+                )}
+                {category == "history" && (
+                    <>
+                        <div className="settings-page-container">
+                            <div className="settings-page-title">General</div>
+                            <div className="settings-setting-container">
+                                Limited Save History
+                                <CheckBox />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Limit for history
+                                <SettingsInput iconChar=" " />
+                            </div>
+                        </div>
+                        <div className="settings-page-container">
+                            <div className="settings-page-title">Continue Watch</div>
+                            <div className="settings-setting-container">
+                                When Start Save History
+                                <SettingsInput iconChar="s" />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                When Stop Save History
+                                <SettingsInput iconChar="s" />
                             </div>
                         </div>
                     </>

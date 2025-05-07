@@ -106,7 +106,7 @@ export interface SettingsConfig {
         }
         screenShot: {
             alwaysAsk: boolean
-            saveType: "File" | "Clip" | "Both"
+            saveType: "File" | "Clipboard" | "Both"
             path: string
         }
         keybinds: {

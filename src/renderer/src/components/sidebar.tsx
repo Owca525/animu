@@ -71,7 +71,7 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, sidebarClass, data, hideBut
             {showLogo ? (
                 <div className="sidebar-logo-icon-container">
                     <img src={icon} alt={version} className="sidebar-image" />
-                    <div className="sidebar-version">{version}</div>
+                    <div className="sidebar-version">{`v${version}`}</div>
                 </div>
             ) : ""}
             <div className={"sidebar-container-max"} style={hideButton == false ? sidebarHover ? {} : { display: "none" } : {}} ref={sidebarRef}>
