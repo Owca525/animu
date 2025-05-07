@@ -2,11 +2,15 @@ import { useEffect, useRef, useState } from "react"
 import Button from "./buttons"
 import "./css/sidebar.css"
 import useHotkeys from "@reecelucas/react-use-hotkeys"
+import icon from "../../../../resources/icon.png"
 
 interface sidebarProps {
     showLogo?: boolean
-    alwaysShow?: boolean
     hideButton?: boolean
+    sidebarClass?: {
+        container?: string
+        sidebar?: string
+    }
     data: {
         top: {
             icon: string
@@ -21,9 +25,12 @@ interface sidebarProps {
     }
 }
 
-const Sidebar: React.FC<sidebarProps> = ({ showLogo, alwaysShow, data, hideButton }) => {
+const Sidebar: React.FC<sidebarProps> = ({ showLogo, sidebarClass, data, hideButton = false }) => {
     const [sidebarHover, setHover] = useState<boolean>(false)
     const sidebarRef = useRef<HTMLDivElement>(null);
+    const [version, setversion] = useState<string>("")
+
+    const getVersion = async (): Promise<void> => setversion(await window.backend.version())
 
     const handleClickOutside = (event: MouseEvent) => {
         let data = event.target as HTMLElement
@@ -36,6 +43,7 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, alwaysShow, data, hideButto
     };
 
     useEffect(() => {
+        getVersion()
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
@@ -54,19 +62,26 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, alwaysShow, data, hideButto
     }
 
     return (
-        <div className="sidebar-main-container">
+        <div className={"sidebar-main-container " + sidebarClass?.container}>
             {hideButton ? "" : (
                 <div className="sidebar-hide-container">
                     <Button icon="menu" ButtonClass="sidebar-hide-button" iconClassName="sidebar-hide-button" />
                 </div>
             )}
-            <div className={"sidebar-container-max"} style={sidebarHover ? {} : { display: "none" }} ref={sidebarRef}>
+            {showLogo ? (
+                <div className="sidebar-logo-icon-container">
+                    <img src={icon} alt={version} className="sidebar-image" />
+                    <div className="sidebar-version">{version}</div>
+                </div>
+            ) : ""}
+            <div className={"sidebar-container-max"} style={hideButton == false ? sidebarHover ? {} : { display: "none" } : {}} ref={sidebarRef}>
                 <div className={`sidebar-top ${"sidebar-max-button"}`}>
-                    {data.top.map((value) => <Button icon={value.icon} content={sidebarHover ? value.text : undefined} onClick={(event) => hideSidebar(event, value.onClick)} ButtonClass="sidebar-button" iconClassName="sidebar-button" />)}
+                    {showLogo ? <div className="sidebar-black-line"></div> : ""}
+                    {data.top.map((value) => <Button icon={value.icon} content={hideButton == false ? sidebarHover ? value.text : undefined : value.text} onClick={(event) => hideSidebar(event, value.onClick)} ButtonClass="sidebar-button" iconClassName="sidebar-button" />)}
                 </div>
                 <div className={`sidebar-bottom ${"sidebar-max-button"}`}>
                     <div className="sidebar-black-line"></div>
-                    {data.bottom.map((value) => <Button icon={value.icon} content={sidebarHover ? value.text : undefined} onClick={(event) => hideSidebar(event, value.onClick)} ButtonClass="sidebar-button" iconClassName="sidebar-button" />)}
+                    {data.bottom.map((value) => <Button icon={value.icon} content={hideButton == false ? sidebarHover ? value.text : undefined : value.text} onClick={(event) => hideSidebar(event, value.onClick)} ButtonClass="sidebar-button" iconClassName="sidebar-button" />)}
                 </div>
             </div>
         </div>

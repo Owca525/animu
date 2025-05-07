@@ -1,5 +1,51 @@
 .settings-setting-container {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  width: 100%;
   margin: 15px;
+}
+
+.settings-container {
+  display: flex;
+}
+
+.settings-sidebar {
+  position: relative;
+}
+
+.settings-sidebar-container {
+  position: relative;
+}
+
+.settings-content-container {
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settings-page-container {
+  background-color: var(--bg2);
+  padding: 12px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.settings-page-title {
+  font-size: 1.8em;
+  width: 100%;
+  text-align: center;
+  font-weight: 800;
+}
+
+.settings-line {
+  width: 95%;
+  background-color: var(--bg3);
+  border-radius: 8px;
+  height: 4px;
 }
