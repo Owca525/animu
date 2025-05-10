@@ -8,6 +8,7 @@
 
 .settings-container {
   display: flex;
+  height: 100vh;
 }
 
 .settings-sidebar {
@@ -20,11 +21,11 @@
 
 .settings-content-container {
   width: 100%;
-  height: 100%;
   padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  overflow: auto;
 }
 
 .settings-page-container {
