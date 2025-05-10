@@ -12,7 +12,7 @@
   border: 2px solid var(--bg3);
   transition: border-color 150ms ease;
   background-color: var(--bg3);
-
+  justify-content: end;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
@@ -24,7 +24,7 @@
   position: absolute;
   padding: 4px;
   display: flex;
-  align-items: center;
+  align-items: start;
   width: 100%;
   gap: 4px;
   border-radius: 7px;
@@ -43,7 +43,7 @@
   border-radius: 6px;
   transition: background-color 150ms ease;
   overflow: hidden;
-
+  text-align: end;
   text-overflow: ellipsis;
   white-space: nowrap;
   background-color: var(--bg3);

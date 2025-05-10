@@ -50,3 +50,19 @@
   border-radius: 8px;
   height: 4px;
 }
+
+.settings-text-space {
+  background-color: var(--bg3);
+  padding: 4px 8px 4px 8px;
+  border-radius: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.settings-mini-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 600px;
+}

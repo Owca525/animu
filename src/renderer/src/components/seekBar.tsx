@@ -1,7 +1,7 @@
 import { formatTime } from '@renderer/utils/functions';
 import React, { useEffect, useRef, useState } from 'react';
 
-import "../../css/ui/seekBar.css"
+import "./css/seekBar.css"
 
 interface SeekBarProps {
   maxValue: number | undefined;

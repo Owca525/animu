@@ -37,7 +37,7 @@
             "skip": "Auto Skip Episodes",
             "volume": "Default Volume",
             "longskip": "Long Skip Forward",
-            "longskipb": "Long SKip Backward",
+            "longskipb": "Long Skip Backward",
             "shortskip": "Short Skip Forward",
             "shortskipb": "Short Skip Backward",
             "preload": "Player Preload Type",
@@ -55,5 +55,9 @@
     },
     "player": {
 
+    },
+    "lang": {
+        "en": "English",
+        "pl": "Polish"
     }
 }
