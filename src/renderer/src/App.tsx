@@ -13,6 +13,8 @@ import "./themes/DarkAnimu.css"
 import { checkConfig, readConfig } from './utils/config';
 import store from './utils/store';
 
+import "./utils/i18n"
+
 LoadConfig()
 
 function App() {

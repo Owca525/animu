@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Dropdown from "./components/dropDown";
 import { useState } from "react";
 import Button from "@renderer/components/buttons";
+import { t } from "i18next"
 
 function settings() {
     const navigate = useNavigate();
@@ -16,30 +17,30 @@ function settings() {
         top: [
             {
                 icon: "manufacturing",
-                text: "General",
+                text: t("global.general"),
                 onClick: () => setCategory(() => "general"),
             },
             {
                 icon: "movie",
-                text: "Player",
+                text: t("global.player"),
                 onClick: () => setCategory(() => "player"),
             },
             {
                 icon: "history",
-                text: "History",
+                text: t("global.history"),
                 onClick: () => setCategory(() => "history"),
             },
         ],
         bottom: [
             {
                 icon: "folder",
-                text: "Config Location",
+                text: t("global.cfglocation"),
                 onClick: async () =>
                     await window.api.open(await window.api.os.getPath("userData")),
             },
             {
                 icon: "home",
-                text: "Home",
+                text: t("global.home"),
                 onClick: () => navigate("/"),
             },
         ],
@@ -60,9 +61,9 @@ function settings() {
                 {category == "general" && (
                     <>
                         <div className="settings-page-container">
-                            <div className="settings-page-title">General</div>
+                            <div className="settings-page-title">{t("global.general")}</div>
                             <div className="settings-setting-container">
-                                Language
+                                {t("settings.general.language")}
                                 <Dropdown
                                     options={[
                                         { label: "English" },
@@ -74,7 +75,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Theme
+                                {t("settings.general.theme")}
                                 <Dropdown
                                     options={[
                                         { label: "DarkAnimu" },
@@ -86,14 +87,14 @@ function settings() {
                             </div>
                         </div>
                         <div className="settings-page-container">
-                            <div className="settings-page-title">Updates</div>
+                            <div className="settings-page-title">{t("settings.general.updates")}</div>
                             <div className="settings-setting-container">
-                                Updates
+                                {t("settings.general.updates")}
                                 <CheckBox />
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Check Updates
+                                {t("settings.general.checkupdates")}
                                 <Dropdown
                                     options={[
                                         { label: "On Start" },
@@ -105,19 +106,19 @@ function settings() {
                             </div>
                         </div>
                         <div className="settings-page-container">
-                            <div className="settings-page-title">Window</div>
+                            <div className="settings-page-title">{t("settings.general.window")}</div>
                             <div className="settings-setting-container">
-                                Auto Maximize
+                                {t("settings.general.maximize")}
                                 <CheckBox />
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Auto Fullscreen
+                                {t("settings.general.fullscreen")}
                                 <CheckBox />
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Zoom
+                                {t("settings.general.zoom")}
                                 <SettingsInput iconChar="%" />
                             </div>
                         </div>
@@ -126,49 +127,49 @@ function settings() {
                 {category == "player" && (
                     <>
                         <div className="settings-page-container">
-                            <div className="settings-page-title">General</div>
+                            <div className="settings-page-title">{t("global.general")}</div>
                             <div className="settings-setting-container">
-                                Auto Play
+                                {t("settings.player.play")}
                                 <CheckBox />
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Auto Fullscreen
+                                {t("settings.general.fullscreen")}
                                 <CheckBox />
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Auto Skip Episodes
+                                {t("settings.player.skip")}
                                 <CheckBox />
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Default Volume
+                                {t("settings.player.volume")}
                                 <SettingsInput iconChar="%" />
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Long Skip Forward
+                                {t("settings.player.longskip")}
                                 <SettingsInput iconChar="s" />
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Long Skip Backward
+                                {t("settings.player.longskipb")}
                                 <SettingsInput iconChar="s" />
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Short Skip Forward
+                                {t("settings.player.shortskip")}
                                 <SettingsInput iconChar="s" />
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Short Skip Backward
+                                {t("settings.player.shortskipb")}
                                 <SettingsInput iconChar="s" />
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Player Preloard Type
+                                {t("settings.player.preload")}
                                 <Dropdown
                                     options={[
                                         { label: "Metadata" },
@@ -179,14 +180,14 @@ function settings() {
                             </div>
                         </div>
                         <div className="settings-page-container">
-                            <div className="settings-page-title">ScreenShots</div>
+                            <div className="settings-page-title">{t("settings.player.screenshot")}</div>
                             <div className="settings-setting-container">
-                                Always ask Where Save Screemshot
+                                {t("settings.player.screenask")}
                                 <CheckBox />
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Save type
+                                {t("settings.player.type")}
                                 <Dropdown
                                     options={[
                                         { label: "File" },
@@ -198,8 +199,8 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                ScreenShot Save path
-                                <Button content="Change Location"/>
+                                {t("settings.player.path")}
+                                <Button content="Change Location" />
                             </div>
                         </div>
                         <div className="settings-page-container">
@@ -210,26 +211,26 @@ function settings() {
                 {category == "history" && (
                     <>
                         <div className="settings-page-container">
-                            <div className="settings-page-title">General</div>
+                            <div className="settings-page-title">{t("global.general")}</div>
                             <div className="settings-setting-container">
-                                Limited Save History
+                                {t("settings.history.limited")}
                                 <CheckBox />
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Limit for history
+                                {t("settings.history.limit")}
                                 <SettingsInput iconChar=" " />
                             </div>
                         </div>
                         <div className="settings-page-container">
-                            <div className="settings-page-title">Continue Watch</div>
+                            <div className="settings-page-title">{t("global.continuewatch")}</div>
                             <div className="settings-setting-container">
-                                When Start Save History
+                                {t("settings.history.startsave")}
                                 <SettingsInput iconChar="s" />
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                When Stop Save History
+                                {t("settings.history.stopsave")}
                                 <SettingsInput iconChar="s" />
                             </div>
                         </div>

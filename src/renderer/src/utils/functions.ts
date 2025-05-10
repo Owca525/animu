@@ -29,3 +29,12 @@ export function convertSeconds(totalSeconds: number | undefined) {
     const seconds = totalSeconds % 60;
     return { days, hours, minutes, seconds };
 }
+
+export function formatTime(seconds: number | undefined): string {
+    if (!seconds) return "0:00";
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    const hoursPart = hours > 0 ? `${hours}:` : '';
+    return `${hoursPart}${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+}

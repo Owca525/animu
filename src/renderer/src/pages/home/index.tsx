@@ -8,6 +8,7 @@ import Container from "./components/container"
 import { useSelector } from "react-redux"
 import { useEffect } from "react"
 import { homeData } from "@renderer/utils/GlobalInterface"
+import { t } from "i18next"
 
 function home() {
     const navigate = useNavigate()
@@ -18,18 +19,18 @@ function home() {
         top: [
             {
                 icon: "home",
-                text: "Home",
+                text: t("global.home"),
                 onClick: plugin.information.home
             },
             {
                 icon: "history",
-                text: "History",
+                text: t("global.history"),
             }
         ],
         bottom: [
             {
                 icon: "settings",
-                text: "Settings",
+                text: t("global.settings"),
                 onClick: () => navigate("/settings")
             }
         ]
@@ -45,7 +46,7 @@ function home() {
         <main className="home">
             <div className="home-header">
                 <div className="home-header-left">
-                    <Input placeholder="Search..." onKeyDown={plugin.information.search} />
+                    <Input placeholder={t("home.search")} onKeyDown={plugin.information.search} />
                 </div>
                 <div></div>
                 <div className="home-header-right"></div>
