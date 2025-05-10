@@ -10,7 +10,6 @@
 .settings-input-field {
     background-color: var(--bg3);
     outline: none;
-    /*border-radius: 12px 0px 0px 12px;*/
     color: var(--text);
     text-align: right;
     font-size: 1em;
@@ -32,6 +31,7 @@
     border-radius: 0px 12px 12px 0px;
     border: 2px solid var(--bg3);
     border-left: 0px;
+    min-width: 4px;
 }
 
 .settings-input-container:hover .settings-input-type,
