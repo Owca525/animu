@@ -1,0 +1,63 @@
+{
+    "global": {
+        "home": "Strona Główna",
+        "history": "Historia",
+        "settings": "Ustawienia",
+        "general": "General",
+        "cfglocation": "Config Location",
+        "player": "Player",
+        "continuewatch": "Continue Watch"
+    },
+    "home": {
+        "search": "Wyszukaj..."
+    },
+    "information": {
+        "airing": "Aring Episode",
+        "format": "Format",
+        "episodes": "Odcinki",
+        "duration": "Długość Odcinka",
+        "status": "Status",
+        "startdate": "Data Rozpoczęcia",
+        "endate": "Data Zakończenia",
+        "season": "Sezon"
+    },
+    "settings": {
+        "general": {
+            "language": "Język",
+            "theme": "Motyw",
+            "updates": "Aktualizacje",
+            "checkupdates": "Sprawdź Aktualizacje",
+            "window": "Okno",
+            "maximize": "Auto Maximizer",
+            "fullscreen": "Auto fullscreen",
+            "zoom": "Zoom"
+        },
+        "player": {
+            "play": "Auto Play",
+            "skip": "Auto Skip Episodes",
+            "volume": "Default Volume",
+            "longskip": "Long Skip Forward",
+            "longskipb": "Long Skip Backward",
+            "shortskip": "Short Skip Forward",
+            "shortskipb": "Short Skip Backward",
+            "preload": "Player Preload Type",
+            "screenshot": "Screenshots",
+            "screenask": "Always ask Where Save Screenshots",
+            "type": "Save Type",
+            "path": "Screenshot Save Path"
+        },
+        "history": {
+            "limited": "Limited Save History",
+            "limit": "Limit For History",
+            "startsave": "When Start Save History",
+            "stopsave": "When Stop save History"
+        }
+    },
+    "player": {
+
+    },
+    "lang": {
+        "en": "Angielski",
+        "pl": "Polski"
+    }
+}
