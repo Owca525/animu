@@ -32,7 +32,11 @@ export default defineConfig({
       viteStaticCopy({
         targets: [
           {
-            src: 'src/css/themes/*', 
+            src: 'src/themes/*', 
+            dest: 'assets/themes'
+          },
+          {
+            src: 'src/themes/*', 
             dest: 'assets/themes'
           },
         ],
