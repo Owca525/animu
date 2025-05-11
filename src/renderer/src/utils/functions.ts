@@ -38,3 +38,13 @@ export function formatTime(seconds: number | undefined): string {
     const hoursPart = hours > 0 ? `${hours}:` : '';
     return `${hoursPart}${minutes}:${secs < 10 ? '0' : ''}${secs}`;
 }
+
+export async function changeTheme(name: string) {
+    const themes = await window.api.getlistThemes()
+    themes.forEach((elememnt) => {
+        if (elememnt.filename.replace(".css", "") === name) {
+            let link = document.getElementById("theme-stylesheet") as HTMLLinkElement
+            if (link) link.href = elememnt.path
+        }
+    })
+}

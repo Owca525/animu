@@ -62,7 +62,7 @@ ipcMain.handle('get-css-files', async (): Promise<{ path: string, filename: stri
     const localList = await takeFileExtensionAndPath(stylesDir, '.css')
 
     // this prevent load user theme because in version dev this can't load, idk why. Show status 200 but no css data, maybe i fix someday
-    if (process.env.NODE_ENV === 'development') return convertListTodict(await takeFileExtensionAndPath(path.join(__dirname, '../../src/renderer/src/css/themes'), '.css'), "official")
+    if (process.env.NODE_ENV === 'development') return convertListTodict(await takeFileExtensionAndPath(path.join(__dirname, '../../src/renderer/src/themes'), '.css'), "official")
 
     const configcss = checkConfigFolder()
     if (configcss == undefined) return convertListTodict(localList, "official")

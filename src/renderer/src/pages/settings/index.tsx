@@ -11,14 +11,14 @@ import { SettingsConfig } from "@renderer/utils/GlobalInterface";
 import { useSelector } from "react-redux";
 import i18n from "i18next"
 import { checkPictureFolder } from "@renderer/utils/config";
-import { capitalizeFirstLetter } from "@renderer/utils/functions";
-import useHotkeys from "@reecelucas/react-use-hotkeys";
+import { capitalizeFirstLetter, changeTheme } from "@renderer/utils/functions";
 
 function settings() {
     const navigate = useNavigate();
     const cfg: SettingsConfig = useSelector((data: any) => data.config);
     const [category, setCategory] = useState<string>("general");
     const [config, setConfig] = useState<{ old: SettingsConfig, new: SettingsConfig }>({ old: structuredClone(cfg), new: structuredClone(cfg) })
+    const [themes, setThemes] = useState<{ label: string, onClick?: () => void }[]>([])
 
     let sidebarData = {
         top: [
@@ -76,6 +76,13 @@ function settings() {
         // console.log(config.new)
     }, [config.new])
 
+    useEffect(() => {
+        window.api.getlistThemes().then((data) => {
+            let themes = data.map((element) => {return { label: element.filename.replace(".css", ""), onClick: () => changeTheme(element.filename.replace(".css", "")) }})
+            setThemes(() => themes)
+        })
+    }, [])
+
     async function ChangeScreenshot(path: string | any) {
         if (!path) handleChange("Player.screenShot.path", await checkPictureFolder())
         else handleChange("Player.screenShot.path", path)
@@ -110,11 +117,7 @@ function settings() {
                             <div className="settings-setting-container">
                                 {t("settings.general.theme")}
                                 <Dropdown
-                                    options={[
-                                        { label: "DarkAnimu" },
-                                        { label: "WhiteAnimu" },
-                                        { label: "GruvBox" },
-                                    ]}
+                                    options={themes}
                                     placeholder="DarkAnimu"
                                 />
                             </div>
@@ -135,11 +138,11 @@ function settings() {
                                 {t("settings.general.checkupdates")}
                                 <Dropdown
                                     options={[
-                                        { label: "On Start" },
-                                        { label: "Every Day" },
-                                        { label: "Every Week" },
+                                        { label: "On Start", onClick: () => handleChange("update.type", "On Start") },
+                                        { label: "Every Day", onClick: () => handleChange("update.type", "Every Day") },
+                                        { label: "Every Week", onClick: () => handleChange("update.type", "Every Week") },
                                     ]}
-                                    placeholder="On Start"
+                                    placeholder={config.new.update.type}
                                 />
                             </div>
                         </div>

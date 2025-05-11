@@ -45,7 +45,13 @@ function AppLoading() {
 async function LoadConfig() {
   if (!await checkConfig()) return
   const loadedConnfig = await readConfig()
-  console.log(loadedConnfig)
+
+  // Loading theme
+  const link = document.createElement('link');
+  link.id = 'theme-stylesheet';
+  link.rel = 'stylesheet';
+  document.head.appendChild(link);
+
   store.dispatch({ type: "setConfig", payload: loadedConnfig })
 }
 
