@@ -5,6 +5,7 @@
     border-radius: 12px;
     width: min-content;
     overflow: hidden;
+    width: 130px;
 }
 
 .settings-input-field {
@@ -32,6 +33,7 @@
     border: 2px solid var(--bg3);
     border-left: 0px;
     min-width: 4px;
+    width: 100%;
 }
 
 .settings-input-container:hover .settings-input-type,
