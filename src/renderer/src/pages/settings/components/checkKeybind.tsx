@@ -62,7 +62,7 @@ const CheckKeybind: React.FC<CheckKeybindProps> = ({ content, keyBind }) => {
   }
 
   return (
-    <button onClick={() => setActive((prev) => !prev)} className={"settings-keybind-check " + isActive ? "settings-keybind-check-active" : ""}>{pressedKeys.length > 0 ? pressedKeys.join('+') : content}</button>
+    <button onClick={() => setActive((prev) => !prev)} className={isActive ? "settings-keybind-check-active" : "settings-keybind-check"}>{pressedKeys.length > 0 ? pressedKeys.join('+') : content}</button>
   )
 }
 
