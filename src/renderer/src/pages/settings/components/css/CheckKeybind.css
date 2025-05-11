@@ -1,7 +1,17 @@
-.settings-keybind-check {
+.settings-keybind-check , .settings-keybind-check-active {
+    background-color: var(--bg3);
+    border-radius: 12px;
+    width: 130px;
+    border: 2px solid var(--bg3);
+    height: 40px;
+    color: var(--text);
+}
 
+.settings-keybind-check:hover {
+    background-color: var(--bg4);
 }
 
 .settings-keybind-check-active {
-    
+    border-color: var(--neutral1);
+    background-color: var(--bg4);
 }

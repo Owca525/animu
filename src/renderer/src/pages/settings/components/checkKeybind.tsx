@@ -1,5 +1,6 @@
 import { convertKeybinds } from "@renderer/utils/functions";
 import { useEffect, useState } from "react";
+import "./css/CheckKeybind.css"
 
 interface CheckKeybindProps {
     content: string
