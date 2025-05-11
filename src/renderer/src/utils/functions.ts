@@ -48,3 +48,22 @@ export async function changeTheme(name: string) {
         }
     })
 }
+
+export function convertKeybinds(inputString: string) {
+    const convert: Record<string, string> = {
+        "control": "ctrl",
+        "shift": "shft",
+        "alt": "alt",
+        "escape": "esc",
+        "tab": "tab",
+        "delete": "del",
+        "end": "end",
+        " ": "space"
+    }
+    for (const key in convert) {
+        if (convert.hasOwnProperty(key)) {
+            inputString = inputString.toUpperCase().replace(key.toUpperCase(), convert[key].toUpperCase())
+        }
+    }
+    return inputString
+}

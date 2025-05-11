@@ -11,7 +11,8 @@ import { SettingsConfig } from "@renderer/utils/GlobalInterface";
 import { useSelector } from "react-redux";
 import i18n from "i18next"
 import { checkPictureFolder } from "@renderer/utils/config";
-import { capitalizeFirstLetter, changeTheme } from "@renderer/utils/functions";
+import { capitalizeFirstLetter, changeTheme, convertKeybinds } from "@renderer/utils/functions";
+import CheckKeybind from "./components/checkKeybind";
 
 function settings() {
     const navigate = useNavigate();
@@ -311,48 +312,63 @@ function settings() {
                             <div className="settings-page-title">Keybinds</div>
                             <div className="settings-setting-container">
                                 Pause
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.Pause)} keyBind={(keys) => handleChange("Player.keybinds.Pause", keys)}/>
                             </div>
                             <div className="settings-setting-container">
                                 Fullscreen
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.Fullscreen)} keyBind={(keys) => handleChange("Player.keybinds.Fullscreen", keys)}/>
                             </div>
                             <div className="settings-setting-container">
                                 Exit Player
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.ExitPlayer)} keyBind={(keys) => handleChange("Player.keybinds.ExitPlayer", keys)}/>
                             </div>
                             <div className="settings-setting-container">
                                 Long Skip Forward
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.LongTimeSkipForward)} keyBind={(keys) => handleChange("Player.keybinds.LongTimeSkipForward", keys)}/>
                             </div>
                             <div className="settings-setting-container">
                                 Long Skip Backward
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.LongTimeSkipBack)} keyBind={(keys) => handleChange("Player.keybinds.LongTimeSkipBack", keys)}/>
                             </div>
                             <div className="settings-setting-container">
                                 Short Skip Forward
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.TimeSkipRight)} keyBind={(keys) => handleChange("Player.keybinds.TimeSkipRight", keys)}/>
                             </div>
                             <div className="settings-setting-container">
                                 Short Skip Backward
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.TimeSkipLeft)} keyBind={(keys) => handleChange("Player.keybinds.TimeSkipLeft", keys)}/>
                             </div>
                             <div className="settings-setting-container">
                                 Frame Skip Forward
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.FrameSkipForward)} keyBind={(keys) => handleChange("Player.keybinds.FrameSkipForward", keys)}/>
                             </div>
                             <div className="settings-setting-container">
                                 Frame Skip Backward
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.FrameSkipForward)} keyBind={(keys) => handleChange("Player.keybinds.FrameSkipForward", keys)}/>
                             </div>
                             <div className="settings-setting-container">
                                 Next Episode
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.NextEpisode)} keyBind={(keys) => handleChange("Player.keybinds.NextEpisode", keys)}/>
                             </div>
                             <div className="settings-setting-container">
                                 Previus Episode
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.PrevEpisode)} keyBind={(keys) => handleChange("Player.keybinds.PrevEpisode", keys)}/>
                             </div>
                             <div className="settings-setting-container">
                                 Volume Up
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.VolumeUp)} keyBind={(keys) => handleChange("Player.keybinds.VolumeUp", keys)}/>
                             </div>
                             <div className="settings-setting-container">
                                 Volume Down
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.VolumeDown)} keyBind={(keys) => handleChange("Player.keybinds.VolumeDown", keys)}/>
                             </div>
                             <div className="settings-setting-container">
                                 Volume Mute
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.VolumeMute)} keyBind={(keys) => handleChange("Player.keybinds.VolumeMute", keys)}/>
                             </div>
                             <div className="settings-setting-container">
                                 Take a screenshot
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.ScreenShot)} keyBind={(keys) => handleChange("Player.keybinds.ScreenShot", keys)}/>
                             </div>
                         </div>
                     </>
