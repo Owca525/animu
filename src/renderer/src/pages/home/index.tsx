@@ -9,8 +9,6 @@ import { useSelector } from "react-redux"
 import { useEffect } from "react"
 import { homeData } from "@renderer/utils/GlobalInterface"
 import { t } from "i18next"
-import useHotkeys from "@reecelucas/react-use-hotkeys"
-import { closeDialog, dialogIsOpen, showDialog } from "@renderer/utils/context/DialogContext"
 
 function home() {
     const navigate = useNavigate()
@@ -43,24 +41,6 @@ function home() {
             plugin.information.home()
         }
     }, [])
-
-    useHotkeys(']', () => {
-        if (dialogIsOpen()) {
-            closeDialog()
-            console.log("Closing dialog")
-            return
-        }
-        console.log("Dialog show")
-        showDialog({
-            type: "error",
-            title: "Test Error",
-            // description: "Test Description",
-            buttons: {
-                yesButton: () => console,
-                noButton: () => console
-            }
-        })
-    })
     
     return (
         <main className="home">

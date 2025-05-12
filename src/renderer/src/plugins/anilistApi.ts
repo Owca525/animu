@@ -1,6 +1,5 @@
 import { cardData, containerData, pluginFormat } from "@renderer/utils/GlobalInterface";
 import { setHomeData } from "@renderer/utils/pluginApi";
-import store from "@renderer/utils/store";
 
 const graphicApi = `
 query(
