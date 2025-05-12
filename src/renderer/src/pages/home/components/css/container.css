@@ -1,6 +1,17 @@
-.container-title {
+.container-title, .container-title-click {
     font-weight: 600;
     font-size: 1.6em;
+    width: max-content;
+    padding: 2px 8px 2px 8px;
+    border-radius: 12px;
+}
+
+.container-title-click {
+    cursor: pointer;
+}
+
+.container-title-click:hover {
+    background-color: var(--bg3);
 }
 
 .main-container {

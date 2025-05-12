@@ -1,4 +1,5 @@
-import { cardData, pluginFormat } from "@renderer/utils/GlobalInterface";
+import { cardData, containerData, pluginFormat } from "@renderer/utils/GlobalInterface";
+import { setHomeData } from "@renderer/utils/pluginApi";
 import store from "@renderer/utils/store";
 
 const graphicApi = `
@@ -130,6 +131,18 @@ const header = {
   "Accept": "application/json",
 }
 
+const tendingAnime = { 
+  page: 1, 
+  sort: [ "TRENDING_DESC", "POPULARITY_DESC" ], 
+  type: "ANIME" 
+}
+
+const allPopular = {
+  page: 1, 
+  sort: "POPULARITY_DESC", 
+  type: "ANIME"
+}
+
 function Convert(convert: any): cardData {
   return {
     AnimeData: {
@@ -140,7 +153,7 @@ function Convert(convert: any): cardData {
   }
 }
 
-async function sendToApi(variable: any) {
+async function sendToApi(variable: any): Promise<cardData[]> {
   let data = await window.api.request.post("https://graphql.anilist.co", header, { query: graphicApi, variables: variable })
   if (data.success) {
     return data.data.data.Page.media.map((data) => Convert(data))
@@ -163,33 +176,42 @@ function getSeasonFromDate(date: Date) {
   return [];
 }
 
-async function SearchAnilistApi(text: string) {
-  store.dispatch({ type: "setLoadingHome", payload: { isLoading: true } })
-  store.dispatch({ type: "setAllHomeData", payload: { isLoading: false, isError: false, data: [
-    {
-      title: `Searching: ${text}`,
-      data: await sendToApi({ 
-        page: 1,
-        search: text,
-        sort: "SEARCH_MATCH", 
-        type: "ANIME" 
-      })
-    }
-  ]}})
+async function SearchAnilistApi(text: string): Promise<void> {
+  setHomeData(async () => {
+    return [
+      {
+        title: `Searching: ${text}`,
+        data: await sendToApi({ 
+          page: 1,
+          search: text,
+          sort: "SEARCH_MATCH", 
+          type: "ANIME" 
+        })
+      }
+    ]
+  })
 }
 
-async function CreateHomePage() {
+async function getFullCategory(params, title: string) {
+  let data = await sendToApi(params)
+  setHomeData(async () => {
+    return [
+      {
+        title: title,
+        data: data
+      }
+    ]
+  })
+}
+
+async function CreateHomePage(): Promise<containerData[]> {
   let season = getSeasonFromDate(new Date())
-  store.dispatch({ type: "setLoadingHome", payload: { isLoading: true } })
-  store.dispatch({ type: "setAllHomeData", payload: { isLoading: false, isError: false, data: [
+  return [
     {
       title: "Trending Now",
-      data: await sendToApi({ 
-        page: 1, 
-        sort: [ "TRENDING_DESC", "POPULARITY_DESC" ], 
-        type: "ANIME" 
-      }),
-      horizontal: true
+      data: await sendToApi(tendingAnime),
+      horizontal: true,
+      onTitleClick: () => getFullCategory(tendingAnime, "Trending Now")
     },
     {
       title: "Popular in this Season",
@@ -199,19 +221,21 @@ async function CreateHomePage() {
         seasonYear: season[1],
         type: "ANIME"
       }),
-      horizontal: true
+      horizontal: true,
+      onTitleClick: () => getFullCategory({
+        page: 1, 
+        season: season[0],
+        seasonYear: season[1],
+        type: "ANIME"
+      }, "Popular in this Season")
     },
     {
       title: "All Time Popular",
-      data: await sendToApi({
-        page: 1, 
-        sort: "POPULARITY_DESC", 
-        type: "ANIME"
-      }),
-      horizontal: true
+      data: await sendToApi(allPopular),
+      horizontal: true,
+      onTitleClick: () => getFullCategory(allPopular, "All Time Popular")
     }
   ]
-  }})
 }
 
 export const infoPlugin: pluginFormat = {
@@ -219,7 +243,7 @@ export const infoPlugin: pluginFormat = {
   name: "AnilistApi",
   author: "Owca525",
   information: {
-    home: CreateHomePage,
+    home: () => setHomeData(CreateHomePage),
     search: SearchAnilistApi
   }
 }

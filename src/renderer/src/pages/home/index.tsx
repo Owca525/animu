@@ -75,7 +75,7 @@ function home() {
                 {
                     homeCache.isLoading ? <div className="material-symbols-outlined home-loading-animation">progress_activity</div> 
                     : 
-                    homeCache.data.map((element) => <Container title={element.title} data={element.data} horizontal={element.horizontal} onScrollDownFunction={element.onScrollDownFunction} />)
+                    homeCache.data.map((element) => <Container title={element.title} data={element.data} horizontal={element.horizontal} onScrollDownFunction={element.onScrollDownFunction} onTitleClick={element.onTitleClick} />)
                 }
             </div>
             <Sidebar data={sidebarData}/>

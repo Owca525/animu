@@ -23,17 +23,14 @@ const Container: React.FC<containerData> = ({ title, data, horizontal, onScrollD
     console.log('haiiii')
   }
 
-  onTitleClick = (title: string) => {
-    console.log(title)
-  }
-
   return (
     <div className="main-container" onScroll={onScrollDownFunction}>
-        <div className="container-title" onClick={() => onTitleClick(title)}>{title}</div>
+        <div className={onTitleClick ? "container-title-click" : "container-title"} onClick={onTitleClick}>{title}</div>
         <div className="button-container">
           {horizontal ? <Button icon="chevron_left" ButtonClass="container-left-skip-button" onClick={() => handleButtonScroll(-120)}/> : ""}
           <div className={horizontal ? "container-data-horizontal" : "container-data"} ref={container}> {/* onWheel={handleScroll} */}
-              {data.map((card) => <Card AnimeData={card.AnimeData} saveData={card.saveData} deletionCard={card.deletionCard} />)}
+              {data.length > 0 && data.map((card) => <Card AnimeData={card.AnimeData} saveData={card.saveData} deletionCard={card.deletionCard} />)}
+              {data.length <= 0 && <div>None</div>}
           </div>
           {horizontal ? <Button icon="chevron_right" ButtonClass="container-right-skip-button" onClick={() => handleButtonScroll(120)}/> : ""}
         </div>

@@ -64,7 +64,7 @@ export interface containerData {
     data: cardData[]
     horizontal?: boolean
     onScrollDownFunction?: () => void
-    onTitleClick?: (title: string) => void
+    onTitleClick?: () => void
 }
 
 export interface pluginFormat {
