@@ -20,6 +20,7 @@ function settings() {
     const [category, setCategory] = useState<string>("general");
     const [config, setConfig] = useState<{ old: SettingsConfig, new: SettingsConfig }>({ old: structuredClone(cfg), new: structuredClone(cfg) })
     const [themes, setThemes] = useState<{ label: string, onClick?: () => void }[]>([])
+    const [versions] = useState(window.electronAPI.process.versions)
 
     let sidebarData = {
         top: [
@@ -54,6 +55,14 @@ function settings() {
         ],
     };
 
+    if (config.new.Developer.DeveloperMode) {
+        sidebarData.top.push({
+            icon: "code",
+            text: t("global.dev"),
+            onClick: () => setCategory(() => "developer")
+        })
+    }
+
     function handleChange(path: string, value: string | number | boolean) {
         setConfig((prevConfig) => {
             const keys = path.split('.')
@@ -79,7 +88,7 @@ function settings() {
 
     useEffect(() => {
         window.api.getlistThemes().then((data) => {
-            let themes = data.map((element) => {return { label: element.filename.replace(".css", ""), onClick: () => changeTheme(element.filename.replace(".css", "")) }})
+            let themes = data.map((element) => { return { label: element.filename.replace(".css", ""), onClick: () => changeTheme(element.filename.replace(".css", "")) } })
             setThemes(() => themes)
         })
     }, [])
@@ -131,7 +140,7 @@ function settings() {
                                     checked={config.new.update.enable}
                                     onChecked={(checked) =>
                                         handleChange('update.enable', checked)
-                                    } 
+                                    }
                                 />
                             </div>
                             <div className="settings-line"></div>
@@ -165,13 +174,13 @@ function settings() {
                                     checked={config.new.General.Window.AutoMaximize}
                                     onChecked={(checked) =>
                                         handleChange('General.Window.AutoMaximize', checked)
-                                    } 
+                                    }
                                 />
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.general.zoom")}
-                                <SettingsInput 
+                                <SettingsInput
                                     iconChar="%"
                                     type="number"
                                     onKeyDown={(text) => handleChange("General.Window.Zoom", parseInt(text))}
@@ -217,7 +226,7 @@ function settings() {
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.player.volume")}
-                                <SettingsInput 
+                                <SettingsInput
                                     iconChar="%"
                                     type="number"
                                     onKeyDown={(text) => handleChange("Player.general.Volume", parseInt(text))}
@@ -227,7 +236,7 @@ function settings() {
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.player.longskip")}
-                                <SettingsInput 
+                                <SettingsInput
                                     iconChar="s"
                                     type="number"
                                     onKeyDown={(text) => handleChange("Player.general.LongTimeSkipForward", parseInt(text))}
@@ -237,7 +246,7 @@ function settings() {
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.player.longskipb")}
-                                <SettingsInput 
+                                <SettingsInput
                                     iconChar="s"
                                     type="number"
                                     onKeyDown={(text) => handleChange("Player.general.LongTimeSkipBack", parseInt(text))}
@@ -247,7 +256,7 @@ function settings() {
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.player.shortskip")}
-                                <SettingsInput 
+                                <SettingsInput
                                     iconChar="s"
                                     type="number"
                                     onKeyDown={(text) => handleChange("Player.general.TimeSkipRight", parseInt(text))}
@@ -257,7 +266,7 @@ function settings() {
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.player.shortskipb")}
-                                <SettingsInput 
+                                <SettingsInput
                                     iconChar="s"
                                     type="number"
                                     onKeyDown={(text) => handleChange("Player.general.TimeSkipLeft", parseInt(text))}
@@ -312,63 +321,63 @@ function settings() {
                             <div className="settings-page-title">Keybinds</div>
                             <div className="settings-setting-container">
                                 Pause
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.Pause)} keyBind={(keys) => handleChange("Player.keybinds.Pause", keys)}/>
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.Pause)} keyBind={(keys) => handleChange("Player.keybinds.Pause", keys)} />
                             </div>
                             <div className="settings-setting-container">
                                 Fullscreen
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.Fullscreen)} keyBind={(keys) => handleChange("Player.keybinds.Fullscreen", keys)}/>
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.Fullscreen)} keyBind={(keys) => handleChange("Player.keybinds.Fullscreen", keys)} />
                             </div>
                             <div className="settings-setting-container">
                                 Exit Player
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.ExitPlayer)} keyBind={(keys) => handleChange("Player.keybinds.ExitPlayer", keys)}/>
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.ExitPlayer)} keyBind={(keys) => handleChange("Player.keybinds.ExitPlayer", keys)} />
                             </div>
                             <div className="settings-setting-container">
                                 Long Skip Forward
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.LongTimeSkipForward)} keyBind={(keys) => handleChange("Player.keybinds.LongTimeSkipForward", keys)}/>
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.LongTimeSkipForward)} keyBind={(keys) => handleChange("Player.keybinds.LongTimeSkipForward", keys)} />
                             </div>
                             <div className="settings-setting-container">
                                 Long Skip Backward
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.LongTimeSkipBack)} keyBind={(keys) => handleChange("Player.keybinds.LongTimeSkipBack", keys)}/>
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.LongTimeSkipBack)} keyBind={(keys) => handleChange("Player.keybinds.LongTimeSkipBack", keys)} />
                             </div>
                             <div className="settings-setting-container">
                                 Short Skip Forward
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.TimeSkipRight)} keyBind={(keys) => handleChange("Player.keybinds.TimeSkipRight", keys)}/>
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.TimeSkipRight)} keyBind={(keys) => handleChange("Player.keybinds.TimeSkipRight", keys)} />
                             </div>
                             <div className="settings-setting-container">
                                 Short Skip Backward
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.TimeSkipLeft)} keyBind={(keys) => handleChange("Player.keybinds.TimeSkipLeft", keys)}/>
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.TimeSkipLeft)} keyBind={(keys) => handleChange("Player.keybinds.TimeSkipLeft", keys)} />
                             </div>
                             <div className="settings-setting-container">
                                 Frame Skip Forward
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.FrameSkipForward)} keyBind={(keys) => handleChange("Player.keybinds.FrameSkipForward", keys)}/>
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.FrameSkipForward)} keyBind={(keys) => handleChange("Player.keybinds.FrameSkipForward", keys)} />
                             </div>
                             <div className="settings-setting-container">
                                 Frame Skip Backward
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.FrameSkipForward)} keyBind={(keys) => handleChange("Player.keybinds.FrameSkipForward", keys)}/>
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.FrameSkipForward)} keyBind={(keys) => handleChange("Player.keybinds.FrameSkipForward", keys)} />
                             </div>
                             <div className="settings-setting-container">
                                 Next Episode
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.NextEpisode)} keyBind={(keys) => handleChange("Player.keybinds.NextEpisode", keys)}/>
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.NextEpisode)} keyBind={(keys) => handleChange("Player.keybinds.NextEpisode", keys)} />
                             </div>
                             <div className="settings-setting-container">
                                 Previus Episode
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.PrevEpisode)} keyBind={(keys) => handleChange("Player.keybinds.PrevEpisode", keys)}/>
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.PrevEpisode)} keyBind={(keys) => handleChange("Player.keybinds.PrevEpisode", keys)} />
                             </div>
                             <div className="settings-setting-container">
                                 Volume Up
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.VolumeUp)} keyBind={(keys) => handleChange("Player.keybinds.VolumeUp", keys)}/>
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.VolumeUp)} keyBind={(keys) => handleChange("Player.keybinds.VolumeUp", keys)} />
                             </div>
                             <div className="settings-setting-container">
                                 Volume Down
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.VolumeDown)} keyBind={(keys) => handleChange("Player.keybinds.VolumeDown", keys)}/>
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.VolumeDown)} keyBind={(keys) => handleChange("Player.keybinds.VolumeDown", keys)} />
                             </div>
                             <div className="settings-setting-container">
                                 Volume Mute
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.VolumeMute)} keyBind={(keys) => handleChange("Player.keybinds.VolumeMute", keys)}/>
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.VolumeMute)} keyBind={(keys) => handleChange("Player.keybinds.VolumeMute", keys)} />
                             </div>
                             <div className="settings-setting-container">
                                 Take a screenshot
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.ScreenShot)} keyBind={(keys) => handleChange("Player.keybinds.ScreenShot", keys)}/>
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.ScreenShot)} keyBind={(keys) => handleChange("Player.keybinds.ScreenShot", keys)} />
                             </div>
                         </div>
                     </>
@@ -389,7 +398,7 @@ function settings() {
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.history.limit")}
-                                <SettingsInput 
+                                <SettingsInput
                                     iconChar=" "
                                     type="number"
                                     onKeyDown={(text) => handleChange("History.history.maxSave", parseInt(text))}
@@ -401,7 +410,7 @@ function settings() {
                             <div className="settings-page-title">{t("global.continuewatch")}</div>
                             <div className="settings-setting-container">
                                 {t("settings.history.startsave")}
-                                <SettingsInput 
+                                <SettingsInput
                                     iconChar="s"
                                     type="number"
                                     onKeyDown={(text) => handleChange("History.continue.MaximizeTimeSave", parseInt(text))}
@@ -411,12 +420,73 @@ function settings() {
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.history.stopsave")}
-                                <SettingsInput 
+                                <SettingsInput
                                     iconChar="s"
                                     type="number"
                                     onKeyDown={(text) => handleChange("History.continue.MinimalTimeSave", parseInt(text))}
                                     startValue={config.new.History.continue.MinimalTimeSave.toString()}
                                 />
+                            </div>
+                        </div>
+                    </>
+                )}
+                {category == "developer" && (
+                    <>
+                        <div className="settings-page-container">
+                            <div className="settings-page-title">{"DevTools"}</div>
+                            <div className="settings-setting-container">
+                                {"Developer Mode"}
+                                <CheckBox
+                                    checked={config.new.Developer.DeveloperMode}
+                                    onChecked={(checked) =>
+                                        handleChange('Developer.DeveloperMode', checked)
+                                    }
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                {"Turn on DevTools"}
+                                <CheckBox
+                                    checked={config.new.Developer.DevTools}
+                                    onChecked={(checked) =>
+                                        handleChange('Developer.DevTools', checked)
+                                    }
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                {"DevTools On Start"}
+                                <CheckBox
+                                    checked={config.new.Developer.DevToolsOnStart}
+                                    onChecked={(checked) =>
+                                        handleChange('Developer.DevToolsOnStart', checked)
+                                    }
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                {"PlayerDebug Stats"}
+                                <CheckBox
+                                    checked={config.new.Developer.playerDebug}
+                                    onChecked={(checked) =>
+                                        handleChange('Developer.playerDebug', checked)
+                                    }
+                                />
+                            </div>
+                        </div>
+                        <div className="settings-page-container">
+                            <div className="settings-page-title">{"Information"}</div>
+                            <div className="settings-setting-container">
+                                <span>Electron Version</span>
+                                <span>{versions.electron}</span>
+                            </div>
+                            <div className="settings-setting-container">
+                                <span>Chromium Version</span>
+                                <span>{versions.chrome}</span>
+                            </div>
+                            <div className="settings-setting-container">
+                                <span>Node Version</span>
+                                <span>{versions.node}</span>
                             </div>
                         </div>
                     </>

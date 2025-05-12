@@ -6,7 +6,8 @@
         "general": "General",
         "cfglocation": "Config Location",
         "player": "Player",
-        "continuewatch": "Continue Watch"
+        "continuewatch": "Continue Watch",
+        "dev": "Developer"
     },
     "home": {
         "search": "Search..."
