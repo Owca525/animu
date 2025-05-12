@@ -1,13 +1,31 @@
 .dialog-main-background {
-
+  width: 100%;
+  height: 100%;
+  z-index: 9000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  background-color: rgb(0, 0, 0, 0.5);
 }
 
 .dialog-container {
-
+    background-color: var(--bg2);
+    display: grid;
+    padding: 15px;
+    border-radius: 12px;
+    gap: 6px;
+    min-width: min-content;
+    max-width: 70vw;
 }
 
 .dialog-title {
-
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    width: 100%;
+    font-size: 1.3em;
 }
 
 .dialog-icon {
@@ -15,9 +33,16 @@
 }
 
 .dialog-description {
+    padding: 5px;
+    max-width: 400px;
+}
 
+.dialog-description:empty {
+    padding: 0%;
 }
 
 .dialog-buttons {
-    
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 6px;
 }

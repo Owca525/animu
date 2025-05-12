@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { dialogProps } from "../GlobalInterface";
 import Button from "@renderer/components/buttons";
+import "./css/DialogContext.css"
 
 let showDialog: (data: dialogProps) => void = () => { };
 let closeDialog: () => void = () => { };
