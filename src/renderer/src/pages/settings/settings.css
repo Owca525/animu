@@ -66,3 +66,33 @@
   gap: 8px;
   max-width: 600px;
 }
+
+.settings-save-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.settings-save-content {
+  display: flex;
+  background-color: var(--bg4);
+  border-radius: 12px;
+  align-items: center;
+  padding: 4px 6px 4px 6px;
+  gap: 8px;
+}
+
+.settings-save-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.settings-save-title {
+  font-size: 1.1em;
+  font-weight: 500;
+}

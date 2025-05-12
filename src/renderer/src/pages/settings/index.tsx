@@ -15,6 +15,7 @@ import { capitalizeFirstLetter, changeTheme, convertKeybinds } from "@renderer/u
 import CheckKeybind from "./components/checkKeybind";
 import useHotkeys from "@reecelucas/react-use-hotkeys";
 import { showDialog } from "@renderer/utils/context/DialogContext";
+import store from "@renderer/utils/store";
 
 function settings() {
     const navigate = useNavigate();
@@ -23,6 +24,7 @@ function settings() {
     const [config, setConfig] = useState<{ old: SettingsConfig, new: SettingsConfig }>({ old: structuredClone(cfg), new: structuredClone(cfg) })
     const [themes, setThemes] = useState<{ label: string, onClick?: () => void }[]>([])
     const [versions] = useState(window.electronAPI.process.versions)
+    const [isSaving, setSaving] = useState<boolean>(false)
 
     let sidebarData = {
         top: [
@@ -98,8 +100,8 @@ function settings() {
     }
 
     useEffect(() => {
-        // console.log(config.new)
-    }, [config.new])
+        if (JSON.stringify(config.old) != JSON.stringify(config.new)) setSaving(() => true)
+    }, [config])
 
     useEffect(() => {
         window.api.getlistThemes().then((data) => {
@@ -113,6 +115,21 @@ function settings() {
         else handleChange("Player.screenShot.path", path)
     }
 
+    function saveNewConfig() {
+        store.dispatch({ type: "setConfig", payload: config.new })
+        setConfig((prev) => {
+            return { old: structuredClone(prev.new), new: structuredClone(prev.new) }
+        })
+        setSaving(() => false)
+    }
+
+    function resetConfig() {
+        setConfig((prev) => {
+            return { old: structuredClone(prev.old), new: structuredClone(prev.old) }
+        })
+        setSaving(() => false)
+    }
+
     return (
         <main className="settings-container">
             <Sidebar
@@ -124,6 +141,17 @@ function settings() {
                 hideButton
                 showLogo
             />
+            {isSaving && (
+                <div className="settings-save-container">
+                    <div className="settings-save-content">
+                        <div className="settings-save-title">Do you wanna save changes?</div>
+                        <div className="settings-save-buttons">
+                            <Button content="Yes" onClick={saveNewConfig} />
+                            <Button content="Reset" onClick={resetConfig} />
+                        </div>
+                    </div>
+                </div>
+            )}
             <div className="settings-content-container">
                 {category == "general" && (
                     <>
