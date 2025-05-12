@@ -13,6 +13,8 @@ import i18n from "i18next"
 import { checkPictureFolder } from "@renderer/utils/config";
 import { capitalizeFirstLetter, changeTheme, convertKeybinds } from "@renderer/utils/functions";
 import CheckKeybind from "./components/checkKeybind";
+import useHotkeys from "@reecelucas/react-use-hotkeys";
+import { showDialog } from "@renderer/utils/context/DialogContext";
 
 function settings() {
     const navigate = useNavigate();
@@ -62,6 +64,19 @@ function settings() {
             onClick: () => setCategory(() => "developer")
         })
     }
+
+    useHotkeys(["ctrl", "d"], () => {
+        console.log("Keybind")
+        if (config.new.Developer.DeveloperMode) return
+        showDialog({
+            type: "info",
+            title: "Turn On Developer Mode",
+            buttons: {
+                yesButton: () => handleChange("Developer.DeveloperMode", true),
+                noButton: () => handleChange("Developer.DeveloperMode", false)
+            }
+        })
+    })
 
     function handleChange(path: string, value: string | number | boolean) {
         setConfig((prevConfig) => {
