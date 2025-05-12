@@ -7,6 +7,7 @@ import './App.css'
 // Import language support
 import { QueryClient, QueryClientProvider } from 'react-query'
 import store from './utils/store';
+import { DialogContext } from './utils/context/DialogContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,10 +20,12 @@ const queryClient = new QueryClient({
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <Provider store={store}>
-        <App />
-      </Provider>
-    </QueryClientProvider>
+    <DialogContext>
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>
+          <App />
+        </Provider>
+      </QueryClientProvider>
+    </DialogContext>
   </React.StrictMode>
 )

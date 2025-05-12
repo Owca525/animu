@@ -151,3 +151,13 @@ export interface SettingsConfig {
         enable: boolean
     }
 }
+
+export interface dialogProps {
+    type: "error" | "info" | "none"
+    title: string
+    description?: string
+    buttons: {
+        yesButton: () => void
+        noButton: () => void
+    }
+}
