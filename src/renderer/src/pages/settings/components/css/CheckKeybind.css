@@ -5,6 +5,9 @@
     border: 2px solid var(--bg3);
     height: 40px;
     color: var(--text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .settings-keybind-check:hover {

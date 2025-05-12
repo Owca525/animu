@@ -13,6 +13,7 @@ const CheckKeybind: React.FC<CheckKeybindProps> = ({ content, keyBind }) => {
   const [isActive, setActive] = useState<boolean>(false)
 
   const handleKeyDown = (event: KeyboardEvent) => {
+    event.preventDefault()
     console.log(event.key)
     setPressedKeys((previus) => {
       if (!previus.includes(convertKeybinds(event.key))) {
@@ -31,12 +32,14 @@ const CheckKeybind: React.FC<CheckKeybindProps> = ({ content, keyBind }) => {
     console.log(pressedKeys)
   };
   const handleKeyUp = (event: KeyboardEvent) => {
+    event.preventDefault()
     setKeysUp((previus) => {
       const index = previus.findIndex((item) => item === event.key);
       previus.splice(index, 1)
       return previus
     })
-    if (keysUp.length >= 0) removeEvents()
+    if (keysUp.length <= 0) removeEvents()
+    if (keysUp.length >= 3) removeEvents()
   };
 
 
@@ -63,7 +66,7 @@ const CheckKeybind: React.FC<CheckKeybindProps> = ({ content, keyBind }) => {
   }
 
   return (
-    <button onClick={() => setActive((prev) => !prev)} className={isActive ? "settings-keybind-check-active" : "settings-keybind-check"}>{pressedKeys.length > 0 ? pressedKeys.join('+') : content}</button>
+    <div onClick={() => setActive((prev) => !prev)} tabIndex={-1} className={isActive ? "settings-keybind-check-active" : "settings-keybind-check"}>{pressedKeys.length > 0 ? pressedKeys.join('+') : content}</div>
   )
 }
 
