@@ -130,6 +130,11 @@ function settings() {
         setSaving(() => false)
     }
 
+    function ChangeLanguage(lang: string) {
+        i18n.changeLanguage(lang)
+        handleChange("General.language", lang)
+    }
+
     return (
         <main className="settings-container">
             <Sidebar
@@ -160,10 +165,11 @@ function settings() {
                             <div className="settings-setting-container">
                                 {t("settings.general.language")}
                                 <Dropdown
-                                    options={i18n.languages.map(element => {
-                                        return { label: t(`lang.${element}`), onClick: () => i18n.changeLanguage(element) }
+                                    options={Object.keys(i18n.store.data).map(element => {
+                                        return { label: t(`lang.${element}`), onClick: () => ChangeLanguage(element) }
                                     })}
                                     placeholder={t(`lang.${config.new.General.language}`)}
+                                    placeholderChange={() => t(`lang.${config.new.General.language}`)}
                                 />
                             </div>
                             <div className="settings-line"></div>
