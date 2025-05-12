@@ -45,7 +45,25 @@
             "screenshot": "Screenshots",
             "screenask": "Always ask Where Save Screenshots",
             "type": "Save Type",
-            "path": "Screenshot Save Path"
+            "path": "Screenshot Save Path",
+            "keybind": "Keybinds",
+            "keybinds": {
+                "pause": "Pause",
+                "fullscreen": "Fullscreen",
+                "exitplayer": "Exit Player",
+                "lskipforward": "Long Skip Forward",
+                "lskipbackward": "Long Skip Backward",
+                "skipforward": "Short Skip Forward",
+                "skipbackward": "Short Skip Backward",
+                "fskipforward": "Frame Skip Forward",
+                "fskipbackward": "Frame Skip Backward",
+                "nextepisode": "Next Episode",
+                "prevepisode": "Previus Episode",
+                "volumeup": "Volume Up",
+                "volumedown": "Volume Down",
+                "volumemute": "Volume Mute",
+                "screenshot": "Take a Screenshot"
+            }
         },
         "history": {
             "limited": "Limited Save History",
