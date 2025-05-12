@@ -4,7 +4,7 @@ import Card from "./card"
 import { useRef } from "react"
 import Button from "@renderer/components/buttons"
 
-const Container: React.FC<containerData> = ({ title, data, horizontal, onScrollDownFunction, onTitleClick }) => {
+const Container: React.FC<containerData> = ({ title, data, horizontal, onTitleClick }) => {
   const container = useRef<HTMLDivElement>(null)
   // function handleScroll(event) {
   //   if (event.deltaY === 0) return;
@@ -19,12 +19,9 @@ const Container: React.FC<containerData> = ({ title, data, horizontal, onScrollD
     container.current.scrollLeft += num
   }
 
-  onScrollDownFunction = () => {
-    console.log('haiiii')
-  }
 
   return (
-    <div className="main-container" onScroll={onScrollDownFunction}>
+    <div className="main-container">
         <div className={onTitleClick ? "container-title-click" : "container-title"} onClick={onTitleClick}>{title}</div>
         <div className="button-container">
           {horizontal ? <Button icon="chevron_left" ButtonClass="container-left-skip-button" onClick={() => handleButtonScroll(-120)}/> : ""}

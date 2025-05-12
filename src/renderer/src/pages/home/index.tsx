@@ -10,7 +10,7 @@ import { useEffect } from "react"
 import { homeData } from "@renderer/utils/GlobalInterface"
 import { t } from "i18next"
 
-function home() {
+const Home = () => {
     const navigate = useNavigate()
     const plugin = useSelector((plugin: any) => plugin.plugin.informationPlugin);
     const homeCache: homeData = useSelector((cache: any) => cache.home);
@@ -41,6 +41,14 @@ function home() {
             plugin.information.home()
         }
     }, [])
+
+
+    const handleScroll = () => {
+        const currentPos = -document.getElementById("scrollID")!.scrollTop + document.getElementById("scrollID")!.scrollHeight
+        const isBottom = document.getElementById("scrollID")!.offsetHeight == currentPos
+
+        if (isBottom) alert("reached bottom")
+    }
     
     return (
         <main className="home">
@@ -51,7 +59,7 @@ function home() {
                 <div></div>
                 <div className="home-header-right"></div>
             </div>
-            <div className={homeCache.isLoading ? "home-loading-container" : "home-container"}>
+            <div id={"scrollID"} className={homeCache.isLoading ? "home-loading-container" : "home-container"} onScroll={handleScroll}>
                 {
                     homeCache.isLoading ? <div className="material-symbols-outlined home-loading-animation">progress_activity</div> 
                     : 
@@ -63,4 +71,4 @@ function home() {
     )
 }
 
-export default home
+export default Home
