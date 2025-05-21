@@ -1,13 +1,14 @@
 .settings-keybind-check , .settings-keybind-check-active {
     background-color: var(--bg3);
     border-radius: 12px;
-    width: 130px;
+    min-width: 130px;
     border: 2px solid var(--bg3);
     height: 40px;
     color: var(--text);
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 0.62em;
 }
 
 .settings-keybind-check:hover {
