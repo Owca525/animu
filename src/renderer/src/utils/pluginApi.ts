@@ -14,8 +14,23 @@ export async function setHomeData(func: () => Promise<containerData[]>) {
     } catch (error) {
         store.dispatch({
             type: "setAllHomeData", payload: {
-                isLoading: false, isError: true, data: []
+                isLoading: false, isError: true
             }
         })
+    }
+}
+
+
+export async function setSearchData(func: () => Promise<containerData>) {
+    try {
+        let data = await func()
+        let tmp = store.getState().home.data[0]
+        store.dispatch({
+            type: "setAllHomeData", payload: {
+                isLoading: false, isError: false, data: [{ ...data, data: [ ...tmp.data, ...data.data ] }]
+            }
+        })
+    } catch (error) {
+        console.log(error)
     }
 }

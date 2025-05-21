@@ -36,6 +36,8 @@ export interface homeData {
     data: containerData[]
     isLoading: boolean
     isError: boolean
+    search: string
+    page: number
 }
 
 export interface playerData {
@@ -72,7 +74,7 @@ export interface pluginFormat {
     name: string
     author: string
     information?: {
-        search: (name: string) => void
+        search: (name: string, page: number) => void
         home: () => void
     } | null
     player?: {

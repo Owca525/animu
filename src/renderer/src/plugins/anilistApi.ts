@@ -1,5 +1,5 @@
 import { cardData, containerData, pluginFormat } from "@renderer/utils/GlobalInterface";
-import { setHomeData } from "@renderer/utils/pluginApi";
+import { setHomeData, setSearchData } from "@renderer/utils/pluginApi";
 
 const graphicApi = `
 query(
@@ -130,15 +130,15 @@ const header = {
   "Accept": "application/json",
 }
 
-const tendingAnime = { 
-  page: 1, 
-  sort: [ "TRENDING_DESC", "POPULARITY_DESC" ], 
-  type: "ANIME" 
+const tendingAnime = {
+  page: 1,
+  sort: ["TRENDING_DESC", "POPULARITY_DESC"],
+  type: "ANIME"
 }
 
 const allPopular = {
-  page: 1, 
-  sort: "POPULARITY_DESC", 
+  page: 1,
+  sort: "POPULARITY_DESC",
   type: "ANIME"
 }
 
@@ -157,6 +157,7 @@ async function sendToApi(variable: any): Promise<cardData[]> {
   if (data.success) {
     return data.data.data.Page.media.map((data) => Convert(data))
   }
+  console.log(data)
   return []
 }
 
@@ -164,27 +165,41 @@ function getSeasonFromDate(date: Date) {
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
   if (month >= 12 || month <= 2) {
-      return ["WINTER", year];
+    return ["WINTER", year];
   } else if (month >= 3 && month <= 5) {
-      return ["SPRING", year];
+    return ["SPRING", year];
   } else if (month >= 6 && month <= 8) {
-      return ["SUMMER", year];
+    return ["SUMMER", year];
   } else if (month >= 9 && month <= 11) {
-      return ["FALL", year];
+    return ["FALL", year];
   }
   return [];
 }
 
-async function SearchAnilistApi(text: string): Promise<void> {
+async function SearchAnilistApi(text: string, page: number): Promise<void> {
+  if (page > 1) {
+    setSearchData(async () => {
+      return {
+        title: `Searching: ${text}`,
+        data: await sendToApi({
+          page: page,
+          search: text,
+          sort: "SEARCH_MATCH",
+          type: "ANIME"
+        })
+      }
+    })
+    return
+  }
   setHomeData(async () => {
     return [
       {
         title: `Searching: ${text}`,
-        data: await sendToApi({ 
-          page: 1,
+        data: await sendToApi({
+          page: page,
           search: text,
-          sort: "SEARCH_MATCH", 
-          type: "ANIME" 
+          sort: "SEARCH_MATCH",
+          type: "ANIME"
         })
       }
     ]
@@ -215,14 +230,14 @@ async function CreateHomePage(): Promise<containerData[]> {
     {
       title: "Popular in this Season",
       data: await sendToApi({
-        page: 1, 
+        page: 1,
         season: season[0],
         seasonYear: season[1],
         type: "ANIME"
       }),
       horizontal: true,
       onTitleClick: () => getFullCategory({
-        page: 1, 
+        page: 1,
         season: season[0],
         seasonYear: season[1],
         type: "ANIME"

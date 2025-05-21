@@ -9,6 +9,7 @@ import { useSelector } from "react-redux"
 import { useEffect } from "react"
 import { homeData } from "@renderer/utils/GlobalInterface"
 import { t } from "i18next"
+import store from "@renderer/utils/store"
 
 const Home = () => {
     const navigate = useNavigate()
@@ -37,24 +38,27 @@ const Home = () => {
     }
 
     useEffect(() => {
-        if (homeCache.data.length == 0) {
-            plugin.information.home()
-        }
+        if (homeCache.data.length == 0) plugin.information.home()
     }, [])
 
+    console.log(homeCache)
 
     const handleScroll = () => {
+        if (homeCache.data.length > 1) return 
         const currentPos = -document.getElementById("scrollID")!.scrollTop + document.getElementById("scrollID")!.scrollHeight
         const isBottom = document.getElementById("scrollID")!.offsetHeight == currentPos
-
-        if (isBottom) alert("reached bottom")
+        console.log("asdasd")
+        if (isBottom) {
+            store.dispatch({ type: "setPage", payload: homeCache.page + 1 })
+            plugin.information.search(homeCache.search, homeCache.page + 1)
+        }
     }
     
     return (
         <main className="home">
             <div className="home-header">
                 <div className="home-header-left">
-                    <Input placeholder={t("home.search")} onKeyDown={plugin.information.search} />
+                    <Input placeholder={t("home.search")} onKeyDown={(text) => {store.dispatch({ type: "setSearch", payload: text }); store.dispatch({ type: "setPage", payload: 1 }); plugin.information.search(text, 1)}} />
                 </div>
                 <div></div>
                 <div className="home-header-right"></div>

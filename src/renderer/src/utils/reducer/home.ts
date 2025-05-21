@@ -3,7 +3,9 @@ import { homeData } from "../GlobalInterface";
 const initialState: homeData = {
     isLoading: false,
     isError: false,
-    data: []
+    data: [],
+    search: "",
+    page: 1
 };
 
 const userReducer = (state = initialState, action) => {
@@ -14,6 +16,10 @@ const userReducer = (state = initialState, action) => {
       return { ...state, isLoading: action.payload };
     case "setErrorHome":
       return { ...state, isError: action.payload };
+    case "setSearch":
+      return { ...state, search: action.payload };
+    case "setPage":
+      return { ...state, page: action.payload };
     case "resetHomeData":
         return { ...initialState };
     default:
