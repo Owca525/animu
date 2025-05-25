@@ -30,6 +30,9 @@ export interface AnimeData {
     studios: any
     title: string
     type: string | null
+    episodesList?: { episodes: string[], type: string, name?: string }[]
+    player_ID?: string
+    id: string
 }
 
 export interface homeData {
@@ -79,7 +82,7 @@ export interface pluginFormat {
     } | null
     player?: {
         getUrls: () => playerData
-        listEpisodes: () => string[]
+        listEpisodes?: (name: string) => Promise<{ episodes: string[], type: string, name?: string }[]>
     } | null
 }
 

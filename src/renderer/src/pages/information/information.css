@@ -111,6 +111,8 @@
     background-color: var(--bg2);
     border-radius: 16px;
     padding: 12px;
+    display: flex;
+    flex-direction: column  ;
     gap: 12px;
 }
 
@@ -127,6 +129,29 @@
     overflow: hidden;
 }
 
+.information-buttons-episode-container {
+  display: flex;
+  justify-content: start;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+
+.information-episode-button {
+  padding: 12px;
+  width: clamp(10px, 1.5vw, 20px);
+  height: clamp(10px, 1.5vw, 20px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  background-color: var(--bg4);
+  border-radius: 8px;
+  border: 2px solid var(--bg4);
+}
+
+.information-episode-button:hover {
+    border-color: var(--neutral1);
+}
 
 
 /* For smaller devices / window sizes */

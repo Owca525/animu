@@ -5,15 +5,28 @@ import "./information.css"
 import { capitalizeFirstLetter, convertDateToFormattedString, convertSeconds, decodeHtmlEntities } from "@renderer/utils/functions";
 import { useEffect, useState } from "react";
 import { t } from "i18next"
+import useHotkeys from "@reecelucas/react-use-hotkeys";
+import { getInformation } from "@renderer/plugins/allmanga";
+import { useQuery } from "react-query";
+import { useSelector } from "react-redux";
+import Drop from "./components/drop";
 
 function information() {
     const navigate = useNavigate()
     const location = useLocation();
-    const data: AnimeData = location.state;
+    const anime_data: AnimeData = location.state;
+    const plugin = useSelector((plugin: any) => plugin.plugin.playerPlugin);
+    const [func, setfunc] = useState<() => Promise<any>>(() => async () => await getInformation(anime_data.title))
+    const { data, error, isLoading, refetch } = useQuery(
+        [func.toString()],
+        func,
+        {
+            refetchOnWindowFocus: false,
+            cacheTime: 0,
+        }
+    );
 
-    console.log(data)
-
-    const [secondsLeft, setSecondsLeft] = useState<undefined | number>(data.nextAiringEpisode?.timeUntilAiring);
+    const [secondsLeft, setSecondsLeft] = useState<undefined | number>(anime_data.nextAiringEpisode?.timeUntilAiring);
 
     useEffect(() => {
         if (secondsLeft && secondsLeft <= 0) return;
@@ -32,10 +45,25 @@ function information() {
 
     const time = convertSeconds(secondsLeft)
 
+
+    function makeButtons(episode: string[], type: string, name?: string) {
+        return (
+            <div className='information-buttons-episode-container'>
+                {episode.map((num) => (
+                    <div className='information-episode-button'>{num}</div>
+                ))}
+            </div>
+        )
+    }
+
+    useHotkeys("tab", () => {
+        console.log(anime_data)
+    })
+
     return (
         <main className="information">
             <div className="information-banner">
-                <img className={data.bannerImage ? "information-banner-image" : "information-banner-image-blur"} src={data.bannerImage ? data.bannerImage : data.coverImage ? data.coverImage : ""} />
+                <img className={anime_data.bannerImage ? "information-banner-image" : "information-banner-image-blur"} src={anime_data.bannerImage ? anime_data.bannerImage : anime_data.coverImage ? anime_data.coverImage : ""} />
             </div>
 
             <div className="information-fade"></div>
@@ -44,11 +72,11 @@ function information() {
 
                 <div className="information-top">
 
-                    <img className="information-cover" src={data.coverImage ? data.coverImage : ""}></img>
+                    <img className="information-cover" src={anime_data.coverImage ? anime_data.coverImage : ""}></img>
 
                     <div className="information-description">
-                        <div className="information-title">{data.title}</div>
-                        {decodeHtmlEntities(data.description ? data.description : "Description Dosen't exist")}
+                        <div className="information-title">{anime_data.title}</div>
+                        {decodeHtmlEntities(anime_data.description ? anime_data.description : "Description Dosen't exist")}
                     </div>
 
                 </div>
@@ -57,66 +85,73 @@ function information() {
 
                     <div className="information-info">
 
-                        {data.nextAiringEpisode &&
+                        {anime_data.nextAiringEpisode &&
                             <div className="information-info-content">
-                                <div className="information-content-title">{t("information.airing")}: {data.nextAiringEpisode.episode}</div>
+                                <div className="information-content-title">{t("information.airing")}: {anime_data.nextAiringEpisode.episode}</div>
                                 {`${time?.days}d ${time?.hours}h ${time?.minutes}m ${time?.seconds}s`}
                             </div>
                         }
 
-                        {data.format &&
+                        {anime_data.format &&
                             <div className="information-info-content">
                                 <div className="information-content-title">{t("information.format")}</div>
-                                {data.format}
+                                {capitalizeFirstLetter(anime_data.format)}
                             </div>
                         }
 
-                        {data.episodes &&
+                        {anime_data.episodes &&
                             <div className="information-info-content">
                                 <div className="information-content-title">{t("information.episodes")}</div>
-                                {data.episodes}
+                                {anime_data.episodes}
                             </div>
                         }
 
-                        {data.duration &&
+                        {anime_data.duration &&
                             <div className="information-info-content">
                                 <div className="information-content-title">{t("information.duration")}</div>
-                                {data.duration}
+                                {anime_data.duration}
                             </div>
                         }
 
-                        {data.status &&
+                        {anime_data.status &&
                             <div className="information-info-content">
                                 <div className="information-content-title">{t("information.status")}</div>
-                                {capitalizeFirstLetter(data.status)}
+                                {capitalizeFirstLetter(anime_data.status)}
                             </div>
                         }
 
-                        {data.startDate && data.startDate.day && data.startDate.month && data.startDate.year &&
+                        {anime_data.startDate && anime_data.startDate.day && anime_data.startDate.month && anime_data.startDate.year &&
                             <div className="information-info-content">
                                 <div className="information-content-title">{t("information.startdate")}</div>
-                                {convertDateToFormattedString(data.startDate.year, data.startDate.month, data.startDate.day, 0, 0)}
+                                {convertDateToFormattedString(anime_data.startDate.year, anime_data.startDate.month, anime_data.startDate.day, 0, 0)}
                             </div>
                         }
 
-                        {data.endDate && data.endDate.day && data.endDate.month && data.endDate.year &&
+                        {anime_data.endDate && anime_data.endDate.day && anime_data.endDate.month && anime_data.endDate.year &&
                             <div className="information-info-content">
                                 <div className="information-content-title">{t("information.endate")}</div>
-                                {convertDateToFormattedString(data.endDate.year, data.endDate.month, data.endDate.day, 0, 0)}
+                                {convertDateToFormattedString(anime_data.endDate.year, anime_data.endDate.month, anime_data.endDate.day, 0, 0)}
                             </div>
                         }
 
-                        {data.season && data.seasonYear &&
+                        {anime_data.season && anime_data.seasonYear &&
                             <div className="information-info-content">
                                 <div className="information-content-title">{t("information.season")}</div>
-                                {capitalizeFirstLetter(data.season)} {data.seasonYear}
+                                {capitalizeFirstLetter(anime_data.season)} {anime_data.seasonYear}
                             </div>
                         }
 
                     </div>
 
-                    <div className="information-episodes">
 
+                    <div className="information-episodes">
+                        {isLoading == false && data.length > 0 && anime_data.status != "NOT_YET_RELEASED" && (
+                            <>
+                                {data.map((episode: { episodes: string[], type: string, name?: string }) => episode.episodes.length > 0 ? (
+                                    <Drop LeftHeader={episode.name ? episode.name : episode.type} RightHeader={`${episode.episodes.length} episodes`} content={makeButtons(episode.episodes, episode.type)} />
+                                ) : "")}
+                            </>
+                        )}
                     </div>
 
                 </div>
