@@ -1,3 +1,10 @@
+export const notificationProps = {
+    closeOnClick: true,
+    autoClose: 3000,
+    pauseOnHover: true,
+    hideProgressBar: true
+}
+
 export interface AnimeData {
     averageScore: number | null
     bannerImage: string | null
@@ -44,18 +51,17 @@ export interface homeData {
 }
 
 export interface playerData {
-    title: string
-    resolutions: {
-        res: string
-        url: string
-        hostname: string
-        hls: boolean
-    }[]
+    res: string
+    url: string
+    hostname: string
+    hls: boolean
 }
 
 export interface indentityPlayer {
-    animeID: string
     pluginName: string
+    last_Time: number
+    episode: string
+    type: string
 }
 
 export interface cardData {
@@ -81,8 +87,8 @@ export interface pluginFormat {
         home: () => void
     } | null
     player?: {
-        getUrls: () => playerData
-        listEpisodes?: (name: string) => Promise<{ episodes: string[], type: string, name?: string }[]>
+        getUrls: (type: string, episode: string) => playerData
+        listEpisodes?: (name: string) => Promise<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] }>
     } | null
 }
 

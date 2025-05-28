@@ -1,0 +1,324 @@
+.video-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+}
+
+.video-player {
+  width: 100%;
+  height: 100%;
+}
+
+.video-overlay {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.mask {
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 1) 10%,
+    rgba(0, 0, 0, 0.5)
+  );
+}
+
+.time-display {
+  padding: 5px 10px;
+  border-radius: 5px;
+  pointer-events: all;
+  font-size: large;
+  font-weight: 500;
+  user-select: text;
+  background-color: rgb(0, 0, 0, 0.8);
+}
+
+.video-top {
+  margin-top: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  transition: opacity 200ms ease;
+}
+
+.mask {
+  transition: mask-image 200ms ease;
+}
+
+.video-center {
+  display: flex;
+  justify-content: center;
+}
+
+.video-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: 12px;
+  padding-right: 12px;
+  transition: opacity 200ms ease;
+}
+
+.bottom-section {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 4px;
+  padding-right: 4px;
+  margin-bottom: 8px;
+}
+.player-left,
+.player-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.player-buttons {
+  pointer-events: all;
+  width: 40px;
+  height: 40px;
+  border: none;
+  font-size: xx-large;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.player-title {
+  pointer-events: all;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: x-large;
+  user-select: text;
+  background-color: rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+}
+
+.volume-seek {
+  max-width: 200px;
+  width: 20vw;
+  padding: 0px 4px;
+}
+
+.player-waiting {
+  font-size: 72px;
+  animation: spin 1s linear infinite;
+}
+
+.disabled {
+  pointer-events: none;
+}
+
+.show-time {
+  padding: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+  bottom: 80px;
+  width: min-content;
+  border-radius: 4px;
+  position: absolute;
+  transition: opacity 100ms ease;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.volume-bar {
+  appearance: none;
+  height: 6px;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+.volume-bar::-webkit-slider-thumb {
+  appearance: none;
+  background-color: #5962a6;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.player-hide-cursor {
+  cursor: none;
+}
+
+.button-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.player-settings-container {
+  pointer-events: all;
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  padding: 0.5em;
+  border-radius: 8px;
+  min-width: 200px;
+  width: 20%;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.player-settings-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.player-settings-button:hover, .player-settings-button-back:hover {
+  background-color: rgba(150, 150, 150, 0.3);
+}
+
+.player-settings-button-text {
+  font-size: larger;
+}
+
+.player-hidden {
+  opacity: 0;
+  pointer-events: none;
+  cursor: default;
+}
+
+.player-settings-button-back {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-radius: 8px;
+  gap: 8px;
+}
+
+.up-Next-container {
+  position: fixed;
+  left: 1;
+  top: 1;
+  right: 30px;
+  bottom: 30px;
+  z-index: 2000;
+
+  width: clamp(20vw, 25vw, 30vw);
+
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  border-radius: 1em;
+}
+
+.up-Next-Anime, .up-Next-Title {
+  display: -webkit-box;
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.up-Next-Title {
+  font-size: clamp(1rem, 1.4vw, 2em);
+  font-weight: 500;
+}
+
+.up-Next-Anime {
+  max-width: 30svw;
+  font-size: clamp(0.8rem, 1vw, 1em);
+}
+
+.up-Next-Buttons {
+  display: flex;
+  justify-content: end;
+  gap: 1em;
+}
+
+.up-Next-Button {
+  font-size: clamp(0.5rem, 1.1vw, .8rem);
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 8px;
+}
+
+.player-nerd-container {
+  position: fixed;
+  top: 200px;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 12px 14px;
+  margin: 20px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 250px;
+}
+.player-nerd-element {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.player-dev-container {
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 12px;
+  border-radius: 12px;
+  right: 0;
+  top: 0;
+  margin: 12px;
+  max-width: 30vw;
+  width: min-content;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.player-dev-header {
+  font-size: large;
+  font-weight: 600;
+}
+
+.player-dev-text {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+
+/* external player section */
+.external-container{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.external-player-container {
+  background-color: var(--bg2);
+  border-radius: 12px;
+
+  padding: 12px;
+  display: flex;
+  gap: 1em;
+  width: max-content;
+}
+
+.external-title {
+  background-color: var(--bg2);
+  border-radius: 12px;
+  padding: 12px;
+  font-size: larger;
+}

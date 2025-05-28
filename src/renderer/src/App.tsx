@@ -7,6 +7,7 @@ import 'material-symbols'
 import Home from "./pages/home/index"
 import Information from "./pages/information/index"
 import Settings from "./pages/settings/index"
+import Player from "./pages/player/index"
 
 // Temporally
 import "./themes/DarkAnimu.css"
@@ -27,6 +28,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/info" element={<Information />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/player" element={<Player />} />
           </Routes>
         </Suspense>
       </HashRouter>

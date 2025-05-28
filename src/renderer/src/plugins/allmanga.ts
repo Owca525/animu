@@ -120,9 +120,9 @@ function converterData(data: any): cardData {
 //   return null
 // }
 
-export async function getInformation(name: string): Promise<{ episodes: string[], type: string, name?: string }[]> {
+export async function getInformation(name: string): Promise<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] }> {
   let data = await SearchAnime(name)
-  if (data == 0) return []
+  if (data == 0) return { player_id: "", episodesData: [] }
   data = data.shows.edges.map((data) => converterData(data))
   let precentage: { name: string, prec: number }[] = []
 
@@ -130,15 +130,24 @@ export async function getInformation(name: string): Promise<{ episodes: string[]
     const element: cardData = data[i];
     precentage.push({ name: element.AnimeData.title, prec: similarityText(name, element.AnimeData.title) })
   }
-  if (precentage.length <= 0) return []
+  if (precentage.length <= 0) return { player_id: "", episodesData: [] }
   let anime_name = precentage.filter(item => item.prec === Math.max(...precentage.map(item => item.prec)))[0]
   let anime_id = data.filter((item: cardData) => item.AnimeData.title == anime_name.name)[0]
 
   let variables = `{"_id":"${anime_id.AnimeData.player_ID}"}`
   const resp = await sendRequest(variables, HASH_INFO, header)
   let anime_data = converterData(resp.data.show).AnimeData.episodesList
-  if (!anime_data) return []
-  return anime_data
+  if (!anime_data) return { player_id: "", episodesData: [] }
+  return { player_id: anime_id.AnimeData.player_ID, episodesData: anime_data }
+}
+
+export async function extractURLS(type: string, episode: string, id: string): Promise<playerData[]> {
+  let variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${episode}"}`
+
+  const resp = await sendRequest(variables, HASH_PLAYER, header)
+
+  console.log(resp)
+  return []
 }
 
 // export async function getPlayerUrls(id: string, episode: string, type: string) {

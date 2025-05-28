@@ -15,9 +15,9 @@ function information() {
     const navigate = useNavigate()
     const location = useLocation();
     const anime_data: AnimeData = location.state;
-    const plugin = useSelector((plugin: any) => plugin.plugin.playerPlugin);
-    const [func, setfunc] = useState<() => Promise<any>>(() => async () => await getInformation(anime_data.title))
-    const { data, error, isLoading, refetch } = useQuery(
+    // const plugin = useSelector((plugin: any) => plugin.plugin.playerPlugin);
+    const func = async () => await getInformation(anime_data.title)
+    const { data, error, isLoading } = useQuery(
         [func.toString()],
         func,
         {
@@ -45,12 +45,31 @@ function information() {
 
     const time = convertSeconds(secondsLeft)
 
+    function enterPlayer(episodes: string[], type: string, episode: string) {
+        navigate("/player", {
+            state: {
+                data: {
+                    AnimeData: {
+                        ...anime_data,
+                        player_ID: data?.player_id
+                    },
+                    saveData: {
+                        last_Time: 0,
+                        type: type,
+                        player_ID: anime_data.player_ID,
+                        episode: episode
+                    }
+                },
+                episodelist: episodes
+            }
+        })
+    }
 
-    function makeButtons(episode: string[], type: string, name?: string) {
+    function makeButtons(episode: string[], type: string) {
         return (
             <div className='information-buttons-episode-container'>
                 {episode.map((num) => (
-                    <div className='information-episode-button'>{num}</div>
+                    <div className='information-episode-button' onClick={() => enterPlayer(episode, type, num)}>{num}</div>
                 ))}
             </div>
         )
@@ -145,10 +164,10 @@ function information() {
 
 
                     <div className="information-episodes">
-                        {isLoading == false && data.length > 0 && anime_data.status != "NOT_YET_RELEASED" && (
+                        {isLoading == false && data && data.episodesData.length > 0 && anime_data.status != "NOT_YET_RELEASED" && (
                             <>
-                                {data.map((episode: { episodes: string[], type: string, name?: string }) => episode.episodes.length > 0 ? (
-                                    <Drop LeftHeader={episode.name ? episode.name : episode.type} RightHeader={`${episode.episodes.length} episodes`} content={makeButtons(episode.episodes, episode.type)} />
+                                {data.episodesData.map((episode: { episodes: string[], type: string, name?: string }) => episode.episodes.length > 0 ? (
+                                    <Drop LeftHeader={episode.name ? episode.name : episode.type} RightHeader={`${episode.episodes.length} episodes`} content={makeButtons(episode.episodes, episode.type)}/>
                                 ) : "")}
                             </>
                         )}

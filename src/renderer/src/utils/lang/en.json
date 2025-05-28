@@ -73,7 +73,9 @@
         }
     },
     "player": {
-
+        "error": {
+            "notfound": "Player dosen't found any urls"
+        }
     },
     "lang": {
         "en": "English",

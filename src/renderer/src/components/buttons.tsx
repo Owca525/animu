@@ -6,11 +6,12 @@ interface ButtonProps {
     content?: string
     ButtonClass?: string
     onClick?: (event: any) => void
+    titleButton?: string
 }
 
-const Button: React.FC<ButtonProps> = ({ icon, ButtonClass, onClick, content, iconClassName }) => {
+const Button: React.FC<ButtonProps> = ({ icon, ButtonClass, onClick, content, iconClassName, titleButton }) => {
   return (
-    <button className={"button " + ButtonClass} onClick={onClick}>
+    <button className={"button " + ButtonClass} onClick={onClick} title={titleButton ? titleButton : ""}>
         {icon && <span className={"material-symbols-outlined " + iconClassName}>{icon}</span>} {content}
     </button>
   )
