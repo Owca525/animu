@@ -4,6 +4,8 @@
     position: relative;
     cursor: pointer;
     width: 100%;
+    background-color: color-mix(in srgb, var(--bg4) 70%, transparent);
+    border-radius: 12px;
 }
 
 .seekbar-progress {
@@ -27,4 +29,11 @@
     transform: translateX(-50%);
     width: min-content;
     padding: 8px 12px;
+    background-color: color-mix(in srgb, var(--bg3) 80%, transparent);
+    border-radius: 12px;
+}
+
+.seekbar-thumb, .seekbar-progress, .seekbar-box.progress {
+  background-color: var(--neutral1);
+  border-radius: 12px;
 }

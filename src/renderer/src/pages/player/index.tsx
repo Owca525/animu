@@ -22,10 +22,10 @@ const player = () => {
 
     const [playerVolume, setPlayerVolume] = useState<number>(config.Player.general.Volume)
     const [extractionData, setextractionData] = useState<{ actual: string, type: string, episodelist: Array<string> }>({ actual: anime_data.data.saveData ? anime_data.data.saveData.episode : "1", type: anime_data.data.saveData ? anime_data.data.saveData.type : "sub", episodelist: anime_data.episodelist })
-    const func = async () => await extractURLS(extractionData.type, extractionData.actual, anime_data.data.AnimeData.player_ID ? anime_data.data.AnimeData.player_ID : "")
+    const func = () => extractURLS(extractionData.type, extractionData.actual, anime_data.data.AnimeData.player_ID ? anime_data.data.AnimeData.player_ID : "")
     // const buttons = [{ title: t('general.ok'), onClick: () => leave() }, { title: t('general.reload'), onClick: async () => { closeDialog(); refetch({ exact: true }) } }]
 
-    const { data, isLoading, refetch } = useQuery(
+    const { data, isLoading, error, refetch } = useQuery(
         [func.toString()],
         func,
         {
@@ -33,12 +33,7 @@ const player = () => {
         }
     );
 
-    function setNewEpisode(type: string,) {
-        navigate('/player', {
-            state: {
-                ...anime_data
-            }
-        })
+    function setNewEpisode(type: string) {
         setextractionData((old) => {
             let ep = extractionData.episodelist.indexOf(old.actual)
             if (type == 'prev') ep = ep - 1
@@ -51,6 +46,7 @@ const player = () => {
                 actual: extractionData.episodelist[ep]
             }
         })
+        console.log(extractionData)
         refetch({ exact: true })
     }
 
@@ -63,8 +59,8 @@ const player = () => {
         window.BrowserWindow.setFullscreen(false)
         closeDialog()
     }
-
-    if (data && data.length !== 0) {
+    console.log(data)
+    if (isLoading == false && data && data.length <= 0) {
         loadingAnimation()
         showDialog({
             type: "error",
@@ -82,30 +78,27 @@ const player = () => {
     //         <ExternalPlayer />
     //     )
     // }
-    console.log(data)
-    if (data && data.length !== 0 && isLoading == false) {
-        return 
-
-        // return (
-        //     <Suspense fallback={loadingAnimation()}>
-        //         <VideoPlayer
-        //             player_data={data}
-        //             anime_data={anime_data.data}
-        //             temp={{ episode: extractionData.actual, type: extractionData.type, episodes: extractionData.episodelist }}
-        //             functions={{ nextButton: setNewEpisode, prevButton: setNewEpisode }}
-        //             volumeCacheFunc={setPlayerVolume}
-        //             PlayerVolume={playerVolume}
-        //             time={anime_data.data.saveData ? anime_data.data.saveData.last_Time : 0}
-        //         />
-        //     </Suspense>
-        // )
+    if (data) {
+        return (
+            <Suspense fallback={loadingAnimation()}>
+                <VideoPlayer
+                    player_data={data}
+                    anime_data={anime_data.data}
+                    temp={{ episode: extractionData.actual, type: extractionData.type, episodes: extractionData.episodelist }}
+                    functions={{ nextButton: setNewEpisode, prevButton: setNewEpisode }}
+                    volumeCacheFunc={setPlayerVolume}
+                    PlayerVolume={playerVolume}
+                    time={anime_data.data.saveData ? anime_data.data.saveData.last_Time : 0}
+                />
+            </Suspense>
+        )
     }
     return loadingAnimation()
 }
 
 function loadingAnimation() {
     return (
-        <div className="video-container" style={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <div className="player-video-container" style={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
             <div className="player-loading-container" style={{ maxHeight: "min-content" }}>
                 <div className="player-waiting material-symbols-outlined">progress_activity</div>
             </div>

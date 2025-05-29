@@ -75,6 +75,27 @@
     "player": {
         "error": {
             "notfound": "Player dosen't found any urls"
+        },
+        "TitleEpisode": "Episode: {{ep}} of {{name}}",
+        "Volume": "Volume",
+        "next": "Next {{ep}} episode",
+        "previous": "Previous {{ep}} episode",
+        "Pause": "Pause",
+        "play": "Play",
+        "fullscreen": "Fullscreen",
+        "errors": {
+            "extractionError": "Failed Extracting Player Urls: {{error}}",
+            "MEDIA_ERR_ABORTED": "The playback was aborted.",
+            "MEDIA_ERR_NETWORK": "A network error occurred while fetching the video.",
+            "MEDIA_ERR_DECODE": "An error occurred while decoding the video.",
+            "MEDIA_ERR_SRC_NOT_SUPPORTED": "The video format or source is not supported.",
+            "default": "An unknown error occurred."
+        },
+        "upNext": {
+            "title": "Next Episode Playing in {{sec}} seconds",
+            "titleAnime": "Next Episode {{ep}} of {{title}}",
+            "nextEp": "Next Episode",
+            "hide": "Hide"
         }
     },
     "lang": {

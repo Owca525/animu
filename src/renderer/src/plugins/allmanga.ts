@@ -61,8 +61,14 @@ function decodeText(textString: string): string {
   return textString.replace(/\n/g, '').replace('/clock', '/clock.json')
 }
 
-async function sendRequest(variables: string, hash: string, header: any): Promise<any | null> {
+async function sendToAPI(variables: string, hash: string, header: any): Promise<any | null> {
   let url = `${API_WEB}/api?variables=${variables}&extensions={"persistedQuery":{"version":1,"sha256Hash": "${hash}"}}`
+  let data = await window.api.request.get(url, header)
+  if (data.success) return data.data
+  return null
+}
+
+async function sendRequest(url: string, header: any): Promise<any | null> {
   let data = await window.api.request.get(url, header)
   if (data.success) return data.data
   return null
@@ -71,7 +77,7 @@ async function sendRequest(variables: string, hash: string, header: any): Promis
 export async function SearchAnime(name: string, page: number = 1) {
   let variables = `{"search":{"query":"${name}"},"limit":26,"page":${page},"translationType":"sub","countryOrigin":"ALL"}`
 
-  const resp = await sendRequest(variables, HASH_SEARCH, header)
+  const resp = await sendToAPI(variables, HASH_SEARCH, header)
   if (resp) return resp.data
   return null
 }
@@ -114,7 +120,7 @@ function converterData(data: any): cardData {
 //   let extensions = `{"persistedQuery":{"version":1,"sha256Hash": "${HASH_SEARCH}"}}`
 //   let url = API_WEB + `/api?variables=${variables}&extensions=${extensions}`
 
-//   const resp = await sendRequest(url, header)
+//   const resp = await sendToAPI(url, header)
 //   console.log(resp)
 //   if (resp) return resp.data
 //   return null
@@ -135,58 +141,95 @@ export async function getInformation(name: string): Promise<{ player_id: string,
   let anime_id = data.filter((item: cardData) => item.AnimeData.title == anime_name.name)[0]
 
   let variables = `{"_id":"${anime_id.AnimeData.player_ID}"}`
-  const resp = await sendRequest(variables, HASH_INFO, header)
+  const resp = await sendToAPI(variables, HASH_INFO, header)
   let anime_data = converterData(resp.data.show).AnimeData.episodesList
   if (!anime_data) return { player_id: "", episodesData: [] }
   return { player_id: anime_id.AnimeData.player_ID, episodesData: anime_data }
 }
 
+async function getURLS(url: string): Promise<playerData | undefined> {
+  url = decodeText(url.replace('--', ''))
+  const links = await sendRequest(`http://allanime.day${url}`, {
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0'
+  })
+  if (!links) return undefined
+
+  let listUrls: playerData | undefined 
+
+  links.links.forEach(element => {
+    if (!element.link) return
+
+    const urlObject = new URL(element.link);
+
+    if (element.hls && urlObject.hostname != "ayvic.fast4speed.rsvp") {
+      listUrls = { resolution: [{ url: element.link, res: "" }], hostname: urlObject.hostname, hls: true }
+    }
+    if (element.mp4) {
+      listUrls = { resolution: [{ url: element.link, res: "1080" }], hostname: urlObject.hostname, hls: false }
+    }
+  });
+  return listUrls
+}
+
 export async function extractURLS(type: string, episode: string, id: string): Promise<playerData[]> {
   let variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${episode}"}`
 
-  const resp = await sendRequest(variables, HASH_PLAYER, header)
-
+  const resp = await sendToAPI(variables, HASH_PLAYER, header)
   console.log(resp)
-  return []
+  const sources = resp.data.episode.sourceUrls
+  const urls = sources
+    .map((tmp: { sourceUrl: string; sourceName: string }) =>
+      findUrl(tmp.sourceUrl, tmp.sourceName, source_names)
+    )
+    .filter((item: string) => item !== '')
+
+  let data: playerData[] = []
+  for (let i = 0; i < urls.length; i++) {
+    const element = urls[i];
+    let tmp = await getURLS(element)
+    if (tmp) data.push(tmp)
+  }
+
+  return data
 }
 
 // export async function getPlayerUrls(id: string, episode: string, type: string) {
 //   let variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${episode}"}`
 //   let extensions = `{"persistedQuery":{"version":1,"sha256Hash": "${HASH_PLAYER}"}}`
 //   let url = API_WEB + `/api?variables=${variables}&extensions=${extensions}`
-  
+
 //   let listUrls = []
 
-//   const resp = await sendRequest(url, header)
+//   const resp = await sendToAPI(url, header)
 //   console.log(resp)
 //   if (!resp) return null
 //   if (resp.data.episode === null) return null
 
 //   const sources = resp.data.episode.sourceUrls
-//   const urls = sources
-//     .map((tmp: { sourceUrl: string; sourceName: string }) =>
-//       findUrl(tmp.sourceUrl, tmp.sourceName, source_names)
-//     )
-//     .filter((item: string) => item !== '')
+// const urls = sources
+//   .map((tmp: { sourceUrl: string; sourceName: string }) =>
+//     findUrl(tmp.sourceUrl, tmp.sourceName, source_names)
+//   )
+//   .filter((item: string) => item !== '')
 
 //   for (let i = 0; i < urls.length; i++) {
 //     const element = urls[i]
 //     let url = decodeText(element.replace('--', ''))
-//     const links = await sendRequest(`http://allanime.day${url}`, {
-//       'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0'
-//     })
+// const links = await sendToAPI(`http://allanime.day${url}`, {
+//   'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0'
+// })
 //     if (links) {
 //       links.links.forEach(element => {
 //         if (!element.link) return
 
 //         const urlObject = new URL(element.link);
 
-        // if (element.hls && urlObject.hostname != "ayvic.fast4speed.rsvp") {
-        //   listUrls.push({ url: element.link, res: [], hostname: urlObject.hostname, hls: true })
-        // }
-        // if (element.mp4) {
-        //   listUrls.push({ url: element.link, res: [{ url: element.link, resolution: "1080" }], hostname: urlObject.hostname, hls: false })
-        // }
+// if (element.hls && urlObject.hostname != "ayvic.fast4speed.rsvp") {
+//   listUrls.push({ url: element.link, res: [], hostname: urlObject.hostname, hls: true })
+// }
+// if (element.mp4) {
+//   listUrls.push({ url: element.link, res: [{ url: element.link, resolution: "1080" }], hostname: urlObject.hostname, hls: false })
+// }
 //       });
 //     }
 //   }

@@ -51,10 +51,9 @@ export interface homeData {
 }
 
 export interface playerData {
-    res: string
-    url: string
     hostname: string
     hls: boolean
+    resolution: { res: string, url: string}[]
 }
 
 export interface indentityPlayer {
