@@ -1,7 +1,7 @@
 
 import { useQuery } from "react-query";
 import { useLocation, useNavigate } from "react-router-dom"
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useCallback, useState } from "react";
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
 import useHotkeys from "@reecelucas/react-use-hotkeys";
 import { cardData, SettingsConfig } from "@renderer/utils/GlobalInterface";
@@ -22,22 +22,23 @@ const player = () => {
 
     const [playerVolume, setPlayerVolume] = useState<number>(config.Player.general.Volume)
     const [extractionData, setextractionData] = useState<{ actual: string, type: string, episodelist: Array<string> }>({ actual: anime_data.data.saveData ? anime_data.data.saveData.episode : "1", type: anime_data.data.saveData ? anime_data.data.saveData.type : "sub", episodelist: anime_data.episodelist })
-    const func = () => extractURLS(extractionData.type, extractionData.actual, anime_data.data.AnimeData.player_ID ? anime_data.data.AnimeData.player_ID : "")
-    // const buttons = [{ title: t('general.ok'), onClick: () => leave() }, { title: t('general.reload'), onClick: async () => { closeDialog(); refetch({ exact: true }) } }]
+    const playerID = anime_data.data.AnimeData.player_ID ?? "";
+    const extractFunc = useCallback(() => {
+    return extractURLS(extractionData.type, extractionData.actual, playerID);
+    }, [extractionData, playerID]);
 
-    const { data, isLoading, error, refetch } = useQuery(
-        [func.toString()],
-        func,
-        {
-            refetchOnWindowFocus: false,
-        }
-    );
+    const { data, isLoading, refetch } = useQuery({
+        queryKey: ['extract-urls', extractionData.type, extractionData.actual, playerID],
+        queryFn: extractFunc,
+        refetchOnWindowFocus: false,
+    });
 
     function setNewEpisode(type: string) {
         setextractionData((old) => {
             let ep = extractionData.episodelist.indexOf(old.actual)
             if (type == 'prev') ep = ep - 1
             if (type == 'next') ep = ep + 1
+            console.log(extractionData.episodelist[ep], extractionData.episodelist.indexOf(old.actual))
             if (extractionData.episodelist[ep] === undefined) return {
                 ...old
             }
@@ -47,7 +48,7 @@ const player = () => {
             }
         })
         console.log(extractionData)
-        refetch({ exact: true })
+        refetch()
     }
 
     useHotkeys("Escape", () => {
@@ -67,7 +68,7 @@ const player = () => {
             title: t("player.error.notfound"),
             buttons: {
                 yesButton: () => leave(),
-                noButton: () => refetch({ exact: true })
+                noButton: () => refetch()
             }
         })
         return
@@ -78,7 +79,8 @@ const player = () => {
     //         <ExternalPlayer />
     //     )
     // }
-    if (data) {
+    console.log(isLoading)
+    if (data && isLoading == false) {
         return (
             <Suspense fallback={loadingAnimation()}>
                 <VideoPlayer

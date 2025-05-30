@@ -96,10 +96,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 2px solid var(--bg3);
+  border: 2px solid rgba(0, 0, 0, 0);
+  background-color: rgba(0, 0, 0, 0);
 }
 
 .player-buttons:hover {
+  background-color: var(--bg3);
   border-color: var(--neutral1);
 }
 
