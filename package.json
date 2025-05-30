@@ -1,6 +1,6 @@
 {
   "name": "animu",
-  "version": "0.4.15",
+  "version": "0.5",
   "description": "Simple Application To Watch Anime",
   "main": "./out/main/index.js",
   "author": "Owca525",
