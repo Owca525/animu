@@ -17,7 +17,7 @@ function information() {
     const anime_data: AnimeData = location.state;
     // const plugin = useSelector((plugin: any) => plugin.plugin.playerPlugin);
     const func = async () => await getInformation(anime_data.title)
-    const { data, error, isLoading } = useQuery(
+    const { data, isError, isLoading } = useQuery(
         [func.toString()],
         func,
         {
@@ -171,6 +171,8 @@ function information() {
                                 ) : "")}
                             </>
                         )}
+                        {isLoading && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
+                        {isError && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>Zero Episode was finded</div>}
                     </div>
 
                 </div>
