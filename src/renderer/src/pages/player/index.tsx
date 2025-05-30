@@ -47,7 +47,6 @@ const player = () => {
                 actual: extractionData.episodelist[ep]
             }
         })
-        console.log(extractionData)
         refetch()
     }
 
@@ -79,7 +78,6 @@ const player = () => {
     //         <ExternalPlayer />
     //     )
     // }
-    console.log(isLoading)
     if (data && isLoading == false) {
         return (
             <Suspense fallback={loadingAnimation()}>

@@ -173,7 +173,6 @@ async function getURLS(url: string): Promise<playerData | undefined> {
 
 export async function extractURLS(type: string, episode: string, id: string): Promise<playerData[]> {
   let variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${episode}"}`
-  console.log(type, episode, id)
   const resp = await sendToAPI(variables, HASH_PLAYER, header)
   console.log(resp)
   const sources = resp.data.episode.sourceUrls
