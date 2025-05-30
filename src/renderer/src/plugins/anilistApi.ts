@@ -1,5 +1,7 @@
 import { cardData, containerData, pluginFormat } from "@renderer/utils/GlobalInterface";
-import { setHomeData, setSearchData } from "@renderer/utils/pluginApi";
+import { homeStopScrolling, setHomeData, setSearchData } from "@renderer/utils/pluginApi";
+
+const pageSize = 20
 
 const graphicApi = `
 query(
@@ -35,7 +37,7 @@ query(
   $minimumTagRank: Int,
   $sort: [MediaSort] = [POPULARITY_DESC, SCORE_DESC]
 ) {
-  Page(page: $page, perPage: 20) {
+  Page(page: $page, perPage: ${pageSize}) {
     pageInfo {
       total
       perPage
@@ -177,33 +179,24 @@ function getSeasonFromDate(date: Date) {
 }
 
 async function SearchAnilistApi(text: string, page: number): Promise<void> {
-  if (page > 1) {
-    setSearchData(async () => {
-      return {
-        title: `Searching: ${text}`,
-        data: await sendToApi({
-          page: page,
-          search: text,
-          sort: "SEARCH_MATCH",
-          type: "ANIME"
-        })
-      }
+  let data = {
+    title: `Searching: ${text}`,
+    data: await sendToApi({
+      page: page,
+      search: text,
+      sort: "SEARCH_MATCH",
+      type: "ANIME"
     })
-    return
   }
-  setHomeData(async () => {
-    return [
-      {
-        title: `Searching: ${text}`,
-        data: await sendToApi({
-          page: page,
-          search: text,
-          sort: "SEARCH_MATCH",
-          type: "ANIME"
-        })
-      }
-    ]
-  })
+
+  console.log(data.data)
+  if (data.data.length < pageSize) await homeStopScrolling()
+
+  if (page > 1) {
+    setSearchData(async () => data)
+  } else {
+    setHomeData(async () => [data])
+  }
 }
 
 async function getFullCategory(params, title: string) {

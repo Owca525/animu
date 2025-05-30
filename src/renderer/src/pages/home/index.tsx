@@ -47,8 +47,7 @@ const Home = () => {
         if (homeCache.data.length > 1) return 
         const currentPos = -document.getElementById("scrollID")!.scrollTop + document.getElementById("scrollID")!.scrollHeight
         const isBottom = document.getElementById("scrollID")!.offsetHeight == currentPos
-        console.log("asdasd")
-        if (isBottom) {
+        if (isBottom && !homeCache.stopScrolling) {
             store.dispatch({ type: "setPage", payload: homeCache.page + 1 })
             plugin.information.search(homeCache.search, homeCache.page + 1)
         }

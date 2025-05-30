@@ -34,3 +34,13 @@ export async function setSearchData(func: () => Promise<containerData>) {
         console.log(error)
     }
 }
+
+export async function homeStopScrolling() {
+    try {
+        store.dispatch({
+            type: "setStopScrolling", payload: true
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}

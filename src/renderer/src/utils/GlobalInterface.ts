@@ -48,6 +48,7 @@ export interface homeData {
     isError: boolean
     search: string
     page: number
+    stopScrolling: boolean
 }
 
 export interface playerData {
