@@ -1,5 +1,5 @@
 import { playerData } from "@renderer/utils/GlobalInterface"
-
+import "./css/developerStats.css"
 
 interface developerStatsProps {
     isMuted: boolean

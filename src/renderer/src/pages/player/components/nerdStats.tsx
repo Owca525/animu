@@ -1,4 +1,5 @@
 import { RefObject } from "react"
+import "./css/nerdStats.css"
 
 interface nerdStatsProps {
     video: RefObject<HTMLVideoElement | null>

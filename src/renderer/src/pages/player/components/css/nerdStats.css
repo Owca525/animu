@@ -1,0 +1,18 @@
+.player-nerd-container {
+  position: fixed;
+  top: 200px;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 12px 14px;
+  margin: 20px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 250px;
+}
+.player-nerd-element {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}

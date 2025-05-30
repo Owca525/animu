@@ -10,7 +10,7 @@ import { t } from "i18next";
 
 import "./css/player.css"
 
-const VideoPlayer = lazy(() => import('./VideoPlayer'));
+const VideoPlayer = lazy(() => import('./components/VideoPlayer'));
 // const ExternalPlayer = lazy(() => import('./externalPlayer'));
 
 const player = () => {
