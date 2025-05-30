@@ -575,7 +575,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             {showNerdStats && (
                 <NerdStats video={videoRef} volume={volume} currentTime={currentTime} />
             )}
-            {/* {config.Developer.playerDebug && (
+            {config.Developer.playerDebug && (
                 <DeveloperStats
                     isMuted={isMuted}
                     isFullscreen={isFullscreen}
@@ -591,13 +591,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     hls={hls}
                     time={time}
                     timeNextEpisode={timeNextEpisode}
-                    episode={temp.episode}
-                    episodes={episodes}
-                    episodesUrl={episodesUrl}
+                    episode={{ ep: temp.episode, type: temp.type }}
+                    episodes={temp.episodes}
+                    episodesUrl={player_data}
                     showNerdStats={showNerdStats}
                     PlayerVolume={PlayerVolume}
                 />
-            )} */}
+            )}
         </div>
     )
 }

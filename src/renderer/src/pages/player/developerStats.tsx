@@ -1,4 +1,5 @@
-import { playerUrlProps } from "@renderer/utils/interface"
+import { playerData } from "@renderer/utils/GlobalInterface"
+
 
 interface developerStatsProps {
     isMuted: boolean
@@ -11,14 +12,14 @@ interface developerStatsProps {
     timeNextEpisode: number
     isUpNextEpisode: boolean
     isHideUpNextEpisode: boolean
-    episodes: number[]
+    episodes: string[]
     episode: {
         type: string;
-        ep: number;
+        ep: string;
     }
     PlayerVolume: number
     time: number
-    episodesUrl: playerUrlProps[]
+    episodesUrl: playerData[]
     currentHost: string
     currentSettings: string
     showNerdStats: boolean
