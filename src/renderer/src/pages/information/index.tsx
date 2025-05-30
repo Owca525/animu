@@ -6,7 +6,6 @@ import { capitalizeFirstLetter, convertDateToFormattedString, convertSeconds, de
 import { useEffect, useState } from "react";
 import { t } from "i18next"
 import useHotkeys from "@reecelucas/react-use-hotkeys";
-import { getInformation } from "@renderer/plugins/allmanga";
 import { useQuery } from "react-query";
 import { useSelector } from "react-redux";
 import Drop from "./components/drop";
@@ -15,8 +14,8 @@ function information() {
     const navigate = useNavigate()
     const location = useLocation();
     const anime_data: AnimeData = location.state;
-    // const plugin = useSelector((plugin: any) => plugin.plugin.playerPlugin);
-    const func = async () => await getInformation(anime_data.title)
+    const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
+    const func = async () => await pluginPlayer.player.listEpisodes(anime_data.title)
     const { data, isError, isLoading } = useQuery(
         [func.toString()],
         func,

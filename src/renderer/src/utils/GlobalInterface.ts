@@ -87,7 +87,7 @@ export interface pluginFormat {
         home: () => void
     } | null
     player?: {
-        getUrls: (type: string, episode: string) => playerData
+        getUrls: (type: string, episode: string, id: string) => Promise<playerData[]>
         listEpisodes?: (name: string) => Promise<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] }>
     } | null
 }

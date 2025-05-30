@@ -236,14 +236,12 @@ export async function extractURLS(type: string, episode: string, id: string): Pr
 // }
 
 
-export const infoPlugin: pluginFormat = {
+export const infoPluginPlayer: pluginFormat = {
   version: "0.1",
   name: "Allmanga",
   author: "Owca525",
   player: {
     listEpisodes: getInformation,
-    getUrls: function (): playerData {
-      throw new Error("Function not implemented.")
-    }
+    getUrls: extractURLS
   }
 }

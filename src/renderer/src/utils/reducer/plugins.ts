@@ -1,8 +1,9 @@
+import { infoPluginPlayer } from "@renderer/plugins/allmanga";
 import { infoPlugin } from "@renderer/plugins/anilistApi";
 
 const initialState = {
     informationPlugin: infoPlugin,
-    playerPlugin: null
+    playerPlugin: infoPluginPlayer
 };
 
 const userReducer = (state = initialState, action) => {
