@@ -191,50 +191,17 @@ export async function extractURLS(type: string, episode: string, id: string): Pr
   return data
 }
 
-// export async function getPlayerUrls(id: string, episode: string, type: string) {
-//   let variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${episode}"}`
-//   let extensions = `{"persistedQuery":{"version":1,"sha256Hash": "${HASH_PLAYER}"}}`
-//   let url = API_WEB + `/api?variables=${variables}&extensions=${extensions}`
-
-//   let listUrls = []
-
-//   const resp = await sendToAPI(url, header)
-//   console.log(resp)
-//   if (!resp) return null
-//   if (resp.data.episode === null) return null
-
-//   const sources = resp.data.episode.sourceUrls
-// const urls = sources
-//   .map((tmp: { sourceUrl: string; sourceName: string }) =>
-//     findUrl(tmp.sourceUrl, tmp.sourceName, source_names)
-//   )
-//   .filter((item: string) => item !== '')
-
-//   for (let i = 0; i < urls.length; i++) {
-//     const element = urls[i]
-//     let url = decodeText(element.replace('--', ''))
-// const links = await sendToAPI(`http://allanime.day${url}`, {
-//   'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0'
-// })
-//     if (links) {
-//       links.links.forEach(element => {
-//         if (!element.link) return
-
-//         const urlObject = new URL(element.link);
-
-// if (element.hls && urlObject.hostname != "ayvic.fast4speed.rsvp") {
-//   listUrls.push({ url: element.link, res: [], hostname: urlObject.hostname, hls: true })
-// }
-// if (element.mp4) {
-//   listUrls.push({ url: element.link, res: [{ url: element.link, resolution: "1080" }], hostname: urlObject.hostname, hls: false })
-// }
-//       });
-//     }
-//   }
-
-//   return listUrls
-// }
-
+export async function convertToNewData(id: string): Promise<cardData | null> {
+  try {
+    let variables = `{"_id":"${id}"}`
+    const resp = await sendToAPI(variables, HASH_INFO, header)
+    if (resp) return converterData(resp.data.show)
+    return null
+  } catch (Error) {
+    console.error(Error)
+    return null
+  }
+}
 
 export const infoPluginPlayer: pluginFormat = {
   version: "0.1",

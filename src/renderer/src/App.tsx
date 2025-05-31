@@ -15,6 +15,8 @@ import { checkConfig, readConfig } from './utils/config';
 import store from './utils/store';
 
 import "./utils/i18n"
+import { CheckContinue } from './utils/history/continueWatch';
+import { CheckHistory } from './utils/history/history';
 
 LoadConfig()
 
@@ -45,6 +47,8 @@ function AppLoading() {
 }
 
 async function LoadConfig() {
+  await CheckContinue()
+  await CheckHistory()
   if (!await checkConfig()) return
   const loadedConnfig = await readConfig()
 

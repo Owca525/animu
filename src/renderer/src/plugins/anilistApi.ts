@@ -1,5 +1,5 @@
 import { cardData, containerData, pluginFormat } from "@renderer/utils/GlobalInterface";
-import { homeStopScrolling, setHomeData, setSearchData } from "@renderer/utils/pluginApi";
+import { setHomeData, setSearchData } from "@renderer/utils/pluginApi";
 
 const pageSize = 20
 
