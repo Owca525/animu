@@ -8,7 +8,7 @@ import { cardData, SettingsConfig } from "@renderer/utils/GlobalInterface";
 import { useSelector } from "react-redux";
 import { t } from "i18next";
 
-import "./css/player.css"
+import "./player.css"
 
 const VideoPlayer = lazy(() => import('./components/VideoPlayer'));
 // const ExternalPlayer = lazy(() => import('./externalPlayer'));
