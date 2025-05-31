@@ -49,6 +49,7 @@ export interface homeData {
     search: string
     page: number
     stopScrolling: boolean
+    containerLoading: boolean
 }
 
 export interface playerData {
@@ -83,6 +84,7 @@ export interface pluginFormat {
     name: string
     author: string
     information?: {
+        pageSize: number
         search: (name: string, page: number) => void
         home: () => void
     } | null

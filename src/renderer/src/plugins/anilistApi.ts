@@ -189,9 +189,6 @@ async function SearchAnilistApi(text: string, page: number): Promise<void> {
     })
   }
 
-  console.log(data.data)
-  if (data.data.length < pageSize) await homeStopScrolling()
-
   if (page > 1) {
     setSearchData(async () => data)
   } else {
@@ -250,6 +247,7 @@ export const infoPlugin: pluginFormat = {
   name: "AnilistApi",
   author: "Owca525",
   information: {
+    pageSize: pageSize,
     home: () => setHomeData(CreateHomePage),
     search: SearchAnilistApi
   }

@@ -73,3 +73,16 @@
 .button-container:hover .container-right-skip-button {
     display: block;
 }
+
+.container-loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 50px;
+}
+
+.container-loading {
+    font-size: 3em;
+    animation: spin 1s linear infinite;
+}

@@ -10,6 +10,7 @@ import { useEffect } from "react"
 import { homeData } from "@renderer/utils/GlobalInterface"
 import { t } from "i18next"
 import store from "@renderer/utils/store"
+import { homeStopScrolling } from "@renderer/utils/pluginApi"
 
 const Home = () => {
     const navigate = useNavigate()
@@ -57,7 +58,7 @@ const Home = () => {
         <main className="home">
             <div className="home-header">
                 <div className="home-header-left">
-                    <Input placeholder={t("home.search")} onKeyDown={(text) => {store.dispatch({ type: "setSearch", payload: text }); store.dispatch({ type: "setPage", payload: 1 }); plugin.information.search(text, 1)}} />
+                    <Input placeholder={t("home.search")} onKeyDown={(text) => {store.dispatch({ type: "setSearch", payload: text }); store.dispatch({ type: "setPage", payload: 1 }); homeStopScrolling(false); plugin.information.search(text, 1)}} />
                 </div>
                 <div></div>
                 <div className="home-header-right"></div>

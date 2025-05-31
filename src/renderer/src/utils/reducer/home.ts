@@ -6,7 +6,8 @@ const initialState: homeData = {
     data: [],
     search: "",
     page: 1,
-    stopScrolling: false
+    stopScrolling: false,
+    containerLoading: false
 };
 
 const userReducer = (state = initialState, action) => {
@@ -23,6 +24,8 @@ const userReducer = (state = initialState, action) => {
       return { ...state, page: action.payload };
     case "setStopScrolling":
       return { ...state, stopScrolling: action.payload };
+    case "setcontainerLoading":
+      return { ...state, containerLoading: action.payload };
     case "resetHomeData":
         return { ...initialState };
     default:

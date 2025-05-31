@@ -3,8 +3,9 @@ import "./css/container.css"
 import Card from "./card"
 import { useRef } from "react"
 import Button from "@renderer/components/buttons"
+import store from "@renderer/utils/store"
 
-const Container: React.FC<containerData> = ({ title, data, horizontal, onTitleClick }) => {
+const Container: React.FC<containerData> = ({ title, data, horizontal = false, onTitleClick }) => {
   const container = useRef<HTMLDivElement>(null)
   // function handleScroll(event) {
   //   if (event.deltaY === 0) return;
@@ -19,7 +20,6 @@ const Container: React.FC<containerData> = ({ title, data, horizontal, onTitleCl
     container.current.scrollLeft += num
   }
 
-
   return (
     <div className="main-container">
         <div className={onTitleClick ? "container-title-click" : "container-title"} onClick={onTitleClick}>{title}</div>
@@ -31,6 +31,7 @@ const Container: React.FC<containerData> = ({ title, data, horizontal, onTitleCl
           </div>
           {horizontal ? <Button icon="chevron_right" ButtonClass="container-right-skip-button" onClick={() => handleButtonScroll(120)}/> : ""}
         </div>
+        {store.getState().home.containerLoading ? <div className="container-loading-container"><span className="container-loading material-symbols-outlined">progress_activity</span></div> : ""}
     </div>
   )
 }
