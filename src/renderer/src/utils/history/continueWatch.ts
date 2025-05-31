@@ -14,7 +14,7 @@ async function ContinueDetectVersion() {
     try {
         let file = await window.api.os.read(await appConfigDirPath + "/continueWatch.json")
         file = JSON.parse(file)
-        if ("data" in file) return
+        if ("AnimeData" in file[0]) return
         if ("player" in file.continue[0]) {
             window.api.os.write(
                 await appConfigDirPath + "/continueWatch.json.backup",
@@ -73,8 +73,10 @@ async function ContinueDetectVersion() {
     }
 }
 
-export async function ReadContinue(): Promise<cardData[]> {
-    return await ReadFile("continueWatch")
+export async function ReadContinue(size?: number): Promise<cardData[]> {
+    let data = await ReadFile("continueWatch")
+    if (size) return data.slice(0, size)
+    return data
 }
 
 export async function SaveContinue(save: cardData)  {

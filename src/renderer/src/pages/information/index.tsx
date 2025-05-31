@@ -44,6 +44,10 @@ function information() {
 
     const time = convertSeconds(secondsLeft)
 
+    useHotkeys("Tab", () => {
+        console.log(anime_data)
+    })
+
     function enterPlayer(episodes: string[], type: string, episode: string) {
         navigate("/player", {
             state: {
@@ -110,10 +114,10 @@ function information() {
                             </div>
                         }
 
-                        {anime_data.format &&
+                        {anime_data.type &&
                             <div className="information-info-content">
                                 <div className="information-content-title">{t("information.format")}</div>
-                                {capitalizeFirstLetter(anime_data.format)}
+                                {capitalizeFirstLetter(anime_data.type)}
                             </div>
                         }
 

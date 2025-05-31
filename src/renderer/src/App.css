@@ -39,6 +39,13 @@ input[type="number"]::-webkit-outer-spin-button {
   font-weight: 500;
 }
 
+.Toastify__toast {
+  background-color: var(--bg2);
+  border-radius: 12px;
+  color: var(--text);
+  border: 2px solid var(--bg4);
+}
+
 /* animation */
 @keyframes spin {
   0% {

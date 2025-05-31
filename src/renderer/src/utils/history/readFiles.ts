@@ -5,7 +5,7 @@ const appConfigDirPath = window.api.os.getPath("userData");
 export async function ReadFile(file: string): Promise<cardData[]> {
     try {
         await CheckFile(file)
-        const dataFile = await window.api.os.read(appConfigDirPath + `/${file}.json`)
+        const dataFile = await window.api.os.read(await appConfigDirPath + `/${file}.json`)
         const data = JSON.parse(dataFile) as cardData[];
         if (data.length <= 0) return []
         return data.map((value: cardData) => { return { ...value, deletionCard: () => DeleteFromFile(value, file) } }).reverse()

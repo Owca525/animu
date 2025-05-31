@@ -7,10 +7,12 @@ import Sidebar from "@renderer/components/sidebar"
 import Container from "./components/container"
 import { useSelector } from "react-redux"
 import { useEffect } from "react"
-import { homeData } from "@renderer/utils/GlobalInterface"
+import { containerData, homeData } from "@renderer/utils/GlobalInterface"
 import { t } from "i18next"
 import store from "@renderer/utils/store"
-import { homeStopScrolling } from "@renderer/utils/pluginApi"
+import { homeStopScrolling, setHomeData } from "@renderer/utils/pluginApi"
+import { ReadContinue } from "@renderer/utils/history/continueWatch"
+import { ReadHistory } from "@renderer/utils/history/history"
 
 const Home = () => {
     const navigate = useNavigate()
@@ -27,6 +29,7 @@ const Home = () => {
             {
                 icon: "history",
                 text: t("global.history"),
+                onClick: () => setHomeData(history)
             }
         ],
         bottom: [
@@ -42,10 +45,27 @@ const Home = () => {
         if (homeCache.data.length == 0) plugin.information.home()
     }, [])
 
+    async function history(): Promise<containerData[]> {
+        return [
+            {
+                title: "Continue Watch",
+                data: await ReadContinue(20),
+                horizontal: true,
+                onTitleClick: () => setHomeData(async () => [{ title: "Continue Watch", data: await ReadContinue(), horizontal: false }])
+            },
+            {
+                title: "History",
+                data: await ReadHistory(20),
+                horizontal: true,
+                onTitleClick: () => setHomeData(async () => [{ title: "History", data: await ReadHistory(), horizontal: false }])
+            },
+        ]
+    }
+
     console.log(homeCache)
 
     const handleScroll = () => {
-        if (homeCache.data.length > 1) return 
+        if (homeCache.data.length > 1) return
         const currentPos = -document.getElementById("scrollID")!.scrollTop + document.getElementById("scrollID")!.scrollHeight
         const isBottom = document.getElementById("scrollID")!.offsetHeight == currentPos
         if (isBottom && !homeCache.stopScrolling) {
@@ -53,24 +73,24 @@ const Home = () => {
             plugin.information.search(homeCache.search, homeCache.page + 1)
         }
     }
-    
+
     return (
         <main className="home">
             <div className="home-header">
                 <div className="home-header-left">
-                    <Input placeholder={t("home.search")} onKeyDown={(text) => {store.dispatch({ type: "setSearch", payload: text }); store.dispatch({ type: "setPage", payload: 1 }); homeStopScrolling(false); plugin.information.search(text, 1)}} />
+                    <Input placeholder={t("home.search")} onKeyDown={(text) => { store.dispatch({ type: "setSearch", payload: text }); store.dispatch({ type: "setPage", payload: 1 }); homeStopScrolling(false); plugin.information.search(text, 1) }} />
                 </div>
                 <div></div>
                 <div className="home-header-right"></div>
             </div>
             <div id={"scrollID"} className={homeCache.isLoading ? "home-loading-container" : "home-container"} onScroll={handleScroll}>
                 {
-                    homeCache.isLoading ? <div className="material-symbols-outlined home-loading-animation">progress_activity</div> 
-                    : 
-                    homeCache.data.map((element) => <Container title={element.title} data={element.data} horizontal={element.horizontal} onScrollDownFunction={element.onScrollDownFunction} onTitleClick={element.onTitleClick} />)
+                    homeCache.isLoading ? <div className="material-symbols-outlined home-loading-animation">progress_activity</div>
+                        :
+                        homeCache.data.map((element) => <Container title={element.title} data={element.data} horizontal={element.horizontal} onScrollDownFunction={element.onScrollDownFunction} onTitleClick={element.onTitleClick} />)
                 }
             </div>
-            <Sidebar data={sidebarData}/>
+            <Sidebar data={sidebarData} />
         </main>
     )
 }

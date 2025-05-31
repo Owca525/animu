@@ -14,8 +14,7 @@ async function HistoryDetectVersion() {
     try {
         let file = await window.api.os.read(await appConfigDirPath + "/history.json")
         file = JSON.parse(file)
-        console.log(file)
-        if ("data" in file) return
+        if ("AnimeData" in file[0]) return
         if ("id" in file[0]) {
             window.api.os.write(
                 await appConfigDirPath + "/history.json.backup",
@@ -73,8 +72,10 @@ async function HistoryDetectVersion() {
     }
 }
 
-export async function ReadHistory(): Promise<cardData[]> {
-    return await ReadFile("history")
+export async function ReadHistory(size?: number): Promise<cardData[]> {
+    let data = await ReadFile("history")
+    if (size) return data.slice(0, size)
+    return data
 }
 
 export async function SaveHistory(save: cardData)  {
