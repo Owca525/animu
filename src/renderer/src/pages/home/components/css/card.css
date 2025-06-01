@@ -1,8 +1,8 @@
 .card-container {
     position: relative;
     height: min-content;
-    max-width: 220px;
-    width: auto;
+    width: 155px;
+    min-width: 155px;
     cursor: pointer;
     display: flex;
     justify-content: center;
@@ -10,6 +10,7 @@
     flex-direction: column;
     gap: 4px;
     padding: 4px;
+    box-sizing: border-box;
 
     scroll-snap-align: start;
 }
