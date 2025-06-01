@@ -1,6 +1,6 @@
 // import { playerUrlProps } from "@renderer/utils/interface"
 
-import { similarityText } from "@renderer/utils/functions"
+import { convertMsToMinutes, similarityText } from "@renderer/utils/functions"
 import { AnimeData, cardData, playerData, pluginFormat } from "@renderer/utils/GlobalInterface"
 
 const HASH_SEARCH = '06327bc10dd682e1ee7e07b6db9c16e9ad2fd56c1b769e47513128cd5c9fc77a'
@@ -83,22 +83,23 @@ export async function SearchAnime(name: string, page: number = 1) {
 }
 
 function converterData(data: any): cardData {
+  console.log(data)
   return {
     AnimeData: {
       averageScore: data.averageScore,
       bannerImage: data.banner,
       coverImage: data.thumbnail,
       description: data.description,
-      duration: data.episodeDuration,
-      endDate: data.airedEnd ? { year: data.airedEnd.year, day: data.airedEnd.day, month: data.airedEnd.month } : null,
-      startDate: data.airedStart ? { year: data.airedStart.year, day: data.airedStart.day, month: data.airedStart.month } : null,
+      duration: data.episodeDuration ? convertMsToMinutes(parseInt(data.episodeDuration)) : null,
+      endDate: data.airedEnd ? { year: data.airedEnd.year, day: data.airedEnd.date, month: data.airedEnd.month } : null,
+      startDate: data.airedStart ? { year: data.airedStart.year, day: data.airedStart.date, month: data.airedStart.month } : null,
       episodes: parseInt(data.episodeCount),
       genres: data.genres,
       isAdult: data.isAdult,
       nextAiringEpisode: null,
       popularity: 0,
-      season: data.season.quarter,
-      seasonYear: data.season.year,
+      season: data.season ? data.season.quarter : null,
+      seasonYear: data.season ? data.season.year : null,
       status: data.status,
       studios: data.studios,
       title: data.name,

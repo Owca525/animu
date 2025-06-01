@@ -95,3 +95,7 @@ export function similarityText(text1: string, text2: string): number {
 
   return Math.round(similarity * 100) / 100;
 }
+
+export function convertMsToMinutes(ms: number): number {
+  return Math.floor(ms / 60000);
+}
