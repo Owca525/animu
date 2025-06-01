@@ -48,6 +48,10 @@
     line-clamp: 2;
 }
 
+.card-continue-watch-text {
+    font-size: 0.7em;
+}
+
 .card-delete-icon {
   display: none;
   position: absolute;
