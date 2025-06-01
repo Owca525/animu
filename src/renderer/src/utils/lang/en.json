@@ -98,6 +98,20 @@
             "hide": "Hide"
         }
     },
+    "history": {
+        "continue": "Continue Episode {{ep}}",
+        "history": "Watched Episode {{ep}}"
+    },
+    "oldBackup": {
+        "backupcontinue": "Backup File Old Continue watch done",
+        "convertcontinue": "Convert Continue Watch: Succes {{success}}, Failed {{failed}}",
+        "convertcontinuedone": "Convertion Continue Watch Done: Succes {{success}}, Failed {{failed}}",
+        "convertcontinuefailed": "Failed Convert old continue watch to new",
+        "backuphistory": "Backup File Old History done",
+        "converthistory": "Convert History: Succes {{success}}, Failed {{failed}}",
+        "converthistorydone": "Convertion Continue Watch Done: Succes {{success}}, Failed {{failed}}",
+        "converthistoryfailed": "Failed Convert old History watch to new"
+    },
     "lang": {
         "en": "English",
         "pl": "Polish"

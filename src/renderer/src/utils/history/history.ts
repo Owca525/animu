@@ -2,6 +2,7 @@ import { toast } from "react-toastify";
 import { cardData, notificationProps } from "../GlobalInterface";
 import { convertToNewData } from "@renderer/plugins/allmanga";
 import { CheckFile, DeleteFromFile, ReadFile, SaveToFile } from "./readFiles";
+import { t } from "i18next";
 
 const appConfigDirPath = window.api.os.getPath("userData");
 
@@ -24,11 +25,11 @@ async function HistoryDetectVersion() {
                 await appConfigDirPath + "/history.json",
                 JSON.stringify(DefaultHistory)
             );
-            toast.info("Backup File Old History done", notificationProps)
+            toast.info(t("oldBackup.backuphistory"), notificationProps)
             let data: cardData[] = []
             let success: number = 0
             let failed: number = 0
-            updatedToast = toast.loading(`Convert History: Succes ${success}, Failed ${failed}`, notificationProps)
+            updatedToast = toast.loading(t("oldBackup.converthistory", { success: success, failed: failed }), notificationProps)
             for (let i = 0; i < file.length; i++) {
                 try {
                     const element = file[i];
@@ -51,15 +52,15 @@ async function HistoryDetectVersion() {
                     } else {
                         failed += 1
                     }
-                    toast.update(updatedToast, { render: `Convert History: Succes ${success}, Failed ${failed}` })
+                    toast.update(updatedToast, { render: t("oldBackup.converthistory", { success: success, failed: failed }) })
                 } catch (Error) {
                     console.error(Error)
                     failed += 1
-                    toast.update(updatedToast, { render: `Convert History: Succes ${success}, Failed ${failed}` })
+                    toast.update(updatedToast, { render: t("oldBackup.converthistory", { success: success, failed: failed }) })
                 }
             }
             toast.dismiss(updatedToast)
-            toast.success(`Convertion History Done: Succes ${success}, Failed ${failed}`, notificationProps)
+            toast.success(t("oldBackup.converthistorydone", { success: success, failed: failed }), notificationProps)
             window.api.os.write(
                 await appConfigDirPath + "/history.json",
                 JSON.stringify(data)
@@ -68,7 +69,7 @@ async function HistoryDetectVersion() {
     } catch (Error) {
         console.info(Error)
         toast.dismiss(updatedToast)
-        toast.info("Failed Convert old History watch to new", notificationProps)
+        toast.info(t("oldBackup.converthistoryfailed"), notificationProps)
     }
 }
 

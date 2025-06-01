@@ -2,6 +2,7 @@ import { toast } from "react-toastify";
 import { cardData, notificationProps } from "../GlobalInterface";
 import { convertToNewData } from "@renderer/plugins/allmanga";
 import { CheckFile, DeleteFromFile, ReadFile, SaveToFile } from "./readFiles";
+import { t } from "i18next";
 
 const appConfigDirPath = window.api.os.getPath("userData");
 
@@ -24,11 +25,11 @@ async function ContinueDetectVersion() {
                 await appConfigDirPath + "/continueWatch.json",
                 JSON.stringify(DefaultContinue)
             );
-            toast.info("Backup File Old Continue watch done", notificationProps)
+            toast.info(t("oldBackup.backupcontinue"), notificationProps)
             let data: cardData[] = []
             let success: number = 0
             let failed: number = 0
-            updatedToast = toast.loading(`Convert Continue Watch: Succes ${success}, Failed ${failed}`, notificationProps)
+            updatedToast = toast.loading(t("oldBackup.convertcontinue", { success: success, failed: failed }), notificationProps)
             for (let i = 0; i < file.continue.length; i++) {
                 try {
                     const element = file.continue[i];
@@ -51,15 +52,15 @@ async function ContinueDetectVersion() {
                     } else {
                         failed += 1
                     }
-                    toast.update(updatedToast, { render: `Convert Continue Watch: Succes ${success}, Failed ${failed}` })
+                    toast.update(updatedToast, { render: t("oldBackup.convertcontinue", { success: success, failed: failed }) })
                 } catch (Error) {
                     console.error(Error)
                     failed += 1
-                    toast.update(updatedToast, { render: `Convert Continue Watch: Succes ${success}, Failed ${failed}` })
+                    toast.update(updatedToast, { render: t("oldBackup.convertcontinue", { success: success, failed: failed }) })
                 }
             }
             toast.dismiss(updatedToast)
-            toast.success(`Convertion Continue Watch Done: Succes ${success}, Failed ${failed}`, notificationProps)
+            toast.success(t("oldBackup.convertcontinuedone", { success: success, failed: failed }), notificationProps)
             console.log(data)
             window.api.os.write(
                 await appConfigDirPath + "/continueWatch.json",
@@ -69,7 +70,7 @@ async function ContinueDetectVersion() {
     } catch (Error) {
         console.info(Error)
         toast.dismiss(updatedToast)
-        toast.info("Failed Convert old continue watch to new", notificationProps)
+        toast.info(t("oldBackup.convertcontinuefailed"), notificationProps)
     }
 }
 
@@ -84,9 +85,7 @@ export async function SaveContinue(save: cardData) {
 }
 
 export async function DeleteFromContinue(save: cardData) {
-    if (await DeleteFromFile(save, "continueWatch")) {
-        toast.success("Succesfully Removed Anime from continue watch")
-    }
+    await DeleteFromFile(save, "continueWatch")
 }
 
 export async function CheckContinue() {
