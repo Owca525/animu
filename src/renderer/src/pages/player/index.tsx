@@ -14,7 +14,7 @@ const VideoPlayer = lazy(() => import('./components/VideoPlayer'));
 // const ExternalPlayer = lazy(() => import('./externalPlayer'));
 
 const player = () => {
-    const anime_data: { data: cardData } = useLocation().state
+    const anime_data: { data: cardData, episodelist: Array<string> } = useLocation().state
     // const { t } = useTranslation()
     const navigate = useNavigate()
     const config: SettingsConfig = useSelector((data: any) => data.config);
