@@ -17,6 +17,7 @@ import { useSelector } from "react-redux"
 import { formatTime } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
+import { DeleteFromContinue, SaveContinue } from "@renderer/utils/history/continueWatch"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -239,21 +240,25 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             videoRef.current.currentTime >= parseInt(config.History.continue.MinimalTimeSave.toString()) &&
             videoRef.current.currentTime <= videoRef.current.duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
         ) {
-            //     SaveContinue({
-            //         id: id,
-            //         title: title,
-            //         img: img,
-            //         player: { episodes: episodes, episode: episode, time: videoRef.current.currentTime },
-            //         text: t('general.LastContinue', { episode: episode.ep })
-            //     })
-            // } else {
-            //     DeleteFromcontinue({
-            //         id: id,
-            //         title: title,
-            //         img: img,
-            //         player: { episodes: episodes, episode: episode, time: videoRef.current.currentTime }
-            //     })
-            // }
+            SaveContinue({
+                AnimeData: { ...anime_data.AnimeData },
+                saveData: {
+                    pluginName: "",
+                    last_Time: videoRef.current.currentTime,
+                    episode: temp.episode,
+                    type: temp.type
+                }
+            })
+        } else {
+            DeleteFromContinue({
+                AnimeData: { ...anime_data.AnimeData },
+                saveData: {
+                    pluginName: "",
+                    last_Time: 0,
+                    episode: temp.episode,
+                    type: temp.type
+                }
+            })
         }
     }
 

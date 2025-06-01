@@ -1,7 +1,7 @@
 
 import { useQuery } from "react-query";
 import { useLocation, useNavigate } from "react-router-dom"
-import { lazy, Suspense, useCallback, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
 import useHotkeys from "@reecelucas/react-use-hotkeys";
 import { cardData, SettingsConfig } from "@renderer/utils/GlobalInterface";
@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { t } from "i18next";
 
 import "./player.css"
+import { SaveHistory } from "@renderer/utils/history/history";
 
 const VideoPlayer = lazy(() => import('./components/VideoPlayer'));
 // const ExternalPlayer = lazy(() => import('./externalPlayer'));
@@ -51,6 +52,20 @@ const player = () => {
         })
         refetch()
     }
+
+    useEffect(() => {
+        SaveHistory({
+            saveData: {
+                pluginName: "",
+                last_Time: 0,
+                type: extractionData.type,
+                episode: extractionData.actual.toString()
+            },
+            AnimeData: {
+                ...anime_data.data.AnimeData
+            }
+        })
+    }, [extractionData])
 
     useHotkeys("Escape", () => {
         leave()
