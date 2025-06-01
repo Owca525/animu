@@ -9,11 +9,18 @@ const Card: React.FC<cardData> = ({ AnimeData, saveData, deletionCard }) => {
 
   function sendToInformation() {
     if (saveData && saveData.episode != "" && saveData.last_Time != 0 && saveData.type != "") {
+      let episodes = AnimeData.episodesList?.filter((data) => data.type === saveData.type)[0]
+      console.log(AnimeData, saveData)
       navigate("/player", {
         state: {
-          
+          data: {
+            AnimeData: AnimeData,
+            saveData: saveData,
+          },
+          episodelist: episodes?.episodes
         }
       })
+      return
     }
 
     navigate("/info", {

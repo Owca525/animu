@@ -19,6 +19,8 @@ const player = () => {
     const navigate = useNavigate()
     const config: SettingsConfig = useSelector((data: any) => data.config);
 
+    console.log(anime_data, anime_data.data)
+
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
     const [playerVolume, setPlayerVolume] = useState<number>(config.Player.general.Volume)
     const [extractionData, setextractionData] = useState<{ actual: string, type: string, episodelist: Array<string> }>({ actual: anime_data.data.saveData ? anime_data.data.saveData.episode : "1", type: anime_data.data.saveData ? anime_data.data.saveData.type : "sub", episodelist: anime_data.episodelist })
