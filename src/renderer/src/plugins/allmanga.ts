@@ -90,9 +90,9 @@ function converterData(data: any): cardData {
       coverImage: data.thumbnail,
       description: data.description,
       duration: data.episodeDuration,
-      endDate: data.airedEnd,
-      startDate: data.airedStart,
-      episodes: data.episodeCaunt,
+      endDate: data.airedEnd ? { year: data.airedEnd.year, day: data.airedEnd.day, month: data.airedEnd.month } : null,
+      startDate: data.airedStart ? { year: data.airedStart.year, day: data.airedStart.day, month: data.airedStart.month } : null,
+      episodes: parseInt(data.episodeCount),
       genres: data.genres,
       isAdult: data.isAdult,
       nextAiringEpisode: null,
@@ -102,9 +102,9 @@ function converterData(data: any): cardData {
       status: data.status,
       studios: data.studios,
       title: data.name,
-      type: data.type,
+      type: null,
       id: "",
-      format: null,
+      format: data.type,
       player_ID: data._id,
       episodesList: data.availableEpisodesDetail ? [
         { episodes: data.availableEpisodesDetail.sub.reverse(), type: "sub", name: "Subtitles" },
@@ -142,6 +142,7 @@ export async function getInformation(name: string): Promise<{ player_id: string,
 
   let variables = `{"_id":"${anime_id.AnimeData.player_ID}"}`
   const resp = await sendToAPI(variables, HASH_INFO, header)
+  console.log(resp)
   let anime_data = converterData(resp.data.show).AnimeData.episodesList
   if (!anime_data) return { player_id: "", episodesData: [] }
   return { player_id: anime_id.AnimeData.player_ID, episodesData: anime_data }

@@ -114,10 +114,10 @@ function information() {
                             </div>
                         }
 
-                        {anime_data.type &&
+                        {anime_data.format &&
                             <div className="information-info-content">
                                 <div className="information-content-title">{t("information.format")}</div>
-                                {capitalizeFirstLetter(anime_data.type)}
+                                {capitalizeFirstLetter(anime_data.format)}
                             </div>
                         }
 
