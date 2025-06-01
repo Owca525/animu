@@ -46,3 +46,23 @@
     -webkit-line-clamp: 2;
     line-clamp: 2;
 }
+
+.card-delete-icon {
+  display: none;
+  position: absolute;
+  padding: 4px;
+  top: 0;
+  right: 1;
+  left: 0;
+  background-color: var(--bg3);
+  border-radius: 50%;
+  z-index: 10000;
+}
+
+.card-delete-icon:hover {
+    background-color: var(--bg4);
+}
+
+.card-container:hover .card-delete-icon {
+  display: block;
+} 

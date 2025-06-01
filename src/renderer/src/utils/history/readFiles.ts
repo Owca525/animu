@@ -17,16 +17,18 @@ export async function ReadFile(file: string): Promise<cardData[]> {
 
 export async function DeleteFromFile(data: cardData, file: string) {
     try {
+        console.log(data, file)
         await CheckFile(file)
-        const saveFile = await window.api.os.read(appConfigDirPath + `/${file}.json`)
+        const saveFile = await window.api.os.read(await appConfigDirPath + `/${file}.json`)
         const list = JSON.parse(saveFile) as cardData[];
+        console.log(saveFile)
         const index = list.findIndex(
             (item) => item.saveData?.episode === data.saveData?.episode && item.AnimeData.player_ID === data.AnimeData.player_ID
         );
 
         if (index != -1) list.splice(index, 1);
 
-        window.api.os.write(appConfigDirPath + `/${file}.json`, JSON.stringify(list))
+        window.api.os.write(await appConfigDirPath + `/${file}.json`, JSON.stringify(list))
         return true
     } catch (Error) {
         console.error(`${Error} in DeleteFromFile`)
@@ -37,14 +39,14 @@ export async function DeleteFromFile(data: cardData, file: string) {
 export async function SaveToFile(data: cardData, file: string): Promise<boolean> {
     try {
         await CheckFile(file)
-        const saveFile = await window.api.os.read(appConfigDirPath + `/${file}.json`);
+        const saveFile = await window.api.os.read(await appConfigDirPath + `/${file}.json`);
         const tmpData = JSON.parse(saveFile) as cardData[];
         const index = tmpData.findIndex((item) => item.AnimeData.player_ID === data.AnimeData.player_ID);
 
         if (index != -1) tmpData.splice(index, 1);
 
         tmpData.push(data);
-        window.api.os.write(appConfigDirPath + `/${file}.json`, JSON.stringify(tmpData))
+        window.api.os.write(await appConfigDirPath + `/${file}.json`, JSON.stringify(tmpData))
         return true
     } catch (Error) {
         console.error(`${Error} in SaveToFile`)

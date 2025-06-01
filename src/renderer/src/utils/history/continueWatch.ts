@@ -79,7 +79,7 @@ export async function ReadContinue(size?: number): Promise<cardData[]> {
     return data
 }
 
-export async function SaveContinue(save: cardData)  {
+export async function SaveContinue(save: cardData) {
     await SaveToFile(save, "continueWatch")
 }
 

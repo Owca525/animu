@@ -28,11 +28,20 @@ const Card: React.FC<cardData> = ({ AnimeData, saveData, deletionCard }) => {
     })
   }
 
+  function runDeletionFunction(event) {
+    console.log(deletionCard)
+    event.preventDefault()
+    event.stopPropagation()
+    if (deletionCard) deletionCard()
+  }
+
   return (
     <div className="card-container" onClick={sendToInformation}>
       {AnimeData.coverImage ? <img src={AnimeData.coverImage} className="card-image" onLoad={() => setLoading(() => false)} style={isLoading ? { display: "none" } : {}} /> : ""}
       {isLoading ? <div className="card-image-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div> : ""}
       <div className="card-title">{AnimeData.title}</div>
+      {saveData && saveData.episode && <div className="card-continue-watch-text">{saveData.last_Time != 0 && saveData.type != "" ? `Continue Episode ${saveData.episode}` : `Last Episode ${saveData.episode}`}</div>}
+      {deletionCard && <div className="card-delete-icon material-symbols-outlined" onClick={runDeletionFunction}>close</div>}
     </div>
   )
 }
