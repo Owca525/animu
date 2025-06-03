@@ -25,8 +25,6 @@ function information() {
         }
     );
 
-    console.log(data)
-
     const [secondsLeft, setSecondsLeft] = useState<undefined | number>(anime_data.nextAiringEpisode?.timeUntilAiring);
 
     useEffect(() => {
@@ -83,6 +81,8 @@ function information() {
     useHotkeys("tab", () => {
         console.log(anime_data)
     })
+
+    console.log(data)
 
     return (
         <main className="information">
@@ -144,17 +144,17 @@ function information() {
                             </div>
                         }
 
-                        {anime_data.startDate &&
+                        {anime_data.startDate && (anime_data.startDate.year != undefined && anime_data.startDate.day != undefined && anime_data.startDate.month != undefined) &&
                             <div className="information-info-content">
                                 <div className="information-content-title">{t("information.startdate")}</div>
-                                {convertDateToFormattedString(anime_data.startDate.year, anime_data.startDate.month, anime_data.startDate.day, 0, 0)}
+                                {convertDateToFormattedString(anime_data.startDate.year, anime_data.startDate.month, anime_data.startDate.day, undefined, undefined)}
                             </div>
                         }
 
-                        {anime_data.endDate &&
+                        {anime_data.endDate && (anime_data.endDate.year != undefined && anime_data.endDate.day != undefined && anime_data.endDate.month != undefined) &&
                             <div className="information-info-content">
                                 <div className="information-content-title">{t("information.endate")}</div>
-                                {convertDateToFormattedString(anime_data.endDate.year, anime_data.endDate.month, anime_data.endDate.day, 0, 0)}
+                                {convertDateToFormattedString(anime_data.endDate.year, anime_data.endDate.month, anime_data.endDate.day, undefined, undefined)}
                             </div>
                         }
 
@@ -177,7 +177,8 @@ function information() {
                             </>
                         )}
                         {isLoading && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
-                        {isError && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>Zero Episode was finded</div>}
+                        {isError && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime dosen't have episodes</div>}
+                        {data && isLoading == false && data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime dosen't have episodes</div>}
                     </div>
 
                 </div>

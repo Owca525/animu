@@ -15,8 +15,9 @@ export function convertDateToFormattedString(year: number | undefined, month: nu
 
 export function capitalizeFirstLetter(text: string) {
     if (text.length === 0) return '';
-    if (text.length <= 2) return text.toUpperCase()
-    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+    if (text.length <= 2) return text.toUpperCase().replace("_", " ")
+    text = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+    return text.replaceAll("_", " ");
 }
 
 export function convertSeconds(totalSeconds: number | undefined) {
