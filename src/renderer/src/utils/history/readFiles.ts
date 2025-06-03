@@ -21,7 +21,6 @@ export async function DeleteFromFile(data: cardData, file: string) {
         await CheckFile(file)
         const saveFile = await window.api.os.read(await appConfigDirPath + `/${file}.json`)
         const list = JSON.parse(saveFile) as cardData[];
-        console.log(saveFile)
         const index = list.findIndex(
             (item) => item.saveData?.episode === data.saveData?.episode && item.AnimeData.player_ID === data.AnimeData.player_ID
         );
