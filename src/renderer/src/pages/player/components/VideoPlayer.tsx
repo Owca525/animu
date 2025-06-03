@@ -269,7 +269,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         checkUpNext()
 
         // Update RPC
-        window.api.rpc.setActivity(`${anime_data.AnimeData.title} Episode ${temp.episode}`, `${formatTime(videoRef.current.currentTime)} / ${formatTime(videoRef.current.duration)}`)
+        window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title, ep: temp.episode }), `${formatTime(videoRef.current.currentTime)} / ${formatTime(videoRef.current.duration)}`)
         if (config.Player.general.AutoSkipEpisode && videoRef.current.duration == videoRef.current.currentTime) functions.nextButton("next")
     }
 

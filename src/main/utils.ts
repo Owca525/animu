@@ -26,7 +26,7 @@ ipcMain.handle('setActivity', (_event, details: string | undefined, state: strin
             startTimestamp: runTime,
             largeImageKey: 'https://github.com/Owca525/animu/blob/electron/resources/icon.png?raw=true',
             instance: false,
-        });
+        } as any);
     }
 })
 
@@ -99,7 +99,7 @@ export function setupDiscordRPC(): void {
                 startTimestamp: runTime,
                 largeImageKey: 'https://github.com/Owca525/animu/blob/electron/resources/icon.png?raw=true',
                 instance: false,
-            });
+            } as any);
         });
 
         rpc.login({ clientId: CLIENT_ID }).catch((error) => console.log(`Discord RPC has ${error}`))

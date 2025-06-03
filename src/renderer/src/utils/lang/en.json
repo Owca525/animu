@@ -117,6 +117,11 @@
         "progess": "Download Progress {{procent}}%",
         "done": "Updated Download, please restart application"
     },
+    "discordrpc": {
+        "home": "In home",
+        "settings": "In Settings",
+        "player": "{{title}} Episode {{ep}}"
+    },
     "lang": {
         "en": "English",
         "pl": "Polish"

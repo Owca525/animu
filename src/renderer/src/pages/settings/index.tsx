@@ -108,6 +108,7 @@ function settings() {
             let themes = data.map((element) => { return { label: element.filename.replace(".css", ""), onClick: () => changeTheme(element.filename.replace(".css", "")) } })
             setThemes(() => themes)
         })
+        window.api.rpc.setActivity(undefined, t("discordrpc.settings"))
     }, [])
 
     async function ChangeScreenshot(path: string | any) {

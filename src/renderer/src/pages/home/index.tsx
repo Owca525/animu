@@ -43,6 +43,7 @@ const Home = () => {
 
     useEffect(() => {
         if (homeCache.data.length == 0) plugin.information.home()
+        window.api.rpc.setActivity(undefined, t("discordrpc.home"))
     }, [])
 
     async function history(): Promise<containerData[]> {
