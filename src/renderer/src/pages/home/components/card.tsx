@@ -3,14 +3,15 @@ import "./css/card.css"
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
 import { t } from "i18next"
+import { useSelector } from "react-redux"
 
 const Card: React.FC<cardData> = ({ AnimeData, saveData, deletionCard }) => {
   const navigate = useNavigate()
   const [isLoading, setLoading] = useState<boolean>(true)
+  const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
 
-  function sendToInformation() {
+  async function sendToInformation() {
     if (saveData && saveData.episode != "" && saveData.last_Time != 0 && saveData.type != "") {
-      let episodes = AnimeData.episodesList?.filter((data) => data.type === saveData.type)[0]
       console.log(AnimeData, saveData)
       navigate("/player", {
         state: {
@@ -18,7 +19,7 @@ const Card: React.FC<cardData> = ({ AnimeData, saveData, deletionCard }) => {
             AnimeData: AnimeData,
             saveData: saveData,
           },
-          episodelist: episodes?.episodes
+          episodelist: await pluginPlayer.player.episodeList(saveData.type, AnimeData.player_ID)
         }
       })
       return

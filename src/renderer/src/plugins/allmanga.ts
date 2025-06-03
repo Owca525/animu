@@ -205,12 +205,29 @@ export async function convertToNewData(id: string): Promise<cardData | null> {
   }
 }
 
+export async function getEpisodeList(type: string, anime_id: string): Promise<string[] | null> {
+  try {
+    let variables = `{"_id":"${anime_id}"}`
+    const resp = await sendToAPI(variables, HASH_INFO, header)
+    if (resp) {
+      let data = converterData(resp.data.show).AnimeData.episodesList
+      if (!data) return null
+      return data.filter(item => item.type === type).flatMap(item => item.episodes)
+    }
+    return null
+  } catch (Error) {
+    console.error(Error)
+    return null
+  }
+}
+
 export const infoPluginPlayer: pluginFormat = {
   version: "0.1",
   name: "Allmanga",
   author: "Owca525",
   player: {
-    listEpisodes: getInformation,
-    getUrls: extractURLS
+    animeDataList: getInformation,
+    getUrls: extractURLS,
+    episodeList: getEpisodeList
   }
 }

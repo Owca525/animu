@@ -42,9 +42,7 @@ const player = () => {
             if (type == 'prev') ep = ep - 1
             if (type == 'next') ep = ep + 1
             console.log(extractionData.episodelist[ep], extractionData.episodelist.indexOf(old.actual))
-            if (extractionData.episodelist[ep] === undefined) return {
-                ...old
-            }
+            if (extractionData.episodelist[ep] === undefined) return old
             return {
                 ...old,
                 actual: extractionData.episodelist[ep]

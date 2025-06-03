@@ -15,7 +15,7 @@ function information() {
     const location = useLocation();
     const anime_data: AnimeData = location.state;
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
-    const func = async () => await pluginPlayer.player.listEpisodes(anime_data.title)
+    const func = async () => await pluginPlayer.player.animeDataList(anime_data.title)
     const { data, isError, isLoading } = useQuery(
         [func.toString()],
         func,

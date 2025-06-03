@@ -90,7 +90,8 @@ export interface pluginFormat {
     } | null
     player?: {
         getUrls: (type: string, episode: string, id: string) => Promise<playerData[]>
-        listEpisodes?: (name: string) => Promise<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] }>
+        animeDataList: (name: string) => Promise<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] }>
+        episodeList: (type: string, anime_id: string) => Promise<Array<string> | null>
     } | null
 }
 
