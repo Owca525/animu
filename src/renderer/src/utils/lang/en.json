@@ -113,6 +113,10 @@
         "converthistorydone": "Convertion Continue Watch Done: Succes {{success}}, Failed {{failed}}",
         "converthistoryfailed": "Failed Convert old History watch to new"
     },
+    "update": {
+        "progess": "Download Progress {{procent}}%",
+        "done": "Updated Download, please restart application"
+    },
     "lang": {
         "en": "English",
         "pl": "Polish"

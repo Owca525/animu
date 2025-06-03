@@ -30,6 +30,24 @@ export function convertSeconds(totalSeconds: number | undefined) {
     return { days, hours, minutes, seconds };
 }
 
+export function checkDate(date: string, type: "week" | "day") {
+    const givenDate = new Date(date);
+    const currentDate = new Date();
+    const milliseconds = currentDate.getTime() - givenDate.getTime();
+    switch (type) {
+        case "week":
+            return milliseconds >= 7 * 24 * 60 * 60 * 1000;
+        case "day":
+            return milliseconds >= 24 * 60 * 60 * 1000;
+    }
+}
+
+export function calculateZoomLevel(percentage: number): number {
+    if (isNaN(percentage)) return 0
+    if (percentage < 50 || percentage > 200) return 0
+    return Math.log(percentage / 100) / Math.log(1.2)
+}
+
 export function formatTime(seconds: number | undefined): string {
     if (!seconds) return "0:00";
     const hours = Math.floor(seconds / 3600);

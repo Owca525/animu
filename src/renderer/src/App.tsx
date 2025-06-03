@@ -17,6 +17,9 @@ import store from './utils/store';
 import "./utils/i18n"
 import { CheckContinue } from './utils/history/continueWatch';
 import { CheckHistory } from './utils/history/history';
+import { checkUpdate } from './utils/update';
+import { calculateZoomLevel, checkDate } from './utils/functions';
+import i18n from './utils/i18n';
 
 LoadConfig()
 
@@ -57,6 +60,16 @@ async function LoadConfig() {
   link.id = 'theme-stylesheet';
   link.rel = 'stylesheet';
   document.head.appendChild(link);
+
+  i18n.changeLanguage(loadedConnfig.General.language)
+  if (loadedConnfig.General.Window.AutoMaximize) window.BrowserWindow.setMaximize()
+  if (loadedConnfig.Developer.DevToolsOnStart) window.BrowserWindow.openDevTools()
+  window.BrowserWindow.setZoom(calculateZoomLevel(parseFloat(loadedConnfig.General.Window.Zoom.toString())))
+  window.BrowserWindow.setFullscreen(loadedConnfig.General.Window.AutoFullscreen)
+
+  if (loadedConnfig.update.type == "On Start") checkUpdate()
+  if (loadedConnfig.update.type == "Every Day" && checkDate(loadedConnfig.update.lastTime, "day")) checkUpdate()
+  if (loadedConnfig.update.type == "Every Week" && checkDate(loadedConnfig.update.lastTime, "week")) checkUpdate()
 
   store.dispatch({ type: "setConfig", payload: loadedConnfig })
 }
