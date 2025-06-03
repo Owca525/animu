@@ -39,7 +39,8 @@ async function HistoryDetectVersion() {
                             ...tmp,
                             AnimeData: {
                                 ...tmp.AnimeData,
-                                player_ID: element.id
+                                player_ID: element.id,
+                                episodesList: undefined
                             },
                             saveData: {
                                 pluginName: "",
