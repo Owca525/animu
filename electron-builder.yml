@@ -14,7 +14,7 @@ asarUnpack:
 win:
   executableName: animu
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
+  artifactName: ${name}-${version}-unstable-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
@@ -35,7 +35,7 @@ linux:
   maintainer: https://github.com/Owca525
   category: AudioVideo
 appImage:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: ${name}-${version}-unstable.${ext}
 npmRebuild: false
 publish:
   provider: github
