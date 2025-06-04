@@ -10,8 +10,8 @@
 
   /* accent */
   --neutral1: #72e15a; /* is using on outline, border-color etc */ 
-  --neutral2: #41c475; /* not use */
-  --neutral3: #30b063; /* not use */
+  --neutral2: #41c475;
+  --neutral3: #30b063;
 
   /* player */
   --playerbg: rgba(0, 0, 0); /* is used in video container */
