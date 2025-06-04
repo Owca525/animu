@@ -168,7 +168,7 @@ function getSeasonFromDate() {
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
 
-  let season;
+  let season: string;
 
   if (month >= 1 && month <= 3) {
     season = "WINTER";
