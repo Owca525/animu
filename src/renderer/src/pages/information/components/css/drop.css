@@ -2,8 +2,6 @@
     display: flex;
     justify-content: space-between;
     padding: 12px;
-    background-color: var(--bg3);
-    border-radius: 12px;
     cursor: pointer;
 }
 
@@ -15,15 +13,6 @@
 
 .drop-content {
     padding: 12px;
-    background-color: var(--bg3);
-    border-radius: 12px;
-
-    border-top: 0px;
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
-
-    border: 2px solid var(--bg4);
-    border-width: 2px 0px 0px 0px;
 
     display: none;
     transition: height 150ms ease;
@@ -32,9 +21,4 @@
 .drop-content-show {
     height: max-content;
     display: block;
-}
-
-.active-drop {
-    border-bottom-right-radius: 0px;
-    border-bottom-left-radius: 0px;
 }

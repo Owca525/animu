@@ -10,10 +10,6 @@
     cursor: pointer;
 }
 
-.container-title-click:hover {
-    background-color: var(--bg3);
-}
-
 .main-container {
     display: flex;
     flex-direction: column;

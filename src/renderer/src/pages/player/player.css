@@ -6,7 +6,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: black;
 }
 
 .video-player {
@@ -26,23 +25,12 @@
   pointer-events: none;
 }
 
-.player-mask {
-  mask-image: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.5),
-    rgba(0, 0, 0, 1) 10%,
-    rgba(0, 0, 0, 0.5)
-  );
-}
-
 .player-time-display {
   padding: 5px 10px;
-  border-radius: 5px;
   pointer-events: all;
   font-size: large;
   font-weight: 500;
   user-select: text;
-  background-color: color-mix(in srgb, var(--bg3) 80%, transparent);
 }
 
 .video-top {
@@ -91,33 +79,21 @@
   pointer-events: all;
   width: 40px;
   height: 40px;
-  border: none;
   font-size: xx-large;
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 2px solid rgba(0, 0, 0, 0);
-  background-color: rgba(0, 0, 0, 0);
-}
-
-.player-buttons:hover {
-  background-color: var(--bg3);
-  border-color: var(--neutral1);
 }
 
 .player-loading-container {
   padding: 12px;
-  border-radius: 12px;
-  background-color: color-mix(in srgb, var(--bg3) 80%, transparent);
 }
 
 .player-title {
   pointer-events: all;
   padding: 8px;
-  border-radius: 4px;
   font-size: x-large;
   user-select: text;
-  background-color: color-mix(in srgb, var(--bg3) 80%, transparent);
   overflow: hidden;
 }
 
@@ -142,24 +118,19 @@
   padding-right: 8px;
   bottom: 80px;
   width: min-content;
-  border-radius: 4px;
   position: absolute;
   transition: opacity 100ms ease;
-  background-color: rgba(0, 0, 0, 0.8);
 }
 
 .player-volume-bar {
   appearance: none;
   height: 6px;
-  border-radius: 5px;
-  background-color: rgba(255, 255, 255, 0.3);
 }
+
 .player-volume-bar::-webkit-slider-thumb {
   appearance: none;
-  background-color: #5962a6;
   width: 20px;
   height: 20px;
-  border-radius: 50%;
 }
 
 .player-hide-cursor {
@@ -178,10 +149,8 @@
   bottom: 90px;
   right: 20px;
   padding: 0.5em;
-  border-radius: 8px;
   min-width: 200px;
   width: 20%;
-  background-color: rgba(0, 0, 0, 0.6);
 }
 
 .player-settings-button {
@@ -189,12 +158,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px;
-  border-radius: 8px;
 }
 
-.player-settings-button:hover, .player-settings-button-back:hover {
-  background-color: rgba(150, 150, 150, 0.3);
-}
 
 .player-settings-button-text {
   font-size: larger;
@@ -210,7 +175,6 @@
   display: flex;
   align-items: center;
   padding: 8px;
-  border-radius: 8px;
   gap: 8px;
 }
 
@@ -224,12 +188,10 @@
 
   width: clamp(20vw, 25vw, 30vw);
 
-  background-color: rgba(0, 0, 0, 0.8);
   padding: 1em;
   display: flex;
   flex-direction: column;
   gap: 1em;
-  border-radius: 1em;
 }
 
 .player-up-Next-Anime, .player-up-Next-Title {
@@ -258,6 +220,5 @@
 
 .player-up-Next-Button {
   font-size: clamp(0.5rem, 1.1vw, .8rem);
-  background-color: rgba(0, 0, 0, 0.5);
   padding: 8px;
 }

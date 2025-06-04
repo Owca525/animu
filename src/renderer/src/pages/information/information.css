@@ -1,9 +1,7 @@
 /* Main Container */
 .information {
-    background-color: var(--bg);
     height: 100%;
     width: 100%;
-    color: var(--text);
     overflow-x: hidden;
     position: fixed;
 }
@@ -50,11 +48,9 @@
 }
 
 .information-top {
-    background-color: var(--bg2);
     width: 80%;
     height: fit-content;
     display: flex;
-    border-radius: 16px;
     margin-top: clamp(100px, 16%, 40vh);
     gap: 20px;
     padding: 20px;
@@ -62,7 +58,6 @@
 }
 
 .information-cover {
-    border-radius: 16px;
     margin-top: min(-3%, -60px);
     max-width: 240px;
     max-height: 240px;
@@ -83,8 +78,6 @@
 }
 
 .information-info {
-    background-color: var(--bg2);
-    border-radius: 16px;
     padding: 12px;
     width: min-content;
     display: flex;
@@ -94,9 +87,7 @@
 }
 
 .information-info-content {
-    background-color: var(--bg3);
     padding: 14px 10px;
-    border-radius: 10px;
 }
 
 .information-content-title {
@@ -108,8 +99,6 @@
     width: 100%;
     min-height: 25px;
     height: min-content;
-    background-color: var(--bg2);
-    border-radius: 16px;
     padding: 12px;
     display: flex;
     flex-direction: column;
@@ -122,7 +111,6 @@
     z-index: 7;
     top: 8px;
     left: 8px;
-    border-radius: 50%;
 }
 
 .information-description {
@@ -144,13 +132,6 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    background-color: var(--bg4);
-    border-radius: 8px;
-    border: 2px solid var(--bg4);
-}
-
-.information-episode-button:hover {
-    border-color: var(--neutral1);
 }
 
 .information-loading {
@@ -174,7 +155,7 @@
         margin-top: max(20%, 90px);
         padding: 10px 15px 10px 20px;
         gap: 20px;
-        border-radius: 0px;
+        /*border-radius: 0px;*/
     }
 
     .information-bottom {
@@ -201,7 +182,7 @@
         grid-auto-flow: column;
         align-self: center;
         width: 98%;
-        border-radius: 0px;
+        /*border-radius: 0px;*/
         overflow-x: auto;
     }
 
@@ -212,7 +193,7 @@
     }
 
     .information-info-content {
-        border-radius: 10px;
+        /*border-radius: 10px;*/
         flex-flow: row;
         font-size: 0.8em;
         width: fit-content;
@@ -232,7 +213,7 @@
 
 }
 
-/* for smatrphones 
+/* for smartphones 
 maybe that will be usefull in the future */
 @media (max-width: 600px) {
     .information-top {
@@ -271,7 +252,7 @@ maybe that will be usefull in the future */
 
     .information-info-content {
         padding: 8px 5px;
-        border-radius: 10px;
+        /* border-radius: 10px; */
         font-size: 0.8em;
         flex-flow: row;
     }

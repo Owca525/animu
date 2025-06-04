@@ -8,10 +8,7 @@
   cursor: pointer;
   width: 110px;
   display: flex;
-  border-radius: 8px;
-  border: 2px solid var(--bg3);
   transition: border-color 150ms ease;
-  background-color: var(--bg3);
   justify-content: end;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -27,12 +24,10 @@
   align-items: start;
   width: 100%;
   gap: 4px;
-  border-radius: 7px;
   flex-direction: column;
   list-style: none;
   margin: 0;
   z-index: 1000;
-  background-color: var(--bg2);
 }
 
 .dropdown-item {
@@ -40,11 +35,9 @@
   padding: 8px;
   width: 90%;
   font-size: 1em;
-  border-radius: 6px;
   transition: background-color 150ms ease;
   overflow: hidden;
   text-align: end;
   text-overflow: ellipsis;
   white-space: nowrap;
-  background-color: var(--bg3);
 }

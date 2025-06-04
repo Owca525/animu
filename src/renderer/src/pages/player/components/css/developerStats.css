@@ -1,8 +1,6 @@
 .player-dev-container {
   position: fixed;
-  background-color: color-mix(in srgb, var(--bg3) 80%, transparent);
   padding: 12px;
-  border-radius: 12px;
   right: 0;
   top: 0;
   margin: 12px;

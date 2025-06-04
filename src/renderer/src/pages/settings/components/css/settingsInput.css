@@ -1,23 +1,16 @@
 .settings-input-container {
-    background-color: var(--bg3);
     display: flex;
     flex-direction: row;
-    border-radius: 12px;
     width: min-content;
     overflow: hidden;
     width: 130px;
 }
 
 .settings-input-field {
-    background-color: var(--bg3);
     outline: none;
-    color: var(--text);
     text-align: right;
     font-size: 1em;
     width: min-content;
-    border-radius: 12px 0px 0px 12px;
-    border: 2px solid var(--bg3);
-    border-right: 0px;
     padding: 10px 0 10px 8px;
     max-width: 100px;
 }
@@ -25,25 +18,8 @@
 .settings-input-type {
     /*border-radius: 0px 12px 12px 0px;*/
     text-align: center;
-    background-color: var(--bg3);
-    color: var(--text);
     align-content: center;
     padding-right: 5px;
-    border-radius: 0px 12px 12px 0px;
-    border: 2px solid var(--bg3);
-    border-left: 0px;
     min-width: 4px;
     width: 100%;
-}
-
-.settings-input-container:hover .settings-input-type,
-.settings-input-container:hover .settings-input-field {
-    background-color: var(--bg4);
-}
-
-.settings-input-field:focus,
-.settings-input-field:active,
-.settings-input-field:focus~.settings-input-type,
-.settings-input-field:active~.settings-input-type {
-    border-color: var(--neutral1);
 }

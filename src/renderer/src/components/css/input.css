@@ -1,23 +1,8 @@
 .input {
     appearance: none;
-    border: none;
     outline: none;
     padding: clamp(4px, 1vw, 12px);
     max-width: 400px;
     width: clamp(50px, 25vw, 400px);
-    border-radius: 8px;
     font-size: large;
-
-    background-color: var(--bg3);
-    color: var(--text);
-    border: 2px solid var(--bg3);
-    transition: all 0.1s ease;
-}
-
-.input:hover {
-    border-color: var(--neutral1);
-}
-
-.input:focus {
-    border-color: var(--neutral1);
 }

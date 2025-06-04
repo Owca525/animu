@@ -1,8 +1,4 @@
 .button {
-    border: none;
-    border-style: solid;
-    border-width: 2px;
-    border-radius: 8px;
     cursor: pointer;
     display: flex;
     justify-content: start;
@@ -10,12 +6,4 @@
     gap: clamp(4px, 1vw, 12px);
     padding: clamp(4px, 1vw, 10px);
     transition: all 0.1s ease;
-
-    background-color: var(--bg3);
-    border-color: var(--bg3);
-    color: var(--text);
-}
-
-.button:hover {
-    border-color: var(--neutral1);
 }

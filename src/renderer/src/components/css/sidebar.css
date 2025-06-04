@@ -13,7 +13,6 @@
     flex-direction: column;
     justify-content: space-between;
     position: fixed;
-    background-color: var(--bg2);
     grid-area: sidebar;
 }
 
@@ -46,10 +45,8 @@
 }
 
 .sidebar-black-line {
-    background-color: var(--bg);
     width: 100%;
     height: 4px;
-    border-radius: 12px;
 }
 
 .sidebar-logo-icon-container {
@@ -59,7 +56,6 @@
     padding-top: 4px;
     padding-bottom: 4px;
     gap: 12px;
-    background-color: var(--bg2);
     width: clamp(50px, 20vw, 200px);
 }
 

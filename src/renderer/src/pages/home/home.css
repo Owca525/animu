@@ -10,7 +10,6 @@
 }
 
 .home-header {
-    background-color: var(--bg2);
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     justify-content: center;
