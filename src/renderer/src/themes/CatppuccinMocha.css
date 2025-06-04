@@ -13,92 +13,49 @@
   --neutral2: #ca9ee6;
   --neutral3: #cea7e7;
 
-  /* Other */
-  --black: rgba(0, 0, 0);  /* is use in video container */
-  --notVisible: rgba(0, 0, 0, 0.0); /* is use in player button */
+  /* player */
+  --playerbg: rgba(0, 0, 0); /* is used in video container */
+  --playertext: var(--text);
+  --playertext-gray: gray;
+  --playerbg3: var(--bg3);
+  --playerneutral1: var(--neutral1);
+  --playerbutton: rgba(0, 0, 0, 0); /* is used in player button */
+  --playerbutton2: rgba(150, 150, 150, 0.3); /* is used in player button */
+  --playervolumebar: rgba(255, 255, 255, 0.3);
+  --playervolumebar1: #5962a6;
+
+  /* seekbar */
+  --seekbarbg3: var(--bg3);
+  --seekbarbg4: rgb(64, 64, 64);
+  --seekbarneutral1: var(--neutral1);
+  
+  /* ::selection color */
+  --selectioncolor: var(--neutral1);
 }
 
 
+/* App */
+
+::selection {
+  background-color: var(--selectioncolor);
+}
+
 * {
-  font-family: sans-serif;
-  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 body {
+  color: var(--text);
   background-color: var(--bg);
 }
 
-::selection {
-  background-color: var(--neutral1);
+::-webkit-scrollbar {
+  background-color: var(--bg);
 }
 
-button {
-  border: none;
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
   background-color: var(--bg3);
-  color: var(--text);
-  box-shadow: 0px 0px 10px rgb(0, 0, 0, 0.3);
-}
-.button-sidebar-show {
-  background-color: var(--bg2);
-  box-shadow: none;
-}
-
-.backlight:hover {
-  background-color: var(--bg4);
-  color: var(--text);
-}
-
-.active {
-  background-color: var(--bg4);
-}
-.active:hover {
-  background-color: none;
-}
-
-.sidebar-mini {
-  background-color: var(--bg2);
-}
-.border {
-  border-color: var(--bg4);
-}
-
-.border-settings {
-  border-color: var(--bg4);
-}
-
-.sidebar-max {
-  background-color: var(--bg2);
-}
-
-.input {
-  background-color: var(--bg3);
-  outline-color: var(--bg3);
-  outline-width: 2px;
-  outline-style: solid;
-  transition: outline 150ms ease;
-}
-.input:focus {
-  outline-color: var(--neutral1);
-}
-
-.header {
-  background-color: var(--bg2);
-}
-
-.settings-space {
-  background-color: var(--bg2);
-}
-
-.checkbox {
-  background-color: var(--bg3);
-  box-shadow: inset 0 0 5px rgb(0, 0, 0, 0.2);
-}
-.checkbox:checked {
-  background-color: var(--neutral1);
-}
-.checkbox::before {
-  background-color: var(--text);
-  box-shadow: 0 2px 5px rgb(0, 0, 0, 0.2);
 }
 
 .Toastify__toast {
@@ -106,267 +63,492 @@ button {
   border-radius: 12px;
   color: var(--text);
   border: 2px solid var(--bg4);
-}
-
-.settings-input {
-  outline: none;
-  background-color: var(--bg3);
-  color: var(--text);
-  transition: background-color 150ms ease;
-  border-radius: 12px 0px 0px 12px;
-  border: 2px solid var(--bg3);
-  border-right: 0px;
-}
-.settings-input-type {
-  background-color: var(--bg3);
-  color: var(--text);
-  border-radius: 0px 12px 12px 0px;
-  text-align: center;
-  border: 2px solid var(--bg3);
-  border-width: 2px 2px 2px 0px;
-}
-.settings-input:hover {
-  background-color: var(--bg4);
-}
-.settings-input:hover + .settings-input-type {
-  background-color: var(--bg4);
-}
-.settings-input:focus {
-  border: solid 2px var(--neutral1);
-  border-width: 2px 0px 2px 2px;
-}
-
-.settings-input:focus + .settings-input-type {
-  border: solid 2px var(--neutral1);
-  border-width: 2px 2px 2px 0px;
-}
-
-.dropdown-button {
-  background-color: var(--bg3);
-  transition: background-color 150ms ease;
-  border-color: var(--bg3);
-  border-radius: 12px;
-}
-.dropdown-button:hover {
-  background-color: var(--bg4);
-}
-
-.dropdown-menu {
-  background-color: var(--bg3);
-}
-
-.dropdown-item {
-  background-color: var(--bg3);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-.dropdown-item:hover {
-  background-color: var(--bg4);
-}
-
-.keybind-content {
-  background-color: var(--bg3);
-  border-color: var(--bg3);
-  transition:
-    background-color,
-    border-color 150ms ease;
-  border-radius: 12px;
-}
-
-.keybind-content:hover {
-  background-color: var(--bg4);
-}
-
-.keybind-active {
-  background-color: var(--bg4);
-  border-color: var(--neutral1);
-}
-
-.card-container {
   border-radius: 8px;
-}
-.card-container:hover {
-  background-color: var(--bg4);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.card-image {
-  border-radius: 8px;
-}
-.card-image-placeholder {
-  background-color: var(--bg3);
+
+/* DialogContext */
+
+.dialog-main-background {
+  background-color: rgb(0, 0, 0, 0.5);
 }
 
-.card-continue-watch-text {
-  color: var(--text-gray);
-}
 .dialog-container {
-  background-color: var(--bg2);
-  border-radius: 12px;
+    background-color: var(--bg2);
+    border-radius: 12px;
 }
 
-.information-image-placeholder {
-  background-color: var(--bg3);
-  border-radius: 12px;
+
+/* Buttons */
+
+.button {
+    border: none;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 8px;
+
+    background-color: var(--bg3);
+    border-color: var(--bg3);
+    color: var(--text);
 }
 
-.context-menu-item:hover {
-  background: var(--bg3);
+.button:hover {
+    border-color: var(--neutral1);
 }
 
-.context-menu {
-  background: var(--bg2);
+
+/* Input */
+
+.input {
+    /*border: none;*/
+    border-radius: 8px;
+    background-color: var(--bg3);
+    color: var(--text);
+    border: 2px solid var(--bg3);
+    transition: all 0.1s ease;
 }
 
-.information-episode-button:hover {
-  outline: solid 2px var(--neutral1);
+.input:hover {
+    border-color: var(--neutral1);
 }
 
-.information-episode-button:active {
-  background-color: var(--bg4);
+.input:focus {
+    border-color: var(--neutral1);
 }
 
-.information-episode-button {
-  background-color: var(--bg4);
-  border-radius: 6px;
-  outline-color: var(--bg4);
-  transition: outline 100ms ease;
+
+/* Sidebar */
+
+.sidebar-container-min, .sidebar-container-max  {
+    background-color: var(--bg2);
 }
 
-.information-episodes {
-  background-color: var(--bg2);
-  border-radius: 12px;
+.sidebar-black-line {
+    background-color: var(--bg);
+    border-radius: 12px;
 }
 
-.information-anime-info {
-  background-color: var(--bg2);
-  border-radius: 12px;
+.sidebar-logo-icon-container {
+    background-color: var(--bg2);
 }
 
-.information-anime-info-content {
-  background-color: var(--bg3);
-  border-radius: 12px;
+
+/* Home */
+
+.home-header {
+    background-color: var(--bg2);
 }
 
-.information-exit-button {
-  background-color: var(--bg2);
+
+/* Cards */
+
+.card-container:hover {
+    background-color: var(--bg4);
+    border-radius: 8px;
 }
 
-.information-exit-button:hover {
-  background-color: var(--bg4);
-  outline: solid 2px var(--neutral1);
+
+.card-image, .card-image-placeholder {
+    border-radius: 8px;
 }
 
-.information-top {
-  background-color: var(--bg2);
-}
-
-.player-buttons {
-  background-color: var(--notVisible);
-  box-shadow: none;
-  outline-color: var(--notVisible);
-}
-
-.thumb, .slider-thumb, .slider-progress,.progress {
-  background-color: var(--neutral1);
-}
-
-.time-display, .player-title, .show-time {
-  background-color: rgb(30, 30, 30, 0.8);
-}
-
-.video-container {
-  background-color: var(--black);
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: var(--bg2);
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg);
-}
-
-.information-top {
-  background-color: var(--bg2);
-  border-radius: 12px;
-}
-
-.information-fade {
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 1%, var(--bg) 90%);
-}
-
-.information-background {
-  background-color: var(--bg);
-}
-
-.dropdown-container {
-  border: none;
-  outline: none;
-}
-
-.seekBar-container {
-  background-color: var(--bg4);
-  border-radius: 12px;
-}
-
-.seekbar-progress {
-  background-color: var(--neutral1);
-  border-radius: 12px;
-}
-
-.seekbar-thumb {
-  background-color: var(--neutral1);
-}
-
-.seekbar-box {
-  background-color: rgb(30, 30, 30, 0.8);
-  border-radius: 12px;
-}
-
-.player-seekbar {
-  background-color: rgb(50, 50, 50, 0.5);
-}
-
-.player-loading-container {
-  background-color: rgb(30, 30, 30, 0.8);
-  padding: 8px;
-  border-radius: 24px;
-}
-
-.player-settings-container {
-  background-color: rgb(30, 30, 30, 0.8);
-}
-
-.up-Next-container {
-  background-color: rgb(30, 30, 30, 0.8);
-}
-
-.player-dev-container {
-  background-color: rgb(30, 30, 30, 0.8);
-}
-
-.settings-save-box {
-  background-color: rgb(46, 46, 46, 0.8);
-  border-radius: 12px;
-}
-.settings-save-button {
-  background-color: var(--bg4);
-}
-.settings-save-button:hover {
-  background-color: var(--bg3);
+.card-image-placeholder {
+    background-color: var(--bg3);
 }
 
 .card-delete-icon {
   background-color: var(--bg3);
   border-radius: 50%;
 }
-.card-delete-icon:hover {
-  background-color: var(--bg4);
-} 
 
-.up-Next-Button {
-  background-color: rgb(46, 46, 46, 0.5);
+.card-delete-icon:hover {
+    background-color: var(--bg4);
 }
-.up-Next-Button:hover {
-  background-color: rgb(64, 64, 64, 0.5);
+
+
+/* Container */
+
+.container-title, .container-title-click {
+    border-radius: 12px;
+}
+
+.container-title-click:hover {
+    background-color: var(--bg3);
+}
+
+
+/* Information */
+
+.information {
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+.information-top {
+    background-color: var(--bg2);
+    border-radius: 16px;
+}
+
+.information-cover {
+    border-radius: 16px;
+}
+
+.information-info {
+    background-color: var(--bg2);
+    border-radius: 16px;
+}
+
+.information-info-content {
+    background-color: var(--bg3);
+    border-radius: 10px;
+}
+
+.information-episodes {
+    background-color: var(--bg2);
+    border-radius: 16px;
+}
+
+.information-exit-button {
+    border-radius: 50%;
+}
+
+.information-episode-button {
+    background-color: var(--bg4);
+    border-radius: 8px;
+    border: 2px solid var(--bg4);
+}
+
+.information-episode-button:hover {
+    border-color: var(--neutral1);
+}
+
+  /* For smaller devices / window sizes */
+@media (max-width: 1000px) {
+    .information-top {
+        border-radius: 0px;
+    }
+
+    .information-info {
+        border-radius: 0px;
+    }
+
+    .information-info-content {
+        border-radius: 10px;
+    }
+}
+
+  /* for smartphones */
+@media (max-width: 600px) {
+    .information-info-content {
+        border-radius: 10px;
+    }
+  }
+  
+
+/* Drop */
+
+.drop-button {
+    background-color: var(--bg3);
+    border-radius: 12px;
+}
+
+.drop-content {
+    background-color: var(--bg3);
+    border-radius: 12px;
+
+    border-top: 0px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+
+    border: 2px solid var(--bg4);
+    border-width: 2px 0px 0px 0px;
+}
+
+.active-drop {
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+
+/* DeveloperStats */
+
+.player-dev-container {
+  background-color: color-mix(in srgb, var(--bg3) 80%, transparent);
+  border-radius: 12px;
+}
+
+
+/* ExternalPlayer */
+
+.external-player-container {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+.external-title {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+
+/* Settings */
+
+.settings-page-container {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+.settings-line {
+  background-color: var(--bg3);
+  border-radius: 8px;
+}
+
+.settings-text-space {
+  background-color: var(--bg3);
+  border-radius: 12px;
+}
+
+.settings-save-content {
+  background-color: var(--bg2);
+  border-radius: 12px;
+  border: 2px solid var(--bg4);
+}
+
+
+/* Checkbox */
+
+.checkbox {
+    background-color: var(--bg3);
+    box-shadow: inset 0 0 5px rgb(0, 0, 0, 0.2);
+    border-radius: 20px;
+}
+
+.checkbox::before {
+    border-radius: 20px;
+    background-color: var(--text);
+    box-shadow: 0 2px 5px rgb(0, 0, 0, 0.2);
+}
+
+.checkbox:checked {
+    background-color: var(--neutral1);
+}
+
+
+/* CheckKeybind */
+
+.settings-keybind-check , .settings-keybind-check-active {
+    background-color: var(--bg3);
+    border-radius: 12px;
+    border: 2px solid var(--bg3);
+    color: var(--text);
+}
+
+.settings-keybind-check:hover {
+    background-color: var(--bg4);
+}
+
+.settings-keybind-check-active {
+    border-color: var(--neutral1);
+    background-color: var(--bg4);
+}
+
+
+/* DropDown */
+
+.dropdown-button {
+  border-radius: 8px;
+  border: 2px solid var(--bg3);
+  background-color: var(--bg3);
+}
+
+.dropdown-menu {
+  border-radius: 7px;
+  background-color: var(--bg2);
+}
+
+.dropdown-item {
+  background-color: var(--bg3);
+  border-radius: 6px;
+}
+
+
+/* SettingsInput */
+
+.settings-input-container {
+    border-radius: 12px;
+    background-color: var(--bg3);
+}
+
+.settings-input-field {
+    background-color: var(--bg3);
+    color: var(--text);
+    border-radius: 12px 0px 0px 12px;
+    border: 2px solid var(--bg3);
+    border-right: 0px;
+}
+
+.settings-input-type {
+    background-color: var(--bg3);
+    color: var(--text);
+    border-radius: 0px 12px 12px 0px;
+    border: 2px solid var(--bg3);
+    border-left: 0px;
+}
+
+.settings-input-container:hover .settings-input-type,
+.settings-input-container:hover .settings-input-field {
+    background-color: var(--bg4);
+}
+
+.settings-input-field:focus,
+.settings-input-field:active,
+.settings-input-field:focus~.settings-input-type,
+.settings-input-field:active~.settings-input-type {
+    border-color: var(--neutral1);
+}
+
+
+/* Player */
+
+.player-video-container {
+  background-color: var(--playerbg);
+  color: var(--playertext);
+}
+
+.player-mask {
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 1) 10%,
+    rgba(0, 0, 0, 0.5)
+  );
+}
+
+.player-time-display {
+  border-radius: 5px;
+  background-color: color-mix(in srgb, var(--playerbg3) 80%, transparent);
+  color: var(--playertext);
+}
+
+.player-buttons {
+  border: none;
+  border: 2px solid var(--playerbutton);
+  background-color: var(--playerbutton);
+  color: var(--playertext);
+}
+
+.player-buttons:hover {
+  background-color: var(--playerbg3);
+  border-color: var(--playerneutral1);
+  color: var(--playertext);
+}
+
+.player-loading-container {
+  border-radius: 12px;
+  background-color: color-mix(in srgb, var(--playerbg3) 80%, transparent);
+}
+
+.player-title {
+  border-radius: 4px;
+  background-color: color-mix(in srgb, var(--playerbg3) 80%, transparent);
+  color: var(--playertext);
+}
+
+.player-show-time {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.player-volume-bar {
+  border-radius: 5px;
+  background-color: var(--playervolumebar);
+}
+
+.player-volume-bar::-webkit-slider-thumb {
+  background-color: var(--playervolumebar1);
+  border-radius: 50%;
+}
+
+.player-settings-container {
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: var(--playertext);
+}
+
+.player-settings-button {
+  border-radius: 8px;
+  color: var(--playertext);
+}
+
+.player-settings-button:hover, .player-settings-button-back:hover {
+  background-color: var(--playerbutton2);
+}
+
+.player-settings-button-back {
+  border-radius: 8px;
+}
+
+.player-up-Next-container {
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 1em;
+  color: var(--playertext);
+}
+
+.player-up-Next-Button {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.player-settings-button-text-gray {
+  color: var(--playertext-gray);
+}
+
+/* nerdStats */
+
+.player-nerd-container {
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 12px;
+  color: var(--playertext);
+}
+
+
+/* SeekBar */
+
+.seekBar-container {
+    background-color: color-mix(in srgb, var(--bg4) 70%, transparent);
+    border-radius: 12px;
+}
+
+.seekbar-thumb {
+    border-radius: 50%;
+}
+
+.seekbar-box {
+    background-color: color-mix(in srgb, var(--bg3) 80%, transparent);
+    border-radius: 12px;
+}
+
+.seekbar-thumb, .seekbar-progress, .seekbar-box.progress {
+  background-color: var(--neutral1);
+  border-radius: 12px;
+}
+
+  /* player seekbar */
+.video-bottom .seekBar-container {
+    background-color: color-mix(in srgb, var(--seekbarbg4) 70%, transparent);
+    border-radius: 12px;
+}
+
+.video-bottom .seekbar-thumb {
+    border-radius: 50%;
+}
+
+.video-bottom .seekbar-box {
+    background-color: color-mix(in srgb, var(--seekbarbg3) 80%, transparent);
+    border-radius: 12px;
+}
+
+.video-bottom .seekbar-thumb, .seekbar-progress, .seekbar-box.progress {
+  background-color: var(--seekbarneutral1);
+  border-radius: 12px;
 }

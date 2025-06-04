@@ -24,17 +24,20 @@
   --playervolumebar: rgba(255, 255, 255, 0.3);
   --playervolumebar1: #5962a6;
   
-  /* seekbar */
+  /* player seekbar */
   --seekbarbg3: var(--bg3);
   --seekbarbg4: var(--bg4);
   --seekbarneutral1: var(--neutral1);
+  
+  /* ::selection color */
+  --selectioncolor: var(--neutral1);
 }
 
 
 /* App */
 
 ::selection {
-  background-color: var(--neutral1);
+  background-color: var(--selectioncolor);
 }
 
 * {
@@ -512,7 +515,7 @@ body {
 /* SeekBar */
 
 .seekBar-container {
-    background-color: color-mix(in srgb, var(--seekbarbg4) 70%, transparent);
+    background-color: color-mix(in srgb, var(--bg4) 70%, transparent);
     border-radius: 12px;
 }
 
@@ -521,11 +524,31 @@ body {
 }
 
 .seekbar-box {
-    background-color: color-mix(in srgb, var(--seekbarbg3) 80%, transparent);
+    background-color: color-mix(in srgb, var(--bg3) 80%, transparent);
     border-radius: 12px;
 }
 
 .seekbar-thumb, .seekbar-progress, .seekbar-box.progress {
+  background-color: var(--neutral1);
+  border-radius: 12px;
+}
+
+  /* player seekbar */
+.video-bottom .seekBar-container {
+    background-color: color-mix(in srgb, var(--seekbarbg4) 70%, transparent);
+    border-radius: 12px;
+}
+
+.video-bottom .seekbar-thumb {
+    border-radius: 50%;
+}
+
+.video-bottom .seekbar-box {
+    background-color: color-mix(in srgb, var(--seekbarbg3) 80%, transparent);
+    border-radius: 12px;
+}
+
+.video-bottom .seekbar-thumb, .seekbar-progress, .seekbar-box.progress {
   background-color: var(--seekbarneutral1);
   border-radius: 12px;
 }
