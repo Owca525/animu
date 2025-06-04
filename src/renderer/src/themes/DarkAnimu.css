@@ -15,7 +15,8 @@
 
   /* player */
   --playerbg: rgba(0, 0, 0); /* is used in video container */
-  --playertext: red;
+  --playertext: var(--text);
+  --playertext-gray: gray;
   --playerbg3: var(--bg3);
   --playerneutral1: var(--neutral1);
   --playerbutton: rgba(0, 0, 0, 0); /* is used in player button */
@@ -491,6 +492,9 @@ body {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
+.player-settings-button-text-gray {
+  color: var(--playertext-gray);
+}
 
 /* nerdStats */
 

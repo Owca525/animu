@@ -505,7 +505,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                 <div className="player-settings-container">
                                     {player_data.length <= 1 ? (
                                         <div className="player-settings-button">
-                                            <span className='player-settings-button-text' style={{ color: "gray" }} >Urls</span> <span style={{ color: "gray" }}>{currentHost}</span>
+                                            <span className='player-settings-button-text-gray'>Urls</span> <span className='player-settings-button-text-gray'>{currentHost}</span>
                                         </div>
                                     ) : (
                                         <div className="player-settings-button" onClick={() => setcurrentSettings("urls")}>
@@ -514,7 +514,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                     )}
                                     {ListResolution.length <= 1 ? (
                                         <div className="player-settings-button">
-                                            <span className='player-settings-button-text' style={{ color: "gray" }}>Resolution</span> <span style={{ color: "gray" }}>{currentResolution.toString().length >= 1 ? currentResolution + "p" : ""}</span>
+                                            <span className='player-settings-button-text-gray'>Resolution</span> <span className='player-settings-button-text-gray'>{currentResolution.toString().length >= 1 ? currentResolution + "p" : ""}</span>
                                         </div>
                                     ) : (
                                         <div className="player-settings-button" onClick={() => setcurrentSettings("resolution")}>
