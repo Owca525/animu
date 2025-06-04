@@ -157,10 +157,10 @@ function settings() {
             {isSaving && (
                 <div className="settings-save-container">
                     <div className="settings-save-content">
-                        <div className="settings-save-title">Do you wanna save changes?</div>
+                        <div className="settings-save-title">{t("settings.saving.notification")}</div>
                         <div className="settings-save-buttons">
-                            <Button content="Yes" onClick={saveNewConfig} />
-                            <Button content="Reset" onClick={resetConfig} />
+                            <Button content={t("dialog.yes")} onClick={saveNewConfig} />
+                            <Button content={t("dialog.reset")} onClick={resetConfig} />
                         </div>
                     </div>
                 </div>

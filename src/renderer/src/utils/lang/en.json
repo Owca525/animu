@@ -14,7 +14,8 @@
         "yes": "Yes",
         "no": "No",
         "retry": "Retry",
-        "exit": "Exit"
+        "exit": "Exit",
+        "reset": "Reset"
     },
     "home": {
         "search": "Search..."
@@ -80,7 +81,8 @@
         },
         "saving": {
             "done": "Config has been succesfully saved",
-            "error": "Saving config accure error"
+            "error": "Saving config accure error",
+            "notification": "Do you wanna save changes?"
         }
     },
     "player": {

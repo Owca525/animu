@@ -80,11 +80,12 @@
 
 .settings-save-content {
   display: flex;
-  background-color: var(--bg4);
+  background-color: var(--bg2);
   border-radius: 12px;
   align-items: center;
-  padding: 4px 6px 4px 6px;
+  padding: 6px 10px 6px 10px;
   gap: 8px;
+  border: 2px solid var(--bg4);
 }
 
 .settings-save-buttons {
@@ -93,6 +94,6 @@
 }
 
 .settings-save-title {
-  font-size: 1.1em;
+  font-size: 1.2em;
   font-weight: 500;
 }
