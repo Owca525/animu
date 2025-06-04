@@ -46,6 +46,25 @@ input[type="number"]::-webkit-outer-spin-button {
   border: 2px solid var(--bg4);
 }
 
+.main-error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.main-error-text {
+  font-size: 2em;
+}
+
+.main-error-button-container {
+  display: flex;
+  gap: 8px;
+}
+
 /* animation */
 @keyframes spin {
   0% {

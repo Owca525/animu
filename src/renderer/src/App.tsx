@@ -20,12 +20,16 @@ import { CheckHistory } from './utils/history/history';
 import { checkUpdate } from './utils/update';
 import { calculateZoomLevel, checkDate } from './utils/functions';
 import i18n from './utils/i18n';
+import ErrorBoundary from './utils/ErrorBoundary';
+import useHotkeys from '@reecelucas/react-use-hotkeys';
 
 LoadConfig()
 
 function App() {
+  useHotkeys("F12", () => window.BrowserWindow.openDevTools())
+
   return (
-    <>
+    <ErrorBoundary>
       <ToastContainer />
       <HashRouter>
         <Suspense fallback={AppLoading()}>
@@ -37,7 +41,7 @@ function App() {
           </Routes>
         </Suspense>
       </HashRouter>
-    </>
+    </ErrorBoundary>
   )
 }
 
