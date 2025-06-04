@@ -163,19 +163,24 @@ async function sendToApi(variable: any): Promise<cardData[]> {
   return []
 }
 
-function getSeasonFromDate(date: Date) {
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
-  if (month >= 12 || month <= 2) {
-    return ["WINTER", year];
-  } else if (month >= 3 && month <= 5) {
-    return ["SPRING", year];
-  } else if (month >= 6 && month <= 8) {
-    return ["SUMMER", year];
-  } else if (month >= 9 && month <= 11) {
-    return ["FALL", year];
+function getSeasonFromDate() {
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const year = now.getFullYear();
+
+  let season;
+
+  if (month >= 1 && month <= 3) {
+    season = "WINTER";
+  } else if (month >= 4 && month <= 6) {
+    season = "SPRING";
+  } else if (month >= 7 && month <= 9) {
+    season = "SUMMER";
+  } else {
+    season = "FALL";
   }
-  return [];
+
+  return { season, seasonYear: year };
 }
 
 async function SearchAnilistApi(text: string, page: number): Promise<void> {
@@ -209,7 +214,7 @@ async function getFullCategory(params, title: string) {
 }
 
 async function CreateHomePage(): Promise<containerData[]> {
-  let season = getSeasonFromDate(new Date())
+  let season = getSeasonFromDate()
   return [
     {
       title: "Trending Now",
@@ -221,8 +226,8 @@ async function CreateHomePage(): Promise<containerData[]> {
       title: "Popular in this Season",
       data: await sendToApi({
         page: 1,
-        season: season[0],
-        seasonYear: season[1],
+        season: season.season,
+        seasonYear: season.seasonYear,
         type: "ANIME"
       }),
       horizontal: true,
