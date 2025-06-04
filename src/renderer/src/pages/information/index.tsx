@@ -169,6 +169,7 @@ function information() {
 
 
                     <div className="information-episodes">
+                     <div className="information-select-episode">:) Placeholder</div>
                         {isLoading == false && data && data.episodesData.length > 0 && anime_data.status != "NOT_YET_RELEASED" && (
                             <>
                                 {data.episodesData.map((episode: { episodes: string[], type: string, name?: string }) => episode.episodes.length > 0 ? (

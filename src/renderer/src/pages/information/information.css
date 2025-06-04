@@ -147,6 +147,11 @@
     gap: 12px;
 }
 
+.information-select-episode {
+    padding: 6px;
+    width: fit-content;
+    margin-top: -20px;
+}
 
 /* For smaller devices / window sizes */
 @media (max-width: 1000px) {

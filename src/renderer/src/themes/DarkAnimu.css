@@ -223,6 +223,12 @@ body {
     border-color: var(--neutral1);
 }
 
+
+.information-select-episode {
+    background-color: var(--bg3);
+    border-radius: 12px;
+}
+
   /* For smaller devices / window sizes */
 @media (max-width: 1000px) {
     .information-top {
