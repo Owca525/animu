@@ -176,9 +176,9 @@ function information() {
                                 ) : "")}
                             </>
                         )}
-                        {isLoading && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
+                        {isLoading && anime_data.status != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
                         {isError && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime dosen't have episodes</div>}
-                        {data && isLoading == false && data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime dosen't have episodes</div>}
+                        {data && data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime dosen't have episodes</div>}
                     </div>
 
                 </div>
