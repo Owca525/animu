@@ -7,15 +7,16 @@ import Dropdown from "./components/dropDown";
 import { useEffect, useState } from "react";
 import Button from "@renderer/components/buttons";
 import { t } from "i18next"
-import { SettingsConfig } from "@renderer/utils/GlobalInterface";
+import { notificationProps, SettingsConfig } from "@renderer/utils/GlobalInterface";
 import { useSelector } from "react-redux";
 import i18n from "i18next"
-import { checkPictureFolder } from "@renderer/utils/config";
+import { checkPictureFolder, saveConfig } from "@renderer/utils/config";
 import { capitalizeFirstLetter, changeTheme, convertKeybinds } from "@renderer/utils/functions";
 import CheckKeybind from "./components/checkKeybind";
 import useHotkeys from "@reecelucas/react-use-hotkeys";
 import { showDialog } from "@renderer/utils/context/DialogContext";
 import store from "@renderer/utils/store";
+import { toast } from "react-toastify";
 
 function settings() {
     const navigate = useNavigate();
@@ -25,6 +26,8 @@ function settings() {
     const [themes, setThemes] = useState<{ label: string, onClick?: () => void }[]>([])
     const [versions] = useState(window.electronAPI.process.versions)
     const [isSaving, setSaving] = useState<boolean>(false)
+
+    console.log(config)
 
     let sidebarData = {
         top: [
@@ -117,11 +120,17 @@ function settings() {
     }
 
     function saveNewConfig() {
-        store.dispatch({ type: "setConfig", payload: config.new })
-        setConfig((prev) => {
-            return { old: structuredClone(prev.new), new: structuredClone(prev.new) }
-        })
-        setSaving(() => false)
+        try {
+            store.dispatch({ type: "setConfig", payload: config.new })
+            setConfig((prev) => {
+                return { old: structuredClone(prev.new), new: structuredClone(prev.new) }
+            })
+            setSaving(() => false)
+            saveConfig(config.new)
+            toast.success(t("settings.saving.done"), notificationProps)
+        } catch (error) {
+            toast.success(t("settings.saving.error"), notificationProps)
+        }
     }
 
     function resetConfig() {

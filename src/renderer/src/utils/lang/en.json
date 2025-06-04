@@ -71,6 +71,10 @@
             "limit": "Limit For History",
             "startsave": "When Start Save History",
             "stopsave": "When Stop save History"
+        },
+        "saving": {
+            "done": "Config has been succesfully saved",
+            "error": "Saving config accure error"
         }
     },
     "player": {
