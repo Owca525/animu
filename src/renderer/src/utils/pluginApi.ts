@@ -19,18 +19,17 @@ export async function setHomeData(func: () => Promise<containerData[]>) {
     }
 }
 
-
-export async function setSearchData(func: () => Promise<containerData>) {
+export async function UpdateHomeData(func: () => Promise<{ data: containerData, maxPage: number }>) {
     try {
         store.dispatch({ type: "setcontainerLoading", payload: true })
         let data = await func()
         let tmp = store.getState().home.data[0]
 
-        if (data.data.length < store.getState().plugin.informationPlugin.information.pageSize) homeStopScrolling(true)
+        if (data.data.data.length < data.maxPage) homeStopScrolling(true)
         
         store.dispatch({
             type: "setAllHomeData", payload: {
-                isLoading: false, isError: false, data: [{ ...data, data: [ ...tmp.data, ...data.data ] }]
+                isLoading: false, isError: false, data: [{ ...data.data, data: [ ...tmp.data, ...data.data.data ] }]
             }
         })
         store.dispatch({ type: "setcontainerLoading", payload: false })

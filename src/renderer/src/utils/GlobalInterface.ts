@@ -75,7 +75,7 @@ export interface containerData {
     title: string
     data: cardData[]
     horizontal?: boolean
-    onScrollDownFunction?: () => void
+    onScrollDownFunction?: (page: number) => void
     onTitleClick?: () => void
 }
 

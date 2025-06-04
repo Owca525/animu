@@ -68,8 +68,17 @@ const Home = () => {
     const handleScroll = () => {
         if (homeCache.data.length > 1) return
         const currentPos = -document.getElementById("scrollID")!.scrollTop + document.getElementById("scrollID")!.scrollHeight
-        const isBottom = document.getElementById("scrollID")!.offsetHeight == currentPos
-        if (isBottom && !homeCache.stopScrolling) {
+        const endPosition = document.getElementById("scrollID")!.offsetHeight
+        const isFUCKINGBottom = parseInt(currentPos.toFixed(0)) <= endPosition+30
+        if (isFUCKINGBottom && homeCache.stopScrolling == false && homeCache.data.length === 1) {
+            console.log(homeCache.data[0])
+            if (homeCache.data[0].onScrollDownFunction) {
+                store.dispatch({ type: "setPage", payload: homeCache.page + 1 })
+                homeCache.data[0].onScrollDownFunction(homeCache.page + 1)
+            }
+            return
+        }
+        if (isFUCKINGBottom && !homeCache.stopScrolling) {
             store.dispatch({ type: "setPage", payload: homeCache.page + 1 })
             plugin.information.search(homeCache.search, homeCache.page + 1)
         }

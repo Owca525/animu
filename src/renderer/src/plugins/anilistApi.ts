@@ -1,5 +1,5 @@
 import { cardData, containerData, pluginFormat } from "@renderer/utils/GlobalInterface";
-import { setHomeData, setSearchData } from "@renderer/utils/pluginApi";
+import { setHomeData, UpdateHomeData } from "@renderer/utils/pluginApi";
 
 const pageSize = 20
 
@@ -195,7 +195,7 @@ async function SearchAnilistApi(text: string, page: number): Promise<void> {
   }
 
   if (page > 1) {
-    setSearchData(async () => data)
+    UpdateHomeData(async () => { return { data: data, maxPage: pageSize } })
   } else {
     setHomeData(async () => [data])
   }
@@ -207,10 +207,21 @@ async function getFullCategory(params, title: string) {
     return [
       {
         title: title,
-        data: data
+        data: data,
+        onScrollDownFunction: (page) => updateCategory(page, params, title)
       }
     ]
   })
+}
+
+async function updateCategory(page: number, variables: any, title: string) {
+  let data = {
+    title: title,
+    data: await sendToApi({ ...variables, page: page }),
+    onScrollDownFunction: (page) => updateCategory(page, variables, title)
+  }
+  console.log(data)
+  UpdateHomeData(async () => { return { data: data, maxPage: pageSize } })
 }
 
 async function CreateHomePage(): Promise<containerData[]> {
@@ -220,7 +231,7 @@ async function CreateHomePage(): Promise<containerData[]> {
       title: "Trending Now",
       data: await sendToApi(tendingAnime),
       horizontal: true,
-      onTitleClick: () => getFullCategory(tendingAnime, "Trending Now")
+      onTitleClick: () => getFullCategory(tendingAnime, "Trending Now"),
     },
     {
       title: "Popular in this Season",
