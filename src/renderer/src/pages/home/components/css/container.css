@@ -53,9 +53,13 @@
 
 .container-left-skip-button {
     left: 0;
+    margin-left: 10px;
+    margin-bottom: 30px;
 }
 .container-right-skip-button{
     right: 0;
+    margin-right: 20px;
+    margin-bottom: 30px;
 }
 
 .button-container {
