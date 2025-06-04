@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { dialogProps } from "../GlobalInterface";
 import Button from "@renderer/components/buttons";
 import "./css/DialogContext.css"
+import { t } from "i18next";
 
 let showDialog: (data: dialogProps) => void = () => { };
 let closeDialog: () => void = () => { };
@@ -37,8 +38,8 @@ const DialogContext: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             </div>
             <div className="dialog-description"></div>
             <div className="dialog-buttons">
-              <Button content="Yes" onClick={() => {data.buttons.yesButton(); closeDialog()}}/>
-              <Button content="No" onClick={() => {data.buttons.noButton(); closeDialog()}}/>
+              <Button content={t("dialog.yes")} onClick={() => {data.buttons.yesButton(); closeDialog()}}/>
+              <Button content={t("dialog.no")} onClick={() => {data.buttons.noButton(); closeDialog()}}/>
             </div>
           </div>
         </main>

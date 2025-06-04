@@ -10,6 +10,12 @@
         "dev": "Developer",
         "minutes": "Minutes"
     },
+    "dialog": {
+        "yes": "Yes",
+        "no": "No",
+        "retry": "Retry",
+        "exit": "Exit"
+    },
     "home": {
         "search": "Search..."
     },
@@ -126,6 +132,7 @@
         "settings": "In Settings",
         "player": "{{title}} Episode {{ep}}"
     },
+    "globalError": "Critical Error has been accured, do you want go home?",
     "lang": {
         "en": "English",
         "pl": "Polish"

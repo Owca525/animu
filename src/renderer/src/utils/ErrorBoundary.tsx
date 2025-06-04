@@ -1,4 +1,5 @@
 import Button from '@renderer/components/buttons';
+import { t } from 'i18next';
 import React from 'react';
 
 interface ErrorBoundaryProps {
@@ -27,10 +28,10 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
         if (this.state.hasError) {
             return (
                 <div className='main-error-container'>
-                    <div className="main-error-text">Critical Error has been accured, do you want go home?</div>
+                    <div className="main-error-text">{t("globalError")}</div>
                     <div className="main-error-button-container">
-                        <Button content='yes' onClick={() => window.location.href = `${window.location.origin}${window.location.pathname}`}/>
-                        <Button content='No' onClick={window.BrowserWindow.exit} />
+                        <Button content={t("dialog.yes")} onClick={() => window.location.href = `${window.location.origin}${window.location.pathname}`}/>
+                        <Button content={t("dialog.no")} onClick={window.BrowserWindow.exit} />
                     </div>
                 </div>
             )

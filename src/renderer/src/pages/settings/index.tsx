@@ -27,8 +27,6 @@ function settings() {
     const [versions] = useState(window.electronAPI.process.versions)
     const [isSaving, setSaving] = useState<boolean>(false)
 
-    console.log(config)
-
     let sidebarData = {
         top: [
             {
