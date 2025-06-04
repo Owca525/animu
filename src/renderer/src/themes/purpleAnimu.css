@@ -1,0 +1,554 @@
+:root {
+  --text: #f2f2f3; /* is used on regular text */
+  --text-gray: #8d8d8d; /* is used in card continue watch */
+
+  /* Background */
+  --bg: #16181d; /* First layer, background only */
+  --bg2: #282b3e; /* Second layer, used in sidebar, header */
+  --bg3: #3c415d; /* Thirt layer, used in button etc */
+  --bg4: #282b3e; /* Fourth layer, used in hover button etc */
+
+  /* accent */
+  --neutral1: var(--text); /* is using on outline, border-color etc */
+  --neutral2: #4e59b1; /* not used */
+  --neutral3: #3e488e; /* not used */
+
+  /* player */
+  --playerbg: rgba(0, 0, 0); /* is used in video container */
+  --playertext: var(--text);
+  --playertext-gray: gray;
+  --playerbg3: var(--bg3);
+  --playerneutral1: var(--neutral1);
+  --playerbutton: rgba(0, 0, 0, 0); /* is used in player button */
+  --playerbutton2: rgba(150, 150, 150, 0.3); /* is used in player button */
+  --playervolumebar: rgba(255, 255, 255, 0.3);
+  --playervolumebar1: #5962a6;
+  
+  /* player seekbar */
+  --seekbarbg3: var(--bg3);
+  --seekbarbg4: var(--bg4);
+  --seekbarneutral1: var(--neutral1);
+  
+  /* ::selection color */
+  --selectioncolor: var(--neutral1);
+}
+
+
+/* App */
+
+::selection {
+  background-color: var(--selectioncolor);
+}
+
+* {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  color: var(--text);
+  background-color: var(--bg);
+}
+
+::-webkit-scrollbar {
+  background-color: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: var(--bg3);
+}
+
+.Toastify__toast {
+  background-color: var(--bg2);
+  border-radius: 12px;
+  color: var(--text);
+  border: 2px solid var(--bg4);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+/* DialogContext */
+
+.dialog-main-background {
+  background-color: rgb(0, 0, 0, 0.5);
+}
+
+.dialog-container {
+    background-color: var(--bg2);
+    border-radius: 12px;
+}
+
+
+/* Buttons */
+
+.button {
+    border: none;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 8px;
+
+    background-color: var(--bg3);
+    border-color: var(--bg3);
+    color: var(--text);
+}
+
+.button:hover {
+    border-color: var(--neutral1);
+}
+
+
+/* Input */
+
+.input {
+    /*border: none;*/
+    border-radius: 8px;
+    background-color: var(--bg3);
+    color: var(--text);
+    border: 2px solid var(--bg3);
+    transition: all 0.1s ease;
+}
+
+.input:hover {
+    border-color: var(--neutral1);
+}
+
+.input:focus {
+    border-color: var(--neutral1);
+}
+
+
+/* Sidebar */
+
+.sidebar-container-min, .sidebar-container-max  {
+    background-color: var(--bg2);
+}
+
+.sidebar-black-line {
+    background-color: var(--bg);
+    border-radius: 12px;
+}
+
+.sidebar-logo-icon-container {
+    background-color: var(--bg2);
+}
+
+
+/* Home */
+
+.home-header {
+    background-color: var(--bg2);
+}
+
+
+/* Cards */
+
+.card-container:hover {
+    background-color: var(--bg4);
+    border-radius: 8px;
+}
+
+
+.card-image, .card-image-placeholder {
+    border-radius: 8px;
+}
+
+.card-image-placeholder {
+    background-color: var(--bg3);
+}
+
+.card-delete-icon {
+  background-color: var(--bg3);
+  border-radius: 50%;
+}
+
+.card-delete-icon:hover {
+    background-color: var(--bg4);
+}
+
+
+/* Container */
+
+.container-title, .container-title-click {
+    border-radius: 12px;
+}
+
+.container-title-click:hover {
+    background-color: var(--bg3);
+}
+
+
+/* Information */
+
+.information {
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+.information-top {
+    background-color: var(--bg2);
+    border-radius: 16px;
+}
+
+.information-cover {
+    border-radius: 16px;
+}
+
+.information-info {
+    background-color: var(--bg2);
+    border-radius: 16px;
+}
+
+.information-info-content {
+    background-color: var(--bg3);
+    border-radius: 10px;
+}
+
+.information-episodes {
+    background-color: var(--bg2);
+    border-radius: 16px;
+}
+
+.information-exit-button {
+    border-radius: 50%;
+}
+
+.information-episode-button {
+    background-color: var(--bg4);
+    border-radius: 8px;
+    border: 2px solid var(--bg4);
+}
+
+.information-episode-button:hover {
+    border-color: var(--neutral1);
+}
+
+  /* For smaller devices / window sizes */
+@media (max-width: 1000px) {
+    .information-top {
+        border-radius: 0px;
+    }
+
+    .information-info {
+        border-radius: 0px;
+    }
+
+    .information-info-content {
+        border-radius: 10px;
+    }
+}
+
+  /* for smartphones */
+@media (max-width: 600px) {
+    .information-info-content {
+        border-radius: 10px;
+    }
+  }
+  
+
+/* Drop */
+
+.drop-button {
+    background-color: var(--bg3);
+    border-radius: 12px;
+}
+
+.drop-content {
+    background-color: var(--bg3);
+    border-radius: 12px;
+
+    border-top: 0px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+
+    border: 2px solid var(--bg4);
+    border-width: 2px 0px 0px 0px;
+}
+
+.active-drop {
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+
+/* DeveloperStats */
+
+.player-dev-container {
+  background-color: color-mix(in srgb, var(--bg3) 80%, transparent);
+  border-radius: 12px;
+}
+
+
+/* ExternalPlayer */
+
+.external-player-container {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+.external-title {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+
+/* Settings */
+
+.settings-page-container {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+.settings-line {
+  background-color: var(--bg3);
+  border-radius: 8px;
+}
+
+.settings-text-space {
+  background-color: var(--bg3);
+  border-radius: 12px;
+}
+
+.settings-save-content {
+  background-color: var(--bg2);
+  border-radius: 12px;
+  border: 2px solid var(--bg4);
+}
+
+
+/* Checkbox */
+
+.checkbox {
+    background-color: var(--bg3);
+    box-shadow: inset 0 0 5px rgb(0, 0, 0, 0.2);
+    border-radius: 20px;
+}
+
+.checkbox::before {
+    border-radius: 20px;
+    background-color: var(--text);
+    box-shadow: 0 2px 5px rgb(0, 0, 0, 0.2);
+}
+
+.checkbox:checked {
+    background-color: var(--neutral1);
+}
+
+
+/* CheckKeybind */
+
+.settings-keybind-check , .settings-keybind-check-active {
+    background-color: var(--bg3);
+    border-radius: 12px;
+    border: 2px solid var(--bg3);
+    color: var(--text);
+}
+
+.settings-keybind-check:hover {
+    background-color: var(--bg4);
+}
+
+.settings-keybind-check-active {
+    border-color: var(--neutral1);
+    background-color: var(--bg4);
+}
+
+
+/* DropDown */
+
+.dropdown-button {
+  border-radius: 8px;
+  border: 2px solid var(--bg3);
+  background-color: var(--bg3);
+}
+
+.dropdown-menu {
+  border-radius: 7px;
+  background-color: var(--bg2);
+}
+
+.dropdown-item {
+  background-color: var(--bg3);
+  border-radius: 6px;
+}
+
+
+/* SettingsInput */
+
+.settings-input-container {
+    border-radius: 12px;
+    background-color: var(--bg3);
+}
+
+.settings-input-field {
+    background-color: var(--bg3);
+    color: var(--text);
+    border-radius: 12px 0px 0px 12px;
+    border: 2px solid var(--bg3);
+    border-right: 0px;
+}
+
+.settings-input-type {
+    background-color: var(--bg3);
+    color: var(--text);
+    border-radius: 0px 12px 12px 0px;
+    border: 2px solid var(--bg3);
+    border-left: 0px;
+}
+
+.settings-input-container:hover .settings-input-type,
+.settings-input-container:hover .settings-input-field {
+    background-color: var(--bg4);
+}
+
+.settings-input-field:focus,
+.settings-input-field:active,
+.settings-input-field:focus~.settings-input-type,
+.settings-input-field:active~.settings-input-type {
+    border-color: var(--neutral1);
+}
+
+
+/* Player */
+
+.player-video-container {
+  background-color: var(--playerbg);
+  color: var(--playertext);
+}
+
+.player-mask {
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 1) 10%,
+    rgba(0, 0, 0, 0.5)
+  );
+}
+
+.player-time-display {
+  border-radius: 5px;
+  background-color: color-mix(in srgb, var(--playerbg3) 80%, transparent);
+  color: var(--playertext);
+}
+
+.player-buttons {
+  border: none;
+  border: 2px solid var(--playerbutton);
+  background-color: var(--playerbutton);
+  color: var(--playertext);
+}
+
+.player-buttons:hover {
+  background-color: var(--playerbg3);
+  border-color: var(--playerneutral1);
+  color: var(--playertext);
+}
+
+.player-loading-container {
+  border-radius: 12px;
+  background-color: color-mix(in srgb, var(--playerbg3) 80%, transparent);
+}
+
+.player-title {
+  border-radius: 4px;
+  background-color: color-mix(in srgb, var(--playerbg3) 80%, transparent);
+  color: var(--playertext);
+}
+
+.player-show-time {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.player-volume-bar {
+  border-radius: 5px;
+  background-color: var(--playervolumebar);
+}
+
+.player-volume-bar::-webkit-slider-thumb {
+  background-color: var(--playervolumebar1);
+  border-radius: 50%;
+}
+
+.player-settings-container {
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: var(--playertext);
+}
+
+.player-settings-button {
+  border-radius: 8px;
+  color: var(--playertext);
+}
+
+.player-settings-button:hover, .player-settings-button-back:hover {
+  background-color: var(--playerbutton2);
+}
+
+.player-settings-button-back {
+  border-radius: 8px;
+}
+
+.player-up-Next-container {
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 1em;
+  color: var(--playertext);
+}
+
+.player-up-Next-Button {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.player-settings-button-text-gray {
+  color: var(--playertext-gray);
+}
+
+/* nerdStats */
+
+.player-nerd-container {
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 12px;
+  color: var(--playertext);
+}
+
+
+/* SeekBar */
+
+.seekBar-container {
+    background-color: color-mix(in srgb, var(--bg4) 70%, transparent);
+    border-radius: 12px;
+}
+
+.seekbar-thumb {
+    border-radius: 50%;
+}
+
+.seekbar-box {
+    background-color: color-mix(in srgb, var(--bg3) 80%, transparent);
+    border-radius: 12px;
+}
+
+.seekbar-thumb, .seekbar-progress, .seekbar-box.progress {
+  background-color: var(--neutral1);
+  border-radius: 12px;
+}
+
+  /* player seekbar */
+.video-bottom .seekBar-container {
+    background-color: color-mix(in srgb, var(--seekbarbg4) 70%, transparent);
+    border-radius: 12px;
+}
+
+.video-bottom .seekbar-thumb {
+    border-radius: 50%;
+}
+
+.video-bottom .seekbar-box {
+    background-color: color-mix(in srgb, var(--seekbarbg3) 80%, transparent);
+    border-radius: 12px;
+}
+
+.video-bottom .seekbar-thumb, .seekbar-progress, .seekbar-box.progress {
+  background-color: var(--seekbarneutral1);
+  border-radius: 12px;
+}
