@@ -33,6 +33,10 @@
 
 /* App */
 
+::selection {
+  background-color: var(--neutral1);
+}
+
 * {
   font-family: Arial, Helvetica, sans-serif;
 }
