@@ -60,10 +60,10 @@ export function formatTime(seconds: number | undefined): string {
 
 export async function changeTheme(name: string) {
     const themes = await window.api.getlistThemes()
-    themes.forEach((elememnt) => {
-        if (elememnt.filename.replace(".css", "") === name) {
+    themes.forEach((element) => {
+        if (element.filename.replace(".css", "") === name) {
             let link = document.getElementById("theme-stylesheet") as HTMLLinkElement
-            if (link) link.href = elememnt.path
+            if (link) link.href = element.path
         }
     })
 }
