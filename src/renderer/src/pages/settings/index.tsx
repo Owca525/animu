@@ -11,12 +11,13 @@ import { notificationProps, SettingsConfig } from "@renderer/utils/GlobalInterfa
 import { useSelector } from "react-redux";
 import i18n from "i18next"
 import { checkPictureFolder, saveConfig } from "@renderer/utils/config";
-import { capitalizeFirstLetter, changeTheme, convertKeybinds } from "@renderer/utils/functions";
+import { calculateZoomLevel, capitalizeFirstLetter, changeTheme, convertKeybinds } from "@renderer/utils/functions";
 import CheckKeybind from "./components/checkKeybind";
 import useHotkeys from "@reecelucas/react-use-hotkeys";
 import { showDialog } from "@renderer/utils/context/DialogContext";
 import store from "@renderer/utils/store";
 import { toast } from "react-toastify";
+import SeekBar from "@renderer/components/seekBar";
 
 function settings() {
     const navigate = useNavigate();
@@ -143,6 +144,10 @@ function settings() {
         handleChange("General.language", lang)
     }
 
+    function setDynamicZoom(value: number) {
+        window.BrowserWindow.setZoom(calculateZoomLevel(value))
+    }
+
     return (
         <main className="settings-container">
             <Sidebar
@@ -237,12 +242,11 @@ function settings() {
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.general.zoom")}
-                                <SettingsInput
-                                    iconChar="%"
-                                    type="number"
-                                    onKeyDown={(text) => handleChange("General.Window.Zoom", parseInt(text))}
-                                    startValue={config.new.General.Window.Zoom.toString()}
-                                />
+                                <div className="settings-setting-seekbar-container">
+                                    <span>50%</span>
+                                    <SeekBar maxValue={200} minValue={50} type="procent" currentValue={config.new.General.Window.Zoom} onSeek={(value) => {handleChange("General.Window.Zoom", value); setDynamicZoom(value)}} />
+                                    <span>200%</span>
+                                </div>
                             </div>
                         </div>
                     </>

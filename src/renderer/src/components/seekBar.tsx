@@ -5,15 +5,17 @@ import "./css/seekBar.css"
 
 interface SeekBarProps {
   maxValue: number | undefined;
+  minValue?: number;
   currentValue: number | undefined;
   onSeek: (value: number) => void;
-  type?: "value" | "float" | "time"
+  type?: "value" | "float" | "time" | "procent"
   classes?: { container?: string, progress?: string, thumb?: string, box?: string }
   screen?: boolean
 }
 
 const SeekBar: React.FC<SeekBarProps> = ({
   maxValue,
+  minValue = 0,
   currentValue,
   onSeek,
   type = "value",
@@ -34,54 +36,54 @@ const SeekBar: React.FC<SeekBarProps> = ({
     updateSeekBar(value)
   }, [currentValue]);
 
-  function updateSeekBar(value: number | undefined) {
-    if (!seekBarProgress.current) return
-    if (!seekbarThumb.current) return
-    if (!seekbarBox.current) return
-    if (!value) return
-    if (!maxValue) return
+  function updateSeekBar(val: number | undefined) {
+    if (!seekBarProgress.current || !seekbarThumb.current || !seekbarBox.current) return;
+    if (val === undefined || maxValue === undefined) return;
 
-    const percent = (value / maxValue) * 100
-    seekBarProgress.current.style.width = `${percent}%`
-    seekbarThumb.current.style.left = `${percent}%`
+    const clampedVal = Math.max(minValue, Math.min(val, maxValue));
+    const percent = ((clampedVal - minValue) / (maxValue - minValue)) * 100;
+    seekBarProgress.current.style.width = `${percent}%`;
+    seekbarThumb.current.style.left = `${percent}%`;
   }
 
   function setPosition(event: React.MouseEvent<HTMLDivElement> | MouseEvent) {
-    if (!maxValue) return
-    if (seekBarRef.current) {
-      const rect = seekBarRef.current.getBoundingClientRect();
-      const offsetX = event.clientX - rect.left;
-      const newTime = (offsetX / rect.width) * maxValue;
-      if (newTime >= 0 && newTime <= maxValue) {
-        setValue(newTime);
-        onSeek(newTime);
-        updateSeekBar(newTime)
-      }
+    if (!maxValue || !seekBarRef.current) return;
+
+    const rect = seekBarRef.current.getBoundingClientRect();
+    const offsetX = event.clientX - rect.left;
+    const newValue = (offsetX / rect.width) * (maxValue - minValue) + minValue;
+
+    if (newValue >= minValue && newValue <= maxValue) {
+      setValue(newValue);
+      onSeek(newValue);
+      updateSeekBar(newValue);
     }
   }
 
   function setPositionBox(event: React.MouseEvent<HTMLDivElement> | MouseEvent) {
-    if (!maxValue) {
-      setshow(() => false)
-      return
+    if (!maxValue || !seekBarRef.current || !seekbarBox.current) {
+      setshow(false);
+      return;
     }
-    if (!seekbarBox.current) return
-    if (!seekBarRef.current) return
 
     const rect = seekBarRef.current.getBoundingClientRect();
     const offsetX = event.clientX - rect.left;
-    const newTime = (offsetX / rect.width) * maxValue;
-    if (!(newTime >= 0 && newTime <= maxValue)) return
+    const newValue = (offsetX / rect.width) * (maxValue - minValue) + minValue;
 
-    seekbarBox.current.style.left = `${newTime / maxValue * 100}%`
+    if (newValue < minValue || newValue > maxValue) return;
+
+    const percent = ((newValue - minValue) / (maxValue - minValue)) * 100;
+    seekbarBox.current.style.left = `${percent}%`;
+
     if (screen) {
-      if (newTime / maxValue * 100 > 98) seekbarBox.current.style.left = `98%`
-      if (newTime / maxValue * 100 < 1.5) seekbarBox.current.style.left = `1.5%`
+      if (percent > 98) seekbarBox.current.style.left = `98%`;
+      if (percent < 1.5) seekbarBox.current.style.left = `1.5%`;
     }
 
-    if (type === "value") seekbarBox.current.innerHTML = newTime.toFixed(0)
-    if (type === "float") seekbarBox.current.innerHTML = newTime.toFixed(1)
-    if (type === "time") seekbarBox.current.innerHTML = formatTime(newTime)
+    if (type === "value") seekbarBox.current.innerHTML = newValue.toFixed(0);
+    if (type === "float") seekbarBox.current.innerHTML = newValue.toFixed(1);
+    if (type === "time") seekbarBox.current.innerHTML = formatTime(newValue);
+    if (type === "procent") seekbarBox.current.innerHTML = `${newValue.toFixed(0)}%`
   }
 
   function handleMouseMove(event: React.MouseEvent<HTMLDivElement> | MouseEvent) {
