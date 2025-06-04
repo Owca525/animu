@@ -60,9 +60,16 @@ async function LoadConfig() {
   const loadedConnfig = await readConfig()
 
   // Loading theme
+  const themes = await window.api.getlistThemes()
+  let path: string = themes[0].path
+  themes.forEach((element) => {
+    if (element.filename.replace(".css", "") == loadedConnfig.General.theme) path = element.path
+  })
+
   const link = document.createElement('link');
   link.id = 'theme-stylesheet';
   link.rel = 'stylesheet';
+  link.href = path;
   document.head.appendChild(link);
 
   i18n.changeLanguage(loadedConnfig.General.language)

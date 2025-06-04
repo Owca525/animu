@@ -107,7 +107,7 @@ function settings() {
 
     useEffect(() => {
         window.api.getlistThemes().then((data) => {
-            let themes = data.map((element) => { return { label: element.filename.replace(".css", ""), onClick: () => changeTheme(element.filename.replace(".css", "")) } })
+            let themes = data.map((element) => { return { label: element.filename.replace(".css", ""), onClick: () => {changeTheme(element.filename.replace(".css", ""));handleChange("General.theme", element.filename.replace(".css", ""))} } })
             setThemes(() => themes)
         })
         window.api.rpc.setActivity(undefined, t("discordrpc.settings"))
@@ -190,7 +190,7 @@ function settings() {
                                 {t("settings.general.theme")}
                                 <Dropdown
                                     options={themes}
-                                    placeholder="DarkAnimu"
+                                    placeholder={config.new.General.theme}
                                 />
                             </div>
                         </div>
