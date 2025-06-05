@@ -496,13 +496,15 @@ body {
 }
 
 .player-up-Next-container {
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: color-mix(in srgb, var(--playerbg3) 70%, transparent);
   border-radius: 1em;
+  border-color: var(--bg4);
   color: var(--playertext);
 }
 
 .player-up-Next-Button {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: color-mix(in srgb, var(--bg3) 80%, transparent);
+  border-color: var(--bg4);
 }
 
 .player-settings-button-text-gray {
@@ -512,7 +514,7 @@ body {
 /* nerdStats */
 
 .player-nerd-container {
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: color-mix(in srgb, var(--playerbg3) 70%, transparent);
   border-radius: 12px;
   color: var(--playertext);
 }
