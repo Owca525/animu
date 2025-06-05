@@ -244,7 +244,7 @@ function settings() {
                                 {t("settings.general.zoom")}
                                 <div className="settings-setting-seekbar-container">
                                     <span>50%</span>
-                                    <SeekBar maxValue={200} minValue={50} type="procent" currentValue={config.new.General.Window.Zoom} onSeek={(value) => {handleChange("General.Window.Zoom", value); setDynamicZoom(value)}} />
+                                    <SeekBar maxValue={200} minValue={50} type="procent" currentValue={config.new.General.Window.Zoom} onSeek={(value) => {handleChange("General.Window.Zoom", parseInt(value.toFixed(0))); setDynamicZoom(parseInt(value.toFixed(0)))}} />
                                     <span>200%</span>
                                 </div>
                             </div>
