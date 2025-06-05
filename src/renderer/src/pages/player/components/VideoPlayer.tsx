@@ -409,7 +409,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         const context = canvasRef.current.getContext('2d');
 
         if (context == null) {
-            toast.error(t("toast.screenshotFail"), notificationProps);
+            toast.error(t("player.toastscreenshot.failed"), notificationProps);
             return
         }
 
@@ -419,7 +419,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         const screenshot = canvasRef.current.toDataURL('image/png');
 
         if (screenshot == "data:,") {
-            toast.error(t("toast.screenshotFail"), notificationProps);
+            toast.error(t("player.toastscreenshot.failed"), notificationProps);
             return
         }
         console.log(config.Player.screenShot.path == "Both")
@@ -430,17 +430,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     'image/png': blob,
                 }),
             ]);
-            toast.success("Image Saved To the Clipboard Succesfull", notificationProps);
+            toast.success(t("player.toastscreenshot.doneclip"), notificationProps);
             if (config.Player.screenShot.saveType == "Clipboard") return
         }
 
         if (config.Player.screenShot.alwaysAsk) var resp = await window.api.os.saveDialog(`${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot.replace(/^data:image\/png;base64,/, ''), `screenshot${formatedDate}.png`, "png", ["PNG"], "base64")
         else var resp = await window.api.os.write(`${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot.replace(/^data:image\/png;base64,/, ''), "base64")
         if (resp) {
-            toast.success(t("toast.screenshot", { path: config.Player.screenShot.path }), notificationProps);
+            toast.success(t("player.toastscreenshot.donefile", { path: config.Player.screenShot.path }), notificationProps);
             return;
         }
-        toast.error(t("toast.screenshotFail"), notificationProps);
+        toast.error(t("player.toastscreenshot.failed"), notificationProps);
         return;
     };
 
