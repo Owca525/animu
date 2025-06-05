@@ -18,7 +18,8 @@
         "reset": "Reset"
     },
     "home": {
-        "search": "Search..."
+        "search": "Search...",
+        "nothingfound": "Where did it all go?"
     },
     "information": {
         "airing": "Aring Episode",
