@@ -5,12 +5,16 @@ import { useState } from "react"
 import { t } from "i18next"
 import { useSelector } from "react-redux"
 
-const Card: React.FC<cardData> = ({ AnimeData, saveData, deletionCard }) => {
+const Card: React.FC<cardData> = ({ AnimeData, saveData, deletionCard, onClick }) => {
   const navigate = useNavigate()
   const [isLoading, setLoading] = useState<boolean>(true)
   const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
 
   async function sendToInformation() {
+    if (onClick) {
+      onClick(AnimeData)
+      return
+    }
     if (saveData && saveData.episode != "" && saveData.last_Time != 0 && saveData.type != "") {
       console.log(AnimeData, saveData)
       navigate("/player", {

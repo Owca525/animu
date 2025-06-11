@@ -151,6 +151,14 @@
     padding: 6px;
     width: fit-content;
     margin-top: -20px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.information-select-episode:hover {
+    background-color: var(--bg4);
 }
 
 /* For smaller devices / window sizes */

@@ -9,16 +9,18 @@ import useHotkeys from "@reecelucas/react-use-hotkeys";
 import { useQuery } from "react-query";
 import { useSelector } from "react-redux";
 import Drop from "./components/drop";
+import ContainerWrong from "./components/containerWrong";
 
 function information() {
     const navigate = useNavigate()
     const location = useLocation();
     const anime_data: AnimeData = location.state;
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
-    const func = async () => await pluginPlayer.player.animeDataList(anime_data.title)
+    const [showWrong, setshowWrong] = useState<boolean>(false)
+    const [func, setfunc] = useState(async () => await pluginPlayer.player.animeDataList(anime_data.title))
     const { data, isError, isLoading } = useQuery(
         [func.toString()],
-        func,
+        () => func,
         {
             refetchOnWindowFocus: false,
             cacheTime: 0,
@@ -82,7 +84,7 @@ function information() {
         console.log(anime_data)
     })
 
-    console.log(data)
+    // console.log(data)
 
     return (
         <main className="information">
@@ -169,24 +171,27 @@ function information() {
 
 
                     <div className="information-episodes">
-                     {/* <div className="information-select-episode">:) Placeholder</div> */}
-                        {isLoading == false && data && data.episodesData.length > 0 && anime_data.status != "NOT_YET_RELEASED" && (
+                        <div className="information-select-episode" onClick={() => setshowWrong(() => true)}><span className="material-symbols-outlined">search</span>This is wrong Anime?</div>
+                        {showWrong == false &&
                             <>
-                                {data.episodesData.map((episode: { episodes: string[], type: string, name?: string }) => episode.episodes.length > 0 ? (
-                                    <Drop LeftHeader={episode.name ? episode.name : episode.type} RightHeader={`${episode.episodes.length} episodes`} content={makeButtons(episode.episodes, episode.type)}/>
-                                ) : "")}
-                            </>
-                        )}
-                        {isLoading && anime_data.status != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
-                        {isError && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime dosen't have episodes</div>}
-                        {data && (data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime dosen't have episodes</div>}
+                                {isLoading == false && data && data.episodesData.length > 0 && anime_data.status != "NOT_YET_RELEASED" && (
+                                    <>
+                                        {data.episodesData.map((episode: { episodes: string[], type: string, name?: string }) => episode.episodes.length > 0 ? (
+                                            <Drop LeftHeader={episode.name ? episode.name : episode.type} RightHeader={`${episode.episodes.length} episodes`} content={makeButtons(episode.episodes, episode.type)} />
+                                        ) : "")}
+                                    </>
+                                )}
+                                {isLoading && anime_data.status != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
+                                {isError && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime dosen't have episodes</div>}
+                                {data && (data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime dosen't have episodes</div>}
+                            </>}
                     </div>
 
                 </div>
             </div>
 
             <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
-
+            {showWrong && <ContainerWrong name={anime_data.title} func={setfunc} />}
         </main>
     )
 }
