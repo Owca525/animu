@@ -2,6 +2,7 @@ import React from 'react'
 import Container from '../../home/components/container'
 import { useSelector } from 'react-redux';
 import { useQuery } from 'react-query';
+import './css/containerWrong.css'
 
 interface containerwrongprops {
     name: string,
