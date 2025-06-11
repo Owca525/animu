@@ -2,6 +2,7 @@
 
 import { convertMsToMinutes, similarityText } from "@renderer/utils/functions"
 import { cardData, playerData, pluginFormat } from "@renderer/utils/GlobalInterface"
+import { setHomeData, UpdateHomeData } from "@renderer/utils/pluginApi"
 
 const HASH_SEARCH = '06327bc10dd682e1ee7e07b6db9c16e9ad2fd56c1b769e47513128cd5c9fc77a'
 const HASH_INFO = '9d7439c90f203e534ca778c4901f9aa2d3ad42c06243ab2c5e6b79612af32028'
@@ -116,16 +117,46 @@ function converterData(data: any): cardData {
   }
 }
 
-// export async function getRecentAnime() {
-//   let variables = `{"search":{"sortBy":"Recent"},"limit":26,"page":1,"translationType":"sub","countryOrigin":"JP"}`
-//   let extensions = `{"persistedQuery":{"version":1,"sha256Hash": "${HASH_SEARCH}"}}`
-//   let url = API_WEB + `/api?variables=${variables}&extensions=${extensions}`
+export async function recentAnime(page: number = 1) {
+  let variables = `{"search":{"sortBy":"Recent"},"limit":26,"page":${page},"translationType":"sub","countryOrigin":"JP"}`
+  let anime = await sendToAPI(variables, HASH_SEARCH, header)
+  console.log(variables, anime, page)
+  if (page && page > 1) {
+    await UpdateHomeData(async () => {
+      return {
+        data: {
+          title: "Recent Anime",
+          data: anime.data.shows.edges.map((data) => converterData(data)),
+          onScrollDownFunction: (page) => recentAnime(page)
+        },
+        maxPage: 26
+      }
+    })
+    return
+  }
 
-//   const resp = await sendToAPI(url, header)
-//   console.log(resp)
-//   if (resp) return resp.data
-//   return null
-// }
+  if (anime == null) {
+    await setHomeData(async () => {
+      return [
+        {
+          title: "Recent Anime",
+          data: []
+        }
+      ]
+    })
+    return
+  }
+
+  await setHomeData(async () => {
+    return [
+      {
+        title: "Recent Anime",
+        data: anime.data.shows.edges.map((data) => converterData(data)),
+        onScrollDownFunction: (page) => recentAnime(page)
+      }
+    ]
+  })
+}
 
 async function getAnimeList(name: string): Promise<cardData[]> {
   let data = await SearchAnime(name)
@@ -147,7 +178,7 @@ export async function getInformation(name?: string, anime_id?: string): Promise<
     let card = data.filter((item: cardData) => item.AnimeData.title == anime_name.name)[0];
     anime_id = card.AnimeData.player_ID ? card.AnimeData.player_ID : "";
   };
-  if (anime_id == "") return { player_id: "", episodesData: []};
+  if (anime_id == "") return { player_id: "", episodesData: [] };
 
   let variables = `{"_id":"${anime_id}"}`;
   const resp = await sendToAPI(variables, HASH_INFO, header);
@@ -238,5 +269,6 @@ export const infoPluginPlayer: pluginFormat = {
     getUrls: extractURLS,
     episodeList: getEpisodeList,
     animeList: getAnimeList
-  }
+  },
+  sidebarAddon: [{ icon: "today", text: "Recent Anime", onClick: async () => await recentAnime() }]
 }

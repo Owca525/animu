@@ -18,8 +18,9 @@ const Home = () => {
     const navigate = useNavigate()
     const plugin = useSelector((plugin: any) => plugin.plugin.informationPlugin);
     const homeCache: homeData = useSelector((cache: any) => cache.home);
+    const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
 
-    const sidebarData = {
+    let sidebarData = {
         top: [
             {
                 icon: "home",
@@ -39,6 +40,13 @@ const Home = () => {
                 onClick: () => navigate("/settings")
             }
         ]
+    }
+
+    if (pluginPlayer.sidebarAddon) {
+        sidebarData = {
+            bottom: [...sidebarData.bottom],
+            top: [...sidebarData.top, ...pluginPlayer.sidebarAddon]
+        }
     }
 
     useEffect(() => {
@@ -69,7 +77,7 @@ const Home = () => {
         if (homeCache.data.length > 1) return
         const currentPos = -document.getElementById("scrollID")!.scrollTop + document.getElementById("scrollID")!.scrollHeight
         const endPosition = document.getElementById("scrollID")!.offsetHeight
-        const isFUCKINGBottom = parseInt(currentPos.toFixed(0)) <= endPosition+30
+        const isFUCKINGBottom = parseInt(currentPos.toFixed(0)) <= endPosition + 30
         if (isFUCKINGBottom && homeCache.stopScrolling == false && homeCache.data.length === 1) {
             console.log(homeCache.data[0])
             if (homeCache.data[0].onScrollDownFunction) {

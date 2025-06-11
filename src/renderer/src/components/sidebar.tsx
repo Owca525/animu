@@ -3,6 +3,7 @@ import Button from "./buttons"
 import "./css/sidebar.css"
 import useHotkeys from "@reecelucas/react-use-hotkeys"
 import icon from "../../../../resources/icon.png"
+import { sidebarData } from "@renderer/utils/GlobalInterface"
 
 interface sidebarProps {
     showLogo?: boolean
@@ -12,16 +13,8 @@ interface sidebarProps {
         sidebar?: string
     }
     data: {
-        top: {
-            icon: string
-            text: string
-            onClick?: () => any
-        }[]
-        bottom: {
-            icon: string
-            text: string
-            onClick?: () => any
-        }[]
+        top: sidebarData[]
+        bottom: sidebarData[]
     }
 }
 

@@ -55,7 +55,7 @@ export interface homeData {
 export interface playerData {
     hostname: string
     hls: boolean
-    resolution: { res: string, url: string}[]
+    resolution: { res: string, url: string }[]
 }
 
 export interface indentityPlayer {
@@ -80,6 +80,12 @@ export interface containerData {
     onTitleClick?: () => void
 }
 
+export interface sidebarData {
+    icon: string
+    text: string
+    onClick?: () => any
+}
+
 export interface pluginFormat {
     version: string
     name: string
@@ -95,6 +101,7 @@ export interface pluginFormat {
         episodeList: (type: string, anime_id: string) => Promise<Array<string> | null>
         animeList: (name: string) => Promise<cardData[]>
     } | null
+    sidebarAddon?: sidebarData[]
 }
 
 export interface SettingsConfig {
