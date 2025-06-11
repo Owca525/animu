@@ -10,6 +10,7 @@ import { t } from "i18next";
 
 import "./player.css"
 import { SaveHistory } from "@renderer/utils/history/history";
+import { refetchHistory } from "@renderer/utils/functions";
 
 const VideoPlayer = lazy(() => import('./components/VideoPlayer'));
 // const ExternalPlayer = lazy(() => import('./externalPlayer'));
@@ -64,6 +65,7 @@ const player = () => {
                 ...anime_data.data.AnimeData
             }
         })
+        refetchHistory()
     }, [extractionData])
 
     useHotkeys("Escape", () => {

@@ -14,7 +14,7 @@ const DeveloperStats = lazy(() => import('./developerStats'));
 // css
 import { cardData, notificationProps, playerData, SettingsConfig } from "@renderer/utils/GlobalInterface"
 import { useSelector } from "react-redux"
-import { formatTime } from "@renderer/utils/functions"
+import { formatTime, refetchHistory } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
 import { DeleteFromContinue, SaveContinue } from "@renderer/utils/history/continueWatch"
@@ -260,6 +260,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 }
             })
         }
+        refetchHistory()
     }
 
     function updateProgress() {

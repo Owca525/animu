@@ -1,3 +1,10 @@
+import { t } from "i18next";
+import { homeData } from "./GlobalInterface";
+import store from "./store";
+import { setHomeData } from "./pluginApi";
+import { ReadContinue } from "./history/continueWatch";
+import { ReadHistory } from "./history/history";
+
 export function decodeHtmlEntities(str: string) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(str, 'text/html');
@@ -88,33 +95,68 @@ export function convertKeybinds(inputString: string) {
 }
 
 export function similarityText(text1: string, text2: string): number {
-  const len1 = text1.length;
-  const len2 = text2.length;
+    const len1 = text1.length;
+    const len2 = text2.length;
 
-  const dp: number[][] = Array.from({ length: len1 + 1 }, () =>
-    Array(len2 + 1).fill(0)
-  );
+    const dp: number[][] = Array.from({ length: len1 + 1 }, () =>
+        Array(len2 + 1).fill(0)
+    );
 
-  for (let i = 0; i <= len1; i++) dp[i][0] = i;
-  for (let j = 0; j <= len2; j++) dp[0][j] = j;
+    for (let i = 0; i <= len1; i++) dp[i][0] = i;
+    for (let j = 0; j <= len2; j++) dp[0][j] = j;
 
-  for (let i = 1; i <= len1; i++) {
-    for (let j = 1; j <= len2; j++) {
-      if (text1[i - 1] === text2[j - 1]) {
-        dp[i][j] = dp[i - 1][j - 1];
-      } else {
-        dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
-      }
+    for (let i = 1; i <= len1; i++) {
+        for (let j = 1; j <= len2; j++) {
+            if (text1[i - 1] === text2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1];
+            } else {
+                dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+            }
+        }
     }
-  }
 
-  const maxLen = Math.max(len1, len2);
-  const distance = dp[len1][len2];
-  const similarity = ((maxLen - distance) / maxLen) * 100;
+    const maxLen = Math.max(len1, len2);
+    const distance = dp[len1][len2];
+    const similarity = ((maxLen - distance) / maxLen) * 100;
 
-  return Math.round(similarity * 100) / 100;
+    return Math.round(similarity * 100) / 100;
 }
 
 export function convertMsToMinutes(ms: number): number {
-  return Math.floor(ms / 60000);
+    return Math.floor(ms / 60000);
+}
+
+export async function refetchHistory() {
+    let data: homeData = store.getState().home
+    if (data.data.length > 2) return
+    if (data.data.length <= 0) return
+    if (data.data.length == 1 && data.data[0].title == t("global.continuewatch")) {
+        await setHomeData(async () => [{ title: t("global.continuewatch"), data: await ReadContinue(), horizontal: false }])
+        return
+    }
+
+    if (data.data.length == 1 && data.data[0].title == t("global.history")) {
+        await setHomeData(async () => [{ title: t("global.History"), data: await ReadHistory(), horizontal: false }])
+        return
+    }
+
+    if (data.data[0].title == t("global.continuewatch") && data.data[1].title == t("global.history")) {
+        await setHomeData(async () => {
+            return [
+                {
+                    title: t("global.continuewatch"),
+                    data: await ReadContinue(20),
+                    horizontal: true,
+                    onTitleClick: () => setHomeData(async () => [{ title: t("global.continuewatch"), data: await ReadContinue(), horizontal: false }])
+                },
+                {
+                    title: t("global.history"),
+                    data: await ReadHistory(20),
+                    horizontal: true,
+                    onTitleClick: () => setHomeData(async () => [{ title: t("global.history"), data: await ReadHistory(), horizontal: false }])
+                },
+            ]
+        })
+        return
+    }
 }

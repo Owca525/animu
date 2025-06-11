@@ -49,16 +49,16 @@ const Home = () => {
     async function history(): Promise<containerData[]> {
         return [
             {
-                title: "Continue Watch",
+                title: t("global.continuewatch"),
                 data: await ReadContinue(20),
                 horizontal: true,
-                onTitleClick: () => setHomeData(async () => [{ title: "Continue Watch", data: await ReadContinue(), horizontal: false }])
+                onTitleClick: () => setHomeData(async () => [{ title: t("global.continuewatch"), data: await ReadContinue(), horizontal: false }])
             },
             {
-                title: "History",
+                title: t("global.history"),
                 data: await ReadHistory(20),
                 horizontal: true,
-                onTitleClick: () => setHomeData(async () => [{ title: "History", data: await ReadHistory(), horizontal: false }])
+                onTitleClick: () => setHomeData(async () => [{ title: t("global.history"), data: await ReadHistory(), horizontal: false }])
             },
         ]
     }

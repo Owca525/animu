@@ -1,3 +1,4 @@
+import { refetchHistory } from "../functions";
 import { cardData } from "../GlobalInterface";
 
 const appConfigDirPath = window.api.os.getPath("userData");
@@ -28,6 +29,7 @@ export async function DeleteFromFile(data: cardData, file: string) {
         if (index != -1) list.splice(index, 1);
 
         window.api.os.write(await appConfigDirPath + `/${file}.json`, JSON.stringify(list))
+        refetchHistory()
         return true
     } catch (Error) {
         console.error(`${Error} in DeleteFromFile`)
