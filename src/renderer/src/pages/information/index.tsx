@@ -18,7 +18,7 @@ function information() {
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
     const [showWrong, setshowWrong] = useState<boolean>(false)
     const [func, setfunc] = useState(async () => await pluginPlayer.player.animeDataList(anime_data.title))
-    const { data, isError, isLoading } = useQuery(
+    const { data, isError, isLoading, refetch } = useQuery(
         [func.toString()],
         () => func,
         {
@@ -28,6 +28,14 @@ function information() {
     );
 
     const [secondsLeft, setSecondsLeft] = useState<undefined | number>(anime_data.nextAiringEpisode?.timeUntilAiring);
+
+    async function refetchData(id: string) {
+        console.log(id)
+        setshowWrong(() => false)
+        setfunc(async () => await pluginPlayer.player.animeDataList(undefined, id))
+        refetch()
+    }
+    console.log(data, isLoading, isError)
 
     useEffect(() => {
         if (secondsLeft && secondsLeft <= 0) return;
@@ -87,112 +95,114 @@ function information() {
     // console.log(data)
 
     return (
-        <main className="information">
-            <div className="information-banner">
-                <img className={anime_data.bannerImage ? "information-banner-image" : "information-banner-image-blur"} src={anime_data.bannerImage ? anime_data.bannerImage : anime_data.coverImage ? anime_data.coverImage : ""} />
-            </div>
-
-            <div className="information-fade"></div>
-
-            <div className="information-container">
-
-                <div className="information-top">
-
-                    <img className="information-cover" src={anime_data.coverImage ? anime_data.coverImage : ""}></img>
-
-                    <div className="information-description">
-                        <div className="information-title">{anime_data.title}</div>
-                        {decodeHtmlEntities(anime_data.description ? anime_data.description : "Description Dosen't exist")}
-                    </div>
-
+        <>
+            <main className="information">
+                <div className="information-banner">
+                    <img className={anime_data.bannerImage ? "information-banner-image" : "information-banner-image-blur"} src={anime_data.bannerImage ? anime_data.bannerImage : anime_data.coverImage ? anime_data.coverImage : ""} />
                 </div>
 
-                <div className="information-bottom">
+                <div className="information-fade"></div>
 
-                    <div className="information-info">
+                <div className="information-container">
 
-                        {anime_data.nextAiringEpisode &&
-                            <div className="information-info-content">
-                                <div className="information-content-title">{t("information.airing")}: {anime_data.nextAiringEpisode.episode}</div>
-                                {`${time?.days}d ${time?.hours}h ${time?.minutes}m ${time?.seconds}s`}
-                            </div>
-                        }
+                    <div className="information-top">
 
-                        {anime_data.format &&
-                            <div className="information-info-content">
-                                <div className="information-content-title">{t("information.format")}</div>
-                                {capitalizeFirstLetter(anime_data.format)}
-                            </div>
-                        }
+                        <img className="information-cover" src={anime_data.coverImage ? anime_data.coverImage : ""}></img>
 
-                        {anime_data.episodes &&
-                            <div className="information-info-content">
-                                <div className="information-content-title">{t("information.episodes")}</div>
-                                {anime_data.episodes}
-                            </div>
-                        }
-
-                        {anime_data.duration &&
-                            <div className="information-info-content">
-                                <div className="information-content-title">{t("information.duration")}</div>
-                                {anime_data.duration} {t("global.minutes")}
-                            </div>
-                        }
-
-                        {anime_data.status &&
-                            <div className="information-info-content">
-                                <div className="information-content-title">{t("information.status")}</div>
-                                {capitalizeFirstLetter(anime_data.status)}
-                            </div>
-                        }
-
-                        {anime_data.startDate && (anime_data.startDate.year != undefined && anime_data.startDate.day != undefined && anime_data.startDate.month != undefined) &&
-                            <div className="information-info-content">
-                                <div className="information-content-title">{t("information.startdate")}</div>
-                                {convertDateToFormattedString(anime_data.startDate.year, anime_data.startDate.month, anime_data.startDate.day, undefined, undefined)}
-                            </div>
-                        }
-
-                        {anime_data.endDate && (anime_data.endDate.year != undefined && anime_data.endDate.day != undefined && anime_data.endDate.month != undefined) &&
-                            <div className="information-info-content">
-                                <div className="information-content-title">{t("information.endate")}</div>
-                                {convertDateToFormattedString(anime_data.endDate.year, anime_data.endDate.month, anime_data.endDate.day, undefined, undefined)}
-                            </div>
-                        }
-
-                        {anime_data.season && anime_data.seasonYear &&
-                            <div className="information-info-content">
-                                <div className="information-content-title">{t("information.season")}</div>
-                                {capitalizeFirstLetter(anime_data.season)} {anime_data.seasonYear}
-                            </div>
-                        }
+                        <div className="information-description">
+                            <div className="information-title">{anime_data.title}</div>
+                            {decodeHtmlEntities(anime_data.description ? anime_data.description : "Description Dosen't exist")}
+                        </div>
 
                     </div>
 
+                    <div className="information-bottom">
 
-                    <div className="information-episodes">
-                        <div className="information-select-episode" onClick={() => setshowWrong(() => true)}><span className="material-symbols-outlined">search</span>This is wrong Anime?</div>
-                        {showWrong == false &&
-                            <>
-                                {isLoading == false && data && data.episodesData.length > 0 && anime_data.status != "NOT_YET_RELEASED" && (
-                                    <>
-                                        {data.episodesData.map((episode: { episodes: string[], type: string, name?: string }) => episode.episodes.length > 0 ? (
-                                            <Drop LeftHeader={episode.name ? episode.name : episode.type} RightHeader={`${episode.episodes.length} episodes`} content={makeButtons(episode.episodes, episode.type)} />
-                                        ) : "")}
-                                    </>
-                                )}
-                                {isLoading && anime_data.status != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
-                                {isError && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime dosen't have episodes</div>}
-                                {data && (data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime dosen't have episodes</div>}
-                            </>}
+                        <div className="information-info">
+
+                            {anime_data.nextAiringEpisode &&
+                                <div className="information-info-content">
+                                    <div className="information-content-title">{t("information.airing")}: {anime_data.nextAiringEpisode.episode}</div>
+                                    {`${time?.days}d ${time?.hours}h ${time?.minutes}m ${time?.seconds}s`}
+                                </div>
+                            }
+
+                            {anime_data.format &&
+                                <div className="information-info-content">
+                                    <div className="information-content-title">{t("information.format")}</div>
+                                    {capitalizeFirstLetter(anime_data.format)}
+                                </div>
+                            }
+
+                            {anime_data.episodes &&
+                                <div className="information-info-content">
+                                    <div className="information-content-title">{t("information.episodes")}</div>
+                                    {anime_data.episodes}
+                                </div>
+                            }
+
+                            {anime_data.duration &&
+                                <div className="information-info-content">
+                                    <div className="information-content-title">{t("information.duration")}</div>
+                                    {anime_data.duration} {t("global.minutes")}
+                                </div>
+                            }
+
+                            {anime_data.status &&
+                                <div className="information-info-content">
+                                    <div className="information-content-title">{t("information.status")}</div>
+                                    {capitalizeFirstLetter(anime_data.status)}
+                                </div>
+                            }
+
+                            {anime_data.startDate && (anime_data.startDate.year != undefined && anime_data.startDate.day != undefined && anime_data.startDate.month != undefined) &&
+                                <div className="information-info-content">
+                                    <div className="information-content-title">{t("information.startdate")}</div>
+                                    {convertDateToFormattedString(anime_data.startDate.year, anime_data.startDate.month, anime_data.startDate.day, undefined, undefined)}
+                                </div>
+                            }
+
+                            {anime_data.endDate && (anime_data.endDate.year != undefined && anime_data.endDate.day != undefined && anime_data.endDate.month != undefined) &&
+                                <div className="information-info-content">
+                                    <div className="information-content-title">{t("information.endate")}</div>
+                                    {convertDateToFormattedString(anime_data.endDate.year, anime_data.endDate.month, anime_data.endDate.day, undefined, undefined)}
+                                </div>
+                            }
+
+                            {anime_data.season && anime_data.seasonYear &&
+                                <div className="information-info-content">
+                                    <div className="information-content-title">{t("information.season")}</div>
+                                    {capitalizeFirstLetter(anime_data.season)} {anime_data.seasonYear}
+                                </div>
+                            }
+
+                        </div>
+
+
+                        <div className="information-episodes">
+                            <div className="information-select-episode" onClick={() => setshowWrong(() => true)}><span className="material-symbols-outlined">search</span>This is wrong Anime?</div>
+                            {showWrong == false &&
+                                <>
+                                    {isLoading == false && data && data.episodesData.length > 0 && anime_data.status != "NOT_YET_RELEASED" && (
+                                        <>
+                                            {data.episodesData.map((episode: { episodes: string[], type: string, name?: string }) => episode.episodes.length > 0 ? (
+                                                <Drop LeftHeader={episode.name ? episode.name : episode.type} RightHeader={`${episode.episodes.length} episodes`} content={makeButtons(episode.episodes, episode.type)} />
+                                            ) : "")}
+                                        </>
+                                    )}
+                                    {isLoading && anime_data.status != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
+                                    {isError && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime dosen't have episodes</div>}
+                                    {data && (data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime dosen't have episodes</div>}
+                                </>}
+                        </div>
+
                     </div>
-
                 </div>
-            </div>
 
-            <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
-            {showWrong && <ContainerWrong name={anime_data.title} func={setfunc} />}
-        </main>
+                <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
+            </main>
+            {showWrong && <ContainerWrong name={anime_data.title} refetchfunc={refetchData} exitfunc={() => setshowWrong(() => false)} />}
+        </>
     )
 }
 

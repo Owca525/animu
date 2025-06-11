@@ -14,13 +14,15 @@ const Container: React.FC<containerData> = ({ title, data, horizontal = false, o
     container.current.scrollLeft += num
   }
 
+  console.log(data)
+
   return (
     <div className="main-container">
         <div className={onTitleClick ? "container-title-click" : "container-title"} onClick={onTitleClick}>{title}</div>
         <div className={"container-button-container" + (data.length <= 0 ? " container-error" : "")}>
           {horizontal && data.length > 0 ? <Button icon="chevron_left" ButtonClass="container-left-skip-button" onClick={() => handleButtonScroll(-120)}/> : ""}
           <div className={horizontal ? "container-data-horizontal" : "container-data"} ref={container}> {/* onWheel={handleScroll} */}
-              {data.length > 0 && data.map((card) => <Card AnimeData={card.AnimeData} saveData={card.saveData} deletionCard={card.deletionCard} />)}
+              {data.length > 0 && data.map((card) => <Card AnimeData={card.AnimeData} saveData={card.saveData} deletionCard={card.deletionCard} onClick={card.onClick} />)}
               {data.length <= 0 && <div className="container-error-text">{t("home.nothingfound")}</div>}
           </div>
           {horizontal && data.length > 0 ? <Button icon="chevron_right" ButtonClass="container-right-skip-button" onClick={() => handleButtonScroll(120)}/> : ""}
