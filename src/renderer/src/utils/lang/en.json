@@ -72,11 +72,6 @@
                 "volumedown": "Volume Down",
                 "volumemute": "Volume Mute",
                 "screenshot": "Take a Screenshot"
-            },
-            "toastscreenshot": {
-                "failed": "Failed To save Screenshot",
-                "doneclip": "Image Saved To the Clipboard Succesfull",
-                "donefile": "Image Saved To the File Succesfull"
             }
         },
         "history": {
@@ -115,6 +110,11 @@
             "titleAnime": "Next Episode {{ep}} of {{title}}",
             "nextEp": "Next Episode",
             "hide": "Hide"
+        },
+        "toastscreenshot": {
+            "failed": "Failed To save Screenshot",
+            "doneclip": "Image Saved To the Clipboard Succesfull",
+            "donefile": "Image Saved To the File Succesfull"
         }
     },
     "history": {
