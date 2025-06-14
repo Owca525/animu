@@ -31,8 +31,9 @@
     height: max-content;
     overflow: hidden;
     overflow-x: scroll;
-
+    scroll-behavior: smooth;
     scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
 }
 .container-data-horizontal::-webkit-scrollbar {
     display: none;
