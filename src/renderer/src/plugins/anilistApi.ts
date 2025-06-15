@@ -244,8 +244,8 @@ async function CreateHomePage(): Promise<containerData[]> {
       horizontal: true,
       onTitleClick: () => getFullCategory({
         page: 1,
-        season: season[0],
-        seasonYear: season[1],
+        season: season.season,
+        seasonYear: season.seasonYear,
         type: "ANIME"
       }, "Popular in this Season")
     },
