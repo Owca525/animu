@@ -36,6 +36,8 @@ linux:
   category: AudioVideo
 appImage:
   artifactName: ${name}-${version}-unstable.${ext}
+deb:
+  artifactName: ${name}-${version}-unstable.${ext}
 npmRebuild: false
 publish:
   provider: github
