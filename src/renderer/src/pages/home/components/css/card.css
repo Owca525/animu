@@ -13,6 +13,12 @@
     box-sizing: border-box;
 
     scroll-snap-align: start;
+    transform: scale(1);
+    transition: transform 0.3s ease;
+}
+
+.card-container:hover {
+    transform: scale(1.02);
 }
 
 .card-image, .card-image-placeholder {

@@ -14,8 +14,6 @@ const Container: React.FC<containerData> = ({ title, data, horizontal = false, o
     container.current.scrollLeft += num
   }
 
-  console.log(data)
-
   return (
     <div className="main-container">
         <div className={onTitleClick ? "container-title-click" : "container-title"} onClick={onTitleClick}>{title}</div>

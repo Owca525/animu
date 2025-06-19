@@ -4,6 +4,7 @@ import "./css/sidebar.css"
 import useHotkeys from "@reecelucas/react-use-hotkeys"
 import icon from "../../../../resources/icon.png"
 import { sidebarData } from "@renderer/utils/GlobalInterface"
+import { motion } from "framer-motion"
 
 interface sidebarProps {
     showLogo?: boolean
@@ -54,6 +55,11 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, sidebarClass, data, hideBut
         }
     }
 
+    const sidebarVariants = {
+        hidden: { opacity: 1, x: -200 },
+        visible: { opacity: 1, x: 0 },
+    };
+
     return (
         <div className={"sidebar-main-container " + sidebarClass?.container}>
             {hideButton ? "" : (
@@ -67,7 +73,13 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, sidebarClass, data, hideBut
                     <div className="sidebar-version">{`v${version}`}</div>
                 </div>
             ) : ""}
-            <div className={"sidebar-container-max"} style={hideButton == false ? sidebarHover ? {} : { display: "none" } : {}} ref={sidebarRef}>
+            <motion.div className={"sidebar-container-max"} ref={sidebarRef}
+                initial="hidden"
+                animate={hideButton == false ? sidebarHover ? "visible" : "hidden" : "visible"}
+                variants={sidebarVariants}
+                transition={{ duration: 0.2 }}
+            >
+
                 <div className={`sidebar-top ${"sidebar-max-button"}`}>
                     {showLogo ? <div className="sidebar-black-line"></div> : ""}
                     {data.top.map((value) => <Button icon={value.icon} content={hideButton == false ? sidebarHover ? value.text : undefined : value.text} onClick={(event) => hideSidebar(event, value.onClick)} ButtonClass="sidebar-button" iconClassName="sidebar-button" />)}
@@ -76,7 +88,7 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, sidebarClass, data, hideBut
                     <div className="sidebar-black-line"></div>
                     {data.bottom.map((value) => <Button icon={value.icon} content={hideButton == false ? sidebarHover ? value.text : undefined : value.text} onClick={(event) => hideSidebar(event, value.onClick)} ButtonClass="sidebar-button" iconClassName="sidebar-button" />)}
                 </div>
-            </div>
+            </motion.div>
         </div>
     )
 }
