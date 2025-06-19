@@ -88,7 +88,7 @@
     },
     "player": {
         "error": {
-            "notfound": "Player dosen't found any urls"
+            "notfound": "Player doesn't found any urls"
         },
         "TitleEpisode": "Episode: {{ep}} of {{name}}",
         "Volume": "Volume",

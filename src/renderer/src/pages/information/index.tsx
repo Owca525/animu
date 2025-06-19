@@ -6,7 +6,6 @@ import { capitalizeFirstLetter, convertDateToFormattedString, convertSeconds, de
 import { useEffect, useState } from "react";
 import { t } from "i18next"
 import useHotkeys from "@reecelucas/react-use-hotkeys";
-import { useQuery } from "react-query";
 import { useSelector } from "react-redux";
 import Drop from "./components/drop";
 import ContainerWrong from "./components/containerWrong";
@@ -17,25 +16,10 @@ function information() {
     const anime_data: AnimeData = location.state;
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
     const [showWrong, setshowWrong] = useState<boolean>(false)
-    const [func, setfunc] = useState(async () => await pluginPlayer.player.animeDataList(anime_data.title))
-    const { data, isError, isLoading, refetch } = useQuery(
-        [func.toString()],
-        () => func,
-        {
-            refetchOnWindowFocus: false,
-            cacheTime: 0,
-        }
-    );
-
     const [secondsLeft, setSecondsLeft] = useState<undefined | number>(anime_data.nextAiringEpisode?.timeUntilAiring);
-
-    async function refetchData(id: string) {
-        console.log(id)
-        setshowWrong(() => false)
-        setfunc(async () => await pluginPlayer.player.animeDataList(undefined, id))
-        refetch()
-    }
-    console.log(data, isLoading, isError)
+    const [data, setData] = useState<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] } | undefined>(undefined)
+    const [isLoading, setLoadingData] = useState<boolean>(false)
+    const [isError, setIsError] = useState<boolean>(false)
 
     useEffect(() => {
         if (secondsLeft && secondsLeft <= 0) return;
@@ -57,6 +41,31 @@ function information() {
     useHotkeys("Tab", () => {
         console.log(anime_data)
     })
+
+    // I can't use useQuery Because Doesn't Work
+    async function fetchData(func: any, title?: string, id?: string) {
+        try {
+            setIsError(() => false)
+            setLoadingData(() => true) 
+            let data = await func(title, id)
+            if (data) {
+                setData(() => data)
+                setLoadingData(() => false) 
+            } else {
+                setIsError(() => true)
+                console.log(data)
+            }
+            setshowWrong(() => false)
+        } catch (Error) {
+            setIsError(() => true)
+            setshowWrong(() => false)
+            console.log(Error)
+        }
+    }
+
+    useEffect(() => {
+        fetchData(pluginPlayer.player.animeDataList, anime_data.title)
+    }, [])
 
     function enterPlayer(episodes: string[], type: string, episode: string) {
         navigate("/player", {
@@ -183,7 +192,7 @@ function information() {
                             <div className="information-select-episode" onClick={() => setshowWrong(() => true)}><span className="material-symbols-outlined">search</span>This is wrong Anime?</div>
                             {showWrong == false &&
                                 <>
-                                    {isLoading == false && data && data.episodesData.length > 0 && anime_data.status != "NOT_YET_RELEASED" && (
+                                    {isLoading == false && data && data.episodesData && data.episodesData.length > 0 && anime_data.status != "NOT_YET_RELEASED" && (
                                         <>
                                             {data.episodesData.map((episode: { episodes: string[], type: string, name?: string }) => episode.episodes.length > 0 ? (
                                                 <Drop LeftHeader={episode.name ? episode.name : episode.type} RightHeader={`${episode.episodes.length} episodes`} content={makeButtons(episode.episodes, episode.type)} />
@@ -192,7 +201,7 @@ function information() {
                                     )}
                                     {isLoading && anime_data.status != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
                                     {isError && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime dosen't have episodes</div>}
-                                    {data && (data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime dosen't have episodes</div>}
+                                    {data && (data.episodesData && data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime dosen't have episodes</div>}
                                 </>}
                         </div>
 
@@ -201,7 +210,7 @@ function information() {
 
                 <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
             </main>
-            {showWrong && <ContainerWrong name={anime_data.title} refetchfunc={refetchData} exitfunc={() => setshowWrong(() => false)} />}
+            {showWrong && <ContainerWrong name={anime_data.title} refetchfunc={fetchData} exitfunc={() => setshowWrong(() => false)} />}
         </>
     )
 }

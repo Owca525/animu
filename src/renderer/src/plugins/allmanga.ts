@@ -84,7 +84,6 @@ export async function SearchAnime(name: string, page: number = 1) {
 }
 
 function converterData(data: any): cardData {
-  console.log(data)
   return {
     AnimeData: {
       averageScore: data.averageScore,
