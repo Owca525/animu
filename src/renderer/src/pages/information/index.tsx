@@ -21,6 +21,13 @@ function information() {
     const [isLoading, setLoadingData] = useState<boolean>(false)
     const [isError, setIsError] = useState<boolean>(false)
 
+    // Banner
+    const [isBannerLoading, setBannerLoadingData] = useState<boolean>(true)
+    const [isBannerError, setBannerIsError] = useState<boolean>(false)
+    // Cover
+    const [isCoverLoading, setCoverIsLoading] = useState<boolean>(true)
+    const [isCoverError, setCoverIsError] = useState<boolean>(false)
+
     useEffect(() => {
         if (secondsLeft && secondsLeft <= 0) return;
         const intervalId = setInterval(() => {
@@ -46,11 +53,11 @@ function information() {
     async function fetchData(func: any, title?: string, id?: string) {
         try {
             setIsError(() => false)
-            setLoadingData(() => true) 
+            setLoadingData(() => true)
             let data = await func(title, id)
             if (data) {
                 setData(() => data)
-                setLoadingData(() => false) 
+                setLoadingData(() => false)
             } else {
                 setIsError(() => true)
                 console.log(data)
@@ -87,6 +94,17 @@ function information() {
         })
     }
 
+    // async function SaveCoverToClipboard(screenshot: string | null) {
+    //     if (!screenshot) return
+    //     const blob = await (await fetch(screenshot)).blob();
+    //     console.log(screenshot)
+    //     await navigator.clipboard.write([
+    //         new ClipboardItem({
+    //             [blob.type]: blob
+    //         })
+    //     ]);
+    // }
+
     function makeButtons(episode: string[], type: string) {
         return (
             <div className='information-buttons-episode-container'>
@@ -101,13 +119,13 @@ function information() {
         console.log(anime_data)
     })
 
-    // console.log(data)
-
     return (
         <>
             <main className="information">
                 <div className="information-banner">
-                    <img className={anime_data.bannerImage ? "information-banner-image" : "information-banner-image-blur"} src={anime_data.bannerImage ? anime_data.bannerImage : anime_data.coverImage ? anime_data.coverImage : ""} />
+                    <img className={anime_data.bannerImage ? "information-banner-image" : "information-banner-image-blur"} onError={() => setBannerIsError(() => true)} onLoad={() => setBannerLoadingData(() => false)} src={anime_data.bannerImage ? anime_data.bannerImage : anime_data.coverImage ? anime_data.coverImage : ""} style={isBannerLoading ? {display: "none"} : isBannerError ? {display: "none"} : {}} />
+                    {isBannerLoading && isBannerError == false && <div className="information-banner-image-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div>}
+                    {isBannerError && isBannerLoading == false && <div className="information-banner-image-placeholder"><span className="material-symbols-outlined">error</span></div>}
                 </div>
 
                 <div className="information-fade"></div>
@@ -116,7 +134,9 @@ function information() {
 
                     <div className="information-top">
 
-                        <img className="information-cover" src={anime_data.coverImage ? anime_data.coverImage : ""}></img>
+                        <img className="information-cover" onError={() => setCoverIsError(() => true)} onLoad={() => setCoverIsLoading(() => false)} src={anime_data.coverImage ? anime_data.coverImage : ""} style={isCoverLoading ? { display: "none" } : isError ? { display: "none" } : {}}></img>
+                        {isCoverLoading && isError == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div>}
+                        {isCoverError && isCoverLoading == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined">error</span></div>}
 
                         <div className="information-description">
                             <div className="information-title">{anime_data.title}</div>

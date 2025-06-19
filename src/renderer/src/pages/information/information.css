@@ -28,10 +28,17 @@
 }
 
 .information-banner-image,
+.information-banner-image-placeholder,
 .information-banner-image-blur {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.information-banner-image-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .information-banner-image-blur {
@@ -57,11 +64,26 @@
     box-sizing: border-box;
 }
 
-.information-cover {
+.information-cover, .information-cover-placeholder {
     margin-top: min(-3%, -60px);
     max-width: 240px;
     max-height: 240px;
     transition: all 0.1s;
+    cursor: pointer;
+}
+
+.information-cover-placeholder {
+    width: 240px;
+    height: 220px;
+    cursor: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 2 / 3;
+    user-select: none;
+
+    border-radius: 12px;
+    background-color: var(--bg3);
 }
 
 .information-cover:hover {
