@@ -61,6 +61,11 @@
     margin-top: min(-3%, -60px);
     max-width: 240px;
     max-height: 240px;
+    transition: all 0.1s;
+}
+
+.information-cover:hover {
+    transform: scale(1.05);
 }
 
 .information-title {

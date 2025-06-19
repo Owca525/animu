@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { useQuery } from 'react-query';
 import './css/containerWrong.css'
 import Button from '@renderer/components/buttons';
+import { motion } from 'framer-motion';
 
 interface containerwrongprops {
     name: string,
@@ -23,16 +24,14 @@ const containerWrong: React.FC<containerwrongprops> = ({ name, exitfunc, refetch
         }
     );
 
-    console.log(data, name)
-
     return (
         <div className='information-containerwrong-void'>
-            <div className='information-containerwrong'>
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.2 }} className='information-containerwrong'>
                 {isLoading == false && isError == false && data && <Container title={`Anime Found For name: ${name}`} data={data.map((anime) => {return {...anime, onClick: () => refetchfunc(anime.AnimeData.player_ID)}})} />}
                 {isLoading && <div className='information-containerwrong-loading'><span className='information-loading material-symbols-outlined'>progress_activity</span></div>}
                 {isError && isLoading == false && <div className='information-containerwrong-error'><span className='material-symbols-outlined'>error</span>Error Accured</div>}
                 <Button icon="arrow_back" ButtonClass="information-containerwrong-exit-button" onClick={exitfunc} />
-            </div>
+            </motion.div>
         </div>
     )
 }
