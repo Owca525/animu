@@ -17,6 +17,7 @@
 
 .settings-sidebar-container {
   position: relative;
+  z-index: 10;
 }
 
 .settings-content-container {
@@ -63,6 +64,7 @@
 
 .settings-save-container {
   position: fixed;
+  z-index: 0;
   bottom: 0;
   left: 0;
   width: 100vw;

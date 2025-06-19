@@ -18,6 +18,7 @@ import { showDialog } from "@renderer/utils/context/DialogContext";
 import store from "@renderer/utils/store";
 import { toast } from "react-toastify";
 import SeekBar from "@renderer/components/seekBar";
+import { motion } from "framer-motion";
 
 function settings() {
     const navigate = useNavigate();
@@ -107,7 +108,7 @@ function settings() {
 
     useEffect(() => {
         window.api.getlistThemes().then((data) => {
-            let themes = data.map((element) => { return { label: element.filename.replace(".css", ""), onClick: () => {changeTheme(element.filename.replace(".css", ""));handleChange("General.theme", element.filename.replace(".css", ""))} } })
+            let themes = data.map((element) => { return { label: element.filename.replace(".css", ""), onClick: () => { changeTheme(element.filename.replace(".css", "")); handleChange("General.theme", element.filename.replace(".css", "")) } } })
             setThemes(() => themes)
         })
         window.api.rpc.setActivity(undefined, t("discordrpc.settings"))
@@ -148,6 +149,11 @@ function settings() {
         window.BrowserWindow.setZoom(calculateZoomLevel(value))
     }
 
+    const saveCommunicateAnimation = {
+        hidden: { y: 200 },
+        visible: { y: 0 },
+    };
+
     return (
         <main className="settings-container">
             <Sidebar
@@ -159,17 +165,15 @@ function settings() {
                 hideButton
                 showLogo
             />
-            {isSaving && (
-                <div className="settings-save-container">
-                    <div className="settings-save-content">
-                        <div className="settings-save-title">{t("settings.saving.notification")}</div>
-                        <div className="settings-save-buttons">
-                            <Button content={t("dialog.yes")} onClick={saveNewConfig} />
-                            <Button content={t("dialog.reset")} onClick={resetConfig} />
-                        </div>
+            <div className="settings-save-container">
+                <motion.div variants={saveCommunicateAnimation} initial={"hidden"} animate={isSaving ? "visible" : "hidden"} transition={{ duration: 0.2 }} className="settings-save-content">
+                    <div className="settings-save-title">{t("settings.saving.notification")}</div>
+                    <div className="settings-save-buttons">
+                        <Button content={t("dialog.yes")} onClick={saveNewConfig} />
+                        <Button content={t("dialog.reset")} onClick={resetConfig} />
                     </div>
-                </div>
-            )}
+                </motion.div>
+            </div>
             <div className="settings-content-container">
                 {category == "general" && (
                     <>
@@ -244,7 +248,7 @@ function settings() {
                                 {t("settings.general.zoom")}
                                 <div className="settings-setting-seekbar-container">
                                     <span>50%</span>
-                                    <SeekBar maxValue={200} minValue={50} type="procent" currentValue={config.new.General.Window.Zoom} onSeek={(value) => {handleChange("General.Window.Zoom", parseInt(value.toFixed(0))); setDynamicZoom(parseInt(value.toFixed(0)))}} />
+                                    <SeekBar maxValue={200} minValue={50} type="procent" currentValue={config.new.General.Window.Zoom} onSeek={(value) => { handleChange("General.Window.Zoom", parseInt(value.toFixed(0))); setDynamicZoom(parseInt(value.toFixed(0))) }} />
                                     <span>200%</span>
                                 </div>
                             </div>
