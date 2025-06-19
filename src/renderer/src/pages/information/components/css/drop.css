@@ -22,3 +22,7 @@
     height: max-content;
     display: block;
 }
+
+.drop-container {
+    user-select: none;
+}

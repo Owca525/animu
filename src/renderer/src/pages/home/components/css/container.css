@@ -49,6 +49,7 @@
     display: block;
     opacity: 0;
     transition: opacity 1s ease;
+    user-select: none;
 }
 
 .container-left-skip-button {

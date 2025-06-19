@@ -6,4 +6,5 @@
     gap: clamp(4px, 1vw, 12px);
     padding: clamp(4px, 1vw, 10px);
     transition: all 0.1s ease;
+    user-select: none;
 }

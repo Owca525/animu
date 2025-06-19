@@ -16,6 +16,7 @@
     object-fit: cover;
     position: absolute;
     z-index: 0;
+    user-select: none;
 }
 
 .information-fade {
@@ -70,6 +71,7 @@
     max-height: 240px;
     transition: all 0.1s;
     cursor: pointer;
+    user-select: none;
 }
 
 .information-cover-placeholder {
@@ -182,6 +184,7 @@
     align-items: center;
     gap: 4px;
     cursor: pointer;
+    user-select: none;
 }
 
 .information-select-episode:hover {
