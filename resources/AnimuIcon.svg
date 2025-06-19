@@ -7,11 +7,8 @@
    viewBox="0 0 512 512"
    version="1.1"
    id="svg1"
-   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
-   sodipodi:docname="AnimuIcon.svg"
-   inkscape:export-filename="AnimuIcon.png"
-   inkscape:export-xdpi="96"
-   inkscape:export-ydpi="96"
+   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
+   sodipodi:docname="Animu Icon.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -27,83 +24,73 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#505050"
      inkscape:document-units="px"
-     inkscape:zoom="1.5722656"
-     inkscape:cx="231.51304"
+     inkscape:zoom="1.5839844"
+     inkscape:cx="255.68434"
      inkscape:cy="256"
      inkscape:window-width="1920"
-     inkscape:window-height="1014"
+     inkscape:window-height="1020"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1" />
   <defs
      id="defs1">
-    <pattern
+    <linearGradient
+       id="linearGradient1"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#282b3d;stop-opacity:1;"
+         offset="0"
+         id="stop1" />
+      <stop
+         style="stop-color:#404040;stop-opacity:1;"
+         offset="1"
+         id="stop2" />
+    </linearGradient>
+    <linearGradient
        inkscape:collect="always"
-       xlink:href="#Strips4_1"
-       preserveAspectRatio="xMidYMid"
-       id="pattern34"
-       patternTransform="matrix(2.9222423,0,0,2.946591,-128.29415,-115.84234)" />
-    <pattern
-       inkscape:collect="always"
-       patternUnits="userSpaceOnUse"
-       width="1.25"
-       height="1"
-       patternTransform="translate(0,0) scale(2,2)"
-       preserveAspectRatio="xMidYMid"
-       id="Strips4_1"
-       style="fill:#000000"
-       inkscape:stockid="Stripes 13 (4:1)"
-       inkscape:isstock="true"
-       inkscape:label="Stripes 13 (4:1)">
-      <rect
-   style="stroke:none"
-   x="0"
-   y="-0.5"
-   width="1"
-   height="2"
-   id="rect203" />
-
-    </pattern>
-    <rect
-       x="205.08029"
-       y="195.97311"
-       width="27.658855"
-       height="20.57549"
-       id="rect5" />
+       xlink:href="#linearGradient1"
+       id="linearGradient2"
+       x1="162.88036"
+       y1="93.750893"
+       x2="396.46851"
+       y2="448.55237"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
     <ellipse
-       style="fill:url(#pattern34);fill-opacity:1;stroke:none;stroke-width:1.90296;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:url(#linearGradient2);stroke-width:1.83466"
        id="path1"
-       inkscape:transform-center-x="0.92930781"
-       inkscape:transform-center-y="-0.93705398"
-       cx="255.04594"
-       cy="256.63602"
-       rx="256.95404"
-       ry="255.40024" />
+       cx="257.2626"
+       cy="256.63129"
+       rx="256.63132"
+       ry="254.10605" />
     <text
        xml:space="preserve"
-       style="text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;white-space:pre;inline-size:118.96;display:inline;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.297;stroke-dasharray:none;stroke-opacity:1"
-       x="217.52049"
-       y="190.17143"
-       id="text4" />
+       style="font-weight:bold;font-size:375.663px;line-height:1;font-family:'Arimo Nerd Font';-inkscape-font-specification:'Arimo Nerd Font Bold';text-align:start;letter-spacing:5.53712px;word-spacing:6.43715px;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;stroke-width:2.53769"
+       x="73.764252"
+       y="348.92996"
+       id="text2"
+       transform="scale(0.93203993,1.0729154)"><tspan
+         sodipodi:role="line"
+         x="73.764252"
+         y="348.92996"
+         id="tspan3"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Arimo Nerd Font';-inkscape-font-specification:'Arimo Nerd Font';stroke-width:2.53769">A</tspan></text>
     <text
        xml:space="preserve"
-       id="text5"
-       style="text-align:start;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect5);display:inline;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.297;stroke-dasharray:none;stroke-opacity:1" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:252.414px;line-height:1;font-family:'Arimo Nerd Font';-inkscape-font-specification:'Arimo Nerd Font Bold';text-align:start;letter-spacing:3.72047px;word-spacing:4.32521px;writing-mode:lr-tb;direction:ltr;text-anchor:start;white-space:pre;inline-size:187.124;display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.70511;stroke-dasharray:none;stroke-opacity:1"
-       x="187.58046"
-       y="325.20834"
-       id="text6"
-       transform="matrix(1.5319686,0,0,1.7088337,-169.35631,-157.70203)"><tspan
-         x="187.58046"
-         y="325.20834"
-         id="tspan1">A</tspan></text>
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:274.46px;line-height:1;font-family:'Arimo Nerd Font';-inkscape-font-specification:'Arimo Nerd Font';text-align:start;letter-spacing:4.04543px;word-spacing:4.703px;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;stroke-width:1.85404"
+       x="260.73093"
+       y="361.38611"
+       id="text4"
+       transform="scale(0.96721705,1.0338941)"><tspan
+         sodipodi:role="line"
+         id="tspan4"
+         x="260.73093"
+         y="361.38611"
+         style="stroke-width:1.85404">N</tspan></text>
   </g>
 </svg>
