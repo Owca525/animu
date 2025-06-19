@@ -29,7 +29,8 @@
         "status": "Status",
         "startdate": "Start Date",
         "endate": "End Date",
-        "season": "Season"
+        "season": "Season",
+        "descriptionnotfound": "Description Doesn't exist"
     },
     "settings": {
         "general": {

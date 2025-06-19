@@ -140,7 +140,7 @@ function information() {
 
                         <div className="information-description">
                             <div className="information-title">{anime_data.title}</div>
-                            {decodeHtmlEntities(anime_data.description ? anime_data.description : "Description Dosen't exist")}
+                            {decodeHtmlEntities(anime_data.description ? anime_data.description : t("information.descriptionnotfound"))}
                         </div>
 
                     </div>
