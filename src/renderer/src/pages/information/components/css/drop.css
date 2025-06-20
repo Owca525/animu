@@ -12,15 +12,13 @@
 }
 
 .drop-content {
-    padding: 12px;
-
-    display: none;
-    transition: height 150ms ease;
+    padding: 0px;
+    overflow: hidden;
+    height: 0px;
 }
 
 .drop-content-show {
-    height: max-content;
-    display: block;
+    padding: 12px;
 }
 
 .drop-container {
