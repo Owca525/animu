@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 function information() {
     const navigate = useNavigate()
     const location = useLocation();
-    const anime_data: AnimeData = location.state;
+    let anime_data: AnimeData = location.state;
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
     const [showWrong, setshowWrong] = useState<boolean>(false)
     const [secondsLeft, setSecondsLeft] = useState<undefined | number>(anime_data.nextAiringEpisode?.timeUntilAiring);
@@ -72,7 +72,11 @@ function information() {
     }
 
     useEffect(() => {
-        fetchData(pluginPlayer.player.animeDataList, anime_data.title)
+        if (anime_data.id === "") {
+            fetchData(pluginPlayer.player.animeDataList, undefined, anime_data.player_ID)
+        } else {
+            fetchData(pluginPlayer.player.animeDataList, anime_data.title)
+        }
     }, [])
 
     function enterPlayer(episodes: string[], type: string, episode: string) {

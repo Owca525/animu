@@ -163,6 +163,12 @@ async function getAnimeList(name: string): Promise<cardData[]> {
   return data.shows.edges.map((data) => converterData(data))
 }
 
+async function extractInformation(id: string) {
+  let variables = `{"_id":"${id}"}`;
+  const resp = await sendToAPI(variables, HASH_INFO, header);
+  return converterData(resp.data.show).AnimeData
+}
+
 export async function getInformation(name?: string, anime_id?: string): Promise<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] }> {
   if (name) {
     let data = await getAnimeList(name);
@@ -178,11 +184,8 @@ export async function getInformation(name?: string, anime_id?: string): Promise<
     anime_id = card.AnimeData.player_ID ? card.AnimeData.player_ID : "";
   };
   if (anime_id == "") return { player_id: "", episodesData: [] };
-
-  let variables = `{"_id":"${anime_id}"}`;
-  const resp = await sendToAPI(variables, HASH_INFO, header);
-  console.log(resp);
-  let anime_data = converterData(resp.data.show).AnimeData.episodesList;
+  if (!anime_id) return { player_id: "", episodesData: [] }
+  let anime_data = (await extractInformation(anime_id)).episodesList
   if (!anime_data) return { player_id: "", episodesData: [] };
   return { player_id: anime_id ? anime_id : "", episodesData: anime_data };
 }
@@ -267,7 +270,8 @@ export const infoPluginPlayer: pluginFormat = {
     animeDataList: getInformation,
     getUrls: extractURLS,
     episodeList: getEpisodeList,
-    animeList: getAnimeList
+    animeList: getAnimeList,
+    getInformation: extractInformation
   },
   sidebarAddon: [{ icon: "today", text: "Recent Anime", onClick: async () => await recentAnime() }]
 }

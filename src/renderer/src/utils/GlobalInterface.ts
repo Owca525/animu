@@ -100,6 +100,7 @@ export interface pluginFormat {
         animeDataList: (name?: string, anime_id?: string) => Promise<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] }>
         episodeList: (type: string, anime_id: string) => Promise<Array<string> | null>
         animeList: (name: string) => Promise<cardData[]>
+        getInformation: (id: string) => Promise<AnimeData>
     } | null
     sidebarAddon?: sidebarData[]
 }

@@ -30,6 +30,13 @@ const Card: React.FC<cardData> = ({ AnimeData, saveData, deletionCard, onClick }
       return
     }
 
+    if (AnimeData.id === "") {
+      navigate("/info", {
+        state: await pluginPlayer.player.getInformation(AnimeData.player_ID)
+      })
+      return
+    }
+
     navigate("/info", {
       state: AnimeData
     })
