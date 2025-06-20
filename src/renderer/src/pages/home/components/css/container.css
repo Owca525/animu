@@ -13,6 +13,9 @@
 }
 
 .container-title-click {
+    display: flex;
+    justify-content: center;
+    width: max-content;
     cursor: pointer;
 }
 
