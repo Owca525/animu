@@ -70,8 +70,7 @@ function settings() {
         })
     }
 
-    useHotkeys(["ctrl", "d"], () => {
-        console.log("Keybind")
+    useHotkeys(["ctrl+d"], () => {
         if (config.new.Developer.DeveloperMode) return
         showDialog({
             type: "info",
