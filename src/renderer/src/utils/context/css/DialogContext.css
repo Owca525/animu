@@ -14,7 +14,8 @@
     padding: 15px;
     gap: 6px;
     min-width: min-content;
-    max-width: 70vw;
+    max-width: 400px;
+    width: clamp(30px, 20vw, 400px);
 }
 
 .dialog-title {

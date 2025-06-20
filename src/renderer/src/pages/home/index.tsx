@@ -13,6 +13,8 @@ import store from "@renderer/utils/store"
 import { homeStopScrolling, setHomeData } from "@renderer/utils/pluginApi"
 import { ReadContinue } from "@renderer/utils/history/continueWatch"
 import { ReadHistory } from "@renderer/utils/history/history"
+import { useHotkeys } from "react-hotkeys-hook"
+import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext"
 
 const Home = () => {
     const navigate = useNavigate()
@@ -48,6 +50,20 @@ const Home = () => {
             top: [...sidebarData.top, ...pluginPlayer.sidebarAddon]
         }
     }
+
+    useHotkeys("d", () => {
+        showDialog({
+            type: "refresh",
+            title: "Test",
+            description: "Test",
+            buttons: {
+                firstbutton: function (): void {
+                    throw new Error("Function not implemented.")
+                },
+                secondbutton: () => closeDialog()
+            }
+        })
+    })
 
     useEffect(() => {
         if (homeCache.data.length == 0) plugin.information.home()

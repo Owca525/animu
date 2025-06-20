@@ -176,11 +176,11 @@ export interface SettingsConfig {
 }
 
 export interface dialogProps {
-    type: "error" | "info" | "none"
+    type: "error" | "info" | "refresh" | "none" 
     title: string
     description?: string
     buttons: {
-        yesButton: () => void
-        noButton: () => void
+        firstbutton: () => void
+        secondbutton: () => void
     }
 }

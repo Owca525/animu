@@ -81,11 +81,11 @@ const player = () => {
     if (isLoading == false && data && data.length <= 0) {
         loadingAnimation()
         showDialog({
-            type: "error",
+            type: "refresh",
             title: t("player.error.notfound"),
             buttons: {
-                yesButton: () => leave(),
-                noButton: () => refetch()
+                firstbutton: () => refetch(),
+                secondbutton: () => leave()
             }
         })
         return

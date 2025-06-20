@@ -76,8 +76,8 @@ function settings() {
             type: "info",
             title: "Turn On Developer Mode",
             buttons: {
-                yesButton: () => handleChange("Developer.DeveloperMode", true),
-                noButton: () => handleChange("Developer.DeveloperMode", false)
+                firstbutton: () => handleChange("Developer.DeveloperMode", true),
+                secondbutton: () => handleChange("Developer.DeveloperMode", false)
             }
         })
     })
