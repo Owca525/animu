@@ -7,6 +7,7 @@ if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld("api", {
       open: (url: string) => ipcRenderer.invoke("open", url),
+      saveToClipboard: (type: "text" | "image", content: string) => ipcRenderer.invoke("saveToClipboard", type, content),
       update: {
         updateAvailable: (callback) =>
           ipcRenderer.on("update-available", callback),

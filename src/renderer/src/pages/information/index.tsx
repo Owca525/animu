@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { AnimeData } from "@renderer/utils/GlobalInterface";
+import { AnimeData, notificationProps } from "@renderer/utils/GlobalInterface";
 import Button from "@renderer/components/buttons";
 import "./information.css"
 import { capitalizeFirstLetter, convertDateToFormattedString, convertSeconds, decodeHtmlEntities } from "@renderer/utils/functions";
@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import Drop from "./components/drop";
 import ContainerWrong from "./components/containerWrong";
 import { useHotkeys } from "react-hotkeys-hook";
+import { toast } from "react-toastify";
 
 function information() {
     const navigate = useNavigate()
@@ -94,16 +95,14 @@ function information() {
         })
     }
 
-    // async function SaveCoverToClipboard(screenshot: string | null) {
-    //     if (!screenshot) return
-    //     const blob = await (await fetch(screenshot)).blob();
-    //     console.log(screenshot)
-    //     await navigator.clipboard.write([
-    //         new ClipboardItem({
-    //             [blob.type]: blob
-    //         })
-    //     ]);
-    // }
+    async function SaveCoverToClipboard(url: string | null) {
+        if (!url) return
+        if (await window.api.saveToClipboard("image", url)) {
+            toast.success(t("information.notification.coverdone"), notificationProps)
+        } else {
+            toast.error(t("information.notification.coverfailed"), notificationProps)
+        }
+    }
 
     function makeButtons(episode: string[], type: string) {
         return (
@@ -134,7 +133,7 @@ function information() {
 
                     <div className="information-top">
 
-                        <img className="information-cover" onError={() => setCoverIsError(() => true)} onLoad={() => setCoverIsLoading(() => false)} src={anime_data.coverImage ? anime_data.coverImage : ""} style={isCoverLoading ? { display: "none" } : isError ? { display: "none" } : {animation: "fadeIn 0.3s forwards"}}></img>
+                        <img className="information-cover" onClick={() => SaveCoverToClipboard(anime_data.coverImage)} onError={() => setCoverIsError(() => true)} onLoad={() => setCoverIsLoading(() => false)} src={anime_data.coverImage ? anime_data.coverImage : ""} style={isCoverLoading ? { display: "none" } : isError ? { display: "none" } : {animation: "fadeIn 0.3s forwards"}}></img>
                         {isCoverLoading && isError == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div>}
                         {isCoverError && isCoverLoading == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined">error</span></div>}
 

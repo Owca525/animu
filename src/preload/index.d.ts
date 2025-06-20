@@ -4,6 +4,7 @@ declare global {
   interface Window {
     api: {
       open: (url: string) => Promise<void>;
+      saveToClipboard: (type: "text" | "image", content: string) => Promise<boolean>;
       update: {
         updateAvailable: (
           callback: (

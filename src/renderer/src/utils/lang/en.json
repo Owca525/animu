@@ -30,7 +30,11 @@
         "startdate": "Start Date",
         "endate": "End Date",
         "season": "Season",
-        "descriptionnotfound": "Description Doesn't exist"
+        "descriptionnotfound": "Description Doesn't exist",
+        "notification": {
+            "coverdone": "Cover Succesfully saved in clipboard",
+            "coverfailed": "Failed save cover to clipboard"
+        }
     },
     "settings": {
         "general": {

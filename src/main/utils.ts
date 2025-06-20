@@ -1,4 +1,4 @@
-import { app, ipcMain, shell } from "electron"
+import { app, clipboard, ipcMain, nativeImage, shell } from "electron"
 import * as RPC from 'discord-rpc';
 
 import fs from "fs";
@@ -54,6 +54,26 @@ ipcMain.handle('runExternalPlayer', (_event, url: string, path: string, time: st
 ipcMain.handle('open', async (_event, url: string): Promise<void> => {
     if (validUrl(url)) await shell.openExternal(url)
     else await shell.openPath(url)
+})
+
+ipcMain.handle('saveToClipboard', async (_event, type: "text" | "image", content: string): Promise<boolean> => {
+    try {
+        if (type == "text") {
+            clipboard.writeText(content)
+            return true
+        }
+        if (type == "image") {
+            const response = await fetch(content);
+            const buffer = await response.arrayBuffer();
+            const image = nativeImage.createFromBuffer(Buffer.from(buffer));
+            clipboard.writeImage(image);
+            return true
+        }
+        return false
+    } catch (Error) {
+        console.log(Error)
+        return false
+    }
 })
 
 ipcMain.handle('get-css-files', async (): Promise<{ path: string, filename: string, type: "user" | "official" }[]> => {
