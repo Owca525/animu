@@ -3,6 +3,7 @@ import { dialogProps } from "../GlobalInterface";
 import Button from "@renderer/components/buttons";
 import "./css/DialogContext.css"
 import { t } from "i18next";
+import { motion } from "framer-motion";
 
 let showDialog: (data: dialogProps) => void = () => { };
 let closeDialog: () => void = () => { };
@@ -29,7 +30,7 @@ const DialogContext: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       {children}
       {isOpen && data && (
         <main className="dialog-main-background">
-          <div className="dialog-container">
+          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.1 }} className="dialog-container">
             <div className="dialog-title">
               {data.title}
               {data.type != "none" && data.type != "refresh" && (
@@ -47,7 +48,7 @@ const DialogContext: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 <Button content={t("dialog.no")} onClick={() => { data.buttons.secondbutton(); closeDialog() }} />
               </>}
             </div>
-          </div>
+          </motion.div>
         </main>
       )}
     </>
