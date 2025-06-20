@@ -45,7 +45,7 @@ const Card: React.FC<cardData> = ({ AnimeData, saveData, deletionCard, onClick }
   function checkState() {
     if (isLoading) return { display: "none" }
     if (isError) return { display: "none" }
-    return {}
+    return {animation: "fadeIn 0.3s forwards"}
   }
 
   return (
