@@ -2,7 +2,6 @@ import { lazy, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
-import useHotkeys from "@reecelucas/react-use-hotkeys"
 
 // utils
 import { closeDialog } from "@renderer/utils/context/DialogContext"
@@ -18,6 +17,7 @@ import { formatTime, refetchHistory } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
 import { DeleteFromContinue, SaveContinue } from "@renderer/utils/history/continueWatch"
+import { useHotkeys } from "react-hotkeys-hook"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -423,7 +423,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             toast.error(t("player.toastscreenshot.failed"), notificationProps);
             return
         }
-        console.log(config.Player.screenShot.path == "Both")
         if (config.Player.screenShot.saveType == "Clipboard" || config.Player.screenShot.saveType == "Both") {
             const blob = await (await fetch(screenshot)).blob();
             await navigator.clipboard.write([

@@ -13,12 +13,12 @@ import i18n from "i18next"
 import { checkPictureFolder, saveConfig } from "@renderer/utils/config";
 import { calculateZoomLevel, capitalizeFirstLetter, changeTheme, convertKeybinds } from "@renderer/utils/functions";
 import CheckKeybind from "./components/checkKeybind";
-import useHotkeys from "@reecelucas/react-use-hotkeys";
 import { showDialog } from "@renderer/utils/context/DialogContext";
 import store from "@renderer/utils/store";
 import { toast } from "react-toastify";
 import SeekBar from "@renderer/components/seekBar";
 import { motion } from "framer-motion";
+import { useHotkeys } from "react-hotkeys-hook";
 
 function settings() {
     const navigate = useNavigate();

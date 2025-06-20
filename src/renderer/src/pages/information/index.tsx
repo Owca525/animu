@@ -5,10 +5,10 @@ import "./information.css"
 import { capitalizeFirstLetter, convertDateToFormattedString, convertSeconds, decodeHtmlEntities } from "@renderer/utils/functions";
 import { useEffect, useState } from "react";
 import { t } from "i18next"
-import useHotkeys from "@reecelucas/react-use-hotkeys";
 import { useSelector } from "react-redux";
 import Drop from "./components/drop";
 import ContainerWrong from "./components/containerWrong";
+import { useHotkeys } from "react-hotkeys-hook";
 
 function information() {
     const navigate = useNavigate()

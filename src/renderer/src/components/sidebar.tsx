@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react"
 import Button from "./buttons"
 import "./css/sidebar.css"
-import useHotkeys from "@reecelucas/react-use-hotkeys"
 import icon from "../../../../resources/icon.png"
 import { sidebarData } from "@renderer/utils/GlobalInterface"
 import { motion } from "framer-motion"
+import { useHotkeys } from "react-hotkeys-hook"
 
 interface sidebarProps {
     showLogo?: boolean

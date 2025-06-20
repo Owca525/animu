@@ -21,7 +21,7 @@ import { checkUpdate } from './utils/update';
 import { calculateZoomLevel, checkDate } from './utils/functions';
 import i18n from './utils/i18n';
 import ErrorBoundary from './utils/ErrorBoundary';
-import useHotkeys from '@reecelucas/react-use-hotkeys';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 LoadConfig()
 
