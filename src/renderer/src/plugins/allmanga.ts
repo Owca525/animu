@@ -93,7 +93,7 @@ function converterData(data: any): cardData {
       duration: data.episodeDuration ? convertMsToMinutes(parseInt(data.episodeDuration)) : null,
       endDate: data.airedEnd ? { year: data.airedEnd.year, day: data.airedEnd.date, month: data.airedEnd.month } : null,
       startDate: data.airedStart ? { year: data.airedStart.year, day: data.airedStart.date, month: data.airedStart.month } : null,
-      episodes: parseInt(data.episodeCount),
+      episodes: data.episodeCount ? parseInt(data.episodeCount) : null,
       genres: data.genres,
       isAdult: data.isAdult,
       nextAiringEpisode: null,
