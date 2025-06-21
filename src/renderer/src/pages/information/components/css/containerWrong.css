@@ -6,16 +6,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: color-mix(in srgb, var(--bg) 70%, transparent);
 }
 
 .information-containerwrong {
-    background-color: var(--bg2);
     width: 80%;
     height: 80%;
     border-radius: 12px;
     padding: 12px;
-    border: solid 2px var(--bg3);
     position: relative;
 }
 
@@ -26,5 +23,5 @@
     right: 1;
     left: 0;
     margin: -24px;
-    border-radius: 50%;
+    border-radius: 50% !important; 
 }

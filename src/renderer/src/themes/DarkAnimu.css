@@ -563,3 +563,16 @@ body {
   background-color: var(--seekbarneutral1);
   border-radius: 12px;
 }
+
+
+/* ContainerWrong */
+
+.information-containerwrong {
+    background-color: var(--bg2);
+    border: solid 2px var(--bg3);
+}
+
+
+.information-containerwrong-void {
+    background-color: color-mix(in srgb, var(--bg) 70%, transparent);
+}
