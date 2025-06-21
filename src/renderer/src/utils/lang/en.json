@@ -6,7 +6,7 @@
         "general": "General",
         "cfglocation": "Config Location",
         "player": "Player",
-        "continuewatch": "Continue Watch",
+        "continuewatch": "Continue Watching",
         "dev": "Developer",
         "minutes": "Minutes"
     },
@@ -22,7 +22,7 @@
         "nothingfound": "Where did it all go?"
     },
     "information": {
-        "airing": "Aring Episode",
+        "airing": "Airing Episode",
         "format": "Format",
         "episodes": "Episodes",
         "duration": "Episode Duration",
@@ -30,10 +30,10 @@
         "startdate": "Start Date",
         "endate": "End Date",
         "season": "Season",
-        "descriptionnotfound": "Description Doesn't exist",
+        "descriptionnotfound": "Description Not Found",
         "notification": {
-            "coverdone": "Cover Succesfully saved in clipboard",
-            "coverfailed": "Failed save cover to clipboard"
+            "coverdone": "Cover succesfully copied to clipboard",
+            "coverfailed": "Failed to copy clipboard"
         }
     },
     "settings": {
@@ -43,9 +43,10 @@
             "updates": "Updates",
             "checkupdates": "Check Updates",
             "window": "Window",
-            "maximize": "Auto Maximizer",
-            "fullscreen": "Auto fullscreen",
-            "zoom": "Zoom"
+            "maximize": "Auto Maximize",
+            "fullscreen": "Auto Fullscreen",
+            "zoom": "Zoom",
+            "meow" : ":3"
         },
         "player": {
             "play": "Auto Play",
