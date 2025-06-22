@@ -78,7 +78,7 @@ export async function changeTheme(name: string) {
 export function convertKeybinds(inputString: string) {
     const convert: Record<string, string> = {
         "control": "ctrl",
-        "shift": "shft",
+        "shift": "shift",
         "alt": "alt",
         "escape": "esc",
         "tab": "tab",

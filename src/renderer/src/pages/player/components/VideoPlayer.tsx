@@ -13,11 +13,11 @@ const DeveloperStats = lazy(() => import('./developerStats'));
 // css
 import { cardData, notificationProps, playerData, SettingsConfig } from "@renderer/utils/GlobalInterface"
 import { useSelector } from "react-redux"
-import { formatTime, refetchHistory } from "@renderer/utils/functions"
+import { convertKeybinds, formatTime, refetchHistory } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
 import { DeleteFromContinue, SaveContinue } from "@renderer/utils/history/continueWatch"
-import { useHotkeys } from "react-hotkeys-hook"
+import useKeyPress from "@renderer/utils/hooks/useKeyPress"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -336,57 +336,60 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         } else videoRef.current.currentTime = time
     }
 
-    useHotkeys("*", (event) => {
-        if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() == "d") setshowNerdStats((prev) => !prev)
-        keybinds(event)
-    });
-    async function keybinds(event: KeyboardEvent) {
-        if (videoRef.current && config) {
+    useKeyPress((keys: string) => {
+        console.log(keys)
+        if (keys == "CTRL+SHIFT+D") {
+            setshowNerdStats((prev) => !prev)
+        }
+        keybinds(keys)
+    })
+    async function keybinds(event: string) {
+        if (videoRef.current) {
             var time_now = videoRef.current.currentTime
-            switch (event.key.toLowerCase()) {
-                case config.Player.keybinds.Pause.toLowerCase():
+            switch (event.toLowerCase()) {
+                case convertKeybinds(config.Player.keybinds.Pause.toLowerCase()).toLowerCase():
                     togglePlay()
                     break
-                case config.Player.keybinds.TimeSkipRight.toLowerCase():
+                case convertKeybinds(config.Player.keybinds.TimeSkipRight.toLowerCase()).toLowerCase():
                     change_time((time_now += parseInt(config.Player.general.TimeSkipRight.toString())))
                     break
-                case config.Player.keybinds.TimeSkipLeft.toLowerCase():
+                case convertKeybinds(config.Player.keybinds.TimeSkipLeft.toLowerCase()).toLowerCase():
                     change_time((time_now -= parseInt(config.Player.general.TimeSkipLeft.toString())))
                     break
-                case config.Player.keybinds.LongTimeSkipForward.toLowerCase():
+                case convertKeybinds(config.Player.keybinds.LongTimeSkipForward.toLowerCase()).toLowerCase():
                     change_time((time_now += parseInt(config.Player.general.LongTimeSkipForward.toString())))
                     break
-                case config.Player.keybinds.LongTimeSkipBack.toLowerCase():
+                case convertKeybinds(config.Player.keybinds.LongTimeSkipBack.toLowerCase()).toLowerCase():
                     change_time((time_now -= parseInt(config.Player.general.LongTimeSkipBack.toString())))
                     break
-                case config.Player.keybinds.Fullscreen.toLowerCase():
+                case convertKeybinds(config.Player.keybinds.Fullscreen.toLowerCase()).toLowerCase():
                     await enterFullscreen()
                     break
-                case config.Player.keybinds.ExitPlayer.toLowerCase():
+                case convertKeybinds(config.Player.keybinds.ExitPlayer.toLowerCase()).toLowerCase():
                     exitPlayer()
                     break
-                case config.Player.keybinds.FrameSkipForward.toLowerCase():
+                case convertKeybinds(config.Player.keybinds.FrameSkipForward.toLowerCase()).toLowerCase():
                     change_time((time_now += 0.0416))
                     break
-                case config.Player.keybinds.FrameSkipBack.toLowerCase():
+                case convertKeybinds(config.Player.keybinds.FrameSkipBack.toLowerCase()).toLowerCase():
                     change_time((time_now -= 0.0416))
                     break
-                case config.Player.keybinds.VolumeDown.toLowerCase():
+                case convertKeybinds(config.Player.keybinds.VolumeDown.toLowerCase()).toLowerCase():
                     handleVolume((videoRef.current.volume * 100) - 1)
                     break
-                case config.Player.keybinds.VolumeUp.toLowerCase():
+                case convertKeybinds(config.Player.keybinds.VolumeUp.toLowerCase()).toLowerCase():
                     handleVolume((videoRef.current.volume * 100) + 1)
                     break
-                case config.Player.keybinds.ScreenShot.toLowerCase():
+                case convertKeybinds(config.Player.keybinds.ScreenShot.toLowerCase()).toLowerCase():
                     takeScreenshot()
                     break
-                case config.Player.keybinds.VolumeMute.toLowerCase():
+                case convertKeybinds(config.Player.keybinds.VolumeMute.toLowerCase()).toLowerCase():
                     setMuted(prev => !prev)
                     break
-                case config.Player.keybinds.NextEpisode.toLowerCase():
+                case convertKeybinds(config.Player.keybinds.NextEpisode.toLowerCase()).toLowerCase():
                     functions.nextButton("next")
                     break
-                case config.Player.keybinds.PrevEpisode.toLowerCase():
+                case convertKeybinds(config.Player.keybinds.PrevEpisode.toLowerCase()).toLowerCase():
                     functions.prevButton("prev")
                     break
             }
@@ -560,8 +563,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                     ))}
                                 </div>
                             )}
-                            <Button icon="settings" ButtonClass="player-buttons" titleButton={t('global.settings')} onClick={() => { currentSettings !== "" ? setcurrentSettings("") : setcurrentSettings("settings") }}/>
-                            <Button icon={isFullscreen ? 'fullscreen_exit' : 'fullscreen'} ButtonClass="player-buttons" titleButton={t('player.fullscreen')} onClick={async () => await enterFullscreen()}/>
+                            <Button icon="settings" ButtonClass="player-buttons" titleButton={t('global.settings')} onClick={() => { currentSettings !== "" ? setcurrentSettings("") : setcurrentSettings("settings") }} />
+                            <Button icon={isFullscreen ? 'fullscreen_exit' : 'fullscreen'} ButtonClass="player-buttons" titleButton={t('player.fullscreen')} onClick={async () => await enterFullscreen()} />
                         </div>
                     </div>
                 </div>
