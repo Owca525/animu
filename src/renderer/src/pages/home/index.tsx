@@ -13,7 +13,6 @@ import store from "@renderer/utils/store"
 import { homeStopScrolling, setHomeData, setHomeLocalSearch } from "@renderer/utils/pluginApi"
 import { ReadContinue } from "@renderer/utils/history/continueWatch"
 import { ReadHistory } from "@renderer/utils/history/history"
-import { similarityText } from "@renderer/utils/functions"
 
 const Home = () => {
     const navigate = useNavigate()
