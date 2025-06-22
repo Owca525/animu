@@ -5,6 +5,7 @@ import icon from "../../../../resources/icon.png"
 import { sidebarData } from "@renderer/utils/GlobalInterface"
 import { motion } from "framer-motion"
 import { useHotkeys } from "react-hotkeys-hook"
+import { setHomeLocalSearch } from "@renderer/utils/pluginApi"
 
 interface sidebarProps {
     showLogo?: boolean
@@ -82,11 +83,11 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, sidebarClass, data, hideBut
 
                 <div className={`sidebar-top ${"sidebar-max-button"}`}>
                     {showLogo ? <div className="sidebar-black-line"></div> : ""}
-                    {data.top.map((value) => <Button icon={value.icon} content={hideButton == false ? sidebarHover ? value.text : undefined : value.text} onClick={(event) => hideSidebar(event, value.onClick)} ButtonClass="sidebar-button" iconClassName="sidebar-button" />)}
+                    {data.top.map((value) => <Button icon={value.icon} content={hideButton == false ? sidebarHover ? value.text : undefined : value.text} onClick={(event) => {setHomeLocalSearch(false); hideSidebar(event, value.onClick)}} ButtonClass="sidebar-button" iconClassName="sidebar-button" />)}
                 </div>
                 <div className={`sidebar-bottom ${"sidebar-max-button"}`}>
                     <div className="sidebar-black-line"></div>
-                    {data.bottom.map((value) => <Button icon={value.icon} content={hideButton == false ? sidebarHover ? value.text : undefined : value.text} onClick={(event) => hideSidebar(event, value.onClick)} ButtonClass="sidebar-button" iconClassName="sidebar-button" />)}
+                    {data.bottom.map((value) => <Button icon={value.icon} content={hideButton == false ? sidebarHover ? value.text : undefined : value.text} onClick={(event) => {setHomeLocalSearch(false); hideSidebar(event, value.onClick)}} ButtonClass="sidebar-button" iconClassName="sidebar-button" />)}
                 </div>
             </motion.div>
         </div>

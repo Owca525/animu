@@ -10,9 +10,10 @@ import { useEffect } from "react"
 import { containerData, homeData } from "@renderer/utils/GlobalInterface"
 import { t } from "i18next"
 import store from "@renderer/utils/store"
-import { homeStopScrolling, setHomeData } from "@renderer/utils/pluginApi"
+import { homeStopScrolling, setHomeData, setHomeLocalSearch } from "@renderer/utils/pluginApi"
 import { ReadContinue } from "@renderer/utils/history/continueWatch"
 import { ReadHistory } from "@renderer/utils/history/history"
+import { similarityText } from "@renderer/utils/functions"
 
 const Home = () => {
     const navigate = useNavigate()
@@ -55,6 +56,7 @@ const Home = () => {
     }, [])
 
     async function history(): Promise<containerData[]> {
+        setHomeLocalSearch(true)
         return [
             {
                 title: t("global.continuewatch"),
@@ -92,11 +94,44 @@ const Home = () => {
         }
     }
 
+    async function OnSearch(text: string) {
+        if (!homeCache.localSearch) {
+            store.dispatch({ type: "setSearch", payload: text });
+            store.dispatch({ type: "setPage", payload: 1 });
+            homeStopScrolling(false);
+            plugin.information.search(text, 1)
+            return
+        }
+
+        if (text == "" || text == " "){
+            await setHomeData(history)
+            return
+        }
+
+        let HomeData = homeCache.data;
+        if (homeCache.data.length == 2 || homeCache.data.length == 0) {
+            HomeData = await history()
+        }
+        if (homeCache.data.length == 1 && homeCache.data[0].title == t("global.history")){
+            HomeData = [{...homeCache.data[0], data: await ReadHistory() }]
+        }
+        if (homeCache.data.length == 1 && homeCache.data[0].title == t("global.continuewatch")){
+            HomeData = [{...homeCache.data[0], data: await ReadContinue() }]
+        }
+
+        let newData = HomeData.map((containerData) => {
+            let data = containerData.data.filter(data => data.AnimeData.title.toLowerCase().includes(text.toLowerCase()));
+            if (data.length == 0) return 
+            return {...containerData, data: data}
+        })
+        setHomeData(async () => newData.filter((value) => value != undefined))
+    }
+
     return (
         <main className="home">
             <div className="home-header">
                 <div className="home-header-left">
-                    <Input placeholder={t("home.search")} onKeyDown={(text) => { store.dispatch({ type: "setSearch", payload: text }); store.dispatch({ type: "setPage", payload: 1 }); homeStopScrolling(false); plugin.information.search(text, 1) }} />
+                    <Input placeholder={t("home.search")} onKeyDown={OnSearch} />
                 </div>
                 <div></div>
                 <div className="home-header-right"></div>

@@ -50,6 +50,7 @@ export interface homeData {
     page: number
     stopScrolling: boolean
     containerLoading: boolean
+    localSearch: boolean
 }
 
 export interface playerData {

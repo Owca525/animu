@@ -40,10 +40,20 @@ export async function UpdateHomeData(func: () => Promise<{ data: containerData, 
     }
 }
 
-export async function homeStopScrolling(playload: boolean) {
+export async function homeStopScrolling(payload: boolean) {
     try {
         store.dispatch({
-            type: "setStopScrolling", payload: playload
+            type: "setStopScrolling", payload: payload
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export async function setHomeLocalSearch(payload: boolean) {
+    try {
+        store.dispatch({
+            type: "setLocalSearch", payload: payload
         })
     } catch (error) {
         console.log(error)
