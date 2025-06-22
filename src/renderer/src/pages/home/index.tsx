@@ -6,7 +6,7 @@ import Input from "@renderer/components/input"
 import Sidebar from "@renderer/components/sidebar"
 import Container from "./components/container"
 import { useSelector } from "react-redux"
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { containerData, homeData } from "@renderer/utils/GlobalInterface"
 import { t } from "i18next"
 import store from "@renderer/utils/store"
@@ -19,6 +19,8 @@ const Home = () => {
     const plugin = useSelector((plugin: any) => plugin.plugin.informationPlugin);
     const homeCache: homeData = useSelector((cache: any) => cache.home);
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
+
+    const divRef = useRef<HTMLDivElement | null>(null);
 
     let sidebarData = {
         top: [
@@ -54,6 +56,17 @@ const Home = () => {
         window.api.rpc.setActivity(undefined, t("discordrpc.home"))
     }, [])
 
+    useEffect(() => {
+        if (!divRef.current) return
+        if (homeCache.data.length == 0) return
+        if (homeCache.data.length > 1) return
+        const { scrollHeight, clientHeight } = divRef.current;
+        console.log(scrollHeight > clientHeight)
+        if (scrollHeight > clientHeight == false) {
+            handleScroll()
+        }
+    }, [homeCache.data])
+
     async function history(): Promise<containerData[]> {
         setHomeLocalSearch(true)
         return [
@@ -76,8 +89,9 @@ const Home = () => {
 
     const handleScroll = () => {
         if (homeCache.data.length > 1) return
-        const currentPos = -document.getElementById("scrollID")!.scrollTop + document.getElementById("scrollID")!.scrollHeight
-        const endPosition = document.getElementById("scrollID")!.offsetHeight
+        if (!divRef.current) return
+        const currentPos = -divRef.current.scrollTop + divRef.current.scrollHeight
+        const endPosition = divRef.current.offsetHeight
         const isFUCKINGBottom = parseInt(currentPos.toFixed(0)) <= endPosition + 30
         if (isFUCKINGBottom && homeCache.stopScrolling == false && homeCache.data.length === 1) {
             console.log(homeCache.data[0])
@@ -102,7 +116,7 @@ const Home = () => {
             return
         }
 
-        if (text == "" || text == " "){
+        if (text == "" || text == " ") {
             await setHomeData(history)
             return
         }
@@ -111,17 +125,17 @@ const Home = () => {
         if (homeCache.data.length == 2 || homeCache.data.length == 0) {
             HomeData = await history()
         }
-        if (homeCache.data.length == 1 && homeCache.data[0].title == t("global.history")){
-            HomeData = [{...homeCache.data[0], data: await ReadHistory() }]
+        if (homeCache.data.length == 1 && homeCache.data[0].title == t("global.history")) {
+            HomeData = [{ ...homeCache.data[0], data: await ReadHistory() }]
         }
-        if (homeCache.data.length == 1 && homeCache.data[0].title == t("global.continuewatch")){
-            HomeData = [{...homeCache.data[0], data: await ReadContinue() }]
+        if (homeCache.data.length == 1 && homeCache.data[0].title == t("global.continuewatch")) {
+            HomeData = [{ ...homeCache.data[0], data: await ReadContinue() }]
         }
 
         let newData = HomeData.map((containerData) => {
             let data = containerData.data.filter(data => data.AnimeData.title.toLowerCase().includes(text.toLowerCase()));
-            if (data.length == 0) return 
-            return {...containerData, data: data}
+            if (data.length == 0) return
+            return { ...containerData, data: data }
         })
         setHomeData(async () => newData.filter((value) => value != undefined))
     }
@@ -135,7 +149,7 @@ const Home = () => {
                 <div></div>
                 <div className="home-header-right"></div>
             </div>
-            <div id={"scrollID"} className={homeCache.isLoading ? "home-loading-container" : "home-container"} onScroll={handleScroll}>
+            <div ref={divRef} className={homeCache.isLoading ? "home-loading-container" : "home-container"} onScroll={handleScroll}>
                 {
                     homeCache.isLoading ? <div className="material-symbols-outlined home-loading-animation">progress_activity</div>
                         :
