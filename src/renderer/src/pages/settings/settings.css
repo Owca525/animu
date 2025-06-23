@@ -97,3 +97,9 @@
   align-items: center;
   gap: 12px;
 }
+
+.settings-helpicon-space {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

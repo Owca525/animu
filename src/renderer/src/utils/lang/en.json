@@ -93,6 +93,14 @@
             "done": "Config has been succesfully saved",
             "error": "Saving config accure error",
             "notification": "Do you wanna save changes?"
+        },
+        "tips": {
+            "automaximize": "This make window maximize when you start application",
+            "autofullscreen": "This make window fullscreen when you start application",
+            "autofullscreenplayer": "Set fullscreen when player start",
+            "longskip": "You can set what time skip in the episode (this usefull for skipping opening)",
+            "shotskip": "This is normal skip time left or right",
+            "continuewatchsavehistory": "Animu save to 'continue watch' when for example past 20 seconds and stop saving when (epduration-100) seconds"
         }
     },
     "player": {

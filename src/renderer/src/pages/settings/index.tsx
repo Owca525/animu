@@ -19,6 +19,7 @@ import { toast } from "react-toastify";
 import SeekBar from "@renderer/components/seekBar";
 import { motion } from "framer-motion";
 import { useHotkeys } from "react-hotkeys-hook";
+import HelpIcon from "./components/helpIcon";
 
 function settings() {
     const navigate = useNavigate();
@@ -224,7 +225,7 @@ function settings() {
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.general.window")}</div>
                             <div className="settings-setting-container">
-                                {t("settings.general.maximize")}
+                                <span className="settings-helpicon-space">{t("settings.general.maximize")}<HelpIcon description={t("settings.tips.automaximize")}/></span>
                                 <CheckBox
                                     checked={config.new.General.Window.AutoMaximize}
                                     onChecked={(checked) =>
@@ -234,7 +235,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {t("settings.general.fullscreen")}
+                                <span className="settings-helpicon-space">{t("settings.general.fullscreen")}<HelpIcon description={t("settings.tips.autofullscreen")}/></span>
                                 <CheckBox
                                     checked={config.new.General.Window.AutoFullscreen}
                                     onChecked={(checked) =>
@@ -269,7 +270,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {t("settings.general.fullscreen")}
+                                <span className="settings-helpicon-space">{t("settings.general.fullscreen")}<HelpIcon description={t("settings.tips.autofullscreenplayer")}/></span>
                                 <CheckBox
                                     checked={config.new.Player.general.AutoFullscreen}
                                     onChecked={(checked) =>
@@ -299,7 +300,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {t("settings.player.longskip")}
+                                <span className="settings-helpicon-space">{t("settings.player.longskip")}<HelpIcon description={t("settings.tips.longskip")}/></span>
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
@@ -309,7 +310,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {t("settings.player.longskipb")}
+                                <span className="settings-helpicon-space">{t("settings.player.longskipb")}<HelpIcon description={t("settings.tips.longskip")}/></span>
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
@@ -319,7 +320,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {t("settings.player.shortskip")}
+                                <span className="settings-helpicon-space">{t("settings.player.shortskip")}<HelpIcon description={t("settings.tips.shotskip")}/></span>
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
@@ -329,7 +330,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {t("settings.player.shortskipb")}
+                                <span className="settings-helpicon-space">{t("settings.player.shortskipb")}<HelpIcon description={t("settings.tips.shotskip")}/></span>
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
@@ -473,22 +474,22 @@ function settings() {
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("global.continuewatch")}</div>
                             <div className="settings-setting-container">
-                                {t("settings.history.startsave")}
-                                <SettingsInput
-                                    iconChar="s"
-                                    type="number"
-                                    onKeyDown={(text) => handleChange("History.continue.MaximizeTimeSave", parseInt(text))}
-                                    startValue={config.new.History.continue.MaximizeTimeSave.toString()}
-                                />
-                            </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
-                                {t("settings.history.stopsave")}
+                                <span className="settings-helpicon-space">{t("settings.history.startsave")}<HelpIcon description={t("settings.tips.continuewatchsavehistory")}/></span>
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
                                     onKeyDown={(text) => handleChange("History.continue.MinimalTimeSave", parseInt(text))}
                                     startValue={config.new.History.continue.MinimalTimeSave.toString()}
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                <span className="settings-helpicon-space">{t("settings.history.stopsave")}<HelpIcon description={t("settings.tips.continuewatchsavehistory")}/></span>
+                                <SettingsInput
+                                    iconChar="s"
+                                    type="number"
+                                    onKeyDown={(text) => handleChange("History.continue.MaximizeTimeSave", parseInt(text))}
+                                    startValue={config.new.History.continue.MaximizeTimeSave.toString()}
                                 />
                             </div>
                         </div>
