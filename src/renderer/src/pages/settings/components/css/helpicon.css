@@ -1,0 +1,29 @@
+.help-icon-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+.help-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: x-large;
+}
+.help-icon-description {
+  position: absolute;
+  top: 110%;
+  left: 50%;
+  max-width: 200px;
+  width: max-content;
+  max-height: 100px;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 8px;
+  border-radius: 4px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  z-index: 1000;
+}

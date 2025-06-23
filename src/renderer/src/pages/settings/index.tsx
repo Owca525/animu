@@ -226,9 +226,9 @@ function settings() {
                             <div className="settings-setting-container">
                                 {t("settings.general.maximize")}
                                 <CheckBox
-                                    checked={config.new.General.Window.AutoFullscreen}
+                                    checked={config.new.General.Window.AutoMaximize}
                                     onChecked={(checked) =>
-                                        handleChange('General.Window.AutoFullscreen', checked)
+                                        handleChange('General.Window.AutoMaximize', checked)
                                     }
                                 />
                             </div>
@@ -236,9 +236,9 @@ function settings() {
                             <div className="settings-setting-container">
                                 {t("settings.general.fullscreen")}
                                 <CheckBox
-                                    checked={config.new.General.Window.AutoMaximize}
+                                    checked={config.new.General.Window.AutoFullscreen}
                                     onChecked={(checked) =>
-                                        handleChange('General.Window.AutoMaximize', checked)
+                                        handleChange('General.Window.AutoFullscreen', checked)
                                     }
                                 />
                             </div>
