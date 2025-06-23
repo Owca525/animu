@@ -2,8 +2,9 @@ import { containerData } from "./GlobalInterface";
 import store from "./store";
 
 export async function setHomeData(func: () => Promise<containerData[]>) {
-    store.dispatch({ type: "setLoadingHome", payload: { isLoading: true } })
     try {
+        if (store.getState().home.isLoading) return
+        store.dispatch({ type: "setLoadingHome", payload: { isLoading: true } })
         let data = await func()
         console.log(data)
         store.dispatch({
@@ -22,6 +23,7 @@ export async function setHomeData(func: () => Promise<containerData[]>) {
 
 export async function UpdateHomeData(func: () => Promise<{ data: containerData, maxPage: number }>) {
     try {
+        if (store.getState().home.isLoading) return
         store.dispatch({ type: "setcontainerLoading", payload: true })
         let data = await func()
         let tmp = store.getState().home.data[0]
