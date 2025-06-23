@@ -31,6 +31,9 @@
         "endate": "End Date",
         "season": "Season",
         "descriptionnotfound": "Description Not Found",
+        "containerwrong": {
+            "title": "Anime Found For name: {{name}}"
+        },
         "notification": {
             "coverdone": "Cover succesfully copied to clipboard",
             "coverfailed": "Failed to copy clipboard"
