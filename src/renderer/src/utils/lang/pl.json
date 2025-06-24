@@ -3,44 +3,72 @@
         "home": "Strona Główna",
         "history": "Historia",
         "settings": "Ustawienia",
-        "general": "General",
-        "cfglocation": "Config Location",
+        "general": "Ogólne",
+        "cfglocation": "Otwórz Config",
         "player": "Player",
-        "continuewatch": "Continue Watch",
-        "dev": "Developer"
+        "continuewatch": "Kontynuuj oglądanie",
+        "dev": "Developer",
+        "minutes": "Minuty",
+        "exitAnimu": "Czy chcesz opuścić Animu?"
+    },
+    "dialog": {
+        "yes": "Tak",
+        "no": "Nie",
+        "retry": "Spróbuj ponownie",
+        "exit": "Wyjdź",
+        "reset": "Reset",
+        "reload": "Reload",
+        "open": "Otwórz"
     },
     "home": {
-        "search": "Wyszukaj..."
+        "search": "Wyszukaj...",
+        "nothingfound": "Gdzie wszytko zniknęło?"
+    },
+    "contextMenu": {
+        "devtools": "Otwórz DevTools",
+        "nerdstats": "Pokaż statystyki dla nerdów",
+        "copytitle": "Kopiuj tytuł",
+        "copycover": "Kopiuj Okładkę",
+        "delete": "Usuń"
     },
     "information": {
-        "airing": "Aring Episode",
+        "airing": "Airing Episode",
         "format": "Format",
         "episodes": "Odcinki",
         "duration": "Długość Odcinka",
         "status": "Status",
-        "startdate": "Data Rozpoczęcia",
-        "endate": "Data Zakończenia",
-        "season": "Sezon"
+        "startdate": "Data rozpoczęcia",
+        "endate": "Data zakończenia",
+        "season": "Sezon",
+        "descriptionnotfound": "Nie znaleziono opisu",
+        "containerwrong": {
+            "title": "Anime Found For name: {{name}}"
+        },
+        "notification": {
+            "coverdone": "Okładka skopiowana do schowka",
+            "coverfailed": "Kopiowanie do schowka nie powiodło się"
+        }
     },
     "settings": {
         "general": {
             "language": "Język",
             "theme": "Motyw",
             "updates": "Aktualizacje",
-            "checkupdates": "Sprawdź Aktualizacje",
+            "checkupdates": "Sprawdź aktualizacje",
             "window": "Okno",
-            "maximize": "Auto Maximizer",
-            "fullscreen": "Auto fullscreen",
-            "zoom": "Zoom"
+            "maximize": "Automatycznie masksymalizuj",
+            "fullscreen": "Automatyczny fullscreen",
+            "zoom": "Zoom",
+            "meow" : ":3"
         },
         "player": {
-            "play": "Auto Play",
-            "skip": "Auto Skip Episodes",
-            "volume": "Default Volume",
-            "longskip": "Long Skip Forward",
-            "longskipb": "Long Skip Backward",
-            "shortskip": "Short Skip Forward",
-            "shortskipb": "Short Skip Backward",
+            "play": "Auto play",
+            "skip": "Automatycznie pomijaj odcinki",
+            "volume": "Domyślna głośność",
+            "longskip": "Długie pominięcie",
+            "longskipb": "Długie przewinięcie",
+            "shortskip": "Krótkie pominięcie do przodu",
+            "shortskipb": "Krótkie przewinięcie",
             "preload": "Player Preload Type",
             "screenshot": "Screenshots",
             "screenask": "Always ask Where Save Screenshots",
@@ -70,13 +98,78 @@
             "limit": "Limit For History",
             "startsave": "When Start Save History",
             "stopsave": "When Stop save History"
+        },
+        "saving": {
+            "done": "Config has been succesfully saved",
+            "error": "Saving config accure error",
+            "notification": "Do you wanna save changes?"
+        },
+        "tips": {
+            "automaximize": "This make window maximize when you start application",
+            "autofullscreen": "This make window fullscreen when you start application",
+            "autofullscreenplayer": "Set fullscreen when player start",
+            "longskip": "You can set what time skip in the episode (this usefull for skipping opening)",
+            "shotskip": "This is normal skip time left or right",
+            "continuewatchsavehistory": "Animu save to 'continue watch' when for example past 20 seconds and stop saving when (epduration-100) seconds"
         }
     },
     "player": {
-
+        "error": {
+            "notfound": "Player didn't find any urls"
+        },
+        "TitleEpisode": "Episode: {{ep}} of {{name}}",
+        "Volume": "Volume",
+        "next": "Next {{ep}} episode",
+        "previous": "Previous {{ep}} episode",
+        "Pause": "Pause",
+        "play": "Play",
+        "fullscreen": "Fullscreen",
+        "errors": {
+            "extractionError": "Failed Extracting Player Urls: {{error}}",
+            "MEDIA_ERR_ABORTED": "The playback was aborted.",
+            "MEDIA_ERR_NETWORK": "A network error occurred while fetching the video.",
+            "MEDIA_ERR_DECODE": "An error occurred while decoding the video.",
+            "MEDIA_ERR_SRC_NOT_SUPPORTED": "The video format or source is not supported.",
+            "default": "An unknown error occurred."
+        },
+        "upNext": {
+            "title": "Next Episode Playing in {{sec}} seconds",
+            "titleAnime": "Next Episode {{ep}} of {{title}}",
+            "nextEp": "Next Episode",
+            "hide": "Hide"
+        },
+        "toastscreenshot": {
+            "failed": "Failed To save Screenshot",
+            "doneclip": "Image Saved To the Clipboard Succesfully",
+            "donefile": "Image Saved To File Succesfully"
+        }
     },
+    "history": {
+        "continue": "Continue Episode {{ep}}",
+        "history": "Watched Episode {{ep}}"
+    },
+    "oldBackup": {
+        "backupcontinue": "Backup File Old Continue watch done",
+        "convertcontinue": "Convert Continue Watch: Succes {{success}}, Failed {{failed}}",
+        "convertcontinuedone": "Convertion Continue Watch Done: Succes {{success}}, Failed {{failed}}",
+        "convertcontinuefailed": "Failed Convert old continue watch to new",
+        "backuphistory": "Backup File Old History done",
+        "converthistory": "Convert History: Succes {{success}}, Failed {{failed}}",
+        "converthistorydone": "Convertion Continue Watch Done: Succes {{success}}, Failed {{failed}}",
+        "converthistoryfailed": "Failed Convert old History watch to new"
+    },
+    "update": {
+        "progess": "Download Progress {{procent}}%",
+        "done": "Updated Download, please restart application"
+    },
+    "discordrpc": {
+        "home": "In home",
+        "settings": "In Settings",
+        "player": "{{title}} Episode {{ep}}"
+    },
+    "globalError": "Critical Error has been accured, do you want go home?",
     "lang": {
-        "en": "Angielski",
-        "pl": "Polski"
+        "en": "English",
+        "pl": "Polish"
     }
 }

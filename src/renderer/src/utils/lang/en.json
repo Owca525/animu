@@ -115,7 +115,7 @@
     },
     "player": {
         "error": {
-            "notfound": "Player doesn't found any urls"
+            "notfound": "Player didn't find any urls"
         },
         "TitleEpisode": "Episode: {{ep}} of {{name}}",
         "Volume": "Volume",
@@ -140,8 +140,8 @@
         },
         "toastscreenshot": {
             "failed": "Failed To save Screenshot",
-            "doneclip": "Image Saved To the Clipboard Succesfull",
-            "donefile": "Image Saved To the File Succesfull"
+            "doneclip": "Image Saved To the Clipboard Succesfully",
+            "donefile": "Image Saved To File Succesfully"
         }
     },
     "history": {
