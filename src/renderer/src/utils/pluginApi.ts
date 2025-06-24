@@ -3,6 +3,7 @@ import store from "./store";
 
 export async function setHomeData(func: () => Promise<containerData[]>) {
     try {
+        homeStopScrolling(false)
         if (store.getState().home.isLoading) return
         store.dispatch({ type: "setLoadingHome", payload: { isLoading: true } })
         let data = await func()
@@ -23,6 +24,7 @@ export async function setHomeData(func: () => Promise<containerData[]>) {
 
 export async function UpdateHomeData(func: () => Promise<{ data: containerData, maxPage: number }>) {
     try {
+        homeStopScrolling(false)
         if (store.getState().home.isLoading) return
         store.dispatch({ type: "setcontainerLoading", payload: true })
         let data = await func()
