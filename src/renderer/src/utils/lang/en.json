@@ -11,6 +11,12 @@
         "minutes": "Minutes",
         "exitAnimu": "Do you want exit animu?"
     },
+    "saving": {
+        "historysucces": "Anime Has been Succesfully Removed From History",
+        "historyfailed": "Failed Save anime in History",
+        "continuewatchsuccess": "Anime Has been Succesfully Removed From Continue Watch",
+        "continuewatchfailed": "Failed Save anime in Continue Watch"
+    },
     "dialog": {
         "yes": "Yes",
         "no": "No",
@@ -91,7 +97,8 @@
                 "volumedown": "Volume Down",
                 "volumemute": "Volume Mute",
                 "screenshot": "Take a Screenshot"
-            }
+            },
+            "turnDeveloper": "Turn On Developer Mode"
         },
         "history": {
             "limited": "Limited Save History",

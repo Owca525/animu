@@ -1,5 +1,7 @@
+import { toast } from "react-toastify";
 import { refetchHistory } from "../functions";
 import { cardData } from "../GlobalInterface";
+import i18n from "../i18n";
 
 const appConfigDirPath = window.api.os.getPath("userData");
 
@@ -30,9 +32,21 @@ export async function DeleteFromFile(data: cardData, file: string) {
 
         window.api.os.write(await appConfigDirPath + `/${file}.json`, JSON.stringify(list))
         refetchHistory()
+        if (!data.deletionCard) return true
+        if (file === "continueWatch") {
+            toast.success(i18n.t("saving.continuewatchsuccess"))
+        } else if (file === "history") {
+            toast.success(i18n.t("saving.historysucces"))
+        }
         return true
     } catch (Error) {
         console.error(`${Error} in DeleteFromFile`)
+        if (!data.deletionCard) return false
+        if (file === "continueWatch") {
+            toast.error(i18n.t("saving.continuewatchfailed"))
+        } else if (file === "history") {
+            toast.error(i18n.t("saving.historyfailed"))
+        }
         return false
     }
 }

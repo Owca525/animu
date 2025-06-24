@@ -76,7 +76,7 @@ function settings() {
         if (config.new.Developer.DeveloperMode) return
         showDialog({
             type: "info",
-            title: "Turn On Developer Mode",
+            title: t("settings.turnDeveloper"),
             buttons: {
                 firstbutton: () => handleChange("Developer.DeveloperMode", true),
                 secondbutton: () => handleChange("Developer.DeveloperMode", false)
@@ -100,7 +100,7 @@ function settings() {
     ]
 
     if (config.new.Developer.DeveloperMode) {
-        ContextMenu.push({ option: "Open DevTools", onClick: window.BrowserWindow.openDevTools })
+        ContextMenu.push({ option: t("contextMenu.devtools"), onClick: window.BrowserWindow.openDevTools })
     }
 
     function handleChange(path: string, value: string | number | boolean) {
