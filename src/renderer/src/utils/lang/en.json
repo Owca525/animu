@@ -97,7 +97,8 @@
                 "volumedown": "Volume Down",
                 "volumemute": "Volume Mute",
                 "screenshot": "Take a Screenshot"
-            }
+            },
+            "turnDeveloper": "Turn On Developer Mode"
         },
         "history": {
             "limited": "Limited Save History",
