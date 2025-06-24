@@ -8,6 +8,7 @@ import './App.css'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import store from './utils/store';
 import { DialogContext } from './utils/context/DialogContext';
+import { ContextMenu } from './utils/context/ContextMenu';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,11 +22,13 @@ const queryClient = new QueryClient({
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <DialogContext>
-      <QueryClientProvider client={queryClient}>
-        <Provider store={store}>
-          <App />
-        </Provider>
-      </QueryClientProvider>
+      <ContextMenu>
+        <QueryClientProvider client={queryClient}>
+          <Provider store={store}>
+            <App />
+          </Provider>
+        </QueryClientProvider>
+      </ContextMenu>
     </DialogContext>
   </React.StrictMode>
 )

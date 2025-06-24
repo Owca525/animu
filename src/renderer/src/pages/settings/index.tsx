@@ -7,7 +7,7 @@ import Dropdown from "./components/dropDown";
 import { useEffect, useState } from "react";
 import Button from "@renderer/components/buttons";
 import { t } from "i18next"
-import { notificationProps, SettingsConfig } from "@renderer/utils/GlobalInterface";
+import { ContextMenuProps, notificationProps, SettingsConfig } from "@renderer/utils/GlobalInterface";
 import { useSelector } from "react-redux";
 import i18n from "i18next"
 import { checkPictureFolder, saveConfig } from "@renderer/utils/config";
@@ -20,6 +20,7 @@ import SeekBar from "@renderer/components/seekBar";
 import { motion } from "framer-motion";
 import { useHotkeys } from "react-hotkeys-hook";
 import HelpIcon from "./components/helpIcon";
+import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 
 function settings() {
     const navigate = useNavigate();
@@ -82,6 +83,25 @@ function settings() {
             }
         })
     })
+
+    let ContextMenu: ContextMenuProps = [
+        { option: t("dialog.reload"), onClick: () => location.reload() },
+        { option: "", line: true },
+        {
+            option: t("dialog.exit"), onClick: () => showDialog({
+                type: "info",
+                title: t("global.exitAnimu"),
+                buttons: {
+                    firstbutton: () => window.BrowserWindow.exit(),
+                    secondbutton: () => ""
+                }
+            })
+        }
+    ]
+
+    if (config.new.Developer.DeveloperMode) {
+        ContextMenu.push({ option: "Open DevTools", onClick: window.BrowserWindow.openDevTools })
+    }
 
     function handleChange(path: string, value: string | number | boolean) {
         setConfig((prevConfig) => {
@@ -155,7 +175,7 @@ function settings() {
     };
 
     return (
-        <main className="settings-container">
+        <main className="settings-container" onContextMenu={(event) => OpenContextMenu(ContextMenu, event)}>
             <Sidebar
                 data={sidebarData}
                 sidebarClass={{
@@ -225,7 +245,7 @@ function settings() {
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.general.window")}</div>
                             <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">{t("settings.general.maximize")}<HelpIcon description={t("settings.tips.automaximize")}/></span>
+                                <span className="settings-helpicon-space">{t("settings.general.maximize")}<HelpIcon description={t("settings.tips.automaximize")} /></span>
                                 <CheckBox
                                     checked={config.new.General.Window.AutoMaximize}
                                     onChecked={(checked) =>
@@ -235,7 +255,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">{t("settings.general.fullscreen")}<HelpIcon description={t("settings.tips.autofullscreen")}/></span>
+                                <span className="settings-helpicon-space">{t("settings.general.fullscreen")}<HelpIcon description={t("settings.tips.autofullscreen")} /></span>
                                 <CheckBox
                                     checked={config.new.General.Window.AutoFullscreen}
                                     onChecked={(checked) =>
@@ -270,7 +290,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">{t("settings.general.fullscreen")}<HelpIcon description={t("settings.tips.autofullscreenplayer")}/></span>
+                                <span className="settings-helpicon-space">{t("settings.general.fullscreen")}<HelpIcon description={t("settings.tips.autofullscreenplayer")} /></span>
                                 <CheckBox
                                     checked={config.new.Player.general.AutoFullscreen}
                                     onChecked={(checked) =>
@@ -300,7 +320,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">{t("settings.player.longskip")}<HelpIcon description={t("settings.tips.longskip")}/></span>
+                                <span className="settings-helpicon-space">{t("settings.player.longskip")}<HelpIcon description={t("settings.tips.longskip")} /></span>
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
@@ -310,7 +330,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">{t("settings.player.longskipb")}<HelpIcon description={t("settings.tips.longskip")}/></span>
+                                <span className="settings-helpicon-space">{t("settings.player.longskipb")}<HelpIcon description={t("settings.tips.longskip")} /></span>
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
@@ -320,7 +340,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">{t("settings.player.shortskip")}<HelpIcon description={t("settings.tips.shotskip")}/></span>
+                                <span className="settings-helpicon-space">{t("settings.player.shortskip")}<HelpIcon description={t("settings.tips.shotskip")} /></span>
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
@@ -330,7 +350,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">{t("settings.player.shortskipb")}<HelpIcon description={t("settings.tips.shotskip")}/></span>
+                                <span className="settings-helpicon-space">{t("settings.player.shortskipb")}<HelpIcon description={t("settings.tips.shotskip")} /></span>
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
@@ -474,7 +494,7 @@ function settings() {
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("global.continuewatch")}</div>
                             <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">{t("settings.history.startsave")}<HelpIcon description={t("settings.tips.continuewatchsavehistory")}/></span>
+                                <span className="settings-helpicon-space">{t("settings.history.startsave")}<HelpIcon description={t("settings.tips.continuewatchsavehistory")} /></span>
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
@@ -484,7 +504,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">{t("settings.history.stopsave")}<HelpIcon description={t("settings.tips.continuewatchsavehistory")}/></span>
+                                <span className="settings-helpicon-space">{t("settings.history.stopsave")}<HelpIcon description={t("settings.tips.continuewatchsavehistory")} /></span>
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"

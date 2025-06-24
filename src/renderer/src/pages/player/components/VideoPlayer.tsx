@@ -11,13 +11,14 @@ import NerdStats from "./nerdStats"
 const DeveloperStats = lazy(() => import('./developerStats'));
 
 // css
-import { cardData, notificationProps, playerData, SettingsConfig } from "@renderer/utils/GlobalInterface"
+import { cardData, ContextMenuProps, notificationProps, playerData, SettingsConfig } from "@renderer/utils/GlobalInterface"
 import { useSelector } from "react-redux"
-import { convertKeybinds, formatTime, refetchHistory } from "@renderer/utils/functions"
+import { convertKeybinds, CreateContextMenuOptions, formatTime, refetchHistory } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
 import { DeleteFromContinue, SaveContinue } from "@renderer/utils/history/continueWatch"
 import useKeyPress from "@renderer/utils/hooks/useKeyPress"
+import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -447,8 +448,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         return;
     };
 
+    const centerContextMenu: ContextMenuProps = [
+        { option: t("contextMenu.nerdstats"), onClick: () => setshowNerdStats((prev) => !prev) }
+    ]
+
     return (
-        <div className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove}>
+        <div className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
             <video
                 ref={videoRef}
                 className={isVisible ? 'video-player player-mask' : 'video-player'}

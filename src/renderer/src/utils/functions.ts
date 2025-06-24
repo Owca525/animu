@@ -1,9 +1,11 @@
 import { t } from "i18next";
-import { homeData } from "./GlobalInterface";
+import { ContextMenuProps, homeData } from "./GlobalInterface";
 import store from "./store";
 import { setHomeData } from "./pluginApi";
 import { ReadContinue } from "./history/continueWatch";
 import { ReadHistory } from "./history/history";
+import { showDialog } from "./context/DialogContext";
+import i18n from "./i18n";
 
 export function decodeHtmlEntities(str: string) {
     const parser = new DOMParser();
@@ -159,4 +161,42 @@ export async function refetchHistory() {
         })
         return
     }
+}
+
+export function CreateContextMenuOptions(start?: ContextMenuProps, center?: ContextMenuProps, end?: ContextMenuProps) {
+    let ContextMenu: ContextMenuProps = []
+    if (start) {
+        for (let index = 0; index < start.length; index++) {
+            const element = start[index];
+            ContextMenu.push(element)
+        }
+    }
+    ContextMenu.push({ option: i18n.t("dialog.reload"), onClick: () => location.reload() })
+    if (center) {
+        ContextMenu.push({ option: "", line: true })
+        for (let index = 0; index < center.length; index++) {
+            const element = center[index];
+            ContextMenu.push(element)
+        }
+    }
+    ContextMenu.push({ option: "", line: true })
+    if (end) {
+        for (let index = 0; index < end.length; index++) {
+            const element = end[index];
+            ContextMenu.push(element)
+        }
+    }
+    let config = store.getState().config
+    if (config.Developer.DeveloperMode) ContextMenu.push({ option: i18n.t("contextMenu.devtools"), onClick: window.BrowserWindow.openDevTools })
+    ContextMenu.push({
+        option: i18n.t("dialog.exit"), onClick: () => showDialog({
+            type: "info",
+            title: i18n.t("global.exitAnimu"),
+            buttons: {
+                firstbutton: () => window.BrowserWindow.exit(),
+                secondbutton: () => ""
+            }
+        })
+    })
+    return ContextMenu
 }

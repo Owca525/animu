@@ -87,6 +87,13 @@ export interface sidebarData {
     onClick?: () => any
 }
 
+export type ContextMenuProps = {
+    option: string,
+    onClick?: () => void,
+    line?: boolean,
+    deletion?: boolean
+}[]
+
 export interface pluginFormat {
     version: string
     name: string

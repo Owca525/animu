@@ -1,9 +1,11 @@
-import { cardData } from "@renderer/utils/GlobalInterface"
+import { cardData, ContextMenuProps } from "@renderer/utils/GlobalInterface"
 import "./css/card.css"
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
 import { t } from "i18next"
 import { useSelector } from "react-redux"
+import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
+import { CreateContextMenuOptions } from "@renderer/utils/functions"
 
 const Card: React.FC<cardData> = ({ AnimeData, saveData, deletionCard, onClick }) => {
   const navigate = useNavigate()
@@ -42,12 +44,11 @@ const Card: React.FC<cardData> = ({ AnimeData, saveData, deletionCard, onClick }
     })
   }
 
-  function runDeletionFunction(event) {
-    console.log(deletionCard)
-    event.preventDefault()
-    event.stopPropagation()
-    if (deletionCard) deletionCard()
-  }
+  // function runDeletionFunction(event) {
+  //   event.preventDefault()
+  //   event.stopPropagation()
+  //   if (deletionCard) deletionCard()
+  // }
 
   function checkState() {
     if (isLoading) return { display: "none" }
@@ -55,14 +56,23 @@ const Card: React.FC<cardData> = ({ AnimeData, saveData, deletionCard, onClick }
     return {animation: "fadeIn 0.3s forwards"}
   }
 
+  let CenterContextMenu: ContextMenuProps = [
+    { option: t("contextMenu.copytitle"), onClick: () => window.api.saveToClipboard("text", AnimeData.title) },
+    { option: t("contextMenu.copycover"), onClick: () => AnimeData.coverImage ? window.api.saveToClipboard("image", AnimeData.coverImage) : "" },
+  ]
+
+  if (deletionCard) {
+    CenterContextMenu.push({option: t("contextMenu.delete"), deletion: true, onClick: deletionCard})
+  }
+
   return (
-    <div className="card-container" onClick={sendToInformation} title={AnimeData.title}>
+    <div className="card-container" onClick={sendToInformation} title={AnimeData.title} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions([{option:t("dialog.open"), onClick: sendToInformation}], CenterContextMenu), event)}>
       {AnimeData.coverImage && <img src={AnimeData.coverImage} className="card-image" onLoad={() => setLoading(() => false)} onError={() => setisError(() => true)} style={checkState()} />}
       {isLoading && isError == false && <div className="card-image-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div>}
       {isError && <div className="card-image-placeholder"><span className="material-symbols-outlined">error</span></div>}
       <div className="card-title">{AnimeData.title}</div>
       {saveData && saveData.episode && <div className="card-continue-watch-text">{saveData.last_Time != 0 && saveData.type != "" ? t("history.continue", { ep: saveData.episode }) : t("history.history", { ep: saveData.episode })}</div>}
-      {deletionCard && <div className="card-delete-icon material-symbols-outlined" onClick={runDeletionFunction}>close</div>}
+      {/* {deletionCard && <div className="card-delete-icon material-symbols-outlined" onClick={runDeletionFunction}>close</div>} */}
     </div>
   )
 }

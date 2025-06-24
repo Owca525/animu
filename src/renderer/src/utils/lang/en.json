@@ -8,18 +8,28 @@
         "player": "Player",
         "continuewatch": "Continue Watching",
         "dev": "Developer",
-        "minutes": "Minutes"
+        "minutes": "Minutes",
+        "exitAnimu": "Do you want exit animu?"
     },
     "dialog": {
         "yes": "Yes",
         "no": "No",
         "retry": "Retry",
         "exit": "Exit",
-        "reset": "Reset"
+        "reset": "Reset",
+        "reload": "Reload",
+        "open": "Open"
     },
     "home": {
         "search": "Search...",
         "nothingfound": "Where did it all go?"
+    },
+    "contextMenu": {
+        "devtools": "Open DevTools",
+        "nerdstats": "Show NerdStats",
+        "copytitle": "Copy Title",
+        "copycover": "Copy Cover",
+        "delete": "Delete"
     },
     "information": {
         "airing": "Airing Episode",

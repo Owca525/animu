@@ -13,6 +13,8 @@ import store from "@renderer/utils/store"
 import { homeStopScrolling, setHomeData, setHomeLocalSearch } from "@renderer/utils/pluginApi"
 import { ReadContinue } from "@renderer/utils/history/continueWatch"
 import { ReadHistory } from "@renderer/utils/history/history"
+import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
+import { CreateContextMenuOptions } from "@renderer/utils/functions"
 
 const Home = () => {
     const navigate = useNavigate()
@@ -141,7 +143,7 @@ const Home = () => {
     }
 
     return (
-        <main className="home">
+        <main className="home" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>
             <div className="home-header">
                 <div className="home-header-left">
                     <Input placeholder={t("home.search")} onKeyDown={OnSearch} />

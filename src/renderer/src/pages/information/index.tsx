@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { AnimeData, notificationProps } from "@renderer/utils/GlobalInterface";
 import Button from "@renderer/components/buttons";
 import "./information.css"
-import { capitalizeFirstLetter, convertDateToFormattedString, convertSeconds, decodeHtmlEntities } from "@renderer/utils/functions";
+import { capitalizeFirstLetter, convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities } from "@renderer/utils/functions";
 import { useEffect, useState } from "react";
 import { t } from "i18next"
 import { useSelector } from "react-redux";
@@ -10,6 +10,7 @@ import Drop from "./components/drop";
 import ContainerWrong from "./components/containerWrong";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "react-toastify";
+import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 
 function information() {
     const navigate = useNavigate()
@@ -124,7 +125,7 @@ function information() {
 
     return (
         <>
-            <main className="information">
+            <main className="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>
                 <div className="information-banner">
                     <img className={anime_data.bannerImage ? "information-banner-image" : "information-banner-image-blur"} onError={() => setBannerIsError(() => true)} onLoad={() => setBannerLoadingData(() => false)} src={anime_data.bannerImage ? anime_data.bannerImage : anime_data.coverImage ? anime_data.coverImage : ""} style={isBannerLoading ? {display: "none"} : isBannerError ? {display: "none"} : {animation: "fadeIn 0.3s forwards"}} />
                     {isBannerLoading && isBannerError == false && <div className="information-banner-image-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div>}
