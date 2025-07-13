@@ -20,7 +20,7 @@
 .home-header-left {
     justify-self: start;
     display: flex;
-    gap: clamp(12px, 2vw, 32px);
+    gap: 12px;
 }
 
 .home-header-right {
@@ -52,4 +52,28 @@
 .home-loading-animation {
     font-size: 3em;
     animation: spin 1s linear infinite;
+}
+
+.home-filter-void {
+    display: flex;
+    flex-direction: column;
+}
+
+.home-filter-container {
+    z-index: 999;
+    margin-top: 60px;
+    margin-left: -270px;
+    display: flex;
+    position: fixed;
+    background-color: var(--bg2);
+    padding: 12px;
+    border-radius: 12px;
+    gap: 8px;
+    border: 2px solid var(--bg3);
+}
+
+.home-filter-space {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }

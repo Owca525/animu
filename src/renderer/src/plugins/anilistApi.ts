@@ -1,3 +1,4 @@
+import { genYearsList } from "@renderer/utils/functions";
 import { cardData, containerData, pluginFormat } from "@renderer/utils/GlobalInterface";
 import { setHomeData, UpdateHomeData } from "@renderer/utils/pluginApi";
 
@@ -126,6 +127,12 @@ query(
   }
 }
 `;
+
+const genres = `
+query {
+  GenreCollection
+}
+`
 
 const header = {
   "Content-Type": "application/json",
@@ -258,6 +265,12 @@ async function CreateHomePage(): Promise<containerData[]> {
   ]
 }
 
+async function getGenres(): Promise<string[]> {
+  let data = await window.api.request.post("https://graphql.anilist.co", header, { query: genres, variables: "" })
+  if (data.success) return data.data.data.GenreCollection
+  return []
+}
+
 export const infoPlugin: pluginFormat = {
   version: "0.1",
   name: "AnilistApi",
@@ -265,6 +278,13 @@ export const infoPlugin: pluginFormat = {
   information: {
     pageSize: pageSize,
     home: () => setHomeData(CreateHomePage),
-    search: SearchAnilistApi
+    search: SearchAnilistApi,
+    searchOption: {
+      genres: await getGenres(),
+      seasons: ["Winter", "Spring", "Summer", "Fall"],
+      years: genYearsList(1940),
+      format: ["TV", "Movie", "TV Short", "special", " OVA", "ONA"],
+      statuses: ["Airing", "Finished", "Not Yet Aired", "Cancelled"]
+    }
   }
 }

@@ -6,7 +6,7 @@ import Input from "@renderer/components/input"
 import Sidebar from "@renderer/components/sidebar"
 import Container from "./components/container"
 import { useSelector } from "react-redux"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { containerData, homeData } from "@renderer/utils/GlobalInterface"
 import { t } from "i18next"
 import store from "@renderer/utils/store"
@@ -15,12 +15,16 @@ import { ReadContinue } from "@renderer/utils/history/continueWatch"
 import { ReadHistory } from "@renderer/utils/history/history"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
 import { CreateContextMenuOptions } from "@renderer/utils/functions"
+import Button from "@renderer/components/buttons"
+import Dropdown from "../../components/dropDown"
 
 const Home = () => {
     const navigate = useNavigate()
     const plugin = useSelector((plugin: any) => plugin.plugin.informationPlugin);
     const homeCache: homeData = useSelector((cache: any) => cache.home);
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
+    const [showFilter, setShowFilter] = useState<boolean>(false)
+    const [filter, setfilter] = useState<{ genres?: string, years?: string, seasons?: string, format?: string, airing?: string }>()
 
     const divRef = useRef<HTMLDivElement | null>(null);
 
@@ -69,6 +73,8 @@ const Home = () => {
         }
     }, [homeCache.data])
 
+    console.log(plugin.information.searchOption)
+
     async function history(): Promise<containerData[]> {
         setHomeLocalSearch(true)
         return [
@@ -114,7 +120,7 @@ const Home = () => {
             store.dispatch({ type: "setSearch", payload: text });
             store.dispatch({ type: "setPage", payload: 1 });
             homeStopScrolling(false);
-            plugin.information.search(text, 1)
+            plugin.information.search(text, 1, filter)
             return
         }
 
@@ -142,11 +148,47 @@ const Home = () => {
         setHomeData(async () => newData.filter((value) => value != undefined))
     }
 
+    async function onChange(params: { genres?: string, years?: string, seasons?: string, format?: string, airing?: string }) {
+        setfilter((prev) => {
+            console.log(prev)
+            if (!prev) return params
+            return { ...prev, ...params }
+        })
+        console.log(filter)
+    }
+
     return (
         <main className="home" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>
             <div className="home-header">
                 <div className="home-header-left">
                     <Input placeholder={t("home.search")} onKeyDown={OnSearch} />
+                    <div className="home-filter-void">
+                        <Button icon="tune" onClick={() => setShowFilter((prev) => !prev)}/>
+                        {showFilter && 
+                            <div className="home-filter-container">
+                                <div className="home-filter-space">
+                                    <div className="home-filter-title">Genres:</div>
+                                    <Dropdown options={plugin.information.searchOption.genres.map((element) => {return { label: element, onClick: (text) => onChange({ genres: text }) } })} placeholder={"Genres"} />
+                                </div>
+                                <div className="home-filter-space">
+                                    <div className="home-filter-title">Year:</div>
+                                    <Dropdown options={plugin.information.searchOption.years.map((element) => {return { label: element, onClick: (text) => onChange({ years: text }) } })} placeholder={"Years"} />
+                                </div>
+                                <div className="home-filter-space">
+                                    <div className="home-filter-title">Season:</div>
+                                    <Dropdown options={plugin.information.searchOption.seasons.map((element) => {return { label: element, onClick: (text) => onChange({ seasons: text }) } })} placeholder={"Season"} />
+                                </div>
+                                <div className="home-filter-space">
+                                    <div className="home-filter-title">Format:</div>
+                                    <Dropdown options={plugin.information.searchOption.format.map((element) => {return { label: element, onClick: (text) => onChange({ format: text }) } })} placeholder={"Format"} />
+                                </div>
+                                <div className="home-filter-space">
+                                    <div className="home-filter-title">Airing Status:</div>
+                                    <Dropdown options={plugin.information.searchOption.statuses.map((element) => {return { label: element, onClick: (text) => onChange({ airing: text }) } })} placeholder={"Aring"} />
+                                </div>
+                            </div>
+                        }
+                    </div>
                 </div>
                 <div></div>
                 <div className="home-header-right"></div>

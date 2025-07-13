@@ -6,28 +6,46 @@
 .dropdown-button {
   padding: 8px;
   cursor: pointer;
-  width: 110px;
+  width: 130px;
   display: flex;
   transition: border-color 150ms ease;
+  align-items: center;
+  gap: 2px;
   justify-content: end;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
   min-width: 0;
+  background-color: var(--bg3);
+  border-radius: 8px;
+  font-size: 1em;
+}
+.dropdown-button-shadow-text {
+  color: gray;
+}
+.dropdown-button-icon {
+  color: var(--text);
+  font-size: 1.2em;
+}
+.dropdown-button-text {
+  font-size: 0.9em;
 }
 
 .dropdown-menu {
   top: 44px;
   position: absolute;
   padding: 4px;
-  display: flex;
+  display: grid;
   align-items: start;
   width: 100%;
-  gap: 4px;
   flex-direction: column;
   list-style: none;
   margin: 0;
   z-index: 1000;
+  background-color: var(--bg3);
+  border-radius: 8px;
+  max-height: 300px;
+  overflow: auto;
 }
 
 .dropdown-item {
@@ -40,4 +58,9 @@
   text-align: end;
   text-overflow: ellipsis;
   white-space: nowrap;
+  border-radius: 8px;
+}
+
+.dropdown-item:hover {
+  background-color: var(--bg2);
 }

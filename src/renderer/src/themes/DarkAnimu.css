@@ -365,7 +365,7 @@ body {
 
 /* DropDown */
 
-.dropdown-button {
+/* .dropdown-button {
   border-radius: 8px;
   border: 2px solid var(--bg3);
   background-color: var(--bg3);
@@ -379,7 +379,7 @@ body {
 .dropdown-item {
   background-color: var(--bg3);
   border-radius: 6px;
-}
+} */
 
 
 /* SettingsInput */

@@ -3,7 +3,7 @@ import CheckBox from "./components/checkBox";
 import SettingsInput from "./components/settingsInput";
 import "./settings.css";
 import { useNavigate } from "react-router-dom";
-import Dropdown from "./components/dropDown";
+import Dropdown from "../../components/dropDown";
 import { useEffect, useState } from "react";
 import Button from "@renderer/components/buttons";
 import { t } from "i18next"

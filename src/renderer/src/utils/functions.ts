@@ -200,3 +200,13 @@ export function CreateContextMenuOptions(start?: ContextMenuProps, center?: Cont
     })
     return ContextMenu
 }
+
+export function genYearsList(stopYear: number): string[] {
+    let yearList: string[] = []
+    const currentYear = new Date().getFullYear();
+    yearList.push((currentYear + 1).toString())
+    for (let index = (currentYear+1); index > (stopYear-1); index--) {
+        yearList.push(index.toString())
+    }
+    return yearList
+}
