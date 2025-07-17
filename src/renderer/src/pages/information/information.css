@@ -6,6 +6,7 @@
     position: fixed;
 }
 
+/* TODO: Adding colors, borders, transition to the DarkAnimu File*/
 .information-score {
     background-color: var(--bg);
     z-index: 1000;
