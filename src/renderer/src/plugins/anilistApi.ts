@@ -1,5 +1,5 @@
 import { genYearsList } from "@renderer/utils/functions";
-import { cardData, containerData, pluginFormat } from "@renderer/utils/GlobalInterface";
+import { cardData, containerData, FilterParams, pluginFormat } from "@renderer/utils/GlobalInterface";
 import { setHomeData, UpdateHomeData } from "@renderer/utils/pluginApi";
 
 const pageSize = 20
@@ -190,22 +190,49 @@ function getSeasonFromDate() {
   return { season, seasonYear: year };
 }
 
-async function SearchAnilistApi(text: string, page: number): Promise<void> {
-  let data = {
-    title: `Searching: ${text}`,
-    data: await sendToApi({
+async function SearchAnilistApi(text: string, page: number, params?: FilterParams): Promise<void> {
+  let variables: any = {
       page: page,
-      search: text,
       sort: "SEARCH_MATCH",
       type: "ANIME"
-    })
+  }
+  let title = ``
+  if (!(text.replaceAll(" ", "") == "")) {
+    variables = { ...variables, search: text }
+    title = `Searching: ${text}`
+  } else {
+    title = "Tags: "
+  }
+  if (params && params.genres) {
+    variables = { ...variables, genres: params.genres }
+    title = title + ` ${params.genres[0]}`
+  }
+  if (params && params.years) {
+    variables = { ...variables, seasonYear: parseInt(params.years) }
+    title = title + ` ${params.years}`
+  }
+  if (params && params.seasons) {
+    variables = { ...variables, season: params.seasons.toUpperCase() }
+    title = title + ` ${params.seasons}`
+  }
+  if (params && params.format) {
+    variables = { ...variables, format: params.format.map((tmp) => tmp.toUpperCase().replaceAll(" ", "_")) }
+    title = title + ` ${params.format}`
+  }
+  if (params && params.airing) {
+    variables = { ...variables, status: params.airing.toUpperCase().replaceAll(" ", "_") }
+    title = title + ` ${params.airing}`
   }
 
-  if (page > 1) {
-    UpdateHomeData(async () => { return { data: data, maxPage: pageSize } })
-  } else {
-    setHomeData(async () => [data])
+  console.log(variables)
+  let data = {
+    title: title,
+    data: await sendToApi(variables),
+    onScrollDownFunction: (currentPage: number) => SearchAnilistApi(text, currentPage, params)
   }
+
+  if (page > 1) UpdateHomeData(async () => { return { data: data, maxPage: pageSize } })
+  else setHomeData(async () => [data])
 }
 
 async function getFullCategory(params, title: string) {
@@ -284,7 +311,7 @@ export const infoPlugin: pluginFormat = {
       seasons: ["Winter", "Spring", "Summer", "Fall"],
       years: genYearsList(1940),
       format: ["TV", "Movie", "TV Short", "special", " OVA", "ONA"],
-      statuses: ["Airing", "Finished", "Not Yet Aired", "Cancelled"]
+      statuses: ["Releasing", "Finished", "Not Yet Aired", "Cancelled"]
     }
   }
 }

@@ -100,7 +100,7 @@ export interface pluginFormat {
     author: string
     information?: {
         pageSize: number
-        search: (name: string, page: number, params?: { genres?: string, years?: string, seasons?: string, format?: string, airing?: string }) => void
+        search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => void
         home: () => void
         searchOption: { genres: string[], seasons: string[], years: string[], format: string[], statuses: string[] }
     } | null
@@ -194,3 +194,11 @@ export interface dialogProps {
         secondbutton: () => void
     }
 }
+
+export interface FilterParams {
+  genres?: string[];
+  years?: string;
+  seasons?: string;
+  format?: string[];
+  airing?: string;
+};

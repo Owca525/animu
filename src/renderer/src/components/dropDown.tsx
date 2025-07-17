@@ -10,11 +10,13 @@ interface DropdownProps {
   options: DropdownOption[] | undefined
   placeholder: string
   placeholderChange?: () => string;
+  buttonText?: string
+  onClickX?: (text: string) => void
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '', placeholderChange }) => {
+const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '', placeholderChange, buttonText = "", onClickX }) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [text, setText] = useState<string>("")
+  const [text, setText] = useState<string>(buttonText)
 
   const toggleDropdown = () => setIsOpen(prev => !prev)
 
@@ -27,6 +29,7 @@ const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '', placehol
 
   function resetText(event) {
     event.stopPropagation()
+    if (onClickX) onClickX(text ? text : "")
     setText(() => "")
   }
 

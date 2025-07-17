@@ -7,7 +7,7 @@ import Sidebar from "@renderer/components/sidebar"
 import Container from "./components/container"
 import { useSelector } from "react-redux"
 import { useEffect, useRef, useState } from "react"
-import { containerData, homeData } from "@renderer/utils/GlobalInterface"
+import { containerData, FilterParams, homeData } from "@renderer/utils/GlobalInterface"
 import { t } from "i18next"
 import store from "@renderer/utils/store"
 import { homeStopScrolling, setHomeData, setHomeLocalSearch } from "@renderer/utils/pluginApi"
@@ -24,7 +24,7 @@ const Home = () => {
     const homeCache: homeData = useSelector((cache: any) => cache.home);
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
     const [showFilter, setShowFilter] = useState<boolean>(false)
-    const [filter, setfilter] = useState<{ genres?: string, years?: string, seasons?: string, format?: string, airing?: string }>()
+    const [filter, setfilter] = useState<FilterParams | undefined>()
 
     const divRef = useRef<HTMLDivElement | null>(null);
 
@@ -72,9 +72,7 @@ const Home = () => {
             handleScroll()
         }
     }, [homeCache.data])
-
-    console.log(plugin.information.searchOption)
-
+    
     async function history(): Promise<containerData[]> {
         setHomeLocalSearch(true)
         return [
@@ -93,7 +91,11 @@ const Home = () => {
         ]
     }
 
-    console.log(homeCache)
+    useEffect(() => {
+        OnSearch("")
+    }, [filter])
+
+    // console.log(homeCache)
 
     const handleScroll = () => {
         if (homeCache.data.length > 1) return
@@ -101,8 +103,8 @@ const Home = () => {
         const currentPos = -divRef.current.scrollTop + divRef.current.scrollHeight
         const endPosition = divRef.current.offsetHeight
         const isFUCKINGBottom = parseInt(currentPos.toFixed(0)) <= endPosition + 30
+        console.log("handleScroll", isFUCKINGBottom, homeCache)
         if (isFUCKINGBottom && homeCache.stopScrolling == false && homeCache.data.length === 1) {
-            console.log(homeCache.data[0])
             if (homeCache.data[0].onScrollDownFunction) {
                 store.dispatch({ type: "setPage", payload: homeCache.page + 1 })
                 homeCache.data[0].onScrollDownFunction(homeCache.page + 1)
@@ -111,7 +113,7 @@ const Home = () => {
         }
         if (isFUCKINGBottom && !homeCache.stopScrolling) {
             store.dispatch({ type: "setPage", payload: homeCache.page + 1 })
-            plugin.information.search(homeCache.search, homeCache.page + 1)
+            plugin.information.search(homeCache.search, homeCache.page + 1, filter)
         }
     }
 
@@ -148,13 +150,18 @@ const Home = () => {
         setHomeData(async () => newData.filter((value) => value != undefined))
     }
 
-    async function onChange(params: { genres?: string, years?: string, seasons?: string, format?: string, airing?: string }) {
-        setfilter((prev) => {
-            console.log(prev)
-            if (!prev) return params
-            return { ...prev, ...params }
-        })
-        console.log(filter)
+    function onChange(params?: FilterParams, removeParam?: string) {
+        if (removeParam) {
+            const newParams: FilterParams = { ...params };
+            if (newParams[removeParam] !== undefined) {
+                delete newParams[removeParam];
+            }
+            setfilter(() => newParams)
+            return
+        }
+
+        if (!filter) setfilter(() => params)
+        else setfilter(() => {return { ...filter, ...params }})
     }
 
     return (
@@ -165,26 +172,27 @@ const Home = () => {
                     <div className="home-filter-void">
                         <Button icon="tune" onClick={() => setShowFilter((prev) => !prev)}/>
                         {showFilter && 
-                            <div className="home-filter-container">
+                            // TODO: Make Better Tags shover  
+                            <div className="home-filter-container" onMouseLeave={() => setShowFilter(() => false)}>
                                 <div className="home-filter-space">
                                     <div className="home-filter-title">Genres:</div>
-                                    <Dropdown options={plugin.information.searchOption.genres.map((element) => {return { label: element, onClick: (text) => onChange({ genres: text }) } })} placeholder={"Genres"} />
+                                    <Dropdown onClickX={(text) => onChange(undefined, text)} buttonText={filter?.genres ? filter.genres[0] : ""} options={plugin.information.searchOption.genres.map((element) => {return { label: element, onClick: (text) => onChange({ genres: [text] }) } })} placeholder={"Genres"} />
                                 </div>
                                 <div className="home-filter-space">
                                     <div className="home-filter-title">Year:</div>
-                                    <Dropdown options={plugin.information.searchOption.years.map((element) => {return { label: element, onClick: (text) => onChange({ years: text }) } })} placeholder={"Years"} />
+                                    <Dropdown onClickX={(text) => onChange(undefined, text)} buttonText={filter?.years ? filter.years : ""} options={plugin.information.searchOption.years.map((element) => {return { label: element, onClick: (text) => onChange({ years: text }) } })} placeholder={"Years"} />
                                 </div>
                                 <div className="home-filter-space">
                                     <div className="home-filter-title">Season:</div>
-                                    <Dropdown options={plugin.information.searchOption.seasons.map((element) => {return { label: element, onClick: (text) => onChange({ seasons: text }) } })} placeholder={"Season"} />
+                                    <Dropdown onClickX={(text) => onChange(undefined, text)} buttonText={filter?.seasons ? filter.seasons : ""} options={plugin.information.searchOption.seasons.map((element) => {return { label: element, onClick: (text) => onChange({ seasons: text }) } })} placeholder={"Season"} />
                                 </div>
                                 <div className="home-filter-space">
                                     <div className="home-filter-title">Format:</div>
-                                    <Dropdown options={plugin.information.searchOption.format.map((element) => {return { label: element, onClick: (text) => onChange({ format: text }) } })} placeholder={"Format"} />
+                                    <Dropdown onClickX={(text) => onChange(undefined, text)} buttonText={filter?.format ? filter.format[0] : ""} options={plugin.information.searchOption.format.map((element) => {return { label: element, onClick: (text) => onChange({ format: [text] }) } })} placeholder={"Format"} />
                                 </div>
                                 <div className="home-filter-space">
                                     <div className="home-filter-title">Airing Status:</div>
-                                    <Dropdown options={plugin.information.searchOption.statuses.map((element) => {return { label: element, onClick: (text) => onChange({ airing: text }) } })} placeholder={"Aring"} />
+                                    <Dropdown onClickX={(text) => onChange(undefined, text)} buttonText={filter?.airing ? filter.airing : ""} options={plugin.information.searchOption.statuses.map((element) => {return { label: element, onClick: (text) => onChange({ airing: text }) } })} placeholder={"Aring"} />
                                 </div>
                             </div>
                         }
