@@ -16,6 +16,7 @@
     transform: scale(1);
     transition: transform 0.3s ease;
     user-select: none;
+    z-index: 1;
 }
 
 .card-container:hover {
@@ -28,6 +29,7 @@
     width: max-content;
     height: max-content;
     aspect-ratio: 2 / 3;
+    z-index: 1;
 }
 
 .card-image-placeholder {
@@ -36,6 +38,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1;
 }
 
 .card-title {
@@ -65,3 +68,48 @@
 .card-container:hover .card-delete-icon {
   display: block;
 } 
+
+/* TODO: Adding colors, borders, transition to the DarkAnimu File*/
+.card-information {
+    display: none;
+    position: absolute;
+    flex-direction: column;
+    top: 0;
+    background-color: var(--bg2);
+    z-index: 10000;
+
+    border: solid 2px var(--neutral1);
+    border-radius: 12px;
+    width: 240px;
+    padding: 12px;
+}
+
+.card-information-left {
+    right: 1;
+    left: 0;
+    margin-left: -280px;
+    margin-right: 0px;
+}
+
+.card-information-right {
+    top: 0;
+    left: 170px;
+    z-index: 10000;
+}
+
+.card-container:hover .card-information {
+    display: flex;
+}
+
+.dot {
+    font-size: 1.7em;
+    display: flex;
+    justify-content: center;
+}
+
+.card-information-text {
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+    gap: 4px;
+}

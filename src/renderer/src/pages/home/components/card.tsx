@@ -1,7 +1,7 @@
 import { cardData, ContextMenuProps } from "@renderer/utils/GlobalInterface"
 import "./css/card.css"
 import { useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { t } from "i18next"
 import { useSelector } from "react-redux"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
@@ -12,7 +12,9 @@ const Card: React.FC<cardData> = ({ AnimeData, saveData, deletionCard, onClick }
   const [isLoading, setLoading] = useState<boolean>(true)
   const [isError, setisError] = useState<boolean>(false)
   const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
-
+  const [isOut, setisOut] = useState<boolean>(false)
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  console.log(isOut)
   async function sendToInformation() {
     if (onClick) {
       onClick(AnimeData)
@@ -65,8 +67,25 @@ const Card: React.FC<cardData> = ({ AnimeData, saveData, deletionCard, onClick }
     CenterContextMenu.push({option: t("contextMenu.delete"), deletion: true, onClick: deletionCard})
   }
 
+  function checkOutOfBound() {
+    if (!cardRef.current) return
+    const infoRect = cardRef.current.getBoundingClientRect();
+    const windowWidth = window.innerWidth;
+    const cardLeft = infoRect.left;
+    if (windowWidth - cardLeft < 400) {
+      setisOut(() => true)
+    } else {
+      setisOut(() => false)
+    }
+  }
+
   return (
-    <div className="card-container" onClick={sendToInformation} title={AnimeData.title} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions([{option:t("dialog.open"), onClick: sendToInformation}], CenterContextMenu), event)}>
+    <div ref={cardRef} className="card-container" onClick={sendToInformation} onMouseOver={checkOutOfBound} title={AnimeData.title} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions([{option:t("dialog.open"), onClick: sendToInformation}], CenterContextMenu), event)}>
+      {/* TODO: Fix why card-information under cards */}
+      {/* <div className={`card-information ${isOut ? "card-information-left" : "card-information-right"}`}>
+          <div className="card-information-text">{AnimeData.studios[0]}</div>
+          <div className="card-information-text">{capitalizeFirstLetter(AnimeData.type ? AnimeData.type : "")}<span className="dot">·</span>{AnimeData.episodes} Episodes</div>
+      </div> */}
       {AnimeData.coverImage && <img src={AnimeData.coverImage} className="card-image" onLoad={() => setLoading(() => false)} onError={() => setisError(() => true)} style={checkState()} />}
       {isLoading && isError == false && <div className="card-image-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div>}
       {isError && <div className="card-image-placeholder"><span className="material-symbols-outlined">error</span></div>}
