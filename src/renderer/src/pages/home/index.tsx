@@ -120,6 +120,7 @@ const Home = () => {
 
     async function OnSearch(text: string) {
         if (!homeCache.localSearch) {
+            if (text == "") return // This Fix bug showing empty Filter
             store.dispatch({ type: "setSearch", payload: text });
             store.dispatch({ type: "setPage", payload: 1 });
             homeStopScrolling(false);
