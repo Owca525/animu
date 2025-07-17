@@ -210,3 +210,12 @@ export function genYearsList(stopYear: number): string[] {
     }
     return yearList
 }
+
+export function getGradientColor(value: number): string {
+  const clamped = Math.max(0, Math.min(100, value));
+  
+  const red = clamped < 50 ? 255 : Math.floor(255 - ((clamped - 50) * 5.1));
+  const green = clamped > 50 ? 128 : Math.floor((clamped * 2.56));
+  
+  return `rgb(${red}, ${green}, 0)`;
+}

@@ -6,6 +6,20 @@
     position: fixed;
 }
 
+.information-score {
+    background-color: var(--bg);
+    z-index: 1000;
+    width: 30px;
+    height: 30px;
+    padding: 8px;
+    display: flex;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    margin-top: -80px;
+    margin-left: -20px;
+}
 
 /* banner related classes */
 .information-banner {
