@@ -91,6 +91,7 @@ const Home = () => {
         ]
     }
 
+    // I can't add this function to onChange because global change don't applay, Idk why
     useEffect(() => {
         OnSearch("")
     }, [filter])
@@ -172,7 +173,8 @@ const Home = () => {
                     <div className="home-filter-void">
                         <Button icon="tune" onClick={() => setShowFilter((prev) => !prev)}/>
                         {showFilter && 
-                            // TODO: Make Better Tags shover  
+                            // TODO: Make Better Tags shover
+                            // TODO: Adding Text To lang File
                             <div className="home-filter-container" onMouseLeave={() => setShowFilter(() => false)}>
                                 <div className="home-filter-space">
                                     <div className="home-filter-title">Genres:</div>
