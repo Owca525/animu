@@ -93,7 +93,7 @@ const Home = () => {
 
     // I can't add this function to onChange because global change don't applay, Idk why
     useEffect(() => {
-        OnSearch("")
+        if (filter) OnSearch("")
     }, [filter])
 
     // console.log(homeCache)
@@ -120,7 +120,6 @@ const Home = () => {
 
     async function OnSearch(text: string) {
         if (!homeCache.localSearch) {
-            if (text == "") return // This Fix bug showing empty Filter
             store.dispatch({ type: "setSearch", payload: text });
             store.dispatch({ type: "setPage", payload: 1 });
             homeStopScrolling(false);
@@ -154,7 +153,7 @@ const Home = () => {
 
     function onChange(params?: FilterParams, removeParam?: string) {
         if (removeParam) {
-            const newParams: FilterParams = { ...params };
+            const newParams: FilterParams = { ...filter };
             if (newParams[removeParam] !== undefined) {
                 delete newParams[removeParam];
             }
@@ -179,23 +178,23 @@ const Home = () => {
                             <div className="home-filter-container" onMouseLeave={() => setShowFilter(() => false)}>
                                 <div className="home-filter-space">
                                     <div className="home-filter-title">Genres:</div>
-                                    <Dropdown onClickX={(text) => onChange(undefined, text)} buttonText={filter?.genres ? filter.genres[0] : ""} options={plugin.information.searchOption.genres.map((element) => {return { label: element, onClick: (text) => onChange({ genres: [text] }) } })} placeholder={"Genres"} />
+                                    <Dropdown onClickX={() => onChange(undefined, "genres")} buttonText={filter?.genres ? filter.genres[0] : ""} options={plugin.information.searchOption.genres.map((element) => {return { label: element, onClick: (text) => onChange({ genres: [text] }) } })} placeholder={"Genres"} />
                                 </div>
                                 <div className="home-filter-space">
                                     <div className="home-filter-title">Year:</div>
-                                    <Dropdown onClickX={(text) => onChange(undefined, text)} buttonText={filter?.years ? filter.years : ""} options={plugin.information.searchOption.years.map((element) => {return { label: element, onClick: (text) => onChange({ years: text }) } })} placeholder={"Years"} />
+                                    <Dropdown onClickX={() => onChange(undefined, "years")} buttonText={filter?.years ? filter.years : ""} options={plugin.information.searchOption.years.map((element) => {return { label: element, onClick: (text) => onChange({ years: text }) } })} placeholder={"Years"} />
                                 </div>
                                 <div className="home-filter-space">
                                     <div className="home-filter-title">Season:</div>
-                                    <Dropdown onClickX={(text) => onChange(undefined, text)} buttonText={filter?.seasons ? filter.seasons : ""} options={plugin.information.searchOption.seasons.map((element) => {return { label: element, onClick: (text) => onChange({ seasons: text }) } })} placeholder={"Season"} />
+                                    <Dropdown onClickX={() => onChange(undefined, "seasons")} buttonText={filter?.seasons ? filter.seasons : ""} options={plugin.information.searchOption.seasons.map((element) => {return { label: element, onClick: (text) => onChange({ seasons: text }) } })} placeholder={"Season"} />
                                 </div>
                                 <div className="home-filter-space">
                                     <div className="home-filter-title">Format:</div>
-                                    <Dropdown onClickX={(text) => onChange(undefined, text)} buttonText={filter?.format ? filter.format[0] : ""} options={plugin.information.searchOption.format.map((element) => {return { label: element, onClick: (text) => onChange({ format: [text] }) } })} placeholder={"Format"} />
+                                    <Dropdown onClickX={() => onChange(undefined, "format")} buttonText={filter?.format ? filter.format[0] : ""} options={plugin.information.searchOption.format.map((element) => {return { label: element, onClick: (text) => onChange({ format: [text] }) } })} placeholder={"Format"} />
                                 </div>
                                 <div className="home-filter-space">
                                     <div className="home-filter-title">Airing Status:</div>
-                                    <Dropdown onClickX={(text) => onChange(undefined, text)} buttonText={filter?.airing ? filter.airing : ""} options={plugin.information.searchOption.statuses.map((element) => {return { label: element, onClick: (text) => onChange({ airing: text }) } })} placeholder={"Aring"} />
+                                    <Dropdown onClickX={() => onChange(undefined, "airing")} buttonText={filter?.airing ? filter.airing : ""} options={plugin.information.searchOption.statuses.map((element) => {return { label: element, onClick: (text) => onChange({ airing: text }) } })} placeholder={"Aring"} />
                                 </div>
                             </div>
                         }

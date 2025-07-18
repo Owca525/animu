@@ -12,9 +12,9 @@ const Card: React.FC<cardData> = ({ AnimeData, saveData, deletionCard, onClick }
   const [isLoading, setLoading] = useState<boolean>(true)
   const [isError, setisError] = useState<boolean>(false)
   const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
-  const [isOut, setisOut] = useState<boolean>(false)
+  const [_isOut, setisOut] = useState<boolean>(false)
   const cardRef = useRef<HTMLDivElement | null>(null);
-  console.log(isOut)
+
   async function sendToInformation() {
     if (onClick) {
       onClick(AnimeData)
