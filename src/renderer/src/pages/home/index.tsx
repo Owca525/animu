@@ -117,6 +117,7 @@ const Home = () => {
         }
     }
 
+    // TODO: Fix problem when search dosen't set when delete the tag and fix cache reset 
     async function OnSearch(text: string) {
         if (!homeCache.localSearch) {
             store.dispatch({ type: "setSearch", payload: text });
