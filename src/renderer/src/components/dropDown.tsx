@@ -8,13 +8,14 @@ interface DropdownOption {
 
 interface DropdownProps {
   options: DropdownOption[] | undefined
-  placeholder: string
+  placeholder?: string
   placeholderChange?: () => string;
   buttonText?: string
+  disableX?: boolean
   onClickX?: (text: string) => void
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '', placeholderChange, buttonText = "", onClickX }) => {
+const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '', placeholderChange, buttonText = "", onClickX, disableX = true }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [text, setText] = useState<string>(buttonText)
 
@@ -38,7 +39,7 @@ const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '', placehol
       <div className={`dropdown-button`} onClick={toggleDropdown}>
         <div className={`dropdown-button-text ${text == "" ? "dropdown-button-shadow-text" : ""}`}>{text == "" ? placeholder : text }</div>
         {text == "" && <div className='material-symbols-outlined dropdown-button-icon'>{isOpen ? "keyboard_arrow_left" : "keyboard_arrow_down"}</div>}
-        {text != "" && <div className='material-symbols-outlined dropdown-button-icon' onClick={resetText}>close</div>}
+        {text != "" && !disableX && <div className='material-symbols-outlined dropdown-button-icon' onClick={resetText}>close</div>}
       </div>
       {isOpen && options && (
         <ul className="dropdown-menu" onMouseLeave={() => setIsOpen(false)}>

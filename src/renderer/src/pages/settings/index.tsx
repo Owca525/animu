@@ -187,6 +187,7 @@ function settings() {
             />
             <div className="settings-save-container">
                 <motion.div variants={saveCommunicateAnimation} initial={"hidden"} animate={isSaving ? "visible" : "hidden"} transition={{ duration: 0.2 }} className="settings-save-content">
+                    {/* TODO: Translate Full polish file */}
                     <div className="settings-save-title">{t("settings.saving.notification")}</div>
                     <div className="settings-save-buttons">
                         <Button content={t("dialog.yes")} onClick={saveNewConfig} />
@@ -205,8 +206,9 @@ function settings() {
                                     options={Object.keys(i18n.store.data).map(element => {
                                         return { label: t(`lang.${element}`), onClick: () => ChangeLanguage(element) }
                                     })}
-                                    placeholder={t(`lang.${config.new.General.language}`)}
+                                    buttonText={t(`lang.${config.new.General.language}`)}
                                     placeholderChange={() => t(`lang.${config.new.General.language}`)}
+                                    disableX
                                 />
                             </div>
                             <div className="settings-line"></div>
@@ -214,7 +216,8 @@ function settings() {
                                 {t("settings.general.theme")}
                                 <Dropdown
                                     options={themes}
-                                    placeholder={config.new.General.theme}
+                                    buttonText={config.new.General.theme}
+                                    disableX
                                 />
                             </div>
                         </div>
@@ -238,7 +241,8 @@ function settings() {
                                         { label: "Every Day", onClick: () => handleChange("update.type", "Every Day") },
                                         { label: "Every Week", onClick: () => handleChange("update.type", "Every Week") },
                                     ]}
-                                    placeholder={config.new.update.type}
+                                    disableX
+                                    buttonText={config.new.update.type}
                                 />
                             </div>
                         </div>
@@ -366,7 +370,8 @@ function settings() {
                                         { label: "Metadata", onClick: () => handleChange("Player.general.playerLoadType", "metadata") },
                                         { label: "Auto", onClick: () => handleChange("Player.general.playerLoadType", "auto") },
                                     ]}
-                                    placeholder={capitalizeFirstLetter(config.new.Player.general.playerLoadType)}
+                                    buttonText={capitalizeFirstLetter(config.new.Player.general.playerLoadType)}
+                                    disableX
                                 />
                             </div>
                         </div>
@@ -390,7 +395,8 @@ function settings() {
                                         { label: "Clipboard", onClick: () => handleChange("Player.screenShot.saveType", "Clipboard") },
                                         { label: "Both", onClick: () => handleChange("Player.screenShot.saveType", "Both") },
                                     ]}
-                                    placeholder={config.new.Player.screenShot.saveType}
+                                    buttonText={config.new.Player.screenShot.saveType}
+                                    disableX
                                 />
                             </div>
                             <div className="settings-line"></div>
