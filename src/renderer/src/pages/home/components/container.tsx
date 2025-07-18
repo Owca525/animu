@@ -6,7 +6,7 @@ import Button from "@renderer/components/buttons"
 import store from "@renderer/utils/store"
 import { t } from "i18next"
 
-const Container: React.FC<containerData> = ({ title, data, horizontal = false, onTitleClick }) => {
+const Container: React.FC<containerData> = ({ title, data, horizontal = false, onTitleClick, tags }) => {
   const container = useRef<HTMLDivElement>(null)
 
   function handleButtonScroll(num: number) {
@@ -16,7 +16,10 @@ const Container: React.FC<containerData> = ({ title, data, horizontal = false, o
 
   return (
     <div className="main-container">
-        <div className={onTitleClick ? "container-title-click" : "container-title"} onClick={onTitleClick}>{title}</div>
+        <div className="container-title-container">
+          {title && <div className={onTitleClick ? "container-title-click" : "container-title"} onClick={onTitleClick}>{title}</div>}
+          {tags && tags.map((element) => <div onClick={element.remover} className="container-tag">{element.name} <span className="container-tag-icon material-symbols-outlined">close</span></div>)}
+        </div>
         <div className={"container-button-container" + (data.length <= 0 ? " container-error" : "")}>
           {horizontal && data.length > 0 ? <Button icon="chevron_left" ButtonClass="container-left-skip-button" onClick={() => handleButtonScroll(-120)}/> : ""}
           <div className={horizontal ? "container-data-horizontal" : "container-data"} ref={container}> {/* onWheel={handleScroll} */}

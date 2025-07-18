@@ -196,32 +196,27 @@ async function SearchAnilistApi(text: string, page: number, params?: FilterParam
       sort: "SEARCH_MATCH",
       type: "ANIME"
   }
-  let title = ``
+  let title: string | undefined = undefined
+  
   if (!(text.replaceAll(" ", "") == "")) {
     variables = { ...variables, search: text }
     title = `Searching: ${text}`
-  } else {
-    title = "Tags: "
   }
+  
   if (params && params.genres) {
     variables = { ...variables, genres: params.genres }
-    title = title + ` ${params.genres[0]}`
   }
   if (params && params.years) {
     variables = { ...variables, seasonYear: parseInt(params.years) }
-    title = title + ` ${params.years}`
   }
   if (params && params.seasons) {
     variables = { ...variables, season: params.seasons.toUpperCase() }
-    title = title + ` ${params.seasons}`
   }
   if (params && params.format) {
     variables = { ...variables, format: params.format.map((tmp) => tmp.toUpperCase().replaceAll(" ", "_")) }
-    title = title + ` ${params.format}`
   }
   if (params && params.airing) {
     variables = { ...variables, status: params.airing.toUpperCase().replaceAll(" ", "_") }
-    title = title + ` ${params.airing}`
   }
 
   console.log(variables)

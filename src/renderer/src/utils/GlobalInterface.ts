@@ -51,6 +51,7 @@ export interface homeData {
     stopScrolling: boolean
     containerLoading: boolean
     localSearch: boolean
+    filterTags: FilterParams | undefined
 }
 
 export interface playerData {
@@ -74,11 +75,15 @@ export interface cardData {
 }
 
 export interface containerData {
-    title: string
+    title?: string
     data: cardData[]
     horizontal?: boolean
     onScrollDownFunction?: (page: number) => void
     onTitleClick?: () => void
+    tags?: {
+        remover: () => void
+        name: string
+    }[]
 }
 
 export interface sidebarData {

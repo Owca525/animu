@@ -24,7 +24,6 @@ const Home = () => {
     const homeCache: homeData = useSelector((cache: any) => cache.home);
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
     const [showFilter, setShowFilter] = useState<boolean>(false)
-    const [filter, setfilter] = useState<FilterParams | undefined>()
 
     const divRef = useRef<HTMLDivElement | null>(null);
 
@@ -93,10 +92,10 @@ const Home = () => {
 
     // I can't add this function to onChange because global change don't applay, Idk why
     useEffect(() => {
-        if (filter) OnSearch("")
-    }, [filter])
+        if (homeCache.filterTags) OnSearch("")
+    }, [homeCache.filterTags])
 
-    // console.log(homeCache)
+    console.log(homeCache)
 
     const handleScroll = () => {
         if (homeCache.data.length > 1) return
@@ -114,7 +113,7 @@ const Home = () => {
         }
         if (isFUCKINGBottom && !homeCache.stopScrolling) {
             store.dispatch({ type: "setPage", payload: homeCache.page + 1 })
-            plugin.information.search(homeCache.search, homeCache.page + 1, filter)
+            plugin.information.search(homeCache.search, homeCache.page + 1, homeCache.filterTags)
         }
     }
 
@@ -123,7 +122,7 @@ const Home = () => {
             store.dispatch({ type: "setSearch", payload: text });
             store.dispatch({ type: "setPage", payload: 1 });
             homeStopScrolling(false);
-            plugin.information.search(text, 1, filter)
+            plugin.information.search(text, 1, homeCache.filterTags)
             return
         }
 
@@ -153,16 +152,26 @@ const Home = () => {
 
     function onChange(params?: FilterParams, removeParam?: string) {
         if (removeParam) {
-            const newParams: FilterParams = { ...filter };
+            const newParams: FilterParams = { ...homeCache.filterTags };
             if (newParams[removeParam] !== undefined) {
                 delete newParams[removeParam];
             }
-            setfilter(() => newParams)
+            store.dispatch({ type: "setTags", payload: newParams })
             return
         }
 
-        if (!filter) setfilter(() => params)
-        else setfilter(() => {return { ...filter, ...params }})
+        if (!homeCache.filterTags) store.dispatch({ type: "setTags", payload: params })
+        else store.dispatch({ type: "setTags", payload: { ...homeCache.filterTags, ...params } })
+    }
+
+    function CreateTagList() {
+        if (!homeCache.filterTags) return
+        let data: any = []
+        for (const [key, type] of Object.entries(homeCache.filterTags)) {
+            data.push({ remover: () => onChange(undefined, key), name: type })
+        }
+
+        return data
     }
 
     return (
@@ -177,23 +186,23 @@ const Home = () => {
                             <div className="home-filter-container" onMouseLeave={() => setShowFilter(() => false)}>
                                 <div className="home-filter-space">
                                     <div className="home-filter-title">{t("filter.genres")}</div>
-                                    <Dropdown onClickX={() => onChange(undefined, "genres")} buttonText={filter?.genres ? filter.genres[0] : ""} options={plugin.information.searchOption.genres.map((element) => {return { label: element, onClick: (text) => onChange({ genres: [text] }) } })} placeholder={"Genres"} />
+                                    <Dropdown onClickX={() => onChange(undefined, "genres")} buttonText={homeCache.filterTags?.genres ? homeCache.filterTags.genres[0] : ""} options={plugin.information.searchOption.genres.map((element) => {return { label: element, onClick: (text) => onChange({ genres: [text] }) } })} placeholder={"Genres"} />
                                 </div>
                                 <div className="home-filter-space">
                                     <div className="home-filter-title">{t("filter.year")}</div>
-                                    <Dropdown onClickX={() => onChange(undefined, "years")} buttonText={filter?.years ? filter.years : ""} options={plugin.information.searchOption.years.map((element) => {return { label: element, onClick: (text) => onChange({ years: text }) } })} placeholder={"Years"} />
+                                    <Dropdown onClickX={() => onChange(undefined, "years")} buttonText={homeCache.filterTags?.years ? homeCache.filterTags.years : ""} options={plugin.information.searchOption.years.map((element) => {return { label: element, onClick: (text) => onChange({ years: text }) } })} placeholder={"Years"} />
                                 </div>
                                 <div className="home-filter-space">
                                     <div className="home-filter-title">{t("filter.season")}</div>
-                                    <Dropdown onClickX={() => onChange(undefined, "seasons")} buttonText={filter?.seasons ? filter.seasons : ""} options={plugin.information.searchOption.seasons.map((element) => {return { label: element, onClick: (text) => onChange({ seasons: text }) } })} placeholder={"Season"} />
+                                    <Dropdown onClickX={() => onChange(undefined, "seasons")} buttonText={homeCache.filterTags?.seasons ? homeCache.filterTags.seasons : ""} options={plugin.information.searchOption.seasons.map((element) => {return { label: element, onClick: (text) => onChange({ seasons: text }) } })} placeholder={"Season"} />
                                 </div>
                                 <div className="home-filter-space">
                                     <div className="home-filter-title">{t("filter.format")}</div>
-                                    <Dropdown onClickX={() => onChange(undefined, "format")} buttonText={filter?.format ? filter.format[0] : ""} options={plugin.information.searchOption.format.map((element) => {return { label: element, onClick: (text) => onChange({ format: [text] }) } })} placeholder={"Format"} />
+                                    <Dropdown onClickX={() => onChange(undefined, "format")} buttonText={homeCache.filterTags?.format ? homeCache.filterTags.format[0] : ""} options={plugin.information.searchOption.format.map((element) => {return { label: element, onClick: (text) => onChange({ format: [text] }) } })} placeholder={"Format"} />
                                 </div>
                                 <div className="home-filter-space">
                                     <div className="home-filter-title">{t("filter.airing")}</div>
-                                    <Dropdown onClickX={() => onChange(undefined, "airing")} buttonText={filter?.airing ? filter.airing : ""} options={plugin.information.searchOption.statuses.map((element) => {return { label: element, onClick: (text) => onChange({ airing: text }) } })} placeholder={"Aring"} />
+                                    <Dropdown onClickX={() => onChange(undefined, "airing")} buttonText={homeCache.filterTags?.airing ? homeCache.filterTags.airing : ""} options={plugin.information.searchOption.statuses.map((element) => {return { label: element, onClick: (text) => onChange({ airing: text }) } })} placeholder={"Aring"} />
                                 </div>
                             </div>
                         }
@@ -206,7 +215,7 @@ const Home = () => {
                 {
                     homeCache.isLoading ? <div className="material-symbols-outlined home-loading-animation">progress_activity</div>
                         :
-                        homeCache.data.map((element) => <Container title={element.title} data={element.data} horizontal={element.horizontal} onScrollDownFunction={element.onScrollDownFunction} onTitleClick={element.onTitleClick} />)
+                        homeCache.data.map((element) => <Container tags={homeCache.filterTags ? CreateTagList() : undefined} title={element.title} data={element.data} horizontal={element.horizontal} onScrollDownFunction={element.onScrollDownFunction} onTitleClick={element.onTitleClick} />)
                 }
             </div>
             <Sidebar data={sidebarData} />

@@ -2,7 +2,6 @@
 .container-title-click {
     font-weight: 600;
     font-size: 1.6em;
-    width: 100%;
     padding: 2px 8px 2px 8px;
     border-radius: 12px;
     line-clamp: 1;
@@ -192,4 +191,32 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.container-title-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.container-tag {
+    display: flex;
+    justify-content: center;
+    background-color: var(--neutral2);
+    padding: 2px;
+    border-radius: 6px;
+    align-items: center;
+    gap: 2px;
+    cursor: pointer;
+    border: 2px solid var(--neutral2);
+    transition: width 0.2s ease;
+}
+
+.container-tag-icon {
+    font-size: 1em;
+    display: none;
+}
+
+.container-tag:hover .container-tag-icon {
+    display: flex;
 }

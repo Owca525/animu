@@ -8,7 +8,8 @@ const initialState: homeData = {
     page: 1,
     stopScrolling: false,
     containerLoading: false,
-    localSearch: false
+    localSearch: false,
+    filterTags: undefined
 };
 
 const userReducer = (state = initialState, action) => {
@@ -29,6 +30,8 @@ const userReducer = (state = initialState, action) => {
       return { ...state, containerLoading: action.payload };
     case "setLocalSearch":
       return { ...state, localSearch: action.payload };
+    case "setTags":
+      return { ...state, filterTags: action.payload };
     case "resetHomeData":
         return { ...initialState };
     default:
