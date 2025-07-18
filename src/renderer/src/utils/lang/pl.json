@@ -1,13 +1,13 @@
 {
     "global": {
-        "home": "Strona Główna",
+        "home": "Strona główna",
         "history": "Historia",
         "settings": "Ustawienia",
         "general": "Ogólne",
-        "cfglocation": "Otwórz Config",
-        "player": "Player",
+        "cfglocation": "Otwórz konfigurację",
+        "player": "Odtwarzacz",
         "continuewatch": "Kontynuuj oglądanie",
-        "dev": "Developer",
+        "dev": "Deweloper",
         "minutes": "Minuty",
         "exitAnimu": "Czy chcesz opuścić Animu?"
     },
@@ -16,37 +16,37 @@
         "no": "Nie",
         "retry": "Spróbuj ponownie",
         "exit": "Wyjdź",
-        "reset": "Reset",
-        "reload": "Reload",
+        "reset": "Resetuj",
+        "reload": "Odśwież",
         "open": "Otwórz"
     },
     "home": {
         "search": "Wyszukaj...",
-        "nothingfound": "Gdzie wszytko zniknęło?"
+        "nothingfound": "Gdzie wszystko zniknęło?"
     },
     "contextMenu": {
-        "devtools": "Otwórz DevTools",
+        "devtools": "Otwórz narzędzia deweloperskie",
         "nerdstats": "Pokaż statystyki dla nerdów",
         "copytitle": "Kopiuj tytuł",
-        "copycover": "Kopiuj Okładkę",
+        "copycover": "Kopiuj okładkę",
         "delete": "Usuń"
     },
     "information": {
-        "airing": "Airing Episode",
+        "airing": "Emitowany odcinek",
         "format": "Format",
         "episodes": "Odcinki",
-        "duration": "Długość Odcinka",
+        "duration": "Długość odcinka",
         "status": "Status",
         "startdate": "Data rozpoczęcia",
         "endate": "Data zakończenia",
         "season": "Sezon",
         "descriptionnotfound": "Nie znaleziono opisu",
         "containerwrong": {
-            "title": "Anime Found For name: {{name}}"
+            "title": "Znaleziono anime o nazwie: {{name}}"
         },
         "notification": {
             "coverdone": "Okładka skopiowana do schowka",
-            "coverfailed": "Kopiowanie do schowka nie powiodło się"
+            "coverfailed": "Nie udało się skopiować do schowka"
         }
     },
     "settings": {
@@ -56,118 +56,118 @@
             "updates": "Aktualizacje",
             "checkupdates": "Sprawdź aktualizacje",
             "window": "Okno",
-            "maximize": "Automatycznie masksymalizuj",
-            "fullscreen": "Automatyczny fullscreen",
-            "zoom": "Zoom",
-            "meow" : ":3"
+            "maximize": "Automatycznie maksymalizuj",
+            "fullscreen": "Automatycznie w trybie pełnoekranowym",
+            "zoom": "Powiększenie",
+            "meow": ":3"
         },
         "player": {
-            "play": "Auto play",
-            "skip": "Automatycznie pomijaj odcinki",
+            "play": "Automatyczne odtwarzanie",
+            "skip": "Automatyczne pomijanie odcinków",
             "volume": "Domyślna głośność",
-            "longskip": "Długie pominięcie",
-            "longskipb": "Długie przewinięcie",
-            "shortskip": "Krótkie pominięcie do przodu",
-            "shortskipb": "Krótkie przewinięcie",
-            "preload": "Player Preload Type",
-            "screenshot": "Screenshots",
-            "screenask": "Always ask Where Save Screenshots",
-            "type": "Save Type",
-            "path": "Screenshot Save Path",
-            "keybind": "Keybinds",
+            "longskip": "Długie przewijanie",
+            "longskipb": "Długie przewijanie wstecz",
+            "shortskip": "Krótkie przewijanie do przodu",
+            "shortskipb": "Krótkie przewijanie wstecz",
+            "preload": "Typ wstępnego ładowania odtwarzacza",
+            "screenshot": "Zrzuty ekranu",
+            "screenask": "Zawsze pytaj, gdzie zapisać zrzuty ekranu",
+            "type": "Typ zapisu",
+            "path": "Ścieżka zapisu zrzutów ekranu",
+            "keybind": "Skróty klawiszowe",
             "keybinds": {
-                "pause": "Pause",
-                "fullscreen": "Fullscreen",
-                "exitplayer": "Exit Player",
-                "lskipforward": "Long Skip Forward",
-                "lskipbackward": "Long Skip Backward",
-                "skipforward": "Short Skip Forward",
-                "skipbackward": "Short Skip Backward",
-                "fskipforward": "Frame Skip Forward",
-                "fskipbackward": "Frame Skip Backward",
-                "nextepisode": "Next Episode",
-                "prevepisode": "Previus Episode",
-                "volumeup": "Volume Up",
-                "volumedown": "Volume Down",
-                "volumemute": "Volume Mute",
-                "screenshot": "Take a Screenshot"
+                "pause": "Pauza",
+                "fullscreen": "Pełny ekran",
+                "exitplayer": "Zamknij odtwarzacz",
+                "lskipforward": "Długie przewinięcie do przodu",
+                "lskipbackward": "Długie przewinięcie wstecz",
+                "skipforward": "Krótkie przewinięcie do przodu",
+                "skipbackward": "Krótkie przewinięcie wstecz",
+                "fskipforward": "Przewinięcie klatki do przodu",
+                "fskipbackward": "Przewinięcie klatki wstecz",
+                "nextepisode": "Następny odcinek",
+                "prevepisode": "Poprzedni odcinek",
+                "volumeup": "Zwiększ głośność",
+                "volumedown": "Zmniejsz głośność",
+                "volumemute": "Wycisz",
+                "screenshot": "Wykonaj zrzut ekranu"
             }
         },
         "history": {
-            "limited": "Limited Save History",
-            "limit": "Limit For History",
-            "startsave": "When Start Save History",
-            "stopsave": "When Stop save History"
+            "limited": "Ogranicz zapisywanie historii",
+            "limit": "Limit historii",
+            "startsave": "Kiedy rozpocząć zapisywanie historii",
+            "stopsave": "Kiedy zakończyć zapisywanie historii"
         },
         "saving": {
-            "done": "Config has been succesfully saved",
-            "error": "Saving config accure error",
-            "notification": "Do you wanna save changes?"
+            "done": "Konfiguracja została pomyślnie zapisana",
+            "error": "Wystąpił błąd podczas zapisywania konfiguracji",
+            "notification": "Czy chcesz zapisać zmiany?"
         },
         "tips": {
-            "automaximize": "This make window maximize when you start application",
-            "autofullscreen": "This make window fullscreen when you start application",
-            "autofullscreenplayer": "Set fullscreen when player start",
-            "longskip": "You can set what time skip in the episode (this usefull for skipping opening)",
-            "shotskip": "This is normal skip time left or right",
-            "continuewatchsavehistory": "Animu save to 'continue watch' when for example past 20 seconds and stop saving when (epduration-100) seconds"
+            "automaximize": "Automatycznie maksymalizuj okno przy starcie aplikacji",
+            "autofullscreen": "Automatycznie przechodź w tryb pełnoekranowy przy starcie",
+            "autofullscreenplayer": "Ustaw tryb pełnoekranowy po uruchomieniu odtwarzacza",
+            "longskip": "Ustaw czas długiego przewijania (np. do pomijania openingów)",
+            "shotskip": "Ustaw czas krótkiego przewijania w lewo/prawo",
+            "continuewatchsavehistory": "Animu zapisuje postęp 'kontynuuj oglądanie' po np. 20 sekundach i przestaje zapisywać po (czas trwania odcinka - 100) sekundach"
         }
     },
     "player": {
         "error": {
-            "notfound": "Player didn't find any urls"
+            "notfound": "Nie znaleziono żadnych adresów URL odtwarzacza"
         },
-        "TitleEpisode": "Episode: {{ep}} of {{name}}",
-        "Volume": "Volume",
-        "next": "Next {{ep}} episode",
-        "previous": "Previous {{ep}} episode",
-        "Pause": "Pause",
-        "play": "Play",
-        "fullscreen": "Fullscreen",
+        "TitleEpisode": "Odcinek: {{ep}} z {{name}}",
+        "Volume": "Głośność",
+        "next": "Następny odcinek {{ep}}",
+        "previous": "Poprzedni odcinek {{ep}}",
+        "Pause": "Pauza",
+        "play": "Odtwórz",
+        "fullscreen": "Pełny ekran",
         "errors": {
-            "extractionError": "Failed Extracting Player Urls: {{error}}",
-            "MEDIA_ERR_ABORTED": "The playback was aborted.",
-            "MEDIA_ERR_NETWORK": "A network error occurred while fetching the video.",
-            "MEDIA_ERR_DECODE": "An error occurred while decoding the video.",
-            "MEDIA_ERR_SRC_NOT_SUPPORTED": "The video format or source is not supported.",
-            "default": "An unknown error occurred."
+            "extractionError": "Nie udało się pobrać adresów URL odtwarzacza: {{error}}",
+            "MEDIA_ERR_ABORTED": "Odtwarzanie zostało przerwane.",
+            "MEDIA_ERR_NETWORK": "Wystąpił błąd sieci podczas pobierania wideo.",
+            "MEDIA_ERR_DECODE": "Wystąpił błąd podczas dekodowania wideo.",
+            "MEDIA_ERR_SRC_NOT_SUPPORTED": "Format lub źródło wideo nie jest obsługiwane.",
+            "default": "Wystąpił nieznany błąd."
         },
         "upNext": {
-            "title": "Next Episode Playing in {{sec}} seconds",
-            "titleAnime": "Next Episode {{ep}} of {{title}}",
-            "nextEp": "Next Episode",
-            "hide": "Hide"
+            "title": "Następny odcinek za {{sec}} sekund",
+            "titleAnime": "Następny odcinek {{ep}} z {{title}}",
+            "nextEp": "Następny odcinek",
+            "hide": "Ukryj"
         },
         "toastscreenshot": {
-            "failed": "Failed To save Screenshot",
-            "doneclip": "Image Saved To the Clipboard Succesfully",
-            "donefile": "Image Saved To File Succesfully"
+            "failed": "Nie udało się zapisać zrzutu ekranu",
+            "doneclip": "Obraz zapisano do schowka pomyślnie",
+            "donefile": "Obraz zapisano do pliku pomyślnie"
         }
     },
     "history": {
-        "continue": "Continue Episode {{ep}}",
-        "history": "Watched Episode {{ep}}"
+        "continue": "Kontynuuj odcinek {{ep}}",
+        "history": "Obejrzano odcinek {{ep}}"
     },
     "oldBackup": {
-        "backupcontinue": "Backup File Old Continue watch done",
-        "convertcontinue": "Convert Continue Watch: Succes {{success}}, Failed {{failed}}",
-        "convertcontinuedone": "Convertion Continue Watch Done: Succes {{success}}, Failed {{failed}}",
-        "convertcontinuefailed": "Failed Convert old continue watch to new",
-        "backuphistory": "Backup File Old History done",
-        "converthistory": "Convert History: Succes {{success}}, Failed {{failed}}",
-        "converthistorydone": "Convertion Continue Watch Done: Succes {{success}}, Failed {{failed}}",
-        "converthistoryfailed": "Failed Convert old History watch to new"
+        "backupcontinue": "Utworzono kopię zapasową starego 'kontynuuj oglądanie'",
+        "convertcontinue": "Konwertowanie 'kontynuuj oglądanie': Sukcesy {{success}}, Niepowodzenia {{failed}}",
+        "convertcontinuedone": "Zakończono konwersję 'kontynuuj oglądanie': Sukcesy {{success}}, Niepowodzenia {{failed}}",
+        "convertcontinuefailed": "Nie udało się przekonwertować starego 'kontynuuj oglądanie'",
+        "backuphistory": "Utworzono kopię zapasową starej historii",
+        "converthistory": "Konwersja historii: Sukcesy {{success}}, Niepowodzenia {{failed}}",
+        "converthistorydone": "Zakończono konwersję historii: Sukcesy {{success}}, Niepowodzenia {{failed}}",
+        "converthistoryfailed": "Nie udało się przekonwertować starej historii"
     },
     "update": {
-        "progess": "Download Progress {{procent}}%",
-        "done": "Updated Download, please restart application"
+        "progess": "Postęp pobierania {{procent}}%",
+        "done": "Zaktualizowano. Uruchom ponownie aplikację"
     },
     "discordrpc": {
-        "home": "In home",
-        "settings": "In Settings",
-        "player": "{{title}} Episode {{ep}}"
+        "home": "Na stronie głównej",
+        "settings": "W ustawieniach",
+        "player": "{{title}}, odcinek {{ep}}"
     },
-    "globalError": "Critical Error has been accured, do you want go home?",
+    "globalError": "Wystąpił krytyczny błąd. Czy chcesz wrócić do strony głównej?",
     "filter": {
         "genres": "Gatunki:",
         "year": "Rok:",
@@ -176,7 +176,7 @@
         "airing": "Status emisji:"
     },
     "lang": {
-        "en": "English",
-        "pl": "Polish"
+        "en": "Angielski",
+        "pl": "Polski"
     }
 }

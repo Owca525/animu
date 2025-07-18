@@ -187,7 +187,6 @@ function settings() {
             />
             <div className="settings-save-container">
                 <motion.div variants={saveCommunicateAnimation} initial={"hidden"} animate={isSaving ? "visible" : "hidden"} transition={{ duration: 0.2 }} className="settings-save-content">
-                    {/* TODO: Translate Full polish file */}
                     <div className="settings-save-title">{t("settings.saving.notification")}</div>
                     <div className="settings-save-buttons">
                         <Button content={t("dialog.yes")} onClick={saveNewConfig} />
