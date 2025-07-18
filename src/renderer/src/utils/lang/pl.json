@@ -168,6 +168,13 @@
         "player": "{{title}} Episode {{ep}}"
     },
     "globalError": "Critical Error has been accured, do you want go home?",
+    "filter": {
+        "genres": "Gatunki:",
+        "year": "Rok:",
+        "season": "Sezon:",
+        "format": "Format:",
+        "airing": "Status emisji:"
+    },
     "lang": {
         "en": "English",
         "pl": "Polish"

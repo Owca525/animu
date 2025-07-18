@@ -174,26 +174,25 @@ const Home = () => {
                         <Button icon="tune" onClick={() => setShowFilter((prev) => !prev)}/>
                         {showFilter && 
                             // TODO: Make Better Tags shover
-                            // TODO: Adding Text To lang File
                             <div className="home-filter-container" onMouseLeave={() => setShowFilter(() => false)}>
                                 <div className="home-filter-space">
-                                    <div className="home-filter-title">Genres:</div>
+                                    <div className="home-filter-title">{t("filter.genres")}</div>
                                     <Dropdown onClickX={() => onChange(undefined, "genres")} buttonText={filter?.genres ? filter.genres[0] : ""} options={plugin.information.searchOption.genres.map((element) => {return { label: element, onClick: (text) => onChange({ genres: [text] }) } })} placeholder={"Genres"} />
                                 </div>
                                 <div className="home-filter-space">
-                                    <div className="home-filter-title">Year:</div>
+                                    <div className="home-filter-title">{t("filter.year")}</div>
                                     <Dropdown onClickX={() => onChange(undefined, "years")} buttonText={filter?.years ? filter.years : ""} options={plugin.information.searchOption.years.map((element) => {return { label: element, onClick: (text) => onChange({ years: text }) } })} placeholder={"Years"} />
                                 </div>
                                 <div className="home-filter-space">
-                                    <div className="home-filter-title">Season:</div>
+                                    <div className="home-filter-title">{t("filter.season")}</div>
                                     <Dropdown onClickX={() => onChange(undefined, "seasons")} buttonText={filter?.seasons ? filter.seasons : ""} options={plugin.information.searchOption.seasons.map((element) => {return { label: element, onClick: (text) => onChange({ seasons: text }) } })} placeholder={"Season"} />
                                 </div>
                                 <div className="home-filter-space">
-                                    <div className="home-filter-title">Format:</div>
+                                    <div className="home-filter-title">{t("filter.format")}</div>
                                     <Dropdown onClickX={() => onChange(undefined, "format")} buttonText={filter?.format ? filter.format[0] : ""} options={plugin.information.searchOption.format.map((element) => {return { label: element, onClick: (text) => onChange({ format: [text] }) } })} placeholder={"Format"} />
                                 </div>
                                 <div className="home-filter-space">
-                                    <div className="home-filter-title">Airing Status:</div>
+                                    <div className="home-filter-title">{t("filter.airing")}</div>
                                     <Dropdown onClickX={() => onChange(undefined, "airing")} buttonText={filter?.airing ? filter.airing : ""} options={plugin.information.searchOption.statuses.map((element) => {return { label: element, onClick: (text) => onChange({ airing: text }) } })} placeholder={"Aring"} />
                                 </div>
                             </div>

@@ -175,6 +175,13 @@
         "player": "{{title}} Episode {{ep}}"
     },
     "globalError": "Critical Error has been accured, do you want go home?",
+    "filter": {
+        "genres": "Genres:",
+        "year": "Year:",
+        "season": "Season:",
+        "format": "Format:",
+        "airing": "Airing Status:"
+    },
     "lang": {
         "en": "English",
         "pl": "Polish"
