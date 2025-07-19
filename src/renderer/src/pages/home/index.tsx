@@ -175,6 +175,7 @@ const Home = () => {
                     <Input placeholder={t("home.search")} onKeyDown={OnSearch} />
                     <div className="home-filter-void">
                         <Button icon="tune" onClick={() => setShowFilter((prev) => !prev)}/>
+                        {/* TODO: Change from mouseleave to when click mouse to exit filter menu */}
                         {showFilter && 
                             <div className="home-filter-container" onMouseLeave={() => setShowFilter(() => false)}>
                                 <div className="home-filter-space">
