@@ -125,6 +125,7 @@ const Card: React.FC<cardData> = ({
   }
 
   function GenerateInformation() {
+    if (!AnimeData.studios && !AnimeData.status && !AnimeData.genres && !AnimeData.description) return undefined
     let information: JSX.Element[] = []
     if (AnimeData.averageScore) {
       information = [ ...information, <div className="card-information-score" style={{border: `3px solid ${getGradientColor(AnimeData.averageScore)}`}}>{AnimeData.averageScore}%</div> ]
@@ -176,11 +177,11 @@ const Card: React.FC<cardData> = ({
         )
       }
     >
-      <div
+      {GenerateInformation() && <div
         className={`card-information ${isOut ? "card-information-left" : "card-information-right"}`}
       >
         {GenerateInformation()}
-      </div>
+      </div>}
       {AnimeData.coverImage && (
         <img
           src={AnimeData.coverImage}
