@@ -22,9 +22,10 @@ export function convertDateToFormattedString(year: number | undefined, month: nu
     return new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(year, month, day, hour, minute));
 }
 
-export function capitalizeFirstLetter(text: string) {
+export function capitalizeFirstLetter(text: string | undefined | null) {
+    if (!text) return ""
     if (text.length === 0) return '';
-    if (text.length <= 2) return text.toUpperCase().replace("_", " ")
+    if (text.length <= 3) return text.toUpperCase().replace("_", " ")
     text = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
     return text.replaceAll("_", " ");
 }
@@ -211,11 +212,12 @@ export function genYearsList(stopYear: number): string[] {
     return yearList
 }
 
-export function getGradientColor(value: number): string {
-  const clamped = Math.max(0, Math.min(100, value));
-  
-  const red = clamped < 50 ? 255 : Math.floor(255 - ((clamped - 50) * 5.1));
-  const green = clamped > 50 ? 128 : Math.floor((clamped * 2.56));
-  
-  return `rgb(${red}, ${green}, 0)`;
+export function getGradientColor(value: number | undefined | null): string {
+    if (!value) return ""
+    const clamped = Math.max(0, Math.min(100, value));
+    
+    const red = clamped < 50 ? 255 : Math.floor(255 - ((clamped - 50) * 5.1));
+    const green = clamped > 50 ? 128 : Math.floor((clamped * 2.56));
+    
+    return `rgb(${red}, ${green}, 0)`;
 }
