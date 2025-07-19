@@ -6,9 +6,7 @@
     position: fixed;
 }
 
-/* TODO: Adding colors, borders, transition to the DarkAnimu File*/
 .information-score {
-    background-color: var(--bg);
     z-index: 1000;
     /*width: 30px;
     height: 30px;
@@ -20,7 +18,6 @@
     font-size: clamp(0.8rem, 2vw, 1.2rem);
 
     display: flex;
-    border-radius: 50%;
     justify-content: center;
     align-items: center;
     position: absolute;
@@ -94,7 +91,6 @@
 .information-cover, .information-cover-placeholder {
     max-width: 240px;
     max-height: 240px;
-    transition: all 0.1s;
     cursor: pointer;
     user-select: none;
     aspect-ratio: 2 / 3;
@@ -109,9 +105,6 @@
     align-items: center;
     aspect-ratio: 2 / 3;
     user-select: none;
-
-    border-radius: 12px;
-    background-color: var(--bg3);
 }
 
 .information-cover:hover {
@@ -213,9 +206,6 @@
     user-select: none;
 }
 
-.information-select-episode:hover {
-    background-color: var(--bg4);
-}
 
 /* For smaller devices / window sizes */
 @media (max-width: 1000px) {
@@ -224,10 +214,10 @@
         margin-top: max(18%, 90px);
         padding: 10px 15px 10px 20px;
         gap: 20px;
-        /*border-radius: 0px;*/
     }
 
     .information-bottom {
+        margin-top: 4px;
         width: 100%;
     }
 
@@ -251,7 +241,6 @@
         grid-auto-flow: column;
         align-self: center;
         width: 98%;
-        /*border-radius: 0px;*/
         overflow-x: auto;
     }
 
@@ -264,11 +253,11 @@
     }
 
     .information-info-content {
-        /*border-radius: 10px;*/
         flex-flow: row;
-        font-size: 0.8em;
+        font-size: 0.6em;
         width: fit-content;
         min-width: 120px;
+        
     }
 
     .information-content-title {
@@ -300,6 +289,7 @@ maybe that will be usefull in the future */
 
     .information-bottom {
         width: 100%;
+        margin-top: 0px;
     }
 
     .information-banner {
@@ -330,8 +320,7 @@ maybe that will be usefull in the future */
 
     .information-info-content {
         padding: 8px 5px;
-        /* border-radius: 10px; */
-        font-size: 0.8em;
+        font-size: 0.5em;
         flex-flow: row;
     }
 

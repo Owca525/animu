@@ -14,7 +14,6 @@
 
     scroll-snap-align: start;
     transform: scale(1);
-    transition: transform 0.3s ease;
     user-select: none;
     z-index: 1;
 }
@@ -69,17 +68,13 @@
   display: block;
 } 
 
-/* TODO: Adding colors, borders, transition to the DarkAnimu File*/
 .card-information {
     display: none;
     position: absolute;
     flex-direction: column;
     top: 0;
-    background-color: var(--bg2);
     z-index: 10000;
 
-    border: solid 2px var(--neutral1);
-    border-radius: 12px;
     width: 240px;
     padding: 12px;
     margin-top: 12px;
