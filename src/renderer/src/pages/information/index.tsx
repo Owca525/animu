@@ -214,7 +214,7 @@ function information() {
 
 
                         <div className="information-episodes">
-                            <div className="information-select-episode" onClick={() => setshowWrong(() => true)}><span className="material-symbols-outlined">search</span>This is wrong Anime?</div>
+                            <div className="information-select-episode" onClick={() => setshowWrong(() => true)}><span className="material-symbols-outlined">search</span>Is this the wrong Anime?</div>
                             {showWrong == false &&
                                 <>
                                     {isLoading == false && data && data.episodesData && data.episodesData.length > 0 && anime_data.status != "NOT_YET_RELEASED" && (
@@ -225,8 +225,8 @@ function information() {
                                         </>
                                     )}
                                     {isLoading && anime_data.status != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
-                                    {isError && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime dosen't have episodes</div>}
-                                    {data && (data.episodesData && data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime dosen't have episodes</div>}
+                                    {isError && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime doesn't have episodes</div>}
+                                    {data && (data.episodesData && data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime doesn't have episodes</div>}
                                 </>}
                         </div>
 
