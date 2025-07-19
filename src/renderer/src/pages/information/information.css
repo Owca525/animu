@@ -154,6 +154,7 @@
 
 .information-episodes {
     width: 100%;
+    margin-top: 10px;
     min-height: 25px;
     height: min-content;
     padding: 12px;
@@ -176,7 +177,6 @@
 
 .information-characters-container {
     padding-top: 15px;
-    margin-top: 5px;
     display: flex;
     gap: 15px;
     overflow-x: scroll;
