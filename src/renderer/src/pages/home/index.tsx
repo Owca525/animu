@@ -66,10 +66,7 @@ const Home = () => {
         if (homeCache.data.length == 0) return
         if (homeCache.data.length > 1) return
         const { scrollHeight, clientHeight } = divRef.current;
-        console.log(scrollHeight > clientHeight)
-        if (scrollHeight > clientHeight == false) {
-            handleScroll()
-        }
+        if (scrollHeight > clientHeight == false) handleScroll()
     }, [homeCache.data])
     
     async function history(): Promise<containerData[]> {
@@ -90,11 +87,6 @@ const Home = () => {
         ]
     }
 
-    // I can't add this function to onChange because global change don't applay, Idk why
-    useEffect(() => {
-        if (homeCache.filterTags) OnSearch("")
-    }, [homeCache.filterTags])
-
     console.log(homeCache)
 
     const handleScroll = () => {
@@ -103,7 +95,7 @@ const Home = () => {
         const currentPos = -divRef.current.scrollTop + divRef.current.scrollHeight
         const endPosition = divRef.current.offsetHeight
         const isFUCKINGBottom = parseInt(currentPos.toFixed(0)) <= endPosition + 30
-        console.log("handleScroll", isFUCKINGBottom, homeCache)
+        console.log("handleScroll", isFUCKINGBottom, homeCache, homeCache.data[0].onScrollDownFunction)
         if (isFUCKINGBottom && homeCache.stopScrolling == false && homeCache.data.length === 1) {
             if (homeCache.data[0].onScrollDownFunction) {
                 store.dispatch({ type: "setPage", payload: homeCache.page + 1 })
@@ -117,13 +109,12 @@ const Home = () => {
         }
     }
 
-    // TODO: Fix problem when search dosen't set when delete the tag and fix cache reset 
     async function OnSearch(text: string) {
         if (!homeCache.localSearch) {
             store.dispatch({ type: "setSearch", payload: text });
             store.dispatch({ type: "setPage", payload: 1 });
             homeStopScrolling(false);
-            plugin.information.search(text, 1, homeCache.filterTags)
+            plugin.information.search(text, 1, store.getState().home.filterTags)
             return
         }
 
@@ -158,11 +149,13 @@ const Home = () => {
                 delete newParams[removeParam];
             }
             store.dispatch({ type: "setTags", payload: newParams })
+            OnSearch(homeCache.search)
             return
         }
 
         if (!homeCache.filterTags) store.dispatch({ type: "setTags", payload: params })
         else store.dispatch({ type: "setTags", payload: { ...homeCache.filterTags, ...params } })
+        OnSearch(homeCache.search)
     }
 
     function CreateTagList() {
@@ -183,7 +176,6 @@ const Home = () => {
                     <div className="home-filter-void">
                         <Button icon="tune" onClick={() => setShowFilter((prev) => !prev)}/>
                         {showFilter && 
-                            // TODO: Make Better Tags shover
                             <div className="home-filter-container" onMouseLeave={() => setShowFilter(() => false)}>
                                 <div className="home-filter-space">
                                     <div className="home-filter-title">{t("filter.genres")}</div>
