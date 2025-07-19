@@ -82,7 +82,6 @@ const Card: React.FC<cardData> = ({ AnimeData, saveData, deletionCard, onClick }
   return (
     <div ref={cardRef} className="card-container" onClick={sendToInformation} onMouseOver={checkOutOfBound} title={AnimeData.title} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions([{option:t("dialog.open"), onClick: sendToInformation}], CenterContextMenu), event)}>
        <div className={`card-information ${_isOut ? "card-information-left" : "card-information-right"}`}>
-          <div className="card-information-text">{AnimeData.studios[0]}</div>
           <div className="card-information-text">{capitalizeFirstLetter(AnimeData.type ? AnimeData.type : "")}<span className="dot">·</span>{AnimeData.episodes} Episodes</div>
       </div>
       {AnimeData.coverImage && <img src={AnimeData.coverImage} className="card-image" onLoad={() => setLoading(() => false)} onError={() => setisError(() => true)} style={checkState()} />}
