@@ -261,7 +261,7 @@ function information() {
 
                                     <div className="information-characters-container">
                                         {anime_data.characters.map((character) => (character.voiceActor != undefined &&
-                                            <div className="information-characters-card" onClick={() => window.api.open(`https://anilist.co/staff/${character.voiceActor.id}`)}>
+                                            <div className="information-characters-card" onClick={() => window.api.open(`https://anilist.co/staff/${character.voiceActor ? character.voiceActor.id : ""}`)}>
                                                 <img className="information-characters-card-cover" src={character.voiceActor.image}></img>
                                                 <div className="information-characters-card-description">
                                                     <span className="information-character-name">{character.voiceActor.name}</span>
