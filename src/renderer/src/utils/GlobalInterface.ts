@@ -34,7 +34,7 @@ export interface AnimeData {
         year: number
     } | null
     status: string | null
-    studios: any
+    studios: string[]
     title: string
     type: string | null
     episodesList?: { episodes: string[], type: string, name?: string }[]

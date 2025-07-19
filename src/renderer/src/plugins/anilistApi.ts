@@ -82,8 +82,10 @@ query(
       title {
         english
         romaji
+        native
       }
       coverImage {
+        extraLarge
         large
       }
       startDate {
@@ -106,9 +108,7 @@ query(
       episodes
       duration
       genres
-      isAdult
       averageScore
-      popularity
       nextAiringEpisode {
         airingAt
         timeUntilAiring
@@ -156,7 +156,8 @@ function Convert(convert: any): cardData {
     AnimeData: {
       ...convert,
       coverImage: convert.coverImage.large,
-      title: convert.title.romaji
+      title: convert.title.romaji,
+      studios: convert.studios.edges.map((studio) => studio.node.name)
     },
   }
 }
