@@ -10,16 +10,22 @@
 .information-score {
     background-color: var(--bg);
     z-index: 1000;
-    width: 30px;
+    /*width: 30px;
     height: 30px;
-    padding: 8px;
+    padding: 8px;*/
+    width: clamp(20px, 1vw, 30px);
+    height: clamp(20px, 1vw, 30px);
+    padding: clamp(4px, 1vw, 12px);
+    
+    font-size: clamp(0.8rem, 2vw, 1.2rem);
+
     display: flex;
     border-radius: 50%;
     justify-content: center;
     align-items: center;
     position: absolute;
-    margin-top: -80px;
-    margin-left: -20px;
+    margin-top: -20px;
+    margin-left: -15px;
 }
 
 /* banner related classes */
@@ -80,13 +86,17 @@
     box-sizing: border-box;
 }
 
-.information-cover, .information-cover-placeholder {
+.information-image-container {
     margin-top: min(-3%, -60px);
+}
+
+.information-cover, .information-cover-placeholder {
     max-width: 240px;
     max-height: 240px;
     transition: all 0.1s;
     cursor: pointer;
     user-select: none;
+    aspect-ratio: 2 / 3;
 }
 
 .information-cover-placeholder {
@@ -244,10 +254,12 @@
         overflow-x: auto;
     }
 
+    .information-image-container {
+        margin-top: -40px;
+    }
 
     .information-cover {
         max-height: 220px;
-        margin-top: -40px;
     }
 
     .information-info-content {
@@ -303,9 +315,12 @@ maybe that will be usefull in the future */
         overflow: scroll;
     }
 
+    .information-image-container {
+        margin-top: 0px;
+    }
+
     .information-cover {
         max-height: 150px;
-        margin-top: 0px;
     }
 
     .information-info-content {
