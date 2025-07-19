@@ -148,6 +148,9 @@ body {
     border-radius: 8px;
 }
 
+.card-container {
+    transition: transform 0.3s ease;
+}
 
 .card-image, .card-image-placeholder {
     border-radius: 8px;
@@ -164,6 +167,13 @@ body {
 
 .card-delete-icon:hover {
     background-color: var(--bg4);
+}
+
+
+.card-information {
+    background-color: var(--bg2);
+    border-radius: 12px;
+    border: solid 2px var(--neutral1);
 }
 
 
@@ -194,6 +204,15 @@ body {
     border-radius: 16px;
 }
 
+.information-cover-placeholder {
+    border-radius: 12px;
+    background-color: var(--bg3);
+}
+
+.information-cover, .information-cover-placeholder {
+    transition: all 0.1s;
+}
+
 .information-info {
     background-color: var(--bg2);
     border-radius: 16px;
@@ -213,6 +232,10 @@ body {
     border-radius: 50%;
 }
 
+.information-select-episode:hover {
+    background-color: var(--bg4);
+}
+
 .information-episode-button {
     background-color: var(--bg4);
     border-radius: 8px;
@@ -227,6 +250,11 @@ body {
 .information-select-episode {
     background-color: var(--bg3);
     border-radius: 12px;
+}
+
+.information-score {
+    background-color: var(--bg);
+    border-radius: 50%;
 }
 
   /* For smaller devices / window sizes */
@@ -267,8 +295,11 @@ body {
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
 
-    border: 2px solid var(--bg4);
-    border-width: 2px 0px 0px 0px;
+    border: 0px solid var(--bg3);
+}
+.drop-content-show {
+  border-width: 2px 0px 0px 0px;
+  border-color: var(--bg4);
 }
 
 .active-drop {
@@ -362,7 +393,7 @@ body {
 
 /* DropDown */
 
-.dropdown-button {
+/* .dropdown-button {
   border-radius: 8px;
   border: 2px solid var(--bg3);
   background-color: var(--bg3);
@@ -376,7 +407,7 @@ body {
 .dropdown-item {
   background-color: var(--bg3);
   border-radius: 6px;
-}
+} */
 
 
 /* SettingsInput */
@@ -496,13 +527,15 @@ body {
 }
 
 .player-up-Next-container {
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: color-mix(in srgb, var(--playerbg3) 70%, transparent);
   border-radius: 1em;
+  border-color: var(--bg4);
   color: var(--playertext);
 }
 
 .player-up-Next-Button {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: color-mix(in srgb, var(--bg3) 80%, transparent);
+  border-color: var(--bg4);
 }
 
 .player-settings-button-text-gray {
@@ -512,7 +545,7 @@ body {
 /* nerdStats */
 
 .player-nerd-container {
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: color-mix(in srgb, var(--playerbg3) 70%, transparent);
   border-radius: 12px;
   color: var(--playertext);
 }
@@ -557,4 +590,17 @@ body {
 .video-bottom .seekbar-thumb, .seekbar-progress, .seekbar-box.progress {
   background-color: var(--seekbarneutral1);
   border-radius: 12px;
+}
+
+
+/* ContainerWrong */
+
+.information-containerwrong {
+    background-color: var(--bg2);
+    border: solid 2px var(--bg3);
+}
+
+
+.information-containerwrong-void {
+    background-color: color-mix(in srgb, var(--bg) 70%, transparent);
 }
