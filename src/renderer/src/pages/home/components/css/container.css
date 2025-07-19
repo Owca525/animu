@@ -52,7 +52,7 @@
 .container-right-skip-button {
     width: max-content;
     height: max-content;
-    z-index: 2;
+    z-index: 20;
     margin-bottom: 25px;
     position: absolute;
     display: none;
