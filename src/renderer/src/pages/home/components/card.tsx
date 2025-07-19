@@ -5,7 +5,7 @@ import { useRef, useState } from "react"
 import { t } from "i18next"
 import { useSelector } from "react-redux"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
-import { CreateContextMenuOptions } from "@renderer/utils/functions"
+import { capitalizeFirstLetter, CreateContextMenuOptions } from "@renderer/utils/functions"
 
 const Card: React.FC<cardData> = ({ AnimeData, saveData, deletionCard, onClick }) => {
   const navigate = useNavigate()
@@ -81,11 +81,10 @@ const Card: React.FC<cardData> = ({ AnimeData, saveData, deletionCard, onClick }
 
   return (
     <div ref={cardRef} className="card-container" onClick={sendToInformation} onMouseOver={checkOutOfBound} title={AnimeData.title} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions([{option:t("dialog.open"), onClick: sendToInformation}], CenterContextMenu), event)}>
-      {/* TODO: Fix why card-information under cards */}
-      {/* <div className={`card-information ${isOut ? "card-information-left" : "card-information-right"}`}>
+       <div className={`card-information ${_isOut ? "card-information-left" : "card-information-right"}`}>
           <div className="card-information-text">{AnimeData.studios[0]}</div>
           <div className="card-information-text">{capitalizeFirstLetter(AnimeData.type ? AnimeData.type : "")}<span className="dot">·</span>{AnimeData.episodes} Episodes</div>
-      </div> */}
+      </div>
       {AnimeData.coverImage && <img src={AnimeData.coverImage} className="card-image" onLoad={() => setLoading(() => false)} onError={() => setisError(() => true)} style={checkState()} />}
       {isLoading && isError == false && <div className="card-image-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div>}
       {isError && <div className="card-image-placeholder"><span className="material-symbols-outlined">error</span></div>}

@@ -82,6 +82,7 @@
     border-radius: 12px;
     width: 240px;
     padding: 12px;
+    margin-top: 12px;
 }
 
 .card-information-left {
@@ -89,16 +90,22 @@
     left: 0;
     margin-left: -280px;
     margin-right: 0px;
+    position: absolute;
 }
 
 .card-information-right {
     top: 0;
     left: 170px;
     z-index: 10000;
+    position: absolute;
 }
 
 .card-container:hover .card-information {
     display: flex;
+}
+
+.card-container:hover {
+    z-index: 7;
 }
 
 .dot {
