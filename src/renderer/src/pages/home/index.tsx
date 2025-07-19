@@ -205,6 +205,7 @@ const Home = () => {
                 <div></div>
                 <div className="home-header-right"></div>
             </div>
+            {/* TODO: Add error and empty text */}
             <div ref={divRef} className={homeCache.isLoading ? "home-loading-container" : "home-container"} onScroll={handleScroll}>
                 {
                     homeCache.isLoading ? <div className="material-symbols-outlined home-loading-animation">progress_activity</div>
