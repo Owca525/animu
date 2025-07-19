@@ -114,6 +114,25 @@ query(
         timeUntilAiring
         episode
       }
+      characters(perPage: 10) {
+        edges {
+          role
+          node {
+            name {
+              full
+            }
+          }
+          voiceActors(language: JAPANESE) {
+            name {
+              full
+            }
+            language
+            image {
+              large
+            }
+          }
+        }
+      }
       studios(isMain: true) {
         edges {
           isMain
@@ -152,10 +171,11 @@ const allPopular = {
 }
 
 function Convert(convert: any): cardData {
+  console.log(convert)
   return {
     AnimeData: {
       ...convert,
-      coverImage: convert.coverImage.large,
+      coverImage: convert.coverImage.extraLarge ? convert.coverImage.extraLarge : convert.coverImage.large,
       title: convert.title.romaji,
       studios: convert.studios.edges.map((studio) => studio.node.name)
     },
