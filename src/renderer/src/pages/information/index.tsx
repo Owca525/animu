@@ -127,7 +127,7 @@ function information() {
         <>
             <main className="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>
                 <div className="information-banner">
-                    <img className={anime_data.bannerImage ? "information-banner-image" : "information-banner-image-blur"} onError={() => setBannerIsError(() => true)} onLoad={() => setBannerLoadingData(() => false)} src={anime_data.bannerImage ? anime_data.bannerImage : anime_data.coverImage ? anime_data.coverImage : ""} style={isBannerLoading ? {display: "none"} : isBannerError ? {display: "none"} : {animation: "fadeIn 0.3s forwards"}} />
+                    <img className={anime_data.bannerImage ? "information-banner-image" : "information-banner-image-blur"} onError={() => setBannerIsError(() => true)} onLoad={() => setBannerLoadingData(() => false)} src={anime_data.bannerImage ? anime_data.bannerImage : anime_data.coverImage ? anime_data.coverImage : ""} style={isBannerLoading ? { display: "none" } : isBannerError ? { display: "none" } : { animation: "fadeIn 0.3s forwards" }} />
                     {isBannerLoading && isBannerError == false && <div className="information-banner-image-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div>}
                     {isBannerError && isBannerLoading == false && <div className="information-banner-image-placeholder"><span className="material-symbols-outlined">error</span></div>}
                 </div>
@@ -138,8 +138,8 @@ function information() {
 
                     <div className="information-top">
                         <div className="information-image-container">
-                            {anime_data.averageScore && <div title="Anime Score" className="information-score" style={{ border: `3px solid ${getGradientColor(anime_data.averageScore)}` }}>{anime_data.averageScore}%</div>}
-                            <img className="information-cover" onClick={() => SaveCoverToClipboard(anime_data.coverImage)} onError={() => setCoverIsError(() => true)} onLoad={() => setCoverIsLoading(() => false)} src={anime_data.coverImage ? anime_data.coverImage : ""} style={isCoverLoading ? { display: "none" } : isError ? { display: "none" } : {animation: "fadeIn 0.3s forwards"}}></img>
+                            {anime_data.averageScore && <div title="Anime Score" className="information-score" style={{ border: `2px solid ${getGradientColor(anime_data.averageScore)}` }}>{anime_data.averageScore}%</div>}
+                            <img className="information-cover" onClick={() => SaveCoverToClipboard(anime_data.coverImage)} onError={() => setCoverIsError(() => true)} onLoad={() => setCoverIsLoading(() => false)} src={anime_data.coverImage ? anime_data.coverImage : ""} style={isCoverLoading ? { display: "none" } : isError ? { display: "none" } : { animation: "fadeIn 0.3s forwards" }}></img>
                             {isCoverLoading && isError == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div>}
                             {isCoverError && isCoverLoading == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined">error</span></div>}
                         </div>
@@ -211,7 +211,7 @@ function information() {
                             }
 
                         </div>
-                
+
 
                         <div className="information-bottom-content">
 
@@ -231,31 +231,50 @@ function information() {
                                         {data && (data.episodesData && data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime doesn't have episodes</div>}
                                     </>}
                             </div>
-                            
-                            
-                            {/* <div className="information-characters">
-                                <div className="information-characters-title">
-                                    Characters
-                                </div>
 
-                                <div className="information-characters-container">
-                                
 
-                                    <div className="information-characters-card">
-                                        <img className="information-characters-card-cover" src="https://s4.anilist.co/file/anilistcdn/character/large/b222593-qBqUvpodooAI.png"></img>
-                                        <div className="information-characters-card-description">
-                                            <span className="information-character-name">Ken Takakura</span>
-                                            <br />
-                                            <span className="information-character-role">Main</span>
-                                        </div>
+                            {anime_data.characters &&
+                                <div className="information-characters">
+                                    <div className="information-characters-title">
+                                        Characters
                                     </div>
 
-
+                                    <div className="information-characters-container">
+                                        {anime_data.characters.map((character) =>
+                                            <div className="information-characters-card" onClick={() => window.api.open(`https://anilist.co/character/${character.character.id}`)}>
+                                                <img className="information-characters-card-cover" src={character.character.image}></img>
+                                                <div className="information-characters-card-description">
+                                                    <span className="information-character-name">{character.character.name}</span>
+                                                    <span className="information-character-role">{capitalizeFirstLetter(character.role)}</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
+                            }
 
-                            </div> */}
+                            {anime_data.characters &&
+                                <div className="information-characters">
+                                    <div className="information-characters-title">
+                                        Actors
+                                    </div>
 
-                            
+                                    <div className="information-characters-container">
+                                        {anime_data.characters.map((character) => (character.voiceActor != undefined &&
+                                            <div className="information-characters-card" onClick={() => window.api.open(`https://anilist.co/character/${character.voiceActor.id}`)}>
+                                                <img className="information-characters-card-cover" src={character.voiceActor.image}></img>
+                                                <div className="information-characters-card-description">
+                                                    <span className="information-character-name">{character.voiceActor.name}</span>
+                                                    <span className="information-character-role">As {character.character.name}</span>
+                                                </div>
+                                            </div>
+                                        )
+                                        )}
+                                    </div>
+                                </div>
+                            }
+
+
                         </div>
                     </div>
                 </div>

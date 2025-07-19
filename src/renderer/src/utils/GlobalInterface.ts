@@ -33,6 +33,19 @@ export interface AnimeData {
         month: number
         year: number
     } | null
+    characters: {
+        role: string,
+        character: {
+            id: string,
+            name: string,
+            image: string
+        },
+        voiceActor?: {
+            id: string,
+            name: string,
+            image: string
+        }
+    }[]
     status: string | null
     studios: string[]
     title: string

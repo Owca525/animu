@@ -118,11 +118,16 @@ query(
         edges {
           role
           node {
+            id
             name {
               full
             }
+            image {
+              large
+            }
           }
           voiceActors(language: JAPANESE) {
+            id
             name {
               full
             }
@@ -172,12 +177,24 @@ const allPopular = {
 
 function Convert(convert: any): cardData {
   console.log(convert)
+  let characters: any = []
+  try {
+      for (let index = 0; index < convert.characters.edges.length; index++) {
+        const element = convert.characters.edges[index];
+        if (element.voiceActors.length === 0) characters.push({role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full }})
+        else characters.push({role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full }, voiceActor: { id: element.voiceActors[0].id, image: element.voiceActors[0].image.large, name: element.voiceActors[0].name.full }})
+    }
+  } catch (error) {
+    console.log(error)
+  }
+  
   return {
     AnimeData: {
       ...convert,
       coverImage: convert.coverImage.extraLarge ? convert.coverImage.extraLarge : convert.coverImage.large,
       title: convert.title.romaji,
-      studios: convert.studios.edges.map((studio) => studio.node.name)
+      studios: convert.studios.edges.map((studio) => studio.node.name),
+      characters: characters
     },
   }
 }
