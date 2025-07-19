@@ -305,6 +305,10 @@ body {
     border-radius: 12px;
 }
 
+.drop-button:hover {
+  background-color: var(--bg4);
+}
+
 .drop-content {
     background-color: var(--bg3);
     border-radius: 12px;

@@ -127,7 +127,7 @@ const Card: React.FC<cardData> = ({
   function GenerateInformation() {
     let information: JSX.Element[] = []
     if (AnimeData.averageScore) {
-      information = [ ...information, <div className="card-information-score" style={{border: `2px solid ${getGradientColor(AnimeData.averageScore)}`}}>{AnimeData.averageScore}%</div> ]
+      information = [ ...information, <div className="card-information-score" style={{border: `3px solid ${getGradientColor(AnimeData.averageScore)}`}}>{AnimeData.averageScore}%</div> ]
     }
     if (AnimeData.nextAiringEpisode) {
       information = [ ...information, <div className="card-information-text card-information-top">Ep {AnimeData.nextAiringEpisode.episode} airing in {ConvertTimeToText()}</div> ]

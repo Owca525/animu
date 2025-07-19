@@ -228,6 +228,24 @@ body {
     border-radius: 16px;
 }
 
+.information-characters {
+    background-color: var(--bg2);
+    border-radius: 16px;
+}
+
+.information-characters-card {
+    background-color: var(--bg3);
+    border-radius: 16px;
+}
+
+.information-characters-card:hover {
+    background-color: var(--bg4);
+}
+
+.information-characters-card-cover {
+  border-radius: 16px;
+}
+
 .information-exit-button {
     border-radius: 50%;
 }
@@ -285,6 +303,10 @@ body {
 .drop-button {
     background-color: var(--bg3);
     border-radius: 12px;
+}
+
+.drop-button:hover {
+  background-color: var(--bg4);
 }
 
 .drop-content {
