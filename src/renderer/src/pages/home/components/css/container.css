@@ -42,7 +42,7 @@
     scroll-behavior: smooth;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    padding: 3px 0px;
+    padding: 4px 0px 3px 0px;
 }
 
 .container-data-horizontal::-webkit-scrollbar {
