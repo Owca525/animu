@@ -176,6 +176,7 @@
 
 .information-characters-container {
     padding-top: 15px;
+    margin-top: 5px;
     display: flex;
     gap: 15px;
     overflow-x: scroll;
