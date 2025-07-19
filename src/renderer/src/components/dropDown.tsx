@@ -15,7 +15,7 @@ interface DropdownProps {
   onClickX?: (text: string) => void
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '', placeholderChange, buttonText = "", onClickX, disableX = true }) => {
+const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '', placeholderChange, buttonText = "", onClickX, disableX = false }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [text, setText] = useState<string>(buttonText)
 
