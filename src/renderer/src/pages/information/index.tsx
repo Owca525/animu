@@ -211,25 +211,52 @@ function information() {
                             }
 
                         </div>
+                
+
+                        <div className="information-bottom-content">
+
+                            <div className="information-episodes">
+                                <div className="information-select-episode" onClick={() => setshowWrong(() => true)}><span className="material-symbols-outlined">search</span>Is this the wrong Anime?</div>
+                                {showWrong == false &&
+                                    <>
+                                        {isLoading == false && data && data.episodesData && data.episodesData.length > 0 && anime_data.status != "NOT_YET_RELEASED" && (
+                                            <>
+                                                {data.episodesData.map((episode: { episodes: string[], type: string, name?: string }) => episode.episodes.length > 0 ? (
+                                                    <Drop LeftHeader={episode.name ? episode.name : episode.type} RightHeader={`${episode.episodes.length} episodes`} content={makeButtons(episode.episodes, episode.type)} />
+                                                ) : "")}
+                                            </>
+                                        )}
+                                        {isLoading && anime_data.status != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
+                                        {isError && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime doesn't have episodes</div>}
+                                        {data && (data.episodesData && data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime doesn't have episodes</div>}
+                                    </>}
+                            </div>
+                            
+                            
+                            {/* <div className="information-characters">
+                                <div className="information-characters-title">
+                                    Characters
+                                </div>
+
+                                <div className="information-characters-container">
+                                
+
+                                    <div className="information-characters-card">
+                                        <img className="information-characters-card-cover" src="https://s4.anilist.co/file/anilistcdn/character/large/b222593-qBqUvpodooAI.png"></img>
+                                        <div className="information-characters-card-description">
+                                            <span className="information-character-name">Ken Takakura</span>
+                                            <br />
+                                            <span className="information-character-role">Main</span>
+                                        </div>
+                                    </div>
 
 
-                        <div className="information-episodes">
-                            <div className="information-select-episode" onClick={() => setshowWrong(() => true)}><span className="material-symbols-outlined">search</span>Is this the wrong Anime?</div>
-                            {showWrong == false &&
-                                <>
-                                    {isLoading == false && data && data.episodesData && data.episodesData.length > 0 && anime_data.status != "NOT_YET_RELEASED" && (
-                                        <>
-                                            {data.episodesData.map((episode: { episodes: string[], type: string, name?: string }) => episode.episodes.length > 0 ? (
-                                                <Drop LeftHeader={episode.name ? episode.name : episode.type} RightHeader={`${episode.episodes.length} episodes`} content={makeButtons(episode.episodes, episode.type)} />
-                                            ) : "")}
-                                        </>
-                                    )}
-                                    {isLoading && anime_data.status != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
-                                    {isError && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime doesn't have episodes</div>}
-                                    {data && (data.episodesData && data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime doesn't have episodes</div>}
-                                </>}
+                                </div>
+
+                            </div> */}
+
+                            
                         </div>
-
                     </div>
                 </div>
 
