@@ -124,6 +124,7 @@ const Card: React.FC<cardData> = ({
     return "Today"
   }
 
+  // TODO: Fix bug status dosen't apear
   function GenerateInformation() {
     if (!AnimeData.studios && !AnimeData.status && !AnimeData.genres && !AnimeData.description) return undefined
     let information: JSX.Element[] = []
