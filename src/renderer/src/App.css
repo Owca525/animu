@@ -34,7 +34,7 @@ input[type="number"]::-webkit-outer-spin-button {
   width: 100vw;
   height: 100vh;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .main-error-text {
@@ -43,7 +43,11 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .main-error-button-container {
   display: flex;
-  gap: 8px;
+  gap: 16px;
+}
+
+.error-button {
+  font-size: 1.1em;
 }
 
 /* animation */

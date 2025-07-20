@@ -8,16 +8,17 @@ interface ErrorBoundaryProps {
 
 interface ErrorBoundaryState {
     hasError: boolean;
+    error: Error | undefined
 }
-// TODO: Improve Error Boundary 
+
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
     constructor(props: ErrorBoundaryProps) {
         super(props);
-        this.state = { hasError: false };
+        this.state = { hasError: false, error: undefined };
     }
 
     static getDerivedStateFromError(_error: Error) {
-        return { hasError: true };
+        return { hasError: true, error: _error };
     }
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
@@ -30,9 +31,14 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                 <div className='main-error-container'>
                     <div className="main-error-text">{t("globalError")}</div>
                     <div className="main-error-button-container">
-                        <Button content={t("dialog.yes")} onClick={() => window.location.href = `${window.location.origin}${window.location.pathname}`}/>
-                        <Button content={t("dialog.no")} onClick={window.BrowserWindow.exit} />
+                        <Button content={"Go Back To Home"} ButtonClass='error-button' onClick={() => window.location.href = `${window.location.origin}${window.location.pathname}`}/>
+                        <Button content={"Leave Animu"} ButtonClass='error-button' onClick={() => window.BrowserWindow.exit()} />
                     </div>
+                    {this.state.error && 
+                        <div className="main-error-show">
+                            Error Message: {this.state.error.message}
+                        </div>
+                    }
                 </div>
             )
         }
