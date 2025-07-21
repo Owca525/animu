@@ -198,6 +198,17 @@ body {
     background-color: var(--bg3);
 }
 
+.container-title,
+.container-title-click {
+    border-radius: 12px;
+}
+
+.container-tag {
+    border-radius: 6px;
+    background-color: var(--neutral2);
+    border: 2px solid var(--neutral2);
+}
+
 
 /* Information */
 
@@ -289,6 +300,16 @@ body {
 .information-title2 {
   color: var(--text-gray);
 }
+
+.information-bar {
+    background-color: var(--bg2);
+    border-radius: 18px;
+}
+
+.information-bar-icon {
+    border-radius: 50% !important;
+}
+
 
   /* For smaller devices / window sizes */
 @media (max-width: 1000px) {
@@ -430,21 +451,32 @@ body {
 
 /* DropDown */
 
-/* .dropdown-button {
-  border-radius: 8px;
-  border: 2px solid var(--bg3);
+
+.dropdown-button {
   background-color: var(--bg3);
+  border-radius: 8px;
+}
+
+.dropdown-button-shadow-text {
+  color: var(--text-gray);
+}
+
+.dropdown-button-icon {
+  color: var(--text);
 }
 
 .dropdown-menu {
-  border-radius: 7px;
-  background-color: var(--bg2);
+  background-color: var(--bg3);
+  border-radius: 8px;
 }
 
 .dropdown-item {
-  background-color: var(--bg3);
-  border-radius: 6px;
-} */
+  border-radius: 8px;
+}
+
+.dropdown-item:hover {
+  background-color: var(--bg2);
+}
 
 
 /* SettingsInput */
@@ -635,9 +667,50 @@ body {
 .information-containerwrong {
     background-color: var(--bg2);
     border: solid 2px var(--bg3);
+    border-radius: 12px;
 }
-
 
 .information-containerwrong-void {
     background-color: color-mix(in srgb, var(--bg) 70%, transparent);
+}
+
+.information-containerwrong-exit-button {
+    border-radius: 50% !important; 
+}
+
+
+/* ContextMenu */
+
+
+.contextmenu-container {
+    background-color: var(--bg3);
+    border-radius: 4px;
+}
+
+.contextmenu-option:hover {
+    background-color: var(--bg4);
+}
+
+.contextmenu-option-line {
+    background-color: var(--bg2);
+    border-radius: 12px;
+}
+
+.contextmenu-option-deletion {
+    background-color: color-mix(in srgb, rgb(255, 0, 0) 20%, transparent);
+}
+
+.contextmenu-option, .contextmenu-option-deletion {
+    border-radius: 4px;
+}
+
+
+/* Help icon */
+
+
+.help-icon-description {
+  background-color: #333;
+  color: #fff;
+  border-radius: 4px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }

@@ -1,9 +1,7 @@
 .contextmenu-container {
     display: flex;
     flex-direction: column;
-    background-color: var(--bg3);
     padding: 6px;
-    border-radius: 4px;
     width: 150px;
     gap: 2px;
 }
@@ -11,21 +9,10 @@
 .contextmenu-option, .contextmenu-option-deletion {
     cursor: pointer;
     padding: 4px 0px 4px 4px;
-    border-radius: 4px;
     font-size: 1.1em;
-}
-
-.contextmenu-option:hover {
-    background-color: var(--bg4);
 }
 
 .contextmenu-option-line {
     width: 100%;
     height: 2px;
-    background-color: var(--bg2);
-    border-radius: 12px;
-}
-
-.contextmenu-option-deletion {
-    background-color: color-mix(in srgb, rgb(255, 0, 0) 20%, transparent);
 }

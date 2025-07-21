@@ -3,6 +3,7 @@
   display: flex;
   justify-content: center;
 }
+
 .dropdown-button {
   padding: 8px;
   cursor: pointer;
@@ -16,17 +17,13 @@
   white-space: nowrap;
   overflow: hidden;
   min-width: 0;
-  background-color: var(--bg3);
-  border-radius: 8px;
   font-size: 1em;
 }
-.dropdown-button-shadow-text {
-  color: gray;
-}
+
 .dropdown-button-icon {
-  color: var(--text);
   font-size: 1.2em;
 }
+
 .dropdown-button-text {
   font-size: 0.9em;
 }
@@ -42,8 +39,6 @@
   list-style: none;
   margin: 0;
   z-index: 1000;
-  background-color: var(--bg3);
-  border-radius: 8px;
   max-height: 300px;
   overflow: auto;
 }
@@ -58,9 +53,4 @@
   text-align: end;
   text-overflow: ellipsis;
   white-space: nowrap;
-  border-radius: 8px;
-}
-
-.dropdown-item:hover {
-  background-color: var(--bg2);
 }
