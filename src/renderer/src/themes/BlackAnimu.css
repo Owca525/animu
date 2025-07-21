@@ -177,6 +177,12 @@ body {
 }
 
 
+.card-information-score {
+    border-radius: 50%;
+    background-color: var(--bg2);
+    border: 2px solid var(--neutral1);
+}
+
 /* Container */
 
 .container-title, .container-title-click {

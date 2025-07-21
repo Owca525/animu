@@ -69,18 +69,13 @@
   display: block;
 } 
 
-/* TODO: Adding colors, borders, transition to the DarkAnimu File*/
-/* TODO: Fix information dosen't show out of container */
 .card-information {
     display: none;
     position: absolute;
     flex-direction: column;
     top: 0;
-    background-color: var(--bg2);
     z-index: 10000;
 
-    border: solid 2px var(--neutral1);
-    border-radius: 12px;
     width: 240px;
     padding: 12px;
     margin-top: 8px;
@@ -94,9 +89,6 @@
     width: 30px;
     height: 30px;
     padding: 4px;
-    border-radius: 50%;
-    background-color: var(--bg2);
-    border: 2px solid var(--neutral1);
     position: absolute;
     top: -10px;
     right: -10px;
