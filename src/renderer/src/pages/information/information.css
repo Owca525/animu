@@ -453,8 +453,9 @@ maybe that will be usefull in the future */
     .information-title-mobile {
         display: block;
         width: 100%;
-        text-align: center;
+        text-align: left;
         font-size: 1.5rem;
+        padding-left: 5dvw;
     }
     
     .button {

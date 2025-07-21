@@ -172,6 +172,7 @@ const Home = () => {
         <main className="home" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>
             <div className="home-header">
                 <div className="home-header-left">
+                <div className="button home-header-sidebar-placeholder"><span className="material-symbols-outlined">menu</span></div>
                     <Input placeholder={t("home.search")} InputClass="home-header-search" onKeyDown={OnSearch} />
                     <div className="home-filter-void">
                         <Button icon="tune" onClick={() => setShowFilter((prev) => !prev)}/>

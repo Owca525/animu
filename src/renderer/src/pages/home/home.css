@@ -14,8 +14,8 @@
     grid-template-columns: 1fr auto 1fr;
     justify-content: center;
     grid-area: header;
-    padding-left: clamp(50px, 8vw, 80px);
 }
+
 
 .home-header-search {
     padding: clamp(4px, 1vw, 8px) !important;
@@ -90,4 +90,13 @@
 
 .home-error-icon, .home-empty-icon {
     font-size: 2em;
+}
+
+/* for smartphones 
+maybe that will be usefull in the future */
+@media (max-width: 600px) {
+    .home-header {
+        padding-right: clamp(4px, 1vw, 8px);
+    }
+
 }
