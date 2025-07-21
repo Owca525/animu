@@ -108,6 +108,7 @@ query(
       episodes
       duration
       genres
+      source
       averageScore
       nextAiringEpisode {
         airingAt
@@ -187,6 +188,7 @@ const graphicHomeApi = `
     description
     type
     format
+    source
     status(version: 2)
     episodes
     duration

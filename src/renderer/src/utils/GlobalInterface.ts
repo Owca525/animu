@@ -46,6 +46,7 @@ export interface AnimeData {
             image: string
         }
     }[]
+    source: string
     status: string | undefined
     studios: string[]
     title: string
