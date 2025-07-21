@@ -131,10 +131,10 @@ const Card: React.FC<cardData> = ({
     if (AnimeData.averageScore) {
       information = [ ...information, <div className="card-information-score" style={{border: `3px solid ${getGradientColor(AnimeData.averageScore)}`}}>{AnimeData.averageScore}%</div> ]
     }
-    if (AnimeData.nextAiringEpisode) {
+    if (AnimeData.nextAiringEpisode && !saveData) {
       information = [ ...information, <div className="card-information-text card-information-top">Ep {AnimeData.nextAiringEpisode.episode} airing in {ConvertTimeToText()}</div> ]
     }
-    if (!AnimeData.nextAiringEpisode && (AnimeData.season && AnimeData.seasonYear)) {
+    if ((!AnimeData.nextAiringEpisode || saveData) && (AnimeData.season && AnimeData.seasonYear)) {
       information = [ ...information, <div className="card-information-text card-information-top">{capitalizeFirstLetter(AnimeData.season)} {AnimeData.seasonYear}</div>]
     } else if (!(AnimeData.season && AnimeData.seasonYear) && !AnimeData.nextAiringEpisode) {
       information = [ ...information, <div className="card-information-text card-information-top">TBA</div>]
