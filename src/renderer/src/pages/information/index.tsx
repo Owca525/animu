@@ -266,7 +266,7 @@ function information() {
                                 </div>
                             }
 
-                            {anime_data.characters &&
+                            {anime_data.characters && anime_data.characters.length != 0 &&
                                 <div className="information-characters">
                                     <div className="information-characters-title">
                                         Actors
