@@ -172,7 +172,7 @@ const Home = () => {
         <main className="home" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>
             <div className="home-header">
                 <div className="home-header-left">
-                    <Input placeholder={t("home.search")} onKeyDown={OnSearch} />
+                    <Input placeholder={t("home.search")} InputClass="home-header-search" onKeyDown={OnSearch} />
                     <div className="home-filter-void">
                         <Button icon="tune" onClick={() => setShowFilter((prev) => !prev)}/>
                         {/* TODO: Change from mouseleave to when click mouse to exit filter menu */}

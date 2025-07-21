@@ -38,10 +38,11 @@
 }
 
 .sidebar-hide-container {
-    padding: 8px;
+    padding: clamp(4px, 1vw, 8px);
+    /* padding: 8px;
     padding-left: 10px;
     padding-top: 7px;
-    padding-bottom: 6px;
+    padding-bottom: 6px; */
 }
 
 .sidebar-black-line {
