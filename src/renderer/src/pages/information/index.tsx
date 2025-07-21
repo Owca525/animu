@@ -145,6 +145,8 @@ function information() {
                         </div>
                         <div className="information-description">
                             <div className="information-title">{anime_data.title}</div>
+                            {/* TODO: Make it work */}
+                            {/* <div className="information-title2">The Fragrant Flower Blooms With Dignity</div> */}
                             {decodeHtmlEntities(anime_data.description ? anime_data.description : t("information.descriptionnotfound"))}
                         </div>
 
@@ -209,6 +211,12 @@ function information() {
                                     {capitalizeFirstLetter(anime_data.season)} {anime_data.seasonYear}
                                 </div>
                             }
+
+                            {/* TODO: Make it work */}
+                                {/* <div className="information-info-content">
+                                    <div className="information-content-title">Source</div>
+                                    Manga
+                                </div> */}
 
                         </div>
 

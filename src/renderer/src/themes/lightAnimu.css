@@ -286,6 +286,10 @@ body {
     border-radius: 50%;
 }
 
+.information-title2 {
+  color: var(--text-gray);
+}
+
   /* For smaller devices / window sizes */
 @media (max-width: 1000px) {
     .information-top {
