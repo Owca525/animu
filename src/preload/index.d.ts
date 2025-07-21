@@ -29,7 +29,7 @@ declare global {
           statusText?: string;
           error?: unknown;
         }>;
-        post: (url: string, header: Record<string, string>, body?: { query: string, variables: Object }) => Promise<{
+        post: (url: string, header: Record<string, string>, body?: { query: any, variables: Object }) => Promise<{
           success: boolean;
           data?: any;
           status?: number;

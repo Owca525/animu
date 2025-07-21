@@ -2,7 +2,7 @@ import { genYearsList } from "@renderer/utils/functions";
 import { cardData, containerData, FilterParams, pluginFormat } from "@renderer/utils/GlobalInterface";
 import { setHomeData, UpdateHomeData } from "@renderer/utils/pluginApi";
 
-const pageSize = 20
+const pageSize = 15
 
 const graphicApi = `
 query(
@@ -152,6 +152,89 @@ query(
 }
 `;
 
+
+const graphicHomeApi = `
+  query (
+    $season: MediaSeason,
+    $seasonYear: Int,
+  ) {
+    trending: Page(page: 1, perPage: ${pageSize}) {
+      media(sort: TRENDING_DESC, type: ANIME, isAdult: false) {
+        ...media
+      }
+    }
+    season: Page(page: 1, perPage: ${pageSize}) {
+      media(season: $season, seasonYear: $seasonYear, sort: POPULARITY_DESC, type: ANIME, isAdult: false) {
+        ...media
+      }
+    }
+    popular: Page(page: 1, perPage: ${pageSize}) {
+      media(sort: POPULARITY_DESC, type: ANIME, isAdult: false) {
+        ...media
+      }
+    }
+  }
+
+  fragment media on Media {
+    id
+    title { english romaji native }
+    coverImage { extraLarge large color }
+    startDate { year month day }
+    endDate { year month day }
+    bannerImage
+    season
+    seasonYear
+    description
+    type
+    format
+    status(version: 2)
+    episodes
+    duration
+    chapters
+    volumes
+    genres
+    isAdult
+    averageScore
+    popularity
+    mediaListEntry { id status }
+    nextAiringEpisode {
+      airingAt
+      timeUntilAiring
+      episode
+    }
+    characters(perPage: 10) {
+      edges {
+        role
+        node {
+          id
+          name {
+            full
+          }
+          image {
+            large
+          }
+        }
+        voiceActors(language: JAPANESE) {
+          id
+          name {
+            full
+          }
+          language
+          image {
+            large
+          }
+        }
+      }
+    }
+    studios(isMain: true) {
+      edges {
+        isMain
+        node { id name }
+      }
+    }
+  }
+`;
+
 const genres = `
 query {
   GenreCollection
@@ -199,8 +282,14 @@ function Convert(convert: any): cardData {
   }
 }
 
-async function sendToApi(variable: any): Promise<cardData[]> {
-  let data = await window.api.request.post("https://graphql.anilist.co", header, { query: graphicApi, variables: variable })
+// WHY THE FUCK THIS DOSEN"T WORK IF I CALL window.api.request.post IN CreateHomePage
+async function sendPost(variable: any, query: any): Promise<{success: boolean; data?: any; status?: number; statusText?: string; error?: unknown; }> {
+  return await window.api.request.post("https://graphql.anilist.co", header, { query: query, variables: variable })
+}
+
+async function sendToApi(variable: any, query: any): Promise<cardData[]> {
+  let data = await window.api.request.post("https://graphql.anilist.co", header, { query: query, variables: variable })
+  console.log(data)
   if (data.success) {
     return data.data.data.Page.media.map((data) => Convert(data))
   }
@@ -260,7 +349,7 @@ async function SearchAnilistApi(text: string, page: number, params?: FilterParam
   console.log(variables)
   let data = {
     title: title,
-    data: await sendToApi(variables),
+    data: await sendToApi(variables, graphicApi),
     onScrollDownFunction: (currentPage: number) => SearchAnilistApi(text, currentPage, params)
   }
 
@@ -269,7 +358,7 @@ async function SearchAnilistApi(text: string, page: number, params?: FilterParam
 }
 
 async function getFullCategory(params, title: string) {
-  let data = await sendToApi(params)
+  let data = await sendToApi(params, graphicApi)
   setHomeData(async () => {
     return [
       {
@@ -284,30 +373,26 @@ async function getFullCategory(params, title: string) {
 async function updateCategory(page: number, variables: any, title: string) {
   let data = {
     title: title,
-    data: await sendToApi({ ...variables, page: page }),
+    data: await sendToApi({ ...variables, page: page }, graphicApi),
     onScrollDownFunction: (page) => updateCategory(page, variables, title)
   }
-  console.log(data)
   UpdateHomeData(async () => { return { data: data, maxPage: pageSize } })
 }
 
 async function CreateHomePage(): Promise<containerData[]> {
   let season = getSeasonFromDate()
-  return [
+  let data = await sendPost({ season: season.season, seasonYear: season.seasonYear }, graphicHomeApi)
+  if (!data.success) return []
+  return [ 
     {
       title: "Trending Now",
-      data: await sendToApi(tendingAnime),
+      data: data.data.data.trending.media.map((anime) => Convert(anime)),
       horizontal: true,
       onTitleClick: () => getFullCategory(tendingAnime, "Trending Now"),
     },
     {
       title: "Popular in this Season",
-      data: await sendToApi({
-        page: 1,
-        season: season.season,
-        seasonYear: season.seasonYear,
-        type: "ANIME"
-      }),
+      data: data.data.data.season.media.map((anime) => Convert(anime)),
       horizontal: true,
       onTitleClick: () => getFullCategory({
         page: 1,
@@ -318,7 +403,7 @@ async function CreateHomePage(): Promise<containerData[]> {
     },
     {
       title: "All Time Popular",
-      data: await sendToApi(allPopular),
+      data: data.data.data.popular.media.map((anime) => Convert(anime)),
       horizontal: true,
       onTitleClick: () => getFullCategory(allPopular, "All Time Popular")
     }

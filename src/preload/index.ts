@@ -18,7 +18,7 @@ if (process.contextIsolated) {
       request: {
         get: (url: string, header: Record<string, string>) =>
           ipcRenderer.invoke("fetch-data", url, header),
-        post: (url: string, header: Record<string, string>, body?: { query: string, variables: Object }) =>
+        post: (url: string, header: Record<string, string>, body?: { query: any, variables: Object }) =>
           ipcRenderer.invoke("send-post", url, header, body),
       },
       rpc: {
