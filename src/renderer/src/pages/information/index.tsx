@@ -147,12 +147,12 @@ function information() {
                         </div>
                         <div className="information-description">
                             <div className="information-title">{anime_data.title.romaji}</div>
-                            {/* TODO: Make it work */}
-                            {/* <div className="information-title2">The Fragrant Flower Blooms With Dignity</div> */}
+                            <div className="information-title2">{anime_data.title.english ? anime_data.title.english : anime_data.title.native}</div>
                             {decodeHtmlEntities(anime_data.description ? anime_data.description : t("information.descriptionnotfound"))}
                         </div>
                         <div className="information-bar">
-                            <Button icon="open_in_new" ButtonClass="information-bar-icon" onClick={() => window.api.open(`https://anilist.co/anime/${anime_data.id}`)}/>
+                            <Button titleButton="Anilist Page" icon="open_in_new" ButtonClass="information-bar-icon" onClick={() => window.api.open(`https://anilist.co/anime/${anime_data.id}`)} />
+                            {anime_data.trailer && anime_data.trailer.site == "youtube" && <Button titleButton="Anime Trailer" icon="theaters" ButtonClass="information-bar-icon" onClick={() => window.api.open(`https://www.youtube.com/watch?v=${anime_data.trailer?.id}`)} />}
                         </div>
                     </div>
 
@@ -216,11 +216,12 @@ function information() {
                                 </div>
                             }
 
-                            {/* TODO: Make it work */}
-                                {/* <div className="information-info-content">
+                            {anime_data.source &&
+                                <div className="information-info-content">
                                     <div className="information-content-title">Source</div>
-                                    Manga
-                                </div> */}
+                                    {capitalizeFirstLetter(anime_data.source)}
+                                </div>
+                            }
 
                         </div>
 
