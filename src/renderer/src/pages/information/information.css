@@ -25,6 +25,23 @@
     margin-left: -15px;
 }
 
+.information-bar {
+    margin-right: -90px;
+    margin-top: -20px;
+    background-color: var(--bg2);
+    border-radius: 18px;
+    padding: 8px;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: max-content;
+    gap: 6px;
+}
+
+.information-bar-icon {
+    border-radius: 50% !important;
+}
+
 /* banner related classes */
 .information-banner {
     width: 100%;
@@ -234,6 +251,7 @@
 
 .information-description {
     overflow: hidden;
+    width: 100%;
 }
 
 .information-buttons-episode-container {
