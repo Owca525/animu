@@ -205,13 +205,11 @@ const Home = () => {
                 <div></div>
                 <div className="home-header-right"></div>
             </div>
-            {/* TODO: Add error and empty text */}
-            <div ref={divRef} className={homeCache.isLoading ? "home-loading-container" : "home-container"} onScroll={handleScroll}>
-                {
-                    homeCache.isLoading ? <div className="material-symbols-outlined home-loading-animation">progress_activity</div>
-                        :
-                        homeCache.data.map((element) => <Container tags={homeCache.filterTags && homeCache.data.length == 1 ? CreateTagList() : undefined} title={element.title} data={element.data} horizontal={element.horizontal} onScrollDownFunction={element.onScrollDownFunction} onTitleClick={element.onTitleClick} />)
-                }
+            <div ref={divRef} className={`home-container ${homeCache.isLoading && "home-loading-container"} ${homeCache.isError && "home-loading-container"}`} onScroll={handleScroll}>
+                {homeCache.isLoading && homeCache.isError == false && <div className="material-symbols-outlined home-loading-animation">progress_activity</div>}
+                {homeCache.isError && homeCache.isLoading == false && <div className="home-error-container"><span className="material-symbols-outlined home-error-icon">error</span>Error Occured</div>}
+                {homeCache.isLoading == false && homeCache.isError == false && homeCache.data.length > 0 && homeCache.data.map((element) => <Container tags={homeCache.filterTags && homeCache.data.length == 1 ? CreateTagList() : undefined} title={element.title} data={element.data} horizontal={element.horizontal} onScrollDownFunction={element.onScrollDownFunction} onTitleClick={element.onTitleClick} />)}
+                {homeCache.isError == false && homeCache.isLoading == false && homeCache.data.length <= 0 && <div className="home-empty-container"><span className="material-symbols-outlined home-empty-icon">error</span>Nothing Found Here</div>}
             </div>
             <Sidebar data={sidebarData} />
         </main>
