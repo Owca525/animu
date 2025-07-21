@@ -5,6 +5,7 @@ import i18n from "../i18n";
 
 const appConfigDirPath = window.api.os.getPath("userData");
 
+// TODO: Add check to dosen't make copy of the anime
 export async function ReadFile(file: string): Promise<cardData[]> {
     try {
         await CheckFile(file)
