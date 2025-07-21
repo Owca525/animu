@@ -178,7 +178,7 @@ const graphicHomeApi = `
   fragment media on Media {
     id
     title { english romaji native }
-    coverImage { extraLarge large color }
+    coverImage { extraLarge large }
     startDate { year month day }
     endDate { year month day }
     bannerImage
@@ -190,13 +190,9 @@ const graphicHomeApi = `
     status(version: 2)
     episodes
     duration
-    chapters
-    volumes
     genres
-    isAdult
     averageScore
     popularity
-    mediaListEntry { id status }
     nextAiringEpisode {
       airingAt
       timeUntilAiring
