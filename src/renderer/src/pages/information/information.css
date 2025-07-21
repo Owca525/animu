@@ -15,14 +15,14 @@
     height: clamp(20px, 1vw, 30px);
     padding: clamp(4px, 1vw, 12px);
     
-    font-size: clamp(0.8rem, 2vw, 1.2rem);
+    font-size: clamp(0.8rem, 1.5vw, 1.2rem);
 
     display: flex;
     justify-content: center;
     align-items: center;
     position: absolute;
-    margin-top: -20px;
-    margin-left: -15px;
+    margin-top: -13px;
+    margin-left: -12px;
 }
 
 .information-bar {
@@ -381,6 +381,10 @@
     margin-top: 0px;
     padding: 0px;
     gap: 4px;
+}
+
+.information-score {
+    font-size: clamp(0.85rem, 1.8vw, 1rem);
 }
 
 }
