@@ -210,7 +210,7 @@ const Home = () => {
                 {
                     homeCache.isLoading ? <div className="material-symbols-outlined home-loading-animation">progress_activity</div>
                         :
-                        homeCache.data.map((element) => <Container tags={homeCache.filterTags ? CreateTagList() : undefined} title={element.title} data={element.data} horizontal={element.horizontal} onScrollDownFunction={element.onScrollDownFunction} onTitleClick={element.onTitleClick} />)
+                        homeCache.data.map((element) => <Container tags={homeCache.filterTags && homeCache.data.length == 1 ? CreateTagList() : undefined} title={element.title} data={element.data} horizontal={element.horizontal} onScrollDownFunction={element.onScrollDownFunction} onTitleClick={element.onTitleClick} />)
                 }
             </div>
             <Sidebar data={sidebarData} />
