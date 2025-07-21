@@ -140,6 +140,11 @@ body {
     background-color: var(--bg2);
 }
 
+.home-filter-container {
+    background-color: var(--bg2);
+    border-radius: 12px;
+    border: 2px solid var(--bg3);
+}
 
 /* Cards */
 

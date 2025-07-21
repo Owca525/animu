@@ -66,11 +66,8 @@
     margin-left: -270px;
     display: flex;
     position: fixed;
-    background-color: var(--bg2);
     padding: 12px;
-    border-radius: 12px;
     gap: 8px;
-    border: 2px solid var(--bg3);
 }
 
 .home-filter-space {
