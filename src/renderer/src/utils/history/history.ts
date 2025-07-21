@@ -1,8 +1,9 @@
 import { toast } from "react-toastify";
-import { cardData, notificationProps } from "../GlobalInterface";
+import { AnimeData, cardData, notificationProps } from "../GlobalInterface";
 import { convertToNewData } from "@renderer/plugins/allmanga";
 import { CheckFile, DeleteFromFile, ReadFile, SaveToFile } from "./readFiles";
 import { t } from "i18next";
+import { SearchConvertData } from "@renderer/plugins/anilistApi";
 
 const appConfigDirPath = window.api.os.getPath("userData");
 
@@ -35,12 +36,21 @@ async function HistoryDetectVersion() {
                     const element = file[i];
                     let tmp = await convertToNewData(element.id)
                     if (tmp) {
+                        let tmpAnimeData: AnimeData | undefined = undefined 
+                        let animeData = await SearchConvertData(tmp.AnimeData)
+                        console.log("HISTORY",animeData, tmp.AnimeData)
+                        if (animeData) {
+                            tmpAnimeData = animeData
+                        } else {
+                            tmpAnimeData = tmp.AnimeData
+                        }
                         data.push({
                             ...tmp,
                             AnimeData: {
-                                ...tmp.AnimeData,
+                                ...tmpAnimeData,
                                 player_ID: element.id,
-                                episodesList: undefined
+                                episodesList: undefined,
+                                nextAiringEpisode: undefined
                             },
                             saveData: {
                                 pluginName: "",

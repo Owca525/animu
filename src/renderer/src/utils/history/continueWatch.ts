@@ -1,8 +1,9 @@
 import { toast } from "react-toastify";
-import { cardData, notificationProps } from "../GlobalInterface";
+import { AnimeData, cardData, notificationProps } from "../GlobalInterface";
 import { convertToNewData } from "@renderer/plugins/allmanga";
 import { CheckFile, DeleteFromFile, ReadFile, SaveToFile } from "./readFiles";
 import { t } from "i18next";
+import { reCovertData, SearchConvertData } from "@renderer/plugins/anilistApi";
 
 const appConfigDirPath = window.api.os.getPath("userData");
 
@@ -10,7 +11,6 @@ const DefaultContinue: { data: cardData[] } = {
     data: [],
 };
 
-// Improve converting
 async function ContinueDetectVersion() {
     let updatedToast: any
     try {
@@ -36,12 +36,22 @@ async function ContinueDetectVersion() {
                     const element = file.continue[i];
                     let tmp = await convertToNewData(element.id)
                     if (tmp) {
+                        let tmpAnimeData: AnimeData | undefined = undefined 
+                        let animeData = await SearchConvertData(tmp.AnimeData)
+                        console.log("CONTINUE WATCH",animeData, tmp.AnimeData)
+                        if (animeData) {
+                            tmpAnimeData = animeData
+                        } else {
+                            tmpAnimeData = tmp.AnimeData
+                        }
+                        console.log(animeData, tmpAnimeData)
                         data.push({
                             ...tmp,
                             AnimeData: {
-                                ...tmp.AnimeData,
+                                ...tmpAnimeData,
                                 player_ID: element.id,
-                                episodesList: undefined
+                                episodesList: undefined,
+                                nextAiringEpisode: undefined
                             },
                             saveData: {
                                 pluginName: "",
@@ -79,6 +89,12 @@ async function ContinueDetectVersion() {
 export async function ReadContinue(size?: number): Promise<cardData[]> {
     let data = await ReadFile("continueWatch")
     if (size) return data.slice(0, size)
+    // for (let index = 0; index < data.length; index++) {
+    //     const element = data[index];
+    //     console.log(element)
+    //     console.log(await reCovertData(element.AnimeData))
+    //     break
+    // }
     return data
 }
 

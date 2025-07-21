@@ -135,7 +135,7 @@ const Home = () => {
         }
 
         let newData = HomeData.map((containerData) => {
-            let data = containerData.data.filter(data => data.AnimeData.title.toLowerCase().includes(text.toLowerCase()));
+            let data = containerData.data.filter(data => data.AnimeData.title.romaji.toLowerCase().includes(text.toLowerCase()));
             if (data.length == 0) return
             return { ...containerData, data: data }
         })

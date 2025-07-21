@@ -84,26 +84,39 @@ export async function SearchAnime(name: string, page: number = 1) {
 }
 
 function converterData(data: any): cardData {
+  let characters: any = []
+  try {
+    if (data.characters) {
+        for (let index = 0; index < data.characters.length; index++) {
+          const element = data.characters[index];
+          characters.push({ role: element.role, character: { id: element.aniListId, name: element.name.full, image: element.image.large } })
+          if (index == 10) break
+        }
+    }
+  } catch (error) {
+    console.log(error)
+  }
+
+
   return {
     AnimeData: {
       averageScore: data.averageScore,
       bannerImage: data.banner,
       coverImage: data.thumbnail,
       description: data.description,
-      duration: data.episodeDuration ? convertMsToMinutes(parseInt(data.episodeDuration)) : null,
-      endDate: data.airedEnd ? { year: data.airedEnd.year, day: data.airedEnd.date, month: data.airedEnd.month } : null,
-      startDate: data.airedStart ? { year: data.airedStart.year, day: data.airedStart.date, month: data.airedStart.month } : null,
-      episodes: data.episodeCount ? parseInt(data.episodeCount) : null,
+      duration: data.episodeDuration ? convertMsToMinutes(parseInt(data.episodeDuration)) : undefined,
+      endDate: data.airedEnd ? { year: data.airedEnd.year, day: data.airedEnd.date, month: data.airedEnd.month } : undefined,
+      startDate: data.airedStart ? { year: data.airedStart.year, day: data.airedStart.date, month: data.airedStart.month } : undefined,
+      episodes: data.episodeCount ? parseInt(data.episodeCount) : undefined,
       genres: data.genres,
-      isAdult: data.isAdult,
-      nextAiringEpisode: null,
+      nextAiringEpisode: undefined,
       popularity: 0,
-      season: data.season ? data.season.quarter : null,
-      seasonYear: data.season ? data.season.year : null,
+      season: data.season ? data.season.quarter : undefined,
+      seasonYear: data.season ? data.season.year : undefined,
       status: data.status,
       studios: data.studios,
-      title: data.name,
-      type: null,
+      title: { romaji: data.name, native: data.nativeName, english: data.englishName },
+      type: data.type,
       id: "",
       format: data.type,
       player_ID: data._id,
@@ -111,7 +124,10 @@ function converterData(data: any): cardData {
         { episodes: data.availableEpisodesDetail.sub.reverse(), type: "sub", name: "Subtitles" },
         { episodes: data.availableEpisodesDetail.dub.reverse(), type: "dub", name: "Dubbing" },
         { episodes: data.availableEpisodesDetail.raw.reverse(), type: "raw" }
-      ] : data.availableEpisodesDetail
+      ] : data.availableEpisodesDetail,
+      characters: characters,
+      source: undefined,
+      trailer: undefined
     }
   }
 }
@@ -176,11 +192,11 @@ export async function getInformation(name?: string, anime_id?: string): Promise<
 
     for (let i = 0; i < data.length; i++) {
       const element: cardData = data[i];
-      precentage.push({ name: element.AnimeData.title, prec: similarityText(name, element.AnimeData.title) });
+      precentage.push({ name: element.AnimeData.title.romaji, prec: similarityText(name, element.AnimeData.title.romaji) });
     };
     if (precentage.length <= 0) return { player_id: "", episodesData: [] };
     let anime_name = precentage.filter(item => item.prec === Math.max(...precentage.map(item => item.prec)))[0];
-    let card = data.filter((item: cardData) => item.AnimeData.title == anime_name.name)[0];
+    let card = data.filter((item: cardData) => item.AnimeData.title.romaji == anime_name.name)[0];
     anime_id = card.AnimeData.player_ID ? card.AnimeData.player_ID : "";
   };
   if (anime_id == "") return { player_id: "", episodesData: [] };

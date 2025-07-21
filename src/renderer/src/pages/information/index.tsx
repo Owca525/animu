@@ -76,7 +76,7 @@ function information() {
         if (anime_data.id === "") {
             fetchData(pluginPlayer.player.animeDataList, undefined, anime_data.player_ID)
         } else {
-            fetchData(pluginPlayer.player.animeDataList, anime_data.title)
+            fetchData(pluginPlayer.player.animeDataList, anime_data.title.romaji)
         }
     }, [])
 
@@ -143,10 +143,10 @@ function information() {
                             {isCoverLoading && isError == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div>}
                             {isCoverError && isCoverLoading == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined">error</span></div>}
 
-                            <div className="information-title-mobile">{anime_data.title}</div>
+                            <div className="information-title-mobile">{anime_data.title.romaji}</div>
                         </div>
                         <div className="information-description">
-                            <div className="information-title">{anime_data.title}</div>
+                            <div className="information-title">{anime_data.title.romaji}</div>
                             {/* TODO: Make it work */}
                             {/* <div className="information-title2">The Fragrant Flower Blooms With Dignity</div> */}
                             {decodeHtmlEntities(anime_data.description ? anime_data.description : t("information.descriptionnotfound"))}
@@ -293,7 +293,7 @@ function information() {
 
                 <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
             </main>
-            {showWrong && <ContainerWrong name={anime_data.title} refetchfunc={fetchData} exitfunc={() => setshowWrong(() => false)} />}
+            {showWrong && <ContainerWrong name={anime_data.title.romaji} refetchfunc={fetchData} exitfunc={() => setshowWrong(() => false)} />}
         </>
     )
 }

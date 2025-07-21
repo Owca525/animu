@@ -79,7 +79,7 @@ const Card: React.FC<cardData> = ({
   let CenterContextMenu: ContextMenuProps = [
     {
       option: t("contextMenu.copytitle"),
-      onClick: () => window.api.saveToClipboard("text", AnimeData.title),
+      onClick: () => window.api.saveToClipboard("text", AnimeData.title.romaji),
     },
     {
       option: t("contextMenu.copycover"),
@@ -167,7 +167,7 @@ const Card: React.FC<cardData> = ({
       className="card-container"
       onClick={sendToInformation}
       onMouseOver={checkOutOfBound}
-      title={AnimeData.title}
+      title={AnimeData.title.romaji}
       onContextMenu={(event) =>
         OpenContextMenu(
           CreateContextMenuOptions(
@@ -204,7 +204,7 @@ const Card: React.FC<cardData> = ({
           <span className="material-symbols-outlined">error</span>
         </div>
       )}
-      <div className="card-title">{AnimeData.title}</div>
+      <div className="card-title">{AnimeData.title.romaji}</div>
       {saveData && saveData.episode && (
         <div className="card-continue-watch-text">
           {saveData.last_Time != 0 && saveData.type != ""

@@ -1,5 +1,5 @@
-import { genYearsList } from "@renderer/utils/functions";
-import { cardData, containerData, FilterParams, pluginFormat } from "@renderer/utils/GlobalInterface";
+import { genYearsList, sleep } from "@renderer/utils/functions";
+import { AnimeData, cardData, containerData, FilterParams, pluginFormat } from "@renderer/utils/GlobalInterface";
 import { setHomeData, UpdateHomeData } from "@renderer/utils/pluginApi";
 
 const pageSize = 15
@@ -110,6 +110,10 @@ query(
       genres
       source
       averageScore
+      trailer {
+        id
+        site
+      }
       nextAiringEpisode {
         airingAt
         timeUntilAiring
@@ -195,6 +199,10 @@ const graphicHomeApi = `
     genres
     averageScore
     popularity
+    trailer {
+      id
+      site
+    }
     nextAiringEpisode {
       airingAt
       timeUntilAiring
@@ -233,6 +241,72 @@ const graphicHomeApi = `
   }
 `;
 
+const graphicApIDAnime = `
+query(
+  $id: Int!
+) {
+  Media(id: $id, type: ANIME) {
+    id
+    title { english romaji native }
+    coverImage { extraLarge large }
+    startDate { year month day }
+    endDate { year month day }
+    bannerImage
+    season
+    seasonYear
+    description
+    type
+    format
+    source
+    status(version: 2)
+    episodes
+    duration
+    genres
+    averageScore
+    popularity
+    trailer {
+      id
+      site
+    }
+    nextAiringEpisode {
+      airingAt
+      timeUntilAiring
+      episode
+    }
+    characters(perPage: 10) {
+      edges {
+        role
+        node {
+          id
+          name {
+            full
+          }
+          image {
+            large
+          }
+        }
+        voiceActors(language: JAPANESE) {
+          id
+          name {
+            full
+          }
+          language
+          image {
+            large
+          }
+        }
+      }
+    }
+    studios(isMain: true) {
+      edges {
+        isMain
+        node { id name }
+      }
+    }
+  }
+}
+`;
+
 const genres = `
 query {
   GenreCollection
@@ -257,7 +331,6 @@ const allPopular = {
 }
 
 function Convert(convert: any): cardData {
-  console.log(convert)
   let characters: any = []
   try {
       for (let index = 0; index < convert.characters.edges.length; index++) {
@@ -273,7 +346,6 @@ function Convert(convert: any): cardData {
     AnimeData: {
       ...convert,
       coverImage: convert.coverImage.extraLarge ? convert.coverImage.extraLarge : convert.coverImage.large,
-      title: convert.title.romaji,
       studios: convert.studios.edges.map((studio) => studio.node.name),
       characters: characters
     },
@@ -412,6 +484,37 @@ async function getGenres(): Promise<string[]> {
   let data = await window.api.request.post("https://graphql.anilist.co", header, { query: genres, variables: "" })
   if (data.success) return data.data.data.GenreCollection
   return []
+}
+
+export async function reCovertData(data: AnimeData): Promise<AnimeData | undefined> {
+    if (!(typeof data.title === "string")) return data
+    let req = await sendPost({ id: data.id }, graphicApIDAnime)
+    if (!req.success) return
+    return Convert(req.data.data.Media).AnimeData
+}
+
+export async function SearchConvertData(animeData: AnimeData): Promise<AnimeData | undefined> {
+  let variables: any = {
+      page: 1,
+      search: animeData.title.native,
+      sort: "SEARCH_MATCH",
+      type: "ANIME"
+  }
+
+  while (true) {
+    let data = await sendPost(variables, graphicApi)
+    if (!data.success) await sleep(20000)
+    if (data.success) {
+      let listData = data.data.data.Page.media
+      for (let index = 0; index < listData.length; index++) {
+        const element = listData[index];
+        if (element.bannerImage == animeData.bannerImage) return Convert(element).AnimeData
+        if (element.coverImage.large == animeData.coverImage) return Convert(element).AnimeData
+      }
+      break
+    }
+  }
+  return undefined
 }
 
 export const infoPlugin: pluginFormat = {

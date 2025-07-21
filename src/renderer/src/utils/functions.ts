@@ -221,3 +221,7 @@ export function getGradientColor(value: number | undefined | null): string {
     
     return `rgb(${red}, ${green}, 0)`;
 }
+
+export function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}

@@ -19,7 +19,6 @@ export interface AnimeData {
     episodes: number | undefined
     format: string | undefined
     genres: Array<String> | undefined
-    isAdult: boolean
     nextAiringEpisode: {
         airingAt: number
         episode: number
@@ -46,14 +45,15 @@ export interface AnimeData {
             image: string
         }
     }[]
-    source: string
+    source: string | undefined
     status: string | undefined
     studios: string[]
-    title: string
+    title: { english?: string, native: string, romaji: string }
     type: string | undefined
     episodesList?: { episodes: string[], type: string, name?: string }[]
     player_ID?: string
     id: string
+    trailer: { id: string, site: string } | undefined
 }
 
 export interface homeData {
