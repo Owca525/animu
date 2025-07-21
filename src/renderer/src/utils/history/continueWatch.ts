@@ -10,6 +10,7 @@ const DefaultContinue: { data: cardData[] } = {
     data: [],
 };
 
+// Improve converting
 async function ContinueDetectVersion() {
     let updatedToast: any
     try {
