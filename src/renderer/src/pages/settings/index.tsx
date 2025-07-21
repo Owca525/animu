@@ -21,6 +21,8 @@ import { motion } from "framer-motion";
 import { useHotkeys } from "react-hotkeys-hook";
 import HelpIcon from "./components/helpIcon";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
+import { ContinueCheckConversion, ContinueDetectVersion } from "@renderer/utils/history/continueWatch";
+import { HistoryCheckConvert, HistoryDetectVersion } from "@renderer/utils/history/history";
 
 function settings() {
     const navigate = useNavigate();
@@ -173,6 +175,18 @@ function settings() {
         hidden: { y: 200 },
         visible: { y: 0 },
     };
+
+    async function buttonCheck() {
+        toast.info("Start Checking History", notificationProps)
+        await ContinueCheckConversion()
+        await HistoryCheckConvert()
+        if (await HistoryDetectVersion()) {
+            toast.info("History is good, nothing to change", notificationProps)
+        }
+        if (await ContinueDetectVersion()) {
+            toast.info("Continue watch is good, nothing to change", notificationProps)
+        }
+    }
 
     return (
         <main className="settings-container" onContextMenu={(event) => OpenContextMenu(ContextMenu, event)}>
@@ -494,6 +508,11 @@ function settings() {
                                     onKeyDown={(text) => handleChange("History.history.maxSave", parseInt(text))}
                                     startValue={config.new.History.history.maxSave.toString()}
                                 />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Check History
+                                <Button content="Check" onClick={buttonCheck}/>
                             </div>
                         </div>
                         <div className="settings-page-container">

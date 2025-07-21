@@ -11,15 +11,17 @@ const DefaultHistory: { data: cardData[] } = {
     data: [],
 };
 
-async function HistoryDetectVersion() {
+export async function HistoryDetectVersion(): Promise<boolean> {
     let updatedToast: any
     try {
         let file = await window.api.os.read(await appConfigDirPath + "/history.json")
         file = JSON.parse(file)
-        if ("AnimeData" in file[0]) return
+        if (file == "{}") return true
+        if ("AnimeData" in file[0]) return true
         if ("id" in file[0]) {
+            let nowDate = new Date();
             window.api.os.write(
-                await appConfigDirPath + "/history.json.backup",
+                await appConfigDirPath + `/history.json.backup-${nowDate.toISOString().replace(/[:.]/g, '-')}`,
                 JSON.stringify(file)
             );
             window.api.os.write(
@@ -36,9 +38,9 @@ async function HistoryDetectVersion() {
                     const element = file[i];
                     let tmp = await convertToNewData(element.id)
                     if (tmp) {
-                        let tmpAnimeData: AnimeData | undefined = undefined 
+                        let tmpAnimeData: AnimeData | undefined = undefined
                         let animeData = await SearchConvertData(tmp.AnimeData)
-                        console.log("HISTORY",animeData, tmp.AnimeData)
+                        console.log("HISTORY", animeData, tmp.AnimeData)
                         if (animeData) {
                             tmpAnimeData = animeData
                         } else {
@@ -77,10 +79,12 @@ async function HistoryDetectVersion() {
                 JSON.stringify(data)
             );
         }
+        return true
     } catch (Error) {
         console.info(Error)
         toast.dismiss(updatedToast)
         toast.info(t("oldBackup.converthistoryfailed"), notificationProps)
+        return false
     }
 }
 
@@ -90,7 +94,7 @@ export async function ReadHistory(size?: number): Promise<cardData[]> {
     return data
 }
 
-export async function SaveHistory(save: cardData)  {
+export async function SaveHistory(save: cardData) {
     await SaveToFile(save, "history")
 }
 
@@ -104,4 +108,58 @@ export async function CheckHistory() {
     if (await CheckFile("history") == false) {
         await HistoryDetectVersion()
     }
+}
+
+// This too
+export async function HistoryCheckConvert() {
+    let data = await ReadHistory()
+    let updatedToast: any
+    let nowDate = new Date();
+    window.api.os.write(
+        await appConfigDirPath + `/history.json.backup-${nowDate.toISOString().replace(/[:.]/g, '-')}`,
+        JSON.stringify(await window.api.os.read(await appConfigDirPath + "/history.json"))
+    );
+    window.api.os.write(
+        await appConfigDirPath + "/history.json",
+        JSON.stringify(DefaultHistory)
+    );
+    let success: number = 0
+    let failed: number = 0
+    let animeCardData: cardData[] = []
+    updatedToast = toast.loading(t("oldBackup.converthistory", { success: success, failed: failed }), notificationProps)
+    for (let index = 0; index < data.length; index++) {
+        const element = data[index];
+        if (typeof element.AnimeData.title === "string") {
+            let tmp = await convertToNewData(element.AnimeData.player_ID ? element.AnimeData.player_ID : "")
+            if (tmp) {
+                let savedAnime = await SearchConvertData(tmp.AnimeData)
+                if (savedAnime != undefined) {
+                    console.log(savedAnime, element)
+                    animeCardData.push({
+                        ...element,
+                        AnimeData: savedAnime
+                    })
+                    success += 1
+                } else {
+                    failed += 1
+                    animeCardData.push({
+                        ...element,
+                        ...tmp,
+                    })
+                    toast.error(`Failed Covert ${tmp.AnimeData.title.romaji}`, notificationProps)
+                }
+            } else {
+                failed += 1
+            }
+        } else {
+            success += 1
+        }
+        toast.update(updatedToast, { render: t("oldBackup.converthistory", { success: success, failed: failed }) })
+    }
+    window.api.os.write(
+        await appConfigDirPath + "/history.json",
+        JSON.stringify(animeCardData.reverse())
+    );
+    toast.dismiss(updatedToast)
+    toast.success(t("oldBackup.converthistorydone", { success: success, failed: failed }), notificationProps)
 }

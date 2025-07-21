@@ -122,7 +122,7 @@ function information() {
     useHotkeys("tab", () => {
         console.log(anime_data)
     })
-
+    
     return (
         <>
             <main className="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>
@@ -266,7 +266,7 @@ function information() {
                                 </div>
                             }
 
-                            {anime_data.characters && anime_data.characters.length != 0 &&
+                            {anime_data.characters && anime_data.characters.map((tmp) => tmp.voiceActor).filter((item) => item != undefined).length > 0 &&
                                 <div className="information-characters">
                                     <div className="information-characters-title">
                                         Actors

@@ -508,8 +508,13 @@ export async function SearchConvertData(animeData: AnimeData): Promise<AnimeData
       let listData = data.data.data.Page.media
       for (let index = 0; index < listData.length; index++) {
         const element = listData[index];
+        console.log(element.bannerImage == animeData.bannerImage, element.bannerImage, animeData.bannerImage)
         if (element.bannerImage == animeData.bannerImage) return Convert(element).AnimeData
         if (element.coverImage.large == animeData.coverImage) return Convert(element).AnimeData
+        if (element.coverImage.extraLarge == animeData.coverImage) return Convert(element).AnimeData
+        if (element.title.english == animeData.title.english) return Convert(element).AnimeData
+        if (element.title.romaji == animeData.title.romaji) return Convert(element).AnimeData
+        if (element.title.native == animeData.title.native) return Convert(element).AnimeData
       }
       break
     }
