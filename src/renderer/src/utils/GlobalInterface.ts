@@ -6,33 +6,33 @@ export const notificationProps = {
 }
 
 export interface AnimeData {
-    averageScore: number | null
-    bannerImage: string | null
-    coverImage: string | null
-    description: string | null
-    duration: number | null
+    averageScore: number | undefined
+    bannerImage: string | undefined
+    coverImage: string | undefined
+    description: string | undefined
+    duration: number | undefined
     endDate: {
         day: number
         month: number
         year: number
-    } | null
-    episodes: number | null
-    format: string | null
-    genres: Array<String> | null
+    } | undefined
+    episodes: number | undefined
+    format: string | undefined
+    genres: Array<String> | undefined
     isAdult: boolean
     nextAiringEpisode: {
         airingAt: number
         episode: number
         timeUntilAiring: number
-    } | null
+    } | undefined
     popularity: number
-    season: string | null
-    seasonYear: number | null
+    season: string | undefined
+    seasonYear: number | undefined
     startDate: {
         day: number
         month: number
         year: number
-    } | null
+    } | undefined
     characters: {
         role: string,
         character: {
@@ -46,10 +46,10 @@ export interface AnimeData {
             image: string
         }
     }[]
-    status: string | null
+    status: string | undefined
     studios: string[]
     title: string
-    type: string | null
+    type: string | undefined
     episodesList?: { episodes: string[], type: string, name?: string }[]
     player_ID?: string
     id: string

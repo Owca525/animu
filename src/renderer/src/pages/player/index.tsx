@@ -62,7 +62,8 @@ const player = () => {
                 episode: extractionData.actual.toString()
             },
             AnimeData: {
-                ...anime_data.data.AnimeData
+                ...anime_data.data.AnimeData,
+                nextAiringEpisode: undefined
             }
         })
         refetchHistory()

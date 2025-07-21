@@ -242,7 +242,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             videoRef.current.currentTime <= videoRef.current.duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
         ) {
             SaveContinue({
-                AnimeData: { ...anime_data.AnimeData },
+                AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
                 saveData: {
                     pluginName: "",
                     last_Time: videoRef.current.currentTime,
