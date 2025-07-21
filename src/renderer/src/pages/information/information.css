@@ -466,4 +466,8 @@ maybe that will be usefull in the future */
         padding: clamp(4px, 2vw, 20px);
     }
 
+    .information-bar {
+        flex-direction: row;
+    }
+
 }
