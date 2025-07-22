@@ -5,14 +5,13 @@ import i18n from "../i18n";
 
 const appConfigDirPath = window.api.os.getPath("userData");
 
-// TODO: Add check to dosen't make copy of the anime
 export async function ReadFile(file: string): Promise<cardData[]> {
     try {
         await CheckFile(file)
         const dataFile = await window.api.os.read(await appConfigDirPath + `/${file}.json`)
         const data = JSON.parse(dataFile) as cardData[];
         if (data.length <= 0) return []
-        return data.map((value: cardData) => { return { ...value, deletionCard: () => DeleteFromFile(value, file) } }).reverse()
+        return checkAnimeDuplicate(data).map((value: cardData) => { return { ...value, deletionCard: () => DeleteFromFile(value, file) } }).reverse()
     } catch (Error) {
         console.error(`${Error} in ReadFile`)
         return [];
@@ -86,4 +85,17 @@ export async function CheckFile(file: string): Promise<boolean> {
         console.error(`${Error} in CheckFile`)
         return true
     }
+}
+
+function checkAnimeDuplicate(listcard: cardData[]): cardData[] {
+    let cache: string[] = []
+    let newListCard: cardData[] = []
+    for (let index = 0; index < listcard.length; index++) {
+        const element = listcard[index];
+        if (!cache.includes(element.AnimeData.title.romaji)) {
+            newListCard.push(element)
+            cache.push(element.AnimeData.title.romaji)
+        }
+    }
+    return newListCard
 }
