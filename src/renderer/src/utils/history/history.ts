@@ -40,7 +40,6 @@ export async function HistoryDetectVersion(): Promise<boolean> {
                     if (tmp) {
                         let tmpAnimeData: AnimeData | undefined = undefined
                         let animeData = await SearchConvertData(tmp.AnimeData)
-                        console.log("HISTORY", animeData, tmp.AnimeData)
                         if (animeData) {
                             tmpAnimeData = animeData
                         } else {
@@ -87,7 +86,7 @@ export async function HistoryDetectVersion(): Promise<boolean> {
                 return true
             }
         }
-        console.log(error)
+        console.error(error)
         toast.dismiss(updatedToast)
         toast.info(t("oldBackup.converthistoryfailed"), notificationProps)
         return false
@@ -140,7 +139,6 @@ export async function HistoryCheckConvert() {
             if (tmp) {
                 let savedAnime = await SearchConvertData(tmp.AnimeData)
                 if (savedAnime != undefined) {
-                    console.log(savedAnime, element)
                     animeCardData.push({
                         ...element,
                         AnimeData: {

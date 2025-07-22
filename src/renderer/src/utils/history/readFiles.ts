@@ -21,7 +21,6 @@ export async function ReadFile(file: string): Promise<cardData[]> {
 
 export async function DeleteFromFile(data: cardData, file: string) {
     try {
-        console.log(data, file)
         await CheckFile(file)
         const saveFile = await window.api.os.read(await appConfigDirPath + `/${file}.json`)
         const list = JSON.parse(saveFile) as cardData[];

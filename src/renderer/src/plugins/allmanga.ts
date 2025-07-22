@@ -94,7 +94,7 @@ function converterData(data: any): cardData {
         }
     }
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 
 
@@ -135,7 +135,6 @@ function converterData(data: any): cardData {
 export async function recentAnime(page: number = 1) {
   let variables = `{"search":{"sortBy":"Recent"},"limit":26,"page":${page},"translationType":"sub","countryOrigin":"JP"}`
   let anime = await sendToAPI(variables, HASH_SEARCH, header)
-  console.log(variables, anime, page)
   if (page && page > 1) {
     await UpdateHomeData(async () => {
       return {
@@ -233,7 +232,6 @@ async function getURLS(url: string): Promise<playerData | undefined> {
 export async function extractURLS(type: string, episode: string, id: string): Promise<playerData[]> {
   let variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${episode}"}`
   const resp = await sendToAPI(variables, HASH_PLAYER, header)
-  console.log(resp)
   const sources = resp.data.episode.sourceUrls
   const urls = sources
     .map((tmp: { sourceUrl: string; sourceName: string }) =>

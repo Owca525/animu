@@ -13,7 +13,6 @@ const Filter: React.FC<{ onChange: (params?: FilterParams, removeParam?: string)
 
     const handleClickOutside = (event: MouseEvent) => {
         let data = event.target as HTMLElement
-        console.log(data)
         if (data.classList.contains("home-filter-button")) return
         if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
             setShowFilter(false);

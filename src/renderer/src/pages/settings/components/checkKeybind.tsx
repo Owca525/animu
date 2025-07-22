@@ -14,7 +14,6 @@ const CheckKeybind: React.FC<CheckKeybindProps> = ({ content, keyBind }) => {
 
   const handleKeyDown = (event: KeyboardEvent) => {
     event.preventDefault()
-    console.log(event.key)
     setPressedKeys((previus) => {
       if (!previus.includes(convertKeybinds(event.key))) {
         previus.push(convertKeybinds(event.key))
@@ -29,7 +28,6 @@ const CheckKeybind: React.FC<CheckKeybindProps> = ({ content, keyBind }) => {
       }
       return previus
     })
-    console.log(pressedKeys)
   };
   const handleKeyUp = (event: KeyboardEvent) => {
     event.preventDefault()

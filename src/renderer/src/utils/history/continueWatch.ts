@@ -39,13 +39,11 @@ export async function ContinueDetectVersion(): Promise<boolean> {
                     if (tmp) {
                         let tmpAnimeData: AnimeData | undefined = undefined
                         let animeData = await SearchConvertData(tmp.AnimeData)
-                        console.log("CONTINUE WATCH", animeData, tmp.AnimeData)
                         if (animeData) {
                             tmpAnimeData = animeData
                         } else {
                             tmpAnimeData = tmp.AnimeData
                         }
-                        console.log(animeData, tmpAnimeData)
                         data.push({
                             ...tmp,
                             AnimeData: {
@@ -73,7 +71,7 @@ export async function ContinueDetectVersion(): Promise<boolean> {
                             return true
                         }
                     }
-                    console.log(error)
+                    console.error(error)
                     failed += 1
                     toast.update(updatedToast, { render: t("oldBackup.convertcontinue", { success: success, failed: failed }) })
                 }
@@ -138,7 +136,6 @@ export async function ContinueCheckConversion() {
             if (tmp) {
                 let savedAnime = await SearchConvertData(tmp.AnimeData)
                 if (savedAnime != undefined) {
-                    console.log(savedAnime, element)
                     animeCardData.push({
                         ...element,
                         AnimeData: {
@@ -171,7 +168,6 @@ export async function ContinueCheckConversion() {
         await appConfigDirPath + "/continueWatch.json",
         JSON.stringify(animeCardData.reverse())
     );
-    console.log(animeCardData)
     toast.dismiss(updatedToast)
     toast.success(t("oldBackup.convertcontinuedone", { success: success, failed: failed }), notificationProps)
 }

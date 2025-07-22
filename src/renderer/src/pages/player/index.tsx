@@ -21,8 +21,6 @@ const player = () => {
     const navigate = useNavigate()
     const config: SettingsConfig = useSelector((data: any) => data.config);
 
-    console.log(anime_data, anime_data.data)
-
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
     const [playerVolume, setPlayerVolume] = useState<number>(config.Player.general.Volume)
     const [extractionData, setextractionData] = useState<{ actual: string, type: string, episodelist: Array<string>, time: number }>({ actual: anime_data.data.saveData ? anime_data.data.saveData.episode : "1", type: anime_data.data.saveData ? anime_data.data.saveData.type : "sub", episodelist: anime_data.episodelist, time: anime_data.data.saveData ? anime_data.data.saveData?.last_Time : 0 })
@@ -42,7 +40,6 @@ const player = () => {
             let ep = extractionData.episodelist.indexOf(old.actual)
             if (type == 'prev') ep = ep - 1
             if (type == 'next') ep = ep + 1
-            console.log(extractionData.episodelist[ep], extractionData.episodelist.indexOf(old.actual))
             if (extractionData.episodelist[ep] === undefined) return old
             return {
                 ...old,
@@ -78,7 +75,6 @@ const player = () => {
         window.BrowserWindow.setFullscreen(false)
         closeDialog()
     }
-    console.log(data)
     if (isLoading == false && data && data.length <= 0) {
         loadingAnimation()
         showDialog({

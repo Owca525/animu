@@ -339,7 +339,7 @@ function Convert(convert: any): cardData {
         else characters.push({role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full }, voiceActor: { id: element.voiceActors[0].id, image: element.voiceActors[0].image.large, name: element.voiceActors[0].name.full }})
     }
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
   
   return {
@@ -359,11 +359,9 @@ async function sendPost(variable: any, query: any): Promise<{success: boolean; d
 
 async function sendToApi(variable: any, query: any): Promise<cardData[]> {
   let data = await window.api.request.post("https://graphql.anilist.co", header, { query: query, variables: variable })
-  console.log(data)
   if (data.success) {
     return data.data.data.Page.media.map((data) => Convert(data))
   }
-  console.log(data)
   return []
 }
 
@@ -416,7 +414,6 @@ async function SearchAnilistApi(text: string, page: number, params?: FilterParam
     variables = { ...variables, status: params.airing.toUpperCase().replaceAll(" ", "_") }
   }
 
-  console.log(variables)
   let data = {
     title: title,
     data: await sendToApi(variables, graphicApi),
@@ -508,7 +505,6 @@ export async function SearchConvertData(animeData: AnimeData): Promise<AnimeData
       let listData = data.data.data.Page.media
       for (let index = 0; index < listData.length; index++) {
         const element = listData[index];
-        console.log(element.bannerImage == animeData.bannerImage, element.bannerImage, animeData.bannerImage)
         if (element.bannerImage == animeData.bannerImage) return Convert(element).AnimeData
         if (element.coverImage.large == animeData.coverImage) return Convert(element).AnimeData
         if (element.coverImage.extraLarge == animeData.coverImage) return Convert(element).AnimeData

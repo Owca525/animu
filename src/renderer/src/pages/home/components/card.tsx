@@ -36,7 +36,6 @@ const Card: React.FC<cardData> = ({
       saveData.last_Time != 0 &&
       saveData.type != ""
     ) {
-      console.log(AnimeData, saveData);
       navigate("/player", {
         state: {
           data: {

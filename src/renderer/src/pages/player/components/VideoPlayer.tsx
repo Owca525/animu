@@ -338,7 +338,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     }
 
     useKeyPress((keys: string) => {
-        console.log(keys)
         if (keys == "CTRL+SHIFT+D") {
             setshowNerdStats((prev) => !prev)
         }

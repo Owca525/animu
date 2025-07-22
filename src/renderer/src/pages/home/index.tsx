@@ -85,15 +85,12 @@ const Home = () => {
         ]
     }
 
-    console.log(homeCache)
-
     const handleScroll = () => {
         if (homeCache.data.length > 1) return
         if (!divRef.current) return
         const currentPos = -divRef.current.scrollTop + divRef.current.scrollHeight
         const endPosition = divRef.current.offsetHeight
         const isFUCKINGBottom = parseInt(currentPos.toFixed(0)) <= endPosition + 30
-        console.log("handleScroll", isFUCKINGBottom, homeCache, homeCache.data[0].onScrollDownFunction)
         if (isFUCKINGBottom && homeCache.stopScrolling == false && homeCache.data.length === 1) {
             if (homeCache.data[0].onScrollDownFunction) {
                 store.dispatch({ type: "setPage", payload: homeCache.page + 1 })

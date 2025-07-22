@@ -119,7 +119,6 @@ function settings() {
             }
 
             current[keys[keys.length - 1]] = value
-            console.log(newConfig)
             return { old: prevConfig.old, new: newConfig }
         })
     }

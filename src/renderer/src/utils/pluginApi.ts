@@ -7,7 +7,6 @@ export async function setHomeData(func: () => Promise<containerData[]>) {
         if (store.getState().home.isLoading) return
         store.dispatch({ type: "setLoadingHome", payload: { isLoading: true } })
         let data = await func()
-        console.log(data)
         store.dispatch({
             type: "setAllHomeData", payload: {
                 isLoading: false, isError: false, data: data
@@ -40,7 +39,7 @@ export async function UpdateHomeData(func: () => Promise<{ data: containerData, 
         store.dispatch({ type: "setcontainerLoading", payload: false })
     } catch (error) {
         store.dispatch({ type: "setcontainerLoading", payload: false })
-        console.log(error)
+        console.error(error)
     }
 }
 
@@ -50,7 +49,7 @@ export async function homeStopScrolling(payload: boolean) {
             type: "setStopScrolling", payload: payload
         })
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 }
 
@@ -60,6 +59,6 @@ export async function setHomeLocalSearch(payload: boolean) {
             type: "setLocalSearch", payload: payload
         })
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 }

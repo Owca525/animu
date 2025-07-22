@@ -58,13 +58,12 @@ function information() {
                 setLoadingData(() => false)
             } else {
                 setIsError(() => true)
-                console.log(data)
             }
             setshowWrong(() => false)
         } catch (Error) {
             setIsError(() => true)
             setshowWrong(() => false)
-            console.log(Error)
+            console.error(Error)
         }
     }
 
