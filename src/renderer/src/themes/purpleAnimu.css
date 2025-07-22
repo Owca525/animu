@@ -140,6 +140,12 @@ body {
     background-color: var(--bg2);
 }
 
+.home-header-sidebar-placeholder {
+    background-color: var(--bg2) !important;
+    color: var(--bg2) !important;
+    z-index: -1;
+}
+
 .home-filter-container {
     background-color: var(--bg2);
     border-radius: 12px;
@@ -297,7 +303,7 @@ body {
     border-radius: 50%;
 }
 
-.information-title2 {
+.information-title2, .information-title-mobile2 {
   color: var(--text-gray);
 }
 
