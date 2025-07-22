@@ -3,7 +3,6 @@ import "./css/container.css"
 import Card from "./card"
 import { useRef } from "react"
 import Button from "@renderer/components/buttons"
-import { t } from "i18next"
 
 const Container: React.FC<containerData> = ({ title, data, horizontal = false, onTitleClick, tags }) => {
   const container = useRef<HTMLDivElement>(null)
@@ -13,18 +12,22 @@ const Container: React.FC<containerData> = ({ title, data, horizontal = false, o
     container.current.scrollLeft += num
   }
 
+  data = []
+
   return (
     <div className="main-container">
         <div className="container-title-container">
           {title && <div className={onTitleClick ? "container-title-click" : "container-title"} onClick={onTitleClick}>{title}</div>}
           {tags && tags.map((element) => <div onClick={element.remover} className="container-tag">{element.name} <span className="container-tag-icon material-symbols-outlined">close</span></div>)}
         </div>
-        <div className={"container-button-container" + (data.length <= 0 ? " container-error" : "")}>
+        <div className={`container-button-container ${data.length <= 0 && " container-error"}`}>
           {horizontal && data.length > 0 ? <Button icon="chevron_left" ButtonClass="container-left-skip-button" onClick={() => handleButtonScroll(-120)}/> : ""}
-          <div className={horizontal ? "container-data-horizontal" : "container-data"} ref={container}> {/* onWheel={handleScroll} */}
-              {data.length > 0 && data.map((card) => <Card AnimeData={card.AnimeData} saveData={card.saveData} deletionCard={card.deletionCard} onClick={card.onClick} />)}
-              {data.length <= 0 && <div className="container-error-text">{t("home.nothingfound")}</div>}
-          </div>
+          {data.length > 0 && 
+            <div className={horizontal ? "container-data-horizontal" : "container-data"} ref={container}>
+                {data.length > 0 && data.map((card) => <Card AnimeData={card.AnimeData} saveData={card.saveData} deletionCard={card.deletionCard} onClick={card.onClick} />)}
+            </div>
+          }
+          {data.length <= 0 && <div className="home-empty-container container-error-text"><span className="material-symbols-outlined home-empty-icon">search_off</span>Nothing Found Here</div>}
           {horizontal && data.length > 0 ? <Button icon="chevron_right" ButtonClass="container-right-skip-button" onClick={() => handleButtonScroll(120)}/> : ""}
         </div>
     </div>
