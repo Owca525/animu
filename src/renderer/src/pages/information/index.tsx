@@ -117,6 +117,11 @@ function information() {
     useHotkeys("tab", () => {
         console.log(anime_data)
     })
+
+    useHotkeys("esc", () => {
+        if (showWrong) setshowWrong(() => false)
+        else navigate("/")
+    })
     
     return (
         <>
