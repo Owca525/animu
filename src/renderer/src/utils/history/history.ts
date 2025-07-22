@@ -105,7 +105,9 @@ export async function SaveHistory(save: cardData) {
 
 export async function DeleteFromHistory(save: cardData) {
     if (await DeleteFromFile(save, "history")) {
-        toast.success("Succesfully Removed Anime from History watch")
+        toast.success(t("history.historysaved"), notificationProps)
+    } else {
+        toast.success(t("history.historyfailed"), notificationProps)
     }
 }
 

@@ -185,7 +185,11 @@
     },
     "history": {
         "continue": "Kontynuuj odcinek {{ep}}",
-        "history": "Obejrzano odcinek {{ep}}"
+        "history": "Obejrzano odcinek {{ep}}",
+        "historysaved": "Pomyślnie usunięto anime z historii",
+        "historyfailed": "Nie udało się usunąć anime z historii",
+        "continuesaved": "Pomyślnie usunięto anime z kontynuowanych",
+        "continuefailed": "Nie udało się usunąć anime z kontynuowanych"
     },
     "oldBackup": {
         "backupcontinue": "Utworzono kopię zapasową starego 'kontynuuj oglądanie'",

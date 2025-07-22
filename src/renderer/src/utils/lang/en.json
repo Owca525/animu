@@ -192,7 +192,11 @@
     },
     "history": {
         "continue": "Continue Episode {{ep}}",
-        "history": "Watched Episode {{ep}}"
+        "history": "Watched Episode {{ep}}",
+        "historysaved": "Succesfully Removed Anime from History",
+        "historyfailed": "Failed Removed Anime from History",
+        "continuesaved": "Succesfully Removed Anime from Continue Watch",
+        "continuefailed": "Failed Removed Anime from Continue Watch"
     },
     "oldBackup": {
         "backupcontinue": "Backup File Old Continue watch done",
