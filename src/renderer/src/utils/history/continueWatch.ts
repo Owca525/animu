@@ -135,7 +135,10 @@ export async function ContinueCheckConversion() {
                     console.log(savedAnime, element)
                     animeCardData.push({
                         ...element,
-                        AnimeData: savedAnime
+                        AnimeData: {
+                            ...element.AnimeData,
+                            ...savedAnime
+                        }
                     })
                     success += 1
                 } else {
@@ -143,6 +146,10 @@ export async function ContinueCheckConversion() {
                     animeCardData.push({
                         ...element,
                         ...tmp,
+                        AnimeData: {
+                            ...element.AnimeData,
+                            ...tmp.AnimeData
+                        }
                     })
                     toast.error(`Failed Covert ${tmp.AnimeData.title.romaji}`, notificationProps)
                 }

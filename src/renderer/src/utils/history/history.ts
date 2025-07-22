@@ -137,7 +137,10 @@ export async function HistoryCheckConvert() {
                     console.log(savedAnime, element)
                     animeCardData.push({
                         ...element,
-                        AnimeData: savedAnime
+                        AnimeData: {
+                            ...element.AnimeData,
+                            ...savedAnime
+                        }
                     })
                     success += 1
                 } else {
@@ -145,6 +148,10 @@ export async function HistoryCheckConvert() {
                     animeCardData.push({
                         ...element,
                         ...tmp,
+                        AnimeData: {
+                            ...element.AnimeData,
+                            ...tmp.AnimeData
+                        }
                     })
                     toast.error(`Failed Covert ${tmp.AnimeData.title.romaji}`, notificationProps)
                 }
