@@ -31,12 +31,12 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                 <div className='main-error-container'>
                     <div className="main-error-text">{t("globalError")}</div>
                     <div className="main-error-button-container">
-                        <Button content={"Go Back To Home"} ButtonClass='error-button' onClick={() => window.location.href = `${window.location.origin}${window.location.pathname}`}/>
-                        <Button content={"Leave Animu"} ButtonClass='error-button' onClick={() => window.BrowserWindow.exit()} />
+                        <Button content={t("errorboundary.gotohome")} ButtonClass='error-button' onClick={() => window.location.href = `${window.location.origin}${window.location.pathname}`}/>
+                        <Button content={t("errorboundary.leaveanimu")} ButtonClass='error-button' onClick={() => window.BrowserWindow.exit()} />
                     </div>
                     {this.state.error && 
                         <div className="main-error-show">
-                            Error Message: {this.state.error.message}
+                            {t("errorboundary.errormessage", { error: this.state.error.message })}
                         </div>
                     }
                 </div>

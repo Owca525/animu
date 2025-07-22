@@ -222,6 +222,11 @@
         "format": "Format:",
         "airing": "Airing Status:"
     },
+    "errorboundary": {
+        "gotohome": "Go Back To Home",
+        "leaveanimu": "Leave Animu",
+        "errormessage": "Error Message: {{error}}"
+    },
     "lang": {
         "en": "English",
         "pl": "Polish"

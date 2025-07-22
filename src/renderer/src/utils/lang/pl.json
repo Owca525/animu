@@ -215,6 +215,11 @@
         "format": "Format:",
         "airing": "Status emisji:"
     },
+    "errorboundary": {
+        "gotohome": "Wróć do strony głównej",
+        "leaveanimu": "Opuść Animu",
+        "errormessage": "Komunikat błędu: {{error}}"
+    },
     "lang": {
         "en": "Angielski",
         "pl": "Polski"
