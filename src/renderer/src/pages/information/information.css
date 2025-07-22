@@ -137,6 +137,9 @@
     padding-bottom: 10px;
 }
 
+.information-title-mobile2 {
+    display: none;
+}
 
 .information-bottom {
     margin-top: 20px;
@@ -438,7 +441,7 @@ maybe that will be usefull in the future */
 
     .information-info-content {
         padding: 8px 5px;
-        font-size: 0.5em;
+        /* font-size: 0.5em; */
         flex-flow: row;
     }
 
@@ -450,7 +453,7 @@ maybe that will be usefull in the future */
         font-size: 0.8em;
     }
     
-    .information-title {
+    .information-title, .information-title2 {
         display: none;
     }
 
@@ -460,6 +463,15 @@ maybe that will be usefull in the future */
         text-align: left;
         font-size: 1.5rem;
         padding-left: 5dvw;
+    }
+
+    .information-title-mobile2 {
+        display: block;
+        width: 100%;
+        text-align: left;
+        font-size: 0.95rem;
+        padding-left: 6dvw;
+        padding-top: 15px;
     }
     
     .button {

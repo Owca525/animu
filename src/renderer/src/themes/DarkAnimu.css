@@ -303,7 +303,7 @@ body {
     border-radius: 50%;
 }
 
-.information-title2 {
+.information-title2, .information-title-mobile2 {
   color: var(--text-gray);
 }
 
