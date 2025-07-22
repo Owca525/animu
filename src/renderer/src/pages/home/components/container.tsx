@@ -3,7 +3,6 @@ import "./css/container.css"
 import Card from "./card"
 import { useRef } from "react"
 import Button from "@renderer/components/buttons"
-import store from "@renderer/utils/store"
 import { t } from "i18next"
 
 const Container: React.FC<containerData> = ({ title, data, horizontal = false, onTitleClick, tags }) => {
@@ -28,7 +27,6 @@ const Container: React.FC<containerData> = ({ title, data, horizontal = false, o
           </div>
           {horizontal && data.length > 0 ? <Button icon="chevron_right" ButtonClass="container-right-skip-button" onClick={() => handleButtonScroll(120)}/> : ""}
         </div>
-        {store.getState().home.containerLoading ? <div className="container-loading-container"><span className="container-loading material-symbols-outlined">progress_activity</span></div> : ""}
     </div>
   )
 }
