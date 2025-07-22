@@ -3,7 +3,7 @@ import { useQuery } from "react-query";
 import { useLocation, useNavigate } from "react-router-dom"
 import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
-import { AnimeData, cardData, SettingsConfig } from "@renderer/utils/GlobalInterface";
+import { cardData, SettingsConfig } from "@renderer/utils/GlobalInterface";
 import { useSelector } from "react-redux";
 import { t } from "i18next";
 

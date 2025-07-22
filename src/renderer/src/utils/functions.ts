@@ -227,6 +227,11 @@ export function sleep(ms: number): Promise<void> {
 }
 
 export function detectTitle(data: cardData): String {
-    if (data.AnimeData.title.romaji.toLowerCase().includes("movie")) return t('player.TitleMovie', { name: data.AnimeData.title.romaji })
-    return t('player.TitleEpisode', { ep: data.saveData?.episode, name: data.AnimeData.title.romaji })
+    try {
+        if (data.AnimeData.format?.toLowerCase().includes("movie")) return t('player.TitleMovie', { name: data.AnimeData.title.romaji })
+        return t('player.TitleEpisode', { ep: data.saveData?.episode, name: data.AnimeData.title.romaji })
+    } catch (error) {
+        console.error(error)
+        return t('player.TitleEpisode', { ep: data.saveData?.episode, name: data.AnimeData.title.romaji })
+    }
 }
