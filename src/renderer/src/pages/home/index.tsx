@@ -6,7 +6,7 @@ import Input from "@renderer/components/input"
 import Sidebar from "@renderer/components/sidebar"
 import Container from "./components/container"
 import { useSelector } from "react-redux"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { containerData, FilterParams, homeData } from "@renderer/utils/GlobalInterface"
 import { t } from "i18next"
 import store from "@renderer/utils/store"
@@ -15,15 +15,13 @@ import { ReadContinue } from "@renderer/utils/history/continueWatch"
 import { ReadHistory } from "@renderer/utils/history/history"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
 import { CreateContextMenuOptions } from "@renderer/utils/functions"
-import Button from "@renderer/components/buttons"
-import Dropdown from "../../components/dropDown"
+import Filter from "./components/filter"
 
 const Home = () => {
     const navigate = useNavigate()
     const plugin = useSelector((plugin: any) => plugin.plugin.informationPlugin);
     const homeCache: homeData = useSelector((cache: any) => cache.home);
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
-    const [showFilter, setShowFilter] = useState<boolean>(false)
 
     const divRef = useRef<HTMLDivElement | null>(null);
 
@@ -175,32 +173,14 @@ const Home = () => {
                 <div className="button home-header-sidebar-placeholder"><span className="material-symbols-outlined">menu</span></div>
                     <Input placeholder={t("home.search")} InputClass="home-header-search" onKeyDown={OnSearch} />
                     <div className="home-filter-void">
-                        <Button icon="tune" onClick={() => setShowFilter((prev) => !prev)}/>
-                        {/* TODO: Change from mouseleave to when click mouse to exit filter menu */}
-                        {showFilter && 
-                            <div className="home-filter-container" onMouseLeave={() => setShowFilter(() => false)}>
-                                <div className="home-filter-space">
-                                    <div className="home-filter-title">{t("filter.genres")}</div>
-                                    <Dropdown onClickX={() => onChange(undefined, "genres")} buttonText={homeCache.filterTags?.genres ? homeCache.filterTags.genres[0] : ""} options={plugin.information.searchOption.genres.map((element) => {return { label: element, onClick: (text) => onChange({ genres: [text] }) } })} placeholder={"Genres"} />
-                                </div>
-                                <div className="home-filter-space">
-                                    <div className="home-filter-title">{t("filter.year")}</div>
-                                    <Dropdown onClickX={() => onChange(undefined, "years")} buttonText={homeCache.filterTags?.years ? homeCache.filterTags.years : ""} options={plugin.information.searchOption.years.map((element) => {return { label: element, onClick: (text) => onChange({ years: text }) } })} placeholder={"Years"} />
-                                </div>
-                                <div className="home-filter-space">
-                                    <div className="home-filter-title">{t("filter.season")}</div>
-                                    <Dropdown onClickX={() => onChange(undefined, "seasons")} buttonText={homeCache.filterTags?.seasons ? homeCache.filterTags.seasons : ""} options={plugin.information.searchOption.seasons.map((element) => {return { label: element, onClick: (text) => onChange({ seasons: text }) } })} placeholder={"Season"} />
-                                </div>
-                                <div className="home-filter-space">
-                                    <div className="home-filter-title">{t("filter.format")}</div>
-                                    <Dropdown onClickX={() => onChange(undefined, "format")} buttonText={homeCache.filterTags?.format ? homeCache.filterTags.format[0] : ""} options={plugin.information.searchOption.format.map((element) => {return { label: element, onClick: (text) => onChange({ format: [text] }) } })} placeholder={"Format"} />
-                                </div>
-                                <div className="home-filter-space">
-                                    <div className="home-filter-title">{t("filter.airing")}</div>
-                                    <Dropdown onClickX={() => onChange(undefined, "airing")} buttonText={homeCache.filterTags?.airing ? homeCache.filterTags.airing : ""} options={plugin.information.searchOption.statuses.map((element) => {return { label: element, onClick: (text) => onChange({ airing: text }) } })} placeholder={"Aring"} />
-                                </div>
-                            </div>
-                        }
+                        <Filter onChange={onChange} filter={{ 
+                                genres: plugin.information.searchOption.genres, 
+                                years: plugin.information.searchOption.years,
+                                seasons: plugin.information.searchOption.seasons,
+                                format: plugin.information.searchOption.format,
+                                airing: plugin.information.searchOption.statuses
+                            }}
+                        />
                     </div>
                 </div>
                 <div></div>

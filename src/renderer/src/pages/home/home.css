@@ -58,27 +58,6 @@
     animation: spin 1s linear infinite;
 }
 
-.home-filter-void {
-    display: flex;
-    flex-direction: column;
-}
-
-.home-filter-container {
-    z-index: 999;
-    margin-top: 60px;
-    margin-left: -270px;
-    display: flex;
-    position: fixed;
-    padding: 12px;
-    gap: 8px;
-}
-
-.home-filter-space {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
 .home-error-container, .home-empty-container {
     display: flex;
     justify-content: center;
