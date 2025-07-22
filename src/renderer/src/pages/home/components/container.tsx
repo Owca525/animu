@@ -12,8 +12,6 @@ const Container: React.FC<containerData> = ({ title, data, horizontal = false, o
     container.current.scrollLeft += num
   }
 
-  data = []
-
   return (
     <div className="main-container">
         <div className="container-title-container">
