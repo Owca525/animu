@@ -113,15 +113,15 @@ const Card: React.FC<cardData> = ({
   function ConvertTimeToText(): string {
     const time = convertSeconds(AnimeData.nextAiringEpisode?.timeUntilAiring);
     if (time?.days != 0) {
-      return `in ${time?.days} days`
+      return t("card_information.ep_airing_day", { day: time?.days })
     }
     if (time.hours != 0) {
-      return `in ${time?.hours} Hours`
+      return t("card_information.ep_airing_hours", { hours: time?.hours })
     }
     if (time.minutes != 0) {
-      return `in ${time?.hours} Minutes`
+      return t("card_information.ep_airing_minutes", { min: time?.minutes })
     }
-    return "Today"
+    return t("card_information.ep_airing_today")
   }
 
 
@@ -132,10 +132,10 @@ const Card: React.FC<cardData> = ({
       information = [ ...information, <div className="card-information-score" style={{border: `3px solid ${getGradientColor(AnimeData.averageScore)}`}}>{AnimeData.averageScore}%</div> ]
     }
     if (AnimeData.nextAiringEpisode && !saveData) {
-      information = [ ...information, <div className="card-information-text card-information-top">Ep {AnimeData.nextAiringEpisode.episode} airing in {ConvertTimeToText()}</div> ]
+      information = [ ...information, <div className="card-information-text card-information-top">{t("card_information.ep_airing", { ep: AnimeData.nextAiringEpisode.episode, text: ConvertTimeToText() })}</div> ]
     }
     if ((!AnimeData.nextAiringEpisode || saveData) && (AnimeData.season && AnimeData.seasonYear)) {
-      information = [ ...information, <div className="card-information-text card-information-top">{capitalizeFirstLetter(AnimeData.season)} {AnimeData.seasonYear}</div>]
+      information = [ ...information, <div className="card-information-text card-information-top">{t(`anime_seasons.${AnimeData.season.toLowerCase()}`)} {AnimeData.seasonYear}</div>]
     } else if (!(AnimeData.season && AnimeData.seasonYear) && !AnimeData.nextAiringEpisode) {
       information = [ ...information, <div className="card-information-text card-information-top">TBA</div>]
     }
@@ -143,7 +143,7 @@ const Card: React.FC<cardData> = ({
       information = [ ...information, <div className="card-information-text">{AnimeData.studios[0]}</div> ]
     }
     if (AnimeData.studios.length <= 0 && AnimeData.status) {
-      information = [ ...information, <div className="card-information-text">{capitalizeFirstLetter(AnimeData.status)}</div> ]
+      information = [ ...information, <div className="card-information-text">{t(`anime_statuses.${AnimeData.status.toLowerCase()}`)}</div> ]
     }
     let bottom: JSX.Element[] = []
     if (AnimeData.format) {
@@ -153,9 +153,9 @@ const Card: React.FC<cardData> = ({
       bottom = [ ...bottom, <>{capitalizeFirstLetter(AnimeData.type)}</> ]
     }
     if (AnimeData.episodes && AnimeData.format?.toUpperCase() != "MOVIE") {
-      bottom = [ ...bottom, <>{bottom.length !== 0 && <span className="card-dot">·</span>}{`${AnimeData.episodes} Episodes`}</> ]
+      bottom = [ ...bottom, <>{bottom.length !== 0 && <span className="card-dot">·</span>}{t("card_information.episodes", { ep: AnimeData.episodes })}</> ]
     } else if (AnimeData.duration) {
-      bottom = [ ...bottom, <>{bottom.length !== 0 && <span className="card-dot">·</span>}{`${AnimeData.duration}Min Durration`}</> ]
+      bottom = [ ...bottom, <>{bottom.length !== 0 && <span className="card-dot">·</span>}{t("card_information.minutes", { min: AnimeData.duration })}</> ]
     }
     information = [ ...information, <div className="card-information-text">{bottom}</div> ]
     return <>{information}</>

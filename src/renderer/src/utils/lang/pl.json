@@ -22,7 +22,8 @@
     },
     "home": {
         "search": "Wyszukaj...",
-        "nothingfound": "Gdzie wszystko zniknęło?"
+        "nothingfound": "Nic nie znaleziono",
+        "error": "Wystąpił błąd"
     },
     "contextMenu": {
         "devtools": "Otwórz narzędzia deweloperskie",
@@ -30,6 +31,27 @@
         "copytitle": "Kopiuj tytuł",
         "copycover": "Kopiuj okładkę",
         "delete": "Usuń"
+    },
+    "anime_seasons": {
+        "winter": "Zima",
+        "spring": "Wiosna",
+        "summer": "Lato",
+        "fall": "Jesień"
+    },
+    "anime_statuses": {
+        "releasing": "Emitowane",
+        "finished": "Zakończone",
+        "not_yet_aired": "Jeszcze nie emitowane",
+        "cancelled": "Anulowane"
+    },
+    "card_information": {
+        "ep_airing": "Odc. {{ep}} zostanie wyemitowany za {{text}}",
+        "ep_airing_day": "{{day}} dni",
+        "ep_airing_hours": "{{hours}} godzin",
+        "ep_airing_minutes": "{{min}} minut",
+        "ep_airing_today": "Dzisiaj",
+        "episodes": "{{ep}} odcinków",
+        "minutes": "{{min}} min czas trwania"
     },
     "information": {
         "airing": "Emitowany odcinek",
@@ -40,16 +62,32 @@
         "startdate": "Data rozpoczęcia",
         "endate": "Data zakończenia",
         "season": "Sezon",
+        "source": "Żródło",
         "descriptionnotfound": "Nie znaleziono opisu",
+        "errors": "To anime nie ma odcinków",
+        "wrongtext": "Czy to niewłaściwe anime?",
+        "bar": {
+            "anilist": "Strona Anilist",
+            "trailer": "Zwiastun anime"
+        },
         "containerwrong": {
             "title": "Znaleziono anime o nazwie: {{name}}"
         },
         "notification": {
             "coverdone": "Okładka skopiowana do schowka",
             "coverfailed": "Nie udało się skopiować do schowka"
+        },
+        "actors": "Aktorzy",
+        "actor_as": "Jako {{actor}}",
+        "characters": "Postacie",
+        "role": {
+            "main": "Główna",
+            "supporting": "Drugoplanowa",
+            "background": "Tło"
         }
     },
     "settings": {
+        "turnDeveloper": "Włącz tryb deweloperski",
         "general": {
             "language": "Język",
             "theme": "Motyw",
@@ -97,7 +135,8 @@
             "limited": "Ogranicz zapisywanie historii",
             "limit": "Limit historii",
             "startsave": "Kiedy rozpocząć zapisywanie historii",
-            "stopsave": "Kiedy zakończyć zapisywanie historii"
+            "stopsave": "Kiedy zakończyć zapisywanie historii",
+            "check_history": "Sprawdzanie Historii" 
         },
         "saving": {
             "done": "Konfiguracja została pomyślnie zapisana",
@@ -156,7 +195,8 @@
         "backuphistory": "Utworzono kopię zapasową starej historii",
         "converthistory": "Konwersja historii: Sukcesy {{success}}, Niepowodzenia {{failed}}",
         "converthistorydone": "Zakończono konwersję historii: Sukcesy {{success}}, Niepowodzenia {{failed}}",
-        "converthistoryfailed": "Nie udało się przekonwertować starej historii"
+        "converthistoryfailed": "Nie udało się przekonwertować starej historii",
+        "failedconvert": "Nie udało się przekonwertować {{title}}"
     },
     "update": {
         "progess": "Postęp pobierania {{procent}}%",

@@ -3,6 +3,7 @@ import "./css/container.css"
 import Card from "./card"
 import { useRef } from "react"
 import Button from "@renderer/components/buttons"
+import { t } from "i18next"
 
 const Container: React.FC<containerData> = ({ title, data, horizontal = false, onTitleClick, tags }) => {
   const container = useRef<HTMLDivElement>(null)
@@ -25,7 +26,7 @@ const Container: React.FC<containerData> = ({ title, data, horizontal = false, o
                 {data.length > 0 && data.map((card) => <Card AnimeData={card.AnimeData} saveData={card.saveData} deletionCard={card.deletionCard} onClick={card.onClick} />)}
             </div>
           }
-          {data.length <= 0 && <div className="home-empty-container container-error-text"><span className="material-symbols-outlined home-empty-icon">search_off</span>Nothing Found Here</div>}
+          {data.length <= 0 && <div className="home-empty-container container-error-text"><span className="material-symbols-outlined home-empty-icon">search_off</span>{t("home.nothingfound")}</div>}
           {horizontal && data.length > 0 ? <Button icon="chevron_right" ButtonClass="container-right-skip-button" onClick={() => handleButtonScroll(120)}/> : ""}
         </div>
     </div>

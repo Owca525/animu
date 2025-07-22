@@ -150,8 +150,8 @@ function information() {
                             {decodeHtmlEntities(anime_data.description ? anime_data.description : t("information.descriptionnotfound"))}
                         </div>
                         <div className="information-bar">
-                            <Button titleButton="Anilist Page" icon="open_in_new" ButtonClass="information-bar-icon" onClick={() => window.api.open(`https://anilist.co/anime/${anime_data.id}`)} />
-                            {anime_data.trailer && anime_data.trailer.site == "youtube" && <Button titleButton="Anime Trailer" icon="theaters" ButtonClass="information-bar-icon" onClick={() => window.api.open(`https://www.youtube.com/watch?v=${anime_data.trailer?.id}`)} />}
+                            <Button titleButton={t("information.bar.anilist")} icon="open_in_new" ButtonClass="information-bar-icon" onClick={() => window.api.open(`https://anilist.co/anime/${anime_data.id}`)} />
+                            {anime_data.trailer && anime_data.trailer.site == "youtube" && <Button titleButton={t("information.bar.trailer")} icon="theaters" ButtonClass="information-bar-icon" onClick={() => window.api.open(`https://www.youtube.com/watch?v=${anime_data.trailer?.id}`)} />}
                         </div>
                     </div>
 
@@ -190,7 +190,7 @@ function information() {
                             {anime_data.status &&
                                 <div className="information-info-content">
                                     <div className="information-content-title">{t("information.status")}</div>
-                                    {capitalizeFirstLetter(anime_data.status)}
+                                    {t(`anime_statuses.${anime_data.status.toLowerCase()}`)}
                                 </div>
                             }
 
@@ -211,13 +211,13 @@ function information() {
                             {anime_data.season && anime_data.seasonYear &&
                                 <div className="information-info-content">
                                     <div className="information-content-title">{t("information.season")}</div>
-                                    {capitalizeFirstLetter(anime_data.season)} {anime_data.seasonYear}
+                                    {t(`anime_seasons.${anime_data.season.toLowerCase()}`)} {anime_data.seasonYear}
                                 </div>
                             }
 
                             {anime_data.source &&
                                 <div className="information-info-content">
-                                    <div className="information-content-title">Source</div>
+                                    <div className="information-content-title">{t("information.source")}</div>
                                     {capitalizeFirstLetter(anime_data.source)}
                                 </div>
                             }
@@ -239,16 +239,16 @@ function information() {
                                             </>
                                         )}
                                         {isLoading && anime_data.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
-                                        {isError && isLoading == false && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime doesn't have episodes</div>}
-                                        {data && (data.episodesData && data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime doesn't have episodes</div>}
+                                        {isError && isLoading == false && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}
+                                        {data && (data.episodesData && data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}
                                     </>}
                             </div>
 
 
-                            {anime_data.characters && anime_data.characters.length <= 0 &&
+                            {anime_data.characters && anime_data.characters.length > 0 &&
                                 <div className="information-characters">
                                     <div className="information-characters-title">
-                                        Characters
+                                        {t("information.characters")}
                                     </div>
 
                                     <div className="information-characters-container">
@@ -257,7 +257,7 @@ function information() {
                                                 <img className="information-characters-card-cover" src={character.character.image}></img>
                                                 <div className="information-characters-card-description">
                                                     <span className="information-character-name">{character.character.name}</span>
-                                                    <span className="information-character-role">{capitalizeFirstLetter(character.role)}</span>
+                                                    <span className="information-character-role">{t(`information.role.${character.role.toLowerCase()}`)}</span>
                                                 </div>
                                             </div>
                                         )}
@@ -268,7 +268,7 @@ function information() {
                             {anime_data.characters && anime_data.characters.map((tmp) => tmp.voiceActor).filter((item) => item != undefined).length > 0 &&
                                 <div className="information-characters">
                                     <div className="information-characters-title">
-                                        Actors
+                                        {t("information.actors")}
                                     </div>
 
                                     <div className="information-characters-container">
@@ -277,7 +277,7 @@ function information() {
                                                 <img className="information-characters-card-cover" src={character.voiceActor.image}></img>
                                                 <div className="information-characters-card-description">
                                                     <span className="information-character-name">{character.voiceActor.name}</span>
-                                                    <span className="information-character-role">As {character.character.name}</span>
+                                                    <span className="information-character-role">{t("information.actor_as", { actor: character.character.name })}</span>
                                                 </div>
                                             </div>
                                         )

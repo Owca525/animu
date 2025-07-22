@@ -28,7 +28,8 @@
     },
     "home": {
         "search": "Search...",
-        "nothingfound": "Where did it all go?"
+        "nothingfound": "Nothing Found Here",
+        "error": "Error Occured"
     },
     "contextMenu": {
         "devtools": "Open DevTools",
@@ -36,6 +37,27 @@
         "copytitle": "Copy Title",
         "copycover": "Copy Cover",
         "delete": "Delete"
+    },
+    "anime_seasons": {
+        "winter": "Winter",
+        "spring": "Spring",
+        "summer": "Summer",
+        "fall": "Fall"
+    },
+    "anime_statuses": {
+        "releasing": "Releasing",
+        "finished": "Finished",
+        "not_yet_aired": "Not Yet Aired",
+        "cancelled": "Cancelled"
+    },
+    "card_information": {
+        "ep_airing": "Ep {{ep}} airing in {{text}}",
+        "ep_airing_day": "{{day}} Days",
+        "ep_airing_hours": "{{hours}} Hours",
+        "ep_airing_minutes": "{{min}} Minutes",
+        "ep_airing_today": "Today",
+        "episodes": "{{ep}} Episodes",
+        "minutes": "{{min}}Min Durration"
     },
     "information": {
         "airing": "Airing Episode",
@@ -46,16 +68,32 @@
         "startdate": "Start Date",
         "endate": "End Date",
         "season": "Season",
+        "source": "Source",
         "descriptionnotfound": "Description Not Found",
+        "errors": "This Anime doesn't have episodes",
+        "wrongtext": "Is this the wrong Anime?",
+        "bar": {
+            "anilist": "Anilist Page",
+            "trailer": "Anime Trailer"
+        },
         "containerwrong": {
             "title": "Anime Found For name: {{name}}"
         },
         "notification": {
             "coverdone": "Cover succesfully copied to clipboard",
             "coverfailed": "Failed to copy clipboard"
+        },
+        "actors": "Actors",
+        "actor_as": "As {{actor}}",
+        "characters": "Characters",
+        "role": {
+            "main": "Main",
+            "supporting": "Supporting",
+            "background": "Background"
         }
     },
     "settings": {
+        "turnDeveloper": "Turn On Developer Mode",
         "general": {
             "language": "Language",
             "theme": "Theme",
@@ -97,14 +135,14 @@
                 "volumedown": "Volume Down",
                 "volumemute": "Volume Mute",
                 "screenshot": "Take a Screenshot"
-            },
-            "turnDeveloper": "Turn On Developer Mode"
+            }
         },
         "history": {
             "limited": "Limited Save History",
             "limit": "Limit For History",
             "startsave": "When Start Save History",
-            "stopsave": "When Stop save History"
+            "stopsave": "When Stop save History",
+            "check_history": "Check History" 
         },
         "saving": {
             "done": "Config has been succesfully saved",
@@ -163,7 +201,8 @@
         "backuphistory": "Backup File Old History done",
         "converthistory": "Convert History: Succes {{success}}, Failed {{failed}}",
         "converthistorydone": "Convertion Continue Watch Done: Succes {{success}}, Failed {{failed}}",
-        "converthistoryfailed": "Failed Convert old History watch to new"
+        "converthistoryfailed": "Failed Convert old History watch to new",
+        "failedconvert": "Failed Covert {{title}}"
     },
     "update": {
         "progess": "Download Progress {{procent}}%",

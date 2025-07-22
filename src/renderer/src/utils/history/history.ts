@@ -159,7 +159,7 @@ export async function HistoryCheckConvert() {
                             ...tmp.AnimeData
                         }
                     })
-                    toast.error(`Failed Covert ${tmp.AnimeData.title.romaji}`, notificationProps)
+                    toast.error(t("oldBackup.failedconvert", { title: tmp.AnimeData.title.romaji }), notificationProps)
                 }
             } else {
                 failed += 1

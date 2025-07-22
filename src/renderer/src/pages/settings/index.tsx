@@ -511,7 +511,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Check History
+                                {t("settings.history.check_history")}
                                 <Button content="Check" onClick={buttonCheck}/>
                             </div>
                         </div>
