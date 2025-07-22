@@ -231,15 +231,15 @@ function information() {
                                 <div className="information-select-episode" onClick={() => setshowWrong(() => true)}><span className="material-symbols-outlined">search</span>Is this the wrong Anime?</div>
                                 {showWrong == false &&
                                     <>
-                                        {isLoading == false && data && data.episodesData && data.episodesData.length > 0 && anime_data.status != "NOT_YET_RELEASED" && (
+                                        {isLoading == false && data && data.episodesData && data.episodesData.length > 0 && anime_data.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && (
                                             <>
                                                 {data.episodesData.map((episode: { episodes: string[], type: string, name?: string }) => episode.episodes.length > 0 ? (
                                                     <Drop LeftHeader={episode.name ? episode.name : episode.type} RightHeader={`${episode.episodes.length} episodes`} content={makeButtons(episode.episodes, episode.type)} />
                                                 ) : "")}
                                             </>
                                         )}
-                                        {isLoading && anime_data.status != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
-                                        {isError && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime doesn't have episodes</div>}
+                                        {isLoading && anime_data.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
+                                        {isError && isLoading == false && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime doesn't have episodes</div>}
                                         {data && (data.episodesData && data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>This Anime doesn't have episodes</div>}
                                     </>}
                             </div>
