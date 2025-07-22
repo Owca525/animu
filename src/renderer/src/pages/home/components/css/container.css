@@ -2,7 +2,7 @@
 .container-title-click {
     font-weight: 600;
     font-size: 1.6em;
-    padding: 2px 8px 2px 8px;
+    padding: 2px 8px 2px 4px;
     line-clamp: 1;
     display: -webkit-box;
     -webkit-line-clamp: 1;
@@ -217,4 +217,19 @@
 
 .container-tag:hover .container-tag-icon {
     display: flex;
+}
+
+
+
+
+/* for smartphones 
+maybe that will be usefull in the future */
+@media (max-width: 600px) {
+    .container-title,
+    .container-title-click {
+        font-weight: 600;
+        font-size: 1.4em;
+        padding: 2px 8px 2px 1px;
+    }
+
 }
