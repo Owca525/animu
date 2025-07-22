@@ -57,7 +57,7 @@
     padding-top: 4px;
     padding-bottom: 4px;
     gap: 12px;
-    width: clamp(50px, 20vw, 200px);
+    width: clamp(155px, 20vw, 200px);
 }
 
 .sidebar-image {
