@@ -63,6 +63,7 @@ function information() {
         } catch (Error) {
             setIsError(() => true)
             setshowWrong(() => false)
+            setLoadingData(() => false)
             console.error(Error)
         }
     }
@@ -139,8 +140,8 @@ function information() {
                     <div className="information-top">
                         <div className="information-image-container">
                             {anime_data.averageScore && <div title="Anime Score" className="information-score" style={{ border: `3px solid ${getGradientColor(anime_data.averageScore)}` }}>{anime_data.averageScore}%</div>}
-                            <img className="information-cover" onClick={() => anime_data.coverImage && SaveCoverToClipboard(anime_data.coverImage)} onError={() => setCoverIsError(() => true)} onLoad={() => setCoverIsLoading(() => false)} src={anime_data.coverImage ? anime_data.coverImage : ""} style={isCoverLoading ? { display: "none" } : isError ? { display: "none" } : { animation: "fadeIn 0.3s forwards" }}></img>
-                            {isCoverLoading && isError == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div>}
+                            <img className="information-cover" onClick={() => anime_data.coverImage && SaveCoverToClipboard(anime_data.coverImage)} onError={() => setCoverIsError(() => true)} onLoad={() => setCoverIsLoading(() => false)} src={anime_data.coverImage ? anime_data.coverImage : ""} style={isCoverLoading ? { display: "none" } : isCoverError ? { display: "none" } : { animation: "fadeIn 0.3s forwards" }}></img>
+                            {isCoverLoading && isCoverError == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div>}
                             {isCoverError && isCoverLoading == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined">error</span></div>}
 
                             <div className="information-title-mobile-container">
