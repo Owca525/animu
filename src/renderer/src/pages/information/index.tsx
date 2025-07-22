@@ -47,10 +47,6 @@ function information() {
 
     const time = convertSeconds(secondsLeft)
 
-    useHotkeys("Tab", () => {
-        console.log(anime_data)
-    })
-
     // I can't use useQuery Because Doesn't Work
     async function fetchData(func: any, title?: string, id?: string) {
         try {
@@ -249,7 +245,7 @@ function information() {
                             </div>
 
 
-                            {anime_data.characters &&
+                            {anime_data.characters && anime_data.characters.length <= 0 &&
                                 <div className="information-characters">
                                     <div className="information-characters-title">
                                         Characters
