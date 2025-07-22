@@ -54,3 +54,12 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* for smartphones 
+maybe that will be usefull in the future */
+@media (max-width: 600px) {
+
+  .dropdown-button {
+    width: 100px;
+  }
+}

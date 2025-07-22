@@ -103,3 +103,21 @@
   align-items: center;
   gap: 8px;
 }
+
+/* for smartphones 
+maybe that will be usefull in the future */
+@media (max-width: 600px) {
+
+    .settings-container .sidebar-logo-icon-container,
+    .settings-container .sidebar-container-max {
+        width: 130px;
+    }
+    
+    .settings-content-container {
+      font-size: 0.8em;
+    }
+
+    .settings-setting-seekbar-container {
+      width: 60%;
+    }
+}
