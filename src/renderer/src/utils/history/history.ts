@@ -80,8 +80,14 @@ export async function HistoryDetectVersion(): Promise<boolean> {
             );
         }
         return true
-    } catch (Error) {
-        console.info(Error)
+    } catch (error) {
+        if (error instanceof Error) {
+            if (error.message == "Unexpected end of JSON input") {
+                toast.dismiss(updatedToast)
+                return true
+            }
+        }
+        console.log(error)
         toast.dismiss(updatedToast)
         toast.info(t("oldBackup.converthistoryfailed"), notificationProps)
         return false

@@ -66,8 +66,14 @@ export async function ContinueDetectVersion(): Promise<boolean> {
                         failed += 1
                     }
                     toast.update(updatedToast, { render: t("oldBackup.convertcontinue", { success: success, failed: failed }) })
-                } catch (Error) {
-                    console.error(Error)
+                } catch (error) {
+                    if (error instanceof Error) {
+                        if (error.message == "Unexpected end of JSON input") {
+                            toast.dismiss(updatedToast)
+                            return true
+                        }
+                    }
+                    console.log(error)
                     failed += 1
                     toast.update(updatedToast, { render: t("oldBackup.convertcontinue", { success: success, failed: failed }) })
                 }
