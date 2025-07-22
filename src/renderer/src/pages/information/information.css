@@ -108,7 +108,7 @@
 }
 
 .information-cover-placeholder {
-    width: 240px;
+    /* width: 240px; */
     height: 220px;
     cursor: auto;
     display: flex;
