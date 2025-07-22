@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import { refetchHistory } from "../functions";
-import { cardData } from "../GlobalInterface";
+import { cardData, notificationProps } from "../GlobalInterface";
 import i18n from "../i18n";
 
 const appConfigDirPath = window.api.os.getPath("userData");
@@ -11,7 +11,7 @@ export async function ReadFile(file: string): Promise<cardData[]> {
         const dataFile = await window.api.os.read(await appConfigDirPath + `/${file}.json`)
         const data = JSON.parse(dataFile) as cardData[];
         if (data.length <= 0) return []
-        return checkAnimeDuplicate(data).map((value: cardData) => { return { ...value, deletionCard: () => DeleteFromFile(value, file) } }).reverse()
+        return checkAnimeDuplicate(data).map((value: cardData) => { return { ...value, deletionCard: () => DeleteFromFile({ ...value, deletionCard: () => "", }, file) } }).reverse()
     } catch (Error) {
         console.error(`${Error} in ReadFile`)
         return [];
@@ -24,27 +24,30 @@ export async function DeleteFromFile(data: cardData, file: string) {
         const saveFile = await window.api.os.read(await appConfigDirPath + `/${file}.json`)
         const list = JSON.parse(saveFile) as cardData[];
         const index = list.findIndex(
-            (item) => item.saveData?.episode === data.saveData?.episode && item.AnimeData.player_ID === data.AnimeData.player_ID
+            (item) => item.saveData?.episode === data.saveData?.episode && item.AnimeData.player_ID ? item.AnimeData.player_ID === data.AnimeData.player_ID : item.AnimeData.id === data.AnimeData.id
         );
 
         if (index != -1) list.splice(index, 1);
 
         window.api.os.write(await appConfigDirPath + `/${file}.json`, JSON.stringify(list))
         refetchHistory()
-        if (!data.deletionCard) return true
-        if (file === "continueWatch") {
-            toast.success(i18n.t("saving.continuewatchsuccess"))
-        } else if (file === "history") {
-            toast.success(i18n.t("saving.historysucces"))
+        console.log(data)
+        if (data.deletionCard) {
+            if (file === "continueWatch") {
+                toast.success(i18n.t("history.continuesaved"), notificationProps)
+            } else if (file === "history") {
+                toast.success(i18n.t("history.historysaved"), notificationProps)
+            }
         }
         return true
     } catch (Error) {
         console.error(`${Error} in DeleteFromFile`)
-        if (!data.deletionCard) return false
-        if (file === "continueWatch") {
-            toast.error(i18n.t("saving.continuewatchfailed"))
-        } else if (file === "history") {
-            toast.error(i18n.t("saving.historyfailed"))
+        if (data.deletionCard) {
+            if (file === "continueWatch") {
+                toast.error(i18n.t("history.continuefailed"), notificationProps)
+            } else if (file === "history") {
+                toast.error(i18n.t("history.historyfailed"), notificationProps)
+            }
         }
         return false
     }

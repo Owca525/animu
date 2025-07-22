@@ -104,11 +104,7 @@ export async function SaveHistory(save: cardData) {
 }
 
 export async function DeleteFromHistory(save: cardData) {
-    if (await DeleteFromFile(save, "history")) {
-        toast.success(t("history.historysaved"), notificationProps)
-    } else {
-        toast.success(t("history.historyfailed"), notificationProps)
-    }
+    await DeleteFromFile(save, "history")
 }
 
 export async function CheckHistory() {

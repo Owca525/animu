@@ -103,11 +103,7 @@ export async function SaveContinue(save: cardData) {
 }
 
 export async function DeleteFromContinue(save: cardData) {
-    if (await DeleteFromFile(save, "continueWatch")) {
-        toast.success(t("history.continuesaved"), notificationProps)
-    } else {
-        toast.success(t("history.continuefailed"), notificationProps)
-    }
+    await DeleteFromFile(save, "continueWatch")
 }
 
 export async function CheckContinue() {
