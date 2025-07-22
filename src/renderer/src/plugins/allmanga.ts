@@ -191,11 +191,11 @@ export async function getInformation(name?: string, anime_id?: string): Promise<
 
     for (let i = 0; i < data.length; i++) {
       const element: cardData = data[i];
-      precentage.push({ name: element.AnimeData.title.romaji, prec: similarityText(name, element.AnimeData.title.romaji) });
+      precentage.push({ name: element.AnimeData.title.native, prec: similarityText(name, element.AnimeData.title.native) });
     };
     if (precentage.length <= 0) return { player_id: "", episodesData: [] };
     let anime_name = precentage.filter(item => item.prec === Math.max(...precentage.map(item => item.prec)))[0];
-    let card = data.filter((item: cardData) => item.AnimeData.title.romaji == anime_name.name)[0];
+    let card = data.filter((item: cardData) => item.AnimeData.title.native == anime_name.name)[0];
     anime_id = card.AnimeData.player_ID ? card.AnimeData.player_ID : "";
   };
   if (anime_id == "") return { player_id: "", episodesData: [] };

@@ -72,7 +72,7 @@ function information() {
         if (anime_data.id === "") {
             fetchData(pluginPlayer.player.animeDataList, undefined, anime_data.player_ID)
         } else {
-            fetchData(pluginPlayer.player.animeDataList, anime_data.title.romaji)
+            fetchData(pluginPlayer.player.animeDataList, anime_data.title.native)
         }
     }, [])
 
