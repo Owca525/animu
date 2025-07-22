@@ -13,7 +13,7 @@ const DeveloperStats = lazy(() => import('./developerStats'));
 // css
 import { cardData, ContextMenuProps, notificationProps, playerData, SettingsConfig } from "@renderer/utils/GlobalInterface"
 import { useSelector } from "react-redux"
-import { convertKeybinds, CreateContextMenuOptions, formatTime, refetchHistory } from "@renderer/utils/functions"
+import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
 import { DeleteFromContinue, SaveContinue } from "@renderer/utils/history/continueWatch"
@@ -469,7 +469,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             <div className="video-overlay">
                 <div className={isUpNextEpisode == false ? isVisible ? 'video-top' : 'video-top player-hidden' : 'video-top'}>
                     <Button icon='arrow_back' ButtonClass='player-buttons' onClick={async () => await exitPlayer()} />
-                    <div className="player-title ">{t('player.TitleEpisode', { ep: temp.episode, name: anime_data.AnimeData.title.romaji })}</div>
+                    <div className="player-title ">{detectTitle(anime_data)}</div>
                 </div>
                 <div
                     className={

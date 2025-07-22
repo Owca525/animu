@@ -162,7 +162,8 @@
         "error": {
             "notfound": "Player didn't find any urls"
         },
-        "TitleEpisode": "Episode: {{ep}} of {{name}}",
+        "TitleEpisode": "Episode {{ep}} of {{name}}",
+        "TitleMovie": "Movie: {{name}}",
         "Volume": "Volume",
         "next": "Next {{ep}} episode",
         "previous": "Previous {{ep}} episode",

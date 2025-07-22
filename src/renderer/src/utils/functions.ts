@@ -1,5 +1,5 @@
 import { t } from "i18next";
-import { ContextMenuProps, homeData } from "./GlobalInterface";
+import { cardData, ContextMenuProps, homeData } from "./GlobalInterface";
 import store from "./store";
 import { setHomeData } from "./pluginApi";
 import { ReadContinue } from "./history/continueWatch";
@@ -224,4 +224,9 @@ export function getGradientColor(value: number | undefined | null): string {
 
 export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export function detectTitle(data: cardData): String {
+    if (data.AnimeData.title.romaji.toLowerCase().includes("movie")) return t('player.TitleMovie', { name: data.AnimeData.title.romaji })
+    return t('player.TitleEpisode', { ep: data.saveData?.episode, name: data.AnimeData.title.romaji })
 }

@@ -3,14 +3,15 @@ import { useQuery } from "react-query";
 import { useLocation, useNavigate } from "react-router-dom"
 import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
-import { cardData, SettingsConfig } from "@renderer/utils/GlobalInterface";
+import { AnimeData, cardData, SettingsConfig } from "@renderer/utils/GlobalInterface";
 import { useSelector } from "react-redux";
 import { t } from "i18next";
 
 import "./player.css"
 import { SaveHistory } from "@renderer/utils/history/history";
-import { refetchHistory } from "@renderer/utils/functions";
+import { detectTitle, refetchHistory } from "@renderer/utils/functions";
 import { useHotkeys } from "react-hotkeys-hook";
+import Button from "@renderer/components/buttons";
 
 const VideoPlayer = lazy(() => import('./components/VideoPlayer'));
 // const ExternalPlayer = lazy(() => import('./externalPlayer'));
@@ -76,7 +77,7 @@ const player = () => {
         closeDialog()
     }
     if (isLoading == false && data && data.length <= 0) {
-        loadingAnimation()
+        loadingAnimation(leave, anime_data.data)
         showDialog({
             type: "refresh",
             title: t("player.error.notfound"),
@@ -87,7 +88,6 @@ const player = () => {
         })
         return
     }
-
     // if (true) {
     //     return (
     //         <ExternalPlayer />
@@ -95,7 +95,7 @@ const player = () => {
     // }
     if (data && isLoading == false) {
         return (
-            <Suspense fallback={loadingAnimation()}>
+            <Suspense fallback={loadingAnimation(leave, anime_data.data)}>
                 <VideoPlayer
                     player_data={data}
                     anime_data={anime_data.data}
@@ -108,13 +108,18 @@ const player = () => {
             </Suspense>
         )
     }
-    return loadingAnimation()
+    return loadingAnimation(leave, anime_data.data)
 }
 
-function loadingAnimation() {
+function loadingAnimation(leave: () => void, anime_data: cardData) {
+    // TODO: Fix theme
     return (
-        <div className="player-video-container" style={{ height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }}>
-            <div className="player-loading-container" style={{ maxHeight: "min-content" }}>
+        <div className="player-loading-container">
+            <div className="player-loading-top">
+                <Button icon='arrow_back' ButtonClass='player-buttons' onClick={leave} />
+                <div className="player-title ">{detectTitle(anime_data)}</div>
+            </div>
+            <div className="player-loading-animation-container" style={{ maxHeight: "min-content" }}>
                 <div className="player-waiting material-symbols-outlined">progress_activity</div>
             </div>
         </div>
