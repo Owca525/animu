@@ -271,7 +271,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         checkUpNext()
 
         // Update RPC
-        window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title, ep: temp.episode }), `${formatTime(videoRef.current.currentTime)} / ${formatTime(videoRef.current.duration)}`)
+        window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(videoRef.current.currentTime)} / ${formatTime(videoRef.current.duration)}`)
         if (config.Player.general.AutoSkipEpisode && videoRef.current.duration == videoRef.current.currentTime) functions.nextButton("next")
     }
 
@@ -578,7 +578,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             {isUpNextEpisode ? (
                 <div className="player-up-Next-container">
                     <div className="player-up-Next-Title">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>
-                    <div className="player-up-Next-Anime">{t("player.upNext.titleAnime", { ep: temp.episodes[temp.episodes.indexOf(temp.episode) + 1], title: anime_data.AnimeData.title })}</div>
+                    <div className="player-up-Next-Anime">{t("player.upNext.titleAnime", { ep: temp.episodes[temp.episodes.indexOf(temp.episode) + 1], title: anime_data.AnimeData.title.romaji })}</div>
                     <div className="player-up-Next-Buttons">
                         <Button content={t("player.upNext.nextEp")} ButtonClass='player-up-Next-Button' onClick={() => functions.nextButton("next")} />
                         <Button content={t("player.upNext.hide")} ButtonClass='player-up-Next-Button' onClick={() => { setHideUpNextEpisode(true); setUpNextEpisode(false) }} />
