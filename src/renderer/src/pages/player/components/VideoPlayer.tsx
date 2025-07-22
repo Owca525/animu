@@ -475,7 +475,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     className={
                         "video-center " + (isWaitingPlayer ? '' : 'player-hidden')
                     }>
-                    <div className="player-loading-container">
+                    <div className="player-loading-animation-container">
                         <div className="player-waiting material-symbols-outlined">progress_activity</div>
                     </div>
                 </div>
