@@ -239,6 +239,7 @@
 .information-character-name, .information-character-role {
     position: absolute;
     right: 15px;
+    margin-left: 5px;
 }
 
 .information-character-name {
