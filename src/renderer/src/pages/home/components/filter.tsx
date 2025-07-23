@@ -49,7 +49,7 @@ const Filter: React.FC<{ onChange: (params?: FilterParams, removeParam?: string)
                     </div>
                     <div className="home-filter-space">
                         <div className="home-filter-title">{t("filter.airing")}</div>
-                        <Dropdown onClickX={() => onChange(undefined, "airing")} buttonText={homeCache.filterTags?.airing ? homeCache.filterTags.airing : ""} options={filter.airing.map((element) => { return { label: element, onClick: (text) => onChange({ airing: text }) } })} placeholder={"Aring"} />
+                        <Dropdown onClickX={() => onChange(undefined, "airing")} buttonText={homeCache.filterTags?.airing ? homeCache.filterTags.airing : ""} options={filter.airing.map((element) => { return { label: element, onClick: (text) => onChange({ airing: text }) } })} placeholder={"Airing"} />
                     </div>
                 </div>
             }

@@ -9,7 +9,7 @@
         "continuewatch": "Continue Watching",
         "dev": "Developer",
         "minutes": "Minutes",
-        "exitAnimu": "Do you want exit animu?"
+        "exitAnimu": "Do you really want exit animu?"
     },
     "dialog": {
         "yes": "Yes",
@@ -64,7 +64,7 @@
         "season": "Season",
         "source": "Source",
         "descriptionnotfound": "Description Not Found",
-        "errors": "This Anime doesn't have episodes",
+        "errors": "This Anime doesn't have any episodes",
         "wrongtext": "Is this the wrong Anime?",
         "bar": {
             "anilist": "Anilist Page",
@@ -91,8 +91,8 @@
         "general": {
             "language": "Language",
             "theme": "Theme",
-            "updates": "Updates",
-            "checkupdates": "Check Updates",
+            "updates": "Update Notifications",
+            "checkupdates": "Check for Updates",
             "window": "Window",
             "maximize": "Auto Maximize",
             "fullscreen": "Auto Fullscreen",
@@ -101,7 +101,7 @@
         },
         "player": {
             "play": "Auto Play",
-            "skip": "Auto Skip Episodes",
+            "skip": "Automatically Play the Next Episode",
             "volume": "Default Volume",
             "longskip": "Long Skip Forward",
             "longskipb": "Long Skip Backward",
@@ -109,7 +109,7 @@
             "shortskipb": "Short Skip Backward",
             "preload": "Player Preload Type",
             "screenshot": "Screenshots",
-            "screenask": "Always ask Where Save Screenshots",
+            "screenask": "Always ask Where to Save Screenshots",
             "type": "Save Type",
             "path": "Screenshot Save Path",
             "keybind": "Keybinds",
@@ -127,29 +127,29 @@
                 "prevepisode": "Previus Episode",
                 "volumeup": "Volume Up",
                 "volumedown": "Volume Down",
-                "volumemute": "Volume Mute",
+                "volumemute": "Mute the audio",
                 "screenshot": "Take a Screenshot"
             }
         },
         "history": {
             "limited": "Limited Save History",
             "limit": "Limit For History",
-            "startsave": "When Start Save History",
-            "stopsave": "When Stop save History",
+            "startsave": "When to Start Saving History",
+            "stopsave": "When to Stop saving History",
             "check_history": "Check History" 
         },
         "saving": {
             "done": "Config has been succesfully saved",
-            "error": "Saving config accure error",
+            "error": "Config saving error occured",
             "notification": "Do you wanna save changes?"
         },
         "tips": {
-            "automaximize": "This make window maximize when you start application",
-            "autofullscreen": "This make window fullscreen when you start application",
-            "autofullscreenplayer": "Set fullscreen when player start",
-            "longskip": "You can set what time skip in the episode (this usefull for skipping opening)",
-            "shotskip": "This is normal skip time left or right",
-            "continuewatchsavehistory": "Animu save to 'continue watch' when for example past 20 seconds and stop saving when (epduration-100) seconds"
+            "automaximize": "Maximize window on application start",
+            "autofullscreen": "Open application in fullscreen mode",
+            "autofullscreenplayer": "Set fullscreen mode when player starts",
+            "longskip": "Change how many seconds long skips skip (usefull for skipping openings)",
+            "shotskip": "Change how many seconds short skips skip",
+            "continuewatchsavehistory": "After how many seconds episode will be saved to Continue watching / After how many seconds before the end remove episode from continue watching"
         }
     },
     "player": {
@@ -193,26 +193,26 @@
         "continuefailed": "Failed Removed Anime from Continue Watch"
     },
     "oldBackup": {
-        "backupcontinue": "Backup File Old Continue watch done",
-        "convertcontinue": "Convert Continue Watch: Success {{success}}, Failed {{failed}}",
-        "convertcontinuedone": "Convertion Continue Watch Done: Succes {{success}}, Failed {{failed}}",
-        "convertcontinuefailed": "Failed to Convert old continue watch to new",
-        "backuphistory": "Backup File Old History done",
+        "backupcontinue": "Backing up old Continue Watch file: Done",
+        "convertcontinue": "Converting Continue Watch: Success {{success}}, Failed {{failed}}",
+        "convertcontinuedone": "Converting Continue Watch Done: Succes {{success}}, Failed {{failed}}",
+        "convertcontinuefailed": "Failed to convert old continue watch to new",
+        "backuphistory": "Backing Up old History file: Done",
         "converthistory": "Convert History: Success {{success}}, Failed {{failed}}",
-        "converthistorydone": "Convertion Continue Watch Done: Succes {{success}}, Failed {{failed}}",
-        "converthistoryfailed": "Failed to Convert old History watch to new",
+        "converthistorydone": "Converting Continue Watch Done: Succes {{success}}, Failed {{failed}}",
+        "converthistoryfailed": "Failed to convert old Watch History to new",
         "failedconvert": "Failed to Covert {{title}}"
     },
     "update": {
         "progess": "Download Progress {{procent}}%",
-        "done": "Updated Downloaded, please restart application"
+        "done": "Update Downloaded, please restart the application"
     },
     "discordrpc": {
         "home": "In home",
         "settings": "In Settings",
         "player": "{{title}} Episode {{ep}}"
     },
-    "globalError": "Critical Error has occured, do you want go home?",
+    "globalError": "Critical Error has occured, do you want to go home?",
     "filter": {
         "genres": "Genres:",
         "year": "Year:",
@@ -221,7 +221,7 @@
         "airing": "Airing Status:"
     },
     "errorboundary": {
-        "gotohome": "Go Back To Home",
+        "gotohome": "Go Back Home",
         "leaveanimu": "Leave Animu",
         "errormessage": "Error Message: {{error}}"
     },

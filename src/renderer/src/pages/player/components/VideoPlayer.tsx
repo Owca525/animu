@@ -517,7 +517,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                 <div className="player-settings-container">
                                     {player_data.length <= 1 ? (
                                         <div className="player-settings-button">
-                                            <span className='player-settings-button-text-gray'>Urls</span> <span className='player-settings-button-text-gray'>{currentHost}</span>
+                                            <span className='player-settings-button-text-gray'>Sources</span> <span className='player-settings-button-text-gray'>{currentHost}</span>
                                         </div>
                                     ) : (
                                         <div className="player-settings-button" onClick={() => setcurrentSettings("urls")}>
