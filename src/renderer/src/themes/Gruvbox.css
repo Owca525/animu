@@ -556,11 +556,6 @@ body {
   color: var(--playertext);
 }
 
-.player-loading-container {
-  border-radius: 12px;
-  background-color: color-mix(in srgb, var(--playerbg3) 80%, transparent);
-}
-
 .player-title {
   border-radius: 4px;
   background-color: color-mix(in srgb, var(--playerbg3) 80%, transparent);
