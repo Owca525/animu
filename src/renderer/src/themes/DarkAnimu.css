@@ -463,6 +463,10 @@ body {
   border-radius: 8px;
 }
 
+.dropdown-button:hover {
+  background-color: var(--bg4);
+}
+
 .dropdown-button-shadow-text {
   color: var(--text-gray);
 }

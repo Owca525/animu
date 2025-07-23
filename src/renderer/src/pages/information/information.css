@@ -161,6 +161,7 @@
 .information-info {
     padding: 12px;
     width: min-content;
+    height: min-content;
     display: flex;
     gap: 12px;
     flex-direction: column;
