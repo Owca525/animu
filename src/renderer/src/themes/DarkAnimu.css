@@ -184,7 +184,7 @@ body {
 .card-information {
     background-color: var(--bg2);
     border-radius: 12px;
-    border: solid 2px var(--neutral1);
+    border: solid 3px var(--neutral1);
 }
 
 
