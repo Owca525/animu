@@ -19,6 +19,7 @@ import SeekBar from "@renderer/components/seekBar"
 import { DeleteFromContinue, SaveContinue } from "@renderer/utils/history/continueWatch"
 import useKeyPress from "@renderer/utils/hooks/useKeyPress"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
+import PlayerSettings from "./components/PlayerSettings"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -72,7 +73,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const [isHideUpNextEpisode, setHideUpNextEpisode] = useState<boolean>(false)
 
     // other
-    const [currentSettings, setcurrentSettings] = useState<string>("")
+    const [currentSettings, setcurrentSettings] = useState<boolean>(false)
     const [showNerdStats, setshowNerdStats] = useState<boolean>(false)
     const [hls, setHls] = useState<any>(null);
 
@@ -81,7 +82,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         if (hideTimer.current) {
             clearTimeout(hideTimer.current)
         }
-        if (currentSettings == "") {
+        if (currentSettings == false) {
             hideTimer.current = setTimeout(() => setIsVisible(false), 2000)
         }
     }
@@ -112,7 +113,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     function setSpeed(speed: string) {
         if (!videoRef.current) return
         videoRef.current.playbackRate = parseFloat(speed)
-        setcurrentSettings("settings")
     }
 
     function setRes(res: number | undefined) {
@@ -457,7 +457,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 ref={videoRef}
                 className={isVisible ? 'video-player player-mask' : 'video-player'}
                 onTimeUpdate={updateProgress}
-                onClick={() => { togglePlay(); setcurrentSettings("") }}
+                onClick={() => { togglePlay(); setcurrentSettings(() => false) }}
                 autoPlay={isPlaying}
                 onWaiting={() => { setWaitingPlayer(() => true) }}
                 onCanPlay={() => { setWaitingPlayer(() => false) }}
@@ -469,12 +469,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             <div className="video-overlay">
                 <div className={isUpNextEpisode == false ? isVisible ? 'video-top' : 'video-top player-hidden' : 'video-top'}>
                     <Button icon='arrow_back' ButtonClass='player-buttons' onClick={async () => await exitPlayer()} />
-                    <div className="player-title ">{detectTitle({ ...anime_data, ...anime_data.saveData, saveData: {
-                        episode: temp.episode,
-                        pluginName: "",
-                        last_Time: 0,
-                        type: ""
-                    } })}</div>
+                    <div className="player-title ">{detectTitle({
+                        ...anime_data, ...anime_data.saveData, saveData: {
+                            episode: temp.episode,
+                            pluginName: "",
+                            last_Time: 0,
+                            type: ""
+                        }
+                    })}</div>
                 </div>
                 <div
                     className={
@@ -513,66 +515,25 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                     <SeekBar currentValue={volume} maxValue={100} onSeek={value => handleVolume(value)} classes={{ container: "player-seekbar" }} />
                                 )}
                             </div>
-                            {currentSettings == "settings" && (
-                                <div className="player-settings-container">
-                                    {player_data.length <= 1 ? (
-                                        <div className="player-settings-button">
-                                            <span className='player-settings-button-text-gray'>Sources</span> <span className='player-settings-button-text-gray'>{currentHost}</span>
-                                        </div>
-                                    ) : (
-                                        <div className="player-settings-button" onClick={() => setcurrentSettings("urls")}>
-                                            <span className='player-settings-button-text'>Urls</span> <span className="player-settings-button-text">{currentHost}</span>
-                                        </div>
-                                    )}
-                                    {ListResolution.length <= 1 ? (
-                                        <div className="player-settings-button">
-                                            <span className='player-settings-button-text-gray'>Resolution</span> <span className='player-settings-button-text-gray'>{currentResolution.toString().length >= 1 ? currentResolution + "p" : ""}</span>
-                                        </div>
-                                    ) : (
-                                        <div className="player-settings-button" onClick={() => setcurrentSettings("resolution")}>
-                                            <span className='player-settings-button-text'>Resolution</span> <span className="player-settings-button-text">{currentResolution.toString().length >= 1 ? currentResolution + "p" : ""}</span>
-                                        </div>
-                                    )}
-                                    <div className="player-settings-button" onClick={() => setcurrentSettings("speed")}>
-                                        <span className='player-settings-button-text'>Speed</span> <span className="player-settings-button-text">{videoRef.current?.playbackRate}</span>
-                                    </div>
-                                </div>
-                            )}
-                            {currentSettings == "urls" && (
-                                <div className='player-settings-container'>
-                                    <div className="player-settings-button-back" onClick={() => setcurrentSettings("settings")}>
-                                        <span className="material-symbols-outlined player-settings-button-text">arrow_back</span><span className="player-settings-button-text">Urls</span>
-                                    </div>
-                                    {player_data.map((data) => (
-                                        <div className="player-settings-button" onClick={() => { checkUrl(player_data[player_data.findIndex((item) => item.hostname === data.hostname)]); setcurrentSettings("") }}>
-                                            <span className="player-settings-button-text">{data.hostname}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                            {currentSettings == "resolution" && (
-                                <div className='player-settings-container'>
-                                    <div className="player-settings-button-back" onClick={() => setcurrentSettings("settings")}>
-                                        <span className="material-symbols-outlined">arrow_back</span><span>Resolution</span>
-                                    </div>
-                                    {ListResolution.map((data) => (
-                                        <div className="player-settings-button" onClick={() => { setcurrentSettings("settings"); setRes(data) }}>
-                                            <span className="player-settings-button-text">{data.toString() + "p"}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                            {currentSettings == "speed" && (
-                                <div className='player-settings-container'>
-                                    <div className="player-settings-button-back" onClick={() => setcurrentSettings("settings")}>
-                                        <span className="material-symbols-outlined">arrow_back</span><span className="player-settings-button-text">Speed</span>
-                                    </div>
-                                    {speed.map(element => (
-                                        <div className="player-settings-button" onClick={() => setSpeed(element)}>{element}</div>
-                                    ))}
-                                </div>
-                            )}
-                            <Button icon="settings" ButtonClass="player-buttons" titleButton={t('global.settings')} onClick={() => { currentSettings !== "" ? setcurrentSettings("") : setcurrentSettings("settings") }} />
+                            {currentSettings &&
+                                <PlayerSettings
+                                    sources={
+                                        player_data.map((val) => { return { name: val.hostname, change: () => checkUrl(player_data[player_data.findIndex((item) => item.hostname === val.hostname)]) } })
+                                    }
+                                    resolution={
+                                        ListResolution.map((val) => { return { res: val, change: () => setRes(val) } })
+                                    }
+                                    speed={speed.map((val) => { return { speed: parseFloat(val), change: () => setSpeed(val) } })}
+                                    disableSettings={function (): void {
+                                        throw new Error("Function not implemented.")
+                                    }} current={{
+                                        currentHost: currentHost,
+                                        currentResolution: currentResolution,
+                                        currentSpeed: videoRef.current?.playbackRate ? videoRef.current?.playbackRate : 1
+                                    }}
+                                />
+                            }
+                            <Button icon="settings" ButtonClass="player-buttons" titleButton={t('global.settings')} onClick={() => setcurrentSettings((prev) => !prev)} />
                             <Button icon={isFullscreen ? 'fullscreen_exit' : 'fullscreen'} ButtonClass="player-buttons" titleButton={t('player.fullscreen')} onClick={async () => await enterFullscreen()} />
                         </div>
                     </div>

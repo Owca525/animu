@@ -1,0 +1,29 @@
+.player-settings-container {
+  pointer-events: all;
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  min-width: 300px;
+  width: 20vw;
+  padding: 2px;
+}
+
+.player-settings-button, .player-settings-button-back {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.player-settings-button-back {
+    padding: 8px;
+}
+
+.player-settings-button-text {
+  font-size: 1em;
+}
+
+.player-settings-button-back {
+    align-items: center;
+}

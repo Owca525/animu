@@ -583,21 +583,22 @@ body {
 
 .player-settings-container {
   border-radius: 8px;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: color-mix(in srgb, var(--bg2) 80%, transparent);
   color: var(--playertext);
 }
 
-.player-settings-button {
-  border-radius: 8px;
+.player-settings-button, .player-settings-button-back {
+  border-radius: 6px;
   color: var(--playertext);
+}
+
+.player-settings-button-back {
+  border: 2px solid var(--bg4);
+  border-width: 0px 0px 2px 0px;
 }
 
 .player-settings-button:hover, .player-settings-button-back:hover {
   background-color: var(--playerbutton2);
-}
-
-.player-settings-button-back {
-  border-radius: 8px;
 }
 
 .player-up-Next-container {

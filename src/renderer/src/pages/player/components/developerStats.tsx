@@ -21,7 +21,7 @@ interface developerStatsProps {
     time: number
     episodesUrl: playerData[]
     currentHost: string
-    currentSettings: string
+    currentSettings: boolean
     showNerdStats: boolean
     hls: any
 }

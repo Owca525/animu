@@ -139,39 +139,10 @@
   flex-direction: column;
 }
 
-.player-settings-container {
-  pointer-events: all;
-  position: fixed;
-  bottom: 90px;
-  right: 20px;
-  padding: 0.5em;
-  min-width: 200px;
-  width: 20%;
-}
-
-.player-settings-button {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px;
-}
-
-
-.player-settings-button-text {
-  font-size: larger;
-}
-
 .player-hidden {
   opacity: 0;
   pointer-events: none;
   cursor: default;
-}
-
-.player-settings-button-back {
-  display: flex;
-  align-items: center;
-  padding: 8px;
-  gap: 8px;
 }
 
 .player-up-Next-container {
