@@ -13,7 +13,7 @@ import { detectTitle, refetchHistory } from "@renderer/utils/functions";
 import { useHotkeys } from "react-hotkeys-hook";
 import Button from "@renderer/components/buttons";
 
-const VideoPlayer = lazy(() => import('./components/VideoPlayer'));
+const VideoPlayer = lazy(() => import('./VideoPlayer'));
 // const ExternalPlayer = lazy(() => import('./externalPlayer'));
 
 const player = () => {

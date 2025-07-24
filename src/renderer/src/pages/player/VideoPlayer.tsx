@@ -7,8 +7,8 @@ import { toast } from "react-toastify"
 import { closeDialog } from "@renderer/utils/context/DialogContext"
 
 // Components
-import NerdStats from "./nerdStats"
-const DeveloperStats = lazy(() => import('./developerStats'));
+import NerdStats from "./components/nerdStats"
+const DeveloperStats = lazy(() => import('./components/developerStats'));
 
 // css
 import { cardData, ContextMenuProps, notificationProps, playerData, SettingsConfig } from "@renderer/utils/GlobalInterface"
