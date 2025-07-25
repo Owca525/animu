@@ -201,7 +201,6 @@
 
 .player-loading-animation-container {
   padding: 12px;
-  border-radius: 12px;
   background-color: color-mix(in srgb, var(--playerbg3) 80%, transparent);
 }
 

@@ -617,6 +617,10 @@ body {
   color: var(--playertext-gray);
 }
 
+.player-loading-animation-container {
+  border-radius: 12px;
+}
+
 /* nerdStats */
 
 .player-nerd-container {
