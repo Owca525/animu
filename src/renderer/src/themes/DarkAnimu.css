@@ -14,15 +14,14 @@
   --neutral3: #27ae5d; /* not used */
 
   /* player */
+  --player-bg-containers: color-mix(in srgb, var(--bg2) 70%, transparent);
   --playerbg: rgba(0, 0, 0); /* is used in video container */
   --playertext: var(--text);
   --playertext-gray: gray;
-  --playerbg3: var(--bg3);
   --playerneutral1: var(--neutral1);
   --playerbutton: rgba(0, 0, 0, 0); /* is used in player button */
   --playerbutton2: rgba(150, 150, 150, 0.3); /* is used in player button */
   --playervolumebar: rgba(255, 255, 255, 0.3);
-  --playervolumebar1: #5962a6;
   
   /* player seekbar */
   --seekbarbg3: var(--bg3);
@@ -543,7 +542,7 @@ body {
 
 .player-time-display {
   border-radius: 5px;
-  background-color: color-mix(in srgb, var(--playerbg3) 80%, transparent);
+  background-color: var(--player-bg-containers);
   color: var(--playertext);
 }
 
@@ -555,14 +554,14 @@ body {
 }
 
 .player-buttons:hover {
-  background-color: var(--playerbg3);
+  background-color: var(--player-bg-containers);
   border-color: var(--playerneutral1);
   color: var(--playertext);
 }
 
 .player-title {
   border-radius: 4px;
-  background-color: color-mix(in srgb, var(--playerbg3) 80%, transparent);
+  background-color: color-mix(in srgb, var(--player-bg-containers) 80%, transparent);
   color: var(--playertext);
 }
 
@@ -574,11 +573,6 @@ body {
 .player-volume-bar {
   border-radius: 5px;
   background-color: var(--playervolumebar);
-}
-
-.player-volume-bar::-webkit-slider-thumb {
-  background-color: var(--playervolumebar1);
-  border-radius: 50%;
 }
 
 .player-settings-container {
@@ -602,14 +596,14 @@ body {
 }
 
 .player-up-Next-container {
-  background-color: color-mix(in srgb, var(--playerbg3) 70%, transparent);
+  background-color: var(--player-bg-containers);
   border-radius: 1em;
   border-color: var(--bg4);
   color: var(--playertext);
 }
 
 .player-up-Next-Button {
-  background-color: color-mix(in srgb, var(--bg3) 80%, transparent);
+  background-color: var(--player-bg-containers);
   border-color: var(--bg4);
 }
 
@@ -624,16 +618,19 @@ body {
 /* nerdStats */
 
 .player-nerd-container {
-  background-color: color-mix(in srgb, var(--playerbg3) 70%, transparent);
+  background-color: var(--player-bg-containers);
   border-radius: 12px;
   color: var(--playertext);
 }
 
 
 /* SeekBar */
+.player-seekbar {
+  background-color: var(--player-bg-containers) !important;
+}
 
 .seekBar-container {
-    background-color: color-mix(in srgb, var(--bg4) 70%, transparent);
+    background-color: var(--bg3);
     border-radius: 12px;
 }
 

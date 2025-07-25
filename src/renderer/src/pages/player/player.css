@@ -212,3 +212,22 @@
   padding: 12px;
   gap: 12px;
 }
+
+.player-button-up-text-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.player-button-up-text {
+  display: none;
+  position: absolute;
+  bottom: 70px;
+  background-color: var(--player-bg-containers);
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.player-button-up-text-container:hover .player-button-up-text {
+  display: block;
+}
