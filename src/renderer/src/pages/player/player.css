@@ -199,11 +199,6 @@
   align-items: center;
 }
 
-.player-loading-animation-container {
-  padding: 12px;
-  background-color: color-mix(in srgb, var(--playerbg3) 80%, transparent);
-}
-
 .player-loading-top {
   display: flex;
   position: absolute;
