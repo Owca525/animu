@@ -199,11 +199,6 @@
   align-items: center;
 }
 
-.player-loading-animation-container {
-  padding: 12px;
-  background-color: color-mix(in srgb, var(--playerbg3) 80%, transparent);
-}
-
 .player-loading-top {
   display: flex;
   position: absolute;
@@ -211,23 +206,4 @@
   left: 0;
   padding: 12px;
   gap: 12px;
-}
-
-.player-button-up-text-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.player-button-up-text {
-  display: none;
-  position: absolute;
-  bottom: 70px;
-  background-color: var(--player-bg-containers);
-  padding: 4px;
-  border-radius: 6px;
-}
-
-.player-button-up-text-container:hover .player-button-up-text {
-  display: block;
 }

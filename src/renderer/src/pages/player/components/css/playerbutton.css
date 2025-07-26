@@ -1,0 +1,21 @@
+.player-button-up-text {
+    display: none;
+    position: absolute;
+    bottom: 70px;
+    background-color: var(--player-bg-containers);
+    padding: 4px;
+    border-radius: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.player-button-up-text-container:hover .player-button-up-text {
+    display: block;
+}
+
+.player-button-up-text-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

@@ -20,6 +20,7 @@ import { DeleteFromContinue, SaveContinue } from "@renderer/utils/history/contin
 import useKeyPress from "@renderer/utils/hooks/useKeyPress"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
 import PlayerSettings from "./components/PlayerSettings"
+import PlayerButton from "./components/PlayerButton"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -490,47 +491,27 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     <SeekBar currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => setTimeVideo(value)} type="time" classes={{ container: "player-seekbar" }} screen={true} />
                     <div className="player-bottom-section">
                         <div className="player-left">
-                            {temp.episodes[temp.episodes.indexOf(temp.episode) - 1] == undefined
-                                ? "" :
-                                (
-                                    <div className="player-button-up-text-container">
-                                        <div className="player-button-up-text">{t('player.previous', { ep: temp.episodes[temp.episodes.indexOf(temp.episode) - 1] })}</div>
-                                        <Button icon='skip_previous'
-                                            onClick={() => functions.prevButton("prev")}
-                                            ButtonClass="player-buttons" />
-                                    </div>
-                                )
+                            {temp.episodes[temp.episodes.indexOf(temp.episode) - 1] !== undefined &&
+                                <PlayerButton title={t('player.previous', { ep: temp.episodes[temp.episodes.indexOf(temp.episode) - 1] })} icon='skip_previous'
+                                    onClick={() => functions.prevButton("prev")}
+                                    ButtonClass="player-buttons" />
                             }
-                            <div className="player-button-up-text-container">
-                                <div className="player-button-up-text">{isPlaying ? t('player.Pause') : t('player.play')}</div>
-                                <Button icon={isPlaying ? "pause" : "play_arrow"} titleButton={isPlaying ? t('player.Pause') : t('player.play')} ButtonClass="player-buttons" onClick={togglePlay} />
-                            </div>
-                            {temp.episodes[temp.episodes.indexOf(temp.episode) + 1] !== undefined
-                                ? (
-                                    <div className="player-button-up-text-container">
-                                        <div className="player-button-up-text">{t('player.next', { ep: temp.episodes[temp.episodes.indexOf(temp.episode) + 1] })}</div>
-                                        <Button icon='skip_next' ButtonClass='material-symbols-outlined player-buttons' titleButton={t('player.next', { ep: temp.episodes[temp.episodes.indexOf(temp.episode) + 1] })} onClick={() => functions.nextButton("next")} />
-                                    </div>
-                                ) : ""
+                            <PlayerButton icon={isPlaying ? "pause" : "play_arrow"} title={isPlaying ? t('player.Pause') : t('player.play')} ButtonClass="player-buttons" onClick={togglePlay} />
+                            {temp.episodes[temp.episodes.indexOf(temp.episode) + 1] !== undefined &&
+                                <PlayerButton icon='skip_next' ButtonClass='material-symbols-outlined player-buttons' title={t('player.next', { ep: temp.episodes[temp.episodes.indexOf(temp.episode) + 1] })} onClick={() => functions.nextButton("next")} />
                             }
                             <div className="player-time-display">
                                 {formatTime(currentTime)} / {formatTime(videoRef.current?.duration)}
                             </div>
                         </div>
                         <div className="player-right">
-                            <div className="player-button-up-text-container">
-                                <div className="player-button-up-text">{t('player.Volume')}</div>
-                                <Button icon={isMuted ? 'volume_off' : 'volume_up'} titleButton={t('player.Volume')} ButtonClass="player-buttons volume-button" onClick={setMutedToPlayer} />
-                            </div>
+                            <PlayerButton icon={isMuted ? 'volume_off' : 'volume_up'} title={t('player.Volume')} ButtonClass="player-buttons volume-button" onClick={setMutedToPlayer} />
                             <div className="player-volume-seek">
                                 {volume && (
                                     <SeekBar currentValue={volume} maxValue={100} onSeek={value => handleVolume(value)} classes={{ container: "player-seekbar" }} />
                                 )}
                             </div>
-                            <div className="player-button-up-text-container">
-                                <div className="player-button-up-text">Select Episode</div>
-                                <Button icon={"video_library"} titleButton={"Select Episode"} ButtonClass="player-buttons" />
-                            </div>
+                            <PlayerButton icon={"video_library"} title={currentSettings == false ? "Select Episode" : undefined} ButtonClass="player-buttons" />
                             {currentSettings &&
                                 <PlayerSettings
                                     sources={
@@ -549,14 +530,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                     }}
                                 />
                             }
-                            <div className="player-button-up-text-container">
-                                {currentSettings == false && <div className="player-button-up-text">{t('global.settings')}</div>}
-                                <Button icon="settings" ButtonClass="player-buttons" titleButton={t('global.settings')} onClick={() => setcurrentSettings((prev) => !prev)} />
-                            </div>
-                            <div className="player-button-up-text-container">
-                                <div className="player-button-up-text">{t('player.fullscreen')}</div>
-                                <Button icon={isFullscreen ? 'fullscreen_exit' : 'fullscreen'} ButtonClass="player-buttons" titleButton={t('player.fullscreen')} onClick={async () => await enterFullscreen()} />
-                            </div>
+                            <PlayerButton icon="settings" ButtonClass="player-buttons" title={currentSettings == false ? t('global.settings') : undefined} onClick={() => setcurrentSettings((prev) => !prev)} />
+                            <PlayerButton icon={isFullscreen ? 'fullscreen_exit' : 'fullscreen'} ButtonClass="player-buttons" title={currentSettings == false ? t('player.fullscreen') : undefined} onClick={async () => await enterFullscreen()} />
                         </div>
                     </div>
                 </div>

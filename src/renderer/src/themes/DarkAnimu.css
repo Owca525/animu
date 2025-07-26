@@ -613,6 +613,8 @@ body {
 
 .player-loading-animation-container {
   border-radius: 12px;
+  padding: 12px;
+  background-color: var(--player-bg-containers);
 }
 
 /* nerdStats */
