@@ -3,10 +3,10 @@
   --text-gray: #d5c4a1;
 
   /* Background */
-  --bg: #282828; /* First layer, background only */
-  --bg2: #32302f; /* Second layer, use in sidebar, header */
-  --bg3: #3c3836; /* Thirt layer, use in button etc */
-  --bg4: #504945; /* Fourth layer, use in hover button etc */
+  --bg: #1d2021; /* First layer, background only */
+  --bg2: #282828; /* Second layer, use in sidebar, header */
+  --bg3: #32302f; /* Thirt layer, use in button etc */
+  --bg4: #3c3836; /* Fourth layer, use in hover button etc */
 
   /* accent */
   --neutral1: #d65d0e;
