@@ -164,7 +164,7 @@ function information() {
 
                         <div className="information-info">
 
-                            {anime_data.nextAiringEpisode &&
+                            {anime_data.nextAiringEpisode && anime_data.player_ID == undefined &&
                                 <div className="information-info-content">
                                     <div className="information-content-title">{t("information.airing")}: {anime_data.nextAiringEpisode.episode}</div>
                                     {`${time?.days}d ${time?.hours}h ${time?.minutes}m ${time?.seconds}s`}
