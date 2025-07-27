@@ -14,7 +14,7 @@
   --neutral3: #0f7dcc;
 
   /* other */
-  --player-bg-containers: color-mix(in srgb, #232323 70%, transparent);
+  --player-bg-containers: color-mix(in srgb, #9e9595 70%, transparent);
   --invisible: rgba(0, 0, 0, 0);
   /* is used in player button */
   --black: rgba(0, 0, 0);
@@ -35,13 +35,7 @@
   background-color: var(--bg) !important;
 }
 .player-video-container, .video-player, .video-overlay, .player-title, .player-buttons, .player-time-display, .player-nerd-container, .player-settings-button, .player-settings-button-back {
-  color: #cfcfcf !important;
-}
-.player-title, .player-nerd-container, .player-time-display {
-  background-color: #232323 !important;
-}
-.player-settings-container {
-  background-color: color-mix(in srgb, #232323 80%, transparent) !important;
+  color: var(--text) !important;
 }
 .player-settings-button-text-gray {
   color: #8d8d8d !important;
@@ -67,9 +61,12 @@
 /*
   Taken from https://github.com/jdan/98.css by jdan
 */
-.button, .information-episode-button, .information-select-episode {
+.button, .information-episode-button, .information-select-episode, .player-buttons, .player-title, .player-time-display, .player-settings-container, .player-nerd-container, .contextmenu-option, .contextmenu-container {
   box-shadow: inset -1px -1px #0a0a0a,inset 1px 1px #fff,inset -2px -2px grey,inset 2px 2px #dfdfdf;
   border-width: 0px !important;
+}
+.player-buttons, .player-title, .player-nerd-container, .player-time-display, .player-button-up-text-container, .player-settings-button, .player-settings-container {
+  background-color: var(--bg2) !important;
 }
 .button:active {
   box-shadow: inset -1px -1px #ffffff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px #808080;
@@ -102,7 +99,7 @@
 
 body {
   color: var(--text);
-  background-color: var(--bg);
+  background-color: var(--bg)"Times New Roman", Times, serif;
 }
 
 ::-webkit-scrollbar {
