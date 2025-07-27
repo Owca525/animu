@@ -13,31 +13,18 @@
   --neutral2: #fe8019;
   --neutral3: #ff8828;
 
-  /* player */
-  --playerbg: rgba(0, 0, 0); /* is used in video container */
-  --playertext: var(--text);
-  --playertext-gray: gray;
-  --playerbg3: var(--bg3);
-  --playerneutral1: var(--neutral1);
-  --playerbutton: rgba(0, 0, 0, 0); /* is used in player button */
-  --playerbutton2: rgba(150, 150, 150, 0.3); /* is used in player button */
-  --playervolumebar: rgba(255, 255, 255, 0.3);
-  --playervolumebar1: #5962a6;
-
-  /* seekbar */
-  --seekbarbg3: var(--bg3);
-  --seekbarbg4: rgb(64, 64, 64);
-  --seekbarneutral1: var(--neutral1);
-  
-  /* ::selection color */
-  --selectioncolor: var(--neutral1);
+  /* other */
+  --player-bg-containers: color-mix(in srgb, var(--bg2) 70%, transparent);
+  --invisible: rgba(0, 0, 0, 0);
+  /* is used in player button */
+  --black: rgba(0, 0, 0);
 }
 
 
 /* App */
 
 ::selection {
-  background-color: var(--selectioncolor);
+  background-color: var(--neutral2);
 }
 
 * {
@@ -75,100 +62,102 @@ body {
 }
 
 .dialog-container {
-    background-color: var(--bg2);
-    border-radius: 12px;
+  background-color: var(--bg2);
+  border-radius: 12px;
 }
 
 
 /* Buttons */
 
 .button {
-    border: none;
-    border-style: solid;
-    border-width: 3px;
-    border-radius: 8px;
+  border: none;
+  border-style: solid;
+  border-width: 3px;
+  border-radius: 8px;
 
-    background-color: var(--bg3);
-    border-color: var(--bg3);
-    color: var(--text);
+  background-color: var(--bg3);
+  border-color: var(--bg3);
+  color: var(--text);
 }
 
 .button:hover {
-    border-color: var(--neutral1);
+  border-color: var(--neutral1);
 }
 
 
 /* Input */
 
 .input {
-    /*border: none;*/
-    border-radius: 8px;
-    background-color: var(--bg3);
-    color: var(--text);
-    border: 3px solid var(--bg3);
-    transition: all 0.1s ease;
+  /*border: none;*/
+  border-radius: 8px;
+  background-color: var(--bg3);
+  color: var(--text);
+  border: 3px solid var(--bg3);
+  transition: all 0.1s ease;
 }
 
 .input:hover {
-    border-color: var(--neutral1);
+  border-color: var(--neutral1);
 }
 
 .input:focus {
-    border-color: var(--neutral1);
+  border-color: var(--neutral1);
 }
 
 
 /* Sidebar */
 
-.sidebar-container-min, .sidebar-container-max  {
-    background-color: var(--bg2);
+.sidebar-container-min,
+.sidebar-container-max {
+  background-color: var(--bg2);
 }
 
 .sidebar-black-line {
-    background-color: var(--bg);
-    border-radius: 12px;
+  background-color: var(--bg);
+  border-radius: 12px;
 }
 
 .sidebar-logo-icon-container {
-    background-color: var(--bg2);
+  background-color: var(--bg2);
 }
 
 
 /* Home */
 
 .home-header {
-    background-color: var(--bg2);
+  background-color: var(--bg2);
 }
 
 .home-header-sidebar-placeholder {
-    background-color: var(--bg2) !important;
-    color: var(--bg2) !important;
-    z-index: -1;
+  background-color: var(--bg2) !important;
+  color: var(--bg2) !important;
+  z-index: -1;
 }
 
 .home-filter-container {
-    background-color: var(--bg2);
-    border-radius: 12px;
-    border: 2px solid var(--bg3);
+  background-color: var(--bg2);
+  border-radius: 12px;
+  border: 2px solid var(--bg3);
 }
 
 /* Cards */
 
 .card-container:hover {
-    background-color: var(--bg4);
-    border-radius: 8px;
+  background-color: var(--bg4);
+  border-radius: 8px;
 }
 
 .card-container {
-    transition: transform 0.3s ease;
+  transition: transform 0.3s ease;
 }
 
-.card-image, .card-image-placeholder {
-    border-radius: 8px;
+.card-image,
+.card-image-placeholder {
+  border-radius: 8px;
 }
 
 .card-image-placeholder {
-    background-color: var(--bg3);
+  background-color: var(--bg3);
 }
 
 .card-delete-icon {
@@ -177,97 +166,99 @@ body {
 }
 
 .card-delete-icon:hover {
-    background-color: var(--bg4);
+  background-color: var(--bg4);
 }
 
 
 .card-information {
-    background-color: var(--bg2);
-    border-radius: 12px;
-    border: solid 3px var(--neutral1);
+  background-color: var(--bg2);
+  border-radius: 12px;
+  border: solid 3px var(--neutral1);
 }
 
 
 .card-information-score {
-    border-radius: 50%;
-    background-color: var(--bg2);
-    border: 2px solid var(--neutral1);
+  border-radius: 50%;
+  background-color: var(--bg2);
+  border: 2px solid var(--neutral1);
 }
 
 /* Container */
 
-.container-title, .container-title-click {
-    border-radius: 12px;
+.container-title,
+.container-title-click {
+  border-radius: 12px;
 }
 
 .container-title-click:hover {
-    background-color: var(--bg3);
+  background-color: var(--bg3);
 }
 
 .container-title,
 .container-title-click {
-    border-radius: 12px;
+  border-radius: 12px;
 }
 
 .container-tag {
-    border-radius: 6px;
-    background-color: var(--neutral2);
-    border: 2px solid var(--neutral2);
+  border-radius: 6px;
+  background-color: var(--neutral2);
+  border: 2px solid var(--neutral2);
 }
 
 
 /* Information */
 
 .information {
-    background-color: var(--bg);
-    color: var(--text);
+  background-color: var(--bg);
+  color: var(--text);
 }
 
 .information-top {
-    background-color: var(--bg2);
-    border-radius: 16px;
+  background-color: var(--bg2);
+  border-radius: 16px;
 }
 
 .information-cover {
-    border-radius: 16px;
+  border-radius: 16px;
 }
 
 .information-cover-placeholder {
-    border-radius: 12px;
-    background-color: var(--bg3);
+  border-radius: 12px;
+  background-color: var(--bg3);
 }
 
-.information-cover, .information-cover-placeholder {
-    transition: all 0.1s;
+.information-cover,
+.information-cover-placeholder {
+  transition: all 0.1s;
 }
 
 .information-info {
-    background-color: var(--bg2);
-    border-radius: 16px;
+  background-color: var(--bg2);
+  border-radius: 16px;
 }
 
 .information-info-content {
-    background-color: var(--bg3);
-    border-radius: 10px;
+  background-color: var(--bg3);
+  border-radius: 10px;
 }
 
 .information-episodes {
-    background-color: var(--bg2);
-    border-radius: 16px;
+  background-color: var(--bg2);
+  border-radius: 16px;
 }
 
 .information-characters {
-    background-color: var(--bg2);
-    border-radius: 16px;
+  background-color: var(--bg2);
+  border-radius: 16px;
 }
 
 .information-characters-card {
-    background-color: var(--bg3);
-    border-radius: 16px;
+  background-color: var(--bg3);
+  border-radius: 16px;
 }
 
 .information-characters-card:hover {
-    background-color: var(--bg4);
+  background-color: var(--bg4);
 }
 
 .information-characters-card-cover {
@@ -275,76 +266,77 @@ body {
 }
 
 .information-exit-button {
-    border-radius: 50%;
+  border-radius: 50%;
 }
 
 .information-select-episode:hover {
-    background-color: var(--bg4);
+  background-color: var(--bg4);
 }
 
 .information-episode-button {
-    background-color: var(--bg4);
-    border-radius: 8px;
-    border: 2px solid var(--bg4);
+  background-color: var(--bg4);
+  border-radius: 8px;
+  border: 2px solid var(--bg4);
 }
 
 .information-episode-button:hover {
-    border-color: var(--neutral1);
+  border-color: var(--neutral1);
 }
 
 
 .information-select-episode {
-    background-color: var(--bg3);
-    border-radius: 12px;
+  background-color: var(--bg3);
+  border-radius: 12px;
 }
 
 .information-score {
-    background-color: var(--bg);
-    border-radius: 50%;
+  background-color: var(--bg);
+  border-radius: 50%;
 }
 
-.information-title2, .information-title-mobile2 {
+.information-title2,
+.information-title-mobile2 {
   color: var(--text-gray);
 }
 
 .information-bar {
-    background-color: var(--bg2);
-    border-radius: 18px;
+  background-color: var(--bg2);
+  border-radius: 18px;
 }
 
 .information-bar-icon {
-    border-radius: 50% !important;
+  border-radius: 50% !important;
 }
 
 
-  /* For smaller devices / window sizes */
+/* For smaller devices / window sizes */
 @media (max-width: 1000px) {
-    .information-top {
-        border-radius: 0px;
-    }
+  .information-top {
+    border-radius: 0px;
+  }
 
-    .information-info {
-        border-radius: 0px;
-    }
+  .information-info {
+    border-radius: 0px;
+  }
 
-    .information-info-content {
-        border-radius: 10px;
-    }
+  .information-info-content {
+    border-radius: 10px;
+  }
 }
 
-  /* for smartphones */
+/* for smartphones */
 @media (max-width: 600px) {
-    .information-info-content {
-        border-radius: 10px;
-    }
+  .information-info-content {
+    border-radius: 10px;
   }
-  
+}
+
 
 /* Drop */
 
 .drop-button {
-    background-color: var(--bg3);
-    border-radius: 12px;
+  background-color: var(--bg3);
+  border-radius: 12px;
 }
 
 .drop-button:hover {
@@ -352,23 +344,24 @@ body {
 }
 
 .drop-content {
-    background-color: var(--bg3);
-    border-radius: 12px;
+  background-color: var(--bg3);
+  border-radius: 12px;
 
-    border-top: 0px;
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
+  border-top: 0px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
 
-    border: 0px solid var(--bg3);
+  border: 0px solid var(--bg3);
 }
+
 .drop-content-show {
   border-width: 2px 0px 0px 0px;
   border-color: var(--bg4);
 }
 
 .active-drop {
-    border-bottom-right-radius: 0px;
-    border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0px;
 }
 
 
@@ -420,38 +413,39 @@ body {
 /* Checkbox */
 
 .checkbox {
-    background-color: var(--bg3);
-    box-shadow: inset 0 0 5px rgb(0, 0, 0, 0.2);
-    border-radius: 20px;
+  background-color: var(--bg3);
+  box-shadow: inset 0 0 5px rgb(0, 0, 0, 0.2);
+  border-radius: 20px;
 }
 
 .checkbox::before {
-    border-radius: 20px;
-    background-color: var(--text);
-    box-shadow: 0 2px 5px rgb(0, 0, 0, 0.2);
+  border-radius: 20px;
+  background-color: var(--text);
+  box-shadow: 0 2px 5px rgb(0, 0, 0, 0.2);
 }
 
 .checkbox:checked {
-    background-color: var(--neutral1);
+  background-color: var(--neutral1);
 }
 
 
 /* CheckKeybind */
 
-.settings-keybind-check , .settings-keybind-check-active {
-    background-color: var(--bg3);
-    border-radius: 12px;
-    border: 2px solid var(--bg3);
-    color: var(--text);
+.settings-keybind-check,
+.settings-keybind-check-active {
+  background-color: var(--bg3);
+  border-radius: 12px;
+  border: 2px solid var(--bg3);
+  color: var(--text);
 }
 
 .settings-keybind-check:hover {
-    background-color: var(--bg4);
+  background-color: var(--bg4);
 }
 
 .settings-keybind-check-active {
-    border-color: var(--neutral1);
-    background-color: var(--bg4);
+  border-color: var(--neutral1);
+  background-color: var(--bg4);
 }
 
 
@@ -492,177 +486,179 @@ body {
 /* SettingsInput */
 
 .settings-input-container {
-    border-radius: 12px;
-    background-color: var(--bg3);
+  border-radius: 12px;
+  background-color: var(--bg3);
 }
 
 .settings-input-field {
-    background-color: var(--bg3);
-    color: var(--text);
-    border-radius: 12px 0px 0px 12px;
-    border: 2px solid var(--bg3);
-    border-right: 0px;
+  background-color: var(--bg3);
+  color: var(--text);
+  border-radius: 12px 0px 0px 12px;
+  border: 2px solid var(--bg3);
+  border-right: 0px;
 }
 
 .settings-input-type {
-    background-color: var(--bg3);
-    color: var(--text);
-    border-radius: 0px 12px 12px 0px;
-    border: 2px solid var(--bg3);
-    border-left: 0px;
+  background-color: var(--bg3);
+  color: var(--text);
+  border-radius: 0px 12px 12px 0px;
+  border: 2px solid var(--bg3);
+  border-left: 0px;
 }
 
 .settings-input-container:hover .settings-input-type,
 .settings-input-container:hover .settings-input-field {
-    background-color: var(--bg4);
+  background-color: var(--bg4);
 }
 
 .settings-input-field:focus,
 .settings-input-field:active,
 .settings-input-field:focus~.settings-input-type,
 .settings-input-field:active~.settings-input-type {
-    border-color: var(--neutral1);
+  border-color: var(--neutral1);
 }
 
 
 /* Player */
 
 .player-video-container {
-  background-color: var(--playerbg);
-  color: var(--playertext);
+  background-color: var(--black);
+  color: var(--text);
 }
 
-.player-mask {
-  mask-image: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.5),
-    rgba(0, 0, 0, 1) 10%,
-    rgba(0, 0, 0, 0.5)
-  );
+.player-mask.bottom {
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+}
+
+.player-mask.top {
+  top: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
 }
 
 .player-time-display {
   border-radius: 5px;
-  background-color: color-mix(in srgb, var(--playerbg3) 80%, transparent);
-  color: var(--playertext);
+  background-color: var(--player-bg-containers);
+  color: var(--text);
 }
 
 .player-buttons {
   border: none;
-  border: 2px solid var(--playerbutton);
-  background-color: var(--playerbutton);
-  color: var(--playertext);
+  border: 2px solid var(--invisible);
+  background-color: var(--invisible);
+  color: var(--text);
 }
 
 .player-buttons:hover {
-  background-color: var(--playerbg3);
-  border-color: var(--playerneutral1);
-  color: var(--playertext);
+  background-color: var(--player-bg-containers);
+  border-color: var(--neutral1);
+  color: var(--text);
 }
 
 .player-title {
   border-radius: 4px;
-  background-color: color-mix(in srgb, var(--playerbg3) 80%, transparent);
-  color: var(--playertext);
-}
-
-.player-show-time {
-  border-radius: 4px;
-  background-color: rgba(0, 0, 0, 0.8);
-}
-
-.player-volume-bar {
-  border-radius: 5px;
-  background-color: var(--playervolumebar);
-}
-
-.player-volume-bar::-webkit-slider-thumb {
-  background-color: var(--playervolumebar1);
-  border-radius: 50%;
+  background-color: color-mix(in srgb, var(--player-bg-containers) 80%, transparent);
+  color: var(--text);
 }
 
 .player-settings-container {
   border-radius: 8px;
-  background-color: rgba(0, 0, 0, 0.6);
-  color: var(--playertext);
+  background-color: color-mix(in srgb, var(--bg2) 80%, transparent);
+  color: var(--text);
 }
 
-.player-settings-button {
-  border-radius: 8px;
-  color: var(--playertext);
-}
-
-.player-settings-button:hover, .player-settings-button-back:hover {
-  background-color: var(--playerbutton2);
+.player-settings-button,
+.player-settings-button-back {
+  border-radius: 6px;
+  color: var(--text);
 }
 
 .player-settings-button-back {
-  border-radius: 8px;
+  border: 2px solid var(--bg4);
+  border-width: 0px 0px 2px 0px;
+}
+
+.player-settings-button:hover,
+.player-settings-button-back:hover {
+  background-color: var(--player-bg-containers);
 }
 
 .player-up-Next-container {
-  background-color: color-mix(in srgb, var(--playerbg3) 70%, transparent);
+  background-color: var(--player-bg-containers);
   border-radius: 1em;
   border-color: var(--bg4);
-  color: var(--playertext);
+  color: var(--text);
 }
 
 .player-up-Next-Button {
-  background-color: color-mix(in srgb, var(--bg3) 80%, transparent);
+  background-color: var(--player-bg-containers);
   border-color: var(--bg4);
 }
 
 .player-settings-button-text-gray {
-  color: var(--playertext-gray);
+  color: var(--text-gray);
+}
+
+.player-loading-animation-container {
+  border-radius: 12px;
+  padding: 12px;
+  background-color: var(--player-bg-containers);
 }
 
 /* nerdStats */
 
 .player-nerd-container {
-  background-color: color-mix(in srgb, var(--playerbg3) 70%, transparent);
+  background-color: var(--player-bg-containers);
   border-radius: 12px;
-  color: var(--playertext);
+  color: var(--text);
 }
 
 
 /* SeekBar */
+.player-seekbar {
+  background-color: var(--player-bg-containers) !important;
+}
 
 .seekBar-container {
-    background-color: color-mix(in srgb, var(--bg4) 70%, transparent);
-    border-radius: 12px;
+  background-color: var(--bg3);
+  border-radius: 12px;
 }
 
 .seekbar-thumb {
-    border-radius: 50%;
+  border-radius: 50%;
 }
 
 .seekbar-box {
-    background-color: color-mix(in srgb, var(--bg3) 80%, transparent);
-    border-radius: 12px;
+  background-color: color-mix(in srgb, var(--bg3) 80%, transparent);
+  border-radius: 12px;
 }
 
-.seekbar-thumb, .seekbar-progress, .seekbar-box.progress {
+.seekbar-thumb,
+.seekbar-progress,
+.seekbar-box.progress {
   background-color: var(--neutral1);
   border-radius: 12px;
 }
 
-  /* player seekbar */
+/* player seekbar */
 .video-bottom .seekBar-container {
-    background-color: color-mix(in srgb, var(--seekbarbg4) 70%, transparent);
-    border-radius: 12px;
+  background-color: color-mix(in srgb, var(--bg4) 50%, transparent);
+  border-radius: 12px;
 }
 
 .video-bottom .seekbar-thumb {
-    border-radius: 50%;
+  border-radius: 50%;
 }
 
 .video-bottom .seekbar-box {
-    background-color: color-mix(in srgb, var(--seekbarbg3) 80%, transparent);
-    border-radius: 12px;
+  background-color: color-mix(in srgb, var(--bg3) 80%, transparent);
+  border-radius: 12px;
 }
 
-.video-bottom .seekbar-thumb, .seekbar-progress, .seekbar-box.progress {
-  background-color: var(--seekbarneutral1);
+.video-bottom .seekbar-thumb,
+.seekbar-progress,
+.seekbar-box.progress {
+  background-color: var(--neutral1);
   border-radius: 12px;
 }
 
@@ -670,17 +666,17 @@ body {
 /* ContainerWrong */
 
 .information-containerwrong {
-    background-color: var(--bg2);
-    border: solid 2px var(--bg3);
-    border-radius: 12px;
+  background-color: var(--bg2);
+  border: solid 2px var(--bg3);
+  border-radius: 12px;
 }
 
 .information-containerwrong-void {
-    background-color: color-mix(in srgb, var(--bg) 70%, transparent);
+  background-color: color-mix(in srgb, var(--bg) 70%, transparent);
 }
 
 .information-containerwrong-exit-button {
-    border-radius: 50% !important; 
+  border-radius: 50% !important;
 }
 
 
@@ -688,25 +684,26 @@ body {
 
 
 .contextmenu-container {
-    background-color: var(--bg3);
-    border-radius: 4px;
+  background-color: var(--bg3);
+  border-radius: 4px;
 }
 
 .contextmenu-option:hover {
-    background-color: var(--bg4);
+  background-color: var(--bg4);
 }
 
 .contextmenu-option-line {
-    background-color: var(--bg2);
-    border-radius: 12px;
+  background-color: var(--bg2);
+  border-radius: 12px;
 }
 
 .contextmenu-option-deletion {
-    background-color: color-mix(in srgb, rgb(255, 0, 0) 20%, transparent);
+  background-color: color-mix(in srgb, rgb(255, 0, 0) 20%, transparent);
 }
 
-.contextmenu-option, .contextmenu-option-deletion {
-    border-radius: 4px;
+.contextmenu-option,
+.contextmenu-option-deletion {
+  border-radius: 4px;
 }
 
 
