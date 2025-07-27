@@ -9,11 +9,10 @@ if (process.contextIsolated) {
       open: (url: string) => ipcRenderer.invoke("open", url),
       saveToClipboard: (type: "text" | "image", content: string) => ipcRenderer.invoke("saveToClipboard", type, content),
       update: {
-        updateAvailable: (callback) =>
-          ipcRenderer.on("update-available", callback),
         updateProgress: (callback) =>
           ipcRenderer.on("update-download-progress", callback),
         downloadUpdate: () => ipcRenderer.send("downloadUpdate"),
+        checkUpdate: () => ipcRenderer.invoke("checkUpdates"),
       },
       request: {
         get: (url: string, header: Record<string, string>) =>

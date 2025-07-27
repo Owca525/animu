@@ -6,17 +6,11 @@ declare global {
       open: (url: string) => Promise<void>;
       saveToClipboard: (type: "text" | "image", content: string) => Promise<boolean>;
       update: {
-        updateAvailable: (
-          callback: (
-            event: Event,
-            isAvailable: boolean,
-            version: string
-          ) => void
-        ) => void;
         updateProgress: (
           callback: (event: Event, percent: number) => void
         ) => void;
         downloadUpdate: () => void;
+        checkUpdate: () => Promise<{ available: boolean, version: string }>
       };
       request: {
         get: (

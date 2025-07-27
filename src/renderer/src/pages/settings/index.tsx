@@ -23,6 +23,7 @@ import HelpIcon from "./components/helpIcon";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import { ContinueCheckConversion, ContinueDetectVersion } from "@renderer/utils/history/continueWatch";
 import { HistoryCheckConvert, HistoryDetectVersion } from "@renderer/utils/history/history";
+import { checkUpdate } from "@renderer/utils/update";
 
 function settings() {
     const navigate = useNavigate();
@@ -235,6 +236,11 @@ function settings() {
                         </div>
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.general.updates")}</div>
+                            <div className="settings-setting-container">
+                                {`Check Update`}
+                                <Button content="Check For Updates" onClick={() => checkUpdate(true)}/>
+                            </div>
+                            <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.general.updates")}
                                 <CheckBox

@@ -54,8 +54,6 @@ function AppLoading() {
 }
 
 async function LoadConfig() {
-  await CheckContinue()
-  await CheckHistory()
   if (!await checkConfig()) return
   const loadedConnfig = await readConfig()
 
@@ -78,11 +76,13 @@ async function LoadConfig() {
   window.BrowserWindow.setZoom(calculateZoomLevel(parseFloat(loadedConnfig.General.Window.Zoom.toString())))
   window.BrowserWindow.setFullscreen(loadedConnfig.General.Window.AutoFullscreen)
 
-  if (loadedConnfig.update.type == "On Start") checkUpdate()
-  if (loadedConnfig.update.type == "Every Day" && checkDate(loadedConnfig.update.lastTime, "day")) checkUpdate()
-  if (loadedConnfig.update.type == "Every Week" && checkDate(loadedConnfig.update.lastTime, "week")) checkUpdate()
-
+  if (loadedConnfig.update.type == "On Start") await checkUpdate()
+  if (loadedConnfig.update.type == "Every Day" && checkDate(loadedConnfig.update.lastTime, "day")) await checkUpdate()
+  if (loadedConnfig.update.type == "Every Week" && checkDate(loadedConnfig.update.lastTime, "week")) await checkUpdate()
+  
   store.dispatch({ type: "setConfig", payload: loadedConnfig })
+  await CheckContinue()
+  await CheckHistory()
 }
 
 export default App
