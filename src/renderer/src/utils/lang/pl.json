@@ -41,7 +41,7 @@
   "anime_statuses": {
     "releasing": "Emitowane",
     "finished": "Zakończone",
-    "not_yet_aired": "Jeszcze nie wyemitowane",
+    "not_yet_released": "Jeszcze nie wyemitowane",
     "cancelled": "Anulowane"
   },
   "card_information": {
