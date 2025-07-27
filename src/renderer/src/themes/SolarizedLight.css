@@ -1,20 +1,20 @@
 :root {
-  --text: #839496;
-  --text-gray: #707979;
+  --text: #657b83; /* is use on regular text */
+  --text-gray: #93a1a1; /* is use in card continue watch */
 
   /* Background */
-  --bg: #002b36; /* First layer, background only */
-  --bg2: #073642; /* Second layer, use in sidebar, header */
-  --bg3: #43555a; /* Thirt layer, use in button etc */
-  --bg4: #4f6066; /* Fourth layer, use in hover button etc */
+  --bg: #fdf6e3; /* First layer, background only */
+  --bg2: #eee8d5; /* Second layer, use in sidebar, header */
+  --bg3: #dbd3b8; /* Thirt layer, use in button etc */
+  --bg4: #cdc095; /* Fourth layer, use in hover button etc */
 
   /* accent */
-  --neutral1: #b58900;
-  --neutral2: #c99700;
-  --neutral3: #dca501;
+  --neutral1: #b58900; /* is using on outline, border-color etc */ 
+  --neutral2: #b7901d;
+  --neutral3: #b7983c;
 
   /* other */
-  --player-bg-containers: color-mix(in srgb, var(--bg2) 70%, transparent);
+  --player-bg-containers: color-mix(in srgb, #073642 70%, transparent);
   --invisible: rgba(0, 0, 0, 0);
   /* is used in player button */
   --black: rgba(0, 0, 0);
@@ -24,13 +24,23 @@
   color: #cfcfcf !important;
 }
 
+.player-title, .player-nerd-container, .player-time-display {
+  background-color: #073642 !important;
+}
+
+.player-settings-container {
+  background-color: color-mix(in srgb, #073642 80%, transparent) !important;
+}
+
 .player-settings-button-text-gray {
   color: #8d8d8d !important;
 }
 
 .seekbar-box {
-  background-color: color-mix(in srgb, var(--bg3) 80%, transparent) !important;
+  background-color: color-mix(in srgb, #43555a 80%, transparent) !important;
 }
+
+
 
 
 /* App */
