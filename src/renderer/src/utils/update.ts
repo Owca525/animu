@@ -7,7 +7,7 @@ import store from "./store";
 export function checkUpdate() {
     window.api.update.updateAvailable((_event, isAvailable, version) => {
         if (isAvailable) {
-            toast.info(t('toast.update', { version: version }), { ...notificationProps, onClick: () => { window.api.update.downloadUpdate(); downloadUpdate(toast.loading(t("update.progress", { procent: 0 }), notificationProps)) } });
+            toast.info(t('update.available', { ver: version }), { ...notificationProps, onClick: () => { window.api.update.downloadUpdate(); downloadUpdate(toast.loading(t("update.progress", { procent: 0 }), notificationProps)) } });
         }
     });
     let config = store.getState().config

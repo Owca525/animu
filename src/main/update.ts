@@ -8,10 +8,12 @@ autoUpdater.on('download-progress', (progressObj) => {
 });
 
 autoUpdater.on('update-available', (update) => {
+    console.log(update)
     if (mainWindow) mainWindow.webContents.send('update-available', true, update.version);
 });
 
-autoUpdater.on("error", () => {
+autoUpdater.on("error", (_event) => {
+    console.error(_event)
     if (mainWindow) mainWindow.webContents.send('update-available', false);
 })
 

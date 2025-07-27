@@ -204,6 +204,7 @@
         "failedconvert": "Failed to Covert {{title}}"
     },
     "update": {
+        "available": "Update {{ver}} is available now, click to update",
         "progess": "Download Progress {{procent}}%",
         "done": "Update Downloaded, please restart the application"
     },
