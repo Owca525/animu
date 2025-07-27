@@ -7,14 +7,15 @@ autoUpdater.on('download-progress', (progressObj) => {
     if (mainWindow) mainWindow.webContents.send('update-download-progress', percent);
 });
 
-autoUpdater.on('update-available', (update) => {
-    console.log(update)
-    if (mainWindow) mainWindow.webContents.send('update-available', true, update.version);
-});
-
 autoUpdater.on("error", (_event) => {
     console.error(_event)
     if (mainWindow) mainWindow.webContents.send('update-available', false);
+})
+
+ipcMain.handle("checkUpdates", async () => {
+    let data = await autoUpdater.checkForUpdates()
+    if (!data) return { available: false, version: autoUpdater.currentVersion.version }
+    return { available: data.isUpdateAvailable, version: data.updateInfo.version }
 })
 
 ipcMain.on("downloadUpdate", () => {

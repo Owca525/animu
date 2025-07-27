@@ -206,7 +206,8 @@
   "update": {
     "available": "Aktualizacja {{ver}} jest już dostępna, kliknij, aby zaktualizować",
     "progess": "Postęp pobierania {{procent}}%",
-    "done": "Aktualizacja pobrana, proszę zrestartuj aplikację"
+    "done": "Aktualizacja pobrana, proszę zrestartuj aplikację",
+    "same": "Masz najnowszą wersję Animu"
   },
   "discordrpc": {
     "home": "Na stronie głównej",

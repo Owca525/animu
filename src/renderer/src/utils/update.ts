@@ -4,12 +4,14 @@ import { notificationProps } from "./GlobalInterface";
 import { t } from "i18next";
 import store from "./store";
 
-export function checkUpdate() {
-    window.api.update.updateAvailable((_event, isAvailable, version) => {
-        if (isAvailable) {
-            toast.info(t('update.available', { ver: version }), { ...notificationProps, onClick: () => { window.api.update.downloadUpdate(); downloadUpdate(toast.loading(t("update.progress", { procent: 0 }), notificationProps)) } });
-        }
-    });
+export async function checkUpdate(alwaysShow: boolean = false) {
+    let update = await window.api.update.checkUpdate()
+    if (update.available) {
+        toast.info(t('update.available', { ver: update.version }), { ...notificationProps, onClick: () => { window.api.update.downloadUpdate(); downloadUpdate(toast.loading(t("update.progress", { procent: 0 }), notificationProps)) } });
+    } else if (alwaysShow) {
+        toast.info(t("update.same", notificationProps))
+    }
+    
     let config = store.getState().config
     if (config) {
         const currentDate = new Date();

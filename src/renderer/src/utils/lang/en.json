@@ -206,7 +206,8 @@
     "update": {
         "available": "Update {{ver}} is available now, click to update",
         "progess": "Download Progress {{procent}}%",
-        "done": "Update Downloaded, please restart the application"
+        "done": "Update Downloaded, please restart the application",
+        "same": "You have The newest version of Animu"
     },
     "discordrpc": {
         "home": "In home",
