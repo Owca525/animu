@@ -456,7 +456,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         <div className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
             <video
                 ref={videoRef}
-                className={isVisible ? 'video-player player-mask' : 'video-player'}
+                className="video-player"
                 onTimeUpdate={updateProgress}
                 onClick={() => { togglePlay(); setcurrentSettings(() => false) }}
                 autoPlay={isPlaying}
@@ -466,6 +466,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 preload={config?.Player.general.playerLoadType}
                 muted={isMuted}
             />
+            {isVisible && 
+                <>
+                    <div className="player-mask top"></div>
+                    <div className="player-mask bottom"></div>
+                </>
+            }
 
             <div className="video-overlay">
                 <div className={isUpNextEpisode == false ? isVisible ? 'video-top' : 'video-top player-hidden' : 'video-top'}>
