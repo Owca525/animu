@@ -15,7 +15,7 @@
 
   /* other */
   --player-bg-containers: color-mix(in srgb, var(--bg2) 70%, transparent);
-  --invicible: rgba(0, 0, 0, 0);
+  --invisible: rgba(0, 0, 0, 0);
   /* is used in player button */
   --black: rgba(0, 0, 0);
 }
@@ -544,8 +544,8 @@ body {
 
 .player-buttons {
   border: none;
-  border: 2px solid var(--invicible);
-  background-color: var(--invicible);
+  border: 2px solid var(--invisible);
+  background-color: var(--invisible);
   color: var(--text);
 }
 
