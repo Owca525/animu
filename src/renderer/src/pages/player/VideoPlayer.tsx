@@ -51,8 +51,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     // Variable
     const [volume, setVolume] = useState<number>(PlayerVolume)
-    // const [duration, setduration] = useState<number>(0)
     const [currentTime, setcurrentTime] = useState<number>(0)
+    const [currentBuffer, setBuffered] = useState<{ position: number, width: number }[]>([])
 
     // States
     const [isMuted, setMuted] = useState<boolean>(false)
@@ -270,6 +270,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         saveContinueProgress()
         setcurrentTime(videoRef.current.currentTime)
         checkUpNext()
+        handleProgress()
 
         // Update RPC
         window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(videoRef.current.currentTime)} / ${formatTime(videoRef.current.duration)}`)
@@ -452,12 +453,32 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         { option: t("contextMenu.nerdstats"), onClick: () => setshowNerdStats((prev) => !prev) }
     ]
 
+    const handleProgress = () => {
+        const video = videoRef.current;
+        if (video && video.duration > 0 && video.buffered.length > 0) {
+            let timestamps: { position: number, width: number }[] = []
+            for (let index = 0; index < video.buffered.length; index++) {
+                console.log(video.buffered.start(index), video.buffered.end(index))
+                const start = video.buffered.start(index);
+                const end = video.buffered.end(index);
+                const left = (start / video.duration) * 100;
+                const width = ((end - start) / video.duration) * 100;
+                timestamps.push({ position: left, width: width })
+            }
+            setBuffered(() => timestamps);
+            console.log(timestamps)
+        }
+    };
+
+
     return (
         <div className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
             <video
                 ref={videoRef}
                 className="video-player"
                 onTimeUpdate={updateProgress}
+                onProgress={handleProgress}
+                onSeeked={handleProgress}
                 onClick={() => { togglePlay(); setcurrentSettings(() => false) }}
                 autoPlay={isPlaying}
                 onWaiting={() => { setWaitingPlayer(() => true) }}
@@ -465,6 +486,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 onError={(error) => videoErrorHandler(error)}
                 preload={config?.Player.general.playerLoadType}
                 muted={isMuted}
+                
             />
             {isVisible && 
                 <>
@@ -494,7 +516,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     </div>
                 </div>
                 <div className={isVisible && isUpNextEpisode == false ? 'video-bottom' : 'video-bottom player-hidden'}>
-                    <SeekBar currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => setTimeVideo(value)} type="time" classes={{ container: "player-seekbar" }} screen={true} />
+                    <SeekBar secondBarValues={currentBuffer} currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => {setTimeVideo(value); setBuffered(() => [])}} type="time" classes={{ container: "player-seekbar" }} screen={true} />
                     <div className="player-bottom-section">
                         <div className="player-left">
                             {temp.episodes[temp.episodes.indexOf(temp.episode) - 1] !== undefined &&

@@ -11,6 +11,7 @@ interface SeekBarProps {
   type?: "value" | "float" | "time" | "procent"
   classes?: { container?: string, progress?: string, thumb?: string, box?: string }
   screen?: boolean
+  secondBarValues?: { position: number, width: number }[]
 }
 
 const SeekBar: React.FC<SeekBarProps> = ({
@@ -20,7 +21,8 @@ const SeekBar: React.FC<SeekBarProps> = ({
   onSeek,
   type = "value",
   classes,
-  screen = false
+  screen = false,
+  secondBarValues
 }) => {
   const [value, setValue] = useState(currentValue);
   const [drag, setdrage] = useState<boolean>(false);
@@ -102,6 +104,13 @@ const SeekBar: React.FC<SeekBarProps> = ({
       onMouseEnter={() => setshow(() => true)}
       onMouseMove={handleMouseMove}
     >
+      {/* {secondBarValue && <div className="seekbar-progress-second" style={{ width: `${secondBarValue}%` }} />} */}
+      {secondBarValues && 
+        <div className="seekbar-buffer-wrapper">
+          {secondBarValues.map((buffer) => <div className="seekbar-buffer" style={{ left: `${buffer.position}%`, width: `${buffer.width}%` }}></div> )}
+        </div>
+      }
+      
       <div
         ref={seekBarProgress}
         className={`seekbar-progress ${classes?.progress}`}
