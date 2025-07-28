@@ -340,6 +340,14 @@ body {
   .information-info-content {
     border-radius: 10px;
   }
+  .information-exit-button {
+      border-radius: 0px;
+      background-color: var(--bg2);
+      border-color: var(--bg2);
+  }
+    .information-episodes, .information-characters {
+        border-radius: 0px;
+    }
 }
 
 

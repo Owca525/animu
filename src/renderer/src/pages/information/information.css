@@ -407,8 +407,8 @@ maybe that will be usefull in the future */
 @media (max-width: 600px) {
     .information-top {
         width: 100%;
-        margin-top: max(10vh, 100px);
-        padding: 10px 15px;
+        margin-top: calc(max(10vh, 100px) + 42px);;
+        padding: 15px;
         gap: 15px;
         flex-direction: column;
     }
@@ -428,7 +428,7 @@ maybe that will be usefull in the future */
     }
 
     .information-bottom-content {
-        padding: 0px max(1dvw, 4px);
+        padding: 0px;
     }
 
     .information-info {
@@ -485,6 +485,13 @@ maybe that will be usefull in the future */
 
     .information-bar {
         flex-direction: row;
+    }
+
+    .information-exit-button {
+        padding: 6px;
+        top: max(10vh, 100px);
+        left: 0px;
+        width: 100%;
     }
 
 }
