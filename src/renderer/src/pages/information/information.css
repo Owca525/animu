@@ -108,7 +108,6 @@
 }
 
 .information-cover-placeholder {
-    /* width: 240px; */
     height: 220px;
     cursor: auto;
     display: flex;
@@ -397,6 +396,10 @@
     font-size: clamp(0.85rem, 1.8vw, 1rem);
 }
 
+.information-exit-button {
+    position: absolute;
+}
+
 }
 
 /* for smartphones 
@@ -404,7 +407,7 @@ maybe that will be usefull in the future */
 @media (max-width: 600px) {
     .information-top {
         width: 100%;
-        margin-top: max(17%, 150px);
+        margin-top: max(10vh, 100px);
         padding: 10px 15px;
         gap: 15px;
         flex-direction: column;
@@ -415,14 +418,9 @@ maybe that will be usefull in the future */
         margin-top: 0px;
     }
 
-    .information-banner {
+    .information-banner, .information-fade {
         width: 100%;
-        height: 20%
-    }
-
-    .information-fade {
-        width: 100%;
-        height: 20%
+        height: max(10vh, 100px);
     }
 
     .information-bottom {
