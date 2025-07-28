@@ -14,7 +14,7 @@
   --neutral3: #27ae5d;
 
   /* other */
-  --player-bg-containers: color-mix(in srgb, var(--bg2) 70%, transparent);
+  --player-bg-containers: color-mix(in srgb, var(--bg3) 70%, transparent);
   --invisible: rgba(0, 0, 0, 0);
   /* is used in player button */
   --black: rgba(0, 0, 0);
@@ -580,7 +580,7 @@ body {
 
 .player-settings-button:hover,
 .player-settings-button-back:hover {
-  background-color: var(--player-bg-containers);
+  background-color: var(--bg);
 }
 
 .player-up-Next-container {

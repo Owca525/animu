@@ -65,16 +65,16 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding-left: 12px;
-  padding-right: 12px;
+  margin-left: 12px;
+  margin-right: 12px;
   transition: opacity 200ms ease;
 }
 
 .player-bottom-section {
   display: flex;
   justify-content: space-between;
-  padding-left: 4px;
-  padding-right: 4px;
+  margin-left: 4px;
+  margin-right: 8px;
   margin-bottom: 8px;
 }
 .player-left,
