@@ -193,25 +193,24 @@
     width: 100%;
     min-height: 25px;
     height: min-content;
-    padding: 12px;
     gap: 12px;
     box-sizing: border-box;
-    padding-bottom: 0px;
+    padding-top: 12px;
     overflow: hidden;
 }
 
 .information-characters-container {
-    padding-top: 15px;
+    padding: 15px 12px 12px 12px;
     display: flex;
     gap: 15px;
     overflow-x: scroll;
-    padding-bottom: 12px;
     cursor: pointer;
 }
 
 .information-characters-title {
     font-size: 1.2rem;
     font-weight: bold;
+    padding-left: 12px;
 }
 
 .information-characters-card {

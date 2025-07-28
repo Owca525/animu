@@ -283,7 +283,6 @@ body {
   border-color: var(--neutral1);
 }
 
-
 .information-select-episode {
   background-color: var(--bg3);
   border-radius: 12px;
@@ -306,6 +305,18 @@ body {
 
 .information-bar-icon {
   border-radius: 50% !important;
+}
+
+.information-bottom ::-webkit-scrollbar,
+.information-containerwrong-cards ::-webkit-scrollbar,
+.information-containerwrong-container ::-webkit-scrollbar {
+  background-color: var(--bg2) !important;
+}
+
+.information-bottom ::-webkit-scrollbar-thumb,
+.information-containerwrong-cards ::-webkit-scrollbar-thumb,
+.information-containerwrong-container ::-webkit-scrollbar-thumb {
+  background-color: var(--bg3) !important;
 }
 
 
