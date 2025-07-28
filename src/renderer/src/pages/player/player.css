@@ -206,3 +206,41 @@
   padding: 12px;
   gap: 12px;
 }
+
+.player-volume-ui-container {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg4);
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  border-radius: 12px;
+  max-width: 280px;
+  min-width: 180px;
+  width: 290px;
+  padding: 12px;
+  border: 3px solid var(--neutral2);
+  gap: 8px;
+}
+
+.player-volume-ui-bar-progress {
+  height: 100%;
+  width: 0%;
+  background-color: var(--neutral2);
+  border-radius: 12px;
+}
+
+.player-volume-ui-text {
+  font-size: 1.3em;
+}
+
+.player-volume-ui-icon {
+  font-size: 2em;
+}
+
+.player-volume-ui-bar-container {
+  width: 100%;
+  height: 8px;
+  background-color: var(--player-bg-containers);
+  border-radius: 12px;
+}

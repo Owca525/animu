@@ -37,7 +37,7 @@ interface VideoPlayerProps {
     time: number
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp, functions, volumeCacheFunc, PlayerVolume, time }) => {
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp, functions, volumeCacheFunc, PlayerVolume = 0, time }) => {
     const navigate = useNavigate()
     // Translation 
     const { t } = useTranslation()
@@ -53,6 +53,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const [volume, setVolume] = useState<number>(PlayerVolume)
     const [currentTime, setcurrentTime] = useState<number>(0)
     const [currentBuffer, setBuffered] = useState<{ position: number, width: number }[]>([])
+
+    // UI
+    const [isVolume, setShowVolume] = useState<boolean>(false)
 
     // States
     const [isMuted, setMuted] = useState<boolean>(false)
@@ -486,9 +489,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 onError={(error) => videoErrorHandler(error)}
                 preload={config?.Player.general.playerLoadType}
                 muted={isMuted}
-                
+
             />
-            {isVisible && 
+            {isVisible &&
                 <>
                     <div className="player-mask top"></div>
                     <div className="player-mask bottom"></div>
@@ -516,7 +519,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     </div>
                 </div>
                 <div className={isVisible && isUpNextEpisode == false ? 'video-bottom' : 'video-bottom player-hidden'}>
-                    <SeekBar secondBarValues={currentBuffer} currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => {setTimeVideo(value); setBuffered(() => [])}} type="time" classes={{ container: "player-seekbar" }} screen={true} />
+                    <SeekBar secondBarValues={currentBuffer} currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => { setTimeVideo(value); setBuffered(() => []) }} type="time" classes={{ container: "player-seekbar" }} screen={true} />
                     <div className="player-bottom-section">
                         <div className="player-left">
                             {temp.episodes[temp.episodes.indexOf(temp.episode) - 1] !== undefined &&
@@ -575,6 +578,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     </div>
                 </div>
             ) : ""}
+            {isVolume &&
+                <div className="player-volume-ui-container">
+                    <span className="player-volume-ui-icon material-symbols-outlined">{isMuted ? 'volume_off' : 'volume_up'}</span>
+                    <div className="player-volume-ui-bar-container">
+                        <div className="player-volume-ui-bar-progress" style={{ width: `${volume}%` }}></div>
+                    </div>
+                    <span className="player-volume-ui-text">{parseInt(volume.toString())}%</span>
+                </div>
+            }
             {showNerdStats && (
                 <NerdStats video={videoRef} volume={volume} currentTime={currentTime} />
             )}
