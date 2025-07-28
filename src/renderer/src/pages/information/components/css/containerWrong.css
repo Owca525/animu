@@ -13,6 +13,7 @@
     height: 80%;
     padding: 12px;
     position: relative;
+    padding-right: 0px;
 }
 
 .information-containerwrong-exit-button {
@@ -44,6 +45,7 @@
     height: 100%;
     grid-template-columns: repeat(auto-fit, minmax(150px, max-content));
     gap: 4px;
+    padding-right: 12px;
 }
 
 .information-containerwrong-loading {

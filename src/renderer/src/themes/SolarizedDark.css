@@ -12,24 +12,23 @@
   --neutral1: #b58900;
   --neutral2: #c99700;
   --neutral3: #dca501;
+}
+
+.video-player, .player-video-container {
+  --text: #cfcfcf; /* is used on regular text */
+  --text-gray: #8d8d8d; /* is used in card continue watch */
+
+  /* Background */
+  --bg: #1e1e1e; /* First layer, background only */
+  --bg2: #232323; /* Second layer, used in sidebar, header */
+  --bg3: rgb(46, 46, 46); /* Thirt layer, used in button etc */
+  --bg4: rgb(64, 64, 64); /* Fourth layer, used in hover button etc */
 
   /* other */
   --player-bg-containers: color-mix(in srgb, var(--bg2) 70%, transparent);
   --invisible: rgba(0, 0, 0, 0);
   /* is used in player button */
   --black: rgba(0, 0, 0);
-}
-
-.player-video-container, .video-player, .video-overlay, .player-title, .player-buttons, .player-time-display, .player-nerd-container, .player-settings-button, .player-settings-button-back {
-  color: #cfcfcf !important;
-}
-
-.player-settings-button-text-gray {
-  color: #8d8d8d !important;
-}
-
-.seekbar-box {
-  background-color: color-mix(in srgb, var(--bg3) 80%, transparent) !important;
 }
 
 
