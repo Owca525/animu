@@ -43,6 +43,7 @@
     flex-direction: column;
     gap: 12px;
     overflow-x: hidden;
+    padding-right: 0px;
 }
 
 .home-loading-container {
