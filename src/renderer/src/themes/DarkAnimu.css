@@ -643,6 +643,10 @@ body {
   border-radius: 12px;
 }
 
+.seekbar-buffer-wrapper {
+  border-radius: 12px;
+}
+
 .seekbar-thumb {
   border-radius: 50%;
 }
