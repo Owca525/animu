@@ -13,9 +13,9 @@ const useKeyPress = (func: (keybinds: string) => void) => {
       }
       return previus
     })
+    func(keysUp.join('+'))
   };
   const handleKeyUp = (event: KeyboardEvent) => {
-    func(keysUp.join('+'))
     setKeysUp((previus) => {
       const index = previus.findIndex((item) => item === event.key);
       previus.splice(index, 1)
