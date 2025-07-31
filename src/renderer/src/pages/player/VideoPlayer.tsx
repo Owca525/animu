@@ -60,7 +60,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const volumeTimeout = useRef<NodeJS.Timeout | null>(null);
     const [isShowPlay, setShowPlay] = useState<boolean>(false)
     const playAnimationTimeout = useRef<NodeJS.Timeout | null>(null);
-    const playerLoadingRef = useRef<HTMLDivElement | null>(null);
 
     // States
     const [isMuted, setMuted] = useState<boolean>(false)
@@ -487,7 +486,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         }
     };
 
-    console.log(playerLoadingRef.current?.style.display)
+    const hiddenVariants = {
+        hidden: { opacity: 0 },
+        visible: { opacity: 1 },
+    }
 
     return (
         <div className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
@@ -542,12 +544,25 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         <div className="player-icon-ui material-symbols-outlined">fast_forward</div>
                     </div> */}
 
-                    <div ref={playerLoadingRef} className={`player-loading-animation-container player-buffering-animation ${isWaitingPlayer ? "player-loading-ui-in" : "player-loading-ui-out"}`}>
+                    {/* FIXME: Fix why loading animation is too low */}
+                    <motion.div className="player-loading-animation-container player-buffering-animation"
+                        variants={hiddenVariants}
+                        animate={isWaitingPlayer ? "visible" : "hidden"}
+                        initial="hidden"
+                        transition={{ duration: 0.2 }}
+                    >
                         <div className="player-waiting material-symbols-outlined">progress_activity</div>
-                    </div>
-                    <div className={`player-loading-animation-container ${isShowPlay && isWaitingPlayer == false ? "player-loading-ui-in" : "player-loading-ui-out"}`}>
-                        <div className="player-icon-ui material-symbols-outlined">{isPlaying ? "pause" : "play_arrow"}</div>
-                    </div>
+                    </motion.div>
+                    {isWaitingPlayer == false &&
+                        <motion.div className="player-loading-animation-container"
+                            variants={hiddenVariants}
+                            animate={isShowPlay ? "visible" : "hidden"}
+                            initial="hidden"
+                            transition={{ duration: 0.5 }}
+                        >
+                            <div className="player-icon-ui material-symbols-outlined">{isPlaying ? "pause" : "play_arrow"}</div>
+                        </motion.div>
+                    }
                 </div>
                 <div className={isVisible && isUpNextEpisode == false ? 'video-bottom' : 'video-bottom player-hidden'}>
                     <SeekBar secondBarValues={currentBuffer} currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => { setTimeVideo(value); setBuffered(() => []) }} type="time" classes={{ container: "player-seekbar" }} screen={true} />

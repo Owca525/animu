@@ -266,14 +266,6 @@
 }
 
 /* UI */
-.player-loading-ui-in {
-  animation: fadeIn 100ms ease-out forwards;
-}
-
-.player-loading-ui-out {
-  animation: fadeOut 100ms ease-out forwards;
-}
-
 .player-icon-ui {
   font-size: 72px;
 }
