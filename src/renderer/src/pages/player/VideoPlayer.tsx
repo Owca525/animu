@@ -98,7 +98,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     useEffect(() => {
         // import("../../utils/filesMange/history").then(({ SaveHistory }) => SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) }))
         checkUrl(player_data[0])
-        handleVolume(PlayerVolume)
+        handleVolume(PlayerVolume, true)
         handleMouseMove()
         if (config.Player.general.AutoFullscreen) {
             window.BrowserWindow.setFullscreen(true)
@@ -204,11 +204,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         }
     }
 
-    function handleVolume(value: number) {
+    function handleVolume(value: number, dontShow: boolean = false) {
         if (!videoRef.current) return
         videoRef.current.volume = value / 100
         setVolume(() => value)
         volumeCacheFunc(value)
+        if (dontShow) return
         if (volumeTimeout.current) clearTimeout(volumeTimeout.current)
         setShowVolume(() => true)
         volumeTimeout.current = setTimeout(() => {
@@ -523,22 +524,29 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         }
                     })}</div>
                 </div>
-                <div className="video-center-container">
+                <div className="video-center"> {/* video-center-container */}
                     {/* <div className="player-loading-animation-container player-fast-rewind-ui">
                         <div className="player-icon-ui material-symbols-outlined">fast_rewind</div>
                     </div> */}
-                    <div className="video-center">
+                    {/* <div className="video-center">
                         <div ref={playerLoadingRef} className={`player-loading-animation-container ${isWaitingPlayer ? "player-loading-ui-in" : "player-loading-ui-out"}`}>
                             <div className="player-waiting material-symbols-outlined">progress_activity</div>
-                        </div>
-                        {/* FIXME: If someone want to fix this bullshit, you can. The problem is if someone spam space then on 100ms show beside loading animation */}
-                        <div className={`player-loading-animation-container ${isShowPlay && isWaitingPlayer == false ? "player-loading-ui-in" : "player-loading-ui-out"}`}>
+                        </div> */}
+                    {/* FIXME: If someone want to fix this bullshit, you can. The problem is if someone spam space then on 100ms show beside loading animation */}
+                    {/* <div className={`player-loading-animation-container ${isShowPlay && isWaitingPlayer == false ? "player-loading-ui-in" : "player-loading-ui-out"}`}>
                             <div className="player-icon-ui material-symbols-outlined">{isPlaying ? "pause" : "play_arrow"}</div>
                         </div>
-                    </div>
+                    </div> */}
                     {/* <div className="player-loading-animation-container player-fast-forward-ui">
                         <div className="player-icon-ui material-symbols-outlined">fast_forward</div>
                     </div> */}
+
+                    <div ref={playerLoadingRef} className={`player-loading-animation-container ${isWaitingPlayer ? "player-loading-ui-in" : "player-loading-ui-out"}`}>
+                        <div className="player-waiting material-symbols-outlined">progress_activity</div>
+                    </div>
+                    <div className={`player-loading-animation-container ${isShowPlay && isWaitingPlayer == false ? "player-loading-ui-in" : "player-loading-ui-out"}`}>
+                        <div className="player-icon-ui material-symbols-outlined">{isPlaying ? "pause" : "play_arrow"}</div>
+                    </div>
                 </div>
                 <div className={isVisible && isUpNextEpisode == false ? 'video-bottom' : 'video-bottom player-hidden'}>
                     <SeekBar secondBarValues={currentBuffer} currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => { setTimeVideo(value); setBuffered(() => []) }} type="time" classes={{ container: "player-seekbar" }} screen={true} />
