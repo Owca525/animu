@@ -541,7 +541,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         <div className="player-icon-ui material-symbols-outlined">fast_forward</div>
                     </div> */}
 
-                    <div ref={playerLoadingRef} className={`player-loading-animation-container ${isWaitingPlayer ? "player-loading-ui-in" : "player-loading-ui-out"}`}>
+                    <div ref={playerLoadingRef} className={`player-loading-animation-container player-buffering-animation ${isWaitingPlayer ? "player-loading-ui-in" : "player-loading-ui-out"}`}>
                         <div className="player-waiting material-symbols-outlined">progress_activity</div>
                     </div>
                     <div className={`player-loading-animation-container ${isShowPlay && isWaitingPlayer == false ? "player-loading-ui-in" : "player-loading-ui-out"}`}>

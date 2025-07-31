@@ -65,6 +65,10 @@
 .video-center {
   display: flex;
   justify-content: center;
+  position: fixed;
+  width: 100%;
+  top: 50%;
+  translate: 0px -50%;
 }
 
 .video-bottom {
@@ -255,6 +259,10 @@
 
 .player-loading-animation-container {
   position: relative;
+}
+
+.player-buffering-animation {
+  position: absolute !important;
 }
 
 /* UI */
