@@ -638,6 +638,10 @@ body {
   background-color: var(--player-bg-containers) !important;
 }
 
+.seekbar-buffer {
+  border-radius: 12px;
+}
+
 .seekBar-container {
   background-color: var(--bg3);
   border-radius: 12px;
