@@ -228,6 +228,7 @@
   width: 290px;
   padding: 12px;
   gap: 8px;
+  z-index: 12;
 }
 
 .player-volume-ui-bar-progress {
