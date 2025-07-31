@@ -266,14 +266,6 @@
 }
 
 /* UI */
-.volume-ui-slide-in {
-  animation: volumeSlideIn 100ms ease-out forwards;
-}
-
-.volume-ui-slide-out {
-  animation: volumeSlideOut 100ms ease-out forwards;
-}
-
 .player-loading-ui-in {
   animation: fadeIn 100ms ease-out forwards;
 }
@@ -299,28 +291,3 @@
   right: 0;
   margin-right: clamp(40px, 25vw, 350px);
 } */
-
-/* Animations */
-@keyframes volumeSlideIn {
-  0% {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes volumeSlideOut {
-  0% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-
-  100% {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-}

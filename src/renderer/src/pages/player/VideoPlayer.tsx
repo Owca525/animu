@@ -21,6 +21,7 @@ import useKeyPress from "@renderer/utils/hooks/useKeyPress"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
 import PlayerSettings from "./components/PlayerSettings"
 import PlayerButton from "./components/PlayerButton"
+import { motion } from "framer-motion"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -214,7 +215,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         setShowVolume(() => true)
         volumeTimeout.current = setTimeout(() => {
             setShowVolume(() => false)
-        }, 500);
+        }, 1000);
     }
 
     function togglePlay() {
@@ -608,13 +609,21 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     </div>
                 </div>
             ) : ""}
-            <div className={`player-volume-ui-container ${isVolume ? " volume-ui-slide-in" : "volume-ui-slide-out"}`}>
+            <motion.div className="player-volume-ui-container"
+                variants={{
+                    hidden: { x: 400 },
+                    visible: { x: 0 },
+                }}
+                animate={isVolume ? "visible" : "hidden"}
+                initial="hidden"
+                transition={{ duration: 0.2 }}
+            >
                 <span className="player-volume-ui-icon material-symbols-outlined">{isMuted ? 'volume_off' : 'volume_up'}</span>
                 <div className="player-volume-ui-bar-container">
                     <div className="player-volume-ui-bar-progress" style={{ width: `${volume}%` }}></div>
                 </div>
                 <span className="player-volume-ui-text">{parseInt(volume.toString())}%</span>
-            </div>
+            </motion.div>
             {showNerdStats && (
                 <NerdStats video={videoRef} volume={volume} currentTime={currentTime} />
             )}
