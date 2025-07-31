@@ -56,6 +56,12 @@
   transition: mask-image 200ms ease;
 }
 
+.video-center-container {
+  display: flex;
+  /* justify-content: space-between; */
+  justify-content: center;
+}
+
 .video-center {
   display: flex;
   justify-content: center;
@@ -246,6 +252,11 @@
   border-radius: 12px;
 }
 
+.player-loading-animation-container {
+  position: relative;
+}
+
+/* UI */
 .volume-ui-slide-in {
   animation: volumeSlideIn 100ms ease-out forwards;
 }
@@ -254,7 +265,33 @@
   animation: volumeSlideOut 100ms ease-out forwards;
 }
 
+.player-loading-ui-in {
+  animation: fadeIn 100ms ease-out forwards;
+}
 
+.player-loading-ui-out {
+  animation: fadeOut 100ms ease-out forwards;
+}
+
+.player-icon-ui {
+  font-size: 72px;
+}
+
+/* .player-fast-forward-ui, .player-fast-rewind-ui {
+  position: relative;
+}
+
+.player-fast-rewind-ui {
+  left: 0;
+  margin-left: clamp(40px, 25vw, 350px);
+}
+
+.player-fast-forward-ui {
+  right: 0;
+  margin-right: clamp(40px, 25vw, 350px);
+} */
+
+/* Animations */
 @keyframes volumeSlideIn {
   0% {
     transform: translateX(100%);

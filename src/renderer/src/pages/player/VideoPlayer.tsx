@@ -57,6 +57,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     // UI
     const [isVolume, setShowVolume] = useState<boolean>(false)
     const volumeTimeout = useRef<NodeJS.Timeout | null>(null);
+    const [isShowPlay, setShowPlay] = useState<boolean>(false)
+    const playAnimationTimeout = useRef<NodeJS.Timeout | null>(null);
+    const playerLoadingRef = useRef<HTMLDivElement | null>(null);
 
     // States
     const [isMuted, setMuted] = useState<boolean>(false)
@@ -225,6 +228,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 return true
             }
         })
+        if (playAnimationTimeout.current) clearTimeout(playAnimationTimeout.current)
+        setShowPlay(() => true)
+        playAnimationTimeout.current = setTimeout(() => {
+            setShowPlay(() => false)
+        }, 200);
     }
 
     function setMutedToPlayer() {
@@ -477,6 +485,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         }
     };
 
+    console.log(playerLoadingRef.current?.style.display)
 
     return (
         <div className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
@@ -514,13 +523,22 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         }
                     })}</div>
                 </div>
-                <div
-                    className={
-                        "video-center " + (isWaitingPlayer ? '' : 'player-hidden')
-                    }>
-                    <div className="player-loading-animation-container">
-                        <div className="player-waiting material-symbols-outlined">progress_activity</div>
+                <div className="video-center-container">
+                    {/* <div className="player-loading-animation-container player-fast-rewind-ui">
+                        <div className="player-icon-ui material-symbols-outlined">fast_rewind</div>
+                    </div> */}
+                    <div className="video-center">
+                        <div ref={playerLoadingRef} className={`player-loading-animation-container ${isWaitingPlayer ? "player-loading-ui-in" : "player-loading-ui-out"}`}>
+                            <div className="player-waiting material-symbols-outlined">progress_activity</div>
+                        </div>
+                        {/* FIXME: If someone want to fix this bullshit, you can. The problem is if someone spam space then on 100ms show beside loading animation */}
+                        <div className={`player-loading-animation-container ${isShowPlay && isWaitingPlayer == false ? "player-loading-ui-in" : "player-loading-ui-out"}`}>
+                            <div className="player-icon-ui material-symbols-outlined">{isPlaying ? "pause" : "play_arrow"}</div>
+                        </div>
                     </div>
+                    {/* <div className="player-loading-animation-container player-fast-forward-ui">
+                        <div className="player-icon-ui material-symbols-outlined">fast_forward</div>
+                    </div> */}
                 </div>
                 <div className={isVisible && isUpNextEpisode == false ? 'video-bottom' : 'video-bottom player-hidden'}>
                     <SeekBar secondBarValues={currentBuffer} currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => { setTimeVideo(value); setBuffered(() => []) }} type="time" classes={{ container: "player-seekbar" }} screen={true} />
