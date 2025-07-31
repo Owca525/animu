@@ -77,6 +77,7 @@
   margin-right: 8px;
   margin-bottom: 8px;
 }
+
 .player-left,
 .player-right {
   display: flex;
@@ -160,7 +161,8 @@
   gap: 1em;
 }
 
-.player-up-Next-Anime, .player-up-Next-Title {
+.player-up-Next-Anime,
+.player-up-Next-Title {
   display: -webkit-box;
   line-clamp: 1;
   -webkit-line-clamp: 1;
@@ -210,7 +212,7 @@
 .player-volume-ui-container {
   display: flex;
   align-items: center;
-  background-color: var(--bg4);
+  background-color: var(--bg2);
   position: absolute;
   top: 10px;
   right: 20px;
@@ -219,14 +221,13 @@
   min-width: 180px;
   width: 290px;
   padding: 12px;
-  border: 3px solid var(--neutral2);
   gap: 8px;
 }
 
 .player-volume-ui-bar-progress {
   height: 100%;
   width: 0%;
-  background-color: var(--neutral2);
+  background-color: var(--neutral1);
   border-radius: 12px;
 }
 
@@ -241,6 +242,39 @@
 .player-volume-ui-bar-container {
   width: 100%;
   height: 8px;
-  background-color: var(--player-bg-containers);
+  background-color: var(--bg3);
   border-radius: 12px;
+}
+
+.volume-ui-slide-in {
+  animation: volumeSlideIn 100ms ease-out forwards;
+}
+
+.volume-ui-slide-out {
+  animation: volumeSlideOut 100ms ease-out forwards;
+}
+
+
+@keyframes volumeSlideIn {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes volumeSlideOut {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
 }

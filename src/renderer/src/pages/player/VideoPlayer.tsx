@@ -56,6 +56,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     // UI
     const [isVolume, setShowVolume] = useState<boolean>(false)
+    const volumeTimeout = useRef<NodeJS.Timeout | null>(null);
 
     // States
     const [isMuted, setMuted] = useState<boolean>(false)
@@ -205,6 +206,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         videoRef.current.volume = value / 100
         setVolume(() => value)
         volumeCacheFunc(value)
+        if (volumeTimeout.current) clearTimeout(volumeTimeout.current)
+        setShowVolume(() => true)
+        volumeTimeout.current = setTimeout(() => {
+            setShowVolume(() => false)
+        }, 500);
     }
 
     function togglePlay() {
@@ -348,7 +354,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         }
         keybinds(keys)
     })
-    async function keybinds(event: string) {
+    function keybinds(event: string) {
         if (videoRef.current) {
             var time_now = videoRef.current.currentTime
             switch (event.toLowerCase()) {
@@ -368,7 +374,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     change_time((time_now -= parseInt(config.Player.general.LongTimeSkipBack.toString())))
                     break
                 case convertKeybinds(config.Player.keybinds.Fullscreen.toLowerCase()).toLowerCase():
-                    await enterFullscreen()
+                    enterFullscreen()
                     break
                 case convertKeybinds(config.Player.keybinds.ExitPlayer.toLowerCase()).toLowerCase():
                     exitPlayer()
@@ -461,7 +467,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         if (video && video.duration > 0 && video.buffered.length > 0) {
             let timestamps: { position: number, width: number }[] = []
             for (let index = 0; index < video.buffered.length; index++) {
-                console.log(video.buffered.start(index), video.buffered.end(index))
                 const start = video.buffered.start(index);
                 const end = video.buffered.end(index);
                 const left = (start / video.duration) * 100;
@@ -469,7 +474,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 timestamps.push({ position: left, width: width })
             }
             setBuffered(() => timestamps);
-            console.log(timestamps)
         }
     };
 
@@ -578,15 +582,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     </div>
                 </div>
             ) : ""}
-            {isVolume &&
-                <div className="player-volume-ui-container">
-                    <span className="player-volume-ui-icon material-symbols-outlined">{isMuted ? 'volume_off' : 'volume_up'}</span>
-                    <div className="player-volume-ui-bar-container">
-                        <div className="player-volume-ui-bar-progress" style={{ width: `${volume}%` }}></div>
-                    </div>
-                    <span className="player-volume-ui-text">{parseInt(volume.toString())}%</span>
+            <div className={`player-volume-ui-container ${isVolume ? " volume-ui-slide-in" : "volume-ui-slide-out"}`}>
+                <span className="player-volume-ui-icon material-symbols-outlined">{isMuted ? 'volume_off' : 'volume_up'}</span>
+                <div className="player-volume-ui-bar-container">
+                    <div className="player-volume-ui-bar-progress" style={{ width: `${volume}%` }}></div>
                 </div>
-            }
+                <span className="player-volume-ui-text">{parseInt(volume.toString())}%</span>
+            </div>
             {showNerdStats && (
                 <NerdStats video={videoRef} volume={volume} currentTime={currentTime} />
             )}
