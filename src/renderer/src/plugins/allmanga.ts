@@ -198,12 +198,16 @@ export async function getInformation(animeData?: AnimeData, anime_id?: string): 
     for (let i = 0; i < data.length; i++) {
       const element: cardData = data[i];
       // FOR KARTQ NOTE: JEBAĆ ONE PIECE I ROBIE TYLKO JEDNĄ RZECZ BO MNIE WKURWIA
-      if (element.AnimeData.title.romaji === "1P") globalONEPIECE = element.AnimeData.player_ID
+      if (element.AnimeData.title.romaji === "1P") {
+        globalONEPIECE = element.AnimeData.player_ID
+        break
+      }
 
-      precentageNative.push({ name: element.AnimeData.title.native, prec: similarityText(animeData.title.native, element.AnimeData.title.native), data: element.AnimeData });
-      precentageRomaji.push({ name: element.AnimeData.title.romaji, prec: similarityText(animeData.title.romaji, element.AnimeData.title.romaji), data: element.AnimeData });
-      precentageEnglish.push({ name: element.AnimeData.title.english ? element.AnimeData.title.english : "", prec: similarityText(animeData.title.english, element.AnimeData.title.english), data: element.AnimeData });
+      precentageNative.push({ name: element.AnimeData.title.native, prec: similarityText(animeData.title.native.toLowerCase(), element.AnimeData.title.native.toLowerCase()), data: element.AnimeData });
+      precentageRomaji.push({ name: element.AnimeData.title.romaji, prec: similarityText(animeData.title.romaji.toLowerCase(), element.AnimeData.title.romaji.toLowerCase()), data: element.AnimeData });
+      precentageEnglish.push({ name: element.AnimeData.title.english ? element.AnimeData.title.english.toLowerCase() : "", prec: similarityText(animeData.title.english?.toLowerCase(), element.AnimeData.title.english?.toLowerCase()), data: element.AnimeData });
     };
+    console.log(precentageEnglish, precentageNative, precentageRomaji)
 
     let romaji = precentageRomaji.filter(item => item.prec === Math.max(...precentageRomaji.map(item => item.prec)));
     let english = precentageEnglish.filter(item => item.prec === Math.max(...precentageEnglish.map(item => item.prec)));
@@ -218,7 +222,7 @@ export async function getInformation(animeData?: AnimeData, anime_id?: string): 
       }
     }
 
-    console.log(counter)
+    console.log(counter, romaji, english, native)
 
     let theMost = "";
     let max = 0;
