@@ -560,7 +560,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         <div ref={playerLoadingRef} className={`player-loading-animation-container ${isWaitingPlayer ? "player-loading-ui-in" : "player-loading-ui-out"}`}>
                             <div className="player-waiting material-symbols-outlined">progress_activity</div>
                         </div> */}
-                    {/* FIXME: If someone want to fix this bullshit, you can. The problem is if someone spam space then on 100ms show beside loading animation */}
                     {/* <div className={`player-loading-animation-container ${isShowPlay && isWaitingPlayer == false ? "player-loading-ui-in" : "player-loading-ui-out"}`}>
                             <div className="player-icon-ui material-symbols-outlined">{isPlaying ? "pause" : "play_arrow"}</div>
                         </div>
@@ -569,7 +568,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         <div className="player-icon-ui material-symbols-outlined">fast_forward</div>
                     </div> */}
 
-                    {/* FIXME: Fix why loading animation is too low */}
                     <motion.div className="player-loading-animation-container player-buffering-animation"
                         variants={hiddenVariants}
                         animate={isWaitingPlayer ? "visible" : "hidden"}
