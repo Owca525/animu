@@ -69,6 +69,8 @@
   width: 100%;
   top: 50%;
   translate: 0px -50%;
+  height: fit-content;
+  min-height: 100px;
 }
 
 .video-bottom {
@@ -263,6 +265,8 @@
 
 .player-buffering-animation {
   position: absolute !important;
+  top: 0px;
+
 }
 
 /* UI */
