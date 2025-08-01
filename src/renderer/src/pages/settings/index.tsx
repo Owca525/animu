@@ -473,6 +473,10 @@ function settings() {
                                 <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.PrevEpisode)} keyBind={(keys) => handleChange("Player.keybinds.PrevEpisode", keys)} />
                             </div>
                             <div className="settings-setting-container">
+                                Picture In Picture
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.PictureInPicture)} keyBind={(keys) => handleChange("Player.keybinds.PictureInPicture", keys)} />
+                            </div>
+                            <div className="settings-setting-container">
                                 {t("settings.player.keybinds.volumeup")}
                                 <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.VolumeUp)} keyBind={(keys) => handleChange("Player.keybinds.VolumeUp", keys)} />
                             </div>
