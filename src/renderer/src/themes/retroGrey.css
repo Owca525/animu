@@ -25,10 +25,12 @@
   --bg4: rgb(64, 64, 64); /* Fourth layer, used in hover button etc */
 
   /* other */
-  --player-bg-containers: color-mix(in srgb, var(--bg2) 70%, transparent);
+  --player-bg-containers: color-mix(in srgb, var(--bg3) 70%, transparent);
   --invisible: rgba(0, 0, 0, 0);
   /* is used in player button */
   --black: rgba(0, 0, 0);
+
+  color: #cfcfcf;
 }
 
 * {
