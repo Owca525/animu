@@ -112,7 +112,6 @@ const player = () => {
 }
 
 function loadingAnimation(leave: () => void, anime_data: cardData) {
-    // TODO: Fix theme
     return (
         <div className="player-loading-container">
             <div className="player-loading-top">
