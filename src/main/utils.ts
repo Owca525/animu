@@ -5,8 +5,11 @@ import fs from "fs";
 import path from "path";
 import { mainWindow } from ".";
 import { exec } from "child_process";
+let rpc: any = undefined
 
-export const rpc = new RPC.Client({ transport: 'ipc' });
+if (process.env.NODE_ENV != 'development') {
+    rpc = new RPC.Client({ transport: 'ipc' });
+}
 
 // Client id for Discord Rich presence
 export const CLIENT_ID = '1320810160205070377';
@@ -19,7 +22,7 @@ ipcMain.on("openDevTools", () => {
 
 // Change activity in Discord Rich presence
 ipcMain.handle('setActivity', (_event, details: string | undefined, state: string | undefined) => {
-    if (rpc) {
+    if (rpc != undefined) {
         rpc.setActivity({
             details: details,
             state: state,
