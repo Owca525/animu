@@ -248,6 +248,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             navigate('/')
             return
         }
+        if (document.pictureInPictureElement) {
+            await document.exitPictureInPicture();
+        }
         window.BrowserWindow.setFullscreen(false)
         navigate('/')
     }
