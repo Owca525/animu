@@ -78,11 +78,14 @@ ipcMain.handle('saveToClipboard', async (_event, type: "text" | "image", content
 
 ipcMain.handle('get-css-files', async (): Promise<{ path: string, filename: string, type: "user" | "official" }[]> => {
     // Directory for local css
-    const stylesDir = path.join(__dirname, '../../out/renderer/assets/themes');
+    let stylesDir: string = "";
+    if (process.env.NODE_ENV === 'development') {
+        stylesDir = path.join(__dirname, '../../src/renderer/src/themes')
+    } else {
+        stylesDir = path.join(__dirname, '../../out/renderer/assets/themes')
+    }
+    
     const localList = await takeFileExtensionAndPath(stylesDir, '.css')
-
-    // this prevent load user theme because in version dev this can't load, idk why. Show status 200 but no css data, maybe i fix someday
-    if (process.env.NODE_ENV === 'development') return convertListTodict(await takeFileExtensionAndPath(path.join(__dirname, '../../src/renderer/src/themes'), '.css'), "official")
 
     const configcss = checkConfigFolder()
     if (configcss == undefined) return convertListTodict(localList, "official")
