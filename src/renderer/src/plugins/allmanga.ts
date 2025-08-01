@@ -1,7 +1,7 @@
 // import { playerUrlProps } from "@renderer/utils/interface"
 
 import { convertMsToMinutes, similarityText } from "@renderer/utils/functions"
-import { cardData, playerData, pluginFormat } from "@renderer/utils/GlobalInterface"
+import { AnimeData, cardData, playerData, pluginFormat } from "@renderer/utils/GlobalInterface"
 import { setHomeData, UpdateHomeData } from "@renderer/utils/pluginApi"
 
 const HASH_SEARCH = '06327bc10dd682e1ee7e07b6db9c16e9ad2fd56c1b769e47513128cd5c9fc77a'
@@ -184,24 +184,58 @@ async function extractInformation(id: string) {
   return converterData(resp.data.show).AnimeData
 }
 
-export async function getInformation(name?: string, anime_id?: string): Promise<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] }> {
-  if (name) {
-    let data = await getAnimeList(name);
-    let precentage: { name: string, prec: number }[] = [];
+export async function getInformation(animeData?: AnimeData, anime_id?: string): Promise<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] }> {
+  // CHUJ MNIE TO ŻE ONE PIECIE NIE JEST WYKRYWANIE, JEŚLI ALLMANGA BY NIE MIAŁA 1P ZAMIAST ONE PIECIE JAKIE CWEL TO JEST
+  if (animeData) {
+    let data = await getAnimeList(animeData.title.native);
+    let precentageNative: { name: string, prec: number, data: AnimeData }[] = [];
+    let precentageRomaji: { name: string, prec: number, data: AnimeData }[] = [];
+    let precentageEnglish: { name: string, prec: number, data: AnimeData }[] = [];
 
     for (let i = 0; i < data.length; i++) {
       const element: cardData = data[i];
-      precentage.push({ name: element.AnimeData.title.native, prec: similarityText(name, element.AnimeData.title.native) });
+      precentageNative.push({ name: element.AnimeData.title.native, prec: similarityText(animeData.title.native, element.AnimeData.title.native), data: element.AnimeData });
+      precentageRomaji.push({ name: element.AnimeData.title.romaji, prec: similarityText(animeData.title.romaji, element.AnimeData.title.romaji), data: element.AnimeData });
+      precentageEnglish.push({ name: element.AnimeData.title.english ? element.AnimeData.title.english : "", prec: similarityText(animeData.title.english, element.AnimeData.title.english), data: element.AnimeData });
     };
-    if (precentage.length <= 0) return { player_id: "", episodesData: [] };
-    let anime_name = precentage.filter(item => item.prec === Math.max(...precentage.map(item => item.prec)))[0];
-    let card = data.filter((item: cardData) => item.AnimeData.title.native == anime_name.name)[0];
-    anime_id = card.AnimeData.player_ID ? card.AnimeData.player_ID : "";
+
+    let romaji = precentageRomaji.filter(item => item.prec === Math.max(...precentageRomaji.map(item => item.prec)));
+    let english = precentageEnglish.filter(item => item.prec === Math.max(...precentageEnglish.map(item => item.prec)));
+    let native = precentageNative.filter(item => item.prec === Math.max(...precentageNative.map(item => item.prec)));
+
+    let list_of_number = [ ...romaji.map((element) => element.data.player_ID), ...english.map((element) => element.data.player_ID), ...native.map((element) => element.data.player_ID) ]
+    const counter: { [key: string]: number } = {};
+
+    for (const item of list_of_number) {
+      if (item && !["unknown", "undefined", ""].includes(item)) {
+        counter[item] = (counter[item] || 0) + 1;
+      }
+    }
+
+    console.log(counter)
+
+    let theMost = "";
+    let max = 0;
+
+    for (const [klucz, ilosc] of Object.entries(counter)) {
+      if (ilosc > max) {
+        theMost = klucz;
+        max = ilosc;
+      }
+    }
+    anime_id = theMost
+
+    // let card = data.filter((item: cardData) => item.AnimeData.title.native == anime_name.name)[0];
+
+    // anime_id = card.AnimeData.player_ID ? card.AnimeData.player_ID : "";
   };
+
   if (anime_id == "") return { player_id: "", episodesData: [] };
   if (!anime_id) return { player_id: "", episodesData: [] }
+
   let anime_data = (await extractInformation(anime_id)).episodesList
   if (!anime_data) return { player_id: "", episodesData: [] };
+
   return { player_id: anime_id ? anime_id : "", episodesData: anime_data };
 }
 

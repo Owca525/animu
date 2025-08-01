@@ -48,11 +48,11 @@ function information() {
     const time = convertSeconds(secondsLeft)
 
     // I can't use useQuery Because Doesn't Work
-    async function fetchData(func: any, title?: string, id?: string) {
+    async function fetchData(func: any, id?: string) {
         try {
             setIsError(() => false)
             setLoadingData(() => true)
-            let data = await func(title, id)
+            let data = await func(anime_data, id)
             if (data) {
                 setData(() => data)
                 setLoadingData(() => false)
@@ -70,7 +70,7 @@ function information() {
 
     useEffect(() => {
         if (anime_data.id === "") {
-            fetchData(pluginPlayer.player.animeDataList, undefined, anime_data.player_ID)
+            fetchData(pluginPlayer.player.animeDataList, anime_data.player_ID)
         } else {
             fetchData(pluginPlayer.player.animeDataList, anime_data.title.native)
         }
