@@ -46,6 +46,7 @@ export const defaultConfig: SettingsConfig = {
             VolumeUp: "0",
             VolumeMute: "m",
             ScreenShot: "f10",
+            PictureInPicture: "P"
         },
     },
     History: {

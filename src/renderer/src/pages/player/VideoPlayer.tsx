@@ -54,6 +54,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const [volume, setVolume] = useState<number>(PlayerVolume)
     const [currentTime, setcurrentTime] = useState<number>(0)
     const [currentBuffer, setBuffered] = useState<{ position: number, width: number }[]>([])
+    const [isPIP, setPictureInPicture] = useState<boolean>(false)
 
     // UI
     const [isVolume, setShowVolume] = useState<boolean>(false)
@@ -283,6 +284,26 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         refetchHistory()
     }
 
+    async function handlePictureInPicture() {
+        const video = videoRef.current;
+
+        try {
+            if (document.pictureInPictureElement) {
+                await document.exitPictureInPicture();
+                setPictureInPicture(() => false)
+            } else {
+                if (video) {
+                    await video.requestPictureInPicture();
+                    setPictureInPicture(() => true)
+                }
+            }
+        } catch (error) {
+            console.error('Error PiP:', error);
+            setPictureInPicture(() => false)
+            toast.error("Failed open Picture in Picture Mode")
+        }
+    };
+
     function updateProgress() {
         if (!videoRef.current) return
         saveContinueProgress()
@@ -363,6 +384,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         }
         keybinds(keys)
     })
+
     function keybinds(event: string) {
         if (videoRef.current) {
             var time_now = videoRef.current.currentTime
@@ -411,6 +433,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     break
                 case convertKeybinds(config.Player.keybinds.PrevEpisode.toLowerCase()).toLowerCase():
                     functions.prevButton("prev")
+                    break
+                case convertKeybinds(config.Player.keybinds.PictureInPicture.toLowerCase()).toLowerCase():
+                    handlePictureInPicture()
                     break
             }
         }
@@ -506,7 +531,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 onError={(error) => videoErrorHandler(error)}
                 preload={config?.Player.general.playerLoadType}
                 muted={isMuted}
-
+                style={isPIP ? { display: "none" } : {}}
             />
             {isVisible &&
                 <>
@@ -588,6 +613,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                     <SeekBar currentValue={volume} maxValue={100} onSeek={value => handleVolume(value)} classes={{ container: "player-seekbar" }} />
                                 )}
                             </div>
+                            <PlayerButton icon={"picture_in_picture"} onClick={handlePictureInPicture} title={currentSettings == false ? "Picture In Picture" : undefined} ButtonClass="player-buttons" />
                             <PlayerButton icon={"video_library"} title={currentSettings == false ? "Select Episode" : undefined} ButtonClass="player-buttons" />
                             {currentSettings &&
                                 <PlayerSettings

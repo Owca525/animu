@@ -178,6 +178,7 @@ export interface SettingsConfig {
             VolumeDown: string
             VolumeMute: string
             ScreenShot: string
+            PictureInPicture: string
         }
     }
     History: {
