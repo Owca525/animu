@@ -233,7 +233,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         setShowPlay(() => true)
         playAnimationTimeout.current = setTimeout(() => {
             setShowPlay(() => false)
-        }, 200);
+        }, 300);
     }
 
     function setMutedToPlayer() {
@@ -549,7 +549,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         variants={hiddenVariants}
                         animate={isWaitingPlayer ? "visible" : "hidden"}
                         initial="hidden"
-                        transition={{ duration: 0.2 }}
+                        transition={{ duration: 0.8 }}
                     >
                         <div className="player-waiting material-symbols-outlined">progress_activity</div>
                     </motion.div>
@@ -558,7 +558,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                             variants={hiddenVariants}
                             animate={isShowPlay ? "visible" : "hidden"}
                             initial="hidden"
-                            transition={{ duration: 0.5 }}
+                            transition={{ duration: 0.8 }}
                         >
                             <div className="player-icon-ui material-symbols-outlined">{isPlaying ? "pause" : "play_arrow"}</div>
                         </motion.div>
