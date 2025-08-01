@@ -52,7 +52,7 @@ function information() {
         try {
             setIsError(() => false)
             setLoadingData(() => true)
-            let data = await func(anime_data, id)
+            let data = await func(id ? undefined : anime_data, id)
             if (data) {
                 setData(() => data)
                 setLoadingData(() => false)
@@ -72,7 +72,7 @@ function information() {
         if (anime_data.id === "") {
             fetchData(pluginPlayer.player.animeDataList, anime_data.player_ID)
         } else {
-            fetchData(pluginPlayer.player.animeDataList, anime_data.title.native)
+            fetchData(pluginPlayer.player.animeDataList)
         }
     }, [])
 

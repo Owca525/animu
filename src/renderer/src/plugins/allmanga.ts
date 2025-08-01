@@ -186,14 +186,20 @@ async function extractInformation(id: string) {
 
 export async function getInformation(animeData?: AnimeData, anime_id?: string): Promise<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] }> {
   // CHUJ MNIE TO ŻE ONE PIECIE NIE JEST WYKRYWANIE, JEŚLI ALLMANGA BY NIE MIAŁA 1P ZAMIAST ONE PIECIE JAKIE CWEL TO JEST
+  console.log(animeData)
   if (animeData) {
     let data = await getAnimeList(animeData.title.native);
     let precentageNative: { name: string, prec: number, data: AnimeData }[] = [];
     let precentageRomaji: { name: string, prec: number, data: AnimeData }[] = [];
     let precentageEnglish: { name: string, prec: number, data: AnimeData }[] = [];
 
+    let globalONEPIECE: string | undefined = undefined
+
     for (let i = 0; i < data.length; i++) {
       const element: cardData = data[i];
+      // FOR KARTQ NOTE: JEBAĆ ONE PIECE I ROBIE TYLKO JEDNĄ RZECZ BO MNIE WKURWIA
+      if (element.AnimeData.title.romaji === "1P") globalONEPIECE = element.AnimeData.player_ID
+
       precentageNative.push({ name: element.AnimeData.title.native, prec: similarityText(animeData.title.native, element.AnimeData.title.native), data: element.AnimeData });
       precentageRomaji.push({ name: element.AnimeData.title.romaji, prec: similarityText(animeData.title.romaji, element.AnimeData.title.romaji), data: element.AnimeData });
       precentageEnglish.push({ name: element.AnimeData.title.english ? element.AnimeData.title.english : "", prec: similarityText(animeData.title.english, element.AnimeData.title.english), data: element.AnimeData });
@@ -223,7 +229,9 @@ export async function getInformation(animeData?: AnimeData, anime_id?: string): 
         max = ilosc;
       }
     }
-    anime_id = theMost
+
+    if (globalONEPIECE) anime_id = globalONEPIECE
+    else anime_id = theMost
 
     // let card = data.filter((item: cardData) => item.AnimeData.title.native == anime_name.name)[0];
 
