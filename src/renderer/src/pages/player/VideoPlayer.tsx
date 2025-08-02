@@ -54,7 +54,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const [volume, setVolume] = useState<number>(PlayerVolume)
     const [currentTime, setcurrentTime] = useState<number>(0)
     const [currentBuffer, setBuffered] = useState<{ position: number, width: number }[]>([])
-    const [isPIP, setPictureInPicture] = useState<boolean>(false)
 
     // UI
     const [isVolume, setShowVolume] = useState<boolean>(false)
@@ -293,16 +292,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         try {
             if (document.pictureInPictureElement) {
                 await document.exitPictureInPicture();
-                setPictureInPicture(() => false)
+
             } else {
                 if (video) {
                     await video.requestPictureInPicture();
-                    setPictureInPicture(() => true)
                 }
             }
         } catch (error) {
             console.error('Error PiP:', error);
-            setPictureInPicture(() => false)
             toast.error("Failed open Picture in Picture Mode")
         }
     };
@@ -534,7 +531,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 onError={(error) => videoErrorHandler(error)}
                 preload={config?.Player.general.playerLoadType}
                 muted={isMuted}
-                style={isPIP ? { display: "none" } : {}}
             />
             {isVisible &&
                 <>
