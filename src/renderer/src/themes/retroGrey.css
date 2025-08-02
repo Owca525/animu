@@ -65,10 +65,13 @@
 /*
   Taken from https://github.com/jdan/98.css by jdan
 */
-.button, .information-episode-button, .information-select-episode, .player-nerd-container, .contextmenu-option {
+.button, .information-select-episode, .player-nerd-container, .contextmenu-option {
   box-shadow: inset -1px -1px #0a0a0a,inset 1px 1px #fff,inset -2px -2px grey,inset 2px 2px #dfdfdf;
   border-width: 0px !important;
 }
+ .information-episode-button {
+  box-shadow: inset -1px -1px #0a0a0a,inset 1px 1px #fff,inset -2px -2px grey,inset 2px 2px #dfdfdf;
+ }
 .button:active {
   box-shadow: inset -1px -1px #ffffff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px #808080;
 }
