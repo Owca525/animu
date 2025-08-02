@@ -12,6 +12,7 @@
   --neutral1: #7caa32; /* is using on outline, border-color etc */ 
   --neutral2: #84aa23;
   --neutral3: #699626;
+  --red: #d20f39;
 }
 
 .video-player, .player-video-container, .player-loading-container {
