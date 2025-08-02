@@ -12,6 +12,7 @@
   --neutral1: #17964a; /* is using on outline, border-color etc */
   --neutral2: #19a651;
   --neutral3: #27ae5d;
+  --red: #861832;
 
   /* other */
   --player-bg-containers: color-mix(in srgb, var(--bg3) 70%, transparent);
@@ -208,6 +209,10 @@ body {
 
 /* Information */
 
+.information-episode-button-watched {
+  border-color: var(--neutral1);
+}
+
 .information {
   background-color: var(--bg);
   color: var(--text);
@@ -280,7 +285,15 @@ body {
 }
 
 .information-episode-button:hover {
+  background-color: var(--bg3);
+}
+
+.information-episode-button.watched {
   border-color: var(--neutral1);
+}
+
+.information-episode-button.watching {
+  border-color: var(--red);
 }
 
 .information-select-episode {
