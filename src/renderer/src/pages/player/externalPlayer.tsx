@@ -3,34 +3,51 @@
 import Button from "@renderer/components/buttons"
 import "./components/css/externalPlayer.css"
 import Drop from "../information/components/drop"
+import { cardData, playerData } from "@renderer/utils/GlobalInterface"
+import { detectTitle } from "@renderer/utils/functions"
 
-const ExternalPlayer = () => {
+interface ExternalplayerProps {
+    animeData: cardData
+    playerData: playerData[]
+    time: number
+    setNextEpisode: (value: string) => void
+    now_episodes: { episode: string, type: string, episodes: Array<string> }
+}
 
-    function makeButtons(episode: number[]) {
+const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes }) => {
+
+    function makeButtons(episode: string[]) {
         return (
-          <div className='information-buttons-episode-container'>
-            {episode.map((num) => (
-              <div className='information-episode-button'>{num}</div>
-            ))}
-          </div>
+            <div className='information-buttons-episode-container'>
+                {episode.map((num) => (
+                    <div className='information-episode-button'>{num}</div>
+                ))}
+            </div>
         )
-      }
+    }
 
     return (
         <div className="external-player-container">
-        <div className="video-top">
-            <Button icon="arrow_back" ButtonClass="player-buttons" />
-            <div className="player-title">Episode 8 of Oshi No ko</div>
+            <div className="video-top">
+                <Button icon="arrow_back" ButtonClass="player-buttons" />
+                <div className="player-title">{detectTitle({
+                    ...animeData, saveData: {
+                        episode: now_episodes.episode,
+                        pluginName: "",
+                        last_Time: 0,
+                        type: ""
+                    }
+                })}</div>
                 <div className="external-dropdown"> <div className="dropdown-container"><div className="dropdown-button">test</div></div> </div>
-        </div>
-        <div className="external-player-center">
-            <div className="external-button-container">
-                <Button icon='skip_previous' ButtonClass="player-buttons" />
-                <Button icon='replay' ButtonClass="player-buttons" />
-                <Button icon='skip_next' ButtonClass="player-buttons" />
             </div>
-            <Drop content={makeButtons([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,])} LeftHeader={"Episodes"} RightHeader={""} />
-        </div>
+            <div className="external-player-center">
+                <div className="external-button-container">
+                    <Button icon='skip_previous' ButtonClass="player-buttons" />
+                    <Button icon='replay' ButtonClass="player-buttons" />
+                    <Button icon='skip_next' ButtonClass="player-buttons" />
+                </div>
+                <Drop content={makeButtons(now_episodes.episodes)} LeftHeader={"Episodes"} RightHeader={""} />
+            </div>
         </div>
     )
 }

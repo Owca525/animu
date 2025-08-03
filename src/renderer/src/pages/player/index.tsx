@@ -87,7 +87,13 @@ const player = () => {
     }
      if (true) {
          return (
-             <ExternalPlayer />
+             <ExternalPlayer 
+                animeData={anime_data.data}
+                playerData={data}
+                time={extractionData.time}
+                setNextEpisode={setNewEpisode}
+                now_episodes={{ episode: extractionData.actual, type: extractionData.type, episodes: extractionData.episodelist }}
+            />
          )
      }
     if (data && isLoading == false) {
