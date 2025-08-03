@@ -89,11 +89,11 @@ const player = () => {
         })
         return
     }
-    // if (true) {
-    //     return (
-    //         <ExternalPlayer />
-    //     )
-    // }
+     if (true) {
+         return (
+             <ExternalPlayer />
+         )
+     }
     if (data && isLoading == false) {
         return (
             <Suspense fallback={loadingAnimation(leave, anime_data.data)}>

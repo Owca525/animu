@@ -17,14 +17,20 @@ const ExternalPlayer = () => {
       }
 
     return (
-        <div className="external-container">
-            <div className="external-title">Episode 8 of Oshi No ko</div>
-            <div className="external-player-container">
+        <div className="external-player-container">
+        <div className="video-top">
+            <Button icon="arrow_back" ButtonClass="player-buttons" />
+            <div className="player-title">Episode 8 of Oshi No ko</div>
+                <div className="external-dropdown"> <div className="dropdown-container"><div className="dropdown-button">test</div></div> </div>
+        </div>
+        <div className="external-player-center">
+            <div className="external-button-container">
                 <Button icon='skip_previous' ButtonClass="player-buttons" />
                 <Button icon='replay' ButtonClass="player-buttons" />
                 <Button icon='skip_next' ButtonClass="player-buttons" />
             </div>
-            <Drop content={makeButtons([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,])} LeftHeader={"Episodes"} RightHeader={""} />
+            <Drop content={makeButtons([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,])} LeftHeader={"Episodes"} RightHeader={""} />
+        </div>
         </div>
     )
 }
