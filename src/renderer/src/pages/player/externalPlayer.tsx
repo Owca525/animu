@@ -2,11 +2,12 @@
 
 import Button from "@renderer/components/buttons"
 import "./components/css/externalPlayer.css"
-import { cardData, notificationProps, playerData } from "@renderer/utils/GlobalInterface"
+import { cardData, notificationProps, playerData, SettingsConfig } from "@renderer/utils/GlobalInterface"
 import { detectTitle } from "@renderer/utils/functions"
 import { useEffect } from "react"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
+import { useSelector } from "react-redux"
 
 interface ExternalplayerProps {
     animeData: cardData
@@ -18,10 +19,11 @@ interface ExternalplayerProps {
 
 const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes, playerData, setNextEpisode }) => {
     const navigate = useNavigate()
+    const config: SettingsConfig = useSelector((data: any) => data.config);
 
     async function RunMovian() {
         let url = playerData[0].resolution[0].url
-        let req = await window.api.request.get(`http://localhost:42000/showtime/open?url=${encodeURIComponent(url)}`, {})
+        let req = await window.api.request.get(`http://${config.Player.external.movianIP}/showtime/open?url=${encodeURIComponent(url)}`, {})
         if (!req.success) {
             toast.error("Failed Run Movian", notificationProps)
         } 
