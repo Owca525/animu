@@ -29,16 +29,13 @@ interface VideoPlayerProps {
     player_data: playerData[]
     anime_data: cardData
     temp: { episode: string, type: string, episodes: Array<string> }
-    functions: {
-        prevButton: (value: "prev") => void
-        nextButton: (value: "next") => void
-    }
+    setNextEpisode: (value: string) => void
     volumeCacheFunc: (value: number) => void
     PlayerVolume: number
     time: number
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp, functions, volumeCacheFunc, PlayerVolume = 0, time }) => {
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp, setNextEpisode, volumeCacheFunc, PlayerVolume = 0, time }) => {
     const navigate = useNavigate()
     // Translation 
     const { t } = useTranslation()
@@ -60,6 +57,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const volumeTimeout = useRef<NodeJS.Timeout | null>(null);
     const [isShowPlay, setShowPlay] = useState<boolean>(false)
     const playAnimationTimeout = useRef<NodeJS.Timeout | null>(null);
+    const [isShowSelectEpisode, setShowSelectEpisode] = useState<boolean>(false)
 
     // States
     const [isMuted, setMuted] = useState<boolean>(false)
@@ -90,7 +88,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         if (hideTimer.current) {
             clearTimeout(hideTimer.current)
         }
-        if (currentSettings == false) {
+        if (currentSettings == false && isShowSelectEpisode == false) {
             hideTimer.current = setTimeout(() => setIsVisible(false), 2000)
         }
     }
@@ -313,7 +311,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
         // Update RPC
         window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(videoRef.current.currentTime)} / ${formatTime(videoRef.current.duration)}`)
-        if (config.Player.general.AutoSkipEpisode && videoRef.current.duration == videoRef.current.currentTime) functions.nextButton("next")
+        if (config.Player.general.AutoSkipEpisode && videoRef.current.duration == videoRef.current.currentTime) setEpisode("next")
     }
 
     function checkUpNext() {
@@ -331,7 +329,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             setUpNextEpisode(false)
         }
 
-        if (duration != 0 && currentTime != 0 && (isHideUpNextEpisode == false && timeNextEpisode <= 0)) functions.nextButton("next")
+        if (duration != 0 && currentTime != 0 && (isHideUpNextEpisode == false && timeNextEpisode <= 0)) setEpisode("next")
     }
 
     function videoErrorHandler(event: React.SyntheticEvent<HTMLVideoElement, Event>) {
@@ -385,6 +383,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         keybinds(keys)
     })
 
+    function setEpisode(type: "next" | "prev") {
+        let ep = temp.episodes.indexOf(temp.episode)
+        if (type == 'prev') ep = ep - 1
+        if (type == 'next') ep = ep + 1
+        if (temp.episodes[ep] === undefined) return
+        setNextEpisode(ep.toString())
+    }
+
     function keybinds(event: string) {
         if (videoRef.current) {
             var time_now = videoRef.current.currentTime
@@ -429,10 +435,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     setMuted(prev => !prev)
                     break
                 case convertKeybinds(config.Player.keybinds.NextEpisode.toLowerCase()).toLowerCase():
-                    functions.nextButton("next")
+                    setEpisode("next")
                     break
                 case convertKeybinds(config.Player.keybinds.PrevEpisode.toLowerCase()).toLowerCase():
-                    functions.prevButton("prev")
+                    setEpisode("prev")
                     break
                 case convertKeybinds(config.Player.keybinds.PictureInPicture.toLowerCase()).toLowerCase():
                     handlePictureInPicture()
@@ -516,6 +522,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         visible: { opacity: 1 },
     }
 
+    function detectDisableTooltips(text: string): string | undefined {
+        if (isShowSelectEpisode) return undefined
+        if (currentSettings) return undefined
+        return text
+    }
+
     return (
         <div className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
             <video
@@ -524,7 +536,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 onTimeUpdate={updateProgress}
                 onProgress={handleProgress}
                 onSeeked={handleProgress}
-                onClick={() => { togglePlay(); setcurrentSettings(() => false) }}
+                onClick={() => { togglePlay(); setcurrentSettings(() => false); setShowSelectEpisode(() => false) }}
                 autoPlay={isPlaying}
                 onWaiting={() => { setWaitingPlayer(() => true) }}
                 onCanPlay={() => { setWaitingPlayer(() => false) }}
@@ -592,12 +604,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         <div className="player-left">
                             {temp.episodes[temp.episodes.indexOf(temp.episode) - 1] !== undefined &&
                                 <PlayerButton title={t('player.previous', { ep: temp.episodes[temp.episodes.indexOf(temp.episode) - 1] })} icon='skip_previous'
-                                    onClick={() => functions.prevButton("prev")}
+                                    onClick={() => setEpisode("prev")}
                                     ButtonClass="player-buttons" />
                             }
                             <PlayerButton icon={isPlaying ? "pause" : "play_arrow"} title={isPlaying ? t('player.Pause') : t('player.play')} ButtonClass="player-buttons" onClick={togglePlay} />
                             {temp.episodes[temp.episodes.indexOf(temp.episode) + 1] !== undefined &&
-                                <PlayerButton icon='skip_next' ButtonClass='material-symbols-outlined player-buttons' title={t('player.next', { ep: temp.episodes[temp.episodes.indexOf(temp.episode) + 1] })} onClick={() => functions.nextButton("next")} />
+                                <PlayerButton icon='skip_next' ButtonClass='material-symbols-outlined player-buttons' title={t('player.next', { ep: temp.episodes[temp.episodes.indexOf(temp.episode) + 1] })} onClick={() => setEpisode("next")} />
                             }
                             <div className="player-time-display">
                                 {formatTime(currentTime)} / {formatTime(videoRef.current?.duration)}
@@ -610,8 +622,18 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                     <SeekBar currentValue={volume} maxValue={100} onSeek={value => handleVolume(value)} classes={{ container: "player-seekbar" }} />
                                 )}
                             </div>
-                            <PlayerButton icon={"picture_in_picture"} onClick={handlePictureInPicture} title={currentSettings == false ? "Picture In Picture" : undefined} ButtonClass="player-buttons" />
-                            <PlayerButton icon={"video_library"} title={currentSettings == false ? "Select Episode" : undefined} ButtonClass="player-buttons" />
+                            <PlayerButton icon={"picture_in_picture"} onClick={handlePictureInPicture} title={detectDisableTooltips("Picture In Picture")} ButtonClass="player-buttons" />
+                            <PlayerButton icon={"video_library"} title={detectDisableTooltips("Select Episode")} ButtonClass="player-buttons" onClick={() => { setShowSelectEpisode((prev) => !prev); setcurrentSettings(() => false) }} />
+                            {isShowSelectEpisode &&
+                                <div className="player-select-episode-container">
+                                    <div className="player-select-episode-title">Change Episode</div>
+                                    <div className="player-select-episode-content">
+                                        {temp.episodes.map((element) => (
+                                            <div className={`information-episode-button ${parseInt(element) < parseInt(temp.episode) ? "watched" : ""} ${parseInt(element) == parseInt(temp.episode) ? "current" : ""}`} onClick={() => setNextEpisode(element)}>{element}</div>
+                                        ))}
+                                    </div>
+                                </div>
+                            }
                             {currentSettings &&
                                 <PlayerSettings
                                     sources={
@@ -630,8 +652,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                     }}
                                 />
                             }
-                            <PlayerButton icon="settings" ButtonClass="player-buttons" title={currentSettings == false ? t('global.settings') : undefined} onClick={() => setcurrentSettings((prev) => !prev)} />
-                            <PlayerButton icon={isFullscreen ? 'fullscreen_exit' : 'fullscreen'} ButtonClass="player-buttons" title={currentSettings == false ? t('player.fullscreen') : undefined} onClick={async () => await enterFullscreen()} />
+                            <PlayerButton icon="settings" ButtonClass="player-buttons" title={detectDisableTooltips(t('global.settings'))} onClick={() => { setcurrentSettings((prev) => !prev); setShowSelectEpisode(() => false) }} />
+                            <PlayerButton icon={isFullscreen ? 'fullscreen_exit' : 'fullscreen'} ButtonClass="player-buttons" title={detectDisableTooltips(t('player.fullscreen'))} onClick={async () => await enterFullscreen()} />
                         </div>
                     </div>
                 </div>
@@ -642,7 +664,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     <div className="player-up-Next-Title">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>
                     <div className="player-up-Next-Anime">{t("player.upNext.titleAnime", { ep: temp.episodes[temp.episodes.indexOf(temp.episode) + 1], title: anime_data.AnimeData.title.romaji })}</div>
                     <div className="player-up-Next-Buttons">
-                        <Button content={t("player.upNext.nextEp")} ButtonClass='player-up-Next-Button' onClick={() => functions.nextButton("next")} />
+                        <Button content={t("player.upNext.nextEp")} ButtonClass='player-up-Next-Button' onClick={() => setEpisode("next")} />
                         <Button content={t("player.upNext.hide")} ButtonClass='player-up-Next-Button' onClick={() => { setHideUpNextEpisode(true); setUpNextEpisode(false) }} />
                     </div>
                 </div>

@@ -269,6 +269,51 @@
 
 }
 
+.player-select-episode-void {
+  background-color: var(--player-bg-containers);
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  z-index: 9999;
+
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-wrap: wrap;
+}
+
+.player-select-episode-container {
+  height: max-content;
+  max-height: 200px;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  gap: 4px;
+
+  pointer-events: all;
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+
+  background-color: var(--player-bg-containers);
+  border-radius: 8px;
+  border: 2px solid var(--bg4);
+  overflow: auto;
+}
+
+.player-select-episode-title {
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.player-select-episode-content {
+  display: flex;
+  gap: 4px;
+  padding: 2px;
+  flex-wrap: wrap;
+}
+
 /* UI */
 .player-icon-ui {
   font-size: 72px;

@@ -13,6 +13,7 @@
   --neutral2: #19a651;
   --neutral3: #27ae5d;
   --red: #861832;
+  --blue: #1C1291;
 
   /* other */
   --player-bg-containers: color-mix(in srgb, var(--bg3) 70%, transparent);
@@ -294,6 +295,10 @@ body {
 
 .information-episode-button.watching {
   border-color: var(--red);
+}
+
+.information-episode-button.current {
+  border-color: var(--blue);
 }
 
 .information-select-episode {

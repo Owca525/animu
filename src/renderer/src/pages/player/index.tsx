@@ -28,7 +28,7 @@ const player = () => {
     const [extractionData, setextractionData] = useState<{ actual: string, type: string, episodelist: Array<string>, time: number }>({ actual: anime_data.data.saveData ? anime_data.data.saveData.episode : "1", type: anime_data.data.saveData ? anime_data.data.saveData.type : "sub", episodelist: anime_data.episodelist, time: anime_data.data.saveData ? anime_data.data.saveData?.last_Time : 0 })
     const playerID = anime_data.data.AnimeData.player_ID ?? "";
     const extractFunc = useCallback(() => {
-    return pluginPlayer.player.getUrls(extractionData.type, extractionData.actual, playerID);
+        return pluginPlayer.player.getUrls(extractionData.type, extractionData.actual, playerID);
     }, [extractionData, playerID]);
 
     const { data, isLoading, refetch } = useQuery({
@@ -37,16 +37,12 @@ const player = () => {
         refetchOnWindowFocus: false,
     });
 
-    function setNewEpisode(type: string) {
+    function setNewEpisode(ep: string) {
         setextractionData((old) => {
-            let ep = extractionData.episodelist.indexOf(old.actual)
-            if (type == 'prev') ep = ep - 1
-            if (type == 'next') ep = ep + 1
-            if (extractionData.episodelist[ep] === undefined) return old
             return {
                 ...old,
                 time: 0,
-                actual: extractionData.episodelist[ep]
+                actual: ep
             }
         })
         refetch()
@@ -101,7 +97,7 @@ const player = () => {
                     player_data={data}
                     anime_data={anime_data.data}
                     temp={{ episode: extractionData.actual, type: extractionData.type, episodes: extractionData.episodelist }}
-                    functions={{ nextButton: setNewEpisode, prevButton: setNewEpisode }}
+                    setNextEpisode={setNewEpisode}
                     volumeCacheFunc={setPlayerVolume}
                     PlayerVolume={playerVolume}
                     time={extractionData.time}
