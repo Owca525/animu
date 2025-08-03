@@ -7,7 +7,7 @@
 .dropdown-button {
   padding: 8px;
   cursor: pointer;
-  width: 130px;
+  width: 150px;
   display: flex;
   transition: border-color 150ms ease;
   align-items: center;
@@ -60,6 +60,6 @@ maybe that will be usefull in the future */
 @media (max-width: 600px) {
 
   .dropdown-button {
-    width: 100px;
+    width: 120px;
   }
 }
