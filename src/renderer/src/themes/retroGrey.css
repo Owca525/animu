@@ -13,6 +13,7 @@
   --neutral2: #0947ab;
   --neutral3: #0f7dcc;
   --red: red;
+  --blue: var(--neutral3);
 }
 
 .video-player, .player-video-container, .player-loading-container {
