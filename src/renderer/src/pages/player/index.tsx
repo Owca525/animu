@@ -12,6 +12,7 @@ import { SaveHistory } from "@renderer/utils/history/history";
 import { detectTitle, refetchHistory } from "@renderer/utils/functions";
 import { useHotkeys } from "react-hotkeys-hook";
 import Button from "@renderer/components/buttons";
+import ExternalPlayer from "./externalPlayer";
 
 const VideoPlayer = lazy(() => import('./VideoPlayer'));
 // const ExternalPlayer = lazy(() => import('./externalPlayer'));
