@@ -394,6 +394,41 @@ function settings() {
                             </div>
                         </div>
                         <div className="settings-page-container">
+                            <div className="settings-page-title">External Player</div>
+                            <div className="settings-setting-container">
+                                Enable External Player
+                                <CheckBox
+                                    checked={config.new.Player.external.enable}
+                                    onChecked={(checked) =>
+                                        handleChange('Player.external.enable', checked)
+                                    }
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Select Player
+                                <Dropdown
+                                    options={[
+                                        { label: "Movian", onClick: () => handleChange("Player.external.type", "movian") },
+                                        { label: "Mpv", onClick: () => handleChange("Player.external.type", "mpv") },
+                                        { label: "VLC", onClick: () => handleChange("Player.external.type", "vlc") },
+                                    ]}
+                                    buttonText={config.new.Player.external.type}
+                                    disableX
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Movian IP
+                                <SettingsInput
+                                    iconChar=" "
+                                    type="text"
+                                    onKeyDown={(text) => handleChange("Player.external.movianIP", text)}
+                                    startValue={config.new.Player.external.movianIP}
+                                />
+                            </div>
+                        </div>
+                        <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.player.screenshot")}</div>
                             <div className="settings-setting-container">
                                 {t("settings.player.screenask")}

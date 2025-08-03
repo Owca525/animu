@@ -161,6 +161,11 @@ export interface SettingsConfig {
             alwaysAsk: boolean
             saveType: "File" | "Clipboard" | "Both"
             path: string
+        },
+        external: {
+            enable: boolean,
+            type: "movian" | "vlc" | "mpv" | "custom",
+            movianIP: string
         }
         keybinds: {
             Pause: string

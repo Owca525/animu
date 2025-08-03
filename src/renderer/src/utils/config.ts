@@ -30,6 +30,11 @@ export const defaultConfig: SettingsConfig = {
             saveType: "File",
             path: await checkPictureFolder(),
         },
+        external: {
+            enable: false,
+            type: "mpv",
+            movianIP: "localhost:42000"
+        },
         keybinds: {
             Pause: " ",
             LongTimeSkipForward: "ArrowUp",
