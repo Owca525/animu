@@ -85,7 +85,8 @@ const player = () => {
         })
         return
     }
-     if (true) {
+
+    if (config.Player.external.enable) {
          return (
              <ExternalPlayer 
                 animeData={anime_data.data}
@@ -95,7 +96,8 @@ const player = () => {
                 now_episodes={{ episode: extractionData.actual, type: extractionData.type, episodes: extractionData.episodelist }}
             />
          )
-     }
+    }
+
     if (data && isLoading == false) {
         return (
             <Suspense fallback={loadingAnimation(leave, anime_data.data)}>
