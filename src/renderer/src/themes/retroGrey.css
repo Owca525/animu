@@ -35,7 +35,7 @@
   color: #cfcfcf;
 }
 
-* {
+*, .information-bar-icon {
   border-radius: 0px !important;
 }
 ::-webkit-scrollbar, ::-webkit-scrollbar-thumb {
