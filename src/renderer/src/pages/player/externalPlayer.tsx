@@ -53,7 +53,13 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                     <Button icon='replay' ButtonClass="player-buttons" onClick={RunMocian} />
                     <Button icon='skip_next' ButtonClass="player-buttons" />
                 </div>
-                <Drop content={makeButtons(now_episodes.episodes)} LeftHeader={"Episodes"} RightHeader={""} />
+                {/* <Drop content={makeButtons(now_episodes.episodes)} LeftHeader={"Episodes"} RightHeader={""} /> */}
+            </div>
+            <div className="external-episodes-container">
+                <div className="external-episodes-title">Episodes:</div>
+                <div className="external-episodes">
+                    {makeButtons(now_episodes.episodes)}
+                </div>
             </div>
         </div>
     )

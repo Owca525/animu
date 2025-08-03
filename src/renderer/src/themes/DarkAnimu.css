@@ -412,16 +412,30 @@ body {
 
 /* ExternalPlayer */
 
+.external-player-container ::-webkit-scrollbar {
+  color: var(--bg3);
+  background-color: var(--bg3);
+}
+
+.external-player-container ::-webkit-scrollbar-thumb {
+  color: var(--bg2);
+  background-color: var(--bg2);
+}
+
 .external-player-container {
   background-color: var(--bg2);
   border-radius: 12px;
 }
 
-.external-title {
-  background-color: var(--bg2);
+.external-button-container {
+  background-color: var(--bg3);
   border-radius: 12px;
 }
 
+.external-episodes-container {
+  background-color: var(--bg3);
+  border-radius: 12px;
+}
 
 /* Settings */
 
