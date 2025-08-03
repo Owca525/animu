@@ -2,9 +2,11 @@
 
 import Button from "@renderer/components/buttons"
 import "./components/css/externalPlayer.css"
-import Drop from "../information/components/drop"
-import { cardData, playerData } from "@renderer/utils/GlobalInterface"
+import { cardData, notificationProps, playerData } from "@renderer/utils/GlobalInterface"
 import { detectTitle } from "@renderer/utils/functions"
+import { useEffect } from "react"
+import { toast } from "react-toastify"
+import { useNavigate } from "react-router-dom"
 
 interface ExternalplayerProps {
     animeData: cardData
@@ -14,29 +16,35 @@ interface ExternalplayerProps {
     now_episodes: { episode: string, type: string, episodes: Array<string> }
 }
 
-const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes, playerData }) => {
+const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes, playerData, setNextEpisode }) => {
+    const navigate = useNavigate()
 
-    function makeButtons(episode: string[]) {
-        return (
-            <div className='information-buttons-episode-container'>
-                {episode.map((num) => (
-                    <div className='information-episode-button'>{num}</div>
-                ))}
-            </div>
-        )
-    }
-
-    async function RunMocian() {
+    async function RunMovian() {
         let url = playerData[0].resolution[0].url
-        console.log(await window.api.request.get(`http://localhost:42000/showtime/open?url=${encodeURIComponent(url)}`, {}))
+        let req = await window.api.request.get(`http://localhost:42000/showtime/open?url=${encodeURIComponent(url)}`, {})
+        if (!req.success) {
+            toast.error("Failed Run Movian", notificationProps)
+        } 
     }
 
     console.log(playerData)
 
+    function setEpisode(type: "next" | "prev") {
+        let ep = now_episodes.episodes.indexOf(now_episodes.episode)
+        if (type == 'prev') ep = ep - 1
+        if (type == 'next') ep = ep + 1
+        if (now_episodes.episodes[ep] === undefined) return
+        setNextEpisode(ep.toString())
+    }
+
+    useEffect(() => {
+        RunMovian()
+    }, [])
+
     return (
         <div className="external-player-container">
             <div className="video-top">
-                <Button icon="arrow_back" ButtonClass="player-buttons" />
+                <Button icon="arrow_back" ButtonClass="player-buttons" onClick={() => navigate("/")} />
                 <div className="player-title">{detectTitle({
                     ...animeData, saveData: {
                         episode: now_episodes.episode,
@@ -49,16 +57,17 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
             </div>
             <div className="external-player-center">
                 <div className="external-button-container">
-                    <Button icon='skip_previous' ButtonClass="player-buttons" />
-                    <Button icon='replay' ButtonClass="player-buttons" onClick={RunMocian} />
-                    <Button icon='skip_next' ButtonClass="player-buttons" />
+                    <Button icon='skip_previous' ButtonClass="player-buttons" onClick={() => setEpisode("prev")} />
+                    <Button icon='replay' ButtonClass="player-buttons" onClick={RunMovian} />
+                    <Button icon='skip_next' ButtonClass="player-buttons" onClick={() => setEpisode("next")} />
                 </div>
-                {/* <Drop content={makeButtons(now_episodes.episodes)} LeftHeader={"Episodes"} RightHeader={""} /> */}
             </div>
             <div className="external-episodes-container">
                 <div className="external-episodes-title">Episodes:</div>
                 <div className="external-episodes">
-                    {makeButtons(now_episodes.episodes)}
+                    {now_episodes.episodes.map((num) => (
+                        <div className='information-episode-button' onClick={() => setNextEpisode(num)}>{num}</div>
+                    ))}
                 </div>
             </div>
         </div>

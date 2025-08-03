@@ -86,7 +86,7 @@ const player = () => {
         return
     }
 
-    if (config.Player.external.enable) {
+    if (data && isLoading == false && config.Player.external.enable) {
          return (
              <ExternalPlayer 
                 animeData={anime_data.data}
