@@ -49,6 +49,10 @@
   padding: 6px 6px 11px 6px;
   height: fit-content;
   max-height: 92%;
+  display: flex;
+  justify-content: start;
+  gap: 0.5em;
+  flex-wrap: wrap;
 }
 
 .external-episodes-title {
