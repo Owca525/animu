@@ -14,7 +14,7 @@ interface ExternalplayerProps {
     now_episodes: { episode: string, type: string, episodes: Array<string> }
 }
 
-const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes }) => {
+const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes, playerData }) => {
 
     function makeButtons(episode: string[]) {
         return (
@@ -25,6 +25,13 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
             </div>
         )
     }
+
+    async function RunMocian() {
+        let url = playerData[0].resolution[0].url
+        console.log(await window.api.request.get(`http://localhost:42000/showtime/open?url=${encodeURIComponent(url)}`, {}))
+    }
+
+    console.log(playerData)
 
     return (
         <div className="external-player-container">
@@ -43,7 +50,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
             <div className="external-player-center">
                 <div className="external-button-container">
                     <Button icon='skip_previous' ButtonClass="player-buttons" />
-                    <Button icon='replay' ButtonClass="player-buttons" />
+                    <Button icon='replay' ButtonClass="player-buttons" onClick={RunMocian} />
                     <Button icon='skip_next' ButtonClass="player-buttons" />
                 </div>
                 <Drop content={makeButtons(now_episodes.episodes)} LeftHeader={"Episodes"} RightHeader={""} />
