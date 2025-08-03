@@ -26,6 +26,9 @@
 
 .dropdown-button-text {
   font-size: 0.9em;
+  display: flex;
+  gap: 4px;
+  align-items: center;
 }
 
 .dropdown-menu {
@@ -53,6 +56,15 @@
   text-align: end;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.dropdown-item-image {
+  width: 24px;
+  height: 24px;
 }
 
 /* for smartphones 
