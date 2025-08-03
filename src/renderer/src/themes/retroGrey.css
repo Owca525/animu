@@ -70,6 +70,9 @@
   box-shadow: inset -1px -1px #0a0a0a,inset 1px 1px #fff,inset -2px -2px grey,inset 2px 2px #dfdfdf;
   border-width: 0px !important;
 }
+.external-button-container .player-buttons, .external-player-container .video-top .player-buttons, .external-player-container .video-top .player-title, .external-button-container {
+  box-shadow: inset -1px -1px #0a0a0a,inset 1px 1px #fff,inset -2px -2px grey,inset 2px 2px #dfdfdf !important;
+}
  .information-episode-button {
   box-shadow: inset -1px -1px #0a0a0a,inset 1px 1px #fff,inset -2px -2px grey,inset 2px 2px #dfdfdf;
  }
@@ -80,7 +83,7 @@
   outline: 1px dotted #000000;
   outline-offset: -4px;
 }
-.home-header-search, .dropdown-button, .drop-button, .drop-content-show, .information-info-content, .settings-text-space, .settings-keybind-check, .settings-input-container {
+.home-header-search, .dropdown-button, .drop-button, .drop-content-show, .information-info-content, .settings-text-space, .settings-keybind-check, .settings-input-container, .external-episodes-container {
   background-color: var(--bg) !important;
   border-width: 0px !important;
   box-shadow: inset -1px -1px #fff,inset 1px 1px grey,inset -2px -2px #dfdfdf,inset 2px 2px #0a0a0a;
