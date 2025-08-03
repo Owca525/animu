@@ -104,6 +104,10 @@
   gap: 8px;
 }
 
+.settings-sidebar-container .sidebar-container-max .sidebar-bottom {
+  margin-bottom: 64px;
+}
+
 /* for smartphones 
 maybe that will be usefull in the future */
 @media (max-width: 600px) {
