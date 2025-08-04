@@ -388,7 +388,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         if (type == 'prev') ep = ep - 1
         if (type == 'next') ep = ep + 1
         if (temp.episodes[ep] === undefined) return
-        setNextEpisode(ep.toString())
+        setNextEpisode(temp.episodes[ep])
     }
 
     function keybinds(event: string) {
