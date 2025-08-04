@@ -13,11 +13,14 @@ import { toast } from "react-toastify";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import { ReadHistory } from "@renderer/utils/history/history";
 import { ReadContinue } from "@renderer/utils/history/continueWatch";
+import store from "@renderer/utils/store";
 
 function information() {
     const navigate = useNavigate()
     const location = useLocation();
     let anime_data: AnimeData = location.state;
+
+    const informationTemp = useSelector((info: any) => info.information);
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
     const [showWrong, setshowWrong] = useState<boolean>(false)
     const [secondsLeft, setSecondsLeft] = useState<undefined | number>(anime_data.nextAiringEpisode?.timeUntilAiring);
@@ -59,6 +62,7 @@ function information() {
             if (data) {
                 setData(() => data)
                 setLoadingData(() => false)
+                store.dispatch({ type: "setInformationEpisodesData", payload: data })
             } else {
                 setIsError(() => true)
             }
@@ -72,26 +76,34 @@ function information() {
     }
 
     async function initialInformation() {
-        if (anime_data.id === "") {
+        console.log(informationTemp)
+        if (anime_data.id == "") {
             fetchData(pluginPlayer.player.animeDataList, anime_data.player_ID)
             return
         }
 
         let cardAnime = (await ReadHistory()).filter((element) => element.AnimeData.id == anime_data.id)
         let cardAnimeContinueWatch = (await ReadContinue()).filter((element) => element.AnimeData.id == anime_data.id)
-        if (cardAnime.length <= 0) {
-            fetchData(pluginPlayer.player.animeDataList)
-            return
-        }
 
         if (cardAnimeContinueWatch.length > 0) {
             let animeContinue = cardAnimeContinueWatch[0].saveData
             if (animeContinue) setsavedata(() => {return{ last_episode: parseInt(animeContinue.episode), last_time: animeContinue.last_Time }})
-        } else {
+        }
+        if (cardAnime.length > 0 && cardAnimeContinueWatch.length <= 0) {
             let animeHistory = cardAnime[0].saveData
             if (animeHistory) setsavedata(() => {return{ last_episode: parseInt(animeHistory.episode), last_time: animeHistory.last_Time }})
         }
-        
+
+        if (informationTemp.id == anime_data.id && informationTemp.episodes_data != undefined) {
+            setData(() => informationTemp.episodes_data)
+            return
+        }
+
+        store.dispatch({ type: "setInformationID", payload: anime_data.id })
+        if (cardAnime.length <= 0 && cardAnimeContinueWatch.length <= 0) {
+            fetchData(pluginPlayer.player.animeDataList)
+            return
+        }
         fetchData(pluginPlayer.player.animeDataList, cardAnime[0].AnimeData.player_ID)
     }
 

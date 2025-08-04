@@ -4,11 +4,13 @@ import { combineReducers } from "redux";
 import pluginStore from "./reducer/plugins"
 import HomeData from "./reducer/home"
 import Config from "./reducer/config"
+import information from "./reducer/information";
 
 const rootReducer = combineReducers({
     plugin: pluginStore,
     home: HomeData,
-    config: Config
+    config: Config,
+    information: information
 });
 
 const store = configureStore({
