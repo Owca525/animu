@@ -8,6 +8,7 @@
   padding: 8px;
   cursor: pointer;
   width: 150px;
+  height: 20px;
   display: flex;
   transition: border-color 150ms ease;
   align-items: center;
