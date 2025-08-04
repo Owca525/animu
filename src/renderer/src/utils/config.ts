@@ -24,6 +24,9 @@ export const defaultConfig: SettingsConfig = {
             LongTimeSkipBack: 90,
             TimeSkipLeft: 5,
             TimeSkipRight: 5,
+            VideoScaling: false,
+            RemovingSpaceAnimation: false,
+            DisableVolumeAnimation: false
         },
         screenShot: {
             alwaysAsk: true,
@@ -34,6 +37,11 @@ export const defaultConfig: SettingsConfig = {
             enable: false,
             type: "mpv",
             movianIP: "localhost:42000"
+        },
+        upToNextEpisode: {
+            enable: true,
+            interval: 30,
+            durrationShow: 5
         },
         keybinds: {
             Pause: " ",

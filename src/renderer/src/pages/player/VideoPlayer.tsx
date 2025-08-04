@@ -318,16 +318,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         // checking to show Up next communicat
         if (!config) return
         if (!videoRef.current) return
+        if (!config.Player.upToNextEpisode.enable) return
         const duration = videoRef.current.duration
         const currentTime = videoRef.current.currentTime
 
-        if (duration <= 300) return
+        if (duration <= config.Player.upToNextEpisode.durrationShow * 60) return
 
         if (duration != 0 && currentTime != 0 && isHideUpNextEpisode == false && temp.episodes[temp.episodes.indexOf(temp.episode) + 1] != null && currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
             setUpNextEpisode(true)
             setTimeNextEpisode(((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + 30)
         } else {
-            setTimeNextEpisode(30)
+            setTimeNextEpisode(config.Player.upToNextEpisode.interval)
             setUpNextEpisode(false)
         }
 
@@ -545,6 +546,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 onError={(error) => videoErrorHandler(error)}
                 preload={config?.Player.general.playerLoadType}
                 muted={isMuted}
+                style={config.Player.general.VideoScaling ? { objectFit: "cover" } : {}}
             />
             {isVisible &&
                 <>
@@ -589,7 +591,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     >
                         <div className="player-waiting material-symbols-outlined">progress_activity</div>
                     </motion.div>
-                    {isWaitingPlayer == false &&
+                    {isWaitingPlayer == false && !config.Player.general.RemovingSpaceAnimation &&
                         <motion.div className="player-loading-animation-container"
                             variants={hiddenVariants}
                             animate={isShowPlay ? "visible" : "hidden"}
@@ -671,21 +673,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     </div>
                 </div>
             ) : ""}
-            <motion.div className="player-volume-ui-container"
-                variants={{
-                    hidden: { x: 400 },
-                    visible: { x: 0 },
-                }}
-                animate={isVolume ? "visible" : "hidden"}
-                initial="hidden"
-                transition={{ duration: 0.2 }}
-            >
-                <span className="player-volume-ui-icon material-symbols-outlined">{isMuted ? 'volume_off' : 'volume_up'}</span>
-                <div className="player-volume-ui-bar-container">
-                    <div className="player-volume-ui-bar-progress" style={{ width: `${volume}%` }}></div>
-                </div>
-                <span className="player-volume-ui-text">{parseInt(volume.toString())}%</span>
-            </motion.div>
+            {!config.Player.general.DisableVolumeAnimation &&
+                <motion.div className="player-volume-ui-container"
+                    variants={{
+                        hidden: { x: 400 },
+                        visible: { x: 0 },
+                    }}
+                    animate={isVolume ? "visible" : "hidden"}
+                    initial="hidden"
+                    transition={{ duration: 0.2 }}
+                >
+                    <span className="player-volume-ui-icon material-symbols-outlined">{isMuted ? 'volume_off' : 'volume_up'}</span>
+                    <div className="player-volume-ui-bar-container">
+                        <div className="player-volume-ui-bar-progress" style={{ width: `${volume}%` }}></div>
+                    </div>
+                    <span className="player-volume-ui-text">{parseInt(volume.toString())}%</span>
+                </motion.div>
+            }
             {showNerdStats && (
                 <NerdStats video={videoRef} volume={volume} currentTime={currentTime} />
             )}

@@ -156,6 +156,9 @@ export interface SettingsConfig {
             LongTimeSkipBack: number | string
             TimeSkipLeft: number | string
             TimeSkipRight: number | string
+            VideoScaling: boolean,
+            DisableVolumeAnimation: boolean,
+            RemovingSpaceAnimation: boolean
         }
         screenShot: {
             alwaysAsk: boolean
@@ -166,6 +169,11 @@ export interface SettingsConfig {
             enable: boolean,
             type: "movian" | "vlc" | "mpv" | "custom",
             movianIP: string
+        }
+        upToNextEpisode: {
+            enable: boolean
+            interval: number
+            durrationShow: number
         }
         keybinds: {
             Pause: string

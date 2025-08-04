@@ -392,6 +392,48 @@ function settings() {
                                     disableX
                                 />
                             </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Video Scaling
+                                <CheckBox
+                                    checked={config.new.Player.general.VideoScaling}
+                                    onChecked={(checked) =>
+                                        handleChange('Player.general.VideoScaling', checked)
+                                    }
+                                />
+                            </div>
+                        </div>
+                        <div className="settings-page-container">
+                            <div className="settings-page-title">Up To next Episode Notification</div>
+                            <div className="settings-setting-container">
+                                Is Enabled
+                                <CheckBox
+                                    checked={config.new.Player.upToNextEpisode.enable}
+                                    onChecked={(checked) =>
+                                        handleChange('Player.upToNextEpisode.enable', checked)
+                                    }
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Interval Notification
+                                <SettingsInput
+                                    iconChar="s"
+                                    type="number"
+                                    onKeyDown={(text) => handleChange("Player.upToNextEpisode.interval", parseInt(text))}
+                                    startValue={config.new.Player.upToNextEpisode.interval.toString()}
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Durration Episode when is hide
+                                <SettingsInput
+                                    iconChar="m"
+                                    type="number"
+                                    onKeyDown={(text) => handleChange("Player.upToNextEpisode.durrationShow", parseInt(text))}
+                                    startValue={config.new.Player.upToNextEpisode.durrationShow.toString()}
+                                />
+                            </div>
                         </div>
                         <div className="settings-page-container">
                             <div className="settings-page-title">External Player</div>
