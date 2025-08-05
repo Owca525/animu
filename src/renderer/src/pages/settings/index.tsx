@@ -706,13 +706,21 @@ function settings() {
                                     <td className="settings-extensions-title"><img className="settings-extensions-icon" src="https://anilist.co/img/icons/icon.svg" />Anilist</td>
                                     <td><div className="settings-extensions-background">Owca525</div></td>
                                     <td><div className="settings-extensions-background">1.0</div></td>
-                                    <td className="settings-extensions-button-container"><div className="settings-extensions-background">Information</div> <Button icon="settings" ButtonClass="settings-extensions-button"/></td>
+                                    <td>
+                                        <div className="settings-extensions-button-container">
+                                            <div className="settings-extensions-background">Information</div> <Button icon="settings" ButtonClass="settings-extensions-button"/>
+                                        </div>
+                                    </td>
                                 </tr>
                                 <tr className="settings-table-button">
                                     <td className="settings-extensions-title"><img className="settings-extensions-icon" src="https://allmanga.to/android-icon-192x192.png" />Allmanga</td>
                                     <td><div className="settings-extensions-background">Owca525</div></td>
                                     <td><div className="settings-extensions-background">1.0</div></td>
-                                    <td className="settings-extensions-button-container"><div className="settings-extensions-background">Player</div> <Button icon="settings" ButtonClass="settings-extensions-button"/></td>
+                                    <td>
+                                        <div className="settings-extensions-button-container">
+                                            <div className="settings-extensions-background">Player</div> <Button icon="settings" ButtonClass="settings-extensions-button"/>
+                                        </div>
+                                    </td>
                                 </tr>
                             </table>
                         </div>
