@@ -316,7 +316,7 @@ function settings() {
                                 <CheckBox
                                     checked={config.new.Player.general.AutoFullscreen}
                                     onChecked={(checked) =>
-                                        handleChange('Player.general.Autoplay', checked)
+                                        handleChange('Player.general.AutoFullscreen', checked)
                                     }
                                 />
                             </div>
