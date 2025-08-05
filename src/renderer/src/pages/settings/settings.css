@@ -62,23 +62,15 @@
   max-width: 600px;
 }
 
-.settings-save-container {
-  position: fixed;
-  z-index: 0;
-  bottom: 0;
-  left: 0;
-  width: 100vw;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
 .settings-save-content {
   display: flex;
   align-items: center;
   padding: 6px 10px 6px 10px;
   gap: 8px;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  translate: -50%;
 }
 
 .settings-save-buttons {

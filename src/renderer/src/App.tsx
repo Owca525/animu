@@ -26,7 +26,9 @@ import { useHotkeys } from 'react-hotkeys-hook';
 LoadConfig()
 
 function App() {
-  useHotkeys("F12", () => window.BrowserWindow.openDevTools())
+  useHotkeys("F12", () => {
+    if (store.getState().config.Developer.DevTools) window.BrowserWindow.openDevTools()
+  })
 
   return (
     <ErrorBoundary>

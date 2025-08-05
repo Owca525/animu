@@ -154,6 +154,7 @@ function settings() {
             })
             setSaving(() => false)
             saveConfig(config.new)
+            setDynamicZoom(config.new.General.Window.Zoom)
             toast.success(t("settings.saving.done"), notificationProps)
         } catch (error) {
             toast.success(t("settings.saving.error"), notificationProps)
@@ -162,6 +163,7 @@ function settings() {
 
     function resetConfig() {
         setConfig((prev) => {
+            ChangeLanguage(config.old.General.language)
             return { old: structuredClone(prev.old), new: structuredClone(prev.old) }
         })
         setSaving(() => false)
@@ -204,7 +206,6 @@ function settings() {
                 hideButton
                 showLogo
             />
-            <div className="settings-save-container">
                 <motion.div variants={saveCommunicateAnimation} initial={"hidden"} animate={isSaving ? "visible" : "hidden"} transition={{ duration: 0.2 }} className="settings-save-content">
                     <div className="settings-save-title">{t("settings.saving.notification")}</div>
                     <div className="settings-save-buttons">
@@ -212,7 +213,6 @@ function settings() {
                         <Button content={t("dialog.reset")} onClick={resetConfig} />
                     </div>
                 </motion.div>
-            </div>
             <div className="settings-content-container">
                 {category == "general" && (
                     <>
@@ -295,7 +295,7 @@ function settings() {
                                 {t("settings.general.zoom")}
                                 <div className="settings-setting-seekbar-container">
                                     <span>50%</span>
-                                    <SeekBar maxValue={200} minValue={50} type="procent" currentValue={config.new.General.Window.Zoom} onSeek={(value) => { handleChange("General.Window.Zoom", parseInt(value.toFixed(0))); setDynamicZoom(parseInt(value.toFixed(0))) }} />
+                                    <SeekBar maxValue={200} minValue={50} type="procent" currentValue={config.new.General.Window.Zoom} onSeek={(value) => { handleChange("General.Window.Zoom", parseInt(value.toFixed(0))) }} />
                                     <span>200%</span>
                                 </div>
                             </div>
@@ -321,7 +321,7 @@ function settings() {
                                 <CheckBox
                                     checked={config.new.Player.general.AutoFullscreen}
                                     onChecked={(checked) =>
-                                        handleChange('Player.general.Autoplay', checked)
+                                        handleChange('Player.general.AutoFullscreen', checked)
                                     }
                                 />
                             </div>

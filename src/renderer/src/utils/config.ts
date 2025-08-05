@@ -6,7 +6,7 @@ export const defaultConfig: SettingsConfig = {
         // HoverSidebar: true,
         // HideSidebar: false,
         language: "en",
-        theme: "darkAnimu",
+        theme: "DarkAnimu",
         Window: {
             AutoMaximize: false,
             AutoFullscreen: false,
@@ -90,9 +90,11 @@ const appConfigDirPath = window.api.os.getPath("userData");
 
 export async function checkPictureFolder(): Promise<string> {
     const path = await window.api.os.getPath("pictures");
-    if (await window.api.os.exists(`${path}/animu`)) return `${path}/animu`;
-    window.api.os.mkdir(`${path}/animu`);
-    return `${path}/animu`;
+    const platform = await window.api.getOSDetails()
+    const platform_path = platform.platform == "win32" ? "\animu" : "/animu "
+    if (await window.api.os.exists(`${path}${platform_path}`)) return `${path}${platform_path}`;
+    window.api.os.mkdir(`${path}${platform_path}`);
+    return `${path}${platform_path}`;
 }
 
 function deepMerge(target: any, source: any): any {
@@ -126,10 +128,15 @@ export async function SaveOneParametrConfig(path: string, value: string | number
 }
 
 export async function readConfig(): Promise<SettingsConfig> {
-    if (await checkConfig() == false) return defaultConfig
-    const content = await window.api.os.read(await appConfigDirPath + "/config.ini");
-    const loadedConfig = ini.parse(content) as SettingsConfig;
-    return deepMerge(defaultConfig, loadedConfig);
+    try {
+        if (await checkConfig() == false) return defaultConfig
+        const content = await window.api.os.read(await appConfigDirPath + "/config.ini");
+        const loadedConfig = ini.parse(content) as SettingsConfig;
+        return deepMerge(defaultConfig, loadedConfig);
+    } catch (error) {
+        console.log(error)
+        return defaultConfig
+    }
 }
 
 export async function saveConfig(content: SettingsConfig): Promise<boolean> {
