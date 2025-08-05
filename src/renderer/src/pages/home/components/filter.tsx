@@ -28,7 +28,7 @@ const Filter: React.FC<{ onChange: (params?: FilterParams, removeParam?: string)
 
     return (
         <>
-            <Button ButtonClass="home-filter-button" icon="tune" onClick={() => setShowFilter((prev) => !prev)} />
+            <Button ButtonClass="home-filter-button" iconClassName="home-filter-button" icon="tune" onClick={() => setShowFilter((prev) => !prev)} />
             {showFilter &&
                 <div className="home-filter-container" ref={containerRef}>
                     <div className="home-filter-space">
