@@ -201,7 +201,6 @@ function settings() {
                 hideButton
                 showLogo
             />
-            <div className="settings-save-container">
                 <motion.div variants={saveCommunicateAnimation} initial={"hidden"} animate={isSaving ? "visible" : "hidden"} transition={{ duration: 0.2 }} className="settings-save-content">
                     <div className="settings-save-title">{t("settings.saving.notification")}</div>
                     <div className="settings-save-buttons">
@@ -209,7 +208,6 @@ function settings() {
                         <Button content={t("dialog.reset")} onClick={resetConfig} />
                     </div>
                 </motion.div>
-            </div>
             <div className="settings-content-container">
                 {category == "general" && (
                     <>
