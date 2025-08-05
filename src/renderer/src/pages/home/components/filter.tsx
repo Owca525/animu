@@ -28,7 +28,7 @@ const Filter: React.FC<{ onChange: (params?: FilterParams, removeParam?: string)
 
     return (
         <>
-            <Button ButtonClass="home-filter-button" icon="tune" onClick={() => setShowFilter((prev) => !prev)} />
+            <Button ButtonClass="home-filter-button" iconClassName="home-filter-button" icon="tune" onClick={() => setShowFilter((prev) => !prev)} />
             {showFilter &&
                 <div className="home-filter-container" ref={containerRef}>
                     <div className="home-filter-space">
@@ -41,7 +41,7 @@ const Filter: React.FC<{ onChange: (params?: FilterParams, removeParam?: string)
                     </div>
                     <div className="home-filter-space">
                         <div className="home-filter-title">{t("filter.season")}</div>
-                        <Dropdown onClickX={() => onChange(undefined, "seasons")} buttonText={homeCache.filterTags?.seasons ? homeCache.filterTags.seasons : ""} options={filter.years.map((element) => { return { label: element, onClick: (text) => onChange({ seasons: text }) } })} placeholder={"Season"} />
+                        <Dropdown onClickX={() => onChange(undefined, "seasons")} buttonText={homeCache.filterTags?.seasons ? homeCache.filterTags.seasons : ""} options={filter.seasons.map((element) => { return { label: element, onClick: (text) => onChange({ seasons: text }) } })} placeholder={"Season"} />
                     </div>
                     <div className="home-filter-space">
                         <div className="home-filter-title">{t("filter.format")}</div>
