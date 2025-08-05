@@ -1,7 +1,9 @@
 # Animu
 The concept is simple: watching anime while having a powerful tool for synchronizing anime lists, downloading anime, tracking what you've watched, using plugins to enable viewing anime from all sites, receiving notifications when a new episode is released on a site, and syncing with anime lists with the ability to update what you've watched, etc.
 
-The only problem is that my friend and I have no experience in creating such a project. So, if anyone wants to help, feel free to contact me: owca525 on Discord.
+The only problem is that my friend and I have no experience in creating such a project. So, if anyone wants to help, We have [Discord server](https://discord.gg/pAZyf78j)
+
+![discord](assets/discord.png)
 
 ## Screenshots
 ![home](assets/screenshot1.png)
