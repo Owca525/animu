@@ -1,5 +1,6 @@
 import { app, dialog, ipcMain } from "electron";
 import { mainWindow } from ".";
+import os from 'os';
 
 import fs, { WriteFileOptions } from "fs";
 
@@ -121,3 +122,11 @@ ipcMain.handle(
     return "";
   }
 );
+
+ipcMain.handle('get-os-info', async () => {
+  return {
+    platform: os.platform(),
+    release: os.release(),
+    arch: os.arch(),
+  };
+});

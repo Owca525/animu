@@ -66,6 +66,7 @@ declare global {
       };
       runExternaPlayer: (url: string, path: string, time: string, type: "mpv" | "vlc") => any
       getlistThemes: () => Promise<{ path: string, filename: string, type: "user" | "official" }[]>
+      getOSDetails: () => Promise<{ platform: NodeJS.Platform, release: string, arch: string }>
     };
     backend: {
       ipcRenderer: {

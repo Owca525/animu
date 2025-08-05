@@ -76,9 +76,11 @@ const appConfigDirPath = window.api.os.getPath("userData");
 
 export async function checkPictureFolder(): Promise<string> {
     const path = await window.api.os.getPath("pictures");
-    if (await window.api.os.exists(`${path}/animu`)) return `${path}/animu`;
-    window.api.os.mkdir(`${path}/animu`);
-    return `${path}/animu`;
+    const platform = await window.api.getOSDetails()
+    const platform_path = platform.platform == "win32" ? "\animu" : "/animu "
+    if (await window.api.os.exists(`${path}${platform_path}`)) return `${path}${platform_path}`;
+    window.api.os.mkdir(`${path}${platform_path}`);
+    return `${path}${platform_path}`;
 }
 
 function deepMerge(target: any, source: any): any {

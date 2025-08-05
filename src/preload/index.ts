@@ -52,7 +52,8 @@ if (process.contextIsolated) {
         openDialog: (path?: string, name?: string, extensions?: string[]) => ipcRenderer.invoke("openDialog", path, name, extensions),
       },
       runExternaPlayer: (url: string, path: string, time: string, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", url, path, time, type),
-      getlistThemes: () => ipcRenderer.invoke("get-css-files")
+      getlistThemes: () => ipcRenderer.invoke("get-css-files"),
+      getOSDetails: () => ipcRenderer.invoke('get-os-info')
     });
     contextBridge.exposeInMainWorld("backend", {
       Buffer: require("buffer").Buffer,
