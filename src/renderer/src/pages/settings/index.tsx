@@ -47,6 +47,11 @@ function settings() {
                 onClick: () => setCategory(() => "player"),
             },
             {
+                icon: "extension",
+                text: "Extensions",
+                onClick: () => setCategory(() => "extensions"),
+            },
+            {
                 icon: "history",
                 text: t("global.history"),
                 onClick: () => setCategory(() => "history"),
@@ -686,6 +691,33 @@ function settings() {
                         </div>
                     </>
                 )}
+                {category == "extensions" &&
+                    <div className="settings-page-container">
+                        <div className="settings-page-title">{"Extensions"}</div>
+                        <div className="settings-container-extensions">
+                            <table className="settings-table-extensions">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Plugin Author</th>
+                                    <th>Version</th>
+                                    <th>Type</th>
+                                </tr>
+                                <tr className="settings-table-button">
+                                    <td className="settings-extensions-title"><img className="settings-extensions-icon" src="https://anilist.co/img/icons/icon.svg" />Anilist</td>
+                                    <td><div className="settings-extensions-background">Owca525</div></td>
+                                    <td><div className="settings-extensions-background">1.0</div></td>
+                                    <td className="settings-extensions-button-container"><div className="settings-extensions-background">Information</div> <Button icon="settings" ButtonClass="settings-extensions-button"/></td>
+                                </tr>
+                                <tr className="settings-table-button">
+                                    <td className="settings-extensions-title"><img className="settings-extensions-icon" src="https://allmanga.to/android-icon-192x192.png" />Allmanga</td>
+                                    <td><div className="settings-extensions-background">Owca525</div></td>
+                                    <td><div className="settings-extensions-background">1.0</div></td>
+                                    <td className="settings-extensions-button-container"><div className="settings-extensions-background">Player</div> <Button icon="settings" ButtonClass="settings-extensions-button"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                }
             </div>
         </main>
     );
