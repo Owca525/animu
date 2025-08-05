@@ -18,7 +18,6 @@ interface DropdownProps {
 const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '', placeholderChange, buttonText = "", onClickX, disableX = false }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [text, setText] = useState<string>(buttonText)
-  console.log([placeholder], [buttonText])
 
   const toggleDropdown = () => setIsOpen(prev => !prev)
 
