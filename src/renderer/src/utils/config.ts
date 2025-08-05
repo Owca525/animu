@@ -6,7 +6,7 @@ export const defaultConfig: SettingsConfig = {
         // HoverSidebar: true,
         // HideSidebar: false,
         language: "en",
-        theme: "darkAnimu",
+        theme: "DarkAnimu",
         Window: {
             AutoMaximize: false,
             AutoFullscreen: false,
@@ -112,10 +112,15 @@ export async function SaveOneParametrConfig(path: string, value: string | number
 }
 
 export async function readConfig(): Promise<SettingsConfig> {
-    if (await checkConfig() == false) return defaultConfig
-    const content = await window.api.os.read(await appConfigDirPath + "/config.ini");
-    const loadedConfig = ini.parse(content) as SettingsConfig;
-    return deepMerge(defaultConfig, loadedConfig);
+    try {
+        if (await checkConfig() == false) return defaultConfig
+        const content = await window.api.os.read(await appConfigDirPath + "/config.ini");
+        const loadedConfig = ini.parse(content) as SettingsConfig;
+        return deepMerge(defaultConfig, loadedConfig);
+    } catch (error) {
+        console.log(error)
+        return defaultConfig
+    }
 }
 
 export async function saveConfig(content: SettingsConfig): Promise<boolean> {
