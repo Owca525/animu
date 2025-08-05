@@ -1,22 +1,62 @@
 /* external player section */
-.external-container{
+.external-player-container{
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100;
   width: 100%;
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  gap: 1em;
 }
 
-.external-player-container {
+.external-button-container {
   padding: 12px;
   display: flex;
   gap: 1em;
   width: max-content;
 }
 
-.external-title {
-  padding: 12px;
-  font-size: larger;
+.external-player-center {
+  margin-top: 15%;
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: fit-content;
+  min-height: 100px;
+  gap: 7px;
+}
+
+.external-dropdown {
+  position: absolute;
+  right: 15px;
+}
+
+.external-episodes-container {
+  width: fit-content;
+  max-width: min(122vh, 90%);
+  height: fit-content;
+  align-self: center;
+  padding: 11px 1px 1px 11px;
+  max-height: 45%;
+  overflow: hidden;
+}
+
+.external-episodes {
+  overflow-y: scroll;
+  padding: 6px 6px 11px 6px;
+  height: fit-content;
+  max-height: 92%;
+  display: flex;
+  justify-content: start;
+  gap: 0.5em;
+  flex-wrap: wrap;
+}
+
+.external-episodes-title {
+   padding: 1px 1px 3px 6px;
+   font-weight: bold;
+   font-size: 1.3em;
 }

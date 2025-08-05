@@ -5,8 +5,11 @@ import fs from "fs";
 import path from "path";
 import { mainWindow } from ".";
 import { exec } from "child_process";
+let rpc: any = undefined
 
-export const rpc = new RPC.Client({ transport: 'ipc' });
+if (process.env.NODE_ENV != 'development') {
+    rpc = new RPC.Client({ transport: 'ipc' });
+}
 
 // Client id for Discord Rich presence
 export const CLIENT_ID = '1320810160205070377';
@@ -19,7 +22,7 @@ ipcMain.on("openDevTools", () => {
 
 // Change activity in Discord Rich presence
 ipcMain.handle('setActivity', (_event, details: string | undefined, state: string | undefined) => {
-    if (rpc) {
+    if (rpc != undefined) {
         rpc.setActivity({
             details: details,
             state: state,
@@ -78,11 +81,14 @@ ipcMain.handle('saveToClipboard', async (_event, type: "text" | "image", content
 
 ipcMain.handle('get-css-files', async (): Promise<{ path: string, filename: string, type: "user" | "official" }[]> => {
     // Directory for local css
-    const stylesDir = path.join(__dirname, '../../out/renderer/assets/themes');
+    let stylesDir: string = "";
+    if (process.env.NODE_ENV === 'development') {
+        stylesDir = path.join(__dirname, '../../src/renderer/src/themes')
+    } else {
+        stylesDir = path.join(__dirname, '../../out/renderer/assets/themes')
+    }
+    
     const localList = await takeFileExtensionAndPath(stylesDir, '.css')
-
-    // this prevent load user theme because in version dev this can't load, idk why. Show status 200 but no css data, maybe i fix someday
-    if (process.env.NODE_ENV === 'development') return convertListTodict(await takeFileExtensionAndPath(path.join(__dirname, '../../src/renderer/src/themes'), '.css'), "official")
 
     const configcss = checkConfigFolder()
     if (configcss == undefined) return convertListTodict(localList, "official")

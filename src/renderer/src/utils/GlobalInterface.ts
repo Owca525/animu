@@ -125,7 +125,7 @@ export interface pluginFormat {
     } | null
     player?: {
         getUrls: (type: string, episode: string, id: string) => Promise<playerData[]>
-        animeDataList: (name?: string, anime_id?: string) => Promise<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] }>
+        animeDataList: (animeData?: AnimeData, anime_id?: string) => Promise<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] }>
         episodeList: (type: string, anime_id: string) => Promise<Array<string> | null>
         animeList: (name: string) => Promise<cardData[]>
         getInformation: (id: string) => Promise<AnimeData>
@@ -156,11 +156,24 @@ export interface SettingsConfig {
             LongTimeSkipBack: number | string
             TimeSkipLeft: number | string
             TimeSkipRight: number | string
+            VideoScaling: boolean,
+            DisableVolumeAnimation: boolean,
+            RemovingSpaceAnimation: boolean
         }
         screenShot: {
             alwaysAsk: boolean
             saveType: "File" | "Clipboard" | "Both"
             path: string
+        },
+        external: {
+            enable: boolean,
+            type: "movian" | "vlc" | "mpv" | "custom",
+            movianIP: string
+        }
+        upToNextEpisode: {
+            enable: boolean
+            interval: number
+            durrationShow: number
         }
         keybinds: {
             Pause: string
@@ -178,6 +191,7 @@ export interface SettingsConfig {
             VolumeDown: string
             VolumeMute: string
             ScreenShot: string
+            PictureInPicture: string
         }
     }
     History: {

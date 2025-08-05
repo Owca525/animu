@@ -97,7 +97,10 @@ export function convertKeybinds(inputString: string) {
     return inputString
 }
 
-export function similarityText(text1: string, text2: string): number {
+export function similarityText(text1: string | undefined, text2: string | undefined): number {
+    if (!text1) return 0
+    if (!text2) return 0
+
     const len1 = text1.length;
     const len2 = text2.length;
 

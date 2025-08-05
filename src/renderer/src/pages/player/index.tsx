@@ -12,6 +12,7 @@ import { SaveHistory } from "@renderer/utils/history/history";
 import { detectTitle, refetchHistory } from "@renderer/utils/functions";
 import { useHotkeys } from "react-hotkeys-hook";
 import Button from "@renderer/components/buttons";
+import ExternalPlayer from "./externalPlayer";
 
 const VideoPlayer = lazy(() => import('./VideoPlayer'));
 // const ExternalPlayer = lazy(() => import('./externalPlayer'));
@@ -27,7 +28,7 @@ const player = () => {
     const [extractionData, setextractionData] = useState<{ actual: string, type: string, episodelist: Array<string>, time: number }>({ actual: anime_data.data.saveData ? anime_data.data.saveData.episode : "1", type: anime_data.data.saveData ? anime_data.data.saveData.type : "sub", episodelist: anime_data.episodelist, time: anime_data.data.saveData ? anime_data.data.saveData?.last_Time : 0 })
     const playerID = anime_data.data.AnimeData.player_ID ?? "";
     const extractFunc = useCallback(() => {
-    return pluginPlayer.player.getUrls(extractionData.type, extractionData.actual, playerID);
+        return pluginPlayer.player.getUrls(extractionData.type, extractionData.actual, playerID);
     }, [extractionData, playerID]);
 
     const { data, isLoading, refetch } = useQuery({
@@ -36,16 +37,12 @@ const player = () => {
         refetchOnWindowFocus: false,
     });
 
-    function setNewEpisode(type: string) {
+    function setNewEpisode(ep: string) {
         setextractionData((old) => {
-            let ep = extractionData.episodelist.indexOf(old.actual)
-            if (type == 'prev') ep = ep - 1
-            if (type == 'next') ep = ep + 1
-            if (extractionData.episodelist[ep] === undefined) return old
             return {
                 ...old,
                 time: 0,
-                actual: extractionData.episodelist[ep]
+                actual: ep
             }
         })
         refetch()
@@ -88,11 +85,19 @@ const player = () => {
         })
         return
     }
-    // if (true) {
-    //     return (
-    //         <ExternalPlayer />
-    //     )
-    // }
+
+    if (data && isLoading == false && config.Player.external.enable) {
+         return (
+             <ExternalPlayer 
+                animeData={anime_data.data}
+                playerData={data}
+                time={extractionData.time}
+                setNextEpisode={setNewEpisode}
+                now_episodes={{ episode: extractionData.actual, type: extractionData.type, episodes: extractionData.episodelist }}
+            />
+         )
+    }
+
     if (data && isLoading == false) {
         return (
             <Suspense fallback={loadingAnimation(leave, anime_data.data)}>
@@ -100,7 +105,7 @@ const player = () => {
                     player_data={data}
                     anime_data={anime_data.data}
                     temp={{ episode: extractionData.actual, type: extractionData.type, episodes: extractionData.episodelist }}
-                    functions={{ nextButton: setNewEpisode, prevButton: setNewEpisode }}
+                    setNextEpisode={setNewEpisode}
                     volumeCacheFunc={setPlayerVolume}
                     PlayerVolume={playerVolume}
                     time={extractionData.time}
@@ -112,7 +117,6 @@ const player = () => {
 }
 
 function loadingAnimation(leave: () => void, anime_data: cardData) {
-    // TODO: Fix theme
     return (
         <div className="player-loading-container">
             <div className="player-loading-top">

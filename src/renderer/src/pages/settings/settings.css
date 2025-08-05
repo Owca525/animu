@@ -96,6 +96,77 @@
   gap: 8px;
 }
 
+.settings-sidebar-container .sidebar-container-max .sidebar-bottom {
+  margin-bottom: 64px;
+}
+
+.settings-table-extensions {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.settings-container-extensions {
+  width: 100%;
+  margin: 12px;
+  min-height: 500px;
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+.settings-extensions-button {
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+}
+
+th, td {
+  padding: 6px;
+}
+
+th {
+  font-size: 1.2em;
+  border: 3px solid var(--bg4);
+}
+
+td {
+  font-size: 1.1em;
+  padding: 8px;
+}
+
+.settings-extensions-button-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-table-button {
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+.settings-table-button:hover {
+  background-color: var(--bg4);
+}
+
+.settings-extensions-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.settings-extensions-background {
+  background-color: var(--bg3);
+  width: max-content;
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.settings-extensions-title {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 12px;
+}
+
 /* for smartphones 
 maybe that will be usefull in the future */
 @media (max-width: 600px) {

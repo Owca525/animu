@@ -12,9 +12,11 @@
   --neutral1: #17964a; /* is using on outline, border-color etc */
   --neutral2: #19a651;
   --neutral3: #27ae5d;
+  --red: #861832;
+  --blue: #1C1291;
 
   /* other */
-  --player-bg-containers: color-mix(in srgb, var(--bg2) 70%, transparent);
+  --player-bg-containers: color-mix(in srgb, var(--bg3) 70%, transparent);
   --invisible: rgba(0, 0, 0, 0);
   /* is used in player button */
   --black: rgba(0, 0, 0);
@@ -208,6 +210,10 @@ body {
 
 /* Information */
 
+.information-episode-button-watched {
+  border-color: var(--neutral1);
+}
+
 .information {
   background-color: var(--bg);
   color: var(--text);
@@ -280,7 +286,19 @@ body {
 }
 
 .information-episode-button:hover {
+  background-color: var(--bg3);
+}
+
+.information-episode-button.watched {
   border-color: var(--neutral1);
+}
+
+.information-episode-button.watching {
+  border-color: var(--red);
+}
+
+.information-episode-button.current {
+  border-color: var(--blue);
 }
 
 .information-select-episode {
@@ -394,16 +412,30 @@ body {
 
 /* ExternalPlayer */
 
+.external-player-container ::-webkit-scrollbar {
+  color: var(--bg3);
+  background-color: var(--bg3);
+}
+
+.external-player-container ::-webkit-scrollbar-thumb {
+  color: var(--bg2);
+  background-color: var(--bg2);
+}
+
 .external-player-container {
   background-color: var(--bg2);
   border-radius: 12px;
 }
 
-.external-title {
-  background-color: var(--bg2);
+.external-button-container {
+  background-color: var(--bg3);
   border-radius: 12px;
 }
 
+.external-episodes-container {
+  background-color: var(--bg3);
+  border-radius: 12px;
+}
 
 /* Settings */
 
@@ -599,7 +631,7 @@ body {
 
 .player-settings-button:hover,
 .player-settings-button-back:hover {
-  background-color: var(--player-bg-containers);
+  background-color: var(--bg);
 }
 
 .player-up-Next-container {
@@ -638,8 +670,16 @@ body {
   background-color: var(--player-bg-containers) !important;
 }
 
+.seekbar-buffer {
+  border-radius: 12px;
+}
+
 .seekBar-container {
   background-color: var(--bg3);
+  border-radius: 12px;
+}
+
+.seekbar-buffer-wrapper {
   border-radius: 12px;
 }
 

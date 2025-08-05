@@ -47,6 +47,11 @@ function settings() {
                 onClick: () => setCategory(() => "player"),
             },
             {
+                icon: "extension",
+                text: "Extensions",
+                onClick: () => setCategory(() => "extensions"),
+            },
+            {
                 icon: "history",
                 text: t("global.history"),
                 onClick: () => setCategory(() => "history"),
@@ -392,6 +397,83 @@ function settings() {
                                     disableX
                                 />
                             </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Video Scaling
+                                <CheckBox
+                                    checked={config.new.Player.general.VideoScaling}
+                                    onChecked={(checked) =>
+                                        handleChange('Player.general.VideoScaling', checked)
+                                    }
+                                />
+                            </div>
+                        </div>
+                        <div className="settings-page-container">
+                            <div className="settings-page-title">Up To next Episode Notification</div>
+                            <div className="settings-setting-container">
+                                Is Enabled
+                                <CheckBox
+                                    checked={config.new.Player.upToNextEpisode.enable}
+                                    onChecked={(checked) =>
+                                        handleChange('Player.upToNextEpisode.enable', checked)
+                                    }
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Interval Notification
+                                <SettingsInput
+                                    iconChar="s"
+                                    type="number"
+                                    onKeyDown={(text) => handleChange("Player.upToNextEpisode.interval", parseInt(text))}
+                                    startValue={config.new.Player.upToNextEpisode.interval.toString()}
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Durration Episode when is hide
+                                <SettingsInput
+                                    iconChar="m"
+                                    type="number"
+                                    onKeyDown={(text) => handleChange("Player.upToNextEpisode.durrationShow", parseInt(text))}
+                                    startValue={config.new.Player.upToNextEpisode.durrationShow.toString()}
+                                />
+                            </div>
+                        </div>
+                        <div className="settings-page-container">
+                            <div className="settings-page-title">External Player</div>
+                            <div className="settings-setting-container">
+                                Enable External Player
+                                <CheckBox
+                                    checked={config.new.Player.external.enable}
+                                    onChecked={(checked) =>
+                                        handleChange('Player.external.enable', checked)
+                                    }
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Select Player
+                                <Dropdown
+                                    options={[
+                                        { label: "Movian", onClick: () => handleChange("Player.external.type", "movian") },
+                                        { label: "Mpv", onClick: () => handleChange("Player.external.type", "mpv") },
+                                        { label: "VLC", onClick: () => handleChange("Player.external.type", "vlc") },
+                                    ]}
+                                    buttonText={config.new.Player.external.type}
+                                    disableX
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Movian IP
+                                <SettingsInput
+                                    iconChar=" "
+                                    type="text"
+                                    onKeyDown={(text) => handleChange("Player.external.movianIP", text)}
+                                    startValue={config.new.Player.external.movianIP}
+                                />
+                            </div>
                         </div>
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.player.screenshot")}</div>
@@ -471,6 +553,10 @@ function settings() {
                             <div className="settings-setting-container">
                                 {t("settings.player.keybinds.prevepisode")}
                                 <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.PrevEpisode)} keyBind={(keys) => handleChange("Player.keybinds.PrevEpisode", keys)} />
+                            </div>
+                            <div className="settings-setting-container">
+                                Picture In Picture
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.PictureInPicture)} keyBind={(keys) => handleChange("Player.keybinds.PictureInPicture", keys)} />
                             </div>
                             <div className="settings-setting-container">
                                 {t("settings.player.keybinds.volumeup")}
@@ -605,6 +691,41 @@ function settings() {
                         </div>
                     </>
                 )}
+                {category == "extensions" &&
+                    <div className="settings-page-container">
+                        <div className="settings-page-title">{"Extensions"}</div>
+                        <div className="settings-container-extensions">
+                            <table className="settings-table-extensions">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Plugin Author</th>
+                                    <th>Version</th>
+                                    <th>Type</th>
+                                </tr>
+                                <tr className="settings-table-button">
+                                    <td className="settings-extensions-title"><img className="settings-extensions-icon" src="https://anilist.co/img/icons/icon.svg" />Anilist</td>
+                                    <td><div className="settings-extensions-background">Owca525</div></td>
+                                    <td><div className="settings-extensions-background">1.0</div></td>
+                                    <td>
+                                        <div className="settings-extensions-button-container">
+                                            <div className="settings-extensions-background">Information</div> <Button icon="settings" ButtonClass="settings-extensions-button"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr className="settings-table-button">
+                                    <td className="settings-extensions-title"><img className="settings-extensions-icon" src="https://allmanga.to/android-icon-192x192.png" />Allmanga</td>
+                                    <td><div className="settings-extensions-background">Owca525</div></td>
+                                    <td><div className="settings-extensions-background">1.0</div></td>
+                                    <td>
+                                        <div className="settings-extensions-button-container">
+                                            <div className="settings-extensions-background">Player</div> <Button icon="settings" ButtonClass="settings-extensions-button"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                }
             </div>
         </main>
     );

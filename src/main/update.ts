@@ -15,7 +15,7 @@ autoUpdater.on("error", (_event) => {
 ipcMain.handle("checkUpdates", async () => {
     let data = await autoUpdater.checkForUpdates()
     if (!data) return { available: false, version: autoUpdater.currentVersion.version }
-    return { available: data.isUpdateAvailable, version: data.updateInfo.version }
+    return { available: true, version: data.updateInfo.version }
 })
 
 ipcMain.on("downloadUpdate", () => {

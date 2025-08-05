@@ -1,8 +1,9 @@
 .settings-keybind-check , .settings-keybind-check-active {
-    min-width: 130px;
+    min-width: 170px;
     height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 0.62em;
+    font-size: 0.8em;
+    overflow: hidden;
 }

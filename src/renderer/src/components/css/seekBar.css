@@ -6,9 +6,27 @@
     width: 100%;
 }
 
-.seekbar-progress {
+.seekbar-progress{
     width: 0%;
     height: 100%;
+    z-index: 2;
+    position: relative;
+}
+
+.seekbar-buffer-wrapper {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.seekbar-buffer {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background-color: color-mix(in srgb, var(--text) 70%, transparent);
+    z-index: 1;
 }
 
 .seekbar-thumb {
@@ -17,6 +35,7 @@
     width: 15px;
     height: 15px;
     transform: translate(-50%, -50%);
+    z-index: 3;
 }
 
 .seekbar-box {

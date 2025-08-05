@@ -11,15 +11,21 @@ import ContainerWrong from "./components/containerWrong";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "react-toastify";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
+import { ReadHistory } from "@renderer/utils/history/history";
+import { ReadContinue } from "@renderer/utils/history/continueWatch";
+import store from "@renderer/utils/store";
 
 function information() {
     const navigate = useNavigate()
     const location = useLocation();
     let anime_data: AnimeData = location.state;
+
+    const informationTemp = useSelector((info: any) => info.information);
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
     const [showWrong, setshowWrong] = useState<boolean>(false)
     const [secondsLeft, setSecondsLeft] = useState<undefined | number>(anime_data.nextAiringEpisode?.timeUntilAiring);
     const [data, setData] = useState<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] } | undefined>(undefined)
+    const [savedata, setsavedata] = useState<{ last_episode: number, last_time: number } | undefined>(undefined)
     const [isLoading, setLoadingData] = useState<boolean>(false)
     const [isError, setIsError] = useState<boolean>(false)
 
@@ -48,14 +54,15 @@ function information() {
     const time = convertSeconds(secondsLeft)
 
     // I can't use useQuery Because Doesn't Work
-    async function fetchData(func: any, title?: string, id?: string) {
+    async function fetchData(func: any, id?: string) {
         try {
             setIsError(() => false)
             setLoadingData(() => true)
-            let data = await func(title, id)
+            let data = await func(id ? undefined : anime_data, id)
             if (data) {
                 setData(() => data)
                 setLoadingData(() => false)
+                store.dispatch({ type: "setInformationEpisodesData", payload: data })
             } else {
                 setIsError(() => true)
             }
@@ -68,12 +75,40 @@ function information() {
         }
     }
 
-    useEffect(() => {
-        if (anime_data.id === "") {
-            fetchData(pluginPlayer.player.animeDataList, undefined, anime_data.player_ID)
-        } else {
-            fetchData(pluginPlayer.player.animeDataList, anime_data.title.native)
+    async function initialInformation() {
+        console.log(informationTemp)
+        if (anime_data.id == "") {
+            fetchData(pluginPlayer.player.animeDataList, anime_data.player_ID)
+            return
         }
+
+        let cardAnime = (await ReadHistory()).filter((element) => element.AnimeData.id == anime_data.id)
+        let cardAnimeContinueWatch = (await ReadContinue()).filter((element) => element.AnimeData.id == anime_data.id)
+
+        if (cardAnimeContinueWatch.length > 0) {
+            let animeContinue = cardAnimeContinueWatch[0].saveData
+            if (animeContinue) setsavedata(() => {return{ last_episode: parseInt(animeContinue.episode), last_time: animeContinue.last_Time }})
+        }
+        if (cardAnime.length > 0 && cardAnimeContinueWatch.length <= 0) {
+            let animeHistory = cardAnime[0].saveData
+            if (animeHistory) setsavedata(() => {return{ last_episode: parseInt(animeHistory.episode), last_time: animeHistory.last_Time }})
+        }
+
+        if (informationTemp.id == anime_data.id && informationTemp.episodes_data != undefined) {
+            setData(() => informationTemp.episodes_data)
+            return
+        }
+
+        store.dispatch({ type: "setInformationID", payload: anime_data.id })
+        if (cardAnime.length <= 0 && cardAnimeContinueWatch.length <= 0) {
+            fetchData(pluginPlayer.player.animeDataList)
+            return
+        }
+        fetchData(pluginPlayer.player.animeDataList, cardAnime[0].AnimeData.player_ID)
+    }
+
+    useEffect(() => {
+        initialInformation()
     }, [])
 
     function enterPlayer(episodes: string[], type: string, episode: string) {
@@ -85,7 +120,7 @@ function information() {
                         player_ID: data?.player_id
                     },
                     saveData: {
-                        last_Time: 0,
+                        last_Time: savedata && savedata.last_episode.toString() === episode ? savedata.last_time : 0,
                         type: type,
                         player_ID: anime_data.player_ID,
                         episode: episode
@@ -109,14 +144,14 @@ function information() {
         return (
             <div className='information-buttons-episode-container'>
                 {episode.map((num) => (
-                    <div className='information-episode-button' onClick={() => enterPlayer(episode, type, num)}>{num}</div>
+                    <div className={`information-episode-button ${savedata && parseInt(num) < savedata.last_episode ? "watched" : ""} ${savedata && parseInt(num) == savedata.last_episode && savedata.last_time != 0 ? "watching" : savedata && parseInt(num) == savedata.last_episode ? "watched" : ""}`} onClick={() => enterPlayer(episode, type, num)}>{num}</div>
                 ))}
             </div>
         )
     }
 
     useHotkeys("tab", () => {
-        console.log(anime_data)
+        console.log(anime_data, savedata)
     })
 
     useHotkeys("esc", () => {

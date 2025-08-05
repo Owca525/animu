@@ -24,11 +24,24 @@ export const defaultConfig: SettingsConfig = {
             LongTimeSkipBack: 90,
             TimeSkipLeft: 5,
             TimeSkipRight: 5,
+            VideoScaling: false,
+            RemovingSpaceAnimation: false,
+            DisableVolumeAnimation: false
         },
         screenShot: {
             alwaysAsk: true,
             saveType: "File",
             path: await checkPictureFolder(),
+        },
+        external: {
+            enable: false,
+            type: "mpv",
+            movianIP: "localhost:42000"
+        },
+        upToNextEpisode: {
+            enable: true,
+            interval: 30,
+            durrationShow: 5
         },
         keybinds: {
             Pause: " ",
@@ -46,6 +59,7 @@ export const defaultConfig: SettingsConfig = {
             VolumeUp: "0",
             VolumeMute: "m",
             ScreenShot: "f10",
+            PictureInPicture: "P"
         },
     },
     History: {
