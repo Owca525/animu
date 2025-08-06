@@ -1,6 +1,6 @@
 import { Routes, Route, HashRouter } from 'react-router-dom'
 import { Suspense } from 'react'
-import { ToastContainer } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import 'material-symbols'
 
@@ -22,12 +22,20 @@ import { calculateZoomLevel, changeTheme, checkDate } from './utils/functions';
 import i18n from './utils/i18n';
 import ErrorBoundary from './utils/ErrorBoundary';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { notificationProps } from './utils/GlobalInterface';
 
 LoadConfig()
 
 function App() {
   useHotkeys("F12", () => {
     if (store.getState().config.Developer.DevTools) window.BrowserWindow.openDevTools()
+  })
+
+  useHotkeys("ctrl+shift+r", async () => {
+    if (store.getState().config.Developer.DeveloperMode) {
+      await changeTheme(store.getState().config.General.theme)
+      toast.info("Reloaded Theme", notificationProps)
+    }
   })
 
   return (
