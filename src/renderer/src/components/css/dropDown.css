@@ -19,6 +19,7 @@
   overflow: hidden;
   min-width: 0;
   font-size: 1em;
+  min-width: fit-content;
 }
 
 .dropdown-button-icon {
