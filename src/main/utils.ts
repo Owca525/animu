@@ -35,17 +35,17 @@ ipcMain.handle('setActivity', (_event, details: string | undefined, state: strin
 
 ipcMain.handle('getVersion', (_event): String => app.getVersion())
 
-ipcMain.handle('runExternalPlayer', (_event, url: string, path: string, time: string, type: "mpv" | "vlc"): any => {
+ipcMain.handle('runExternalPlayer', (_event, videoData: {url: string, path: string, time: number, title: string}, type: "mpv" | "vlc"): any => {
     switch (type) {
         case "mpv":
-            exec(`${path} --start=${time} ${url}`, (error, stdout, stderr) => {
+            exec(`${videoData.path} --title='${videoData.title}' --start=${videoData.time} '${videoData.url}'`, (error, stdout, stderr) => {
                 if (error) console.error(error)
                 if (stderr) console.error(error)
                 console.log(stdout)
             })
             break;
         case "vlc":
-            exec(``, (error, stdout, stderr) => {
+            exec(`${videoData.path} --input-title-format='${videoData.title}' --start-time='${videoData.time}' '${videoData.url}'`, (error, stdout, stderr) => {
                 if (error) console.error(error)
                 if (stderr) console.error(error)
                 console.log(stdout)

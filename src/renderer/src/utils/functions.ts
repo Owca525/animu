@@ -229,7 +229,7 @@ export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function detectTitle(data: cardData): String {
+export function detectTitle(data: cardData): string {
     try {
         if (data.AnimeData.format?.toLowerCase().includes("movie")) return t('player.TitleMovie', { name: data.AnimeData.title.romaji })
         return t('player.TitleEpisode', { ep: data.saveData?.episode, name: data.AnimeData.title.romaji })

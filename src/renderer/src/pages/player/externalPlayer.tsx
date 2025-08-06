@@ -4,7 +4,7 @@ import Button from "@renderer/components/buttons"
 import "./components/css/externalPlayer.css"
 import { cardData, notificationProps, playerData, SettingsConfig } from "@renderer/utils/GlobalInterface"
 import { detectTitle } from "@renderer/utils/functions"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
 import { useSelector } from "react-redux"
@@ -18,16 +18,24 @@ interface ExternalplayerProps {
     now_episodes: { episode: string, type: string, episodes: Array<string> }
 }
 
-const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes, playerData, setNextEpisode }) => {
+const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes, playerData, setNextEpisode, time }) => {
     const navigate = useNavigate()
     const config: SettingsConfig = useSelector((data: any) => data.config);
+    const [AnimeTitle, _setAnimeTitle] = useState<string>(() => detectTitle({
+        ...animeData, saveData: {
+            episode: now_episodes.episode,
+            pluginName: "",
+            last_Time: 0,
+            type: ""
+        }
+    }))
 
     async function RunMovian() {
         let url = playerData[0].resolution[0].url
         let req = await window.api.request.get(`http://${config.Player.external.movianIP}/showtime/open?url=${encodeURIComponent(url)}`, {})
         if (!req.success && req.error == "fetch failed") {
             toast.error("Failed to run Movian", notificationProps)
-        } 
+        }
     }
 
     console.log(playerData)
@@ -40,35 +48,38 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         setNextEpisode(ep.toString())
     }
 
+    function runMpvPlayer() {
+        window.api.runExternaPlayer({ url: playerData[0].resolution[0].url, title: AnimeTitle, path: "/usr/bin/mpv", time: time }, "mpv")
+    }
+
+    function runVlcPlayer() {
+        window.api.runExternaPlayer({ url: playerData[0].resolution[0].url, title: AnimeTitle, path: "/usr/bin/vlc", time: time }, "vlc")
+    }
+
     useEffect(() => {
-        RunMovian()
+        if (config.Player.external.type === "movian") RunMovian()
+        if (config.Player.external.type === "mpv") runMpvPlayer()
+        if (config.Player.external.type === "mpv") runVlcPlayer()
     }, [])
 
     return (
         <div className="external-player-container">
-        <div className="external-player-top">
-            <div className="video-top">
-                <Button icon="arrow_back" ButtonClass="player-buttons" onClick={() => navigate("/")} />
-                <div className="player-title">{detectTitle({
-                    ...animeData, saveData: {
-                        episode: now_episodes.episode,
-                        pluginName: "",
-                        last_Time: 0,
-                        type: ""
-                    }
-                })}</div>
-            </div>
+            <div className="external-player-top">
+                <div className="video-top">
+                    <Button icon="arrow_back" ButtonClass="player-buttons" onClick={() => navigate("/")} />
+                    <div className="player-title">{AnimeTitle}</div>
+                </div>
                 <div className="external-dropdown">
-                    <Dropdown buttonText={playerData[0].hostname} options={playerData.map((element) => {return{ label: element.hostname }})} />
+                    <Dropdown buttonText={playerData[0].hostname} options={playerData.map((element) => { return { label: element.hostname } })} />
                     <Dropdown buttonText="1080p" options={[{ label: "1080p" }, { label: "720p" }, { label: "480p" }, { label: "360p" }]} />
                     <Dropdown options={
-                    [
-                        { label: "mpv", icon: "https://mpv.io/images/mpv-logo-128-0baae5aa.png" },
-                        { label: "VLC", icon: "https://images.videolan.org/images/largeVLC.png" },
-                        { label: "Movian", icon: "https://apps.movian.eu/favicon.ico" },
-                    ]
+                        [
+                            { label: "mpv", icon: "https://mpv.io/images/mpv-logo-128-0baae5aa.png" },
+                            { label: "VLC", icon: "https://images.videolan.org/images/largeVLC.png" },
+                            { label: "Movian", icon: "https://apps.movian.eu/favicon.ico" },
+                        ]
                     } disableX
-                /></div>
+                    /></div>
             </div>
             <div className="external-player-center">
                 <div className="external-button-container">

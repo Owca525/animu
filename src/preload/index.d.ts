@@ -64,7 +64,7 @@ declare global {
         saveDialog: (fileName: string, data: any, title: string, name: string, extensions: string[], format?: string) => Promise<boolean>
         openDialog: (path?: string, name?: string, extensions?: string[]) => Promise<string>
       };
-      runExternaPlayer: (url: string, path: string, time: string, type: "mpv" | "vlc") => any
+      runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string}, type: "mpv" | "vlc") => any
       getlistThemes: () => Promise<{ path: string, filename: string, type: "user" | "official" }[]>
       getOSDetails: () => Promise<{ platform: NodeJS.Platform, release: string, arch: string }>
       getListLang: () => Promise<{ data: any, lang: string }[]>
