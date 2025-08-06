@@ -16,6 +16,7 @@ import { ReadHistory } from "@renderer/utils/history/history"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
 import { CreateContextMenuOptions } from "@renderer/utils/functions"
 import Filter from "./components/filter"
+import { useHotkeys } from "react-hotkeys-hook"
 
 const Home = () => {
     const navigate = useNavigate()
@@ -162,6 +163,13 @@ const Home = () => {
 
         return data
     }
+
+    useHotkeys("d",() => {
+        async function name() {
+            await window.api.getListLang()
+        }
+        name()
+    })
 
     return (
         <main className="home" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>

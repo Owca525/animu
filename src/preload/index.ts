@@ -53,7 +53,8 @@ if (process.contextIsolated) {
       },
       runExternaPlayer: (url: string, path: string, time: string, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", url, path, time, type),
       getlistThemes: () => ipcRenderer.invoke("get-css-files"),
-      getOSDetails: () => ipcRenderer.invoke('get-os-info')
+      getOSDetails: () => ipcRenderer.invoke('get-os-info'),
+      getListLang: () => ipcRenderer.invoke("get-lang-files")
     });
     contextBridge.exposeInMainWorld("backend", {
       Buffer: require("buffer").Buffer,

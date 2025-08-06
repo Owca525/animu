@@ -90,7 +90,7 @@ ipcMain.handle('get-css-files', async (): Promise<{ path: string, filename: stri
     
     const localList = await takeFileExtensionAndPath(stylesDir, '.css')
 
-    const configcss = checkConfigFolder()
+    const configcss = checkConfigFolder("themes")
     if (configcss == undefined) return convertListTodict(localList, "official")
 
     // Direcotry for config/theme css
@@ -99,15 +99,42 @@ ipcMain.handle('get-css-files', async (): Promise<{ path: string, filename: stri
     return [...convertListTodict(localList, "official"), ...convertListTodict(customList, "user")]
 });
 
+ipcMain.handle('get-lang-files', async (): Promise<{ data: any, lang: string }[]> => {
+    let langDir: string = "";
+    if (process.env.NODE_ENV === 'development') {
+        langDir = path.join(__dirname, '../../src/renderer/src/utils/lang')
+    } else {
+        langDir = path.join(__dirname, '../../out/renderer/assets/lang')
+    }
+    
+    let langPaths = await takeFileExtensionAndPath(langDir, ".json")
+    let langList = langPaths.map((element) => {return{ data: fs.readFileSync(element, "utf-8"), lang: path.basename(element).replace(".json", "") }})
+
+    const userLangPath = checkConfigFolder("lang")
+    if (!userLangPath) return langList
+
+    let userlangListPath = await takeFileExtensionAndPath(userLangPath, ".json")
+    let userLangList = userlangListPath.map((element) => {return{ data: fs.readFileSync(element, "utf-8"), lang: path.basename(element).replace(".json", "") }})
+    
+    for (let index = 0; index < userLangList.length; index++) {
+        const element = userLangList[index];
+        const indexList = langList.findIndex((item) => item.lang.toLowerCase() == element.lang.toLowerCase());
+        if (indexList != -1) langList.splice(indexList, 1);
+    }
+
+    return [...langList, ...userLangList]
+});
+
 function convertListTodict(list: string[], type: "user" | "official"): { path: string, filename: string, type: "user" | "official" }[] {
     return list.map((element) => {
         return { path: element, filename: path.basename(element), type: type }
     })
 }
 
-function checkConfigFolder(): string | undefined {
-    if (fs.existsSync(`${app.getPath("userData")}/themes`)) return `${app.getPath("userData")}/themes`
-    return undefined
+function checkConfigFolder(folder: string): string | undefined {
+    if (fs.existsSync(`${app.getPath("userData")}/${folder}`)) return `${app.getPath("userData")}/${folder}`
+    fs.mkdirSync(`${app.getPath("userData")}/${folder}`)
+    return `${app.getPath("userData")}/${folder}`
 }
 
 async function takeFileExtensionAndPath(dir: string, format: string): Promise<string[]> {
