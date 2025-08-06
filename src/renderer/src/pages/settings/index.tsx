@@ -67,7 +67,7 @@ function settings() {
             {
                 icon: "home",
                 text: t("global.home"),
-                onClick: () => navigate("/"),
+                onClick: () => {navigate("/"); resetConfig()},
             },
         ],
     };
