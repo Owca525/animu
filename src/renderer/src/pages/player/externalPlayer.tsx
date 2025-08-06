@@ -46,6 +46,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
 
     return (
         <div className="external-player-container">
+        <div className="external-player-top">
             <div className="video-top">
                 <Button icon="arrow_back" ButtonClass="player-buttons" onClick={() => navigate("/")} />
                 <div className="player-title">{detectTitle({
@@ -56,6 +57,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                         type: ""
                     }
                 })}</div>
+            </div>
                 <div className="external-dropdown">
                     <Dropdown buttonText={playerData[0].hostname} options={playerData.map((element) => {return{ label: element.hostname }})} />
                     <Dropdown buttonText="1080p" options={[{ label: "1080p" }, { label: "720p" }, { label: "480p" }, { label: "360p" }]} />
