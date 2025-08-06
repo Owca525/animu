@@ -113,6 +113,14 @@ export type ContextMenuProps = {
     deletion?: boolean
 }[]
 
+export interface themeMetadata { 
+    version?: string; 
+    autor?: string; 
+    pathcss: string; 
+    animuTitle?: string; 
+    name: string;
+}
+
 export interface pluginFormat {
     version: string
     name: string

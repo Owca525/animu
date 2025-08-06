@@ -10,7 +10,7 @@ import Settings from "./pages/settings/index"
 import Player from "./pages/player/index"
 
 // Temporally
-import "./themes/DarkAnimu.css"
+import "./themes/darkAnimu/DarkAnimu.css"
 import { checkConfig, readConfig } from './utils/config';
 import store from './utils/store';
 
@@ -18,7 +18,7 @@ import "./utils/i18n"
 import { CheckContinue } from './utils/history/continueWatch';
 import { CheckHistory } from './utils/history/history';
 import { checkUpdate } from './utils/update';
-import { calculateZoomLevel, checkDate } from './utils/functions';
+import { calculateZoomLevel, changeTheme, checkDate } from './utils/functions';
 import i18n from './utils/i18n';
 import ErrorBoundary from './utils/ErrorBoundary';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -60,17 +60,7 @@ async function LoadConfig() {
   const loadedConnfig = await readConfig()
 
   // Loading theme
-  const themes = await window.api.getlistThemes()
-  let path: string = themes[0].path
-  themes.forEach((element) => {
-    if (element.filename.replace(".css", "") == loadedConnfig.General.theme) path = element.path
-  })
-
-  const link = document.createElement('link');
-  link.id = 'theme-stylesheet';
-  link.rel = 'stylesheet';
-  link.href = path;
-  document.head.appendChild(link);
+  await changeTheme(loadedConnfig.General.theme)
 
   i18n.changeLanguage(loadedConnfig.General.language)
   if (loadedConnfig.General.Window.AutoMaximize) window.BrowserWindow.setMaximize()

@@ -135,7 +135,7 @@ function settings() {
 
     useEffect(() => {
         window.api.getlistThemes().then((data) => {
-            let themes = data.map((element) => { return { label: element.filename.replace(".css", ""), onClick: () => { changeTheme(element.filename.replace(".css", "")); handleChange("General.theme", element.filename.replace(".css", "")) } } })
+            let themes = data.map((element) => { return { label: element.name, onClick: () => { changeTheme(element.name); handleChange("General.theme", element.name) } } })
             setThemes(() => themes)
         })
         window.api.rpc.setActivity(undefined, t("discordrpc.settings"))

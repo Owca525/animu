@@ -21,6 +21,7 @@ const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '', placehol
   const [isOpen, setIsOpen] = useState(false)
   const [text, setText] = useState<string>(buttonText)
   const [icon, setIcon] = useState<string | undefined>(undefined)
+  console.log(text, buttonText, placeholder)
 
   const toggleDropdown = () => setIsOpen(prev => !prev)
 

@@ -79,7 +79,7 @@ ipcMain.handle('saveToClipboard', async (_event, type: "text" | "image", content
     }
 })
 
-ipcMain.handle('get-css-files', async (): Promise<{ path: string, filename: string, type: "user" | "official" }[]> => {
+ipcMain.handle('get-css-files', async (): Promise<{ version?: string; autor?: string; pathcss: string; animuTitle?: string; name: string; }[]> => {
     // Directory for local css
     let stylesDir: string = "";
     if (process.env.NODE_ENV === 'development') {
@@ -88,16 +88,62 @@ ipcMain.handle('get-css-files', async (): Promise<{ path: string, filename: stri
         stylesDir = path.join(__dirname, '../../out/renderer/assets/themes')
     }
     
-    const localList = await takeFileExtensionAndPath(stylesDir, '.css')
+    const localList = await getThemeList(stylesDir)
 
     const configcss = checkConfigFolder("themes")
-    if (configcss == undefined) return convertListTodict(localList, "official")
+    if (configcss == undefined) return localList
 
     // Direcotry for config/theme css
-    const customList = await takeFileExtensionAndPath(configcss, '.css')
+    const customList = await getThemeList(configcss)
 
-    return [...convertListTodict(localList, "official"), ...convertListTodict(customList, "user")]
+    return [...localList, ...customList]
 });
+
+async function getThemeList(path: string): Promise<{ version?: string; autor?: string; pathcss: string; animuTitle?: string; name: string; }[]> {
+    let listFolder = await fs.promises.readdir(path)
+    let finnalList: any = []
+    for (let index = 0; index < listFolder.length; index++) {
+        const element = listFolder[index];
+        if (fs.statSync(`${path}/${element}`).isDirectory()) {
+            let theme = await getMetadataTheme(`${path}/${element}`)
+            if (theme) finnalList.push(theme)
+        }
+    }
+    return finnalList
+}
+
+async function getMetadataTheme(path_theme: string): Promise<{ version?: string; autor?: string; pathcss: string; animuTitle?: string; name: string; } | undefined | {}> {
+    try {
+        let themeMetadata = {}
+        if (!fs.existsSync(`${path_theme}/theme.json`)) return undefined
+        let themeJSON = JSON.parse(fs.readFileSync(`${path_theme}/theme.json`, "utf-8"))
+
+        if ("version" in themeJSON) {
+            if (themeJSON.version.replace(" ", "") != "") themeMetadata = { ...themeMetadata, version: themeJSON.version }
+        }
+        if ("author" in themeJSON) {
+            if (themeJSON.author.replace(" ", "") != "") themeMetadata = { ...themeMetadata, author: themeJSON.author }
+        }
+        if ("mainCSS" in themeJSON) {
+            if (themeJSON.mainCSS.startsWith(".") && fs.existsSync(`${path_theme}${themeJSON.mainCSS.slice(1)}`)) themeMetadata = { ...themeMetadata, pathcss: `${path_theme}${themeJSON.mainCSS.slice(1)}` }
+            else undefined
+        }
+        else return undefined
+        
+        if ("customTitle" in themeJSON) {
+            if (themeJSON.customTitle.replace(" ", "") != "") themeMetadata = { ...themeMetadata, animuTitle: themeJSON.customTitle }
+        }
+        if ("themeName" in themeJSON) {
+            if (themeJSON.themeName.replace(" ", "") != "") themeMetadata = { ...themeMetadata, name: themeJSON.themeName }
+            else themeMetadata = { ...themeMetadata, name: path.basename(path_theme) }
+        }
+        
+        return Object.keys(themeMetadata).length <= 0 ? undefined : themeMetadata
+    } catch (error) {
+        console.log(error)
+        return undefined
+    }
+}
 
 ipcMain.handle('get-lang-files', async (): Promise<{ data: any, lang: string }[]> => {
     let langDir: string = "";
@@ -124,12 +170,6 @@ ipcMain.handle('get-lang-files', async (): Promise<{ data: any, lang: string }[]
 
     return [...langList, ...userLangList]
 });
-
-function convertListTodict(list: string[], type: "user" | "official"): { path: string, filename: string, type: "user" | "official" }[] {
-    return list.map((element) => {
-        return { path: element, filename: path.basename(element), type: type }
-    })
-}
 
 function checkConfigFolder(folder: string): string | undefined {
     if (fs.existsSync(`${app.getPath("userData")}/${folder}`)) return `${app.getPath("userData")}/${folder}`

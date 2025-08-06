@@ -34,23 +34,23 @@ function createWindow(): void {
     title: title
   })
 
-    global.createPiPWindow = () => {
-      pipWindow = new BrowserWindow({
-        width: 300,
-        height: 200,
-        alwaysOnTop: true,
-        frame: false,
-        resizable: false,
-        transparent: true,
-        webPreferences: {
-          nodeIntegration: true,
-          contextIsolation: false,
-        },
-      });
+  global.createPiPWindow = () => {
+    pipWindow = new BrowserWindow({
+      width: 300,
+      height: 200,
+      alwaysOnTop: true,
+      frame: false,
+      resizable: false,
+      transparent: true,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+      },
+    });
 
-      pipWindow.loadURL('http://localhost:3000/pip');
-      pipWindow.setAlwaysOnTop(true, 'screen-saver');
-    };
+    pipWindow.loadURL('http://localhost:3000/pip');
+    pipWindow.setAlwaysOnTop(true, 'screen-saver');
+  };
 
   if (process.env.NODE_ENV === 'development') {
     mainWindow.setTitle(title + " developer")
@@ -70,7 +70,7 @@ function createWindow(): void {
 
   mainWindow.webContents.on('before-input-event', (event, input) => {
     if ((input.control && input.shift && input.key === 'I')) {
-        event.preventDefault();
+      event.preventDefault();
     }
   });
 

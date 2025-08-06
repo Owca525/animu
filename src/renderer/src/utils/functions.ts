@@ -1,5 +1,5 @@
 import { t } from "i18next";
-import { cardData, ContextMenuProps, homeData } from "./GlobalInterface";
+import { cardData, ContextMenuProps, homeData, themeMetadata } from "./GlobalInterface";
 import store from "./store";
 import { setHomeData } from "./pluginApi";
 import { ReadContinue } from "./history/continueWatch";
@@ -69,13 +69,25 @@ export function formatTime(seconds: number | undefined): string {
 }
 
 export async function changeTheme(name: string) {
+    let old = document.getElementById("theme-stylesheet") as HTMLLinkElement
+    old.remove()
+
     const themes = await window.api.getlistThemes()
+    let theme: themeMetadata = themes[0]
+
     themes.forEach((element) => {
-        if (element.filename.replace(".css", "") === name) {
-            let link = document.getElementById("theme-stylesheet") as HTMLLinkElement
-            if (link) link.href = element.path
+        if (element.name === name) {
+            theme = element
         }
     })
+
+    const link = document.createElement('link');
+    link.id = 'theme-stylesheet';
+    link.rel = 'stylesheet';
+    link.href = theme.pathcss;
+    document.head.appendChild(link);
+
+    if (theme.animuTitle) document.title = theme.animuTitle
 }
 
 export function convertKeybinds(inputString: string) {
@@ -209,7 +221,7 @@ export function genYearsList(stopYear: number): string[] {
     let yearList: string[] = []
     const currentYear = new Date().getFullYear();
     yearList.push((currentYear + 1).toString())
-    for (let index = (currentYear+1); index > (stopYear-1); index--) {
+    for (let index = (currentYear + 1); index > (stopYear - 1); index--) {
         yearList.push(index.toString())
     }
     return yearList
@@ -218,15 +230,15 @@ export function genYearsList(stopYear: number): string[] {
 export function getGradientColor(value: number | undefined | null): string {
     if (!value) return ""
     const clamped = Math.max(0, Math.min(100, value));
-    
+
     const red = clamped < 50 ? 255 : Math.floor(255 - ((clamped - 50) * 5.1));
     const green = clamped > 50 ? 128 : Math.floor((clamped * 2.56));
-    
+
     return `rgb(${red}, ${green}, 0)`;
 }
 
 export function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 export function detectTitle(data: cardData): string {
