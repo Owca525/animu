@@ -14,9 +14,10 @@ interface DropdownProps {
   buttonText?: string
   disableX?: boolean
   onClickX?: (text: string) => void
+  dropClassName?: string
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '', placeholderChange, buttonText = "", onClickX, disableX = false }) => {
+const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '', placeholderChange, buttonText = "", onClickX, disableX = false, dropClassName }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [text, setText] = useState<string>(buttonText)
   const [icon, setIcon] = useState<string | undefined>(undefined)
@@ -38,7 +39,7 @@ const Dropdown: React.FC<DropdownProps> = ({ options, placeholder = '', placehol
   }
 
   return (
-    <div className="dropdown-container">
+    <div className={`dropdown-container ${dropClassName}`}>
       <div className={`dropdown-button`} onClick={toggleDropdown}>
         <div className={`dropdown-button-text ${text == "" ? "dropdown-button-shadow-text" : ""}`}>{icon && <img className='dropdown-item-image' src={icon}></img>} {placeholder != "" ? text == "" ? placeholder : text : buttonText }</div>
         {text == "" && <div className='material-symbols-outlined dropdown-button-icon'>{isOpen ? "keyboard_arrow_left" : "keyboard_arrow_down"}</div>}
