@@ -26,7 +26,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         let url = playerData[0].resolution[0].url
         let req = await window.api.request.get(`http://${config.Player.external.movianIP}/showtime/open?url=${encodeURIComponent(url)}`, {})
         if (!req.success && req.error == "fetch failed") {
-            toast.error("Failed Run Movian", notificationProps)
+            toast.error("Failed to run Movian", notificationProps)
         } 
     }
 
