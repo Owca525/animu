@@ -8,6 +8,7 @@ import { useEffect } from "react"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
 import { useSelector } from "react-redux"
+import Dropdown from "@renderer/components/dropDown"
 
 interface ExternalplayerProps {
     animeData: cardData
@@ -55,7 +56,17 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                         type: ""
                     }
                 })}</div>
-                <div className="external-dropdown"> <div className="dropdown-container"><div className="dropdown-button">test</div></div> </div>
+                <div className="external-dropdown">
+                    <Dropdown buttonText={playerData[0].hostname} options={playerData.map((element) => {return{ label: element.hostname }})} />
+                    <Dropdown buttonText="1080p" options={[{ label: "1080p" }, { label: "720p" }, { label: "480p" }, { label: "360p" }]} />
+                    <Dropdown options={
+                    [
+                        { label: "mpv", icon: "https://mpv.io/images/mpv-logo-128-0baae5aa.png" },
+                        { label: "VLC", icon: "https://images.videolan.org/images/largeVLC.png" },
+                        { label: "Movian", icon: "https://apps.movian.eu/favicon.ico" },
+                    ]
+                    } disableX
+                /></div>
             </div>
             <div className="external-player-center">
                 <div className="external-button-container">
