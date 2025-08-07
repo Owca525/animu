@@ -168,6 +168,7 @@ function settings() {
     function resetConfig() {
         setConfig((prev) => {
             ChangeLanguage(config.old.General.language)
+            changeTheme(config.old.General.theme)
             return { old: structuredClone(prev.old), new: structuredClone(prev.old) }
         })
         setSaving(() => false)
