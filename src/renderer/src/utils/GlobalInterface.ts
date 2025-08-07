@@ -115,7 +115,7 @@ export type ContextMenuProps = {
 
 export interface themeMetadata { 
     version?: string; 
-    autor?: string; 
+    author?: string; 
     pathcss: string; 
     animuTitle?: string; 
     name: string;

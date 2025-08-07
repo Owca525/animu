@@ -7,11 +7,11 @@ import Dropdown from "../../components/dropDown";
 import { useEffect, useState } from "react";
 import Button from "@renderer/components/buttons";
 import { t } from "i18next"
-import { ContextMenuProps, notificationProps, SettingsConfig } from "@renderer/utils/GlobalInterface";
+import { ContextMenuProps, notificationProps, SettingsConfig, themeMetadata } from "@renderer/utils/GlobalInterface";
 import { useSelector } from "react-redux";
 import i18n from "i18next"
 import { checkPictureFolder, saveConfig } from "@renderer/utils/config";
-import { calculateZoomLevel, capitalizeFirstLetter, changeTheme, convertKeybinds } from "@renderer/utils/functions";
+import { calculateZoomLevel, capitalizeFirstLetter, changeTheme, convertKeybinds, convertPath } from "@renderer/utils/functions";
 import CheckKeybind from "./components/checkKeybind";
 import { showDialog } from "@renderer/utils/context/DialogContext";
 import store from "@renderer/utils/store";
@@ -33,6 +33,7 @@ function settings() {
     const [themes, setThemes] = useState<{ label: string, onClick?: () => void }[]>([])
     const [versions] = useState(window.electronAPI.process.versions)
     const [isSaving, setSaving] = useState<boolean>(false)
+    const [themeMetadata, setthemeMetadata] = useState<themeMetadata | undefined>(undefined)
 
     let sidebarData = {
         top: [
@@ -135,8 +136,11 @@ function settings() {
 
     useEffect(() => {
         window.api.getlistThemes().then((data) => {
-            let themes = data.map((element) => { return { label: element.name, onClick: () => { changeTheme(element.name); handleChange("General.theme", element.name) } } })
+            let themes = data.map((element) => { return { label: element.name, onClick: () => { changeTheme(element.name); handleChange("General.theme", element.name); setthemeMetadata(() => element) } } })
             setThemes(() => themes)
+            data.forEach(element => {
+                if (element.name == config.new.General.theme) setthemeMetadata(() => element)
+            });
         })
         window.api.rpc.setActivity(undefined, t("discordrpc.settings"))
     }, [])
@@ -195,6 +199,8 @@ function settings() {
         }
     }
 
+    console.log(themeMetadata)
+
     return (
         <main className="settings-container" onContextMenu={(event) => OpenContextMenu(ContextMenu, event)}>
             <Sidebar
@@ -220,23 +226,31 @@ function settings() {
                             <div className="settings-page-title">{t("global.general")}</div>
                             <div className="settings-setting-container">
                                 {t("settings.general.language")}
-                                <Dropdown
-                                    options={Object.keys(i18n.store.data).map(element => {
-                                        return { label: t(`lang.${element}`), onClick: () => ChangeLanguage(element) }
-                                    })}
-                                    buttonText={t(`lang.${config.new.General.language}`)}
-                                    placeholderChange={() => t(`lang.${config.new.General.language}`)}
-                                    disableX
-                                />
+                                <div className="settings-helpicon-space">
+                                    <Dropdown
+                                        options={Object.keys(i18n.store.data).map(element => {
+                                            return { label: t(`lang.${element}`), onClick: () => ChangeLanguage(element) }
+                                        })}
+                                        buttonText={t(`lang.${config.new.General.language}`)}
+                                        placeholderChange={() => t(`lang.${config.new.General.language}`)}
+                                        disableX
+                                    />
+                                    <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getPath("userData")}/lang`))}/>
+                                </div>
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.general.theme")}
-                                <Dropdown
-                                    options={themes}
-                                    buttonText={config.new.General.theme}
-                                    disableX
-                                />
+                                <div className="settings-helpicon-space">
+                                    {themeMetadata && themeMetadata.author && <div className="settings-text-space">{themeMetadata.author}</div>}
+                                    {themeMetadata && themeMetadata.version && <div className="settings-text-space">{themeMetadata.version}</div>}
+                                    <Dropdown
+                                        options={themes}
+                                        buttonText={config.new.General.theme}
+                                        disableX
+                                    />
+                                    <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getPath("userData")}/themes`))}/>
+                                </div>
                             </div>
                         </div>
                         <div className="settings-page-container">

@@ -250,3 +250,8 @@ export function detectTitle(data: cardData): string {
         return t('player.TitleEpisode', { ep: data.saveData?.episode, name: data.AnimeData.title.romaji })
     }
 }
+
+export async function convertPath(path: string) {
+    if ((await window.api.getOSDetails()).platform == "win32") return path.replace("/", "\\")
+    return path
+}
