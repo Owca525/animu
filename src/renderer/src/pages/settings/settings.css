@@ -71,6 +71,7 @@
   bottom: 20px;
   left: 50%;
   translate: -50%;
+  z-index: 2000;
 }
 
 .settings-save-buttons {
