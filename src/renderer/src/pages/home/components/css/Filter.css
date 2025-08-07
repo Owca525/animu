@@ -24,5 +24,12 @@
     .home-filter-container {
        margin-left: 0px;
        translate: -50% 0px; 
+       left: 50%;
+    }
+}
+@media (max-width: 925px) {
+    .home-filter-container {
+        flex-wrap: wrap;
+        width: 340px;
     }
 }
