@@ -18,3 +18,11 @@
     flex-direction: column;
     gap: 8px;
 }
+
+/* For smaller devices / window sizes */
+@media (max-width: 1000px) {
+    .home-filter-container {
+       margin-left: 0px;
+       translate: -50% 0px; 
+    }
+}
