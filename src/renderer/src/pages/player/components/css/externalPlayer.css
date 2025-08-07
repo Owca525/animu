@@ -83,6 +83,7 @@
 @media (max-width: 1000px) {
   .external-dropdown {
     flex-direction: column;
-    min-width: 160px;
+    min-width: 200px;
+    align-items: end;
   }
 }
