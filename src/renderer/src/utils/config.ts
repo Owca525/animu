@@ -1,5 +1,6 @@
 import ini from "ini";
 import { SettingsConfig } from "./GlobalInterface";
+import { convertPath } from "./functions";
 
 export const defaultConfig: SettingsConfig = {
     General: {
@@ -90,11 +91,10 @@ const appConfigDirPath = window.api.os.getPath("userData");
 
 export async function checkPictureFolder(): Promise<string> {
     const path = await window.api.os.getPath("pictures");
-    const platform = await window.api.getOSDetails()
-    const platform_path = platform.platform == "win32" ? "\animu" : "/animu "
-    if (await window.api.os.exists(`${path}${platform_path}`)) return `${path}${platform_path}`;
-    window.api.os.mkdir(`${path}${platform_path}`);
-    return `${path}${platform_path}`;
+    const picturePath = await convertPath(`${path}/animu`)
+    if (await window.api.os.exists(picturePath)) return picturePath;
+    window.api.os.mkdir(picturePath);
+    return picturePath;
 }
 
 function deepMerge(target: any, source: any): any {
