@@ -75,10 +75,6 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         setchromCastDeviceList(await window.api.chromecast.deviceList())
     }
 
-    useEffect(() => {
-        refetchChromeCastDevices()
-    }, [window.api.chromecast.deviceList()])
-
     return (
         <div className="external-player-container">
             <div className="external-leftpanel-container">
