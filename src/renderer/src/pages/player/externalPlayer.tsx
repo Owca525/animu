@@ -80,8 +80,8 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     }, [window.api.chromecast.deviceList()])
 
     return (
-        // TODO: add .external-player-container-chromecast class when left bar is shown
-        <div className="external-player-container">
+        // TODO: add .external-player-container-chromecast class only when left bar is shown
+        <div className="external-player-container external-player-container-chromecast">
             <div className="external-leftpanel-container">
                 <div className="external-leftpanel-topbar">
                     <button className="button external-leftpanel-topbar-button material-symbols-outlined" onClick={refetchChromeCastDevices}>refresh</button>
@@ -91,7 +91,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                         <button className="button external-panelbutton" onClick={async () => await runChromeCast(element)}>
                             <div className="external-panelbutton-icon material-symbols-outlined">cast</div>
                             <div className="external-button-textcontainer">
-                                {element.name}
+                                <span className="external-panelbuttom-title">{element.name}</span>
                                 <span className="external-panelbutton-bottomtext">disconnected</span>
                             </div>
                         </button>

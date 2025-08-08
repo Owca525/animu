@@ -92,6 +92,11 @@
   overflow: hidden;
   min-width: 250px;
   min-height: 250px;
+  display: none;
+}
+
+.external-player-container-chromecast .external-leftpanel-container {
+  display: block;
 }
 
 .external-leftpanel {
@@ -115,9 +120,17 @@
   flex-direction: column;
 }
 
+.external-panelbutton-title {
+  width: 100%;
+  overflow: hidden;
+  align-items: start;
+  white-space: nowrap
+}
+
 .external-panelbutton-bottomtext {
   color: var(--text-gray);
   font-size: 0.7em;
+  align-items: start;
   width: 100%;
 }
 
