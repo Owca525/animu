@@ -63,7 +63,7 @@ export async function SaveToFile(data: cardData, file: string): Promise<boolean>
         if (index != -1) tmpData.splice(index, 1);
 
         tmpData.push(data);
-        window.api.os.write(await appConfigDirPath + `/${file}.json`, JSON.stringify(tmpData))
+        window.api.os.write(await appConfigDirPath + `/${file}.json`, JSON.stringify(checkAnimeDuplicate(tmpData)))
         return true
     } catch (Error) {
         console.error(`${Error} in SaveToFile`)
@@ -91,14 +91,16 @@ export async function CheckFile(file: string): Promise<boolean> {
 }
 
 function checkAnimeDuplicate(listcard: cardData[]): cardData[] {
-    let cache: string[] = []
-    let newListCard: cardData[] = []
-    for (let index = 0; index < listcard.length; index++) {
-        const element = listcard[index];
-        if (!cache.includes(element.AnimeData.title.romaji)) {
-            newListCard.push(element)
-            cache.push(element.AnimeData.title.romaji)
+    const map = new Map<string, cardData>()
+
+    for (const element of listcard) {
+        const title = element.AnimeData.title.romaji
+        const current = map.get(title)
+
+        if (!current || (element.saveData && current.saveData && element.saveData.episode > current.saveData.episode)) {
+            map.set(title, element)
         }
     }
-    return newListCard
+
+    return Array.from(map.values())
 }
