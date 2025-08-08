@@ -200,8 +200,6 @@ function settings() {
         }
     }
 
-    console.log(themeMetadata)
-
     return (
         <main className="settings-container" onContextMenu={(event) => OpenContextMenu(ContextMenu, event)}>
             <Sidebar
@@ -723,7 +721,7 @@ function settings() {
                                     <td><div className="settings-extensions-background">1.0</div></td>
                                     <td>
                                         <div className="settings-extensions-button-container">
-                                            <div className="settings-extensions-background">Information</div> <Button icon="settings" ButtonClass="settings-extensions-button"/>
+                                            <div className="settings-extensions-background">Information</div> <div className="settings-helpicon-space"><CheckBox /><Button icon="settings" ButtonClass="settings-extensions-button"/></div>
                                         </div>
                                     </td>
                                 </tr>
@@ -733,7 +731,7 @@ function settings() {
                                     <td><div className="settings-extensions-background">1.0</div></td>
                                     <td>
                                         <div className="settings-extensions-button-container">
-                                            <div className="settings-extensions-background">Player</div> <Button icon="settings" ButtonClass="settings-extensions-button"/>
+                                            <div className="settings-extensions-background">Player</div> <div className="settings-helpicon-space"><CheckBox /><Button icon="settings" ButtonClass="settings-extensions-button"/></div>
                                         </div>
                                     </td>
                                 </tr>
