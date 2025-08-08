@@ -111,27 +111,41 @@
   width: 97%;
   margin: 5% 3% 5% 0px;
   padding: 8px 4px 8px 12px;
-  font-size: 1.3em;
+  font-size: 1em;
   align-items: start;
 }
 
 .external-button-textcontainer {
   display: flex;
   flex-direction: column;
+  max-width: 90%;
+  overflow: hidden;
 }
 
 .external-panelbutton-title {
+  overflow: hidden;
   width: 100%;
   overflow: hidden;
   align-items: start;
-  white-space: nowrap
+  white-space: nowrap;
+  text-align: left;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
 }
 
 .external-panelbutton-bottomtext {
+  overflow: hidden;
   color: var(--text-gray);
   font-size: 0.7em;
   align-items: start;
   width: 100%;
+  text-align: left;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
 }
 
 .external-panelbutton-icon {

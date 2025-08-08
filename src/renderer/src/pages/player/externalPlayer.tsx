@@ -87,7 +87,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                         <button className="button external-panelbutton" onClick={async () => await runChromeCast(element)}>
                             <div className="external-panelbutton-icon material-symbols-outlined">cast</div>
                             <div className="external-button-textcontainer">
-                                <span className="external-panelbuttom-title">{element.name}</span>
+                                <span className="external-panelbutton-title">{element.name}</span>
                                 <span className="external-panelbutton-bottomtext">disconnected</span>
                             </div>
                         </button>
