@@ -75,10 +75,6 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         setchromCastDeviceList(await window.api.chromecast.deviceList())
     }
 
-    useEffect(() => {
-        refetchChromeCastDevices()
-    }, [window.api.chromecast.deviceList()])
-
     return (
         // TODO: add .external-player-container-chromecast class only when left bar is shown
         <div className="external-player-container external-player-container-chromecast">
