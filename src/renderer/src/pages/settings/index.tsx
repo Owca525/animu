@@ -200,8 +200,6 @@ function settings() {
         }
     }
 
-    console.log(themeMetadata)
-
     return (
         <main className="settings-container" onContextMenu={(event) => OpenContextMenu(ContextMenu, event)}>
             <Sidebar
