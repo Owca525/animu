@@ -64,6 +64,20 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
 
     return (
         <div className="external-player-container">
+        <div className="external-leftpanel-container">
+        <div className="external-leftpanel-topbar">
+            <button className="button external-leftpanel-topbar-button">fr</button>
+        </div>
+            <div className="external-leftpanel">
+                <button className="button external-panelbutton">
+                    <div className="external-panelbutton-icon">te</div>
+                    <div className="external-button-textcontainer">
+                        Top text
+                        <span className="external-panelbutton-bottomtext">Bottom text</span>
+                    </div>
+                </button>
+            </div>
+        </div>
             <div className="external-player-top">
                 <div className="video-top">
                     <Button icon="arrow_back" ButtonClass="player-buttons" onClick={() => navigate("/")} />

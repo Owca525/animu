@@ -432,9 +432,18 @@ body {
   border-radius: 12px;
 }
 
-.external-episodes-container {
+.external-episodes-container,
+.external-leftpanel-container {
   background-color: var(--bg3);
   border-radius: 12px;
+}
+
+.external-panelbutton, .external-leftpanel-topbar-button {
+  border-radius: 9px;
+
+  background-color: var(--bg4);
+  border-color: var(--bg4);
+
 }
 
 /* Settings */
