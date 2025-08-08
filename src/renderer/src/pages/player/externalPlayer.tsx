@@ -76,6 +76,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     }
 
     return (
+        // TODO: add .external-player-container-chromecast class when left bar is shown
         <div className="external-player-container">
             <div className="external-leftpanel-container">
                 <div className="external-leftpanel-topbar">
