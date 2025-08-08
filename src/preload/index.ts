@@ -8,6 +8,12 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld("api", {
       open: (url: string) => ipcRenderer.invoke("open", url),
       saveToClipboard: (type: "text" | "image", content: string) => ipcRenderer.invoke("saveToClipboard", type, content),
+      chromecast: {
+        startSearch: () => ipcRenderer.invoke("searchChromeCast"),
+        deviceList: () => ipcRenderer.invoke("getListChromcasts"),
+        stopSearch: () => ipcRenderer.invoke("stopSearchChromcast"),
+        connect: (device: { host: string, port: number, name: string }, metadata: { title: string, time: number, url: string, type: string }) => ipcRenderer.invoke("playOnChromeCast", device, metadata)
+      },
       update: {
         updateProgress: (callback) =>
           ipcRenderer.on("update-download-progress", callback),

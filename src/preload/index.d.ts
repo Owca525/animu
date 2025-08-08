@@ -5,6 +5,12 @@ declare global {
     api: {
       open: (url: string) => Promise<void>;
       saveToClipboard: (type: "text" | "image", content: string) => Promise<boolean>;
+      chromecast: {
+        startSearch: () => void,
+        deviceList: () => Promise<{ host: string, port: number, name: string }[]>;
+        connect: (device: { host: string, port: number, name: string }, metadata: { title: string, time: number, url: string, type: string }) => void
+        stopSearch: () => void
+      },
       update: {
         updateProgress: (
           callback: (event: Event, percent: number) => void
