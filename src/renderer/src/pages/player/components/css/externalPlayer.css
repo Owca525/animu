@@ -133,6 +133,7 @@
   -webkit-box-orient: vertical;
   line-clamp: 1;
   -webkit-line-clamp: 1;
+  text-overflow: ellipsis;
 }
 
 .external-panelbutton-bottomtext {
@@ -146,6 +147,7 @@
   -webkit-box-orient: vertical;
   line-clamp: 1;
   -webkit-line-clamp: 1;
+  text-overflow: ellipsis;
 }
 
 .external-panelbutton-icon {
