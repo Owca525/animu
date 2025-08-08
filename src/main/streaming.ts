@@ -6,19 +6,21 @@ const bonjour = Bonjour();
 
 const devices: { host: string, port: number, name: string }[] = [];
 const browser = bonjour.find({ type: 'googlecast' });
-browser.stop()
+
+browser.on('up', (service) => {
+    const device = {
+        name: service.name,
+        host: service.addresses[0],
+        port: service.port
+    }
+
+    console.log(device)
+
+    if (!devices.some(d => d.host === device.host)) devices.push(device);
+});
+
 
 ipcMain.handle("searchChromeCast", (_event) => {
-    browser.on('up', (service) => {
-        const device = {
-            name: service.name,
-            host: service.addresses[0],
-            port: service.port
-        }
-
-        if (!devices.some(d => d.host === device.host)) devices.push(device);
-    });
-
     browser.start();
 });
 
