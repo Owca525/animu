@@ -4,24 +4,25 @@ import { ipcMain } from 'electron';
 
 const bonjour = Bonjour();
 
-const devices: { host: string, port: number, name: string }[] = [];
-const browser = bonjour.find({ type: 'googlecast' });
-
-browser.on('up', (service) => {
-    const device = {
-        name: service.name,
-        host: service.addresses[0],
-        port: service.port
-    }
-
-    console.log(device)
-
-    if (!devices.some(d => d.host === device.host)) devices.push(device);
-});
-
+let devices: { host: string, port: number, name: string }[] = [];
+let browser: Bonjour.Browser | undefined = undefined;
 
 ipcMain.handle("searchChromeCast", (_event) => {
-    browser.start();
+    if (browser) return
+    browser = bonjour.find({ type: 'googlecast' })
+    browser.on('up', (service) => {
+        const device = {
+            name: service.name,
+            host: service.addresses[0],
+            port: service.port
+        }
+
+        console.log(device)
+
+        if (!devices.some(d => d.host === device.host)) devices.push(device)
+    });
+
+    browser.start()
 });
 
 ipcMain.handle("getListChromcasts", (_event) => {
@@ -29,7 +30,11 @@ ipcMain.handle("getListChromcasts", (_event) => {
 });
 
 ipcMain.handle("stopSearchChromcast", (_event) => {
-    browser.stop();
+    if (browser) {
+        browser.stop();
+        browser = undefined
+        devices = []
+    }
 });
 
 ipcMain.handle("playOnChromeCast", (_event, device: { host: string, port: number, name: string }, metadata: { title: string, time: number, url: string, type: string }) => {
