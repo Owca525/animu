@@ -18,6 +18,12 @@ interface ExternalplayerProps {
     now_episodes: { episode: string, type: string, episodes: Array<string> }
 }
 
+function filterTextChromeCast(text: string) {
+    let index = text.lastIndexOf("-")
+    if (index === -1) return text;
+    return text.substring(0, index).replaceAll("-", " ")
+}
+
 const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes, playerData, setNextEpisode, time }) => {
     const navigate = useNavigate()
     const config: SettingsConfig = useSelector((data: any) => data.config);
@@ -67,6 +73,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
 
     // TODO: napraw wyszukiwanie urządzeń i zabezpieczenia do tego
     async function runChromeCast(device: { host: string, port: number, name: string }) {
+        return
         await window.api.chromecast.connect(device, { title: AnimeTitle, time: time, url: playerData[0].resolution[0].url, type: "video/mp4" })
     }
 
@@ -87,7 +94,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                         <button className="button external-panelbutton" onClick={async () => await runChromeCast(element)}>
                             <div className="external-panelbutton-icon material-symbols-outlined">cast</div>
                             <div className="external-button-textcontainer">
-                                <span className="external-panelbutton-title">{element.name}</span>
+                                <span className="external-panelbutton-title">{filterTextChromeCast(element.name)}</span>
                                 <span className="external-panelbutton-bottomtext">disconnected</span>
                             </div>
                         </button>
