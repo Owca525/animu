@@ -83,32 +83,14 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     }
 
     return (
-        // TODO: add .external-player-container-chromecast class only when left bar is shown
-        <div className="external-player-container external-player-container-chromecast">
-            <div className="external-leftpanel-container">
-                <div className="external-leftpanel-topbar">
-                    <button className="button external-leftpanel-topbar-button material-symbols-outlined" onClick={refetchChromeCastDevices}>refresh</button>
-                </div>
-                <div className="external-leftpanel">
-                    {chromCastDeviceList.map((element) => (
-                        <button className="button external-panelbutton" onClick={async () => await runChromeCast(element)}>
-                            <div className="external-panelbutton-icon material-symbols-outlined">cast</div>
-                            <div className="external-button-textcontainer">
-                                <span className="external-panelbutton-title">{filterTextChromeCast(element.name)}</span>
-                                <span className="external-panelbutton-bottomtext">disconnected</span>
-                            </div>
-                        </button>
-                    ))}
-                </div>
-            </div>
+        <div className="external-player-container-container">
+        <div className="external-player-container">
             <div className="external-player-top">
                 <div className="video-top">
                     <Button icon="arrow_back" ButtonClass="player-buttons" onClick={() => navigate("/")} />
                     <div className="player-title">{AnimeTitle}</div>
                 </div>
                 <div className="external-dropdown">
-                    <Dropdown placeholder={playerData[0].hostname} options={playerData.map((element) => { return { label: element.hostname } })} disableX />
-                    <Dropdown placeholder="1080p" options={[{ label: "1080p" }, { label: "720p" }, { label: "480p" }, { label: "360p" }]} disableX />
                     <Dropdown options={
                         [
                             { label: "mpv", icon: "https://mpv.io/images/mpv-logo-128-0baae5aa.png" },
@@ -116,7 +98,10 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                             { label: "Movian", icon: "https://apps.movian.eu/favicon.ico" },
                         ]
                     } disableX placeholder={"test"}
-                    /></div>
+                    />
+                    <Dropdown placeholder="1080p" options={[{ label: "1080p" }, { label: "720p" }, { label: "480p" }, { label: "360p" }]} disableX />
+                    <Dropdown placeholder={playerData[0].hostname} options={playerData.map((element) => { return { label: element.hostname } })} disableX />
+                    </div>
             </div>
             <div className="external-player-center">
                 <div className="external-button-container">
@@ -134,6 +119,26 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                 </div>
             </div>
         </div>
+        {/* TODO: Give this thing display: none if external player is not chromecast */}
+        <div className="external-player-container-chromecast">
+            <div className="external-leftpanel-container">
+                <div className="external-leftpanel-topbar">
+                    <button className="button external-leftpanel-topbar-button material-symbols-outlined" onClick={refetchChromeCastDevices}>refresh</button>
+                </div>
+                <div className="external-leftpanel">
+                    {chromCastDeviceList.map((element) => (
+                        <button className="button external-panelbutton" onClick={async () => await runChromeCast(element)}>
+                            <div className="external-panelbutton-icon material-symbols-outlined">cast</div>
+                            <div className="external-button-textcontainer">
+                                <span className="external-panelbutton-title">{filterTextChromeCast(element.name)}</span>
+                                <span className="external-panelbutton-bottomtext">disconnected</span>
+                            </div>
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </div>
+</div>
     )
 }
 

@@ -1,6 +1,15 @@
 /* external player section */
+/* This abomination exists because owca wanted a sidebar and i don't have better ideas that don't require a rewrite */
+.external-player-container-container {
+  display: flex;
+  flex-direction: row-reverse;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  overflow-y: scroll;
+}
+
 .external-player-container{
-  position: absolute;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -21,6 +30,9 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  position: absolute;
+  left: 0px;
+  top: 0px;
 }
 
 .external-player-top .video-top {
@@ -28,7 +40,7 @@
 }
 
 .external-player-center {
-  margin-top: 15%;
+  margin-top: max(16%, 18vh);
   align-self: center;
   display: flex;
   flex-direction: column;
@@ -44,7 +56,7 @@
   right: 15px;
   top: 15px;
   display: flex;
-  flex-direction: row;
+  flex-direction: row-reverse;
   flex-wrap: wrap;
   align-self: center;
   gap: 5px;
@@ -54,7 +66,7 @@
 }
 
 .external-episodes-container {
-  max-width: min(81vh, 75%);
+  max-width: min(100vh, 80%);
   width: fit-content;
   height: fit-content;
   align-self: center;
@@ -93,6 +105,13 @@
   min-width: 250px;
   min-height: 250px;
   display: none;
+}
+
+.external-player-container-chromecast {
+  width: 15%;
+  min-width: 305px;
+  height: 100%;
+  min-height: 100%;
 }
 
 .external-player-container-chromecast .external-leftpanel-container {
@@ -160,31 +179,72 @@
 }
 
 
-@media (max-width: 1400px) {
-.external-episodes-container {
-  max-width: 60%;
-}
-.external-player-container-chromecast .external-player-center, .external-player-container-chromecast .external-episodes-container {
-  margin-left: 20%;
-}
-}
-
 @media (max-width: 1000px) {
   .external-dropdown {
     flex-direction: column;
     min-width: 200px;
     align-items: end;
   }
-
-  .external-episodes-container {
-    max-width: 40%;
-  }
-  .external-player-center {
-    margin-top: 0px;
-  }
-
   .external-leftpanel-container {
-    min-width: 0px;
-    width: 30%;
+    min-width: 200px;
+    width: 25%;
+  }
+
+  .external-player-container-chromecast {
+  width: calc(25% + 60px);
+  min-width: 240px;
+}
+}
+
+
+@media (max-width: 650px) {
+  .external-player-container-container {
+    flex-direction: column;
+  }
+  .external-player-container {
+    z-index: 0;
+    height: 90%;
+  }
+
+  .external-player-container-chromecast {
+    width: 100%;
+    height: 35%;
+    min-height: 35%;
+  }
+  
+  .external-leftpanel-container {
+    position: relative;
+    width: 60%;
+    margin: 0px 20% 0px 20%;
+    translate: 0px 0px;
+    top: 30px;
+  }
+  
+  .external-player-top {
+    flex-wrap: wrap;
+    position: relative;
+  }
+  
+  .external-player-center {
+    margin-top: 20px;
+  }
+  
+  .external-episodes-container {
+    max-height: 60%;
+  }
+  
+}
+
+@media (max-width: 360px) {
+  .external-leftpanel-container {
+    margin: 0px 15% 0px 15%;
+    min-width: 10px;
+  }
+}
+
+@media (max-width: 240px) {
+  .external-leftpanel-container {
+    margin: 0px;
+    width: 100%;
   }
 }
