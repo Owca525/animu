@@ -69,6 +69,7 @@ declare global {
         mkdir: (path: string) => Promise<boolean>;
         saveDialog: (fileName: string, data: any, title: string, name: string, extensions: string[], format?: string) => Promise<boolean>
         openDialog: (path?: string, name?: string, extensions?: string[]) => Promise<string>
+        getPathProgram: (program: string) => Promise<string>
       };
       runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string}, type: "mpv" | "vlc") => any
       getlistThemes: () => Promise<{ version?: string; autor?: string; pathcss: string; animuTitle?: string; name: string; pathIcon?: string }[]>

@@ -4,7 +4,7 @@ import * as RPC from 'discord-rpc';
 import fs from "fs";
 import path from "path";
 import { mainWindow } from ".";
-import { exec } from "child_process";
+import { exec, execSync } from "child_process";
 let rpc: any = undefined
 
 if (process.env.NODE_ENV != 'development') {
@@ -36,16 +36,21 @@ ipcMain.handle('setActivity', (_event, details: string | undefined, state: strin
 ipcMain.handle('getVersion', (_event): String => app.getVersion())
 
 ipcMain.handle('runExternalPlayer', (_event, videoData: {url: string, path: string, time: number, title: string}, type: "mpv" | "vlc"): any => {
+    let flatpakList = execSync(`flatpak list --columns=application`).toString().trim().split(" ").includes(videoData.path)
+    let path = videoData.path
+    if (!fs.existsSync(videoData.path) && !flatpakList) return
+    if (flatpakList) path = `flatpak run ${path}`
+    if (videoData.path.replaceAll(" ", "") == "") return
     switch (type) {
         case "mpv":
-            exec(`${videoData.path} --title='${videoData.title}' --start=${videoData.time} '${videoData.url}'`, (error, stdout, stderr) => {
+            exec(`${path} --title='${videoData.title}' --start=${videoData.time} '${videoData.url}'`, (error, stdout, stderr) => {
                 if (error) console.error(error)
                 if (stderr) console.error(error)
                 console.log(stdout)
             })
             break;
         case "vlc":
-            exec(`${videoData.path} --input-title-format='${videoData.title}' --start-time='${videoData.time}' '${videoData.url}'`, (error, stdout, stderr) => {
+            exec(`${path} --input-title-format='${videoData.title}' --start-time='${videoData.time}' '${videoData.url}'`, (error, stdout, stderr) => {
                 if (error) console.error(error)
                 if (stderr) console.error(error)
                 console.log(stdout)

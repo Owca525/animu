@@ -164,7 +164,7 @@ export interface SettingsConfig {
             LongTimeSkipBack: number | string
             TimeSkipLeft: number | string
             TimeSkipRight: number | string
-            VideoScaling: boolean,
+            VideoStreching: boolean,
             DisableVolumeAnimation: boolean,
             RemovingSpaceAnimation: boolean
         }
@@ -175,8 +175,10 @@ export interface SettingsConfig {
         },
         external: {
             enable: boolean,
-            type: "movian" | "vlc" | "mpv" | "custom",
+            type: "Movian" | "VLC" | "Mpv" | "ChromeCast",
             movianIP: string
+            vlcPath: string
+            mpvPath: string
         }
         upToNextEpisode: {
             enable: boolean
