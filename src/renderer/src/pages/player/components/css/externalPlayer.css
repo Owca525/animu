@@ -16,6 +16,7 @@
   z-index: 100;
   width: 100%;
   height: 100%;
+  margin-right: 15%;
 }
 
 .external-button-container {
@@ -40,7 +41,7 @@
 }
 
 .external-player-center {
-  margin-top: max(16%, 18vh);
+  margin-top: 24vh;
   align-self: center;
   display: flex;
   flex-direction: column;
@@ -196,6 +197,12 @@
 }
 }
 
+
+@media (max-width: 839px) {
+.external-player-container {
+  margin-right: 0px;
+}
+}
 
 @media (max-width: 650px) {
   .external-player-container-container {
