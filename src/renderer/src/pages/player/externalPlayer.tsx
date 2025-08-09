@@ -65,9 +65,9 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     }
 
     useEffect(() => {
-        if (config.Player.external.type === "movian") RunMovian()
-        if (config.Player.external.type === "mpv") runMpvPlayer()
-        if (config.Player.external.type === "vlc") runVlcPlayer()
+        if (config.Player.external.type === "Movian") RunMovian()
+        if (config.Player.external.type === "Mpv") runMpvPlayer()
+        if (config.Player.external.type === "VLC") runVlcPlayer()
         window.api.chromecast.startSearch()
     }, [])
 
@@ -111,9 +111,9 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                     <Dropdown placeholder="1080p" options={[{ label: "1080p" }, { label: "720p" }, { label: "480p" }, { label: "360p" }]} disableX />
                     <Dropdown options={
                         [
-                            { label: "mpv", icon: "https://mpv.io/images/mpv-logo-128-0baae5aa.png" },
-                            { label: "VLC", icon: "https://images.videolan.org/images/largeVLC.png" },
-                            { label: "Movian", icon: "https://apps.movian.eu/favicon.ico" },
+                            { label: "mpv" },
+                            { label: "VLC" },
+                            { label: "Movian" },
                         ]
                     } disableX placeholder={"test"}
                     /></div>

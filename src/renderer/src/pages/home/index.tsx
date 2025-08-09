@@ -16,6 +16,7 @@ import { ReadHistory } from "@renderer/utils/history/history"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
 import { CreateContextMenuOptions } from "@renderer/utils/functions"
 import Filter from "./components/filter"
+import { useHotkeys } from "react-hotkeys-hook"
 
 const Home = () => {
     const navigate = useNavigate()
@@ -136,6 +137,10 @@ const Home = () => {
         })
         setHomeData(async () => newData.filter((value) => value != undefined))
     }
+
+    useHotkeys("d", async () => {
+        console.log(await window.api.os.getPathProgram("vlc"))
+    })
 
     function onChange(params?: FilterParams, removeParam?: string) {
         if (removeParam) {

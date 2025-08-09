@@ -25,7 +25,7 @@ export const defaultConfig: SettingsConfig = {
             LongTimeSkipBack: 90,
             TimeSkipLeft: 5,
             TimeSkipRight: 5,
-            VideoScaling: false,
+            VideoStreching: false,
             RemovingSpaceAnimation: false,
             DisableVolumeAnimation: false
         },
@@ -36,8 +36,10 @@ export const defaultConfig: SettingsConfig = {
         },
         external: {
             enable: false,
-            type: "mpv",
-            movianIP: "localhost:42000"
+            type: "Mpv",
+            movianIP: "localhost:42000",
+            mpvPath: await window.api.os.getPathProgram("mpv"),
+            vlcPath: await window.api.os.getPathProgram("vlc")
         },
         upToNextEpisode: {
             enable: true,

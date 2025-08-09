@@ -3,6 +3,7 @@ import { mainWindow } from ".";
 import os from 'os';
 
 import fs, { WriteFileOptions } from "fs";
+import { execSync } from "child_process";
 
 function write(path: string, data: string, format?: WriteFileOptions): boolean {
   try {
@@ -45,6 +46,23 @@ ipcMain.handle(
 ipcMain.handle("exist", (_event, path: string): boolean => {
   if (fs.existsSync(path)) return true;
   else return false;
+});
+
+ipcMain.handle("getPathProgram", async (_event, program: string): Promise<string> => {
+  try {
+    if (os.platform() === "win32") return ""
+    let paths = execSync(`whereis ${program}`).toString().trim().split(" ")
+    if (!(paths.length <= 1)) return paths[1]
+    let flatpakPaths = execSync(`flatpak list --columns=application`).toString().trim().split(" ")
+    for (let index = 0; index < flatpakPaths.length; index++) {
+      const element = flatpakPaths[index];
+      if (element.toLowerCase().includes(program.toLocaleLowerCase())) return element.replace("\n", "")
+    }
+    return ""
+  } catch (error) {
+    console.error(error)
+    return ""
+  }
 });
 
 ipcMain.handle(

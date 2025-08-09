@@ -56,6 +56,7 @@ if (process.contextIsolated) {
         mkdir: (path: string) => ipcRenderer.invoke("mkdir", path),
         saveDialog: (fileName: string, data: any, title: string, name: string, extensions: string[], format?: string) => ipcRenderer.invoke("saveDialog", fileName, data, title, name, extensions, format),
         openDialog: (path?: string, name?: string, extensions?: string[]) => ipcRenderer.invoke("openDialog", path, name, extensions),
+        getPathProgram: (program: string) => ipcRenderer.invoke("getPathProgram", program) 
       },
       runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string}, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", videoData, type),
       getlistThemes: () => ipcRenderer.invoke("get-css-files"),

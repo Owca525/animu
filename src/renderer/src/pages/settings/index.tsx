@@ -412,11 +412,11 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Video Scaling
+                                Video Streching
                                 <CheckBox
-                                    checked={config.new.Player.general.VideoScaling}
+                                    checked={config.new.Player.general.VideoStreching}
                                     onChecked={(checked) =>
-                                        handleChange('Player.general.VideoScaling', checked)
+                                        handleChange('Player.general.VideoStreching', checked)
                                     }
                                 />
                             </div>
@@ -469,24 +469,45 @@ function settings() {
                                 Select Player
                                 <Dropdown
                                     options={[
-                                        { label: "Movian", onClick: () => handleChange("Player.external.type", "movian") },
-                                        { label: "Mpv", onClick: () => handleChange("Player.external.type", "mpv") },
-                                        { label: "VLC", onClick: () => handleChange("Player.external.type", "vlc") },
+                                        { label: "Movian", onClick: () => handleChange("Player.external.type", "Movian") },
+                                        { label: "Mpv", onClick: () => handleChange("Player.external.type", "Mpv") },
+                                        { label: "VLC", onClick: () => handleChange("Player.external.type", "VLC") },
                                     ]}
                                     buttonText={config.new.Player.external.type}
-                                    disableX
+                                    disableX   
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
-                                Movian IP
-                                <SettingsInput
-                                    iconChar=" "
-                                    type="text"
-                                    onKeyDown={(text) => handleChange("Player.external.movianIP", text)}
-                                    startValue={config.new.Player.external.movianIP}
-                                />
-                            </div>
+                            {config.new.Player.external.type != "ChromeCast" && <div className="settings-line"></div>}
+                            {config.new.Player.external.type === "Movian" &&
+                                <div className="settings-setting-container">
+                                    Movian IP
+                                    <SettingsInput
+                                        type="text"
+                                        onKeyDown={(text) => handleChange("Player.external.movianIP", text)}
+                                        startValue={config.new.Player.external.movianIP}
+                                    />
+                                </div>
+                            }
+                            {config.new.Player.external.type === "Mpv" &&
+                                <div className="settings-setting-container">
+                                    Mpv Path
+                                    <SettingsInput
+                                        type="text"
+                                        onKeyDown={(text) => handleChange("Player.external.mpvPath", text)}
+                                        startValue={config.new.Player.external.mpvPath}
+                                    />
+                                </div>
+                            }
+                            {config.new.Player.external.type === "VLC" &&
+                                <div className="settings-setting-container">
+                                    VLC Path
+                                    <SettingsInput
+                                        type="text"
+                                        onKeyDown={(text) => handleChange("Player.external.vlcPath", text)}
+                                        startValue={config.new.Player.external.vlcPath}
+                                    />
+                                </div>
+                            }
                         </div>
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.player.screenshot")}</div>
