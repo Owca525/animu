@@ -13,7 +13,7 @@
     padding: 10px 0 10px 8px;
     max-width: 140px;
     field-sizing: content;
-    min-width: 50px;
+    /* min-width: 50px; */
 }
 
 .settings-input-type {
