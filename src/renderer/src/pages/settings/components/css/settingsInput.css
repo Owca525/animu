@@ -11,8 +11,8 @@
     font-size: 1em;
     width: min-content;
     padding: 10px 0 10px 8px;
-    max-width: 140px;
     field-sizing: content;
+    /* max-width: 140px; */
     /* min-width: 50px; */
 }
 

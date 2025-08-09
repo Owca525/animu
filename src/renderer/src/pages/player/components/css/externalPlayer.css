@@ -1,6 +1,6 @@
 /* external player section */
 /* This abomination exists because owca wanted a sidebar and i don't have better ideas that don't require a rewrite */
-.external-player-container-container {
+.external-player-container {
   display: flex;
   flex-direction: row-reverse;
   width: 100vw;
@@ -9,7 +9,7 @@
   overflow-y: scroll;
 }
 
-.external-player-container{
+.external-player-container-player{
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -106,16 +106,17 @@
   min-width: 250px;
   min-height: 250px;
   display: none;
+  max-width: 350px;
 }
 
-.external-player-container-chromecast {
+.external-player-container-player-chromecast {
   width: 15%;
   min-width: 305px;
   height: 100%;
   min-height: 100%;
 }
 
-.external-player-container-chromecast .external-leftpanel-container {
+.external-player-container-player-chromecast .external-leftpanel-container {
   display: block;
 }
 
@@ -191,7 +192,7 @@
     width: 25%;
   }
 
-  .external-player-container-chromecast {
+  .external-player-container-player-chromecast {
   width: calc(25% + 60px);
   min-width: 240px;
 }
@@ -199,21 +200,21 @@
 
 
 @media (max-width: 839px) {
-.external-player-container {
+.external-player-container-player {
   margin-right: 0px;
 }
 }
 
 @media (max-width: 650px) {
-  .external-player-container-container {
+  .external-player-container {
     flex-direction: column;
   }
-  .external-player-container {
+  .external-player-container-player {
     z-index: 0;
     height: 90%;
   }
 
-  .external-player-container-chromecast {
+  .external-player-container-player-chromecast {
     width: 100%;
     height: 35%;
     min-height: 35%;

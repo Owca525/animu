@@ -422,7 +422,7 @@ body {
   background-color: var(--bg2);
 }
 
-.external-player-container, .external-player-container-container {
+.external-player-container {
   background-color: var(--bg2);
   border-radius: 12px;
 }

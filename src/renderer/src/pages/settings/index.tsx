@@ -482,6 +482,7 @@ function settings() {
                                 <div className="settings-setting-container">
                                     Movian IP
                                     <SettingsInput
+                                        iconChar=" "
                                         type="text"
                                         onKeyDown={(text) => handleChange("Player.external.movianIP", text)}
                                         startValue={config.new.Player.external.movianIP}

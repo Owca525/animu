@@ -83,8 +83,8 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     }
 
     return (
-        <div className="external-player-container-container">
         <div className="external-player-container">
+        <div className="external-player-container-player">
             <div className="external-player-top">
                 <div className="video-top">
                     <Button icon="arrow_back" ButtonClass="player-buttons" onClick={() => navigate("/")} />
@@ -120,7 +120,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
             </div>
         </div>
         {/* TODO: Give this thing display: none if external player is not chromecast */}
-        <div className="external-player-container-chromecast">
+        <div className="external-player-container-player-chromecast">
             <div className="external-leftpanel-container">
                 <div className="external-leftpanel-topbar">
                     <button className="button external-leftpanel-topbar-button material-symbols-outlined" onClick={refetchChromeCastDevices}>refresh</button>
