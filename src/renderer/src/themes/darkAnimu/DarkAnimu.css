@@ -550,12 +550,16 @@ body {
   background-color: var(--bg3);
 }
 
-.settings-input-field {
+.settings-input-field, .settings-input-field-hide-type {
   background-color: var(--bg3);
   color: var(--text);
-  border-radius: 12px 0px 0px 12px;
+  border-radius: 12px;
   border: 2px solid var(--bg3);
+}
+
+.settings-input-field {
   border-right: 0px;
+  border-radius: 12px 0px 0px 12px;
 }
 
 .settings-input-type {
@@ -567,12 +571,16 @@ body {
 }
 
 .settings-input-container:hover .settings-input-type,
-.settings-input-container:hover .settings-input-field {
+.settings-input-container:hover .settings-input-field,
+.settings-input-container:hover .settings-input-field-hide-type {
   background-color: var(--bg4);
 }
 
+
 .settings-input-field:focus,
 .settings-input-field:active,
+.settings-input-field-hide-type:focus,
+.settings-input-field-hide-type:active,
 .settings-input-field:focus~.settings-input-type,
 .settings-input-field:active~.settings-input-type {
   border-color: var(--neutral1);

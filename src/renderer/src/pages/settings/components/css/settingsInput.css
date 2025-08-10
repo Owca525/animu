@@ -5,15 +5,21 @@
     overflow: hidden;
 }
 
-.settings-input-field {
+.settings-input-field, .settings-input-field-hide-type {
     outline: none;
     text-align: right;
     font-size: 1em;
     width: min-content;
-    padding: 10px 0 10px 8px;
+    min-width: 50px;
     field-sizing: content;
-    /* max-width: 140px; */
-    /* min-width: 50px; */
+}
+
+.settings-input-field {
+    padding: 10px 0 10px 8px;
+}
+
+.settings-input-field-hide-type {
+    padding: 10px;
 }
 
 .settings-input-type {
@@ -21,5 +27,5 @@
     align-content: center;
     padding-right: 5px;
     min-width: 4px;
-    width: 100%;
+    width: min-content;
 }
