@@ -472,6 +472,7 @@ function settings() {
                                         { label: "Movian", onClick: () => handleChange("Player.external.type", "Movian") },
                                         { label: "Mpv", onClick: () => handleChange("Player.external.type", "Mpv") },
                                         { label: "VLC", onClick: () => handleChange("Player.external.type", "VLC") },
+                                        { label: "ChromeCast", onClick: () => handleChange("Player.external.type", "ChromeCast") }
                                     ]}
                                     buttonText={config.new.Player.external.type}
                                     disableX   
