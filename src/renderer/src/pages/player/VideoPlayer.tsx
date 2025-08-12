@@ -546,7 +546,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 onError={(error) => videoErrorHandler(error)}
                 preload={config.Player.general.playerLoadType.toLowerCase()}
                 muted={isMuted}
-                style={config.Player.general.VideoScaling ? { objectFit: "cover" } : {}}
+                style={config.Player.general.VideoStreching ? { objectFit: "cover" } : {}}
             />
             {isVisible &&
                 <>
