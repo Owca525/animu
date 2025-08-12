@@ -8,7 +8,7 @@ import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
 import { useSelector } from "react-redux"
-import PlayerDropDown from "./components/playerDropDown"
+import Dropdown from "@renderer/components/dropDown"
 
 interface ExternalplayerProps {
     animeData: cardData
@@ -129,15 +129,15 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                         <div className="player-title">{AnimeTitle}</div>
                     </div>
                     <div className="external-dropdown">
-                        <PlayerDropDown options={[
+                        <Dropdown options={[
                             { label: "Mpv", onClick: () => setCurrentPlayer("Mpv") },
                             { label: "VLC", onClick: () => setCurrentPlayer("VLC") },
                             { label: "Movian", onClick: () => setCurrentPlayer("Movian") },
                             { label: "ChromeCast", onClick: () => setCurrentPlayer("ChromeCast") }
-                        ]} defaultButtonText={config.Player.external.type}
+                        ]} placeholder={config.Player.external.type} disableX
                         />
-                        <PlayerDropDown defaultButtonText={currentResolution != "Not Found" ? `${currentResolution}p` : currentResolution} options={resolutionList.map((element) => { return { label: `${element.res}p`, onClick: () => ChangeResolution(element) } })} />
-                        <PlayerDropDown defaultButtonText={currentHost ? currentHost.hostname : "Not Found"} options={playerData.map((element) => { return { label: element.hostname, onClick: () => ChangeHost(element) } })} />
+                        <Dropdown placeholder={currentResolution != "Not Found" ? `${currentResolution}p` : currentResolution} options={resolutionList.map((element) => { return { label: `${element.res}p`, onClick: () => ChangeResolution(element) } })} disableX />
+                        <Dropdown placeholder={currentHost ? currentHost.hostname : "Not Found"} options={playerData.map((element) => { return { label: element.hostname, onClick: () => ChangeHost(element) } })} disableX />
                     </div>
                 </div>
                 <div className="external-player-center">
