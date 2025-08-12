@@ -109,7 +109,8 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         setResolutionList(() => playerData[0].resolution)
         setCurrentResolution(() => playerData[0].resolution[0].res)
         setCurrentUrl(() => playerData[0].resolution[0].url)
-
+        
+        // FIXME: Napraw dlaczego żeby player się odpalał
         RunPlayers()
     }, [])
 

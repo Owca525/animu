@@ -90,6 +90,7 @@ export async function CheckFile(file: string): Promise<boolean> {
     }
 }
 
+// FIXME: Napraw zapisywanie nowych anime
 function checkAnimeDuplicate(listcard: cardData[]): cardData[] {
     const map = new Map<string, cardData>()
 
