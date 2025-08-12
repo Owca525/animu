@@ -8,7 +8,7 @@ import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
 import { useSelector } from "react-redux"
-import Dropdown from "@renderer/components/dropDown"
+import PlayerDropDown from "./components/playerDropDown"
 
 interface ExternalplayerProps {
     animeData: cardData
@@ -36,17 +36,40 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         }
     }))
 
+    // Player Related
+    const [resolutionList, setResolutionList] = useState<{ res: string, url: string }[]>([])
+    const [currentHost, setCurrentHost] = useState<playerData | undefined>(undefined)
+    const [currentResolution, setCurrentResolution] = useState<string>("Not Found")
+    const [currentUrl, setCurrentUrl] = useState<string | undefined>(undefined)
+    const [currentPlayer, setCurrentPlayer] = useState<"Movian" | "VLC" | "Mpv" | "ChromeCast">(config.Player.external.type)
+
+    // Chomecast Related
     const [chromCastDeviceList, setchromCastDeviceList] = useState<{ host: string, port: number, name: string }[]>([])
 
+    // Running Players
     async function RunMovian() {
-        let url = playerData[0].resolution[0].url
-        let req = await window.api.request.get(`http://${config.Player.external.movianIP}/showtime/open?url=${encodeURIComponent(url)}`, {})
+        if (!currentUrl) return
+        let req = await window.api.request.get(`http://${config.Player.external.movianIP}/showtime/open?url=${encodeURIComponent(currentUrl)}`, {})
         if (!req.success && req.error == "fetch failed") {
             toast.error("Failed to run Movian", notificationProps)
         }
     }
+    function runMpvPlayer() {
+        if (!currentUrl) return
+        window.api.runExternaPlayer({ url: currentUrl, title: AnimeTitle, path: config.Player.external.mpvPath, time: time }, "mpv")
+    }
 
-    console.log(playerData)
+    function runVlcPlayer() {
+        if (!currentUrl) return
+        window.api.runExternaPlayer({ url: currentUrl, title: AnimeTitle, path: config.Player.external.vlcPath, time: time }, "vlc")
+    }
+    // TODO: napraw wyszukiwanie urządzeń i zabezpieczenia do tego
+    async function runChromeCast(device: { host: string, port: number, name: string }) {
+        device
+        // if (currentUrl) await window.api.chromecast.connect(device, { title: AnimeTitle, time: time, url: currentUrl, type: "video/mp4" })
+    }
+
+    console.log(playerData, currentUrl)
 
     function setEpisode(type: "next" | "prev") {
         let ep = now_episodes.episodes.indexOf(now_episodes.episode)
@@ -56,89 +79,103 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         setNextEpisode(ep.toString())
     }
 
-    function runMpvPlayer() {
-        window.api.runExternaPlayer({ url: playerData[0].resolution[0].url, title: AnimeTitle, path: "/usr/bin/mpv", time: time }, "mpv")
+    function ChangeResolution(data: { res: string, url: string }) {
+        setCurrentResolution(() => data.res)
+        setCurrentUrl(() => data.url)
     }
 
-    function runVlcPlayer() {
-        window.api.runExternaPlayer({ url: playerData[0].resolution[0].url, title: AnimeTitle, path: "/usr/bin/vlc", time: time }, "vlc")
+    function ChangeHost(data: playerData) {
+        setCurrentHost(() => data)
+        setResolutionList(() => data.resolution)
+    }
+
+    function RunPlayers() {
+        if (currentPlayer === "Movian") RunMovian()
+        if (currentPlayer === "Mpv") runMpvPlayer()
+        if (currentPlayer === "VLC") runVlcPlayer()
     }
 
     useEffect(() => {
-        if (config.Player.external.type === "Movian") RunMovian()
-        if (config.Player.external.type === "Mpv") runMpvPlayer()
-        if (config.Player.external.type === "VLC") runVlcPlayer()
-        window.api.chromecast.startSearch()
-    }, [])
+        if (playerData.length <= 0) {
+            toast.error("Players Not Found", notificationProps)
+            return
+        }
 
-    // TODO: napraw wyszukiwanie urządzeń i zabezpieczenia do tego
-    async function runChromeCast(device: { host: string, port: number, name: string }) {
-        return
-        await window.api.chromecast.connect(device, { title: AnimeTitle, time: time, url: playerData[0].resolution[0].url, type: "video/mp4" })
-    }
+        setCurrentHost(() => playerData[0])
+        if (playerData[0].resolution.length <= 0) {
+            toast.error("Resolution not found", notificationProps)
+            return
+        }
+        setResolutionList(() => playerData[0].resolution)
+        setCurrentResolution(() => playerData[0].resolution[0].res)
+        setCurrentUrl(() => playerData[0].resolution[0].url)
+
+        RunPlayers()
+    }, [])
 
     async function refetchChromeCastDevices() {
         console.log(await window.api.chromecast.deviceList())
         setchromCastDeviceList(await window.api.chromecast.deviceList())
     }
 
+    console.log(currentHost, currentResolution, resolutionList)
+
     return (
         <div className="external-player-container">
-        <div className="external-player-container-player">
-            <div className="external-player-top">
-                <div className="video-top">
-                    <Button icon="arrow_back" ButtonClass="player-buttons" onClick={() => navigate("/")} />
-                    <div className="player-title">{AnimeTitle}</div>
-                </div>
-                <div className="external-dropdown">
-                    <Dropdown options={
-                        [
-                            { label: "mpv" },
-                            { label: "VLC" },
-                            { label: "Movian" },
-                        ]
-                    } disableX placeholder={"test"}
-                    />
-                    <Dropdown placeholder="1080p" options={[{ label: "1080p" }, { label: "720p" }, { label: "480p" }, { label: "360p" }]} disableX />
-                    <Dropdown placeholder={playerData[0].hostname} options={playerData.map((element) => { return { label: element.hostname } })} disableX />
+            <div className="external-player-container-player">
+                <div className="external-player-top">
+                    <div className="video-top">
+                        <Button icon="arrow_back" ButtonClass="player-buttons" onClick={() => navigate("/")} />
+                        <div className="player-title">{AnimeTitle}</div>
                     </div>
-            </div>
-            <div className="external-player-center">
-                <div className="external-button-container">
-                    <Button icon='skip_previous' ButtonClass="player-buttons" onClick={() => setEpisode("prev")} />
-                    <Button icon='replay' ButtonClass="player-buttons" onClick={RunMovian} />
-                    <Button icon='skip_next' ButtonClass="player-buttons" onClick={() => setEpisode("next")} />
+                    <div className="external-dropdown">
+                        <PlayerDropDown options={[
+                            { label: "Mpv", onClick: () => setCurrentPlayer("Mpv") },
+                            { label: "VLC", onClick: () => setCurrentPlayer("VLC") },
+                            { label: "Movian", onClick: () => setCurrentPlayer("Movian") },
+                            { label: "ChromeCast", onClick: () => setCurrentPlayer("ChromeCast") }
+                        ]} defaultButtonText={config.Player.external.type}
+                        />
+                        <PlayerDropDown defaultButtonText={currentResolution != "Not Found" ? `${currentResolution}p` : currentResolution} options={resolutionList.map((element) => { return { label: `${element.res}p`, onClick: () => ChangeResolution(element) } })} />
+                        <PlayerDropDown defaultButtonText={currentHost ? currentHost.hostname : "Not Found"} options={playerData.map((element) => { return { label: element.hostname, onClick: () => ChangeHost(element) } })} />
+                    </div>
+                </div>
+                <div className="external-player-center">
+                    <div className="external-button-container">
+                        <Button icon='skip_previous' ButtonClass="player-buttons" onClick={() => setEpisode("prev")} />
+                        <Button icon='replay' ButtonClass="player-buttons" onClick={RunPlayers} />
+                        <Button icon='skip_next' ButtonClass="player-buttons" onClick={() => setEpisode("next")} />
+                    </div>
+                </div>
+                <div className="external-episodes-container">
+                    <div className="external-episodes-title">Episodes:</div>
+                    <div className="external-episodes">
+                        {now_episodes.episodes.map((num) => (
+                            <div className='information-episode-button' onClick={() => setNextEpisode(num)}>{num}</div>
+                        ))}
+                    </div>
                 </div>
             </div>
-            <div className="external-episodes-container">
-                <div className="external-episodes-title">Episodes:</div>
-                <div className="external-episodes">
-                    {now_episodes.episodes.map((num) => (
-                        <div className='information-episode-button' onClick={() => setNextEpisode(num)}>{num}</div>
-                    ))}
+            {/* TODO: Give this thing display: none if external player is not chromecast */}
+            <div className="external-player-container-player-chromecast">
+                <div className="external-leftpanel-container">
+                    <div className="external-leftpanel-topbar">
+                        <button className="button external-leftpanel-topbar-button material-symbols-outlined" onClick={refetchChromeCastDevices}>refresh</button>
+                    </div>
+                    <div className="external-leftpanel">
+                        {chromCastDeviceList.map((element) => (
+                            <button className="button external-panelbutton" onClick={async () => await runChromeCast(element)}>
+                                <div className="external-panelbutton-icon material-symbols-outlined">cast</div>
+                                <div className="external-button-textcontainer">
+                                    <span className="external-panelbutton-title">{filterTextChromeCast(element.name)}</span>
+                                    <span className="external-panelbutton-bottomtext">disconnected</span>
+                                </div>
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
-        {/* TODO: Give this thing display: none if external player is not chromecast */}
-        <div className="external-player-container-player-chromecast">
-            <div className="external-leftpanel-container">
-                <div className="external-leftpanel-topbar">
-                    <button className="button external-leftpanel-topbar-button material-symbols-outlined" onClick={refetchChromeCastDevices}>refresh</button>
-                </div>
-                <div className="external-leftpanel">
-                    {chromCastDeviceList.map((element) => (
-                        <button className="button external-panelbutton" onClick={async () => await runChromeCast(element)}>
-                            <div className="external-panelbutton-icon material-symbols-outlined">cast</div>
-                            <div className="external-button-textcontainer">
-                                <span className="external-panelbutton-title">{filterTextChromeCast(element.name)}</span>
-                                <span className="external-panelbutton-bottomtext">disconnected</span>
-                            </div>
-                        </button>
-                    ))}
-                </div>
-            </div>
-        </div>
-</div>
     )
 }
 
