@@ -59,10 +59,11 @@
   flex-direction: row-reverse;
   flex-wrap: wrap;
   align-self: center;
-  gap: 5px;
-  min-width: 510px;
+  gap: 10px;
+  min-width: 380px;
   margin-left: auto;
   padding: 10px;
+  box-sizing: border-box;
 }
 
 .external-episodes-container {
@@ -201,6 +202,10 @@
 @media (max-width: 839px) {
 .external-player-container-player {
   margin-right: 0px;
+}
+
+.external-player-container {
+  overflow-y: scroll;
 }
 }
 
