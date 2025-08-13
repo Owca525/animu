@@ -16,6 +16,7 @@ interface ExternalplayerProps {
     time: number
     setNextEpisode: (value: string) => void
     now_episodes: { episode: string, type: string, episodes: Array<string> }
+    externalPlayerData: { onChage: (data: "Movian" | "VLC" | "Mpv" | "ChromeCast") => void, current: "Movian" | "VLC" | "Mpv" | "ChromeCast" }
 }
 
 function filterTextChromeCast(text: string) {
@@ -24,7 +25,7 @@ function filterTextChromeCast(text: string) {
     return text.substring(0, index).replaceAll("-", " ")
 }
 
-const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes, playerData, setNextEpisode, time }) => {
+const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes, playerData, setNextEpisode, time, externalPlayerData }) => {
     const navigate = useNavigate()
     const config: SettingsConfig = useSelector((data: any) => data.config);
     const [AnimeTitle, _setAnimeTitle] = useState<string>(() => detectTitle({
@@ -41,7 +42,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     const [currentHost, setCurrentHost] = useState<playerData | undefined>(undefined)
     const [currentResolution, setCurrentResolution] = useState<string>("Not Found")
     const [currentUrl, setCurrentUrl] = useState<string | undefined>(undefined)
-    const [currentPlayer, setCurrentPlayer] = useState<"Movian" | "VLC" | "Mpv" | "ChromeCast">(config.Player.external.type)
+    const [currentPlayer, setCurrentPlayer] = useState<"Movian" | "VLC" | "Mpv" | "ChromeCast">(externalPlayerData.current)
 
     // Chomecast Related
     const [chromCastDeviceList, setchromCastDeviceList] = useState<{ host: string, port: number, name: string }[]>([])
@@ -132,10 +133,10 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                     </div>
                     <div className="external-dropdown">
                         <Dropdown options={[
-                            { label: "Mpv", onClick: () => setCurrentPlayer("Mpv") },
-                            { label: "VLC", onClick: () => setCurrentPlayer("VLC") },
-                            { label: "Movian", onClick: () => setCurrentPlayer("Movian") },
-                            { label: "ChromeCast", onClick: () => setCurrentPlayer("ChromeCast") }
+                            { label: "Mpv", onClick: () => {setCurrentPlayer("Mpv"), RunPlayers()} },
+                            { label: "VLC", onClick: () => {setCurrentPlayer("VLC"), RunPlayers()} },
+                            { label: "Movian", onClick: () => {setCurrentPlayer("Movian"), RunPlayers()} },
+                            { label: "ChromeCast", onClick: () => {setCurrentPlayer("ChromeCast"), RunPlayers()} }
                         ]} placeholder="Not Found" buttonText={config.Player.external.type} disableX
                         />
                         {currentHost && !currentHost.hls && <Dropdown placeholder="Not Found" buttonText={currentResolution != "Not Found" && currentResolution != "" ? `${currentResolution}p` : "Not Found"} options={resolutionList.map((element) => { return { label: `${element.res}p`, onClick: () => ChangeResolution(element) } })} disableX />}

@@ -30,6 +30,7 @@ const player = () => {
     const extractFunc = useCallback(() => {
         return pluginPlayer.player.getUrls(extractionData.type, extractionData.actual, playerID);
     }, [extractionData, playerID]);
+    const [externalPlayerType, setexternalPlayerType] = useState<"Movian" | "VLC" | "Mpv" | "ChromeCast">(config.Player.external.type)
 
     const { data, isLoading, refetch } = useQuery({
         queryKey: ['extract-urls', extractionData.type, extractionData.actual, playerID],
@@ -94,6 +95,7 @@ const player = () => {
                 time={extractionData.time}
                 setNextEpisode={setNewEpisode}
                 now_episodes={{ episode: extractionData.actual, type: extractionData.type, episodes: extractionData.episodelist }}
+                externalPlayerData={{ onChage: (data) => setexternalPlayerType(data), current: externalPlayerType }}
             />
          )
     }
