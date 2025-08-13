@@ -86,7 +86,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         if (type == 'prev') ep = ep - 1
         if (type == 'next') ep = ep + 1
         if (now_episodes.episodes[ep] === undefined) return
-        setNextEpisode(ep.toString())
+        setNextEpisode(now_episodes.episodes[ep])
     }
 
     function ChangeResolution(data: { res: string, url: string }) {
