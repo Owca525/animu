@@ -10,7 +10,7 @@ const HASH_PLAYER = '5f1a64b73793cc2234a389cf3a8f93ad82de7043017dd551f38f65b89da
 const API_WEB = 'https://api.allanime.day'
 
 const header = {
-  'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0',
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0',
   'Referer': 'https://allmanga.to/'
 }
 
