@@ -352,7 +352,7 @@ function Convert(convert: any): cardData {
   }
 }
 
-// WHY THE FUCK THIS DOSEN"T WORK IF I CALL window.api.request.post IN CreateHomePage
+// WHY THE FUCK THIS DOESN'T WORK IF I CALL window.api.request.post IN CreateHomePage
 async function sendPost(variable: any, query: any): Promise<{success: boolean; data?: any; status?: number; statusText?: string; error?: unknown; }> {
   return await window.api.request.post("https://graphql.anilist.co", header, { query: query, variables: variable })
 }

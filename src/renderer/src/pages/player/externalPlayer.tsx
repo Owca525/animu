@@ -67,7 +67,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     // TODO: napraw wyszukiwanie urządzeń i zabezpieczenia do tego
     async function runChromeCast(device: { host: string, port: number, name: string }) {
         if (currentHost && currentHost.hls) {
-            toast.error("ChromeCast Dosen't support m3u8 format")
+            toast.error("ChromeCast Doesn't support m3u8 format")
             return
         }
         if (currentUrl) await window.api.chromecast.connect(device, { title: AnimeTitle, time: time, url: currentUrl, type: "video/mp4" })
