@@ -48,26 +48,20 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
 
     // Running Players
     async function RunMovian(url?: string) {
-        let temp = currentUrl
-        if (url) temp = url
-        if (!temp) return
-        let req = await window.api.request.get(`http://${config.Player.external.movianIP}/showtime/open?url=${encodeURIComponent(temp)}`, {})
+        if (!url) return
+        let req = await window.api.request.get(`http://${config.Player.external.movianIP}/showtime/open?url=${encodeURIComponent(url)}`, {})
         if (!req.success && req.error == "fetch failed") {
             toast.error("Failed to run Movian", notificationProps)
         }
     }
     function runMpvPlayer(url?: string) {
-        let temp = currentUrl
-        if (url) temp = url
-        if (!temp) return
-        window.api.runExternaPlayer({ url: temp, title: AnimeTitle, path: config.Player.external.mpvPath, time: time }, "mpv")
+        if (!url) return
+        window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.mpvPath, time: time }, "mpv")
     }
 
     function runVlcPlayer(url?: string) {
-        let temp = currentUrl
-        if (url) temp = url
-        if (!temp) return
-        window.api.runExternaPlayer({ url: temp, title: AnimeTitle, path: config.Player.external.vlcPath, time: time }, "vlc")
+        if (!url) return
+        window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.vlcPath, time: time }, "vlc")
     }
     // TODO: napraw wyszukiwanie urządzeń i zabezpieczenia do tego
     async function runChromeCast(device: { host: string, port: number, name: string }) {
