@@ -43,7 +43,7 @@ ipcMain.handle('runExternalPlayer', (_event, videoData: {url: string, path: stri
     if (videoData.path.replaceAll(" ", "") == "") return
     switch (type) {
         case "mpv":
-            exec(`${path} --title='${videoData.title}' --start=${videoData.time} '${videoData.url}'`, (error, stdout, stderr) => {
+            exec(`${path} --title="${videoData.title}" --force-media-title="${videoData.title}" --start=${videoData.time} '${videoData.url}'`, (error, stdout, stderr) => {
                 if (error) console.error(error)
                 if (stderr) console.error(error)
                 console.log(stdout)
