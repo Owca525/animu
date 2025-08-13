@@ -9,6 +9,7 @@ import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
 import { useSelector } from "react-redux"
 import Dropdown from "@renderer/components/dropDown"
+import { motion } from "framer-motion"
 
 interface ExternalplayerProps {
     animeData: cardData
@@ -46,6 +47,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
 
     // Chomecast Related
     const [chromCastDeviceList, setchromCastDeviceList] = useState<{ host: string, port: number, name: string }[]>([])
+    const [isSearchChromecastHidded, setisSearchChromecastHidded] = useState<boolean>(false)
 
     // Running Players
     async function RunMovian(url?: string) {
@@ -116,7 +118,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         setResolutionList(() => playerData[0].resolution)
         setCurrentResolution(() => playerData[0].resolution[0].res)
         setCurrentUrl(() => playerData[0].resolution[0].url)
-        
+
         RunPlayers(playerData[0].resolution[0].url)
     }, [])
 
@@ -124,6 +126,12 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         console.log(await window.api.chromecast.deviceList())
         setchromCastDeviceList(await window.api.chromecast.deviceList())
     }
+
+    const chromecastSearchContainerVariants = {
+        invisible: { opacity: 0, x: -500 },
+        hidden: { opacity: 1, x: -230 },
+        visible: { opacity: 1, x: 0 },
+    };
 
     return (
         <div className="external-player-container">
@@ -135,10 +143,10 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                     </div>
                     <div className="external-dropdown">
                         <Dropdown options={[
-                            { label: "Mpv", onClick: () => {setCurrentPlayer(() => "Mpv"), RunPlayers(undefined, "Mpv")} },
-                            { label: "VLC", onClick: () => {setCurrentPlayer(() => "VLC"), RunPlayers(undefined, "VLC")} },
-                            { label: "Movian", onClick: () => {setCurrentPlayer(() => "Movian"), RunPlayers(undefined, "Movian")} },
-                            { label: "ChromeCast", onClick: () => {setCurrentPlayer(() => "ChromeCast"), RunPlayers(undefined, "ChromeCast")} }
+                            { label: "Mpv", onClick: () => { setCurrentPlayer(() => "Mpv"), RunPlayers(undefined, "Mpv") } },
+                            { label: "VLC", onClick: () => { setCurrentPlayer(() => "VLC"), RunPlayers(undefined, "VLC") } },
+                            { label: "Movian", onClick: () => { setCurrentPlayer(() => "Movian"), RunPlayers(undefined, "Movian") } },
+                            { label: "ChromeCast", onClick: () => { setCurrentPlayer(() => "ChromeCast"), RunPlayers(undefined, "ChromeCast") } }
                         ]} placeholder="Not Found" buttonText={config.Player.external.type} disableX
                         />
                         {currentHost && !currentHost.hls && <Dropdown placeholder="Not Found" buttonText={currentResolution != "Not Found" && currentResolution != "" ? `${currentResolution}p` : "Not Found"} options={resolutionList.map((element) => { return { label: `${element.res}p`, onClick: () => ChangeResolution(element) } })} disableX />}
@@ -162,10 +170,17 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                 </div>
             </div>
             {/* TODO: Give this thing display: none if external player is not chromecast */}
-            <div className="external-player-container-player-chromecast">
+            <motion.div className="external-player-container-player-chromecast" 
+                variants={chromecastSearchContainerVariants}
+                initial={"invisible"}
+                animate={currentPlayer == "ChromeCast" ? isSearchChromecastHidded ? "visible" : "hidden" : "invisible"}
+                onMouseEnter={() => setisSearchChromecastHidded(() => true)}
+                onMouseLeave={() => setisSearchChromecastHidded(() => false)}
+            >
                 <div className="external-leftpanel-container">
                     <div className="external-leftpanel-topbar">
                         <button className="button external-leftpanel-topbar-button material-symbols-outlined" onClick={refetchChromeCastDevices}>refresh</button>
+                        <button className="button external-leftpanel-topbar-button material-symbols-outlined" onClick={refetchChromeCastDevices}>search</button>
                     </div>
                     <div className="external-leftpanel">
                         {chromCastDeviceList.map((element) => (
@@ -173,13 +188,13 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                                 <div className="external-panelbutton-icon material-symbols-outlined">cast</div>
                                 <div className="external-button-textcontainer">
                                     <span className="external-panelbutton-title">{filterTextChromeCast(element.name)}</span>
-                                    <span className="external-panelbutton-bottomtext">disconnected</span>
+                                    {/* <span className="external-panelbutton-bottomtext">disconnected</span> */}
                                 </div>
                             </button>
                         ))}
                     </div>
                 </div>
-            </div>
+            </motion.div>
         </div>
     )
 }

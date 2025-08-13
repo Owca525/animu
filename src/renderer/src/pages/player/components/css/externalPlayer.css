@@ -96,7 +96,7 @@
 .external-leftpanel-container {
   width: 15%;
   height: 50%;
-  position: absolute;
+  position: fixed;
   left: 10px;
   top: 50%;
   translate: 0px -50%;
@@ -178,6 +178,7 @@
 
 .external-leftpanel-topbar {
   display: flex;
+  gap: 8px;
 }
 
 
