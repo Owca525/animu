@@ -183,7 +183,7 @@ export interface SettingsConfig {
         upToNextEpisode: {
             enable: boolean
             interval: number
-            durrationShow: number
+            durationShow: number
         }
         keybinds: {
             Pause: string

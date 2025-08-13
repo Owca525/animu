@@ -422,9 +422,9 @@ function settings() {
                             </div>
                         </div>
                         <div className="settings-page-container">
-                            <div className="settings-page-title">Up To next Episode Notification</div>
+                            <div className="settings-page-title">Up To Next Episode Notification</div>
                             <div className="settings-setting-container">
-                                Is Enabled
+                                Enable
                                 <CheckBox
                                     checked={config.new.Player.upToNextEpisode.enable}
                                     onChecked={(checked) =>
@@ -434,7 +434,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Interval Notification
+                                Notification Interval
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
@@ -444,12 +444,12 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Durration Episode when is hide
+                                Don't show if episode is shorter than
                                 <SettingsInput
                                     iconChar="m"
                                     type="number"
-                                    onKeyDown={(text) => handleChange("Player.upToNextEpisode.durrationShow", parseInt(text))}
-                                    startValue={config.new.Player.upToNextEpisode.durrationShow.toString()}
+                                    onKeyDown={(text) => handleChange("Player.upToNextEpisode.durationShow", parseInt(text))}
+                                    startValue={config.new.Player.upToNextEpisode.durationShow.toString()}
                                 />
                             </div>
                         </div>
