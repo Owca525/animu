@@ -79,8 +79,6 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         // if (currentUrl) await window.api.chromecast.connect(device, { title: AnimeTitle, time: time, url: currentUrl, type: "video/mp4" })
     }
 
-    console.log(playerData, currentUrl)
-
     function setEpisode(type: "next" | "prev") {
         let ep = now_episodes.episodes.indexOf(now_episodes.episode)
         if (type == 'prev') ep = ep - 1
@@ -123,7 +121,6 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         setCurrentResolution(() => playerData[0].resolution[0].res)
         setCurrentUrl(() => playerData[0].resolution[0].url)
         
-        // FIXME: Napraw dlaczego żeby player się odpalał
         RunPlayers(playerData[0].resolution[0].url)
     }, [])
 
@@ -131,8 +128,6 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         console.log(await window.api.chromecast.deviceList())
         setchromCastDeviceList(await window.api.chromecast.deviceList())
     }
-
-    console.log(currentHost, currentResolution, resolutionList)
 
     return (
         <div className="external-player-container">
