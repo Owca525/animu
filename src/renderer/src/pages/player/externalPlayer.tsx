@@ -91,13 +91,15 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         setResolutionList(() => data.resolution)
     }
 
-    function RunPlayers(url?: string) {
+    function RunPlayers(url?: string, type?: "Movian" | "VLC" | "Mpv" | "ChromeCast") {
+        let tempType = currentPlayer != type && type ? type : currentPlayer
         let temp = currentUrl
         if (url) temp = url
-        if (currentPlayer === "Movian") RunMovian(temp)
-        if (currentPlayer === "Mpv") runMpvPlayer(temp)
-        if (currentPlayer === "VLC") runVlcPlayer(temp)
-        toast.success(`Running ${currentPlayer}`)
+        if (tempType === "Movian") RunMovian(temp)
+        if (tempType === "Mpv") runMpvPlayer(temp)
+        if (tempType === "VLC") runVlcPlayer(temp)
+        externalPlayerData.onChage(tempType)
+        toast.success(`Running ${tempType}`)
     }
 
     useEffect(() => {
@@ -133,10 +135,10 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                     </div>
                     <div className="external-dropdown">
                         <Dropdown options={[
-                            { label: "Mpv", onClick: () => {setCurrentPlayer("Mpv"), RunPlayers()} },
-                            { label: "VLC", onClick: () => {setCurrentPlayer("VLC"), RunPlayers()} },
-                            { label: "Movian", onClick: () => {setCurrentPlayer("Movian"), RunPlayers()} },
-                            { label: "ChromeCast", onClick: () => {setCurrentPlayer("ChromeCast"), RunPlayers()} }
+                            { label: "Mpv", onClick: () => {setCurrentPlayer(() => "Mpv"), RunPlayers(undefined, "Mpv")} },
+                            { label: "VLC", onClick: () => {setCurrentPlayer(() => "VLC"), RunPlayers(undefined, "VLC")} },
+                            { label: "Movian", onClick: () => {setCurrentPlayer(() => "Movian"), RunPlayers(undefined, "Movian")} },
+                            { label: "ChromeCast", onClick: () => {setCurrentPlayer(() => "ChromeCast"), RunPlayers(undefined, "ChromeCast")} }
                         ]} placeholder="Not Found" buttonText={config.Player.external.type} disableX
                         />
                         {currentHost && !currentHost.hls && <Dropdown placeholder="Not Found" buttonText={currentResolution != "Not Found" && currentResolution != "" ? `${currentResolution}p` : "Not Found"} options={resolutionList.map((element) => { return { label: `${element.res}p`, onClick: () => ChangeResolution(element) } })} disableX />}
