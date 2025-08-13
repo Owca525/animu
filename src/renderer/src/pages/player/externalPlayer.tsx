@@ -66,6 +66,10 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     // TODO: napraw wyszukiwanie urządzeń i zabezpieczenia do tego
     async function runChromeCast(device: { host: string, port: number, name: string }) {
         device
+        if (currentHost && currentHost.hls) {
+            toast.error("ChromeCast Dosen't support m3u8 format")
+            return
+        }
         // if (currentUrl) await window.api.chromecast.connect(device, { title: AnimeTitle, time: time, url: currentUrl, type: "video/mp4" })
     }
 
@@ -90,9 +94,11 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     }
 
     function RunPlayers() {
+        console.log(currentPlayer, currentUrl)
         if (currentPlayer === "Movian") RunMovian()
         if (currentPlayer === "Mpv") runMpvPlayer()
         if (currentPlayer === "VLC") runVlcPlayer()
+        toast.success(`Running ${currentPlayer}`)
     }
 
     useEffect(() => {
@@ -135,10 +141,10 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                             { label: "VLC", onClick: () => setCurrentPlayer("VLC") },
                             { label: "Movian", onClick: () => setCurrentPlayer("Movian") },
                             { label: "ChromeCast", onClick: () => setCurrentPlayer("ChromeCast") }
-                        ]} placeholder={config.Player.external.type} disableX
+                        ]} placeholder="Not Found" buttonText={config.Player.external.type} disableX
                         />
-                        <Dropdown placeholder={currentResolution != "Not Found" ? `${currentResolution}p` : currentResolution} options={resolutionList.map((element) => { return { label: `${element.res}p`, onClick: () => ChangeResolution(element) } })} disableX />
-                        <Dropdown placeholder={currentHost ? currentHost.hostname : "Not Found"} options={playerData.map((element) => { return { label: element.hostname, onClick: () => ChangeHost(element) } })} disableX />
+                        {currentHost && !currentHost.hls && <Dropdown placeholder="Not Found" buttonText={currentResolution != "Not Found" && currentResolution != "" ? `${currentResolution}p` : "Not Found"} options={resolutionList.map((element) => { return { label: `${element.res}p`, onClick: () => ChangeResolution(element) } })} disableX />}
+                        <Dropdown placeholder="Not Found" buttonText={currentHost ? currentHost.hostname : "Not Found"} options={playerData.map((element) => { return { label: element.hostname, onClick: () => ChangeHost(element) } })} disableX />
                     </div>
                 </div>
                 <div className="external-player-center">
