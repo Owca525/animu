@@ -129,7 +129,7 @@
 
 .external-panelbutton {
   box-sizing: border-box;
-  width: 97%;
+  width: 100%;
   margin: 5% 3% 5% 0px;
   padding: 8px 4px 8px 12px;
   font-size: 1em;
