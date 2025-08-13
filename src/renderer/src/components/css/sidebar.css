@@ -61,6 +61,7 @@
 }
 
 .sidebar-image {
+    user-select: none;
     height: 50px
 }
 

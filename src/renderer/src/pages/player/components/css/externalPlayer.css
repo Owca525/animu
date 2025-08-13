@@ -8,17 +8,13 @@
   overflow: hidden;
 }
 
-.external-player-container-player, .external-player-container-player2 {
+.external-player-container-player {
   display: flex;
   flex-direction: column;
   gap: 10px;
   z-index: 100;
   width: 100%;
   height: 100%;
-}
-
-.external-player-container-player2 {
-  margin-right: 15%;
 }
 
 .external-button-container {

@@ -225,6 +225,7 @@
 .information-characters-card-cover {
     aspect-ratio: 2/3;
     object-fit: cover;
+    user-select: none;
 }
 
 .information-characters-card-description {
