@@ -93,6 +93,11 @@ function settings() {
         })
     })
 
+    useHotkeys(["esc"], () => {
+        navigate("/");
+        resetConfig()
+    })
+
     let ContextMenu: ContextMenuProps = [
         { option: t("dialog.reload"), onClick: () => location.reload() },
         { option: "", line: true },
