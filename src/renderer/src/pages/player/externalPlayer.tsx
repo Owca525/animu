@@ -48,6 +48,8 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     // Chomecast Related
     const [chromCastDeviceList, setchromCastDeviceList] = useState<{ host: string, port: number, name: string }[]>([])
     const [isSearchChromecastHidded, setisSearchChromecastHidded] = useState<boolean>(false)
+    const [secondsLeft, setSecondsLeft] = useState<number>(0);
+    const [isChromeCastSearch, setisChromeCastSearch] = useState<boolean>(false);
 
     // Running Players
     async function RunMovian(url?: string) {
@@ -68,11 +70,11 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     }
     // TODO: napraw wyszukiwanie urządzeń i zabezpieczenia do tego
     async function runChromeCast(device: { host: string, port: number, name: string }) {
-        if (currentHost && currentHost.hls) {
-            toast.error("ChromeCast Doesn't support m3u8 format")
-            return
-        }
-        if (currentUrl) await window.api.chromecast.connect(device, { title: AnimeTitle, time: time, url: currentUrl, type: "video/mp4" })
+        // if (currentHost && currentHost.hls) {
+        //     toast.error("ChromeCast Doesn't support m3u8 format")
+        //     return
+        // }
+        // if (currentUrl) await window.api.chromecast.connect(device, { title: AnimeTitle, time: time, url: currentUrl, type: "video/mp4" })
     }
 
     function setEpisode(type: "next" | "prev") {
@@ -101,7 +103,8 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         if (tempType === "Mpv") runMpvPlayer(temp)
         if (tempType === "VLC") runVlcPlayer(temp)
         externalPlayerData.onChage(tempType)
-        toast.success(`Running ${tempType}`)
+        if (tempType !== "ChromeCast") toast.success(`Running ${tempType}`)
+        if (tempType === "ChromeCast") startSearchChromeCast()
     }
 
     useEffect(() => {
@@ -122,9 +125,34 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         RunPlayers(playerData[0].resolution[0].url)
     }, [])
 
+    useEffect(() => {
+        if (secondsLeft <= 0) {
+            stopSearchChromeCast()
+            return
+        }
+        const intervalId = setInterval(() => {
+            setSecondsLeft(prev => {
+                refetchChromeCastDevices()
+                return prev - 1
+            });
+        }, 1000);
+        return () => clearInterval(intervalId);
+    }, [secondsLeft]);
+
     async function refetchChromeCastDevices() {
-        console.log(await window.api.chromecast.deviceList())
         setchromCastDeviceList(await window.api.chromecast.deviceList())
+    }
+
+    function startSearchChromeCast() {
+        setSecondsLeft(() => 30)
+        setisChromeCastSearch(() => true)
+        window.api.chromecast.startSearch()
+    }
+
+    function stopSearchChromeCast() {
+        setSecondsLeft(() => 0)
+        setisChromeCastSearch(() => false)
+        window.api.chromecast.stopSearch()
     }
 
     const chromecastSearchContainerVariants = {
@@ -171,7 +199,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                 </div>
             </div>
             {/* TODO: Give this thing display: none if external player is not chromecast */}
-            <motion.div className="external-player-container-player-chromecast" 
+            <motion.div className="external-player-container-player-chromecast"
                 variants={chromecastSearchContainerVariants}
                 initial={"invisible"}
                 animate={currentPlayer == "ChromeCast" ? isSearchChromecastHidded ? "visible" : "hidden" : "invisible"}
@@ -180,8 +208,9 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
             >
                 <div className="external-leftpanel-container">
                     <div className="external-leftpanel-topbar">
+                        {/* FIXME: Napraw żeby przyciski działały */}
+                        <button className="button external-leftpanel-topbar-button material-symbols-outlined" onClick={() => isChromeCastSearch ? startSearchChromeCast() : stopSearchChromeCast()}>{isChromeCastSearch ? "close" : "search"}</button>
                         <button className="button external-leftpanel-topbar-button material-symbols-outlined" onClick={refetchChromeCastDevices}>refresh</button>
-                        <button className="button external-leftpanel-topbar-button material-symbols-outlined" onClick={refetchChromeCastDevices}>search</button>
                     </div>
                     <div className="external-leftpanel">
                         {chromCastDeviceList.map((element) => (
@@ -189,10 +218,11 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                                 <div className="external-panelbutton-icon material-symbols-outlined">cast</div>
                                 <div className="external-button-textcontainer">
                                     <span className="external-panelbutton-title">{filterTextChromeCast(element.name)}</span>
-                                    {/* <span className="external-panelbutton-bottomtext">disconnected</span> */}
+                                    <span className="external-panelbutton-bottomtext">disconnected</span>
                                 </div>
                             </button>
                         ))}
+                        {isChromeCastSearch && <div className="external-panel-search-text">Searching...</div>}
                     </div>
                 </div>
             </motion.div>

@@ -112,6 +112,12 @@
   max-width: 350px;
 }
 
+.external-leftpanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .external-player-container-player-chromecast {
   width: 15%;
   min-width: 305px;
@@ -137,6 +143,7 @@
   padding: 8px 4px 8px 12px;
   font-size: 1em;
   align-items: start;
+  background-color: var(--bg4) !important;
 }
 
 .external-button-textcontainer {
@@ -179,11 +186,30 @@
   align-self: center;
 }
 
+/* TODO: Dodaj to do theme */
 .external-leftpanel-topbar {
   display: flex;
   gap: 8px;
+  margin-right: 10px;
+  border: 2px solid var(--bg4);
+  border-width: 0px 0px 2px 0px;
+  padding: 6px;
 }
 
+.external-leftpanel-topbar-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50% !important;
+  background-color: var(--bg3) !important;
+}
+
+.external-panel-search-text {
+  font-size: 0.9em;
+  padding-top: 4px;
+}
 
 @media (max-width: 1000px) {
   .external-dropdown {
