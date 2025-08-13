@@ -27,7 +27,7 @@ const PlayerSettings: React.FC<playerSettingsProps> = ({ sources, resolution, sp
             {currentSettings === "settings" &&
                 <>
                     <div className="player-settings-button" onClick={() => sources.length > 1 ? setcurrentSettings("source") : ""}>
-                        <span className='player-settings-button-text'>Sources</span> <span className={`player-settings-button-text ${sources.length <= 1 && "player-settings-button-text-gray"}`}>{current.currentHost}</span>
+                        <span className='player-settings-button-text'>Source</span> <span className={`player-settings-button-text ${sources.length <= 1 && "player-settings-button-text-gray"}`}>{current.currentHost}</span>
                     </div>
                     <div className="player-settings-button" onClick={() => resolution.length > 1 ? setcurrentSettings("res") : ""}>
                         <span className='player-settings-button-text'>Resolution</span> <span className={`player-settings-button-text ${resolution.length <= 1 && "player-settings-button-text-gray"}`}>{current.currentResolution + "p"}</span>

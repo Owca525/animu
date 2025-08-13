@@ -51,7 +51,7 @@
         "ep_airing_minutes": "{{min}} Minutes",
         "ep_airing_today": "Today",
         "episodes": "{{ep}} Episodes",
-        "minutes": "{{min}}Min Durration"
+        "minutes": "{{min}}Min Duration"
     },
     "information": {
         "airing": "Airing Episode",

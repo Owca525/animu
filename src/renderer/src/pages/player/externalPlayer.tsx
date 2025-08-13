@@ -135,6 +135,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
 
     return (
         <div className="external-player-container">
+            {/* TODO: Give this div class external-player-container-player when chromecast panel is shown */}
             <div className="external-player-container-player">
                 <div className="external-player-top">
                     <div className="video-top">

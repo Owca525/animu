@@ -322,7 +322,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         const duration = videoRef.current.duration
         const currentTime = videoRef.current.currentTime
 
-        if (duration <= config.Player.upToNextEpisode.durrationShow * 60) return
+        if (duration <= config.Player.upToNextEpisode.durationShow * 60) return
 
         if (duration != 0 && currentTime != 0 && isHideUpNextEpisode == false && temp.episodes[temp.episodes.indexOf(temp.episode) + 1] != null && currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
             setUpNextEpisode(true)
