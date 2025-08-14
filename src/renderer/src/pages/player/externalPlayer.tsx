@@ -203,6 +203,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                 animate={currentPlayer == "ChromeCast" ? isSearchChromecastHidded ? "visible" : "hidden" : "invisible"}
                 onMouseEnter={() => setisSearchChromecastHidded(() => true)}
                 onMouseLeave={() => setisSearchChromecastHidded(() => false)}
+                transition={{ duration: 0.2 }}
             >
                 <div className="external-leftpanel-container">
                     <div className="external-leftpanel-topbar">
