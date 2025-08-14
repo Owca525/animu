@@ -103,7 +103,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         if (tempType === "Mpv") runMpvPlayer(temp)
         if (tempType === "VLC") runVlcPlayer(temp)
         externalPlayerData.onChage(tempType)
-        if (tempType !== "ChromeCast") toast.success(`Running ${tempType}`)
+        if (tempType !== "ChromeCast") toast.success(`Running ${tempType}`, notificationProps)
         if (tempType === "ChromeCast") startSearchChromeCast()
     }
 
