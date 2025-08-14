@@ -94,7 +94,7 @@
 
 .external-leftpanel-container {
   width: 15%;
-  height: 50%;
+  height: 100%;
   position: fixed;
   left: 10px;
   top: 50%;
@@ -103,9 +103,8 @@
   box-sizing: border-box;
   overflow: hidden;
   min-width: 250px;
-  min-height: 250px;
+  min-height: 100%;
   display: none;
-  max-width: 350px;
 }
 
 .external-leftpanel {
@@ -117,8 +116,12 @@
 .external-player-container-player-chromecast {
   width: 15%;
   min-width: 305px;
-  height: 100%;
-  min-height: 100%;
+  height: 50%;
+  position: absolute;
+  left: 0px;
+  z-index: 1000;
+  top: 50%;
+  translate: 0px -50%;
 }
 
 .external-player-container-player-chromecast .external-leftpanel-container {
@@ -213,23 +216,10 @@
     min-width: 200px;
     align-items: end;
   }
-  .external-leftpanel-container {
-    min-width: 200px;
-    width: 25%;
-  }
-
-  .external-player-container-player-chromecast {
-  width: calc(25% + 60px);
-  min-width: 240px;
-}
 }
 
 
 @media (max-width: 839px) {
-.external-player-container-player {
-  margin-right: 0px;
-}
-
 .external-player-container {
   overflow-y: scroll;
 }
@@ -244,20 +234,6 @@
     height: 90%;
   }
 
-  .external-player-container-player-chromecast {
-    width: 100%;
-    height: 35%;
-    min-height: 35%;
-  }
-  
-  .external-leftpanel-container {
-    position: relative;
-    width: 60%;
-    margin: 0px 20% 0px 20%;
-    translate: 0px 0px;
-    top: 30px;
-  }
-  
   .external-player-top {
     flex-wrap: wrap;
     position: relative;
@@ -271,18 +247,4 @@
     max-height: 60%;
   }
   
-}
-
-@media (max-width: 360px) {
-  .external-leftpanel-container {
-    margin: 0px 15% 0px 15%;
-    min-width: 10px;
-  }
-}
-
-@media (max-width: 240px) {
-  .external-leftpanel-container {
-    margin: 0px;
-    width: 100%;
-  }
 }
