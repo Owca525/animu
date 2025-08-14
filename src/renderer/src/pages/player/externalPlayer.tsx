@@ -68,7 +68,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         if (!url) return
         window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.vlcPath, time: time }, "vlc")
     }
-    // TODO: napraw wyszukiwanie urządzeń i zabezpieczenia do tego
+
     async function runChromeCast(device: { host: string, port: number, name: string }) {
         if (currentHost && currentHost.hls) {
             toast.error("ChromeCast Doesn't support m3u8 format")
@@ -197,7 +197,6 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                     </div>
                 </div>
             </div>
-            {/* TODO: Give this thing display: none if external player is not chromecast */}
             <motion.div className="external-player-container-player-chromecast"
                 variants={chromecastSearchContainerVariants}
                 initial={"invisible"}
@@ -207,8 +206,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
             >
                 <div className="external-leftpanel-container">
                     <div className="external-leftpanel-topbar">
-                        {/* FIXME: Napraw żeby przyciski działały */}
-                        <button className="button external-leftpanel-topbar-button material-symbols-outlined" onClick={() => isChromeCastSearch ? startSearchChromeCast() : stopSearchChromeCast()}>{isChromeCastSearch ? "close" : "search"}</button>
+                        <button className="button external-leftpanel-topbar-button material-symbols-outlined" onClick={() => isChromeCastSearch ? stopSearchChromeCast() : startSearchChromeCast()}>{isChromeCastSearch ? "close" : "search"}</button>
                         <button className="button external-leftpanel-topbar-button material-symbols-outlined" onClick={refetchChromeCastDevices}>refresh</button>
                     </div>
                     <div className="external-leftpanel">
