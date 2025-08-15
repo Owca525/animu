@@ -24,10 +24,11 @@ export async function DeleteFromFile(data: cardData, file: string) {
         const saveFile = await window.api.os.read(await appConfigDirPath + `/${file}.json`)
         const list = JSON.parse(saveFile) as cardData[];
         const index = list.findIndex(
-            (item) => item.saveData?.episode === data.saveData?.episode && item.AnimeData.player_ID ? item.AnimeData.player_ID === data.AnimeData.player_ID : item.AnimeData.id === data.AnimeData.id
+            (item) => item.saveData?.episode === data.saveData?.episode && item.AnimeData.id === data.AnimeData.id
         );
 
         if (index != -1) list.splice(index, 1);
+        console.log(index)
 
         window.api.os.write(await appConfigDirPath + `/${file}.json`, JSON.stringify(list))
         refetchHistory()
@@ -90,7 +91,6 @@ export async function CheckFile(file: string): Promise<boolean> {
     }
 }
 
-// FIXME: Napraw zapisywanie nowych anime
 function checkAnimeDuplicate(listcard: cardData[]): cardData[] {
     const map = new Map<string, cardData>()
 
