@@ -336,6 +336,21 @@ export async function extractURLS(type: string, episode: string, id: string): Pr
     let tmp = await getURLS(element)
     if (tmp) data.push(tmp)
   }
+  let secondVariables = `{"showId":"${id}","episodeNumStart":${episode},"episodeNumEnd":${episode}}`
+  const secondResp = await sendToAPI(secondVariables, HASH_DATA, header)
+  if (!secondResp) data
+
+  if (type == "dub" && secondResp.data.episodeInfos[0].vidInforsdub) {
+    data.push({ hostname: "wp.youtube-anime.com", hls: false, resolution: [{ res: secondResp.data.episodeInfos[0].vidInforsdub.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${secondResp.data.episodeInfos[0].vidInforsdub.vidPath}` }] })
+  }
+  if (type == "raw" && secondResp.data.episodeInfos[0].vidInforsraw) {
+    data.push({ hostname: "wp.youtube-anime.com", hls: false, resolution: [{ res: secondResp.data.episodeInfos[0].vidInforsraw.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${secondResp.data.episodeInfos[0].vidInforsraw.vidPath}` }] })
+  }
+  if (type == "sub" && secondResp.data.episodeInfos[0].vidInforssub) {
+    data.push({ hostname: "wp.youtube-anime.com", hls: false, resolution: [{ res: secondResp.data.episodeInfos[0].vidInforssub.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${secondResp.data.episodeInfos[0].vidInforssub.vidPath}` }] })
+  }
+  console.log(data, secondResp)
+
   return data
 }
 
