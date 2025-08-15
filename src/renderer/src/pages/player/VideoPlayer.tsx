@@ -673,9 +673,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                         ListResolution.map((val) => { return { res: val, change: () => setRes(val) } })
                                     }
                                     speed={speed.map((val) => { return { speed: parseFloat(val), change: () => setSpeed(val) } })}
-                                    disableSettings={function (): void {
-                                        throw new Error("Function not implemented.")
-                                    }} current={{
+                                    disableSettings={() => setcurrentSettings(() => false)} 
+                                    current={{
                                         currentHost: currentHost,
                                         currentResolution: currentResolution,
                                         currentSpeed: videoRef.current?.playbackRate ? videoRef.current?.playbackRate : 1
