@@ -16,7 +16,7 @@ interface ExternalplayerProps {
     playerData: playerData[]
     time: number
     setNextEpisode: (value: string) => void
-    now_episodes: { episode: string, type: string, episodes: Array<string> }
+    now_episodes: { episode: string, type: string, episodes: { ep: string, img?: string, title?: string }[] }
     externalPlayerData: { onChage: (data: "Movian" | "VLC" | "Mpv" | "ChromeCast") => void, current: "Movian" | "VLC" | "Mpv" | "ChromeCast" }
 }
 
@@ -78,11 +78,12 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     }
 
     function setEpisode(type: "next" | "prev") {
-        let ep = now_episodes.episodes.indexOf(now_episodes.episode)
+        let ep = now_episodes.episodes.findIndex((item) => item.ep === now_episodes.episode)
+        if (ep < 0) return
         if (type == 'prev') ep = ep - 1
         if (type == 'next') ep = ep + 1
-        if (now_episodes.episodes[ep] === undefined) return
-        setNextEpisode(now_episodes.episodes[ep])
+        if (now_episodes.episodes[ep].ep === undefined) return
+        setNextEpisode(now_episodes.episodes[ep].ep)
     }
 
     function ChangeResolution(data: { res: string, url: string }) {
@@ -192,7 +193,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                     <div className="external-episodes-title">Episodes:</div>
                     <div className="external-episodes">
                         {now_episodes.episodes.map((num) => (
-                            <div className='information-episode-button' onClick={() => setNextEpisode(num)}>{num}</div>
+                            <div className='information-episode-button' onClick={() => setNextEpisode(num.ep)}>{num.ep}</div>
                         ))}
                     </div>
                 </div>

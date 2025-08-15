@@ -12,7 +12,7 @@ interface developerStatsProps {
     timeNextEpisode: number
     isUpNextEpisode: boolean
     isHideUpNextEpisode: boolean
-    episodes: string[]
+    episodes: { ep: string, img?: string, title?: string }[]
     episode: {
         type: string;
         ep: string;

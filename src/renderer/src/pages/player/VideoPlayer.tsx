@@ -28,7 +28,7 @@ const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75"
 interface VideoPlayerProps {
     player_data: playerData[]
     anime_data: cardData
-    temp: { episode: string, type: string, episodes: Array<string> }
+    temp: { episode: string, type: string, episodes: { ep: string, img?: string, title?: string }[] }
     setNextEpisode: (value: string) => void
     volumeCacheFunc: (value: number) => void
     PlayerVolume: number
@@ -324,7 +324,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
         if (duration <= config.Player.upToNextEpisode.durationShow * 60) return
 
-        if (duration != 0 && currentTime != 0 && isHideUpNextEpisode == false && temp.episodes[temp.episodes.indexOf(temp.episode) + 1] != null && currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
+        if (duration != 0 && currentTime != 0 && isHideUpNextEpisode == false && temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] != null && currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
             setUpNextEpisode(true)
             setTimeNextEpisode(((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + 30)
         } else {
@@ -387,11 +387,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     })
 
     function setEpisode(type: "next" | "prev") {
-        let ep = temp.episodes.indexOf(temp.episode)
+        let ep = temp.episodes.findIndex((item) => item.ep === temp.episode)
+        if (ep < 0) return
         if (type == 'prev') ep = ep - 1
         if (type == 'next') ep = ep + 1
-        if (temp.episodes[ep] === undefined) return
-        setNextEpisode(temp.episodes[ep])
+        if (temp.episodes[ep].ep === undefined) return
+        setNextEpisode(temp.episodes[ep].ep)
     }
 
     function keybinds(event: string) {
@@ -606,14 +607,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     <SeekBar secondBarValues={currentBuffer} currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => { setTimeVideo(value); setBuffered(() => []) }} type="time" classes={{ container: "player-seekbar" }} screen={true} />
                     <div className="player-bottom-section">
                         <div className="player-left">
-                            {temp.episodes[temp.episodes.indexOf(temp.episode) - 1] !== undefined &&
-                                <PlayerButton title={t('player.previous', { ep: temp.episodes[temp.episodes.indexOf(temp.episode) - 1] })} icon='skip_previous'
+                            {temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) - 1] !== undefined &&
+                                <PlayerButton title={t('player.previous', { ep: temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) - 1] })} icon='skip_previous'
                                     onClick={() => setEpisode("prev")}
                                     ButtonClass="player-buttons" />
                             }
                             <PlayerButton icon={isPlaying ? "pause" : "play_arrow"} title={isPlaying ? t('player.Pause') : t('player.play')} ButtonClass="player-buttons" onClick={togglePlay} />
-                            {temp.episodes[temp.episodes.indexOf(temp.episode) + 1] !== undefined &&
-                                <PlayerButton icon='skip_next' ButtonClass='material-symbols-outlined player-buttons' title={t('player.next', { ep: temp.episodes[temp.episodes.indexOf(temp.episode) + 1] })} onClick={() => setEpisode("next")} />
+                            {temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] !== undefined &&
+                                <PlayerButton icon='skip_next' ButtonClass='material-symbols-outlined player-buttons' title={t('player.next', { ep: temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] })} onClick={() => setEpisode("next")} />
                             }
                             <div className="player-time-display">
                                 {formatTime(currentTime)} / {formatTime(videoRef.current?.duration)}
@@ -633,7 +634,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                     <div className="player-select-episode-title">Change Episode</div>
                                     <div className="player-select-episode-content">
                                         {temp.episodes.map((element) => (
-                                            <div className={`information-episode-button ${parseInt(element) < parseInt(temp.episode) ? "watched" : ""} ${parseInt(element) == parseInt(temp.episode) ? "current" : ""}`} onClick={() => setNextEpisode(element)}>{element}</div>
+                                            <div className={`information-episode-button ${parseInt(element.ep) < parseInt(temp.episode) ? "watched" : ""} ${parseInt(element.ep) == parseInt(temp.episode) ? "current" : ""}`} onClick={() => setNextEpisode(element.ep)}>{element.ep}</div>
                                         ))}
                                     </div>
                                 </div>
@@ -666,7 +667,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             {isUpNextEpisode ? (
                 <div className="player-up-Next-container">
                     <div className="player-up-Next-Title">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>
-                    <div className="player-up-Next-Anime">{t("player.upNext.titleAnime", { ep: temp.episodes[temp.episodes.indexOf(temp.episode) + 1], title: anime_data.AnimeData.title.romaji })}</div>
+                    <div className="player-up-Next-Anime">{t("player.upNext.titleAnime", { ep: temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1], title: anime_data.AnimeData.title.romaji })}</div>
                     <div className="player-up-Next-Buttons">
                         <Button content={t("player.upNext.nextEp")} ButtonClass='player-up-Next-Button' onClick={() => setEpisode("next")} />
                         <Button content={t("player.upNext.hide")} ButtonClass='player-up-Next-Button' onClick={() => { setHideUpNextEpisode(true); setUpNextEpisode(false) }} />

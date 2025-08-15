@@ -306,7 +306,7 @@ export async function convertToNewData(id: string): Promise<cardData | null> {
   }
 }
 
-export async function getEpisodeList(type: string, anime_id: string): Promise<string[] | null> {
+export async function getEpisodeList(type: string, anime_id: string): Promise<{ ep: string, img?: string, title?: string }[] | null> {
   try {
     let variables = `{"_id":"${anime_id}"}`
     const resp = await sendToAPI(variables, HASH_INFO, header)

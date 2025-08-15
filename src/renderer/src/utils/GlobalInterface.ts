@@ -50,7 +50,7 @@ export interface AnimeData {
     studios: string[]
     title: { english?: string, native: string, romaji: string }
     type: string | undefined
-    episodesList?: { episodes: string[], type: string, name?: string }[]
+    episodesList?: { episodes: { ep: string, img?: string, title?: string }[], type: string, name?: string }[]
     player_ID?: string
     id: string
     trailer: { id: string, site: string } | undefined
@@ -133,8 +133,8 @@ export interface pluginFormat {
     } | null
     player?: {
         getUrls: (type: string, episode: string, id: string) => Promise<playerData[]>
-        animeDataList: (animeData?: AnimeData, anime_id?: string) => Promise<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] }>
-        episodeList: (type: string, anime_id: string) => Promise<Array<string> | null>
+        animeDataList: (animeData?: AnimeData, anime_id?: string) => Promise<{ player_id: string, episodesData: { episodes: { ep: string, img?: string, title?: string }[], type: string, name?: string }[] }>
+        episodeList: (type: string, anime_id: string) => Promise<{ ep: string, img?: string, title?: string }[] | null>
         animeList: (name: string) => Promise<cardData[]>
         getInformation: (id: string) => Promise<AnimeData>
     } | null

@@ -18,14 +18,14 @@ const VideoPlayer = lazy(() => import('./VideoPlayer'));
 // const ExternalPlayer = lazy(() => import('./externalPlayer'));
 
 const player = () => {
-    const anime_data: { data: cardData, episodelist: Array<string> } = useLocation().state
+    const anime_data: { data: cardData, episodelist: { ep: string, img?: string, title?: string }[] } = useLocation().state
     // const { t } = useTranslation()
     const navigate = useNavigate()
     const config: SettingsConfig = useSelector((data: any) => data.config);
 
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
     const [playerVolume, setPlayerVolume] = useState<number>(config.Player.general.Volume)
-    const [extractionData, setextractionData] = useState<{ actual: string, type: string, episodelist: Array<string>, time: number }>({ actual: anime_data.data.saveData ? anime_data.data.saveData.episode : "1", type: anime_data.data.saveData ? anime_data.data.saveData.type : "sub", episodelist: anime_data.episodelist, time: anime_data.data.saveData ? anime_data.data.saveData?.last_Time : 0 })
+    const [extractionData, setextractionData] = useState<{ actual: string, type: string, episodelist: { ep: string, img?: string, title?: string }[], time: number }>({ actual: anime_data.data.saveData ? anime_data.data.saveData.episode : "1", type: anime_data.data.saveData ? anime_data.data.saveData.type : "sub", episodelist: anime_data.episodelist, time: anime_data.data.saveData ? anime_data.data.saveData?.last_Time : 0 })
     const playerID = anime_data.data.AnimeData.player_ID ?? "";
     const extractFunc = useCallback(() => {
         return pluginPlayer.player.getUrls(extractionData.type, extractionData.actual, playerID);
