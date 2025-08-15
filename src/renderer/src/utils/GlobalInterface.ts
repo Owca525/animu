@@ -133,13 +133,15 @@ export interface pluginFormat {
     } | null
     player?: {
         getUrls: (type: string, episode: string, id: string) => Promise<playerData[]>
-        animeDataList: (animeData?: AnimeData, anime_id?: string) => Promise<{ player_id: string, episodesData: { episodes: { ep: string, img?: string, title?: string }[], type: string, name?: string }[] }>
+        animeDataList: (animeData?: AnimeData, anime_id?: string) => Promise<episodeList>
         episodeList: (type: string, anime_id: string) => Promise<{ ep: string, img?: string, title?: string }[] | null>
         animeList: (name: string) => Promise<cardData[]>
         getInformation: (id: string) => Promise<AnimeData>
     } | null
     sidebarAddon?: sidebarData[]
 }
+
+export interface episodeList { player_id: string, episodesData: { episodes: { ep: string, img?: string, title?: string }[], type: string, name?: string }[] }
 
 export interface SettingsConfig {
     General: {

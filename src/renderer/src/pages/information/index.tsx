@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { AnimeData, notificationProps } from "@renderer/utils/GlobalInterface";
+import { AnimeData, episodeList, notificationProps } from "@renderer/utils/GlobalInterface";
 import Button from "@renderer/components/buttons";
 import "./information.css"
 import { capitalizeFirstLetter, convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities, getGradientColor } from "@renderer/utils/functions";
@@ -24,7 +24,7 @@ function information() {
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
     const [showWrong, setshowWrong] = useState<boolean>(false)
     const [secondsLeft, setSecondsLeft] = useState<undefined | number>(anime_data.nextAiringEpisode?.timeUntilAiring);
-    const [data, setData] = useState<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] } | undefined>(undefined)
+    const [data, setData] = useState<episodeList | undefined>(undefined)
     const [savedata, setsavedata] = useState<{ last_episode: number, last_time: number } | undefined>(undefined)
     const [isLoading, setLoadingData] = useState<boolean>(false)
     const [isError, setIsError] = useState<boolean>(false)
@@ -111,7 +111,7 @@ function information() {
         initialInformation()
     }, [])
 
-    function enterPlayer(episodes: string[], type: string, episode: string) {
+    function enterPlayer(episodes: { ep: string, img?: string, title?: string }[], type: string, episode: string) {
         navigate("/player", {
             state: {
                 data: {
@@ -140,11 +140,11 @@ function information() {
         }
     }
 
-    function makeButtons(episode: string[], type: string) {
+    function makeButtons(episode: { ep: string, img?: string, title?: string }[], type: string) {
         return (
             <div className='information-buttons-episode-container'>
-                {episode.map((num) => (
-                    <div className={`information-episode-button ${savedata && parseInt(num) < savedata.last_episode ? "watched" : ""} ${savedata && parseInt(num) == savedata.last_episode && savedata.last_time != 0 ? "watching" : savedata && parseInt(num) == savedata.last_episode ? "watched" : ""}`} onClick={() => enterPlayer(episode, type, num)}>{num}</div>
+                {episode.map((data) => (
+                    <div className={`information-episode-button ${savedata && parseInt(data.ep) < savedata.last_episode ? "watched" : ""} ${savedata && parseInt(data.ep) == savedata.last_episode && savedata.last_time != 0 ? "watching" : savedata && parseInt(data.ep) == savedata.last_episode ? "watched" : ""}`} onClick={() => enterPlayer(episode, type, data.ep)}>{data.ep}</div>
                 ))}
             </div>
         )
@@ -158,6 +158,8 @@ function information() {
         if (showWrong) setshowWrong(() => false)
         else navigate("/")
     })
+
+    console.log(data)
     
     return (
         <>
@@ -273,7 +275,7 @@ function information() {
                                     <>
                                         {isLoading == false && data && data.episodesData && data.episodesData.length > 0 && anime_data.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && (
                                             <>
-                                                {data.episodesData.map((episode: { episodes: string[], type: string, name?: string }) => episode.episodes.length > 0 ? (
+                                                {data.episodesData.map((episode) => episode.episodes.length > 0 ? (
                                                     <Drop LeftHeader={episode.name ? episode.name : episode.type} RightHeader={`${episode.episodes.length} episodes`} content={makeButtons(episode.episodes, episode.type)} />
                                                 ) : "")}
                                             </>

@@ -1,12 +1,13 @@
 // import { playerUrlProps } from "@renderer/utils/interface"
 
 import { convertMsToMinutes, similarityText } from "@renderer/utils/functions"
-import { AnimeData, cardData, playerData, pluginFormat } from "@renderer/utils/GlobalInterface"
+import { AnimeData, cardData, episodeList, playerData, pluginFormat } from "@renderer/utils/GlobalInterface"
 import { setHomeData, UpdateHomeData } from "@renderer/utils/pluginApi"
 
 const HASH_SEARCH = '06327bc10dd682e1ee7e07b6db9c16e9ad2fd56c1b769e47513128cd5c9fc77a'
 const HASH_INFO = '9d7439c90f203e534ca778c4901f9aa2d3ad42c06243ab2c5e6b79612af32028'
 const HASH_PLAYER = '5f1a64b73793cc2234a389cf3a8f93ad82de7043017dd551f38f65b89daa65e0'
+const HASH_DATA = "c8f3ac51f598e630a1d09d7f7fb6924cff23277f354a23e473b962a367880f7d"
 const API_WEB = 'https://api.allanime.day'
 
 const header = {
@@ -71,6 +72,7 @@ async function sendToAPI(variables: string, hash: string, header: any): Promise<
 
 async function sendRequest(url: string, header: any): Promise<any | null> {
   let data = await window.api.request.get(url, header)
+  console.log(data)
   if (data.success) return data.data
   return null
 }
@@ -83,7 +85,40 @@ export async function SearchAnime(name: string, page: number = 1) {
   return null
 }
 
-function converterData(data: any): cardData {
+let episodeListCache: { id: string, temp: any } | undefined = undefined
+
+async function convertEpisodes(anime_id: string, episodeList: string[]): Promise<{ ep: string, img?: string, title?: string }[]> {
+  if (!episodeList) return episodeList
+  try {
+    if (episodeList.length > 51) return episodeList.map((element) => {return{ ep: element }})
+    if (episodeList.length <= 0) return []
+
+    let variables = `{"showId":"${anime_id}","episodeNumStart":${episodeList[0]},"episodeNumEnd":${episodeList[episodeList.length-1]}}`
+    let response: any = undefined
+
+    if (episodeListCache && episodeListCache.id == anime_id) response = episodeListCache.temp
+    else response = await sendToAPI(variables, HASH_DATA, header)
+
+    if (!response) return episodeList.map((element) => {return{ ep: element }})
+    
+    let episodeData: { ep: string, img?: string, title?: string }[] = []
+    // I decide for loop because map be harder to add episode number
+    for (let index = 0; index < response.data.episodeInfos.length; index++) {
+      const element = response.data.episodeInfos[index];
+      if (episodeList.length-1 < index) break
+      if (element.thumbnails.length <= 0) episodeData.push({ ep: (index+1).toString() })
+      else episodeData.push({ ep: (index+1).toString(), img: `https://wp.youtube-anime.com/aln.youtube-anime.com${element.thumbnails[0]}` })
+    }
+
+    episodeListCache = { id: anime_id, temp: episodeData }
+    return episodeData
+  } catch (error) {
+    console.error(`Error in convertEpisodes: ${error}`)
+    return episodeList.map((element) => {return{ ep: element }})
+  }
+}
+
+async function converterData(data: any): Promise<cardData> {
   let characters: any = []
   try {
     if (data.characters) {
@@ -121,9 +156,9 @@ function converterData(data: any): cardData {
       format: data.type,
       player_ID: data._id,
       episodesList: data.availableEpisodesDetail ? [
-        { episodes: data.availableEpisodesDetail.sub.reverse(), type: "sub", name: "Subtitles" },
-        { episodes: data.availableEpisodesDetail.dub.reverse(), type: "dub", name: "Dubbing" },
-        { episodes: data.availableEpisodesDetail.raw.reverse(), type: "raw" }
+        { episodes: await convertEpisodes(data._id ,data.availableEpisodesDetail.sub.reverse()), type: "sub", name: "Subtitles" },
+        { episodes: await convertEpisodes(data._id ,data.availableEpisodesDetail.dub.reverse()), type: "dub", name: "Dubbing" },
+        { episodes: await convertEpisodes(data._id ,data.availableEpisodesDetail.raw.reverse()), type: "raw" }
       ] : data.availableEpisodesDetail,
       characters: characters,
       source: undefined,
@@ -140,7 +175,7 @@ export async function recentAnime(page: number = 1) {
       return {
         data: {
           title: "Recent Anime",
-          data: anime.data.shows.edges.map((data) => converterData(data)),
+          data: anime.data.shows.edges.map(async (data) => await converterData(data)),
           onScrollDownFunction: (page) => recentAnime(page)
         },
         maxPage: 26
@@ -165,7 +200,7 @@ export async function recentAnime(page: number = 1) {
     return [
       {
         title: "Recent Anime",
-        data: anime.data.shows.edges.map((data) => converterData(data)),
+        data: anime.data.shows.edges.map(async (data) => await converterData(data)),
         onScrollDownFunction: (page) => recentAnime(page)
       }
     ]
@@ -173,18 +208,28 @@ export async function recentAnime(page: number = 1) {
 }
 
 async function getAnimeList(name: string): Promise<cardData[]> {
-  let data = await SearchAnime(name)
-  if (data == 0) return []
-  return data.shows.edges.map((data) => converterData(data))
+  try {
+    let data = await SearchAnime(name)
+    if (data == 0) return []
+    let returnData: cardData[] = []
+    for (let index = 0; index < data.shows.edges.length; index++) {
+      const element = data.shows.edges[index];
+      returnData.push(await converterData(element))
+    }
+    return returnData
+  } catch (error) {
+    console.log(`Error in getAnimeList: ${error}`)
+    return []
+  }
 }
 
 async function extractInformation(id: string) {
   let variables = `{"_id":"${id}"}`;
   const resp = await sendToAPI(variables, HASH_INFO, header);
-  return converterData(resp.data.show).AnimeData
+  return (await converterData(resp.data.show)).AnimeData
 }
 
-export async function getInformation(animeData?: AnimeData, anime_id?: string): Promise<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] }> {
+export async function getInformation(animeData?: AnimeData, anime_id?: string): Promise<episodeList> {
   // CHUJ MNIE TO ŻE ONE PIECIE NIE JEST WYKRYWANIE, JEŚLI ALLMANGA BY NIE MIAŁA 1P ZAMIAST ONE PIECIE JAKIE CWEL TO JEST
   console.log(animeData)
   if (animeData) {
@@ -298,7 +343,7 @@ export async function convertToNewData(id: string): Promise<cardData | null> {
   try {
     let variables = `{"_id":"${id}"}`
     const resp = await sendToAPI(variables, HASH_INFO, header)
-    if (resp) return converterData(resp.data.show)
+    if (resp) return await converterData(resp.data.show)
     return null
   } catch (Error) {
     console.error(Error)
@@ -311,7 +356,7 @@ export async function getEpisodeList(type: string, anime_id: string): Promise<{ 
     let variables = `{"_id":"${anime_id}"}`
     const resp = await sendToAPI(variables, HASH_INFO, header)
     if (resp) {
-      let data = converterData(resp.data.show).AnimeData.episodesList
+      let data = (await converterData(resp.data.show)).AnimeData.episodesList
       if (!data) return null
       return data.filter(item => item.type === type).flatMap(item => item.episodes)
     }
