@@ -290,8 +290,8 @@
 
 .player-select-episode-container {
   height: max-content;
-  max-height: 200px;
-  max-width: 320px;
+  max-height: 350px;
+  max-width: 500px;
   display: flex;
   flex-direction: column;
   padding: 8px;
@@ -318,6 +318,34 @@
   gap: 4px;
   padding: 2px;
   flex-wrap: wrap;
+}
+
+.player-select-episode-content-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.information-episode-button-full {
+  width: 300px;
+  font-size: 1em;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content:space-between;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 12px;
+  border: 1px solid var(--invisible);
+}
+
+.information-episode-button-full:hover {
+  background-color: var(--bg4);
+}
+
+.information-episode-button-image {
+  width: 100px;
+  border-radius: 4px;
 }
 
 /* UI */

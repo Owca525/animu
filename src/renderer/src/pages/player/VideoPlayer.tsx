@@ -532,6 +532,19 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         return text
     }
 
+    function countImages(data: { ep: string, img?: string, title?: string }[]): boolean {
+        let counter: number = 0
+        console.log(data)
+        for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+            console.log(element.img)
+            if (element.img) counter += 1
+        }
+        console.log(counter, data.length)
+        if (data.length <= counter) return true
+        return false
+    }
+
     return (
         <div className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
             <video
@@ -632,11 +645,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                             {isShowSelectEpisode &&
                                 <div className="player-select-episode-container">
                                     <div className="player-select-episode-title">Change Episode</div>
-                                    <div className="player-select-episode-content">
-                                        {temp.episodes.map((element) => (
-                                            <div className={`information-episode-button ${parseInt(element.ep) < parseInt(temp.episode) ? "watched" : ""} ${parseInt(element.ep) == parseInt(temp.episode) ? "current" : ""}`} onClick={() => setNextEpisode(element.ep)}>{element.ep}</div>
-                                        ))}
-                                    </div>
+                                    { !countImages(temp.episodes) &&
+                                        <div className="player-select-episode-content">
+                                            {temp.episodes.map((element) => (
+                                                <div className={`information-episode-button ${parseInt(element.ep) < parseInt(temp.episode) ? "watched" : ""} ${parseInt(element.ep) == parseInt(temp.episode) ? "current" : ""}`} onClick={() => setNextEpisode(element.ep)}>{element.ep}</div>
+                                            ))}
+                                        </div>
+                                    }
+                                    { countImages(temp.episodes) &&
+                                        <div className="player-select-episode-content-list">
+                                            {temp.episodes.map((element) => (
+                                                <div className={`information-episode-button-full ${parseInt(element.ep) < parseInt(temp.episode) ? "watched" : ""} ${parseInt(element.ep) == parseInt(temp.episode) ? "current" : ""}`} onClick={() => setNextEpisode(element.ep)}>
+                                                    Episode: {element.ep}
+                                                    <img src={element.img} className="information-episode-button-image" />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    }
                                 </div>
                             }
                             {currentSettings &&

@@ -289,15 +289,18 @@ body {
   background-color: var(--bg3);
 }
 
-.information-episode-button.watched {
+.information-episode-button.watched,
+.information-episode-button-full.watched {
   border-color: var(--neutral1);
 }
 
-.information-episode-button.watching {
+.information-episode-button.watching,
+.information-episode-button-full.watching {
   border-color: var(--red);
 }
 
-.information-episode-button.current {
+.information-episode-button.current,
+.information-episode-button-full.current {
   border-color: var(--blue);
 }
 
