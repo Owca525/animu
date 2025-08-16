@@ -11,7 +11,7 @@ import { ContextMenuProps, notificationProps, SettingsConfig, themeMetadata } fr
 import { useSelector } from "react-redux";
 import i18n from "i18next"
 import { checkPictureFolder, saveConfig } from "@renderer/utils/config";
-import { calculateZoomLevel, capitalizeFirstLetter, changeTheme, convertKeybinds, convertPath } from "@renderer/utils/functions";
+import { calculateZoomLevel, changeTheme, convertKeybinds, convertPath } from "@renderer/utils/functions";
 import CheckKeybind from "./components/checkKeybind";
 import { showDialog } from "@renderer/utils/context/DialogContext";
 import store from "@renderer/utils/store";
@@ -401,18 +401,6 @@ function settings() {
                                     type="number"
                                     onKeyDown={(text) => handleChange("Player.general.TimeSkipLeft", parseInt(text))}
                                     startValue={config.new.Player.general.TimeSkipLeft.toString()}
-                                />
-                            </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
-                                {t("settings.player.preload")}
-                                <Dropdown
-                                    options={[
-                                        { label: "Metadata", onClick: () => handleChange("Player.general.playerLoadType", "metadata") },
-                                        { label: "Auto", onClick: () => handleChange("Player.general.playerLoadType", "auto") },
-                                    ]}
-                                    buttonText={capitalizeFirstLetter(config.new.Player.general.playerLoadType)}
-                                    disableX
                                 />
                             </div>
                             <div className="settings-line"></div>

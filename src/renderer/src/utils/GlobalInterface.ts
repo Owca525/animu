@@ -161,7 +161,6 @@ export interface SettingsConfig {
             AutoFullscreen: boolean
             AutoSkipEpisode: boolean
             Volume: number
-            playerLoadType: string
             LongTimeSkipForward: number | string
             LongTimeSkipBack: number | string
             TimeSkipLeft: number | string
