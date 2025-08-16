@@ -144,6 +144,7 @@ export interface pluginFormat {
 export interface episodeList { player_id: string, episodesData: { episodes: { ep: string, img?: string, title?: string }[], type: string, name?: string }[] }
 
 export interface SettingsConfig {
+    firstStart: boolean
     General: {
         // HoverSidebar: boolean
         // HideSidebar: boolean

@@ -16,6 +16,7 @@ import { ReadHistory } from "@renderer/utils/history/history"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
 import { CreateContextMenuOptions } from "@renderer/utils/functions"
 import Filter from "./components/filter"
+// import WelcomeScreen from "./components/welcomeScreen"
 
 const Home = () => {
     const navigate = useNavigate()
@@ -190,6 +191,7 @@ const Home = () => {
                 {homeCache.isError == false && homeCache.isLoading == false && homeCache.data.length <= 0 && <div className="home-empty-container"><span className="material-symbols-outlined home-empty-icon">search_off</span>{t("home.nothingfound")}</div>}
             </div>
             <Sidebar data={sidebarData} />
+            {/* <WelcomeScreen /> */}
         </main>
     )
 }

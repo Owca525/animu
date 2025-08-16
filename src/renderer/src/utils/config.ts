@@ -3,6 +3,7 @@ import { SettingsConfig } from "./GlobalInterface";
 import { convertPath } from "./functions";
 
 export const defaultConfig: SettingsConfig = {
+    firstStart: true,
     General: {
         // HoverSidebar: true,
         // HideSidebar: false,
