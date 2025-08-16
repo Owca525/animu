@@ -93,24 +93,29 @@ async function convertEpisodes(anime_id: string, episodeList: string[]): Promise
     if (episodeList.length > 51) return episodeList.map((element) => {return{ ep: element }})
     if (episodeList.length <= 0) return []
 
-    let variables = `{"showId":"${anime_id}","episodeNumStart":${episodeList[0]},"episodeNumEnd":${episodeList[episodeList.length-1]}}`
+    let variables = `{"showId":"${anime_id}","episodeNumStart":${episodeList[episodeList.length-1]},"episodeNumEnd":${episodeList[0]}}`
     let response: any = undefined
 
     if (episodeListCache && episodeListCache.id == anime_id) response = episodeListCache.temp
     else response = await sendToAPI(variables, HASH_DATA, header)
+    console.log(response)
 
     if (!response) return episodeList.map((element) => {return{ ep: element }})
+    if (response.errors) return episodeList.map((element) => {return{ ep: element }})
+    let infoData = response.data.episodeInfos
+    if (infoData.length <= 0) return episodeList.map((element) => {return{ ep: element }})
     
     let episodeData: { ep: string, img?: string, title?: string }[] = []
     // I decide for loop because map be harder to add episode number
-    for (let index = 0; index < response.data.episodeInfos.length; index++) {
-      const element = response.data.episodeInfos[index];
+    for (let index = 0; index < infoData.length; index++) {
+      const element = infoData[index];
       if (episodeList.length-1 < index) break
       if (element.thumbnails.length <= 0) episodeData.push({ ep: (index+1).toString() })
-      else episodeData.push({ ep: (index+1).toString(), img: `https://wp.youtube-anime.com/aln.youtube-anime.com${element.thumbnails[0]}` })
+      else episodeData.push({ ep: (episodeList[index]).toString(), img: `https://wp.youtube-anime.com/aln.youtube-anime.com${element.thumbnails[0]}` })
     }
 
-    episodeListCache = { id: anime_id, temp: episodeData }
+    episodeListCache = { id: anime_id, temp: response }
+    console.log(episodeData)
     return episodeData
   } catch (error) {
     console.error(`Error in convertEpisodes: ${error}`)
@@ -156,9 +161,9 @@ async function converterData(data: any): Promise<cardData> {
       format: data.type,
       player_ID: data._id,
       episodesList: data.availableEpisodesDetail ? [
-        { episodes: await convertEpisodes(data._id ,data.availableEpisodesDetail.sub.reverse()), type: "sub", name: "Subtitles" },
-        { episodes: await convertEpisodes(data._id ,data.availableEpisodesDetail.dub.reverse()), type: "dub", name: "Dubbing" },
-        { episodes: await convertEpisodes(data._id ,data.availableEpisodesDetail.raw.reverse()), type: "raw" }
+        { episodes: (await convertEpisodes(data._id ,data.availableEpisodesDetail.sub)).reverse(), type: "sub", name: "Subtitles" },
+        { episodes: (await convertEpisodes(data._id ,data.availableEpisodesDetail.dub)).reverse(), type: "dub", name: "Dubbing" },
+        { episodes: (await convertEpisodes(data._id ,data.availableEpisodesDetail.raw)).reverse(), type: "raw" }
       ] : data.availableEpisodesDetail,
       characters: characters,
       source: undefined,
