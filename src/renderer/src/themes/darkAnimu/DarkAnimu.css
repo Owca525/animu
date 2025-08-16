@@ -109,13 +109,17 @@ body {
 
 /* Sidebar */
 
+.sidebar-button {
+  background-color: var(--bg2);
+}
+
 .sidebar-container-min,
 .sidebar-container-max {
   background-color: var(--bg2);
 }
 
 .sidebar-black-line {
-  background-color: var(--bg);
+  background-color: var(--bg4);
   border-radius: 12px;
 }
 
