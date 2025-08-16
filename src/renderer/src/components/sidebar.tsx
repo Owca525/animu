@@ -75,7 +75,7 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, sidebarClass, data, hideBut
                 </div>
             ) : ""}
             <motion.div className={"sidebar-container-max"} ref={sidebarRef}
-                initial="hidden"
+                initial={showLogo ? "visible" :"hidden"}
                 animate={hideButton == false ? sidebarHover ? "visible" : "hidden" : "visible"}
                 variants={sidebarVariants}
                 transition={{ duration: 0.2 }}
