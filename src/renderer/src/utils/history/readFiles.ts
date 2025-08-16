@@ -28,11 +28,10 @@ export async function DeleteFromFile(data: cardData, file: string) {
         );
 
         if (index != -1) list.splice(index, 1);
-        console.log(index)
 
         window.api.os.write(await appConfigDirPath + `/${file}.json`, JSON.stringify(list))
         refetchHistory()
-        console.log(data)
+
         if (data.deletionCard) {
             if (file === "continueWatch") {
                 toast.success(i18n.t("history.continuesaved"), notificationProps)
