@@ -511,11 +511,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         if (video && video.duration > 0 && video.buffered.length > 0) {
             let timestamps: { position: number, width: number }[] = []
             for (let index = 0; index < video.buffered.length; index++) {
-                const start = video.buffered.start(index);
-                const end = video.buffered.end(index);
-                const left = (start / video.duration) * 100;
-                const width = ((end - start) / video.duration) * 100;
-                timestamps.push({ position: left, width: width })
+                const startX = (video.buffered.start(index) / video.duration) * 100;
+                const endX = (video.buffered.end(index) / video.duration) * 100;
+                const width = endX - startX;
+                timestamps.push({ position: startX, width: width })
             }
             setBuffered(() => timestamps);
         }
@@ -617,7 +616,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     }
                 </div>
                 <div className={isVisible && isUpNextEpisode == false ? 'video-bottom' : 'video-bottom player-hidden'}>
-                    <SeekBar secondBarValues={currentBuffer} currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => { setTimeVideo(value); setBuffered(() => []) }} type="time" classes={{ container: "player-seekbar" }} screen={true} />
+                    <SeekBar secondBarValues={currentBuffer} currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => { setTimeVideo(value) }} type="time" classes={{ container: "player-seekbar" }} screen={true} />
                     <div className="player-bottom-section">
                         <div className="player-left">
                             {temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) - 1] !== undefined &&

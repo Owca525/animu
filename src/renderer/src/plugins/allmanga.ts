@@ -344,6 +344,7 @@ export async function extractURLS(type: string, episode: string, id: string): Pr
   let secondVariables = `{"showId":"${id}","episodeNumStart":${episode},"episodeNumEnd":${episode}}`
   const secondResp = await sendToAPI(secondVariables, HASH_DATA, header)
   if (!secondResp) data
+  if (!secondResp.data.episodeInfos) return data
 
   if (type == "dub" && secondResp.data.episodeInfos[0].vidInforsdub) {
     data.push({ hostname: "wp.youtube-anime.com", hls: false, resolution: [{ res: secondResp.data.episodeInfos[0].vidInforsdub.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${secondResp.data.episodeInfos[0].vidInforsdub.vidPath}` }] })
