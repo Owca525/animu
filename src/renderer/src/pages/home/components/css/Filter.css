@@ -3,14 +3,24 @@
     flex-direction: column;
 }
 
+.home-filter-container-horizontal {
+    margin-left: -270px;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    translate: 0px 0px;
+}
+
 .home-filter-container {
     z-index: 999;
     margin-top: 60px;
-    margin-left: -270px;
+    margin-left: 0px;
     display: flex;
     position: fixed;
     padding: 12px;
     gap: 8px;
+    translate: -38%;
+    flex-direction: column;
 }
 
 .home-filter-space {
