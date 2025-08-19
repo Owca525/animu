@@ -31,14 +31,14 @@
 
 /* For smaller devices / window sizes */
 @media (max-width: 1000px) {
-    .home-filter-container {
+    .home-filter-container-horizontal {
        margin-left: 0px;
        translate: -50% 0px; 
        left: 50%;
     }
 }
 @media (max-width: 925px) {
-    .home-filter-container {
+    .home-filter-container-horizontal {
         flex-wrap: wrap;
         width: 340px;
     }
