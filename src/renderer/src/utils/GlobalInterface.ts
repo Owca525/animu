@@ -146,8 +146,8 @@ export interface episodeList { player_id: string, episodesData: { episodes: { ep
 export interface SettingsConfig {
     firstStart: boolean
     General: {
-        // HoverSidebar: boolean
-        // HideSidebar: boolean
+        HoverSidebar: boolean
+        HideSidebar: boolean
         language: string
         theme: string
         Window: {

@@ -7,7 +7,7 @@ import Sidebar from "@renderer/components/sidebar"
 import Container from "./components/container"
 import { useSelector } from "react-redux"
 import { useEffect, useRef } from "react"
-import { containerData, FilterParams, homeData } from "@renderer/utils/GlobalInterface"
+import { containerData, FilterParams, homeData, SettingsConfig } from "@renderer/utils/GlobalInterface"
 import { t } from "i18next"
 import store from "@renderer/utils/store"
 import { homeStopScrolling, setHomeData, setHomeLocalSearch } from "@renderer/utils/pluginApi"
@@ -23,6 +23,7 @@ const Home = () => {
     const plugin = useSelector((plugin: any) => plugin.plugin.informationPlugin);
     const homeCache: homeData = useSelector((cache: any) => cache.home);
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
+    const config: SettingsConfig = useSelector((data: any) => data.config);
 
     const divRef = useRef<HTMLDivElement | null>(null);
 
@@ -184,6 +185,7 @@ const Home = () => {
                 <div></div>
                 <div className="home-header-right"></div>
             </div>
+            {!config.General.HideSidebar && <div className="shadow-sidebar"></div>}
             <div ref={divRef} className={`home-container ${homeCache.isLoading && "home-loading-container"} ${homeCache.isError && "home-loading-container"} ${homeCache.data.length <= 0 && "home-loading-container"}`} onScroll={handleScroll}>
                 {homeCache.isLoading && homeCache.isError == false && <div className="material-symbols-outlined home-loading-animation">progress_activity</div>}
                 {homeCache.isError && homeCache.isLoading == false && <div className="home-error-container"><span className="material-symbols-outlined home-error-icon">error</span>{t("home.error")}</div>}

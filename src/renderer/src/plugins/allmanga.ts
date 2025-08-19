@@ -175,12 +175,17 @@ async function converterData(data: any): Promise<cardData> {
 export async function recentAnime(page: number = 1) {
   let variables = `{"search":{"sortBy":"Recent"},"limit":26,"page":${page},"translationType":"sub","countryOrigin":"JP"}`
   let anime = await sendToAPI(variables, HASH_SEARCH, header)
+  let animeData: cardData[] = []
+  for (let index = 0; index < anime.data.shows.edges.length; index++) {
+    const element = anime.data.shows.edges[index];
+    animeData.push(await converterData(element))
+  }
   if (page && page > 1) {
     await UpdateHomeData(async () => {
       return {
         data: {
           title: "Recent Anime",
-          data: anime.data.shows.edges.map(async (data) => await converterData(data)),
+          data: animeData,
           onScrollDownFunction: (page) => recentAnime(page)
         },
         maxPage: 26
@@ -205,7 +210,7 @@ export async function recentAnime(page: number = 1) {
     return [
       {
         title: "Recent Anime",
-        data: anime.data.shows.edges.map(async (data) => await converterData(data)),
+        data: animeData,
         onScrollDownFunction: (page) => recentAnime(page)
       }
     ]

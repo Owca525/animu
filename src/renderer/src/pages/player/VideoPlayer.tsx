@@ -635,9 +635,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         <div className="player-right">
                             <PlayerButton icon={isMuted ? 'volume_off' : 'volume_up'} title={t('player.Volume')} ButtonClass="player-buttons volume-button" onClick={setMutedToPlayer} />
                             <div className="player-volume-seek">
-                                {volume && (
-                                    <SeekBar currentValue={volume} maxValue={100} onSeek={value => handleVolume(value)} classes={{ container: "player-seekbar" }} />
-                                )}
+                                <SeekBar currentValue={volume} maxValue={100} onSeek={value => handleVolume(value)} classes={{ container: "player-seekbar" }} />
                             </div>
                             <PlayerButton icon={"picture_in_picture"} onClick={handlePictureInPicture} title={detectDisableTooltips("Picture In Picture")} ButtonClass="player-buttons" />
                             <PlayerButton icon={"video_library"} title={detectDisableTooltips("Select Episode")} ButtonClass="player-buttons" onClick={() => { setShowSelectEpisode((prev) => !prev); setcurrentSettings(() => false) }} />
