@@ -89,6 +89,11 @@ maybe that will be usefull in the future */
         width: clamp(175px, 40vw, 200px);
     }
     
+    .sidebar-container-min, .shadow-sidebar {
+        width: clamp(50px, 9vw, 66px);
+        min-width: fit-content;
+    }
+    
     /* .settings-container .sidebar-logo-icon-container,
     .settings-container .sidebar-container-max {
         width: 130px;
