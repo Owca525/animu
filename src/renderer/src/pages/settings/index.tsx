@@ -49,7 +49,7 @@ function settings() {
             },
             {
                 icon: "extension",
-                text: "Extensions",
+                text: t("global.extensions"),
                 onClick: () => setCategory(() => "extensions"),
             },
             {
@@ -199,14 +199,14 @@ function settings() {
     };
 
     async function buttonCheck() {
-        toast.info("Start Checking History", notificationProps)
+        toast.info(t("settings.history.check_start"), notificationProps)
         await ContinueCheckConversion()
         await HistoryCheckConvert()
         if (await HistoryDetectVersion()) {
-            toast.info("History is good, nothing to change", notificationProps)
+            toast.info(t("settings.history.history_good"), notificationProps)
         }
         if (await ContinueDetectVersion()) {
-            toast.info("Continue watch is good, nothing to change", notificationProps)
+            toast.info(t("settings.history.continue_good"), notificationProps)
         }
     }
 
@@ -265,8 +265,8 @@ function settings() {
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.general.updates")}</div>
                             <div className="settings-setting-container">
-                                {`Check Update`}
-                                <Button content="Check For Updates" onClick={() => checkUpdate(true)}/>
+                                {t("settings.general.checkupdate")}
+                                <Button content={t("settings.general.checkupdates")} icon="update" onClick={() => checkUpdate(true)}/>
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
@@ -283,9 +283,9 @@ function settings() {
                                 {t("settings.general.checkupdates")}
                                 <Dropdown
                                     options={[
-                                        { label: "On Start", onClick: () => handleChange("update.type", "On Start") },
-                                        { label: "Every Day", onClick: () => handleChange("update.type", "Every Day") },
-                                        { label: "Every Week", onClick: () => handleChange("update.type", "Every Week") },
+                                        { label: t("settings.general.onstart"), onClick: () => handleChange("update.type", "On Start") },
+                                        { label: t("settings.general.every_day"), onClick: () => handleChange("update.type", "Every Day") },
+                                        { label: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
                                     ]}
                                     disableX
                                     buttonText={config.new.update.type}
@@ -410,7 +410,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Video Streching
+                               {t("settings.player.stretching")} 
                                 <CheckBox
                                     checked={config.new.Player.general.VideoStreching}
                                     onChecked={(checked) =>
@@ -420,9 +420,9 @@ function settings() {
                             </div>
                         </div>
                         <div className="settings-page-container">
-                            <div className="settings-page-title">Up To Next Episode Notification</div>
+                            <div className="settings-page-title">{t("settings.player.uptonextep")}</div>
                             <div className="settings-setting-container">
-                                Enable
+                                {t("global.enable")}
                                 <CheckBox
                                     checked={config.new.Player.upToNextEpisode.enable}
                                     onChecked={(checked) =>
@@ -432,7 +432,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Notification Interval
+                                {t("settings.player.notif_interval")}
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
@@ -442,7 +442,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Don't show if episode is shorter than
+                                {t("settings.player.epshorter")}
                                 <SettingsInput
                                     iconChar="m"
                                     type="number"
@@ -452,9 +452,9 @@ function settings() {
                             </div>
                         </div>
                         <div className="settings-page-container">
-                            <div className="settings-page-title">External Player</div>
+                            <div className="settings-page-title">{t("settings.player.external")}</div>
                             <div className="settings-setting-container">
-                                Enable External Player
+                                {t("settings.player.enable_external")}
                                 <CheckBox
                                     checked={config.new.Player.external.enable}
                                     onChecked={(checked) =>
@@ -464,7 +464,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Select Player
+                                {t("settings.player.select_player")}
                                 <Dropdown
                                     options={[
                                         { label: "Movian", onClick: () => handleChange("Player.external.type", "Movian") },
@@ -479,7 +479,7 @@ function settings() {
                             {config.new.Player.external.type != "ChromeCast" && <div className="settings-line"></div>}
                             {config.new.Player.external.type === "Movian" &&
                                 <div className="settings-setting-container">
-                                    Movian IP
+                                    {t("settings.player.movianip")}
                                     <SettingsInput
                                         iconChar=" "
                                         type="text"
@@ -490,7 +490,7 @@ function settings() {
                             }
                             {config.new.Player.external.type === "Mpv" &&
                                 <div className="settings-setting-container">
-                                    Mpv Path
+                                    {t("settings.player.mpvpath")}
                                     <SettingsInput
                                         type="text"
                                         onKeyDown={(text) => handleChange("Player.external.mpvPath", text)}
@@ -500,7 +500,7 @@ function settings() {
                             }
                             {config.new.Player.external.type === "VLC" &&
                                 <div className="settings-setting-container">
-                                    VLC Path
+                                    {t("settings.player.vlcpath")}
                                     <SettingsInput
                                         type="text"
                                         onKeyDown={(text) => handleChange("Player.external.vlcPath", text)}
@@ -525,9 +525,9 @@ function settings() {
                                 {t("settings.player.type")}
                                 <Dropdown
                                     options={[
-                                        { label: "File", onClick: () => handleChange("Player.screenShot.saveType", "File") },
-                                        { label: "Clipboard", onClick: () => handleChange("Player.screenShot.saveType", "Clipboard") },
-                                        { label: "Both", onClick: () => handleChange("Player.screenShot.saveType", "Both") },
+                                        { label: t("settings.player.file"), onClick: () => handleChange("Player.screenShot.saveType", "File") },
+                                        { label: t("settings.player.clipboard"), onClick: () => handleChange("Player.screenShot.saveType", "Clipboard") },
+                                        { label: t("settings.player.both"), onClick: () => handleChange("Player.screenShot.saveType", "Both") },
                                     ]}
                                     buttonText={config.new.Player.screenShot.saveType}
                                     disableX
@@ -539,7 +539,7 @@ function settings() {
                                     {t("settings.player.path")}
                                     <span className="settings-text-space">{config.new.Player.screenShot.path}</span>
                                 </div>
-                                <Button content="Change Location" onClick={async () => await ChangeScreenshot(await window.api.os.openDialog(undefined, undefined, ["openDirectory"]))} />
+                                <Button content={t("settings.player.changelocaton")} onClick={async () => await ChangeScreenshot(await window.api.os.openDialog(undefined, undefined, ["openDirectory"]))} />
                             </div>
                         </div>
                         <div className="settings-page-container">
@@ -669,7 +669,7 @@ function settings() {
                         <div className="settings-page-container">
                             <div className="settings-page-title">{"DevTools"}</div>
                             <div className="settings-setting-container">
-                                {"Developer Mode"}
+                                {t("settings.devmode.developermode")}
                                 <CheckBox
                                     checked={config.new.Developer.DeveloperMode}
                                     onChecked={(checked) =>
@@ -679,7 +679,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {"Turn on DevTools"}
+                                {t("settings.devmode.tornondevtools")}
                                 <CheckBox
                                     checked={config.new.Developer.DevTools}
                                     onChecked={(checked) =>
@@ -689,7 +689,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {"DevTools On Start"}
+                                {t("settings.devmode.devtoolsonstart")}
                                 <CheckBox
                                     checked={config.new.Developer.DevToolsOnStart}
                                     onChecked={(checked) =>
@@ -699,7 +699,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {"PlayerDebug Stats"}
+                                {t("settings.devmode.playerdebug")}
                                 <CheckBox
                                     checked={config.new.Developer.playerDebug}
                                     onChecked={(checked) =>
@@ -709,17 +709,17 @@ function settings() {
                             </div>
                         </div>
                         <div className="settings-page-container">
-                            <div className="settings-page-title">{"Information"}</div>
+                            <div className="settings-page-title">{t("settings.devmode.information")}</div>
                             <div className="settings-setting-container">
-                                <span>Electron Version</span>
+                                <span>{t("settings.devmode.electronver")}</span>
                                 <span>{versions.electron}</span>
                             </div>
                             <div className="settings-setting-container">
-                                <span>Chromium Version</span>
+                                <span>{t("settings.devmode.chromiumver")}</span>
                                 <span>{versions.chrome}</span>
                             </div>
                             <div className="settings-setting-container">
-                                <span>Node Version</span>
+                                <span>{t("settings.devmode.nodever")}</span>
                                 <span>{versions.node}</span>
                             </div>
                         </div>
@@ -727,14 +727,14 @@ function settings() {
                 )}
                 {category == "extensions" &&
                     <div className="settings-page-container">
-                        <div className="settings-page-title">{"Extensions"}</div>
+                        <div className="settings-page-title">{t("global.extensions")}</div>
                         <div className="settings-container-extensions">
                             <table className="settings-table-extensions">
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Plugin Author</th>
-                                    <th>Version</th>
-                                    <th>Type</th>
+                                    <th>{t("settings.extensions.name")}</th>
+                                    <th>{t("settings.extensions.author")}</th>
+                                    <th>{t("settings.extensions.version")}</th>
+                                    <th>{t("settings.extensions.type")}</th>
                                 </tr>
                                 <tr className="settings-table-button">
                                     <td className="settings-extensions-title"><img className="settings-extensions-icon" src="https://anilist.co/img/icons/icon.svg" />Anilist</td>
@@ -742,7 +742,7 @@ function settings() {
                                     <td><div className="settings-extensions-background">1.0</div></td>
                                     <td>
                                         <div className="settings-extensions-button-container">
-                                            <div className="settings-extensions-background">Information</div> <div className="settings-helpicon-space"><CheckBox /><Button icon="settings" ButtonClass="settings-extensions-button"/></div>
+                                            <div className="settings-extensions-background">{t("settings.extensions.information")}</div> <div className="settings-helpicon-space"><CheckBox /><Button icon="settings" ButtonClass="settings-extensions-button"/></div>
                                         </div>
                                     </td>
                                 </tr>
@@ -752,7 +752,7 @@ function settings() {
                                     <td><div className="settings-extensions-background">1.0</div></td>
                                     <td>
                                         <div className="settings-extensions-button-container">
-                                            <div className="settings-extensions-background">Player</div> <div className="settings-helpicon-space"><CheckBox /><Button icon="settings" ButtonClass="settings-extensions-button"/></div>
+                                            <div className="settings-extensions-background">{t("settings.extensions.player")}</div> <div className="settings-helpicon-space"><CheckBox /><Button icon="settings" ButtonClass="settings-extensions-button"/></div>
                                         </div>
                                     </td>
                                 </tr>

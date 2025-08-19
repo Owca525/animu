@@ -10,7 +10,9 @@
         "continuewatch": "Continue Watching",
         "dev": "Developer",
         "minutes": "Minutes",
-        "exitAnimu": "Do you really want exit animu?"
+        "exitAnimu": "Do you really want exit animu?",
+        "enable": "Enable",
+        "extensions":"Extensions"
     },
     "dialog": {
         "yes": "Yes",
@@ -94,13 +96,17 @@
             "theme": "Theme",
             "updates": "Update Notifications",
             "checkupdates": "Check for Updates",
+            "checkupdate": "Check Update",
             "window": "Window",
             "maximize": "Auto Maximize",
             "fullscreen": "Auto Fullscreen",
             "zoom": "Zoom",
             "meow" : ":3",
             "credits": "Credits",
-            "specialthanks": "Special Thanks to"
+            "specialthanks": "Special Thanks to",
+            "onstart": "On Start",
+            "every_day": "Every day",
+            "everyweek": "Every Week"
         },
         "player": {
             "play": "Auto Play",
@@ -113,8 +119,22 @@
             "preload": "Player Preload Type",
             "screenshot": "Screenshots",
             "screenask": "Always ask Where to Save Screenshots",
+            "uptonextep": "Up To Next Episode Notification",
+            "notif_interval": "Notification Interval",
+            "epshorter": "Don't show if episode is shorter than",
+            "external": "External Player",
+            "stretching": "Video Streching",
+            "enable_external": "Enable External Player",
+            "select_player": "Select Player",
+            "movianip": "Movian IP Address",
+            "mpvpath": "MPV Path",
+            "vlcpath": "VLC Path",
             "type": "Save Type",
             "path": "Screenshot Save Path",
+            "file": "File",
+            "clipboard": "Clipboard",
+            "both": "Both",
+            "changelocaton": "Change Location",
             "keybind": "Keybinds",
             "keybinds": {
                 "pause": "Pause",
@@ -139,7 +159,10 @@
             "limit": "Limit For History",
             "startsave": "When to Start Saving History",
             "stopsave": "When to Stop saving History",
-            "check_history": "Check History" 
+            "check_history": "Check History",
+            "check_start": "Start Checking History",
+            "history_good": "History is good, nothing to change",
+            "continue_good": "Continue watch is good, nothing to change"
         },
         "saving": {
             "done": "Config has been succesfully saved",
@@ -153,6 +176,24 @@
             "longskip": "Change how many seconds long skips skip (usefull for skipping openings)",
             "shotskip": "Change how many seconds short skips skip",
             "continuewatchsavehistory": "After how many seconds episode will be saved to Continue watching / After how many seconds before the end remove episode from continue watching"
+        },
+        "devmode": {
+            "developermode": "Developer Mode",
+            "tornondevtools": "Turn on Devtools",
+            "devtoolsonstart": "Devtools on Start",
+            "playerdebug": "Player Debug Stats",
+            "information": "Information",
+            "electronver": "Electron Version",
+            "chromiumver": "Chromium Version",
+            "nodever": "Electron Version"
+        },
+        "extensions": {
+            "name": "Name",
+            "author": "Plugin Author",
+            "version": "Version",
+            "type": "Type",
+            "information": "Information",
+            "player": "Player"
         }
     },
     "player": {
