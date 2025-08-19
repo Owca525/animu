@@ -3,8 +3,8 @@
   position: fixed;
   bottom: 90px;
   right: 20px;
-  min-width: max-content;
-  width: 20vw;
+  min-width: 130px;
+  width: fit-content;
   padding: 8px;
 }
 
