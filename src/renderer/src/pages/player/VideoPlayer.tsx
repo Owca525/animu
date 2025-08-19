@@ -22,6 +22,7 @@ import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
 import PlayerSettings from "./components/PlayerSettings"
 import PlayerButton from "./components/PlayerButton"
 import { motion } from "framer-motion"
+import PlayerEpisodeElement from "./components/playerEpisodeElement"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -652,10 +653,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                     { countImages(temp.episodes) &&
                                         <div className="player-select-episode-content-list">
                                             {temp.episodes.map((element) => (
-                                                <div className={`information-episode-button-full ${parseInt(element.ep) < parseInt(temp.episode) ? "watched" : ""} ${parseInt(element.ep) == parseInt(temp.episode) ? "current" : ""}`} onClick={() => setNextEpisode(element.ep)}>
-                                                    Episode: {element.ep}
-                                                    <img src={element.img} className="information-episode-button-image" />
-                                                </div>
+                                                <PlayerEpisodeElement animeTitle={anime_data.AnimeData.title.romaji} episodes={element} currentEpisode={temp.episode} />
                                             ))}
                                         </div>
                                     }
