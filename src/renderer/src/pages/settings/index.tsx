@@ -57,6 +57,11 @@ function settings() {
                 text: t("global.history"),
                 onClick: () => setCategory(() => "history"),
             },
+            {
+                icon: "history",
+                text: t("global.about"),
+                onClick: () => setCategory(() => "about"),
+            },
         ],
         bottom: [
             {
@@ -774,6 +779,24 @@ function settings() {
                             </table>
                         </div>
                     </div>
+                }
+                {category == "about" &&
+                    <>
+                        <div className="settings-page-container">
+                            <div className="settings-page-title">{t("global.about")}</div>
+                            <div className="settings-special-container">
+                                <div className="">ico</div>
+                                <div className="">ico</div>
+                                <div className="">ico</div>
+                            </div>
+                        </div>
+                        <div className="settings-page-container">
+                            <div className="settings-page-title">{t("settings.general.credits")}</div>
+                        </div>
+                        <div className="settings-page-container">
+                            <div className="settings-page-title">{t("settings.general.specialthanks")}</div>
+                        </div>
+                    </>
                 }
             </div>
         </main>

@@ -97,6 +97,12 @@
   gap: 8px;
 }
 
+.settings-special-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .settings-sidebar-container .sidebar-container-max .sidebar-bottom {
   margin-bottom: 64px;
 }

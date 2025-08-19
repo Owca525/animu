@@ -3,6 +3,7 @@
         "home": "Home",
         "history": "History",
         "settings": "Settings",
+        "about": "About",
         "general": "General",
         "cfglocation": "Config Location",
         "player": "Player",
@@ -97,7 +98,9 @@
             "maximize": "Auto Maximize",
             "fullscreen": "Auto Fullscreen",
             "zoom": "Zoom",
-            "meow" : ":3"
+            "meow" : ":3",
+            "credits": "Credits",
+            "specialthanks": "Special Thanks to"
         },
         "player": {
             "play": "Auto Play",
