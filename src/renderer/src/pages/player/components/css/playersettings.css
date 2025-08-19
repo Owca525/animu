@@ -16,6 +16,10 @@
   cursor: pointer;
 }
 
+.player-settings-button {
+  gap: 12px;
+}
+
 .player-settings-button-back {
   padding: 8px;
   justify-content: start;
