@@ -229,6 +229,26 @@ function settings() {
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("global.general")}</div>
                             <div className="settings-setting-container">
+                                Hide Sidebar
+                                <CheckBox
+                                    checked={config.new.General.HideSidebar}
+                                    onChecked={(checked) =>
+                                        handleChange('General.HideSidebar', checked)
+                                    }
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Hover Sidebar
+                                <CheckBox
+                                    checked={config.new.General.HoverSidebar}
+                                    onChecked={(checked) =>
+                                        handleChange('General.HoverSidebar', checked)
+                                    }
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
                                 {t("settings.general.language")}
                                 <div className="settings-helpicon-space">
                                     <Dropdown

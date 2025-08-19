@@ -109,7 +109,7 @@ body {
 
 /* Sidebar */
 
-.sidebar-button {
+.sidebar-button, .sidebar-button-min {
   background-color: var(--bg2);
 }
 

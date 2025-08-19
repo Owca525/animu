@@ -5,8 +5,8 @@ import { convertPath } from "./functions";
 export const defaultConfig: SettingsConfig = {
     firstStart: true,
     General: {
-        // HoverSidebar: true,
-        // HideSidebar: false,
+        HoverSidebar: true,
+        HideSidebar: false,
         language: "en",
         theme: "DarkAnimu",
         Window: {
