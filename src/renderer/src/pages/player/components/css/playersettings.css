@@ -3,9 +3,9 @@
   position: fixed;
   bottom: 90px;
   right: 20px;
-  min-width: 300px;
+  min-width: max-content;
   width: 20vw;
-  padding: 2px;
+  padding: 8px;
 }
 
 .player-settings-button, .player-settings-button-back {
@@ -17,13 +17,19 @@
 }
 
 .player-settings-button-back {
-    padding: 8px;
+  padding: 8px;
+  justify-content: start;
+  gap: 8px;
+  align-items: center;
 }
 
 .player-settings-button-text {
   font-size: 1em;
 }
 
-.player-settings-button-back {
-    align-items: center;
+.player-settings-button-icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
 }

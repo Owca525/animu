@@ -27,13 +27,13 @@ const PlayerSettings: React.FC<playerSettingsProps> = ({ sources, resolution, sp
             {currentSettings === "settings" &&
                 <>
                     <div className="player-settings-button" onClick={() => sources.length > 1 ? setcurrentSettings("source") : ""}>
-                        <span className='player-settings-button-text'>Source</span> <span className={`player-settings-button-text ${sources.length <= 1 && "player-settings-button-text-gray"}`}>{current.currentHost}</span>
+                        <div className="player-settings-button-icon-container"><span className="material-symbols-outlined">web</span><span className='player-settings-button-text'>Source</span></div> <span className={`player-settings-button-text ${sources.length <= 1 && "player-settings-button-text-gray"}`}>{current.currentHost}</span>
                     </div>
                     <div className="player-settings-button" onClick={() => resolution.length > 1 ? setcurrentSettings("res") : ""}>
-                        <span className='player-settings-button-text'>Resolution</span> <span className={`player-settings-button-text ${resolution.length <= 1 && "player-settings-button-text-gray"}`}>{current.currentResolution + "p"}</span>
+                        <div className="player-settings-button-icon-container"><span className="material-symbols-outlined">instant_mix</span><span className='player-settings-button-text'>Resolution</span></div><span className={`player-settings-button-text ${resolution.length <= 1 && "player-settings-button-text-gray"}`}>{current.currentResolution + "p"}</span>
                     </div>
                     <div className="player-settings-button" onClick={() => setcurrentSettings("speed")}>
-                        <span className='player-settings-button-text'>Speed</span> <span className="player-settings-button-text">{current.currentSpeed + "x"}</span>
+                        <div className="player-settings-button-icon-container"><span className="material-symbols-outlined">speed</span><span className='player-settings-button-text'>Speed</span></div> <span className="player-settings-button-text">{current.currentSpeed + "x"}</span>
                     </div>
                 </>
             }

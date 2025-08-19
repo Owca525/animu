@@ -629,8 +629,9 @@ body {
 
 .player-settings-container {
   border-radius: 8px;
-  background-color: color-mix(in srgb, var(--bg2) 80%, transparent);
+  background-color: var(--bg2);
   color: var(--text);
+  border: 2px solid var(--bg4);
 }
 
 .player-settings-button,
@@ -646,7 +647,7 @@ body {
 
 .player-settings-button:hover,
 .player-settings-button-back:hover {
-  background-color: var(--bg);
+  background-color: var(--bg3);
 }
 
 .player-up-Next-container {
