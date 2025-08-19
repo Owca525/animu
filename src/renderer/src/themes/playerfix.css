@@ -1,0 +1,23 @@
+.video-player, .player-video-container, .player-loading-container {
+  --text: #cfcfcf; /* is used on regular text */
+  --text-gray: #8d8d8d; /* is used in card continue watch */
+
+  /* Background */
+  --bg: #1e1e1e; /* First layer, background only */
+  --bg2: #232323; /* Second layer, used in sidebar, header */
+  --bg3: rgb(46, 46, 46); /* Thirt layer, used in button etc */
+  --bg4: rgb(64, 64, 64); /* Fourth layer, used in hover button etc */
+
+  /* accent */
+
+  /* other */
+  --player-bg-containers: color-mix(in srgb, var(--bg3) 70%, transparent);
+  --invisible: rgba(0, 0, 0, 0);
+  /* is used in player button */
+  --black: rgba(0, 0, 0);
+}
+
+
+.video-player, .player-video-container, .player-loading-container {
+  color: #cfcfcf;
+}
