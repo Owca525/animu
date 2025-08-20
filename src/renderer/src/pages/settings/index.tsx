@@ -786,7 +786,7 @@ function settings() {
                             <div className="settings-page-title">{"Usefull Links"}</div>
                             <div className="settings-special-container">
                                 <img className="settings-special-images" onClick={() => window.api.open("https://github.com/Owca525/animu")} src="https://github.com/fluidicon.png" alt="Github Logo" />
-                                <img className="settings-special-images" onClick={() => window.api.open("https://github.com/Owca525/animu")} src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg" alt="Discord Logo" />
+                                <img className="settings-special-images" onClick={() => console.log("Test")} src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg" alt="Discord Logo" />
                                 <img className="settings-special-images" onClick={() => window.api.open("https://buymeacoffee.com/owca525")} src="https://studio.buymeacoffee.com/assets/img/bmc-meta-new/new/android-icon-192x192.png" alt="Buymeacoffee logo" />
                             </div>
                         </div>
@@ -796,6 +796,7 @@ function settings() {
                             <div className="settings-setting-container"><div className="settings-user-title">KartQ</div>  Helper</div>
                             <div className="settings-setting-container"><div className="settings-user-title">DawoleQ</div>  Programmer Helper</div>
                             <div className="settings-setting-container"><div className="settings-user-title">Ary</div>  Designer</div>
+                            <div className="settings-setting-container"><div className="settings-user-title">Rain_kyle</div>  Chinese Translation</div>
                         </div>
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.general.specialthanks")}</div>

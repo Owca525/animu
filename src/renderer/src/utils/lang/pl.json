@@ -226,9 +226,5 @@
     "gotohome": "Wróć na stronę główną",
     "leaveanimu": "Opuść Animu",
     "errormessage": "Komunikat błędu: {{error}}"
-  },
-  "lang": {
-    "en": "Angielski",
-    "pl": "Polski"
   }
 }
