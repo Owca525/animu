@@ -125,6 +125,7 @@ export interface pluginFormat {
     version: string
     name: string
     author: string
+    icon: string
     information?: {
         pageSize: number
         search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => void
@@ -145,6 +146,10 @@ export interface episodeList { player_id: string, episodesData: { episodes: { ep
 
 export interface SettingsConfig {
     firstStart: boolean
+    plugins: {
+        // information: string
+        player: string
+    }
     General: {
         HoverSidebar: boolean
         HideSidebar: boolean

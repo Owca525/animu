@@ -47,11 +47,11 @@ function settings() {
                 text: t("global.player"),
                 onClick: () => setCategory(() => "player"),
             },
-            {
-                icon: "extension",
-                text: t("global.extensions"),
-                onClick: () => setCategory(() => "extensions"),
-            },
+            // {
+            //     icon: "extension",
+            //     text: t("global.extensions"),
+            //     onClick: () => setCategory(() => "extensions"),
+            // },
             {
                 icon: "history",
                 text: t("global.history"),

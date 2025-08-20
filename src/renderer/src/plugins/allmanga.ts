@@ -397,6 +397,7 @@ export const infoPluginPlayer: pluginFormat = {
   version: "0.1",
   name: "Allmanga",
   author: "Owca525",
+  icon: "https://allmanga.to/android-icon-192x192.png",
   player: {
     animeDataList: getInformation,
     getUrls: extractURLS,

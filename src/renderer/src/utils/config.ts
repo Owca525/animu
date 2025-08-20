@@ -87,6 +87,10 @@ export const defaultConfig: SettingsConfig = {
         type: "On Start",
         enable: true
     },
+    plugins: {
+        // information: "AnilistApi",
+        player: "Allmanga"
+    }
 };
 
 const appConfigDirPath = window.api.os.getPath("userData");

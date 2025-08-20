@@ -522,6 +522,7 @@ export const infoPlugin: pluginFormat = {
   version: "0.1",
   name: "AnilistApi",
   author: "Owca525",
+  icon: "https://anilist.co/img/icons/icon.svg",
   information: {
     pageSize: pageSize,
     home: () => setHomeData(CreateHomePage),
