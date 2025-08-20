@@ -31,13 +31,8 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, sidebarClass, data, hideBut
 
     const handleClickOutside = (event: MouseEvent) => {
         let data = event.target as HTMLElement
-        if (!config.General.HoverSidebar) return
-        if (!config.General.HideSidebar) return
         if (data.classList.contains("sidebar-button")) return
-        if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && data.classList.contains("sidebar-hide-button")) {
-            setHover((prev) => !prev)
-            return
-        }
+        if (data.classList.contains("sidebar-hide-button")) return
         setHover(() => false)
     };
 
@@ -99,7 +94,7 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, sidebarClass, data, hideBut
         <div className={"sidebar-main-container " + sidebarClass?.container}>
             {!hideButton && (
                 <div className="sidebar-hide-container">
-                    <Button icon="menu" ButtonClass="sidebar-hide-button" onClick={() => !config.General.HideSidebar && setHover((prev) => !prev)} iconClassName="sidebar-hide-button" />
+                    <Button icon="menu" ButtonClass="sidebar-hide-button" onClick={() => setHover((prev) => !prev)} iconClassName="sidebar-hide-button" />
                 </div>
             )}
             {showLogo && (
