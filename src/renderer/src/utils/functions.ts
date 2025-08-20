@@ -70,7 +70,8 @@ export function formatTime(seconds: number | undefined): string {
 
 export async function changeTheme(name: string) {
     let old = document.getElementById("theme-stylesheet") as HTMLLinkElement
-    old.remove()
+    if (old) old.remove()
+    document.title = ""
 
     const themes = await window.api.getlistThemes()
     let theme: themeMetadata = themes[0]

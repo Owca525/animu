@@ -1,5 +1,5 @@
 import { Routes, Route, HashRouter } from 'react-router-dom'
-import { Suspense } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import 'material-symbols'
@@ -24,9 +24,10 @@ import ErrorBoundary from './utils/ErrorBoundary';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { notificationProps } from './utils/GlobalInterface';
 
-LoadConfig()
-
 function App() {
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [textLoading, _setTextLoading] = useState<string>("Loading Config...")
+  
   useHotkeys("F12", () => {
     if (store.getState().config.Developer.DevTools) window.BrowserWindow.openDevTools()
   })
@@ -37,6 +38,17 @@ function App() {
       toast.info("Reloaded Theme", notificationProps)
     }
   })
+
+  async function initialAnimu() {
+    await LoadConfig()
+    setIsLoading(() => false)
+  }
+
+  useEffect(() => {
+    initialAnimu()
+  }, [])
+
+  if (isLoading) return AppLoading(textLoading)
 
   return (
     <ErrorBoundary>
@@ -55,10 +67,11 @@ function App() {
   )
 }
 
-function AppLoading() {
+function AppLoading(text?: string) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-      <div className="loading material-symbols-outlined">progress_activity</div>
+    <div className='app-loading-container'>
+      <div className="material-symbols-outlined app-loading-animation">progress_activity</div>
+      {text && <div className="app-loading-information">{text}</div>}
     </div>
   )
 }
