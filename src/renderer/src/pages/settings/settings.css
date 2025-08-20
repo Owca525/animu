@@ -100,7 +100,8 @@
 .settings-special-container {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 40px;
+  padding: 30px;
 }
 
 .settings-sidebar-container .sidebar-container-max .sidebar-bottom {
@@ -173,6 +174,15 @@ td {
   justify-content: start;
   align-items: center;
   gap: 12px;
+}
+
+.settings-special-images {
+  cursor: pointer;
+  width: 60px;
+}
+
+.settings-user-title {
+  font-weight: 600;
 }
 
 /* for smartphones 
