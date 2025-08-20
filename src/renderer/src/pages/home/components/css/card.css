@@ -136,3 +136,10 @@
     font-size: 1.1em;
     font-weight: 600;
 }
+
+/* For smaller devices / window sizes */
+@media (max-width: 600px) {
+    .card-information, .card-information-left, .card-information-right {
+        display: none !important;
+    }
+}

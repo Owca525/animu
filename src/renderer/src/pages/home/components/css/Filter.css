@@ -3,14 +3,24 @@
     flex-direction: column;
 }
 
+.home-filter-container-horizontal {
+    margin-left: -270px;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    translate: 0px 0px;
+}
+
 .home-filter-container {
     z-index: 999;
     margin-top: 60px;
-    margin-left: -270px;
+    margin-left: 0px;
     display: flex;
     position: fixed;
     padding: 12px;
     gap: 8px;
+    translate: -38%;
+    flex-direction: column;
 }
 
 .home-filter-space {
@@ -21,14 +31,14 @@
 
 /* For smaller devices / window sizes */
 @media (max-width: 1000px) {
-    .home-filter-container {
+    .home-filter-container-horizontal {
        margin-left: 0px;
        translate: -50% 0px; 
        left: 50%;
     }
 }
 @media (max-width: 925px) {
-    .home-filter-container {
+    .home-filter-container-horizontal {
         flex-wrap: wrap;
         width: 340px;
     }
