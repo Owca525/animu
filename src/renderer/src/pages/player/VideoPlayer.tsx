@@ -653,7 +653,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                     { countImages(temp.episodes) &&
                                         <div className="player-select-episode-content-list">
                                             {temp.episodes.map((element) => (
-                                                <PlayerEpisodeElement animeTitle={anime_data.AnimeData.title.romaji} episodes={element} currentEpisode={temp.episode} />
+                                                <PlayerEpisodeElement nextEpisode={setNextEpisode} animeTitle={anime_data.AnimeData.title.romaji} episodes={element} currentEpisode={temp.episode} />
                                             ))}
                                         </div>
                                     }
