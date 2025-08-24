@@ -2,6 +2,7 @@ import { toast } from "react-toastify";
 import { refetchHistory } from "../functions";
 import { cardData, notificationProps } from "../GlobalInterface";
 import i18n from "../i18n";
+import store from "../store";
 
 const appConfigDirPath = window.api.os.getPath("userData");
 
@@ -20,6 +21,7 @@ export async function ReadFile(file: string): Promise<cardData[]> {
 
 export async function DeleteFromFile(data: cardData, file: string) {
     try {
+        if (store.getState().global.incognito) return
         await CheckFile(file)
         const saveFile = await window.api.os.read(await appConfigDirPath + `/${file}.json`)
         const list = JSON.parse(saveFile) as cardData[];
@@ -55,6 +57,7 @@ export async function DeleteFromFile(data: cardData, file: string) {
 
 export async function SaveToFile(data: cardData, file: string): Promise<boolean> {
     try {
+        if (store.getState().global.incognito) return true
         await CheckFile(file)
         const saveFile = await window.api.os.read(await appConfigDirPath + `/${file}.json`);
         const tmpData = JSON.parse(saveFile) as cardData[];

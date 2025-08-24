@@ -39,6 +39,11 @@ function App() {
     }
   })
 
+  useHotkeys("ctrl+i", () => {
+    store.dispatch({ type: "setIcognitoMode", payload: !store.getState().global.incognito })
+    toast.info(`Incognito Mode: ${store.getState().global.incognito ? "On" : "Off"}`, notificationProps)
+  })
+
   async function initialAnimu() {
     await LoadConfig()
     setIsLoading(() => false)
