@@ -185,6 +185,11 @@ td {
   font-weight: 600;
 }
 
+.settings-extensions-type-container {
+  display: flex;
+  gap: 4px;
+}
+
 /* for smartphones 
 maybe that will be usefull in the future */
 @media (max-width: 600px) {

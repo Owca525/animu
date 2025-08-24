@@ -7,7 +7,7 @@ import Dropdown from "../../components/dropDown";
 import { useEffect, useState } from "react";
 import Button from "@renderer/components/buttons";
 import { t } from "i18next"
-import { ContextMenuProps, notificationProps, SettingsConfig, themeMetadata } from "@renderer/utils/GlobalInterface";
+import { ContextMenuProps, notificationProps, pluginFormat, SettingsConfig, themeMetadata } from "@renderer/utils/GlobalInterface";
 import { useSelector } from "react-redux";
 import i18n from "i18next"
 import { checkPictureFolder, saveConfig } from "@renderer/utils/config";
@@ -28,6 +28,7 @@ import { checkUpdate } from "@renderer/utils/update";
 function settings() {
     const navigate = useNavigate();
     const cfg: SettingsConfig = useSelector((data: any) => data.config);
+    const pluginList: pluginFormat[] = useSelector((data: any) => data.plugin.loadedPlugins);
     const [category, setCategory] = useState<string>("general");
     const [config, setConfig] = useState<{ old: SettingsConfig, new: SettingsConfig }>({ old: structuredClone(cfg), new: structuredClone(cfg) })
     const [themes, setThemes] = useState<{ label: string, onClick?: () => void }[]>([])
@@ -47,11 +48,11 @@ function settings() {
                 text: t("global.player"),
                 onClick: () => setCategory(() => "player"),
             },
-            // {
-            //     icon: "extension",
-            //     text: t("global.extensions"),
-            //     onClick: () => setCategory(() => "extensions"),
-            // },
+            {
+                icon: "extension",
+                text: t("global.extensions"),
+                onClick: () => setCategory(() => "extensions"),
+            },
             {
                 icon: "history",
                 text: t("global.history"),
@@ -756,26 +757,22 @@ function settings() {
                                     <th>{t("settings.extensions.version")}</th>
                                     <th>{t("settings.extensions.type")}</th>
                                 </tr>
-                                <tr className="settings-table-button">
-                                    <td className="settings-extensions-title"><img className="settings-extensions-icon" src="https://anilist.co/img/icons/icon.svg" />Anilist</td>
-                                    <td><div className="settings-extensions-background">Owca525</div></td>
-                                    <td><div className="settings-extensions-background">1.0</div></td>
-                                    <td>
-                                        <div className="settings-extensions-button-container">
-                                            <div className="settings-extensions-background">{t("settings.extensions.information")}</div> <div className="settings-helpicon-space"><CheckBox /><Button icon="settings" ButtonClass="settings-extensions-button"/></div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr className="settings-table-button">
-                                    <td className="settings-extensions-title"><img className="settings-extensions-icon" src="https://allmanga.to/android-icon-192x192.png" />Allmanga</td>
-                                    <td><div className="settings-extensions-background">Owca525</div></td>
-                                    <td><div className="settings-extensions-background">1.0</div></td>
-                                    <td>
-                                        <div className="settings-extensions-button-container">
-                                            <div className="settings-extensions-background">{t("settings.extensions.player")}</div> <div className="settings-helpicon-space"><CheckBox /><Button icon="settings" ButtonClass="settings-extensions-button"/></div>
-                                        </div>
-                                    </td>
-                                </tr>
+                                {pluginList.map((plugin) => (
+                                    <tr className="settings-table-button">
+                                        <td className="settings-extensions-title"><img className="settings-extensions-icon" src={plugin.icon} />{plugin.name}</td>
+                                        <td><div className="settings-extensions-background">{plugin.author}</div></td>
+                                        <td><div className="settings-extensions-background">{plugin.version}</div></td>
+                                        <td>
+                                            <div className="settings-extensions-button-container">
+                                                <div className="settings-extensions-type-container">
+                                                    {plugin.information && <div className="settings-extensions-background">{t("settings.extensions.information")}</div>}
+                                                    {plugin.player && <div className="settings-extensions-background">Player</div>}
+                                                </div>
+                                                <div className="settings-helpicon-space"><CheckBox /><Button icon="settings" ButtonClass="settings-extensions-button"/></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
                             </table>
                         </div>
                     </div>
