@@ -108,7 +108,7 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, sidebarClass, data, hideBut
                 variants={sidebarVariants}
                 transition={{ duration: 0.2 }}
                 onMouseEnter={() => config.General.HoverSidebar && setHover(() => true)}
-                onMouseLeave={() => !config.General.HideSidebar && config.General.HoverSidebar && setHover(() => false)}
+                onMouseLeave={() => !config.General.HideSidebar && setHover(() => false)}
             >
 
                 <div className={`sidebar-top ${detectSidebarStateContainers()}`}>
