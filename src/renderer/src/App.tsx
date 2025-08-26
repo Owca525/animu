@@ -23,10 +23,11 @@ import i18n from './utils/i18n';
 import ErrorBoundary from './utils/ErrorBoundary';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { notificationProps } from './utils/GlobalInterface';
+import { InitialPlugin } from './utils/pluginApi';
 
 function App() {
   const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [textLoading, _setTextLoading] = useState<string>("Loading Config...")
+  const [textLoading, setTextLoading] = useState<string>("Loading Config...")
   
   useHotkeys("F12", () => {
     if (store.getState().config.Developer.DevTools) window.BrowserWindow.openDevTools()
@@ -40,12 +41,15 @@ function App() {
   })
 
   useHotkeys("ctrl+i", () => {
+    console.log(store.getState().config)
     store.dispatch({ type: "setIcognitoMode", payload: !store.getState().global.incognito })
     toast.info(`Incognito Mode: ${store.getState().global.incognito ? "On" : "Off"}`, notificationProps)
   })
 
   async function initialAnimu() {
     await LoadConfig()
+    setTextLoading(() => "Loading Plugins...")
+    await InitialPlugin()
     setIsLoading(() => false)
   }
 

@@ -1,4 +1,4 @@
-import { containerData } from "./GlobalInterface";
+import { containerData, pluginFormat, SettingsConfig } from "./GlobalInterface";
 import store from "./store";
 
 export async function setHomeData(func: () => Promise<containerData[]>) {
@@ -57,6 +57,29 @@ export async function setHomeLocalSearch(payload: boolean) {
     try {
         store.dispatch({
             type: "setLocalSearch", payload: payload
+        })
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export async function InitialPlugin() {
+    try {
+        const config: SettingsConfig = store.getState().config
+        const loadedPlugins: pluginFormat[] = store.getState().plugin.loadedPlugins
+        for (let index = 0; index < loadedPlugins.length; index++) {
+            const element = loadedPlugins[index];
+            if (element.name == config.plugins.player) {
+                store.dispatch({type: "setPluginPlayer", payload: element})
+                return
+            }
+        }
+
+        loadedPlugins.forEach((element: pluginFormat) => {
+            if (element.name == "Allmanga") {
+                store.dispatch({type: "setPluginPlayer", payload: element})
+                return
+            }
         })
     } catch (error) {
         console.error(error)

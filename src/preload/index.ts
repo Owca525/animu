@@ -21,8 +21,8 @@ if (process.contextIsolated) {
         checkUpdate: () => ipcRenderer.invoke("checkUpdates"),
       },
       request: {
-        get: (url: string, header: Record<string, string>) =>
-          ipcRenderer.invoke("fetch-data", url, header),
+        get: (url: string, header: Record<string, string>, type?: "json" | "text") =>
+          ipcRenderer.invoke("fetch-data", url, header, type),
         post: (url: string, header: Record<string, string>, body?: { query: any, variables: Object }) =>
           ipcRenderer.invoke("send-post", url, header, body),
       },

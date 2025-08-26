@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { AnimeData, episodeList, notificationProps } from "@renderer/utils/GlobalInterface";
+import { AnimeData, episodeList, notificationProps, SettingsConfig } from "@renderer/utils/GlobalInterface";
 import Button from "@renderer/components/buttons";
 import "./information.css"
 import { capitalizeFirstLetter, convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities, getGradientColor } from "@renderer/utils/functions";
@@ -14,12 +14,14 @@ import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import { ReadHistory } from "@renderer/utils/history/history";
 import { ReadContinue } from "@renderer/utils/history/continueWatch";
 import store from "@renderer/utils/store";
+import { getInformation } from "@renderer/plugins/allmanga";
 
 function information() {
     const navigate = useNavigate()
     const location = useLocation();
     let anime_data: AnimeData = location.state;
 
+    const config: SettingsConfig = useSelector((data: any) => data.config);
     const informationTemp = useSelector((info: any) => info.information);
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
     const [showWrong, setshowWrong] = useState<boolean>(false)
@@ -77,7 +79,7 @@ function information() {
 
     async function initialInformation() {
         console.log(informationTemp)
-        if (anime_data.id == "") {
+        if (anime_data.id == "" && config.plugins.player == "Allmanga") {
             fetchData(pluginPlayer.player.animeDataList, anime_data.player_ID)
             return
         }
@@ -104,7 +106,15 @@ function information() {
             fetchData(pluginPlayer.player.animeDataList)
             return
         }
-        fetchData(pluginPlayer.player.animeDataList, cardAnime[0].AnimeData.player_ID)
+
+        if (cardAnime[0].saveData?.pluginName == "") {
+            fetchData(getInformation, cardAnime[0].AnimeData.player_ID)
+            return
+        }
+        if (cardAnime[0].saveData?.pluginName == config.plugins.player) {
+            fetchData(pluginPlayer.player.animeDataList, cardAnime[0].AnimeData.player_ID)
+        }
+        fetchData(pluginPlayer.player.animeDataList)
     }
 
     useEffect(() => {
@@ -158,8 +168,6 @@ function information() {
         if (showWrong) setshowWrong(() => false)
         else navigate("/")
     })
-
-    console.log(data)
     
     return (
         <>

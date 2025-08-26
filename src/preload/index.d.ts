@@ -21,7 +21,8 @@ declare global {
       request: {
         get: (
           url: string,
-          header: Record<string, string>
+          header: Record<string, string>,
+          type?: "json" | "text"
         ) => Promise<{
           success: boolean;
           data?: any;

@@ -52,7 +52,7 @@ const player = () => {
     useEffect(() => {
         SaveHistory({
             saveData: {
-                pluginName: "",
+                pluginName: config.plugins.player,
                 last_Time: 0,
                 type: extractionData.type,
                 episode: extractionData.actual.toString()

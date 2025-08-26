@@ -233,7 +233,7 @@ async function getAnimeList(name: string): Promise<cardData[]> {
   }
 }
 
-async function extractInformation(id: string) {
+export async function extractInformation(id: string) {
   let variables = `{"_id":"${id}"}`;
   const resp = await sendToAPI(variables, HASH_INFO, header);
   return (await converterData(resp.data.show)).AnimeData
@@ -403,7 +403,6 @@ export const infoPluginPlayer: pluginFormat = {
     getUrls: extractURLS,
     episodeList: getEpisodeList,
     animeList: getAnimeList,
-    getInformation: extractInformation
   },
   sidebarAddon: [{ icon: "today", text: "Recent Anime", onClick: async () => await recentAnime() }]
 }

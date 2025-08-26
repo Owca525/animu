@@ -1,11 +1,12 @@
 import { infoPluginPlayer } from "@renderer/plugins/allmanga";
 import { infoPlugin } from "@renderer/plugins/anilistApi";
 import { pluginFormat } from "../GlobalInterface";
+import { AniZone } from "@renderer/plugins/anizone";
 
 const initialState = {
-    loadedPlugins: [infoPlugin, infoPluginPlayer] as pluginFormat[],
+    loadedPlugins: [infoPlugin, infoPluginPlayer, AniZone] as pluginFormat[],
     informationPlugin: infoPlugin,
-    playerPlugin: infoPluginPlayer,
+    playerPlugin: undefined,
 };
 
 const userReducer = (state = initialState, action) => {

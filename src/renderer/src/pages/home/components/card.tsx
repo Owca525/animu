@@ -11,6 +11,7 @@ import {
   CreateContextMenuOptions,
   getGradientColor,
 } from "@renderer/utils/functions";
+import { extractInformation } from "@renderer/plugins/allmanga";
 
 const Card: React.FC<cardData> = ({
   AnimeData,
@@ -53,7 +54,7 @@ const Card: React.FC<cardData> = ({
 
     if (AnimeData.id === "") {
       navigate("/info", {
-        state: await pluginPlayer.player.getInformation(AnimeData.player_ID),
+        state: await extractInformation(AnimeData.player_ID ? AnimeData.player_ID : ""),
       });
       return;
     }

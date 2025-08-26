@@ -265,7 +265,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             SaveContinue({
                 AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
                 saveData: {
-                    pluginName: "",
+                    pluginName: config.plugins.player,
                     last_Time: videoRef.current.currentTime,
                     episode: temp.episode,
                     type: temp.type

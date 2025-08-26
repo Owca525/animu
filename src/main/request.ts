@@ -1,14 +1,18 @@
 import { ipcMain } from "electron";
 
-ipcMain.handle('fetch-data', async (_event, url: string, header: Record<string, string>): Promise<{ success: boolean; data?: any; status?: number; statusText?: string; error?: unknown; }> => {
+ipcMain.handle('fetch-data', async (_event, url: string, header: Record<string, string>, type: "json" | "text" = "json"): Promise<{ success: boolean; data?: any; status?: number; statusText?: string; error?: unknown; }> => {
     try {
         const response = await fetch(url, {
             method: 'GET',
             headers: header
         })
 
-        if (response.ok) {
+        if (response.ok && type == "json") {
             const data = await response.json()
+            return { success: true, data }
+        }
+        if (response.ok && type == "text") {
+            const data = await response.text()
             return { success: true, data }
         }
         return { success: false, status: response.status, statusText: response.statusText }

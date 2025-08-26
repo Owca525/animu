@@ -24,6 +24,7 @@ import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import { ContinueCheckConversion, ContinueDetectVersion } from "@renderer/utils/history/continueWatch";
 import { HistoryCheckConvert, HistoryDetectVersion } from "@renderer/utils/history/history";
 import { checkUpdate } from "@renderer/utils/update";
+import { InitialPlugin } from "@renderer/utils/pluginApi";
 
 function settings() {
     const navigate = useNavigate();
@@ -170,6 +171,7 @@ function settings() {
             setSaving(() => false)
             saveConfig(config.new)
             setDynamicZoom(config.new.General.Window.Zoom)
+            InitialPlugin()
             toast.success(t("settings.saving.done"), notificationProps)
         } catch (error) {
             toast.success(t("settings.saving.error"), notificationProps)
@@ -182,6 +184,7 @@ function settings() {
             changeTheme(config.old.General.theme)
             return { old: structuredClone(prev.old), new: structuredClone(prev.old) }
         })
+        InitialPlugin()
         setSaving(() => false)
     }
 
@@ -768,7 +771,10 @@ function settings() {
                                                     {plugin.information && <div className="settings-extensions-background">{t("settings.extensions.information")}</div>}
                                                     {plugin.player && <div className="settings-extensions-background">Player</div>}
                                                 </div>
-                                                <div className="settings-helpicon-space"><CheckBox /><Button icon="settings" ButtonClass="settings-extensions-button"/></div>
+                                                <div className="settings-helpicon-space">
+                                                    <CheckBox checked={config.new.plugins.player == plugin.name ? true : plugin.name == "AnilistApi" ? true : false} onChecked={() => plugin.name != "AnilistApi" ? handleChange('plugins.player', plugin.name) : ""}/>
+                                                    <Button icon="settings" ButtonClass="settings-extensions-button"/>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
