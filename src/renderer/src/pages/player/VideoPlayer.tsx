@@ -605,10 +605,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     >
                         <div className="player-waiting material-symbols-outlined">progress_activity</div>
                     </motion.div>
-                    {isWaitingPlayer == false && !config.Player.general.RemovingSpaceAnimation &&
+                    {!config.Player.general.RemovingSpaceAnimation &&
                         <motion.div className="player-loading-animation-container"
                             variants={hiddenVariants}
-                            animate={isShowPlay ? "visible" : "hidden"}
+                            animate={isShowPlay && isWaitingPlayer == false ? "visible" : "hidden"}
                             initial="hidden"
                             transition={{ duration: 0.65 }}
                         >
