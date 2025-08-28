@@ -621,13 +621,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     <div className="player-bottom-section">
                         <div className="player-left">
                             {temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) - 1] !== undefined &&
-                                <PlayerButton title={t('player.previous', { ep: temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) - 1] })} icon='skip_previous'
+                                <PlayerButton title={t('player.previous', { ep: temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) - 1].ep })} icon='skip_previous'
                                     onClick={() => setEpisode("prev")}
                                     ButtonClass="player-buttons" />
                             }
                             <PlayerButton icon={isPlaying ? "pause" : "play_arrow"} title={isPlaying ? t('player.Pause') : t('player.play')} ButtonClass="player-buttons" onClick={togglePlay} />
                             {temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] !== undefined &&
-                                <PlayerButton icon='skip_next' ButtonClass='material-symbols-outlined player-buttons' title={t('player.next', { ep: temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] })} onClick={() => setEpisode("next")} />
+                                <PlayerButton icon='skip_next' ButtonClass='material-symbols-outlined player-buttons' title={t('player.next', { ep: temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1].ep })} onClick={() => setEpisode("next")} />
                             }
                             <div className="player-time-display">
                                 {formatTime(currentTime)} / {formatTime(videoRef.current?.duration)}
