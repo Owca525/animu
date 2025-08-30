@@ -534,13 +534,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     function countImages(data: { ep: string, img?: string, title?: string }[]): boolean {
         let counter: number = 0
-        console.log(data)
         for (let index = 0; index < data.length; index++) {
             const element = data[index];
-            console.log(element.img)
             if (element.img) counter += 1
         }
-        console.log(counter, data.length)
         if (data.length <= counter) return true
         return false
     }
