@@ -173,6 +173,7 @@ export interface SettingsConfig {
             VideoStreching: boolean,
             DisableVolumeAnimation: boolean,
             RemovingSpaceAnimation: boolean
+            PlayerBehavior: "home" | "information"
         }
         screenShot: {
             alwaysAsk: boolean

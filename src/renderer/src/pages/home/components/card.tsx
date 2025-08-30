@@ -47,6 +47,7 @@ const Card: React.FC<cardData> = ({
             saveData.type,
             AnimeData.player_ID
           ),
+          continueWatch: true
         },
       });
       return;

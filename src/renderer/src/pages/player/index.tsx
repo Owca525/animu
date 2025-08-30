@@ -18,7 +18,7 @@ const VideoPlayer = lazy(() => import('./VideoPlayer'));
 // const ExternalPlayer = lazy(() => import('./externalPlayer'));
 
 const player = () => {
-    const anime_data: { data: cardData, episodelist: { ep: string, img?: string, title?: string }[] } = useLocation().state
+    const anime_data: { data: cardData, episodelist: { ep: string, img?: string, title?: string }[], continueWatch?: boolean } = useLocation().state
     // const { t } = useTranslation()
     const navigate = useNavigate()
     const config: SettingsConfig = useSelector((data: any) => data.config);
@@ -70,7 +70,9 @@ const player = () => {
     });
 
     function leave() {
-        navigate("/")
+        if (config.Player.general.PlayerBehavior === "home") navigate("/")
+        if (anime_data.continueWatch) navigate("/")
+        else navigate("/info", { state: anime_data.data.AnimeData })
         window.BrowserWindow.setFullscreen(false)
         closeDialog()
     }

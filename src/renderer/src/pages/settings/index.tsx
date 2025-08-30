@@ -442,6 +442,18 @@ function settings() {
                                     }
                                 />
                             </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                               {"Player Exit behavior"} 
+                                <Dropdown
+                                    options={[
+                                        { label: "To Information", onClick: () => handleChange("Player.general.PlayerBehavior", "information") },
+                                        { label: "To Home", onClick: () => handleChange("Player.general.PlayerBehavior", "home") },
+                                    ]}
+                                    buttonText={config.new.Player.general.PlayerBehavior}
+                                    disableX   
+                                />
+                            </div>
                         </div>
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.player.uptonextep")}</div>
