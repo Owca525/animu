@@ -10,7 +10,11 @@ const Container: React.FC<containerData> = ({ title, data, horizontal = false, o
 
   function handleButtonScroll(num: number) {
     if (!container.current) return
+    let maxScrolLeft = (container.current.scrollWidth - container.current.clientWidth) + 120
+    let currentValue = container.current.scrollLeft + num
     container.current.scrollLeft += num
+    if (currentValue <= 0) container.current.scrollLeft = maxScrolLeft
+    if (currentValue >= maxScrolLeft) container.current.scrollLeft = 0
   }
 
   return (
