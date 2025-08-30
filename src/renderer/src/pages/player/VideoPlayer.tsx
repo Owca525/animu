@@ -569,14 +569,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             <div className="video-overlay">
                 <div className={isUpNextEpisode == false ? isVisible ? 'video-top' : 'video-top player-hidden' : 'video-top'}>
                     <Button icon='arrow_back' ButtonClass='player-buttons' onClick={async () => await exitPlayer()} />
-                    <div className="player-title ">{detectTitle({
-                        ...anime_data, ...anime_data.saveData, saveData: {
-                            episode: temp.episode,
-                            pluginName: "",
-                            last_Time: 0,
-                            type: ""
-                        }
-                    })}</div>
+                    <div className="player-title ">{detectTitle({ title: anime_data.AnimeData.title, ep: temp.episode, format: anime_data.AnimeData.format })}</div>
                 </div>
                 <div className="video-center"> {/* video-center-container */}
                     {/* <div className="player-loading-animation-container player-fast-rewind-ui">

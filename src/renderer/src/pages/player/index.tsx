@@ -77,7 +77,7 @@ const player = () => {
         closeDialog()
     }
     if (isLoading == false && data && data.length <= 0) {
-        loadingAnimation(leave, anime_data.data)
+        loadingAnimation(leave, { title: anime_data.data.AnimeData.title, ep: extractionData.actual, format: anime_data.data.AnimeData.format })
         showDialog({
             type: "refresh",
             title: t("player.error.notfound"),
@@ -104,7 +104,7 @@ const player = () => {
 
     if (data && isLoading == false) {
         return (
-            <Suspense fallback={loadingAnimation(leave, anime_data.data)}>
+            <Suspense fallback={loadingAnimation(leave, { title: anime_data.data.AnimeData.title, ep: extractionData.actual, format: anime_data.data.AnimeData.format })}>
                 <VideoPlayer
                     player_data={data}
                     anime_data={anime_data.data}
@@ -117,10 +117,10 @@ const player = () => {
             </Suspense>
         )
     }
-    return loadingAnimation(leave, anime_data.data)
+    return loadingAnimation(leave, { title: anime_data.data.AnimeData.title, ep: extractionData.actual, format: anime_data.data.AnimeData.format })
 }
 
-function loadingAnimation(leave: () => void, anime_data: cardData) {
+function loadingAnimation(leave: () => void, anime_data: { title: { english?: string | undefined; native: string; romaji: string; }, ep: string, format?: string}) {
     return (
         <div className="player-loading-container">
             <div className="player-loading-top">
