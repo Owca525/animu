@@ -41,7 +41,7 @@
 .information-banner {
     width: 100%;
     height: clamp(222px, 43%, 35vh);
-    max-height: 35vw;
+    max-height: 43vw;
     overflow: hidden;
     object-fit: cover;
     position: absolute;
@@ -51,8 +51,8 @@
 
 .information-fade {
     width: 100%;
-    height: clamp(222px, 43%, 35vh);
-    max-height: 35vw;
+    height: 100%;
+    top: 0;
     z-index: 1;
     position: absolute;
     background: linear-gradient(to bottom, #0000 60%, var(--bg));
@@ -90,7 +90,7 @@
     width: 80%;
     height: fit-content;
     display: flex;
-    margin-top: clamp(100px, 16%, 40vh);
+    margin-top: clamp(202px, 43% - 22px, 35vh - 25px);
     gap: 20px;
     padding: 20px;
     box-sizing: border-box;
@@ -311,7 +311,7 @@
 @media (max-width: 1000px) {
     .information-top {
         width: 100%;
-        margin-top: max(18%, 90px);
+        margin-top: 0px;
         padding: 10px 15px 10px 20px;
         gap: 20px;
     }
@@ -321,14 +321,16 @@
         width: 100%;
     }
 
-    .information-banner {
-        width: 100%;
-        height: 34%
+    .information-banner, .information-banner-image {
+        position: relative;
+        height: fit-content;
+        max-height: 250px;
+        aspect-ratio: 19/4;
     }
 
     .information-fade {
-        width: 100%;
-        height: 34%
+        aspect-ratio: 19/4;
+        background: linear-gradient(to bottom, #0000 60%, var(--bg2));
     }
 
     .information-bottom {
@@ -379,30 +381,26 @@
         font-size: 0.9em;
     }
 
-.information-characters-card {
-    width: 20%;
-    min-width: 200px;
-    height: 90px;
-    display: flex;
-    overflow: hidden;
-    font-size: 0.8rem;
-}
-
-.information-bar {
-    margin-right: 0px;
-    margin-top: 0px;
-    padding: 0px;
-    gap: 4px;
-}
-
-.information-score {
-    font-size: clamp(0.85rem, 1.8vw, 1rem);
-}
-
-.information-exit-button {
-    position: absolute;
-}
-
+    .information-characters-card {
+        width: 20%;
+        min-width: 200px;
+        height: 90px;
+        display: flex;
+        overflow: hidden;
+        font-size: 0.8rem;
+    }
+    
+    .information-bar {
+        margin-right: 0px;
+        margin-top: 0px;
+        padding: 0px;
+        gap: 4px;
+    }
+    
+    .information-score {
+        font-size: clamp(0.85rem, 1.8vw, 1rem);
+    }
+    
 }
 
 /* for smartphones 
