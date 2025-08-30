@@ -14,6 +14,7 @@ export const defaultConfig: SettingsConfig = {
             AutoFullscreen: false,
             Zoom: 100,
         },
+        discordRPC: true
     },
     Player: {
         general: {

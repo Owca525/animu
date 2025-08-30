@@ -1,19 +1,20 @@
 import { app, clipboard, ipcMain, nativeImage, shell } from "electron"
-import * as RPC from 'discord-rpc';
+import { Client } from "@xhayper/discord-rpc";
+import { ActivityType } from "discord-api-types/v10"
 
 import fs from "fs";
 import path from "path";
 import { mainWindow } from ".";
 import { exec, execSync } from "child_process";
-let rpc: any = undefined
-
-if (process.env.NODE_ENV != 'development') {
-    rpc = new RPC.Client({ transport: 'ipc' });
-}
+let rpc: Client | undefined = undefined
 
 // Client id for Discord Rich presence
 export const CLIENT_ID = '1320810160205070377';
 export const runTime = new Date()
+
+if (process.env.NODE_ENV != 'development') {
+    rpc = new Client({ clientId: CLIENT_ID, transport: { type: 'ipc' } });
+}
 
 ipcMain.on("openDevTools", () => {
     if (!mainWindow) return
@@ -21,21 +22,26 @@ ipcMain.on("openDevTools", () => {
 })
 
 // Change activity in Discord Rich presence
-ipcMain.handle('setActivity', (_event, details: string | undefined, state: string | undefined) => {
-    if (rpc != undefined) {
-        rpc.setActivity({
-            details: details,
-            state: state,
-            startTimestamp: runTime,
-            largeImageKey: 'https://github.com/Owca525/animu/blob/electron/resources/icon.png?raw=true',
-            instance: false,
-        } as any);
-    }
+ipcMain.handle('setActivity', (_event, details?: string, state?: string, time?: Date) => {
+    if (!rpc) return
+
+    rpc.user?.setActivity({
+        details: details,
+        state: state,
+        startTimestamp: time ? time : runTime,
+        largeImageKey: 'https://github.com/Owca525/animu/blob/electron/resources/icon.png?raw=true',
+        instance: false,
+        type: ActivityType.Watching
+    });
+})
+
+ipcMain.handle('runDiscordRPC', (_event) => {
+    setupDiscordRPC()
 })
 
 ipcMain.handle('getVersion', (_event): String => app.getVersion())
 
-ipcMain.handle('runExternalPlayer', (_event, videoData: {url: string, path: string, time: number, title: string}, type: "mpv" | "vlc"): any => {
+ipcMain.handle('runExternalPlayer', (_event, videoData: { url: string, path: string, time: number, title: string }, type: "mpv" | "vlc"): any => {
     let flatpakList = execSync(`flatpak list --columns=application`).toString().trim().split(" ").includes(videoData.path)
     let path = videoData.path
     if (!fs.existsSync(videoData.path) && !flatpakList) return
@@ -92,7 +98,7 @@ ipcMain.handle('get-css-files', async (): Promise<{ version?: string; autor?: st
     } else {
         stylesDir = path.join(__dirname, '../../out/renderer/assets/themes')
     }
-    
+
     const localList = await getThemeList(stylesDir)
 
     const configcss = checkConfigFolder("themes")
@@ -134,7 +140,7 @@ async function getMetadataTheme(path_theme: string): Promise<{ version?: string;
             else undefined
         }
         else return undefined
-        
+
         if ("customTitle" in themeJSON) {
             if (themeJSON.customTitle.replace(" ", "") != "") themeMetadata = { ...themeMetadata, animuTitle: themeJSON.customTitle }
         }
@@ -142,7 +148,7 @@ async function getMetadataTheme(path_theme: string): Promise<{ version?: string;
             if (themeJSON.themeName.replace(" ", "") != "") themeMetadata = { ...themeMetadata, name: themeJSON.themeName }
             else themeMetadata = { ...themeMetadata, name: path.basename(path_theme) }
         }
-        
+
         return Object.keys(themeMetadata).length <= 0 ? undefined : themeMetadata
     } catch (error) {
         console.log(error)
@@ -157,16 +163,16 @@ ipcMain.handle('get-lang-files', async (): Promise<{ data: any, lang: string }[]
     } else {
         langDir = path.join(__dirname, '../../out/renderer/assets/lang')
     }
-    
+
     let langPaths = await takeFileExtensionAndPath(langDir, ".json")
-    let langList = langPaths.map((element) => {return{ data: fs.readFileSync(element, "utf-8"), lang: path.basename(element).replace(".json", "") }})
+    let langList = langPaths.map((element) => { return { data: fs.readFileSync(element, "utf-8"), lang: path.basename(element).replace(".json", "") } })
 
     const userLangPath = checkConfigFolder("lang")
     if (!userLangPath) return langList
 
     let userlangListPath = await takeFileExtensionAndPath(userLangPath, ".json")
-    let userLangList = userlangListPath.map((element) => {return{ data: fs.readFileSync(element, "utf-8"), lang: path.basename(element).replace(".json", "") }})
-    
+    let userLangList = userlangListPath.map((element) => { return { data: fs.readFileSync(element, "utf-8"), lang: path.basename(element).replace(".json", "") } })
+
     for (let index = 0; index < userLangList.length; index++) {
         const element = userLangList[index];
         const indexList = langList.findIndex((item) => item.lang.toLowerCase() == element.lang.toLowerCase());
@@ -191,19 +197,17 @@ async function takeFileExtensionAndPath(dir: string, format: string): Promise<st
 
 // Setup Discord Rich presence
 export function setupDiscordRPC(): void {
-    if (RPC.register(CLIENT_ID)) {
-        rpc.on('ready', () => {
-            rpc.setActivity({
-                startTimestamp: runTime,
-                largeImageKey: 'https://github.com/Owca525/animu/blob/electron/resources/icon.png?raw=true',
-                instance: false,
-            } as any);
+    if (!rpc) return
+    rpc.on('ready', () => {
+        rpc.user?.setActivity({
+            startTimestamp: runTime,
+            largeImageKey: 'https://github.com/Owca525/animu/blob/electron/resources/icon.png?raw=true',
+            instance: false,
+            type: ActivityType.Watching
         });
+    });
 
-        rpc.login({ clientId: CLIENT_ID }).catch((error) => console.log(`Discord RPC has ${error}`))
-    } else {
-        console.error("CLIENT_ID Is not register")
-    }
+    rpc.login()
 };
 
 // Check if string is url

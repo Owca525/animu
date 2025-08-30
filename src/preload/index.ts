@@ -29,6 +29,7 @@ if (process.contextIsolated) {
       rpc: {
         setActivity: (details: string | undefined, state: string | undefined) =>
           ipcRenderer.invoke("setActivity", details, state),
+        runDiscordRPC: () => ipcRenderer.invoke("runDiscordRPC"),
       },
       os: {
         getPath: (

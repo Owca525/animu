@@ -154,6 +154,7 @@ export interface SettingsConfig {
         HideSidebar: boolean
         language: string
         theme: string
+        discordRPC: boolean
         Window: {
             AutoMaximize: boolean
             AutoFullscreen: boolean

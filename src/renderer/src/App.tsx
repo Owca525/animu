@@ -89,6 +89,8 @@ async function LoadConfig() {
   if (!await checkConfig()) return
   const loadedConnfig = await readConfig()
 
+  if (loadedConnfig.General.discordRPC) window.api.rpc.runDiscordRPC()
+
   // Loading theme
   await changeTheme(loadedConnfig.General.theme)
 

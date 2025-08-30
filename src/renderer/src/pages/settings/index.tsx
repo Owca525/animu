@@ -154,7 +154,7 @@ function settings() {
                 if (element.name == config.new.General.theme) setthemeMetadata(() => element)
             });
         })
-        window.api.rpc.setActivity(undefined, t("discordrpc.settings"))
+        if (config.new.General.discordRPC) window.api.rpc.setActivity(undefined, t("discordrpc.settings"))
     }, [])
 
     async function ChangeScreenshot(path: string | any) {
@@ -284,6 +284,16 @@ function settings() {
                                     />
                                     <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getPath("userData")}/themes`))}/>
                                 </div>
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Discord RPC
+                                <CheckBox
+                                    checked={config.new.General.discordRPC}
+                                    onChecked={(checked) =>
+                                        handleChange('General.discordRPC', checked)
+                                    }
+                                />
                             </div>
                         </div>
                         <div className="settings-page-container">
