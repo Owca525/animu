@@ -603,7 +603,7 @@ body {
 }
 
 .player-time-display {
-  border-radius: 5px;
+  border-radius: 60px;
   background-color: var(--player-bg-containers);
   color: var(--text);
 }
@@ -611,8 +611,9 @@ body {
 .player-buttons {
   border: none;
   border: 2px solid var(--invisible);
-  background-color: var(--invisible);
   color: var(--text);
+  background-color: var(--bg3);
+  border-radius: 60px;
 }
 
 .player-buttons:hover {
@@ -684,6 +685,17 @@ body {
 /* SeekBar */
 .player-seekbar {
   background-color: var(--player-bg-containers) !important;
+}
+
+.player-seekbar:hover {
+  transform: scaleY(1.5);
+  transition: transform .1s cubic-bezier(0,0,.2,1),-webkit-transform .1s cubic-bezier(0,0,.2,1);
+}
+.player-seekbar:hover .seekbar-thumb {
+  transform: translate(-50%, -50%) scaleX(1.5);
+}
+.seekbar-box {
+  transform: translate(-50%, 10%) scaleY(0.70);
 }
 
 .seekbar-buffer {
