@@ -10,6 +10,7 @@ const HelpIcon: React.FC<HelpIconProps> = ({ description }) => {
 
   return (
     <div
+      tabIndex={-1}
       className="help-icon-container"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

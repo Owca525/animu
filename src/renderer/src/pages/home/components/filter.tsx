@@ -30,7 +30,7 @@ const Filter: React.FC<{ onChange: (params?: FilterParams, removeParam?: string)
         <>
             <Button ButtonClass="home-filter-button" iconClassName="home-filter-button" icon="tune" onClick={() => setShowFilter((prev) => !prev)} />
             {showFilter &&
-                <div className="home-filter-container" ref={containerRef}>
+                <div tabIndex={-1} className="home-filter-container" ref={containerRef}>
                     <div className="home-filter-space">
                         <div className="home-filter-title">{t("filter.genres")}</div>
                         <Dropdown onClickX={() => onChange(undefined, "genres")} buttonText={homeCache.filterTags?.genres ? homeCache.filterTags.genres[0] : ""} options={filter.genres.map((element) => { return { label: element, onClick: (text) => onChange({ genres: [text] }) } })} placeholder={"Genres"} />

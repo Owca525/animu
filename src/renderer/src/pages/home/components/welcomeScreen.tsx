@@ -11,7 +11,7 @@ const WelcomeScreen: React.FC<{}> = () => {
     const config: SettingsConfig = useSelector((data: any) => data.config);
 
     return (
-        <main className="welcome-screen-void">
+        <main tabIndex={-1} className="welcome-screen-void">
             <div className="welcome-screen-content">
                 <div className="welcome-screen-header-container">
                     <div className="welcome-screen-title">Welcome To Animu</div>

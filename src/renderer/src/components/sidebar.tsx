@@ -91,7 +91,7 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, sidebarClass, data, hideBut
     }
 
     return (
-        <div className={"sidebar-main-container " + sidebarClass?.container}>
+        <div tabIndex={-1} className={"sidebar-main-container " + sidebarClass?.container}>
             {!hideButton && (
                 <div className="sidebar-hide-container">
                     <Button icon="menu" ButtonClass="sidebar-hide-button" onClick={() => setHover((prev) => !prev)} iconClassName="sidebar-hide-button" />

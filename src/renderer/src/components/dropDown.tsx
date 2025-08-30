@@ -42,9 +42,9 @@ const Dropdown: React.FC<DropdownProps> = ({ options = [], placeholder = '', pla
   }, [buttonText])
 
   return (
-    <div className={`dropdown-container ${dropClassName}`}>
-      <div className={`dropdown-button`} onClick={toggleDropdown}>
-        <div className={`dropdown-button-text ${text == "" && "dropdown-button-shadow-text"} ${options.length <= 1 && "dropdown-button-shadow-text"}`}>{text != "" && text} {placeholder != "" && text == "" && placeholder}</div>
+    <div tabIndex={-1} className={`dropdown-container ${dropClassName}`}>
+      <div tabIndex={-1} className={`dropdown-button`} onClick={toggleDropdown}>
+        <div tabIndex={-1} className={`dropdown-button-text ${text == "" && "dropdown-button-shadow-text"} ${options.length <= 1 && "dropdown-button-shadow-text"}`}>{text != "" && text} {placeholder != "" && text == "" && placeholder}</div>
         {text == "" && !disableX && <div className='material-symbols-outlined dropdown-button-icon'>{isOpen ? "keyboard_arrow_left" : "keyboard_arrow_down"}</div>}
         {text != "" && !disableX && <div className='material-symbols-outlined dropdown-button-icon' onClick={resetText}>close</div>}
       </div>

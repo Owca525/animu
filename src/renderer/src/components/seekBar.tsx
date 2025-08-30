@@ -95,6 +95,7 @@ const SeekBar: React.FC<SeekBarProps> = ({
 
   return (
     <div
+      tabIndex={-1}
       ref={seekBarRef}
       className={`seekBar-container ${classes?.container}`}
       onClick={setPosition}
@@ -111,15 +112,17 @@ const SeekBar: React.FC<SeekBarProps> = ({
         </div>
       }
       
-      <div
+      <div 
+      tabIndex={-1}
         ref={seekBarProgress}
         className={`seekbar-progress ${classes?.progress}`}
       />
       <div
+        tabIndex={-1}
         ref={seekbarThumb}
         className={`seekbar-thumb ${classes?.thumb}`}
       />
-      <div ref={seekbarBox} style={show ? { display: "block" } : { display: "none" }} className={`seekbar-box ${classes?.box}`}></div>
+      <div tabIndex={-1} ref={seekbarBox} style={show ? { display: "block" } : { display: "none" }} className={`seekbar-box ${classes?.box}`}></div>
     </div>
   );
 };

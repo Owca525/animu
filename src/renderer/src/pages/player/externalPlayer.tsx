@@ -117,6 +117,10 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         setCurrentUrl(() => playerData[0].resolution[0].url)
 
         RunPlayers(playerData[0].resolution[0].url)
+        
+        document.querySelectorAll('*').forEach((element: any) => {
+            element.tabIndex = -1
+        });
     }, [])
 
     useEffect(() => {

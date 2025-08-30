@@ -26,49 +26,49 @@ const PlayerSettings: React.FC<playerSettingsProps> = ({ sources, resolution, sp
         <div className="player-settings-container">
             {currentSettings === "settings" &&
                 <>
-                    <div className="player-settings-button" onClick={() => sources.length > 1 ? setcurrentSettings("source") : ""}>
-                        <div className="player-settings-button-icon-container"><span className="material-symbols-outlined">web</span><span className='player-settings-button-text'>Source</span></div> <span className={`player-settings-button-text ${sources.length <= 1 && "player-settings-button-text-gray"}`}>{current.currentHost}</span>
+                    <div tabIndex={-1} className="player-settings-button" onClick={() => sources.length > 1 ? setcurrentSettings("source") : ""}>
+                        <div tabIndex={-1} className="player-settings-button-icon-container"><span className="material-symbols-outlined">web</span><span className='player-settings-button-text'>Source</span></div> <span className={`player-settings-button-text ${sources.length <= 1 && "player-settings-button-text-gray"}`}>{current.currentHost}</span>
                     </div>
-                    <div className="player-settings-button" onClick={() => resolution.length > 1 ? setcurrentSettings("res") : ""}>
-                        <div className="player-settings-button-icon-container"><span className="material-symbols-outlined">instant_mix</span><span className='player-settings-button-text'>Resolution</span></div><span className={`player-settings-button-text ${resolution.length <= 1 && "player-settings-button-text-gray"}`}>{current.currentResolution + "p"}</span>
+                    <div tabIndex={-1} className="player-settings-button" onClick={() => resolution.length > 1 ? setcurrentSettings("res") : ""}>
+                        <div tabIndex={-1} className="player-settings-button-icon-container"><span className="material-symbols-outlined">instant_mix</span><span className='player-settings-button-text'>Resolution</span></div><span className={`player-settings-button-text ${resolution.length <= 1 && "player-settings-button-text-gray"}`}>{current.currentResolution + "p"}</span>
                     </div>
-                    <div className="player-settings-button" onClick={() => setcurrentSettings("speed")}>
-                        <div className="player-settings-button-icon-container"><span className="material-symbols-outlined">speed</span><span className='player-settings-button-text'>Speed</span></div> <span className="player-settings-button-text">{current.currentSpeed + "x"}</span>
+                    <div tabIndex={-1} className="player-settings-button" onClick={() => setcurrentSettings("speed")}>
+                        <div tabIndex={-1} className="player-settings-button-icon-container"><span className="material-symbols-outlined">speed</span><span className='player-settings-button-text'>Speed</span></div> <span className="player-settings-button-text">{current.currentSpeed + "x"}</span>
                     </div>
                 </>
             }
             {currentSettings === "source" &&
                 <>
-                    <div className="player-settings-button-back" onClick={() => setcurrentSettings("settings")}>
-                        <span className="material-symbols-outlined">arrow_back</span><span>Source</span>
+                    <div tabIndex={-1} className="player-settings-button-back" onClick={() => setcurrentSettings("settings")}>
+                        <span tabIndex={-1} className="material-symbols-outlined">arrow_back</span><span>Source</span>
                     </div>
                     {sources.map((data) =>
-                        <div className="player-settings-button" onClick={() => reset(data.change)}>
-                            <span className="player-settings-button-text">{data.name}</span>
+                        <div tabIndex={-1} className="player-settings-button" onClick={() => reset(data.change)}>
+                            <span tabIndex={-1} className="player-settings-button-text">{data.name}</span>
                         </div>
                     )}
                 </>
             }
             {currentSettings === "res" &&
                 <>
-                    <div className="player-settings-button-back" onClick={() => setcurrentSettings("settings")}>
-                        <span className="material-symbols-outlined">arrow_back</span><span>Resolution</span>
+                    <div tabIndex={-1} className="player-settings-button-back" onClick={() => setcurrentSettings("settings")}>
+                        <span tabIndex={-1} className="material-symbols-outlined">arrow_back</span><span>Resolution</span>
                     </div>
                     {resolution.map((data) =>
-                        <div className="player-settings-button" onClick={() => reset(data.change)}>
-                            <span className="player-settings-button-text">{data.res.toString() + "p"}</span>
+                        <div tabIndex={-1} className="player-settings-button" onClick={() => reset(data.change)}>
+                            <span tabIndex={-1} className="player-settings-button-text">{data.res.toString() + "p"}</span>
                         </div>
                     )}
                 </>
             }
             {currentSettings === "speed" &&
                 <>
-                    <div className="player-settings-button-back" onClick={() => setcurrentSettings("settings")}>
-                        <span className="material-symbols-outlined">arrow_back</span><span>Speed</span>
+                    <div tabIndex={-1} className="player-settings-button-back" onClick={() => setcurrentSettings("settings")}>
+                        <span tabIndex={-1} className="material-symbols-outlined">arrow_back</span><span>Speed</span>
                     </div>
                     {speed.map((data) =>
-                        <div className="player-settings-button" onClick={() => { data.change(); setcurrentSettings("settings") }}>
-                            <span className="player-settings-button-text">{data.speed.toString() + "x"}</span>
+                        <div tabIndex={-1} className="player-settings-button" onClick={() => { data.change(); setcurrentSettings("settings") }}>
+                            <span tabIndex={-1} className="player-settings-button-text">{data.speed.toString() + "x"}</span>
                         </div>
                     )}
                 </>
