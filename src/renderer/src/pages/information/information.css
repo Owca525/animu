@@ -408,7 +408,6 @@ maybe that will be usefull in the future */
 @media (max-width: 600px) {
     .information-top {
         width: 100%;
-        margin-top: calc(max(10vh, 100px) + 42px);;
         padding: 15px;
         gap: 15px;
         flex-direction: column;
@@ -480,7 +479,7 @@ maybe that will be usefull in the future */
         padding-top: 15px;
     }
     
-    .button {
+    .information * .button {
         padding: clamp(4px, 2vw, 20px);
     }
 
@@ -493,6 +492,7 @@ maybe that will be usefull in the future */
         top: max(10vh, 100px);
         left: 0px;
         width: 100%;
+        position: absolute;
     }
 
 }
