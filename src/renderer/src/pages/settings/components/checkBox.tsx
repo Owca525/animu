@@ -6,7 +6,7 @@ interface checkBoxProps {
 }
 
 const checkBox: React.FC<checkBoxProps> = ({ onChecked = () => {}, checked }) => {
-  return <input className="checkbox" type="checkbox" checked={checked} onChange={(event) => onChecked(event.target.checked)}/>
+  return <input tabIndex={-1} className="checkbox" type="checkbox" checked={checked} onChange={(event) => onChecked(event.target.checked)}/>
 }
 
 export default checkBox

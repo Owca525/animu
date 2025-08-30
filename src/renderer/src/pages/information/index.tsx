@@ -119,6 +119,9 @@ function information() {
 
     useEffect(() => {
         initialInformation()
+        document.querySelectorAll('*').forEach((element: any) => {
+            element.tabIndex = -1
+        });
     }, [])
 
     function enterPlayer(episodes: { ep: string, img?: string, title?: string }[], type: string, episode: string) {

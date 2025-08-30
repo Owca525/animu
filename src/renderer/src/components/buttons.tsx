@@ -11,7 +11,7 @@ interface ButtonProps {
 
 const Button: React.FC<ButtonProps> = ({ icon, ButtonClass, onClick, content, iconClassName, titleButton }) => {
   return (
-    <button className={"button " + ButtonClass} onClick={onClick} title={titleButton ? titleButton : ""}>
+    <button tabIndex={-1} className={"button " + ButtonClass} onClick={onClick} title={titleButton ? titleButton : ""}>
         {icon && <span className={"material-symbols-outlined " + iconClassName}>{icon}</span>} {content}
     </button>
   )

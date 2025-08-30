@@ -28,7 +28,7 @@ const Input: React.FC<InputProps> = ({ type = "text", InputClass, placeholder, o
     }
 
     return (
-        <input type={type} ref={inputRef} className={"input " + InputClass} placeholder={placeholder} onKeyDown={handleData} />
+        <input tabIndex={-1} type={type} ref={inputRef} className={"input " + InputClass} placeholder={placeholder} onKeyDown={handleData} />
     )
 }
 

@@ -164,6 +164,7 @@ const Card: React.FC<cardData> = ({
 
   return (
     <div
+      tabIndex={-1}
       ref={cardRef}
       className="card-container"
       onClick={sendToInformation}
