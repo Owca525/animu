@@ -24,6 +24,31 @@ import PlayerButton from "./components/PlayerButton"
 import { motion } from "framer-motion"
 import PlayerEpisodeElement from "./components/playerEpisodeElement"
 
+function addTime(durration: number): string {
+    const now = new Date();
+    let hour: number | undefined = undefined
+    let min: number | undefined = undefined
+    let sec: number | undefined = undefined
+
+    if (formatTime(durration).split(":").length == 2) {
+        min = parseInt(formatTime(durration).split(":")[0])
+        sec = parseInt(formatTime(durration).split(":")[1])
+    } else if (formatTime(durration).split(":").length == 2) {
+        hour = parseInt(formatTime(durration).split(":")[0])
+        min = parseInt(formatTime(durration).split(":")[1])
+        sec = parseInt(formatTime(durration).split(":")[2])
+    }
+
+    if (hour) now.setMinutes(now.getHours() + hour);
+    if (min) now.setMinutes(now.getMinutes() + min);
+    if (sec) now.setSeconds(now.getSeconds() + sec);
+
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+
+    return `${hours}:${minutes}`;
+}
+
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
 interface VideoPlayerProps {
@@ -621,6 +646,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                             }
                             <div className="player-time-display">
                                 {formatTime(currentTime)} / {formatTime(videoRef.current?.duration)}
+                            </div>
+                            <div className="player-end-time-display">
+                                Episode Ends on {addTime(videoRef.current?.duration ? (videoRef.current.duration - currentTime) : 0)}
                             </div>
                         </div>
                         <div className="player-right">
