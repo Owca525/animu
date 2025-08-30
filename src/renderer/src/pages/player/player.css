@@ -223,8 +223,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  padding: 12px;
-  gap: 12px;
+  padding: 8px;
+  gap: 1em;
 }
 
 .player-volume-ui-container {

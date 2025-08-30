@@ -617,7 +617,8 @@ body {
 }
 
 .player-buttons:hover {
-  background-color: var(--player-bg-containers);
+  /*background-color: var(--player-bg-containers);*/
+  background-color: var(--bg3);
   border-color: var(--neutral1);
   color: var(--text);
 }
