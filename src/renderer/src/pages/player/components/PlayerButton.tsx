@@ -17,7 +17,6 @@ const PlayerButton: React.FC<PlayerButtonProps> = ({ icon, title, onClick, Butto
         const rect = containerRef.current.getBoundingClientRect();
         const overflowRight = rect.right > window.innerWidth;
         const overflowLeft = rect.left < 0;
-        console.log(rect.right, rect.left, window.innerWidth, overflowRight, overflowLeft)
 
         if (overflowRight) {
             const shiftLeft = rect.right - window.innerWidth + 10;

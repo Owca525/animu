@@ -1,6 +1,5 @@
 import { app, shell, BrowserWindow, Menu } from 'electron'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import { setupDiscordRPC } from './utils'
 import { join } from 'path'
 
 // Files import
@@ -94,7 +93,7 @@ app.whenReady().then(() => {
   })
 
   createWindow()
-  setupDiscordRPC()
+  // setupDiscordRPC()
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

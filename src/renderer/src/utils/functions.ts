@@ -1,5 +1,5 @@
 import { t } from "i18next";
-import { cardData, ContextMenuProps, homeData, themeMetadata } from "./GlobalInterface";
+import { ContextMenuProps, homeData, themeMetadata } from "./GlobalInterface";
 import store from "./store";
 import { setHomeData } from "./pluginApi";
 import { ReadContinue } from "./history/continueWatch";
@@ -242,13 +242,13 @@ export function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function detectTitle(data: cardData): string {
+export function detectTitle(data: { title: { english?: string | undefined; native: string; romaji: string; }, ep: string, format?: string}): string {
     try {
-        if (data.AnimeData.format?.toLowerCase().includes("movie")) return t('player.TitleMovie', { name: data.AnimeData.title.romaji })
-        return t('player.TitleEpisode', { ep: data.saveData?.episode, name: data.AnimeData.title.romaji })
+        if (data.format?.toLowerCase().includes("movie")) return t('player.TitleMovie', { name: data.title.romaji })
+        return t('player.TitleEpisode', { ep: data.ep, name: data.title.romaji })
     } catch (error) {
         console.error(error)
-        return t('player.TitleEpisode', { ep: data.saveData?.episode, name: data.AnimeData.title.romaji })
+        return t('player.TitleEpisode', { ep: data.ep, name: data.title.romaji })
     }
 }
 

@@ -14,6 +14,7 @@ export const defaultConfig: SettingsConfig = {
             AutoFullscreen: false,
             Zoom: 100,
         },
+        discordRPC: true
     },
     Player: {
         general: {
@@ -27,7 +28,8 @@ export const defaultConfig: SettingsConfig = {
             TimeSkipRight: 5,
             VideoStreching: false,
             RemovingSpaceAnimation: false,
-            DisableVolumeAnimation: false
+            DisableVolumeAnimation: false,
+            PlayerBehavior: "information"
         },
         screenShot: {
             alwaysAsk: true,

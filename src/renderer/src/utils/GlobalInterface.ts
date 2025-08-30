@@ -154,6 +154,7 @@ export interface SettingsConfig {
         HideSidebar: boolean
         language: string
         theme: string
+        discordRPC: boolean
         Window: {
             AutoMaximize: boolean
             AutoFullscreen: boolean
@@ -173,6 +174,7 @@ export interface SettingsConfig {
             VideoStreching: boolean,
             DisableVolumeAnimation: boolean,
             RemovingSpaceAnimation: boolean
+            PlayerBehavior: "home" | "information"
         }
         screenShot: {
             alwaysAsk: boolean

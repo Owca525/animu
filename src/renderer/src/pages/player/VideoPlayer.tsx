@@ -311,7 +311,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         handleProgress()
 
         // Update RPC
-        window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(videoRef.current.currentTime)} / ${formatTime(videoRef.current.duration)}`)
+        if (config.General.discordRPC) window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(videoRef.current.currentTime)} / ${formatTime(videoRef.current.duration)}`)
         if (config.Player.general.AutoSkipEpisode && videoRef.current.duration == videoRef.current.currentTime) setEpisode("next")
     }
 
@@ -534,13 +534,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     function countImages(data: { ep: string, img?: string, title?: string }[]): boolean {
         let counter: number = 0
-        console.log(data)
         for (let index = 0; index < data.length; index++) {
             const element = data[index];
-            console.log(element.img)
             if (element.img) counter += 1
         }
-        console.log(counter, data.length)
         if (data.length <= counter) return true
         return false
     }
@@ -572,14 +569,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             <div className="video-overlay">
                 <div className={isUpNextEpisode == false ? isVisible ? 'video-top' : 'video-top player-hidden' : 'video-top'}>
                     <Button icon='arrow_back' ButtonClass='player-buttons' onClick={async () => await exitPlayer()} />
-                    <div className="player-title ">{detectTitle({
-                        ...anime_data, ...anime_data.saveData, saveData: {
-                            episode: temp.episode,
-                            pluginName: "",
-                            last_Time: 0,
-                            type: ""
-                        }
-                    })}</div>
+                    <div className="player-title ">{detectTitle({ title: anime_data.AnimeData.title, ep: temp.episode, format: anime_data.AnimeData.format })}</div>
                 </div>
                 <div className="video-center"> {/* video-center-container */}
                     {/* <div className="player-loading-animation-container player-fast-rewind-ui">

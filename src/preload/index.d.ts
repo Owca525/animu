@@ -43,6 +43,7 @@ declare global {
           details: string | undefined,
           state: string | undefined
         ) => Promise<void>;
+        runDiscordRPC: () => void;
       }
       os: {
         getPath: (
