@@ -43,3 +43,10 @@
         width: 340px;
     }
 }
+/* for smartphones 
+maybe that will be usefull in the future */
+@media (max-width: 600px) {
+    .home-filter-container {
+        translate: -145%;
+    }
+}

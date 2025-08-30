@@ -489,10 +489,8 @@ maybe that will be usefull in the future */
 
     .information-exit-button {
         padding: 6px;
-        top: max(10vh, 100px);
-        left: 0px;
-        width: 100%;
-        position: absolute;
+        right: 15px;
+        left: unset;
     }
 
 }
