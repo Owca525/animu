@@ -692,9 +692,9 @@ body {
   transition: transform .1s cubic-bezier(0,0,.2,1),-webkit-transform .1s cubic-bezier(0,0,.2,1);
 }
 .player-seekbar:hover .seekbar-thumb {
-  transform: translate(-50%, -50%) scaleX(1.5);
+  display: none;
 }
-.seekbar-box {
+.player-seekbar .seekbar-box {
   transform: translate(-50%, 10%) scaleY(0.70);
 }
 
