@@ -2,6 +2,7 @@ import { AnimeData, cardData, episodeList, playerData, pluginFormat } from "@ren
 
 const WEB = "https://anizone.to"
 const PLAYER_REGEX = /(?<!href=["'])(https:\/\/seiryuu\.vid-cdn\.xyz[^\s"'>]+)/g;
+const CARDS_REGEX = /<div[^>]*class=["']grid grid-cols-1 2xl:grid-cols-2 gap-4["'][^>]*>(.*?)<\/div>/gs
 const HEADER = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0'
 }
@@ -13,27 +14,38 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
     if (!req.success) return []
 
     let data = req.data as string
-    let urls = data.matchAll(/<ul.*?>(.*?)<\/ul>/gs)
+    let urls = [...data.matchAll(PLAYER_REGEX)]
     console.log(urls)
+    
+    let extraction: playerData[] = []
+    for (let index = 0; index < urls.length; index++) {
+        const element = urls[index];
+        if (element[0].includes("master.m3u8")) {
+            extraction.push({
+                hostname: "anizone.to",
+                hls: true,
+                resolution: [{ res: "", url: element[0] }]
+            })
+            break
+        }
+    }
 
-    return []
+    return extraction
 }
 
 async function getAnimeID(text: string): Promise<string | undefined> {
     try {
         let url = `${WEB}/anime?search=${encodeURI(text)}`
+        console.log(url)
         const req = await window.api.request.get(url, HEADER, "text");
-        console.log(req, url)
         if (!req.success) return
-        let tmp = [...req.data.matchAll(/<div[^>]*class=["']grid grid-cols-1 2xl:grid-cols-2 gap-4["'][^>]*>(.*?)<\/div>/gs)]
+        let tmp = [...req.data.matchAll(CARDS_REGEX)]
         if (tmp.length <= 0) return
         let data: string = tmp[0][0]
-        console.log(tmp)
 
         let animeID = [...data.matchAll(/wire:key=["']([^"']+)["']/g)]
         // let animeIMG = [...data.matchAll(/src=["'](https:\/\/anizone\.to\/images\/anime\/[^"']+)["']/g)]
         // let animeTITLE = [...data.matchAll(/alt=["']([^"']+)["']/g)]
-        console.log(animeID[0][1], animeID[0][1].slice(2))
         return animeID[0][1].slice(2)
     } catch (error) {
         console.log(error)
@@ -47,22 +59,55 @@ async function getEpisodeList(animeData?: AnimeData, anime_id?: string): Promise
     if (!idAnime && animeData) {
         idAnime = await getAnimeID(animeData.title.english ? animeData.title.english : animeData.title.romaji)
     } else return undefined
+    if (!idAnime) return
 
     let url = `${WEB}/anime/${idAnime}`
-    console.log(url)
     const req = await window.api.request.get(url, HEADER, "text");
-    console.log(req, url)
     if (!req.success) return undefined
     let data = req.data as string
-    let tmpData = [...data.matchAll(/<ul.*?>(.*?)<\/ul>/gs)]
-    let urls = [...tmpData[0][0].matchAll(/href=["'](https:\/\/anizone\.to\/anime\/[^\s"']+)["']/g)]
-    // TODO: ADD RETURNING EPISODES
-    console.log(urls)
+    // let tmpData = [...data.matchAll(/<ul.*?>(.*?)<\/ul>/gs)]
+    // let urls = [...tmpData[0][0].matchAll(/href=["'](https:\/\/anizone\.to\/anime\/[^\s"']+)["']/g)]
+    let dataList = [...data.matchAll(/<div[^>]*class="(?=[^"]*text-slate-100)(?=[^"]*text-xs)(?=[^"]*lg:text-base)(?=[^"]*flex)(?=[^"]*flex-wrap)(?=[^"]*justify-center)(?=[^"]*gap-2)(?=[^"]*sm:gap-6)[^"]*"[^>]*>[\s\S]*?<\/div>/g)]
+    let informationList = [...dataList[0][0].matchAll(/<[^>]*class="[^"]*\binline-block\b[^"]*"[^>]*>([\s\S]*?)<\/[^>]+>/g)]
+    let ep: number | undefined = undefined
+    for (let index = 0; index < informationList.length; index++) {
+        const element = informationList[index];
+        if (element[1].includes("Episodes")) ep = parseInt(element[1].split(" ")[0])
+    }
+    
+    if (!ep) return undefined
 
-    return undefined
+    let episodeList: { ep: string }[] = []
+    for (let index = 1; index < (ep+1); index++) {
+        episodeList.push({ ep: index.toString() })
+    }
+
+    return { player_id: idAnime, episodesData: [{ episodes: episodeList, type: "sub", name: "Subtitles" }] }
 }
 
-// TODO: trzeba zrobić żeby wyszukiwało w wrong anime i działający extractor linków do plugina
+async function getAnimeCards(text: string): Promise<cardData[]> {
+    try {
+        let url = `${WEB}/anime?search=${encodeURI(text)}`
+        console.log(url)
+        const req = await window.api.request.get(url, HEADER, "text");
+        if (!req.success) return []
+        let tmp = [...req.data.matchAll(CARDS_REGEX)]
+        console.log(tmp)
+        if (tmp.length <= 0) return []
+        for (let index = 0; index < tmp.length; index++) {
+            const element = tmp[index];
+            let animeID = [...element[0].matchAll(/wire:key=["']([^"']+)["']/g)]
+            let animeIMG = [...element[0].matchAll(/src=["'](https:\/\/anizone\.to\/images\/anime\/[^"']+)["']/g)]
+            let animeTITLE = [...element[0].matchAll(/alt=["']([^"']+)["']/g)]
+            console.log(animeID, animeIMG, animeTITLE)
+        }
+
+        return []
+    } catch (error) {
+        console.error(error)
+        return []
+    }
+}
 
 export const AniZone: pluginFormat = {
     version: "1.0",
@@ -75,8 +120,6 @@ export const AniZone: pluginFormat = {
         episodeList: function (type: string, anime_id: string): Promise<{ ep: string; img?: string; title?: string; }[] | null> {
             throw new Error("Function not implemented.");
         },
-        animeList: function (name: string): Promise<cardData[]> {
-            throw new Error("Function not implemented.");
-        }
+        animeList: getAnimeCards
     }
 }

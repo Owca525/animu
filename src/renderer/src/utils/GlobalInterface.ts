@@ -6,28 +6,28 @@ export const notificationProps = {
 }
 
 export interface AnimeData {
-    averageScore: number | undefined
-    bannerImage: string | undefined
-    coverImage: string | undefined
-    description: string | undefined
-    duration: number | undefined
-    endDate: {
+    averageScore?: number | undefined
+    bannerImage?: string | undefined
+    coverImage?: string | undefined
+    description?: string | undefined
+    duration?: number | undefined
+    endDate?: {
         day: number
         month: number
         year: number
     } | undefined
-    episodes: number | undefined
-    format: string | undefined
-    genres: Array<String> | undefined
-    nextAiringEpisode: {
+    episodes?: number | undefined
+    format?: string | undefined
+    genres?: Array<String> | undefined
+    nextAiringEpisode?: {
         airingAt: number
         episode: number
         timeUntilAiring: number
     } | undefined
-    popularity: number
-    season: string | undefined
-    seasonYear: number | undefined
-    startDate: {
+    popularity?: number | undefined
+    season?: string | undefined
+    seasonYear?: number | undefined
+    startDate?: {
         day: number
         month: number
         year: number
@@ -45,15 +45,15 @@ export interface AnimeData {
             image: string
         }
     }[]
-    source: string | undefined
-    status: string | undefined
+    source?: string | undefined
+    status?: string | undefined
     studios: string[]
     title: { english?: string, native: string, romaji: string }
-    type: string | undefined
+    type?: string | undefined
     episodesList?: { episodes: { ep: string, img?: string, title?: string }[], type: string, name?: string }[]
     player_ID?: string
     id: string
-    trailer: { id: string, site: string } | undefined
+    trailer?: { id: string, site: string } | undefined
 }
 
 export interface homeData {

@@ -85,3 +85,18 @@ export async function InitialPlugin() {
         console.error(error)
     }
 }
+
+export async function ChangePlugin(name: string) {
+    try {
+        const loadedPlugins: pluginFormat[] = store.getState().plugin.loadedPlugins
+        for (let index = 0; index < loadedPlugins.length; index++) {
+            const element = loadedPlugins[index];
+            if (element.name == name) {
+                store.dispatch({type: "setPluginPlayer", payload: element})
+                return
+            }
+        }
+    } catch (error) {
+        console.error(error)
+    }
+}

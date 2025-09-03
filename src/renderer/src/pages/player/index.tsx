@@ -13,6 +13,7 @@ import { detectTitle, refetchHistory } from "@renderer/utils/functions";
 import { useHotkeys } from "react-hotkeys-hook";
 import Button from "@renderer/components/buttons";
 import ExternalPlayer from "./externalPlayer";
+import { InitialPlugin } from "@renderer/utils/pluginApi";
 
 const VideoPlayer = lazy(() => import('./VideoPlayer'));
 // const ExternalPlayer = lazy(() => import('./externalPlayer'));
@@ -69,7 +70,8 @@ const player = () => {
         leave()
     });
 
-    function leave() {
+    async function leave() {
+        await InitialPlugin()
         if (config.Player.general.PlayerBehavior === "home") navigate("/")
         if (anime_data.continueWatch) navigate("/")
         else navigate("/info", { state: anime_data.data.AnimeData })

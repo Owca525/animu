@@ -1,4 +1,4 @@
-import { cardData, ContextMenuProps } from "@renderer/utils/GlobalInterface";
+import { cardData, ContextMenuProps, SettingsConfig } from "@renderer/utils/GlobalInterface";
 import "./css/card.css";
 import { useNavigate } from "react-router-dom";
 import { JSX, useRef, useState } from "react";
@@ -12,6 +12,7 @@ import {
   getGradientColor,
 } from "@renderer/utils/functions";
 import { extractInformation } from "@renderer/plugins/allmanga";
+import { ChangePlugin } from "@renderer/utils/pluginApi";
 
 const Card: React.FC<cardData> = ({
   AnimeData,
@@ -24,6 +25,7 @@ const Card: React.FC<cardData> = ({
   const [isError, setisError] = useState<boolean>(false);
   const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
   const [isOut, setisOut] = useState<boolean>(false);
+  const config: SettingsConfig = useSelector((data: any) => data.config);
   const cardRef = useRef<HTMLDivElement | null>(null);
 
   async function sendToInformation() {
@@ -31,6 +33,11 @@ const Card: React.FC<cardData> = ({
       onClick(AnimeData);
       return;
     }
+
+    if (saveData && saveData.last_Time != 0 && saveData.pluginName == config.plugins.player) {
+      await ChangePlugin(saveData.pluginName)
+    }
+
     if (
       saveData &&
       saveData.episode != "" &&
