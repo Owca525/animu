@@ -21,7 +21,20 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
 
     let data = req.data as string
     let urls = [...data.matchAll(PLAYER_REGEX)]
+    if (urls.length <= 0) return []
     console.log(urls)
+    let subList: { url: string, lang: string }[] = []
+    for (let index = 0; index < urls.length; index++) {
+        const element = urls[index];
+        if (element[0].includes("subtitles") && !element[0].includes("es-419")) {
+            let file = element[0].substring(element[0].lastIndexOf("/") + 1)
+            let tmp = [file.lastIndexOf("_")+1, file.lastIndexOf(".")]
+            subList.push({
+                url: element[0],
+                lang: file.slice(tmp[0], tmp[1])
+            })
+        }
+    }
     
     let extraction: playerData[] = []
     for (let index = 0; index < urls.length; index++) {
@@ -30,6 +43,7 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
             extraction.push({
                 hostname: "anizone.to",
                 hls: true,
+                subtitles: subList,
                 resolution: [{ res: "", url: element[0] }]
             })
             break

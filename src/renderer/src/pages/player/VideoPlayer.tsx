@@ -23,6 +23,9 @@ import PlayerSettings from "./components/PlayerSettings"
 import PlayerButton from "./components/PlayerButton"
 import { motion } from "framer-motion"
 import PlayerEpisodeElement from "./components/playerEpisodeElement"
+import { convert } from "subtitle-converter";
+import { useHotkeys } from "react-hotkeys-hook"
+import i18n from "@renderer/utils/i18n"
 
 function addTime(durration: number): string {
     const now = new Date();
@@ -109,6 +112,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const [showNerdStats, setshowNerdStats] = useState<boolean>(false)
     const [hls, setHls] = useState<any>(null);
 
+    // Subtitles
+    const [vttUrl, setVttUrl] = useState<string | undefined>(undefined);
+
     function handleMouseMove() {
         setIsVisible(true)
         if (hideTimer.current) {
@@ -165,6 +171,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     async function checkUrl(data: playerData) {
         if (!videoRef.current) return
         const time = videoRef.current.currentTime
+        if (data.subtitles) {
+            data.subtitles.forEach(async (sub) => {
+                if (sub.lang == i18n.language) convertingSubtitles(sub.url)
+            })
+        }
         if (data.hls) {
             setHost(() => data.hostname)
             await runHLS(data.resolution[0].url, data.hostname)
@@ -421,6 +432,26 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         setNextEpisode(temp.episodes[ep].ep)
     }
 
+    async function convertingSubtitles(url: string) {
+        let data = await window.api.request.get(url, { "User-Agent": navigator.userAgent }, "text")
+        if (!data.success) return
+        const vtt = await convert(data.data, ".vtt");
+        const blob = new Blob([vtt.subtitle], { type: "text/vtt" });
+        setVttUrl(URL.createObjectURL(blob));
+    }
+
+    useHotkeys("x", async () => {
+        console.log(i18n.language)
+        // TODO: Dodanie własnego cue i dodać ustawienie do zmiany napisów 
+        // await convertingSubtitles("https://seiryuu.vid-cdn.xyz/ba2fd122-7d54-4d6a-b386-f47c53497e76/subtitles/2_en.srt")
+        // if (videoRef.current) {
+        //     let track = videoRef.current.textTracks[0]
+        //     if (track.activeCues && track.activeCues.length >= 0) {
+        //         console.log((track.activeCues[0] as VTTCue).text)
+        //     }
+        // }
+    })
+
     function keybinds(event: string) {
         if (videoRef.current) {
             var time_now = videoRef.current.currentTime
@@ -583,7 +614,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 preload="auto"
                 muted={isMuted}
                 style={config.Player.general.VideoStreching ? { objectFit: "cover" } : {}}
-            />
+            >
+                {vttUrl && (
+                    <track
+                        src={vttUrl}
+                        kind="subtitles"
+                        srcLang="en"
+                        label="English"
+                        default
+                    />
+                )}
+            </video>
             {isVisible &&
                 <>
                     <div className="player-mask top"></div>
@@ -661,14 +702,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                             {isShowSelectEpisode &&
                                 <div className="player-select-episode-container">
                                     <div className="player-select-episode-title">Change Episode</div>
-                                    { !countImages(temp.episodes) &&
+                                    {!countImages(temp.episodes) &&
                                         <div className="player-select-episode-content">
                                             {temp.episodes.map((element) => (
                                                 <div className={`information-episode-button ${parseInt(element.ep) < parseInt(temp.episode) ? "watched" : ""} ${parseInt(element.ep) == parseInt(temp.episode) ? "current" : ""}`} onClick={() => setNextEpisode(element.ep)}>{element.ep}</div>
                                             ))}
                                         </div>
                                     }
-                                    { countImages(temp.episodes) &&
+                                    {countImages(temp.episodes) &&
                                         <div className="player-select-episode-content-list">
                                             {temp.episodes.map((element) => (
                                                 <PlayerEpisodeElement nextEpisode={setNextEpisode} animeTitle={anime_data.AnimeData.title.romaji} episodes={element} currentEpisode={temp.episode} />
@@ -686,7 +727,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                         ListResolution.map((val) => { return { res: val, change: () => setRes(val) } })
                                     }
                                     speed={speed.map((val) => { return { speed: parseFloat(val), change: () => setSpeed(val) } })}
-                                    disableSettings={() => setcurrentSettings(() => false)} 
+                                    disableSettings={() => setcurrentSettings(() => false)}
                                     current={{
                                         currentHost: currentHost,
                                         currentResolution: currentResolution,

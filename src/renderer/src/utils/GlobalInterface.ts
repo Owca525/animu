@@ -72,6 +72,7 @@ export interface playerData {
     hostname: string
     hls: boolean
     resolution: { res: string, url: string }[]
+    subtitles?: { url: string, lang: string }[]
 }
 
 export interface indentityPlayer {
