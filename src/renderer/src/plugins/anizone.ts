@@ -7,6 +7,12 @@ const HEADER = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0'
 }
 
+function convertText(text: string) {
+    let uri = encodeURI(text.replaceAll("[", "").replaceAll("]", ""))
+    return uri.replaceAll("+", "%2B")
+        .replaceAll("%20", "+")
+}
+
 async function getURLFromPlayer(_type: string, episode: string, id: string): Promise<playerData[]> {
     let url = `${WEB}/anime/${id}/${episode}`
 
@@ -35,8 +41,7 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
 
 async function getAnimeID(text: string): Promise<string | undefined> {
     try {
-        let url = `${WEB}/anime?search=${encodeURI(text)}`
-        console.log(url)
+        let url = `${WEB}/anime?search=${convertText(text)}`
         const req = await window.api.request.get(url, HEADER, "text");
         if (!req.success) return
         let tmp = [...req.data.matchAll(CARDS_REGEX)]
@@ -85,28 +90,44 @@ async function getEpisodeList(animeData?: AnimeData, anime_id?: string): Promise
     return { player_id: idAnime, episodesData: [{ episodes: episodeList, type: "sub", name: "Subtitles" }] }
 }
 
-async function getAnimeCards(text: string): Promise<cardData[]> {
+async function getAnimeCards(data: AnimeData): Promise<cardData[]> {
     try {
-        let url = `${WEB}/anime?search=${encodeURI(text)}`
-        console.log(url)
+        let url = `${WEB}/anime?search=${convertText(data.title.english ? data.title.english : data.title.romaji)}`
         const req = await window.api.request.get(url, HEADER, "text");
         if (!req.success) return []
         let tmp = [...req.data.matchAll(CARDS_REGEX)]
-        console.log(tmp)
         if (tmp.length <= 0) return []
+        let finnallData: cardData[] = []
         for (let index = 0; index < tmp.length; index++) {
             const element = tmp[index];
             let animeID = [...element[0].matchAll(/wire:key=["']([^"']+)["']/g)]
             let animeIMG = [...element[0].matchAll(/src=["'](https:\/\/anizone\.to\/images\/anime\/[^"']+)["']/g)]
             let animeTITLE = [...element[0].matchAll(/alt=["']([^"']+)["']/g)]
             console.log(animeID, animeIMG, animeTITLE)
+            finnallData.push({ AnimeData: {
+                characters: [],
+                studios: [],
+                coverImage: animeIMG[0][1],
+                title: {
+                    english: undefined,
+                    native: decodeURI(animeTITLE[0][1]),
+                    romaji: decodeURI(animeTITLE[0][1]),
+                },
+                id: animeID[0][1].slice(2)
+            } })
         }
 
-        return []
+        return finnallData
     } catch (error) {
         console.error(error)
         return []
     }
+}
+
+async function extractEpisodeList(_type: string, anime_id: string): Promise<{ ep: string; img?: string; title?: string; }[]> {
+    let data = await getEpisodeList(undefined, anime_id)
+    if (!data) return []
+    return data.episodesData[0].episodes
 }
 
 export const AniZone: pluginFormat = {
@@ -117,9 +138,7 @@ export const AniZone: pluginFormat = {
     player: {
         getUrls: getURLFromPlayer,
         animeDataList: getEpisodeList,
-        episodeList: function (type: string, anime_id: string): Promise<{ ep: string; img?: string; title?: string; }[] | null> {
-            throw new Error("Function not implemented.");
-        },
+        episodeList: extractEpisodeList,
         animeList: getAnimeCards
     }
 }

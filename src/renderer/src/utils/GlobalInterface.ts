@@ -135,8 +135,8 @@ export interface pluginFormat {
     player?: {
         getUrls: (type: string, episode: string, id: string) => Promise<playerData[]>
         animeDataList: (animeData?: AnimeData, anime_id?: string) => Promise<episodeList | undefined>
-        episodeList: (type: string, anime_id: string) => Promise<{ ep: string, img?: string, title?: string }[] | null>
-        animeList: (name: string) => Promise<cardData[]>
+        episodeList: (type: string, anime_id: string) => Promise<{ ep: string, img?: string, title?: string }[]>
+        animeList: (name: AnimeData) => Promise<cardData[]>
     } | null
     sidebarAddon?: sidebarData[]
 }

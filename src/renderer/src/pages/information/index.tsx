@@ -81,10 +81,6 @@ function information() {
 
     async function initialInformation() {
         console.log(informationTemp)
-        if (anime_data.id == "" && config.plugins.player == "Allmanga") {
-            fetchData(pluginPlayer.player.animeDataList, anime_data.player_ID)
-            return
-        }
 
         let cardAnime = (await ReadHistory()).filter((element) => element.AnimeData.id == anime_data.id)
         let cardAnimeContinueWatch = (await ReadContinue()).filter((element) => element.AnimeData.id == anime_data.id)
@@ -98,6 +94,11 @@ function information() {
             if (animeHistory) setsavedata(() => {return{ last_episode: parseInt(animeHistory.episode), last_time: animeHistory.last_Time }})
         }
 
+        if (anime_data.id == "" && config.plugins.player == "Allmanga") {
+            fetchData(getInformation, cardAnime[0].AnimeData.player_ID)
+            return
+        }
+
         if (informationTemp.id == anime_data.id && informationTemp.episodes_data != undefined) {
             setData(() => informationTemp.episodes_data)
             return
@@ -109,10 +110,6 @@ function information() {
             return
         }
 
-        if (cardAnime[0].saveData?.pluginName == "") {
-            fetchData(getInformation, cardAnime[0].AnimeData.player_ID)
-            return
-        }
         if (cardAnime[0].saveData?.pluginName == config.plugins.player) {
             fetchData(pluginPlayer.player.animeDataList, cardAnime[0].AnimeData.player_ID)
         }
@@ -348,7 +345,7 @@ function information() {
 
                 <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
             </main>
-            {showWrong && <ContainerWrong name={anime_data.title.romaji} refetchfunc={fetchData} exitfunc={() => setshowWrong(() => false)} />}
+            {showWrong && <ContainerWrong name={anime_data} refetchfunc={fetchData} exitfunc={() => setshowWrong(() => false)} />}
         </>
     )
 }

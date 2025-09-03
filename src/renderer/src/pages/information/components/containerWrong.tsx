@@ -6,10 +6,10 @@ import Button from '@renderer/components/buttons';
 import { motion } from 'framer-motion';
 import { t } from 'i18next';
 import Card from '@renderer/pages/home/components/card';
-import { cardData } from '@renderer/utils/GlobalInterface';
+import { AnimeData, cardData } from '@renderer/utils/GlobalInterface';
 
 interface containerwrongprops {
-    name: string,
+    name: AnimeData,
     refetchfunc: any,
     exitfunc: any,
 }
@@ -29,7 +29,7 @@ const containerWrong: React.FC<containerwrongprops> = ({ name, exitfunc, refetch
     function buildContainer(cardata: cardData[]) {
         return (
             <div className='information-containerwrong-container'>
-                <div className='information-containerwrong-title'>{t("information.containerwrong.title", { name: name })}</div>
+                <div className='information-containerwrong-title'>{t("information.containerwrong.title", { name: name.title.romaji })}</div>
                 <div className="information-containerwrong-cards">
                     {cardata.map(card => <Card AnimeData={card.AnimeData} deletionCard={card.deletionCard} onClick={card.onClick} />)}
                 </div>
