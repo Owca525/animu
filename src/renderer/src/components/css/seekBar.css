@@ -47,3 +47,13 @@
     padding: 8px 12px;
     z-index: 4;
 }
+
+.seekbar-thumbnail {
+    position: absolute;
+    left: var(--tooltip-x, 50%);
+    transform: translateX(-50%);
+    height: 101px;
+    width: 180px;
+    top: -90px;
+    background-repeat: no-repeat;
+}

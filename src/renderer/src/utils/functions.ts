@@ -256,3 +256,8 @@ export async function convertPath(path: string) {
     if ((await window.api.getOSDetails()).platform == "win32") return path.replace("/", "\\")
     return path
 }
+
+export function toSeconds(time: string) {
+  const [h, m, s] = time.split(":");
+  return parseFloat(h) * 3600 + parseFloat(m) * 60 + parseFloat(s);
+};

@@ -2,6 +2,7 @@ import { formatTime } from '@renderer/utils/functions';
 import React, { useEffect, useRef, useState } from 'react';
 
 import "./css/seekBar.css"
+import { Thumbnail } from '@renderer/utils/GlobalInterface';
 
 interface SeekBarProps {
   maxValue: number | undefined;
@@ -12,6 +13,7 @@ interface SeekBarProps {
   classes?: { container?: string, progress?: string, thumb?: string, box?: string }
   screen?: boolean
   secondBarValues?: { position: number, width: number }[]
+  thumbnail?: Thumbnail
 }
 
 const SeekBar: React.FC<SeekBarProps> = ({
@@ -22,7 +24,8 @@ const SeekBar: React.FC<SeekBarProps> = ({
   type = "value",
   classes,
   screen = false,
-  secondBarValues
+  secondBarValues,
+  thumbnail
 }) => {
   const [value, setValue] = useState(currentValue);
   const [drag, setdrage] = useState<boolean>(false);
@@ -32,6 +35,7 @@ const SeekBar: React.FC<SeekBarProps> = ({
   const seekBarProgress = useRef<HTMLDivElement | null>(null);
   const seekbarThumb = useRef<HTMLDivElement | null>(null);
   const seekbarBox = useRef<HTMLDivElement | null>(null);
+  const seekbarThumbnail = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
     setValue(currentValue);
@@ -81,11 +85,25 @@ const SeekBar: React.FC<SeekBarProps> = ({
       if (percent > 98) seekbarBox.current.style.left = `98%`;
       if (percent < 1.5) seekbarBox.current.style.left = `1.5%`;
     }
-
+    if (thumbnail) setThumbnailPosition(percent)
     if (type === "value") seekbarBox.current.innerHTML = newValue.toFixed(0);
     if (type === "float") seekbarBox.current.innerHTML = newValue.toFixed(1);
     if (type === "time") seekbarBox.current.innerHTML = formatTime(newValue);
     if (type === "procent") seekbarBox.current.innerHTML = `${newValue.toFixed(0)}%`
+  }
+
+  function setThumbnailPosition(percent: number) {
+    if (!thumbnail) return
+    if (!maxValue) return
+    thumbnail.metadata.forEach((value) => {
+      let startProcent = (value.start / maxValue) * 100
+      let endProcent = (value.end / maxValue) * 100
+      if (percent >= startProcent && percent <= endProcent && seekbarThumbnail.current) {
+        console.log(value)
+        seekbarThumbnail.current.style.backgroundPosition = `-${value.imgX}px -${value.imgY}px`
+        seekbarThumbnail.current.style.left = `${percent}%`
+      }
+    })
   }
 
   function handleMouseMove(event: React.MouseEvent<HTMLDivElement> | MouseEvent) {
@@ -106,14 +124,14 @@ const SeekBar: React.FC<SeekBarProps> = ({
       onMouseMove={handleMouseMove}
     >
       {/* {secondBarValue && <div className="seekbar-progress-second" style={{ width: `${secondBarValue}%` }} />} */}
-      {secondBarValues && 
+      {secondBarValues &&
         <div className="seekbar-buffer-wrapper">
-          {secondBarValues.map((buffer) => <div className="seekbar-buffer" style={{ left: `${buffer.position}%`, width: `${buffer.width}%` }}></div> )}
+          {secondBarValues.map((buffer) => <div className="seekbar-buffer" style={{ left: `${buffer.position}%`, width: `${buffer.width}%` }}></div>)}
         </div>
       }
-      
-      <div 
-      tabIndex={-1}
+
+      <div
+        tabIndex={-1}
         ref={seekBarProgress}
         className={`seekbar-progress ${classes?.progress}`}
       />
@@ -123,6 +141,13 @@ const SeekBar: React.FC<SeekBarProps> = ({
         className={`seekbar-thumb ${classes?.thumb}`}
       />
       <div tabIndex={-1} ref={seekbarBox} style={show ? { display: "block" } : { display: "none" }} className={`seekbar-box ${classes?.box}`}></div>
+      {thumbnail && <img
+        tabIndex={-1}
+        ref={seekbarThumbnail}
+        style={show ? { display: "block", backgroundImage: `url(${thumbnail.src})` } : { display: "none" }}
+        className="seekbar-thumbnail"
+      />
+      }
     </div>
   );
 };

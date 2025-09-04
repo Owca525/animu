@@ -11,9 +11,9 @@ import NerdStats from "./components/nerdStats"
 const DeveloperStats = lazy(() => import('./components/developerStats'));
 
 // css
-import { cardData, ContextMenuProps, notificationProps, playerData, SettingsConfig } from "@renderer/utils/GlobalInterface"
+import { cardData, ContextMenuProps, notificationProps, playerData, SettingsConfig, Thumbnail } from "@renderer/utils/GlobalInterface"
 import { useSelector } from "react-redux"
-import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory } from "@renderer/utils/functions"
+import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory, toSeconds } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
 import { DeleteFromContinue, SaveContinue } from "@renderer/utils/history/continueWatch"
@@ -125,6 +125,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     // Audio Tracks
     const [audioTrackList, setAudioTrackList] = useState<{ id: number, lang?: string, label: string }[]>([]);
     const [currentAudioTrack, setCurrentAudioTrack] = useState<{ id: number, lang?: string, label: string } | undefined>();
+
+    // Thumbnail
+    const [thumbnails, setThumbnail] = useState<Thumbnail | undefined>(undefined);
 
     function handleMouseMove() {
         setIsVisible(true)
@@ -243,10 +246,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 if (data.audioTracks.length > 0) {
                     for (let index = 0; index < data.audioTracks.length; index++) {
                         const element = data.audioTracks[index];
-                        if (element.default) setCurrentAudioTrack(() => {return{ id: element.id, label: element.name, lang: element.lang }})
+                        if (element.default) setCurrentAudioTrack(() => { return { id: element.id, label: element.name, lang: element.lang } })
                     }
-                    setAudioTrackList(data.audioTracks.map((element) => {return{ id: element.id, label: element.name, lang: element.lang }}))
-                } 
+                    setAudioTrackList(data.audioTracks.map((element) => { return { id: element.id, label: element.name, lang: element.lang } }))
+                }
                 setListResolution(resolutions)
                 resolutions.reverse()
                 setRes(resolutions[0])
@@ -540,8 +543,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     useHotkeys("x", async () => {
         console.log(player_data)
-        if (hls) console.log(hls.audioTracks)
-        if (hls) hls.audioTrack = 2
+        console.log(setThumbnail(await VTTstoryBoardParser("https://seiryuu.vid-cdn.xyz/ba2fd122-7d54-4d6a-b386-f47c53497e76/storyboard.vtt")))
     })
 
     function keybinds(event: string) {
@@ -690,6 +692,44 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         return false
     }
 
+    async function VTTstoryBoardParser(url: string) {
+        let data = await window.api.request.get(url, { "User-Agent": navigator.userAgent }, "text")
+        if (!data.success) return
+        const lines = data.data.split("\n").map((l: string) => l.trim());
+        let thumbnails: Thumbnail = { src: "", metadata: [] };
+        const src: string = url.slice(0, url.lastIndexOf("/")+1) 
+        let metadata: { start: number; end: number; imgX: number; imgY: number; }[] = []
+
+        for (let i = 0; i < lines.length; i++) {
+            if (lines[i].includes("-->")) {
+                const [start, end] = lines[i].split(" --> ");
+                const next = lines[i + 1];
+                if (!next) continue;
+
+                const [file, fragment] = next.split("#");
+                let x = 0,
+                    y = 0
+
+                if (fragment?.startsWith("xywh=")) {
+                    const [xx, yy] = fragment.replace("xywh=", "").split(",").map(Number);
+                    x = xx;
+                    y = yy;
+                }
+
+                const finnalSrc: string = `${src}${file}`
+                thumbnails = { ...thumbnails, src: finnalSrc }
+                metadata.push({
+                    start: toSeconds(start),
+                    end: toSeconds(end),
+                    imgX: x,
+                    imgY: y,
+                });
+            }
+        }
+
+        return { ...thumbnails, metadata: metadata };
+    }
+
     return (
         <div className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
             <video
@@ -712,7 +752,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     kind="subtitles"
                     default
                     ref={vttSubRef}
-                    
                 />
             </video>
             {currentCue && (
@@ -771,7 +810,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     }
                 </div>
                 <div className={isVisible && isUpNextEpisode == false ? 'video-bottom' : 'video-bottom player-hidden'}>
-                    <SeekBar secondBarValues={currentBuffer} currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => { setTimeVideo(value) }} type="time" classes={{ container: "player-seekbar" }} screen={true} />
+                    <SeekBar thumbnail={thumbnails} secondBarValues={currentBuffer} currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => { setTimeVideo(value) }} type="time" classes={{ container: "player-seekbar" }} screen={true} />
                     <div className="player-bottom-section">
                         <div className="player-left">
                             {temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) - 1] !== undefined &&

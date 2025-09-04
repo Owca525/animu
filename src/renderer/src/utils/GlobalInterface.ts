@@ -247,6 +247,16 @@ export interface dialogProps {
     }
 }
 
+export interface Thumbnail {
+    src: string;
+    metadata: {
+        start: number;
+        end: number;
+        imgX: number;
+        imgY: number;
+    }[]
+};
+
 export interface FilterParams {
   genres?: string[];
   years?: string;
