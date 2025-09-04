@@ -694,6 +694,10 @@ body {
   transform: translate(-50%, 10%) scaleY(0.70);
 }
 
+.player-seekbar .seekbar-thumbnail {
+  transform: translate(-50%, 10%) scaleY(0.70);
+}
+
 .seekbar-buffer {
   border-radius: 12px;
 }
