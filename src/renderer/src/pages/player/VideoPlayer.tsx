@@ -199,6 +199,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         if (!videoRef.current) return
         const time = videoRef.current.currentTime
         if (data.subtitles) await setDefaultSubtitles(data.subtitles)
+        if (data.storyboardVTT) setThumbnail(await VTTstoryBoardParser(data.storyboardVTT))
         if (data.hls) {
             setHost(() => data.hostname)
             await runHLS(data.resolution[0].url, data.hostname)
@@ -543,7 +544,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     useHotkeys("x", async () => {
         console.log(player_data)
-        console.log(setThumbnail(await VTTstoryBoardParser("https://seiryuu.vid-cdn.xyz/ba2fd122-7d54-4d6a-b386-f47c53497e76/storyboard.vtt")))
     })
 
     function keybinds(event: string) {

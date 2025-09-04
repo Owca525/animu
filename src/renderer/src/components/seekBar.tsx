@@ -95,11 +95,11 @@ const SeekBar: React.FC<SeekBarProps> = ({
   function setThumbnailPosition(percent: number) {
     if (!thumbnail) return
     if (!maxValue) return
+    // TODO: Dodaj lepszą matme czy coś żeby nie wychodził obrazek po za ekran
     thumbnail.metadata.forEach((value) => {
       let startProcent = (value.start / maxValue) * 100
       let endProcent = (value.end / maxValue) * 100
       if (percent >= startProcent && percent <= endProcent && seekbarThumbnail.current) {
-        console.log(value)
         seekbarThumbnail.current.style.backgroundPosition = `-${value.imgX}px -${value.imgY}px`
         seekbarThumbnail.current.style.left = `${percent}%`
       }
@@ -141,7 +141,7 @@ const SeekBar: React.FC<SeekBarProps> = ({
         className={`seekbar-thumb ${classes?.thumb}`}
       />
       <div tabIndex={-1} ref={seekbarBox} style={show ? { display: "block" } : { display: "none" }} className={`seekbar-box ${classes?.box}`}></div>
-      {thumbnail && <img
+      {thumbnail && <div
         tabIndex={-1}
         ref={seekbarThumbnail}
         style={show ? { display: "block", backgroundImage: `url(${thumbnail.src})` } : { display: "none" }}

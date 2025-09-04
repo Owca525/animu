@@ -54,6 +54,9 @@
     transform: translateX(-50%);
     height: 101px;
     width: 180px;
-    top: -90px;
+    top: -130px;
     background-repeat: no-repeat;
+    border-radius: 12px;
+    outline: 3px solid var(--player-bg-containers);
+    background-color: var(--player-bg-containers);
 }

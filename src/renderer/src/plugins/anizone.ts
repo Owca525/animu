@@ -19,6 +19,7 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
     if (!req.success) return []
 
     let data = req.data as string
+    let storyboard = [...data.matchAll(/https:\/\/seiryuu\.vid-cdn\.xyz\/[a-z0-9-]+\/storyboard\.vtt/gi)]
     let urls = [...data.matchAll(/https:\/\/seiryuu\.vid-cdn\.xyz\/[a-z0-9-]+\/master\.m3u8/gi)]
     if (urls.length <= 0) return []
     let otherFiles = [...data.matchAll(/<track[^>]*\s+src=["']?(?<src>[^"'\s>]+)["']?[^>]*\s+data-type=["']?(?<dataType>[^"'\s>]+)["']?[^>]*\s+kind=["']?(?<kind>[^"'\s>]+)["']?[^>]*\s+label=["']?(?<label>[^"']+)["']?[^>]*\s+srclang=["']?(?<srclang>[^"'\s>]+)["']?[^>]*>/gi)]
@@ -42,6 +43,7 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
         hostname: "Anizone.to",
         hls: true,
         subtitles: subList,
+        storyboardVTT: storyboard.length > 0 ? storyboard[0][0] : undefined,
         resolution: [{ res: "", url: urls[0][0] }]
     }]
 }
