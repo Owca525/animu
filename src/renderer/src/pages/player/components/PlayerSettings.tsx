@@ -6,16 +6,18 @@ interface playerSettingsProps {
     resolution: { res: number, change: () => void }[]
     speed: { speed: number, change: () => void }[]
     subtitles: { sub: string, change: () => void }[]
+    audioTrack: { track: string, change: () => void }[]
     disableSettings: () => void
     current: {
         currentHost: string,
         currentResolution: string | number,
         currentSpeed: number,
-        currentSub: string
+        currentSub: string,
+        currentTrack: string
     }
 }
 
-const PlayerSettings: React.FC<playerSettingsProps> = ({ sources, resolution, speed, disableSettings, current, subtitles }) => {
+const PlayerSettings: React.FC<playerSettingsProps> = ({ sources, resolution, speed, disableSettings, current, subtitles, audioTrack }) => {
     const [currentSettings, setcurrentSettings] = useState<string>("settings")
 
     function reset(func: () => void) {
@@ -33,6 +35,9 @@ const PlayerSettings: React.FC<playerSettingsProps> = ({ sources, resolution, sp
                     </div>
                     <div tabIndex={-1} className="player-settings-button" onClick={() => resolution.length > 1 ? setcurrentSettings("res") : ""}>
                         <div tabIndex={-1} className="player-settings-button-icon-container"><span className="material-symbols-outlined">instant_mix</span><span className='player-settings-button-text'>Resolution</span></div><span className={`player-settings-button-text ${resolution.length <= 1 && "player-settings-button-text-gray"}`}>{current.currentResolution + "p"}</span>
+                    </div>
+                    <div tabIndex={-1} className="player-settings-button" onClick={() => resolution.length > 1 ? setcurrentSettings("track") : ""}>
+                        <div tabIndex={-1} className="player-settings-button-icon-container"><span className="material-symbols-outlined">music_note</span><span className='player-settings-button-text'>Audio</span></div><span className={`player-settings-button-text ${audioTrack.length <= 1 && "player-settings-button-text-gray"}`}>{current.currentTrack}</span>
                     </div>
                     <div tabIndex={-1} className="player-settings-button" onClick={() => resolution.length > 1 ? setcurrentSettings("sub") : ""}>
                         <div tabIndex={-1} className="player-settings-button-icon-container"><span className="material-symbols-outlined">subtitles</span><span className='player-settings-button-text'>Subtitles</span></div><span className={`player-settings-button-text ${subtitles.length <= 0 && "player-settings-button-text-gray"}`}>{current.currentSub}</span>
@@ -74,6 +79,18 @@ const PlayerSettings: React.FC<playerSettingsProps> = ({ sources, resolution, sp
                     {subtitles.map((data) =>
                         <div tabIndex={-1} className="player-settings-button" onClick={() => reset(data.change)}>
                             <span tabIndex={-1} className="player-settings-button-text">{data.sub}</span>
+                        </div>
+                    )}
+                </>
+            }
+            {currentSettings === "track" &&
+                <>
+                    <div tabIndex={-1} className="player-settings-button-back" onClick={() => setcurrentSettings("settings")}>
+                        <span tabIndex={-1} className="material-symbols-outlined">arrow_back</span><span>Audio</span>
+                    </div>
+                    {audioTrack.map((data) =>
+                        <div tabIndex={-1} className="player-settings-button" onClick={() => reset(data.change)}>
+                            <span tabIndex={-1} className="player-settings-button-text">{data.track}</span>
                         </div>
                     )}
                 </>

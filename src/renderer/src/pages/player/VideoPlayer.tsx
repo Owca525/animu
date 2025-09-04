@@ -122,6 +122,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const vttSubRef = useRef<HTMLTrackElement | null>(null);
     const [currentCue, setCue] = useState<string | undefined>(undefined);
 
+    // Audio Tracks
+    const [audioTrackList, setAudioTrackList] = useState<{ id: number, lang?: string, label: string }[]>([]);
+    const [currentAudioTrack, setCurrentAudioTrack] = useState<{ id: number, lang?: string, label: string } | undefined>();
 
     function handleMouseMove() {
         setIsVisible(true)
@@ -181,7 +184,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         setListSubtitles(() => [{ url: "", format: "", lang: "", label: "Off" }, ...data])
         for (let index = 0; index < data.length; index++) {
             const element = data[index];
-            console.info(element)
             if (element.lang == i18n.language && !element.label.includes("Forced")) {
                 await setNewSubtitles(element)
                 return
@@ -208,11 +210,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         videoRef.current.currentTime = time
     }
 
+    function changeAudioTrack(data: { id: number, lang?: string, label: string }) {
+        try {
+            if (hls) {
+                hls.audioTrack = data.id
+                setCurrentAudioTrack(() => data)
+            }
+        } catch (error) {
+            toast.error("Failed Changing audio", notificationProps)
+        }
+    }
+
     async function runHLS(url: string, host: string) {
         const hlsModule = (await import('hls.js')).default;
 
         const hls = new hlsModule({
             maxBufferLength: 30,
+            autoStartLoad: true,
         });
 
         if (hlsModule.isSupported() && videoRef.current) {
@@ -226,14 +240,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
             hls.on(hlsModule.Events.MANIFEST_PARSED, (_, data) => {
                 const resolutions = data.levels.map((level) => level.height);
+                if (data.audioTracks.length > 0) {
+                    for (let index = 0; index < data.audioTracks.length; index++) {
+                        const element = data.audioTracks[index];
+                        if (element.default) setCurrentAudioTrack(() => {return{ id: element.id, label: element.name, lang: element.lang }})
+                    }
+                    setAudioTrackList(data.audioTracks.map((element) => {return{ id: element.id, label: element.name, lang: element.lang }}))
+                } 
                 setListResolution(resolutions)
                 resolutions.reverse()
                 setRes(resolutions[0])
                 setResolution(resolutions[0])
-            });
-
-            hls.on(hlsModule.Events.MANIFEST_PARSED, (_) => {
-                console.log("Audio tracks:", hls.audioTracks);
             });
 
             hls.on(hlsModule.Events.ERROR, (_event, data) => {
@@ -523,6 +540,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     useHotkeys("x", async () => {
         console.log(player_data)
+        if (hls) console.log(hls.audioTracks)
+        if (hls) hls.audioTrack = 2
     })
 
     function keybinds(event: string) {
@@ -809,12 +828,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                     subtitles={
                                         ListSubtitles.map((val) => { return { sub: val.label, change: () => setNewSubtitles(val) } })
                                     }
+                                    audioTrack={
+                                        audioTrackList.map((val) => { return { track: val.label, change: () => changeAudioTrack(val) } })
+                                    }
                                     disableSettings={() => setcurrentSettings(() => false)}
                                     current={{
                                         currentHost: currentHost,
                                         currentResolution: currentResolution,
                                         currentSpeed: videoRef.current?.playbackRate ? videoRef.current?.playbackRate : 1,
-                                        currentSub: currentSubtitles ? currentSubtitles.label : "Off"
+                                        currentSub: currentSubtitles ? currentSubtitles.label : "Off",
+                                        currentTrack: currentAudioTrack ? currentAudioTrack.label : "Default"
                                     }}
                                 />
                             }
