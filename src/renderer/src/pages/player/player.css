@@ -361,13 +361,16 @@
 }
 .player-subtitle-content {
   text-align: center;
-  font-size: 2em;
-  text-shadow: 2px 2px 4px black;
+  font-size: 3em;
   pointer-events: none;
-  background-color: var(--player-bg-containers);
+  background-color: var(--invisible);
   width: max-content;
   padding: 6px;
-  border-radius: 8px;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  filter: drop-shadow(2px 2px 1px black);
+  -webkit-text-stroke-width: 2px;
+  -webkit-text-stroke-color: black;
+  font-weight: bold;
 }
 
 .player-subtitle-container.up {
