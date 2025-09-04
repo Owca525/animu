@@ -485,7 +485,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             assSubContainer.current.innerHTML = ""
         }
 
-        if (vttUrl) setVttUrl(() => undefined)
+        if (vttUrl) {
+            setVttUrl(() => undefined)
+            setCue(() => undefined)
+        }
 
         if (sub.label == "Off" && sub.format == "", sub.lang == "", sub.url == "") {
             setSubtitles({ url: "", format: "", lang: "", label: "Off" })
