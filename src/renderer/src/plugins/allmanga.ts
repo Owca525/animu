@@ -309,7 +309,7 @@ export async function getInformation(animeData?: AnimeData, anime_id?: string): 
 async function getURLS(url: string): Promise<playerData | undefined> {
   url = decodeText(url.replace('--', ''))
   const links = await sendRequest(`http://allanime.day${url}`, {
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0'
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0'
   })
   if (!links) return undefined
 

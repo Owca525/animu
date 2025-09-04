@@ -3,7 +3,7 @@ import { AnimeData, cardData, episodeList, playerData, pluginFormat } from "@ren
 const WEB = "https://anizone.to"
 const CARDS_REGEX = /<div[^>]*class=["']grid grid-cols-1 2xl:grid-cols-2 gap-4["'][^>]*>(.*?)<\/div>/gs
 const HEADER = {
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0'
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0'
 }
 
 function convertText(text: string) {
