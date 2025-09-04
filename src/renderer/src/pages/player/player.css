@@ -352,6 +352,28 @@
   font-size: 72px;
 }
 
+.player-subtitle-container {
+  position: absolute;
+  bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.player-subtitle-content {
+  text-align: center;
+  font-size: 2em;
+  text-shadow: 2px 2px 4px black;
+  pointer-events: none;
+  background-color: var(--player-bg-containers);
+  width: max-content;
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.player-subtitle-container.up {
+  bottom: 80px;
+}
+
 /* .player-fast-forward-ui, .player-fast-rewind-ui {
   position: relative;
 }

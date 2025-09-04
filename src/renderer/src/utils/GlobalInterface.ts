@@ -72,7 +72,7 @@ export interface playerData {
     hostname: string
     hls: boolean
     resolution: { res: string, url: string }[]
-    subtitles?: { url: string, lang: string }[]
+    subtitles?: { url: string, lang: string, label: string, format: string }[]
 }
 
 export interface indentityPlayer {

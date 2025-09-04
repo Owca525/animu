@@ -26,6 +26,7 @@ import PlayerEpisodeElement from "./components/playerEpisodeElement"
 import { convert } from "subtitle-converter";
 import { useHotkeys } from "react-hotkeys-hook"
 import i18n from "@renderer/utils/i18n"
+import ASS from "assjs"
 
 function addTime(durration: number): string {
     const now = new Date();
@@ -114,6 +115,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     // Subtitles
     const [vttUrl, setVttUrl] = useState<string | undefined>(undefined);
+    const [ListSubtitles, setListSubtitles] = useState<{ url: string, lang: string, label: string, format: string }[]>([])
+    const [currentASSubtitles, setASSubtitles] = useState<ASS | undefined>(undefined)
+    const [currentSubtitles, setSubtitles] = useState<{ url: string, lang: string, label: string, format: string } | undefined>(undefined)
+    const assSubContainer = useRef<HTMLDivElement | null>(null);
+    const vttSubRef = useRef<HTMLTrackElement | null>(null);
+    const [currentCue, setCue] = useState<string | undefined>(undefined);
+
 
     function handleMouseMove() {
         setIsVisible(true)
@@ -168,14 +176,24 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         checkUrl(player_data[value + 1])
     }
 
+    async function setDefaultSubtitles(data: { url: string, lang: string, label: string, format: string }[]) {
+        if (data.length <= 0) return
+        setListSubtitles(() => [{ url: "", format: "", lang: "", label: "Off" }, ...data])
+        for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+            console.info(element)
+            if (element.lang == i18n.language && !element.label.includes("Forced")) {
+                await setNewSubtitles(element)
+                return
+            }
+        }
+        setNewSubtitles(data[0])
+    }
+
     async function checkUrl(data: playerData) {
         if (!videoRef.current) return
         const time = videoRef.current.currentTime
-        if (data.subtitles) {
-            data.subtitles.forEach(async (sub) => {
-                if (sub.lang == i18n.language) convertingSubtitles(sub.url)
-            })
-        }
+        if (data.subtitles) await setDefaultSubtitles(data.subtitles)
         if (data.hls) {
             setHost(() => data.hostname)
             await runHLS(data.resolution[0].url, data.hostname)
@@ -212,6 +230,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 resolutions.reverse()
                 setRes(resolutions[0])
                 setResolution(resolutions[0])
+            });
+
+            hls.on(hlsModule.Events.MANIFEST_PARSED, (_) => {
+                console.log("Audio tracks:", hls.audioTracks);
             });
 
             hls.on(hlsModule.Events.ERROR, (_event, data) => {
@@ -432,24 +454,72 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         setNextEpisode(temp.episodes[ep].ep)
     }
 
-    async function convertingSubtitles(url: string) {
-        let data = await window.api.request.get(url, { "User-Agent": navigator.userAgent }, "text")
+    function onChangeTrackText(event: Event) {
+        if (!event.currentTarget) return
+        let track = event.currentTarget as unknown as TextTrack
+        if (!track.activeCues) return
+        let activeCue = track.activeCues[0] as VTTCue
+
+        try {
+            if (activeCue.text) {
+                setCue(activeCue.text)
+                console.log([activeCue.text])
+            }
+            else setCue(undefined)
+        } catch (error) {
+            setCue(undefined)
+        }
+    }
+
+    async function setNewSubtitles(sub: { url: string, lang: string, label: string, format: string }) {
+        if (!videoRef.current) return
+
+        // This clear subtitles but this dosen't work on dev Because react second render
+        if (currentASSubtitles) {
+            currentASSubtitles.hide()
+            currentASSubtitles.destroy()
+            setASSubtitles(() => undefined)
+        }
+
+        if (window.electronAPI.process.env.NODE_ENV == "development" && currentASSubtitles && assSubContainer.current) {
+            assSubContainer.current.innerHTML = ""
+        }
+
+        if (vttUrl) setVttUrl(() => undefined)
+
+        if (sub.label == "Off" && sub.format == "", sub.lang == "", sub.url == "") {
+            setSubtitles({ url: "", format: "", lang: "", label: "Off" })
+            return
+        }
+
+        let data = await window.api.request.get(sub.url, { "User-Agent": navigator.userAgent }, "text")
         if (!data.success) return
-        const vtt = await convert(data.data, ".vtt");
+        if (sub.format == "ass") {
+            if (!assSubContainer.current) return
+            const ass = new ASS(data.data, videoRef.current, {
+                container: assSubContainer.current,
+            });
+            ass.show();
+            setASSubtitles(ass)
+            setSubtitles(() => sub)
+            if (isPlaying) {
+                videoRef.current.pause()
+                videoRef.current.play()
+            }
+            return
+        }
+
+        const vtt = await convert(data.data, ".vtt", { removeTextFormatting: true });
         const blob = new Blob([vtt.subtitle], { type: "text/vtt" });
         setVttUrl(URL.createObjectURL(blob));
+        setSubtitles(() => sub)
+        let track = videoRef.current.textTracks[0]
+        track.mode = "hidden"
+        track.oncuechange = onChangeTrackText;
     }
 
     useHotkeys("x", async () => {
-        console.log(i18n.language)
-        // TODO: Dodanie własnego cue i dodać ustawienie do zmiany napisów 
-        // await convertingSubtitles("https://seiryuu.vid-cdn.xyz/ba2fd122-7d54-4d6a-b386-f47c53497e76/subtitles/2_en.srt")
-        // if (videoRef.current) {
-        //     let track = videoRef.current.textTracks[0]
-        //     if (track.activeCues && track.activeCues.length >= 0) {
-        //         console.log((track.activeCues[0] as VTTCue).text)
-        //     }
-        // }
+        console.log(player_data)
     })
 
     function keybinds(event: string) {
@@ -615,16 +685,22 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 muted={isMuted}
                 style={config.Player.general.VideoStreching ? { objectFit: "cover" } : {}}
             >
-                {vttUrl && (
-                    <track
-                        src={vttUrl}
-                        kind="subtitles"
-                        srcLang="en"
-                        label="English"
-                        default
-                    />
-                )}
+                <track
+                    src={vttUrl}
+                    kind="subtitles"
+                    default
+                    ref={vttSubRef}
+                    
+                />
             </video>
+            {currentCue && (
+                <div className={`player-subtitle-container ${isVisible ? "up" : "down"}`}>
+                    {currentCue.split("\n").map((text) => (
+                        <span className="player-subtitle-content">{text}</span>
+                    ))}
+                </div>
+            )}
+            <div ref={assSubContainer} style={{ position: "absolute", top: "0", left: "0" }}></div>
             {isVisible &&
                 <>
                     <div className="player-mask top"></div>
@@ -727,11 +803,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                         ListResolution.map((val) => { return { res: val, change: () => setRes(val) } })
                                     }
                                     speed={speed.map((val) => { return { speed: parseFloat(val), change: () => setSpeed(val) } })}
+                                    subtitles={
+                                        ListSubtitles.map((val) => { return { sub: val.label, change: () => setNewSubtitles(val) } })
+                                    }
                                     disableSettings={() => setcurrentSettings(() => false)}
                                     current={{
                                         currentHost: currentHost,
                                         currentResolution: currentResolution,
-                                        currentSpeed: videoRef.current?.playbackRate ? videoRef.current?.playbackRate : 1
+                                        currentSpeed: videoRef.current?.playbackRate ? videoRef.current?.playbackRate : 1,
+                                        currentSub: currentSubtitles ? currentSubtitles.label : "Off"
                                     }}
                                 />
                             }

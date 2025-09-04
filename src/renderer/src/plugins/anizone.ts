@@ -1,7 +1,6 @@
 import { AnimeData, cardData, episodeList, playerData, pluginFormat } from "@renderer/utils/GlobalInterface";
 
 const WEB = "https://anizone.to"
-const PLAYER_REGEX = /(?<!href=["'])(https:\/\/seiryuu\.vid-cdn\.xyz[^\s"'>]+)/g;
 const CARDS_REGEX = /<div[^>]*class=["']grid grid-cols-1 2xl:grid-cols-2 gap-4["'][^>]*>(.*?)<\/div>/gs
 const HEADER = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0'
@@ -20,37 +19,30 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
     if (!req.success) return []
 
     let data = req.data as string
-    let urls = [...data.matchAll(PLAYER_REGEX)]
+    let urls = [...data.matchAll(/https:\/\/seiryuu\.vid-cdn\.xyz\/[a-z0-9-]+\/master\.m3u8/gi)]
     if (urls.length <= 0) return []
-    console.log(urls)
-    let subList: { url: string, lang: string }[] = []
-    for (let index = 0; index < urls.length; index++) {
-        const element = urls[index];
-        if (element[0].includes("subtitles") && !element[0].includes("es-419")) {
-            let file = element[0].substring(element[0].lastIndexOf("/") + 1)
-            let tmp = [file.lastIndexOf("_")+1, file.lastIndexOf(".")]
+    let otherFiles = [...data.matchAll(/<track[^>]*\s+src=["']?(?<src>[^"'\s>]+)["']?[^>]*\s+data-type=["']?(?<dataType>[^"'\s>]+)["']?[^>]*\s+kind=["']?(?<kind>[^"'\s>]+)["']?[^>]*\s+label=["']?(?<label>[^"']+)["']?[^>]*\s+srclang=["']?(?<srclang>[^"'\s>]+)["']?[^>]*>/gi)]
+    if (otherFiles.length <= 0) return []
+
+    let subList: { url: string, lang: string, label: string, format: string }[] = []
+    for (let index = 0; index < otherFiles.length; index++) {
+        const element = otherFiles[index];
+        if (element[3] == "subtitles") {
             subList.push({
-                url: element[0],
-                lang: file.slice(tmp[0], tmp[1])
+                url: element[1],
+                lang: element[5],
+                label: element[4],
+                format: element[2]
             })
-        }
-    }
-    
-    let extraction: playerData[] = []
-    for (let index = 0; index < urls.length; index++) {
-        const element = urls[index];
-        if (element[0].includes("master.m3u8")) {
-            extraction.push({
-                hostname: "anizone.to",
-                hls: true,
-                subtitles: subList,
-                resolution: [{ res: "", url: element[0] }]
-            })
-            break
         }
     }
 
-    return extraction
+    return [{
+        hostname: "Anizone.to",
+        hls: true,
+        subtitles: subList,
+        resolution: [{ res: "", url: urls[0][0] }]
+    }]
 }
 
 async function getAnimeID(text: string): Promise<string | undefined> {

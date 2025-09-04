@@ -6,6 +6,8 @@
   min-width: 130px;
   width: fit-content;
   padding: 8px;
+  max-height: 400px;
+  overflow: auto;
 }
 
 .player-settings-button, .player-settings-button-back {
