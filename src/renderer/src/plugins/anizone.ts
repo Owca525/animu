@@ -147,11 +147,11 @@ export const AniZone: pluginFormat = {
     version: "1.0",
     name: "AniZone",
     author: "Owca525",
-    icon: "",
     player: {
         getUrls: getURLFromPlayer,
         animeDataList: getEpisodeList,
         episodeList: extractEpisodeList,
         animeList: getAnimeCards
-    }
+    },
+    preferedLang: ["en"]
 }

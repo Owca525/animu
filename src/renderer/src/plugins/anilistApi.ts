@@ -519,7 +519,7 @@ export async function SearchConvertData(animeData: AnimeData): Promise<AnimeData
 }
 
 export const infoPlugin: pluginFormat = {
-  version: "0.1",
+  version: "1.0",
   name: "AnilistApi",
   author: "Owca525",
   icon: "https://anilist.co/img/icons/icon.svg",
@@ -534,5 +534,6 @@ export const infoPlugin: pluginFormat = {
       format: ["TV", "Movie", "TV Short", "special", " OVA", "ONA"],
       statuses: ["Releasing", "Finished", "Not Yet Aired", "Cancelled"]
     }
-  }
+  },
+  preferedLang: ["en"]
 }

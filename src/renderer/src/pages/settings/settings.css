@@ -176,6 +176,10 @@ td {
   gap: 12px;
 }
 
+.settings-extensions-icon-placeholder {
+  height: 40px;
+}
+
 .settings-special-images {
   cursor: pointer;
   width: 60px;

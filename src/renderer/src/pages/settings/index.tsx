@@ -784,7 +784,7 @@ function settings() {
                                 </tr>
                                 {pluginList.map((plugin) => (
                                     <tr className="settings-table-button">
-                                        <td className="settings-extensions-title"><img className="settings-extensions-icon" src={plugin.icon} />{plugin.name}</td>
+                                        <td className="settings-extensions-title">{plugin.icon ? <img className="settings-extensions-icon" src={plugin.icon} /> : <div className="settings-extensions-icon-placeholder"></div>}{plugin.name}</td>
                                         <td><div className="settings-extensions-background">{plugin.author}</div></td>
                                         <td><div className="settings-extensions-background">{plugin.version}</div></td>
                                         <td>

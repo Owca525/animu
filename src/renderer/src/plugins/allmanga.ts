@@ -394,7 +394,7 @@ export async function getEpisodeList(type: string, anime_id: string): Promise<{ 
 }
 
 export const infoPluginPlayer: pluginFormat = {
-  version: "0.1",
+  version: "1.0",
   name: "Allmanga",
   author: "Owca525",
   icon: "https://allmanga.to/android-icon-192x192.png",
@@ -404,5 +404,6 @@ export const infoPluginPlayer: pluginFormat = {
     episodeList: getEpisodeList,
     animeList: getAnimeList,
   },
-  sidebarAddon: [{ icon: "today", text: "Recent Anime", onClick: async () => await recentAnime() }]
+  sidebarAddon: [{ icon: "today", text: "Recent Anime", onClick: async () => await recentAnime() }],
+  preferedLang: ["en"]
 }

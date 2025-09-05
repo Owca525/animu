@@ -127,7 +127,8 @@ export interface pluginFormat {
     version: string
     name: string
     author: string
-    icon: string
+    icon?: string
+    preferedLang: string[]
     information?: {
         pageSize: number
         search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => void
