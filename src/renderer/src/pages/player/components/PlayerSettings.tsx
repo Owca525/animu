@@ -36,10 +36,10 @@ const PlayerSettings: React.FC<playerSettingsProps> = ({ sources, resolution, sp
                     <div tabIndex={-1} className="player-settings-button" onClick={() => resolution.length > 1 ? setcurrentSettings("res") : ""}>
                         <div tabIndex={-1} className="player-settings-button-icon-container"><span className="material-symbols-outlined">instant_mix</span><span className='player-settings-button-text'>Resolution</span></div><span className={`player-settings-button-text ${resolution.length <= 1 && "player-settings-button-text-gray"}`}>{current.currentResolution + "p"}</span>
                     </div>
-                    <div tabIndex={-1} className="player-settings-button" onClick={() => resolution.length > 1 ? setcurrentSettings("track") : ""}>
+                    <div tabIndex={-1} className="player-settings-button" onClick={() => audioTrack.length > 1 ? setcurrentSettings("track") : ""}>
                         <div tabIndex={-1} className="player-settings-button-icon-container"><span className="material-symbols-outlined">music_note</span><span className='player-settings-button-text'>Audio</span></div><span className={`player-settings-button-text ${audioTrack.length <= 1 && "player-settings-button-text-gray"}`}>{current.currentTrack}</span>
                     </div>
-                    <div tabIndex={-1} className="player-settings-button" onClick={() => resolution.length > 1 ? setcurrentSettings("sub") : ""}>
+                    <div tabIndex={-1} className="player-settings-button" onClick={() => subtitles.length >= 1 ? setcurrentSettings("sub") : ""}>
                         <div tabIndex={-1} className="player-settings-button-icon-container"><span className="material-symbols-outlined">subtitles</span><span className='player-settings-button-text'>Subtitles</span></div><span className={`player-settings-button-text ${subtitles.length <= 0 && "player-settings-button-text-gray"}`}>{current.currentSub}</span>
                     </div>
                     <div tabIndex={-1} className="player-settings-button" onClick={() => setcurrentSettings("speed")}>
