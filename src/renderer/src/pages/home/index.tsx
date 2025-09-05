@@ -22,7 +22,7 @@ const Home = () => {
     const navigate = useNavigate()
     const plugin = useSelector((plugin: any) => plugin.plugin.informationPlugin);
     const homeCache: homeData = useSelector((cache: any) => cache.home);
-    const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
+    const pluginPlayer = store.getState().plugin.playerPlugin;
     const config: SettingsConfig = useSelector((data: any) => data.config);
 
     const divRef = useRef<HTMLDivElement | null>(null);

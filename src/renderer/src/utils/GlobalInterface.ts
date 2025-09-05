@@ -105,7 +105,7 @@ export interface containerData {
 export interface sidebarData {
     icon: string
     text: string
-    onClick?: () => any
+    onClick?: () => void
 }
 
 export type ContextMenuProps = {

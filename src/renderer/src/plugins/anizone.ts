@@ -36,7 +36,6 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
                 format: element[2]
             })
         }
-        console.log(element)
     }
 
     return [{

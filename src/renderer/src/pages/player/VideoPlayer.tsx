@@ -1,10 +1,6 @@
 import { lazy, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
-
-// utils
-import { closeDialog } from "@renderer/utils/context/DialogContext"
 
 // Components
 import NerdStats from "./components/nerdStats"
@@ -27,6 +23,7 @@ import { convert } from "subtitle-converter";
 import { useHotkeys } from "react-hotkeys-hook"
 import i18n from "@renderer/utils/i18n"
 import ASS from "assjs"
+import store from "@renderer/utils/store"
 
 function addTime(durration: number): string {
     const now = new Date();
@@ -63,10 +60,10 @@ interface VideoPlayerProps {
     volumeCacheFunc: (value: number) => void
     PlayerVolume: number
     time: number
+    exitFromPlayer: () => void
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp, setNextEpisode, volumeCacheFunc, PlayerVolume = 0, time }) => {
-    const navigate = useNavigate()
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp, setNextEpisode, volumeCacheFunc, PlayerVolume = 0, time, exitFromPlayer }) => {
     // Translation 
     const { t } = useTranslation()
     const config: SettingsConfig = useSelector((data: any) => data.config);
@@ -320,16 +317,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     }
 
     async function exitPlayer() {
-        closeDialog()
-        if (config && config.General.Window.AutoFullscreen) {
-            navigate('/')
-            return
-        }
         if (document.pictureInPictureElement) {
             await document.exitPictureInPicture();
         }
         window.BrowserWindow.setFullscreen(false)
-        navigate('/')
+        exitFromPlayer()
     }
 
     function saveContinueProgress() {
@@ -344,7 +336,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             SaveContinue({
                 AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
                 saveData: {
-                    pluginName: config.plugins.player,
+                    pluginName: store.getState().plugin.playerPlugin.name,
                     last_Time: videoRef.current.currentTime,
                     episode: temp.episode,
                     type: temp.type

@@ -49,7 +49,7 @@ function App() {
   async function initialAnimu() {
     await LoadConfig()
     setTextLoading(() => "Loading Plugins...")
-    await InitialPlugin()
+    InitialPlugin()
     setIsLoading(() => false)
   }
 

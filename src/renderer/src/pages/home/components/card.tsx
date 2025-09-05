@@ -13,6 +13,7 @@ import {
 } from "@renderer/utils/functions";
 import { extractInformation } from "@renderer/plugins/allmanga";
 import { ChangePlugin } from "@renderer/utils/pluginApi";
+import store from "@renderer/utils/store";
 
 const Card: React.FC<cardData> = ({
   AnimeData,
@@ -23,7 +24,6 @@ const Card: React.FC<cardData> = ({
   const navigate = useNavigate();
   const [isLoading, setLoading] = useState<boolean>(true);
   const [isError, setisError] = useState<boolean>(false);
-  const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
   const [isOut, setisOut] = useState<boolean>(false);
   const config: SettingsConfig = useSelector((data: any) => data.config);
   const cardRef = useRef<HTMLDivElement | null>(null);
@@ -41,19 +41,21 @@ const Card: React.FC<cardData> = ({
     if (
       saveData &&
       saveData.episode != "" &&
-      saveData.last_Time != 0 &&
-      saveData.type != ""
+      saveData.last_Time != 0
     ) {
+      if (config.plugins.player != saveData.pluginName) await ChangePlugin(saveData.pluginName)
+      let episodeList = await store.getState().plugin.playerPlugin.player.episodeList(
+        saveData.type,
+        AnimeData.player_ID
+      )
+      console.log(config.plugins.player != saveData.pluginName, store.getState().plugin.playerPlugin.name)
       navigate("/player", {
         state: {
           data: {
             AnimeData: AnimeData,
             saveData: saveData,
           },
-          episodelist: await pluginPlayer.player.episodeList(
-            saveData.type,
-            AnimeData.player_ID
-          ),
+          episodelist: episodeList,
           continueWatch: true
         },
       });
@@ -137,35 +139,35 @@ const Card: React.FC<cardData> = ({
     if (!AnimeData.studios && !AnimeData.status && !AnimeData.genres && !AnimeData.description) return undefined
     let information: JSX.Element[] = []
     if (AnimeData.averageScore) {
-      information = [ ...information, <div className="card-information-score" style={{border: `3px solid ${getGradientColor(AnimeData.averageScore)}`}}>{AnimeData.averageScore}%</div> ]
+      information = [...information, <div className="card-information-score" style={{ border: `3px solid ${getGradientColor(AnimeData.averageScore)}` }}>{AnimeData.averageScore}%</div>]
     }
     if (AnimeData.nextAiringEpisode && !saveData) {
-      information = [ ...information, <div className="card-information-text card-information-top">{t("card_information.ep_airing", { ep: AnimeData.nextAiringEpisode.episode, text: ConvertTimeToText() })}</div> ]
+      information = [...information, <div className="card-information-text card-information-top">{t("card_information.ep_airing", { ep: AnimeData.nextAiringEpisode.episode, text: ConvertTimeToText() })}</div>]
     }
     if ((!AnimeData.nextAiringEpisode || saveData) && (AnimeData.season && AnimeData.seasonYear)) {
-      information = [ ...information, <div className="card-information-text card-information-top">{t(`anime_seasons.${AnimeData.season.toLowerCase()}`)} {AnimeData.seasonYear}</div>]
+      information = [...information, <div className="card-information-text card-information-top">{t(`anime_seasons.${AnimeData.season.toLowerCase()}`)} {AnimeData.seasonYear}</div>]
     } else if (!(AnimeData.season && AnimeData.seasonYear) && !AnimeData.nextAiringEpisode) {
-      information = [ ...information, <div className="card-information-text card-information-top">TBA</div>]
+      information = [...information, <div className="card-information-text card-information-top">TBA</div>]
     }
     if (AnimeData.studios.length > 0) {
-      information = [ ...information, <div className="card-information-text">{AnimeData.studios[0]}</div> ]
+      information = [...information, <div className="card-information-text">{AnimeData.studios[0]}</div>]
     }
     if (AnimeData.studios.length <= 0 && AnimeData.status) {
-      information = [ ...information, <div className="card-information-text">{t(`anime_statuses.${AnimeData.status.toLowerCase()}`)}</div> ]
+      information = [...information, <div className="card-information-text">{t(`anime_statuses.${AnimeData.status.toLowerCase()}`)}</div>]
     }
     let bottom: JSX.Element[] = []
     if (AnimeData.format) {
-      bottom = [ ...bottom, <>{capitalizeFirstLetter(AnimeData.format)}</> ]
+      bottom = [...bottom, <>{capitalizeFirstLetter(AnimeData.format)}</>]
     }
     if (!AnimeData.format && AnimeData.type) {
-      bottom = [ ...bottom, <>{capitalizeFirstLetter(AnimeData.type)}</> ]
+      bottom = [...bottom, <>{capitalizeFirstLetter(AnimeData.type)}</>]
     }
     if (AnimeData.episodes && AnimeData.format?.toUpperCase() != "MOVIE") {
-      bottom = [ ...bottom, <>{bottom.length !== 0 && <span className="card-dot">·</span>}{t("card_information.episodes", { ep: AnimeData.episodes })}</> ]
+      bottom = [...bottom, <>{bottom.length !== 0 && <span className="card-dot">·</span>}{t("card_information.episodes", { ep: AnimeData.episodes })}</>]
     } else if (AnimeData.duration) {
-      bottom = [ ...bottom, <>{bottom.length !== 0 && <span className="card-dot">·</span>}{t("card_information.minutes", { min: AnimeData.duration })}</> ]
+      bottom = [...bottom, <>{bottom.length !== 0 && <span className="card-dot">·</span>}{t("card_information.minutes", { min: AnimeData.duration })}</>]
     }
-    information = [ ...information, <div className="card-information-text">{bottom}</div> ]
+    information = [...information, <div className="card-information-text">{bottom}</div>]
     return <>{information}</>
   }
 

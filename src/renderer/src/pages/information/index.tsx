@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { AnimeData, episodeList, notificationProps, SettingsConfig } from "@renderer/utils/GlobalInterface";
+import { AnimeData, episodeList, notificationProps, pluginFormat, SettingsConfig } from "@renderer/utils/GlobalInterface";
 import Button from "@renderer/components/buttons";
 import "./information.css"
 import { capitalizeFirstLetter, convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities, getGradientColor } from "@renderer/utils/functions";
@@ -23,7 +23,7 @@ function information() {
 
     const config: SettingsConfig = useSelector((data: any) => data.config);
     const informationTemp = useSelector((info: any) => info.information);
-    const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
+    const pluginPlayer = store.getState().plugin.playerPlugin as pluginFormat;
     const [showWrong, setshowWrong] = useState<boolean>(false)
     const [secondsLeft, setSecondsLeft] = useState<undefined | number>(anime_data.nextAiringEpisode?.timeUntilAiring);
     const [data, setData] = useState<episodeList | undefined>(undefined)
@@ -80,7 +80,7 @@ function information() {
     }
 
     async function initialInformation() {
-        console.log(informationTemp)
+        if (!pluginPlayer.player) return
 
         let cardAnime = (await ReadHistory()).filter((element) => element.AnimeData.id == anime_data.id)
         let cardAnimeContinueWatch = (await ReadContinue()).filter((element) => element.AnimeData.id == anime_data.id)

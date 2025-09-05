@@ -63,7 +63,7 @@ export async function setHomeLocalSearch(payload: boolean) {
     }
 }
 
-export async function InitialPlugin() {
+export function InitialPlugin() {
     try {
         const config: SettingsConfig = store.getState().config
         const loadedPlugins: pluginFormat[] = store.getState().plugin.loadedPlugins
@@ -92,6 +92,10 @@ export async function ChangePlugin(name: string) {
         for (let index = 0; index < loadedPlugins.length; index++) {
             const element = loadedPlugins[index];
             if (element.name == name) {
+                store.dispatch({type: "setPluginPlayer", payload: element})
+                return
+            }
+            if (name == "" && element.name == "Allmanga") {
                 store.dispatch({type: "setPluginPlayer", payload: element})
                 return
             }

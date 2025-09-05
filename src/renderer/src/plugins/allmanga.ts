@@ -217,9 +217,9 @@ export async function recentAnime(page: number = 1) {
   })
 }
 
-async function getAnimeList(name: string): Promise<cardData[]> {
+async function getAnimeList(anime: AnimeData): Promise<cardData[]> {
   try {
-    let data = await SearchAnime(name)
+    let data = await SearchAnime(anime.title.romaji)
     if (data == 0) return []
     let returnData: cardData[] = []
     for (let index = 0; index < data.shows.edges.length; index++) {
@@ -243,7 +243,7 @@ export async function getInformation(animeData?: AnimeData, anime_id?: string): 
   // CHUJ MNIE TO ŻE ONE PIECIE NIE JEST WYKRYWANIE, JEŚLI ALLMANGA BY NIE MIAŁA 1P ZAMIAST ONE PIECIE JAKIE CWEL TO JEST
   console.log(animeData)
   if (animeData) {
-    let data = await getAnimeList(animeData.title.native);
+    let data = await getAnimeList(animeData);
     let precentageNative: { name: string, prec: number, data: AnimeData }[] = [];
     let precentageRomaji: { name: string, prec: number, data: AnimeData }[] = [];
     let precentageEnglish: { name: string, prec: number, data: AnimeData }[] = [];
@@ -377,19 +377,19 @@ export async function convertToNewData(id: string): Promise<cardData | null> {
   }
 }
 
-export async function getEpisodeList(type: string, anime_id: string): Promise<{ ep: string, img?: string, title?: string }[] | null> {
+export async function getEpisodeList(type: string, anime_id: string): Promise<{ ep: string, img?: string, title?: string }[]> {
   try {
     let variables = `{"_id":"${anime_id}"}`
     const resp = await sendToAPI(variables, HASH_INFO, header)
     if (resp) {
       let data = (await converterData(resp.data.show)).AnimeData.episodesList
-      if (!data) return null
+      if (!data) return []
       return data.filter(item => item.type === type).flatMap(item => item.episodes)
     }
-    return null
+    return []
   } catch (Error) {
     console.error(Error)
-    return null
+    return []
   }
 }
 

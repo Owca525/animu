@@ -29,7 +29,7 @@ const player = () => {
     const [extractionData, setextractionData] = useState<{ actual: string, type: string, episodelist: { ep: string, img?: string, title?: string }[], time: number }>({ actual: anime_data.data.saveData ? anime_data.data.saveData.episode : "1", type: anime_data.data.saveData ? anime_data.data.saveData.type : "sub", episodelist: anime_data.episodelist, time: anime_data.data.saveData ? anime_data.data.saveData?.last_Time : 0 })
     const playerID = anime_data.data.AnimeData.player_ID ?? "";
     const extractFunc = useCallback(() => {
-        return pluginPlayer.player.getUrls(extractionData.type, extractionData.actual, playerID);
+        return pluginPlayer.player.getUrls(extractionData.type, extractionData.actual, playerID); 
     }, [extractionData, playerID]);
     const [externalPlayerType, setexternalPlayerType] = useState<"Movian" | "VLC" | "Mpv" | "ChromeCast">(config.Player.external.type)
 
@@ -66,18 +66,20 @@ const player = () => {
         refetchHistory()
     }, [extractionData])
 
-    useHotkeys("Escape", () => {
-        leave()
+    useHotkeys("Escape", async () => {
+        await leave()
     });
 
     async function leave() {
         await InitialPlugin()
-        console.log(anime_data.continueWatch, config.Player.general.PlayerBehavior)
-        if (anime_data.continueWatch) navigate("/")
-        if (config.Player.general.PlayerBehavior === "home") navigate("/")
-        else navigate("/info", { state: anime_data.data.AnimeData })
         window.BrowserWindow.setFullscreen(false)
         closeDialog()
+        if (anime_data.continueWatch) {
+            navigate("/")
+            return
+        }
+        if (config.Player.general.PlayerBehavior === "home") navigate("/")
+        else navigate("/info", { state: anime_data.data.AnimeData })
     }
     if (isLoading == false && data && data.length <= 0) {
         loadingAnimation(leave, { title: anime_data.data.AnimeData.title, ep: extractionData.actual, format: anime_data.data.AnimeData.format })
@@ -116,6 +118,7 @@ const player = () => {
                     volumeCacheFunc={setPlayerVolume}
                     PlayerVolume={playerVolume}
                     time={extractionData.time}
+                    exitFromPlayer={leave}
                 />
             </Suspense>
         )
