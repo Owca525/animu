@@ -78,8 +78,8 @@ async function getEpisodeList(animeData?: AnimeData, anime_id?: string): Promise
     const req = await window.api.request.get(url, HEADER, "text");
     if (!req.success) return undefined
     let data = req.data as string
-    // let tmpData = [...data.matchAll(/<ul.*?>(.*?)<\/ul>/gs)]
-    // let urls = [...tmpData[0][0].matchAll(/href=["'](https:\/\/anizone\.to\/anime\/[^\s"']+)["']/g)]
+    let tmpData = [...data.matchAll(/<ul.*?>(.*?)<\/ul>/gs)]
+    let urls = [...tmpData[0][0].matchAll(/href=["'](https:\/\/anizone\.to\/anime\/[^\s"']+)["']/g)]
     let dataList = [...data.matchAll(/<div[^>]*class="(?=[^"]*text-slate-100)(?=[^"]*text-xs)(?=[^"]*lg:text-base)(?=[^"]*flex)(?=[^"]*flex-wrap)(?=[^"]*justify-center)(?=[^"]*gap-2)(?=[^"]*sm:gap-6)[^"]*"[^>]*>[\s\S]*?<\/div>/g)]
     let informationList = [...dataList[0][0].matchAll(/<[^>]*class="[^"]*\binline-block\b[^"]*"[^>]*>([\s\S]*?)<\/[^>]+>/g)]
     let ep: number | undefined = undefined
@@ -87,11 +87,15 @@ async function getEpisodeList(animeData?: AnimeData, anime_id?: string): Promise
         const element = informationList[index];
         if (element[1].includes("Episodes")) ep = parseInt(element[1].split(" ")[0])
     }
+
+    let lengthEpisodes = urls.filter((value) => !value[0].substring(value[0].lastIndexOf("/")).includes("s") ).length
     
     if (!ep) return undefined
 
     let episodeList: { ep: string }[] = []
-    for (let index = 1; index < (ep+1); index++) {
+    let tmp = ep
+    if (lengthEpisodes < ep && lengthEpisodes != 36) tmp = lengthEpisodes
+    for (let index = 1; index < (tmp+1); index++) {
         episodeList.push({ ep: index.toString() })
     }
 
