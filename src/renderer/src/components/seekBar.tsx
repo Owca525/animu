@@ -95,16 +95,35 @@ const SeekBar: React.FC<SeekBarProps> = ({
   function setThumbnailPosition(percent: number) {
     if (!thumbnail) return
     if (!maxValue) return
-    // TODO: Dodaj lepszą matme czy coś żeby nie wychodził obrazek po za ekran
+
     thumbnail.metadata.forEach((value) => {
-      let startProcent = (value.start / maxValue) * 100
-      let endProcent = (value.end / maxValue) * 100
-      if (percent >= startProcent && percent <= endProcent && seekbarThumbnail.current) {
-        seekbarThumbnail.current.style.backgroundPosition = `-${value.imgX}px -${value.imgY}px`
-        seekbarThumbnail.current.style.left = `${percent}%`
+      let startPercent = (value.start / maxValue) * 100
+      let endPercent = (value.end / maxValue) * 100
+
+      if (
+        percent >= startPercent &&
+        percent <= endPercent &&
+        seekbarThumbnail.current
+      ) {
+        const thumb = seekbarThumbnail.current
+        const container = thumb.parentElement
+        if (!container) return
+
+        thumb.style.backgroundPosition = `-${value.imgX}px -${value.imgY}px`
+
+        const containerWidth = container.clientWidth
+        const thumbWidth = thumb.offsetWidth
+        let centerPx = (percent / 100) * containerWidth
+        const halfThumb = thumbWidth / 2
+        if (centerPx < halfThumb) centerPx = halfThumb
+        if (centerPx > containerWidth - halfThumb) {
+          centerPx = containerWidth - halfThumb
+        }
+        thumb.style.left = `${centerPx}px`
       }
     })
   }
+
 
   function handleMouseMove(event: React.MouseEvent<HTMLDivElement> | MouseEvent) {
     setPositionBox(event)
