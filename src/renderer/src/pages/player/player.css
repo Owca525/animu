@@ -46,6 +46,15 @@
   font-size: large;
   font-weight: 500;
   user-select: text;
+  white-space: nowrap;
+}
+
+.player-end-time-display {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
 }
 
 .video-top, .player-loading-top {
@@ -390,3 +399,15 @@
   right: 0;
   margin-right: clamp(40px, 25vw, 350px);
 } */
+
+@media (max-width: 1000px) {
+  .player-end-time-display {
+    max-width: 250px;
+  }
+}
+
+@media (max-width: 600px) {
+  .player-end-time-display {
+    display: none;
+  }
+}
