@@ -71,7 +71,7 @@ async function getEpisodeList(animeData?: AnimeData, anime_id?: string): Promise
     let idAnime = anime_id
     if (!idAnime && animeData) {
         idAnime = await getAnimeID(animeData.title.english ? animeData.title.english : animeData.title.romaji)
-    } else return undefined
+    }
     if (!idAnime) return
 
     let url = `${WEB}/anime/${idAnime}`
@@ -134,6 +134,7 @@ async function getAnimeCards(data: AnimeData): Promise<cardData[]> {
 
 async function extractEpisodeList(_type: string, anime_id: string): Promise<{ ep: string; img?: string; title?: string; }[]> {
     let data = await getEpisodeList(undefined, anime_id)
+    console.log(data)
     if (!data) return []
     return data.episodesData[0].episodes
 }

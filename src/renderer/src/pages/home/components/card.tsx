@@ -48,7 +48,7 @@ const Card: React.FC<cardData> = ({
         saveData.type,
         AnimeData.player_ID
       )
-      console.log(config.plugins.player != saveData.pluginName, store.getState().plugin.playerPlugin.name)
+      console.log(episodeList)
       navigate("/player", {
         state: {
           data: {
