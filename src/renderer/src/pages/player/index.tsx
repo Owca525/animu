@@ -72,8 +72,9 @@ const player = () => {
 
     async function leave() {
         await InitialPlugin()
-        if (config.Player.general.PlayerBehavior === "home") navigate("/")
+        console.log(anime_data.continueWatch, config.Player.general.PlayerBehavior)
         if (anime_data.continueWatch) navigate("/")
+        if (config.Player.general.PlayerBehavior === "home") navigate("/")
         else navigate("/info", { state: anime_data.data.AnimeData })
         window.BrowserWindow.setFullscreen(false)
         closeDialog()
