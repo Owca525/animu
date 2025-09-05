@@ -99,12 +99,13 @@ function information() {
             return
         }
 
-        if (informationTemp.id == anime_data.id && informationTemp.episodes_data != undefined) {
+        if (informationTemp.id == anime_data.id && informationTemp.episodes_data != undefined && informationTemp.plugin_name == pluginPlayer.name ) {
             setData(() => informationTemp.episodes_data)
             return
         }
 
         store.dispatch({ type: "setInformationID", payload: anime_data.id })
+        store.dispatch({ type: "setInformationPluginName", payload: pluginPlayer.name })
         if (cardAnime.length <= 0 && cardAnimeContinueWatch.length <= 0) {
             fetchData(pluginPlayer.player.animeDataList)
             return
