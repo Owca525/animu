@@ -699,7 +699,7 @@ body {
 }
 
 .seekbar-buffer {
-  border-radius: 0px 12px 12px 0px;
+  border-radius: 12px;
 }
 
 .seekBar-container {
