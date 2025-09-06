@@ -12,7 +12,7 @@ function convertText(text: string) {
         .replaceAll("%20", "+")
 }
 
-function detectResoltion(text: string): string {
+function detectResoltion(text: string): string | undefined {
     switch (text) {
         case "SD":
             return "480"
@@ -21,7 +21,7 @@ function detectResoltion(text: string): string {
         case "FHD":
             return "1080"
     }
-    return text
+    return undefined
 }
 
 async function extractEpisodeData(_type: string, episode: string, id: string): Promise<playerData[]> {
@@ -35,8 +35,10 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
         const element = episodes[index];
         if (element["number"] == parseInt(episode)) {
             for (const key in element["secondarySource"]) {
-                if (element != "")
-                currentEpisode.push({ res: detectResoltion(key), url: element["secondarySource"][key] })
+                if (element != "") {
+                    let resolution = detectResoltion(key);
+                    if (resolution) currentEpisode.push({ res: resolution, url: element["secondarySource"][key] })
+                }
             }
 
             if (element["subtitles"]["EN"]) subtitles.push({
@@ -57,7 +59,7 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
         hostname: "lycoris.cafe",
         hls: false,
         defaultSubttiles: false,
-        resolution: currentEpisode,
+        resolution: currentEpisode.sort((a, b) => Number(a.res) - Number(b.res)).reverse(),
         subtitles: subtitles
     }]
 }

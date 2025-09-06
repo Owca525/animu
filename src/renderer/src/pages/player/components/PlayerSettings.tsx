@@ -1,16 +1,17 @@
 import { useState } from "react"
 import "./css/playersettings.css"
+import { isNumberString } from "@renderer/utils/functions"
 
 interface playerSettingsProps {
     sources: { name: string, change: () => void }[]
-    resolution: { res: number, change: () => void }[]
+    resolution: { res: string, change: () => void }[]
     speed: { speed: number, change: () => void }[]
     subtitles: { sub: string, change: () => void }[]
     audioTrack: { track: string, change: () => void }[]
     disableSettings: () => void
     current: {
         currentHost: string,
-        currentResolution: string | number,
+        currentResolution: string,
         currentSpeed: number,
         currentSub: string,
         currentTrack: string
@@ -34,7 +35,7 @@ const PlayerSettings: React.FC<playerSettingsProps> = ({ sources, resolution, sp
                         <div tabIndex={-1} className="player-settings-button-icon-container"><span className="material-symbols-outlined">web</span><span className='player-settings-button-text'>Source</span></div> <span className={`player-settings-button-text ${sources.length <= 1 && "player-settings-button-text-gray"}`}>{current.currentHost}</span>
                     </div>
                     <div tabIndex={-1} className="player-settings-button" onClick={() => resolution.length > 1 ? setcurrentSettings("res") : ""}>
-                        <div tabIndex={-1} className="player-settings-button-icon-container"><span className="material-symbols-outlined">instant_mix</span><span className='player-settings-button-text'>Resolution</span></div><span className={`player-settings-button-text ${resolution.length <= 1 && "player-settings-button-text-gray"}`}>{current.currentResolution + "p"}</span>
+                        <div tabIndex={-1} className="player-settings-button-icon-container"><span className="material-symbols-outlined">instant_mix</span><span className='player-settings-button-text'>Resolution</span></div><span className={`player-settings-button-text ${resolution.length <= 1 && "player-settings-button-text-gray"}`}>{isNumberString(current.currentResolution) ? current.currentResolution + "p" : current.currentResolution}</span>
                     </div>
                     <div tabIndex={-1} className="player-settings-button" onClick={() => audioTrack.length > 1 ? setcurrentSettings("track") : ""}>
                         <div tabIndex={-1} className="player-settings-button-icon-container"><span className="material-symbols-outlined">music_note</span><span className='player-settings-button-text'>Audio</span></div><span className={`player-settings-button-text ${audioTrack.length <= 1 && "player-settings-button-text-gray"}`}>{current.currentTrack}</span>
@@ -66,7 +67,7 @@ const PlayerSettings: React.FC<playerSettingsProps> = ({ sources, resolution, sp
                     </div>
                     {resolution.map((data) =>
                         <div tabIndex={-1} className="player-settings-button" onClick={() => reset(data.change)}>
-                            <span tabIndex={-1} className="player-settings-button-text">{data.res.toString() + "p"}</span>
+                            <span tabIndex={-1} className="player-settings-button-text">{isNumberString(data.res) ? data.res + "p" : data.res}</span>
                         </div>
                     )}
                 </>

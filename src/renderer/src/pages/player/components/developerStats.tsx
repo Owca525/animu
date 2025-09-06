@@ -7,7 +7,7 @@ interface developerStatsProps {
     isWaitingPlayer: boolean
     isPlaying: boolean
     isFullscreen: boolean
-    ListResolution: number[]
+    ListResolution: string[]
     currentResolution: string | number
     timeNextEpisode: number
     isUpNextEpisode: boolean

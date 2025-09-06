@@ -261,3 +261,7 @@ export function toSeconds(time: string) {
   const [h, m, s] = time.split(":");
   return parseFloat(h) * 3600 + parseFloat(m) * 60 + parseFloat(s);
 };
+
+export function isNumberString(str: string): boolean {
+  return str.trim() !== "" && !isNaN(Number(str));
+}

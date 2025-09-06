@@ -94,8 +94,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const [isFullscreen, setIsFullscreen] = useState<boolean>(false)
 
     // Resolution
-    const [ListResolution, setListResolution] = useState<number[]>([])
-    const [currentResolution, setResolution] = useState<string | number>("")
+    const [ListResolution, setListResolution] = useState<{ res: string, url: string }[]>([])
+    const [currentResolution, setCurrentResoltion] = useState<{ res: string, url: string } | undefined>(undefined)
 
     // url
     const [currentHost, setHost] = useState<string>("")
@@ -164,11 +164,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         videoRef.current.playbackRate = parseFloat(speed)
     }
 
-    function setRes(res: number | undefined) {
-        if (res && hls) {
-            setResolution(res)
-            hls.currentLevel = hls.levels.findIndex(level => level.height === res);
+    function setNewResolution(data: { res: string, url: string } | undefined) {
+        if (!data) return
+        if (!videoRef.current) return
+        if (hls) {
+            setCurrentResoltion(data)
+            hls.currentLevel = hls.levels.findIndex(level => level.height === data.res);
+            return
         }
+        setCurrentResoltion(data)
+        videoRef.current.src = data.url
     }
 
     function setNewUrl(host: string) {
@@ -204,9 +209,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             return
         }
         if (hls) hls.destroy()
-
-        setResolution(data.resolution[0].res)
-        setListResolution(() => [parseInt(data.resolution[0].res)])
+        setCurrentResoltion(data.resolution[0])
+        setListResolution(() => data.resolution.reverse())
         setHost(data.hostname)
         videoRef.current.src = data.resolution[0].url
         videoRef.current.currentTime = time
@@ -249,10 +253,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     }
                     setAudioTrackList(data.audioTracks.map((element) => { return { id: element.id, label: element.name, lang: element.lang } }))
                 }
-                setListResolution(resolutions)
+                setListResolution(resolutions.map((val) => {return{ res: val.toString(), url: "" }}))
                 resolutions.reverse()
-                setRes(resolutions[0])
-                setResolution(resolutions[0])
+                setNewResolution({ res: resolutions[0].toString(), url: "" })
+                setCurrentResoltion({res: resolutions[0].toString(), url: ""})
             });
 
             hls.on(hlsModule.Events.ERROR, (_event, data) => {
@@ -690,7 +694,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         if (!data.success) return
         const lines = data.data.split("\n").map((l: string) => l.trim());
         let thumbnails: Thumbnail = { src: "", metadata: [] };
-        const src: string = url.slice(0, url.lastIndexOf("/")+1) 
+        const src: string = url.slice(0, url.lastIndexOf("/") + 1)
         let metadata: { start: number; end: number; imgX: number; imgY: number; }[] = []
 
         for (let i = 0; i < lines.length; i++) {
@@ -854,7 +858,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                         player_data.map((val) => { return { name: val.hostname, change: () => checkUrl(player_data[player_data.findIndex((item) => item.hostname === val.hostname)]) } })
                                     }
                                     resolution={
-                                        ListResolution.map((val) => { return { res: val, change: () => setRes(val) } })
+                                        ListResolution.map((val) => { return { res: val.res, change: () => setNewResolution(val) } })
                                     }
                                     speed={speed.map((val) => { return { speed: parseFloat(val), change: () => setSpeed(val) } })}
                                     subtitles={
@@ -866,7 +870,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                     disableSettings={() => setcurrentSettings(() => false)}
                                     current={{
                                         currentHost: currentHost,
-                                        currentResolution: currentResolution,
+                                        currentResolution: currentResolution ? currentResolution.res : "Uknown",
                                         currentSpeed: videoRef.current?.playbackRate ? videoRef.current?.playbackRate : 1,
                                         currentSub: currentSubtitles ? currentSubtitles.label : "Off",
                                         currentTrack: currentAudioTrack ? currentAudioTrack.label : "Default"
@@ -919,9 +923,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     isUpNextEpisode={isUpNextEpisode}
                     isVisible={isVisible}
                     isWaitingPlayer={isWaitingPlayer}
-                    ListResolution={ListResolution}
+                    ListResolution={ListResolution.map((val) => val.res)}
                     currentHost={currentHost}
-                    currentResolution={currentResolution}
+                    currentResolution={currentResolution ? currentResolution.res : "Uknown"}
                     currentSettings={currentSettings}
                     hls={hls}
                     time={time}
