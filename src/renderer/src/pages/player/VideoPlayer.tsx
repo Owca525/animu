@@ -179,11 +179,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         checkUrl(player_data[value + 1])
     }
 
-    async function setDefaultSubtitles(data: { url: string, lang: string, label: string, format: string }[]) {
+    async function setDefaultSubtitles(data: { url: string, lang: string, label: string, format: string }[], defSub: boolean = true) {
         if (data.length <= 0) return
         setListSubtitles(() => [{ url: "", format: "", lang: "", label: "Off" }, ...data])
         for (let index = 0; index < data.length; index++) {
             const element = data[index];
+            if (defSub == false) return setNewSubtitles({ url: "", format: "", lang: "", label: "Off" })
             if (element.lang == i18n.language && !element.label.includes("Forced")) {
                 await setNewSubtitles(element)
                 return
@@ -195,7 +196,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     async function checkUrl(data: playerData) {
         if (!videoRef.current) return
         const time = videoRef.current.currentTime
-        if (data.subtitles && data.defaultSubttiles != false) await setDefaultSubtitles(data.subtitles)
+        if (data.subtitles) await setDefaultSubtitles(data.subtitles, data.defaultSubttiles)
         if (data.storyboardVTT) setThumbnail(await VTTstoryBoardParser(data.storyboardVTT))
         if (data.hls) {
             setHost(() => data.hostname)
