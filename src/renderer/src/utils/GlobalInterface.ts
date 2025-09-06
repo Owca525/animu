@@ -74,6 +74,7 @@ export interface playerData {
     hls: boolean
     resolution: { res: string, url: string }[]
     storyboardVTT?: string
+    defaultSubttiles?: boolean
     subtitles?: { url: string, lang: string, label: string, format: string }[]
 }
 

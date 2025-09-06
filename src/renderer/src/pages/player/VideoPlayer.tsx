@@ -195,7 +195,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     async function checkUrl(data: playerData) {
         if (!videoRef.current) return
         const time = videoRef.current.currentTime
-        if (data.subtitles) await setDefaultSubtitles(data.subtitles)
+        if (data.subtitles && data.defaultSubttiles != false) await setDefaultSubtitles(data.subtitles)
         if (data.storyboardVTT) setThumbnail(await VTTstoryBoardParser(data.storyboardVTT))
         if (data.hls) {
             setHost(() => data.hostname)

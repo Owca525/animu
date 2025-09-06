@@ -56,6 +56,7 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
     return [{
         hostname: "lycoris.cafe",
         hls: false,
+        defaultSubttiles: false,
         resolution: currentEpisode,
         subtitles: subtitles
     }]
