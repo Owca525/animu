@@ -465,6 +465,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         }
         keybinds(keys)
     })
+    
+    useHotkeys("d", () => {
+        console.log(player_data)
+    })
 
     function setEpisode(type: "next" | "prev") {
         let ep = temp.episodes.findIndex((item) => item.ep === temp.episode)

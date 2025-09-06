@@ -31,6 +31,7 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
     let episodes = req.data.anime["episodes"]
     let currentEpisode: { res: string, url: string }[] = []
     let subtitles: { url: string, lang: string, label: string, format: string }[] = []
+    let chapters: { start: number, end: number, type: "opening" | "ending" | "other" }[] = []
     for (let index = 0; index < episodes.length; index++) {
         const element = episodes[index];
         if (element["number"] == parseInt(episode)) {
@@ -53,6 +54,9 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
                 label: "Polish",
                 format: "ass"
             })
+            let extractedChapters = JSON.parse(element["markerPeriods"])
+            if (extractedChapters[0]) chapters.push({ start: extractedChapters[0]["startTime"], end: extractedChapters[0]["endTime"], type: "opening" })
+            if (extractedChapters[1]) chapters.push({ start: extractedChapters[1]["startTime"], end: extractedChapters[1]["endTime"], type: "ending" })
         }
     }
     return [{
@@ -60,6 +64,7 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
         hls: false,
         defaultSubttiles: false,
         resolution: currentEpisode.sort((a, b) => Number(a.res) - Number(b.res)).reverse(),
+        listChapters: chapters,
         subtitles: subtitles
     }]
 }

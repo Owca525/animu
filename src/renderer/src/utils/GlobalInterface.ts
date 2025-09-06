@@ -75,6 +75,7 @@ export interface playerData {
     resolution: { res: string, url: string }[]
     storyboardVTT?: string
     defaultSubttiles?: boolean
+    listChapters?: { start: number, end: number, type: "opening" | "ending" | "other" }[]
     subtitles?: { url: string, lang: string, label: string, format: string }[]
 }
 
