@@ -1,6 +1,7 @@
 import { lazy, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "react-toastify"
+import Hls from "hls.js"
 
 // Components
 import NerdStats from "./components/nerdStats"
@@ -108,7 +109,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     // other
     const [currentSettings, setcurrentSettings] = useState<boolean>(false)
     const [showNerdStats, setshowNerdStats] = useState<boolean>(false)
-    const [hls, setHls] = useState<any>(null);
+    const [hls, setHls] = useState<Hls | undefined>(undefined);
 
     // Subtitles
     const [vttUrl, setVttUrl] = useState<string | undefined>(undefined);
@@ -167,13 +168,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     function setNewResolution(data: { res: string, url: string } | undefined) {
         if (!data) return
         if (!videoRef.current) return
-        if (hls) {
+        console.log(hls)
+        if (hls && data.url == "") {
+            console.log(data)
             setCurrentResoltion(data)
-            hls.currentLevel = hls.levels.findIndex(level => level.height === data.res);
+            hls.currentLevel = hls.levels.findIndex(level => level.height === parseInt(data.res));
             return
         }
         setCurrentResoltion(data)
         videoRef.current.src = data.url
+        videoRef.current.currentTime = time
     }
 
     function setNewUrl(host: string) {
@@ -204,6 +208,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         if (data.subtitles) await setDefaultSubtitles(data.subtitles, data.defaultSubttiles)
         if (data.storyboardVTT) setThumbnail(await VTTstoryBoardParser(data.storyboardVTT))
         if (data.hls) {
+            console.log(data)
             setHost(() => data.hostname)
             await runHLS(data.resolution[0].url, data.hostname)
             return
@@ -228,23 +233,21 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     }
 
     async function runHLS(url: string, host: string) {
-        const hlsModule = (await import('hls.js')).default;
-
-        const hls = new hlsModule({
-            maxBufferLength: 30,
+        const hls = new Hls({
+            maxBufferLength: 60,
             autoStartLoad: true,
         });
 
-        if (hlsModule.isSupported() && videoRef.current) {
+        setHls(() => hls)
+
+        if (Hls.isSupported() && videoRef.current) {
             const time = videoRef.current.currentTime
             hls.loadSource(url);
             hls.attachMedia(videoRef.current);
 
             videoRef.current.currentTime = time
 
-            setHls(hls)
-
-            hls.on(hlsModule.Events.MANIFEST_PARSED, (_, data) => {
+            hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
                 const resolutions = data.levels.map((level) => level.height);
                 if (data.audioTracks.length > 0) {
                     for (let index = 0; index < data.audioTracks.length; index++) {
@@ -253,23 +256,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     }
                     setAudioTrackList(data.audioTracks.map((element) => { return { id: element.id, label: element.name, lang: element.lang } }))
                 }
-                setListResolution(resolutions.map((val) => {return{ res: val.toString(), url: "" }}))
                 resolutions.reverse()
-                setNewResolution({ res: resolutions[0].toString(), url: "" })
+                setListResolution(resolutions.map((val) => {return{ res: val.toString(), url: "" }}))
+                hls.currentLevel = hls.levels.findIndex(level => level.height === resolutions[0]);
                 setCurrentResoltion({res: resolutions[0].toString(), url: ""})
             });
 
-            hls.on(hlsModule.Events.ERROR, (_event, data) => {
+            hls.on(Hls.Events.ERROR, (_event, data) => {
                 if (data.fatal) {
                     let message: string
                     switch (data.type) {
-                        case hlsModule.ErrorTypes.NETWORK_ERROR:
+                        case Hls.ErrorTypes.NETWORK_ERROR:
                             message = t('player.errors.MEDIA_ERR_NETWORK')
                             hls.destroy()
                             setNewUrl(host)
                             // hls.startLoad();
                             break;
-                        case hlsModule.ErrorTypes.MEDIA_ERROR:
+                        case Hls.ErrorTypes.MEDIA_ERROR:
                             message = t('player.errors.MEDIA_ERR_DECODE')
                             hls.recoverMediaError();
                             break;
