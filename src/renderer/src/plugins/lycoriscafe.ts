@@ -20,6 +20,8 @@ function detectResoltion(text: string): string | undefined {
             return "720"
         case "FHD":
             return "1080"
+        case "SourceMKV":
+            return "Source"
     }
     return undefined
 }
