@@ -168,7 +168,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     function setNewResolution(data: { res: string, url: string } | undefined) {
         if (!data) return
         if (!videoRef.current) return
-        console.log(hls)
+        const time = videoRef.current.currentTime
         if (hls && data.url == "") {
             console.log(data)
             setCurrentResoltion(data)
