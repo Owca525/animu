@@ -52,14 +52,15 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
             toast.error("Failed to run Movian", notificationProps)
         }
     }
-    function runMpvPlayer(url?: string) {
+    async function runMpvPlayer(url?: string) {
         if (!url) return
-        window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.mpvPath, time: time }, "mpv")
+        console.log(url)
+        await window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.mpvPath, time: time }, "mpv")
     }
 
-    function runVlcPlayer(url?: string) {
+    async function runVlcPlayer(url?: string) {
         if (!url) return
-        window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.vlcPath, time: time }, "vlc")
+        await window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.vlcPath, time: time }, "vlc")
     }
 
     async function runChromeCast(device: { host: string, port: number, name: string }) {
@@ -80,6 +81,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     }
 
     function ChangeResolution(data: { res: string, url: string }) {
+        console.log(data)
         setCurrentResolution(() => data.res)
         setCurrentUrl(() => data.url)
     }
@@ -183,7 +185,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                 <div className="external-player-center">
                     <div className="external-button-container">
                         <Button icon='skip_previous' ButtonClass="player-buttons" onClick={() => setEpisode("prev")} />
-                        <Button icon='replay' ButtonClass="player-buttons" onClick={RunPlayers} />
+                        <Button icon='replay' ButtonClass="player-buttons" onClick={() => RunPlayers(currentUrl, currentPlayer)} />
                         <Button icon='skip_next' ButtonClass="player-buttons" onClick={() => setEpisode("next")} />
                     </div>
                 </div>
