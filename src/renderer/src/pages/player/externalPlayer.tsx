@@ -29,7 +29,7 @@ function filterTextChromeCast(text: string) {
 const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes, playerData, setNextEpisode, time, externalPlayerData }) => {
     const navigate = useNavigate()
     const config: SettingsConfig = useSelector((data: any) => data.config);
-    const [AnimeTitle, _setAnimeTitle] = useState<string>(() => detectTitle({ title: animeData.AnimeData.title, ep: animeData.saveData ? animeData.saveData.episode : "0", format: animeData.AnimeData.format }))
+    const [AnimeTitle, _setAnimeTitle] = useState<string>(() => detectTitle({ title: animeData.AnimeData.title, ep: now_episodes.episode, format: animeData.AnimeData.format }))
 
     // Player Related
     const [resolutionList, setResolutionList] = useState<{ res: string, url: string }[]>([])
