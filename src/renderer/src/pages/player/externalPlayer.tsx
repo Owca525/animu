@@ -3,7 +3,7 @@
 import Button from "@renderer/components/buttons"
 import "./components/css/externalPlayer.css"
 import { cardData, notificationProps, playerData, SettingsConfig } from "@renderer/utils/GlobalInterface"
-import { detectTitle } from "@renderer/utils/functions"
+import { detectTitle, isNumberString } from "@renderer/utils/functions"
 import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
@@ -176,7 +176,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                         ]} placeholder="Not Found" buttonText={config.Player.external.type} disableX
                         />
                         {/* FIXME: Fix changing resolution */}
-                        {currentHost && !currentHost.hls && <Dropdown placeholder="Not Found" buttonText={currentResolution != "Not Found" && currentResolution != "" ? `${currentResolution}p` : "Not Found"} options={resolutionList.map((element) => { return { label: `${element.res}p`, onClick: () => ChangeResolution(element) } })} disableX />}
+                        <Dropdown placeholder="Not Found" buttonText={currentResolution != "" ?  isNumberString(currentResolution) ? `${currentResolution}p` : currentResolution : "Not Found"} options={resolutionList.map((element) => { return { label: isNumberString(element.res) ? `${element.res}p` : element.res, onClick: () => ChangeResolution(element) } })} disableX />
                         <Dropdown placeholder="Not Found" buttonText={currentHost ? currentHost.hostname : "Not Found"} options={playerData.map((element) => { return { label: element.hostname, onClick: () => ChangeHost(element) } })} disableX />
                     </div>
                 </div>
