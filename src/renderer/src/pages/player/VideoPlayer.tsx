@@ -303,21 +303,19 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             setShowVolume(() => false)
         }, 1000);
     }
-
+    
     function togglePlay() {
         const video = videoRef.current
         if (!video) return
 
-        // https://developer.chrome.com/blog/play-request-was-interrupted
-        let playPromise = video.play()
-        if (playPromise !== undefined && isPlaying) {
-            playPromise.then(_ => {
-                video.pause();
-                setIsPlaying(() => false)
-            }).catch(error => { console.error(error) });
-        } else {
-            setIsPlaying(() => true)
-        }
+        setIsPlaying(prev => {
+            if (prev) {
+                video.pause()
+                return false
+            }
+            video.play()
+            return true
+        })
 
         if (playAnimationTimeout.current) clearTimeout(playAnimationTimeout.current)
         setShowPlay(() => true)
