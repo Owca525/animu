@@ -1,7 +1,7 @@
 
 import { useQuery } from "react-query";
 import { useLocation, useNavigate } from "react-router-dom"
-import { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
 import { cardData, SettingsConfig } from "@renderer/utils/GlobalInterface";
 import { useSelector } from "react-redux";
@@ -15,7 +15,8 @@ import Button from "@renderer/components/buttons";
 import ExternalPlayer from "./externalPlayer";
 import { InitialPlugin } from "@renderer/utils/pluginApi";
 
-const VideoPlayer = lazy(() => import('./VideoPlayer'));
+import VideoPlayer from "./VideoPlayer";
+// const VideoPlayer = lazy(() => import('./VideoPlayer'));
 // const ExternalPlayer = lazy(() => import('./externalPlayer'));
 
 const player = () => {
@@ -29,7 +30,7 @@ const player = () => {
     const [extractionData, setextractionData] = useState<{ actual: string, type: string, episodelist: { ep: string, img?: string, title?: string }[], time: number }>({ actual: anime_data.data.saveData ? anime_data.data.saveData.episode : "1", type: anime_data.data.saveData ? anime_data.data.saveData.type : "sub", episodelist: anime_data.episodelist, time: anime_data.data.saveData ? anime_data.data.saveData?.last_Time : 0 })
     const playerID = anime_data.data.AnimeData.player_ID ?? "";
     const extractFunc = useCallback(() => {
-        return pluginPlayer.player.getUrls(extractionData.type, extractionData.actual, playerID); 
+        return pluginPlayer.player.getUrls(extractionData.type, extractionData.actual, playerID);
     }, [extractionData, playerID]);
     const [externalPlayerType, setexternalPlayerType] = useState<"Movian" | "VLC" | "Mpv" | "ChromeCast">(config.Player.external.type)
 
@@ -95,8 +96,8 @@ const player = () => {
     }
 
     if (data && isLoading == false && config.Player.external.enable) {
-         return (
-             <ExternalPlayer 
+        return (
+            <ExternalPlayer
                 animeData={anime_data.data}
                 playerData={data}
                 time={extractionData.time}
@@ -104,29 +105,27 @@ const player = () => {
                 now_episodes={{ episode: extractionData.actual, type: extractionData.type, episodes: extractionData.episodelist }}
                 externalPlayerData={{ onChage: (data) => setexternalPlayerType(data), current: externalPlayerType }}
             />
-         )
+        )
     }
 
     if (data && isLoading == false) {
         return (
-            <Suspense fallback={loadingAnimation(leave, { title: anime_data.data.AnimeData.title, ep: extractionData.actual, format: anime_data.data.AnimeData.format })}>
-                <VideoPlayer
-                    player_data={data}
-                    anime_data={anime_data.data}
-                    temp={{ episode: extractionData.actual, type: extractionData.type, episodes: extractionData.episodelist }}
-                    setNextEpisode={setNewEpisode}
-                    volumeCacheFunc={setPlayerVolume}
-                    PlayerVolume={playerVolume}
-                    time={extractionData.time}
-                    exitFromPlayer={leave}
-                />
-            </Suspense>
+            <VideoPlayer
+                player_data={data}
+                anime_data={anime_data.data}
+                temp={{ episode: extractionData.actual, type: extractionData.type, episodes: extractionData.episodelist }}
+                setNextEpisode={setNewEpisode}
+                volumeCacheFunc={setPlayerVolume}
+                PlayerVolume={playerVolume}
+                time={extractionData.time}
+                exitFromPlayer={leave}
+            />
         )
     }
     return loadingAnimation(leave, { title: anime_data.data.AnimeData.title, ep: extractionData.actual, format: anime_data.data.AnimeData.format })
 }
 
-function loadingAnimation(leave: () => void, anime_data: { title: { english?: string | undefined; native: string; romaji: string; }, ep: string, format?: string}) {
+function loadingAnimation(leave: () => void, anime_data: { title: { english?: string | undefined; native: string; romaji: string; }, ep: string, format?: string }) {
     return (
         <div className="player-loading-container">
             <div className="player-loading-top">
