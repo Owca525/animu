@@ -7,7 +7,8 @@
   width: fit-content;
   padding: 8px;
   max-height: 400px;
-  overflow: auto;
+  height: min-content;
+  overflow-x: hidden;
 }
 
 .player-settings-button, .player-settings-button-back {
@@ -16,6 +17,14 @@
   align-items: center;
   padding: 12px;
   cursor: pointer;
+  transition: background-color 100ms ease-in-out;
+}
+
+.player-settings-content {
+  display: flex;
+  flex-direction: column;
+  height: max-content;
+  overflow: none;
 }
 
 .player-settings-button {

@@ -902,31 +902,30 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                     }
                                 </div>
                             }
-                            {currentSettings &&
-                                <PlayerSettings
-                                    sources={
-                                        player_data.map((val) => { return { name: val.hostname, change: () => checkUrl(player_data[player_data.findIndex((item) => item.hostname === val.hostname)]) } })
-                                    }
-                                    resolution={
-                                        ListResolution.map((val) => { return { res: val.res, change: () => setNewResolution(val) } })
-                                    }
-                                    speed={speed.map((val) => { return { speed: parseFloat(val), change: () => setSpeed(val) } })}
-                                    subtitles={
-                                        ListSubtitles.map((val) => { return { sub: val.label, change: () => setNewSubtitles(val) } })
-                                    }
-                                    audioTrack={
-                                        audioTrackList.map((val) => { return { track: val.label, change: () => changeAudioTrack(val) } })
-                                    }
-                                    disableSettings={() => setcurrentSettings(() => false)}
-                                    current={{
-                                        currentHost: currentHost,
-                                        currentResolution: currentResolution ? currentResolution.res : "Uknown",
-                                        currentSpeed: videoRef.current?.playbackRate ? videoRef.current?.playbackRate : 1,
-                                        currentSub: currentSubtitles ? currentSubtitles.label : "Off",
-                                        currentTrack: currentAudioTrack ? currentAudioTrack.label : "Default"
-                                    }}
-                                />
-                            }
+                            <PlayerSettings
+                                state={currentSettings}
+                                sources={
+                                    player_data.map((val) => { return { name: val.hostname, change: () => checkUrl(player_data[player_data.findIndex((item) => item.hostname === val.hostname)]) } })
+                                }
+                                resolution={
+                                    ListResolution.map((val) => { return { res: val.res, change: () => setNewResolution(val) } })
+                                }
+                                speed={speed.map((val) => { return { speed: parseFloat(val), change: () => setSpeed(val) } })}
+                                subtitles={
+                                    ListSubtitles.map((val) => { return { sub: val.label, change: () => setNewSubtitles(val) } })
+                                }
+                                audioTrack={
+                                    audioTrackList.map((val) => { return { track: val.label, change: () => changeAudioTrack(val) } })
+                                }
+                                disableSettings={() => setcurrentSettings(() => false)}
+                                current={{
+                                    currentHost: currentHost,
+                                    currentResolution: currentResolution ? currentResolution.res : "Uknown",
+                                    currentSpeed: videoRef.current?.playbackRate ? videoRef.current?.playbackRate : 1,
+                                    currentSub: currentSubtitles ? currentSubtitles.label : "Off",
+                                    currentTrack: currentAudioTrack ? currentAudioTrack.label : "Default"
+                                }}
+                            />
                             <PlayerButton icon="settings" ButtonClass="player-buttons" title={detectDisableTooltips(t('global.settings'))} onClick={() => { setcurrentSettings((prev) => !prev); setShowSelectEpisode(() => false) }} />
                             <PlayerButton icon={isFullscreen ? 'fullscreen_exit' : 'fullscreen'} ButtonClass="player-buttons" title={detectDisableTooltips(t('player.fullscreen'))} onClick={async () => await enterFullscreen()} />
                         </div>
