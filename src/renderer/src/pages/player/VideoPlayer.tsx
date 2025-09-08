@@ -147,7 +147,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             window.BrowserWindow.setFullscreen(true)
             setIsFullscreen(true)
         }
-        if (videoRef.current) videoRef.current.currentTime = time
+        if (videoRef.current) {
+            videoRef.current.currentTime = time
+            setcurrentTime(() => time)
+        }
     }, [])
 
     // player Functions
@@ -258,9 +261,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     setAudioTrackList(data.audioTracks.map((element) => { return { id: element.id, label: element.name, lang: element.lang } }))
                 }
                 resolutions.reverse()
-                setListResolution(resolutions.map((val) => {return{ res: val.toString(), url: "" }}))
+                setListResolution(resolutions.map((val) => { return { res: val.toString(), url: "" } }))
                 hls.currentLevel = hls.levels.findIndex(level => level.height === resolutions[0]);
-                setCurrentResoltion({res: resolutions[0].toString(), url: ""})
+                setCurrentResoltion({ res: resolutions[0].toString(), url: "" })
             });
 
             hls.on(Hls.Events.ERROR, (_event, data) => {
@@ -304,15 +307,18 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     function togglePlay() {
         const video = videoRef.current
         if (!video) return
-        setIsPlaying((prevIsPlaying: boolean) => {
-            if (prevIsPlaying) {
-                video.pause()
-                return false
-            } else {
-                video.play()
-                return true
-            }
-        })
+
+        // https://developer.chrome.com/blog/play-request-was-interrupted
+        let playPromise = video.play()
+        if (playPromise !== undefined && isPlaying) {
+            playPromise.then(_ => {
+                video.pause();
+                setIsPlaying(() => false)
+            }).catch(error => { console.error(error) });
+        } else {
+            setIsPlaying(() => true)
+        }
+
         if (playAnimationTimeout.current) clearTimeout(playAnimationTimeout.current)
         setShowPlay(() => true)
         playAnimationTimeout.current = setTimeout(() => {
@@ -390,6 +396,18 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         checkUpNext()
         handleProgress()
 
+        if (config.Player.general.autoSkipOpenings) {
+            for (let index = 0; index < player_data.length; index++) {
+                const element = player_data[index];
+                if (element.hostname == currentHost && element.listChapters) {
+                    element.listChapters.forEach(element => {
+                        if (!videoRef.current) return
+                        if (videoRef.current.currentTime >= element.start && videoRef.current.currentTime <= element.end) change_time(element.end)
+                    });
+                }
+            }
+        }
+
         // Update RPC
         if (config.General.discordRPC) window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(videoRef.current.currentTime)} / ${formatTime(videoRef.current.duration)}`)
         if (config.Player.general.AutoSkipEpisode && videoRef.current.duration == videoRef.current.currentTime) setEpisode("next")
@@ -452,12 +470,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     function change_time(time: number) {
         if (!videoRef.current) return
-
-        if (isPlaying) {
-            togglePlay()
-            videoRef.current.currentTime = time
-            togglePlay()
-        } else videoRef.current.currentTime = time
+        videoRef.current.currentTime = time
     }
 
     useKeyPress((keys: string) => {
@@ -466,7 +479,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         }
         keybinds(keys)
     })
-    
+
     useHotkeys("d", () => {
         console.log(player_data)
     })
@@ -560,15 +573,19 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     break
                 case convertKeybinds(config.Player.keybinds.TimeSkipRight.toLowerCase()).toLowerCase():
                     change_time((time_now += parseInt(config.Player.general.TimeSkipRight.toString())))
+                    updateProgress()
                     break
                 case convertKeybinds(config.Player.keybinds.TimeSkipLeft.toLowerCase()).toLowerCase():
                     change_time((time_now -= parseInt(config.Player.general.TimeSkipLeft.toString())))
+                    updateProgress()
                     break
                 case convertKeybinds(config.Player.keybinds.LongTimeSkipForward.toLowerCase()).toLowerCase():
                     change_time((time_now += parseInt(config.Player.general.LongTimeSkipForward.toString())))
+                    updateProgress()
                     break
                 case convertKeybinds(config.Player.keybinds.LongTimeSkipBack.toLowerCase()).toLowerCase():
                     change_time((time_now -= parseInt(config.Player.general.LongTimeSkipBack.toString())))
+                    updateProgress()
                     break
                 case convertKeybinds(config.Player.keybinds.Fullscreen.toLowerCase()).toLowerCase():
                     enterFullscreen()
@@ -578,9 +595,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     break
                 case convertKeybinds(config.Player.keybinds.FrameSkipForward.toLowerCase()).toLowerCase():
                     change_time((time_now += 0.0416))
+                    updateProgress()
                     break
                 case convertKeybinds(config.Player.keybinds.FrameSkipBack.toLowerCase()).toLowerCase():
                     change_time((time_now -= 0.0416))
+                    updateProgress()
                     break
                 case convertKeybinds(config.Player.keybinds.VolumeDown.toLowerCase()).toLowerCase():
                     handleVolume((videoRef.current.volume * 100) - 1)
@@ -762,6 +781,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 onCanPlay={() => { setWaitingPlayer(() => false) }}
                 onError={(error) => videoErrorHandler(error)}
                 onLoadedMetadata={() => {
+                    updateProgress()
                     for (let index = 0; index < player_data.length; index++) {
                         const element = player_data[index];
                         if (element.hostname == currentHost && element.listChapters) {

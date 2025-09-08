@@ -464,6 +464,16 @@ function settings() {
                                     disableX   
                                 />
                             </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                {"Auto Skip Openings"}
+                                <CheckBox
+                                    checked={config.new.Player.general.autoSkipOpenings}
+                                    onChecked={(checked) =>
+                                        handleChange('Player.general.autoSkipOpenings', checked)
+                                    }
+                                />
+                            </div>
                         </div>
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.player.uptonextep")}</div>

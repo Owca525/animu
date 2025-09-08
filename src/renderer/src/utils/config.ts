@@ -29,7 +29,8 @@ export const defaultConfig: SettingsConfig = {
             VideoStreching: false,
             RemovingSpaceAnimation: false,
             DisableVolumeAnimation: false,
-            PlayerBehavior: "information"
+            PlayerBehavior: "information",
+            autoSkipOpenings: false
         },
         screenShot: {
             alwaysAsk: true,
