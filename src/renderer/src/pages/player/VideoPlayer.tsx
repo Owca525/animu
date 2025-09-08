@@ -850,7 +850,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                             variants={hiddenVariants}
                             animate={isShowPlay && isWaitingPlayer == false ? "visible" : "hidden"}
                             initial="hidden"
-                            transition={{ duration: 0.65 }}
+                            transition={{ duration: 0.2 }}
                         >
                             <div className="player-icon-ui material-symbols-outlined">{isPlaying ? "pause" : "play_arrow"}</div>
                         </motion.div>
