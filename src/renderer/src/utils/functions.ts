@@ -265,3 +265,11 @@ export function toSeconds(time: string) {
 export function isNumberString(str: string): boolean {
   return str.trim() !== "" && !isNaN(Number(str));
 }
+
+export function timeToSeconds(time: string): number {
+  const [hms] = time.split(".");
+  const parts = hms.split(":").map(Number);
+  const [hours, minutes, seconds] = parts;
+
+  return hours * 3600 + minutes * 60 + seconds;
+}

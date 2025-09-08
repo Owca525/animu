@@ -14,6 +14,7 @@ interface SeekBarProps {
   screen?: boolean
   secondBarValues?: { position: number, width: number }[]
   thumbnail?: Thumbnail
+  chapterList?: { left: number, width: number }[]
 }
 
 const SeekBar: React.FC<SeekBarProps> = ({
@@ -25,7 +26,8 @@ const SeekBar: React.FC<SeekBarProps> = ({
   classes,
   screen = false,
   secondBarValues,
-  thumbnail
+  thumbnail,
+  chapterList
 }) => {
   const [value, setValue] = useState(currentValue);
   const [drag, setdrage] = useState<boolean>(false);
@@ -146,6 +148,11 @@ const SeekBar: React.FC<SeekBarProps> = ({
       {secondBarValues &&
         <div className="seekbar-buffer-wrapper">
           {secondBarValues.map((buffer) => <div className="seekbar-buffer" style={{ left: `${buffer.position}%`, width: `${buffer.width}%` }}></div>)}
+        </div>
+      }
+      {chapterList && chapterList.length > 0 &&
+        <div className="seekbar-chapters-wrapper">
+          {chapterList.map((buffer) => <div className="seekbar-chapters" style={{ left: `${buffer.left}%`, width: `${buffer.width}%` }}></div>)}
         </div>
       }
 

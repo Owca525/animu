@@ -13,7 +13,8 @@
   --neutral2: #19a651;
   --neutral3: #27ae5d;
   --red: #861832;
-  --blue: #1C1291;
+  --blue: #1c1291;
+  --light-blue: #2658c4;
 
   /* other */
   --player-bg-containers: color-mix(in srgb, var(--bg3) 70%, transparent);

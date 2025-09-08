@@ -110,6 +110,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const [currentSettings, setcurrentSettings] = useState<boolean>(false)
     const [showNerdStats, setshowNerdStats] = useState<boolean>(false)
     const [hls, setHls] = useState<Hls | undefined>(undefined);
+    const [chapterList, setChapterList] = useState<{ left: number, width: number }[]>([])
 
     // Subtitles
     const [vttUrl, setVttUrl] = useState<string | undefined>(undefined);
@@ -734,6 +735,19 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         return { ...thumbnails, metadata: metadata };
     }
 
+    function generateOpeningEnding(data: { start: number, end: number, type: "opening" | "ending" | "other" }[]) {
+        if (!videoRef.current) return
+        let tmp: { left: number, width: number }[] = []
+        for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+            if (element.type == "ending" || element.type == "opening") {
+                console.log((element.start / videoRef.current.duration))
+                tmp.push({ left: (element.start / videoRef.current.duration) * 100, width: ((element.end - element.start) / videoRef.current.duration) * 100 })
+            }
+        }
+        setChapterList(() => tmp)
+    }
+
     return (
         <div className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
             <video
@@ -747,6 +761,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 onWaiting={() => { setWaitingPlayer(() => true) }}
                 onCanPlay={() => { setWaitingPlayer(() => false) }}
                 onError={(error) => videoErrorHandler(error)}
+                onLoadedMetadata={() => {
+                    for (let index = 0; index < player_data.length; index++) {
+                        const element = player_data[index];
+                        if (element.hostname == currentHost && element.listChapters) {
+                            generateOpeningEnding(element.listChapters)
+                            return
+                        }
+                    }
+                }}
                 preload="auto"
                 muted={isMuted}
                 style={config.Player.general.VideoStreching ? { objectFit: "cover" } : {}}
@@ -814,7 +837,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     }
                 </div>
                 <div className={isVisible && isUpNextEpisode == false ? 'video-bottom' : 'video-bottom player-hidden'}>
-                    <SeekBar thumbnail={thumbnails} secondBarValues={currentBuffer} currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => { setTimeVideo(value) }} type="time" classes={{ container: "player-seekbar" }} screen={true} />
+                    <SeekBar chapterList={chapterList} thumbnail={thumbnails} secondBarValues={currentBuffer} currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => { setTimeVideo(value) }} type="time" classes={{ container: "player-seekbar" }} screen={true} />
                     <div className="player-bottom-section">
                         <div className="player-left">
                             {temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) - 1] !== undefined &&

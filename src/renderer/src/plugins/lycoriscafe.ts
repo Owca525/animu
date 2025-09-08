@@ -1,3 +1,4 @@
+import { timeToSeconds } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, playerData, pluginFormat } from "@renderer/utils/GlobalInterface";
 
 const WEB = "https://www.lycoris.cafe"
@@ -57,8 +58,8 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
                 format: "ass"
             })
             let extractedChapters = JSON.parse(element["markerPeriods"])
-            if (extractedChapters[0]) chapters.push({ start: extractedChapters[0]["startTime"], end: extractedChapters[0]["endTime"], type: "opening" })
-            if (extractedChapters[1]) chapters.push({ start: extractedChapters[1]["startTime"], end: extractedChapters[1]["endTime"], type: "ending" })
+            if (extractedChapters[0]) chapters.push({ start: timeToSeconds(extractedChapters[0]["startTime"]), end: timeToSeconds(extractedChapters[0]["endTime"]), type: "opening" })
+            if (extractedChapters[1]) chapters.push({ start: timeToSeconds(extractedChapters[1]["startTime"]), end: timeToSeconds(extractedChapters[1]["endTime"]), type: "ending" })
         }
     }
     return [{
