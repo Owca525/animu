@@ -883,25 +883,26 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                             </div>
                             <PlayerButton icon={"picture_in_picture"} onClick={handlePictureInPicture} title={detectDisableTooltips("Picture In Picture")} ButtonClass="player-buttons" />
                             <PlayerButton icon={"video_library"} title={detectDisableTooltips("Select Episode")} ButtonClass="player-buttons" onClick={() => { setShowSelectEpisode((prev) => !prev); setcurrentSettings(() => false) }} />
-                            {isShowSelectEpisode &&
-                                <div className="player-select-episode-container">
-                                    <div className="player-select-episode-title">Change Episode</div>
-                                    {!countImages(temp.episodes) &&
-                                        <div className="player-select-episode-content">
-                                            {temp.episodes.map((element) => (
-                                                <div className={`information-episode-button ${parseInt(element.ep) < parseInt(temp.episode) ? "watched" : ""} ${parseInt(element.ep) == parseInt(temp.episode) ? "current" : ""}`} onClick={() => setNextEpisode(element.ep)}>{element.ep}</div>
-                                            ))}
-                                        </div>
-                                    }
-                                    {countImages(temp.episodes) &&
-                                        <div className="player-select-episode-content-list">
-                                            {temp.episodes.map((element) => (
-                                                <PlayerEpisodeElement nextEpisode={setNextEpisode} animeTitle={anime_data.AnimeData.title.romaji} episodes={element} currentEpisode={temp.episode} />
-                                            ))}
-                                        </div>
-                                    }
-                                </div>
-                            }
+                            <motion.div
+                                initial={{ opacity: 0, display: "none" }} animate={isShowSelectEpisode ? { opacity: 1, display: "" } : { opacity: 0, display: "none" }} transition={{ duration: 0.2 }}
+                                className="player-select-episode-container"
+                            >
+                                <div className="player-select-episode-title">Change Episode</div>
+                                {!countImages(temp.episodes) &&
+                                    <div className="player-select-episode-content">
+                                        {temp.episodes.map((element) => (
+                                            <div className={`information-episode-button ${parseInt(element.ep) < parseInt(temp.episode) ? "watched" : ""} ${parseInt(element.ep) == parseInt(temp.episode) ? "current" : ""}`} onClick={() => setNextEpisode(element.ep)}>{element.ep}</div>
+                                        ))}
+                                    </div>
+                                }
+                                {countImages(temp.episodes) &&
+                                    <div className="player-select-episode-content-list">
+                                        {temp.episodes.map((element) => (
+                                            <PlayerEpisodeElement nextEpisode={setNextEpisode} animeTitle={anime_data.AnimeData.title.romaji} episodes={element} currentEpisode={temp.episode} />
+                                        ))}
+                                    </div>
+                                }
+                            </motion.div>
                             <PlayerSettings
                                 state={currentSettings}
                                 sources={
