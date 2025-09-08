@@ -1,5 +1,6 @@
 import { timeToSeconds } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, playerData, pluginFormat } from "@renderer/utils/GlobalInterface";
+import { getPlayerPluginCache, setPluginPlayerCache } from "@renderer/utils/pluginApi";
 
 const WEB = "https://www.lycoris.cafe"
 
@@ -27,16 +28,28 @@ function detectResoltion(text: string): string | undefined {
     return undefined
 }
 
+async function requestToApi(anime_id: string): Promise<{ data: any } | undefined> {
+    let cache = await getPlayerPluginCache()
+    if (cache && cache.anime_id == anime_id) {
+        return cache
+    } else {
+        console.log("askldnalsnd")
+        let url = `${WEB}/api/anime/${anime_id}`
+        let req = await window.api.request.get(url, HEADER);
+        if (!req.success) return undefined
+        await setPluginPlayerCache({ anime_id: anime_id, data: req.data })
+        return { data: req.data }
+    }
+}
+
 async function extractEpisodeData(_type: string, episode: string, id: string): Promise<playerData[]> {
-    let url = `${WEB}/api/anime/${id}`
-    const req = await window.api.request.get(url, HEADER);
-    if (!req.success) return []
+    let req = await requestToApi(id)
+    if (!req) return []
     let episodes = req.data.anime["episodes"]
     let currentEpisode: { res: string, url: string }[] = []
     let subtitles: { url: string, lang: string, label: string, format: string }[] = []
     let chapters: { start: number, end: number, type: "opening" | "ending" | "other" }[] = []
-    for (let index = 0; index < episodes.length; index++) {
-        const element = episodes[index];
+    episodes.forEach(element => {
         if (element["number"] == parseInt(episode)) {
             for (const key in element["secondarySource"]) {
                 if (element != "") {
@@ -61,7 +74,8 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
             if (extractedChapters[0]) chapters.push({ start: timeToSeconds(extractedChapters[0]["startTime"]), end: timeToSeconds(extractedChapters[0]["endTime"]), type: "opening" })
             if (extractedChapters[1]) chapters.push({ start: timeToSeconds(extractedChapters[1]["startTime"]), end: timeToSeconds(extractedChapters[1]["endTime"]), type: "ending" })
         }
-    }
+    });
+
     return [{
         hostname: "lycoris.cafe",
         hls: false,
@@ -110,11 +124,10 @@ async function extractAnimeList(data: AnimeData): Promise<cardData[]> {
     const req = await window.api.request.get(url, HEADER);
     if (!req.success) return []
     let endData: cardData[] = []
-    for (let index = 0; index < req.data.data.length; index++) {
-        const element = req.data.data[index];
+    req.data.data.forEach(element => {
         let tmp = convertAnime(element)
         if (tmp) endData.push(tmp)
-    }
+    });
 
     return endData
 }
@@ -130,9 +143,9 @@ async function extractEpisodeDataList(animeData?: AnimeData, anime_id?: string):
     }
     if (!animeID) return
 
-    let url = `${WEB}/api/anime/${animeID}`
-    const req = await window.api.request.get(url, HEADER);
-    if (!req.success) return 
+    let req = await requestToApi(animeID)
+    if (!req) return
+    console.log(req)
     let tmpEpisodes = req.data.anime["episodes"]
     let episodes: { ep: string, img?: string, title?: string }[] = tmpEpisodes.map((ep) => {
         return {
@@ -149,9 +162,8 @@ async function extractEpisodeDataList(animeData?: AnimeData, anime_id?: string):
 }
 
 async function extractOnlyEpisodes(_type: string, anime_id: string): Promise<{ ep: string; img?: string; title?: string; }[]> {
-    let url = `${WEB}/api/anime/${anime_id}`
-    const req = await window.api.request.get(url, HEADER);
-    if (!req.success) return []
+    let req = await requestToApi(anime_id)
+    if (!req) return []
     let tmpEpisodes = req.data.anime["episodes"]
     let episodes: { ep: string, img?: string, title?: string }[] = tmpEpisodes.map((ep) => {
         return {
@@ -175,5 +187,5 @@ export const lycorisCafe: pluginFormat = {
         episodeList: extractOnlyEpisodes,
         animeList: extractAnimeList
     },
-    preferedLang: ["pl"]
+    preferedLang: ["pl", "en"]
 }

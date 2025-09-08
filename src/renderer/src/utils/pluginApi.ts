@@ -104,3 +104,27 @@ export async function ChangePlugin(name: string) {
         console.error(error)
     }
 }
+
+export async function setPluginPlayerCache(element: any) {
+    try {
+        store.dispatch({type: "setPlayerPluginCache", payload: element})
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export async function getPlayerPluginCache(): Promise<any> {
+    try {
+        return store.getState().plugin.playerPluginCache
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export async function ResetPluginPlayerCache() {
+    try {
+        store.dispatch({type: "setPlayerPluginCache", payload: undefined})
+    } catch (error) {
+        console.error(error)
+    }
+}

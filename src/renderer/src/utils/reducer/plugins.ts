@@ -8,18 +8,21 @@ const initialState = {
     loadedPlugins: [infoPlugin, infoPluginPlayer, AniZone, lycorisCafe] as pluginFormat[],
     informationPlugin: infoPlugin,
     playerPlugin: undefined,
+    playerPluginCache: undefined
 };
 
 const userReducer = (state = initialState, action) => {
   switch (action.type) {
     case "setPluginPlayer":
-      return { ...state, playerPlugin: action.payload };
+      return { ...state, playerPlugin: action.payload, playerPluginCache: undefined };
     case "setInformationPlugin":
         return { ...state, informationPlugin: action.payload };
     case "setLoadedPlugins":
         return { ...state, loadedPlugins: action.payload };
+    case "setPlayerPluginCache":
+        return { ...state, playerPluginCache: action.payload };
     case "ResetLoadedPlugins":
-        return { informationPlugin: undefined, playerPlugin: undefined, loadedPlugins: [] };
+        return { informationPlugin: undefined, playerPlugin: undefined, loadedPlugins: [], playerPluginCache: undefined };
     default:
       return state;
   }
