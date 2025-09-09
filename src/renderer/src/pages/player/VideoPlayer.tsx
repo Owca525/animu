@@ -839,7 +839,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         variants={hiddenVariants}
                         animate={isWaitingPlayer ? "visible" : "hidden"}
                         initial="hidden"
-                        transition={{ duration: 0.8 }}
+                        transition={{ duration: 0.4 }}
                     >
                         <div className="player-waiting material-symbols-outlined">progress_activity</div>
                     </motion.div>
