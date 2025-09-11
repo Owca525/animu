@@ -46,7 +46,7 @@ export const defaultConfig: SettingsConfig = {
         },
         upToNextEpisode: {
             enable: true,
-            interval: 30,
+            interval: 15,
             durationShow: 5
         },
         keybinds: {

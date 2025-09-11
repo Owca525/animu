@@ -99,7 +99,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const [currentResolution, setCurrentResoltion] = useState<{ res: string, url: string } | undefined>(undefined)
 
     // Up Next
-    const [timeNextEpisode, setTimeNextEpisode] = useState<number>(30)
+    const [timeNextEpisode, setTimeNextEpisode] = useState<number>(config.Player.upToNextEpisode.durationShow)
     const [isUpNextEpisode, setUpNextEpisode] = useState<boolean>(false)
     const [isHideUpNextEpisode, setHideUpNextEpisode] = useState<boolean>(false)
     const [currentPlayer, setPlayer] = useState<playerData | undefined>(undefined)
@@ -415,15 +415,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
         if (duration <= config.Player.upToNextEpisode.durationShow * 60) return
 
-        if (duration != 0 && currentTime != 0 && isHideUpNextEpisode == false && temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] != null && currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
+        if (isHideUpNextEpisode == false && temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] != null && currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
             setUpNextEpisode(true)
             setTimeNextEpisode(((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + 30)
         } else {
             setTimeNextEpisode(config.Player.upToNextEpisode.interval)
             setUpNextEpisode(false)
         }
-
-        if (duration != 0 && currentTime != 0 && (isHideUpNextEpisode == false && timeNextEpisode <= 0)) setEpisode("next")
+        
+        if (isHideUpNextEpisode == false && timeNextEpisode <= 0) setEpisode("next")
     }
 
     function videoErrorHandler(event: React.SyntheticEvent<HTMLVideoElement, Event>) {
