@@ -8,7 +8,7 @@ import NerdStats from "./components/nerdStats"
 const DeveloperStats = lazy(() => import('./components/developerStats'));
 
 // css
-import { cardData, ContextMenuProps, notificationProps, playerData, SettingsConfig, Thumbnail } from "@renderer/utils/GlobalInterface"
+import { cardData, ContextMenuProps, notificationProps, playerChapterList, playerData, SettingsConfig, Thumbnail } from "@renderer/utils/GlobalInterface"
 import { useSelector } from "react-redux"
 import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory, toSeconds } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
@@ -752,7 +752,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         return { ...thumbnails, metadata: metadata };
     }
 
-    function generateOpeningEnding(data: { start: number, end: number, type: "opening" | "ending" | "other" }[]) {
+    function generateOpeningEnding(data: playerChapterList) {
         if (!videoRef.current) return
         let tmp: { left: number, width: number }[] = []
         for (let index = 0; index < data.length; index++) {

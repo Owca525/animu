@@ -4,6 +4,7 @@
     position: relative;
     cursor: pointer;
     width: 100%;
+    overflow: hidden;
 }
 
 .seekbar-progress{

@@ -1,5 +1,5 @@
 import { timeToSeconds } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, playerData, pluginFormat } from "@renderer/utils/GlobalInterface";
+import { AnimeData, cardData, episodeList, playerChapterList, playerData, pluginFormat } from "@renderer/utils/GlobalInterface";
 import { getPlayerPluginCache, setPluginPlayerCache } from "@renderer/utils/pluginApi";
 
 const WEB = "https://www.lycoris.cafe"
@@ -48,7 +48,7 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
     let episodes = req.data.anime["episodes"]
     let currentEpisode: { res: string, url: string }[] = []
     let subtitles: { url: string, lang: string, label: string, format: string }[] = []
-    let chapters: { start: number, end: number, type: "opening" | "ending" | "other" }[] = []
+    let chapters: playerChapterList = []
     episodes.forEach(element => {
         if (element["number"] == parseInt(episode)) {
             for (const key in element["secondarySource"]) {
@@ -71,7 +71,7 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
                 format: "ass"
             })
             let extractedChapters = JSON.parse(element["markerPeriods"])
-            if (extractedChapters[0]) chapters.push({ start: timeToSeconds(extractedChapters[0]["startTime"]), end: timeToSeconds(extractedChapters[0]["endTime"]), type: "opening" })
+            if (extractedChapters[0]) chapters.push({ start: timeToSeconds(extractedChapters[0]["startTime"]), end: timeToSeconds(extractedChapters[0]["endTime"]), type: "opening", name: "Opening" })
             if (extractedChapters[1]) chapters.push({ start: timeToSeconds(extractedChapters[1]["startTime"]), end: timeToSeconds(extractedChapters[1]["endTime"]), type: "ending" })
         }
     });

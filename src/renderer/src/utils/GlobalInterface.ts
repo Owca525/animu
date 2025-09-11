@@ -75,9 +75,11 @@ export interface playerData {
     resolution: { res: string, url: string }[]
     storyboardVTT?: string
     defaultSubttiles?: boolean
-    listChapters?: { start: number, end: number, type: "opening" | "ending" | "other" }[]
+    listChapters?: playerChapterList
     subtitles?: { url: string, lang: string, label: string, format: string }[]
 }
+
+export type playerChapterList = { start: number, end: number, type: "opening" | "ending" | "other", name?: string }[]
 
 export interface indentityPlayer {
     pluginName: string
