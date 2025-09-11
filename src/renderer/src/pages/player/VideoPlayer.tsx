@@ -324,9 +324,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     }
 
     function setMutedToPlayer() {
-        if (isMuted) setMuted(false)
-        else setMuted(true)
+        setMuted((prev) => !prev)
+        handleVolume(volume)
     }
+
+    console.log(isMuted)
 
     async function exitPlayer() {
         if (document.pictureInPictureElement) {
@@ -599,7 +601,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     takeScreenshot()
                     break
                 case convertKeybinds(config.Player.keybinds.VolumeMute.toLowerCase()).toLowerCase():
-                    setMuted(prev => !prev)
+                    setMutedToPlayer()
                     break
                 case convertKeybinds(config.Player.keybinds.NextEpisode.toLowerCase()).toLowerCase():
                     setEpisode("next")
