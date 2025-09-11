@@ -752,9 +752,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         setChapterList(() => tmp)
     }
 
-    // function getcurrentChapter() {
+    function getcurrentChapter(): string | undefined {
+        if (!currentPlayer) return undefined
+        if (!currentPlayer.listChapters) return undefined
+        if (!videoRef.current) return undefined
 
-    // }
+        for (let index = 0; index < currentPlayer.listChapters.length; index++) {
+            const element = currentPlayer.listChapters[index];
+            if (videoRef.current.currentTime >= element.start && videoRef.current.currentTime <= element.end && element.name) return element.name
+        }
+        return undefined
+    }
 
     return (
         <div className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
@@ -862,6 +870,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                             </div>
                         </div>
                         <div className="player-right">
+                            {getcurrentChapter() && <span>Chapter: {getcurrentChapter()}</span>}
                             <PlayerButton icon={isMuted ? 'volume_off' : 'volume_up'} title={isMuted ? "Unmute" : "Mute"} ButtonClass="player-buttons volume-button" onClick={setMutedToPlayer} />
                             <div className="player-volume-seek">
                                 <SeekBar currentValue={volume} maxValue={100} onSeek={value => handleVolume(value)} classes={{ container: "player-seekbar" }} />
