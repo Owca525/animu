@@ -328,8 +328,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         handleVolume(volume)
     }
 
-    console.log(isMuted)
-
     async function exitPlayer() {
         if (document.pictureInPictureElement) {
             await document.exitPictureInPicture();
@@ -637,6 +635,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             return
         }
 
+        // TODO: Fix subtitles dosen't show
         canvasRef.current.width = videoRef.current.videoWidth;
         canvasRef.current.height = videoRef.current.videoHeight;
         context.drawImage(videoRef.current, 0, 0);
