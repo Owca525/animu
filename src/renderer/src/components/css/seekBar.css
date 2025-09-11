@@ -4,7 +4,6 @@
     position: relative;
     cursor: pointer;
     width: 100%;
-    overflow: hidden;
 }
 
 .seekbar-progress{
@@ -47,6 +46,10 @@
     width: min-content;
     padding: 8px 12px;
     z-index: 4;
+}
+
+.seekbar-chapter-box {
+    top: -65px;
 }
 
 .seekbar-thumbnail {

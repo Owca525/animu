@@ -14,7 +14,7 @@ interface SeekBarProps {
   screen?: boolean
   secondBarValues?: { position: number, width: number }[]
   thumbnail?: Thumbnail
-  chapterList?: { left: number, width: number }[]
+  chapterList?: { left: number, width: number, name?: string }[]
 }
 
 const SeekBar: React.FC<SeekBarProps> = ({
@@ -38,6 +38,7 @@ const SeekBar: React.FC<SeekBarProps> = ({
   const seekbarThumb = useRef<HTMLDivElement | null>(null);
   const seekbarBox = useRef<HTMLDivElement | null>(null);
   const seekbarThumbnail = useRef<HTMLImageElement | null>(null);
+  const seekbarChapterText = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
     setValue(currentValue);
@@ -82,10 +83,17 @@ const SeekBar: React.FC<SeekBarProps> = ({
 
     const percent = ((newValue - minValue) / (maxValue - minValue)) * 100;
     seekbarBox.current.style.left = `${percent}%`;
+    setChapterBoxPosition(`${percent}%`, percent)
 
     if (screen) {
-      if (percent > 98) seekbarBox.current.style.left = `98%`;
-      if (percent < 1.5) seekbarBox.current.style.left = `1.5%`;
+      if (percent > 98) {
+        seekbarBox.current.style.left = `98%`
+        setChapterBoxPosition(`98%`, percent)
+      };
+      if (percent < 1.5) {
+        seekbarBox.current.style.left = `1.5%`
+        setChapterBoxPosition(`1.5%`, percent)
+      };
     }
     if (thumbnail) setThumbnailPosition(percent)
     if (type === "value") seekbarBox.current.innerHTML = newValue.toFixed(0);
@@ -122,10 +130,26 @@ const SeekBar: React.FC<SeekBarProps> = ({
           centerPx = containerWidth - halfThumb
         }
         thumb.style.left = `${centerPx}px`
+        setChapterBoxPosition(`${centerPx}px`, percent)
       }
     })
   }
 
+  function setChapterBoxPosition(variable: string, percent: number) {
+    if (!chapterList) return
+    if (!seekbarChapterText.current) return
+    for (let index = 0; index < chapterList.length; index++) {
+      const element = chapterList[index];
+      seekbarChapterText.current.innerHTML = ""
+      seekbarChapterText.current.style.display = "none"
+      if (percent >= element.left && percent <= (element.left + element.width) && element.name) {
+        seekbarChapterText.current.style.left = variable
+        seekbarChapterText.current.innerHTML = element.name
+        seekbarChapterText.current.style.display = ""
+        return
+      }
+    }
+  }
 
   function handleMouseMove(event: React.MouseEvent<HTMLDivElement> | MouseEvent) {
     setPositionBox(event)
@@ -167,12 +191,17 @@ const SeekBar: React.FC<SeekBarProps> = ({
         className={`seekbar-thumb ${classes?.thumb}`}
       />
       <div tabIndex={-1} ref={seekbarBox} style={show ? { display: "block" } : { display: "none" }} className={`seekbar-box ${classes?.box}`}></div>
-      {thumbnail && <div
-        tabIndex={-1}
-        ref={seekbarThumbnail}
-        style={show ? { display: "block", backgroundImage: `url(${thumbnail.src})` } : { display: "none" }}
-        className="seekbar-thumbnail"
-      />
+      {thumbnail && 
+        <div
+          tabIndex={-1}
+          ref={seekbarThumbnail}
+          style={show ? { display: "block", backgroundImage: `url(${thumbnail.src})` } : { display: "none" }}
+          className="seekbar-thumbnail"
+        />
+      }
+
+      {chapterList && chapterList.length > 0 && 
+        <div tabIndex={-1} ref={seekbarChapterText} style={show ? { display: "block" } : { display: "none" }} className={`seekbar-box seekbar-chapter-box ${classes?.box}`}></div>
       }
     </div>
   );
