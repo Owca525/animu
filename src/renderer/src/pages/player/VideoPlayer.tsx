@@ -98,13 +98,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const [ListResolution, setListResolution] = useState<{ res: string, url: string }[]>([])
     const [currentResolution, setCurrentResoltion] = useState<{ res: string, url: string } | undefined>(undefined)
 
-    // url
-    const [currentHost, setHost] = useState<string>("")
-
     // Up Next
     const [timeNextEpisode, setTimeNextEpisode] = useState<number>(30)
     const [isUpNextEpisode, setUpNextEpisode] = useState<boolean>(false)
     const [isHideUpNextEpisode, setHideUpNextEpisode] = useState<boolean>(false)
+    const [currentPlayer, setPlayer] = useState<playerData | undefined>(undefined)
 
     // other
     const [currentSettings, setcurrentSettings] = useState<boolean>(false)
@@ -213,14 +211,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         if (data.storyboardVTT) setThumbnail(await VTTstoryBoardParser(data.storyboardVTT))
         if (data.hls) {
             console.log(data)
-            setHost(() => data.hostname)
+            setPlayer(() => data)
             await runHLS(data.resolution[0].url, data.hostname)
             return
         }
         if (hls) hls.destroy()
         setCurrentResoltion(data.resolution[0])
         setListResolution(() => data.resolution.reverse())
-        setHost(data.hostname)
+        setPlayer(() => data)
         videoRef.current.src = data.resolution[0].url
         videoRef.current.currentTime = time
     }
@@ -273,6 +271,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         case Hls.ErrorTypes.NETWORK_ERROR:
                             message = t('player.errors.MEDIA_ERR_NETWORK')
                             hls.destroy()
+                            // TODO: Update this, may make bug
                             setNewUrl(host)
                             // hls.startLoad();
                             break;
@@ -303,7 +302,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             setShowVolume(() => false)
         }, 1000);
     }
-    
+
     function togglePlay() {
         const video = videoRef.current
         if (!video) return
@@ -394,16 +393,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         checkUpNext()
         handleProgress()
 
-        if (config.Player.general.autoSkipOpenings) {
-            for (let index = 0; index < player_data.length; index++) {
-                const element = player_data[index];
-                if (element.hostname == currentHost && element.listChapters) {
-                    element.listChapters.forEach(element => {
-                        if (!videoRef.current) return
-                        if (videoRef.current.currentTime >= element.start && videoRef.current.currentTime <= element.end) change_time(element.end)
-                    });
-                }
-            }
+        if (config.Player.general.autoSkipOpenings && currentPlayer && currentPlayer.listChapters) {
+            currentPlayer.listChapters.forEach(element => {
+                if (!videoRef.current) return
+                if (videoRef.current.currentTime >= element.start && videoRef.current.currentTime <= element.end) change_time(element.end)
+            });
         }
 
         // Update RPC
@@ -557,10 +551,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         track.mode = "hidden"
         track.oncuechange = onChangeTrackText;
     }
-
-    useHotkeys("x", async () => {
-        console.log(player_data)
-    })
 
     function keybinds(event: string) {
         if (videoRef.current) {
@@ -762,6 +752,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         setChapterList(() => tmp)
     }
 
+    // function getcurrentChapter() {
+
+    // }
+
     return (
         <div className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
             <video
@@ -777,12 +771,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 onError={(error) => videoErrorHandler(error)}
                 onLoadedMetadata={() => {
                     updateProgress()
-                    for (let index = 0; index < player_data.length; index++) {
-                        const element = player_data[index];
-                        if (element.hostname == currentHost && element.listChapters) {
-                            generateOpeningEnding(element.listChapters)
-                            return
-                        }
+                    if (currentPlayer && currentPlayer.listChapters) {
+                        generateOpeningEnding(currentPlayer.listChapters)
                     }
                 }}
                 preload="auto"
@@ -915,7 +905,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                 }
                                 disableSettings={() => setcurrentSettings(() => false)}
                                 current={{
-                                    currentHost: currentHost,
+                                    currentHost: currentPlayer ? currentPlayer.hostname : "Uknown",
                                     currentResolution: currentResolution ? currentResolution.res : "Uknown",
                                     currentSpeed: videoRef.current?.playbackRate ? videoRef.current?.playbackRate : 1,
                                     currentSub: currentSubtitles ? currentSubtitles.label : "Off",
@@ -969,7 +959,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     isVisible={isVisible}
                     isWaitingPlayer={isWaitingPlayer}
                     ListResolution={ListResolution.map((val) => val.res)}
-                    currentHost={currentHost}
+                    currentHost={currentPlayer ? currentPlayer.hostname : "Uknown"}
                     currentResolution={currentResolution ? currentResolution.res : "Uknown"}
                     currentSettings={currentSettings}
                     hls={hls}
