@@ -14,7 +14,7 @@ interface SeekBarProps {
   screen?: boolean
   secondBarValues?: { position: number, width: number }[]
   thumbnail?: Thumbnail
-  chapterList?: { left: number, width: number, name?: string }[]
+  chapterList?: { left: number, width: number, name?: string, type: "opening" | "ending" | "other" }[]
 }
 
 const SeekBar: React.FC<SeekBarProps> = ({
@@ -176,7 +176,7 @@ const SeekBar: React.FC<SeekBarProps> = ({
       }
       {chapterList && chapterList.length > 0 &&
         <div className="seekbar-chapters-wrapper">
-          {chapterList.map((buffer) => <div className="seekbar-chapters" style={{ left: `${buffer.left}%`, width: `${buffer.width}%` }}></div>)}
+          {chapterList.map((chapter) => <div className={`seekbar-chapters ${chapter.type == "opening" || chapter.type == "ending" ? "seekbar-chapters-opening-ending" :""}`} style={{ left: `${chapter.left}%`, width: `${chapter.width}%` }}></div>)}
         </div>
       }
 
@@ -201,7 +201,7 @@ const SeekBar: React.FC<SeekBarProps> = ({
       }
 
       {chapterList && chapterList.length > 0 && 
-        <div tabIndex={-1} ref={seekbarChapterText} style={show ? { display: "block" } : { display: "none" }} className={`seekbar-box seekbar-chapter-box ${classes?.box}`}></div>
+        <div tabIndex={-1} ref={seekbarChapterText} style={show ? { display: "block" } : { display: "none" }} className={`seekbar-box ${thumbnail ? "seekbar-chapter-box-thumbnails" : "seekbar-chapter-box"} ${classes?.box}`}></div>
       }
     </div>
   );

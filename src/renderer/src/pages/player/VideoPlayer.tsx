@@ -110,7 +110,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const [currentSettings, setcurrentSettings] = useState<boolean>(false)
     const [showNerdStats, setshowNerdStats] = useState<boolean>(false)
     const [hls, setHls] = useState<Hls | undefined>(undefined);
-    const [chapterList, setChapterList] = useState<{ left: number, width: number }[]>([])
+    const [chapterList, setChapterList] = useState<{ left: number, width: number, name?: string, type: "opening" | "ending" | "other" }[]>([])
 
     // Subtitles
     const [vttUrl, setVttUrl] = useState<string | undefined>(undefined);
@@ -754,13 +754,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     function generateOpeningEnding(data: playerChapterList) {
         if (!videoRef.current) return
-        let tmp: { left: number, width: number, name?: string }[] = []
+        let tmp: { left: number, width: number, name?: string, type: "opening" | "ending" | "other" }[] = []
         for (let index = 0; index < data.length; index++) {
             const element = data[index];
-            if (element.type == "ending" || element.type == "opening") {
-                console.log((element.start / videoRef.current.duration))
-                tmp.push({ left: (element.start / videoRef.current.duration) * 100, width: ((element.end - element.start) / videoRef.current.duration) * 100, name: element.name })
-            }
+            tmp.push({ left: (element.start / videoRef.current.duration) * 100, width: ((element.end - element.start) / videoRef.current.duration) * 100, name: element.name, type: element.type })
         }
         setChapterList(() => tmp)
     }

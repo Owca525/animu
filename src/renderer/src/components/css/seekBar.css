@@ -29,6 +29,10 @@
     z-index: 1;
 }
 
+.seekbar-chapters {
+    background-color: var(--invisible);
+}
+
 .seekbar-thumb {
     position: relative;
     bottom: 4px;
@@ -48,8 +52,16 @@
     z-index: 4;
 }
 
+.seekbar-chapter-box, .seekbar-chapter-box-thumbnails {
+    width: max-content;
+}
+
 .seekbar-chapter-box {
     top: -65px;
+}
+
+.seekbar-chapter-box-thumbnails {
+    top: -140px;
 }
 
 .seekbar-thumbnail {
@@ -68,6 +80,7 @@
 .seekbar-chapters-wrapper {
     z-index: 3 !important;
 }
-.seekbar-chapters {
+
+.seekbar-chapters-opening-ending {
     background-color: var(--light-blue) !important;
 }
