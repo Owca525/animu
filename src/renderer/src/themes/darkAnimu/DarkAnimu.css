@@ -699,10 +699,6 @@ body {
   transform: translate(-50%, 10%) scaleY(0.70);
 }
 
-.seekbar-buffer {
-  border-radius: 12px;
-}
-
 .seekBar-container {
   background-color: var(--bg3);
   border-radius: 12px;
