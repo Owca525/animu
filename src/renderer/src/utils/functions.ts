@@ -1,5 +1,5 @@
 import { t } from "i18next";
-import { ContextMenuProps, homeData, themeMetadata } from "./GlobalInterface";
+import { ContextMenuProps, homeData, playerChapterList, themeMetadata } from "./GlobalInterface";
 import store from "./store";
 import { setHomeData } from "./pluginApi";
 import { ReadContinue } from "./history/continueWatch";
@@ -242,7 +242,7 @@ export function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function detectTitle(data: { title: { english?: string | undefined; native: string; romaji: string; }, ep: string, format?: string}): string {
+export function detectTitle(data: { title: { english?: string | undefined; native: string; romaji: string; }, ep: string, format?: string }): string {
     try {
         if (data.format?.toLowerCase().includes("movie")) return t('player.TitleMovie', { name: data.title.romaji })
         return t('player.TitleEpisode', { ep: data.ep, name: data.title.romaji })
@@ -258,18 +258,43 @@ export async function convertPath(path: string) {
 }
 
 export function toSeconds(time: string) {
-  const [h, m, s] = time.split(":");
-  return parseFloat(h) * 3600 + parseFloat(m) * 60 + parseFloat(s);
+    const [h, m, s] = time.split(":");
+    return parseFloat(h) * 3600 + parseFloat(m) * 60 + parseFloat(s);
 };
 
 export function isNumberString(str: string): boolean {
-  return str.trim() !== "" && !isNaN(Number(str));
+    return str.trim() !== "" && !isNaN(Number(str));
 }
 
 export function timeToSeconds(time: string): number {
-  const [hms] = time.split(".");
-  const parts = hms.split(":").map(Number);
-  const [hours, minutes, seconds] = parts;
+    const [hms] = time.split(".");
+    const parts = hms.split(":").map(Number);
+    const [hours, minutes, seconds] = parts;
 
-  return hours * 3600 + minutes * 60 + seconds;
+    return hours * 3600 + minutes * 60 + seconds;
+}
+
+export async function convertChaptersVTT(url: string): Promise<playerChapterList> {
+    let req = await window.api.request.get(url, { "User-Agent": navigator.userAgent }, "text")
+    if (!req.success) return []
+    let lines = req.data.split("\n") as string
+    
+    let finnalListChapters: playerChapterList = []
+    for (let i = 0; i < lines.length; i++) {
+        if (lines[i].includes("-->")) {
+            const [start, end] = lines[i].split(" --> ");
+            const next = lines[i + 1];
+
+            if (next == "") continue;
+
+            finnalListChapters.push({
+                start: timeToSeconds(start),
+                end: timeToSeconds(end),
+                type: "other",
+                name: next
+            })
+        }
+    }
+
+    return finnalListChapters
 }

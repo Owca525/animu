@@ -1,4 +1,5 @@
-import { AnimeData, cardData, episodeList, playerData, pluginFormat } from "@renderer/utils/GlobalInterface";
+import { convertChaptersVTT } from "@renderer/utils/functions";
+import { AnimeData, cardData, episodeList, playerChapterList, playerData, pluginFormat } from "@renderer/utils/GlobalInterface";
 
 const WEB = "https://anizone.to"
 const CARDS_REGEX = /<div[^>]*class=["']grid grid-cols-1 2xl:grid-cols-2 gap-4["'][^>]*>(.*?)<\/div>/gs
@@ -20,6 +21,7 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
 
     let data = req.data as string
     let storyboard = [...data.matchAll(/https:\/\/seiryuu\.vid-cdn\.xyz\/[a-z0-9-]+\/storyboard\.vtt/gi)]
+    let chapters = [...data.matchAll(/https:\/\/seiryuu\.vid-cdn\.xyz\/[a-z0-9-]+\/chapters\.vtt/gi)]
     let urls = [...data.matchAll(/https:\/\/seiryuu\.vid-cdn\.xyz\/[a-z0-9-]+\/master\.m3u8/gi)]
     if (urls.length <= 0) return []
     let otherFiles = [...data.matchAll(/<track[^>]*\s+src=["']?(?<src>[^"'\s>]+)["']?[^>]*\s+data-type=["']?(?<dataType>[^"'\s>]+)["']?[^>]*\s+kind=["']?(?<kind>[^"'\s>]+)["']?[^>]*\s+label=["']?(?<label>[^"']+)["']?[^>]*\s+srclang=["']?(?<srclang>[^"'\s>]+)["']?[^>]*>/gi)]
@@ -38,10 +40,28 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
         }
     }
 
+    let chapterList: playerChapterList = []
+    if (chapters.length > 0) {
+        let data = await convertChaptersVTT(chapters[0][0])
+        for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+            if (element.name == "Intro") {
+                chapterList.push({ ...element, type: "opening" })
+                continue
+            }
+            if (element.name == "Credits") {
+                chapterList.push({ ...element, type: "opening" })
+                continue
+            }
+            chapterList.push(element)
+        }
+    }
+
     return [{
         hostname: "Anizone.to",
         hls: true,
         subtitles: subList,
+        listChapters: chapterList,
         storyboardVTT: storyboard.length > 0 ? storyboard[0][0] : undefined,
         resolution: [{ res: "", url: urls[0][0] }]
     }]
