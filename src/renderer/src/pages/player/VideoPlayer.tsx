@@ -399,8 +399,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
         hideChapterButtonTimer.current = setInterval(() => {
             setButtonSkipTime((prev) => {
-                console.log(prev)
-                console.log(IsRunningButtonSkipTime)
                 if (prev <= 1 || IsRunningButtonSkipTime) {
                     if (hideChapterButtonTimer.current) clearInterval(hideChapterButtonTimer.current);
                     setButtonSkipTime(15)
@@ -458,17 +456,32 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         // TODO: Improve 
         if (!config) return
         if (!videoRef.current) return
-        if (!config.Player.upToNextEpisode.enable) return
+        // if (!config.Player.upToNextEpisode.enable) return
+        if (!currentPlayer) return
         const duration = videoRef.current.duration
         const currentTime = videoRef.current.currentTime
 
         if (duration <= config.Player.upToNextEpisode.durationShow * 60) return
 
-        if (isHideUpNextEpisode == false && temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] != null && currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
-            setUpNextEpisode(true)
-            setTimeNextEpisode(((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + config.Player.upToNextEpisode.interval)
+        let showUpToNext: boolean = false
+        let timeDelete: number = ((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
+        if (currentPlayer.listChapters) {
+            for (let index = 0; index < currentPlayer.listChapters.length; index++) {
+                const element = currentPlayer.listChapters[index];
+                if (currentTime >= element.start && currentTime <= element.end && element.type == "ending") {
+                    showUpToNext = true
+                    timeDelete = ((parseInt(duration.toFixed(0)) - (parseInt(duration.toFixed(0)) - element.start)) - parseInt(currentTime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
+                }
+            }
         } else {
-            setTimeNextEpisode(config.Player.upToNextEpisode.interval)
+            showUpToNext = currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
+        }
+
+        if (isHideUpNextEpisode == false && temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] != null && showUpToNext) {
+            setUpNextEpisode(true)
+            setTimeNextEpisode(timeDelete)
+        } else {
+            setTimeNextEpisode(parseInt(config.Player.upToNextEpisode.interval.toString()))
             setUpNextEpisode(false)
         }
 
@@ -522,7 +535,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     })
 
     useHotkeys("d", () => {
-        console.log(player_data)
+        console.log(player_data, temp)
     })
 
     function setEpisode(type: "next" | "prev") {
