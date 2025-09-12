@@ -746,8 +746,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     };
 
     const hiddenVariants = {
-        hidden: { opacity: 0 },
-        visible: { opacity: 1 },
+        hidden: { opacity: 0, display: "none" },
+        visible: { opacity: 1, display: "" },
     }
 
     function detectDisableTooltips(text: string): string | undefined {
@@ -822,6 +822,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         for (let index = 0; index < currentPlayer.listChapters.length; index++) {
             const element = currentPlayer.listChapters[index];
             if (videoRef.current.currentTime >= element.start && videoRef.current.currentTime <= element.end && element.name) return element.name
+        }
+        return undefined
+    }
+
+    function getCurrentImage(): string | undefined {
+        for (let index = 0; index < temp.episodes.length; index++) {
+            const element = temp.episodes[index];
+            if (element.ep == temp.episode && element.img) return element.img
         }
         return undefined
     }
@@ -991,7 +999,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             </div>
             <motion.button onClick={currentSkipButton.onClick} variants={hiddenVariants} initial="hidden" animate={IsRunningButtonSkipTime ? "visible" : "hidden"} className="player-skip-chapters-button">{currentSkipButton.text}, {`${buttonSkipTime}s`}</motion.button>
             <canvas ref={canvasRef} style={{ display: 'none' }} />
-            {isUpNextEpisode ? (
+            {/* {isUpNextEpisode ? (
                 <div className="player-up-Next-container">
                     <div className="player-up-Next-Title">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>
                     <div className="player-up-Next-Anime">{t("player.upNext.titleAnime", { ep: temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1].ep, title: anime_data.AnimeData.title.romaji })}</div>
@@ -1000,7 +1008,36 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         <Button content={t("player.upNext.hide")} ButtonClass='player-up-Next-Button' onClick={() => { setHideUpNextEpisode(true); setUpNextEpisode(false) }} />
                     </div>
                 </div>
-            ) : ""}
+            ) : ""} */}
+            {/* TODO: Remove isVisible */}
+            <motion.div
+                variants={{
+                    hidden: { opacity: 0, x: 400, display: "none" },
+                    visible: { opacity: 1, x: 0, display: "" },
+                }}
+                transition={{ duration: 0.2 }}
+                animate={isUpNextEpisode ? "visible" : "hidden"}
+                initial={"hidden"}
+                className="player-up-Next-background"
+                style={{ backgroundImage: `url(${getCurrentImage()})` }}
+                onClick={() => setEpisode("next")}
+            >
+                <div className="player-up-Next-container">
+                    {/* <img src={getCurrentImage()} className="player-up-Next-image" /> */}
+                    <span className="material-symbols-outlined player-up-Next-icon">skip_next</span>
+                    <div className="player-up-Next-content">
+                        <div className="player-up-Next-title">{anime_data.AnimeData.title.romaji}</div>
+                        <div className="player-up-Next-episode">Ep. {temp.episode}</div>
+                        <div className="player-up-Next-text">Playing next episode in {parseInt(timeNextEpisode.toString())}s...</div>
+                    </div>
+                </div>
+                <button className="material-symbols-outlined player-up-Next-button" onClick={(event) => {
+                    event.stopPropagation();
+                    setHideUpNextEpisode(true);
+                    setUpNextEpisode(false)
+                }
+                }>close</button>
+            </motion.div>
             {!config.Player.general.DisableVolumeAnimation &&
                 <motion.div className="player-volume-ui-container"
                     variants={{

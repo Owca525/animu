@@ -648,18 +648,6 @@ body {
   background-color: var(--bg3);
 }
 
-.player-up-Next-container {
-  background-color: var(--player-bg-containers);
-  border-radius: 1em;
-  border-color: var(--bg4);
-  color: var(--text);
-}
-
-.player-up-Next-Button {
-  background-color: var(--player-bg-containers);
-  border-color: var(--bg4);
-}
-
 .player-settings-button-text-gray {
   color: var(--text-gray);
 }

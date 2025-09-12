@@ -10,9 +10,9 @@
     max-width: 250px;
 }
 
-.player-episode-element-background {
+.player-episode-element-background, .player-up-Next-background {
     border-radius: 8px;
-    background-color: var(--bg3);;
+    /* background-color: var(--bg3); */
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
