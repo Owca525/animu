@@ -383,6 +383,23 @@
   font-weight: bold;
 }
 
+.player-skip-chapters-button {
+  position: absolute;
+  bottom: 12%;
+  left: 1%;
+  padding: 12px;
+  background-color: var(--bg2);
+  color: var(--text);
+  font-size: 1.1em;
+  border: 2px solid var(--player-bg-containers);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.player-skip-chapters-button:hover {
+  border-color: var(--neutral1);
+}
+
 .player-subtitle-container.up {
   bottom: 80px;
 }

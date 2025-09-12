@@ -73,6 +73,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const videoRef = useRef<HTMLVideoElement | null>(null)
     const containerRef = useRef<HTMLDivElement | null>(null)
     const hideTimer = useRef<NodeJS.Timeout | null>(null)
+    const hideChapterButtonTimer = useRef<NodeJS.Timeout | null>(null)
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
     // Variable
@@ -86,6 +87,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const [isShowPlay, setShowPlay] = useState<boolean>(false)
     const playAnimationTimeout = useRef<NodeJS.Timeout | null>(null);
     const [isShowSelectEpisode, setShowSelectEpisode] = useState<boolean>(false)
+    const [buttonSkipTime, setButtonSkipTime] = useState<number>(15)
+    const [IsRunningButtonSkipTime, setIsRunningButtonSkipTime] = useState<boolean>(false)
+    const [IsDisableButtonSkipTimerOpening, setIsDisableButtonSkipTimerOpening] = useState<boolean>(false)
+    const [IsDisableButtonSkipTimerEnding, setIsDisableButtonSkipTimerEnding] = useState<boolean>(false)
+    const [currentSkipButton, setcurrentSkipButton] = useState<{ text: string, onClick: () => void }>({ text: "", onClick: () => "" })
 
     // States
     const [isMuted, setMuted] = useState<boolean>(false)
@@ -386,6 +392,33 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         }
     };
 
+    function startChapterSkipTime() {
+        if (IsRunningButtonSkipTime) return
+
+        setIsRunningButtonSkipTime(() => true)
+
+        hideChapterButtonTimer.current = setInterval(() => {
+            setButtonSkipTime((prev) => {
+                console.log(prev)
+                console.log(IsRunningButtonSkipTime)
+                if (prev <= 1 || IsRunningButtonSkipTime) {
+                    if (hideChapterButtonTimer.current) clearInterval(hideChapterButtonTimer.current);
+                    setButtonSkipTime(15)
+                    setIsRunningButtonSkipTime(() => false)
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+    };
+
+    function clearChapterSkipTime() {
+        if (!hideChapterButtonTimer.current) return
+        clearInterval(hideChapterButtonTimer.current)
+        setButtonSkipTime(15)
+        setIsRunningButtonSkipTime(() => false)
+    }
+
     function updateProgress() {
         if (!videoRef.current) return
         saveContinueProgress()
@@ -393,10 +426,27 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         checkUpNext()
         handleProgress()
 
-        if (config.Player.general.autoSkipOpenings && currentPlayer && currentPlayer.listChapters) {
+        if (currentPlayer && currentPlayer.listChapters) {
             currentPlayer.listChapters.forEach(element => {
                 if (!videoRef.current) return
-                if (videoRef.current.currentTime >= element.start && videoRef.current.currentTime <= element.end) change_time(element.end)
+                let currentTime = videoRef.current.currentTime
+                if (currentTime >= element.start && currentTime <= element.end && element.type == "opening") {
+                    if (config.Player.general.autoSkipOpenings) change_time(element.end)
+                    if (!IsDisableButtonSkipTimerOpening && !config.Player.general.autoSkipOpenings) {
+                        setcurrentSkipButton(() => { return { text: "Skip Opening", onClick: () => { change_time(element.end); clearChapterSkipTime() } } })
+                        startChapterSkipTime()
+                        setIsDisableButtonSkipTimerOpening(() => true)
+                    }
+                }
+                console.log(element)
+                if (currentTime >= element.start && currentTime <= element.end && element.type == "ending") {
+                    console.log("kanjsdljanbsd")
+                    if (!IsDisableButtonSkipTimerEnding) {
+                        setcurrentSkipButton(() => { return { text: "Skip Ending", onClick: () => { change_time(element.end); clearChapterSkipTime() } } })
+                        startChapterSkipTime()
+                        setIsDisableButtonSkipTimerEnding(() => true)
+                    }
+                }
             });
         }
 
@@ -407,6 +457,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     function checkUpNext() {
         // checking to show Up next communicat
+        // TODO: Improve 
         if (!config) return
         if (!videoRef.current) return
         if (!config.Player.upToNextEpisode.enable) return
@@ -422,7 +473,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             setTimeNextEpisode(config.Player.upToNextEpisode.interval)
             setUpNextEpisode(false)
         }
-        
+
         if (isHideUpNextEpisode == false && timeNextEpisode <= 0) setEpisode("next")
     }
 
@@ -771,8 +822,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 ref={videoRef}
                 className="video-player"
                 onTimeUpdate={updateProgress}
-                onProgress={handleProgress}
-                onSeeked={handleProgress}
+                onProgress={updateProgress}
+                onSeeked={updateProgress}
                 onClick={() => { togglePlay(); setcurrentSettings(() => false); setShowSelectEpisode(() => false) }}
                 autoPlay={isPlaying}
                 onWaiting={() => { setWaitingPlayer(() => true) }}
@@ -928,6 +979,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     </div>
                 </div>
             </div>
+            <motion.button onClick={currentSkipButton.onClick} variants={hiddenVariants} initial="hidden" animate={IsRunningButtonSkipTime ? "visible" : "hidden"} className="player-skip-chapters-button">{currentSkipButton.text}, {`${buttonSkipTime}s`}</motion.button>
             <canvas ref={canvasRef} style={{ display: 'none' }} />
             {isUpNextEpisode ? (
                 <div className="player-up-Next-container">

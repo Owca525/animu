@@ -50,7 +50,7 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
                 continue
             }
             if (element.name == "Credits") {
-                chapterList.push({ ...element, type: "opening" })
+                chapterList.push({ ...element, type: "ending" })
                 continue
             }
             chapterList.push(element)
