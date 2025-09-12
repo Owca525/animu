@@ -453,10 +453,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     function checkUpNext() {
         // checking to show Up next communicat
-        // TODO: Improve 
         if (!config) return
         if (!videoRef.current) return
-        // if (!config.Player.upToNextEpisode.enable) return
+        if (!config.Player.upToNextEpisode.enable) return
         if (!currentPlayer) return
         const duration = videoRef.current.duration
         const currentTime = videoRef.current.currentTime
