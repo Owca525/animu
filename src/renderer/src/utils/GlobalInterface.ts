@@ -201,6 +201,7 @@ export interface SettingsConfig {
             enable: boolean
             interval: number
             durationShow: number
+            variants: "var1" | "var2" | "old"
         }
         keybinds: {
             Pause: string

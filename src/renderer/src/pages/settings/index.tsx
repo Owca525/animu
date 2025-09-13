@@ -506,6 +506,19 @@ function settings() {
                                     startValue={config.new.Player.upToNextEpisode.durationShow.toString()}
                                 />
                             </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                               {"Up To Next Style Variants"} 
+                                <Dropdown
+                                    options={[
+                                        { label: "Variant 1", onClick: () => handleChange("Player.upToNextEpisode.variants", "var1") },
+                                        { label: "Variant 2", onClick: () => handleChange("Player.upToNextEpisode.variants", "var2") },
+                                        { label: "Variant Old", onClick: () => handleChange("Player.upToNextEpisode.variants", "old") },
+                                    ]}
+                                    buttonText={config.new.Player.upToNextEpisode.variants}
+                                    disableX   
+                                />
+                            </div>
                         </div>
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.player.external")}</div>

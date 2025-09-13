@@ -834,6 +834,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         return undefined
     }
 
+    const uptoNextVariants = {
+        hidden: { opacity: 0, x: 400, display: "none" },
+        visible: { opacity: 1, x: 0, display: "" },
+    }
+
+    function checkUptoNext() {
+        if (config.Player.upToNextEpisode.variants == "old" && isUpNextEpisode == false) return false
+        return true
+    }
+
     return (
         <div className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
             <video
@@ -880,7 +890,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             }
 
             <div className="video-overlay">
-                <div className={isUpNextEpisode == false ? isVisible ? 'video-top' : 'video-top player-hidden' : 'video-top'}>
+                <div className={checkUptoNext() ? isVisible ? 'video-top' : 'video-top player-hidden' : 'video-top'}>
                     <Button icon='arrow_back' ButtonClass='player-buttons' onClick={async () => await exitPlayer()} />
                     <div className="player-title ">{detectTitle({ title: anime_data.AnimeData.title, ep: temp.episode, format: anime_data.AnimeData.format })}</div>
                 </div>
@@ -919,7 +929,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         </motion.div>
                     }
                 </div>
-                <div className={isVisible && isUpNextEpisode == false ? 'video-bottom' : 'video-bottom player-hidden'}>
+                <div className={isVisible && checkUptoNext() ? 'video-bottom' : 'video-bottom player-hidden'}>
                     <SeekBar chapterList={chapterList} thumbnail={thumbnails} secondBarValues={currentBuffer} currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => { setTimeVideo(value) }} type="time" classes={{ container: "player-seekbar" }} screen={true} />
                     <div className="player-bottom-section">
                         <div className="player-left">
@@ -999,45 +1009,67 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             </div>
             <motion.button onClick={currentSkipButton.onClick} variants={hiddenVariants} initial="hidden" animate={IsRunningButtonSkipTime ? "visible" : "hidden"} className="player-skip-chapters-button">{currentSkipButton.text}, {`${buttonSkipTime}s`}</motion.button>
             <canvas ref={canvasRef} style={{ display: 'none' }} />
-            {/* {isUpNextEpisode ? (
-                <div className="player-up-Next-container">
-                    <div className="player-up-Next-Title">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>
-                    <div className="player-up-Next-Anime">{t("player.upNext.titleAnime", { ep: temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1].ep, title: anime_data.AnimeData.title.romaji })}</div>
-                    <div className="player-up-Next-Buttons">
-                        <Button content={t("player.upNext.nextEp")} ButtonClass='player-up-Next-Button' onClick={() => setEpisode("next")} />
-                        <Button content={t("player.upNext.hide")} ButtonClass='player-up-Next-Button' onClick={() => { setHideUpNextEpisode(true); setUpNextEpisode(false) }} />
+            {config.Player.upToNextEpisode.variants == "old" && (
+                <motion.div variants={uptoNextVariants} transition={{ duration: 0.2 }} animate={isUpNextEpisode ? "visible" : "hidden"} initial={"hidden"} className="player-up-Next-container old">
+                    <div className="player-up-Next-Title old">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>
+                    <div className="player-up-Next-Anime old">{t("player.upNext.titleAnime", { ep: temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1].ep, title: anime_data.AnimeData.title.romaji })}</div>
+                    <div className="player-up-Next-Buttons old">
+                        <Button content={t("player.upNext.nextEp")} ButtonClass='player-up-Next-Button old' onClick={() => setEpisode("next")} />
+                        <Button content={t("player.upNext.hide")} ButtonClass='player-up-Next-Button old' onClick={() => { setHideUpNextEpisode(true); setUpNextEpisode(false) }} />
                     </div>
-                </div>
-            ) : ""} */}
+                </motion.div>
+            )}
             {/* TODO: Remove isVisible */}
-            <motion.div
-                variants={{
-                    hidden: { opacity: 0, x: 400, display: "none" },
-                    visible: { opacity: 1, x: 0, display: "" },
-                }}
-                transition={{ duration: 0.2 }}
-                animate={isUpNextEpisode ? "visible" : "hidden"}
-                initial={"hidden"}
-                className="player-up-Next-background"
-                style={{ backgroundImage: `url(${getCurrentImage()})` }}
-                onClick={() => setEpisode("next")}
-            >
-                <div className="player-up-Next-container">
-                    {/* <img src={getCurrentImage()} className="player-up-Next-image" /> */}
+            {config.Player.upToNextEpisode.variants == "var2" &&
+                <motion.div
+                    variants={uptoNextVariants}
+                    transition={{ duration: 0.2 }}
+                    animate={isUpNextEpisode ? "visible" : "hidden"}
+                    initial={"hidden"}
+                    className="player-up-Next-background"
+                    style={{ backgroundImage: `url(${getCurrentImage()})` }}
+                    onClick={() => setEpisode("next")}
+                >
+                    <div className="player-up-Next-container var2">
+                        <span className="material-symbols-outlined player-up-Next-icon">skip_next</span>
+                        <div className="player-up-Next-content var2">
+                            <div className="player-up-Next-title">{anime_data.AnimeData.title.romaji}</div>
+                            <div className="player-up-Next-episode">Ep. {temp.episode}</div>
+                            <div className="player-up-Next-text">Playing next episode in {parseInt(timeNextEpisode.toString())}s...</div>
+                        </div>
+                    </div>
+                    <button className="material-symbols-outlined player-up-Next-button-close" onClick={(event) => {
+                        event.stopPropagation();
+                        setHideUpNextEpisode(true);
+                        setUpNextEpisode(false)
+                    }
+                    }>close</button>
+                </motion.div>
+            }
+            {config.Player.upToNextEpisode.variants == "var1" &&
+                <motion.div
+                    variants={uptoNextVariants}
+                    transition={{ duration: 0.2 }}
+                    animate={isUpNextEpisode ? "visible" : "hidden"}
+                    initial={"hidden"}
+                    className="player-up-Next-container"
+                    onClick={() => setEpisode("next")}
+                >
+                    <img src={getCurrentImage()} className="player-up-Next-image" />
                     <span className="material-symbols-outlined player-up-Next-icon">skip_next</span>
                     <div className="player-up-Next-content">
                         <div className="player-up-Next-title">{anime_data.AnimeData.title.romaji}</div>
                         <div className="player-up-Next-episode">Ep. {temp.episode}</div>
                         <div className="player-up-Next-text">Playing next episode in {parseInt(timeNextEpisode.toString())}s...</div>
                     </div>
-                </div>
-                <button className="material-symbols-outlined player-up-Next-button" onClick={(event) => {
-                    event.stopPropagation();
-                    setHideUpNextEpisode(true);
-                    setUpNextEpisode(false)
-                }
-                }>close</button>
-            </motion.div>
+                    <button className="material-symbols-outlined player-up-Next-button-close" onClick={(event) => {
+                        event.stopPropagation();
+                        setHideUpNextEpisode(true);
+                        setUpNextEpisode(false)
+                    }
+                    }>close</button>
+                </motion.div>
+            }
             {!config.Player.general.DisableVolumeAnimation &&
                 <motion.div className="player-volume-ui-container"
                     variants={{
