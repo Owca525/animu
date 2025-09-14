@@ -228,13 +228,14 @@
   padding: 8px;
 }
 
-.player-up-Next-container.var2 {
+.player-up-Next-container-var2 {
   padding: 12px;
   display: flex;
   justify-content: center;
   gap: 4px;
   align-items: center;
   background: linear-gradient(to left, var(--bg), rgb(0, 0, 0, 0.2));
+  /* background-color: var(--bg4); */
   backdrop-filter: blur(1px);
   border-radius: 12px !important;
 }

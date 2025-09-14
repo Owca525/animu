@@ -476,6 +476,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             showUpToNext = currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
         }
 
+        console.log(showUpToNext, timeDelete)
+
         if (isHideUpNextEpisode == false && temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] != null && showUpToNext) {
             setUpNextEpisode(true)
             setTimeNextEpisode(timeDelete)
@@ -1030,7 +1032,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     style={{ backgroundImage: `url(${getCurrentImage()})` }}
                     onClick={() => setEpisode("next")}
                 >
-                    <div className="player-up-Next-container var2">
+                    <div className="player-up-Next-container-var2 ">
                         <span className="material-symbols-outlined player-up-Next-icon">skip_next</span>
                         <div className="player-up-Next-content var2">
                             <div className="player-up-Next-title">{anime_data.AnimeData.title.romaji}</div>
