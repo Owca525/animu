@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import "./css/dropDown.css"
 
-interface DropdownOption {
+export interface DropdownOption {
   label: string
   onClick?: (text: string) => void
 }

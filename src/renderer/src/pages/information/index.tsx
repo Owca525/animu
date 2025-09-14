@@ -15,6 +15,8 @@ import { ReadHistory } from "@renderer/utils/history/history";
 import { ReadContinue } from "@renderer/utils/history/continueWatch";
 import store from "@renderer/utils/store";
 import { getInformation } from "@renderer/plugins/allmanga";
+import Dropdown, { DropdownOption } from "@renderer/components/dropDown";
+import { getPluginList } from "@renderer/utils/pluginApi";
 
 function information() {
     const navigate = useNavigate()
@@ -171,6 +173,17 @@ function information() {
         if (showWrong) setshowWrong(() => false)
         else navigate("/")
     })
+
+    function segregatePlugins(): DropdownOption[] {
+        let data = getPluginList()
+        let list: DropdownOption[] = []
+        for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+            if (element.player) list.push({ label: element.name })
+        }
+
+        return list
+    }
     
     return (
         <>
@@ -281,7 +294,12 @@ function information() {
                         <div className="information-bottom-content">
 
                             <div className="information-episodes">
-                                <div className="information-select-episode" onClick={() => setshowWrong(() => true)}><span className="material-symbols-outlined">search</span>Is this the wrong Anime?</div>
+                                <div className="information-episodes-top-content">
+                                    <Button icon="search" onClick={() => setshowWrong(() => true)}/>
+                                    <span className="information-dot">&bull;</span>
+                                    <Dropdown options={segregatePlugins()} disableX buttonText={store.getState().plugin.playerPlugin.name} />
+                                </div>
+                                {/* <div className="information-select-episode" onClick={() => setshowWrong(() => true)}><span className="material-symbols-outlined">search</span>Is this the wrong Anime?</div> */}
                                 {showWrong == false &&
                                     <>
                                         {isLoading == false && data && data.episodesData && data.episodesData.length > 0 && anime_data.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && (

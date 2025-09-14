@@ -105,7 +105,16 @@ export async function ChangePlugin(name: string) {
     }
 }
 
-export async function setPluginPlayerCache(element: any) {
+export function getPluginList(): pluginFormat[] {
+    try {
+        return store.getState().plugin.loadedPlugins
+    } catch (error) {
+        console.error(error)
+        return []
+    }
+}
+
+export function setPluginPlayerCache(element: any) {
     try {
         store.dispatch({type: "setPlayerPluginCache", payload: element})
     } catch (error) {
@@ -113,7 +122,7 @@ export async function setPluginPlayerCache(element: any) {
     }
 }
 
-export async function getPlayerPluginCache(): Promise<any> {
+export function getPlayerPluginCache(): any {
     try {
         return store.getState().plugin.playerPluginCache
     } catch (error) {
@@ -121,7 +130,7 @@ export async function getPlayerPluginCache(): Promise<any> {
     }
 }
 
-export async function ResetPluginPlayerCache() {
+export function ResetPluginPlayerCache() {
     try {
         store.dispatch({type: "setPlayerPluginCache", payload: undefined})
     } catch (error) {

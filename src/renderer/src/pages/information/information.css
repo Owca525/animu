@@ -312,8 +312,15 @@
     justify-content: center;
 }
 
+.information-episodes-top-content {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
 
-
+.information-dot {
+    font-size: 2em;
+}
 
 /* For smaller devices / window sizes */
 @media (max-width: 1000px) {
