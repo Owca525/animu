@@ -54,7 +54,7 @@ const player = () => {
     useEffect(() => {
         SaveHistory({
             saveData: {
-                pluginName: config.plugins.player,
+                pluginName: anime_data.data.saveData && anime_data.data.saveData.pluginName == "" ? "Allmanga" : config.plugins.player,
                 last_Time: 0,
                 type: extractionData.type,
                 episode: extractionData.actual.toString()

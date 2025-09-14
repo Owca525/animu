@@ -48,12 +48,11 @@ const Card: React.FC<cardData> = ({
         saveData.type,
         AnimeData.player_ID
       )
-      console.log(episodeList)
       navigate("/player", {
         state: {
           data: {
             AnimeData: AnimeData,
-            saveData: saveData,
+            saveData: {...saveData, pluginName: saveData.pluginName == "" ? "Allmanga" : ""},
           },
           episodelist: episodeList,
           continueWatch: true

@@ -26,7 +26,7 @@ export async function DeleteFromFile(data: cardData, file: string) {
         const saveFile = await window.api.os.read(await appConfigDirPath + `/${file}.json`)
         const list = JSON.parse(saveFile) as cardData[];
         const index = list.findIndex(
-            (item) => item.saveData?.episode === data.saveData?.episode && item.AnimeData.id === data.AnimeData.id
+            (item) => item.saveData?.episode === data.saveData?.episode && item.AnimeData.title.romaji === data.AnimeData.title.romaji
         );
 
         if (index != -1) list.splice(index, 1);
@@ -100,7 +100,7 @@ function checkAnimeDuplicate(listcard: cardData[]): cardData[] {
         const title = element.AnimeData.title.romaji
         const current = map.get(title)
 
-        if (!current || (element.saveData && current.saveData && element.saveData.episode > current.saveData.episode)) {
+        if (!current || (element.saveData && current.saveData && parseInt(element.saveData.episode.toString()) > parseInt(current.saveData.episode.toString()))) {
             map.set(title, element)
         }
     }
