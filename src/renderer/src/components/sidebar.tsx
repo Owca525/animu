@@ -114,11 +114,11 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, sidebarClass, data, hideBut
 
                 <div className={`sidebar-top ${detectSidebarStateContainers()}`}>
                     {showLogo && <div className="sidebar-black-line"></div>}
-                    {data.top.map((value) => <Button icon={value.icon} content={detectSidebarStateButton(value.text)} onClick={(event) => {setHomeLocalSearch(false); hideSidebar(event, value.onClick)}} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />)}
+                    {data.top.map((value) => <Button icon={value.icon} content={detectSidebarStateButton(value.text)} onClick={(event) => {setHomeLocalSearch(false); hideSidebar(event, value.onClick); setHover((prev) => !prev)}} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />)}
                 </div>
                 <div className={`sidebar-bottom ${detectSidebarStateContainers()}`}>
                     <div className="sidebar-black-line"></div>
-                    {data.bottom.map((value) => <Button icon={value.icon} content={detectSidebarStateButton(value.text)} onClick={(event) => {setHomeLocalSearch(false); hideSidebar(event, value.onClick)}} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />)}
+                    {data.bottom.map((value) => <Button icon={value.icon} content={detectSidebarStateButton(value.text)} onClick={(event) => {setHomeLocalSearch(false); hideSidebar(event, value.onClick); setHover((prev) => !prev)}} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />)}
                 </div>
             </motion.div>
         </div>
