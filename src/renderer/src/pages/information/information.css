@@ -100,6 +100,13 @@
     margin-top: min(-3%, -60px);
 }
 
+.information-episodes-button {
+    width: 40px;
+    height: 40px;
+    justify-content: center;
+    align-items: center;
+}
+
 .information-cover, .information-cover-placeholder {
     max-width: 240px;
     max-height: 240px;

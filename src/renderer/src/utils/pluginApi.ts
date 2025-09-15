@@ -43,7 +43,7 @@ export async function UpdateHomeData(func: () => Promise<{ data: containerData, 
     }
 }
 
-export async function homeStopScrolling(payload: boolean) {
+export function homeStopScrolling(payload: boolean) {
     try {
         store.dispatch({
             type: "setStopScrolling", payload: payload
@@ -53,7 +53,7 @@ export async function homeStopScrolling(payload: boolean) {
     }
 }
 
-export async function setHomeLocalSearch(payload: boolean) {
+export function setHomeLocalSearch(payload: boolean) {
     try {
         store.dispatch({
             type: "setLocalSearch", payload: payload
@@ -86,7 +86,7 @@ export function InitialPlugin() {
     }
 }
 
-export async function ChangePlugin(name: string) {
+export function ChangePlugin(name: string) {
     try {
         const loadedPlugins: pluginFormat[] = store.getState().plugin.loadedPlugins
         for (let index = 0; index < loadedPlugins.length; index++) {

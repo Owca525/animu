@@ -16,7 +16,7 @@ import { ReadContinue } from "@renderer/utils/history/continueWatch";
 import store from "@renderer/utils/store";
 import { getInformation } from "@renderer/plugins/allmanga";
 import Dropdown, { DropdownOption } from "@renderer/components/dropDown";
-import { getPluginList } from "@renderer/utils/pluginApi";
+import { ChangePlugin, getPluginList } from "@renderer/utils/pluginApi";
 
 function information() {
     const navigate = useNavigate()
@@ -25,7 +25,6 @@ function information() {
 
     const config: SettingsConfig = useSelector((data: any) => data.config);
     const informationTemp = useSelector((info: any) => info.information);
-    const pluginPlayer = store.getState().plugin.playerPlugin as pluginFormat;
     const [showWrong, setshowWrong] = useState<boolean>(false)
     const [secondsLeft, setSecondsLeft] = useState<undefined | number>(anime_data.nextAiringEpisode?.timeUntilAiring);
     const [data, setData] = useState<episodeList | undefined>(undefined)
@@ -82,7 +81,8 @@ function information() {
     }
 
     async function initialInformation() {
-        if (!pluginPlayer.player) return
+        let currentPlayerPlugin: pluginFormat = store.getState().plugin.playerPlugin
+        if (!currentPlayerPlugin.player) return
 
         let cardAnime = (await ReadHistory()).filter((element) => element.AnimeData.id == anime_data.id)
         let cardAnimeContinueWatch = (await ReadContinue()).filter((element) => element.AnimeData.id == anime_data.id)
@@ -101,22 +101,22 @@ function information() {
             return
         }
 
-        if (informationTemp.id == anime_data.id && informationTemp.episodes_data != undefined && informationTemp.plugin_name == pluginPlayer.name ) {
+        if (informationTemp.id == anime_data.id && informationTemp.episodes_data != undefined && informationTemp.plugin_name == currentPlayerPlugin.name ) {
             setData(() => informationTemp.episodes_data)
             return
         }
 
         store.dispatch({ type: "setInformationID", payload: anime_data.id })
-        store.dispatch({ type: "setInformationPluginName", payload: pluginPlayer.name })
+        store.dispatch({ type: "setInformationPluginName", payload: currentPlayerPlugin.name })
         if (cardAnime.length <= 0 && cardAnimeContinueWatch.length <= 0) {
-            fetchData(pluginPlayer.player.animeDataList)
+            fetchData(currentPlayerPlugin.player.animeDataList)
             return
         }
 
         if (cardAnime[0].saveData?.pluginName == config.plugins.player) {
-            fetchData(pluginPlayer.player.animeDataList, cardAnime[0].AnimeData.player_ID)
+            fetchData(currentPlayerPlugin.player.animeDataList, cardAnime[0].AnimeData.player_ID)
         }
-        fetchData(pluginPlayer.player.animeDataList)
+        fetchData(currentPlayerPlugin.player.animeDataList)
     }
 
     useEffect(() => {
@@ -174,12 +174,17 @@ function information() {
         else navigate("/")
     })
 
+    async function refreashInformation(name: string) {
+        ChangePlugin(name)
+        await initialInformation()
+    }
+
     function segregatePlugins(): DropdownOption[] {
         let data = getPluginList()
         let list: DropdownOption[] = []
         for (let index = 0; index < data.length; index++) {
             const element = data[index];
-            if (element.player) list.push({ label: element.name })
+            if (element.player) list.push({ label: element.name, onClick: refreashInformation })
         }
 
         return list
@@ -295,9 +300,10 @@ function information() {
 
                             <div className="information-episodes">
                                 <div className="information-episodes-top-content">
-                                    <Button icon="search" onClick={() => setshowWrong(() => true)}/>
+                                    <Button ButtonClass="information-episodes-button" icon="search" onClick={() => setshowWrong(() => true)}/>
                                     <span className="information-dot">&bull;</span>
                                     <Dropdown options={segregatePlugins()} disableX buttonText={store.getState().plugin.playerPlugin.name} />
+                                    <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(store.getState().plugin.playerPlugin.name)}/>
                                 </div>
                                 {/* <div className="information-select-episode" onClick={() => setshowWrong(() => true)}><span className="material-symbols-outlined">search</span>Is this the wrong Anime?</div> */}
                                 {showWrong == false &&
