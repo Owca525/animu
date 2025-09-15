@@ -63,7 +63,7 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
         subtitles: subList,
         listChapters: chapterList,
         storyboardVTT: storyboard.length > 0 ? storyboard[0][0] : undefined,
-        resolution: [{ res: "", url: urls[0][0] }]
+        resolution: [{ res: "", url: urls[0][0], defaultSubtitles: true }]
     }]
 }
 

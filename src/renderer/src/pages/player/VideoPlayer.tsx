@@ -8,7 +8,7 @@ import NerdStats from "./components/nerdStats"
 const DeveloperStats = lazy(() => import('./components/developerStats'));
 
 // css
-import { cardData, ContextMenuProps, notificationProps, playerChapterList, playerData, SettingsConfig, Thumbnail } from "@renderer/utils/GlobalInterface"
+import { cardData, ContextMenuProps, notificationProps, playerChapterList, playerData, playerSubtitlesFormat, SettingsConfig, Thumbnail } from "@renderer/utils/GlobalInterface"
 import { useSelector } from "react-redux"
 import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory, toSeconds } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
@@ -118,9 +118,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     // Subtitles
     const [vttUrl, setVttUrl] = useState<string | undefined>(undefined);
-    const [ListSubtitles, setListSubtitles] = useState<{ url: string, lang: string, label: string, format: string }[]>([])
+    const [ListSubtitles, setListSubtitles] = useState<playerSubtitlesFormat[]>([])
     const [currentASSubtitles, setASSubtitles] = useState<ASS | undefined>(undefined)
-    const [currentSubtitles, setSubtitles] = useState<{ url: string, lang: string, label: string, format: string } | undefined>(undefined)
+    const [currentSubtitles, setSubtitles] = useState<playerSubtitlesFormat | undefined>(undefined)
     const assSubContainer = useRef<HTMLDivElement | null>(null);
     const vttSubRef = useRef<HTMLTrackElement | null>(null);
     const [currentCue, setCue] = useState<string | undefined>(undefined);
@@ -173,10 +173,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         videoRef.current.playbackRate = parseFloat(speed)
     }
 
-    function setNewResolution(data: { res: string, url: string } | undefined) {
+    function setNewResolution(data: { res: string, url: string; defaultSubtitles?: boolean; } | undefined) {
         if (!data) return
         if (!videoRef.current) return
         const time = videoRef.current.currentTime
+        if (data.defaultSubtitles) setDefaultSubtitles(ListSubtitles)
+        else setNewSubtitles(ListSubtitles[0])
+    
         if (hls && data.url == "") {
             console.log(data)
             setCurrentResoltion(data)
@@ -196,25 +199,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         checkUrl(player_data[value + 1])
     }
 
-    async function setDefaultSubtitles(data: { url: string, lang: string, label: string, format: string }[], defSub: boolean = true) {
+    async function setDefaultSubtitles(data: playerSubtitlesFormat[]) {
         if (data.length <= 0) return
-        setListSubtitles(() => [{ url: "", format: "", lang: "", label: "Off" }, ...data])
-        for (let index = 0; index < data.length; index++) {
-            const element = data[index];
-            if (defSub == false) return setNewSubtitles({ url: "", format: "", lang: "", label: "Off" })
+        data.forEach(element => {
             if (element.lang == i18n.language && !element.label.includes("Forced")) {
-                await setNewSubtitles(element)
+                setNewSubtitles(element)
                 return
             }
-        }
+        });
         setNewSubtitles(data[0])
     }
 
     async function checkUrl(data: playerData) {
         if (!videoRef.current) return
         const time = videoRef.current.currentTime
-        if (data.subtitles) await setDefaultSubtitles(data.subtitles, data.defaultSubttiles)
+        if (data.subtitles) setListSubtitles(() => [{ url: "", format: "", lang: "", label: "Off" }, ...data.subtitles as playerSubtitlesFormat[]])
         if (data.storyboardVTT) setThumbnail(await VTTstoryBoardParser(data.storyboardVTT))
+        if (data.resolution[0].defaultSubtitles && data.subtitles) setDefaultSubtitles(data.subtitles)
         if (data.hls) {
             console.log(data)
             setPlayer(() => data)
@@ -223,7 +224,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         }
         if (hls) hls.destroy()
         setCurrentResoltion(data.resolution[0])
-        setListResolution(() => data.resolution.reverse())
+        setListResolution(() => data.resolution)
         setPlayer(() => data)
         videoRef.current.src = data.resolution[0].url
         videoRef.current.currentTime = time
@@ -565,7 +566,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         }
     }
 
-    async function setNewSubtitles(sub: { url: string, lang: string, label: string, format: string }) {
+    async function setNewSubtitles(sub: playerSubtitlesFormat) {
         if (!videoRef.current) return
 
         // This clear subtitles but this dosen't work on dev Because react second render

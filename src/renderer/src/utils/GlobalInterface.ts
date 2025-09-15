@@ -72,12 +72,13 @@ export interface homeData {
 export interface playerData {
     hostname: string
     hls: boolean
-    resolution: { res: string, url: string }[]
+    resolution: { res: string, url: string, defaultSubtitles?: boolean; }[]
     storyboardVTT?: string
-    defaultSubttiles?: boolean
     listChapters?: playerChapterList
-    subtitles?: { url: string, lang: string, label: string, format: string }[]
+    subtitles?: playerSubtitlesFormat[]
 }
+
+export interface playerSubtitlesFormat { url: string, lang: string, label: string, format: string }
 
 export type playerChapterList = { start: number, end: number, type: "opening" | "ending" | "other", name?: string }[]
 

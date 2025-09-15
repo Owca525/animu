@@ -1,5 +1,5 @@
 import { timeToSeconds } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, playerChapterList, playerData, pluginFormat } from "@renderer/utils/GlobalInterface";
+import { AnimeData, cardData, episodeList, playerChapterList, playerData, playerSubtitlesFormat, pluginFormat } from "@renderer/utils/GlobalInterface";
 import { getPlayerPluginCache, setPluginPlayerCache } from "@renderer/utils/pluginApi";
 
 const WEB = "https://www.lycoris.cafe"
@@ -33,7 +33,6 @@ async function requestToApi(anime_id: string): Promise<{ data: any } | undefined
     if (cache && cache.anime_id == anime_id) {
         return cache
     } else {
-        console.log("askldnalsnd")
         let url = `${WEB}/api/anime/${anime_id}`
         let req = await window.api.request.get(url, HEADER);
         if (!req.success) return undefined
@@ -46,15 +45,15 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
     let req = await requestToApi(id)
     if (!req) return []
     let episodes = req.data.anime["episodes"]
-    let currentEpisode: { res: string, url: string }[] = []
-    let subtitles: { url: string, lang: string, label: string, format: string }[] = []
+    let currentEpisode: { res: string, url: string; defaultSubtitles?: boolean; }[] = []
+    let subtitles: playerSubtitlesFormat[] = []
     let chapters: playerChapterList = []
     episodes.forEach(element => {
         if (element["number"] == parseInt(episode)) {
             for (const key in element["secondarySource"]) {
                 if (element != "") {
                     let resolution = detectResoltion(key);
-                    if (resolution) currentEpisode.push({ res: resolution, url: element["secondarySource"][key] })
+                    if (resolution) currentEpisode.push({ res: resolution, url: element["secondarySource"][key], defaultSubtitles: resolution == "Source" })
                 }
             }
 
@@ -79,7 +78,6 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
     return [{
         hostname: "lycoris.cafe",
         hls: false,
-        defaultSubttiles: false,
         resolution: currentEpisode.sort((a, b) => Number(a.res) - Number(b.res)).reverse(),
         listChapters: chapters,
         subtitles: subtitles
