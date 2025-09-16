@@ -139,6 +139,7 @@ export interface pluginFormat {
         pageSize: number
         search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => void
         home: () => void
+        anime: (id: string) => Promise<AnimeData | undefined>
         searchOption: { genres: string[], seasons: string[], years: string[], format: string[], statuses: string[] }
     } | null
     player?: {
