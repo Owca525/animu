@@ -89,11 +89,11 @@ function information() {
 
         if (cardAnimeContinueWatch.length > 0) {
             let animeContinue = cardAnimeContinueWatch[0].saveData
-            if (animeContinue) setsavedata(() => {return{ last_episode: parseInt(animeContinue.episode), last_time: animeContinue.last_Time }})
+            if (animeContinue) setsavedata(() => { return { last_episode: parseInt(animeContinue.episode), last_time: animeContinue.last_Time } })
         }
         if (cardAnime.length > 0 && cardAnimeContinueWatch.length <= 0) {
             let animeHistory = cardAnime[0].saveData
-            if (animeHistory) setsavedata(() => {return{ last_episode: parseInt(animeHistory.episode), last_time: animeHistory.last_Time }})
+            if (animeHistory) setsavedata(() => { return { last_episode: parseInt(animeHistory.episode), last_time: animeHistory.last_Time } })
         }
 
         if (anime_data.id == "" && config.plugins.player == "Allmanga") {
@@ -101,7 +101,7 @@ function information() {
             return
         }
 
-        if (informationTemp.id == anime_data.id && informationTemp.episodes_data != undefined && informationTemp.plugin_name == currentPlayerPlugin.name ) {
+        if (informationTemp.id == anime_data.id && informationTemp.episodes_data != undefined && informationTemp.plugin_name == currentPlayerPlugin.name) {
             setData(() => informationTemp.episodes_data)
             return
         }
@@ -189,7 +189,7 @@ function information() {
 
         return list
     }
-    
+
     return (
         <>
             <main className="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>
@@ -300,10 +300,11 @@ function information() {
 
                             <div className="information-episodes">
                                 <div className="information-episodes-top-content">
-                                    <Button ButtonClass="information-episodes-button" icon="search" onClick={() => setshowWrong(() => true)}/>
-                                    <span className="information-dot">&bull;</span>
-                                    <Dropdown options={segregatePlugins()} disableX buttonText={store.getState().plugin.playerPlugin.name} />
-                                    <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(store.getState().plugin.playerPlugin.name)}/>
+                                    <Button ButtonClass="information-episodes-button" icon="search" onClick={() => setshowWrong(() => true)} />
+                                    <div className="information-episodes-space">
+                                        <Dropdown options={segregatePlugins()} disableX buttonText={store.getState().plugin.playerPlugin.name} />
+                                        <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(store.getState().plugin.playerPlugin.name)} />
+                                    </div>
                                 </div>
                                 {/* <div className="information-select-episode" onClick={() => setshowWrong(() => true)}><span className="material-symbols-outlined">search</span>Is this the wrong Anime?</div> */}
                                 {showWrong == false &&
