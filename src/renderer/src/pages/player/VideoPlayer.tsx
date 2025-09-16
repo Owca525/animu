@@ -1022,7 +1022,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     </div>
                 </motion.div>
             )}
-            {/* TODO: Remove isVisible */}
             {config.Player.upToNextEpisode.variants == "var2" &&
                 <motion.div
                     variants={uptoNextVariants}
