@@ -91,7 +91,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const [IsRunningButtonSkipTime, setIsRunningButtonSkipTime] = useState<boolean>(false)
     const [IsDisableButtonSkipTimerOpening, setIsDisableButtonSkipTimerOpening] = useState<boolean>(false)
     const [IsDisableButtonSkipTimerEnding, setIsDisableButtonSkipTimerEnding] = useState<boolean>(false)
-    const [currentSkipButton, setcurrentSkipButton] = useState<{ text: string, onClick: () => void }>({ text: "", onClick: () => "" })
+    const [currentSkipButton, setcurrentSkipButton] = useState<{ text: string, onClick: () => void, type: "opening" | "ending" | "" }>({ text: "", onClick: () => "", type: "" })
 
     // States
     const [isMuted, setMuted] = useState<boolean>(false)
@@ -401,9 +401,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         hideChapterButtonTimer.current = setInterval(() => {
             setButtonSkipTime((prev) => {
                 if (prev <= 1 || IsRunningButtonSkipTime) {
-                    if (hideChapterButtonTimer.current) clearInterval(hideChapterButtonTimer.current);
-                    setButtonSkipTime(15)
-                    setIsRunningButtonSkipTime(() => false)
+                    clearChapterSkipTime()
                     return 0;
                 }
                 return prev - 1;
@@ -432,14 +430,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 if (currentTime >= element.start && currentTime <= element.end && element.type == "opening") {
                     if (config.Player.general.autoSkipOpenings) change_time(element.end)
                     if (!IsDisableButtonSkipTimerOpening && !config.Player.general.autoSkipOpenings) {
-                        setcurrentSkipButton(() => { return { text: "Skip Opening", onClick: () => { change_time(element.end); clearChapterSkipTime() } } })
+                        setcurrentSkipButton(() => { return { text: "Skip Opening", onClick: () => { change_time(element.end); clearChapterSkipTime() }, type: "opening" } })
                         startChapterSkipTime()
                         setIsDisableButtonSkipTimerOpening(() => true)
                     }
                 }
                 if (currentTime >= element.start && currentTime <= element.end && element.type == "ending") {
                     if (!IsDisableButtonSkipTimerEnding) {
-                        setcurrentSkipButton(() => { return { text: "Skip Ending", onClick: () => { change_time(element.end); clearChapterSkipTime() } } })
+                        setcurrentSkipButton(() => { return { text: "Skip Ending", onClick: () => { change_time(element.end); clearChapterSkipTime() }, type: "ending" } })
                         startChapterSkipTime()
                         setIsDisableButtonSkipTimerEnding(() => true)
                     }
@@ -521,6 +519,18 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         setcurrentTime(() => value)
         if (!isNaN(value) && config && value > videoRef.current.duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
             setHideUpNextEpisode(true)
+        }
+
+        if (currentPlayer && currentPlayer.listChapters) {
+            currentPlayer.listChapters.forEach(element => {
+                console.log((value >= element.start && value <= element.end))
+                if (!(value >= element.start && value <= element.end) && element.type == "opening" && currentSkipButton.type == "opening") {
+                    clearChapterSkipTime()
+                }
+                if (!(value >= element.start && value <= element.end) && element.type == "ending" && currentSkipButton.type == 'ending') {
+                    clearChapterSkipTime()
+                }
+            })
         }
     }
 
