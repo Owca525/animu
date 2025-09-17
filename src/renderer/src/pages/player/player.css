@@ -472,6 +472,7 @@
   flex-direction: column;
   align-items: center;
   color: white;
+  max-width: 100vw;
 }
 
 .player-subtitle-content {
@@ -480,6 +481,7 @@
   pointer-events: none;
   background-color: var(--invisible);
   width: max-content;
+  max-width: 100vw;
   padding: 6px;
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
   filter: drop-shadow(2px 2px 1px black);
