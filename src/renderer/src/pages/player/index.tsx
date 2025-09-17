@@ -13,7 +13,6 @@ import { detectTitle, refetchHistory } from "@renderer/utils/functions";
 import { useHotkeys } from "react-hotkeys-hook";
 import Button from "@renderer/components/buttons";
 import ExternalPlayer from "./externalPlayer";
-import { InitialPlugin } from "@renderer/utils/pluginApi";
 
 import VideoPlayer from "./VideoPlayer";
 // const VideoPlayer = lazy(() => import('./VideoPlayer'));
@@ -72,7 +71,6 @@ const player = () => {
     });
 
     async function leave() {
-        await InitialPlugin()
         window.BrowserWindow.setFullscreen(false)
         closeDialog()
         if (anime_data.continueWatch) {
