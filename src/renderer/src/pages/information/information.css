@@ -323,6 +323,13 @@
     display: flex;
     gap: 8px;
     align-items: center;
+    justify-content: space-between;
+}
+
+.information-episodes-space {
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
 
 .information-dot {

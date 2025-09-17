@@ -21,10 +21,11 @@ import { ChangePlugin, getPluginList } from "@renderer/utils/pluginApi";
 function information() {
     const navigate = useNavigate()
     const location = useLocation();
-    let anime_data: AnimeData = location.state;
 
     const config: SettingsConfig = useSelector((data: any) => data.config);
     const informationTemp = useSelector((info: any) => info.information);
+    const informationPlugin: pluginFormat = useSelector((plugin: any) => plugin.plugin.informationPlugin);
+    const [anime_data, setAnimeData] = useState<AnimeData>(location.state)
     const [showWrong, setshowWrong] = useState<boolean>(false)
     const [secondsLeft, setSecondsLeft] = useState<undefined | number>(anime_data.nextAiringEpisode?.timeUntilAiring);
     const [data, setData] = useState<episodeList | undefined>(undefined)
@@ -80,7 +81,7 @@ function information() {
         }
     }
 
-    async function initialInformation() {
+    async function initialInformation(refetch: boolean = false) {
         let currentPlayerPlugin: pluginFormat = store.getState().plugin.playerPlugin
         if (!currentPlayerPlugin.player) return
 
@@ -89,34 +90,46 @@ function information() {
 
         if (cardAnimeContinueWatch.length > 0) {
             let animeContinue = cardAnimeContinueWatch[0].saveData
-            if (animeContinue) setsavedata(() => {return{ last_episode: parseInt(animeContinue.episode), last_time: animeContinue.last_Time }})
+            if (animeContinue) setsavedata(() => { return { last_episode: parseInt(animeContinue.episode), last_time: animeContinue.last_Time } })
         }
         if (cardAnime.length > 0 && cardAnimeContinueWatch.length <= 0) {
             let animeHistory = cardAnime[0].saveData
-            if (animeHistory) setsavedata(() => {return{ last_episode: parseInt(animeHistory.episode), last_time: animeHistory.last_Time }})
+            if (animeHistory) setsavedata(() => { return { last_episode: parseInt(animeHistory.episode), last_time: animeHistory.last_Time } })
         }
 
         if (anime_data.id == "" && config.plugins.player == "Allmanga") {
-            fetchData(getInformation, cardAnime[0].AnimeData.player_ID)
+            await fetchData(getInformation, cardAnime[0].AnimeData.player_ID)
             return
         }
 
-        if (informationTemp.id == anime_data.id && informationTemp.episodes_data != undefined && informationTemp.plugin_name == currentPlayerPlugin.name ) {
+        if (informationTemp.id == anime_data.id && informationTemp.episodes_data != undefined && informationTemp.plugin_name == currentPlayerPlugin.name) {
             setData(() => informationTemp.episodes_data)
+            if (!refetch) await refeatchData()
             return
         }
 
         store.dispatch({ type: "setInformationID", payload: anime_data.id })
         store.dispatch({ type: "setInformationPluginName", payload: currentPlayerPlugin.name })
         if (cardAnime.length <= 0 && cardAnimeContinueWatch.length <= 0) {
-            fetchData(currentPlayerPlugin.player.animeDataList)
+            await fetchData(currentPlayerPlugin.player.animeDataList)
             return
         }
 
         if (cardAnime[0].saveData?.pluginName == config.plugins.player) {
-            fetchData(currentPlayerPlugin.player.animeDataList, cardAnime[0].AnimeData.player_ID)
+            await fetchData(currentPlayerPlugin.player.animeDataList, cardAnime[0].AnimeData.player_ID)
         }
-        fetchData(currentPlayerPlugin.player.animeDataList)
+        await fetchData(currentPlayerPlugin.player.animeDataList)
+        if (!refetch) await refeatchData()
+    }
+
+    async function refeatchData() {
+        if (!informationPlugin.information) return
+        if (anime_data.id == "") return
+        let data = await informationPlugin.information.anime(anime_data.id)
+        if (!data) return
+        console.log(data, "sex")
+        setAnimeData(() => data)
+        setSecondsLeft(() => data.nextAiringEpisode?.timeUntilAiring)
     }
 
     useEffect(() => {
@@ -176,7 +189,7 @@ function information() {
 
     async function refreashInformation(name: string) {
         ChangePlugin(name)
-        await initialInformation()
+        await initialInformation(true)
     }
 
     function segregatePlugins(): DropdownOption[] {
@@ -189,7 +202,7 @@ function information() {
 
         return list
     }
-    
+
     return (
         <>
             <main className="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>
@@ -300,10 +313,11 @@ function information() {
 
                             <div className="information-episodes">
                                 <div className="information-episodes-top-content">
-                                    <Button ButtonClass="information-episodes-button" icon="search" onClick={() => setshowWrong(() => true)}/>
-                                    <span className="information-dot">&bull;</span>
-                                    <Dropdown options={segregatePlugins()} disableX buttonText={store.getState().plugin.playerPlugin.name} />
-                                    <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(store.getState().plugin.playerPlugin.name)}/>
+                                    <Button ButtonClass="information-episodes-button" icon="search" onClick={() => setshowWrong(() => true)} />
+                                    <div className="information-episodes-space">
+                                        <Dropdown options={segregatePlugins()} disableX buttonText={store.getState().plugin.playerPlugin.name} />
+                                        <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(store.getState().plugin.playerPlugin.name)} />
+                                    </div>
                                 </div>
                                 {/* <div className="information-select-episode" onClick={() => setshowWrong(() => true)}><span className="material-symbols-outlined">search</span>Is this the wrong Anime?</div> */}
                                 {showWrong == false &&

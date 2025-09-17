@@ -518,6 +518,12 @@ export async function SearchConvertData(animeData: AnimeData): Promise<AnimeData
   return undefined
 }
 
+async function getAnime(id: string): Promise<AnimeData | undefined> {
+    let req = await sendPost({ id: id }, graphicApIDAnime)
+    if (!req.success) return undefined
+    return Convert(req.data.data.Media).AnimeData
+}
+
 export const infoPlugin: pluginFormat = {
   version: "1.0",
   name: "AnilistApi",
@@ -533,7 +539,8 @@ export const infoPlugin: pluginFormat = {
       years: genYearsList(1940),
       format: ["TV", "Movie", "TV Short", "special", " OVA", "ONA"],
       statuses: ["Releasing", "Finished", "Not Yet Aired", "Cancelled"]
-    }
+    },
+    anime: getAnime
   },
   preferedLang: ["en"]
 }
