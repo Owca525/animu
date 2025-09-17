@@ -509,8 +509,8 @@
   bottom: 80px;
 }
 
-/* .player-fast-forward-ui, .player-fast-rewind-ui {
-  position: relative;
+.player-fast-forward-ui, .player-fast-rewind-ui {
+  position: absolute;
 }
 
 .player-fast-rewind-ui {
@@ -521,7 +521,7 @@
 .player-fast-forward-ui {
   right: 0;
   margin-right: clamp(40px, 25vw, 350px);
-} */
+}
 
 @media (max-width: 1000px) {
   .player-end-time-display {

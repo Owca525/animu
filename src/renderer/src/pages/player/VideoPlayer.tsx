@@ -1,4 +1,4 @@
-import { lazy, useEffect, useRef, useState } from "react"
+import { lazy, RefObject, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "react-toastify"
 import Hls from "hls.js"
@@ -93,6 +93,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const [IsDisableButtonSkipTimerEnding, setIsDisableButtonSkipTimerEnding] = useState<boolean>(false)
     const [currentSkipButton, setcurrentSkipButton] = useState<{ text: string, onClick: () => void, type: "opening" | "ending" | "" }>({ text: "", onClick: () => "", type: "" })
 
+    const buttonSkipLeft = useRef<NodeJS.Timeout | null>(null);
+    const [isShowButtonSkipLeft, setShowButtonSkipLeft] = useState<boolean>(false)
+    const buttonSkipRight = useRef<NodeJS.Timeout | null>(null);
+    const [isShowButtonSkipRight, setShowButtonSkipRight] = useState<boolean>(false)
+
     // States
     const [isMuted, setMuted] = useState<boolean>(false)
     const [isVisible, setIsVisible] = useState<boolean>(true)
@@ -179,7 +184,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         const time = videoRef.current.currentTime
         if (data.defaultSubtitles) setDefaultSubtitles(ListSubtitles)
         else setNewSubtitles(ListSubtitles[0])
-    
+
         if (hls && data.url == "") {
             console.log(data)
             setCurrentResoltion(data)
@@ -303,11 +308,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         setVolume(() => value)
         volumeCacheFunc(value)
         if (dontShow) return
-        if (volumeTimeout.current) clearTimeout(volumeTimeout.current)
-        setShowVolume(() => true)
+        setTimeoutForElement(volumeTimeout, setShowVolume)
+    }
+
+    function setTimeoutForElement(element: RefObject<NodeJS.Timeout | null>, func: (initialState: boolean) => void) {
+        if (element.current) clearTimeout(element.current)
+        func(true)
         volumeTimeout.current = setTimeout(() => {
-            setShowVolume(() => false)
-        }, 1000);
+            func(false)
+        }, 500);
     }
 
     function togglePlay() {
@@ -635,18 +644,22 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     break
                 case convertKeybinds(config.Player.keybinds.TimeSkipRight.toLowerCase()).toLowerCase():
                     change_time((time_now += parseInt(config.Player.general.TimeSkipRight.toString())))
+                    setTimeoutForElement(buttonSkipRight, setShowButtonSkipRight)
                     updateProgress()
                     break
                 case convertKeybinds(config.Player.keybinds.TimeSkipLeft.toLowerCase()).toLowerCase():
                     change_time((time_now -= parseInt(config.Player.general.TimeSkipLeft.toString())))
+                    setTimeoutForElement(buttonSkipLeft, setShowButtonSkipLeft)
                     updateProgress()
                     break
                 case convertKeybinds(config.Player.keybinds.LongTimeSkipForward.toLowerCase()).toLowerCase():
                     change_time((time_now += parseInt(config.Player.general.LongTimeSkipForward.toString())))
+                    setTimeoutForElement(buttonSkipRight, setShowButtonSkipRight)
                     updateProgress()
                     break
                 case convertKeybinds(config.Player.keybinds.LongTimeSkipBack.toLowerCase()).toLowerCase():
                     change_time((time_now -= parseInt(config.Player.general.LongTimeSkipBack.toString())))
+                    setTimeoutForElement(buttonSkipLeft, setShowButtonSkipLeft)
                     updateProgress()
                     break
                 case convertKeybinds(config.Player.keybinds.Fullscreen.toLowerCase()).toLowerCase():
@@ -908,20 +921,24 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     <div className="player-title ">{detectTitle({ title: anime_data.AnimeData.title, ep: temp.episode, format: anime_data.AnimeData.format })}</div>
                 </div>
                 <div className="video-center"> {/* video-center-container */}
-                    {/* <div className="player-loading-animation-container player-fast-rewind-ui">
-                        <div className="player-icon-ui material-symbols-outlined">fast_rewind</div>
-                    </div> */}
-                    {/* <div className="video-center">
-                        <div ref={playerLoadingRef} className={`player-loading-animation-container ${isWaitingPlayer ? "player-loading-ui-in" : "player-loading-ui-out"}`}>
-                            <div className="player-waiting material-symbols-outlined">progress_activity</div>
-                        </div> */}
-                    {/* <div className={`player-loading-animation-container ${isShowPlay && isWaitingPlayer == false ? "player-loading-ui-in" : "player-loading-ui-out"}`}>
-                            <div className="player-icon-ui material-symbols-outlined">{isPlaying ? "pause" : "play_arrow"}</div>
-                        </div>
-                    </div> */}
-                    {/* <div className="player-loading-animation-container player-fast-forward-ui">
-                        <div className="player-icon-ui material-symbols-outlined">fast_forward</div>
-                    </div> */}
+                    <motion.div
+                        variants={hiddenVariants}
+                        animate={isShowButtonSkipLeft ? "visible" : "hidden"}
+                        initial="hidden"
+                        transition={{ duration: 0.4 }}
+                        className="player-loading-animation-container player-fast-rewind-ui"
+                    >
+                        <div className="material-symbols-outlined player-icon-ui">fast_rewind</div>
+                    </motion.div>
+                    <motion.div
+                        variants={hiddenVariants}
+                        animate={isShowButtonSkipRight ? "visible" : "hidden"}
+                        initial="hidden"
+                        transition={{ duration: 0.4 }}
+                        className="player-loading-animation-container player-fast-forward-ui"
+                    >
+                        <div className="material-symbols-outlined player-icon-ui">fast_forward</div>
+                    </motion.div>
 
                     <motion.div className="player-loading-animation-container player-buffering-animation"
                         variants={hiddenVariants}
