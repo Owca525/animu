@@ -132,6 +132,7 @@ th, td {
 }
 
 th {
+  text-align: left;
   font-size: 1.2em;
   border: 3px solid var(--bg4);
   border-width: 0px 0px 2px 0px;
