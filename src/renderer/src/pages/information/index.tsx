@@ -69,12 +69,14 @@ function information() {
                 setIsError(() => false)
                 store.dispatch({ type: "setInformationEpisodesData", payload: data })
             } else {
+                setData(() => undefined)
                 setIsError(() => true)
                 setLoadingData(() => false)
             }
             setshowWrong(() => false)
         } catch (Error) {
             setIsError(() => true)
+            setData(() => undefined)
             setshowWrong(() => false)
             setLoadingData(() => false)
             console.error(Error)
