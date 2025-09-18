@@ -474,6 +474,16 @@ function settings() {
                                     }
                                 />
                             </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                {"Auto Skip Endings"}
+                                <CheckBox
+                                    checked={config.new.Player.general.autoSkipEndings}
+                                    onChecked={(checked) =>
+                                        handleChange('Player.general.autoSkipEndings', checked)
+                                    }
+                                />
+                            </div>
                         </div>
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.player.uptonextep")}</div>

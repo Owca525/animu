@@ -445,6 +445,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     }
                 }
                 if (currentTime >= element.start && currentTime <= element.end && element.type == "ending") {
+                    if (config.Player.general.autoSkipEndings) change_time(element.end)
                     if (!IsDisableButtonSkipTimerEnding) {
                         setcurrentSkipButton(() => { return { text: "Skip Ending", onClick: () => { change_time(element.end); clearChapterSkipTime() }, type: "ending" } })
                         startChapterSkipTime()

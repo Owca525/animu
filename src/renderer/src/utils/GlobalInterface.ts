@@ -186,6 +186,7 @@ export interface SettingsConfig {
             RemovingSpaceAnimation: boolean
             PlayerBehavior: "home" | "information"
             autoSkipOpenings: boolean
+            autoSkipEndings: boolean
         }
         screenShot: {
             alwaysAsk: boolean

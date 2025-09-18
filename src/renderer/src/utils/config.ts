@@ -30,7 +30,8 @@ export const defaultConfig: SettingsConfig = {
             RemovingSpaceAnimation: false,
             DisableVolumeAnimation: false,
             PlayerBehavior: "information",
-            autoSkipOpenings: false
+            autoSkipOpenings: false,
+            autoSkipEndings: false
         },
         screenShot: {
             alwaysAsk: true,
