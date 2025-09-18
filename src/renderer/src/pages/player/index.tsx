@@ -81,7 +81,7 @@ const player = () => {
         else navigate("/info", { state: anime_data.data.AnimeData })
     }
     if (isLoading == false && data && data.length <= 0) {
-        loadingAnimation(leave, { title: anime_data.data.AnimeData.title, ep: extractionData.actual, format: anime_data.data.AnimeData.format })
+        loadingAnimation(leave, { title: anime_data.data.AnimeData.title, ep: extractionData.actual, format: anime_data.data.AnimeData.format }, extractionData)
         showDialog({
             type: "refresh",
             title: t("player.error.notfound"),
@@ -120,12 +120,22 @@ const player = () => {
             />
         )
     }
-    return loadingAnimation(leave, { title: anime_data.data.AnimeData.title, ep: extractionData.actual, format: anime_data.data.AnimeData.format })
+    return loadingAnimation(leave, { title: anime_data.data.AnimeData.title, ep: extractionData.actual, format: anime_data.data.AnimeData.format }, extractionData)
 }
 
-function loadingAnimation(leave: () => void, anime_data: { title: { english?: string | undefined; native: string; romaji: string; }, ep: string, format?: string }) {
+function getCurrentImage(currentdata: { actual: string, type: string, episodelist: { ep: string, img?: string, title?: string }[], time: number }): string | undefined {
+    for (let index = 0; index < currentdata.episodelist.length; index++) {
+        const element = currentdata.episodelist[index];
+        console.log(element.img)
+        if (element.ep == currentdata.actual && element.img) return element.img
+    }
+    return undefined
+}
+
+function loadingAnimation(leave: () => void, anime_data: { title: { english?: string | undefined; native: string; romaji: string; }, ep: string, format?: string }, currentdata: { actual: string, type: string, episodelist: { ep: string, img?: string, title?: string }[], time: number }) {
     return (
-        <div className="player-loading-container">
+        <div className="player-loading-container" style={{ backgroundImage: `url(${getCurrentImage(currentdata)})` }}>
+            <div className="player-loading-container-black"></div>
             <div className="player-loading-top">
                 <Button icon='arrow_back' ButtonClass='player-buttons' onClick={leave} />
                 <div className="player-title ">{detectTitle(anime_data)}</div>
