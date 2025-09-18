@@ -206,12 +206,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     async function setDefaultSubtitles(data: playerSubtitlesFormat[]) {
         if (data.length <= 0) return
-        data.forEach(element => {
+        for (let index = 0; index < data.length; index++) {
+            const element = data[index];
             if (element.lang == i18n.language && !element.label.includes("Forced")) {
                 setNewSubtitles(element)
                 return
             }
-        });
+        }
         setNewSubtitles(data[0])
     }
 
@@ -587,6 +588,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     async function setNewSubtitles(sub: playerSubtitlesFormat) {
         if (!videoRef.current) return
+
+        console.log(sub)
 
         // This clear subtitles but this dosen't work on dev Because react second render
         if (currentASSubtitles) {
