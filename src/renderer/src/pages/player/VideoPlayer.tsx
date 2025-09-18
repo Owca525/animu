@@ -125,6 +125,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     // Subtitles
     const [vttUrl, setVttUrl] = useState<string | undefined>(undefined);
     const [ListSubtitles, setListSubtitles] = useState<playerSubtitlesFormat[]>([])
+    const [lastSubtitles, setlastSubtitles] = useState<playerSubtitlesFormat | undefined>(undefined)
     const [currentASSubtitles, setASSubtitles] = useState<ASS | undefined>(undefined)
     const [currentSubtitles, setSubtitles] = useState<playerSubtitlesFormat | undefined>(undefined)
     const assSubContainer = useRef<HTMLDivElement | null>(null);
@@ -694,8 +695,21 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 case convertKeybinds(config.Player.keybinds.PictureInPicture.toLowerCase()).toLowerCase():
                     handlePictureInPicture()
                     break
+                case convertKeybinds(config.Player.keybinds.toggleSubtitles.toLowerCase()).toLowerCase():
+                    toggleSubtitles()
+                    break
             }
         }
+    }
+
+    function toggleSubtitles(): any {
+        if (ListSubtitles.length <= 0) return
+        if (currentSubtitles && currentSubtitles.label != "Off") {
+            setlastSubtitles(() => currentSubtitles)
+            setNewSubtitles(ListSubtitles[0])
+            return
+        }
+        if (lastSubtitles) setNewSubtitles(lastSubtitles)
     }
 
     async function takeScreenshot() {

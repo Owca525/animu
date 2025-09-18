@@ -223,6 +223,7 @@ export interface SettingsConfig {
             VolumeMute: string
             ScreenShot: string
             PictureInPicture: string
+            toggleSubtitles: string
         }
     }
     History: {

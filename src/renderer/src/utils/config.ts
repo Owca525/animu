@@ -67,7 +67,8 @@ export const defaultConfig: SettingsConfig = {
             VolumeUp: "0",
             VolumeMute: "m",
             ScreenShot: "f10",
-            PictureInPicture: "P"
+            PictureInPicture: "P",
+            toggleSubtitles: "C"
         },
     },
     History: {
@@ -120,22 +121,6 @@ function deepMerge(target: any, source: any): any {
         }
     }
     return target;
-}
-
-export async function SaveOneParametrConfig(path: string, value: string | number | boolean) {
-    const keys = path.split('.')
-    const newConfig = await readConfig()
-
-    let current: SettingsConfig = newConfig
-    for (let i = 0; i < keys.length - 1; i++) {
-        const key = keys[i]
-
-        if (!current[key]) current[key] = {}
-        current = current[key]
-    }
-
-    current[keys[keys.length - 1]] = value
-    saveConfig(newConfig)
 }
 
 export async function readConfig(): Promise<SettingsConfig> {
