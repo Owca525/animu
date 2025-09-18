@@ -186,7 +186,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         else setNewSubtitles(ListSubtitles[0])
 
         if (hls && data.url == "") {
-            console.log(data)
             setCurrentResoltion(data)
             hls.currentLevel = hls.levels.findIndex(level => level.height === parseInt(data.res));
             return
@@ -223,7 +222,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         if (data.storyboardVTT) setThumbnail(await VTTstoryBoardParser(data.storyboardVTT))
         if (data.resolution[0].defaultSubtitles && data.subtitles) setDefaultSubtitles(data.subtitles)
         if (data.hls) {
-            console.log(data)
             setPlayer(() => data)
             await runHLS(data.resolution[0].url, data.hostname)
             return
@@ -485,8 +483,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             showUpToNext = currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
         }
 
-        console.log(showUpToNext, timeDelete)
-
         if (isHideUpNextEpisode == false && temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] != null && showUpToNext) {
             setUpNextEpisode(true)
             setTimeNextEpisode(timeDelete)
@@ -533,7 +529,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
         if (currentPlayer && currentPlayer.listChapters) {
             currentPlayer.listChapters.forEach(element => {
-                console.log((value >= element.start && value <= element.end))
                 if (!(value >= element.start && value <= element.end) && element.type == "opening" && currentSkipButton.type == "opening") {
                     clearChapterSkipTime()
                 }
@@ -578,7 +573,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         try {
             if (activeCue.text) {
                 setCue(activeCue.text)
-                console.log([activeCue.text])
             }
             else setCue(undefined)
         } catch (error) {
@@ -588,8 +582,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     async function setNewSubtitles(sub: playerSubtitlesFormat) {
         if (!videoRef.current) return
-
-        console.log(sub)
 
         // This clear subtitles but this dosen't work on dev Because react second render
         if (currentASSubtitles) {
