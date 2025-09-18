@@ -25,6 +25,7 @@ import { useHotkeys } from "react-hotkeys-hook"
 import i18n from "@renderer/utils/i18n"
 import ASS from "assjs"
 import store from "@renderer/utils/store"
+import html2canvas from "html2canvas"
 
 function addTime(durration: number): string {
     const now = new Date();
@@ -74,7 +75,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const containerRef = useRef<HTMLDivElement | null>(null)
     const hideTimer = useRef<NodeJS.Timeout | null>(null)
     const hideChapterButtonTimer = useRef<NodeJS.Timeout | null>(null)
-    const canvasRef = useRef<HTMLCanvasElement | null>(null)
+    const screenshotWrapper = useRef<HTMLDivElement | null>(null)
 
     // Variable
     const [volume, setVolume] = useState<number>(PlayerVolume)
@@ -697,31 +698,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     }
 
     async function takeScreenshot() {
-        if (videoRef.current == null) return
-        if (canvasRef.current == null) return
+        if (!screenshotWrapper.current) return
         if (config == null) return
 
         const currentDate: Date = new Date();
-        const year: number = currentDate.getFullYear();
-        const month: number = currentDate.getMonth() + 1;
-        const day: number = currentDate.getDate();
-        const hour: number = currentDate.getHours();
-        const minutes: number = currentDate.getMinutes();
-        const seconds: number = currentDate.getSeconds();
+        const [year, month, day, hour, minute, second] = [
+            currentDate.getFullYear(),
+            currentDate.getMonth() + 1,
+            currentDate.getDate(),
+            currentDate.getHours(),
+            currentDate.getMinutes(),
+            currentDate.getSeconds(),
+        ].map(v => String(v).padStart(2, "0"));
 
-        const formatedDate = `-${year}-${month}-${day}-${hour}-${minutes}-${seconds}`
-        const context = canvasRef.current.getContext('2d');
+        const formatedDate = `-${year}-${month}-${day}-${hour}-${minute}-${second}`;
 
-        if (context == null) {
-            toast.error(t("player.toastscreenshot.failed"), notificationProps);
-            return
-        }
-
-        // TODO: Fix subtitles dosen't show
-        canvasRef.current.width = videoRef.current.videoWidth;
-        canvasRef.current.height = videoRef.current.videoHeight;
-        context.drawImage(videoRef.current, 0, 0);
-        const screenshot = canvasRef.current.toDataURL('image/png');
+        const canvas = await html2canvas(screenshotWrapper.current);
+        const screenshot = canvas.toDataURL("image/png");
 
         if (screenshot == "data:,") {
             toast.error(t("player.toastscreenshot.failed"), notificationProps);
@@ -867,42 +860,44 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     return (
         <div className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
-            <video
-                ref={videoRef}
-                className="video-player"
-                onTimeUpdate={updateProgress}
-                onProgress={updateProgress}
-                onSeeked={updateProgress}
-                onClick={() => { togglePlay(); setcurrentSettings(() => false); setShowSelectEpisode(() => false) }}
-                autoPlay={isPlaying}
-                onWaiting={() => { setWaitingPlayer(() => true) }}
-                onCanPlay={() => { setWaitingPlayer(() => false) }}
-                onError={(error) => videoErrorHandler(error)}
-                onLoadedMetadata={() => {
-                    updateProgress()
-                    if (currentPlayer && currentPlayer.listChapters) {
-                        generateOpeningEnding(currentPlayer.listChapters)
-                    }
-                }}
-                preload="auto"
-                muted={isMuted}
-                style={config.Player.general.VideoStreching ? { objectFit: "cover" } : {}}
-            >
-                <track
-                    src={vttUrl}
-                    kind="subtitles"
-                    default
-                    ref={vttSubRef}
-                />
-            </video>
-            {currentCue && (
-                <div className={`player-subtitle-container ${isVisible ? "up" : "down"}`}>
-                    {currentCue.split("\n").map((text) => (
-                        <span className="player-subtitle-content">{text}</span>
-                    ))}
-                </div>
-            )}
-            <div ref={assSubContainer} style={{ position: "absolute", top: "0", left: "0" }}></div>
+            <div ref={screenshotWrapper} className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} >
+                <video
+                    ref={videoRef}
+                    className="video-player"
+                    onTimeUpdate={updateProgress}
+                    onProgress={updateProgress}
+                    onSeeked={updateProgress}
+                    onClick={() => { togglePlay(); setcurrentSettings(() => false); setShowSelectEpisode(() => false) }}
+                    autoPlay={isPlaying}
+                    onWaiting={() => { setWaitingPlayer(() => true) }}
+                    onCanPlay={() => { setWaitingPlayer(() => false) }}
+                    onError={(error) => videoErrorHandler(error)}
+                    onLoadedMetadata={() => {
+                        updateProgress()
+                        if (currentPlayer && currentPlayer.listChapters) {
+                            generateOpeningEnding(currentPlayer.listChapters)
+                        }
+                    }}
+                    preload="auto"
+                    muted={isMuted}
+                    style={config.Player.general.VideoStreching ? { objectFit: "cover" } : {}}
+                >
+                    <track
+                        src={vttUrl}
+                        kind="subtitles"
+                        default
+                        ref={vttSubRef}
+                    />
+                </video>
+                {currentCue && (
+                    <div className={`player-subtitle-container ${isVisible ? "up" : "down"}`}>
+                        {currentCue.split("\n").map((text) => (
+                            <span className="player-subtitle-content">{text}</span>
+                        ))}
+                    </div>
+                )}
+                <div ref={assSubContainer} style={{ position: "absolute", top: "0", left: "0" }}></div>
+            </div>
             {isVisible &&
                 <>
                     <div className="player-mask top"></div>
@@ -1033,7 +1028,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 </div>
             </div>
             <motion.button onClick={currentSkipButton.onClick} variants={hiddenVariants} initial="hidden" animate={IsRunningButtonSkipTime ? "visible" : "hidden"} className="player-skip-chapters-button">{currentSkipButton.text}, {`${buttonSkipTime}s`}</motion.button>
-            <canvas ref={canvasRef} style={{ display: 'none' }} />
             {config.Player.upToNextEpisode.variants == "old" && (
                 <motion.div variants={uptoNextVariants} transition={{ duration: 0.2 }} animate={isUpNextEpisode ? "visible" : "hidden"} initial={"hidden"} className="player-up-Next-container old">
                     <div className="player-up-Next-Title old">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>

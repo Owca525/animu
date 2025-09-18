@@ -205,8 +205,6 @@ function information() {
         return list
     }
 
-    console.log(isLoading, isError, data)
-
     return (
         <>
             <main className="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>
