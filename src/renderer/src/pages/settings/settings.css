@@ -184,6 +184,13 @@ td {
 .settings-special-images {
   cursor: pointer;
   width: 60px;
+  height: 60px;
+  padding: 8px;
+  border-radius: 12px;
+}
+
+.settings-special-images:hover {
+  background-color: var(--bg4);
 }
 
 .settings-user-title {
