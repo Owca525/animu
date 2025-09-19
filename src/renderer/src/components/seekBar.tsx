@@ -164,7 +164,7 @@ const SeekBar: React.FC<SeekBarProps> = ({
       onClick={setPosition}
       onMouseDown={() => setdrage(() => true)}
       onMouseUp={() => setdrage(() => false)}
-      onMouseLeave={() => { setdrage(() => false); setshow(false) }}
+      onMouseLeave={() => { setdrage(() => false); setshow(() => false) }}
       onMouseEnter={() => setshow(() => true)}
       onMouseMove={handleMouseMove}
     >
@@ -191,18 +191,20 @@ const SeekBar: React.FC<SeekBarProps> = ({
         className={`seekbar-thumb ${classes?.thumb}`}
       />
       <div tabIndex={-1} ref={seekbarBox} style={show ? { display: "block" } : { display: "none" }} className={`seekbar-box ${classes?.box}`}></div>
-      {thumbnail && 
-        <div
-          tabIndex={-1}
-          ref={seekbarThumbnail}
-          style={show ? { display: "block", backgroundImage: `url(${thumbnail.src})` } : { display: "none" }}
-          className="seekbar-thumbnail"
-        />
-      }
+      <div className="seekbar-content-wrapper" style={show ? { display: "block" } : { display: "none" }}>
+        {thumbnail && 
+          <div
+            tabIndex={-1}
+            ref={seekbarThumbnail}
+            style={show ? { display: "block", backgroundImage: `url(${thumbnail.src})` } : { display: "none" }}
+            className="seekbar-thumbnail"
+          />
+        }
 
-      {chapterList && chapterList.length > 0 && 
-        <div tabIndex={-1} ref={seekbarChapterText} style={show ? { display: "block" } : { display: "none" }} className={`seekbar-box ${thumbnail ? "seekbar-chapter-box-thumbnails" : "seekbar-chapter-box"} ${classes?.box}`}></div>
-      }
+        {chapterList && chapterList.length > 0 && 
+          <div tabIndex={-1} ref={seekbarChapterText} className={`seekbar-box ${thumbnail ? "seekbar-chapter-box-thumbnails" : "seekbar-chapter-box"} ${classes?.box}`}></div>
+        }
+      </div>
     </div>
   );
 };

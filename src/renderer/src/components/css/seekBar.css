@@ -50,10 +50,12 @@
     width: min-content;
     padding: 8px 12px;
     z-index: 4;
+    pointer-events: none;
 }
 
 .seekbar-chapter-box, .seekbar-chapter-box-thumbnails {
     width: max-content;
+    pointer-events: none;
 }
 
 .seekbar-chapter-box {
@@ -61,7 +63,7 @@
 }
 
 .seekbar-chapter-box-thumbnails {
-    top: -140px;
+    top: -142px;
 }
 
 .seekbar-thumbnail {
@@ -75,6 +77,7 @@
     border-radius: 12px;
     outline: 3px solid var(--player-bg-containers);
     background-color: var(--player-bg-containers);
+    pointer-events: none;
 }
 
 .seekbar-chapters-wrapper {
