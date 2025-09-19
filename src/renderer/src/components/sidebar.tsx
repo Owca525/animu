@@ -51,9 +51,7 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, sidebarClass, data, hideBut
     function hideSidebar(event, func) {
         if (!func) return
         func(event)
-        if (!config.General.HoverSidebar) return
         setHover((prev) => !prev)
-        
     }
 
     const sidebarVariants = {
