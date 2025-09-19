@@ -187,6 +187,7 @@ export interface SettingsConfig {
             PlayerBehavior: "home" | "information"
             autoSkipOpenings: boolean
             autoSkipEndings: boolean
+            showBrokenBuffer: boolean
         }
         screenShot: {
             alwaysAsk: boolean

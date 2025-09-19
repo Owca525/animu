@@ -75,7 +75,7 @@ function settings() {
             {
                 icon: "home",
                 text: t("global.home"),
-                onClick: () => {navigate("/"); resetConfig()},
+                onClick: () => { navigate("/"); resetConfig() },
             },
         ],
     };
@@ -225,13 +225,13 @@ function settings() {
                 hideButton
                 showLogo
             />
-                <motion.div variants={saveCommunicateAnimation} initial={"hidden"} animate={isSaving ? "visible" : "hidden"} transition={{ duration: 0.2 }} className="settings-save-content">
-                    <div className="settings-save-title">{t("settings.saving.notification")}</div>
-                    <div className="settings-save-buttons">
-                        <Button content={t("dialog.yes")} onClick={saveNewConfig} />
-                        <Button content={t("dialog.reset")} onClick={resetConfig} />
-                    </div>
-                </motion.div>
+            <motion.div variants={saveCommunicateAnimation} initial={"hidden"} animate={isSaving ? "visible" : "hidden"} transition={{ duration: 0.2 }} className="settings-save-content">
+                <div className="settings-save-title">{t("settings.saving.notification")}</div>
+                <div className="settings-save-buttons">
+                    <Button content={t("dialog.yes")} onClick={saveNewConfig} />
+                    <Button content={t("dialog.reset")} onClick={resetConfig} />
+                </div>
+            </motion.div>
             <div className="settings-content-container">
                 {category == "general" && (
                     <>
@@ -268,7 +268,7 @@ function settings() {
                                         placeholderChange={() => t(`lang.${config.new.General.language}`)}
                                         disableX
                                     />
-                                    <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getPath("userData")}/lang`))}/>
+                                    <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getPath("userData")}/lang`))} />
                                 </div>
                             </div>
                             <div className="settings-line"></div>
@@ -282,7 +282,7 @@ function settings() {
                                         buttonText={config.new.General.theme}
                                         disableX
                                     />
-                                    <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getPath("userData")}/themes`))}/>
+                                    <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getPath("userData")}/themes`))} />
                                 </div>
                             </div>
                             <div className="settings-line"></div>
@@ -300,7 +300,7 @@ function settings() {
                             <div className="settings-page-title">{t("settings.general.updates")}</div>
                             <div className="settings-setting-container">
                                 {t("settings.general.checkupdate")}
-                                <Button content={t("settings.general.checkupdates")} icon="update" onClick={() => checkUpdate(true)}/>
+                                <Button content={t("settings.general.checkupdates")} icon="update" onClick={() => checkUpdate(true)} />
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
@@ -444,7 +444,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                               {t("settings.player.stretching")} 
+                                {t("settings.player.stretching")}
                                 <CheckBox
                                     checked={config.new.Player.general.VideoStreching}
                                     onChecked={(checked) =>
@@ -454,14 +454,14 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                               {"Player Exit behavior"} 
+                                {"Player Exit behavior"}
                                 <Dropdown
                                     options={[
                                         { label: "To Information", onClick: () => handleChange("Player.general.PlayerBehavior", "information") },
                                         { label: "To Home", onClick: () => handleChange("Player.general.PlayerBehavior", "home") },
                                     ]}
                                     buttonText={config.new.Player.general.PlayerBehavior}
-                                    disableX   
+                                    disableX
                                 />
                             </div>
                             <div className="settings-line"></div>
@@ -481,6 +481,19 @@ function settings() {
                                     checked={config.new.Player.general.autoSkipEndings}
                                     onChecked={(checked) =>
                                         handleChange('Player.general.autoSkipEndings', checked)
+                                    }
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                <span className="settings-helpicon-space">
+                                    {"Show Broken Buffer"}
+                                    <HelpIcon description={"TODO: add content"} />
+                                </span>
+                                <CheckBox
+                                    checked={config.new.Player.general.showBrokenBuffer}
+                                    onChecked={(checked) =>
+                                        handleChange('Player.general.showBrokenBuffer', checked)
                                     }
                                 />
                             </div>
@@ -518,7 +531,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                               {"Up To Next Style Variants"} 
+                                {"Up To Next Style Variants"}
                                 <Dropdown
                                     options={[
                                         { label: "Variant 1", onClick: () => handleChange("Player.upToNextEpisode.variants", "var1") },
@@ -526,7 +539,7 @@ function settings() {
                                         { label: "Variant Old", onClick: () => handleChange("Player.upToNextEpisode.variants", "old") },
                                     ]}
                                     buttonText={config.new.Player.upToNextEpisode.variants}
-                                    disableX   
+                                    disableX
                                 />
                             </div>
                         </div>
@@ -552,7 +565,7 @@ function settings() {
                                         { label: "ChromeCast", onClick: () => handleChange("Player.external.type", "ChromeCast") }
                                     ]}
                                     buttonText={config.new.Player.external.type}
-                                    disableX   
+                                    disableX
                                 />
                             </div>
                             {config.new.Player.external.type != "ChromeCast" && <div className="settings-line"></div>}
@@ -720,7 +733,7 @@ function settings() {
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.history.check_history")}
-                                <Button content="Check" onClick={buttonCheck}/>
+                                <Button content="Check" onClick={buttonCheck} />
                             </div>
                         </div>
                         <div className="settings-page-container">
@@ -831,8 +844,8 @@ function settings() {
                                                     {plugin.player && <div className="settings-extensions-background">Player</div>}
                                                 </div>
                                                 <div className="settings-helpicon-space">
-                                                    <CheckBox checked={config.new.plugins.player == plugin.name ? true : plugin.name == "AnilistApi" ? true : false} onChecked={() => plugin.name != "AnilistApi" ? handleChange('plugins.player', plugin.name) : ""}/>
-                                                    <Button icon="settings" ButtonClass="settings-extensions-button"/>
+                                                    <CheckBox checked={config.new.plugins.player == plugin.name ? true : plugin.name == "AnilistApi" ? true : false} onChecked={() => plugin.name != "AnilistApi" ? handleChange('plugins.player', plugin.name) : ""} />
+                                                    <Button icon="settings" ButtonClass="settings-extensions-button" />
                                                 </div>
                                             </div>
                                         </td>

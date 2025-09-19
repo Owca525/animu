@@ -761,6 +761,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     ]
 
     const handleProgress = () => {
+        if (!config.Player.general.showBrokenBuffer && !hls) return
         const video = videoRef.current;
         if (video && video.duration > 0 && video.buffered.length > 0) {
             let timestamps: { position: number, width: number }[] = []

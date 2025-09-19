@@ -31,7 +31,8 @@ export const defaultConfig: SettingsConfig = {
             DisableVolumeAnimation: false,
             PlayerBehavior: "information",
             autoSkipOpenings: false,
-            autoSkipEndings: false
+            autoSkipEndings: false,
+            showBrokenBuffer: false
         },
         screenShot: {
             alwaysAsk: true,
