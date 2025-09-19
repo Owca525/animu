@@ -214,6 +214,13 @@ function settings() {
         }
     }
 
+    async function discord_server() {
+        let url = "https://raw.githubusercontent.com/Owca525/animu/refs/heads/unstable/assets/discord.txt"
+        let data = await window.api.request.get(url, { "User-Agent": navigator.userAgent }, "text")
+        if (!data.success) return
+        window.api.open(data.data)
+    }
+
     return (
         <main className="settings-container" onContextMenu={(event) => OpenContextMenu(ContextMenu, event)}>
             <Sidebar
@@ -861,7 +868,7 @@ function settings() {
                             <div className="settings-page-title">{"Usefull Links"}</div>
                             <div className="settings-special-container">
                                 <img className="settings-special-images" onClick={() => window.api.open("https://github.com/Owca525/animu")} src="https://github.com/fluidicon.png" alt="Github Logo" />
-                                <img className="settings-special-images" onClick={() => console.log("Test")} src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg" alt="Discord Logo" />
+                                <img className="settings-special-images" onClick={discord_server} src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg" alt="Discord Logo" />
                                 <img className="settings-special-images" onClick={() => window.api.open("https://buymeacoffee.com/owca525")} src="https://studio.buymeacoffee.com/assets/img/bmc-meta-new/new/android-icon-192x192.png" alt="Buymeacoffee logo" />
                             </div>
                         </div>
