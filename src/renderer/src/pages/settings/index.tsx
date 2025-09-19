@@ -488,7 +488,7 @@ function settings() {
                             <div className="settings-setting-container">
                                 <span className="settings-helpicon-space">
                                     {"Show Broken Buffer"}
-                                    <HelpIcon description={"TODO: add content"} />
+                                    <HelpIcon description={"It shows buffering when playing mp4 files, which is known to display incorrect data"} />
                                 </span>
                                 <CheckBox
                                     checked={config.new.Player.general.showBrokenBuffer}
