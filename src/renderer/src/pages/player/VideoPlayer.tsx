@@ -412,7 +412,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             setButtonSkipTime((prev) => {
                 if (prev <= 1 || IsRunningButtonSkipTime) {
                     clearChapterSkipTime()
-                    return 0;
+                    return 15;
                 }
                 return prev - 1;
             });
