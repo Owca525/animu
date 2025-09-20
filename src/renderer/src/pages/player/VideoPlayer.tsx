@@ -440,7 +440,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 if (currentTime >= element.start && currentTime <= element.end && element.type == "opening") {
                     if (config.Player.general.autoSkipOpenings) change_time(element.end)
                     if (!IsDisableButtonSkipTimerOpening && !config.Player.general.autoSkipOpenings) {
-                        setcurrentSkipButton(() => { return { text: "Skip Opening", onClick: () => { change_time(element.end); clearChapterSkipTime() }, type: "opening" } })
+                        setcurrentSkipButton(() => { return { text: "Skip Opening", onClick: () => { clearChapterSkipTime(); change_time(element.end) }, type: "opening" } })
                         startChapterSkipTime()
                         setIsDisableButtonSkipTimerOpening(() => true)
                     }
@@ -448,7 +448,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 if (currentTime >= element.start && currentTime <= element.end && element.type == "ending") {
                     if (config.Player.general.autoSkipEndings) change_time(element.end)
                     if (!IsDisableButtonSkipTimerEnding) {
-                        setcurrentSkipButton(() => { return { text: "Skip Ending", onClick: () => { change_time(element.end); clearChapterSkipTime() }, type: "ending" } })
+                        setcurrentSkipButton(() => { return { text: "Skip Ending", onClick: () => { clearChapterSkipTime(); change_time(element.end) }, type: "ending" } })
                         startChapterSkipTime()
                         setIsDisableButtonSkipTimerEnding(() => true)
                     }
@@ -697,6 +697,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     break
                 case convertKeybinds(config.Player.keybinds.toggleSubtitles.toLowerCase()).toLowerCase():
                     toggleSubtitles()
+                    break
+                case convertKeybinds(config.Player.keybinds.skipOpeningEnding.toLowerCase()).toLowerCase():
+                    currentSkipButton.onClick()
                     break
             }
         }

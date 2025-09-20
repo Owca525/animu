@@ -225,6 +225,7 @@ export interface SettingsConfig {
             ScreenShot: string
             PictureInPicture: string
             toggleSubtitles: string
+            skipOpeningEnding: string
         }
     }
     History: {

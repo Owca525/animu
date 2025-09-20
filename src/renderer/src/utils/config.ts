@@ -69,7 +69,8 @@ export const defaultConfig: SettingsConfig = {
             VolumeMute: "m",
             ScreenShot: "f10",
             PictureInPicture: "P",
-            toggleSubtitles: "C"
+            toggleSubtitles: "C",
+            skipOpeningEnding: "S"
         },
     },
     History: {

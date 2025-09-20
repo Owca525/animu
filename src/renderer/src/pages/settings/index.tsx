@@ -688,6 +688,10 @@ function settings() {
                                 <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.PrevEpisode)} keyBind={(keys) => handleChange("Player.keybinds.PrevEpisode", keys)} />
                             </div>
                             <div className="settings-setting-container">
+                                Skip Opening/Ending
+                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.skipOpeningEnding)} keyBind={(keys) => handleChange("Player.keybinds.skipOpeningEnding", keys)} />
+                            </div>
+                            <div className="settings-setting-container">
                                 Toggle Subtitles
                                 <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.toggleSubtitles)} keyBind={(keys) => handleChange("Player.keybinds.toggleSubtitles", keys)} />
                             </div>
