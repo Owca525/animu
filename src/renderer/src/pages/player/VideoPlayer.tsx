@@ -699,6 +699,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     toggleSubtitles()
                     break
                 case convertKeybinds(config.Player.keybinds.skipOpeningEnding.toLowerCase()).toLowerCase():
+                    if (currentSkipButton.type == "ending") setHideUpNextEpisode(true)
                     currentSkipButton.onClick()
                     break
             }
