@@ -172,13 +172,7 @@ const Home = () => {
                 <div className="button home-header-sidebar-placeholder"><span className="material-symbols-outlined">menu</span></div>
                     <Input placeholder={t("home.search")} InputClass="home-header-search" onKeyDown={OnSearch} />
                     <div className="home-filter-void">
-                        <Filter onChange={onChange} filter={{ 
-                                genres: plugin.information.searchOption.genres, 
-                                years: plugin.information.searchOption.years,
-                                seasons: plugin.information.searchOption.seasons,
-                                format: plugin.information.searchOption.format,
-                                airing: plugin.information.searchOption.statuses
-                            }}
+                        <Filter onChange={onChange} filter={plugin.searchOption}
                         />
                     </div>
                 </div>

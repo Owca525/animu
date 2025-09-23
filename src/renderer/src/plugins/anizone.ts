@@ -145,7 +145,8 @@ async function getAnimeCards(data: AnimeData): Promise<cardData[]> {
                     native: decodeURI(animeTITLE[0][1]),
                     romaji: decodeURI(animeTITLE[0][1]),
                 },
-                id: animeID[0][1].slice(2)
+                id: "",
+                player_ID: animeID[0][1].slice(2)
             } })
         }
 
@@ -163,6 +164,19 @@ async function extractEpisodeList(_type: string, anime_id: string): Promise<{ ep
     return data.episodesData[0].episodes
 }
 
+async function searchAnime(name: string, page: number, params?: { genres?: string[]; years?: string; seasons?: string; format?: string[]; airing?: string; }): Promise<cardData[]> {
+    return await getAnimeCards({
+        characters: [],
+        studios: [],
+        title: {
+            english: undefined,
+            native: name,
+            romaji: name
+        },
+        id: ""
+    })
+}
+
 export const AniZone: pluginFormat = {
     version: "1.0",
     name: "AniZone",
@@ -171,7 +185,8 @@ export const AniZone: pluginFormat = {
         getUrls: getURLFromPlayer,
         animeDataList: getEpisodeList,
         episodeList: extractEpisodeList,
-        animeList: getAnimeCards
+        animeList: getAnimeCards,
+        search: searchAnime
     },
     preferedLang: ["en"]
 }

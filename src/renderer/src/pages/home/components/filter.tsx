@@ -6,7 +6,7 @@ import { t } from "i18next"
 import { FilterParams, homeData } from "@renderer/utils/GlobalInterface"
 import { useSelector } from "react-redux"
 
-const Filter: React.FC<{ onChange: (params?: FilterParams, removeParam?: string) => void, filter: { genres: string[], years: string[], seasons: string[], format: string[], airing: string[] } }> = ({ onChange, filter }) => {
+const Filter: React.FC<{ onChange: (params?: FilterParams, removeParam?: string) => void, filter: { genres: string[], seasons: string[], years: string[], format: string[], statuses: string[] } }> = ({ onChange, filter }) => {
     const [showFilter, setShowFilter] = useState<boolean>(false)
     const homeCache: homeData = useSelector((cache: any) => cache.home);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -49,7 +49,7 @@ const Filter: React.FC<{ onChange: (params?: FilterParams, removeParam?: string)
                     </div>
                     <div className="home-filter-space">
                         <div className="home-filter-title">{t("filter.airing")}</div>
-                        <Dropdown onClickX={() => onChange(undefined, "airing")} buttonText={homeCache.filterTags?.airing ? homeCache.filterTags.airing : ""} options={filter.airing.map((element) => { return { label: element, onClick: (text) => onChange({ airing: text }) } })} placeholder={"Airing"} />
+                        <Dropdown onClickX={() => onChange(undefined, "airing")} buttonText={homeCache.filterTags?.airing ? homeCache.filterTags.airing : ""} options={filter.statuses.map((element) => { return { label: element, onClick: (text) => onChange({ airing: text }) } })} placeholder={"Airing"} />
                     </div>
                 </div>
             }

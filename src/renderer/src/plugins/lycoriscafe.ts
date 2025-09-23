@@ -174,6 +174,16 @@ async function extractOnlyEpisodes(_type: string, anime_id: string): Promise<{ e
     return episodes
 }
 
+async function searchAnime(name: string, page: number, params?: { genres?: string[]; years?: string; seasons?: string; format?: string[]; airing?: string; }): Promise<cardData[]> {
+    let url = `https://www.lycoris.cafe/api/search?page=${page}&pageSize=12&search=${name}&genres=&status=&format=&year=&season=&source=&sortField=popularity&sortDirection=desc&preferRomaji=true`
+    const req = await window.api.request.get(url, HEADER);
+    if (!req.success) return []
+
+    console.log(req)
+    
+    return []
+}
+
 export const lycorisCafe: pluginFormat = {
     version: "1.0",
     name: "Lycoris.cafe",
@@ -183,7 +193,8 @@ export const lycorisCafe: pluginFormat = {
         getUrls: extractEpisodeData,
         animeDataList: extractEpisodeDataList,
         episodeList: extractOnlyEpisodes,
-        animeList: extractAnimeList
+        animeList: extractAnimeList,
+        search: searchAnime
     },
     preferedLang: ["pl", "en"]
 }

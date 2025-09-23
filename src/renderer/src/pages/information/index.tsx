@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { AnimeData, episodeList, notificationProps, pluginFormat, SettingsConfig } from "@renderer/utils/GlobalInterface";
 import Button from "@renderer/components/buttons";
 import "./information.css"
-import { capitalizeFirstLetter, convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities, getGradientColor } from "@renderer/utils/functions";
+import { capitalizeFirstLetter, convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities, getGradientColor, segregatePlugins } from "@renderer/utils/functions";
 import { useEffect, useState } from "react";
 import { t } from "i18next"
 import { useSelector } from "react-redux";
@@ -15,8 +15,8 @@ import { ReadHistory } from "@renderer/utils/history/history";
 import { ReadContinue } from "@renderer/utils/history/continueWatch";
 import store from "@renderer/utils/store";
 import { getInformation } from "@renderer/plugins/allmanga";
-import Dropdown, { DropdownOption } from "@renderer/components/dropDown";
-import { ChangePlugin, getPluginList } from "@renderer/utils/pluginApi";
+import Dropdown from "@renderer/components/dropDown";
+import { ChangePlugin } from "@renderer/utils/pluginApi";
 
 function information() {
     const navigate = useNavigate()
@@ -194,17 +194,6 @@ function information() {
         await initialInformation(true)
     }
 
-    function segregatePlugins(): DropdownOption[] {
-        let data = getPluginList()
-        let list: DropdownOption[] = []
-        for (let index = 0; index < data.length; index++) {
-            const element = data[index];
-            if (element.player) list.push({ label: element.name, onClick: refreashInformation })
-        }
-
-        return list
-    }
-
     return (
         <>
             <main className="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>
@@ -317,7 +306,7 @@ function information() {
                                 <div className="information-episodes-top-content">
                                     <Button ButtonClass="information-episodes-button" icon="search" onClick={() => setshowWrong(() => true)} />
                                     <div className="information-episodes-space">
-                                        <Dropdown options={segregatePlugins()} disableX buttonText={store.getState().plugin.playerPlugin.name} />
+                                        <Dropdown options={segregatePlugins(refreashInformation)} disableX buttonText={store.getState().plugin.playerPlugin.name} />
                                         <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(store.getState().plugin.playerPlugin.name)} />
                                     </div>
                                 </div>
@@ -386,7 +375,7 @@ function information() {
 
                 <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
             </main>
-            {showWrong && <ContainerWrong name={anime_data} refetchfunc={fetchData} exitfunc={() => setshowWrong(() => false)} />}
+            {showWrong && <ContainerWrong name={anime_data.title.romaji} refetchfunc={fetchData} exitfunc={() => setshowWrong(() => false)} />}
         </>
     )
 }

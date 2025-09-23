@@ -1,11 +1,12 @@
 import { t } from "i18next";
 import { ContextMenuProps, homeData, playerChapterList, themeMetadata } from "./GlobalInterface";
 import store from "./store";
-import { setHomeData } from "./pluginApi";
+import { getPluginList, setHomeData } from "./pluginApi";
 import { ReadContinue } from "./history/continueWatch";
 import { ReadHistory } from "./history/history";
 import { showDialog } from "./context/DialogContext";
 import i18n from "./i18n";
+import { DropdownOption } from "@renderer/components/dropDown";
 
 export function decodeHtmlEntities(str: string) {
     const parser = new DOMParser();
@@ -278,7 +279,7 @@ export async function convertChaptersVTT(url: string): Promise<playerChapterList
     let req = await window.api.request.get(url, { "User-Agent": navigator.userAgent }, "text")
     if (!req.success) return []
     let lines = req.data.split("\n") as string
-    
+
     let finnalListChapters: playerChapterList = []
     for (let i = 0; i < lines.length; i++) {
         if (lines[i].includes("-->")) {
@@ -297,4 +298,15 @@ export async function convertChaptersVTT(url: string): Promise<playerChapterList
     }
 
     return finnalListChapters
+}
+
+export function segregatePlugins(func: (name: string) => void): DropdownOption[] {
+    let data = getPluginList()
+    let list: DropdownOption[] = []
+    for (let index = 0; index < data.length; index++) {
+        const element = data[index];
+        if (element.player) list.push({ label: element.name, onClick: () => func(element.name) })
+    }
+
+    return list
 }

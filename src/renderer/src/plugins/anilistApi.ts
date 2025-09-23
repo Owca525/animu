@@ -333,15 +333,15 @@ const allPopular = {
 function Convert(convert: any): cardData {
   let characters: any = []
   try {
-      for (let index = 0; index < convert.characters.edges.length; index++) {
-        const element = convert.characters.edges[index];
-        if (element.voiceActors.length === 0) characters.push({role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full }})
-        else characters.push({role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full }, voiceActor: { id: element.voiceActors[0].id, image: element.voiceActors[0].image.large, name: element.voiceActors[0].name.full }})
+    for (let index = 0; index < convert.characters.edges.length; index++) {
+      const element = convert.characters.edges[index];
+      if (element.voiceActors.length === 0) characters.push({ role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full } })
+      else characters.push({ role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full }, voiceActor: { id: element.voiceActors[0].id, image: element.voiceActors[0].image.large, name: element.voiceActors[0].name.full } })
     }
   } catch (error) {
     console.error(error)
   }
-  
+
   return {
     AnimeData: {
       ...convert,
@@ -353,7 +353,7 @@ function Convert(convert: any): cardData {
 }
 
 // WHY THE FUCK THIS DOESN'T WORK IF I CALL window.api.request.post IN CreateHomePage
-async function sendPost(variable: any, query: any): Promise<{success: boolean; data?: any; status?: number; statusText?: string; error?: unknown; }> {
+async function sendPost(variable: any, query: any): Promise<{ success: boolean; data?: any; status?: number; statusText?: string; error?: unknown; }> {
   return await window.api.request.post("https://graphql.anilist.co", header, { query: query, variables: variable })
 }
 
@@ -387,17 +387,17 @@ function getSeasonFromDate() {
 
 async function SearchAnilistApi(text: string, page: number, params?: FilterParams): Promise<void> {
   let variables: any = {
-      page: page,
-      sort: "SEARCH_MATCH",
-      type: "ANIME"
+    page: page,
+    sort: "SEARCH_MATCH",
+    type: "ANIME"
   }
   let title: string | undefined = undefined
-  
+
   if (!(text.replaceAll(" ", "") == "")) {
     variables = { ...variables, search: text }
     title = `Searching: ${text}`
   }
-  
+
   if (params && params.genres) {
     variables = { ...variables, genres: params.genres }
   }
@@ -450,7 +450,7 @@ async function CreateHomePage(): Promise<containerData[]> {
   let season = getSeasonFromDate()
   let data = await sendPost({ season: season.season, seasonYear: season.seasonYear }, graphicHomeApi)
   if (!data.success) return []
-  return [ 
+  return [
     {
       title: "Trending Now",
       data: data.data.data.trending.media.map((anime) => Convert(anime)),
@@ -484,18 +484,18 @@ async function getGenres(): Promise<string[]> {
 }
 
 export async function reCovertData(data: AnimeData): Promise<AnimeData | undefined> {
-    if (!(typeof data.title === "string")) return data
-    let req = await sendPost({ id: data.id }, graphicApIDAnime)
-    if (!req.success) return
-    return Convert(req.data.data.Media).AnimeData
+  if (!(typeof data.title === "string")) return data
+  let req = await sendPost({ id: data.id }, graphicApIDAnime)
+  if (!req.success) return
+  return Convert(req.data.data.Media).AnimeData
 }
 
 export async function SearchConvertData(animeData: AnimeData): Promise<AnimeData | undefined> {
   let variables: any = {
-      page: 1,
-      search: animeData.title.native,
-      sort: "SEARCH_MATCH",
-      type: "ANIME"
+    page: 1,
+    search: animeData.title.native,
+    sort: "SEARCH_MATCH",
+    type: "ANIME"
   }
 
   while (true) {
@@ -519,9 +519,9 @@ export async function SearchConvertData(animeData: AnimeData): Promise<AnimeData
 }
 
 async function getAnime(id: string): Promise<AnimeData | undefined> {
-    let req = await sendPost({ id: id }, graphicApIDAnime)
-    if (!req.success) return undefined
-    return Convert(req.data.data.Media).AnimeData
+  let req = await sendPost({ id: id }, graphicApIDAnime)
+  if (!req.success) return undefined
+  return Convert(req.data.data.Media).AnimeData
 }
 
 export const infoPlugin: pluginFormat = {
@@ -533,14 +533,14 @@ export const infoPlugin: pluginFormat = {
     pageSize: pageSize,
     home: () => setHomeData(CreateHomePage),
     search: SearchAnilistApi,
-    searchOption: {
-      genres: await getGenres(),
-      seasons: ["Winter", "Spring", "Summer", "Fall"],
-      years: genYearsList(1940),
-      format: ["TV", "Movie", "TV Short", "special", " OVA", "ONA"],
-      statuses: ["Releasing", "Finished", "Not Yet Aired", "Cancelled"]
-    },
     anime: getAnime
   },
-  preferedLang: ["en"]
+  preferedLang: ["en"],
+  searchOption: {
+    genres: await getGenres(),
+    seasons: ["Winter", "Spring", "Summer", "Fall"],
+    years: genYearsList(1940),
+    format: ["TV", "Movie", "TV Short", "special", " OVA", "ONA"],
+    statuses: ["Releasing", "Finished", "Not Yet Aired", "Cancelled"]
+  },
 }

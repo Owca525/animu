@@ -140,16 +140,19 @@ export interface pluginFormat {
         search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => void
         home: () => void
         anime: (id: string) => Promise<AnimeData | undefined>
-        searchOption: { genres: string[], seasons: string[], years: string[], format: string[], statuses: string[] }
     } | null
     player?: {
         getUrls: (type: string, episode: string, id: string) => Promise<playerData[]>
         animeDataList: (animeData?: AnimeData, anime_id?: string) => Promise<episodeList | undefined>
         episodeList: (type: string, anime_id: string) => Promise<{ ep: string, img?: string, title?: string }[]>
         animeList: (name: AnimeData) => Promise<cardData[]>
+        search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => Promise<cardData[]>
     } | null
+    searchOption?: genres
     sidebarAddon?: sidebarData[]
 }
+
+export type genres = { genres: string[], seasons: string[], years: string[], format: string[], statuses: string[] }
 
 export interface episodeList { player_id: string, episodesData: { episodes: { ep: string, img?: string, title?: string }[], type: string, name?: string }[] }
 

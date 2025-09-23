@@ -34,9 +34,11 @@ const player = () => {
     const [externalPlayerType, setexternalPlayerType] = useState<"Movian" | "VLC" | "Mpv" | "ChromeCast">(config.Player.external.type)
 
     const { data, isLoading, refetch } = useQuery({
-        queryKey: ['extract-urls', extractionData.type, extractionData.actual, playerID],
+        queryKey: [extractionData.type, extractionData.actual, playerID],
         queryFn: extractFunc,
         refetchOnWindowFocus: false,
+        staleTime: 2 * 60 * 60 * 1000,
+        cacheTime: 6 * 60 * 60 * 1000
     });
 
     function setNewEpisode(ep: string) {

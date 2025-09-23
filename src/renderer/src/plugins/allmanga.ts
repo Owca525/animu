@@ -77,7 +77,7 @@ async function sendRequest(url: string, header: any): Promise<any | null> {
   return null
 }
 
-export async function SearchAnime(name: string, page: number = 1) {
+export async function SearchAnime(name: string, page: number = 1): Promise<Record<string, any> | null> {
   let variables = `{"search":{"query":"${name}"},"limit":26,"page":${page},"translationType":"sub","countryOrigin":"ALL"}`
 
   const resp = await sendToAPI(variables, HASH_SEARCH, header)
@@ -220,7 +220,8 @@ export async function recentAnime(page: number = 1) {
 async function getAnimeList(anime: AnimeData): Promise<cardData[]> {
   try {
     let data = await SearchAnime(anime.title.romaji)
-    if (data == 0) return []
+    if (!data) return []
+    if (data.length <= 0) return []
     let returnData: cardData[] = []
     for (let index = 0; index < data.shows.edges.length; index++) {
       const element = data.shows.edges[index];
@@ -393,6 +394,19 @@ export async function getEpisodeList(type: string, anime_id: string): Promise<{ 
   }
 }
 
+async function searchAnime(name: string, page: number, params?: { genres?: string[]; years?: string; seasons?: string; format?: string[]; airing?: string }): Promise<cardData[]> {
+  let dataReq = await SearchAnime(name, page)
+  if (!dataReq || dataReq.length <= 0) return []
+
+  let returnData: cardData[] = []
+  for (let index = 0; index < dataReq.shows.edges.length; index++) {
+    const element = dataReq.shows.edges[index];
+    returnData.push(await converterData(element))
+  }
+
+  return returnData
+}
+
 export const infoPluginPlayer: pluginFormat = {
   version: "1.0",
   name: "Allmanga",
@@ -403,6 +417,7 @@ export const infoPluginPlayer: pluginFormat = {
     getUrls: extractURLS,
     episodeList: getEpisodeList,
     animeList: getAnimeList,
+    search: searchAnime
   },
   sidebarAddon: [{ icon: "today", text: "Recent Anime", onClick: async () => await recentAnime() }],
   preferedLang: ["en"]
