@@ -27,7 +27,7 @@ const Container: React.FC<containerData> = ({ title, data, horizontal = false, o
           {horizontal && data.length > 0 ? <Button icon="chevron_left" ButtonClass="container-left-skip-button" onClick={() => handleButtonScroll(-120)}/> : ""}
           {data.length > 0 && 
             <div tabIndex={-1} className={horizontal ? "container-data-horizontal" : "container-data"} ref={container}>
-                {data.length > 0 && data.map((card) => <Card AnimeData={card.AnimeData} saveData={card.saveData} deletionCard={card.deletionCard} onClick={card.onClick} />)}
+                {data.length > 0 && data.map((card) => <Card card={card} />)}
             </div>
           }
           {data.length <= 0 && <div className="home-empty-container container-error-text"><span className="material-symbols-outlined home-empty-icon">search_off</span>{t("home.nothingfound")}</div>}

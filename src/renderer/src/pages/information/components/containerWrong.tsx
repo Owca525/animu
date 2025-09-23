@@ -57,7 +57,7 @@ const containerWrong: React.FC<containerwrongprops> = ({ name, exitfunc, refetch
                     }
                     {!isLoading && !isError && searchData && searchData.length > 0 &&
                         <div className="information-containerwrong-cards">
-                            {searchData.map(card => <Card AnimeData={card.AnimeData} onClick={() => refetchfunc(card.AnimeData.player_ID)} />)}
+                            {searchData.map(card => <Card card={{ AnimeData: card.AnimeData, onClick: () => refetchfunc(card.AnimeData.player_ID) }} disableinformation />)}
                         </div>
                     }
                 </div>
