@@ -41,7 +41,7 @@ ipcMain.handle('runDiscordRPC', (_event) => {
 
 ipcMain.handle('getVersion', (_event): String => app.getVersion())
 
-ipcMain.handle('runExternalPlayer', (_event, videoData: { url: string, path: string, time: number, title: string }, type: "mpv" | "vlc"): any => {
+ipcMain.handle('runExternalPlayer', (_event, videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc"): any => {
     let flatpakList = execSync(`flatpak list --columns=application`).toString().trim().split(" ").includes(videoData.path)
     let path = videoData.path
     if (!fs.existsSync(videoData.path) && !flatpakList) return
@@ -49,14 +49,18 @@ ipcMain.handle('runExternalPlayer', (_event, videoData: { url: string, path: str
     if (videoData.path.replaceAll(" ", "") == "") return
     switch (type) {
         case "mpv":
-            exec(`${path} --title="${videoData.title}" --force-media-title="${videoData.title}" --start=${videoData.time} '${videoData.url}'`, (error, stdout, stderr) => {
+            let subtitlesFiles: string = ""
+            if (videoData.subs && videoData.subs.subList) subtitlesFiles = videoData.subs.subList.map((sub) => `--sub-file="${sub}"`).join(" ") + ` --sid=${videoData.subs.sid}`
+            exec(`${path} ${subtitlesFiles} ${videoData.chapters ? `--chapters-file=${videoData.chapters}` : ""} --force-media-title="${videoData.title}" --start=${videoData.time} '${videoData.url}'`, (error, stdout, stderr) => {
                 if (error) console.error(error)
                 if (stderr) console.error(error)
                 console.log(stdout)
             })
             break;
         case "vlc":
-            exec(`${path} --input-title-format='${videoData.title}' --start-time='${videoData.time}' '${videoData.url}'`, (error, stdout, stderr) => {
+            let subtitlesFilesVLC: string = ""
+            if (videoData.subs && videoData.subs.subList) subtitlesFilesVLC = videoData.subs.subList.map((sub) => `--sub-file="${sub}"`).join(" ") + ` --sid=${videoData.subs.sid}`
+            exec(`${path} --input-title-format='${videoData.title}' ${subtitlesFilesVLC} --start-time='${videoData.time}' '${videoData.url}'`, (error, stdout, stderr) => {
                 if (error) console.error(error)
                 if (stderr) console.error(error)
                 console.log(stdout)

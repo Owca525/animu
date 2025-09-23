@@ -62,6 +62,7 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
         hls: true,
         subtitles: subList,
         listChapters: chapterList,
+        chaptersUrl: chapters.length > 0 ? chapters[0][0] : undefined,
         storyboardVTT: storyboard.length > 0 ? storyboard[0][0] : undefined,
         resolution: [{ res: "", url: urls[0][0], defaultSubtitles: true }]
     }]
@@ -146,7 +147,8 @@ async function getAnimeCards(data: AnimeData): Promise<cardData[]> {
                     romaji: decodeURI(animeTITLE[0][1]),
                 },
                 id: "",
-                player_ID: animeID[0][1].slice(2)
+                player_ID: animeID[0][1].slice(2),
+                genres: undefined
             } })
         }
 
@@ -173,7 +175,8 @@ async function searchAnime(name: string, page: number, params?: { genres?: strin
             native: name,
             romaji: name
         },
-        id: ""
+        id: "",
+        genres: undefined
     })
 }
 

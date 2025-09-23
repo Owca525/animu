@@ -75,6 +75,7 @@ export interface playerData {
     resolution: { res: string, url: string, defaultSubtitles?: boolean; }[]
     storyboardVTT?: string
     listChapters?: playerChapterList
+    chaptersUrl?: string
     subtitles?: playerSubtitlesFormat[]
 }
 

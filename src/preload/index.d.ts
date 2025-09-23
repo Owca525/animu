@@ -73,7 +73,7 @@ declare global {
         openDialog: (path?: string, name?: string, extensions?: string[]) => Promise<string>
         getPathProgram: (program: string) => Promise<string>
       };
-      runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string}, type: "mpv" | "vlc") => any
+      runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string}, type: "mpv" | "vlc") => any
       getlistThemes: () => Promise<{ version?: string; autor?: string; pathcss: string; animuTitle?: string; name: string; pathIcon?: string }[]>
       getOSDetails: () => Promise<{ platform: NodeJS.Platform, release: string, arch: string }>
       getListLang: () => Promise<{ data: any, lang: string }[]>

@@ -2,7 +2,7 @@
 
 import Button from "@renderer/components/buttons"
 import "./components/css/externalPlayer.css"
-import { cardData, notificationProps, playerData, SettingsConfig } from "@renderer/utils/GlobalInterface"
+import { cardData, notificationProps, playerData, playerSubtitlesFormat, SettingsConfig } from "@renderer/utils/GlobalInterface"
 import { detectTitle, isNumberString } from "@renderer/utils/functions"
 import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
@@ -44,6 +44,8 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     const [secondsLeft, setSecondsLeft] = useState<number>(0);
     const [isChromeCastSearch, setisChromeCastSearch] = useState<boolean>(false);
 
+    console.log(playerData)
+
     // Running Players
     async function RunMovian(url?: string) {
         if (!url) return
@@ -52,10 +54,22 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
             toast.error("Failed to run Movian", notificationProps)
         }
     }
+
+    function getNumberOfSub(data: playerSubtitlesFormat[] | undefined) {
+        if (!data) return 0
+        for (let index = 0; index < data.length; index++) {
+            const element = data[index];
+            if (!element.label.includes("Forced")) return index+1
+        }
+        return 0
+    }
+
     async function runMpvPlayer(url?: string) {
         if (!url) return
-        console.log(url)
-        await window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.mpvPath, time: time }, "mpv")
+        if (!currentHost) return
+        let subsList: string[] = []
+        if (currentHost && currentHost.subtitles) subsList = currentHost.subtitles.map(el => el.url)
+        await window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.mpvPath, time: time, subs: { subList: subsList, sid: getNumberOfSub(currentHost.subtitles) }, chapters: currentHost.chaptersUrl }, "mpv")
     }
 
     async function runVlcPlayer(url?: string) {
