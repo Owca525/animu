@@ -30,6 +30,7 @@ function information() {
         queryKey: [{ data: anime_data, player_id: currentIDplayer }],
         queryFn: async ({ queryKey }) => {
             const [data] = queryKey;
+            console.log('sex')
             if (data.data.id == "") {
                 ChangePlugin("Allmanga")
                 return store.getState().plugin.playerPlugin.player.animeDataList(data.data, "")
@@ -37,7 +38,8 @@ function information() {
             if (store.getState().plugin.playerPlugin) return store.getState().plugin.playerPlugin.player.animeDataList(data.player_id ? undefined : data.data, data.player_id)
         },
         refetchOnWindowFocus: false,
-        staleTime: 1 * 60 * 1000
+        staleTime: 2 * 60 * 60 * 1000,
+        cacheTime: 2 * 60 * 60 * 1000
     });
 
     // Banner
