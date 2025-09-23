@@ -38,7 +38,7 @@ const player = () => {
         queryFn: extractFunc,
         refetchOnWindowFocus: false,
         staleTime: 2 * 60 * 60 * 1000,
-        cacheTime: 6 * 60 * 60 * 1000
+        cacheTime: 2 * 60 * 60 * 1000
     });
 
     function setNewEpisode(ep: string) {

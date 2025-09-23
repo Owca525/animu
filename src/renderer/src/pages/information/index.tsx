@@ -127,7 +127,6 @@ function information() {
         if (anime_data.id == "") return
         let data = await informationPlugin.information.anime(anime_data.id)
         if (!data) return
-        console.log(data, "sex")
         setAnimeData(() => data)
         setSecondsLeft(() => data.nextAiringEpisode?.timeUntilAiring)
     }

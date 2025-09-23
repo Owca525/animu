@@ -28,8 +28,8 @@ const containerWrong: React.FC<containerwrongprops> = ({ name, exitfunc, refetch
             return []
         },
         refetchOnWindowFocus: false,
-        staleTime: 0,
-        cacheTime: 0
+        staleTime: 2 * 60 * 60 * 1000,
+        cacheTime: 2 * 60 * 60 * 1000
     });
 
     return (
