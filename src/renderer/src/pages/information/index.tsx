@@ -30,7 +30,6 @@ function information() {
         queryKey: [{ data: anime_data, player_id: currentIDplayer }],
         queryFn: async ({ queryKey }) => {
             const [data] = queryKey;
-            console.log('sex')
             if (data.data.id == "") {
                 ChangePlugin("Allmanga")
                 return store.getState().plugin.playerPlugin.player.animeDataList(data.data, "")
