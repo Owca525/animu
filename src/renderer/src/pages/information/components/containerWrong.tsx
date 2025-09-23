@@ -1,12 +1,10 @@
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux';
 import { useQuery } from 'react-query';
 import './css/containerWrong.css'
 import Button from '@renderer/components/buttons';
 import { motion } from 'framer-motion';
 import { t } from 'i18next';
 import Card from '@renderer/pages/home/components/card';
-import { pluginFormat } from '@renderer/utils/GlobalInterface';
 import Input from '@renderer/components/input';
 import Dropdown from '@renderer/components/dropDown';
 import store from '@renderer/utils/store';
@@ -20,14 +18,13 @@ interface containerwrongprops {
 }
 
 const containerWrong: React.FC<containerwrongprops> = ({ name, exitfunc, refetchfunc }) => {
-    const pluginPlayer: pluginFormat = useSelector((plugin: any) => plugin.plugin.playerPlugin);
     const [searchName, setSearchName] = useState<string>(name)
 
-    const { data: searchData, isError, isLoading } = useQuery({
+    const { data: searchData, isError, isLoading, refetch } = useQuery({
         queryKey: [searchName],
         queryFn: async ({ queryKey }) => {
             const [name] = queryKey;
-            if (pluginPlayer.player) return await pluginPlayer.player.search(name, 1)
+            if (store.getState().plugin.playerPlugin.player) return await store.getState().plugin.playerPlugin.player.search(name, 1)
             return []
         },
         refetchOnWindowFocus: false,
@@ -40,7 +37,7 @@ const containerWrong: React.FC<containerwrongprops> = ({ name, exitfunc, refetch
             <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.2 }} className='information-containerwrong'>
                 <div className="information-containerwrong-top">
                     <Input placeholder='Search...' defaultValue={name} onKeyDown={(text) => setSearchName(() => text)}/>
-                    <Dropdown options={segregatePlugins((name) => ChangePlugin(name))} disableX buttonText={store.getState().plugin.playerPlugin.name}/>
+                    <Dropdown options={segregatePlugins((name) => {ChangePlugin(name); refetch()})} disableX buttonText={store.getState().plugin.playerPlugin.name}/>
                     {/* <Button icon='tune'/> */}
                 </div>
                 <div className="information-containerwrong-center">

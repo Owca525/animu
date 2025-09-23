@@ -73,11 +73,9 @@ function information() {
                 setIsError(() => true)
                 setLoadingData(() => false)
             }
-            setshowWrong(() => false)
         } catch (Error) {
             setIsError(() => true)
             setData(() => undefined)
-            setshowWrong(() => false)
             setLoadingData(() => false)
             console.error(Error)
         }
@@ -367,15 +365,13 @@ function information() {
                                     </div>
                                 </div>
                             }
-
-
                         </div>
                     </div>
                 </div>
 
                 <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
             </main>
-            {showWrong && <ContainerWrong name={anime_data.title.romaji} refetchfunc={fetchData} exitfunc={() => setshowWrong(() => false)} />}
+            {showWrong && <ContainerWrong name={anime_data.title.romaji} refetchfunc={(func: any, id?: string) => {setshowWrong(() => false);fetchData(func, id)}} exitfunc={() => setshowWrong(() => false)} />}
         </>
     )
 }
