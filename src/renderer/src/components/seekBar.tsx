@@ -129,8 +129,10 @@ const SeekBar: React.FC<SeekBarProps> = ({
         if (centerPx > containerWidth - halfThumb) {
           centerPx = containerWidth - halfThumb
         }
-        thumb.style.left = `${centerPx}px`
-        setChapterBoxPosition(`${centerPx}px`, percent)
+        if (centerPx > 0) {
+          thumb.style.left = `${centerPx}px`
+          setChapterBoxPosition(`${centerPx}px`, percent)
+        }
       }
     })
   }
