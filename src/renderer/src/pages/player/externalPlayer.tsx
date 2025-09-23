@@ -85,6 +85,8 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         if (currentUrl) await window.api.chromecast.connect(device, { title: AnimeTitle, time: time, url: currentUrl, type: "video/mp4" })
     }
 
+
+    // TODO: Fix bug when external player first start
     function setEpisode(type: "next" | "prev") {
         let ep = now_episodes.episodes.findIndex((item) => item.ep === now_episodes.episode)
         if (ep < 0) return
