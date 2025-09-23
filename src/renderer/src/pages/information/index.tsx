@@ -38,8 +38,7 @@ function information() {
             if (store.getState().plugin.playerPlugin) return store.getState().plugin.playerPlugin.player.animeDataList(data.player_id ? undefined : data.data, data.player_id)
         },
         refetchOnWindowFocus: false,
-        staleTime: 2 * 60 * 60 * 1000,
-        cacheTime: 2 * 60 * 60 * 1000
+        staleTime: 1 * 60 * 1000
     });
 
     // Banner
