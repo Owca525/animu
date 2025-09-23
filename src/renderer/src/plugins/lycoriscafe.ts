@@ -174,14 +174,42 @@ async function extractOnlyEpisodes(_type: string, anime_id: string): Promise<{ e
     return episodes
 }
 
+function convertToAnimeData(data: any): AnimeData | undefined{
+    console.log(data)
+    try {
+        return {
+            characters: [],
+            studios: [data["studio"]],
+            genres: data["genres"],
+            title: {
+                english: data["englishTitle"],
+                native: "",
+                romaji: data["title"]
+            },
+            id: data["id"],
+            format: data["format"],
+            season: data["season"],
+            seasonYear: data["seasonYear"],
+            source: data["source"],
+            status: data["status"],
+            averageScore: data["rating"] ? data["rating"] * 10 : undefined,
+            coverImage: data["poster"],
+            nextAiringEpisode: data["nextAiringEpisode"],
+            bannerImage: data["background"]
+        }
+    } catch (error) {
+        return undefined
+    }
+}
+
 async function searchAnime(name: string, page: number, params?: { genres?: string[]; years?: string; seasons?: string; format?: string[]; airing?: string; }): Promise<cardData[]> {
     let url = `https://www.lycoris.cafe/api/search?page=${page}&pageSize=12&search=${name}&genres=&status=&format=&year=&season=&source=&sortField=popularity&sortDirection=desc&preferRomaji=true`
     const req = await window.api.request.get(url, HEADER);
     if (!req.success) return []
 
-    console.log(req)
-    
-    return []
+    let data = req.data.data.map((element) => {return{ AnimeData: convertToAnimeData(element) }})
+    if (!data) return []
+    return data
 }
 
 export const lycorisCafe: pluginFormat = {

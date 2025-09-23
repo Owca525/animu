@@ -18,7 +18,7 @@ export interface AnimeData {
     } | undefined
     episodes?: number | undefined
     format?: string | undefined
-    genres?: Array<String> | undefined
+    genres: Array<String> | undefined
     nextAiringEpisode?: {
         airingAt: number
         episode: number
