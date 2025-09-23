@@ -1,11 +1,10 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { AnimeData, episodeList, notificationProps, pluginFormat, SettingsConfig } from "@renderer/utils/GlobalInterface";
+import { AnimeData, notificationProps, pluginFormat } from "@renderer/utils/GlobalInterface";
 import Button from "@renderer/components/buttons";
 import "./information.css"
 import { capitalizeFirstLetter, convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities, getGradientColor, segregatePlugins } from "@renderer/utils/functions";
 import { useEffect, useState } from "react";
 import { t } from "i18next"
-import { useSelector } from "react-redux";
 import Drop from "./components/drop";
 import ContainerWrong from "./components/containerWrong";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -14,24 +13,34 @@ import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import { ReadHistory } from "@renderer/utils/history/history";
 import { ReadContinue } from "@renderer/utils/history/continueWatch";
 import store from "@renderer/utils/store";
-import { getInformation } from "@renderer/plugins/allmanga";
 import Dropdown from "@renderer/components/dropDown";
 import { ChangePlugin } from "@renderer/utils/pluginApi";
+import { useQuery } from "react-query";
 
 function information() {
     const navigate = useNavigate()
-    const location = useLocation();
+    const anime_data: AnimeData = useLocation().state;
 
-    const config: SettingsConfig = useSelector((data: any) => data.config);
-    const informationTemp = useSelector((info: any) => info.information);
-    const informationPlugin: pluginFormat = useSelector((plugin: any) => plugin.plugin.informationPlugin);
-    const [anime_data, setAnimeData] = useState<AnimeData>(location.state)
     const [showWrong, setshowWrong] = useState<boolean>(false)
     const [secondsLeft, setSecondsLeft] = useState<undefined | number>(anime_data.nextAiringEpisode?.timeUntilAiring);
-    const [data, setData] = useState<episodeList | undefined>(undefined)
     const [savedata, setsavedata] = useState<{ last_episode: number, last_time: number } | undefined>(undefined)
-    const [isLoading, setLoadingData] = useState<boolean>(false)
-    const [isError, setIsError] = useState<boolean>(false)
+    const [currentIDplayer, setCurrentIDplayer] = useState<string | undefined>(anime_data.player_ID)
+
+    const { data: episodeData, isError: isEpisodeError, isLoading: isEpisodeLoading, refetch } = useQuery({
+        queryKey: [{ data: anime_data, player_id: currentIDplayer }],
+        queryFn: async ({ queryKey }) => {
+            const [data] = queryKey;
+            console.log(data)
+            if (data.data.id == "") {
+                ChangePlugin("Allmanga")
+                return store.getState().plugin.playerPlugin.player.animeDataList(data.data, "")
+            }
+            if (store.getState().plugin.playerPlugin) return store.getState().plugin.playerPlugin.player.animeDataList(data.player_id ? undefined : data.data, data.player_id)
+        },
+        refetchOnWindowFocus: false,
+        staleTime: 2 * 60 * 60 * 1000,
+        cacheTime: 2 * 60 * 60 * 1000
+    });
 
     // Banner
     const [isBannerLoading, setBannerLoadingData] = useState<boolean>(true)
@@ -57,31 +66,7 @@ function information() {
 
     const time = convertSeconds(secondsLeft)
 
-    // I can't use useQuery Because Doesn't Work
-    async function fetchData(func: any, id?: string) {
-        try {
-            setIsError(() => false)
-            setLoadingData(() => true)
-            let data = await func(id ? undefined : anime_data, id)
-            if (data) {
-                setData(() => data)
-                setLoadingData(() => false)
-                setIsError(() => false)
-                store.dispatch({ type: "setInformationEpisodesData", payload: data })
-            } else {
-                setData(() => undefined)
-                setIsError(() => true)
-                setLoadingData(() => false)
-            }
-        } catch (Error) {
-            setIsError(() => true)
-            setData(() => undefined)
-            setLoadingData(() => false)
-            console.error(Error)
-        }
-    }
-
-    async function initialInformation(refetch: boolean = false) {
+    async function initialInformation() {
         let currentPlayerPlugin: pluginFormat = store.getState().plugin.playerPlugin
         if (!currentPlayerPlugin.player) return
 
@@ -96,39 +81,6 @@ function information() {
             let animeHistory = cardAnime[0].saveData
             if (animeHistory) setsavedata(() => { return { last_episode: parseInt(animeHistory.episode), last_time: animeHistory.last_Time } })
         }
-
-        if (anime_data.id == "" && config.plugins.player == "Allmanga") {
-            await fetchData(getInformation, cardAnime[0].AnimeData.player_ID)
-            return
-        }
-
-        if (informationTemp.id == anime_data.id && informationTemp.episodes_data != undefined && informationTemp.plugin_name == currentPlayerPlugin.name) {
-            setData(() => informationTemp.episodes_data)
-            if (!refetch) await refeatchData()
-            return
-        }
-
-        store.dispatch({ type: "setInformationID", payload: anime_data.id })
-        store.dispatch({ type: "setInformationPluginName", payload: currentPlayerPlugin.name })
-        if (cardAnime.length <= 0 && cardAnimeContinueWatch.length <= 0) {
-            await fetchData(currentPlayerPlugin.player.animeDataList)
-            return
-        }
-
-        if (cardAnime[0].saveData?.pluginName == config.plugins.player) {
-            await fetchData(currentPlayerPlugin.player.animeDataList, cardAnime[0].AnimeData.player_ID)
-        }
-        await fetchData(currentPlayerPlugin.player.animeDataList)
-        if (!refetch) await refeatchData()
-    }
-
-    async function refeatchData() {
-        if (!informationPlugin.information) return
-        if (anime_data.id == "") return
-        let data = await informationPlugin.information.anime(anime_data.id)
-        if (!data) return
-        setAnimeData(() => data)
-        setSecondsLeft(() => data.nextAiringEpisode?.timeUntilAiring)
     }
 
     useEffect(() => {
@@ -144,7 +96,7 @@ function information() {
                 data: {
                     AnimeData: {
                         ...anime_data,
-                        player_ID: data?.player_id
+                        player_ID: episodeData?.player_id
                     },
                     saveData: {
                         last_Time: savedata && savedata.last_episode.toString() === episode ? savedata.last_time : 0,
@@ -188,7 +140,7 @@ function information() {
 
     async function refreashInformation(name: string) {
         ChangePlugin(name)
-        await initialInformation(true)
+        refetch()
     }
 
     return (
@@ -310,16 +262,16 @@ function information() {
                                 {/* <div className="information-select-episode" onClick={() => setshowWrong(() => true)}><span className="material-symbols-outlined">search</span>Is this the wrong Anime?</div> */}
                                 {showWrong == false &&
                                     <>
-                                        {isLoading == false && isError == false && data && data.episodesData && data.episodesData.length > 0 && anime_data.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && (
+                                        {isEpisodeLoading == false && isEpisodeError == false && episodeData && episodeData.episodesData && episodeData.episodesData.length > 0 && anime_data.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && (
                                             <>
-                                                {data.episodesData.map((episode) => episode.episodes.length > 0 ? (
+                                                {episodeData.episodesData.map((episode) => episode.episodes.length > 0 ? (
                                                     <Drop LeftHeader={episode.name ? episode.name : episode.type} RightHeader={`${episode.episodes.length} episodes`} content={makeButtons(episode.episodes, episode.type)} />
                                                 ) : "")}
                                             </>
                                         )}
-                                        {isLoading && anime_data.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
-                                        {isError && isLoading == false && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}
-                                        {data && (data.episodesData && data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}
+                                        {isEpisodeLoading && anime_data.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
+                                        {isEpisodeError && isEpisodeLoading == false && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}
+                                        {episodeData && (episodeData.episodesData && episodeData.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}
                                     </>}
                             </div>
 
@@ -370,7 +322,7 @@ function information() {
 
                 <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
             </main>
-            {showWrong && <ContainerWrong name={anime_data.title.romaji} refetchfunc={(func: any, id?: string) => {setshowWrong(() => false);fetchData(func, id)}} exitfunc={() => setshowWrong(() => false)} />}
+            {showWrong && <ContainerWrong name={anime_data.title.romaji} refetchfunc={(id?: string) => {setshowWrong(() => false);setCurrentIDplayer(() => id); refetch()}} exitfunc={() => setshowWrong(() => false)} />}
         </>
     )
 }

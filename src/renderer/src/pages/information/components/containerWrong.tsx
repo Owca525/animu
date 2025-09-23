@@ -13,7 +13,7 @@ import { ChangePlugin } from '@renderer/utils/pluginApi';
 
 interface containerwrongprops { 
     name: string,
-    refetchfunc: (func: any, id?: string) => void,
+    refetchfunc: (id?: string) => void,
     exitfunc: () => void,
 }
 
@@ -57,9 +57,7 @@ const containerWrong: React.FC<containerwrongprops> = ({ name, exitfunc, refetch
                     }
                     {!isLoading && !isError && searchData && searchData.length > 0 &&
                         <div className="information-containerwrong-cards">
-                            {searchData.map(card => <Card AnimeData={card.AnimeData} onClick={() => refetchfunc(
-                                store.getState().plugin.playerPlugin.player.animeDataList, card.AnimeData.player_ID
-                            )} />)}
+                            {searchData.map(card => <Card AnimeData={card.AnimeData} onClick={() => refetchfunc(card.AnimeData.player_ID)} />)}
                         </div>
                     }
                 </div>
