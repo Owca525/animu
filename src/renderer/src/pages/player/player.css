@@ -234,10 +234,7 @@
   justify-content: center;
   gap: 4px;
   align-items: center;
-  background: linear-gradient(to left, var(--bg), rgb(0, 0, 0, 0.2));
-  /* background-color: var(--bg4); */
   backdrop-filter: blur(1px);
-  border-radius: 12px !important;
 }
 
 .player-up-Next-background {
@@ -246,15 +243,8 @@
   right: 1%;
   max-width: 340px;
   width: max-content;
-  border-radius: 12px !important;
-  outline: 3px solid var(--bg4);
   transition: all 100ms ease-in-out;
   cursor: pointer;
-  background-color: var(--bg4);
-}
-
-.player-up-Next-background:hover {
-  outline-color: var(--neutral1);
 }
 
 .player-up-Next-title,
@@ -287,19 +277,12 @@
   right: -2%;
   width: 30px;
   height: 30px;
-  border-radius: 50%;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text);
-  background-color: var(--bg4);
   cursor: pointer;
-  border: 2px solid var(--bg4);
   transition: all 100ms ease-in-out;
-}
-.player-up-Next-button-close:hover {
-  border-color: var(--neutral1);
 }
 
 .player-up-Next-container {
@@ -308,8 +291,6 @@
   justify-content: center;
   gap: 4px;
   align-items: center;
-  background-color: var(--black);
-  border-radius: 8px !important;
   position: absolute;
   bottom: 12%;
   right: 1%;
@@ -328,7 +309,6 @@
 }
 
 .player-loading-container {
-  background-color: black;
   width: 100%;
   height: 100%;
   display: flex;
@@ -342,17 +322,14 @@
 .player-loading-container-black {
   width: 100%;
   height: 100%;
-  background-color: rgb(0, 0, 0, 0.4);
 }
 
 .player-volume-ui-container {
   display: flex;
   align-items: center;
-  background-color: var(--bg2);
   position: absolute;
   top: 10px;
   right: 20px;
-  border-radius: 12px;
   max-width: 280px;
   min-width: 180px;
   width: 290px;
@@ -364,8 +341,6 @@
 .player-volume-ui-bar-progress {
   height: 100%;
   width: 0%;
-  background-color: var(--neutral1);
-  border-radius: 12px;
 }
 
 .player-volume-ui-text {
@@ -379,8 +354,6 @@
 .player-volume-ui-bar-container {
   width: 100%;
   height: 8px;
-  background-color: var(--bg3);
-  border-radius: 12px;
 }
 
 .player-loading-animation-container {
@@ -394,7 +367,6 @@
 }
 
 .player-select-episode-void {
-  background-color: var(--player-bg-containers);
   width: 100%;
   height: 100%;
   position: fixed;
@@ -420,9 +392,6 @@
   bottom: 90px;
   right: 20px;
 
-  background-color: var(--bg2);
-  border-radius: 8px;
-  border: 2px solid var(--bg4);
   overflow: hidden;
   overflow-y: scroll;
 }
@@ -455,17 +424,10 @@
   justify-content: space-between;
   padding: 8px;
   cursor: pointer;
-  border-radius: 12px;
-  border: 1px solid var(--invisible);
-}
-
-.information-episode-button-full:hover {
-  background-color: var(--bg4);
 }
 
 .information-episode-button-image {
   width: 100px;
-  border-radius: 4px;
 }
 
 /* UI */
@@ -479,7 +441,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: white;
   max-width: 100vw;
 }
 
@@ -487,7 +448,6 @@
   text-align: center;
   font-size: 3em;
   pointer-events: none;
-  background-color: var(--invisible);
   width: max-content;
   max-width: 100vw;
   padding: 6px;
@@ -503,16 +463,8 @@
   bottom: 12%;
   left: 1%;
   padding: 12px;
-  background-color: var(--bg2);
-  color: var(--text);
   font-size: 1.1em;
-  border: 2px solid var(--player-bg-containers);
-  border-radius: 12px;
   cursor: pointer;
-}
-
-.player-skip-chapters-button:hover {
-  border-color: var(--neutral1);
 }
 
 .player-subtitle-container.up {

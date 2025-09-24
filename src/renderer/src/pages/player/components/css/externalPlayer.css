@@ -142,7 +142,6 @@
   padding: 8px 4px 8px 12px;
   font-size: 1em;
   align-items: start;
-  background-color: var(--bg4) !important;
 }
 
 .external-button-textcontainer {
@@ -168,7 +167,6 @@
 
 .external-panelbutton-bottomtext {
   overflow: hidden;
-  color: var(--text-gray);
   font-size: 0.7em;
   align-items: start;
   width: 100%;
@@ -190,7 +188,6 @@
   display: flex;
   gap: 8px;
   margin-right: 10px;
-  border: 2px solid var(--bg4);
   border-width: 0px 0px 2px 0px;
   padding: 6px;
 }
@@ -201,8 +198,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 50% !important;
-  background-color: var(--bg3) !important;
 }
 
 .external-panel-search-text {

@@ -440,6 +440,23 @@ body {
   border-radius: 12px;
 }
 
+.external-panelbutton {
+  background-color: var(--bg4) !important;
+}
+
+.external-panelbutton-bottomtext {
+  color: var(--text-gray);
+}
+
+.external-leftpanel-topbar {
+  border: 2px solid var(--bg4);
+}
+
+.external-leftpanel-topbar-button {
+  border-radius: 50% !important;
+  background-color: var(--bg3) !important;
+}
+
 /* Settings */
 
 .settings-page-container {
@@ -461,6 +478,36 @@ body {
   background-color: var(--bg2);
   border-radius: 12px;
   border: 2px solid var(--bg4);
+}
+
+.settings-container-extensions {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+th {
+  border: 3px solid var(--bg4);
+}
+
+.settings-table-button:hover {
+  background-color: var(--bg4);
+}
+
+.settings-extensions-background {
+  background-color: var(--bg3);
+  border-radius: 6px;
+}
+
+.settings-special-images:hover {
+  background-color: var(--bg4);
+}
+
+.settings-table-button {
+  border-radius: 12px;
+}
+
+.settings-special-images {
+  border-radius: 12px;
 }
 
 
@@ -658,6 +705,128 @@ body {
   background-color: var(--player-bg-containers);
 }
 
+.player-up-Next-container-var2 {
+  background: linear-gradient(to left, var(--bg), rgb(0, 0, 0, 0.2));
+  border-radius: 12px !important;
+}
+
+.player-up-Next-background {
+  outline: 3px solid var(--bg4);
+  background-color: var(--bg4);
+  border-radius: 12px !important;
+}
+
+.player-up-Next-background:hover {
+  outline-color: var(--neutral1);
+}
+
+.player-up-Next-button-close {
+  border-radius: 50%;
+  color: var(--text);
+  background-color: var(--bg4);
+  border: 2px solid var(--bg4);
+}
+
+
+.player-up-Next-button-close:hover {
+  border-color: var(--neutral1);
+}
+
+.player-up-Next-container {
+  background-color: var(--black);
+  border-radius: 8px !important;
+}
+
+.player-loading-container {
+  background-color: black;
+}
+
+.player-loading-container-black {
+  background-color: rgb(0, 0, 0, 0.4);
+}
+
+.player-volume-ui-container {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+.player-volume-ui-bar-progress {
+  background-color: var(--neutral1);
+  border-radius: 12px;
+}
+
+.player-volume-ui-bar-container {
+  background-color: var(--bg3);
+  border-radius: 12px;
+}
+
+.player-select-episode-void {
+  background-color: var(--player-bg-containers);
+}
+
+.player-select-episode-container {
+  background-color: var(--bg2);
+  border-radius: 8px;
+  border: 2px solid var(--bg4);
+}
+
+.information-episode-button-full {
+  border-radius: 12px;
+  border: 1px solid var(--invisible);
+}
+
+.information-episode-button-full:hover {
+  background-color: var(--bg4);
+}
+
+.player-subtitle-container {
+  color: white;
+}
+
+.player-subtitle-content {
+  background-color: var(--invisible);
+}
+
+.player-skip-chapters-button {
+  background-color: var(--bg2);
+  color: var(--text);
+  border: 2px solid var(--player-bg-containers);
+  border-radius: 12px;
+}
+
+.player-skip-chapters-button:hover {
+  border-color: var(--neutral1);
+}
+
+.information-episode-button-image {
+  border-radius: 4px;
+}
+
+
+/* Player Button */
+
+
+.player-button-up-text {
+    border-radius: 6px;
+}
+
+.player-button-up-text {
+    background-color: var(--player-bg-containers);
+}
+
+
+/* Player episode element */
+
+
+.player-episode-element-background, .player-up-Next-background {
+    border-radius: 8px;
+}
+  
+.player-episode-element-container {
+    background: linear-gradient(to left, var(--black), rgb(0, 0, 0, 0.3)); 
+    border-radius: 8px;
+}
+
 /* nerdStats */
 
 .player-nerd-container {
@@ -710,6 +879,23 @@ body {
 .seekbar-box.progress {
   background-color: var(--neutral1);
   border-radius: 12px;
+}
+
+.seekbar-buffer, .seekbar-chapters {
+    background-color: color-mix(in srgb, var(--text) 70%, transparent);
+}
+
+.seekbar-chapters {
+    background-color: var(--invisible);
+}
+
+.seekbar-thumbnail {
+    border-radius: 12px;
+    background-color: var(--player-bg-containers);
+}
+
+.seekbar-chapters-opening-ending {
+    background-color: var(--light-blue) !important;
 }
 
 /* player seekbar */
@@ -787,4 +973,30 @@ body {
   color: #fff;
   border-radius: 4px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Welcome Screen */
+
+
+.welcome-screen-void {
+    background-color: color-mix(in srgb, var(--bg) 80%, transparent);
+}
+
+.welcome-screen-content {
+    background-color: var(--bg2);
+    border-radius: 12px;
+}
+
+
+/* Container Wrong */
+
+
+.information-containerwrong-text-space {
+    background-color: var(--neutral1);
+    border-radius: 12px;
+}
+
+.information-containerwrong-center {
+    border: 1px solid white;
 }

@@ -5,14 +5,10 @@
     padding: 6px 12px 6px 12px;
     gap: 8px;
     cursor: pointer;
-    background: linear-gradient(to left, var(--black), rgb(0, 0, 0, 0.3)); 
-    border-radius: 8px;
     max-width: 250px;
 }
 
 .player-episode-element-background, .player-up-Next-background {
-    border-radius: 8px;
-    /* background-color: var(--bg3); */
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;

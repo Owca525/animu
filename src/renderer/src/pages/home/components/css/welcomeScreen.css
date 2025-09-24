@@ -1,7 +1,6 @@
 .welcome-screen-void {
     z-index: 99999;
     position: fixed;
-    background-color: color-mix(in srgb, var(--bg) 80%, transparent);
     width: 100%;
     backdrop-filter: blur(4px);
     height: 100%;
@@ -16,9 +15,7 @@
 }
 
 .welcome-screen-content {
-    background-color: var(--bg2);
     padding: 32px;
-    border-radius: 12px;
 
     display: flex;
     align-items: center;

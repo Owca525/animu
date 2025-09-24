@@ -117,8 +117,6 @@
   width: 100%;
   margin: 12px;
   min-height: 500px;
-  background-color: var(--bg2);
-  border-radius: 12px;
 }
 
 .settings-extensions-button {
@@ -134,7 +132,6 @@ th, td {
 th {
   text-align: left;
   font-size: 1.2em;
-  border: 3px solid var(--bg4);
   border-width: 0px 0px 2px 0px;
 }
 
@@ -151,11 +148,6 @@ td {
 
 .settings-table-button {
   cursor: pointer;
-  border-radius: 12px;
-}
-
-.settings-table-button:hover {
-  background-color: var(--bg4);
 }
 
 .settings-extensions-icon {
@@ -164,10 +156,8 @@ td {
 }
 
 .settings-extensions-background {
-  background-color: var(--bg3);
   width: max-content;
   padding: 4px;
-  border-radius: 6px;
 }
 
 .settings-extensions-title {
@@ -186,11 +176,6 @@ td {
   width: 60px;
   height: 60px;
   padding: 8px;
-  border-radius: 12px;
-}
-
-.settings-special-images:hover {
-  background-color: var(--bg4);
 }
 
 .settings-user-title {

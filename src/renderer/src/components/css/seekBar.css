@@ -25,12 +25,7 @@
     position: absolute;
     top: 0;
     height: 100%;
-    background-color: color-mix(in srgb, var(--text) 70%, transparent);
     z-index: 1;
-}
-
-.seekbar-chapters {
-    background-color: var(--invisible);
 }
 
 .seekbar-thumb {
@@ -74,16 +69,10 @@
     width: 180px;
     top: -130px;
     background-repeat: no-repeat;
-    border-radius: 12px;
     outline: 3px solid var(--player-bg-containers);
-    background-color: var(--player-bg-containers);
     pointer-events: none;
 }
 
 .seekbar-chapters-wrapper {
     z-index: 3 !important;
-}
-
-.seekbar-chapters-opening-ending {
-    background-color: var(--light-blue) !important;
 }
