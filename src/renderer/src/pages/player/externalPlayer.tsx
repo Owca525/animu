@@ -4,7 +4,7 @@ import Button from "@renderer/components/buttons"
 import "./components/css/externalPlayer.css"
 import { cardData, notificationProps, playerData, playerSubtitlesFormat, SettingsConfig } from "@renderer/utils/GlobalInterface"
 import { detectTitle, isNumberString } from "@renderer/utils/functions"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
 import { useSelector } from "react-redux"
@@ -33,7 +33,8 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
 
     // Player Related
     const [resolutionList, setResolutionList] = useState<{ res: string, url: string }[]>([])
-    const [currentHost, setCurrentHost] = useState<playerData | undefined>(undefined)
+    // const [currentHost, setCurrentHost] = useState<playerData | undefined>(undefined)
+    const currentHost = useRef<playerData | undefined>(undefined)
     const [currentResolution, setCurrentResolution] = useState<string>("Not Found")
     const [currentUrl, setCurrentUrl] = useState<string | undefined>(undefined)
     const [currentPlayer, setCurrentPlayer] = useState<"Movian" | "VLC" | "Mpv" | "ChromeCast">(externalPlayerData.current)
@@ -66,10 +67,10 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
 
     async function runMpvPlayer(url?: string) {
         if (!url) return
-        if (!currentHost) return
+        if (!currentHost.current) return
         let subsList: string[] = []
-        if (currentHost && currentHost.subtitles) subsList = currentHost.subtitles.map(el => el.url)
-        await window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.mpvPath, time: time, subs: { subList: subsList, sid: getNumberOfSub(currentHost.subtitles) }, chapters: currentHost.chaptersUrl }, "mpv")
+        if (currentHost.current.subtitles) subsList = currentHost.current.subtitles.map(el => el.url)
+        await window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.mpvPath, time: time, subs: { subList: subsList, sid: getNumberOfSub(currentHost.current.subtitles) }, chapters: currentHost.current.chaptersUrl }, "mpv")
     }
 
     async function runVlcPlayer(url?: string) {
@@ -78,15 +79,13 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     }
 
     async function runChromeCast(device: { host: string, port: number, name: string }) {
-        if (currentHost && currentHost.hls) {
+        if (currentHost.current && currentHost.current.hls) {
             toast.error("ChromeCast Doesn't support m3u8 format")
             return
         }
         if (currentUrl) await window.api.chromecast.connect(device, { title: AnimeTitle, time: time, url: currentUrl, type: "video/mp4" })
     }
 
-
-    // TODO: Fix bug when external player first start
     function setEpisode(type: "next" | "prev") {
         let ep = now_episodes.episodes.findIndex((item) => item.ep === now_episodes.episode)
         if (ep < 0) return
@@ -103,7 +102,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     }
 
     function ChangeHost(data: playerData) {
-        setCurrentHost(() => data)
+        currentHost.current = data
         setResolutionList(() => data.resolution)
     }
 
@@ -124,8 +123,8 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
             toast.error("Players Not Found", notificationProps)
             return
         }
-
-        setCurrentHost(() => playerData[0])
+        
+        currentHost.current = playerData[0]
         if (playerData[0].resolution.length <= 0) {
             toast.error("Resolution not found", notificationProps)
             return
@@ -195,7 +194,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                         />
                         {/* FIXME: Fix changing resolution */}
                         <Dropdown placeholder="Not Found" buttonText={currentResolution != "" ?  isNumberString(currentResolution) ? `${currentResolution}p` : currentResolution : "Not Found"} options={resolutionList.map((element) => { return { label: isNumberString(element.res) ? `${element.res}p` : element.res, onClick: () => ChangeResolution(element) } })} disableX />
-                        <Dropdown placeholder="Not Found" buttonText={currentHost ? currentHost.hostname : "Not Found"} options={playerData.map((element) => { return { label: element.hostname, onClick: () => ChangeHost(element) } })} disableX />
+                        <Dropdown placeholder="Not Found" buttonText={currentHost.current ? currentHost.current.hostname : "Not Found"} options={playerData.map((element) => { return { label: element.hostname, onClick: () => ChangeHost(element) } })} disableX />
                     </div>
                 </div>
                 <div className="external-player-center">
