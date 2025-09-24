@@ -1,6 +1,7 @@
 import { genYearsList, sleep } from "@renderer/utils/functions";
 import { AnimeData, cardData, containerData, FilterParams, pluginFormat } from "@renderer/utils/GlobalInterface";
 import { setHomeData, UpdateHomeData } from "@renderer/utils/pluginApi";
+import { t } from "i18next";
 
 const pageSize = 15
 
@@ -452,13 +453,13 @@ async function CreateHomePage(): Promise<containerData[]> {
   if (!data.success) return []
   return [
     {
-      title: "Trending Now",
+      title: t("home.trending_now"),
       data: data.data.data.trending.media.map((anime) => Convert(anime)),
       horizontal: true,
-      onTitleClick: () => getFullCategory(tendingAnime, "Trending Now"),
+      onTitleClick: () => getFullCategory(tendingAnime, t("home.trending_now")),
     },
     {
-      title: "Popular in this Season",
+      title: t("home.popular_in_this_season"),
       data: data.data.data.season.media.map((anime) => Convert(anime)),
       horizontal: true,
       onTitleClick: () => getFullCategory({
@@ -466,13 +467,13 @@ async function CreateHomePage(): Promise<containerData[]> {
         season: season.season,
         seasonYear: season.seasonYear,
         type: "ANIME"
-      }, "Popular in this Season")
+      }, t("home.popular_in_this_season"))
     },
     {
-      title: "All Time Popular",
+      title: t("home.all_time_popular"),
       data: data.data.data.popular.media.map((anime) => Convert(anime)),
       horizontal: true,
-      onTitleClick: () => getFullCategory(allPopular, "All Time Popular")
+      onTitleClick: () => getFullCategory(allPopular, t("home.all_time_popular"))
     }
   ]
 }
@@ -540,7 +541,7 @@ export const infoPlugin: pluginFormat = {
     genres: await getGenres(),
     seasons: ["Winter", "Spring", "Summer", "Fall"],
     years: genYearsList(1940),
-    format: ["TV", "Movie", "TV Short", "special", " OVA", "ONA"],
-    statuses: ["Releasing", "Finished", "Not Yet Aired", "Cancelled"]
+    format: ["TV", "Movie", "TV Short", "special", "OVA", "ONA"],
+    statuses: ["Releasing", "Finished", "Not Yet Released", "Cancelled"]
   },
 }

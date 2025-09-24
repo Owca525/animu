@@ -245,7 +245,7 @@ function settings() {
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("global.general")}</div>
                             <div className="settings-setting-container">
-                                Hide Sidebar
+                                {t("settings.general.hideSidebar")}
                                 <CheckBox
                                     checked={config.new.General.HideSidebar}
                                     onChecked={(checked) =>
@@ -255,7 +255,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Hover Sidebar
+                                {t("settings.general.hoverSidebar")}
                                 <CheckBox
                                     checked={config.new.General.HoverSidebar}
                                     onChecked={(checked) =>
@@ -294,7 +294,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                Discord RPC
+                                {t("settings.general.discordrpc")}
                                 <CheckBox
                                     checked={config.new.General.discordRPC}
                                     onChecked={(checked) =>
@@ -688,15 +688,15 @@ function settings() {
                                 <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.PrevEpisode)} keyBind={(keys) => handleChange("Player.keybinds.PrevEpisode", keys)} />
                             </div>
                             <div className="settings-setting-container">
-                                Skip Opening/Ending
+                                {t("settings.player.keybinds.skipOpeningEnding")}
                                 <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.skipOpeningEnding)} keyBind={(keys) => handleChange("Player.keybinds.skipOpeningEnding", keys)} />
                             </div>
                             <div className="settings-setting-container">
-                                Toggle Subtitles
+                                {t("settings.player.keybinds.toggleSubtitles")}
                                 <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.toggleSubtitles)} keyBind={(keys) => handleChange("Player.keybinds.toggleSubtitles", keys)} />
                             </div>
                             <div className="settings-setting-container">
-                                Picture In Picture
+                                {t("settings.player.keybinds.pip")}
                                 <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.PictureInPicture)} keyBind={(keys) => handleChange("Player.keybinds.PictureInPicture", keys)} />
                             </div>
                             <div className="settings-setting-container">
@@ -852,11 +852,11 @@ function settings() {
                                             <div className="settings-extensions-button-container">
                                                 <div className="settings-extensions-type-container">
                                                     {plugin.information && <div className="settings-extensions-background">{t("settings.extensions.information")}</div>}
-                                                    {plugin.player && <div className="settings-extensions-background">Player</div>}
+                                                    {plugin.player && <div className="settings-extensions-background">{t("global.player")}</div>}
                                                 </div>
                                                 <div className="settings-helpicon-space">
                                                     <CheckBox checked={config.new.plugins.player == plugin.name ? true : plugin.name == "AnilistApi" ? true : false} onChecked={() => plugin.name != "AnilistApi" ? handleChange('plugins.player', plugin.name) : ""} />
-                                                    <Button icon="settings" ButtonClass="settings-extensions-button" />
+                                                    {/* <Button icon="settings" ButtonClass="settings-extensions-button" /> */}
                                                 </div>
                                             </div>
                                         </td>

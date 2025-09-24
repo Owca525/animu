@@ -258,13 +258,12 @@ function information() {
                                         <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(store.getState().plugin.playerPlugin.name)} />
                                     </div>
                                 </div>
-                                {/* <div className="information-select-episode" onClick={() => setshowWrong(() => true)}><span className="material-symbols-outlined">search</span>Is this the wrong Anime?</div> */}
                                 {showWrong == false &&
                                     <>
                                         {isEpisodeLoading == false && isEpisodeError == false && episodeData && episodeData.episodesData && episodeData.episodesData.length > 0 && anime_data.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && (
                                             <>
                                                 {episodeData.episodesData.map((episode) => episode.episodes.length > 0 ? (
-                                                    <Drop LeftHeader={episode.name ? episode.name : episode.type} RightHeader={`${episode.episodes.length} episodes`} content={makeButtons(episode.episodes, episode.type)} />
+                                                    <Drop LeftHeader={t(`information.types.${episode.type}`)} RightHeader={t("information.listEpisodes", { number: episode.episodes.length })} content={makeButtons(episode.episodes, episode.type)} />
                                                 ) : "")}
                                             </>
                                         )}

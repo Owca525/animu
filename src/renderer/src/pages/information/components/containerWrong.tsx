@@ -36,12 +36,12 @@ const containerWrong: React.FC<containerwrongprops> = ({ name, exitfunc, refetch
         <div className='information-containerwrong-void'>
             <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.2 }} className='information-containerwrong'>
                 <div className="information-containerwrong-top">
-                    <Input placeholder='Search...' defaultValue={name} onKeyDown={(text) => setSearchName(() => text)}/>
+                    <Input placeholder={t("home.search")} defaultValue={name} onKeyDown={(text) => setSearchName(() => text)}/>
                     <Dropdown options={segregatePlugins((name) => {ChangePlugin(name); refetch()})} disableX buttonText={store.getState().plugin.playerPlugin.name}/>
                     {/* <Button icon='tune'/> */}
                 </div>
                 <div className="information-containerwrong-center">
-                    <div className="information-containerwrong-text-space">Search: {searchName}</div>
+                    <div className="information-containerwrong-text-space">{t("information.containerwrong.search", { name: searchName })}</div>
                 </div>
                 <div className="information-containerwrong-down">
                     {isError || !isLoading && searchData && searchData.length <= 0 &&

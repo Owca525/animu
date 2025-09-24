@@ -986,11 +986,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                 {formatTime(currentTime)} / {formatTime(videoRef.current?.duration)}
                             </div>
                             <div className="player-end-time-display">
-                                Episode Ends on {addTime(videoRef.current?.duration ? (videoRef.current.duration - currentTime) : 0)}
+                                {t("player.episodeEndsOn", { time: addTime(videoRef.current?.duration ? (videoRef.current.duration - currentTime) : 0) })}
                             </div>
                         </div>
                         <div className="player-right">
-                            {getcurrentChapter() && <span>Chapter: {getcurrentChapter()}</span>}
+                            {getcurrentChapter() && <span>{t("player.chapter", { name: getcurrentChapter() })}</span>}
                             <PlayerButton icon={isMuted ? 'volume_off' : 'volume_up'} title={isMuted ? "Unmute" : "Mute"} ButtonClass="player-buttons volume-button" onClick={setMutedToPlayer} />
                             <div className="player-volume-seek">
                                 <SeekBar currentValue={volume} maxValue={100} onSeek={value => handleVolume(value)} classes={{ container: "player-seekbar" }} />
@@ -1001,7 +1001,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                 initial={{ opacity: 0, display: "none" }} animate={isShowSelectEpisode ? { opacity: 1, display: "" } : { opacity: 0, display: "none" }} transition={{ duration: 0.2 }}
                                 className="player-select-episode-container"
                             >
-                                <div className="player-select-episode-title">Change Episode</div>
+                                <div className="player-select-episode-title">{t("player.changeEpisode")}</div>
                                 {!countImages(temp.episodes) &&
                                     <div className="player-select-episode-content">
                                         {temp.episodes.map((element) => (
@@ -1034,11 +1034,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                 }
                                 disableSettings={() => setcurrentSettings(() => false)}
                                 current={{
-                                    currentHost: currentPlayer ? currentPlayer.hostname : "Uknown",
-                                    currentResolution: currentResolution ? currentResolution.res : "Uknown",
+                                    currentHost: currentPlayer ? currentPlayer.hostname : t("player.other.uknown"),
+                                    currentResolution: currentResolution ? currentResolution.res : t("player.other.uknown"),
                                     currentSpeed: videoRef.current?.playbackRate ? videoRef.current?.playbackRate : 1,
-                                    currentSub: currentSubtitles ? currentSubtitles.label : "Off",
-                                    currentTrack: currentAudioTrack ? currentAudioTrack.label : "Default"
+                                    currentSub: currentSubtitles ? currentSubtitles.label : t("player.other.off"),
+                                    currentTrack: currentAudioTrack ? currentAudioTrack.label : t("player.other.default")
                                 }}
                             />
                             <PlayerButton icon="settings" ButtonClass="player-buttons" title={detectDisableTooltips(t('global.settings'))} onClick={() => { setcurrentSettings((prev) => !prev); setShowSelectEpisode(() => false) }} />
@@ -1072,8 +1072,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         <span className="material-symbols-outlined player-up-Next-icon">skip_next</span>
                         <div className="player-up-Next-content var2">
                             <div className="player-up-Next-title">{anime_data.AnimeData.title.romaji}</div>
-                            <div className="player-up-Next-episode">Ep. {temp.episode}</div>
-                            <div className="player-up-Next-text">Playing next episode in {parseInt(timeNextEpisode.toString())}s...</div>
+                            <div className="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: temp.episode })}</div>
+                            <div className="player-up-Next-text">{t("player.upNext.nextPlaying", { time: parseInt(timeNextEpisode.toString()) })}</div>
                         </div>
                     </div>
                     <button className="material-symbols-outlined player-up-Next-button-close" onClick={(event) => {
@@ -1097,8 +1097,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     <span className="material-symbols-outlined player-up-Next-icon">skip_next</span>
                     <div className="player-up-Next-content">
                         <div className="player-up-Next-title">{anime_data.AnimeData.title.romaji}</div>
-                        <div className="player-up-Next-episode">Ep. {temp.episode}</div>
-                        <div className="player-up-Next-text">Playing next episode in {parseInt(timeNextEpisode.toString())}s...</div>
+                        <div className="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: temp.episode })}</div>
+                        <div className="player-up-Next-text">{t("player.upNext.nextPlaying", { time: parseInt(timeNextEpisode.toString()) })}</div>
                     </div>
                     <button className="material-symbols-outlined player-up-Next-button-close" onClick={(event) => {
                         event.stopPropagation();

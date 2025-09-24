@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom"
 import { useSelector } from "react-redux"
 import Dropdown from "@renderer/components/dropDown"
 import { motion } from "framer-motion"
+import { t } from "i18next"
 
 interface ExternalplayerProps {
     animeData: cardData
@@ -35,7 +36,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     const [resolutionList, setResolutionList] = useState<{ res: string, url: string }[]>([])
     // const [currentHost, setCurrentHost] = useState<playerData | undefined>(undefined)
     const currentHost = useRef<playerData | undefined>(undefined)
-    const [currentResolution, setCurrentResolution] = useState<string>("Not Found")
+    const [currentResolution, setCurrentResolution] = useState<string>(t("global.notFound"))
     const [currentUrl, setCurrentUrl] = useState<string | undefined>(undefined)
     const [currentPlayer, setCurrentPlayer] = useState<"Movian" | "VLC" | "Mpv" | "ChromeCast">(externalPlayerData.current)
 
@@ -50,7 +51,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         if (!url) return
         let req = await window.api.request.get(`http://${config.Player.external.movianIP}/showtime/open?url=${encodeURIComponent(url)}`, {})
         if (!req.success && req.error == "fetch failed") {
-            toast.error("Failed to run Movian", notificationProps)
+            toast.error(t("externalPlayer.failed.movian"), notificationProps)
         }
     }
 
@@ -81,7 +82,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
 
     async function runChromeCast(device: { host: string, port: number, name: string }) {
         if (currentHost.current && currentHost.current.hls) {
-            toast.error("ChromeCast Doesn't support m3u8 format")
+            toast.error(t("externalPlayer.failed.chromecast"))
             return
         }
         if (currentUrl) await window.api.chromecast.connect(device, { title: AnimeTitle, time: time, url: currentUrl, type: "video/mp4" })
@@ -115,19 +116,19 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         if (tempType === "Mpv") runMpvPlayer(temp)
         if (tempType === "VLC") runVlcPlayer(temp)
         externalPlayerData.onChage(tempType)
-        if (tempType !== "ChromeCast") toast.success(`Running ${tempType}`, notificationProps)
+        if (tempType !== "ChromeCast") toast.success(t("externalPlayer.running", { player: tempType }), notificationProps)
         if (tempType === "ChromeCast") startSearchChromeCast()
     }
 
     useEffect(() => {
         if (playerData.length <= 0) {
-            toast.error("Players Not Found", notificationProps)
+            toast.error(t("externalPlayer.failed.player"), notificationProps)
             return
         }
         
         currentHost.current = playerData[0]
         if (playerData[0].resolution.length <= 0) {
-            toast.error("Resolution not found", notificationProps)
+            toast.error(t("externalPlayer.failed.resolution"), notificationProps)
             return
         }
         setResolutionList(() => playerData[0].resolution)
@@ -191,11 +192,11 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                             { label: "VLC", onClick: () => { setCurrentPlayer(() => "VLC"), RunPlayers(undefined, "VLC") } },
                             { label: "Movian", onClick: () => { setCurrentPlayer(() => "Movian"), RunPlayers(undefined, "Movian") } },
                             { label: "ChromeCast", onClick: () => { setCurrentPlayer(() => "ChromeCast"), RunPlayers(undefined, "ChromeCast") } }
-                        ]} placeholder="Not Found" buttonText={config.Player.external.type} disableX
+                        ]} placeholder={t("global.notFound")} buttonText={config.Player.external.type} disableX
                         />
                         {/* FIXME: Fix changing resolution */}
-                        <Dropdown placeholder="Not Found" buttonText={currentResolution != "" ?  isNumberString(currentResolution) ? `${currentResolution}p` : currentResolution : "Not Found"} options={resolutionList.map((element) => { return { label: isNumberString(element.res) ? `${element.res}p` : element.res, onClick: () => ChangeResolution(element) } })} disableX />
-                        <Dropdown placeholder="Not Found" buttonText={currentHost.current ? currentHost.current.hostname : "Not Found"} options={playerData.map((element) => { return { label: element.hostname, onClick: () => ChangeHost(element) } })} disableX />
+                        <Dropdown placeholder={t("global.notFound")} buttonText={currentResolution != "" ?  isNumberString(currentResolution) ? `${currentResolution}p` : currentResolution : t("global.notFound")} options={resolutionList.map((element) => { return { label: isNumberString(element.res) ? `${element.res}p` : element.res, onClick: () => ChangeResolution(element) } })} disableX />
+                        <Dropdown placeholder={t("global.notFound")} buttonText={currentHost.current ? currentHost.current.hostname : t("global.notFound")} options={playerData.map((element) => { return { label: element.hostname, onClick: () => ChangeHost(element) } })} disableX />
                     </div>
                 </div>
                 <div className="external-player-center">
@@ -206,7 +207,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                     </div>
                 </div>
                 <div className="external-episodes-container">
-                    <div className="external-episodes-title">Episodes:</div>
+                    <div className="external-episodes-title">{t("externalPlayer.failed.episodes")}</div>
                     <div className="external-episodes">
                         {now_episodes.episodes.map((num) => (
                             <div className='information-episode-button' onClick={() => setNextEpisode(num.ep)}>{num.ep}</div>
@@ -233,11 +234,11 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
                                 <div className="external-panelbutton-icon material-symbols-outlined">cast</div>
                                 <div className="external-button-textcontainer">
                                     <span className="external-panelbutton-title">{filterTextChromeCast(element.name)}</span>
-                                    <span className="external-panelbutton-bottomtext">disconnected</span>
+                                    <span className="external-panelbutton-bottomtext">{t("externalPlayer.chromeCast.disconnected")}</span>
                                 </div>
                             </button>
                         ))}
-                        {isChromeCastSearch && <div className="external-panel-search-text">Searching...</div>}
+                        {isChromeCastSearch && <div className="external-panel-search-text">{t("externalPlayer.chromeCast.search")}</div>}
                     </div>
                 </div>
             </motion.div>

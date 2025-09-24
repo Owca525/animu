@@ -12,7 +12,8 @@
         "minutes": "Minutes",
         "exitAnimu": "Do you really want exit animu?",
         "enable": "Enable",
-        "extensions": "Extensions"
+        "extensions": "Extensions",
+        "notFound": "Not Found"
     },
     "dialog": {
         "yes": "Yes",
@@ -26,7 +27,10 @@
     "home": {
         "search": "Search...",
         "nothingfound": "Nothing Found Here",
-        "error": "Error Occured"
+        "error": "Error Occured",
+        "trending_now": "Trending Now",
+        "popular_in_this_season": "Popular In This Season",
+        "all_time_popular": "All Time Popular"
     },
     "contextMenu": {
         "devtools": "Open DevTools",
@@ -46,6 +50,35 @@
         "finished": "Finished",
         "not_yet_released": "Not Yet Released",
         "cancelled": "Cancelled"
+    },
+    "anime_genres": {
+        "action": "Action",
+        "adventure": "Adventure",
+        "comedy": "Comedy",
+        "drama": "Drama",
+        "ecchi": "Ecchi",
+        "fantasy": "Fantasy",
+        "hentai": "Hentai",
+        "horror": "Horror",
+        "mahoushoujo": "Mahou Shoujo",
+        "mecha": "Mecha",
+        "music": "Music",
+        "mystery": "Mystery",
+        "psychological": "Psychological",
+        "romance": "romance",
+        "sci-Fi": "Sci-Fi",
+        "sliceoflife": "Slice of Life",
+        "sports": "Sports",
+        "supernatural": "Supernatural",
+        "thriller": "Thriller"
+    },
+    "anime_formats": {
+        "tv": "TV Show",
+        "movie": "Movie",
+        "tv_short": "TV Short",
+        "special": "Special",
+        "ova": "OVA",
+        "ona": "ONA"
     },
     "card_information": {
         "ep_airing": "Ep {{ep}} airing in {{text}}",
@@ -69,12 +102,18 @@
         "descriptionnotfound": "Description Not Found",
         "errors": "This Anime doesn't have any episodes",
         "wrongtext": "Is this the wrong Anime?",
+        "listEpisodes": "{{number}} Episodes",
         "bar": {
             "anilist": "Anilist Page",
             "trailer": "Anime Trailer"
         },
         "containerwrong": {
-            "title": "Anime Found For name: {{name}}"
+            "search": "Search: {{name}}"
+        },
+        "types": {
+            "sub": "Subtitles",
+            "dub": "Dubbing",
+            "raw": "Raw"
         },
         "notification": {
             "coverdone": "Cover succesfully copied to clipboard",
@@ -106,7 +145,10 @@
             "specialthanks": "Special Thanks to",
             "onstart": "On Start",
             "every_day": "Every day",
-            "everyweek": "Every Week"
+            "everyweek": "Every Week",
+            "hideSidebar": "Hide Sidebar",
+            "hoverSidebar": "Hover Sidebar",
+            "discordrpc": "Discord RPC"
         },
         "player": {
             "play": "Auto Play",
@@ -151,7 +193,24 @@
                 "volumeup": "Volume Up",
                 "volumedown": "Volume Down",
                 "volumemute": "Mute the audio",
-                "screenshot": "Take a Screenshot"
+                "screenshot": "Take a Screenshot",
+                "skipOpeningEnding": "Skip Opening/Ending",
+                "toggleSubtitles": "Toggle Subtitles",
+                "pip": "Picture In Picture"
+            }
+        },
+        "externalPlayer": {
+            "running": "Running {{player}}",
+            "episodes": "Episodes",
+            "chromeCast": {
+                "disconnected": "disconnected",
+                "search": "Searching..."
+            },
+            "failed": {
+                "movian": "Failed to run Movian",
+                "chromecast": "ChromeCast Doesn't support m3u8 format",
+                "player": "Players Not Found",
+                "resolution": "Resolution not found"
             }
         },
         "history": {
@@ -208,6 +267,9 @@
         "Pause": "Pause",
         "play": "Play",
         "fullscreen": "Fullscreen",
+        "changeEpisode": "Change Episode",
+        "chapter": "Chapter: {{name}}",
+        "episodeEndsOn": "Episode Ends on {{time}}",
         "errors": {
             "extractionError": "Failed Extracting Player Urls: {{error}}",
             "MEDIA_ERR_ABORTED": "The playback was aborted.",
@@ -220,7 +282,21 @@
             "title": "Next Episode Playing in {{sec}} seconds",
             "titleAnime": "Next Episode {{ep}} of {{title}}",
             "nextEp": "Next Episode",
-            "hide": "Hide"
+            "hide": "Hide",
+            "nextEpisode": "Ep. {{episode}}",
+            "nextPlaying": "Playing next episode in {{time}}s..."
+        },
+        "other": {
+            "unknown": "Uknown",
+            "off": "Off",
+            "default": "Default"
+        },
+        "settings": {
+            "source": "Source",
+            "resolution": "Resolution",
+            "audio": "Audio",
+            "subtitles": "Subtitles",
+            "speed": "Speed"
         },
         "toastscreenshot": {
             "failed": "Failed To save Screenshot",
@@ -264,7 +340,12 @@
         "year": "Year:",
         "season": "Season:",
         "format": "Format:",
-        "airing": "Airing Status:"
+        "airing": "Airing Status:",
+        "placeholderGenres": "Genres",
+        "placeholderYears": "Years",
+        "placeholderSeason": "Season",
+        "placeholderFormat": "Format",
+        "placeholderAiring": "Airing"
     },
     "errorboundary": {
         "gotohome": "Go Back Home",
