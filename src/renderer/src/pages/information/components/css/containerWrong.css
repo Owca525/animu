@@ -33,7 +33,7 @@
 }
 
 .information-containerwrong-center {
-    border-width: 0px 0px 2px 0px;
+    border-width: 0px 0px 2px 0px !important;
     width: 98%;
 }
 
