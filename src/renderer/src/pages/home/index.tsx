@@ -16,6 +16,7 @@ import { ReadHistory } from "@renderer/utils/history/history"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
 import { CreateContextMenuOptions } from "@renderer/utils/functions"
 import Filter from "./components/filter"
+import WelcomeScreen from "./components/welcomeScreen"
 // import WelcomeScreen from "./components/welcomeScreen"
 
 const Home = () => {

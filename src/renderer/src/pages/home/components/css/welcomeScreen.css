@@ -1,7 +1,7 @@
 .welcome-screen-void {
     z-index: 99999;
     position: fixed;
-    background-color: var(--player-bg-containers);
+    background-color: color-mix(in srgb, var(--bg) 80%, transparent);
     width: 100%;
     backdrop-filter: blur(4px);
     height: 100%;
