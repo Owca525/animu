@@ -9,6 +9,7 @@ import { useSelector } from "react-redux"
 import { useState } from "react"
 
 const WelcomeScreen: React.FC<{}> = () => {
+    // TODO: ADD WELCOME SCREEN
     const config: SettingsConfig = useSelector((data: any) => data.config);
     const [currentPage, setPage] = useState<"lang" | "plugins">("lang")
 
@@ -39,7 +40,7 @@ const WelcomeScreen: React.FC<{}> = () => {
                     }
                     {currentPage == "plugins" &&
                         <>
-                            <div className="welcome-screen-option-description">Select language</div>
+                            <div className="welcome-screen-option-description">Select Plugin</div>
                             <Dropdown
                                 options={Object.keys(i18n.store.data).map(element => {
                                     return { label: t(`lang.${element}`), onClick: () => "" }
