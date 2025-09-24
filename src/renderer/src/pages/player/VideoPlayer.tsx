@@ -991,7 +991,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         </div>
                         <div className="player-right">
                             {getcurrentChapter() && <span>{t("player.chapter", { name: getcurrentChapter() })}</span>}
-                            <PlayerButton icon={isMuted ? 'volume_off' : 'volume_up'} title={isMuted ? "Unmute" : "Mute"} ButtonClass="player-buttons volume-button" onClick={setMutedToPlayer} />
+                            <PlayerButton icon={isMuted ? 'volume_off' : 'volume_up'} title={isMuted ? t("player.unmute") : t("player.mute")} ButtonClass="player-buttons volume-button" onClick={setMutedToPlayer} />
                             <div className="player-volume-seek">
                                 <SeekBar currentValue={volume} maxValue={100} onSeek={value => handleVolume(value)} classes={{ container: "player-seekbar" }} />
                             </div>

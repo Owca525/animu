@@ -270,6 +270,8 @@
         "changeEpisode": "Change Episode",
         "chapter": "Chapter: {{name}}",
         "episodeEndsOn": "Episode Ends on {{time}}",
+        "mute": "Mute",
+        "unmute": "Unmute",
         "errors": {
             "extractionError": "Failed Extracting Player Urls: {{error}}",
             "MEDIA_ERR_ABORTED": "The playback was aborted.",

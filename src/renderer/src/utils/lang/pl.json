@@ -270,6 +270,8 @@
     "changeEpisode": "Zmień odcinek",
     "chapter": "Rozdział: {{name}}",
     "episodeEndsOn": "Odcinek kończy się o {{time}}",
+    "mute": "Wycisz",
+    "unmute": "Wyłącz wyciszenie",
     "errors": {
       "extractionError": "Nie udało się pobrać adresów URL odtwarzacza: {{error}}",
       "MEDIA_ERR_ABORTED": "Odtwarzanie zostało przerwane.",
