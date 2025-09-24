@@ -45,8 +45,6 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     const [secondsLeft, setSecondsLeft] = useState<number>(0);
     const [isChromeCastSearch, setisChromeCastSearch] = useState<boolean>(false);
 
-    console.log(playerData)
-
     // Running Players
     async function RunMovian(url?: string) {
         if (!url) return
@@ -75,7 +73,10 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
 
     async function runVlcPlayer(url?: string) {
         if (!url) return
-        await window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.vlcPath, time: time }, "vlc")
+        if (!currentHost.current) return
+        let subsList: string[] = []
+        if (currentHost.current.subtitles) subsList = currentHost.current.subtitles.map(el => el.url)
+        await window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.vlcPath, time: time, subs: { subList: subsList, sid: getNumberOfSub(currentHost.current.subtitles) } }, "vlc")
     }
 
     async function runChromeCast(device: { host: string, port: number, name: string }) {
