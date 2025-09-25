@@ -3,17 +3,17 @@
     "home": "主頁",
     "history": "歷史紀錄",
     "settings": "設定",
-    "about": "About",
+    "about": "關於",
     "general": "一般",
     "cfglocation": "設定檔位置",
-    "player": "撥放",
+    "player": "播放",
     "continuewatch": "繼續觀看",
-    "dev": "開發者",
+    "dev": "開發者選項",
     "minutes": "分鐘",
     "exitAnimu": "你確定要退出動畫嗎？",
-    "enable": "Enable",
-    "extensions": "Extensions",
-    "notFound": "Not Found"
+    "enable": "允許",
+    "extensions": "擴充功能",
+    "notFound": "找不到頁面/未找到內容"
   },
   "dialog": {
     "yes": "是",
@@ -28,9 +28,9 @@
     "search": "搜尋",
     "nothingfound": "這裡甚麼都沒有",
     "error": "發生錯誤",
-    "trending_now": "Trending Now",
-    "popular_in_this_season": "Popular In This Season",
-    "all_time_popular": "All Time Popular"
+    "trending_now": "現在流行",
+    "popular_in_this_season": "本季熱門",
+    "all_time_popular": "歷來最受歡迎"
   },
   "contextMenu": {
     "devtools": "打開開發者工具",
@@ -52,33 +52,33 @@
     "cancelled": "取消"
   },
   "anime_genres": {
-    "action": "Action",
-    "adventure": "Adventure",
-    "comedy": "Comedy",
-    "drama": "Drama",
-    "ecchi": "Ecchi",
-    "fantasy": "Fantasy",
-    "hentai": "Hentai",
-    "horror": "Horror",
-    "mahoushoujo": "Mahou Shoujo",
-    "mecha": "Mecha",
-    "music": "Music",
-    "mystery": "Mystery",
-    "psychological": "Psychological",
-    "romance": "romance",
-    "sci-Fi": "Sci-Fi",
-    "sliceoflife": "Slice of Life",
-    "sports": "Sports",
-    "supernatural": "Supernatural",
-    "thriller": "Thriller"
+    "action": "動作",
+    "adventure": "冒險",
+    "comedy": "喜劇",
+    "drama": "劇情",
+    "ecchi": "擦邊/賣肉",
+    "fantasy": "奇幻",
+    "hentai": "H動漫",
+    "horror": "恐怖",
+    "mahoushoujo": "魔法少女",
+    "mecha": "機甲",
+    "music": "音樂",
+    "mystery": "懸疑",
+    "psychological": "心理",
+    "romance": "浪漫",
+    "sci-Fi": "科幻",
+    "sliceoflife": "日常",
+    "sports": "運動",
+    "supernatural": "超自然",
+    "thriller": "驚悚"
   },
   "anime_formats": {
-    "tv": "TV Show",
-    "movie": "Movie",
-    "tv_short": "TV Short",
-    "special": "Special",
-    "ova": "OVA",
-    "ona": "ONA"
+    "tv": "電視動畫",
+    "movie": "電影",
+    "tv_short": "短篇動畫",
+    "special": "特別篇",
+    "ova": "OVA(原創錄影動畫)",
+    "ona": "ONA(網路動畫)"
   },
   "card_information": {
     "ep_airing": "第 {{ep}} 集將在 {{text}} 後播出",
@@ -97,24 +97,24 @@
     "status": "狀態",
     "startdate": "開始日期",
     "endate": "結束日期",
-    "season": "季節",
+    "season": "季度",
     "source": "原作",
-    "descriptionnotfound": "找不到描述",
+    "descriptionnotfound": "找不到簡介",
     "errors": "這部動畫沒有集數",
     "wrongtext": "這是錯誤的動畫嗎？",
-    "listEpisodes": "{{number}} Episodes",
+    "listEpisodes": "{{number}} 集",
     "bar": {
       "anilist": "Anilist 頁面",
-      "trailer": "動畫預告片"
+      "trailer": "預告片"
     },
     "containerwrong": {
-      "search": "Search: {{name}}",
+      "search": "搜尋: {{name}}",
       "title": "找到名稱為 {{name}} 的動畫"
     },
     "types": {
-      "sub": "Subtitles",
-      "dub": "Dubbing",
-      "raw": "Raw"
+      "sub": "字幕版",
+      "dub": "配音版",
+      "raw": "無字幕版"
     },
     "notification": {
       "coverdone": "複製成功",
@@ -130,26 +130,26 @@
     }
   },
   "settings": {
-    "turnDeveloper": "開啟開法者工具",
+    "turnDeveloper": "開啟開發者工具",
     "general": {
       "language": "語言",
       "theme": "主題",
       "updates": "更新通知",
       "checkupdates": "確認版本更新",
-      "checkupdate": "Check Update",
+      "checkupdate": "檢查更新",
       "window": "視窗",
       "maximize": "自動放大",
       "fullscreen": "自動縮小",
       "zoom": "縮放",
       "meow": ":3",
-      "credits": "Credits",
-      "specialthanks": "Special Thanks to",
-      "onstart": "On Start",
-      "every_day": "Every day",
-      "everyweek": "Every Week",
-      "hideSidebar": "Hide Sidebar",
-      "hoverSidebar": "Hover Sidebar",
-      "discordrpc": "Discord RPC"
+      "credits": "製作人員",
+      "specialthanks": "特別感謝",
+      "onstart": "啟動時",
+      "every_day": "每天",
+      "everyweek": "每周",
+      "hideSidebar": "隱藏側邊攔",
+      "hoverSidebar": "滑鼠移動至側邊欄時顯示",
+      "discordrpc": "Discord 狀態顯示"
     },
     "player": {
       "play": "自動播放",
@@ -161,23 +161,23 @@
       "shortskipb": "短跳轉向後",
       "preload": "播放器預加載類型",
       "screenshot": "畫面截圖",
-      "screenask": "你要把截圖放在哪裡",
-      "uptonextep": "Up To Next Episode Notification",
-      "notif_interval": "Notification Interval",
-      "epshorter": "Don't show if episode is shorter than",
-      "external": "External Player",
-      "stretching": "Video Streching",
-      "enable_external": "Enable External Player",
-      "select_player": "Select Player",
-      "movianip": "Movian IP Address",
-      "mpvpath": "MPV Path",
-      "vlcpath": "VLC Path",
+      "screenask": "選擇截圖儲存位置",
+      "uptonextep": "下一集通知",
+      "notif_interval": "通知間隔",
+      "epshorter": "若集數短於此則不顯示",
+      "external": "外部播放器",
+      "stretching": "畫面拉伸",
+      "enable_external": "啟用外部播放器",
+      "select_player": "選擇播放器r",
+      "movianip": "Movian IP 位址",
+      "mpvpath": "MPV 路徑",
+      "vlcpath": "VLC 路徑",
       "type": "儲存類型",
       "path": "截圖儲存路徑",
-      "file": "File",
-      "clipboard": "Clipboard",
-      "both": "Both",
-      "changelocaton": "Change Location",
+      "file": "檔案",
+      "clipboard": "剪貼簿",
+      "both": "同時",
+      "changelocaton": "變更儲存位置",
       "keybind": "快捷鍵設置",
       "keybinds": {
         "pause": "暫停",
@@ -191,27 +191,27 @@
         "fskipbackward": "幀跳轉向後",
         "nextepisode": "下一集",
         "prevepisode": "上一集",
-        "volumeup": "聲音調大",
-        "volumedown": "聲音調小",
+        "volumeup": "聲音加大",
+        "volumedown": "聲音減小",
         "volumemute": "靜音",
         "screenshot": "拍攝截圖",
-        "skipOpeningEnding": "Skip Opening/Ending",
-        "toggleSubtitles": "Toggle Subtitles",
-        "pip": "Picture In Picture"
+        "skipOpeningEnding": "跳過片頭/片尾",
+        "toggleSubtitles": "切換字幕",
+        "pip": "子母畫面"
       }
     },
     "externalPlayer": {
-      "running": "Running {{player}}",
-      "episodes": "Episodes",
+      "running": "正在執行 {{player}}",
+      "episodes": "集數",
       "chromeCast": {
-        "disconnected": "disconnected",
-        "search": "Searching..."
+        "disconnected": "已中斷連線",
+        "search": "搜尋中..."
       },
       "failed": {
-        "movian": "Failed to run Movian",
-        "chromecast": "ChromeCast Doesn't support m3u8 format",
-        "player": "Players Not Found",
-        "resolution": "Resolution not found"
+        "movian": "無法執行 Movian",
+        "chromecast": "ChromeCast 不支援 m3u8 格式",
+        "player": "找不到播放器",
+        "resolution": "找不到解析度"
       }
     },
     "history": {
@@ -220,9 +220,9 @@
       "startsave": "開始保存歷史紀錄的時間",
       "stopsave": "停止保存歷史紀錄的時間",
       "check_history": "查看歷史紀錄",
-      "check_start": "Start Checking History",
-      "history_good": "History is good, nothing to change",
-      "continue_good": "Continue watch is good, nothing to change"
+      "check_start": "開始檢查歷史紀錄",
+      "history_good": "歷史紀錄正常，無需更改",
+      "continue_good": "繼續觀看正常，無需更改"
     },
     "saving": {
       "done": "設定已成功保存",
@@ -238,22 +238,22 @@
       "continuewatchsavehistory": "設定多少秒後將集數保存到繼續觀看 / 設定結束前多少秒移除集數"
     },
     "devmode": {
-      "developermode": "Developer Mode",
-      "tornondevtools": "Turn on Devtools",
-      "devtoolsonstart": "Devtools on Start",
-      "playerdebug": "Player Debug Stats",
-      "information": "Information",
-      "electronver": "Electron Version",
-      "chromiumver": "Chromium Version",
-      "nodever": "Electron Version"
+      "developermode": "開發者模式",
+      "tornondevtools": "啟動開發工具",
+      "devtoolsonstart": "啟動時開啟開發工具",
+      "playerdebug": "撥放器除錯資訊",
+      "information": "資訊",
+      "electronver": "Electron 版本",
+      "chromiumver": "Chromium 版本",
+      "nodever": "Node 版本"
     },
     "extensions": {
-      "name": "Name",
-      "author": "Plugin Author",
-      "version": "Version",
-      "type": "Type",
-      "information": "Information",
-      "player": "Player"
+      "name": "名稱",
+      "author": "插件作者",
+      "version": "版本",
+      "type": "類型",
+      "information": "資訊",
+      "player": "播放器"
     }
   },
   "player": {
@@ -268,11 +268,11 @@
     "Pause": "暫停",
     "play": "播放",
     "fullscreen": "全螢幕",
-    "changeEpisode": "Change Episode",
-    "chapter": "Chapter: {{name}}",
-    "episodeEndsOn": "Episode Ends on {{time}}",
-    "mute": "Mute",
-    "unmute": "Unmute",
+    "changeEpisode": "切換集數",
+    "chapter": "章節: {{name}}",
+    "episodeEndsOn": "本集將於 {{time}} 結束",
+    "mute": "靜音",
+    "unmute": "取消靜音",
     "errors": {
       "extractionError": "擷取播放器網址失敗：{{error}}",
       "MEDIA_ERR_ABORTED": "播放已中止",
@@ -286,20 +286,20 @@
       "titleAnime": "下一集：{{ep}}，來自 {{title}}",
       "nextEp": "下一集",
       "hide": "隱藏",
-      "nextEpisode": "Ep. {{episode}}",
-      "nextPlaying": "Playing next episode in {{time}}s..."
+      "nextEpisode": "第 {{episode}} 集",
+      "nextPlaying": "下一集將於 {{time}} 秒後播放..."
     },
     "other": {
-      "unknown": "Uknown",
-      "off": "Off",
-      "default": "Default"
+      "unknown": "未知",
+      "off": "關閉",
+      "default": "預設"
     },
     "settings": {
-      "source": "Source",
-      "resolution": "Resolution",
-      "audio": "Audio",
-      "subtitles": "Subtitles",
-      "speed": "Speed"
+      "source": "來源",
+      "resolution": "解析度",
+      "audio": "音訊",
+      "subtitles": "字幕",
+      "speed": "播放速度"
     },
     "toastscreenshot": {
       "failed": "保存截圖失敗",
@@ -344,11 +344,11 @@
     "season": "季節:",
     "format": "格式:",
     "airing": "播出狀態:",
-    "placeholderGenres": "Genres",
-    "placeholderYears": "Years",
-    "placeholderSeason": "Season",
-    "placeholderFormat": "Format",
-    "placeholderAiring": "Airing"
+    "placeholderGenres": "類型",
+    "placeholderYears": "年份",
+    "placeholderSeason": "季度",
+    "placeholderFormat": "格式",
+    "placeholderAiring": "播出狀態"
   },
   "errorboundary": {
     "gotohome": "回到首頁",
