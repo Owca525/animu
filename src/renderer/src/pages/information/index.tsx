@@ -26,7 +26,7 @@ function information() {
     const [savedata, setsavedata] = useState<{ last_episode: number, last_time: number } | undefined>(undefined)
     const [currentIDplayer, setCurrentIDplayer] = useState<string | undefined>(anime_data.player_ID)
 
-    const { data: episodeData, isError: isEpisodeError, isLoading: isEpisodeLoading, refetch } = useQuery({
+    const { data: episodeData, isError: isEpisodeError, isFetching: isEpisodeLoading, refetch } = useQuery({
         queryKey: [{ data: anime_data, player_id: currentIDplayer }],
         queryFn: async ({ queryKey }) => {
             const [data] = queryKey;
