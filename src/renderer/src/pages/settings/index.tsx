@@ -883,6 +883,7 @@ function settings() {
                             <div className="settings-setting-container"><div className="settings-user-title">DawoleQ</div>  Programmer Helper</div>
                             <div className="settings-setting-container"><div className="settings-user-title">Ary</div>  Designer</div>
                             <div className="settings-setting-container"><div className="settings-user-title">Rain_kyle</div>  Chinese Translation</div>
+                            <div className="settings-setting-container"><div className="settings-user-title">AkaShiro</div>  Russian Translation</div>
                         </div>
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.general.specialthanks")}</div>
