@@ -148,7 +148,8 @@
             "everyweek": "Every Week",
             "hideSidebar": "Hide Sidebar",
             "hoverSidebar": "Hover Sidebar",
-            "discordrpc": "Discord RPC"
+            "discordrpc": "Discord RPC",
+            "links": "Usefull Links"
         },
         "player": {
             "play": "Auto Play",

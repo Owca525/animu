@@ -149,7 +149,8 @@
       "everyweek": "每周",
       "hideSidebar": "隱藏側邊攔",
       "hoverSidebar": "滑鼠移動至側邊欄時顯示",
-      "discordrpc": "Discord 狀態顯示"
+      "discordrpc": "Discord 狀態顯示",
+      "links": "實用連結"
     },
     "player": {
       "play": "自動播放",
