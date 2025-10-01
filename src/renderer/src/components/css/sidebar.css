@@ -80,8 +80,7 @@
     padding-right: 12px;
 }
 
-/* for very small window sizes 
-maybe that will be usefull in the future */
+/* for very small window sizes */
 @media (max-width: 600px) {
 
     .sidebar-logo-icon-container,

@@ -72,8 +72,7 @@
     font-size: 2em;
 }
 
-/* for very small window sizes 
-maybe that will be usefull in the future */
+/* for very small window sizes */
 @media (max-width: 600px) {
     .home-header {
         padding-right: clamp(4px, 1vw, 8px);
