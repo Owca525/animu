@@ -142,6 +142,15 @@ function information() {
         refetch()
     }
 
+    console.log(episodeData, isEpisodeError, isEpisodeLoading)
+
+    function checkEpisodes() {
+        if (anime_data.status == "NOT_YET_RELEASED") return true
+        if (!episodeData && !isEpisodeLoading && !isEpisodeError) return true
+        if (episodeData && episodeData.episodesData && episodeData.episodesData.length <= 0) return true
+        return false
+    }
+
     return (
         <>
             <main className="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>
@@ -269,7 +278,7 @@ function information() {
                                         )}
                                         {isEpisodeLoading && anime_data.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
                                         {isEpisodeError && isEpisodeLoading == false && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}
-                                        {episodeData && (episodeData.episodesData && episodeData.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}
+                                        {checkEpisodes() && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}
                                     </>}
                             </div>
 
