@@ -110,7 +110,8 @@ async function convertEpisodes(anime_id: string, episodeList: string[]): Promise
   }
 }
 
-async function converterData(data: any): Promise<cardData> {
+async function converterData(data: any): Promise<cardData | undefined> {
+  if (!data) return
   let characters: any = []
   try {
     if (data.characters) {
@@ -123,6 +124,8 @@ async function converterData(data: any): Promise<cardData> {
   } catch (error) {
     console.error(error)
   }
+
+  console.log(data)
 
 
   return {
@@ -165,7 +168,8 @@ export async function recentAnime(page: number = 1) {
   let animeData: cardData[] = []
   for (let index = 0; index < anime.data.shows.edges.length; index++) {
     const element = anime.data.shows.edges[index];
-    animeData.push(await converterData(element))
+    let data = await converterData(element)
+    if (data) animeData.push(data)
   }
   if (page && page > 1) {
     await UpdateHomeData(async () => {
@@ -212,8 +216,8 @@ async function getAnimeList(anime: AnimeData): Promise<cardData[]> {
     let returnData: cardData[] = []
     for (let index = 0; index < data.shows.edges.length; index++) {
       const element = data.shows.edges[index];
-      console.log(element)
-      returnData.push(await converterData(element))
+      let tmp = await converterData(element)
+      if (tmp) returnData.push(tmp)
     }
     return returnData
   } catch (error) {
@@ -225,7 +229,10 @@ async function getAnimeList(anime: AnimeData): Promise<cardData[]> {
 export async function extractInformation(id: string) {
   let variables = `{"_id":"${id}"}`;
   const resp = await sendToAPI(variables, HASH_INFO, header);
-  return (await converterData(resp.data.show)).AnimeData
+  console.log(resp)
+  let data = await converterData(resp.data.show)
+  if (data) return data.AnimeData
+  return 
 }
 
 export async function getInformation(animeData?: AnimeData, anime_id?: string): Promise<episodeList> {
@@ -289,10 +296,10 @@ export async function getInformation(animeData?: AnimeData, anime_id?: string): 
   if (anime_id == "") return { player_id: "", episodesData: [] };
   if (!anime_id) return { player_id: "", episodesData: [] }
 
-  let anime_data = (await extractInformation(anime_id)).episodesList
+  let anime_data = await extractInformation(anime_id)
   if (!anime_data) return { player_id: "", episodesData: [] };
 
-  return { player_id: anime_id ? anime_id : "", episodesData: anime_data };
+  return { player_id: anime_id ? anime_id : "", episodesData: anime_data.episodesList ?? [] };
 }
 
 async function getURLS(url: string): Promise<playerData | undefined> {
@@ -350,15 +357,15 @@ export async function extractURLS(type: string, episode: string, id: string): Pr
   return data
 }
 
-export async function convertToNewData(id: string): Promise<cardData | null> {
+export async function convertToNewData(id: string): Promise<cardData | undefined> {
   try {
     let variables = `{"_id":"${id}"}`
     const resp = await sendToAPI(variables, HASH_INFO, header)
     if (resp) return await converterData(resp.data.show)
-    return null
+    return
   } catch (Error) {
     console.error(Error)
-    return null
+    return
   }
 }
 
@@ -367,9 +374,9 @@ export async function getEpisodeList(type: string, anime_id: string): Promise<{ 
     let variables = `{"_id":"${anime_id}"}`
     const resp = await sendToAPI(variables, HASH_INFO, header)
     if (resp) {
-      let data = (await converterData(resp.data.show)).AnimeData.episodesList
-      if (!data) return []
-      return data.filter(item => item.type === type).flatMap(item => item.episodes)
+      let data = await converterData(resp.data.show)
+      if (!data || !data.AnimeData.episodesList) return []
+      return data.AnimeData.episodesList.filter(item => item.type === type).flatMap(item => item.episodes)
     }
     return []
   } catch (Error) {
@@ -385,7 +392,8 @@ async function searchAnime(name: string, page: number, params?: { genres?: strin
   let returnData: cardData[] = []
   for (let index = 0; index < dataReq.shows.edges.length; index++) {
     const element = dataReq.shows.edges[index];
-    returnData.push(await converterData(element))
+    let data = await converterData(element)
+    if (data) returnData.push(data)
   }
 
   return returnData
