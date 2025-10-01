@@ -156,7 +156,7 @@ export async function refetchHistory() {
     }
 
     if (data.data.length == 1 && data.data[0].title == t("global.history")) {
-        await setHomeData(async () => [{ title: t("global.History"), data: await ReadHistory(), horizontal: false }])
+        await setHomeData(async () => [{ title: t("global.history"), data: await ReadHistory(), horizontal: false }])
         return
     }
 

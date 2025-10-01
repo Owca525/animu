@@ -142,6 +142,15 @@ function information() {
         refetch()
     }
 
+    console.log(episodeData, isEpisodeError, isEpisodeLoading)
+
+    function checkEpisodes() {
+        if (anime_data.status == "NOT_YET_RELEASED") return true
+        if (!episodeData && !isEpisodeLoading && !isEpisodeError) return true
+        if (episodeData && episodeData.episodesData && episodeData.episodesData.length <= 0) return true
+        return false
+    }
+
     return (
         <>
             <main className="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>
@@ -157,7 +166,7 @@ function information() {
 
                     <div className="information-top">
                         <div className="information-image-container">
-                            {anime_data.averageScore && <div title="Anime Score" className="information-score" style={{ border: `3px solid ${getGradientColor(anime_data.averageScore)}` }}>{anime_data.averageScore}%</div>}
+                            {anime_data.averageScore && <div className="information-score" style={{ border: `3px solid ${getGradientColor(anime_data.averageScore)}` }}>{anime_data.averageScore}%</div>}
                             <img className="information-cover" onClick={() => anime_data.coverImage && SaveCoverToClipboard(anime_data.coverImage)} onError={() => setCoverIsError(() => true)} onLoad={() => setCoverIsLoading(() => false)} src={anime_data.coverImage ? anime_data.coverImage : ""} style={isCoverLoading ? { display: "none" } : isCoverError ? { display: "none" } : { animation: "fadeIn 0.3s forwards" }}></img>
                             {isCoverLoading && isCoverError == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div>}
                             {isCoverError && isCoverLoading == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined">error</span></div>}
@@ -269,7 +278,7 @@ function information() {
                                         )}
                                         {isEpisodeLoading && anime_data.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
                                         {isEpisodeError && isEpisodeLoading == false && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}
-                                        {episodeData && (episodeData.episodesData && episodeData.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}
+                                        {checkEpisodes() && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}
                                     </>}
                             </div>
 
