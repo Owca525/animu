@@ -69,7 +69,7 @@
   height: 24px;
 }
 
-/* for smartphones 
+/* for very small window sizes 
 maybe that will be usefull in the future */
 @media (max-width: 600px) {
 

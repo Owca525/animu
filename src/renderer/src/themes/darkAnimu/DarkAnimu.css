@@ -320,7 +320,7 @@ body {
 }
 
 .information-title2,
-.information-title-mobile2 {
+.information-title-small2 {
   color: var(--text-gray);
 }
 
@@ -361,7 +361,7 @@ body {
   }
 }
 
-/* for smartphones */
+/* for very small window sizes */
 @media (max-width: 600px) {
   .information-info-content {
     border-radius: 10px;

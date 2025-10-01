@@ -134,7 +134,7 @@
     font-size: 1.7em;
 }
 
-.information-title-mobile {
+.information-title-small {
     display: none;
 }
 
@@ -144,7 +144,7 @@
     padding-bottom: 10px;
 }
 
-.information-title-mobile2 {
+.information-title-small2 {
     display: none;
 }
 
@@ -432,7 +432,7 @@
     
 }
 
-/* for smartphones 
+/* for very small window sizes 
 maybe that will be usefull in the future */
 @media (max-width: 600px) {
     .information-top {
@@ -491,7 +491,7 @@ maybe that will be usefull in the future */
         display: none;
     }
 
-    .information-title-mobile {
+    .information-title-small {
         display: block;
         width: 100%;
         text-align: left;
@@ -499,7 +499,7 @@ maybe that will be usefull in the future */
         padding-left: 5dvw;
     }
 
-    .information-title-mobile2 {
+    .information-title-small2 {
         display: block;
         width: 100%;
         text-align: left;
