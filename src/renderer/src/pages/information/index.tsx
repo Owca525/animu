@@ -171,9 +171,9 @@ function information() {
                             {isCoverLoading && isCoverError == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div>}
                             {isCoverError && isCoverLoading == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined">error</span></div>}
 
-                            <div className="information-title-mobile-container">
-                                <div className="information-title-mobile">{anime_data.title.romaji}</div>
-                                <div className="information-title-mobile2">{anime_data.title.english ? anime_data.title.english : anime_data.title.native}</div>
+                            <div className="information-title-small-container">
+                                <div className="information-title-small">{anime_data.title.romaji}</div>
+                                <div className="information-title-small2">{anime_data.title.english ? anime_data.title.english : anime_data.title.native}</div>
                             </div>
                         </div>
                         <div className="information-description">
