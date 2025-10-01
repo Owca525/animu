@@ -500,26 +500,28 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     function videoErrorHandler(event: React.SyntheticEvent<HTMLVideoElement, Event>) {
         const Error = event.currentTarget.error
         var message: string
-
-        if (Error) {
-            switch (Error.code) {
-                case Error.MEDIA_ERR_ABORTED:
-                    message = t('player.errors.MEDIA_ERR_ABORTED')
-                    break
-                case Error.MEDIA_ERR_NETWORK:
-                    message = t('player.errors.MEDIA_ERR_NETWORK')
-                    break
-                case Error.MEDIA_ERR_DECODE:
-                    message = t('player.errors.MEDIA_ERR_DECODE')
-                    break
-                case Error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-                    message = t('player.errors.MEDIA_ERR_SRC_NOT_SUPPORTED')
-                    break
-                default:
-                    message = t('player.errors.default')
-            }
-            toast.error(message, notificationProps);
+        if (!Error) return
+        switch (Error.code) {
+            case Error.MEDIA_ERR_ABORTED:
+                message = t('player.errors.MEDIA_ERR_ABORTED')
+                break
+            case Error.MEDIA_ERR_NETWORK:
+                message = t('player.errors.MEDIA_ERR_NETWORK')
+                break
+            case Error.MEDIA_ERR_DECODE:
+                message = t('player.errors.MEDIA_ERR_DECODE')
+                break
+            case Error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                message = t('player.errors.MEDIA_ERR_SRC_NOT_SUPPORTED')
+                break
+            default:
+                message = t('player.errors.default')
         }
+        toast.error(message, notificationProps);
+        
+        if (!currentPlayer) return
+        let index = player_data.findIndex((element) => element.hostname == currentPlayer.hostname)
+        if (player_data[index+1]) checkUrl(player_data[index+1])
     }
 
     function setTimeVideo(value: number) {
@@ -1047,7 +1049,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     </div>
                 </div>
             </div>
-            <motion.button onClick={_event => {if (currentSkipButton.type == "ending") setHideUpNextEpisode(true); currentSkipButton.onClick()}} variants={hiddenVariants} initial="hidden" animate={IsRunningButtonSkipTime ? "visible" : "hidden"} className="player-skip-chapters-button">{currentSkipButton.text}, {`${buttonSkipTime}s`}</motion.button>
+            <motion.button onClick={_event => { if (currentSkipButton.type == "ending") setHideUpNextEpisode(true); currentSkipButton.onClick() }} variants={hiddenVariants} initial="hidden" animate={IsRunningButtonSkipTime ? "visible" : "hidden"} className="player-skip-chapters-button">{currentSkipButton.text}, {`${buttonSkipTime}s`}</motion.button>
             {config.Player.upToNextEpisode.variants == "old" && (
                 <motion.div variants={uptoNextVariants} transition={{ duration: 0.2 }} animate={isUpNextEpisode ? "visible" : "hidden"} initial={"hidden"} className="player-up-Next-container old">
                     <div className="player-up-Next-Title old">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>
