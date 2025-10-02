@@ -462,19 +462,19 @@ function settings() {
                             {/* TODO: add this to lang */}
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {"Player Exit behavior"}
+                                {t("settings.player.playerexitbechaviour")}
                                 <Dropdown
                                     options={[
-                                        { label: "To Information", onClick: () => handleChange("Player.general.PlayerBehavior", "information") },
-                                        { label: "To Home", onClick: () => handleChange("Player.general.PlayerBehavior", "home") },
+                                        { label: t("settings.player.playerbeexit.information"), onClick: () => handleChange("Player.general.PlayerBehavior", "information") },
+                                        { label: t("settings.player.playerbeexit.home"), onClick: () => handleChange("Player.general.PlayerBehavior", "home") },
                                     ]}
-                                    buttonText={config.new.Player.general.PlayerBehavior}
+                                    buttonText={t(`settings.player.playerbeexit.${config.new.Player.general.PlayerBehavior}`)}
                                     disableX
                                 />
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {"Auto Skip Openings"}
+                                {t("settings.player.skipOpening")}
                                 <CheckBox
                                     checked={config.new.Player.general.autoSkipOpenings}
                                     onChecked={(checked) =>
@@ -484,7 +484,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {"Auto Skip Endings"}
+                                {t("settings.player.skipEnding")}
                                 <CheckBox
                                     checked={config.new.Player.general.autoSkipEndings}
                                     onChecked={(checked) =>
@@ -495,8 +495,8 @@ function settings() {
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 <span className="settings-helpicon-space">
-                                    {"Show Broken Buffer"}
-                                    <HelpIcon description={"It shows buffering when playing mp4 files, which is known to display incorrect data"} />
+                                    {t("settings.player.showBrokenBuffer")}
+                                    <HelpIcon description={t("settings.tips.brokenBuffer")} />
                                 </span>
                                 <CheckBox
                                     checked={config.new.Player.general.showBrokenBuffer}
@@ -539,15 +539,14 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {/* TODO: add this to lang */}
-                                {"Up To Next Style Variants"}
+                                {t("settings.upNext.upNextStyle")}
                                 <Dropdown
                                     options={[
-                                        { label: "Variant 1", onClick: () => handleChange("Player.upToNextEpisode.variants", "var1") },
-                                        { label: "Variant 2", onClick: () => handleChange("Player.upToNextEpisode.variants", "var2") },
-                                        { label: "Variant Old", onClick: () => handleChange("Player.upToNextEpisode.variants", "old") },
+                                        { label: t("settings.upNext.var1"), onClick: () => handleChange("Player.upToNextEpisode.variants", "var1") },
+                                        { label: t("settings.upNext.var2"), onClick: () => handleChange("Player.upToNextEpisode.variants", "var2") },
+                                        { label: t("settings.upNext.old"), onClick: () => handleChange("Player.upToNextEpisode.variants", "old") },
                                     ]}
-                                    buttonText={config.new.Player.upToNextEpisode.variants}
+                                    buttonText={t(`settings.upNext.${config.new.Player.upToNextEpisode.variants}`)}
                                     disableX
                                 />
                             </div>
@@ -555,7 +554,7 @@ function settings() {
                         <div className="settings-page-container">
                             <div className="settings-page-title">{"Player Animations"}</div>
                             <div className="settings-setting-container">
-                                {"Disable Volume Animation"}
+                                {t("settings.playerUI.dvolumeanimation")}
                                 <CheckBox
                                     checked={config.new.Player.ui.DisableVolumeAnimation}
                                     onChecked={(checked) =>
@@ -565,7 +564,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {"Disable Space Animation"}
+                                {t("settings.playerUI.dspaceanimation")}
                                 <CheckBox
                                     checked={config.new.Player.ui.DisableSpaceAnimation}
                                     onChecked={(checked) =>
@@ -575,7 +574,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {"Disable Skip Animation"}
+                                {t("settings.playerUI.dskipanimation")}
                                 <CheckBox
                                     checked={config.new.Player.ui.DisableSkipAnimation}
                                     onChecked={(checked) =>
@@ -585,7 +584,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {"Disable Loading Animation"}
+                                {t("settings.playerUI.dloadinganimation")}
                                 <CheckBox
                                     checked={config.new.Player.ui.DisableLoadingAnimation}
                                     onChecked={(checked) =>

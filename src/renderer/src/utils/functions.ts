@@ -20,7 +20,7 @@ export function convertDateToFormattedString(year: number | undefined, month: nu
     if (hour == undefined) hour = 0
     if (minute == undefined) minute = 0
     if (day == undefined) day = 0
-    return new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(year, month, day, hour, minute));
+    return new Intl.DateTimeFormat(i18n.language, { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(year, month, day, hour, minute));
 }
 
 export function capitalizeFirstLetter(text: string | undefined | null) {

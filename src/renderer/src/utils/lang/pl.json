@@ -10,7 +10,7 @@
     "continuewatch": "Kontynuuj oglądanie",
     "dev": "Deweloper",
     "minutes": "Minuty",
-    "exitAnimu": "Czy na pewno chcesz zamknąć Animu?",
+    "exitAnimu": "Czy na pewno chcesz wyjść z Animu?",
     "enable": "Włącz",
     "extensions": "Rozszerzenia",
     "notFound": "Nie znaleziono"
@@ -26,15 +26,15 @@
   },
   "home": {
     "search": "Szukaj...",
-    "nothingfound": "Nic tu nie znaleziono",
+    "nothingfound": "Nic nie znaleziono",
     "error": "Wystąpił błąd",
-    "trending_now": "Na topie teraz",
+    "trending_now": "Na topie",
     "popular_in_this_season": "Popularne w tym sezonie",
-    "all_time_popular": "Najpopularniejsze wszech czasów"
+    "all_time_popular": "Najpopularniejsze w historii"
   },
   "contextMenu": {
     "devtools": "Otwórz DevTools",
-    "nerdstats": "Pokaż statystyki",
+    "nerdstats": "Pokaż NerdStats",
     "copytitle": "Kopiuj tytuł",
     "copycover": "Kopiuj okładkę",
     "delete": "Usuń"
@@ -53,41 +53,58 @@
   },
   "anime_genres": {
     "action": "Akcja",
-    "adventure": "Przygoda",
+    "adventure": "Przygodowe",
     "comedy": "Komedia",
     "drama": "Dramat",
     "ecchi": "Ecchi",
-    "fantasy": "Fantasy",
+    "fantasy": "Fantastyka",
     "hentai": "Hentai",
     "horror": "Horror",
-    "mahoushoujo": "Magical Girl",
+    "mahoushoujo": "Magical Girls",
     "mecha": "Mecha",
     "music": "Muzyka",
     "mystery": "Tajemnica",
     "psychological": "Psychologiczny",
     "romance": "Romans",
     "sci-Fi": "Sci-Fi",
-    "sliceoflife": "Okruchy życia",
-    "sports": "Sport",
+    "sliceoflife": "Obyczajowe",
+    "sports": "Sportowe",
     "supernatural": "Nadprzyrodzone",
     "thriller": "Thriller"
   },
   "anime_formats": {
     "tv": "Serial TV",
     "movie": "Film",
-    "tv_short": "Krótki serial TV",
-    "special": "Specjal",
+    "tv_short": "Krótkometrażowy TV",
+    "special": "Specjalny",
     "ova": "OVA",
     "ona": "ONA"
   },
+  "anime_source": {
+    "lightnovel": "Light Novel",
+    "manga": "Manga",
+    "original": "Oryginalne",
+    "webnovel": "Web Novel",
+    "novel": "Powieść",
+    "anime": "Anime",
+    "videogame": "Gra wideo",
+    "visualnovel": "Visual Novel",
+    "doujinshi": "Doujinshi",
+    "comic": "Komiks",
+    "liveaction": "Film aktorski",
+    "game": "Gra",
+    "multimediaproject": "Projekt multimedialny",
+    "picturebook": "Książka obrazkowa",
+    "other": "Inne"
+  },
   "card_information": {
-    "ep_airing": "Odcinek {{ep}} zostanie wyemitowany za {{text}}",
+    "ep_airing": "Odcinek {{ep}} ukaże się za {{text}}",
     "ep_airing_day": "{{day}} dni",
     "ep_airing_hours": "{{hours}} godzin",
     "ep_airing_minutes": "{{min}} minut",
-    "ep_airing_today": "Dzisiaj",
+    "ep_airing_today": "Dziś",
     "episodes": "{{ep}} odcinków",
-    "minutes": "Czas trwania {{min}} min"
+    "minutes": "Czas trwania: {{min}} min"
   },
   "information": {
     "airing": "Emitowany odcinek",
@@ -99,9 +116,9 @@
     "endate": "Data zakończenia",
     "season": "Sezon",
     "source": "Źródło",
-    "descriptionnotfound": "Nie znaleziono opisu",
+    "descriptionnotfound": "Brak opisu",
     "errors": "To anime nie ma żadnych odcinków",
-    "wrongtext": "Czy to nie to anime?",
+    "wrongtext": "Czy to niewłaściwe anime?",
     "listEpisodes": "{{number}} odcinków",
     "bar": {
       "anilist": "Strona Anilist",
@@ -113,11 +130,11 @@
     "types": {
       "sub": "Napisy",
       "dub": "Dubbing",
-      "raw": "Bez tłumaczenia"
+      "raw": "Raw"
     },
     "notification": {
-      "coverdone": "Okładka została skopiowana do schowka",
-      "coverfailed": "Nie udało się skopiować do schowka"
+      "coverdone": "Okładka została skopiowana",
+      "coverfailed": "Nie udało się skopiować okładki"
     },
     "actors": "Aktorzy",
     "actor_as": "Jako {{actor}}",
@@ -129,21 +146,21 @@
     }
   },
   "settings": {
-    "turnDeveloper": "Włącz tryb dewelopera",
+    "turnDeveloper": "Włącz tryb deweloperski",
     "general": {
       "language": "Język",
       "theme": "Motyw",
       "updates": "Powiadomienia o aktualizacjach",
-      "checkupdates": "Sprawdź dostępność aktualizacji",
+      "checkupdates": "Sprawdź aktualizacje",
       "checkupdate": "Sprawdź aktualizację",
       "window": "Okno",
       "maximize": "Automatyczne maksymalizowanie",
       "fullscreen": "Automatyczny pełny ekran",
       "zoom": "Powiększenie",
       "meow": ":3",
-      "credits": "Twórcy",
+      "credits": "Autorzy",
       "specialthanks": "Specjalne podziękowania dla",
-      "onstart": "Przy uruchomieniu",
+      "onstart": "Przy starcie",
       "every_day": "Codziennie",
       "everyweek": "Co tydzień",
       "hideSidebar": "Ukryj pasek boczny",
@@ -152,43 +169,51 @@
       "links": "Przydatne linki"
     },
     "player": {
-      "play": "Autoodtwarzanie",
+      "play": "Auto Odtwarzanie",
       "skip": "Automatycznie odtwarzaj następny odcinek",
       "volume": "Domyślna głośność",
       "longskip": "Długie przewijanie do przodu",
       "longskipb": "Długie przewijanie do tyłu",
       "shortskip": "Krótkie przewijanie do przodu",
       "shortskipb": "Krótkie przewijanie do tyłu",
-      "preload": "Rodzaj buforowania odtwarzacza",
+      "preload": "Typ buforowania odtwarzacza",
       "screenshot": "Zrzuty ekranu",
       "screenask": "Zawsze pytaj, gdzie zapisać zrzuty ekranu",
       "uptonextep": "Powiadomienie o następnym odcinku",
       "notif_interval": "Interwał powiadomień",
       "epshorter": "Nie pokazuj, jeśli odcinek jest krótszy niż",
       "external": "Zewnętrzny odtwarzacz",
-      "stretching": "Rozciąganie obrazu",
+      "stretching": "Rozciąganie wideo",
       "enable_external": "Włącz zewnętrzny odtwarzacz",
       "select_player": "Wybierz odtwarzacz",
       "movianip": "Adres IP Movian",
       "mpvpath": "Ścieżka do MPV",
       "vlcpath": "Ścieżka do VLC",
-      "type": "Rodzaj zapisu",
-      "path": "Ścieżka zapisu zrzutów ekranu",
+      "type": "Typ zapisu",
+      "path": "Ścieżka zapisu zrzutów",
       "file": "Plik",
       "clipboard": "Schowek",
       "both": "Oba",
       "changelocaton": "Zmień lokalizację",
       "keybind": "Skróty klawiszowe",
+      "playerexitbechaviour": "Zachowanie przy wyjściu z odtwarzacza",
+      "playerbeexit": {
+        "information": "Do informacji",
+        "home": "Do strony głównej"
+      },
+      "skipOpening": "Automatyczne pomijanie openingów",
+      "skipEnding": "Automatyczne pomijanie endingów",
+      "showBrokenBuffer": "Pokaż uszkodzony bufor",
       "keybinds": {
         "pause": "Pauza",
         "fullscreen": "Pełny ekran",
-        "exitplayer": "Zamknij odtwarzacz",
-        "lskipforward": "Długie przewinięcie do przodu",
-        "lskipbackward": "Długie przewinięcie do tyłu",
-        "skipforward": "Krótkie przewinięcie do przodu",
-        "skipbackward": "Krótkie przewinięcie do tyłu",
-        "fskipforward": "Przewinięcie klatki do przodu",
-        "fskipbackward": "Przewinięcie klatki do tyłu",
+        "exitplayer": "Wyjdź z odtwarzacza",
+        "lskipforward": "Długi skok do przodu",
+        "lskipbackward": "Długi skok do tyłu",
+        "skipforward": "Krótki skok do przodu",
+        "skipbackward": "Krótki skok do tyłu",
+        "fskipforward": "Przeskok o klatkę do przodu",
+        "fskipbackward": "Przeskok o klatkę do tyłu",
         "nextepisode": "Następny odcinek",
         "prevepisode": "Poprzedni odcinek",
         "volumeup": "Głośniej",
@@ -200,22 +225,28 @@
         "pip": "Obraz w obrazie"
       }
     },
+    "playerUI": {
+      "dloadinganimation": "Wyłącz animację ładowania",
+      "dskipanimation": "Wyłącz animację przewijania",
+      "dspaceanimation": "Wyłącz animację spacji",
+      "dvolumeanimation": "Wyłącz animację głośności"
+    },
     "externalPlayer": {
       "running": "Uruchomiono {{player}}",
       "episodes": "Odcinki",
       "chromeCast": {
-        "disconnected": "Rozłączono",
+        "disconnected": "rozłączono",
         "search": "Wyszukiwanie..."
       },
       "failed": {
         "movian": "Nie udało się uruchomić Movian",
         "chromecast": "ChromeCast nie obsługuje formatu m3u8",
-        "player": "Nie znaleziono odtwarzaczy",
+        "player": "Nie znaleziono odtwarzacza",
         "resolution": "Nie znaleziono rozdzielczości"
       }
     },
     "history": {
-      "limited": "Ograniczona historia zapisu",
+      "limited": "Ograniczona historia",
       "limit": "Limit historii",
       "startsave": "Kiedy rozpocząć zapisywanie historii",
       "stopsave": "Kiedy zakończyć zapisywanie historii",
@@ -226,19 +257,20 @@
     },
     "saving": {
       "done": "Konfiguracja została zapisana",
-      "error": "Wystąpił błąd podczas zapisu konfiguracji",
+      "error": "Wystąpił błąd podczas zapisywania konfiguracji",
       "notification": "Czy chcesz zapisać zmiany?"
     },
     "tips": {
       "automaximize": "Maksymalizuj okno przy starcie aplikacji",
-      "autofullscreen": "Otwieraj aplikację w trybie pełnoekranowym",
+      "autofullscreen": "Otwórz aplikację w trybie pełnego ekranu",
       "autofullscreenplayer": "Ustaw pełny ekran przy starcie odtwarzacza",
-      "longskip": "Zmień długość przewinięcia długiego (przydatne do pomijania openingów)",
-      "shotskip": "Zmień długość przewinięcia krótkiego",
-      "continuewatchsavehistory": "Po ilu sekundach odcinek zostanie zapisany do Kontynuuj oglądanie / Po ilu sekundach przed końcem usunąć odcinek z listy"
+      "longskip": "Zmień czas długiego przewijania (przydatne do pomijania openingów)",
+      "shotskip": "Zmień czas krótkiego przewijania",
+      "continuewatchsavehistory": "Po ilu sekundach odcinek zostanie zapisany do 'Kontynuuj oglądanie' / Ile sekund przed końcem usunąć z 'Kontynuuj oglądanie'",
+      "brokenBuffer": "Pokazuje buforowanie przy odtwarzaniu plików mp4, może wyświetlać błędne dane"
     },
     "devmode": {
-      "developermode": "Tryb dewelopera",
+      "developermode": "Tryb deweloperski",
       "tornondevtools": "Włącz DevTools",
       "devtoolsonstart": "DevTools przy starcie",
       "playerdebug": "Statystyki debugowania odtwarzacza",
@@ -251,14 +283,20 @@
       "name": "Nazwa",
       "author": "Autor wtyczki",
       "version": "Wersja",
-      "type": "Rodzaj",
+      "type": "Typ",
       "information": "Informacje",
       "player": "Odtwarzacz"
+    },
+    "upNext": {
+      "var1": "Wariant 1",
+      "var2": "Wariant 2",
+      "old": "Stary wariant",
+      "upNextStyle": "Warianty stylu 'Następny odcinek'"
     }
   },
   "player": {
     "error": {
-      "notfound": "Odtwarzacz nie znalazł żadnych adresów URL"
+      "notfound": "Odtwarzacz nie znalazł żadnych linków"
     },
     "TitleEpisode": "Odcinek {{ep}} z {{name}}",
     "TitleMovie": "Film: {{name}}",
@@ -272,17 +310,17 @@
     "chapter": "Rozdział: {{name}}",
     "episodeEndsOn": "Odcinek kończy się o {{time}}",
     "mute": "Wycisz",
-    "unmute": "Wyłącz wyciszenie",
+    "unmute": "Włącz dźwięk",
     "errors": {
-      "extractionError": "Nie udało się pobrać adresów URL odtwarzacza: {{error}}",
+      "extractionError": "Błąd podczas pobierania linków odtwarzacza: {{error}}",
       "MEDIA_ERR_ABORTED": "Odtwarzanie zostało przerwane.",
       "MEDIA_ERR_NETWORK": "Wystąpił błąd sieci podczas pobierania wideo.",
-      "MEDIA_ERR_DECODE": "Wystąpił błąd podczas dekodowania wideo.",
+      "MEDIA_ERR_DECODE": "Błąd podczas dekodowania wideo.",
       "MEDIA_ERR_SRC_NOT_SUPPORTED": "Format lub źródło wideo nie jest obsługiwane.",
       "default": "Wystąpił nieznany błąd."
     },
     "upNext": {
-      "title": "Następny odcinek za {{sec}} sekund",
+      "title": "Następny odcinek zacznie się za {{sec}} sekund",
       "titleAnime": "Następny odcinek {{ep}} z {{title}}",
       "nextEp": "Następny odcinek",
       "hide": "Ukryj",
@@ -290,9 +328,9 @@
       "nextPlaying": "Odtwarzanie następnego odcinka za {{time}}s..."
     },
     "other": {
-      "unknown": "Nieznane",
-      "off": "Wyłączone",
-      "default": "Domyślne"
+      "unknown": "Nieznany",
+      "off": "Wyłączony",
+      "default": "Domyślny"
     },
     "settings": {
       "source": "Źródło",
@@ -304,30 +342,30 @@
     "toastscreenshot": {
       "failed": "Nie udało się zapisać zrzutu ekranu",
       "doneclip": "Obraz zapisano w schowku",
-      "donefile": "Obraz zapisano do pliku"
+      "donefile": "Obraz zapisano w pliku"
     }
   },
   "history": {
     "continue": "Kontynuuj odcinek {{ep}}",
-    "history": "Oglądano odcinek {{ep}}",
-    "historysaved": "Anime zostało usunięte z historii",
+    "history": "Obejrzany odcinek {{ep}}",
+    "historysaved": "Pomyślnie usunięto anime z historii",
     "historyfailed": "Nie udało się usunąć anime z historii",
-    "continuesaved": "Anime zostało usunięte z listy Kontynuuj oglądanie",
-    "continuefailed": "Nie udało się usunąć anime z listy Kontynuuj oglądanie"
+    "continuesaved": "Pomyślnie usunięto anime z 'Kontynuuj oglądanie'",
+    "continuefailed": "Nie udało się usunąć anime z 'Kontynuuj oglądanie'"
   },
   "oldBackup": {
-    "backupcontinue": "Tworzenie kopii zapasowej starego pliku Kontynuuj oglądanie: Zakończone",
-    "convertcontinue": "Konwertowanie Kontynuuj oglądanie: Sukces {{success}}, Niepowodzenie {{failed}}",
-    "convertcontinuedone": "Konwertowanie zakończone: Sukces {{success}}, Niepowodzenie {{failed}}",
-    "convertcontinuefailed": "Nie udało się przekonwertować starego pliku Kontynuuj oglądanie",
-    "backuphistory": "Tworzenie kopii zapasowej starej historii: Zakończone",
-    "converthistory": "Konwertowanie historii: Sukces {{success}}, Niepowodzenie {{failed}}",
-    "converthistorydone": "Konwertowanie historii zakończone: Sukces {{success}}, Niepowodzenie {{failed}}",
+    "backupcontinue": "Tworzenie kopii 'Kontynuuj oglądanie': Zakończone",
+    "convertcontinue": "Konwertowanie 'Kontynuuj oglądanie': Sukces {{success}}, Błąd {{failed}}",
+    "convertcontinuedone": "Konwertowanie zakończone: Sukces {{success}}, Błąd {{failed}}",
+    "convertcontinuefailed": "Nie udało się przekonwertować starego pliku 'Kontynuuj oglądanie'",
+    "backuphistory": "Tworzenie kopii historii: Zakończone",
+    "converthistory": "Konwertowanie historii: Sukces {{success}}, Błąd {{failed}}",
+    "converthistorydone": "Konwertowanie zakończone: Sukces {{success}}, Błąd {{failed}}",
     "converthistoryfailed": "Nie udało się przekonwertować starej historii",
     "failedconvert": "Nie udało się przekonwertować {{title}}"
   },
   "update": {
-    "available": "Aktualizacja {{ver}} jest dostępna, kliknij aby zaktualizować",
+    "available": "Dostępna aktualizacja {{ver}}, kliknij aby zaktualizować",
     "progess": "Postęp pobierania {{procent}}%",
     "done": "Aktualizacja pobrana, uruchom ponownie aplikację",
     "same": "Masz najnowszą wersję Animu"
@@ -337,7 +375,7 @@
     "settings": "W ustawieniach",
     "player": "{{title}} Odcinek {{ep}}"
   },
-  "globalError": "Wystąpił krytyczny błąd, chcesz wrócić do strony głównej?",
+  "globalError": "Wystąpił krytyczny błąd, czy chcesz wrócić do strony głównej?",
   "filter": {
     "genres": "Gatunki:",
     "year": "Rok:",
@@ -352,7 +390,7 @@
   },
   "errorboundary": {
     "gotohome": "Wróć do strony głównej",
-    "leaveanimu": "Opuść Animu",
+    "leaveanimu": "Zamknij Animu",
     "errormessage": "Komunikat błędu: {{error}}"
   }
 }

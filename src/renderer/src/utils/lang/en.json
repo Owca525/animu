@@ -80,6 +80,23 @@
         "ova": "OVA",
         "ona": "ONA"
     },
+    "anime_source": {
+        "lightnovel": "Light novel",
+        "manga": "Manga",
+        "original": "Original",
+        "webnovel": "Web Novel",
+        "novel": "Novel",
+        "anime": "Anime",
+        "videogame": "Video Game",
+        "visualnovel": "Visual Novel",
+        "doujinshi": "Doujinshi",
+        "comic": "Comic",
+        "liveaction": "Live Action", 
+        "game": "Game",
+        "multimediaproject": "Multimedia Project",
+        "picturebook": "Picture Book",
+        "other": "Other"
+    },
     "card_information": {
         "ep_airing": "Ep {{ep}} airing in {{text}}",
         "ep_airing_day": "{{day}} Days",
@@ -179,6 +196,14 @@
             "both": "Both",
             "changelocaton": "Change Location",
             "keybind": "Keybinds",
+            "playerexitbechaviour": "Player Exit behavior",
+            "playerbeexit": {
+                "information": "To Information",
+                "home": "To Home"
+            },
+            "skipOpening": "Auto Skip Openings",
+            "skipEnding": "Auto Skip Endings",
+            "showBrokenBuffer": "Show Broken Buffer",
             "keybinds": {
                 "pause": "Pause",
                 "fullscreen": "Fullscreen",
@@ -199,6 +224,12 @@
                 "toggleSubtitles": "Toggle Subtitles",
                 "pip": "Picture In Picture"
             }
+        },
+        "playerUI": {
+            "dloadinganimation": "Disable Loading Animation",
+            "dskipanimation": "Disable Skip Animation",
+            "dspaceanimation": "Disable Space Animation",
+            "dvolumeanimation": "Disable Volume Animation"
         },
         "externalPlayer": {
             "running": "Running {{player}}",
@@ -235,7 +266,8 @@
             "autofullscreenplayer": "Set fullscreen mode when player starts",
             "longskip": "Change how many seconds long skips skip (usefull for skipping openings)",
             "shotskip": "Change how many seconds short skips skip",
-            "continuewatchsavehistory": "After how many seconds episode will be saved to Continue watching / After how many seconds before the end remove episode from continue watching"
+            "continuewatchsavehistory": "After how many seconds episode will be saved to Continue watching / After how many seconds before the end remove episode from continue watching",
+            "brokenBuffer": "It shows buffering when playing mp4 files, which is known to display incorrect data"
         },
         "devmode": {
             "developermode": "Developer Mode",
@@ -254,6 +286,12 @@
             "type": "Type",
             "information": "Information",
             "player": "Player"
+        },
+        "upNext": {
+            "var1": "Variant 1",
+            "var2": "Variant 2",
+            "old": "Variant Old",
+            "upNextStyle": "Up To Next Style Variants" 
         }
     },
     "player": {

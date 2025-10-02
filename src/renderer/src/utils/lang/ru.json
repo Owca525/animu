@@ -80,6 +80,23 @@
     "ova": "OVA",
     "ona": "ONA"
   },
+  "anime_source": {
+    "lightnovel": "Light novel",
+    "manga": "Manga",
+    "original": "Original",
+    "webnovel": "Web Novel",
+    "novel": "Novel",
+    "anime": "Anime",
+    "videogame": "Video Game",
+    "visualnovel": "Visual Novel",
+    "doujinshi": "Doujinshi",
+    "comic": "Comic",
+    "liveaction": "Live Action",
+    "game": "Game",
+    "multimediaproject": "Multimedia Project",
+    "picturebook": "Picture Book",
+    "other": "Other"
+  },
   "card_information": {
     "ep_airing": "Эпизод {{ep}} выйдет через {{text}}",
     "ep_airing_day": "{{day}} Дней",
@@ -180,6 +197,14 @@
       "both": "Оба",
       "changelocaton": "Изменить расположение",
       "keybind": "Сочетания клавиш",
+      "playerexitbechaviour": "Player Exit behavior",
+      "playerbeexit": {
+        "information": "To Information",
+        "home": "To Home"
+      },
+      "skipOpening": "Auto Skip Openings",
+      "skipEnding": "Auto Skip Endings",
+      "showBrokenBuffer": "Show Broken Buffer",
       "keybinds": {
         "pause": "Пауза",
         "fullscreen": "Полноэкранный режим",
@@ -200,6 +225,12 @@
         "toggleSubtitles": "Переключить субтитры",
         "pip": "Картинка в картинке"
       }
+    },
+    "playerUI": {
+      "dloadinganimation": "Disable Loading Animation",
+      "dskipanimation": "Disable Skip Animation",
+      "dspaceanimation": "Disable Space Animation",
+      "dvolumeanimation": "Disable Volume Animation"
     },
     "externalPlayer": {
       "running": "Запуск {{player}}",
@@ -236,7 +267,8 @@
       "autofullscreenplayer": "Установить полноэкранный режим при запуске плеера",
       "longskip": "Изменить, на сколько секунд пропускает длинный пропуск (полезно для пропуска опенингов)",
       "shotskip": "Изменить, на сколько секунд пропускает короткий пропуск",
-      "continuewatchsavehistory": "Через сколько секунд эпизод будет сохранен в 'Продолжить просмотр' / За сколько секунд до конца удалить эпизод из 'Продолжить просмотр'"
+      "continuewatchsavehistory": "Через сколько секунд эпизод будет сохранен в 'Продолжить просмотр' / За сколько секунд до конца удалить эпизод из 'Продолжить просмотр'",
+      "brokenBuffer": "It shows buffering when playing mp4 files, which is known to display incorrect data"
     },
     "devmode": {
       "developermode": "Режим разработчика",
@@ -255,6 +287,12 @@
       "type": "Тип",
       "information": "Информация",
       "player": "Плеер"
+    },
+    "upNext": {
+      "var1": "Variant 1",
+      "var2": "Variant 2",
+      "old": "Variant Old",
+      "upNextStyle": "Up To Next Style Variants"
     }
   },
   "player": {
@@ -357,4 +395,3 @@
     "errormessage": "Сообщение об ошибке: {{error}}"
   }
 }
-

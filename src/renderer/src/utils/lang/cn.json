@@ -80,6 +80,23 @@
     "ova": "OVA(原創錄影動畫)",
     "ona": "ONA(網路動畫)"
   },
+  "anime_source": {
+    "lightnovel": "Light novel",
+    "manga": "Manga",
+    "original": "Original",
+    "webnovel": "Web Novel",
+    "novel": "Novel",
+    "anime": "Anime",
+    "videogame": "Video Game",
+    "visualnovel": "Visual Novel",
+    "doujinshi": "Doujinshi",
+    "comic": "Comic",
+    "liveaction": "Live Action",
+    "game": "Game",
+    "multimediaproject": "Multimedia Project",
+    "picturebook": "Picture Book",
+    "other": "Other"
+  },
   "card_information": {
     "ep_airing": "第 {{ep}} 集將在 {{text}} 後播出",
     "ep_airing_day": "{{day}} 天後",
@@ -180,6 +197,14 @@
       "both": "同時",
       "changelocaton": "變更儲存位置",
       "keybind": "快捷鍵設置",
+      "playerexitbechaviour": "Player Exit behavior",
+      "playerbeexit": {
+        "information": "To Information",
+        "home": "To Home"
+      },
+      "skipOpening": "Auto Skip Openings",
+      "skipEnding": "Auto Skip Endings",
+      "showBrokenBuffer": "Show Broken Buffer",
       "keybinds": {
         "pause": "暫停",
         "fullscreen": "全螢幕",
@@ -200,6 +225,12 @@
         "toggleSubtitles": "切換字幕",
         "pip": "子母畫面"
       }
+    },
+    "playerUI": {
+      "dloadinganimation": "Disable Loading Animation",
+      "dskipanimation": "Disable Skip Animation",
+      "dspaceanimation": "Disable Space Animation",
+      "dvolumeanimation": "Disable Volume Animation"
     },
     "externalPlayer": {
       "running": "正在執行 {{player}}",
@@ -236,7 +267,8 @@
       "autofullscreenplayer": "播放器啟動時設置全螢幕模式",
       "longskip": "設置長跳轉的秒數（適用於跳過開頭）",
       "shotskip": "設置短跳轉的秒數",
-      "continuewatchsavehistory": "設定多少秒後將集數保存到繼續觀看 / 設定結束前多少秒移除集數"
+      "continuewatchsavehistory": "設定多少秒後將集數保存到繼續觀看 / 設定結束前多少秒移除集數",
+      "brokenBuffer": "It shows buffering when playing mp4 files, which is known to display incorrect data"
     },
     "devmode": {
       "developermode": "開發者模式",
@@ -255,6 +287,12 @@
       "type": "類型",
       "information": "資訊",
       "player": "播放器"
+    },
+    "upNext": {
+      "var1": "Variant 1",
+      "var2": "Variant 2",
+      "old": "Variant Old",
+      "upNextStyle": "Up To Next Style Variants"
     }
   },
   "player": {

@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { AnimeData, notificationProps, pluginFormat } from "@renderer/utils/GlobalInterface";
 import Button from "@renderer/components/buttons";
 import "./information.css"
-import { capitalizeFirstLetter, convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities, getGradientColor, segregatePlugins } from "@renderer/utils/functions";
+import { convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities, getGradientColor, segregatePlugins } from "@renderer/utils/functions";
 import { useEffect, useState } from "react";
 import { t } from "i18next"
 import Drop from "./components/drop";
@@ -201,7 +201,7 @@ function information() {
                             {anime_data.format &&
                                 <div className="information-info-content">
                                     <div className="information-content-title">{t("information.format")}</div>
-                                    {capitalizeFirstLetter(anime_data.format)}
+                                    {t(`anime_formats.${anime_data.format.toLowerCase()}`)}
                                 </div>
                             }
 
@@ -250,7 +250,7 @@ function information() {
                             {anime_data.source &&
                                 <div className="information-info-content">
                                     <div className="information-content-title">{t("information.source")}</div>
-                                    {capitalizeFirstLetter(anime_data.source)}
+                                    {t(`anime_source.${anime_data.source.toLowerCase().replaceAll("_", "")}`)}
                                 </div>
                             }
 
