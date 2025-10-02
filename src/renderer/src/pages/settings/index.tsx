@@ -325,11 +325,11 @@ function settings() {
                                 <Dropdown
                                     options={[
                                         { label: t("settings.general.onstart"), onClick: () => handleChange("update.type", "On Start") },
-                                        { label: t("settings.general.every_day"), onClick: () => handleChange("update.type", "Every Day") },
+                                        { label: t("settings.general.everyday"), onClick: () => handleChange("update.type", "Every Day") },
                                         { label: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
                                     ]}
                                     disableX
-                                    buttonText={config.new.update.type}
+                                    buttonText={t(`settings.general.${config.new.update.type.toLowerCase().replaceAll(" ", "")}`)}
                                 />
                             </div>
                         </div>
