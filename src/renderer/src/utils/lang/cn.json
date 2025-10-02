@@ -254,7 +254,8 @@
       "check_history": "查看歷史紀錄",
       "check_start": "開始檢查歷史紀錄",
       "history_good": "歷史紀錄正常，無需更改",
-      "continue_good": "繼續觀看正常，無需更改"
+      "continue_good": "繼續觀看正常，無需更改",
+      "check": "Check"
     },
     "saving": {
       "done": "設定已成功保存",
@@ -393,5 +394,15 @@
     "gotohome": "回到首頁",
     "leaveanimu": "離開動畫",
     "errormessage": "錯誤訊息：{{error}}"
+  },
+  "credits": {
+    "owca525": "Animu Creator",
+    "kartq": "Helper",
+    "dawoleq": "Programmer Helper",
+    "ary": "Designer",
+    "rain_kyle": "Chinese Translation",
+    "akashiro": "Russian Translation",
+    "talon": "For making a discord server",
+    "zomi": "For making a new icon"
   }
 }

@@ -254,7 +254,8 @@
       "check_history": "Проверить историю",
       "check_start": "Начать проверку истории",
       "history_good": "История в порядке, ничего менять не нужно",
-      "continue_good": "Продолжить просмотр в порядке, ничего менять не нужно"
+      "continue_good": "Продолжить просмотр в порядке, ничего менять не нужно",
+      "check": "Check"
     },
     "saving": {
       "done": "Конфигурация успешно сохранена",
@@ -393,5 +394,15 @@
     "gotohome": "Вернуться на главную",
     "leaveanimu": "Покинуть Animu",
     "errormessage": "Сообщение об ошибке: {{error}}"
+  },
+  "credits": {
+    "owca525": "Animu Creator",
+    "kartq": "Helper",
+    "dawoleq": "Programmer Helper",
+    "ary": "Designer",
+    "rain_kyle": "Chinese Translation",
+    "akashiro": "Russian Translation",
+    "talon": "For making a discord server",
+    "zomi": "For making a new icon"
   }
 }

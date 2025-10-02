@@ -787,7 +787,7 @@ function settings() {
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.history.check_history")}
-                                <Button content="Check" onClick={buttonCheck} />
+                                <Button content="settings.history.check" onClick={buttonCheck} />
                             </div>
                         </div>
                         <div className="settings-page-container">
@@ -921,17 +921,17 @@ function settings() {
                         </div>
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.general.credits")}</div>
-                            <div className="settings-setting-container"><span className="settings-user-title">Owca525</span> Animu Creator</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">KartQ</div>  Helper</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">DawoleQ</div>  Programmer Helper</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">Ary</div>  Designer</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">Rain_kyle</div>  Chinese Translation</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">AkaShiro</div>  Russian Translation</div>
+                            <div className="settings-setting-container"><span className="settings-user-title">Owca525</span> {t("credits.owca525")}</div>
+                            <div className="settings-setting-container"><div className="settings-user-title">KartQ</div>  {t("credits.kartq")}</div>
+                            <div className="settings-setting-container"><div className="settings-user-title">DawoleQ</div>  {t("credits.dawoleq")}</div>
+                            <div className="settings-setting-container"><div className="settings-user-title">Ary</div>  {t("credits.ary")}</div>
+                            <div className="settings-setting-container"><div className="settings-user-title">Rain_kyle</div>  {t("credits.ryne_kyle")}</div>
+                            <div className="settings-setting-container"><div className="settings-user-title">AkaShiro</div>  {t("credits.akashiro")}</div>
                         </div>
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.general.specialthanks")}</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">Talon</div> For making a discord server</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">Zomi</div> For making a new icon</div>
+                            <div className="settings-setting-container"><div className="settings-user-title">Talon</div> {t("credits.talon")}</div>
+                            <div className="settings-setting-container"><div className="settings-user-title">Zomi</div> {t("credits.zomi")}</div>
                         </div>
                     </>
                 }
