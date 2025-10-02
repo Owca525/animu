@@ -28,9 +28,9 @@
     "search": "Szukaj...",
     "nothingfound": "Nic nie znaleziono",
     "error": "Wystąpił błąd",
-    "trending_now": "Na topie",
+    "trending_now": "Popularne teraz",
     "popular_in_this_season": "Popularne w tym sezonie",
-    "all_time_popular": "Najpopularniejsze w historii"
+    "all_time_popular": "Najpopularniejsze"
   },
   "contextMenu": {
     "devtools": "Otwórz narzędzia deweloperskie",
