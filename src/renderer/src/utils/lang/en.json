@@ -253,7 +253,8 @@
             "check_history": "Check History",
             "check_start": "Start Checking History",
             "history_good": "History is good, nothing to change",
-            "continue_good": "Continue watch is good, nothing to change"
+            "continue_good": "Continue watch is good, nothing to change",
+            "check": "Check"
         },
         "saving": {
             "done": "Config has been succesfully saved",
@@ -392,6 +393,16 @@
         "gotohome": "Go Back Home",
         "leaveanimu": "Leave Animu",
         "errormessage": "Error Message: {{error}}"
+    },
+    "credits": {
+        "owca525": "Animu Creator",
+        "kartq": "Helper",
+        "dawoleq": "Programmer Helper",
+        "ary": "Designer", 
+        "rain_kyle": "Chinese Translation",
+        "akashiro": "Russian Translation",
+        "talon": "For making a discord server",
+        "zomi": "For making a new icon"
     },
     "lang": {
         "en": "English",
