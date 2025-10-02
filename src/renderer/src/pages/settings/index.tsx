@@ -553,6 +553,48 @@ function settings() {
                             </div>
                         </div>
                         <div className="settings-page-container">
+                            <div className="settings-page-title">{"Player Animations"}</div>
+                            <div className="settings-setting-container">
+                                {"Disable Volume Animation"}
+                                <CheckBox
+                                    checked={config.new.Player.ui.DisableVolumeAnimation}
+                                    onChecked={(checked) =>
+                                        handleChange('Player.ui.DisableVolumeAnimation', checked)
+                                    }
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                {"Disable Space Animation"}
+                                <CheckBox
+                                    checked={config.new.Player.ui.DisableSpaceAnimation}
+                                    onChecked={(checked) =>
+                                        handleChange('Player.ui.DisableSpaceAnimation', checked)
+                                    }
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                {"Disable Skip Animation"}
+                                <CheckBox
+                                    checked={config.new.Player.ui.DisableSkipAnimation}
+                                    onChecked={(checked) =>
+                                        handleChange('Player.ui.DisableSkipAnimation', checked)
+                                    }
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                {"Disable Loading Animation"}
+                                <CheckBox
+                                    checked={config.new.Player.ui.DisableLoadingAnimation}
+                                    onChecked={(checked) =>
+                                        handleChange('Player.ui.DisableLoadingAnimation', checked)
+                                    }
+                                />
+                            </div>
+                        </div>
+                        <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.player.external")}</div>
                             <div className="settings-setting-container">
                                 {t("settings.player.enable_external")}

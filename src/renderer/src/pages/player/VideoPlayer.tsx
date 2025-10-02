@@ -518,10 +518,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 message = t('player.errors.default')
         }
         toast.error(message, notificationProps);
-        
+
         if (!currentPlayer) return
         let index = player_data.findIndex((element) => element.hostname == currentPlayer.hostname)
-        if (player_data[index+1]) checkUrl(player_data[index+1])
+        if (player_data[index + 1]) checkUrl(player_data[index + 1])
     }
 
     function setTimeVideo(value: number) {
@@ -933,34 +933,40 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     <div className="player-title ">{detectTitle({ title: anime_data.AnimeData.title, ep: temp.episode, format: anime_data.AnimeData.format })}</div>
                 </div>
                 <div className="video-center"> {/* video-center-container */}
-                    <motion.div
-                        variants={hiddenVariants}
-                        animate={isShowButtonSkipLeft ? "visible" : "hidden"}
-                        initial="hidden"
-                        transition={{ duration: 0.4 }}
-                        className="player-loading-animation-container player-fast-rewind-ui"
-                    >
-                        <div className="material-symbols-outlined player-icon-ui">fast_rewind</div>
-                    </motion.div>
-                    <motion.div
-                        variants={hiddenVariants}
-                        animate={isShowButtonSkipRight ? "visible" : "hidden"}
-                        initial="hidden"
-                        transition={{ duration: 0.4 }}
-                        className="player-loading-animation-container player-fast-forward-ui"
-                    >
-                        <div className="material-symbols-outlined player-icon-ui">fast_forward</div>
-                    </motion.div>
+                    {!config.Player.ui.DisableSkipAnimation &&
+                        <>
+                            <motion.div
+                                variants={hiddenVariants}
+                                animate={isShowButtonSkipLeft ? "visible" : "hidden"}
+                                initial="hidden"
+                                transition={{ duration: 0.4 }}
+                                className="player-loading-animation-container player-fast-rewind-ui"
+                            >
+                                <div className="material-symbols-outlined player-icon-ui">fast_rewind</div>
+                            </motion.div>
+                            <motion.div
+                                variants={hiddenVariants}
+                                animate={isShowButtonSkipRight ? "visible" : "hidden"}
+                                initial="hidden"
+                                transition={{ duration: 0.4 }}
+                                className="player-loading-animation-container player-fast-forward-ui"
+                            >
+                                <div className="material-symbols-outlined player-icon-ui">fast_forward</div>
+                            </motion.div>
+                        </>
+                    }
 
-                    <motion.div className="player-loading-animation-container player-buffering-animation"
-                        variants={hiddenVariants}
-                        animate={isWaitingPlayer ? "visible" : "hidden"}
-                        initial="hidden"
-                        transition={{ duration: 0.4 }}
-                    >
-                        <div className="player-waiting material-symbols-outlined">progress_activity</div>
-                    </motion.div>
-                    {!config.Player.general.RemovingSpaceAnimation &&
+                    {!config.Player.ui.DisableLoadingAnimation &&
+                        <motion.div className="player-loading-animation-container player-buffering-animation"
+                            variants={hiddenVariants}
+                            animate={isWaitingPlayer ? "visible" : "hidden"}
+                            initial="hidden"
+                            transition={{ duration: 0.4 }}
+                        >
+                            <div className="player-waiting material-symbols-outlined">progress_activity</div>
+                        </motion.div>
+                    }
+                    {!config.Player.ui.DisableSpaceAnimation &&
                         <motion.div className="player-loading-animation-container"
                             variants={hiddenVariants}
                             animate={isShowPlay && isWaitingPlayer == false ? "visible" : "hidden"}
@@ -1110,7 +1116,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     }>close</button>
                 </motion.div>
             }
-            {!config.Player.general.DisableVolumeAnimation &&
+            {!config.Player.ui.DisableVolumeAnimation &&
                 <motion.div className="player-volume-ui-container"
                     variants={{
                         hidden: { x: 400 },
