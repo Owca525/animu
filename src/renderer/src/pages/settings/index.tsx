@@ -787,7 +787,7 @@ function settings() {
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.history.check_history")}
-                                <Button content="settings.history.check" onClick={buttonCheck} />
+                                <Button content={t("settings.history.check")} onClick={buttonCheck} />
                             </div>
                         </div>
                         <div className="settings-page-container">
