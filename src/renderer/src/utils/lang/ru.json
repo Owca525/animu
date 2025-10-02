@@ -81,21 +81,21 @@
     "ona": "ONA"
   },
   "anime_source": {
-    "lightnovel": "Light novel",
-    "manga": "Manga",
-    "original": "Original",
-    "webnovel": "Web Novel",
-    "novel": "Novel",
-    "anime": "Anime",
-    "videogame": "Video Game",
-    "visualnovel": "Visual Novel",
-    "doujinshi": "Doujinshi",
-    "comic": "Comic",
-    "liveaction": "Live Action",
-    "game": "Game",
-    "multimediaproject": "Multimedia Project",
-    "picturebook": "Picture Book",
-    "other": "Other"
+    "lightnovel": "Ранобэ",
+    "manga": "Манга",
+    "original": "Оригинал",
+    "webnovel": "Веб-новелла",
+    "novel": "Новелла",
+    "anime": "Аниме",
+    "videogame": "Видеоигра",
+    "visualnovel": "Визуальная новелла",
+    "doujinshi": "Додзинси",
+    "comic": "Комикс",
+    "liveaction": "Игровое кино",
+    "game": "Игра",
+    "multimediaproject": "Мультимедийный проект",
+    "picturebook": "Книга с картинками",
+    "other": "Другое"
   },
   "card_information": {
     "ep_airing": "Эпизод {{ep}} выйдет через {{text}}",
@@ -197,14 +197,14 @@
       "both": "Оба",
       "changelocaton": "Изменить расположение",
       "keybind": "Сочетания клавиш",
-      "playerexitbechaviour": "Player Exit behavior",
+      "playerexitbechaviour": "Поведение при выходе из плеера",
       "playerbeexit": {
-        "information": "To Information",
-        "home": "To Home"
+      "information": "К информации",
+      "home": "На главную"
       },
-      "skipOpening": "Auto Skip Openings",
-      "skipEnding": "Auto Skip Endings",
-      "showBrokenBuffer": "Show Broken Buffer",
+      "skipOpening": "Автопропуск опенингов",
+      "skipEnding": "Автопропуск эндингов",
+      "showBrokenBuffer": "Показывать сломанный буфер",
       "keybinds": {
         "pause": "Пауза",
         "fullscreen": "Полноэкранный режим",
@@ -227,10 +227,10 @@
       }
     },
     "playerUI": {
-      "dloadinganimation": "Disable Loading Animation",
-      "dskipanimation": "Disable Skip Animation",
-      "dspaceanimation": "Disable Space Animation",
-      "dvolumeanimation": "Disable Volume Animation"
+      "dloadinganimation": "Отключить анимацию загрузки",
+      "dskipanimation": "Отключить анимацию пропуска",
+      "dspaceanimation": "Отключить анимацию пробела", 
+      "dvolumeanimation": "Отключить анимацию громкости"
     },
     "externalPlayer": {
       "running": "Запуск {{player}}",
@@ -255,7 +255,7 @@
       "check_start": "Начать проверку истории",
       "history_good": "История в порядке, ничего менять не нужно",
       "continue_good": "Продолжить просмотр в порядке, ничего менять не нужно",
-      "check": "Check"
+      "check": "Проверить"
     },
     "saving": {
       "done": "Конфигурация успешно сохранена",
@@ -269,7 +269,7 @@
       "longskip": "Изменить, на сколько секунд пропускает длинный пропуск (полезно для пропуска опенингов)",
       "shotskip": "Изменить, на сколько секунд пропускает короткий пропуск",
       "continuewatchsavehistory": "Через сколько секунд эпизод будет сохранен в 'Продолжить просмотр' / За сколько секунд до конца удалить эпизод из 'Продолжить просмотр'",
-      "brokenBuffer": "It shows buffering when playing mp4 files, which is known to display incorrect data"
+     "brokenBuffer": "Показывает буферизацию при воспроизведении mp4 файлов, известно, что отображает некорректные данные"
     },
     "devmode": {
       "developermode": "Режим разработчика",
@@ -290,10 +290,10 @@
       "player": "Плеер"
     },
     "upNext": {
-      "var1": "Variant 1",
-      "var2": "Variant 2",
-      "old": "Variant Old",
-      "upNextStyle": "Up To Next Style Variants"
+      "var1": "Вариант 1",
+      "var2": "Вариант 2",
+      "old": "Старый вариант",
+      "upNextStyle": "Следующий стиль'"
     }
   },
   "player": {
@@ -396,13 +396,13 @@
     "errormessage": "Сообщение об ошибке: {{error}}"
   },
   "credits": {
-    "owca525": "Animu Creator",
-    "kartq": "Helper",
-    "dawoleq": "Programmer Helper",
-    "ary": "Designer",
-    "rain_kyle": "Chinese Translation",
-    "akashiro": "Russian Translation",
-    "talon": "For making a discord server",
-    "zomi": "For making a new icon"
+  "owca525": "Создатель Animu",
+  "kartq": "Помощник",
+  "dawoleq": "Помощник программиста",
+  "ary": "Дизайнер",
+  "rain_kyle": "Китайский перевод",
+  "akashiro": "Русский перевод",
+  "talon": "Создатель Дискорд сервера",
+  "zomi": "Создатель новый иконки"
   }
 }
