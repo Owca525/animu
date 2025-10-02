@@ -459,6 +459,7 @@ function settings() {
                                     }
                                 />
                             </div>
+                            {/* TODO: add this to lang */}
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {"Player Exit behavior"}
@@ -538,6 +539,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
+                                {/* TODO: add this to lang */}
                                 {"Up To Next Style Variants"}
                                 <Dropdown
                                     options={[
