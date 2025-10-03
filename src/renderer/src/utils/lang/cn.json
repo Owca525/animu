@@ -81,21 +81,21 @@
     "ona": "ONA(網路動畫)"
   },
   "anime_source": {
-    "lightnovel": "Light novel",
-    "manga": "Manga",
-    "original": "Original",
-    "webnovel": "Web Novel",
-    "novel": "Novel",
-    "anime": "Anime",
-    "videogame": "Video Game",
-    "visualnovel": "Visual Novel",
-    "doujinshi": "Doujinshi",
-    "comic": "Comic",
-    "liveaction": "Live Action",
-    "game": "Game",
-    "multimediaproject": "Multimedia Project",
-    "picturebook": "Picture Book",
-    "other": "Other"
+    "lightnovel": "輕小說",
+    "manga": "漫畫",
+    "original": "原創",
+    "webnovel": 網路小說",
+    "novel": "小說",
+    "anime": "動畫",
+    "videogame": "電子遊戲",
+    "visualnovel": "視覺小說",
+    "doujinshi": "同人誌",
+    "comic": "漫畫(西方)",
+    "liveaction": "真人改編",
+    "game": "遊戲",
+    "multimediaproject": "多媒體企劃",
+    "picturebook": "繪本",
+    "other": "其他"
   },
   "card_information": {
     "ep_airing": "第 {{ep}} 集將在 {{text}} 後播出",
@@ -197,14 +197,14 @@
       "both": "同時",
       "changelocaton": "變更儲存位置",
       "keybind": "快捷鍵設置",
-      "playerexitbechaviour": "Player Exit behavior",
+      "playerexitbechaviour": "播放器退出行為",
       "playerbeexit": {
-        "information": "To Information",
-        "home": "To Home"
+        "information": "回到資訊頁面",
+        "home": "回到首頁"
       },
-      "skipOpening": "Auto Skip Openings",
-      "skipEnding": "Auto Skip Endings",
-      "showBrokenBuffer": "Show Broken Buffer",
+      "skipOpening": "自動跳過片頭",
+      "skipEnding": "自動跳過片尾",
+      "showBrokenBuffer": "顯示異常緩衝",
       "keybinds": {
         "pause": "暫停",
         "fullscreen": "全螢幕",
@@ -227,10 +227,10 @@
       }
     },
     "playerUI": {
-      "dloadinganimation": "Disable Loading Animation",
-      "dskipanimation": "Disable Skip Animation",
-      "dspaceanimation": "Disable Space Animation",
-      "dvolumeanimation": "Disable Volume Animation"
+      "dloadinganimation": "停用載入動畫",
+      "dskipanimation": "停用跳過動畫",
+      "dspaceanimation": "停用空白鍵動畫",
+      "dvolumeanimation": "停用音量動畫"
     },
     "externalPlayer": {
       "running": "正在執行 {{player}}",
@@ -269,7 +269,7 @@
       "longskip": "設置長跳轉的秒數（適用於跳過開頭）",
       "shotskip": "設置短跳轉的秒數",
       "continuewatchsavehistory": "設定多少秒後將集數保存到繼續觀看 / 設定結束前多少秒移除集數",
-      "brokenBuffer": "It shows buffering when playing mp4 files, which is known to display incorrect data"
+      "brokenBuffer": "播放 MP4 檔案時顯示緩衝，但這可能會出現錯誤數據"
     },
     "devmode": {
       "developermode": "開發者模式",
@@ -290,10 +290,10 @@
       "player": "播放器"
     },
     "upNext": {
-      "var1": "Variant 1",
-      "var2": "Variant 2",
-      "old": "Variant Old",
-      "upNextStyle": "Up To Next Style Variants"
+      "var1": "樣式 1",
+      "var2": "樣式 2",
+      "old": "舊版樣式",
+      "upNextStyle": "下一集提示樣式"
     }
   },
   "player": {
@@ -396,13 +396,13 @@
     "errormessage": "錯誤訊息：{{error}}"
   },
   "credits": {
-    "owca525": "Animu Creator",
-    "kartq": "Helper",
-    "dawoleq": "Programmer Helper",
-    "ary": "Designer",
-    "rain_kyle": "Chinese Translation",
-    "akashiro": "Russian Translation",
-    "talon": "For making a discord server",
-    "zomi": "For making a new icon"
+    "owca525": "Animu 創作者",
+    "kartq": "協助者",
+    "dawoleq": "程式協助者",
+    "ary": "設計師",
+    "rain_kyle": "中文翻譯",
+    "akashiro": "俄文翻譯",
+    "talon": "建立 Discord 伺服器",
+    "zomi": "設計新圖示"
   }
 }
