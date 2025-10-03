@@ -459,7 +459,6 @@ function settings() {
                                     }
                                 />
                             </div>
-                            {/* TODO: add this to lang */}
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.player.playerexitbechaviour")}
