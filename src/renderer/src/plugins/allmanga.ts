@@ -385,7 +385,7 @@ export async function getEpisodeList(type: string, anime_id: string): Promise<{ 
   }
 }
 
-async function searchAnime(name: string, page: number, params?: { genres?: string[]; years?: string; seasons?: string; format?: string[]; airing?: string }): Promise<cardData[]> {
+async function searchAnime(name: string, page: number, _params?: { genres?: string[]; years?: string; seasons?: string; format?: string[]; airing?: string }): Promise<cardData[]> {
   let dataReq = await SearchAnime(name, page)
   if (!dataReq || dataReq.length <= 0) return []
 
