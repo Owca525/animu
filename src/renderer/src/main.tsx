@@ -13,8 +13,7 @@ import { ContextMenu } from './utils/context/ContextMenu';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      cacheTime: 0,
-      staleTime: 0,
+      staleTime: 1000,
     },
   },
 })

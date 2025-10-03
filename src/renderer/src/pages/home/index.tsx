@@ -7,7 +7,7 @@ import Sidebar from "@renderer/components/sidebar"
 import Container from "./components/container"
 import { useSelector } from "react-redux"
 import { useEffect, useRef } from "react"
-import { containerData, FilterParams, homeData } from "@renderer/utils/GlobalInterface"
+import { containerData, FilterParams, homeData, SettingsConfig } from "@renderer/utils/GlobalInterface"
 import { t } from "i18next"
 import store from "@renderer/utils/store"
 import { homeStopScrolling, setHomeData, setHomeLocalSearch } from "@renderer/utils/pluginApi"
@@ -16,12 +16,14 @@ import { ReadHistory } from "@renderer/utils/history/history"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
 import { CreateContextMenuOptions } from "@renderer/utils/functions"
 import Filter from "./components/filter"
+// import WelcomeScreen from "./components/welcomeScreen"
 
 const Home = () => {
     const navigate = useNavigate()
     const plugin = useSelector((plugin: any) => plugin.plugin.informationPlugin);
     const homeCache: homeData = useSelector((cache: any) => cache.home);
-    const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
+    const pluginPlayer = store.getState().plugin.playerPlugin;
+    const config: SettingsConfig = useSelector((data: any) => data.config);
 
     const divRef = useRef<HTMLDivElement | null>(null);
 
@@ -56,7 +58,7 @@ const Home = () => {
 
     useEffect(() => {
         if (homeCache.data.length == 0) plugin.information.home()
-        window.api.rpc.setActivity(undefined, t("discordrpc.home"))
+        if (config.General.discordRPC) window.api.rpc.setActivity(undefined, t("discordrpc.home"))
     }, [])
 
     useEffect(() => {
@@ -170,19 +172,14 @@ const Home = () => {
                 <div className="button home-header-sidebar-placeholder"><span className="material-symbols-outlined">menu</span></div>
                     <Input placeholder={t("home.search")} InputClass="home-header-search" onKeyDown={OnSearch} />
                     <div className="home-filter-void">
-                        <Filter onChange={onChange} filter={{ 
-                                genres: plugin.information.searchOption.genres, 
-                                years: plugin.information.searchOption.years,
-                                seasons: plugin.information.searchOption.seasons,
-                                format: plugin.information.searchOption.format,
-                                airing: plugin.information.searchOption.statuses
-                            }}
+                        <Filter onChange={onChange} filter={plugin.searchOption}
                         />
                     </div>
                 </div>
                 <div></div>
                 <div className="home-header-right"></div>
             </div>
+            {!config.General.HideSidebar && <div className="shadow-sidebar"></div>}
             <div ref={divRef} className={`home-container ${homeCache.isLoading && "home-loading-container"} ${homeCache.isError && "home-loading-container"} ${homeCache.data.length <= 0 && "home-loading-container"}`} onScroll={handleScroll}>
                 {homeCache.isLoading && homeCache.isError == false && <div className="material-symbols-outlined home-loading-animation">progress_activity</div>}
                 {homeCache.isError && homeCache.isLoading == false && <div className="home-error-container"><span className="material-symbols-outlined home-error-icon">error</span>{t("home.error")}</div>}
@@ -190,6 +187,7 @@ const Home = () => {
                 {homeCache.isError == false && homeCache.isLoading == false && homeCache.data.length <= 0 && <div className="home-empty-container"><span className="material-symbols-outlined home-empty-icon">search_off</span>{t("home.nothingfound")}</div>}
             </div>
             <Sidebar data={sidebarData} />
+            {/* <WelcomeScreen /> */}
         </main>
     )
 }

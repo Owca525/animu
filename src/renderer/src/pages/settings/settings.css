@@ -40,7 +40,7 @@
   font-size: 1.8em;
   width: 100%;
   text-align: center;
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .settings-line {
@@ -71,6 +71,7 @@
   bottom: 20px;
   left: 50%;
   translate: -50%;
+  z-index: 2000;
 }
 
 .settings-save-buttons {
@@ -96,6 +97,13 @@
   gap: 8px;
 }
 
+.settings-special-container {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding: 30px;
+}
+
 .settings-sidebar-container .sidebar-container-max .sidebar-bottom {
   margin-bottom: 64px;
 }
@@ -109,8 +117,6 @@
   width: 100%;
   margin: 12px;
   min-height: 500px;
-  background-color: var(--bg2);
-  border-radius: 12px;
 }
 
 .settings-extensions-button {
@@ -124,8 +130,9 @@ th, td {
 }
 
 th {
+  text-align: left;
   font-size: 1.2em;
-  border: 3px solid var(--bg4);
+  border-width: 0px 0px 2px 0px;
 }
 
 td {
@@ -141,11 +148,6 @@ td {
 
 .settings-table-button {
   cursor: pointer;
-  border-radius: 12px;
-}
-
-.settings-table-button:hover {
-  background-color: var(--bg4);
 }
 
 .settings-extensions-icon {
@@ -154,10 +156,8 @@ td {
 }
 
 .settings-extensions-background {
-  background-color: var(--bg3);
   width: max-content;
   padding: 4px;
-  border-radius: 6px;
 }
 
 .settings-extensions-title {
@@ -167,8 +167,27 @@ td {
   gap: 12px;
 }
 
-/* for smartphones 
-maybe that will be usefull in the future */
+.settings-extensions-icon-placeholder {
+  height: 40px;
+}
+
+.settings-special-images {
+  cursor: pointer;
+  width: 60px;
+  height: 60px;
+  padding: 8px;
+}
+
+.settings-user-title {
+  font-weight: 600;
+}
+
+.settings-extensions-type-container {
+  display: flex;
+  gap: 4px;
+}
+
+/* for very small window sizes */
 @media (max-width: 600px) {
 
     .settings-container .sidebar-logo-icon-container,

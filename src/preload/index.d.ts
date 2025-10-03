@@ -5,6 +5,12 @@ declare global {
     api: {
       open: (url: string) => Promise<void>;
       saveToClipboard: (type: "text" | "image", content: string) => Promise<boolean>;
+      chromecast: {
+        startSearch: () => void,
+        deviceList: () => Promise<{ host: string, port: number, name: string }[]>;
+        connect: (device: { host: string, port: number, name: string }, metadata: { title: string, time: number, url: string, type: string }) => void
+        stopSearch: () => void
+      },
       update: {
         updateProgress: (
           callback: (event: Event, percent: number) => void
@@ -15,7 +21,8 @@ declare global {
       request: {
         get: (
           url: string,
-          header: Record<string, string>
+          header: Record<string, string>,
+          type?: "json" | "text"
         ) => Promise<{
           success: boolean;
           data?: any;
@@ -36,6 +43,7 @@ declare global {
           details: string | undefined,
           state: string | undefined
         ) => Promise<void>;
+        runDiscordRPC: () => void;
       }
       os: {
         getPath: (
@@ -63,10 +71,12 @@ declare global {
         mkdir: (path: string) => Promise<boolean>;
         saveDialog: (fileName: string, data: any, title: string, name: string, extensions: string[], format?: string) => Promise<boolean>
         openDialog: (path?: string, name?: string, extensions?: string[]) => Promise<string>
+        getPathProgram: (program: string) => Promise<string>
       };
-      runExternaPlayer: (url: string, path: string, time: string, type: "mpv" | "vlc") => any
-      getlistThemes: () => Promise<{ path: string, filename: string, type: "user" | "official" }[]>
+      runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string}, type: "mpv" | "vlc") => any
+      getlistThemes: () => Promise<{ version?: string; autor?: string; pathcss: string; animuTitle?: string; name: string; pathIcon?: string }[]>
       getOSDetails: () => Promise<{ platform: NodeJS.Platform, release: string, arch: string }>
+      getListLang: () => Promise<{ data: any, lang: string }[]>
     };
     backend: {
       ipcRenderer: {

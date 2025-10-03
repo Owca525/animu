@@ -1,11 +1,12 @@
 import { t } from "i18next";
-import { cardData, ContextMenuProps, homeData } from "./GlobalInterface";
+import { ContextMenuProps, homeData, playerChapterList, themeMetadata } from "./GlobalInterface";
 import store from "./store";
-import { setHomeData } from "./pluginApi";
+import { getPluginList, setHomeData } from "./pluginApi";
 import { ReadContinue } from "./history/continueWatch";
 import { ReadHistory } from "./history/history";
 import { showDialog } from "./context/DialogContext";
 import i18n from "./i18n";
+import { DropdownOption } from "@renderer/components/dropDown";
 
 export function decodeHtmlEntities(str: string) {
     const parser = new DOMParser();
@@ -19,7 +20,7 @@ export function convertDateToFormattedString(year: number | undefined, month: nu
     if (hour == undefined) hour = 0
     if (minute == undefined) minute = 0
     if (day == undefined) day = 0
-    return new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(year, month, day, hour, minute));
+    return new Intl.DateTimeFormat(i18n.language, { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(year, month, day, hour, minute));
 }
 
 export function capitalizeFirstLetter(text: string | undefined | null) {
@@ -69,13 +70,26 @@ export function formatTime(seconds: number | undefined): string {
 }
 
 export async function changeTheme(name: string) {
+    let old = document.getElementById("theme-stylesheet") as HTMLLinkElement
+    if (old) old.remove()
+    document.title = ""
+
     const themes = await window.api.getlistThemes()
+    let theme: themeMetadata = themes[0]
+
     themes.forEach((element) => {
-        if (element.filename.replace(".css", "") === name) {
-            let link = document.getElementById("theme-stylesheet") as HTMLLinkElement
-            if (link) link.href = element.path
+        if (element.name === name) {
+            theme = element
         }
     })
+
+    const link = document.createElement('link');
+    link.id = 'theme-stylesheet';
+    link.rel = 'stylesheet';
+    link.href = theme.pathcss;
+    document.head.appendChild(link);
+
+    if (theme.animuTitle) document.title = theme.animuTitle
 }
 
 export function convertKeybinds(inputString: string) {
@@ -142,7 +156,7 @@ export async function refetchHistory() {
     }
 
     if (data.data.length == 1 && data.data[0].title == t("global.history")) {
-        await setHomeData(async () => [{ title: t("global.History"), data: await ReadHistory(), horizontal: false }])
+        await setHomeData(async () => [{ title: t("global.history"), data: await ReadHistory(), horizontal: false }])
         return
     }
 
@@ -209,7 +223,7 @@ export function genYearsList(stopYear: number): string[] {
     let yearList: string[] = []
     const currentYear = new Date().getFullYear();
     yearList.push((currentYear + 1).toString())
-    for (let index = (currentYear+1); index > (stopYear-1); index--) {
+    for (let index = (currentYear + 1); index > (stopYear - 1); index--) {
         yearList.push(index.toString())
     }
     return yearList
@@ -218,23 +232,81 @@ export function genYearsList(stopYear: number): string[] {
 export function getGradientColor(value: number | undefined | null): string {
     if (!value) return ""
     const clamped = Math.max(0, Math.min(100, value));
-    
+
     const red = clamped < 50 ? 255 : Math.floor(255 - ((clamped - 50) * 5.1));
     const green = clamped > 50 ? 128 : Math.floor((clamped * 2.56));
-    
+
     return `rgb(${red}, ${green}, 0)`;
 }
 
 export function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function detectTitle(data: cardData): String {
+export function detectTitle(data: { title: { english?: string | undefined; native: string; romaji: string; }, ep: string, format?: string }): string {
     try {
-        if (data.AnimeData.format?.toLowerCase().includes("movie")) return t('player.TitleMovie', { name: data.AnimeData.title.romaji })
-        return t('player.TitleEpisode', { ep: data.saveData?.episode, name: data.AnimeData.title.romaji })
+        if (data.format?.toLowerCase().includes("movie")) return t('player.TitleMovie', { name: data.title.romaji })
+        return t('player.TitleEpisode', { ep: data.ep, name: data.title.romaji })
     } catch (error) {
         console.error(error)
-        return t('player.TitleEpisode', { ep: data.saveData?.episode, name: data.AnimeData.title.romaji })
+        return t('player.TitleEpisode', { ep: data.ep, name: data.title.romaji })
     }
+}
+
+export async function convertPath(path: string) {
+    if ((await window.api.getOSDetails()).platform == "win32") return path.replace("/", "\\")
+    return path
+}
+
+export function toSeconds(time: string) {
+    const [h, m, s] = time.split(":");
+    return parseFloat(h) * 3600 + parseFloat(m) * 60 + parseFloat(s);
+};
+
+export function isNumberString(str: string): boolean {
+    return str.trim() !== "" && !isNaN(Number(str));
+}
+
+export function timeToSeconds(time: string): number {
+    const [hms] = time.split(".");
+    const parts = hms.split(":").map(Number);
+    const [hours, minutes, seconds] = parts;
+
+    return hours * 3600 + minutes * 60 + seconds;
+}
+
+export async function convertChaptersVTT(url: string): Promise<playerChapterList> {
+    let req = await window.api.request.get(url, { "User-Agent": navigator.userAgent }, "text")
+    if (!req.success) return []
+    let lines = req.data.split("\n") as string
+
+    let finnalListChapters: playerChapterList = []
+    for (let i = 0; i < lines.length; i++) {
+        if (lines[i].includes("-->")) {
+            const [start, end] = lines[i].split(" --> ");
+            const next = lines[i + 1];
+
+            if (next == "") continue;
+
+            finnalListChapters.push({
+                start: timeToSeconds(start),
+                end: timeToSeconds(end),
+                type: "other",
+                name: next
+            })
+        }
+    }
+
+    return finnalListChapters
+}
+
+export function segregatePlugins(func: (name: string) => void): DropdownOption[] {
+    let data = getPluginList()
+    let list: DropdownOption[] = []
+    for (let index = 0; index < data.length; index++) {
+        const element = data[index];
+        if (element.player) list.push({ label: element.name, onClick: () => func(element.name) })
+    }
+
+    return list
 }

@@ -1,6 +1,7 @@
 * {
   margin: 0;
   padding: 0;
+  outline: none;
 }
 body {
   width: 100vw;
@@ -48,6 +49,25 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .error-button {
   font-size: 1.1em;
+}
+
+.app-loading-animation {
+  animation: spin 1s linear infinite;
+  width: min-content;
+  height: min-content;
+  font-size: 4em;
+}
+
+.app-loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  flex-direction: column;
+  height: 100%;
+}
+.app-loading-information {
+  font-size: 1.2em;
 }
 
 /* animation */

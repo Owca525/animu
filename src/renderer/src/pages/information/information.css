@@ -3,6 +3,7 @@
     height: 100%;
     width: 100%;
     overflow-x: hidden;
+    overflow-y: scroll;
     position: fixed;
 }
 
@@ -40,7 +41,7 @@
 .information-banner {
     width: 100%;
     height: clamp(222px, 43%, 35vh);
-    max-height: 35vw;
+    max-height: 43vw;
     overflow: hidden;
     object-fit: cover;
     position: absolute;
@@ -50,8 +51,8 @@
 
 .information-fade {
     width: 100%;
-    height: clamp(222px, 43%, 35vh);
-    max-height: 35vw;
+    height: 100%;
+    top: 0;
     z-index: 1;
     position: absolute;
     background: linear-gradient(to bottom, #0000 60%, var(--bg));
@@ -89,7 +90,7 @@
     width: 80%;
     height: fit-content;
     display: flex;
-    margin-top: clamp(100px, 16%, 40vh);
+    margin-top: clamp(202px, 43% - 22px, 35vh - 25px);
     gap: 20px;
     padding: 20px;
     box-sizing: border-box;
@@ -97,6 +98,13 @@
 
 .information-image-container {
     margin-top: min(-3%, -60px);
+}
+
+.information-episodes-button {
+    width: 40px;
+    height: 40px;
+    justify-content: center;
+    align-items: center;
 }
 
 .information-cover, .information-cover-placeholder {
@@ -126,7 +134,7 @@
     font-size: 1.7em;
 }
 
-.information-title-mobile {
+.information-title-small {
     display: none;
 }
 
@@ -136,7 +144,7 @@
     padding-bottom: 10px;
 }
 
-.information-title-mobile2 {
+.information-title-small2 {
     display: none;
 }
 
@@ -224,6 +232,7 @@
 .information-characters-card-cover {
     aspect-ratio: 2/3;
     object-fit: cover;
+    user-select: none;
 }
 
 .information-characters-card-description {
@@ -302,14 +311,36 @@
     user-select: none;
 }
 
+.information-containerwrong-error {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
 
+.information-episodes-top-content {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+}
 
+.information-episodes-space {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.information-dot {
+    font-size: 2em;
+}
 
 /* For smaller devices / window sizes */
 @media (max-width: 1000px) {
     .information-top {
         width: 100%;
-        margin-top: max(18%, 90px);
+        margin-top: 0px;
         padding: 10px 15px 10px 20px;
         gap: 20px;
     }
@@ -319,14 +350,16 @@
         width: 100%;
     }
 
-    .information-banner {
-        width: 100%;
-        height: 34%
+    .information-banner, .information-banner-image {
+        position: relative;
+        height: fit-content;
+        max-height: 250px;
+        aspect-ratio: 19/4;
     }
 
     .information-fade {
-        width: 100%;
-        height: 34%
+        aspect-ratio: 19/4;
+        background: linear-gradient(to bottom, #0000 60%, var(--bg2));
     }
 
     .information-bottom {
@@ -377,38 +410,32 @@
         font-size: 0.9em;
     }
 
-.information-characters-card {
-    width: 20%;
-    min-width: 200px;
-    height: 90px;
-    display: flex;
-    overflow: hidden;
-    font-size: 0.8rem;
+    .information-characters-card {
+        width: 20%;
+        min-width: 200px;
+        height: 90px;
+        display: flex;
+        overflow: hidden;
+        font-size: 0.8rem;
+    }
+    
+    .information-bar {
+        margin-right: 0px;
+        margin-top: 0px;
+        padding: 0px;
+        gap: 4px;
+    }
+    
+    .information-score {
+        font-size: clamp(0.85rem, 1.8vw, 1rem);
+    }
+    
 }
 
-.information-bar {
-    margin-right: 0px;
-    margin-top: 0px;
-    padding: 0px;
-    gap: 4px;
-}
-
-.information-score {
-    font-size: clamp(0.85rem, 1.8vw, 1rem);
-}
-
-.information-exit-button {
-    position: absolute;
-}
-
-}
-
-/* for smartphones 
-maybe that will be usefull in the future */
+/* for very small window sizes */
 @media (max-width: 600px) {
     .information-top {
         width: 100%;
-        margin-top: calc(max(10vh, 100px) + 42px);;
         padding: 15px;
         gap: 15px;
         flex-direction: column;
@@ -463,7 +490,7 @@ maybe that will be usefull in the future */
         display: none;
     }
 
-    .information-title-mobile {
+    .information-title-small {
         display: block;
         width: 100%;
         text-align: left;
@@ -471,7 +498,7 @@ maybe that will be usefull in the future */
         padding-left: 5dvw;
     }
 
-    .information-title-mobile2 {
+    .information-title-small2 {
         display: block;
         width: 100%;
         text-align: left;
@@ -480,7 +507,7 @@ maybe that will be usefull in the future */
         padding-top: 15px;
     }
     
-    .button {
+    .information * .button {
         padding: clamp(4px, 2vw, 20px);
     }
 
@@ -490,9 +517,8 @@ maybe that will be usefull in the future */
 
     .information-exit-button {
         padding: 6px;
-        top: max(10vh, 100px);
-        left: 0px;
-        width: 100%;
+        right: 15px;
+        left: unset;
     }
 
 }

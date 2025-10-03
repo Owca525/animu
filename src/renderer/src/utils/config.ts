@@ -1,10 +1,12 @@
 import ini from "ini";
 import { SettingsConfig } from "./GlobalInterface";
+import { convertPath } from "./functions";
 
 export const defaultConfig: SettingsConfig = {
+    firstStart: true,
     General: {
-        // HoverSidebar: true,
-        // HideSidebar: false,
+        HoverSidebar: true,
+        HideSidebar: false,
         language: "en",
         theme: "DarkAnimu",
         Window: {
@@ -12,21 +14,23 @@ export const defaultConfig: SettingsConfig = {
             AutoFullscreen: false,
             Zoom: 100,
         },
+        discordRPC: true
     },
     Player: {
         general: {
             Autoplay: true,
             AutoFullscreen: false,
             AutoSkipEpisode: true,
-            playerLoadType: "metadata",
             Volume: 25,
             LongTimeSkipForward: 90,
             LongTimeSkipBack: 90,
             TimeSkipLeft: 5,
             TimeSkipRight: 5,
-            VideoScaling: false,
-            RemovingSpaceAnimation: false,
-            DisableVolumeAnimation: false
+            VideoStreching: false,
+            PlayerBehavior: "information",
+            autoSkipOpenings: false,
+            autoSkipEndings: false,
+            showBrokenBuffer: false
         },
         screenShot: {
             alwaysAsk: true,
@@ -35,13 +39,16 @@ export const defaultConfig: SettingsConfig = {
         },
         external: {
             enable: false,
-            type: "mpv",
-            movianIP: "localhost:42000"
+            type: "Mpv",
+            movianIP: "localhost:42000",
+            mpvPath: await window.api.os.getPathProgram("mpv"),
+            vlcPath: await window.api.os.getPathProgram("vlc")
         },
         upToNextEpisode: {
             enable: true,
-            interval: 30,
-            durrationShow: 5
+            interval: 15,
+            durationShow: 5,
+            variants: "var1"
         },
         keybinds: {
             Pause: " ",
@@ -59,8 +66,16 @@ export const defaultConfig: SettingsConfig = {
             VolumeUp: "0",
             VolumeMute: "m",
             ScreenShot: "f10",
-            PictureInPicture: "P"
+            PictureInPicture: "P",
+            toggleSubtitles: "C",
+            skipOpeningEnding: "S"
         },
+        ui: {
+            DisableVolumeAnimation: false,
+            DisableSpaceAnimation: false,
+            DisableSkipAnimation: false,
+            DisableLoadingAnimation: false
+        }
     },
     History: {
         history: {
@@ -84,17 +99,20 @@ export const defaultConfig: SettingsConfig = {
         type: "On Start",
         enable: true
     },
+    plugins: {
+        // information: "AnilistApi",
+        player: "Allmanga"
+    }
 };
 
 const appConfigDirPath = window.api.os.getPath("userData");
 
 export async function checkPictureFolder(): Promise<string> {
     const path = await window.api.os.getPath("pictures");
-    const platform = await window.api.getOSDetails()
-    const platform_path = platform.platform == "win32" ? "\animu" : "/animu "
-    if (await window.api.os.exists(`${path}${platform_path}`)) return `${path}${platform_path}`;
-    window.api.os.mkdir(`${path}${platform_path}`);
-    return `${path}${platform_path}`;
+    const picturePath = await convertPath(`${path}/animu`)
+    if (await window.api.os.exists(picturePath)) return picturePath;
+    window.api.os.mkdir(picturePath);
+    return picturePath;
 }
 
 function deepMerge(target: any, source: any): any {
@@ -109,22 +127,6 @@ function deepMerge(target: any, source: any): any {
         }
     }
     return target;
-}
-
-export async function SaveOneParametrConfig(path: string, value: string | number | boolean) {
-    const keys = path.split('.')
-    const newConfig = await readConfig()
-
-    let current: SettingsConfig = newConfig
-    for (let i = 0; i < keys.length - 1; i++) {
-        const key = keys[i]
-
-        if (!current[key]) current[key] = {}
-        current = current[key]
-    }
-
-    current[keys[keys.length - 1]] = value
-    saveConfig(newConfig)
 }
 
 export async function readConfig(): Promise<SettingsConfig> {

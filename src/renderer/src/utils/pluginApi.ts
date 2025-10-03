@@ -1,4 +1,4 @@
-import { containerData } from "./GlobalInterface";
+import { containerData, pluginFormat, SettingsConfig } from "./GlobalInterface";
 import store from "./store";
 
 export async function setHomeData(func: () => Promise<containerData[]>) {
@@ -43,7 +43,7 @@ export async function UpdateHomeData(func: () => Promise<{ data: containerData, 
     }
 }
 
-export async function homeStopScrolling(payload: boolean) {
+export function homeStopScrolling(payload: boolean) {
     try {
         store.dispatch({
             type: "setStopScrolling", payload: payload
@@ -53,11 +53,86 @@ export async function homeStopScrolling(payload: boolean) {
     }
 }
 
-export async function setHomeLocalSearch(payload: boolean) {
+export function setHomeLocalSearch(payload: boolean) {
     try {
         store.dispatch({
             type: "setLocalSearch", payload: payload
         })
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export function InitialPlugin() {
+    try {
+        const config: SettingsConfig = store.getState().config
+        const loadedPlugins: pluginFormat[] = store.getState().plugin.loadedPlugins
+        for (let index = 0; index < loadedPlugins.length; index++) {
+            const element = loadedPlugins[index];
+            if (element.name == config.plugins.player) {
+                store.dispatch({type: "setPluginPlayer", payload: element})
+                return
+            }
+        }
+
+        loadedPlugins.forEach((element: pluginFormat) => {
+            if (element.name == "Allmanga") {
+                store.dispatch({type: "setPluginPlayer", payload: element})
+                return
+            }
+        })
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export function ChangePlugin(name: string) {
+    try {
+        const loadedPlugins: pluginFormat[] = store.getState().plugin.loadedPlugins
+        for (let index = 0; index < loadedPlugins.length; index++) {
+            const element = loadedPlugins[index];
+            if (element.name == name) {
+                store.dispatch({type: "setPluginPlayer", payload: element})
+                return
+            }
+            if (name == "" && element.name == "Allmanga") {
+                store.dispatch({type: "setPluginPlayer", payload: element})
+                return
+            }
+        }
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export function getPluginList(): pluginFormat[] {
+    try {
+        return store.getState().plugin.loadedPlugins
+    } catch (error) {
+        console.error(error)
+        return []
+    }
+}
+
+export function setPluginPlayerCache(element: any) {
+    try {
+        store.dispatch({type: "setPlayerPluginCache", payload: element})
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export function getPlayerPluginCache(): any {
+    try {
+        return store.getState().plugin.playerPluginCache
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export function ResetPluginPlayerCache() {
+    try {
+        store.dispatch({type: "setPlayerPluginCache", payload: undefined})
     } catch (error) {
         console.error(error)
     }

@@ -1,65 +1,53 @@
 // import { playerUrlProps } from "@renderer/utils/interface"
 
 import { convertMsToMinutes, similarityText } from "@renderer/utils/functions"
-import { AnimeData, cardData, playerData, pluginFormat } from "@renderer/utils/GlobalInterface"
+import { AnimeData, cardData, episodeList, playerData, pluginFormat } from "@renderer/utils/GlobalInterface"
 import { setHomeData, UpdateHomeData } from "@renderer/utils/pluginApi"
 
 const HASH_SEARCH = '06327bc10dd682e1ee7e07b6db9c16e9ad2fd56c1b769e47513128cd5c9fc77a'
 const HASH_INFO = '9d7439c90f203e534ca778c4901f9aa2d3ad42c06243ab2c5e6b79612af32028'
 const HASH_PLAYER = '5f1a64b73793cc2234a389cf3a8f93ad82de7043017dd551f38f65b89daa65e0'
+const HASH_DATA = "c8f3ac51f598e630a1d09d7f7fb6924cff23277f354a23e473b962a367880f7d"
 const API_WEB = 'https://api.allanime.day'
 
 const header = {
-  'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0',
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0',
   'Referer': 'https://allmanga.to/'
 }
 
-const source_names = ['Sak', 'S-mp4', 'Luf-mp4', "Kir", "Default"]
+const source_names = ["Yt-mp4", 'Sak', 'S-mp4', 'Luf-mp4', "Kir", "Default", "Uv-mp4"]
 
-const replacements: { [key: string]: string } = {
-  '01': '9',
-  '08': '0',
-  '05': '=',
-  '0a': '2',
-  '0b': '3',
-  '0c': '4',
-  '07': '?',
-  '00': '8',
-  '5c': 'd',
-  '0f': '7',
-  '5e': 'f',
-  '17': '/',
-  '54': 'l',
-  '09': '1',
-  '48': 'p',
-  '4f': 'w',
-  '0e': '6',
-  '5b': 'c',
-  '5d': 'e',
-  '0d': '5',
-  '53': 'k',
-  '1e': '&',
-  '5a': 'b',
-  '59': 'a',
-  '4a': 'r',
-  '4c': 't',
-  '4e': 'v',
-  '57': 'o',
-  '51': 'i'
-}
+const mapping: Record<string, string> = {
+  "79": "A", "7a": "B", "7b": "C", "7c": "D", "7d": "E", "7e": "F", "7f": "G",
+  "70": "H", "71": "I", "72": "J", "73": "K", "74": "L", "75": "M", "76": "N",
+  "77": "O", "68": "P", "69": "Q", "6a": "R", "6b": "S", "6c": "T", "6d": "U",
+  "6e": "V", "6f": "W", "60": "X", "61": "Y", "62": "Z", "59": "a", "5a": "b",
+  "5b": "c", "5c": "d", "5d": "e", "5e": "f", "5f": "g", "50": "h", "51": "i",
+  "52": "j", "53": "k", "54": "l", "55": "m", "56": "n", "57": "o", "48": "p",
+  "49": "q", "4a": "r", "4b": "s", "4c": "t", "4d": "u", "4e": "v", "4f": "w",
+  "40": "x", "41": "y", "42": "z", "08": "0", "09": "1", "0a": "2", "0b": "3",
+  "0c": "4", "0d": "5", "0e": "6", "0f": "7", "00": "8", "01": "9", "15": "-",
+  "16": ".", "67": "_", "46": "~", "02": ":", "17": "/", "07": "?", "1b": "#",
+  "63": "[", "65": "]", "78": "@", "19": "!", "1c": "$", "1e": "&", "10": "(",
+  "11": ")", "12": "*", "13": "+", "14": ",", "03": ";", "05": "=", "1d": "%"
+};
 
-function findUrl(url: string, sourceName: string, sourceNames: string[]): string {
-  return sourceNames.includes(sourceName) ? url : ''
+function findUrl(url: string, sourceName: string): string | undefined{
+  for (let index = 0; index < source_names.length; index++) {
+    const element = source_names[index];
+    if (element.toLowerCase() == sourceName.toLowerCase()) return decodeText(url)
+  }
+  return
 }
 
 function decodeText(textString: string): string {
-  textString = textString.replace(/../g, (match) => `${match}\n`)
+    const field = textString.trim();
 
-  for (const [pattern, replacement] of Object.entries(replacements)) {
-    const regex = new RegExp(pattern, 'gm')
-    textString = textString.replace(regex, replacement)
-  }
-  return textString.replace(/\n/g, '').replace('/clock', '/clock.json')
+    const hexPairs: string[] = [];
+    for (let i = 0; i < field.length; i += 2) {
+        hexPairs.push(field.slice(i, i + 2));
+    }
+    return hexPairs.map(hp => mapping[hp] ?? "").join("")
 }
 
 async function sendToAPI(variables: string, hash: string, header: any): Promise<any | null> {
@@ -69,13 +57,14 @@ async function sendToAPI(variables: string, hash: string, header: any): Promise<
   return null
 }
 
-async function sendRequest(url: string, header: any): Promise<any | null> {
+async function sendRequest(url: string, header: any): Promise<any | undefined> {
   let data = await window.api.request.get(url, header)
+  console.log(data)
   if (data.success) return data.data
-  return null
+  return undefined
 }
 
-export async function SearchAnime(name: string, page: number = 1) {
+export async function SearchAnime(name: string, page: number = 1): Promise<Record<string, any> | null> {
   let variables = `{"search":{"query":"${name}"},"limit":26,"page":${page},"translationType":"sub","countryOrigin":"ALL"}`
 
   const resp = await sendToAPI(variables, HASH_SEARCH, header)
@@ -83,19 +72,60 @@ export async function SearchAnime(name: string, page: number = 1) {
   return null
 }
 
-function converterData(data: any): cardData {
+let episodeListCache: { id: string, temp: any } | undefined = undefined
+
+async function convertEpisodes(anime_id: string, episodeList: string[]): Promise<{ ep: string, img?: string, title?: string }[]> {
+  if (!episodeList) return episodeList
+  try {
+    if (episodeList.length > 51) return episodeList.map((element) => { return { ep: element } })
+    if (episodeList.length <= 0) return []
+
+    let variables = `{"showId":"${anime_id}","episodeNumStart":${episodeList[episodeList.length - 1]},"episodeNumEnd":${episodeList[0]}}`
+    let response: any = undefined
+
+    if (episodeListCache && episodeListCache.id == anime_id) response = episodeListCache.temp
+    else response = await sendToAPI(variables, HASH_DATA, header)
+    console.log(response)
+
+    if (!response) return episodeList.map((element) => { return { ep: element } })
+    if (response.errors) return episodeList.map((element) => { return { ep: element } })
+    let infoData = response.data.episode.episodeInfos
+    if (infoData.length <= 0) return episodeList.map((element) => { return { ep: element } })
+
+    let episodeData: { ep: string, img?: string, title?: string }[] = []
+    // I decide for loop because map be harder to add episode number
+    for (let index = 0; index < infoData.length; index++) {
+      const element = infoData[index];
+      if (episodeList.length - 1 < index) break
+      if (element.thumbnails.length <= 0) episodeData.push({ ep: (index + 1).toString() })
+      else episodeData.push({ ep: (episodeList[index]).toString(), img: `https://wp.youtube-anime.com/aln.youtube-anime.com${element.thumbnails[0]}` })
+    }
+
+    episodeListCache = { id: anime_id, temp: response }
+    console.log(episodeData)
+    return episodeData
+  } catch (error) {
+    console.error(`Error in convertEpisodes: ${error}`)
+    return episodeList.map((element) => { return { ep: element } })
+  }
+}
+
+async function converterData(data: any): Promise<cardData | undefined> {
+  if (!data) return
   let characters: any = []
   try {
     if (data.characters) {
-        for (let index = 0; index < data.characters.length; index++) {
-          const element = data.characters[index];
-          characters.push({ role: element.role, character: { id: element.aniListId, name: element.name.full, image: element.image.large } })
-          if (index == 10) break
-        }
+      for (let index = 0; index < data.characters.length; index++) {
+        const element = data.characters[index];
+        characters.push({ role: element.role, character: { id: element.aniListId, name: element.name.full, image: element.image.large } })
+        if (index == 10) break
+      }
     }
   } catch (error) {
     console.error(error)
   }
+
+  console.log(data)
 
 
   return {
@@ -121,9 +151,9 @@ function converterData(data: any): cardData {
       format: data.type,
       player_ID: data._id,
       episodesList: data.availableEpisodesDetail ? [
-        { episodes: data.availableEpisodesDetail.sub.reverse(), type: "sub", name: "Subtitles" },
-        { episodes: data.availableEpisodesDetail.dub.reverse(), type: "dub", name: "Dubbing" },
-        { episodes: data.availableEpisodesDetail.raw.reverse(), type: "raw" }
+        { episodes: (await convertEpisodes(data._id, data.availableEpisodesDetail.sub)).reverse(), type: "sub", name: "Subtitles" },
+        { episodes: (await convertEpisodes(data._id, data.availableEpisodesDetail.dub)).reverse(), type: "dub", name: "Dubbing" },
+        { episodes: (await convertEpisodes(data._id, data.availableEpisodesDetail.raw)).reverse(), type: "raw" }
       ] : data.availableEpisodesDetail,
       characters: characters,
       source: undefined,
@@ -135,12 +165,18 @@ function converterData(data: any): cardData {
 export async function recentAnime(page: number = 1) {
   let variables = `{"search":{"sortBy":"Recent"},"limit":26,"page":${page},"translationType":"sub","countryOrigin":"JP"}`
   let anime = await sendToAPI(variables, HASH_SEARCH, header)
+  let animeData: cardData[] = []
+  for (let index = 0; index < anime.data.shows.edges.length; index++) {
+    const element = anime.data.shows.edges[index];
+    let data = await converterData(element)
+    if (data) animeData.push(data)
+  }
   if (page && page > 1) {
     await UpdateHomeData(async () => {
       return {
         data: {
           title: "Recent Anime",
-          data: anime.data.shows.edges.map((data) => converterData(data)),
+          data: animeData,
           onScrollDownFunction: (page) => recentAnime(page)
         },
         maxPage: 26
@@ -165,30 +201,45 @@ export async function recentAnime(page: number = 1) {
     return [
       {
         title: "Recent Anime",
-        data: anime.data.shows.edges.map((data) => converterData(data)),
+        data: animeData,
         onScrollDownFunction: (page) => recentAnime(page)
       }
     ]
   })
 }
 
-async function getAnimeList(name: string): Promise<cardData[]> {
-  let data = await SearchAnime(name)
-  if (data == 0) return []
-  return data.shows.edges.map((data) => converterData(data))
+async function getAnimeList(anime: AnimeData): Promise<cardData[]> {
+  try {
+    let data = await SearchAnime(anime.title.romaji)
+    if (!data) return []
+    if (data.length <= 0) return []
+    let returnData: cardData[] = []
+    for (let index = 0; index < data.shows.edges.length; index++) {
+      const element = data.shows.edges[index];
+      let tmp = await converterData(element)
+      if (tmp) returnData.push(tmp)
+    }
+    return returnData
+  } catch (error) {
+    console.log(`Error in getAnimeList: ${error}`)
+    return []
+  }
 }
 
-async function extractInformation(id: string) {
+export async function extractInformation(id: string) {
   let variables = `{"_id":"${id}"}`;
   const resp = await sendToAPI(variables, HASH_INFO, header);
-  return converterData(resp.data.show).AnimeData
+  console.log(resp)
+  let data = await converterData(resp.data.show)
+  if (data) return data.AnimeData
+  return 
 }
 
-export async function getInformation(animeData?: AnimeData, anime_id?: string): Promise<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] }> {
+export async function getInformation(animeData?: AnimeData, anime_id?: string): Promise<episodeList> {
   // CHUJ MNIE TO ŻE ONE PIECIE NIE JEST WYKRYWANIE, JEŚLI ALLMANGA BY NIE MIAŁA 1P ZAMIAST ONE PIECIE JAKIE CWEL TO JEST
   console.log(animeData)
   if (animeData) {
-    let data = await getAnimeList(animeData.title.native);
+    let data = await getAnimeList(animeData);
     let precentageNative: { name: string, prec: number, data: AnimeData }[] = [];
     let precentageRomaji: { name: string, prec: number, data: AnimeData }[] = [];
     let precentageEnglish: { name: string, prec: number, data: AnimeData }[] = [];
@@ -213,7 +264,7 @@ export async function getInformation(animeData?: AnimeData, anime_id?: string): 
     let english = precentageEnglish.filter(item => item.prec === Math.max(...precentageEnglish.map(item => item.prec)));
     let native = precentageNative.filter(item => item.prec === Math.max(...precentageNative.map(item => item.prec)));
 
-    let list_of_number = [ ...romaji.map((element) => element.data.player_ID), ...english.map((element) => element.data.player_ID), ...native.map((element) => element.data.player_ID) ]
+    let list_of_number = [...romaji.map((element) => element.data.player_ID), ...english.map((element) => element.data.player_ID), ...native.map((element) => element.data.player_ID)]
     const counter: { [key: string]: number } = {};
 
     for (const item of list_of_number) {
@@ -245,31 +296,29 @@ export async function getInformation(animeData?: AnimeData, anime_id?: string): 
   if (anime_id == "") return { player_id: "", episodesData: [] };
   if (!anime_id) return { player_id: "", episodesData: [] }
 
-  let anime_data = (await extractInformation(anime_id)).episodesList
+  let anime_data = await extractInformation(anime_id)
   if (!anime_data) return { player_id: "", episodesData: [] };
 
-  return { player_id: anime_id ? anime_id : "", episodesData: anime_data };
+  return { player_id: anime_id ? anime_id : "", episodesData: anime_data.episodesList ?? [] };
 }
 
 async function getURLS(url: string): Promise<playerData | undefined> {
-  url = decodeText(url.replace('--', ''))
-  const links = await sendRequest(`http://allanime.day${url}`, {
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:123.0) Gecko/20100101 Firefox/123.0'
+  if (url.startsWith("https")) return { resolution: [{ url: url, res: "1080" }], hostname: new URL(url).hostname, hls: false }
+  const links = await sendRequest(`http://allanime.day${url.replace("clock", "clock.json")}`, {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0'
   })
+  console.log(url, links)
   if (!links) return undefined
 
   let listUrls: playerData | undefined
 
   links.links.forEach(element => {
-    if (!element.link) return
-
-    const urlObject = new URL(element.link);
-
-    if (element.hls && urlObject.hostname != "ayvic.fast4speed.rsvp") {
-      listUrls = { resolution: [{ url: element.link, res: "" }], hostname: urlObject.hostname, hls: true }
-    }
+    if (!element.src) return
+    const urlObject = new URL(element.src);
     if (element.mp4) {
-      listUrls = { resolution: [{ url: element.link, res: "1080" }], hostname: urlObject.hostname, hls: false }
+      listUrls = { resolution: [{ url: element.src, res: "1080" }], hostname: urlObject.hostname, hls: false }
+    } else {
+      listUrls = { resolution: [{ url: element.src, res: "" }], hostname: urlObject.hostname, hls: true }
     }
   });
   return listUrls
@@ -281,9 +330,9 @@ export async function extractURLS(type: string, episode: string, id: string): Pr
   const sources = resp.data.episode.sourceUrls
   const urls = sources
     .map((tmp: { sourceUrl: string; sourceName: string }) =>
-      findUrl(tmp.sourceUrl, tmp.sourceName, source_names)
+      findUrl(tmp.sourceUrl, tmp.sourceName)
     )
-    .filter((item: string) => item !== '')
+    .filter((item: string) => item !== undefined)
 
   let data: playerData[] = []
   for (let i = 0; i < urls.length; i++) {
@@ -291,47 +340,77 @@ export async function extractURLS(type: string, episode: string, id: string): Pr
     let tmp = await getURLS(element)
     if (tmp) data.push(tmp)
   }
+
+  console.log(resp.data.episode.episodeInfo.vidInforssub)
+  if (type == "dub" && resp.data.episode.episodeInfo.vidInforsdub) {
+    data.push({ hostname: "wp.youtube-anime.com", hls: false, resolution: [{ res: resp.data.episode.episodeInfo.vidInforsdub.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.episode.episodeInfo.vidInforsdub.vidPath}` }] })
+  }
+  if (type == "raw" && resp.data.episode.episodeInfo.vidInforsraw) {
+    data.push({ hostname: "wp.youtube-anime.com", hls: false, resolution: [{ res: resp.data.episode.episodeInfo.vidInforsraw.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.episode.episodeInfo.vidInforsraw.vidPath}` }] })
+  }
+  if (type == "sub" && resp.data.episode.episodeInfo.vidInforssub) {
+    data.push({ hostname: "wp.youtube-anime.com", hls: false, resolution: [{ res: resp.data.episode.episodeInfo.vidInforssub.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.episode.episodeInfo.vidInforssub.vidPath}` }] })
+  }
+
+  console.log(data)
+
   return data
 }
 
-export async function convertToNewData(id: string): Promise<cardData | null> {
+export async function convertToNewData(id: string): Promise<cardData | undefined> {
   try {
     let variables = `{"_id":"${id}"}`
     const resp = await sendToAPI(variables, HASH_INFO, header)
-    if (resp) return converterData(resp.data.show)
-    return null
+    if (resp) return await converterData(resp.data.show)
+    return
   } catch (Error) {
     console.error(Error)
-    return null
+    return
   }
 }
 
-export async function getEpisodeList(type: string, anime_id: string): Promise<string[] | null> {
+export async function getEpisodeList(type: string, anime_id: string): Promise<{ ep: string, img?: string, title?: string }[]> {
   try {
     let variables = `{"_id":"${anime_id}"}`
     const resp = await sendToAPI(variables, HASH_INFO, header)
     if (resp) {
-      let data = converterData(resp.data.show).AnimeData.episodesList
-      if (!data) return null
-      return data.filter(item => item.type === type).flatMap(item => item.episodes)
+      let data = await converterData(resp.data.show)
+      if (!data || !data.AnimeData.episodesList) return []
+      return data.AnimeData.episodesList.filter(item => item.type === type).flatMap(item => item.episodes)
     }
-    return null
+    return []
   } catch (Error) {
     console.error(Error)
-    return null
+    return []
   }
 }
 
+async function searchAnime(name: string, page: number, params?: { genres?: string[]; years?: string; seasons?: string; format?: string[]; airing?: string }): Promise<cardData[]> {
+  let dataReq = await SearchAnime(name, page)
+  if (!dataReq || dataReq.length <= 0) return []
+
+  let returnData: cardData[] = []
+  for (let index = 0; index < dataReq.shows.edges.length; index++) {
+    const element = dataReq.shows.edges[index];
+    let data = await converterData(element)
+    if (data) returnData.push(data)
+  }
+
+  return returnData
+}
+
 export const infoPluginPlayer: pluginFormat = {
-  version: "0.1",
+  version: "1.0",
   name: "Allmanga",
   author: "Owca525",
+  icon: "https://allmanga.to/android-icon-192x192.png",
   player: {
     animeDataList: getInformation,
     getUrls: extractURLS,
     episodeList: getEpisodeList,
     animeList: getAnimeList,
-    getInformation: extractInformation
+    search: searchAnime
   },
-  sidebarAddon: [{ icon: "today", text: "Recent Anime", onClick: async () => await recentAnime() }]
+  sidebarAddon: [{ icon: "today", text: "Recent Anime", onClick: async () => await recentAnime() }],
+  preferedLang: ["en"]
 }

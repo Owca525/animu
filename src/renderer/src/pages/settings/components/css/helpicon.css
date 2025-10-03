@@ -3,6 +3,7 @@
   position: relative;
   display: inline-block;
   cursor: pointer;
+  user-select: none;
 }
 .help-icon {
   width: 24px;
@@ -11,6 +12,7 @@
   align-items: center;
   justify-content: center;
   font-size: x-large;
+  user-select: none;
 }
 .help-icon-description {
   position: absolute;

@@ -2,6 +2,7 @@ import { formatTime } from '@renderer/utils/functions';
 import React, { useEffect, useRef, useState } from 'react';
 
 import "./css/seekBar.css"
+import { Thumbnail } from '@renderer/utils/GlobalInterface';
 
 interface SeekBarProps {
   maxValue: number | undefined;
@@ -12,6 +13,8 @@ interface SeekBarProps {
   classes?: { container?: string, progress?: string, thumb?: string, box?: string }
   screen?: boolean
   secondBarValues?: { position: number, width: number }[]
+  thumbnail?: Thumbnail
+  chapterList?: { left: number, width: number, name?: string, type: "opening" | "ending" | "other" }[]
 }
 
 const SeekBar: React.FC<SeekBarProps> = ({
@@ -22,7 +25,9 @@ const SeekBar: React.FC<SeekBarProps> = ({
   type = "value",
   classes,
   screen = false,
-  secondBarValues
+  secondBarValues,
+  thumbnail,
+  chapterList
 }) => {
   const [value, setValue] = useState(currentValue);
   const [drag, setdrage] = useState<boolean>(false);
@@ -32,6 +37,8 @@ const SeekBar: React.FC<SeekBarProps> = ({
   const seekBarProgress = useRef<HTMLDivElement | null>(null);
   const seekbarThumb = useRef<HTMLDivElement | null>(null);
   const seekbarBox = useRef<HTMLDivElement | null>(null);
+  const seekbarThumbnail = useRef<HTMLImageElement | null>(null);
+  const seekbarChapterText = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
     setValue(currentValue);
@@ -76,16 +83,74 @@ const SeekBar: React.FC<SeekBarProps> = ({
 
     const percent = ((newValue - minValue) / (maxValue - minValue)) * 100;
     seekbarBox.current.style.left = `${percent}%`;
+    setChapterBoxPosition(`${percent}%`, percent)
 
     if (screen) {
-      if (percent > 98) seekbarBox.current.style.left = `98%`;
-      if (percent < 1.5) seekbarBox.current.style.left = `1.5%`;
+      if (percent > 98) {
+        seekbarBox.current.style.left = `98%`
+        setChapterBoxPosition(`98%`, percent)
+      };
+      if (percent < 1.5) {
+        seekbarBox.current.style.left = `1.5%`
+        setChapterBoxPosition(`1.5%`, percent)
+      };
     }
-
+    if (thumbnail) setThumbnailPosition(percent)
     if (type === "value") seekbarBox.current.innerHTML = newValue.toFixed(0);
     if (type === "float") seekbarBox.current.innerHTML = newValue.toFixed(1);
     if (type === "time") seekbarBox.current.innerHTML = formatTime(newValue);
     if (type === "procent") seekbarBox.current.innerHTML = `${newValue.toFixed(0)}%`
+  }
+
+  function setThumbnailPosition(percent: number) {
+    if (!thumbnail) return
+    if (!maxValue) return
+
+    thumbnail.metadata.forEach((value) => {
+      let startPercent = (value.start / maxValue) * 100
+      let endPercent = (value.end / maxValue) * 100
+
+      if (
+        percent >= startPercent &&
+        percent <= endPercent &&
+        seekbarThumbnail.current
+      ) {
+        const thumb = seekbarThumbnail.current
+        const container = thumb.parentElement
+        if (!container) return
+
+        thumb.style.backgroundPosition = `-${value.imgX}px -${value.imgY}px`
+
+        const containerWidth = container.clientWidth
+        const thumbWidth = thumb.offsetWidth
+        let centerPx = (percent / 100) * containerWidth
+        const halfThumb = thumbWidth / 2
+        if (centerPx < halfThumb) centerPx = halfThumb
+        if (centerPx > containerWidth - halfThumb) {
+          centerPx = containerWidth - halfThumb
+        }
+        if (centerPx > 0) {
+          thumb.style.left = `${centerPx}px`
+          setChapterBoxPosition(`${centerPx}px`, percent)
+        }
+      }
+    })
+  }
+
+  function setChapterBoxPosition(variable: string, percent: number) {
+    if (!chapterList) return
+    if (!seekbarChapterText.current) return
+    for (let index = 0; index < chapterList.length; index++) {
+      const element = chapterList[index];
+      seekbarChapterText.current.innerHTML = ""
+      seekbarChapterText.current.style.display = "none"
+      if (percent >= element.left && percent <= (element.left + element.width) && element.name) {
+        seekbarChapterText.current.style.left = variable
+        seekbarChapterText.current.innerHTML = element.name
+        seekbarChapterText.current.style.display = ""
+        return
+      }
+    }
   }
 
   function handleMouseMove(event: React.MouseEvent<HTMLDivElement> | MouseEvent) {
@@ -95,31 +160,53 @@ const SeekBar: React.FC<SeekBarProps> = ({
 
   return (
     <div
+      tabIndex={-1}
       ref={seekBarRef}
       className={`seekBar-container ${classes?.container}`}
       onClick={setPosition}
       onMouseDown={() => setdrage(() => true)}
       onMouseUp={() => setdrage(() => false)}
-      onMouseLeave={() => { setdrage(() => false); setshow(false) }}
+      onMouseLeave={() => { setdrage(() => false); setshow(() => false) }}
       onMouseEnter={() => setshow(() => true)}
       onMouseMove={handleMouseMove}
     >
       {/* {secondBarValue && <div className="seekbar-progress-second" style={{ width: `${secondBarValue}%` }} />} */}
-      {secondBarValues && 
+      {secondBarValues &&
         <div className="seekbar-buffer-wrapper">
-          {secondBarValues.map((buffer) => <div className="seekbar-buffer" style={{ left: `${buffer.position}%`, width: `${buffer.width}%` }}></div> )}
+          {secondBarValues.map((buffer) => <div className="seekbar-buffer" style={{ left: `${buffer.position}%`, width: `${buffer.width}%` }}></div>)}
         </div>
       }
-      
+      {chapterList && chapterList.length > 0 &&
+        <div className="seekbar-chapters-wrapper">
+          {chapterList.map((chapter) => <div className={`seekbar-chapters ${chapter.type == "opening" || chapter.type == "ending" ? "seekbar-chapters-opening-ending" :""}`} style={{ left: `${chapter.left}%`, width: `${chapter.width}%` }}></div>)}
+        </div>
+      }
+
       <div
+        tabIndex={-1}
         ref={seekBarProgress}
         className={`seekbar-progress ${classes?.progress}`}
       />
       <div
+        tabIndex={-1}
         ref={seekbarThumb}
         className={`seekbar-thumb ${classes?.thumb}`}
       />
-      <div ref={seekbarBox} style={show ? { display: "block" } : { display: "none" }} className={`seekbar-box ${classes?.box}`}></div>
+      <div tabIndex={-1} ref={seekbarBox} style={show ? { display: "block" } : { display: "none" }} className={`seekbar-box ${classes?.box}`}></div>
+      <div className="seekbar-content-wrapper" style={show ? { display: "block" } : { display: "none" }}>
+        {thumbnail && 
+          <div
+            tabIndex={-1}
+            ref={seekbarThumbnail}
+            style={show ? { display: "block", backgroundImage: `url(${thumbnail.src})` } : { display: "none" }}
+            className="seekbar-thumbnail"
+          />
+        }
+
+        {chapterList && chapterList.length > 0 && 
+          <div tabIndex={-1} ref={seekbarChapterText} className={`seekbar-box ${thumbnail ? "seekbar-chapter-box-thumbnails" : "seekbar-chapter-box"} ${classes?.box}`}></div>
+        }
+      </div>
     </div>
   );
 };

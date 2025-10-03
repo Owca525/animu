@@ -1,11 +1,10 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { AnimeData, notificationProps } from "@renderer/utils/GlobalInterface";
+import { AnimeData, notificationProps, pluginFormat } from "@renderer/utils/GlobalInterface";
 import Button from "@renderer/components/buttons";
 import "./information.css"
-import { capitalizeFirstLetter, convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities, getGradientColor } from "@renderer/utils/functions";
+import { convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities, getGradientColor, segregatePlugins } from "@renderer/utils/functions";
 import { useEffect, useState } from "react";
 import { t } from "i18next"
-import { useSelector } from "react-redux";
 import Drop from "./components/drop";
 import ContainerWrong from "./components/containerWrong";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -14,20 +13,33 @@ import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import { ReadHistory } from "@renderer/utils/history/history";
 import { ReadContinue } from "@renderer/utils/history/continueWatch";
 import store from "@renderer/utils/store";
+import Dropdown from "@renderer/components/dropDown";
+import { ChangePlugin } from "@renderer/utils/pluginApi";
+import { useQuery } from "react-query";
 
 function information() {
     const navigate = useNavigate()
-    const location = useLocation();
-    let anime_data: AnimeData = location.state;
+    const anime_data: AnimeData = useLocation().state;
 
-    const informationTemp = useSelector((info: any) => info.information);
-    const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
     const [showWrong, setshowWrong] = useState<boolean>(false)
     const [secondsLeft, setSecondsLeft] = useState<undefined | number>(anime_data.nextAiringEpisode?.timeUntilAiring);
-    const [data, setData] = useState<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] } | undefined>(undefined)
     const [savedata, setsavedata] = useState<{ last_episode: number, last_time: number } | undefined>(undefined)
-    const [isLoading, setLoadingData] = useState<boolean>(false)
-    const [isError, setIsError] = useState<boolean>(false)
+    const [currentIDplayer, setCurrentIDplayer] = useState<string | undefined>(anime_data.player_ID)
+
+    const { data: episodeData, isError: isEpisodeError, isFetching: isEpisodeLoading, refetch } = useQuery({
+        queryKey: [{ data: anime_data, player_id: currentIDplayer }],
+        queryFn: async ({ queryKey }) => {
+            const [data] = queryKey;
+            if (data.data.id == "") {
+                ChangePlugin("Allmanga")
+                return store.getState().plugin.playerPlugin.player.animeDataList(data.data, "")
+            }
+            if (store.getState().plugin.playerPlugin) return store.getState().plugin.playerPlugin.player.animeDataList(data.player_id ? undefined : data.data, data.player_id)
+        },
+        refetchOnWindowFocus: false,
+        staleTime: 2 * 60 * 60 * 1000,
+        cacheTime: 2 * 60 * 60 * 1000
+    });
 
     // Banner
     const [isBannerLoading, setBannerLoadingData] = useState<boolean>(true)
@@ -53,71 +65,37 @@ function information() {
 
     const time = convertSeconds(secondsLeft)
 
-    // I can't use useQuery Because Doesn't Work
-    async function fetchData(func: any, id?: string) {
-        try {
-            setIsError(() => false)
-            setLoadingData(() => true)
-            let data = await func(id ? undefined : anime_data, id)
-            if (data) {
-                setData(() => data)
-                setLoadingData(() => false)
-                store.dispatch({ type: "setInformationEpisodesData", payload: data })
-            } else {
-                setIsError(() => true)
-            }
-            setshowWrong(() => false)
-        } catch (Error) {
-            setIsError(() => true)
-            setshowWrong(() => false)
-            setLoadingData(() => false)
-            console.error(Error)
-        }
-    }
-
     async function initialInformation() {
-        console.log(informationTemp)
-        if (anime_data.id == "") {
-            fetchData(pluginPlayer.player.animeDataList, anime_data.player_ID)
-            return
-        }
+        let currentPlayerPlugin: pluginFormat = store.getState().plugin.playerPlugin
+        if (!currentPlayerPlugin.player) return
 
         let cardAnime = (await ReadHistory()).filter((element) => element.AnimeData.id == anime_data.id)
         let cardAnimeContinueWatch = (await ReadContinue()).filter((element) => element.AnimeData.id == anime_data.id)
 
         if (cardAnimeContinueWatch.length > 0) {
             let animeContinue = cardAnimeContinueWatch[0].saveData
-            if (animeContinue) setsavedata(() => {return{ last_episode: parseInt(animeContinue.episode), last_time: animeContinue.last_Time }})
+            if (animeContinue) setsavedata(() => { return { last_episode: parseInt(animeContinue.episode), last_time: animeContinue.last_Time } })
         }
         if (cardAnime.length > 0 && cardAnimeContinueWatch.length <= 0) {
             let animeHistory = cardAnime[0].saveData
-            if (animeHistory) setsavedata(() => {return{ last_episode: parseInt(animeHistory.episode), last_time: animeHistory.last_Time }})
+            if (animeHistory) setsavedata(() => { return { last_episode: parseInt(animeHistory.episode), last_time: animeHistory.last_Time } })
         }
-
-        if (informationTemp.id == anime_data.id && informationTemp.episodes_data != undefined) {
-            setData(() => informationTemp.episodes_data)
-            return
-        }
-
-        store.dispatch({ type: "setInformationID", payload: anime_data.id })
-        if (cardAnime.length <= 0 && cardAnimeContinueWatch.length <= 0) {
-            fetchData(pluginPlayer.player.animeDataList)
-            return
-        }
-        fetchData(pluginPlayer.player.animeDataList, cardAnime[0].AnimeData.player_ID)
     }
 
     useEffect(() => {
         initialInformation()
+        document.querySelectorAll('*').forEach((element: any) => {
+            element.tabIndex = -1
+        });
     }, [])
 
-    function enterPlayer(episodes: string[], type: string, episode: string) {
+    function enterPlayer(episodes: { ep: string, img?: string, title?: string }[], type: string, episode: string) {
         navigate("/player", {
             state: {
                 data: {
                     AnimeData: {
                         ...anime_data,
-                        player_ID: data?.player_id
+                        player_ID: episodeData?.player_id
                     },
                     saveData: {
                         last_Time: savedata && savedata.last_episode.toString() === episode ? savedata.last_time : 0,
@@ -140,11 +118,11 @@ function information() {
         }
     }
 
-    function makeButtons(episode: string[], type: string) {
+    function makeButtons(episode: { ep: string, img?: string, title?: string }[], type: string) {
         return (
             <div className='information-buttons-episode-container'>
-                {episode.map((num) => (
-                    <div className={`information-episode-button ${savedata && parseInt(num) < savedata.last_episode ? "watched" : ""} ${savedata && parseInt(num) == savedata.last_episode && savedata.last_time != 0 ? "watching" : savedata && parseInt(num) == savedata.last_episode ? "watched" : ""}`} onClick={() => enterPlayer(episode, type, num)}>{num}</div>
+                {episode.map((data) => (
+                    <div className={`information-episode-button ${savedata && parseInt(data.ep) < savedata.last_episode ? "watched" : ""} ${savedata && parseInt(data.ep) == savedata.last_episode && savedata.last_time != 0 ? "watching" : savedata && parseInt(data.ep) == savedata.last_episode ? "watched" : ""}`} onClick={() => enterPlayer(episode, type, data.ep)}>{data.ep}</div>
                 ))}
             </div>
         )
@@ -158,7 +136,21 @@ function information() {
         if (showWrong) setshowWrong(() => false)
         else navigate("/")
     })
-    
+
+    async function refreashInformation(name: string) {
+        ChangePlugin(name)
+        refetch()
+    }
+
+    console.log(episodeData, isEpisodeError, isEpisodeLoading)
+
+    function checkEpisodes() {
+        if (anime_data.status == "NOT_YET_RELEASED") return true
+        if (!episodeData && !isEpisodeLoading && !isEpisodeError) return true
+        if (episodeData && episodeData.episodesData && episodeData.episodesData.length <= 0) return true
+        return false
+    }
+
     return (
         <>
             <main className="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>
@@ -166,22 +158,22 @@ function information() {
                     <img className={anime_data.bannerImage ? "information-banner-image" : "information-banner-image-blur"} onError={() => setBannerIsError(() => true)} onLoad={() => setBannerLoadingData(() => false)} src={anime_data.bannerImage ? anime_data.bannerImage : anime_data.coverImage ? anime_data.coverImage : ""} style={isBannerLoading ? { display: "none" } : isBannerError ? { display: "none" } : { animation: "fadeIn 0.3s forwards" }} />
                     {isBannerLoading && isBannerError == false && <div className="information-banner-image-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div>}
                     {isBannerError && isBannerLoading == false && <div className="information-banner-image-placeholder"><span className="material-symbols-outlined">error</span></div>}
+                    <div className="information-fade"></div>
                 </div>
 
-                <div className="information-fade"></div>
 
                 <div className="information-container">
 
                     <div className="information-top">
                         <div className="information-image-container">
-                            {anime_data.averageScore && <div title="Anime Score" className="information-score" style={{ border: `3px solid ${getGradientColor(anime_data.averageScore)}` }}>{anime_data.averageScore}%</div>}
+                            {anime_data.averageScore && <div className="information-score" style={{ border: `3px solid ${getGradientColor(anime_data.averageScore)}` }}>{anime_data.averageScore}%</div>}
                             <img className="information-cover" onClick={() => anime_data.coverImage && SaveCoverToClipboard(anime_data.coverImage)} onError={() => setCoverIsError(() => true)} onLoad={() => setCoverIsLoading(() => false)} src={anime_data.coverImage ? anime_data.coverImage : ""} style={isCoverLoading ? { display: "none" } : isCoverError ? { display: "none" } : { animation: "fadeIn 0.3s forwards" }}></img>
                             {isCoverLoading && isCoverError == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div>}
                             {isCoverError && isCoverLoading == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined">error</span></div>}
 
-                            <div className="information-title-mobile-container">
-                                <div className="information-title-mobile">{anime_data.title.romaji}</div>
-                                <div className="information-title-mobile2">{anime_data.title.english ? anime_data.title.english : anime_data.title.native}</div>
+                            <div className="information-title-small-container">
+                                <div className="information-title-small">{anime_data.title.romaji}</div>
+                                <div className="information-title-small2">{anime_data.title.english ? anime_data.title.english : anime_data.title.native}</div>
                             </div>
                         </div>
                         <div className="information-description">
@@ -209,7 +201,7 @@ function information() {
                             {anime_data.format &&
                                 <div className="information-info-content">
                                     <div className="information-content-title">{t("information.format")}</div>
-                                    {capitalizeFirstLetter(anime_data.format)}
+                                    {t(`anime_formats.${anime_data.format.toLowerCase()}`)}
                                 </div>
                             }
 
@@ -258,7 +250,7 @@ function information() {
                             {anime_data.source &&
                                 <div className="information-info-content">
                                     <div className="information-content-title">{t("information.source")}</div>
-                                    {capitalizeFirstLetter(anime_data.source)}
+                                    {t(`anime_source.${anime_data.source.toLowerCase().replaceAll("_", "")}`)}
                                 </div>
                             }
 
@@ -268,19 +260,25 @@ function information() {
                         <div className="information-bottom-content">
 
                             <div className="information-episodes">
-                                <div className="information-select-episode" onClick={() => setshowWrong(() => true)}><span className="material-symbols-outlined">search</span>Is this the wrong Anime?</div>
+                                <div className="information-episodes-top-content">
+                                    <Button ButtonClass="information-episodes-button" icon="search" onClick={() => setshowWrong(() => true)} />
+                                    <div className="information-episodes-space">
+                                        <Dropdown options={segregatePlugins(refreashInformation)} disableX buttonText={store.getState().plugin.playerPlugin.name} />
+                                        <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(store.getState().plugin.playerPlugin.name)} />
+                                    </div>
+                                </div>
                                 {showWrong == false &&
                                     <>
-                                        {isLoading == false && data && data.episodesData && data.episodesData.length > 0 && anime_data.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && (
+                                        {isEpisodeLoading == false && isEpisodeError == false && episodeData && episodeData.episodesData && episodeData.episodesData.length > 0 && anime_data.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && (
                                             <>
-                                                {data.episodesData.map((episode: { episodes: string[], type: string, name?: string }) => episode.episodes.length > 0 ? (
-                                                    <Drop LeftHeader={episode.name ? episode.name : episode.type} RightHeader={`${episode.episodes.length} episodes`} content={makeButtons(episode.episodes, episode.type)} />
+                                                {episodeData.episodesData.map((episode) => episode.episodes.length > 0 ? (
+                                                    <Drop LeftHeader={t(`information.types.${episode.type}`)} RightHeader={t("information.listEpisodes", { number: episode.episodes.length })} content={makeButtons(episode.episodes, episode.type)} />
                                                 ) : "")}
                                             </>
                                         )}
-                                        {isLoading && anime_data.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
-                                        {isError && isLoading == false && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}
-                                        {data && (data.episodesData && data.episodesData.length <= 0 || anime_data.status == "NOT_YET_RELEASED") && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}
+                                        {isEpisodeLoading && anime_data.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
+                                        {isEpisodeError && isEpisodeLoading == false && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}
+                                        {checkEpisodes() && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}
                                     </>}
                             </div>
 
@@ -325,15 +323,13 @@ function information() {
                                     </div>
                                 </div>
                             }
-
-
                         </div>
                     </div>
                 </div>
 
                 <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
             </main>
-            {showWrong && <ContainerWrong name={anime_data.title.romaji} refetchfunc={fetchData} exitfunc={() => setshowWrong(() => false)} />}
+            {showWrong && <ContainerWrong name={anime_data.title.romaji} refetchfunc={(id?: string) => {setshowWrong(() => false);setCurrentIDplayer(() => id); refetch()}} exitfunc={() => setshowWrong(() => false)} />}
         </>
     )
 }

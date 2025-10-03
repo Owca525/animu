@@ -1,33 +1,36 @@
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 import { convertKeybinds } from "../functions";
 
 const useKeyPress = (func: (keybinds: string) => void) => {
-  const [keysUp, setKeysUp] = useState<string[]>([]);
-  const [isActive, setActive] = useState<boolean>(false)
+  const keysRef = useRef<string[]>([]);
+  const funcRef = useRef(func);
 
-  const handleKeyDown = (event: KeyboardEvent) => {
-    setKeysUp((previus) => {
-      if (!previus.includes(convertKeybinds(event.key))) {
-        previus.push(convertKeybinds(event.key))
-        return previus
+  useEffect(() => {
+    funcRef.current = func;
+  }, [func]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const key = convertKeybinds(event.key);
+      if (!keysRef.current.includes(key)) {
+        keysRef.current.push(key);
+        funcRef.current(keysRef.current.join("+"));
       }
-      return previus
-    })
-    func(keysUp.join('+'))
-  };
-  const handleKeyUp = (event: KeyboardEvent) => {
-    setKeysUp((previus) => {
-      const index = previus.findIndex((item) => item === event.key);
-      previus.splice(index, 1)
-      return previus
-    })
-  };
+    };
 
-  if (!isActive) {
-      window.addEventListener('keydown', handleKeyDown, { passive: true });
-      window.addEventListener('keyup', handleKeyUp, { passive: true });
-      setActive(() => true)
-  }
+    const handleKeyUp = (event: KeyboardEvent) => {
+      const key = convertKeybinds(event.key);
+      keysRef.current = keysRef.current.filter((k) => k !== key);
+      funcRef.current(keysRef.current.join("+"));
+    };
+
+    window.addEventListener('keydown', handleKeyDown, { passive: true });
+    window.addEventListener('keyup', handleKeyUp, { passive: true });
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    }
+  }, [])
 };
 
 export default useKeyPress;

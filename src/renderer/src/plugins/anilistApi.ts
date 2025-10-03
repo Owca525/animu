@@ -1,6 +1,7 @@
 import { genYearsList, sleep } from "@renderer/utils/functions";
 import { AnimeData, cardData, containerData, FilterParams, pluginFormat } from "@renderer/utils/GlobalInterface";
 import { setHomeData, UpdateHomeData } from "@renderer/utils/pluginApi";
+import { t } from "i18next";
 
 const pageSize = 15
 
@@ -333,15 +334,15 @@ const allPopular = {
 function Convert(convert: any): cardData {
   let characters: any = []
   try {
-      for (let index = 0; index < convert.characters.edges.length; index++) {
-        const element = convert.characters.edges[index];
-        if (element.voiceActors.length === 0) characters.push({role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full }})
-        else characters.push({role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full }, voiceActor: { id: element.voiceActors[0].id, image: element.voiceActors[0].image.large, name: element.voiceActors[0].name.full }})
+    for (let index = 0; index < convert.characters.edges.length; index++) {
+      const element = convert.characters.edges[index];
+      if (element.voiceActors.length === 0) characters.push({ role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full } })
+      else characters.push({ role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full }, voiceActor: { id: element.voiceActors[0].id, image: element.voiceActors[0].image.large, name: element.voiceActors[0].name.full } })
     }
   } catch (error) {
     console.error(error)
   }
-  
+
   return {
     AnimeData: {
       ...convert,
@@ -352,8 +353,9 @@ function Convert(convert: any): cardData {
   }
 }
 
-// WHY THE FUCK THIS DOSEN"T WORK IF I CALL window.api.request.post IN CreateHomePage
-async function sendPost(variable: any, query: any): Promise<{success: boolean; data?: any; status?: number; statusText?: string; error?: unknown; }> {
+// WHY THE FUCK THIS DOESN'T WORK IF I CALL window.api.request.post IN CreateHomePage
+// Jeśli api anilist jest offline to daje "Forbidden" w statusText i error 403 request 
+async function sendPost(variable: any, query: any): Promise<{ success: boolean; data?: any; status?: number; statusText?: string; error?: unknown; }> {
   return await window.api.request.post("https://graphql.anilist.co", header, { query: query, variables: variable })
 }
 
@@ -387,17 +389,17 @@ function getSeasonFromDate() {
 
 async function SearchAnilistApi(text: string, page: number, params?: FilterParams): Promise<void> {
   let variables: any = {
-      page: page,
-      sort: "SEARCH_MATCH",
-      type: "ANIME"
+    page: page,
+    sort: "SEARCH_MATCH",
+    type: "ANIME"
   }
   let title: string | undefined = undefined
-  
+
   if (!(text.replaceAll(" ", "") == "")) {
     variables = { ...variables, search: text }
     title = `Searching: ${text}`
   }
-  
+
   if (params && params.genres) {
     variables = { ...variables, genres: params.genres }
   }
@@ -450,15 +452,15 @@ async function CreateHomePage(): Promise<containerData[]> {
   let season = getSeasonFromDate()
   let data = await sendPost({ season: season.season, seasonYear: season.seasonYear }, graphicHomeApi)
   if (!data.success) return []
-  return [ 
+  return [
     {
-      title: "Trending Now",
+      title: t("home.trending_now"),
       data: data.data.data.trending.media.map((anime) => Convert(anime)),
       horizontal: true,
-      onTitleClick: () => getFullCategory(tendingAnime, "Trending Now"),
+      onTitleClick: () => getFullCategory(tendingAnime, t("home.trending_now")),
     },
     {
-      title: "Popular in this Season",
+      title: t("home.popular_in_this_season"),
       data: data.data.data.season.media.map((anime) => Convert(anime)),
       horizontal: true,
       onTitleClick: () => getFullCategory({
@@ -466,13 +468,13 @@ async function CreateHomePage(): Promise<containerData[]> {
         season: season.season,
         seasonYear: season.seasonYear,
         type: "ANIME"
-      }, "Popular in this Season")
+      }, t("home.popular_in_this_season"))
     },
     {
-      title: "All Time Popular",
+      title: t("home.all_time_popular"),
       data: data.data.data.popular.media.map((anime) => Convert(anime)),
       horizontal: true,
-      onTitleClick: () => getFullCategory(allPopular, "All Time Popular")
+      onTitleClick: () => getFullCategory(allPopular, t("home.all_time_popular"))
     }
   ]
 }
@@ -484,18 +486,18 @@ async function getGenres(): Promise<string[]> {
 }
 
 export async function reCovertData(data: AnimeData): Promise<AnimeData | undefined> {
-    if (!(typeof data.title === "string")) return data
-    let req = await sendPost({ id: data.id }, graphicApIDAnime)
-    if (!req.success) return
-    return Convert(req.data.data.Media).AnimeData
+  if (!(typeof data.title === "string")) return data
+  let req = await sendPost({ id: data.id }, graphicApIDAnime)
+  if (!req.success) return
+  return Convert(req.data.data.Media).AnimeData
 }
 
 export async function SearchConvertData(animeData: AnimeData): Promise<AnimeData | undefined> {
   let variables: any = {
-      page: 1,
-      search: animeData.title.native,
-      sort: "SEARCH_MATCH",
-      type: "ANIME"
+    page: 1,
+    search: animeData.title.native,
+    sort: "SEARCH_MATCH",
+    type: "ANIME"
   }
 
   while (true) {
@@ -518,20 +520,29 @@ export async function SearchConvertData(animeData: AnimeData): Promise<AnimeData
   return undefined
 }
 
+async function getAnime(id: string): Promise<AnimeData | undefined> {
+  let req = await sendPost({ id: id }, graphicApIDAnime)
+  if (!req.success) return undefined
+  return Convert(req.data.data.Media).AnimeData
+}
+
 export const infoPlugin: pluginFormat = {
-  version: "0.1",
+  version: "1.0",
   name: "AnilistApi",
   author: "Owca525",
+  icon: "https://anilist.co/img/icons/icon.svg",
   information: {
     pageSize: pageSize,
     home: () => setHomeData(CreateHomePage),
     search: SearchAnilistApi,
-    searchOption: {
-      genres: await getGenres(),
-      seasons: ["Winter", "Spring", "Summer", "Fall"],
-      years: genYearsList(1940),
-      format: ["TV", "Movie", "TV Short", "special", " OVA", "ONA"],
-      statuses: ["Releasing", "Finished", "Not Yet Aired", "Cancelled"]
-    }
-  }
+    anime: getAnime
+  },
+  preferedLang: ["en"],
+  searchOption: {
+    genres: await getGenres(),
+    seasons: ["Winter", "Spring", "Summer", "Fall"],
+    years: genYearsList(1940),
+    format: ["TV", "Movie", "TV Short", "special", "OVA", "ONA"],
+    statuses: ["Releasing", "Finished", "Not Yet Released", "Cancelled"]
+  },
 }

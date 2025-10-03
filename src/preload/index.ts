@@ -8,6 +8,12 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld("api", {
       open: (url: string) => ipcRenderer.invoke("open", url),
       saveToClipboard: (type: "text" | "image", content: string) => ipcRenderer.invoke("saveToClipboard", type, content),
+      chromecast: {
+        startSearch: () => ipcRenderer.invoke("searchChromeCast"),
+        deviceList: () => ipcRenderer.invoke("getListChromcasts"),
+        stopSearch: () => ipcRenderer.invoke("stopSearchChromcast"),
+        connect: (device: { host: string, port: number, name: string }, metadata: { title: string, time: number, url: string, type: string }) => ipcRenderer.invoke("playOnChromeCast", device, metadata)
+      },
       update: {
         updateProgress: (callback) =>
           ipcRenderer.on("update-download-progress", callback),
@@ -15,14 +21,15 @@ if (process.contextIsolated) {
         checkUpdate: () => ipcRenderer.invoke("checkUpdates"),
       },
       request: {
-        get: (url: string, header: Record<string, string>) =>
-          ipcRenderer.invoke("fetch-data", url, header),
+        get: (url: string, header: Record<string, string>, type?: "json" | "text") =>
+          ipcRenderer.invoke("fetch-data", url, header, type),
         post: (url: string, header: Record<string, string>, body?: { query: any, variables: Object }) =>
           ipcRenderer.invoke("send-post", url, header, body),
       },
       rpc: {
         setActivity: (details: string | undefined, state: string | undefined) =>
           ipcRenderer.invoke("setActivity", details, state),
+        runDiscordRPC: () => ipcRenderer.invoke("runDiscordRPC"),
       },
       os: {
         getPath: (
@@ -50,10 +57,12 @@ if (process.contextIsolated) {
         mkdir: (path: string) => ipcRenderer.invoke("mkdir", path),
         saveDialog: (fileName: string, data: any, title: string, name: string, extensions: string[], format?: string) => ipcRenderer.invoke("saveDialog", fileName, data, title, name, extensions, format),
         openDialog: (path?: string, name?: string, extensions?: string[]) => ipcRenderer.invoke("openDialog", path, name, extensions),
+        getPathProgram: (program: string) => ipcRenderer.invoke("getPathProgram", program) 
       },
-      runExternaPlayer: (url: string, path: string, time: string, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", url, path, time, type),
+      runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string}, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", videoData, type),
       getlistThemes: () => ipcRenderer.invoke("get-css-files"),
-      getOSDetails: () => ipcRenderer.invoke('get-os-info')
+      getOSDetails: () => ipcRenderer.invoke('get-os-info'),
+      getListLang: () => ipcRenderer.invoke("get-lang-files")
     });
     contextBridge.exposeInMainWorld("backend", {
       Buffer: require("buffer").Buffer,

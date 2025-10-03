@@ -1,0 +1,19 @@
+@import "../playerfix.css";
+
+:root {
+  --text: #ebdbb2;
+  --text-gray: #d5c4a1;
+
+  /* Background */
+  --bg: #1d2021; /* First layer, background only */
+  --bg2: #282828; /* Second layer, use in sidebar, header */
+  --bg3: #32302f; /* Thirt layer, use in button etc */
+  --bg4: #3c3836; /* Fourth layer, use in hover button etc */
+
+  /* accent */
+  --neutral1: #df6616;
+  --neutral2: #fe8019;
+  --neutral3: #ff8828;
+  --red: #a62b1d;
+  --blue: #076678;
+}

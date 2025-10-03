@@ -13,10 +13,11 @@
   --neutral2: #19a651;
   --neutral3: #27ae5d;
   --red: #861832;
-  --blue: #1C1291;
+  --blue: #1c1291;
+  --light-blue: #2658c4;
 
   /* other */
-  --player-bg-containers: color-mix(in srgb, var(--bg3) 70%, transparent);
+  --player-bg-containers: color-mix(in srgb, var(--bg4) 80%, transparent);
   --invisible: rgba(0, 0, 0, 0);
   /* is used in player button */
   --black: rgba(0, 0, 0);
@@ -109,13 +110,17 @@ body {
 
 /* Sidebar */
 
+.sidebar-button, .sidebar-button-min {
+  background-color: var(--bg2);
+}
+
 .sidebar-container-min,
 .sidebar-container-max {
   background-color: var(--bg2);
 }
 
 .sidebar-black-line {
-  background-color: var(--bg);
+  background-color: var(--bg4);
   border-radius: 12px;
 }
 
@@ -289,15 +294,18 @@ body {
   background-color: var(--bg3);
 }
 
-.information-episode-button.watched {
+.information-episode-button.watched,
+.information-episode-button-full.watched {
   border-color: var(--neutral1);
 }
 
-.information-episode-button.watching {
+.information-episode-button.watching,
+.information-episode-button-full.watching {
   border-color: var(--red);
 }
 
-.information-episode-button.current {
+.information-episode-button.current,
+.information-episode-button-full.current {
   border-color: var(--blue);
 }
 
@@ -312,7 +320,7 @@ body {
 }
 
 .information-title2,
-.information-title-mobile2 {
+.information-title-small2 {
   color: var(--text-gray);
 }
 
@@ -353,15 +361,10 @@ body {
   }
 }
 
-/* for smartphones */
+/* for very small window sizes */
 @media (max-width: 600px) {
   .information-info-content {
     border-radius: 10px;
-  }
-  .information-exit-button {
-      border-radius: 0px;
-      background-color: var(--bg2);
-      border-color: var(--bg2);
   }
     .information-episodes, .information-characters {
         border-radius: 0px;
@@ -424,7 +427,6 @@ body {
 
 .external-player-container {
   background-color: var(--bg2);
-  border-radius: 12px;
 }
 
 .external-button-container {
@@ -432,9 +434,27 @@ body {
   border-radius: 12px;
 }
 
-.external-episodes-container {
+.external-episodes-container,
+.external-leftpanel-container {
   background-color: var(--bg3);
   border-radius: 12px;
+}
+
+.external-panelbutton {
+  background-color: var(--bg4) !important;
+}
+
+.external-panelbutton-bottomtext {
+  color: var(--text-gray);
+}
+
+.external-leftpanel-topbar {
+  border: 2px solid var(--bg4);
+}
+
+.external-leftpanel-topbar-button {
+  border-radius: 50% !important;
+  background-color: var(--bg3) !important;
 }
 
 /* Settings */
@@ -458,6 +478,36 @@ body {
   background-color: var(--bg2);
   border-radius: 12px;
   border: 2px solid var(--bg4);
+}
+
+.settings-container-extensions {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+th {
+  border: 3px solid var(--bg4);
+}
+
+.settings-table-button:hover {
+  background-color: var(--bg4);
+}
+
+.settings-extensions-background {
+  background-color: var(--bg3);
+  border-radius: 6px;
+}
+
+.settings-special-images:hover {
+  background-color: var(--bg4);
+}
+
+.settings-table-button {
+  border-radius: 12px;
+}
+
+.settings-special-images {
+  border-radius: 12px;
 }
 
 
@@ -541,12 +591,16 @@ body {
   background-color: var(--bg3);
 }
 
-.settings-input-field {
+.settings-input-field, .settings-input-field-hide-type {
   background-color: var(--bg3);
   color: var(--text);
-  border-radius: 12px 0px 0px 12px;
+  border-radius: 12px;
   border: 2px solid var(--bg3);
+}
+
+.settings-input-field {
   border-right: 0px;
+  border-radius: 12px 0px 0px 12px;
 }
 
 .settings-input-type {
@@ -558,12 +612,16 @@ body {
 }
 
 .settings-input-container:hover .settings-input-type,
-.settings-input-container:hover .settings-input-field {
+.settings-input-container:hover .settings-input-field,
+.settings-input-container:hover .settings-input-field-hide-type {
   background-color: var(--bg4);
 }
 
+
 .settings-input-field:focus,
 .settings-input-field:active,
+.settings-input-field-hide-type:focus,
+.settings-input-field-hide-type:active,
 .settings-input-field:focus~.settings-input-type,
 .settings-input-field:active~.settings-input-type {
   border-color: var(--neutral1);
@@ -588,7 +646,7 @@ body {
 }
 
 .player-time-display {
-  border-radius: 5px;
+  border-radius: 60px;
   background-color: var(--player-bg-containers);
   color: var(--text);
 }
@@ -596,12 +654,14 @@ body {
 .player-buttons {
   border: none;
   border: 2px solid var(--invisible);
-  background-color: var(--invisible);
   color: var(--text);
+  background-color: var(--bg3);
+  border-radius: 60px;
 }
 
 .player-buttons:hover {
-  background-color: var(--player-bg-containers);
+  /*background-color: var(--player-bg-containers);*/
+  background-color: var(--bg3);
   border-color: var(--neutral1);
   color: var(--text);
 }
@@ -614,8 +674,9 @@ body {
 
 .player-settings-container {
   border-radius: 8px;
-  background-color: color-mix(in srgb, var(--bg2) 80%, transparent);
+  background-color: var(--bg2);
   color: var(--text);
+  border: 2px solid var(--bg4);
 }
 
 .player-settings-button,
@@ -631,19 +692,7 @@ body {
 
 .player-settings-button:hover,
 .player-settings-button-back:hover {
-  background-color: var(--bg);
-}
-
-.player-up-Next-container {
-  background-color: var(--player-bg-containers);
-  border-radius: 1em;
-  border-color: var(--bg4);
-  color: var(--text);
-}
-
-.player-up-Next-Button {
-  background-color: var(--player-bg-containers);
-  border-color: var(--bg4);
+  background-color: var(--bg3);
 }
 
 .player-settings-button-text-gray {
@@ -654,6 +703,128 @@ body {
   border-radius: 12px;
   padding: 12px;
   background-color: var(--player-bg-containers);
+}
+
+.player-up-Next-container-var2 {
+  background: linear-gradient(to left, var(--bg), rgb(0, 0, 0, 0.2));
+  border-radius: 12px !important;
+}
+
+.player-up-Next-background {
+  outline: 3px solid var(--bg4);
+  background-color: var(--bg4);
+  border-radius: 12px !important;
+}
+
+.player-up-Next-background:hover {
+  outline-color: var(--neutral1);
+}
+
+.player-up-Next-button-close {
+  border-radius: 50%;
+  color: var(--text);
+  background-color: var(--bg4);
+  border: 2px solid var(--bg4);
+}
+
+
+.player-up-Next-button-close:hover {
+  border-color: var(--neutral1);
+}
+
+.player-up-Next-container {
+  background-color: var(--black);
+  border-radius: 8px !important;
+}
+
+.player-loading-container {
+  background-color: black;
+}
+
+.player-loading-container-black {
+  background-color: rgb(0, 0, 0, 0.4);
+}
+
+.player-volume-ui-container {
+  background-color: var(--bg2);
+  border-radius: 12px;
+}
+
+.player-volume-ui-bar-progress {
+  background-color: var(--neutral1);
+  border-radius: 12px;
+}
+
+.player-volume-ui-bar-container {
+  background-color: var(--bg3);
+  border-radius: 12px;
+}
+
+.player-select-episode-void {
+  background-color: var(--player-bg-containers);
+}
+
+.player-select-episode-container {
+  background-color: var(--bg2);
+  border-radius: 8px;
+  border: 2px solid var(--bg4);
+}
+
+.information-episode-button-full {
+  border-radius: 12px;
+  border: 1px solid var(--invisible);
+}
+
+.information-episode-button-full:hover {
+  background-color: var(--bg4);
+}
+
+.player-subtitle-container {
+  color: white;
+}
+
+.player-subtitle-content {
+  background-color: var(--invisible);
+}
+
+.player-skip-chapters-button {
+  background-color: var(--bg2);
+  color: var(--text);
+  border: 2px solid var(--player-bg-containers);
+  border-radius: 12px;
+}
+
+.player-skip-chapters-button:hover {
+  border-color: var(--neutral1);
+}
+
+.information-episode-button-image {
+  border-radius: 4px;
+}
+
+
+/* Player Button */
+
+
+.player-button-up-text {
+    border-radius: 6px;
+}
+
+.player-button-up-text {
+    background-color: var(--player-bg-containers);
+}
+
+
+/* Player episode element */
+
+
+.player-episode-element-background, .player-up-Next-background {
+    border-radius: 8px;
+}
+  
+.player-episode-element-container {
+    background: linear-gradient(to left, var(--black), rgb(0, 0, 0, 0.3)); 
+    border-radius: 8px;
 }
 
 /* nerdStats */
@@ -670,8 +841,19 @@ body {
   background-color: var(--player-bg-containers) !important;
 }
 
-.seekbar-buffer {
-  border-radius: 12px;
+.player-seekbar:hover {
+  transform: scaleY(1.5);
+  transition: transform .1s cubic-bezier(0,0,.2,1),-webkit-transform .1s cubic-bezier(0,0,.2,1);
+}
+.player-seekbar:hover .seekbar-thumb {
+  display: none;
+}
+.player-seekbar .seekbar-box {
+  transform: translate(-50%, 10%) scaleY(0.70);
+}
+
+.player-seekbar .seekbar-thumbnail {
+  transform: translate(-50%, 10%) scaleY(0.70);
 }
 
 .seekBar-container {
@@ -697,6 +879,23 @@ body {
 .seekbar-box.progress {
   background-color: var(--neutral1);
   border-radius: 12px;
+}
+
+.seekbar-buffer, .seekbar-chapters {
+    background-color: color-mix(in srgb, var(--text) 70%, transparent);
+}
+
+.seekbar-chapters {
+    background-color: var(--invisible);
+}
+
+.seekbar-thumbnail {
+    border-radius: 12px;
+    background-color: var(--player-bg-containers);
+}
+
+.seekbar-chapters-opening-ending {
+    background-color: var(--light-blue) !important;
 }
 
 /* player seekbar */
@@ -774,4 +973,30 @@ body {
   color: #fff;
   border-radius: 4px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Welcome Screen */
+
+
+.welcome-screen-void {
+    background-color: color-mix(in srgb, var(--bg) 80%, transparent);
+}
+
+.welcome-screen-content {
+    background-color: var(--bg2);
+    border-radius: 12px;
+}
+
+
+/* Container Wrong */
+
+
+.information-containerwrong-text-space {
+    background-color: var(--neutral1);
+    border-radius: 12px;
+}
+
+.information-containerwrong-center {
+    border: 1px solid white;
 }

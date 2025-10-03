@@ -3,9 +3,12 @@
   position: fixed;
   bottom: 90px;
   right: 20px;
-  min-width: 300px;
-  width: 20vw;
-  padding: 2px;
+  min-width: 250px;
+  width: fit-content;
+  padding: 8px;
+  max-height: 400px;
+  height: min-content;
+  overflow-x: hidden;
 }
 
 .player-settings-button, .player-settings-button-back {
@@ -14,16 +17,34 @@
   align-items: center;
   padding: 12px;
   cursor: pointer;
+  transition: background-color 100ms ease-in-out;
+}
+
+.player-settings-content {
+  display: flex;
+  flex-direction: column;
+  height: max-content;
+  overflow: none;
+}
+
+.player-settings-button {
+  gap: 24px;
 }
 
 .player-settings-button-back {
-    padding: 8px;
+  padding: 8px;
+  justify-content: start;
+  gap: 8px;
+  align-items: center;
 }
 
 .player-settings-button-text {
   font-size: 1em;
 }
 
-.player-settings-button-back {
-    align-items: center;
+.player-settings-button-icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
 }

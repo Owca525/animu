@@ -6,28 +6,28 @@ export const notificationProps = {
 }
 
 export interface AnimeData {
-    averageScore: number | undefined
-    bannerImage: string | undefined
-    coverImage: string | undefined
-    description: string | undefined
-    duration: number | undefined
-    endDate: {
+    averageScore?: number | undefined
+    bannerImage?: string | undefined
+    coverImage?: string | undefined
+    description?: string | undefined
+    duration?: number | undefined
+    endDate?: {
         day: number
         month: number
         year: number
     } | undefined
-    episodes: number | undefined
-    format: string | undefined
+    episodes?: number | undefined
+    format?: string | undefined
     genres: Array<String> | undefined
-    nextAiringEpisode: {
+    nextAiringEpisode?: {
         airingAt: number
         episode: number
         timeUntilAiring: number
     } | undefined
-    popularity: number
-    season: string | undefined
-    seasonYear: number | undefined
-    startDate: {
+    popularity?: number | undefined
+    season?: string | undefined
+    seasonYear?: number | undefined
+    startDate?: {
         day: number
         month: number
         year: number
@@ -45,15 +45,16 @@ export interface AnimeData {
             image: string
         }
     }[]
-    source: string | undefined
-    status: string | undefined
+    source?: string | undefined
+    status?: string | undefined
     studios: string[]
     title: { english?: string, native: string, romaji: string }
-    type: string | undefined
-    episodesList?: { episodes: string[], type: string, name?: string }[]
+    type?: string | undefined
+    episodesList?: { episodes: { ep: string, img?: string, title?: string }[], type: string, name?: string }[]
     player_ID?: string
     id: string
-    trailer: { id: string, site: string } | undefined
+    malID?: string
+    trailer?: { id: string, site: string } | undefined
 }
 
 export interface homeData {
@@ -71,8 +72,16 @@ export interface homeData {
 export interface playerData {
     hostname: string
     hls: boolean
-    resolution: { res: string, url: string }[]
+    resolution: { res: string, url: string, defaultSubtitles?: boolean; }[]
+    storyboardVTT?: string
+    listChapters?: playerChapterList
+    chaptersUrl?: string
+    subtitles?: playerSubtitlesFormat[]
 }
+
+export interface playerSubtitlesFormat { url: string, lang: string, label: string, format: string }
+
+export type playerChapterList = { start: number, end: number, type: "opening" | "ending" | "other", name?: string }[]
 
 export interface indentityPlayer {
     pluginName: string
@@ -103,7 +112,7 @@ export interface containerData {
 export interface sidebarData {
     icon: string
     text: string
-    onClick?: () => any
+    onClick?: () => void
 }
 
 export type ContextMenuProps = {
@@ -113,32 +122,53 @@ export type ContextMenuProps = {
     deletion?: boolean
 }[]
 
+export interface themeMetadata { 
+    version?: string; 
+    author?: string; 
+    pathcss: string; 
+    animuTitle?: string; 
+    name: string;
+}
+
 export interface pluginFormat {
     version: string
     name: string
     author: string
+    icon?: string
+    preferedLang: string[]
     information?: {
         pageSize: number
         search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => void
         home: () => void
-        searchOption: { genres: string[], seasons: string[], years: string[], format: string[], statuses: string[] }
+        anime: (id: string) => Promise<AnimeData | undefined>
     } | null
     player?: {
         getUrls: (type: string, episode: string, id: string) => Promise<playerData[]>
-        animeDataList: (animeData?: AnimeData, anime_id?: string) => Promise<{ player_id: string, episodesData: { episodes: string[], type: string, name?: string }[] }>
-        episodeList: (type: string, anime_id: string) => Promise<Array<string> | null>
-        animeList: (name: string) => Promise<cardData[]>
-        getInformation: (id: string) => Promise<AnimeData>
+        animeDataList: (animeData?: AnimeData, anime_id?: string) => Promise<episodeList | undefined>
+        episodeList: (type: string, anime_id: string) => Promise<{ ep: string, img?: string, title?: string }[]>
+        animeList: (name: AnimeData) => Promise<cardData[]>
+        search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => Promise<cardData[]>
     } | null
+    searchOption?: genres
     sidebarAddon?: sidebarData[]
 }
 
+export type genres = { genres: string[], seasons: string[], years: string[], format: string[], statuses: string[] }
+
+export interface episodeList { player_id: string, episodesData: { episodes: { ep: string, img?: string, title?: string }[], type: string, name?: string }[] }
+
 export interface SettingsConfig {
+    firstStart: boolean
+    plugins: {
+        // information: string
+        player: string
+    }
     General: {
-        // HoverSidebar: boolean
-        // HideSidebar: boolean
+        HoverSidebar: boolean
+        HideSidebar: boolean
         language: string
         theme: string
+        discordRPC: boolean
         Window: {
             AutoMaximize: boolean
             AutoFullscreen: boolean
@@ -151,14 +181,15 @@ export interface SettingsConfig {
             AutoFullscreen: boolean
             AutoSkipEpisode: boolean
             Volume: number
-            playerLoadType: string
             LongTimeSkipForward: number | string
             LongTimeSkipBack: number | string
             TimeSkipLeft: number | string
             TimeSkipRight: number | string
-            VideoScaling: boolean,
-            DisableVolumeAnimation: boolean,
-            RemovingSpaceAnimation: boolean
+            VideoStreching: boolean,
+            PlayerBehavior: "home" | "information"
+            autoSkipOpenings: boolean
+            autoSkipEndings: boolean
+            showBrokenBuffer: boolean
         }
         screenShot: {
             alwaysAsk: boolean
@@ -167,13 +198,22 @@ export interface SettingsConfig {
         },
         external: {
             enable: boolean,
-            type: "movian" | "vlc" | "mpv" | "custom",
+            type: "Movian" | "VLC" | "Mpv" | "ChromeCast",
             movianIP: string
+            vlcPath: string
+            mpvPath: string
         }
         upToNextEpisode: {
             enable: boolean
             interval: number
-            durrationShow: number
+            durationShow: number
+            variants: "var1" | "var2" | "old"
+        }
+        ui: {
+            DisableVolumeAnimation: boolean,
+            DisableSpaceAnimation: boolean,
+            DisableSkipAnimation: boolean,
+            DisableLoadingAnimation: boolean
         }
         keybinds: {
             Pause: string
@@ -192,6 +232,8 @@ export interface SettingsConfig {
             VolumeMute: string
             ScreenShot: string
             PictureInPicture: string
+            toggleSubtitles: string
+            skipOpeningEnding: string
         }
     }
     History: {
@@ -227,6 +269,16 @@ export interface dialogProps {
         secondbutton: () => void
     }
 }
+
+export interface Thumbnail {
+    src: string;
+    metadata: {
+        start: number;
+        end: number;
+        imgX: number;
+        imgY: number;
+    }[]
+};
 
 export interface FilterParams {
   genres?: string[];

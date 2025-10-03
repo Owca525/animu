@@ -1,6 +1,5 @@
 import { app, shell, BrowserWindow, Menu } from 'electron'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import { setupDiscordRPC } from './utils'
 import { join } from 'path'
 
 // Files import
@@ -10,6 +9,7 @@ import "./window"
 import "./os"
 import "./update"
 import "./request"
+import "./streaming"
 
 export let mainWindow: BrowserWindow | undefined
 
@@ -34,23 +34,23 @@ function createWindow(): void {
     title: title
   })
 
-    global.createPiPWindow = () => {
-      pipWindow = new BrowserWindow({
-        width: 300,
-        height: 200,
-        alwaysOnTop: true,
-        frame: false,
-        resizable: false,
-        transparent: true,
-        webPreferences: {
-          nodeIntegration: true,
-          contextIsolation: false,
-        },
-      });
+  global.createPiPWindow = () => {
+    pipWindow = new BrowserWindow({
+      width: 300,
+      height: 200,
+      alwaysOnTop: true,
+      frame: false,
+      resizable: false,
+      transparent: true,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+      },
+    });
 
-      pipWindow.loadURL('http://localhost:3000/pip');
-      pipWindow.setAlwaysOnTop(true, 'screen-saver');
-    };
+    pipWindow.loadURL('http://localhost:3000/pip');
+    pipWindow.setAlwaysOnTop(true, 'screen-saver');
+  };
 
   if (process.env.NODE_ENV === 'development') {
     mainWindow.setTitle(title + " developer")
@@ -70,7 +70,7 @@ function createWindow(): void {
 
   mainWindow.webContents.on('before-input-event', (event, input) => {
     if ((input.control && input.shift && input.key === 'I')) {
-        event.preventDefault();
+      event.preventDefault();
     }
   });
 
@@ -93,7 +93,7 @@ app.whenReady().then(() => {
   })
 
   createWindow()
-  setupDiscordRPC()
+  // setupDiscordRPC()
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

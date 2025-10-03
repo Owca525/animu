@@ -2,6 +2,7 @@ import { toast } from "react-toastify";
 import { refetchHistory } from "../functions";
 import { cardData, notificationProps } from "../GlobalInterface";
 import i18n from "../i18n";
+import store from "../store";
 
 const appConfigDirPath = window.api.os.getPath("userData");
 
@@ -20,18 +21,19 @@ export async function ReadFile(file: string): Promise<cardData[]> {
 
 export async function DeleteFromFile(data: cardData, file: string) {
     try {
+        if (store.getState().global.incognito) return
         await CheckFile(file)
         const saveFile = await window.api.os.read(await appConfigDirPath + `/${file}.json`)
         const list = JSON.parse(saveFile) as cardData[];
         const index = list.findIndex(
-            (item) => item.saveData?.episode === data.saveData?.episode && item.AnimeData.player_ID ? item.AnimeData.player_ID === data.AnimeData.player_ID : item.AnimeData.id === data.AnimeData.id
+            (item) => item.saveData?.episode === data.saveData?.episode && item.AnimeData.title.romaji === data.AnimeData.title.romaji
         );
 
         if (index != -1) list.splice(index, 1);
 
         window.api.os.write(await appConfigDirPath + `/${file}.json`, JSON.stringify(list))
         refetchHistory()
-        console.log(data)
+
         if (data.deletionCard) {
             if (file === "continueWatch") {
                 toast.success(i18n.t("history.continuesaved"), notificationProps)
@@ -55,6 +57,7 @@ export async function DeleteFromFile(data: cardData, file: string) {
 
 export async function SaveToFile(data: cardData, file: string): Promise<boolean> {
     try {
+        if (store.getState().global.incognito) return true
         await CheckFile(file)
         const saveFile = await window.api.os.read(await appConfigDirPath + `/${file}.json`);
         const tmpData = JSON.parse(saveFile) as cardData[];
@@ -63,7 +66,7 @@ export async function SaveToFile(data: cardData, file: string): Promise<boolean>
         if (index != -1) tmpData.splice(index, 1);
 
         tmpData.push(data);
-        window.api.os.write(await appConfigDirPath + `/${file}.json`, JSON.stringify(tmpData))
+        window.api.os.write(await appConfigDirPath + `/${file}.json`, JSON.stringify(checkAnimeDuplicate(tmpData)))
         return true
     } catch (Error) {
         console.error(`${Error} in SaveToFile`)
@@ -91,14 +94,16 @@ export async function CheckFile(file: string): Promise<boolean> {
 }
 
 function checkAnimeDuplicate(listcard: cardData[]): cardData[] {
-    let cache: string[] = []
-    let newListCard: cardData[] = []
-    for (let index = 0; index < listcard.length; index++) {
-        const element = listcard[index];
-        if (!cache.includes(element.AnimeData.title.romaji)) {
-            newListCard.push(element)
-            cache.push(element.AnimeData.title.romaji)
+    const map = new Map<string, cardData>()
+
+    for (const element of listcard) {
+        const title = element.AnimeData.title.romaji
+        const current = map.get(title)
+
+        if (!current || (element.saveData && current.saveData && parseInt(element.saveData.episode.toString()) > parseInt(current.saveData.episode.toString()))) {
+            map.set(title, element)
         }
     }
-    return newListCard
+
+    return Array.from(map.values())
 }

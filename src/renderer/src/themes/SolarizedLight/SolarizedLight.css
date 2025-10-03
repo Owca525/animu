@@ -1,0 +1,19 @@
+@import "../playerfix.css";
+
+:root {
+  --text: #657b83; /* is use on regular text */
+  --text-gray: #93a1a1; /* is use in card continue watch */
+
+  /* Background */
+  --bg: #fdf6e3; /* First layer, background only */
+  --bg2: #eee8d5; /* Second layer, use in sidebar, header */
+  --bg3: #dbd3b8; /* Thirt layer, use in button etc */
+  --bg4: #cdc095; /* Fourth layer, use in hover button etc */
+
+  /* accent */
+  --neutral1: #b58900; /* is using on outline, border-color etc */ 
+  --neutral2: #b7901d;
+  --neutral3: #b7983c;
+  --red: #dc322f;
+  --blue: #268bd2;
+}

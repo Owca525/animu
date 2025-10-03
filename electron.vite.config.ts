@@ -36,8 +36,8 @@ export default defineConfig({
             dest: 'assets/themes'
           },
           {
-            src: 'src/themes/*', 
-            dest: 'assets/themes'
+            src: 'src/utils/lang/*', 
+            dest: 'assets/lang'
           },
         ],
       }),

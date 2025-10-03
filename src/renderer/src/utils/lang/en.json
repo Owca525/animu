@@ -3,13 +3,17 @@
         "home": "Home",
         "history": "History",
         "settings": "Settings",
+        "about": "About",
         "general": "General",
         "cfglocation": "Config Location",
         "player": "Player",
         "continuewatch": "Continue Watching",
         "dev": "Developer",
         "minutes": "Minutes",
-        "exitAnimu": "Do you really want exit animu?"
+        "exitAnimu": "Do you really want exit animu?",
+        "enable": "Enable",
+        "extensions": "Extensions",
+        "notFound": "Not Found"
     },
     "dialog": {
         "yes": "Yes",
@@ -23,7 +27,10 @@
     "home": {
         "search": "Search...",
         "nothingfound": "Nothing Found Here",
-        "error": "Error Occured"
+        "error": "Error Occured",
+        "trending_now": "Trending Now",
+        "popular_in_this_season": "Popular In This Season",
+        "all_time_popular": "All Time Popular"
     },
     "contextMenu": {
         "devtools": "Open DevTools",
@@ -44,6 +51,52 @@
         "not_yet_released": "Not Yet Released",
         "cancelled": "Cancelled"
     },
+    "anime_genres": {
+        "action": "Action",
+        "adventure": "Adventure",
+        "comedy": "Comedy",
+        "drama": "Drama",
+        "ecchi": "Ecchi",
+        "fantasy": "Fantasy",
+        "hentai": "Hentai",
+        "horror": "Horror",
+        "mahoushoujo": "Mahou Shoujo",
+        "mecha": "Mecha",
+        "music": "Music",
+        "mystery": "Mystery",
+        "psychological": "Psychological",
+        "romance": "romance",
+        "sci-Fi": "Sci-Fi",
+        "sliceoflife": "Slice of Life",
+        "sports": "Sports",
+        "supernatural": "Supernatural",
+        "thriller": "Thriller"
+    },
+    "anime_formats": {
+        "tv": "TV Show",
+        "movie": "Movie",
+        "tv_short": "TV Short",
+        "special": "Special",
+        "ova": "OVA",
+        "ona": "ONA"
+    },
+    "anime_source": {
+        "lightnovel": "Light novel",
+        "manga": "Manga",
+        "original": "Original",
+        "webnovel": "Web Novel",
+        "novel": "Novel",
+        "anime": "Anime",
+        "videogame": "Video Game",
+        "visualnovel": "Visual Novel",
+        "doujinshi": "Doujinshi",
+        "comic": "Comic",
+        "liveaction": "Live Action", 
+        "game": "Game",
+        "multimediaproject": "Multimedia Project",
+        "picturebook": "Picture Book",
+        "other": "Other"
+    },
     "card_information": {
         "ep_airing": "Ep {{ep}} airing in {{text}}",
         "ep_airing_day": "{{day}} Days",
@@ -51,7 +104,7 @@
         "ep_airing_minutes": "{{min}} Minutes",
         "ep_airing_today": "Today",
         "episodes": "{{ep}} Episodes",
-        "minutes": "{{min}}Min Durration"
+        "minutes": "{{min}}Min Duration"
     },
     "information": {
         "airing": "Airing Episode",
@@ -66,12 +119,18 @@
         "descriptionnotfound": "Description Not Found",
         "errors": "This Anime doesn't have any episodes",
         "wrongtext": "Is this the wrong Anime?",
+        "listEpisodes": "{{number}} Episodes",
         "bar": {
             "anilist": "Anilist Page",
             "trailer": "Anime Trailer"
         },
         "containerwrong": {
-            "title": "Anime Found For name: {{name}}"
+            "search": "Search: {{name}}"
+        },
+        "types": {
+            "sub": "Subtitles",
+            "dub": "Dubbing",
+            "raw": "Raw"
         },
         "notification": {
             "coverdone": "Cover succesfully copied to clipboard",
@@ -93,11 +152,21 @@
             "theme": "Theme",
             "updates": "Update Notifications",
             "checkupdates": "Check for Updates",
+            "checkupdate": "Check Update",
             "window": "Window",
             "maximize": "Auto Maximize",
             "fullscreen": "Auto Fullscreen",
             "zoom": "Zoom",
-            "meow" : ":3"
+            "meow": ":3",
+            "credits": "Credits",
+            "specialthanks": "Special Thanks to",
+            "onstart": "On Start",
+            "everyday": "Every day",
+            "everyweek": "Every Week",
+            "hideSidebar": "Hide Sidebar",
+            "hoverSidebar": "Hover Sidebar",
+            "discordrpc": "Discord RPC",
+            "links": "Usefull Links"
         },
         "player": {
             "play": "Auto Play",
@@ -110,9 +179,31 @@
             "preload": "Player Preload Type",
             "screenshot": "Screenshots",
             "screenask": "Always ask Where to Save Screenshots",
+            "uptonextep": "Up To Next Episode Notification",
+            "notif_interval": "Notification Interval",
+            "epshorter": "Don't show if episode is shorter than",
+            "external": "External Player",
+            "stretching": "Video Streching",
+            "enable_external": "Enable External Player",
+            "select_player": "Select Player",
+            "movianip": "Movian IP Address",
+            "mpvpath": "MPV Path",
+            "vlcpath": "VLC Path",
             "type": "Save Type",
             "path": "Screenshot Save Path",
+            "file": "File",
+            "clipboard": "Clipboard",
+            "both": "Both",
+            "changelocaton": "Change Location",
             "keybind": "Keybinds",
+            "playerexitbechaviour": "Player Exit behavior",
+            "playerbeexit": {
+                "information": "To Information",
+                "home": "To Home"
+            },
+            "skipOpening": "Auto Skip Openings",
+            "skipEnding": "Auto Skip Endings",
+            "showBrokenBuffer": "Show Broken Buffer",
             "keybinds": {
                 "pause": "Pause",
                 "fullscreen": "Fullscreen",
@@ -128,7 +219,30 @@
                 "volumeup": "Volume Up",
                 "volumedown": "Volume Down",
                 "volumemute": "Mute the audio",
-                "screenshot": "Take a Screenshot"
+                "screenshot": "Take a Screenshot",
+                "skipOpeningEnding": "Skip Opening/Ending",
+                "toggleSubtitles": "Toggle Subtitles",
+                "pip": "Picture In Picture"
+            }
+        },
+        "playerUI": {
+            "dloadinganimation": "Disable Loading Animation",
+            "dskipanimation": "Disable Skip Animation",
+            "dspaceanimation": "Disable Space Animation",
+            "dvolumeanimation": "Disable Volume Animation"
+        },
+        "externalPlayer": {
+            "running": "Running {{player}}",
+            "episodes": "Episodes",
+            "chromeCast": {
+                "disconnected": "disconnected",
+                "search": "Searching..."
+            },
+            "failed": {
+                "movian": "Failed to run Movian",
+                "chromecast": "ChromeCast Doesn't support m3u8 format",
+                "player": "Players Not Found",
+                "resolution": "Resolution not found"
             }
         },
         "history": {
@@ -136,7 +250,11 @@
             "limit": "Limit For History",
             "startsave": "When to Start Saving History",
             "stopsave": "When to Stop saving History",
-            "check_history": "Check History" 
+            "check_history": "Check History",
+            "check_start": "Start Checking History",
+            "history_good": "History is good, nothing to change",
+            "continue_good": "Continue watch is good, nothing to change",
+            "check": "Check"
         },
         "saving": {
             "done": "Config has been succesfully saved",
@@ -149,7 +267,32 @@
             "autofullscreenplayer": "Set fullscreen mode when player starts",
             "longskip": "Change how many seconds long skips skip (usefull for skipping openings)",
             "shotskip": "Change how many seconds short skips skip",
-            "continuewatchsavehistory": "After how many seconds episode will be saved to Continue watching / After how many seconds before the end remove episode from continue watching"
+            "continuewatchsavehistory": "After how many seconds episode will be saved to Continue watching / After how many seconds before the end remove episode from continue watching",
+            "brokenBuffer": "It shows buffering when playing mp4 files, which is known to display incorrect data"
+        },
+        "devmode": {
+            "developermode": "Developer Mode",
+            "tornondevtools": "Turn on Devtools",
+            "devtoolsonstart": "Devtools on Start",
+            "playerdebug": "Player Debug Stats",
+            "information": "Information",
+            "electronver": "Electron Version",
+            "chromiumver": "Chromium Version",
+            "nodever": "Electron Version"
+        },
+        "extensions": {
+            "name": "Name",
+            "author": "Plugin Author",
+            "version": "Version",
+            "type": "Type",
+            "information": "Information",
+            "player": "Player"
+        },
+        "upNext": {
+            "var1": "Variant 1",
+            "var2": "Variant 2",
+            "old": "Variant Old",
+            "upNextStyle": "Up To Next Style Variants" 
         }
     },
     "player": {
@@ -164,6 +307,11 @@
         "Pause": "Pause",
         "play": "Play",
         "fullscreen": "Fullscreen",
+        "changeEpisode": "Change Episode",
+        "chapter": "Chapter: {{name}}",
+        "episodeEndsOn": "Episode Ends on {{time}}",
+        "mute": "Mute",
+        "unmute": "Unmute",
         "errors": {
             "extractionError": "Failed Extracting Player Urls: {{error}}",
             "MEDIA_ERR_ABORTED": "The playback was aborted.",
@@ -176,7 +324,21 @@
             "title": "Next Episode Playing in {{sec}} seconds",
             "titleAnime": "Next Episode {{ep}} of {{title}}",
             "nextEp": "Next Episode",
-            "hide": "Hide"
+            "hide": "Hide",
+            "nextEpisode": "Ep. {{episode}}",
+            "nextPlaying": "Playing next episode in {{time}}s..."
+        },
+        "other": {
+            "unknown": "Uknown",
+            "off": "Off",
+            "default": "Default"
+        },
+        "settings": {
+            "source": "Source",
+            "resolution": "Resolution",
+            "audio": "Audio",
+            "subtitles": "Subtitles",
+            "speed": "Speed"
         },
         "toastscreenshot": {
             "failed": "Failed To save Screenshot",
@@ -188,9 +350,9 @@
         "continue": "Continue Episode {{ep}}",
         "history": "Watched Episode {{ep}}",
         "historysaved": "Succesfully Removed Anime from History",
-        "historyfailed": "Failed Removed Anime from History",
+        "historyfailed": "Failed Removing Anime from History",
         "continuesaved": "Succesfully Removed Anime from Continue Watch",
-        "continuefailed": "Failed Removed Anime from Continue Watch"
+        "continuefailed": "Failed Removing Anime from Continue Watch"
     },
     "oldBackup": {
         "backupcontinue": "Backing up old Continue Watch file: Done",
@@ -220,15 +382,66 @@
         "year": "Year:",
         "season": "Season:",
         "format": "Format:",
-        "airing": "Airing Status:"
+        "airing": "Airing Status:",
+        "placeholderGenres": "Genres",
+        "placeholderYears": "Years",
+        "placeholderSeason": "Season",
+        "placeholderFormat": "Format",
+        "placeholderAiring": "Airing"
     },
     "errorboundary": {
         "gotohome": "Go Back Home",
         "leaveanimu": "Leave Animu",
         "errormessage": "Error Message: {{error}}"
     },
+    "credits": {
+        "owca525": "Animu Creator",
+        "kartq": "Helper",
+        "dawoleq": "Programmer Helper",
+        "ary": "Designer", 
+        "rain_kyle": "Chinese Translation",
+        "akashiro": "Russian Translation",
+        "talon": "For making a discord server",
+        "zomi": "For making a new icon"
+    },
     "lang": {
         "en": "English",
-        "pl": "Polish"
+        "pl": "Polski",
+        "de": "Deutsch",
+        "fr": "Français",
+        "es": "Español",
+        "it": "Italiano",
+        "pt": "Português",
+        "ru": "Русский",
+        "uk": "Українська",
+        "cs": "Čeština",
+        "sk": "Slovenčina",
+        "sl": "Slovenščina",
+        "hr": "Hrvatski",
+        "sr": "Српски",
+        "bg": "Български",
+        "ro": "Română",
+        "nl": "Nederlands",
+        "sv": "Svenska",
+        "no": "Norsk",
+        "da": "Dansk",
+        "fi": "Suomi",
+        "hu": "Magyar",
+        "el": "Ελληνικά",
+        "tr": "Türkçe",
+        "ar": "العربية",
+        "he": "עברית",
+        "fa": "فارسی",
+        "hi": "हिन्दी",
+        "bn": "বাংলা",
+        "ur": "اردو",
+        "zh": "中文",
+        "ja": "日本語",
+        "ko": "한국어",
+        "id": "Bahasa Indonesia",
+        "ms": "Bahasa Melayu",
+        "th": "ไทย",
+        "vi": "Tiếng Việt",
+        "cn": "中文"
     }
 }

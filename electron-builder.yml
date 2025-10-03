@@ -41,6 +41,6 @@ publish:
   provider: github
   owner: Owca525
   repo: animu
-  releaseType: release
+  releaseType: prerelease
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/

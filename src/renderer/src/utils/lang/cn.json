@@ -1,0 +1,408 @@
+{
+  "global": {
+    "home": "主頁",
+    "history": "歷史紀錄",
+    "settings": "設定",
+    "about": "關於",
+    "general": "一般",
+    "cfglocation": "設定檔位置",
+    "player": "播放",
+    "continuewatch": "繼續觀看",
+    "dev": "開發者選項",
+    "minutes": "分鐘",
+    "exitAnimu": "你確定要退出動畫嗎？",
+    "enable": "允許",
+    "extensions": "擴充功能",
+    "notFound": "找不到頁面/未找到內容"
+  },
+  "dialog": {
+    "yes": "是",
+    "no": "否",
+    "retry": "重試",
+    "exit": "退出",
+    "reset": "重新啟動",
+    "reload": "重新載入",
+    "open": "打開"
+  },
+  "home": {
+    "search": "搜尋",
+    "nothingfound": "這裡甚麼都沒有",
+    "error": "發生錯誤",
+    "trending_now": "現在流行",
+    "popular_in_this_season": "本季熱門",
+    "all_time_popular": "歷來最受歡迎"
+  },
+  "contextMenu": {
+    "devtools": "打開開發者工具",
+    "nerdstats": "顯示技術資訊",
+    "copytitle": "複製標題",
+    "copycover": "複製封面",
+    "delete": "刪除"
+  },
+  "anime_seasons": {
+    "winter": "冬天",
+    "spring": "春天",
+    "summer": "夏天",
+    "fall": "秋天"
+  },
+  "anime_statuses": {
+    "releasing": "正在連載中",
+    "finished": "完成",
+    "not_yet_released": "還沒釋出",
+    "cancelled": "取消"
+  },
+  "anime_genres": {
+    "action": "動作",
+    "adventure": "冒險",
+    "comedy": "喜劇",
+    "drama": "劇情",
+    "ecchi": "擦邊/賣肉",
+    "fantasy": "奇幻",
+    "hentai": "H動漫",
+    "horror": "恐怖",
+    "mahoushoujo": "魔法少女",
+    "mecha": "機甲",
+    "music": "音樂",
+    "mystery": "懸疑",
+    "psychological": "心理",
+    "romance": "浪漫",
+    "sci-Fi": "科幻",
+    "sliceoflife": "日常",
+    "sports": "運動",
+    "supernatural": "超自然",
+    "thriller": "驚悚"
+  },
+  "anime_formats": {
+    "tv": "電視動畫",
+    "movie": "電影",
+    "tv_short": "短篇動畫",
+    "special": "特別篇",
+    "ova": "OVA(原創錄影動畫)",
+    "ona": "ONA(網路動畫)"
+  },
+  "anime_source": {
+    "lightnovel": "輕小說",
+    "manga": "漫畫",
+    "original": "原創",
+    "webnovel": 網路小說",
+    "novel": "小說",
+    "anime": "動畫",
+    "videogame": "電子遊戲",
+    "visualnovel": "視覺小說",
+    "doujinshi": "同人誌",
+    "comic": "漫畫(西方)",
+    "liveaction": "真人改編",
+    "game": "遊戲",
+    "multimediaproject": "多媒體企劃",
+    "picturebook": "繪本",
+    "other": "其他"
+  },
+  "card_information": {
+    "ep_airing": "第 {{ep}} 集將在 {{text}} 後播出",
+    "ep_airing_day": "{{day}} 天後",
+    "ep_airing_hours": "{{hours}} 小時後",
+    "ep_airing_minutes": "{{min}} 分鐘後",
+    "ep_airing_today": "今天播出",
+    "episodes": "共 {{ep}} 集",
+    "minutes": "片長：{{min}} 分鐘"
+  },
+  "information": {
+    "airing": "播放中的集數",
+    "format": "格式",
+    "episodes": "集數",
+    "duration": "每集時長",
+    "status": "狀態",
+    "startdate": "開始日期",
+    "endate": "結束日期",
+    "season": "季度",
+    "source": "原作",
+    "descriptionnotfound": "找不到簡介",
+    "errors": "這部動畫沒有集數",
+    "wrongtext": "這是錯誤的動畫嗎？",
+    "listEpisodes": "{{number}} 集",
+    "bar": {
+      "anilist": "Anilist 頁面",
+      "trailer": "預告片"
+    },
+    "containerwrong": {
+      "search": "搜尋: {{name}}",
+      "title": "找到名稱為 {{name}} 的動畫"
+    },
+    "types": {
+      "sub": "字幕版",
+      "dub": "配音版",
+      "raw": "無字幕版"
+    },
+    "notification": {
+      "coverdone": "複製成功",
+      "coverfailed": "複製失敗，請重試"
+    },
+    "actors": "演員",
+    "actor_as": "由 {{actor}} 飾演",
+    "characters": "角色",
+    "role": {
+      "main": "主角",
+      "supporting": "配角",
+      "background": "背景角色"
+    }
+  },
+  "settings": {
+    "turnDeveloper": "開啟開發者工具",
+    "general": {
+      "language": "語言",
+      "theme": "主題",
+      "updates": "更新通知",
+      "checkupdates": "確認版本更新",
+      "checkupdate": "檢查更新",
+      "window": "視窗",
+      "maximize": "自動放大",
+      "fullscreen": "自動縮小",
+      "zoom": "縮放",
+      "meow": ":3",
+      "credits": "製作人員",
+      "specialthanks": "特別感謝",
+      "onstart": "啟動時",
+      "everyday": "每天",
+      "everyweek": "每周",
+      "hideSidebar": "隱藏側邊攔",
+      "hoverSidebar": "滑鼠移動至側邊欄時顯示",
+      "discordrpc": "Discord 狀態顯示",
+      "links": "實用連結"
+    },
+    "player": {
+      "play": "自動播放",
+      "skip": "跳過",
+      "volume": "音量",
+      "longskip": "長跳轉向前",
+      "longskipb": "長跳轉向後",
+      "shortskip": "短跳轉向前",
+      "shortskipb": "短跳轉向後",
+      "preload": "播放器預加載類型",
+      "screenshot": "畫面截圖",
+      "screenask": "選擇截圖儲存位置",
+      "uptonextep": "下一集通知",
+      "notif_interval": "通知間隔",
+      "epshorter": "若集數短於此則不顯示",
+      "external": "外部播放器",
+      "stretching": "畫面拉伸",
+      "enable_external": "啟用外部播放器",
+      "select_player": "選擇播放器r",
+      "movianip": "Movian IP 位址",
+      "mpvpath": "MPV 路徑",
+      "vlcpath": "VLC 路徑",
+      "type": "儲存類型",
+      "path": "截圖儲存路徑",
+      "file": "檔案",
+      "clipboard": "剪貼簿",
+      "both": "同時",
+      "changelocaton": "變更儲存位置",
+      "keybind": "快捷鍵設置",
+      "playerexitbechaviour": "播放器退出行為",
+      "playerbeexit": {
+        "information": "回到資訊頁面",
+        "home": "回到首頁"
+      },
+      "skipOpening": "自動跳過片頭",
+      "skipEnding": "自動跳過片尾",
+      "showBrokenBuffer": "顯示異常緩衝",
+      "keybinds": {
+        "pause": "暫停",
+        "fullscreen": "全螢幕",
+        "exitplayer": "退出播放器",
+        "lskipforward": "長跳轉向前",
+        "lskipbackward": "長跳轉向後",
+        "skipforward": "短跳轉向前",
+        "skipbackward": "短跳轉向後",
+        "fskipforward": "幀跳轉向前",
+        "fskipbackward": "幀跳轉向後",
+        "nextepisode": "下一集",
+        "prevepisode": "上一集",
+        "volumeup": "聲音加大",
+        "volumedown": "聲音減小",
+        "volumemute": "靜音",
+        "screenshot": "拍攝截圖",
+        "skipOpeningEnding": "跳過片頭/片尾",
+        "toggleSubtitles": "切換字幕",
+        "pip": "子母畫面"
+      }
+    },
+    "playerUI": {
+      "dloadinganimation": "停用載入動畫",
+      "dskipanimation": "停用跳過動畫",
+      "dspaceanimation": "停用空白鍵動畫",
+      "dvolumeanimation": "停用音量動畫"
+    },
+    "externalPlayer": {
+      "running": "正在執行 {{player}}",
+      "episodes": "集數",
+      "chromeCast": {
+        "disconnected": "已中斷連線",
+        "search": "搜尋中..."
+      },
+      "failed": {
+        "movian": "無法執行 Movian",
+        "chromecast": "ChromeCast 不支援 m3u8 格式",
+        "player": "找不到播放器",
+        "resolution": "找不到解析度"
+      }
+    },
+    "history": {
+      "limited": "限制保存歷史紀錄",
+      "limit": "歷史紀錄保存限制",
+      "startsave": "開始保存歷史紀錄的時間",
+      "stopsave": "停止保存歷史紀錄的時間",
+      "check_history": "查看歷史紀錄",
+      "check_start": "開始檢查歷史紀錄",
+      "history_good": "歷史紀錄正常，無需更改",
+      "continue_good": "繼續觀看正常，無需更改",
+      "check": "Check"
+    },
+    "saving": {
+      "done": "設定已成功保存",
+      "error": "設定保存時發生錯誤",
+      "notification": "你要保存更改嗎？"
+    },
+    "tips": {
+      "automaximize": "應用啟動時自動最大化視窗",
+      "autofullscreen": "啟動時以全螢幕模式開啟應用程式",
+      "autofullscreenplayer": "播放器啟動時設置全螢幕模式",
+      "longskip": "設置長跳轉的秒數（適用於跳過開頭）",
+      "shotskip": "設置短跳轉的秒數",
+      "continuewatchsavehistory": "設定多少秒後將集數保存到繼續觀看 / 設定結束前多少秒移除集數",
+      "brokenBuffer": "播放 MP4 檔案時顯示緩衝，但這可能會出現錯誤數據"
+    },
+    "devmode": {
+      "developermode": "開發者模式",
+      "tornondevtools": "啟動開發工具",
+      "devtoolsonstart": "啟動時開啟開發工具",
+      "playerdebug": "撥放器除錯資訊",
+      "information": "資訊",
+      "electronver": "Electron 版本",
+      "chromiumver": "Chromium 版本",
+      "nodever": "Node 版本"
+    },
+    "extensions": {
+      "name": "名稱",
+      "author": "插件作者",
+      "version": "版本",
+      "type": "類型",
+      "information": "資訊",
+      "player": "播放器"
+    },
+    "upNext": {
+      "var1": "樣式 1",
+      "var2": "樣式 2",
+      "old": "舊版樣式",
+      "upNextStyle": "下一集提示樣式"
+    }
+  },
+  "player": {
+    "error": {
+      "notfound": "找不到任何的連結"
+    },
+    "TitleEpisode": "第 {{ep}} 集：{{name}}",
+    "TitleMovie": "電影：{{name}}",
+    "Volume": "音量",
+    "next": "下一集：{{ep}}",
+    "previous": "上一集：{{ep}}",
+    "Pause": "暫停",
+    "play": "播放",
+    "fullscreen": "全螢幕",
+    "changeEpisode": "切換集數",
+    "chapter": "章節: {{name}}",
+    "episodeEndsOn": "本集將於 {{time}} 結束",
+    "mute": "靜音",
+    "unmute": "取消靜音",
+    "errors": {
+      "extractionError": "擷取播放器網址失敗：{{error}}",
+      "MEDIA_ERR_ABORTED": "播放已中止",
+      "MEDIA_ERR_NETWORK": "下載視頻時發生網絡錯誤",
+      "MEDIA_ERR_DECODE": "解碼視頻時發生錯誤",
+      "MEDIA_ERR_SRC_NOT_SUPPORTED": "視頻格式或來源不支持",
+      "default": "發生未知錯誤."
+    },
+    "upNext": {
+      "title": "下一集將在 {{sec}} 秒後播放",
+      "titleAnime": "下一集：{{ep}}，來自 {{title}}",
+      "nextEp": "下一集",
+      "hide": "隱藏",
+      "nextEpisode": "第 {{episode}} 集",
+      "nextPlaying": "下一集將於 {{time}} 秒後播放..."
+    },
+    "other": {
+      "unknown": "未知",
+      "off": "關閉",
+      "default": "預設"
+    },
+    "settings": {
+      "source": "來源",
+      "resolution": "解析度",
+      "audio": "音訊",
+      "subtitles": "字幕",
+      "speed": "播放速度"
+    },
+    "toastscreenshot": {
+      "failed": "保存截圖失敗",
+      "doneclip": "圖片已成功保存到剪貼板",
+      "donefile": "圖片已成功保存到文件"
+    }
+  },
+  "history": {
+    "continue": "繼續觀看第 {{ep}} 集",
+    "history": "已觀看第 {{ep}} 集",
+    "historysaved": "成功從歷史紀錄中移除動畫",
+    "historyfailed": "從歷史紀錄中移除動畫失敗",
+    "continuesaved": "成功從繼續觀看中移除動畫",
+    "continuefailed": "從繼續觀看中移除動畫失敗"
+  },
+  "oldBackup": {
+    "backupcontinue": "備份舊的繼續觀看檔案：完成",
+    "convertcontinue": "轉換繼續觀看：成功 {{success}}，失敗 {{failed}}",
+    "convertcontinuedone": "轉換繼續觀看完成：成功 {{success}}，失敗 {{failed}}",
+    "convertcontinuefailed": "無法將舊的繼續觀看轉換為新格式",
+    "backuphistory": "備份舊的歷史紀錄檔案：完成",
+    "converthistory": "轉換歷史紀錄：成功 {{success}}，失敗 {{failed}}",
+    "converthistorydone": "轉換歷史紀錄完成：成功 {{success}}，失敗 {{failed}}",
+    "converthistoryfailed": "無法將舊的觀看歷史轉換為新格式",
+    "failedconvert": "無法轉換 {{title}}"
+  },
+  "update": {
+    "available": "更新 {{ver}} 現已可用，點擊更新",
+    "progess": "下載進度 {{procent}}%",
+    "done": "更新已下載，請重新啟動應用程式",
+    "same": "你有最新的動畫集數"
+  },
+  "discordrpc": {
+    "home": "在首頁",
+    "settings": "在設定",
+    "player": "{{title}} 第 {{ep}} 集"
+  },
+  "globalError": "發生嚴重錯誤，是否回到首頁？",
+  "filter": {
+    "genres": "類型:",
+    "year": "年份:",
+    "season": "季節:",
+    "format": "格式:",
+    "airing": "播出狀態:",
+    "placeholderGenres": "類型",
+    "placeholderYears": "年份",
+    "placeholderSeason": "季度",
+    "placeholderFormat": "格式",
+    "placeholderAiring": "播出狀態"
+  },
+  "errorboundary": {
+    "gotohome": "回到首頁",
+    "leaveanimu": "離開動畫",
+    "errormessage": "錯誤訊息：{{error}}"
+  },
+  "credits": {
+    "owca525": "Animu 創作者",
+    "kartq": "協助者",
+    "dawoleq": "程式協助者",
+    "ary": "設計師",
+    "rain_kyle": "中文翻譯",
+    "akashiro": "俄文翻譯",
+    "talon": "建立 Discord 伺服器",
+    "zomi": "設計新圖示"
+  }
+}

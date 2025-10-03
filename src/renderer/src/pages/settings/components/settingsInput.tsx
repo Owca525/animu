@@ -14,8 +14,8 @@ const SettingsInput: React.FC<settingsInputProsps> = ({ type = "text", iconChar 
     }
 
     return (
-        <div className="settings-input-container">
-            <input className="settings-input-field" type={type} value={startValue} onChange={handleData} />{iconChar != "" && <div className="settings-input-type">{iconChar}</div>}
+        <div tabIndex={-1} className="settings-input-container">
+            <input className={iconChar == "" ? "settings-input-field-hide-type" : "settings-input-field"} type={type} value={startValue} onChange={handleData} />{iconChar != "" && <div className="settings-input-type">{iconChar}</div>}
         </div>
     )
 }

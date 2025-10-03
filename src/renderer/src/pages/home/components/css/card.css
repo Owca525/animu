@@ -48,6 +48,7 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     line-clamp: 2;
+    width: 100%;
 }
 
 .card-continue-watch-text {
@@ -135,4 +136,11 @@
 .card-information-top {
     font-size: 1.1em;
     font-weight: 600;
+}
+
+/* For smaller devices / window sizes */
+@media (max-width: 600px) {
+    .card-information, .card-information-left, .card-information-right {
+        display: none !important;
+    }
 }

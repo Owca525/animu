@@ -1,7 +1,7 @@
 
 import { useQuery } from "react-query";
 import { useLocation, useNavigate } from "react-router-dom"
-import { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
 import { cardData, SettingsConfig } from "@renderer/utils/GlobalInterface";
 import { useSelector } from "react-redux";
@@ -14,27 +14,26 @@ import { useHotkeys } from "react-hotkeys-hook";
 import Button from "@renderer/components/buttons";
 import ExternalPlayer from "./externalPlayer";
 
-const VideoPlayer = lazy(() => import('./VideoPlayer'));
-// const ExternalPlayer = lazy(() => import('./externalPlayer'));
-
+import VideoPlayer from "./VideoPlayer";
 const player = () => {
-    const anime_data: { data: cardData, episodelist: Array<string> } = useLocation().state
-    // const { t } = useTranslation()
+    const anime_data: { data: cardData, episodelist: { ep: string, img?: string, title?: string }[], continueWatch?: boolean } = useLocation().state
     const navigate = useNavigate()
     const config: SettingsConfig = useSelector((data: any) => data.config);
 
     const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
     const [playerVolume, setPlayerVolume] = useState<number>(config.Player.general.Volume)
-    const [extractionData, setextractionData] = useState<{ actual: string, type: string, episodelist: Array<string>, time: number }>({ actual: anime_data.data.saveData ? anime_data.data.saveData.episode : "1", type: anime_data.data.saveData ? anime_data.data.saveData.type : "sub", episodelist: anime_data.episodelist, time: anime_data.data.saveData ? anime_data.data.saveData?.last_Time : 0 })
-    const playerID = anime_data.data.AnimeData.player_ID ?? "";
-    const extractFunc = useCallback(() => {
-        return pluginPlayer.player.getUrls(extractionData.type, extractionData.actual, playerID);
-    }, [extractionData, playerID]);
+    const [extractionData, setextractionData] = useState<{ actual: string, type: string, episodelist: { ep: string, img?: string, title?: string }[], time: number }>({ actual: anime_data.data.saveData ? anime_data.data.saveData.episode : "1", type: anime_data.data.saveData ? anime_data.data.saveData.type : "sub", episodelist: anime_data.episodelist, time: anime_data.data.saveData ? anime_data.data.saveData?.last_Time : 0 })
+    const [externalPlayerType, setexternalPlayerType] = useState<"Movian" | "VLC" | "Mpv" | "ChromeCast">(config.Player.external.type)
 
     const { data, isLoading, refetch } = useQuery({
-        queryKey: ['extract-urls', extractionData.type, extractionData.actual, playerID],
-        queryFn: extractFunc,
+        queryKey: [extractionData.type, extractionData.actual, anime_data.data.AnimeData.player_ID],
+        queryFn: async ({ queryKey }) => {
+            const [type, actual, player_id] = queryKey;
+            return pluginPlayer.player.getUrls(type, actual, player_id)
+        },
         refetchOnWindowFocus: false,
+        staleTime: 2 * 60 * 60 * 1000,
+        cacheTime: 2 * 60 * 60 * 1000
     });
 
     function setNewEpisode(ep: string) {
@@ -51,7 +50,7 @@ const player = () => {
     useEffect(() => {
         SaveHistory({
             saveData: {
-                pluginName: "",
+                pluginName: anime_data.data.saveData && anime_data.data.saveData.pluginName == "" ? "Allmanga" : config.plugins.player,
                 last_Time: 0,
                 type: extractionData.type,
                 episode: extractionData.actual.toString()
@@ -64,17 +63,22 @@ const player = () => {
         refetchHistory()
     }, [extractionData])
 
-    useHotkeys("Escape", () => {
-        leave()
+    useHotkeys("Escape", async () => {
+        await leave()
     });
 
-    function leave() {
-        navigate("/")
+    async function leave() {
         window.BrowserWindow.setFullscreen(false)
         closeDialog()
+        if (anime_data.continueWatch) {
+            navigate("/")
+            return
+        }
+        if (config.Player.general.PlayerBehavior === "home") navigate("/")
+        else navigate("/info", { state: anime_data.data.AnimeData })
     }
     if (isLoading == false && data && data.length <= 0) {
-        loadingAnimation(leave, anime_data.data)
+        loadingAnimation(leave, { title: anime_data.data.AnimeData.title, ep: extractionData.actual, format: anime_data.data.AnimeData.format }, extractionData)
         showDialog({
             type: "refresh",
             title: t("player.error.notfound"),
@@ -86,39 +90,50 @@ const player = () => {
         return
     }
 
+    // External Player
     if (data && isLoading == false && config.Player.external.enable) {
-         return (
-             <ExternalPlayer 
+        return (
+            <ExternalPlayer
                 animeData={anime_data.data}
                 playerData={data}
                 time={extractionData.time}
                 setNextEpisode={setNewEpisode}
                 now_episodes={{ episode: extractionData.actual, type: extractionData.type, episodes: extractionData.episodelist }}
+                externalPlayerData={{ onChage: (data) => setexternalPlayerType(data), current: externalPlayerType }}
             />
-         )
-    }
-
-    if (data && isLoading == false) {
-        return (
-            <Suspense fallback={loadingAnimation(leave, anime_data.data)}>
-                <VideoPlayer
-                    player_data={data}
-                    anime_data={anime_data.data}
-                    temp={{ episode: extractionData.actual, type: extractionData.type, episodes: extractionData.episodelist }}
-                    setNextEpisode={setNewEpisode}
-                    volumeCacheFunc={setPlayerVolume}
-                    PlayerVolume={playerVolume}
-                    time={extractionData.time}
-                />
-            </Suspense>
         )
     }
-    return loadingAnimation(leave, anime_data.data)
+
+    // Player
+    if (data && isLoading == false) {
+        return (
+            <VideoPlayer
+                player_data={data}
+                anime_data={anime_data.data}
+                temp={{ episode: extractionData.actual, type: extractionData.type, episodes: extractionData.episodelist }}
+                setNextEpisode={setNewEpisode}
+                volumeCacheFunc={setPlayerVolume}
+                PlayerVolume={playerVolume}
+                time={extractionData.time}
+                exitFromPlayer={leave}
+            />
+        )
+    }
+    return loadingAnimation(leave, { title: anime_data.data.AnimeData.title, ep: extractionData.actual, format: anime_data.data.AnimeData.format }, extractionData)
 }
 
-function loadingAnimation(leave: () => void, anime_data: cardData) {
+function getCurrentImage(currentdata: { actual: string, type: string, episodelist: { ep: string, img?: string, title?: string }[], time: number }): string | undefined {
+    for (let index = 0; index < currentdata.episodelist.length; index++) {
+        const element = currentdata.episodelist[index];
+        if (element.ep == currentdata.actual && element.img) return element.img
+    }
+    return undefined
+}
+
+function loadingAnimation(leave: () => void, anime_data: { title: { english?: string | undefined; native: string; romaji: string; }, ep: string, format?: string }, currentdata: { actual: string, type: string, episodelist: { ep: string, img?: string, title?: string }[], time: number }) {
     return (
-        <div className="player-loading-container">
+        <div className="player-loading-container" style={{ backgroundImage: `url(${getCurrentImage(currentdata)})` }}>
+            <div className="player-loading-container-black"></div>
             <div className="player-loading-top">
                 <Button icon='arrow_back' ButtonClass='player-buttons' onClick={leave} />
                 <div className="player-title ">{detectTitle(anime_data)}</div>

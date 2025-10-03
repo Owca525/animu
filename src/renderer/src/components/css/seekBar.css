@@ -13,7 +13,7 @@
     position: relative;
 }
 
-.seekbar-buffer-wrapper {
+.seekbar-buffer-wrapper, .seekbar-chapters-wrapper {
     width: 100%;
     height: 100%;
     position: absolute;
@@ -21,11 +21,10 @@
     overflow: hidden;
 }
 
-.seekbar-buffer {
+.seekbar-buffer, .seekbar-chapters {
     position: absolute;
     top: 0;
     height: 100%;
-    background-color: color-mix(in srgb, var(--text) 70%, transparent);
     z-index: 1;
 }
 
@@ -45,4 +44,35 @@
     transform: translateX(-50%);
     width: min-content;
     padding: 8px 12px;
+    z-index: 4;
+    pointer-events: none;
+}
+
+.seekbar-chapter-box, .seekbar-chapter-box-thumbnails {
+    width: max-content;
+    pointer-events: none;
+}
+
+.seekbar-chapter-box {
+    top: -65px;
+}
+
+.seekbar-chapter-box-thumbnails {
+    top: -142px;
+}
+
+.seekbar-thumbnail {
+    position: absolute;
+    left: var(--tooltip-x, 50%);
+    transform: translateX(-50%);
+    height: 101px;
+    width: 180px;
+    top: -130px;
+    background-repeat: no-repeat;
+    outline: 3px solid var(--player-bg-containers);
+    pointer-events: none;
+}
+
+.seekbar-chapters-wrapper {
+    z-index: 3 !important;
 }

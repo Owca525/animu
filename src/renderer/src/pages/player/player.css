@@ -8,6 +8,15 @@
   align-items: center;
 }
 
+.player-video-container * {
+  -webkit-user-select: none;
+  /* Safari */
+  -ms-user-select: none;
+  /* IE 10 and IE 11 */
+  user-select: none;
+  /* Standard syntax */
+}
+
 .video-player {
   width: 100%;
   height: 100%;
@@ -40,9 +49,19 @@
   font-size: large;
   font-weight: 500;
   user-select: text;
+  white-space: nowrap;
 }
 
-.video-top {
+.player-end-time-display {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+
+.video-top,
+.player-loading-top {
   margin-top: 8px;
   padding-left: 8px;
   padding-right: 8px;
@@ -50,6 +69,12 @@
   align-items: center;
   gap: 1em;
   transition: opacity 200ms ease;
+}
+
+.player-loading-top {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .mask {
@@ -157,7 +182,7 @@
   cursor: default;
 }
 
-.player-up-Next-container {
+.player-up-Next-container.old {
   position: fixed;
   left: 1;
   top: 1;
@@ -173,8 +198,8 @@
   gap: 1em;
 }
 
-.player-up-Next-Anime,
-.player-up-Next-Title {
+.player-up-Next-Anime.old,
+.player-up-Next-Title.old {
   display: -webkit-box;
   line-clamp: 1;
   -webkit-line-clamp: 1;
@@ -182,53 +207,129 @@
   overflow: hidden;
 }
 
-.player-up-Next-Title {
+.player-up-Next-Title.old {
   font-size: clamp(1rem, 1.4vw, 2em);
   font-weight: 500;
 }
 
-.player-up-Next-Anime {
+.player-up-Next-Anime.old {
   max-width: 30svw;
   font-size: clamp(0.8rem, 1vw, 1em);
 }
 
-.player-up-Next-Buttons {
+.player-up-Next-Buttons.old {
   display: flex;
   justify-content: end;
   gap: 1em;
 }
 
-.player-up-Next-Button {
+.player-up-Next-Button.old {
   font-size: clamp(0.5rem, 1.1vw, .8rem);
   padding: 8px;
 }
 
+.player-up-Next-container-var2 {
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  align-items: center;
+  backdrop-filter: blur(1px);
+}
+
+.player-up-Next-background {
+  position: absolute;
+  bottom: 12%;
+  right: 1%;
+  max-width: 340px;
+  width: max-content;
+  transition: all 100ms ease-in-out;
+  cursor: pointer;
+}
+
+.player-up-Next-title,
+.player-up-Next-text {
+  display: -webkit-box;
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  width: 100%;
+}
+
+.player-up-Next-title, .player-up-Next-episode, .player-up-Next-text, .player-up-Next-icon {
+  text-shadow: 2px 2px 5px var(--black);
+}
+
+.player-up-Next-title {
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.player-up-Next-image {
+  height: 80px;
+  -webkit-mask-image: linear-gradient(to right, var(--bg), rgb(0, 0, 0, 0.2));
+}
+
+.player-up-Next-button-close {
+  position: absolute;
+  top: -15%;
+  right: -2%;
+  width: 30px;
+  height: 30px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 100ms ease-in-out;
+}
+
+.player-up-Next-container {
+  padding: 12px 12px 12px 0px;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  align-items: center;
+  position: absolute;
+  bottom: 12%;
+  right: 1%;
+  max-width: 450px;
+  cursor: pointer;
+}
+
+.player-up-Next-icon {
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+
+  font-size: 3em;
+}
+
 .player-loading-container {
-  background-color: black;
   width: 100%;
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
-.player-loading-top {
-  display: flex;
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding: 12px;
-  gap: 12px;
+.player-loading-container-black {
+  width: 100%;
+  height: 100%;
 }
 
 .player-volume-ui-container {
   display: flex;
   align-items: center;
-  background-color: var(--bg2);
   position: absolute;
   top: 10px;
   right: 20px;
-  border-radius: 12px;
   max-width: 280px;
   min-width: 180px;
   width: 290px;
@@ -240,8 +341,6 @@
 .player-volume-ui-bar-progress {
   height: 100%;
   width: 0%;
-  background-color: var(--neutral1);
-  border-radius: 12px;
 }
 
 .player-volume-ui-text {
@@ -255,12 +354,10 @@
 .player-volume-ui-bar-container {
   width: 100%;
   height: 8px;
-  background-color: var(--bg3);
-  border-radius: 12px;
 }
 
 .player-loading-animation-container {
-  position: relative;
+  position: absolute;
 }
 
 .player-buffering-animation {
@@ -270,7 +367,6 @@
 }
 
 .player-select-episode-void {
-  background-color: var(--player-bg-containers);
   width: 100%;
   height: 100%;
   position: fixed;
@@ -284,27 +380,26 @@
 
 .player-select-episode-container {
   height: max-content;
-  max-height: 200px;
-  max-width: 320px;
+  max-height: 300px;
+  max-width: 500px;
   display: flex;
   flex-direction: column;
-  padding: 8px;
-  gap: 4px;
+  padding: 16px 12px 12px 16px;
+  gap: 8px;
 
   pointer-events: all;
   position: fixed;
   bottom: 90px;
   right: 20px;
 
-  background-color: var(--player-bg-containers);
-  border-radius: 8px;
-  border: 2px solid var(--bg4);
-  overflow: auto;
+  overflow: hidden;
+  overflow-y: scroll;
 }
 
 .player-select-episode-title {
-  font-size: 1.2em;
+  font-size: 1.1em;
   font-weight: 600;
+  margin-left: 4px;
 }
 
 .player-select-episode-content {
@@ -314,13 +409,70 @@
   flex-wrap: wrap;
 }
 
+.player-select-episode-content-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.information-episode-button-full {
+  width: 300px;
+  font-size: 1em;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.information-episode-button-image {
+  width: 100px;
+}
+
 /* UI */
 .player-icon-ui {
   font-size: 72px;
 }
 
-/* .player-fast-forward-ui, .player-fast-rewind-ui {
-  position: relative;
+.player-subtitle-container {
+  position: absolute;
+  bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100vw;
+}
+
+.player-subtitle-content {
+  text-align: center;
+  font-size: 3em;
+  pointer-events: none;
+  width: max-content;
+  max-width: 100vw;
+  padding: 6px;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  filter: drop-shadow(2px 2px 1px black);
+  -webkit-text-stroke-width: 2px;
+  -webkit-text-stroke-color: black;
+  font-weight: bold;
+}
+
+.player-skip-chapters-button {
+  position: absolute;
+  bottom: 12%;
+  left: 1%;
+  padding: 12px;
+  font-size: 1.1em;
+  cursor: pointer;
+}
+
+.player-subtitle-container.up {
+  bottom: 80px;
+}
+
+.player-fast-forward-ui, .player-fast-rewind-ui {
+  position: absolute;
 }
 
 .player-fast-rewind-ui {
@@ -331,4 +483,16 @@
 .player-fast-forward-ui {
   right: 0;
   margin-right: clamp(40px, 25vw, 350px);
-} */
+}
+
+@media (max-width: 1000px) {
+  .player-end-time-display {
+    max-width: 250px;
+  }
+}
+
+@media (max-width: 600px) {
+  .player-end-time-display {
+    display: none;
+  }
+}

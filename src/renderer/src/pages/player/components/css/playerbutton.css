@@ -2,9 +2,7 @@
     display: none;
     position: absolute;
     bottom: 70px;
-    background-color: var(--player-bg-containers);
     padding: 4px;
-    border-radius: 6px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

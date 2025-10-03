@@ -5,10 +5,10 @@
 }
 
 .dropdown-button {
-  padding: 8px;
+  padding: 12px;
   cursor: pointer;
   width: 150px;
-  height: 20px;
+  height: max-content;
   display: flex;
   transition: border-color 150ms ease;
   align-items: center;
@@ -19,6 +19,7 @@
   overflow: hidden;
   min-width: 0;
   font-size: 1em;
+  min-width: fit-content;
 }
 
 .dropdown-button-icon {
@@ -68,8 +69,7 @@
   height: 24px;
 }
 
-/* for smartphones 
-maybe that will be usefull in the future */
+/* for very small window sizes */
 @media (max-width: 600px) {
 
   .dropdown-button {
