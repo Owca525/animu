@@ -13,10 +13,6 @@ const WelcomeScreen: React.FC<{}> = () => {
     const config: SettingsConfig = useSelector((data: any) => data.config);
     const [currentPage, setPage] = useState<"lang" | "plugins">("lang")
 
-    function setConfig() {
-        
-    }
-
     return (
         <main tabIndex={-1} className="welcome-screen-void">
             <div className="welcome-screen-content">
