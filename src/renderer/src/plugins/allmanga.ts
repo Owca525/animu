@@ -302,8 +302,9 @@ export async function getInformation(animeData?: AnimeData, anime_id?: string): 
   return { player_id: anime_id ? anime_id : "", episodesData: anime_data.episodesList ?? [] };
 }
 
+// { resolution: [{ url: url, res: "1080" }], hostname: new URL(url).hostname, hls: false }
 async function getURLS(url: string): Promise<playerData | undefined> {
-  if (url.startsWith("https")) return { resolution: [{ url: url, res: "1080" }], hostname: new URL(url).hostname, hls: false }
+  if (url.startsWith("https")) return undefined
   const links = await sendRequest(`http://allanime.day${url.replace("clock", "clock.json")}`, {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0'
   })
