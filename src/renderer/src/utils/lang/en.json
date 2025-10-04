@@ -329,7 +329,7 @@
             "nextPlaying": "Playing next episode in {{time}}s..."
         },
         "other": {
-            "unknown": "Uknown",
+            "unknown": "Unknown",
             "off": "Off",
             "default": "Default"
         },

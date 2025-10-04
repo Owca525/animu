@@ -1042,8 +1042,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                 }
                                 disableSettings={() => setcurrentSettings(() => false)}
                                 current={{
-                                    currentHost: currentPlayer ? currentPlayer.hostname : t("player.other.uknown"),
-                                    currentResolution: currentResolution ? currentResolution.res : t("player.other.uknown"),
+                                    currentHost: currentPlayer ? currentPlayer.hostname : t("player.other.unknown"),
+                                    currentResolution: currentResolution ? currentResolution.res : t("player.other.unknown"),
                                     currentSpeed: videoRef.current?.playbackRate ? videoRef.current?.playbackRate : 1,
                                     currentSub: currentSubtitles ? currentSubtitles.label : t("player.other.off"),
                                     currentTrack: currentAudioTrack ? currentAudioTrack.label : t("player.other.default")
@@ -1146,8 +1146,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     isVisible={isVisible}
                     isWaitingPlayer={isWaitingPlayer}
                     ListResolution={ListResolution.map((val) => val.res)}
-                    currentHost={currentPlayer ? currentPlayer.hostname : "Uknown"}
-                    currentResolution={currentResolution ? currentResolution.res : "Uknown"}
+                    currentHost={currentPlayer ? currentPlayer.hostname : "Unknown"}
+                    currentResolution={currentResolution ? currentResolution.res : "Unknown"}
                     currentSettings={currentSettings}
                     hls={hls}
                     time={time}
