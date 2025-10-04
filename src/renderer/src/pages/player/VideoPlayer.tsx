@@ -119,6 +119,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     // other
     const [currentSettings, setcurrentSettings] = useState<boolean>(false)
     const [showNerdStats, setshowNerdStats] = useState<boolean>(false)
+    const [resolutionNotFound, setResError] = useState<boolean>(false)
     const [hls, setHls] = useState<Hls | undefined>(undefined);
     const [chapterList, setChapterList] = useState<{ left: number, width: number, name?: string, type: "opening" | "ending" | "other" }[]>([])
 
@@ -219,6 +220,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     async function checkUrl(data: playerData) {
         if (!videoRef.current) return
+        if (data.resolution.length <= 0) {
+            toast.info(t("player.errors.missingResoltions"), notificationProps)
+            setResError(() => true)
+            return
+        }
         const time = videoRef.current.currentTime
         if (data.subtitles) setListSubtitles(() => [{ url: "", format: "", lang: "", label: "Off" }, ...data.subtitles as playerSubtitlesFormat[]])
         if (data.storyboardVTT) setThumbnail(await VTTstoryBoardParser(data.storyboardVTT))
@@ -956,7 +962,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         </>
                     }
 
-                    {!config.Player.ui.DisableLoadingAnimation &&
+                    {resolutionNotFound && 
+                        <motion.div className="player-loading-animation-container player-buffering-animation"
+                            variants={hiddenVariants}
+                            initial="visible"
+                            transition={{ duration: 0.4 }}
+                        >
+                            <div className="player-icon-ui material-symbols-outlined">error</div>
+                        </motion.div>
+                    }
+
+                    {!config.Player.ui.DisableLoadingAnimation && !resolutionNotFound &&
                         <motion.div className="player-loading-animation-container player-buffering-animation"
                             variants={hiddenVariants}
                             animate={isWaitingPlayer ? "visible" : "hidden"}

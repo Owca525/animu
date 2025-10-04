@@ -319,7 +319,8 @@
       "MEDIA_ERR_NETWORK": "下載視頻時發生網絡錯誤",
       "MEDIA_ERR_DECODE": "解碼視頻時發生錯誤",
       "MEDIA_ERR_SRC_NOT_SUPPORTED": "視頻格式或來源不支持",
-      "default": "發生未知錯誤."
+      "default": "發生未知錯誤.",
+      "missingResoltions": "播放器未找到任何影片解析度"
     },
     "upNext": {
       "title": "下一集將在 {{sec}} 秒後播放",

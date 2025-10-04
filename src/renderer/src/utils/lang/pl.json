@@ -318,7 +318,8 @@
       "MEDIA_ERR_NETWORK": "Wystąpił błąd sieci podczas pobierania wideo.",
       "MEDIA_ERR_DECODE": "Wystąpił błąd podczas dekodowania wideo.",
       "MEDIA_ERR_SRC_NOT_SUPPORTED": "Format lub źródło wideo nie jest obsługiwane.",
-      "default": "Wystąpił nieznany błąd."
+      "default": "Wystąpił nieznany błąd.",
+      "missingResoltions": "Player nie znalazł znalazł żadnych rozdzielczości"
     },
     "upNext": {
       "title": "Następny odcinek za {{sec}} sekund",
