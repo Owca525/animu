@@ -14,7 +14,7 @@ function convertText(text: string) {
         .replaceAll("%20", "+")
 }
 
-function detectResoltion(text: string): string | undefined {
+function detectResoltion(text: string): string {
     switch (text) {
         case "SD":
             return "480"
@@ -25,7 +25,7 @@ function detectResoltion(text: string): string | undefined {
         case "SourceMKV":
             return "Source"
     }
-    return undefined
+    return "Unknown"
 }
 
 async function requestToApi(anime_id: string): Promise<{ data: any } | undefined> {
@@ -48,32 +48,44 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
     let currentEpisode: { res: string, url: string; defaultSubtitles?: boolean; }[] = []
     let subtitles: playerSubtitlesFormat[] = []
     let chapters: playerChapterList = []
-    episodes.forEach(element => {
-        if (element["number"] == parseInt(episode)) {
-            for (const key in element["secondarySource"]) {
-                if (element != "") {
-                    let resolution = detectResoltion(key);
-                    if (resolution) currentEpisode.push({ res: resolution, url: element["secondarySource"][key], defaultSubtitles: resolution == "Source" })
-                }
-            }
 
-            if (element["subtitles"]["EN"]) subtitles.push({
-                url: element["subtitles"]["EN"],
-                lang: "en",
-                label: "English",
-                format: "ass"
+    let tmp = episodes.find((element) => parseInt(element.number) == parseInt(episode))
+    if (!tmp) return []
+
+    let reqID = await window.api.request.get(`${WEB}/api/watch/getVideoLink?id=${tmp.id}`, HEADER, "text");
+    if (!reqID.success) return []
+    // if (!reqID.data.endWith("LC")) return []
+
+    let decodeData = reqID.data.slice(0, -2)
+    decodeData = decodeData.split("").reverse().map(el => String.fromCharCode(el.charCodeAt(0) - 7)).join("")
+
+    try {
+        let animeEpisodes = JSON.parse(atob(decodeData))
+        for (const key in animeEpisodes) {
+            currentEpisode.push({
+                res: detectResoltion(key),
+                url: animeEpisodes[key]
             })
-            if (element["subtitles"]["PL"]) subtitles.push({
-                url: element["subtitles"]["PL"],
-                lang: "pl",
-                label: "Polish",
-                format: "ass"
-            })
-            let extractedChapters = JSON.parse(element["markerPeriods"])
-            if (extractedChapters[0] && timeToSeconds(extractedChapters[0]["endTime"]) >= 0) chapters.push({ start: timeToSeconds(extractedChapters[0]["startTime"]), end: timeToSeconds(extractedChapters[0]["endTime"]), type: "opening", name: "Opening" })
-            if (extractedChapters[1] && timeToSeconds(extractedChapters[1]["endTime"]) >= 0) chapters.push({ start: timeToSeconds(extractedChapters[1]["startTime"]), end: timeToSeconds(extractedChapters[1]["endTime"]), type: "ending", name: "Ending" })
         }
-    });
+    } catch (error) {
+        console.error(error, atob(decodeData), decodeData, reqID)
+    }
+
+    if (tmp["subtitles"]["EN"]) subtitles.push({
+        url: tmp["subtitles"]["EN"],
+        lang: "en",
+        label: "English",
+        format: "ass"
+    })
+    if (tmp["subtitles"]["PL"]) subtitles.push({
+        url: tmp["subtitles"]["PL"],
+        lang: "pl",
+        label: "Polish",
+        format: "ass"
+    })
+    let extractedChapters = JSON.parse(tmp["markerPeriods"])
+    if (extractedChapters[0] && timeToSeconds(extractedChapters[0]["endTime"]) >= 0) chapters.push({ start: timeToSeconds(extractedChapters[0]["startTime"]), end: timeToSeconds(extractedChapters[0]["endTime"]), type: "opening", name: "Opening" })
+    if (extractedChapters[1] && timeToSeconds(extractedChapters[1]["endTime"]) >= 0) chapters.push({ start: timeToSeconds(extractedChapters[1]["startTime"]), end: timeToSeconds(extractedChapters[1]["endTime"]), type: "ending", name: "Ending" })
 
     return [{
         hostname: "lycoris.cafe",
@@ -174,7 +186,7 @@ async function extractOnlyEpisodes(_type: string, anime_id: string): Promise<{ e
     return episodes
 }
 
-function convertToAnimeData(data: any): AnimeData | undefined{
+function convertToAnimeData(data: any): AnimeData | undefined {
     console.log(data)
     try {
         return {
@@ -207,7 +219,7 @@ async function searchAnime(name: string, page: number, _params?: { genres?: stri
     const req = await window.api.request.get(url, HEADER);
     if (!req.success) return []
 
-    let data = req.data.data.map((element) => {return{ AnimeData: convertToAnimeData(element) }})
+    let data = req.data.data.map((element) => { return { AnimeData: convertToAnimeData(element) } })
     if (!data) return []
     return data
 }
