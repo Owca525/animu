@@ -387,7 +387,7 @@ function getSeasonFromDate() {
   return { season, seasonYear: year };
 }
 
-async function SearchAnilistApi(text: string, page: number, params?: FilterParams): Promise<void> {
+async function SearchAnilistApi(text: string, page: number, params?: FilterParams): Promise<{ topCards?: containerData, sections: containerData[] }> {
   let variables: any = {
     page: page,
     sort: "SEARCH_MATCH",
@@ -422,8 +422,12 @@ async function SearchAnilistApi(text: string, page: number, params?: FilterParam
     onScrollDownFunction: (currentPage: number) => SearchAnilistApi(text, currentPage, params)
   }
 
-  if (page > 1) UpdateHomeData(async () => { return { data: data, maxPage: pageSize } })
-  else setHomeData(async () => [data])
+  return {
+    sections: [data]
+  }
+
+  // if (page > 1) UpdateHomeData(async () => { return { data: data, maxPage: pageSize } })
+  // else setHomeData(async () => [data])
 }
 
 async function getFullCategory(params, title: string) {

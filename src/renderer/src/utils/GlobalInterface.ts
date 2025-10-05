@@ -155,7 +155,7 @@ export interface informationPluginFormat {
     preferedLang: string[]
     pageSize: number
     info: {
-        search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => void
+        search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => Promise<{ topCards?: containerData, sections: containerData[] }>
         home: () => Promise<{ topCards?: containerData, sections: containerData[] }>
         anime: (id: string) => Promise<AnimeData | undefined>
     }

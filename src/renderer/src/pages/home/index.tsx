@@ -125,12 +125,13 @@ const Home = () => {
         }
     }
 
+    // TODO: napraw wyszukiwanie itp
     async function OnSearch(text: string) {
         if (!homeCache.localSearch) {
             store.dispatch({ type: "setSearch", payload: text });
             store.dispatch({ type: "setPage", payload: 1 });
             homeStopScrolling(false);
-            plugin.info.search(text, 1, store.getState().home.filterTags)
+            wrapper(plugin.info.search(text, 1, store.getState().home.filterTags))
             return
         }
 
