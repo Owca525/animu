@@ -533,8 +533,9 @@ export const infoPlugin: informationPluginFormat = {
   icon: "https://anilist.co/img/icons/icon.svg",
   pageSize: pageSize,
   info: {
-    home: async () => { 
-      return { sections: await CreateHomePage() }
+    home: async () => {
+      let data = await CreateHomePage()
+      return { topCards: data[0], sections: await CreateHomePage() }
     },
     search: SearchAnilistApi,
     anime: getAnime

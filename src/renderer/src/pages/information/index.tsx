@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { AnimeData, notificationProps, pluginFormat } from "@renderer/utils/GlobalInterface";
+import { AnimeData, notificationProps, playerPluginFormat } from "@renderer/utils/GlobalInterface";
 import Button from "@renderer/components/buttons";
 import "./information.css"
 import { convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities, getGradientColor, segregatePlugins } from "@renderer/utils/functions";
@@ -66,7 +66,7 @@ function information() {
     const time = convertSeconds(secondsLeft)
 
     async function initialInformation() {
-        let currentPlayerPlugin: pluginFormat = store.getState().plugin.playerPlugin
+        let currentPlayerPlugin: playerPluginFormat = store.getState().plugin.playerPlugin
         if (!currentPlayerPlugin.player) return
 
         let cardAnime = (await ReadHistory()).filter((element) => element.AnimeData.id == anime_data.id)

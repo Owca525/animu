@@ -14,190 +14,12 @@ import { homeStopScrolling, setHomeData, setHomeLocalSearch } from "@renderer/ut
 import { ReadContinue } from "@renderer/utils/history/continueWatch"
 import { ReadHistory } from "@renderer/utils/history/history"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
-import { CreateContextMenuOptions, getGradientColor } from "@renderer/utils/functions"
+import { CreateContextMenuOptions } from "@renderer/utils/functions"
 import Filter from "./components/filter"
 import Button from "@renderer/components/buttons"
 import { useQuery } from "react-query"
 import BigCardsContainer from "./components/bigCardsContainer"
 // import WelcomeScreen from "./components/welcomeScreen"
-
-const ANIME_DATA = {
-    "id": 154768,
-    "title": {
-        "english": "My Dress-Up Darling Season 2",
-        "romaji": "Sono Bisque Doll wa Koi wo Suru Season 2",
-        "native": "その着せ替え人形は恋をする Season 2"
-    },
-    "coverImage": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx154768-DHHvNd4MjV1p.jpg",
-    "startDate": {
-        "year": 2025,
-        "month": 7,
-        "day": 6
-    },
-    "endDate": {
-        "year": 2025,
-        "month": 9,
-        "day": 21
-    },
-    "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/154768-EuZd63IcqsVq.jpg",
-    "season": "SUMMER",
-    "seasonYear": 2025,
-    "description": "The second season of <i>Sono Bisque Doll wa Koi wo Suru</i>.\n<br><br>\nWhen Marin Kitagawa and Wakana Gojo met, they grew close over their love for cosplay. Through interacting with classmates and making new cosplay friends, Marin and Wakana’s world keeps growing. New developments arise as Marin’s love for Wakana continues to be filled with endless excitement. In their ever-expanding world, Marin and Wakana’s story of cosplay and thrills continues!<br><br>\n(Source: Crunchyroll)",
-    "type": "ANIME",
-    "format": "TV",
-    "source": "MANGA",
-    "status": "FINISHED",
-    "episodes": 12,
-    "duration": 24,
-    "genres": [
-        "Comedy",
-        "Ecchi",
-        "Romance",
-        "Slice of Life"
-    ],
-    "averageScore": 83,
-    "popularity": 117565,
-    "trailer": {
-        "id": "Gx1QvE0wtgw",
-        "site": "youtube"
-    },
-    "nextAiringEpisode": null,
-    "characters": [
-        {
-            "role": "MAIN",
-            "character": {
-                "id": 133676,
-                "image": "https://s4.anilist.co/file/anilistcdn/character/large/b133676-kV2czE3C8Qls.png",
-                "name": "Marin Kitagawa"
-            },
-            "voiceActor": {
-                "id": 136365,
-                "image": "https://s4.anilist.co/file/anilistcdn/staff/large/n136365-5OQJgLSpO4Ja.jpg",
-                "name": "Hina Suguta"
-            }
-        },
-        {
-            "role": "MAIN",
-            "character": {
-                "id": 133678,
-                "image": "https://s4.anilist.co/file/anilistcdn/character/large/b133678-IitCgjDxQGgu.png",
-                "name": "Wakana Gojou"
-            },
-            "voiceActor": {
-                "id": 121940,
-                "image": "https://s4.anilist.co/file/anilistcdn/staff/large/n121940-VsqIg2qO2RXF.png",
-                "name": "Shouya Ishige"
-            }
-        },
-        {
-            "role": "SUPPORTING",
-            "character": {
-                "id": 133677,
-                "image": "https://s4.anilist.co/file/anilistcdn/character/large/b133677-PqshvUeVFB7u.jpg",
-                "name": "Sajuna Inui"
-            },
-            "voiceActor": {
-                "id": 112215,
-                "image": "https://s4.anilist.co/file/anilistcdn/staff/large/n112215-kfABGD8W2YSJ.jpg",
-                "name": "Atsumi Tanezaki"
-            }
-        },
-        {
-            "role": "SUPPORTING",
-            "character": {
-                "id": 133675,
-                "image": "https://s4.anilist.co/file/anilistcdn/character/large/b133675-x2ISBsL4jNuT.png",
-                "name": "Kaoru Gojou"
-            },
-            "voiceActor": {
-                "id": 100491,
-                "image": "https://s4.anilist.co/file/anilistcdn/staff/large/n100491-6xlkDMFJdADo.png",
-                "name": "Atsushi Ono"
-            }
-        },
-        {
-            "role": "SUPPORTING",
-            "character": {
-                "id": 207937,
-                "image": "https://s4.anilist.co/file/anilistcdn/character/large/b207937-ytYjcNtNX77K.png",
-                "name": "Shinju Inui"
-            },
-            "voiceActor": {
-                "id": 205892,
-                "image": "https://s4.anilist.co/file/anilistcdn/staff/large/n205892-gaMHjeUijh84.png",
-                "name": "Hina Youmiya"
-            }
-        },
-        {
-            "role": "SUPPORTING",
-            "character": {
-                "id": 260978,
-                "image": "https://s4.anilist.co/file/anilistcdn/character/large/b260978-uWmdkycWGumq.png",
-                "name": "Daia Yahiro"
-            },
-            "voiceActor": {
-                "id": 163941,
-                "image": "https://s4.anilist.co/file/anilistcdn/staff/large/n163941-PXmQzEBR5sgL.png",
-                "name": "Yuuka Amemiya"
-            }
-        },
-        {
-            "role": "SUPPORTING",
-            "character": {
-                "id": 260977,
-                "image": "https://s4.anilist.co/file/anilistcdn/character/large/b260977-dtDIf91s9xkk.png",
-                "name": "Nowa Sugaya"
-            },
-            "voiceActor": {
-                "id": 123888,
-                "image": "https://s4.anilist.co/file/anilistcdn/staff/large/n123888-Vt5drk9nogZu.png",
-                "name": "Larissa Tago Takeda"
-            }
-        },
-        {
-            "role": "SUPPORTING",
-            "character": {
-                "id": 306939,
-                "image": "https://s4.anilist.co/file/anilistcdn/character/large/b306939-kj8HQrsRd9sY.png",
-                "name": "Kensei Morita"
-            },
-            "voiceActor": {
-                "id": 162833,
-                "image": "https://s4.anilist.co/file/anilistcdn/staff/large/n162833-lIRcWnPo20UV.png",
-                "name": "Shuuichi Uchida"
-            }
-        },
-        {
-            "role": "SUPPORTING",
-            "character": {
-                "id": 262590,
-                "image": "https://s4.anilist.co/file/anilistcdn/character/large/b262590-YUr2IDiN0GYB.jpg",
-                "name": "Tae Hanaoka"
-            },
-            "voiceActor": {
-                "id": 104108,
-                "image": "https://s4.anilist.co/file/anilistcdn/staff/large/n104108-UXiBJxnycHhL.png",
-                "name": "Ayaka Shimizu"
-            }
-        },
-        {
-            "role": "SUPPORTING",
-            "character": {
-                "id": 260979,
-                "image": "https://s4.anilist.co/file/anilistcdn/character/large/b260979-NwQz8UAeFZ1e.png",
-                "name": "Rune Yamauchi"
-            },
-            "voiceActor": {
-                "id": 119155,
-                "image": "https://s4.anilist.co/file/anilistcdn/staff/large/n119155-DCKagRHcI95J.png",
-                "name": "Akira Sekine"
-            }
-        }
-    ],
-    "studios": [
-        "CloverWorks"
-    ]
-}
 
 const Home = () => {
     const navigate = useNavigate()
@@ -377,7 +199,7 @@ const Home = () => {
             {/* ADD HERE SIDEBAR */}
 
             <div className="home-content">
-                {homedata && <BigCardsContainer data={homedata?.sections[0]} />}
+                {homedata && homedata.topCards && <BigCardsContainer data={homedata.topCards} />}
                 <div ref={divRef} className={`home-container ${isLoading && "home-loading-container"} ${isError && "home-loading-container"} ${homedata && homedata.sections.length <= 0 && "home-loading-container"}`} onScroll={handleScroll}>
                     {isLoading && isError == false && <div className="material-symbols-outlined home-loading-animation">progress_activity</div>}
                     {isError && isLoading == false && <div className="home-error-container"><span className="material-symbols-outlined home-error-icon">error</span>{t("home.error")}</div>}

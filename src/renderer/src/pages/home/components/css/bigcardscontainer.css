@@ -1,7 +1,34 @@
-.big-cards-container {
+.big-cards-container-content {
     display: flex;
-    overflow-x: scroll;
+    overflow-x: hidden;
     scroll-snap-type: x mandatory;
     width: 100vw;
     scroll-behavior: smooth;
+}
+
+.big-card-container-button {
+    width: 15px;
+    height: 15px;
+    background-color: var(--bg4);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 100;
+    transition: all 250ms ease-in-out;
+}
+
+.big-card-container-button.active {
+    background-color: white;
+    transform: scale(1.3);
+}
+
+.big-card-container-buttons {
+    display: flex;
+    gap: 4px;
+    margin-top: -25px;
+}
+
+.big-card-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
