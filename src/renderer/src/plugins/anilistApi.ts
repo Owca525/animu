@@ -1,5 +1,5 @@
 import { genYearsList, sleep } from "@renderer/utils/functions";
-import { AnimeData, cardData, containerData, FilterParams, pluginFormat } from "@renderer/utils/GlobalInterface";
+import { AnimeData, cardData, containerData, FilterParams, informationPluginFormat } from "@renderer/utils/GlobalInterface";
 import { setHomeData, UpdateHomeData } from "@renderer/utils/pluginApi";
 import { t } from "i18next";
 
@@ -525,14 +525,16 @@ async function getAnime(id: string): Promise<AnimeData | undefined> {
   return Convert(req.data.data.Media).AnimeData
 }
 
-export const infoPlugin: pluginFormat = {
+export const infoPlugin: informationPluginFormat = {
   version: "1.0",
   name: "AnilistApi",
   author: "Owca525",
   icon: "https://anilist.co/img/icons/icon.svg",
-  information: {
-    pageSize: pageSize,
-    home: () => setHomeData(CreateHomePage),
+  pageSize: pageSize,
+  info: {
+    home: async () => { 
+      return { sections: await CreateHomePage() }
+    },
     search: SearchAnilistApi,
     anime: getAnime
   },

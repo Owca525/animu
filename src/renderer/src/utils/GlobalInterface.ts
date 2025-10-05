@@ -130,26 +130,36 @@ export interface themeMetadata {
     name: string;
 }
 
-export interface pluginFormat {
+export interface playerPluginFormat {
     version: string
     name: string
     author: string
     icon?: string
     preferedLang: string[]
-    information?: {
-        pageSize: number
-        search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => void
-        home: () => void
-        anime: (id: string) => Promise<AnimeData | undefined>
-    } | null
-    player?: {
+    sidebarAddon?: sidebarData[]
+    searchOption?: genres
+    player: {
         getUrls: (type: string, episode: string, id: string) => Promise<playerData[]>
         animeDataList: (animeData?: AnimeData, anime_id?: string) => Promise<episodeList | undefined>
         episodeList: (type: string, anime_id: string) => Promise<{ ep: string, img?: string, title?: string }[]>
         animeList: (name: AnimeData) => Promise<cardData[]>
         search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => Promise<cardData[]>
-    } | null
-    searchOption?: genres
+    }
+}
+
+export interface informationPluginFormat {
+    version: string
+    name: string
+    author: string
+    icon?: string
+    preferedLang: string[]
+    pageSize: number
+    info: {
+        search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => void
+        home: () => Promise<{ topCards?: containerData, sections: containerData[] }>
+        anime: (id: string) => Promise<AnimeData | undefined>
+    }
+    searchOption: genres
     sidebarAddon?: sidebarData[]
 }
 

@@ -1,11 +1,11 @@
 import { infoPluginPlayer } from "@renderer/plugins/allmanga";
-import { infoPlugin } from "@renderer/plugins/anilistApi";
-import { pluginFormat } from "../GlobalInterface";
+import { playerPluginFormat } from "../GlobalInterface";
 import { AniZone } from "@renderer/plugins/anizone";
 import { lycorisCafe } from "@renderer/plugins/lycoriscafe";
+import { infoPlugin } from "@renderer/plugins/anilistApi";
 
 const initialState = {
-    loadedPlugins: [infoPlugin, infoPluginPlayer, AniZone, lycorisCafe] as pluginFormat[],
+    loadedPlugins: [infoPluginPlayer, AniZone, lycorisCafe] as playerPluginFormat[],
     informationPlugin: infoPlugin,
     playerPlugin: undefined,
     playerPluginCache: undefined

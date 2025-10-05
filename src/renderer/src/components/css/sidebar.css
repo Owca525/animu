@@ -45,6 +45,8 @@
 .sidebar-main-container {
     position: fixed;
     height: max-content;
+    z-index: 11;
+    background-color: var(--bg2);
 }
 
 .sidebar-hide-container {

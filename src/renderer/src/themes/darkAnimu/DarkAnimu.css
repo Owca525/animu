@@ -11,7 +11,7 @@
   /* accent */
   --neutral1: #17964a; /* is using on outline, border-color etc */
   --neutral2: #19a651;
-  --neutral3: #27ae5d;
+  --neutral3: #4DBC79;
   --red: #861832;
   --blue: #1c1291;
   --light-blue: #2658c4;
@@ -132,7 +132,7 @@ body {
 /* Home */
 
 .home-header {
-  background-color: var(--bg2);
+  /* background-color: var(--bg2); */
 }
 
 .home-header-sidebar-placeholder {

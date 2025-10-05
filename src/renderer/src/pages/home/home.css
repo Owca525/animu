@@ -1,21 +1,60 @@
 .home {
     width: 100%;
     height: 100%;
-    
-    display: grid;
+    /* display: grid;
     grid-template-rows: 1fr 100fr;
     grid-template-columns: 0fr 100fr;
-    grid-template-areas: "header header" "sidebar content";
-    overflow: hidden;
+    grid-template-areas: "header header" "sidebar content"; */
+    overflow: auto;
+    z-index: 1;
 }
 
-.home-header {
+.home-header-container {
+    padding: 24px;
+    display: flex;
+    gap: 24px;
+    position: fixed;
+    width: 100%;
+    z-index: 2;
+}
+
+.home-header-search {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.home-content {
+    width: 100%;
+    height: 100%;
+}
+
+.home-header-background {
+    background-color: color-mix(in srgb, var(--bg) 80%, transparent) !important;
+    border-color: var(--invisible) !important;
+}
+
+/* .home-header {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     justify-content: center;
     grid-area: header;
+    position: fixed;
+    z-index: 10;
+    width: 100%;
 }
 
+.home-top-container {
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.home-top-content {
+    margin-top: 80px;
+    padding: 24px;
+    width: 100%;
+    position: relative;
+}
 
 .home-header-search {
     padding: clamp(4px, 1vw, 8px) !important;
@@ -34,8 +73,10 @@
 .home-header-right, .home-header-left {
     margin: clamp(4px, 1vw, 8px);
 }
+ */
 
-.home-container, .home-loading-container {
+.home-container,
+.home-loading-container {
     grid-area: content;
     padding: 12px;
     overflow: auto;
@@ -59,7 +100,8 @@
     animation: spin 1s linear infinite;
 }
 
-.home-error-container, .home-empty-container {
+.home-error-container,
+.home-empty-container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -68,33 +110,7 @@
     gap: 8px;
 }
 
-.home-error-icon, .home-empty-icon {
+.home-error-icon,
+.home-empty-icon {
     font-size: 2em;
-}
-
-/* for smartphones 
-maybe that will be usefull in the future */
-@media (max-width: 600px) {
-    .home-header {
-        padding-right: clamp(4px, 1vw, 8px);
-        display: flex;
-    }
-    .home-header-search {
-    min-width: calc(100vw - 135px);
-	border-radius: 16px !important;
-	padding: 1px 1px 1px 8px !important;
-	box-sizing: border-box;
-    }
-    
-    .home-header-right {
-        margin: 0px;
-        display: none;
-    }
-    
-    .home-header-left {
-        margin-right: 2px;
-        justify-content: space-between;
-    }
-
-
 }

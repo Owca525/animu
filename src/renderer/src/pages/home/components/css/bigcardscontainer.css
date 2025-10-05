@@ -1,0 +1,7 @@
+.big-cards-container {
+    display: flex;
+    overflow-x: scroll;
+    scroll-snap-type: x mandatory;
+    width: 100vw;
+    scroll-behavior: smooth;
+}

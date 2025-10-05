@@ -6,7 +6,7 @@ import { t } from "i18next"
 import { FilterParams, homeData } from "@renderer/utils/GlobalInterface"
 import { useSelector } from "react-redux"
 
-const Filter: React.FC<{ onChange: (params?: FilterParams, removeParam?: string) => void, filter: { genres: string[], seasons: string[], years: string[], format: string[], statuses: string[] } }> = ({ onChange, filter }) => {
+const Filter: React.FC<{ custonClass?: string, onChange: (params?: FilterParams, removeParam?: string) => void, filter: { genres: string[], seasons: string[], years: string[], format: string[], statuses: string[] } }> = ({ onChange, filter, custonClass }) => {
     const [showFilter, setShowFilter] = useState<boolean>(false)
     const homeCache: homeData = useSelector((cache: any) => cache.home);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -28,7 +28,7 @@ const Filter: React.FC<{ onChange: (params?: FilterParams, removeParam?: string)
 
     return (
         <>
-            <Button ButtonClass="home-filter-button" iconClassName="home-filter-button" icon="tune" onClick={() => setShowFilter((prev) => !prev)} />
+            <Button ButtonClass={`home-filter-button ${custonClass}`} iconClassName="home-filter-button" icon="tune" onClick={() => setShowFilter((prev) => !prev)} />
             {showFilter &&
                 <div tabIndex={-1} className="home-filter-container home-filter-container-horizontal-new" ref={containerRef}>
                     <div className="home-filter-space">

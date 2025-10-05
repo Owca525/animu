@@ -1,5 +1,5 @@
 import { convertChaptersVTT } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, playerChapterList, playerData, pluginFormat } from "@renderer/utils/GlobalInterface";
+import { AnimeData, cardData, episodeList, playerChapterList, playerData, playerPluginFormat } from "@renderer/utils/GlobalInterface";
 
 const WEB = "https://anizone.to"
 const CARDS_REGEX = /<div[^>]*class=["']grid grid-cols-1 2xl:grid-cols-2 gap-4["'][^>]*>(.*?)<\/div>/gs
@@ -180,7 +180,7 @@ async function searchAnime(name: string, page: number, params?: { genres?: strin
     })
 }
 
-export const AniZone: pluginFormat = {
+export const AniZone: playerPluginFormat = {
     version: "1.0",
     name: "AniZone",
     author: "Owca525",
