@@ -7,6 +7,7 @@
     grid-template-areas: "header header" "sidebar content"; */
     overflow: auto;
     z-index: 1;
+    overflow-x: hidden;
 }
 
 .home-header-container {
@@ -113,8 +114,6 @@
 .home-error-icon,
 .home-empty-icon {
     font-size: 2em;
-<<<<<<< HEAD
-=======
 }
 
 /* for very small window sizes */
@@ -124,9 +123,7 @@
         display: flex;
     }
     .home-header-search {
-    min-width: calc(100vw - 135px);
-	border-radius: 16px !important;
-	padding: 1px 1px 1px 8px !important;
+    min-width: calc(100vw - 185px);
 	box-sizing: border-box;
     }
     
@@ -141,5 +138,4 @@
     }
 
 
->>>>>>> refs/remotes/origin/unstable
 }
