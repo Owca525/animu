@@ -6,7 +6,11 @@ async function getAllLangFiles() {
   let res = {}
   for (let index = 0; index < langFiles.length; index++) {
     const element = langFiles[index];
-    res[element.lang] = { translation: JSON.parse(element.data) }
+    try {
+      res[element.lang] = { translation: JSON.parse(element.data) }
+    } catch (error) {
+      console.error(error, "getAllLangFiles")
+    }
   }
   console.log(res)
   return res
