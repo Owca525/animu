@@ -33,8 +33,8 @@ const Home = () => {
             return await homeFunc
         },
         refetchOnWindowFocus: false,
-        staleTime: 2 * 60 * 60 * 1000,
-        cacheTime: 2 * 60 * 60 * 1000
+        staleTime: 2 * 60 * 1000,
+        cacheTime: 2 * 60 * 1000
     });
     console.log(homedata, homeFunc)
 
