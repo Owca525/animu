@@ -535,7 +535,7 @@ export const infoPlugin: informationPluginFormat = {
   info: {
     home: async () => {
       let data = await CreateHomePage()
-      return { topCards: data[0], sections: await CreateHomePage() }
+      return { topCards: data[0], sections: data }
     },
     search: SearchAnilistApi,
     anime: getAnime
