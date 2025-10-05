@@ -187,8 +187,7 @@ td {
   gap: 4px;
 }
 
-/* for smartphones 
-maybe that will be usefull in the future */
+/* for very small window sizes */
 @media (max-width: 600px) {
 
     .settings-container .sidebar-logo-icon-container,

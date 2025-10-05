@@ -325,11 +325,11 @@ function settings() {
                                 <Dropdown
                                     options={[
                                         { label: t("settings.general.onstart"), onClick: () => handleChange("update.type", "On Start") },
-                                        { label: t("settings.general.every_day"), onClick: () => handleChange("update.type", "Every Day") },
+                                        { label: t("settings.general.everyday"), onClick: () => handleChange("update.type", "Every Day") },
                                         { label: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
                                     ]}
                                     disableX
-                                    buttonText={config.new.update.type}
+                                    buttonText={t(`settings.general.${config.new.update.type.toLowerCase().replaceAll(" ", "")}`)}
                                 />
                             </div>
                         </div>
@@ -461,19 +461,19 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {"Player Exit behavior"}
+                                {t("settings.player.playerexitbechaviour")}
                                 <Dropdown
                                     options={[
-                                        { label: "To Information", onClick: () => handleChange("Player.general.PlayerBehavior", "information") },
-                                        { label: "To Home", onClick: () => handleChange("Player.general.PlayerBehavior", "home") },
+                                        { label: t("settings.player.playerbeexit.information"), onClick: () => handleChange("Player.general.PlayerBehavior", "information") },
+                                        { label: t("settings.player.playerbeexit.home"), onClick: () => handleChange("Player.general.PlayerBehavior", "home") },
                                     ]}
-                                    buttonText={config.new.Player.general.PlayerBehavior}
+                                    buttonText={t(`settings.player.playerbeexit.${config.new.Player.general.PlayerBehavior}`)}
                                     disableX
                                 />
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {"Auto Skip Openings"}
+                                {t("settings.player.skipOpening")}
                                 <CheckBox
                                     checked={config.new.Player.general.autoSkipOpenings}
                                     onChecked={(checked) =>
@@ -483,7 +483,7 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {"Auto Skip Endings"}
+                                {t("settings.player.skipEnding")}
                                 <CheckBox
                                     checked={config.new.Player.general.autoSkipEndings}
                                     onChecked={(checked) =>
@@ -494,8 +494,8 @@ function settings() {
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 <span className="settings-helpicon-space">
-                                    {"Show Broken Buffer"}
-                                    <HelpIcon description={"It shows buffering when playing mp4 files, which is known to display incorrect data"} />
+                                    {t("settings.player.showBrokenBuffer")}
+                                    <HelpIcon description={t("settings.tips.brokenBuffer")} />
                                 </span>
                                 <CheckBox
                                     checked={config.new.Player.general.showBrokenBuffer}
@@ -538,15 +538,57 @@ function settings() {
                             </div>
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
-                                {"Up To Next Style Variants"}
+                                {t("settings.upNext.upNextStyle")}
                                 <Dropdown
                                     options={[
-                                        { label: "Variant 1", onClick: () => handleChange("Player.upToNextEpisode.variants", "var1") },
-                                        { label: "Variant 2", onClick: () => handleChange("Player.upToNextEpisode.variants", "var2") },
-                                        { label: "Variant Old", onClick: () => handleChange("Player.upToNextEpisode.variants", "old") },
+                                        { label: t("settings.upNext.var1"), onClick: () => handleChange("Player.upToNextEpisode.variants", "var1") },
+                                        { label: t("settings.upNext.var2"), onClick: () => handleChange("Player.upToNextEpisode.variants", "var2") },
+                                        { label: t("settings.upNext.old"), onClick: () => handleChange("Player.upToNextEpisode.variants", "old") },
                                     ]}
-                                    buttonText={config.new.Player.upToNextEpisode.variants}
+                                    buttonText={t(`settings.upNext.${config.new.Player.upToNextEpisode.variants}`)}
                                     disableX
+                                />
+                            </div>
+                        </div>
+                        <div className="settings-page-container">
+                            <div className="settings-page-title">{"Player Animations"}</div>
+                            <div className="settings-setting-container">
+                                {t("settings.playerUI.dvolumeanimation")}
+                                <CheckBox
+                                    checked={config.new.Player.ui.DisableVolumeAnimation}
+                                    onChecked={(checked) =>
+                                        handleChange('Player.ui.DisableVolumeAnimation', checked)
+                                    }
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                {t("settings.playerUI.dspaceanimation")}
+                                <CheckBox
+                                    checked={config.new.Player.ui.DisableSpaceAnimation}
+                                    onChecked={(checked) =>
+                                        handleChange('Player.ui.DisableSpaceAnimation', checked)
+                                    }
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                {t("settings.playerUI.dskipanimation")}
+                                <CheckBox
+                                    checked={config.new.Player.ui.DisableSkipAnimation}
+                                    onChecked={(checked) =>
+                                        handleChange('Player.ui.DisableSkipAnimation', checked)
+                                    }
+                                />
+                            </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                {t("settings.playerUI.dloadinganimation")}
+                                <CheckBox
+                                    checked={config.new.Player.ui.DisableLoadingAnimation}
+                                    onChecked={(checked) =>
+                                        handleChange('Player.ui.DisableLoadingAnimation', checked)
+                                    }
                                 />
                             </div>
                         </div>
@@ -744,7 +786,7 @@ function settings() {
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.history.check_history")}
-                                <Button content="Check" onClick={buttonCheck} />
+                                <Button content={t("settings.history.check")} onClick={buttonCheck} />
                             </div>
                         </div>
                         <div className="settings-page-container">
@@ -869,7 +911,7 @@ function settings() {
                 {category == "about" &&
                     <>
                         <div className="settings-page-container">
-                            <div className="settings-page-title">{"Usefull Links"}</div>
+                            <div className="settings-page-title">{t("settings.general.links")}</div>
                             <div className="settings-special-container">
                                 <img className="settings-special-images" onClick={() => window.api.open("https://github.com/Owca525/animu")} src="https://github.com/fluidicon.png" alt="Github Logo" />
                                 <img className="settings-special-images" onClick={discord_server} src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg" alt="Discord Logo" />
@@ -878,16 +920,17 @@ function settings() {
                         </div>
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.general.credits")}</div>
-                            <div className="settings-setting-container"><span className="settings-user-title">Owca525</span> Animu Creator</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">KartQ</div>  Helper</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">DawoleQ</div>  Programmer Helper</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">Ary</div>  Designer</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">Rain_kyle</div>  Chinese Translation</div>
+                            <div className="settings-setting-container"><span className="settings-user-title">Owca525</span> {t("credits.owca525")}</div>
+                            <div className="settings-setting-container"><div className="settings-user-title">KartQ</div>  {t("credits.kartq")}</div>
+                            <div className="settings-setting-container"><div className="settings-user-title">DawoleQ</div>  {t("credits.dawoleq")}</div>
+                            <div className="settings-setting-container"><div className="settings-user-title">Ary</div>  {t("credits.ary")}</div>
+                            <div className="settings-setting-container"><div className="settings-user-title">Rain_kyle</div>  {t("credits.ryne_kyle")}</div>
+                            <div className="settings-setting-container"><div className="settings-user-title">AkaShiro</div>  {t("credits.akashiro")}</div>
                         </div>
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.general.specialthanks")}</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">Talon</div> For making a discord server</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">Zomi</div> For making a new icon</div>
+                            <div className="settings-setting-container"><div className="settings-user-title">Talon</div> {t("credits.talon")}</div>
+                            <div className="settings-setting-container"><div className="settings-user-title">Zomi</div> {t("credits.zomi")}</div>
                         </div>
                     </>
                 }

@@ -354,6 +354,7 @@ function Convert(convert: any): cardData {
 }
 
 // WHY THE FUCK THIS DOESN'T WORK IF I CALL window.api.request.post IN CreateHomePage
+// Jeśli api anilist jest offline to daje "Forbidden" w statusText i error 403 request 
 async function sendPost(variable: any, query: any): Promise<{ success: boolean; data?: any; status?: number; statusText?: string; error?: unknown; }> {
   return await window.api.request.post("https://graphql.anilist.co", header, { query: query, variables: variable })
 }

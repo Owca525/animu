@@ -166,7 +166,7 @@ async function extractEpisodeList(_type: string, anime_id: string): Promise<{ ep
     return data.episodesData[0].episodes
 }
 
-async function searchAnime(name: string, page: number, params?: { genres?: string[]; years?: string; seasons?: string; format?: string[]; airing?: string; }): Promise<cardData[]> {
+async function searchAnime(name: string, _page: number, _params?: { genres?: string[]; years?: string; seasons?: string; format?: string[]; airing?: string; }): Promise<cardData[]> {
     return await getAnimeCards({
         characters: [],
         studios: [],

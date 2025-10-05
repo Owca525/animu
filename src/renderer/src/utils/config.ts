@@ -27,8 +27,6 @@ export const defaultConfig: SettingsConfig = {
             TimeSkipLeft: 5,
             TimeSkipRight: 5,
             VideoStreching: false,
-            RemovingSpaceAnimation: false,
-            DisableVolumeAnimation: false,
             PlayerBehavior: "information",
             autoSkipOpenings: false,
             autoSkipEndings: false,
@@ -72,6 +70,12 @@ export const defaultConfig: SettingsConfig = {
             toggleSubtitles: "C",
             skipOpeningEnding: "S"
         },
+        ui: {
+            DisableVolumeAnimation: false,
+            DisableSpaceAnimation: false,
+            DisableSkipAnimation: false,
+            DisableLoadingAnimation: false
+        }
     },
     History: {
         history: {

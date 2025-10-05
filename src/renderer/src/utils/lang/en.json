@@ -80,6 +80,23 @@
         "ova": "OVA",
         "ona": "ONA"
     },
+    "anime_source": {
+        "lightnovel": "Light novel",
+        "manga": "Manga",
+        "original": "Original",
+        "webnovel": "Web Novel",
+        "novel": "Novel",
+        "anime": "Anime",
+        "videogame": "Video Game",
+        "visualnovel": "Visual Novel",
+        "doujinshi": "Doujinshi",
+        "comic": "Comic",
+        "liveaction": "Live Action", 
+        "game": "Game",
+        "multimediaproject": "Multimedia Project",
+        "picturebook": "Picture Book",
+        "other": "Other"
+    },
     "card_information": {
         "ep_airing": "Ep {{ep}} airing in {{text}}",
         "ep_airing_day": "{{day}} Days",
@@ -144,11 +161,12 @@
             "credits": "Credits",
             "specialthanks": "Special Thanks to",
             "onstart": "On Start",
-            "every_day": "Every day",
+            "everyday": "Every day",
             "everyweek": "Every Week",
             "hideSidebar": "Hide Sidebar",
             "hoverSidebar": "Hover Sidebar",
-            "discordrpc": "Discord RPC"
+            "discordrpc": "Discord RPC",
+            "links": "Usefull Links"
         },
         "player": {
             "play": "Auto Play",
@@ -178,6 +196,14 @@
             "both": "Both",
             "changelocaton": "Change Location",
             "keybind": "Keybinds",
+            "playerexitbechaviour": "Player Exit behavior",
+            "playerbeexit": {
+                "information": "To Information",
+                "home": "To Home"
+            },
+            "skipOpening": "Auto Skip Openings",
+            "skipEnding": "Auto Skip Endings",
+            "showBrokenBuffer": "Show Broken Buffer",
             "keybinds": {
                 "pause": "Pause",
                 "fullscreen": "Fullscreen",
@@ -198,6 +224,12 @@
                 "toggleSubtitles": "Toggle Subtitles",
                 "pip": "Picture In Picture"
             }
+        },
+        "playerUI": {
+            "dloadinganimation": "Disable Loading Animation",
+            "dskipanimation": "Disable Skip Animation",
+            "dspaceanimation": "Disable Space Animation",
+            "dvolumeanimation": "Disable Volume Animation"
         },
         "externalPlayer": {
             "running": "Running {{player}}",
@@ -221,7 +253,8 @@
             "check_history": "Check History",
             "check_start": "Start Checking History",
             "history_good": "History is good, nothing to change",
-            "continue_good": "Continue watch is good, nothing to change"
+            "continue_good": "Continue watch is good, nothing to change",
+            "check": "Check"
         },
         "saving": {
             "done": "Config has been succesfully saved",
@@ -234,7 +267,8 @@
             "autofullscreenplayer": "Set fullscreen mode when player starts",
             "longskip": "Change how many seconds long skips skip (usefull for skipping openings)",
             "shotskip": "Change how many seconds short skips skip",
-            "continuewatchsavehistory": "After how many seconds episode will be saved to Continue watching / After how many seconds before the end remove episode from continue watching"
+            "continuewatchsavehistory": "After how many seconds episode will be saved to Continue watching / After how many seconds before the end remove episode from continue watching",
+            "brokenBuffer": "It shows buffering when playing mp4 files, which is known to display incorrect data"
         },
         "devmode": {
             "developermode": "Developer Mode",
@@ -253,6 +287,12 @@
             "type": "Type",
             "information": "Information",
             "player": "Player"
+        },
+        "upNext": {
+            "var1": "Variant 1",
+            "var2": "Variant 2",
+            "old": "Variant Old",
+            "upNextStyle": "Up To Next Style Variants" 
         }
     },
     "player": {
@@ -278,7 +318,8 @@
             "MEDIA_ERR_NETWORK": "A network error occurred while fetching the video.",
             "MEDIA_ERR_DECODE": "An error occurred while decoding the video.",
             "MEDIA_ERR_SRC_NOT_SUPPORTED": "The video format or source is not supported.",
-            "default": "An unknown error occurred."
+            "default": "An unknown error occurred.",
+            "missingResoltions": "Player Didn't Find any video Resolutions"
         },
         "upNext": {
             "title": "Next Episode Playing in {{sec}} seconds",
@@ -289,7 +330,7 @@
             "nextPlaying": "Playing next episode in {{time}}s..."
         },
         "other": {
-            "unknown": "Uknown",
+            "unknown": "Unknown",
             "off": "Off",
             "default": "Default"
         },
@@ -353,6 +394,16 @@
         "gotohome": "Go Back Home",
         "leaveanimu": "Leave Animu",
         "errormessage": "Error Message: {{error}}"
+    },
+    "credits": {
+        "owca525": "Animu Creator",
+        "kartq": "Helper",
+        "dawoleq": "Programmer Helper",
+        "ary": "Designer", 
+        "rain_kyle": "Chinese Translation",
+        "akashiro": "Russian Translation",
+        "talon": "For making a discord server",
+        "zomi": "For making a new icon"
     },
     "lang": {
         "en": "English",

@@ -169,13 +169,25 @@ ipcMain.handle('get-lang-files', async (): Promise<{ data: any, lang: string }[]
     }
 
     let langPaths = await takeFileExtensionAndPath(langDir, ".json")
-    let langList = langPaths.map((element) => { return { data: fs.readFileSync(element, "utf-8"), lang: path.basename(element).replace(".json", "") } })
+    let langList = langPaths.map((element) => {
+        try {
+            return { data: fs.readFileSync(element, "utf-8"), lang: path.basename(element).replace(".json", "") }
+        } catch (error) {
+            return { data: {}, lang: "" }
+        }
+    })
 
     const userLangPath = checkConfigFolder("lang")
-    if (!userLangPath) return langList
+    if (!userLangPath) return langList.filter((data) => data.lang != "")
 
     let userlangListPath = await takeFileExtensionAndPath(userLangPath, ".json")
-    let userLangList = userlangListPath.map((element) => { return { data: fs.readFileSync(element, "utf-8"), lang: path.basename(element).replace(".json", "") } })
+    let userLangList = userlangListPath.map((element) => {
+        try {
+            return { data: fs.readFileSync(element, "utf-8"), lang: path.basename(element).replace(".json", "") }
+        } catch (error) {
+            return { data: {}, lang: "" }
+        }
+    })
 
     for (let index = 0; index < userLangList.length; index++) {
         const element = userLangList[index];
@@ -183,7 +195,7 @@ ipcMain.handle('get-lang-files', async (): Promise<{ data: any, lang: string }[]
         if (indexList != -1) langList.splice(indexList, 1);
     }
 
-    return [...langList, ...userLangList]
+    return [...langList.filter((data) => data.lang != ""), ...userLangList.filter((data) => data.lang != "")]
 });
 
 function checkConfigFolder(folder: string): string | undefined {

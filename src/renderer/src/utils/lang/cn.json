@@ -80,6 +80,23 @@
     "ova": "OVA(原創錄影動畫)",
     "ona": "ONA(網路動畫)"
   },
+  "anime_source": {
+    "lightnovel": "輕小說",
+    "manga": "漫畫",
+    "original": "原創",
+    "webnovel": "網路小說",
+    "novel": "小說",
+    "anime": "動畫",
+    "videogame": "電子遊戲",
+    "visualnovel": "視覺小說",
+    "doujinshi": "同人誌",
+    "comic": "漫畫(西方)",
+    "liveaction": "真人改編",
+    "game": "遊戲",
+    "multimediaproject": "多媒體企劃",
+    "picturebook": "繪本",
+    "other": "其他"
+  },
   "card_information": {
     "ep_airing": "第 {{ep}} 集將在 {{text}} 後播出",
     "ep_airing_day": "{{day}} 天後",
@@ -145,11 +162,12 @@
       "credits": "製作人員",
       "specialthanks": "特別感謝",
       "onstart": "啟動時",
-      "every_day": "每天",
+      "everyday": "每天",
       "everyweek": "每周",
       "hideSidebar": "隱藏側邊攔",
       "hoverSidebar": "滑鼠移動至側邊欄時顯示",
-      "discordrpc": "Discord 狀態顯示"
+      "discordrpc": "Discord 狀態顯示",
+      "links": "實用連結"
     },
     "player": {
       "play": "自動播放",
@@ -179,6 +197,14 @@
       "both": "同時",
       "changelocaton": "變更儲存位置",
       "keybind": "快捷鍵設置",
+      "playerexitbechaviour": "播放器退出行為",
+      "playerbeexit": {
+        "information": "回到資訊頁面",
+        "home": "回到首頁"
+      },
+      "skipOpening": "自動跳過片頭",
+      "skipEnding": "自動跳過片尾",
+      "showBrokenBuffer": "顯示異常緩衝",
       "keybinds": {
         "pause": "暫停",
         "fullscreen": "全螢幕",
@@ -199,6 +225,12 @@
         "toggleSubtitles": "切換字幕",
         "pip": "子母畫面"
       }
+    },
+    "playerUI": {
+      "dloadinganimation": "停用載入動畫",
+      "dskipanimation": "停用跳過動畫",
+      "dspaceanimation": "停用空白鍵動畫",
+      "dvolumeanimation": "停用音量動畫"
     },
     "externalPlayer": {
       "running": "正在執行 {{player}}",
@@ -222,7 +254,8 @@
       "check_history": "查看歷史紀錄",
       "check_start": "開始檢查歷史紀錄",
       "history_good": "歷史紀錄正常，無需更改",
-      "continue_good": "繼續觀看正常，無需更改"
+      "continue_good": "繼續觀看正常，無需更改",
+      "check": "Check"
     },
     "saving": {
       "done": "設定已成功保存",
@@ -235,7 +268,8 @@
       "autofullscreenplayer": "播放器啟動時設置全螢幕模式",
       "longskip": "設置長跳轉的秒數（適用於跳過開頭）",
       "shotskip": "設置短跳轉的秒數",
-      "continuewatchsavehistory": "設定多少秒後將集數保存到繼續觀看 / 設定結束前多少秒移除集數"
+      "continuewatchsavehistory": "設定多少秒後將集數保存到繼續觀看 / 設定結束前多少秒移除集數",
+      "brokenBuffer": "播放 MP4 檔案時顯示緩衝，但這可能會出現錯誤數據"
     },
     "devmode": {
       "developermode": "開發者模式",
@@ -254,6 +288,12 @@
       "type": "類型",
       "information": "資訊",
       "player": "播放器"
+    },
+    "upNext": {
+      "var1": "樣式 1",
+      "var2": "樣式 2",
+      "old": "舊版樣式",
+      "upNextStyle": "下一集提示樣式"
     }
   },
   "player": {
@@ -279,7 +319,8 @@
       "MEDIA_ERR_NETWORK": "下載視頻時發生網絡錯誤",
       "MEDIA_ERR_DECODE": "解碼視頻時發生錯誤",
       "MEDIA_ERR_SRC_NOT_SUPPORTED": "視頻格式或來源不支持",
-      "default": "發生未知錯誤."
+      "default": "發生未知錯誤.",
+      "missingResoltions": "播放器未找到任何影片解析度"
     },
     "upNext": {
       "title": "下一集將在 {{sec}} 秒後播放",
@@ -354,5 +395,15 @@
     "gotohome": "回到首頁",
     "leaveanimu": "離開動畫",
     "errormessage": "錯誤訊息：{{error}}"
+  },
+  "credits": {
+    "owca525": "Animu 創作者",
+    "kartq": "協助者",
+    "dawoleq": "程式協助者",
+    "ary": "設計師",
+    "rain_kyle": "中文翻譯",
+    "akashiro": "俄文翻譯",
+    "talon": "建立 Discord 伺服器",
+    "zomi": "設計新圖示"
   }
 }

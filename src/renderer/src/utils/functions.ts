@@ -20,7 +20,7 @@ export function convertDateToFormattedString(year: number | undefined, month: nu
     if (hour == undefined) hour = 0
     if (minute == undefined) minute = 0
     if (day == undefined) day = 0
-    return new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(year, month, day, hour, minute));
+    return new Intl.DateTimeFormat(i18n.language, { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(year, month, day, hour, minute));
 }
 
 export function capitalizeFirstLetter(text: string | undefined | null) {
@@ -156,7 +156,7 @@ export async function refetchHistory() {
     }
 
     if (data.data.length == 1 && data.data[0].title == t("global.history")) {
-        await setHomeData(async () => [{ title: t("global.History"), data: await ReadHistory(), horizontal: false }])
+        await setHomeData(async () => [{ title: t("global.history"), data: await ReadHistory(), horizontal: false }])
         return
     }
 

@@ -196,8 +196,6 @@ export interface SettingsConfig {
             TimeSkipLeft: number | string
             TimeSkipRight: number | string
             VideoStreching: boolean,
-            DisableVolumeAnimation: boolean,
-            RemovingSpaceAnimation: boolean
             PlayerBehavior: "home" | "information"
             autoSkipOpenings: boolean
             autoSkipEndings: boolean
@@ -220,6 +218,12 @@ export interface SettingsConfig {
             interval: number
             durationShow: number
             variants: "var1" | "var2" | "old"
+        }
+        ui: {
+            DisableVolumeAnimation: boolean,
+            DisableSpaceAnimation: boolean,
+            DisableSkipAnimation: boolean,
+            DisableLoadingAnimation: boolean
         }
         keybinds: {
             Pause: string

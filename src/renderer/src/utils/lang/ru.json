@@ -1,0 +1,409 @@
+{
+  "global": {
+    "home": "Главная",
+    "history": "История",
+    "settings": "Настройки",
+    "about": "О программе",
+    "general": "Общие",
+    "cfglocation": "Настройка конфигурации",
+    "player": "Плеер",
+    "continuewatch": "Продолжить просмотр",
+    "dev": "Разработчик",
+    "minutes": "Минуты",
+    "exitAnimu": "Вы действительно хотите выйти из аниму?",
+    "enable": "Включить",
+    "extensions": "Расширения",
+    "notFound": "Не найдено"
+  },
+  "dialog": {
+    "yes": "Да",
+    "no": "Нет",
+    "retry": "Повторить",
+    "exit": "Выход",
+    "reset": "Сбросить",
+    "reload": "Перезагрузить",
+    "open": "Открыть"
+  },
+  "home": {
+    "search": "Поиск...",
+    "nothingfound": "Здесь ничего не найдено",
+    "error": "Произошла ошибка",
+    "trending_now": "Популярно сейчас",
+    "popular_in_this_season": "Популярно в этом сезоне",
+    "all_time_popular": "Популярно за все время"
+  },
+  "contextMenu": {
+    "devtools": "Открыть инструменты разработчика",
+    "nerdstats": "Показать статистику",
+    "copytitle": "Скопировать название",
+    "copycover": "Скопировать обложку",
+    "delete": "Удалить"
+  },
+  "anime_seasons": {
+    "winter": "Зима",
+    "spring": "Весна",
+    "summer": "Лето",
+    "fall": "Осень"
+  },
+  "anime_statuses": {
+    "releasing": "Онгоинг",
+    "finished": "Вышел",
+    "not_yet_released": "Анонс",
+    "cancelled": "Отменено"
+  },
+  "anime_genres": {
+    "action": "Экшен",
+    "adventure": "Приключения",
+    "comedy": "Комедия",
+    "drama": "Драма",
+    "ecchi": "Этти",
+    "fantasy": "Фэнтези",
+    "hentai": "Хентай",
+    "horror": "Хоррор",
+    "mahoushoujo": "Махо-сёдзё",
+    "mecha": "Меха",
+    "music": "Музыка",
+    "mystery": "Мистика",
+    "psychological": "Психологическое",
+    "romance": "Романтика",
+    "sci-Fi": "Научная фантастика",
+    "sliceoflife": "Повседневность",
+    "sports": "Спорт",
+    "supernatural": "Сверхъестественное",
+    "thriller": "Триллер"
+  },
+  "anime_formats": {
+    "tv": "ТВ сериал",
+    "movie": "Фильм",
+    "tv_short": "Короткий ТВ сериал",
+    "special": "Спешл",
+    "ova": "OVA",
+    "ona": "ONA"
+  },
+  "anime_source": {
+    "lightnovel": "Ранобэ",
+    "manga": "Манга",
+    "original": "Оригинал",
+    "webnovel": "Веб-новелла",
+    "novel": "Новелла",
+    "anime": "Аниме",
+    "videogame": "Видеоигра",
+    "visualnovel": "Визуальная новелла",
+    "doujinshi": "Додзинси",
+    "comic": "Комикс",
+    "liveaction": "Игровое кино",
+    "game": "Игра",
+    "multimediaproject": "Мультимедийный проект",
+    "picturebook": "Книга с картинками",
+    "other": "Другое"
+  },
+  "card_information": {
+    "ep_airing": "Эпизод {{ep}} выйдет через {{text}}",
+    "ep_airing_day": "{{day}} Дней",
+    "ep_airing_hours": "{{hours}} Часов",
+    "ep_airing_minutes": "{{min}} Минут",
+    "ep_airing_today": "Сегодня",
+    "episodes": "{{ep}} Эпизодов",
+    "minutes": "{{min}} Минут"
+  },
+  "information": {
+    "airing": "Новый эпизод",
+    "format": "Формат",
+    "episodes": "Эпизоды",
+    "duration": "Длительность эпизода",
+    "status": "Статус",
+    "startdate": "Дата начала",
+    "endate": "Дата окончания",
+    "season": "Сезон",
+    "source": "Источник",
+    "descriptionnotfound": "Описание не найдено",
+    "errors": "У этого аниме нет эпизодов",
+    "wrongtext": "Это не то аниме?",
+    "listEpisodes": "{{number}} Эпизодов",
+    "bar": {
+      "anilist": "Страница Anilist",
+      "trailer": "Трейлер аниме"
+    },
+    "containerwrong": {
+      "search": "Поиск: {{name}}",
+      "title": "Аниме найдено по названию: {{name}}"
+    },
+    "types": {
+      "sub": "Субтитры",
+      "dub": "Озвучка",
+      "raw": "Оригинал"
+    },
+    "notification": {
+      "coverdone": "Обложка успешно скопирована в буфер обмена",
+      "coverfailed": "Не удалось скопировать в буфер обмена"
+    },
+    "actors": "Актёры",
+    "actor_as": "В роли {{actor}}",
+    "characters": "Персонажи",
+    "role": {
+      "main": "Главный",
+      "supporting": "Второстепенный",
+      "background": "Фоновый"
+    }
+  },
+  "settings": {
+    "turnDeveloper": "Включить режим разработчика",
+    "general": {
+      "language": "Язык",
+      "theme": "Тема",
+      "updates": "Уведомления об обновлениях",
+      "checkupdates": "Проверить обновления",
+      "checkupdate": "Проверить обновления",
+      "window": "Окно",
+      "maximize": "Авторазвертывание",
+      "fullscreen": "Авто полноэкранный режим",
+      "zoom": "Масштаб",
+      "meow": ":3",
+      "credits": "Благодарности",
+      "specialthanks": "Особая благодарность",
+      "onstart": "При запуске",
+      "everyday": "Каждый день",
+      "everyweek": "Каждую неделю",
+      "hideSidebar": "Скрыть боковую панель",
+      "hoverSidebar": "При наведении на боковую панель",
+      "discordrpc": "Discord RPC",
+      "links": "Полезные ссылки"
+    },
+    "player": {
+      "play": "Автовоспроизведение",
+      "skip": "Автоматически воспроизводить следующий эпизод",
+      "volume": "Громкость по умолчанию",
+      "longskip": "Длинный пропуск вперед",
+      "longskipb": "Длинный пропуск назад",
+      "shortskip": "Короткий пропуск вперед",
+      "shortskipb": "Короткий пропуск назад",
+      "preload": "Тип предзагрузки плеера",
+      "screenshot": "Скриншоты",
+      "screenask": "Всегда спрашивать, куда сохранять скриншоты",
+      "uptonextep": "Уведомление о переходе к следующему эпизоду",
+      "notif_interval": "Интервал уведомлений",
+      "epshorter": "Не показывать, если эпизод короче чем",
+      "external": "Внешний плеер",
+      "stretching": "Растягивание видео",
+      "enable_external": "Включить внешний плеер",
+      "select_player": "Выбрать плеер",
+      "movianip": "IP-адрес Movian",
+      "mpvpath": "Путь к MPV",
+      "vlcpath": "Путь к VLC",
+      "type": "Тип сохранения",
+      "path": "Путь сохранения скриншотов",
+      "file": "Файл",
+      "clipboard": "Буфер обмена",
+      "both": "Оба",
+      "changelocaton": "Изменить расположение",
+      "keybind": "Сочетания клавиш",
+      "playerexitbechaviour": "Поведение при выходе из плеера",
+      "playerbeexit": {
+      "information": "К информации",
+      "home": "На главную"
+      },
+      "skipOpening": "Автопропуск опенингов",
+      "skipEnding": "Автопропуск эндингов",
+      "showBrokenBuffer": "Показывать сломанный буфер",
+      "keybinds": {
+        "pause": "Пауза",
+        "fullscreen": "Полноэкранный режим",
+        "exitplayer": "Выйти из плеера",
+        "lskipforward": "Длинный пропуск вперед",
+        "lskipbackward": "Длинный пропуск назад",
+        "skipforward": "Короткий пропуск вперед",
+        "skipbackward": "Короткий пропуск назад",
+        "fskipforward": "Пропуск кадра вперед",
+        "fskipbackward": "Пропуск кадра назад",
+        "nextepisode": "Следующий эпизод",
+        "prevepisode": "Предыдущий эпизод",
+        "volumeup": "Увеличить громкость",
+        "volumedown": "Уменьшить громкость",
+        "volumemute": "Отключить звук",
+        "screenshot": "Сделать скриншот",
+        "skipOpeningEnding": "Пропустить опенинг/эндинг",
+        "toggleSubtitles": "Переключить субтитры",
+        "pip": "Картинка в картинке"
+      }
+    },
+    "playerUI": {
+      "dloadinganimation": "Отключить анимацию загрузки",
+      "dskipanimation": "Отключить анимацию пропуска",
+      "dspaceanimation": "Отключить анимацию пробела", 
+      "dvolumeanimation": "Отключить анимацию громкости"
+    },
+    "externalPlayer": {
+      "running": "Запуск {{player}}",
+      "episodes": "Эпизоды",
+      "chromeCast": {
+        "disconnected": "отключено",
+        "search": "Поиск..."
+      },
+      "failed": {
+        "movian": "Не удалось запустить Movian",
+        "chromecast": "ChromeCast не поддерживает формат m3u8",
+        "player": "Плееры не найдены",
+        "resolution": "Разрешение не найдено"
+      }
+    },
+    "history": {
+      "limited": "Ограниченное сохранение истории",
+      "limit": "Лимит для истории",
+      "startsave": "Когда начинать сохранение истории",
+      "stopsave": "Когда прекращать сохранение истории",
+      "check_history": "Проверить историю",
+      "check_start": "Начать проверку истории",
+      "history_good": "История в порядке, ничего менять не нужно",
+      "continue_good": "Продолжить просмотр в порядке, ничего менять не нужно",
+      "check": "Проверить"
+    },
+    "saving": {
+      "done": "Конфигурация успешно сохранена",
+      "error": "Произошла ошибка сохранения конфигурации",
+      "notification": "Хотите сохранить изменения?"
+    },
+    "tips": {
+      "automaximize": "Развернуть окно при запуске приложения",
+      "autofullscreen": "Открыть приложение в полноэкранном режиме",
+      "autofullscreenplayer": "Установить полноэкранный режим при запуске плеера",
+      "longskip": "Изменить, на сколько секунд пропускает длинный пропуск (полезно для пропуска опенингов)",
+      "shotskip": "Изменить, на сколько секунд пропускает короткий пропуск",
+      "continuewatchsavehistory": "Через сколько секунд эпизод будет сохранен в 'Продолжить просмотр' / За сколько секунд до конца удалить эпизод из 'Продолжить просмотр'",
+     "brokenBuffer": "Показывает буферизацию при воспроизведении mp4 файлов, известно, что отображает некорректные данные"
+    },
+    "devmode": {
+      "developermode": "Режим разработчика",
+      "tornondevtools": "Включить инструменты разработчика",
+      "devtoolsonstart": "Инструменты разработчика при запуске",
+      "playerdebug": "Статистика отладки плеера",
+      "information": "Информация",
+      "electronver": "Версия Electron",
+      "chromiumver": "Версия Chromium",
+      "nodever": "Версия Node"
+    },
+    "extensions": {
+      "name": "Название",
+      "author": "Автор плагина",
+      "version": "Версия",
+      "type": "Тип",
+      "information": "Информация",
+      "player": "Плеер"
+    },
+    "upNext": {
+      "var1": "Вариант 1",
+      "var2": "Вариант 2",
+      "old": "Старый вариант",
+      "upNextStyle": "Следующий стиль'"
+    }
+  },
+  "player": {
+    "error": {
+      "notfound": "Плеер не нашел никаких URL-адресов"
+    },
+    "TitleEpisode": "Эпизод {{ep}} из {{name}}",
+    "TitleMovie": "Фильм: {{name}}",
+    "Volume": "Громкость",
+    "next": "Следующий {{ep}} эпизод",
+    "previous": "Предыдущий {{ep}} эпизод",
+    "Pause": "Пауза",
+    "play": "Воспроизвести",
+    "fullscreen": "Полноэкранный режим",
+    "changeEpisode": "Сменить эпизод",
+    "chapter": "Глава: {{name}}",
+    "episodeEndsOn": "Эпизод заканчивается в {{time}}",
+    "mute": "Отключить звук",
+    "unmute": "Включить звук",
+    "errors": {
+      "extractionError": "Не удалось извлечь URL-адреса плеера: {{error}}",
+      "MEDIA_ERR_ABORTED": "Воспроизведение было прервано.",
+      "MEDIA_ERR_NETWORK": "Произошла сетевая ошибка при получении видео.",
+      "MEDIA_ERR_DECODE": "Произошла ошибка при декодировании видео.",
+      "MEDIA_ERR_SRC_NOT_SUPPORTED": "Формат видео или источник не поддерживается.",
+      "default": "Произошла неизвестная ошибка.",
+      "missingResoltions": "Плеер не нашел подходящих разрешений видео."
+    },
+    "upNext": {
+      "title": "Следующий эпизод начнется через {{sec}} секунд",
+      "titleAnime": "Следующий эпизод {{ep}} из {{title}}",
+      "nextEp": "Следующий эпизод",
+      "hide": "Скрыть",
+      "nextEpisode": "Эп. {{episode}}",
+      "nextPlaying": "Воспроизведение следующего эпизода через {{time}}с..."
+    },
+    "other": {
+      "unknown": "Неизвестно",
+      "off": "Выкл.",
+      "default": "По умолчанию"
+    },
+    "settings": {
+      "source": "Источник",
+      "resolution": "Разрешение",
+      "audio": "Аудио",
+      "subtitles": "Субтитры",
+      "speed": "Скорость"
+    },
+    "toastscreenshot": {
+      "failed": "Не удалось сохранить скриншот",
+      "doneclip": "Изображение успешно сохранено в буфер обмена",
+      "donefile": "Изображение успешно сохранено в файл"
+    }
+  },
+  "history": {
+    "continue": "Продолжить эпизод {{ep}}",
+    "history": "Просмотрен эпизод {{ep}}",
+    "historysaved": "Аниме успешно удалено из истории",
+    "historyfailed": "Не удалось удалить аниме из истории",
+    "continuesaved": "Аниме успешно удалено из 'Продолжить просмотр'",
+    "continuefailed": "Не удалось удалить аниме из 'Продолжить просмотр'"
+  },
+  "oldBackup": {
+    "backupcontinue": "Резервное копирование старого файла 'Продолжить просмотр': Выполнено",
+    "convertcontinue": "Конвертация 'Продолжить просмотр': Успешно {{success}}, Неудачно {{failed}}",
+    "convertcontinuedone": "Конвертация 'Продолжить просмотр' завершена: Успешно {{success}}, Неудачно {{failed}}",
+    "convertcontinuefailed": "Не удалось конвертировать старый 'Продолжить просмотр' в новый",
+    "backuphistory": "Резервное копирование старого файла истории: Выполнено",
+    "converthistory": "Конвертация истории: Успешно {{success}}, Неудачно {{failed}}",
+    "converthistorydone": "Конвертация истории завершена: Успешно {{success}}, Неудачно {{failed}}",
+    "converthistoryfailed": "Не удалось конвертировать старую историю просмотров в новую",
+    "failedconvert": "Не удалось конвертировать {{title}}"
+  },
+  "update": {
+    "available": "Доступно обновление {{ver}}, нажмите для обновления",
+    "progess": "Прогресс загрузки {{procent}}%",
+    "done": "Обновление загружено, перезапустите приложение",
+    "same": "У вас установлена последняя версия Animu"
+  },
+  "discordrpc": {
+    "home": "На главной",
+    "settings": "В настройках",
+    "player": "{{title}} Эпизод {{ep}}"
+  },
+  "globalError": "Произошла критическая ошибка, хотите перейти на главную?",
+  "filter": {
+    "genres": "Жанры:",
+    "year": "Год:",
+    "season": "Сезон:",
+    "format": "Формат:",
+    "airing": "Статус выхода:",
+    "placeholderGenres": "Жанры",
+    "placeholderYears": "Годы",
+    "placeholderSeason": "Сезон",
+    "placeholderFormat": "Формат",
+    "placeholderAiring": "Статус выхода"
+  },
+  "errorboundary": {
+    "gotohome": "Вернуться на главную",
+    "leaveanimu": "Покинуть Animu",
+    "errormessage": "Сообщение об ошибке: {{error}}"
+  },
+  "credits": {
+  "owca525": "Создатель Animu",
+  "kartq": "Помощник",
+  "dawoleq": "Помощник программиста",
+  "ary": "Дизайнер",
+  "rain_kyle": "Китайский перевод",
+  "akashiro": "Русский перевод",
+  "talon": "Создатель Дискорд сервера",
+  "zomi": "Создатель новый иконки"
+  }
+}

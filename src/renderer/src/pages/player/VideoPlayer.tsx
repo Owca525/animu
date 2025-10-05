@@ -119,6 +119,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     // other
     const [currentSettings, setcurrentSettings] = useState<boolean>(false)
     const [showNerdStats, setshowNerdStats] = useState<boolean>(false)
+    const [resolutionNotFound, setResError] = useState<boolean>(false)
     const [hls, setHls] = useState<Hls | undefined>(undefined);
     const [chapterList, setChapterList] = useState<{ left: number, width: number, name?: string, type: "opening" | "ending" | "other" }[]>([])
 
@@ -219,6 +220,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     async function checkUrl(data: playerData) {
         if (!videoRef.current) return
+        if (data.resolution.length <= 0) {
+            toast.info(t("player.errors.missingResoltions"), notificationProps)
+            setResError(() => true)
+            return
+        }
         const time = videoRef.current.currentTime
         if (data.subtitles) setListSubtitles(() => [{ url: "", format: "", lang: "", label: "Off" }, ...data.subtitles as playerSubtitlesFormat[]])
         if (data.storyboardVTT) setThumbnail(await VTTstoryBoardParser(data.storyboardVTT))
@@ -500,26 +506,28 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     function videoErrorHandler(event: React.SyntheticEvent<HTMLVideoElement, Event>) {
         const Error = event.currentTarget.error
         var message: string
-
-        if (Error) {
-            switch (Error.code) {
-                case Error.MEDIA_ERR_ABORTED:
-                    message = t('player.errors.MEDIA_ERR_ABORTED')
-                    break
-                case Error.MEDIA_ERR_NETWORK:
-                    message = t('player.errors.MEDIA_ERR_NETWORK')
-                    break
-                case Error.MEDIA_ERR_DECODE:
-                    message = t('player.errors.MEDIA_ERR_DECODE')
-                    break
-                case Error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-                    message = t('player.errors.MEDIA_ERR_SRC_NOT_SUPPORTED')
-                    break
-                default:
-                    message = t('player.errors.default')
-            }
-            toast.error(message, notificationProps);
+        if (!Error) return
+        switch (Error.code) {
+            case Error.MEDIA_ERR_ABORTED:
+                message = t('player.errors.MEDIA_ERR_ABORTED')
+                break
+            case Error.MEDIA_ERR_NETWORK:
+                message = t('player.errors.MEDIA_ERR_NETWORK')
+                break
+            case Error.MEDIA_ERR_DECODE:
+                message = t('player.errors.MEDIA_ERR_DECODE')
+                break
+            case Error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                message = t('player.errors.MEDIA_ERR_SRC_NOT_SUPPORTED')
+                break
+            default:
+                message = t('player.errors.default')
         }
+        toast.error(message, notificationProps);
+
+        if (!currentPlayer) return
+        let index = player_data.findIndex((element) => element.hostname == currentPlayer.hostname)
+        if (player_data[index + 1]) checkUrl(player_data[index + 1])
     }
 
     function setTimeVideo(value: number) {
@@ -931,34 +939,50 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     <div className="player-title ">{detectTitle({ title: anime_data.AnimeData.title, ep: temp.episode, format: anime_data.AnimeData.format })}</div>
                 </div>
                 <div className="video-center"> {/* video-center-container */}
-                    <motion.div
-                        variants={hiddenVariants}
-                        animate={isShowButtonSkipLeft ? "visible" : "hidden"}
-                        initial="hidden"
-                        transition={{ duration: 0.4 }}
-                        className="player-loading-animation-container player-fast-rewind-ui"
-                    >
-                        <div className="material-symbols-outlined player-icon-ui">fast_rewind</div>
-                    </motion.div>
-                    <motion.div
-                        variants={hiddenVariants}
-                        animate={isShowButtonSkipRight ? "visible" : "hidden"}
-                        initial="hidden"
-                        transition={{ duration: 0.4 }}
-                        className="player-loading-animation-container player-fast-forward-ui"
-                    >
-                        <div className="material-symbols-outlined player-icon-ui">fast_forward</div>
-                    </motion.div>
+                    {!config.Player.ui.DisableSkipAnimation &&
+                        <>
+                            <motion.div
+                                variants={hiddenVariants}
+                                animate={isShowButtonSkipLeft ? "visible" : "hidden"}
+                                initial="hidden"
+                                transition={{ duration: 0.4 }}
+                                className="player-loading-animation-container player-fast-rewind-ui"
+                            >
+                                <div className="material-symbols-outlined player-icon-ui">fast_rewind</div>
+                            </motion.div>
+                            <motion.div
+                                variants={hiddenVariants}
+                                animate={isShowButtonSkipRight ? "visible" : "hidden"}
+                                initial="hidden"
+                                transition={{ duration: 0.4 }}
+                                className="player-loading-animation-container player-fast-forward-ui"
+                            >
+                                <div className="material-symbols-outlined player-icon-ui">fast_forward</div>
+                            </motion.div>
+                        </>
+                    }
 
-                    <motion.div className="player-loading-animation-container player-buffering-animation"
-                        variants={hiddenVariants}
-                        animate={isWaitingPlayer ? "visible" : "hidden"}
-                        initial="hidden"
-                        transition={{ duration: 0.4 }}
-                    >
-                        <div className="player-waiting material-symbols-outlined">progress_activity</div>
-                    </motion.div>
-                    {!config.Player.general.RemovingSpaceAnimation &&
+                    {resolutionNotFound && 
+                        <motion.div className="player-loading-animation-container player-buffering-animation"
+                            variants={hiddenVariants}
+                            initial="visible"
+                            transition={{ duration: 0.4 }}
+                        >
+                            <div className="player-icon-ui material-symbols-outlined">error</div>
+                        </motion.div>
+                    }
+
+                    {!config.Player.ui.DisableLoadingAnimation && !resolutionNotFound &&
+                        <motion.div className="player-loading-animation-container player-buffering-animation"
+                            variants={hiddenVariants}
+                            animate={isWaitingPlayer ? "visible" : "hidden"}
+                            initial="hidden"
+                            transition={{ duration: 0.4 }}
+                        >
+                            <div className="player-waiting material-symbols-outlined">progress_activity</div>
+                        </motion.div>
+                    }
+                    {!config.Player.ui.DisableSpaceAnimation &&
                         <motion.div className="player-loading-animation-container"
                             variants={hiddenVariants}
                             animate={isShowPlay && isWaitingPlayer == false ? "visible" : "hidden"}
@@ -1034,8 +1058,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                 }
                                 disableSettings={() => setcurrentSettings(() => false)}
                                 current={{
-                                    currentHost: currentPlayer ? currentPlayer.hostname : t("player.other.uknown"),
-                                    currentResolution: currentResolution ? currentResolution.res : t("player.other.uknown"),
+                                    currentHost: currentPlayer ? currentPlayer.hostname : t("player.other.unknown"),
+                                    currentResolution: currentResolution ? currentResolution.res : t("player.other.unknown"),
                                     currentSpeed: videoRef.current?.playbackRate ? videoRef.current?.playbackRate : 1,
                                     currentSub: currentSubtitles ? currentSubtitles.label : t("player.other.off"),
                                     currentTrack: currentAudioTrack ? currentAudioTrack.label : t("player.other.default")
@@ -1047,7 +1071,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     </div>
                 </div>
             </div>
-            <motion.button onClick={_event => {if (currentSkipButton.type == "ending") setHideUpNextEpisode(true); currentSkipButton.onClick()}} variants={hiddenVariants} initial="hidden" animate={IsRunningButtonSkipTime ? "visible" : "hidden"} className="player-skip-chapters-button">{currentSkipButton.text}, {`${buttonSkipTime}s`}</motion.button>
+            <motion.button onClick={_event => { if (currentSkipButton.type == "ending") setHideUpNextEpisode(true); currentSkipButton.onClick() }} variants={hiddenVariants} initial="hidden" animate={IsRunningButtonSkipTime ? "visible" : "hidden"} className="player-skip-chapters-button">{currentSkipButton.text}, {`${buttonSkipTime}s`}</motion.button>
             {config.Player.upToNextEpisode.variants == "old" && (
                 <motion.div variants={uptoNextVariants} transition={{ duration: 0.2 }} animate={isUpNextEpisode ? "visible" : "hidden"} initial={"hidden"} className="player-up-Next-container old">
                     <div className="player-up-Next-Title old">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>
@@ -1108,7 +1132,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     }>close</button>
                 </motion.div>
             }
-            {!config.Player.general.DisableVolumeAnimation &&
+            {!config.Player.ui.DisableVolumeAnimation &&
                 <motion.div className="player-volume-ui-container"
                     variants={{
                         hidden: { x: 400 },
@@ -1138,8 +1162,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     isVisible={isVisible}
                     isWaitingPlayer={isWaitingPlayer}
                     ListResolution={ListResolution.map((val) => val.res)}
-                    currentHost={currentPlayer ? currentPlayer.hostname : "Uknown"}
-                    currentResolution={currentResolution ? currentResolution.res : "Uknown"}
+                    currentHost={currentPlayer ? currentPlayer.hostname : "Unknown"}
+                    currentResolution={currentResolution ? currentResolution.res : "Unknown"}
                     currentSettings={currentSettings}
                     hls={hls}
                     time={time}

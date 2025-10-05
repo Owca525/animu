@@ -113,4 +113,33 @@
 .home-error-icon,
 .home-empty-icon {
     font-size: 2em;
+<<<<<<< HEAD
+=======
+}
+
+/* for very small window sizes */
+@media (max-width: 600px) {
+    .home-header {
+        padding-right: clamp(4px, 1vw, 8px);
+        display: flex;
+    }
+    .home-header-search {
+    min-width: calc(100vw - 135px);
+	border-radius: 16px !important;
+	padding: 1px 1px 1px 8px !important;
+	box-sizing: border-box;
+    }
+    
+    .home-header-right {
+        margin: 0px;
+        display: none;
+    }
+    
+    .home-header-left {
+        margin-right: 2px;
+        justify-content: space-between;
+    }
+
+
+>>>>>>> refs/remotes/origin/unstable
 }

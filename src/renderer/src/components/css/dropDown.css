@@ -69,8 +69,7 @@
   height: 24px;
 }
 
-/* for smartphones 
-maybe that will be usefull in the future */
+/* for very small window sizes */
 @media (max-width: 600px) {
 
   .dropdown-button {
