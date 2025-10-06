@@ -7,7 +7,7 @@ import Dropdown from "../../components/dropDown";
 import { useEffect, useState } from "react";
 import Button from "@renderer/components/buttons";
 import { t } from "i18next"
-import { ContextMenuProps, notificationProps, pluginFormat, SettingsConfig, themeMetadata } from "@renderer/utils/GlobalInterface";
+import { ContextMenuProps, notificationProps, playerPluginFormat, SettingsConfig, themeMetadata } from "@renderer/utils/GlobalInterface";
 import { useSelector } from "react-redux";
 import i18n from "i18next"
 import { checkPictureFolder, saveConfig } from "@renderer/utils/config";
@@ -29,7 +29,7 @@ import { InitialPlugin } from "@renderer/utils/pluginApi";
 function settings() {
     const navigate = useNavigate();
     const cfg: SettingsConfig = useSelector((data: any) => data.config);
-    const pluginList: pluginFormat[] = useSelector((data: any) => data.plugin.loadedPlugins);
+    const pluginList: playerPluginFormat[] = useSelector((data: any) => data.plugin.loadedPlugins);
     const [category, setCategory] = useState<string>("general");
     const [config, setConfig] = useState<{ old: SettingsConfig, new: SettingsConfig }>({ old: structuredClone(cfg), new: structuredClone(cfg) })
     const [themes, setThemes] = useState<{ label: string, onClick?: () => void }[]>([])
@@ -229,7 +229,6 @@ function settings() {
                     container: "settings-sidebar-container",
                     sidebar: "settings-sidebar",
                 }}
-                hideButton
                 showLogo
             />
             <motion.div variants={saveCommunicateAnimation} initial={"hidden"} animate={isSaving ? "visible" : "hidden"} transition={{ duration: 0.2 }} className="settings-save-content">
@@ -244,7 +243,7 @@ function settings() {
                     <>
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("global.general")}</div>
-                            <div className="settings-setting-container">
+                            {/* <div className="settings-setting-container">
                                 {t("settings.general.hideSidebar")}
                                 <CheckBox
                                     checked={config.new.General.HideSidebar}
@@ -262,7 +261,7 @@ function settings() {
                                         handleChange('General.HoverSidebar', checked)
                                     }
                                 />
-                            </div>
+                            </div> */}
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.general.language")}
@@ -893,7 +892,6 @@ function settings() {
                                         <td>
                                             <div className="settings-extensions-button-container">
                                                 <div className="settings-extensions-type-container">
-                                                    {plugin.information && <div className="settings-extensions-background">{t("settings.extensions.information")}</div>}
                                                     {plugin.player && <div className="settings-extensions-background">{t("global.player")}</div>}
                                                 </div>
                                                 <div className="settings-helpicon-space">

@@ -11,7 +11,7 @@
 }
 
 .home-header-container {
-    padding: 24px;
+    padding: 12px;
     display: flex;
     gap: 24px;
     position: fixed;
@@ -31,8 +31,12 @@
 }
 
 .home-header-background {
-    background-color: color-mix(in srgb, var(--bg) 80%, transparent) !important;
+    background-color: color-mix(in srgb, var(--bg) 90%, transparent) !important;
     border-color: var(--invisible) !important;
+}
+
+.home-header-background:hover {
+    border-color: var(--neutral1) !important;
 }
 
 /* .home-header {

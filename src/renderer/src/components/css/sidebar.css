@@ -38,10 +38,6 @@
     width: max-content;
 }
 
-.sidebar-bottom {
-    margin-bottom: 70px;
-}
-
 .sidebar-main-container {
     position: fixed;
     height: max-content;

@@ -6,7 +6,7 @@ import Input from "@renderer/components/input"
 import Sidebar from "@renderer/components/sidebar"
 import Container from "./components/container"
 import { useSelector } from "react-redux"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { containerData, FilterParams, homeData, informationPluginFormat, SettingsConfig } from "@renderer/utils/GlobalInterface"
 import { t } from "i18next"
 import store from "@renderer/utils/store"
@@ -27,6 +27,7 @@ const Home = () => {
     const homeCache: homeData = useSelector((cache: any) => cache.home);
     const pluginPlayer = store.getState().plugin.playerPlugin;
     const config: SettingsConfig = useSelector((data: any) => data.config);
+    const [isOpenSidebar, setOpenSidebar] = useState<boolean>(false)
     const homeFunc = useRef<Promise<{ topCards?: containerData, sections: containerData[] }>>(plugin.info.home())
     const { data: homedata, isError: isError, isFetching: isLoading, refetch } = useQuery({
         queryFn: async () => {
@@ -81,7 +82,7 @@ const Home = () => {
         if (scrollHeight > clientHeight == false) handleScroll()
     }, [homeCache.data])
 
-    async function wrapper(func: Promise<{ topCards?: containerData, sections: containerData[] }>) {
+    function wrapper(func: Promise<{ topCards?: containerData, sections: containerData[] }>) {
         homeFunc.current = func
         refetch()
     }
@@ -185,10 +186,12 @@ const Home = () => {
         return data
     }
 
+    console.log(isOpenSidebar)
+
     return (
         <main className="home" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>
             <div className="home-header-container">
-                <Button icon="menu" ButtonClass="home-header-background" />
+                <Button icon="menu" ButtonClass="home-header-background" onClick={() => setOpenSidebar((prev) => !prev)}/>
                 <div className="home-header-search">
                     <Input placeholder={t("home.search")} InputClass="home-header-search home-header-background" onKeyDown={OnSearch} />
                     <div className="home-filter-void">
@@ -198,6 +201,7 @@ const Home = () => {
                 </div>
             </div>
             {/* ADD HERE SIDEBAR */}
+            <Sidebar data={sidebarData} openSidebar={isOpenSidebar} onChange={() => setOpenSidebar(false)} />
 
             <div className="home-content">
                 {homedata && homedata.topCards && <BigCardsContainer data={homedata.topCards} />}

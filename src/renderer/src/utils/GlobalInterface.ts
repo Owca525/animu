@@ -174,8 +174,8 @@ export interface SettingsConfig {
         player: string
     }
     General: {
-        HoverSidebar: boolean
-        HideSidebar: boolean
+        // HoverSidebar: boolean
+        // HideSidebar: boolean
         language: string
         theme: string
         discordRPC: boolean
