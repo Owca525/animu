@@ -6,7 +6,7 @@ import Input from "@renderer/components/input"
 import Sidebar from "@renderer/components/sidebar"
 import Container from "./components/container"
 import { useSelector } from "react-redux"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { containerData, FilterParams, homeData, informationPluginFormat, SettingsConfig } from "@renderer/utils/GlobalInterface"
 import { t } from "i18next"
 import store from "@renderer/utils/store"
@@ -27,10 +27,10 @@ const Home = () => {
     const homeCache: homeData = useSelector((cache: any) => cache.home);
     const pluginPlayer = store.getState().plugin.playerPlugin;
     const config: SettingsConfig = useSelector((data: any) => data.config);
-    const [homeFunc, setFunc] = useState<Promise<{ topCards?: containerData, sections: containerData[] }>>(plugin.info.home)
+    const homeFunc = useRef<Promise<{ topCards?: containerData, sections: containerData[] }>>(plugin.info.home())
     const { data: homedata, isError: isError, isFetching: isLoading, refetch } = useQuery({
         queryFn: async () => {
-            return await homeFunc
+            return await homeFunc.current
         },
         refetchOnWindowFocus: false,
         staleTime: 2 * 60 * 1000,
@@ -82,7 +82,7 @@ const Home = () => {
     }, [homeCache.data])
 
     async function wrapper(func: Promise<{ topCards?: containerData, sections: containerData[] }>) {
-        setFunc(func)
+        homeFunc.current = func
         refetch()
     }
 
