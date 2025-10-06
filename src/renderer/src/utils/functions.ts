@@ -310,3 +310,21 @@ export function segregatePlugins(func: (name: string) => void): DropdownOption[]
 
     return list
 }
+
+export function getEpisodeDay(unixTime: number, episode: number): string {
+    const episodeDate = new Date(unixTime * 1000);
+    const today = new Date();
+
+    const isToday =
+        episodeDate.getFullYear() === today.getFullYear() &&
+        episodeDate.getMonth() === today.getMonth() &&
+        episodeDate.getDate() === today.getDate();
+
+
+    let todayHours = `${episodeDate.getHours().toString().padStart(2, "0")}:${episodeDate.getMinutes().toString().padStart(2, "0")}`
+    if (isToday) return t("week.infoCommunicatToday", { ep: episode, day: t("week.today"), hours: todayHours });
+
+    const days = [t("week.sunday"), t("week.monday"), t("week.tuesday"), t("week.wednesday"), t("week.thursday"), t("week.friday"), t("week.saturday")];
+    let todayName = days[episodeDate.getDay()]
+    return t("week.infoCommunicat", { ep: episode, day: todayName, hours: todayHours });
+}

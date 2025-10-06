@@ -200,9 +200,10 @@ const Home = () => {
                     </div>
                 </div>
             </div>
-            {/* ADD HERE SIDEBAR */}
-            <Sidebar data={sidebarData} openSidebar={isOpenSidebar} onChange={() => setOpenSidebar(false)} />
 
+            <Sidebar data={sidebarData} openSidebar={isOpenSidebar} onChange={() => setOpenSidebar(false)} />
+            {/* FIXME: Napraw przycisk do wyświetlania wiecej kontentu */}
+            {/* FIXME: Napraw bug gdzie topcards się pojawia kiedy kontent się ładuje */}
             <div className="home-content">
                 {homedata && homedata.topCards && <BigCardsContainer data={homedata.topCards} />}
                 <div ref={divRef} className={`home-container ${isLoading && "home-loading-container"} ${isError && "home-loading-container"} ${homedata && homedata.sections.length <= 0 && "home-loading-container"}`} onScroll={handleScroll}>

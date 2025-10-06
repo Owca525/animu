@@ -1,18 +1,26 @@
-import { getGradientColor } from '@renderer/utils/functions';
+import { getEpisodeDay, getGradientColor } from '@renderer/utils/functions';
 import { cardData } from '@renderer/utils/GlobalInterface';
 import React from 'react';
 import "./css/bigcard.css"
 import { t } from 'i18next';
 import Button from '@renderer/components/buttons';
+import { useNavigate } from 'react-router-dom';
 
 type bigCardProps = { data: cardData, ref?: any }
 
 const BigCard: React.FC<bigCardProps> = ({ data, ref }) => {
+    const navigate = useNavigate();
 
     function formatEpisode(): string {
         if (!data.AnimeData.nextAiringEpisode) return ""
         if (data.AnimeData.nextAiringEpisode.episode == 1) return "1"
-        return data.AnimeData.nextAiringEpisode.episode.toString()
+        return (data.AnimeData.nextAiringEpisode.episode - 1).toString()
+    }
+
+    function openInformation() {
+        navigate("/info", {
+            state: data.AnimeData,
+        });
     }
 
     return (
@@ -38,14 +46,19 @@ const BigCard: React.FC<bigCardProps> = ({ data, ref }) => {
                             {data.AnimeData.format &&
                                 <div className="big-card-information-format">{t(`anime_formats.${data.AnimeData.format.toLowerCase()}`)}</div>
                             }
-                            {data.AnimeData.status && 
+                            {data.AnimeData.status &&
                                 <div className="big-card-information-status">{t(`anime_statuses.${data.AnimeData.status.toLowerCase()}`)}</div>
                             }
                             {data.AnimeData.episodes &&
                                 <div className="big-card-information-episode">{formatEpisode() != "" ? `${formatEpisode()} /` : ""} {data.AnimeData.episodes} Episodes</div>
                             }
                         </div>
-                        <Button content='Open' ButtonClass='big-card-button'/>
+                        <div className="big-card-information-bottom">
+                            <Button content='Open' ButtonClass='big-card-button' onClick={openInformation} />
+                            {data.AnimeData.nextAiringEpisode &&
+                                <div className="big-card-information-date">{getEpisodeDay(data.AnimeData.nextAiringEpisode.airingAt, data.AnimeData.nextAiringEpisode.episode)}</div>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>

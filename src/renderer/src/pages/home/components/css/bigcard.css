@@ -49,6 +49,19 @@
     gap: 8px;
 }
 
+.big-card-information-bottom {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.big-card-information-date {
+    background-color: var(--neutral1);
+    text-shadow: 2px 2px 10px var(--black);
+    padding: 4px 12px 4px 12px;
+    border-radius: 12px;
+}
+
 .big-card-information-content {
     display: flex;
     flex-direction: column;
