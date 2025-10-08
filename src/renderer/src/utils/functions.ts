@@ -148,35 +148,36 @@ export function convertMsToMinutes(ms: number): number {
 
 export async function refetchHistory() {
     let data: homeData = store.getState().home
-    if (data.data.length > 2) return
-    if (data.data.length <= 0) return
-    if (data.data.length == 1 && data.data[0].title == t("global.continuewatch")) {
-        await setHomeData(async () => [{ title: t("global.continuewatch"), data: await ReadContinue(), horizontal: false }])
+    if (!data.data) return
+    if (data.data.sections.length > 2) return
+    if (data.data.sections.length <= 0) return
+    if (data.data.sections.length == 1 && data.data[0].title == t("global.continuewatch")) {
+        await setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: await ReadContinue(), horizontal: false }] }))
         return
     }
 
-    if (data.data.length == 1 && data.data[0].title == t("global.history")) {
-        await setHomeData(async () => [{ title: t("global.history"), data: await ReadHistory(), horizontal: false }])
+    if (data.data.sections.length == 1 && data.data[0].title == t("global.history")) {
+        await setHomeData(async () => ({ sections: [{ title: t("global.history"), data: await ReadHistory(), horizontal: false }] }))
         return
     }
 
     if (data.data[0].title == t("global.continuewatch") && data.data[1].title == t("global.history")) {
-        await setHomeData(async () => {
-            return [
+        await setHomeData(async () => ({
+            sections: [
                 {
                     title: t("global.continuewatch"),
                     data: await ReadContinue(20),
                     horizontal: true,
-                    onTitleClick: () => setHomeData(async () => [{ title: t("global.continuewatch"), data: await ReadContinue(), horizontal: false }])
+                    onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: await ReadContinue(), horizontal: false }] }))
                 },
                 {
                     title: t("global.history"),
                     data: await ReadHistory(20),
                     horizontal: true,
-                    onTitleClick: () => setHomeData(async () => [{ title: t("global.history"), data: await ReadHistory(), horizontal: false }])
+                    onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.history"), data: await ReadHistory(), horizontal: false }] }))
                 },
             ]
-        })
+        }))
         return
     }
 }

@@ -58,7 +58,7 @@ export interface AnimeData {
 }
 
 export interface homeData {
-    data: containerData[]
+    data: { topCards?: containerData, sections: containerData[] }
     isLoading: boolean
     isError: boolean
     search: string
@@ -155,8 +155,8 @@ export interface informationPluginFormat {
     preferedLang: string[]
     pageSize: number
     info: {
-        search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => Promise<{ topCards?: containerData, sections: containerData[] }>
-        home: () => Promise<{ topCards?: containerData, sections: containerData[] }>
+        search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => Promise<void>
+        home: () => Promise<void>
         anime: (id: string) => Promise<AnimeData | undefined>
     }
     searchOption: genres
