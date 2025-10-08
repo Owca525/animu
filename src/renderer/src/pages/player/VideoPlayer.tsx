@@ -886,6 +886,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         return true
     }
 
+    function getEpisode(type: "next" | "prev"): { ep: string; img?: string; title?: string; } | undefined {
+        if (type == "next") return temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1]
+        if (type == "prev") return temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) - 1]
+        return undefined
+    }
+
     return (
         <div className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
             <div ref={screenshotWrapper} className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} >
@@ -997,14 +1003,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     <SeekBar chapterList={chapterList} thumbnail={thumbnails} secondBarValues={currentBuffer} currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => { setTimeVideo(value) }} type="time" classes={{ container: "player-seekbar" }} screen={true} />
                     <div className="player-bottom-section">
                         <div className="player-left">
-                            {temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) - 1] !== undefined &&
-                                <PlayerButton title={t('player.previous', { ep: temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) - 1].ep })} icon='skip_previous'
+                            {getEpisode("prev") !== undefined &&
+                                <PlayerButton title={t('player.previous', { ep: getEpisode("prev")?.ep })} icon='skip_previous'
                                     onClick={() => setEpisode("prev")}
                                     ButtonClass="player-buttons" />
                             }
                             <PlayerButton icon={isPlaying ? "pause" : "play_arrow"} title={isPlaying ? t('player.Pause') : t('player.play')} ButtonClass="player-buttons" onClick={togglePlay} />
-                            {temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] !== undefined &&
-                                <PlayerButton icon='skip_next' ButtonClass='material-symbols-outlined player-buttons' title={t('player.next', { ep: temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1].ep })} onClick={() => setEpisode("next")} />
+                            {getEpisode("next") !== undefined &&
+                                <PlayerButton icon='skip_next' ButtonClass='material-symbols-outlined player-buttons' title={t('player.next', { ep: getEpisode("next")?.ep })} onClick={() => setEpisode("next")} />
                             }
                             <div className="player-time-display">
                                 {formatTime(currentTime)} / {formatTime(videoRef.current?.duration)}
@@ -1075,7 +1081,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             {config.Player.upToNextEpisode.variants == "old" && (
                 <motion.div variants={uptoNextVariants} transition={{ duration: 0.2 }} animate={isUpNextEpisode ? "visible" : "hidden"} initial={"hidden"} className="player-up-Next-container old">
                     <div className="player-up-Next-Title old">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>
-                    <div className="player-up-Next-Anime old">{t("player.upNext.titleAnime", { ep: temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1].ep, title: anime_data.AnimeData.title.romaji })}</div>
+                    <div className="player-up-Next-Anime old">{t("player.upNext.titleAnime", { ep: getEpisode("next")?.ep, title: anime_data.AnimeData.title.romaji })}</div>
                     <div className="player-up-Next-Buttons old">
                         <Button content={t("player.upNext.nextEp")} ButtonClass='player-up-Next-Button old' onClick={() => setEpisode("next")} />
                         <Button content={t("player.upNext.hide")} ButtonClass='player-up-Next-Button old' onClick={() => { setHideUpNextEpisode(true); setUpNextEpisode(false) }} />
@@ -1096,7 +1102,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         <span className="material-symbols-outlined player-up-Next-icon">skip_next</span>
                         <div className="player-up-Next-content var2">
                             <div className="player-up-Next-title">{anime_data.AnimeData.title.romaji}</div>
-                            <div className="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: temp.episode })}</div>
+                            <div className="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: getEpisode("next")?.ep })}</div>
                             <div className="player-up-Next-text">{t("player.upNext.nextPlaying", { time: parseInt(timeNextEpisode.toString()) })}</div>
                         </div>
                     </div>
@@ -1121,7 +1127,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     <span className="material-symbols-outlined player-up-Next-icon">skip_next</span>
                     <div className="player-up-Next-content">
                         <div className="player-up-Next-title">{anime_data.AnimeData.title.romaji}</div>
-                        <div className="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: temp.episode })}</div>
+                        <div className="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: getEpisode("next")?.ep })}</div>
                         <div className="player-up-Next-text">{t("player.upNext.nextPlaying", { time: parseInt(timeNextEpisode.toString()) })}</div>
                     </div>
                     <button className="material-symbols-outlined player-up-Next-button-close" onClick={(event) => {
