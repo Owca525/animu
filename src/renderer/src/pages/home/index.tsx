@@ -249,23 +249,23 @@ const Home = () => {
         OpenContextMenu(CreateContextMenuOptions(), event)
       }
     >
-      <div className="home-header-container">
+      <div className={`home-header-container ${homeCache.data && !homeCache.data.topCards ? "active" : ""}`}>
         <Button
           icon="menu"
-          ButtonClass="home-header-background"
+          ButtonClass={homeCache.data && homeCache.data.topCards ? "home-header-background" : undefined}
           onClick={() => setOpenSidebar((prev) => !prev)}
         />
         <div className="home-header-search">
           <Input
             placeholder={t("home.search")}
-            InputClass="home-header-search home-header-background"
+            InputClass={`home-header-search ${homeCache.data && homeCache.data.topCards ? "home-header-background" : ""}`}
             onKeyDown={OnSearch}
           />
           <div className="home-filter-void">
             <Filter
               onChange={onChange}
               filter={plugin.searchOption}
-              custonClass="home-header-background"
+              custonClass={homeCache.data && homeCache.data.topCards ? "home-header-background" : undefined}
             />
           </div>
         </div>
@@ -276,12 +276,14 @@ const Home = () => {
         openSidebar={isOpenSidebar}
         onChange={() => setOpenSidebar(false)}
       />
-      {/* FIXME: Napraw przycisk do wyświetlania wiecej kontentu */}
-      {/* FIXME: Napraw bug gdzie topcards się pojawia kiedy kontent się ładuje */}
+
       <div className="home-content">
         {homeCache.data && homeCache.data.topCards && (
           <BigCardsContainer data={homeCache.data.topCards} />
         )}
+        {homeCache.data && !homeCache.data.topCards &&
+            <div className="home-header-shadow"></div>
+        }
         <div
           ref={divRef}
           className={`home-container ${homeCache.isLoading && "home-loading-container"} ${homeCache.isError && "home-loading-container"} ${homeCache.data && homeCache.data.sections.length <= 0 && "home-loading-container"}`}
