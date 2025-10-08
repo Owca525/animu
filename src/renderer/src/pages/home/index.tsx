@@ -128,7 +128,7 @@ const Home = () => {
       ],
     };
   }
-
+  // FIXME: napraw żeby przy skrolowaniu dawało background headerowi i onscrolldown naprawić funkcje
   const handleScroll = () => {
     if (!homeCache.data) return;
     if (homeCache.data.sections.length > 1) return;
