@@ -11,7 +11,7 @@ import {
   CreateContextMenuOptions,
   getGradientColor,
 } from "@renderer/utils/functions";
-import { extractInformation } from "@renderer/plugins/allmanga";
+// import { extractInformation } from "@renderer/plugins/allmanga";
 import { ChangePlugin } from "@renderer/utils/pluginApi";
 import store from "@renderer/utils/store";
 
@@ -57,9 +57,9 @@ const Card: React.FC<{ card: cardData, disableinformation?: boolean }> = ({ card
     }
 
     if (card.AnimeData.id === "") {
-      navigate("/info", {
-        state: await extractInformation(card.AnimeData.player_ID ? card.AnimeData.player_ID : ""),
-      });
+      // navigate("/info", {
+      //   state: await extractInformation(card.AnimeData.player_ID ? card.AnimeData.player_ID : ""),
+      // });
       return;
     }
 
