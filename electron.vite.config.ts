@@ -23,20 +23,24 @@ export default defineConfig({
           drop_console: false,
         },
         mangle: true,
-     },
-     reportCompressedSize: true,
-     cssCodeSplit: false
+      },
+      reportCompressedSize: true,
+      cssCodeSplit: false
     },
     plugins: [
       react(),
       viteStaticCopy({
         targets: [
           {
-            src: 'src/themes/*', 
+            src: 'src/themes/*',
             dest: 'assets/themes'
           },
           {
-            src: 'src/utils/lang/*', 
+            src: "../../node_modules/jassub/dist/default.woff2",
+            dest: "assets",
+          },
+          {
+            src: 'src/utils/lang/*',
             dest: 'assets/lang'
           },
         ],

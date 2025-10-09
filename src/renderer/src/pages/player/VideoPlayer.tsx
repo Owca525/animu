@@ -23,9 +23,12 @@ import PlayerEpisodeElement from "./components/playerEpisodeElement"
 import { convert } from "subtitle-converter";
 import { useHotkeys } from "react-hotkeys-hook"
 import i18n from "@renderer/utils/i18n"
-import ASS from "assjs"
 import store from "@renderer/utils/store"
 import html2canvas from "html2canvas"
+import JASSUB from "jassub";
+
+import workerUrl from "jassub/dist/jassub-worker.js?url";
+import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
 
 function addTime(durration: number): string {
     const now = new Date();
@@ -127,7 +130,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const [vttUrl, setVttUrl] = useState<string | undefined>(undefined);
     const [ListSubtitles, setListSubtitles] = useState<playerSubtitlesFormat[]>([])
     const [lastSubtitles, setlastSubtitles] = useState<playerSubtitlesFormat | undefined>(undefined)
-    const [currentASSubtitles, setASSubtitles] = useState<ASS | undefined>(undefined)
+    const [currentASSubtitles, setASSubtitles] = useState<JASSUB | undefined>(undefined)
     const [currentSubtitles, setSubtitles] = useState<playerSubtitlesFormat | undefined>(undefined)
     const assSubContainer = useRef<HTMLDivElement | null>(null);
     const vttSubRef = useRef<HTMLTrackElement | null>(null);
@@ -596,8 +599,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
         // This clear subtitles but this dosen't work on dev Because react second render
         if (currentASSubtitles) {
-            currentASSubtitles.hide()
+            // currentASSubtitles.hide()
             currentASSubtitles.destroy()
+            currentASSubtitles._canvas.remove()
             setASSubtitles(() => undefined)
         }
 
@@ -615,22 +619,22 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             return
         }
 
-        let data = await window.api.request.get(sub.url, { "User-Agent": navigator.userAgent }, "text")
-        if (!data.success) return
         if (sub.format == "ass") {
-            if (!assSubContainer.current) return
-            const ass = new ASS(data.data, videoRef.current, {
-                container: assSubContainer.current,
+            const renderer = new JASSUB({
+                video: videoRef.current,
+                subUrl: sub.url,
+                workerUrl,
+                wasmUrl,
             });
-            ass.show();
-            setASSubtitles(ass)
+            setASSubtitles(renderer)
+            console.log(renderer)
             setSubtitles(() => sub)
-            if (isPlaying) {
-                videoRef.current.pause()
-                videoRef.current.play()
-            }
+            
             return
         }
+
+        let data = await window.api.request.get(sub.url, { "User-Agent": navigator.userAgent }, "text")
+        if (!data.success) return
 
         const vtt = await convert(data.data, ".vtt", { removeTextFormatting: true });
         const blob = new Blob([vtt.subtitle], { type: "text/vtt" });
@@ -727,6 +731,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     async function takeScreenshot() {
         if (!screenshotWrapper.current) return
         if (config == null) return
+        if (!videoRef.current) return
 
         const currentDate: Date = new Date();
         const [year, month, day, hour, minute, second] = [
@@ -740,8 +745,26 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
         const formatedDate = `-${year}-${month}-${day}-${hour}-${minute}-${second}`;
 
-        const canvas = await html2canvas(screenshotWrapper.current);
-        const screenshot = canvas.toDataURL("image/png");
+        let screenshot: string = "data:,"
+
+        if (currentASSubtitles) {
+            const outputCanvas = document.createElement("canvas");
+            const ctx = outputCanvas.getContext("2d");
+            if (!ctx) {
+                toast.error(t("player.toastscreenshot.failed"), notificationProps);
+                return
+            };
+            outputCanvas.width = videoRef.current.videoWidth;
+            outputCanvas.height = videoRef.current.videoHeight;
+            ctx.drawImage(videoRef.current, 0, 0, videoRef.current.videoWidth, videoRef.current.videoHeight);
+            ctx.drawImage(currentASSubtitles._canvas, 0, 0, videoRef.current.videoWidth, videoRef.current.videoHeight);
+            screenshot = outputCanvas.toDataURL("image/png");
+        } else {
+            const canvas = await html2canvas(screenshotWrapper.current);
+            screenshot = canvas.toDataURL("image/png");
+        }
+
+        console.log(screenshot)
 
         if (screenshot == "data:,") {
             toast.error(t("player.toastscreenshot.failed"), notificationProps);
