@@ -53,6 +53,14 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
                 chapterList.push({ ...element, type: "ending" })
                 continue
             }
+            if (element.name == "Ending") {
+                chapterList.push({ ...element, type: "ending" })
+                continue
+            }
+            if (element.name == "Opening") {
+                chapterList.push({ ...element, type: "opening" })
+                continue
+            }
             chapterList.push(element)
         }
     }
