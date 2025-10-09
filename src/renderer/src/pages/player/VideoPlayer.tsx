@@ -21,30 +21,26 @@ import PlayerButton from "./components/PlayerButton"
 import { motion } from "framer-motion"
 import PlayerEpisodeElement from "./components/playerEpisodeElement"
 import { convert } from "subtitle-converter";
-import { useHotkeys } from "react-hotkeys-hook"
+// import { useHotkeys } from "react-hotkeys-hook"
 import i18n from "@renderer/utils/i18n"
-import ASS from "assjs"
 import store from "@renderer/utils/store"
 import html2canvas from "html2canvas"
+import JASSUB from "jassub";
+
+import workerUrl from "jassub/dist/jassub-worker.js?url";
+import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
 
 function addTime(durration: number): string {
     const now = new Date();
-    let hour: number | undefined = undefined
-    let min: number | undefined = undefined
-    let sec: number | undefined = undefined
+    let [sec, min, hour] = formatTime(durration).split(":").reverse()
 
-    if (formatTime(durration).split(":").length == 2) {
-        min = parseInt(formatTime(durration).split(":")[0])
-        sec = parseInt(formatTime(durration).split(":")[1])
-    } else if (formatTime(durration).split(":").length == 2) {
-        hour = parseInt(formatTime(durration).split(":")[0])
-        min = parseInt(formatTime(durration).split(":")[1])
-        sec = parseInt(formatTime(durration).split(":")[2])
-    }
-
-    if (hour) now.setMinutes(now.getHours() + hour);
-    if (min) now.setMinutes(now.getMinutes() + min);
-    if (sec) now.setSeconds(now.getSeconds() + sec);
+    if (hour) now.setMinutes(now.getHours() + parseInt(hour));
+    if (min) now.setMinutes(now.getMinutes() + parseInt(min));
+    if (sec) {
+        let tmp = parseInt(sec)
+        if (tmp <= 59) now.setSeconds(now.getSeconds() + (tmp-1))
+        if (tmp <= 0) now.setSeconds(now.getSeconds() + (tmp+2))
+    };
 
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
@@ -127,7 +123,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const [vttUrl, setVttUrl] = useState<string | undefined>(undefined);
     const [ListSubtitles, setListSubtitles] = useState<playerSubtitlesFormat[]>([])
     const [lastSubtitles, setlastSubtitles] = useState<playerSubtitlesFormat | undefined>(undefined)
-    const [currentASSubtitles, setASSubtitles] = useState<ASS | undefined>(undefined)
+    const [currentASSubtitles, setASSubtitles] = useState<JASSUB | undefined>(undefined)
     const [currentSubtitles, setSubtitles] = useState<playerSubtitlesFormat | undefined>(undefined)
     const assSubContainer = useRef<HTMLDivElement | null>(null);
     const vttSubRef = useRef<HTMLTrackElement | null>(null);
@@ -562,9 +558,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         keybinds(keys)
     })
 
-    useHotkeys("d", () => {
-        console.log(player_data, temp)
-    })
+    // useHotkeys("d", () => {
+    //     console.log(player_data, temp, currentSubtitles)
+    // })
 
     function setEpisode(type: "next" | "prev") {
         let ep = temp.episodes.findIndex((item) => item.ep === temp.episode)
@@ -596,8 +592,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
         // This clear subtitles but this dosen't work on dev Because react second render
         if (currentASSubtitles) {
-            currentASSubtitles.hide()
+            // currentASSubtitles.hide()
             currentASSubtitles.destroy()
+            currentASSubtitles._canvas.remove()
             setASSubtitles(() => undefined)
         }
 
@@ -615,22 +612,20 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             return
         }
 
-        let data = await window.api.request.get(sub.url, { "User-Agent": navigator.userAgent }, "text")
-        if (!data.success) return
         if (sub.format == "ass") {
-            if (!assSubContainer.current) return
-            const ass = new ASS(data.data, videoRef.current, {
-                container: assSubContainer.current,
+            const renderer = new JASSUB({
+                video: videoRef.current,
+                subUrl: sub.url,
+                workerUrl,
+                wasmUrl,
             });
-            ass.show();
-            setASSubtitles(ass)
+            setASSubtitles(renderer)
             setSubtitles(() => sub)
-            if (isPlaying) {
-                videoRef.current.pause()
-                videoRef.current.play()
-            }
             return
         }
+
+        let data = await window.api.request.get(sub.url, { "User-Agent": navigator.userAgent }, "text")
+        if (!data.success) return
 
         const vtt = await convert(data.data, ".vtt", { removeTextFormatting: true });
         const blob = new Blob([vtt.subtitle], { type: "text/vtt" });
@@ -727,6 +722,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     async function takeScreenshot() {
         if (!screenshotWrapper.current) return
         if (config == null) return
+        if (!videoRef.current) return
 
         const currentDate: Date = new Date();
         const [year, month, day, hour, minute, second] = [
@@ -740,8 +736,26 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
         const formatedDate = `-${year}-${month}-${day}-${hour}-${minute}-${second}`;
 
-        const canvas = await html2canvas(screenshotWrapper.current);
-        const screenshot = canvas.toDataURL("image/png");
+        let screenshot: string = "data:,"
+
+        if (currentASSubtitles) {
+            const outputCanvas = document.createElement("canvas");
+            const ctx = outputCanvas.getContext("2d");
+            if (!ctx) {
+                toast.error(t("player.toastscreenshot.failed"), notificationProps);
+                return
+            };
+            outputCanvas.width = videoRef.current.videoWidth;
+            outputCanvas.height = videoRef.current.videoHeight;
+            ctx.drawImage(videoRef.current, 0, 0, videoRef.current.videoWidth, videoRef.current.videoHeight);
+            ctx.drawImage(currentASSubtitles._canvas, 0, 0, videoRef.current.videoWidth, videoRef.current.videoHeight);
+            screenshot = outputCanvas.toDataURL("image/png");
+        } else {
+            const canvas = await html2canvas(screenshotWrapper.current);
+            screenshot = canvas.toDataURL("image/png");
+        }
+
+        console.log(screenshot)
 
         if (screenshot == "data:,") {
             toast.error(t("player.toastscreenshot.failed"), notificationProps);
@@ -886,6 +900,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         return true
     }
 
+    function getEpisode(type: "next" | "prev"): { ep: string; img?: string; title?: string; } | undefined {
+        if (type == "next") return temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1]
+        if (type == "prev") return temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) - 1]
+        return undefined
+    }
+
     return (
         <div className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
             <div ref={screenshotWrapper} className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} >
@@ -997,14 +1017,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     <SeekBar chapterList={chapterList} thumbnail={thumbnails} secondBarValues={currentBuffer} currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => { setTimeVideo(value) }} type="time" classes={{ container: "player-seekbar" }} screen={true} />
                     <div className="player-bottom-section">
                         <div className="player-left">
-                            {temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) - 1] !== undefined &&
-                                <PlayerButton title={t('player.previous', { ep: temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) - 1].ep })} icon='skip_previous'
+                            {getEpisode("prev") !== undefined &&
+                                <PlayerButton title={t('player.previous', { ep: getEpisode("prev")?.ep })} icon='skip_previous'
                                     onClick={() => setEpisode("prev")}
                                     ButtonClass="player-buttons" />
                             }
                             <PlayerButton icon={isPlaying ? "pause" : "play_arrow"} title={isPlaying ? t('player.Pause') : t('player.play')} ButtonClass="player-buttons" onClick={togglePlay} />
-                            {temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] !== undefined &&
-                                <PlayerButton icon='skip_next' ButtonClass='material-symbols-outlined player-buttons' title={t('player.next', { ep: temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1].ep })} onClick={() => setEpisode("next")} />
+                            {getEpisode("next") !== undefined &&
+                                <PlayerButton icon='skip_next' ButtonClass='material-symbols-outlined player-buttons' title={t('player.next', { ep: getEpisode("next")?.ep })} onClick={() => setEpisode("next")} />
                             }
                             <div className="player-time-display">
                                 {formatTime(currentTime)} / {formatTime(videoRef.current?.duration)}
@@ -1075,7 +1095,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             {config.Player.upToNextEpisode.variants == "old" && (
                 <motion.div variants={uptoNextVariants} transition={{ duration: 0.2 }} animate={isUpNextEpisode ? "visible" : "hidden"} initial={"hidden"} className="player-up-Next-container old">
                     <div className="player-up-Next-Title old">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>
-                    <div className="player-up-Next-Anime old">{t("player.upNext.titleAnime", { ep: temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1].ep, title: anime_data.AnimeData.title.romaji })}</div>
+                    <div className="player-up-Next-Anime old">{t("player.upNext.titleAnime", { ep: getEpisode("next")?.ep, title: anime_data.AnimeData.title.romaji })}</div>
                     <div className="player-up-Next-Buttons old">
                         <Button content={t("player.upNext.nextEp")} ButtonClass='player-up-Next-Button old' onClick={() => setEpisode("next")} />
                         <Button content={t("player.upNext.hide")} ButtonClass='player-up-Next-Button old' onClick={() => { setHideUpNextEpisode(true); setUpNextEpisode(false) }} />
@@ -1096,7 +1116,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         <span className="material-symbols-outlined player-up-Next-icon">skip_next</span>
                         <div className="player-up-Next-content var2">
                             <div className="player-up-Next-title">{anime_data.AnimeData.title.romaji}</div>
-                            <div className="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: temp.episode })}</div>
+                            <div className="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: getEpisode("next")?.ep })}</div>
                             <div className="player-up-Next-text">{t("player.upNext.nextPlaying", { time: parseInt(timeNextEpisode.toString()) })}</div>
                         </div>
                     </div>
@@ -1121,7 +1141,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     <span className="material-symbols-outlined player-up-Next-icon">skip_next</span>
                     <div className="player-up-Next-content">
                         <div className="player-up-Next-title">{anime_data.AnimeData.title.romaji}</div>
-                        <div className="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: temp.episode })}</div>
+                        <div className="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: getEpisode("next")?.ep })}</div>
                         <div className="player-up-Next-text">{t("player.upNext.nextPlaying", { time: parseInt(timeNextEpisode.toString()) })}</div>
                     </div>
                     <button className="material-symbols-outlined player-up-Next-button-close" onClick={(event) => {

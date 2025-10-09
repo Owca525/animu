@@ -53,6 +53,14 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
                 chapterList.push({ ...element, type: "ending" })
                 continue
             }
+            if (element.name == "Ending") {
+                chapterList.push({ ...element, type: "ending" })
+                continue
+            }
+            if (element.name == "Opening") {
+                chapterList.push({ ...element, type: "opening" })
+                continue
+            }
             chapterList.push(element)
         }
     }
@@ -68,30 +76,14 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
     }]
 }
 
-async function getAnimeID(text: string): Promise<string | undefined> {
-    try {
-        let url = `${WEB}/anime?search=${convertText(text)}`
-        const req = await window.api.request.get(url, HEADER, "text");
-        if (!req.success) return
-        let tmp = [...req.data.matchAll(CARDS_REGEX)]
-        if (tmp.length <= 0) return
-        let data: string = tmp[0][0]
-
-        let animeID = [...data.matchAll(/wire:key=["']([^"']+)["']/g)]
-        // let animeIMG = [...data.matchAll(/src=["'](https:\/\/anizone\.to\/images\/anime\/[^"']+)["']/g)]
-        // let animeTITLE = [...data.matchAll(/alt=["']([^"']+)["']/g)]
-        return animeID[0][1].slice(2)
-    } catch (error) {
-        console.log(error)
-        return undefined
-    }
-}
-
 async function getEpisodeList(animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> {
     console.log(animeData, anime_id)
     let idAnime = anime_id
     if (!idAnime && animeData) {
-        idAnime = await getAnimeID(animeData.title.english ? animeData.title.english : animeData.title.romaji)
+        let data = await getAnimeCards(animeData)
+        console.log(data)
+        if (data.length <= 0) return
+        idAnime = data[0].AnimeData.player_ID
     }
     if (!idAnime) return
 
@@ -125,7 +117,7 @@ async function getEpisodeList(animeData?: AnimeData, anime_id?: string): Promise
 
 async function getAnimeCards(data: AnimeData): Promise<cardData[]> {
     try {
-        let url = `${WEB}/anime?search=${convertText(data.title.english ? data.title.english : data.title.romaji)}`
+        let url = `${WEB}/anime?search=${convertText(data.title.romaji)}`
         const req = await window.api.request.get(url, HEADER, "text");
         if (!req.success) return []
         let tmp = [...req.data.matchAll(CARDS_REGEX)]
@@ -181,7 +173,7 @@ async function searchAnime(name: string, _page: number, _params?: { genres?: str
 }
 
 export const AniZone: playerPluginFormat = {
-    version: "1.0",
+    version: "1.1",
     name: "AniZone",
     author: "Owca525",
     player: {

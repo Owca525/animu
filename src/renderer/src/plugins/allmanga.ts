@@ -32,7 +32,7 @@ const mapping: Record<string, string> = {
   "11": ")", "12": "*", "13": "+", "14": ",", "03": ";", "05": "=", "1d": "%"
 };
 
-function findUrl(url: string, sourceName: string): string | undefined{
+function findUrl(url: string, sourceName: string): string | undefined {
   for (let index = 0; index < source_names.length; index++) {
     const element = source_names[index];
     if (element.toLowerCase() == sourceName.toLowerCase()) return decodeText(url)
@@ -41,20 +41,21 @@ function findUrl(url: string, sourceName: string): string | undefined{
 }
 
 function decodeText(textString: string): string {
-    const field = textString.trim();
+  const field = textString.trim();
 
-    const hexPairs: string[] = [];
-    for (let i = 0; i < field.length; i += 2) {
-        hexPairs.push(field.slice(i, i + 2));
-    }
-    return hexPairs.map(hp => mapping[hp] ?? "").join("")
+  const hexPairs: string[] = [];
+  for (let i = 0; i < field.length; i += 2) {
+    hexPairs.push(field.slice(i, i + 2));
+  }
+  return hexPairs.map(hp => mapping[hp] ?? "").join("")
 }
 
-async function sendToAPI(variables: string, hash: string, header: any): Promise<any | null> {
+async function sendToAPI(variables: string, hash: string, header: any): Promise<any | undefined> {
   let url = `${API_WEB}/api?variables=${variables}&extensions={"persistedQuery":{"version":1,"sha256Hash": "${hash}"}}`
   let data = await window.api.request.get(url, header)
+  console.log(data)
   if (data.success) return data.data
-  return null
+  return
 }
 
 async function sendRequest(url: string, header: any): Promise<any | undefined> {
@@ -70,44 +71,6 @@ export async function SearchAnime(name: string, page: number = 1): Promise<Recor
   const resp = await sendToAPI(variables, HASH_SEARCH, header)
   if (resp) return resp.data
   return null
-}
-
-let episodeListCache: { id: string, temp: any } | undefined = undefined
-
-async function convertEpisodes(anime_id: string, episodeList: string[]): Promise<{ ep: string, img?: string, title?: string }[]> {
-  if (!episodeList) return episodeList
-  try {
-    if (episodeList.length > 51) return episodeList.map((element) => { return { ep: element } })
-    if (episodeList.length <= 0) return []
-
-    let variables = `{"showId":"${anime_id}","episodeNumStart":${episodeList[episodeList.length - 1]},"episodeNumEnd":${episodeList[0]}}`
-    let response: any = undefined
-
-    if (episodeListCache && episodeListCache.id == anime_id) response = episodeListCache.temp
-    else response = await sendToAPI(variables, HASH_DATA, header)
-    console.log(response)
-
-    if (!response) return episodeList.map((element) => { return { ep: element } })
-    if (response.errors) return episodeList.map((element) => { return { ep: element } })
-    let infoData = response.data.episode.episodeInfos
-    if (infoData.length <= 0) return episodeList.map((element) => { return { ep: element } })
-
-    let episodeData: { ep: string, img?: string, title?: string }[] = []
-    // I decide for loop because map be harder to add episode number
-    for (let index = 0; index < infoData.length; index++) {
-      const element = infoData[index];
-      if (episodeList.length - 1 < index) break
-      if (element.thumbnails.length <= 0) episodeData.push({ ep: (index + 1).toString() })
-      else episodeData.push({ ep: (episodeList[index]).toString(), img: `https://wp.youtube-anime.com/aln.youtube-anime.com${element.thumbnails[0]}` })
-    }
-
-    episodeListCache = { id: anime_id, temp: response }
-    console.log(episodeData)
-    return episodeData
-  } catch (error) {
-    console.error(`Error in convertEpisodes: ${error}`)
-    return episodeList.map((element) => { return { ep: element } })
-  }
 }
 
 async function converterData(data: any): Promise<cardData | undefined> {
@@ -150,11 +113,6 @@ async function converterData(data: any): Promise<cardData | undefined> {
       id: "",
       format: data.type,
       player_ID: data._id,
-      episodesList: data.availableEpisodesDetail ? [
-        { episodes: (await convertEpisodes(data._id, data.availableEpisodesDetail.sub)).reverse(), type: "sub", name: "Subtitles" },
-        { episodes: (await convertEpisodes(data._id, data.availableEpisodesDetail.dub)).reverse(), type: "dub", name: "Dubbing" },
-        { episodes: (await convertEpisodes(data._id, data.availableEpisodesDetail.raw)).reverse(), type: "raw" }
-      ] : data.availableEpisodesDetail,
       characters: characters,
       source: undefined,
       trailer: undefined
@@ -226,13 +184,37 @@ async function getAnimeList(anime: AnimeData): Promise<cardData[]> {
   }
 }
 
-export async function extractInformation(id: string) {
+export async function extractInformation(type: "all" | "episodes", id: string): Promise<{ episodes: { ep: string; img?: string; title?: string }[]; type: string; name?: string }[] | { ep: string; img?: string; title?: string }[]> {
   let variables = `{"_id":"${id}"}`;
   const resp = await sendToAPI(variables, HASH_INFO, header);
   console.log(resp)
-  let data = await converterData(resp.data.show)
-  if (data) return data.AnimeData
-  return 
+  if (!resp) return []
+  let anime_data = resp.data.show
+  let episodes = await getEpisodeList(id, { start: parseInt(anime_data.availableEpisodesDetail.sub.at(-1)), end: parseInt(anime_data.availableEpisodesDetail.sub[0]) })
+  console.log(anime_data.availableEpisodesDetail, episodes)
+  if (episodes.length <= 0) return []
+  if (type == "episodes") return episodes
+
+  return [
+    {
+      episodes: episodes.length !== anime_data.availableEpisodes.sub 
+        ? episodes.slice(0, anime_data.availableEpisodes.sub != 0 ? anime_data.availableEpisodes.sub - 1 : 0) 
+        : episodes,
+      type: "sub"
+    },
+    {
+      episodes: episodes.length !== anime_data.availableEpisodes.dub 
+        ? episodes.slice(0, anime_data.availableEpisodes.dub != 0 ? anime_data.availableEpisodes.dub - 1 : 0) 
+        : episodes,
+      type: "dub"
+    },
+    {
+      episodes: episodes.length !== anime_data.availableEpisodes.raw
+        ? episodes.slice(0, anime_data.availableEpisodes.raw != 0 ? anime_data.availableEpisodes.raw - 1 : 0) 
+        : episodes,
+      type: "raw"
+    }
+  ]
 }
 
 export async function getInformation(animeData?: AnimeData, anime_id?: string): Promise<episodeList> {
@@ -292,14 +274,11 @@ export async function getInformation(animeData?: AnimeData, anime_id?: string): 
 
     // anime_id = card.AnimeData.player_ID ? card.AnimeData.player_ID : "";
   };
+  if (!anime_id || anime_id == "") return { player_id: "", episodesData: [] }
 
-  if (anime_id == "") return { player_id: "", episodesData: [] };
-  if (!anime_id) return { player_id: "", episodesData: [] }
-
-  let anime_data = await extractInformation(anime_id)
-  if (!anime_data) return { player_id: "", episodesData: [] };
-
-  return { player_id: anime_id ? anime_id : "", episodesData: anime_data.episodesList ?? [] };
+  let episodeList = await extractInformation("all", anime_id)
+  console.log(episodeList)
+  return { player_id: anime_id, episodesData: episodeList as { episodes: { ep: string; img?: string; title?: string }[]; type: string; name?: string }[]};
 }
 
 // { resolution: [{ url: url, res: "1080" }], hostname: new URL(url).hostname, hls: false }
@@ -353,8 +332,6 @@ export async function extractURLS(type: string, episode: string, id: string): Pr
     data.push({ hostname: "wp.youtube-anime.com", hls: false, resolution: [{ res: resp.data.episode.episodeInfo.vidInforssub.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.episode.episodeInfo.vidInforssub.vidPath}` }] })
   }
 
-  console.log(data)
-
   return data
 }
 
@@ -370,16 +347,33 @@ export async function convertToNewData(id: string): Promise<cardData | undefined
   }
 }
 
-export async function getEpisodeList(type: string, anime_id: string): Promise<{ ep: string, img?: string, title?: string }[]> {
+async function formatEpisodeData(data: any): Promise<{ ep: string, img?: string, title?: string }[]> {
   try {
-    let variables = `{"_id":"${anime_id}"}`
-    const resp = await sendToAPI(variables, HASH_INFO, header)
-    if (resp) {
-      let data = await converterData(resp.data.show)
-      if (!data || !data.AnimeData.episodesList) return []
-      return data.AnimeData.episodesList.filter(item => item.type === type).flatMap(item => item.episodes)
+    if (!data) return []
+    let finnallData: { ep: string, img?: string, title?: string }[] = []
+    for (let index = 0; index < data.length; index++) {
+      const element = data[index];
+      const thumbnail = element.thumbnails.filter(url => url.startsWith("https"))
+      finnallData.push({
+        ep: element.episodeIdNum,
+        img: thumbnail.length > 0 ? thumbnail[0] : undefined,
+        title: element.notes.replace("<note-split>", " ")
+      })
     }
+    return finnallData
+  } catch (error) {
+    console.error("formatEpisodeData", error, data);
     return []
+  }
+}
+
+export async function getEpisodeList(anime_id: string, episode: { start: number, end: number }): Promise<{ ep: string, img?: string, title?: string }[]> {
+  try {
+    let variables = `{"showId":"${anime_id}","episodeNumStart":${episode.start},"episodeNumEnd":${episode.end}}`
+    const resp = await sendToAPI(variables, HASH_DATA, header)
+    console.log(variables)
+    if (!resp) return []
+    return await formatEpisodeData(resp.data.episodeInfos)
   } catch (Error) {
     console.error(Error)
     return []
@@ -401,14 +395,14 @@ async function searchAnime(name: string, page: number, _params?: { genres?: stri
 }
 
 export const infoPluginPlayer: playerPluginFormat = {
-  version: "1.0",
+  version: "1.1",
   name: "Allmanga",
   author: "Owca525",
   icon: "https://allmanga.to/android-icon-192x192.png",
   player: {
     animeDataList: getInformation,
     getUrls: extractURLS,
-    episodeList: getEpisodeList,
+    episodeList: async (_type, id) => { return await extractInformation("episodes", id) as { ep: string; img?: string; title?: string }[] },
     animeList: getAnimeList,
     search: searchAnime
   },
