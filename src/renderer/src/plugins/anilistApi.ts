@@ -1,5 +1,5 @@
 import { genYearsList, sleep } from "@renderer/utils/functions";
-import { AnimeData, cardData, containerData, FilterParams, pluginFormat } from "@renderer/utils/GlobalInterface";
+import { AnimeData, cardData, containerData, FilterParams, informationPluginFormat } from "@renderer/utils/GlobalInterface";
 import { setHomeData, UpdateHomeData } from "@renderer/utils/pluginApi";
 import { t } from "i18next";
 
@@ -423,20 +423,19 @@ async function SearchAnilistApi(text: string, page: number, params?: FilterParam
   }
 
   if (page > 1) UpdateHomeData(async () => { return { data: data, maxPage: pageSize } })
-  else setHomeData(async () => [data])
+  else setHomeData(async () => ({ sections: [data] }))
 }
 
 async function getFullCategory(params, title: string) {
-  let data = await sendToApi(params, graphicApi)
-  setHomeData(async () => {
-    return [
+  setHomeData(async () => ({
+    sections: [
       {
         title: title,
-        data: data,
+        data: await sendToApi(params, graphicApi),
         onScrollDownFunction: (page) => updateCategory(page, params, title)
       }
     ]
-  })
+  }))
 }
 
 async function updateCategory(page: number, variables: any, title: string) {
@@ -448,11 +447,11 @@ async function updateCategory(page: number, variables: any, title: string) {
   UpdateHomeData(async () => { return { data: data, maxPage: pageSize } })
 }
 
-async function CreateHomePage(): Promise<containerData[]> {
+async function CreateHomePage(): Promise<{ topCards?: containerData, sections: containerData[] }> {
   let season = getSeasonFromDate()
   let data = await sendPost({ season: season.season, seasonYear: season.seasonYear }, graphicHomeApi)
-  if (!data.success) return []
-  return [
+  if (!data.success) return { sections: [] }
+  let home = [
     {
       title: t("home.trending_now"),
       data: data.data.data.trending.media.map((anime) => Convert(anime)),
@@ -477,6 +476,8 @@ async function CreateHomePage(): Promise<containerData[]> {
       onTitleClick: () => getFullCategory(allPopular, t("home.all_time_popular"))
     }
   ]
+
+  return { sections: home, topCards: home[0] }
 }
 
 async function getGenres(): Promise<string[]> {
@@ -526,13 +527,13 @@ async function getAnime(id: string): Promise<AnimeData | undefined> {
   return Convert(req.data.data.Media).AnimeData
 }
 
-export const infoPlugin: pluginFormat = {
+export const infoPlugin: informationPluginFormat = {
   version: "1.0",
   name: "AnilistApi",
   author: "Owca525",
   icon: "https://anilist.co/img/icons/icon.svg",
-  information: {
-    pageSize: pageSize,
+  pageSize: pageSize,
+  info: {
     home: () => setHomeData(CreateHomePage),
     search: SearchAnilistApi,
     anime: getAnime

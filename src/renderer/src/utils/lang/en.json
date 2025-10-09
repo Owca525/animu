@@ -405,6 +405,18 @@
         "talon": "For making a discord server",
         "zomi": "For making a new icon"
     },
+    "week": {
+        "infoCommunicat": "Episode {{ep}} {{day}} At {{hours}}",
+        "infoCommunicatToday": "Episode {{ep}} {{day}} At {{hours}}",
+        "today": "Today",
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+    },
     "lang": {
         "en": "English",
         "pl": "Polski",
