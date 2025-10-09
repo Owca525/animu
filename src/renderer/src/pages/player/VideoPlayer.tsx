@@ -21,7 +21,7 @@ import PlayerButton from "./components/PlayerButton"
 import { motion } from "framer-motion"
 import PlayerEpisodeElement from "./components/playerEpisodeElement"
 import { convert } from "subtitle-converter";
-import { useHotkeys } from "react-hotkeys-hook"
+// import { useHotkeys } from "react-hotkeys-hook"
 import i18n from "@renderer/utils/i18n"
 import store from "@renderer/utils/store"
 import html2canvas from "html2canvas"
@@ -558,9 +558,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         keybinds(keys)
     })
 
-    useHotkeys("d", () => {
-        console.log(player_data, temp)
-    })
+    // useHotkeys("d", () => {
+    //     console.log(player_data, temp, currentSubtitles)
+    // })
 
     function setEpisode(type: "next" | "prev") {
         let ep = temp.episodes.findIndex((item) => item.ep === temp.episode)
@@ -620,9 +620,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 wasmUrl,
             });
             setASSubtitles(renderer)
-            console.log(renderer)
             setSubtitles(() => sub)
-            
             return
         }
 
