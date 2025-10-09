@@ -32,22 +32,15 @@ import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
 
 function addTime(durration: number): string {
     const now = new Date();
-    let hour: number | undefined = undefined
-    let min: number | undefined = undefined
-    let sec: number | undefined = undefined
+    let [sec, min, hour] = formatTime(durration).split(":").reverse()
 
-    if (formatTime(durration).split(":").length == 2) {
-        min = parseInt(formatTime(durration).split(":")[0])
-        sec = parseInt(formatTime(durration).split(":")[1])
-    } else if (formatTime(durration).split(":").length == 2) {
-        hour = parseInt(formatTime(durration).split(":")[0])
-        min = parseInt(formatTime(durration).split(":")[1])
-        sec = parseInt(formatTime(durration).split(":")[2])
-    }
-
-    if (hour) now.setMinutes(now.getHours() + hour);
-    if (min) now.setMinutes(now.getMinutes() + min);
-    if (sec) now.setSeconds(now.getSeconds() + sec);
+    if (hour) now.setMinutes(now.getHours() + parseInt(hour));
+    if (min) now.setMinutes(now.getMinutes() + parseInt(min));
+    if (sec) {
+        let tmp = parseInt(sec)
+        if (tmp <= 59) now.setSeconds(now.getSeconds() + (tmp-1))
+        if (tmp <= 0) now.setSeconds(now.getSeconds() + (tmp+2))
+    };
 
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
