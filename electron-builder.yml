@@ -16,6 +16,7 @@ win:
   executableName: animu
   target:
     - zip
+    - nsis
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
