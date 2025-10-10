@@ -6,6 +6,7 @@ import store from "./store";
 
 export async function checkUpdate(alwaysShow: boolean = false) {
     let update = await window.api.update.checkUpdate()
+    console.log(update)
     if (update.available) {
         toast.info(t('update.available', { ver: update.version }), { ...notificationProps, onClick: () => { window.api.update.downloadUpdate(); downloadUpdate(toast.loading(t("update.progress", { procent: 0 }), notificationProps)) } });
     } else if (alwaysShow) {
