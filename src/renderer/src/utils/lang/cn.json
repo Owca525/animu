@@ -369,7 +369,7 @@
   },
   "update": {
     "available": "更新 {{ver}} 現已可用，點擊更新",
-    "progess": "下載進度 {{procent}}%",
+    "progress": "下載進度 {{procent}}%",
     "done": "更新已下載，請重新啟動應用程式",
     "same": "你有最新的動畫集數"
   },

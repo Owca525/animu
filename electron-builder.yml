@@ -2,6 +2,7 @@ appId: com.animu.app
 productName: animu
 directories:
   buildResources: build
+artifactName: "${productName}-${version}-${os}.${ext}"
 files:
   - '!**/.vscode/*'
   - '!src/*'
@@ -13,6 +14,9 @@ asarUnpack:
   - resources/**
 win:
   executableName: animu
+  target:
+    - zip
+    - nsis
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
@@ -30,6 +34,7 @@ linux:
   target:
     - AppImage
     - deb
+    - zip
   maintainer: https://github.com/Owca525
   category: AudioVideo
 appImage:
@@ -41,6 +46,6 @@ publish:
   provider: github
   owner: Owca525
   repo: animu
-  releaseType: prerelease
+  releaseType: release
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/

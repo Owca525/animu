@@ -188,10 +188,9 @@ export async function extractInformation(type: "all" | "episodes", id: string): 
   let variables = `{"_id":"${id}"}`;
   const resp = await sendToAPI(variables, HASH_INFO, header);
   console.log(resp)
-  if (!resp) return []
+  if (!resp || !resp.data.show) return []
   let anime_data = resp.data.show
   let episodes = await getEpisodeList(id, { start: parseInt(anime_data.availableEpisodesDetail.sub.at(-1)), end: parseInt(anime_data.availableEpisodesDetail.sub[0]) })
-  console.log(anime_data.availableEpisodesDetail, episodes)
   if (episodes.length <= 0) return []
   if (type == "episodes") return episodes
 
@@ -357,7 +356,7 @@ async function formatEpisodeData(data: any): Promise<{ ep: string, img?: string,
       finnallData.push({
         ep: element.episodeIdNum,
         img: thumbnail.length > 0 ? thumbnail[0] : undefined,
-        title: element.notes.replace("<note-split>", " ")
+        title: element.notes ? element.notes.replace("<note-split>", " ") : undefined
       })
     }
     return finnallData
