@@ -225,12 +225,9 @@ function settings() {
         <main className="settings-container" onContextMenu={(event) => OpenContextMenu(ContextMenu, event)}>
             <Sidebar
                 data={sidebarData}
-                sidebarClass={{
-                    container: "settings-sidebar-container",
-                    sidebar: "settings-sidebar",
-                }}
                 showLogo
             />
+            <div className="settings-shadow-sidebar"></div>
             <motion.div variants={saveCommunicateAnimation} initial={"hidden"} animate={isSaving ? "visible" : "hidden"} transition={{ duration: 0.2 }} className="settings-save-content">
                 <div className="settings-save-title">{t("settings.saving.notification")}</div>
                 <div className="settings-save-buttons">

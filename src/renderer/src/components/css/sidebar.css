@@ -2,7 +2,7 @@
     width: clamp(155px, 20vw, 200px);
 }
 
-.sidebar-container-min, .shadow-sidebar {
+.sidebar-container-min, .settings-shadow-sidebar {
     width: clamp(50px, 7.3vw, 66px);
 }
 
@@ -11,10 +11,19 @@
     display: flex;
     align-items: center;
     flex-direction: column;
-    justify-content: space-between;
     position: fixed;
     grid-area: sidebar;
     transition: width 100ms ease;
+    z-index: 100;
+}
+
+.sidebar-buttons-content {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    justify-content: space-between;
 }
 
 .sidebar-button-min {
@@ -65,7 +74,7 @@
     padding-top: 4px;
     padding-bottom: 4px;
     gap: 12px;
-    width: clamp(155px, 20vw, 200px);
+    width: max-content;
 }
 
 .sidebar-image {

@@ -11,17 +11,13 @@ interface sidebarProps {
     showLogo?: boolean
     openSidebar?: boolean
     onChange?: (isOpen: boolean) => void
-    sidebarClass?: {
-        container?: string
-        sidebar?: string
-    }
     data: {
         top: sidebarData[]
         bottom: sidebarData[]
     }
 }
 
-const Sidebar: React.FC<sidebarProps> = ({ showLogo = false, sidebarClass, data, onChange, openSidebar }) => {
+const Sidebar: React.FC<sidebarProps> = ({ showLogo = false, data, onChange, openSidebar }) => {
     const [sidebarHover, setHover] = useState<boolean>(false)
     const sidebarRef = useRef<HTMLDivElement>(null);
     const [version, setversion] = useState<string>("")
@@ -64,60 +60,52 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo = false, sidebarClass, data,
     };
 
     function detectSidebarStateButton(text: string): string | undefined {
-        if (showLogo) return text
         if (sidebarHover) return text
         return undefined
     }
 
     function detectSidebarState() {
-        if (showLogo) return "sidebar-container-max"
         if (sidebarHover) return "sidebar-container-max"
-        return "sidebar-container-max"
+        return "sidebar-container-min"
     }
 
     function detectSidebarStateClass() {
-        if (showLogo) return "sidebar-button"
         if (sidebarHover) return "sidebar-button"
-        return "sidebar-button"
+        return "sidebar-button-min"
     }
 
     function detectSidebarStateContainers() {
-        if (showLogo) return "sidebar-max-button-container"
         if (sidebarHover) return "sidebar-max-button-container"
-        return "sidebar-max-button-container"
+        return "sidebar-min-button-container"
     }
 
     return (
-        <div tabIndex={-1} className={"sidebar-main-container " + sidebarClass?.container}>
-            {/* {!hideButton && (
-                <div className="sidebar-hide-container">
-                    <Button icon="menu" ButtonClass="sidebar-hide-button" onClick={() => setHover((prev) => !prev)} iconClassName="sidebar-hide-button" />
-                </div>
-            )} */}
+        <motion.div className={detectSidebarState()} ref={sidebarRef}
+            initial={showLogo ? "visible" : "hidden"}
+            animate={showLogo ? "visible" : sidebarHover ? "visible" : "hidden"}
+            variants={sidebarVariants}
+            transition={{ duration: 0.2 }}
+            onMouseEnter={() => showLogo && setHover(() => true)}
+            onMouseLeave={() => showLogo && setHover(() => false)}
+        >
             {showLogo && (
                 <div className="sidebar-logo-icon-container">
                     <img src={icon} alt={version} className="sidebar-image" />
-                    <div className="sidebar-version">{`v${version}`}</div>
+                    {sidebarHover && <div className="sidebar-version">v{version}</div>}
                 </div>
             )}
-            <motion.div className={detectSidebarState()} ref={sidebarRef}
-                initial={showLogo ? "visible" : "hidden"}
-                animate={sidebarHover ? "visible" : "hidden"}
-                variants={sidebarVariants}
-                transition={{ duration: 0.2 }}
-            >
-
+            <div className="sidebar-buttons-content">
                 <div className={`sidebar-top ${detectSidebarStateContainers()}`}>
-                    <Button icon={"arrow_back"} content={detectSidebarStateButton("Hide Sidebar")} onClick={(event) => {setHomeLocalSearch(false); hideSidebar(event, undefined)}} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />
+                    {!showLogo && <Button icon={"arrow_back"} content={detectSidebarStateButton("Hide Sidebar")} onClick={(event) => { setHomeLocalSearch(false); hideSidebar(event, undefined) }} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />}
                     <div className="sidebar-black-line"></div>
-                    {data.top.map((value) => <Button icon={value.icon} content={detectSidebarStateButton(value.text)} onClick={(event) => {setHomeLocalSearch(false); hideSidebar(event, value.onClick)}} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />)}
+                    {data.top.map((value) => <Button icon={value.icon} content={detectSidebarStateButton(value.text)} onClick={(event) => { setHomeLocalSearch(false); hideSidebar(event, value.onClick) }} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />)}
                 </div>
                 <div className={`sidebar-bottom ${detectSidebarStateContainers()}`}>
                     <div className="sidebar-black-line"></div>
-                    {data.bottom.map((value) => <Button icon={value.icon} content={detectSidebarStateButton(value.text)} onClick={(event) => {setHomeLocalSearch(false); hideSidebar(event, value.onClick)}} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />)}
+                    {data.bottom.map((value) => <Button icon={value.icon} content={detectSidebarStateButton(value.text)} onClick={(event) => { setHomeLocalSearch(false); hideSidebar(event, value.onClick) }} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />)}
                 </div>
-            </motion.div>
-        </div>
+            </div>
+        </motion.div>
     )
 }
 
