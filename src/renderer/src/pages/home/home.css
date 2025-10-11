@@ -1,13 +1,15 @@
 .home {
     width: 100%;
     height: 100%;
-    /* display: grid;
+    display: grid;
+    overflow: hidden;
+    z-index: 1;
+
+}
+.home.active {
     grid-template-rows: 1fr 100fr;
     grid-template-columns: 0fr 100fr;
-    grid-template-areas: "header header" "sidebar content"; */
-    overflow: auto;
-    z-index: 1;
-    overflow-x: hidden;
+    grid-template-areas: "header header" "content content";
 }
 
 .home-header-container {
@@ -17,10 +19,22 @@
     position: fixed;
     width: 100%;
     z-index: 2;
+    grid-area: header;
+    transition: background-color 150ms ease-in-out;
+    z-index: 2;
 }
 
 .home-header-container.active {
     background-color: var(--bg2);
+    position: static;
+}
+
+.home-header-container.color { 
+    background-color: var(--bg2);
+}
+
+.home-header-background.color {
+    background-color: var(--bg3) !important;
 }
 
 .home-header-search {
@@ -32,6 +46,9 @@
 .home-content {
     width: 100%;
     height: 100%;
+    overflow-y: scroll !important;
+    overflow-x: hidden;
+    grid-area: content;
 }
 
 .home-header-background {
@@ -43,11 +60,6 @@
     border-color: var(--neutral1) !important;
 }
 
-.home-header-shadow {
-    height: 50px;
-    padding: 12px;
-}
-
 .home-container,
 .home-loading-container {
     grid-area: content;
@@ -56,8 +68,8 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    overflow-x: hidden;
     padding-right: 0px;
+    overflow-x: hidden;
 }
 
 .home-loading-container {

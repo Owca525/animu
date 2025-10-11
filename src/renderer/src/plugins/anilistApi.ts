@@ -422,7 +422,7 @@ async function SearchAnilistApi(text: string, page: number, params?: FilterParam
     onScrollDownFunction: (currentPage: number) => SearchAnilistApi(text, currentPage, params)
   }
 
-  if (page > 1) UpdateHomeData(async () => { return { data: data, maxPage: pageSize } })
+  if (page > 1) UpdateHomeData(async () => ({ data: data, maxPage: pageSize }))
   else setHomeData(async () => ({ sections: [data] }))
 }
 
@@ -444,7 +444,7 @@ async function updateCategory(page: number, variables: any, title: string) {
     data: await sendToApi({ ...variables, page: page }, graphicApi),
     onScrollDownFunction: (page) => updateCategory(page, variables, title)
   }
-  UpdateHomeData(async () => { return { data: data, maxPage: pageSize } })
+  UpdateHomeData(async () => ({data: data, maxPage: pageSize}))
 }
 
 async function CreateHomePage(): Promise<{ topCards?: containerData, sections: containerData[] }> {

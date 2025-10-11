@@ -39,6 +39,7 @@ const Home = () => {
   const pluginPlayer = store.getState().plugin.playerPlugin;
   const config: SettingsConfig = useSelector((data: any) => data.config);
   const [isOpenSidebar, setOpenSidebar] = useState<boolean>(false);
+  const [headerActive, setHeaderActive] = useState<boolean>(false)
 
   const divRef = useRef<HTMLDivElement | null>(null);
 
@@ -74,19 +75,20 @@ const Home = () => {
   }
 
   useEffect(() => {
-    plugin.info.home()
+    if (homeCache.data.sections.length <= 0) plugin.info.home()
     if (config.General.discordRPC)
       window.api.rpc.setActivity(undefined, t("discordrpc.home"));
   }, []);
 
   useEffect(() => {
-    if (!divRef.current) return;
-    if (!homeCache.data) return;
-    if (homeCache.data.sections.length == 0) return;
-    if (homeCache.data.sections.length > 1) return;
-    const { scrollHeight, clientHeight } = divRef.current;
-    if (scrollHeight > clientHeight == false) handleScroll();
-  }, [homeCache.data]);
+    if (homeCache.data.sections.length <= 0) return
+    if (homeCache.data.sections.length != 1) return
+    if (!divRef.current) return
+    if ((divRef.current.scrollHeight > divRef.current.clientHeight) == false && homeCache.data.sections[0].onScrollDownFunction) {
+      store.dispatch({ type: "setPage", payload: homeCache.page + 1 });
+      homeCache.data.sections[0].onScrollDownFunction(homeCache.page + 1);
+    }
+  }, [homeCache.data])
 
   async function history(): Promise<{
     topCards?: containerData;
@@ -128,11 +130,18 @@ const Home = () => {
       ],
     };
   }
-  // FIXME: napraw żeby przy skrolowaniu dawało background headerowi i onscrolldown naprawić funkcje
   const handleScroll = () => {
     if (!homeCache.data) return;
-    if (homeCache.data.sections.length > 1) return;
     if (!divRef.current) return;
+
+    const scrollTop = divRef.current.scrollTop;
+    const scrollHeight = divRef.current.scrollHeight - divRef.current.clientHeight;
+    const scrollPercent = (scrollTop / scrollHeight) * 100;
+    if (parseInt(scrollPercent.toFixed(0)) >= 20) setHeaderActive(() => true)
+    else setHeaderActive(() => false)
+
+    if (homeCache.data.sections.length > 1) return;
+
     const currentPos = -divRef.current.scrollTop + divRef.current.scrollHeight;
     const endPosition = divRef.current.offsetHeight;
     const isFUCKINGBottom = parseInt(currentPos.toFixed(0)) <= endPosition + 30;
@@ -146,14 +155,6 @@ const Home = () => {
         homeCache.data.sections[0].onScrollDownFunction(homeCache.page + 1);
       }
       return;
-    }
-    if (isFUCKINGBottom && !homeCache.stopScrolling) {
-      store.dispatch({ type: "setPage", payload: homeCache.page + 1 });
-      plugin.info.search(
-        homeCache.search,
-        homeCache.page + 1,
-        homeCache.filterTags
-      );
     }
   };
 
@@ -240,32 +241,32 @@ const Home = () => {
     return data;
   }
 
-  console.log(isOpenSidebar);
+  // console.log(isOpenSidebar);
 
   return (
     <main
-      className="home"
+      className={`home ${homeCache.data && !homeCache.data.topCards ? "active" : ""}`}
       onContextMenu={(event) =>
         OpenContextMenu(CreateContextMenuOptions(), event)
       }
     >
-      <div className={`home-header-container ${homeCache.data && !homeCache.data.topCards ? "active" : ""}`}>
+      <div className={`home-header-container ${homeCache.data && !homeCache.data.topCards ? "active" : ""} ${headerActive ? "color" : ""}`}>
         <Button
           icon="menu"
-          ButtonClass={homeCache.data && homeCache.data.topCards ? "home-header-background" : undefined}
+          ButtonClass={`${homeCache.data && homeCache.data.topCards ? "home-header-background" : ""} ${headerActive ? "color" : ""}`}
           onClick={() => setOpenSidebar((prev) => !prev)}
         />
         <div className="home-header-search">
           <Input
             placeholder={t("home.search")}
-            InputClass={`home-header-search ${homeCache.data && homeCache.data.topCards ? "home-header-background" : ""}`}
+            InputClass={`${homeCache.data && homeCache.data.topCards ? "home-header-background" : ""} ${headerActive ? "color" : ""}`}
             onKeyDown={OnSearch}
           />
           <div className="home-filter-void">
             <Filter
               onChange={onChange}
               filter={plugin.searchOption}
-              custonClass={homeCache.data && homeCache.data.topCards ? "home-header-background" : undefined}
+              custonClass={`${homeCache.data && homeCache.data.topCards ? "home-header-background" : ""} ${headerActive ? "color" : ""}`}
             />
           </div>
         </div>
@@ -277,17 +278,12 @@ const Home = () => {
         onChange={() => setOpenSidebar(false)}
       />
 
-      <div className="home-content">
+      <div className="home-content" onScroll={handleScroll} ref={divRef}>
         {homeCache.data && homeCache.data.topCards && (
           <BigCardsContainer data={homeCache.data.topCards} />
         )}
-        {homeCache.data && !homeCache.data.topCards &&
-            <div className="home-header-shadow"></div>
-        }
         <div
-          ref={divRef}
           className={`home-container ${homeCache.isLoading && "home-loading-container"} ${homeCache.isError && "home-loading-container"} ${homeCache.data && homeCache.data.sections.length <= 0 && "home-loading-container"}`}
-          onScroll={handleScroll}
         >
           {homeCache.isLoading && homeCache.isError == false && (
             <div className="material-symbols-outlined home-loading-animation">
