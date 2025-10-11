@@ -15,7 +15,9 @@ const useKeyPress = (func: (keybinds: string) => void) => {
       if (!keysRef.current.includes(key)) {
         keysRef.current.push(key);
         funcRef.current(keysRef.current.join("+"));
+        return
       }
+      funcRef.current(key);
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {

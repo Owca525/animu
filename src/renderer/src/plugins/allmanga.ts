@@ -194,6 +194,8 @@ export async function extractInformation(type: "all" | "episodes", id: string): 
   if (episodes.length <= 0) return []
   if (type == "episodes") return episodes
 
+  episodes = episodes.sort((a, b) => Number(a.ep) - Number(b.ep))
+
   return [
     {
       episodes: episodes.length !== anime_data.availableEpisodes.sub 

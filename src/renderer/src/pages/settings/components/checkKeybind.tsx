@@ -64,7 +64,27 @@ const CheckKeybind: React.FC<CheckKeybindProps> = ({ content, keyBind }) => {
   }
 
   return (
-    <div onClick={() => setActive((prev) => !prev)} tabIndex={-1} className={isActive ? "settings-keybind-check-active" : "settings-keybind-check"}>{pressedKeys.length > 0 ? pressedKeys.join('+') : content}</div>
+    <div onClick={() => setActive((prev) => !prev)} tabIndex={-1} className={isActive ? "settings-keybind-check-active" : "settings-keybind-check"}>
+      {/* {pressedKeys.length > 0 ? pressedKeys.join('+') : content} */}
+      { pressedKeys.length <= 0 &&
+        content.split("+").map((elemnt, index, list) => (
+          <>
+            <div className="settings-input-content">{elemnt}</div>
+            {index != list.length-1 && <>+</>}
+          </>
+          )
+        )
+      }
+      { pressedKeys.length > 0 &&
+        pressedKeys.map((elemnt, index, list) => (
+          <>
+            <div className="settings-input-content">{elemnt}</div>
+            {index != list.length-1 && <>+</>}
+          </>
+          )
+        )
+      }
+    </div>
   )
 }
 
