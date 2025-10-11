@@ -555,6 +555,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         if (keys == "CTRL+SHIFT+D") {
             setshowNerdStats((prev) => !prev)
         }
+        console.log(keys)
         keybinds(keys)
     })
 
