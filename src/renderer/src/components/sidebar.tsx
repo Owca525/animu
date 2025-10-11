@@ -2,15 +2,15 @@ import { useEffect, useRef, useState } from "react"
 import Button from "./buttons"
 import "./css/sidebar.css"
 import icon from "../../../../resources/icon.png"
-import { SettingsConfig, sidebarData } from "@renderer/utils/GlobalInterface"
+import { sidebarData } from "@renderer/utils/GlobalInterface"
 import { motion } from "framer-motion"
 import { useHotkeys } from "react-hotkeys-hook"
 import { setHomeLocalSearch } from "@renderer/utils/pluginApi"
-import { useSelector } from "react-redux"
 
 interface sidebarProps {
     showLogo?: boolean
-    hideButton?: boolean
+    openSidebar?: boolean
+    onChange?: (isOpen: boolean) => void
     sidebarClass?: {
         container?: string
         sidebar?: string
@@ -21,13 +21,17 @@ interface sidebarProps {
     }
 }
 
-const Sidebar: React.FC<sidebarProps> = ({ showLogo, sidebarClass, data, hideButton = false }) => {
+const Sidebar: React.FC<sidebarProps> = ({ showLogo = false, sidebarClass, data, onChange, openSidebar }) => {
     const [sidebarHover, setHover] = useState<boolean>(false)
     const sidebarRef = useRef<HTMLDivElement>(null);
     const [version, setversion] = useState<string>("")
-    const config: SettingsConfig = useSelector((data: any) => data.config);
 
     const getVersion = async (): Promise<void> => setversion(await window.backend.version())
+
+    useEffect(() => {
+        if (onChange) onChange(sidebarHover)
+        if (openSidebar) setHover(openSidebar)
+    }, [openSidebar, sidebarHover])
 
     const handleClickOutside = (event: MouseEvent) => {
         let data = event.target as HTMLElement
@@ -49,9 +53,9 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, sidebarClass, data, hideBut
     })
 
     function hideSidebar(event, func) {
+        setHover((prev) => !prev)
         if (!func) return
         func(event)
-        setHover((prev) => !prev)
     }
 
     const sidebarVariants = {
@@ -62,39 +66,34 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, sidebarClass, data, hideBut
     function detectSidebarStateButton(text: string): string | undefined {
         if (showLogo) return text
         if (sidebarHover) return text
-        if (!config.General.HideSidebar) return undefined
-        if (hideButton) return text
         return undefined
     }
 
     function detectSidebarState() {
         if (showLogo) return "sidebar-container-max"
         if (sidebarHover) return "sidebar-container-max"
-        if (!config.General.HideSidebar) return "sidebar-container-min"
         return "sidebar-container-max"
     }
 
     function detectSidebarStateClass() {
         if (showLogo) return "sidebar-button"
         if (sidebarHover) return "sidebar-button"
-        if (!config.General.HideSidebar) return "sidebar-button-min"
         return "sidebar-button"
     }
 
     function detectSidebarStateContainers() {
         if (showLogo) return "sidebar-max-button-container"
         if (sidebarHover) return "sidebar-max-button-container"
-        if (!config.General.HideSidebar) return "sidebar-min-button-container"
         return "sidebar-max-button-container"
     }
 
     return (
         <div tabIndex={-1} className={"sidebar-main-container " + sidebarClass?.container}>
-            {!hideButton && (
+            {/* {!hideButton && (
                 <div className="sidebar-hide-container">
                     <Button icon="menu" ButtonClass="sidebar-hide-button" onClick={() => setHover((prev) => !prev)} iconClassName="sidebar-hide-button" />
                 </div>
-            )}
+            )} */}
             {showLogo && (
                 <div className="sidebar-logo-icon-container">
                     <img src={icon} alt={version} className="sidebar-image" />
@@ -102,21 +101,20 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo, sidebarClass, data, hideBut
                 </div>
             )}
             <motion.div className={detectSidebarState()} ref={sidebarRef}
-                initial={showLogo || !config.General.HideSidebar ? "visible" : "hidden"}
-                animate={!config.General.HideSidebar ? "visible" : hideButton == false ? sidebarHover ? "visible" : "hidden" : "visible"}
+                initial={showLogo ? "visible" : "hidden"}
+                animate={sidebarHover ? "visible" : "hidden"}
                 variants={sidebarVariants}
                 transition={{ duration: 0.2 }}
-                onMouseEnter={() => config.General.HoverSidebar && setHover(() => true)}
-                onMouseLeave={() => !config.General.HideSidebar && setHover(() => false)}
             >
 
                 <div className={`sidebar-top ${detectSidebarStateContainers()}`}>
-                    {showLogo && <div className="sidebar-black-line"></div>}
-                    {data.top.map((value) => <Button icon={value.icon} content={detectSidebarStateButton(value.text)} onClick={(event) => {setHomeLocalSearch(false); hideSidebar(event, value.onClick); setHover((prev) => !prev)}} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />)}
+                    <Button icon={"arrow_back"} content={detectSidebarStateButton("Hide Sidebar")} onClick={(event) => {setHomeLocalSearch(false); hideSidebar(event, undefined)}} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />
+                    <div className="sidebar-black-line"></div>
+                    {data.top.map((value) => <Button icon={value.icon} content={detectSidebarStateButton(value.text)} onClick={(event) => {setHomeLocalSearch(false); hideSidebar(event, value.onClick)}} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />)}
                 </div>
                 <div className={`sidebar-bottom ${detectSidebarStateContainers()}`}>
                     <div className="sidebar-black-line"></div>
-                    {data.bottom.map((value) => <Button icon={value.icon} content={detectSidebarStateButton(value.text)} onClick={(event) => {setHomeLocalSearch(false); hideSidebar(event, value.onClick); setHover((prev) => !prev)}} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />)}
+                    {data.bottom.map((value) => <Button icon={value.icon} content={detectSidebarStateButton(value.text)} onClick={(event) => {setHomeLocalSearch(false); hideSidebar(event, value.onClick)}} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />)}
                 </div>
             </motion.div>
         </div>

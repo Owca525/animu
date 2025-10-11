@@ -1,7 +1,7 @@
 // import { playerUrlProps } from "@renderer/utils/interface"
 
 import { convertMsToMinutes, similarityText } from "@renderer/utils/functions"
-import { AnimeData, cardData, episodeList, playerData, pluginFormat } from "@renderer/utils/GlobalInterface"
+import { AnimeData, cardData, episodeList, playerData, playerPluginFormat } from "@renderer/utils/GlobalInterface"
 import { setHomeData, UpdateHomeData } from "@renderer/utils/pluginApi"
 
 const HASH_SEARCH = '06327bc10dd682e1ee7e07b6db9c16e9ad2fd56c1b769e47513128cd5c9fc77a'
@@ -395,7 +395,7 @@ async function searchAnime(name: string, page: number, _params?: { genres?: stri
   return returnData
 }
 
-export const infoPluginPlayer: pluginFormat = {
+export const infoPluginPlayer: playerPluginFormat = {
   version: "1.1",
   name: "Allmanga",
   author: "Owca525",

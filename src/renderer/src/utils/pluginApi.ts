@@ -1,11 +1,15 @@
-import { containerData, pluginFormat, SettingsConfig } from "./GlobalInterface";
+import { containerData, playerPluginFormat, SettingsConfig } from "./GlobalInterface";
 import store from "./store";
 
-export async function setHomeData(func: () => Promise<containerData[]>) {
+export async function setHomeData(func: () => Promise<{ topCards?: containerData, sections: containerData[] }>) {
     try {
         homeStopScrolling(false)
         if (store.getState().home.isLoading) return
-        store.dispatch({ type: "setLoadingHome", payload: { isLoading: true } })
+        store.dispatch({
+            type: "setAllHomeData", payload: {
+                isLoading: true, isError: false, data: { sections: [] }
+            }
+        })
         let data = await func()
         store.dispatch({
             type: "setAllHomeData", payload: {
@@ -27,13 +31,14 @@ export async function UpdateHomeData(func: () => Promise<{ data: containerData, 
         if (store.getState().home.isLoading) return
         store.dispatch({ type: "setcontainerLoading", payload: true })
         let data = await func()
-        let tmp = store.getState().home.data[0]
+        console.log(data, func)
+        let tmp: { topCards?: containerData, sections: containerData[] } = store.getState().home.data
 
         if (data.data.data.length < data.maxPage) homeStopScrolling(true)
-        
+
         store.dispatch({
             type: "setAllHomeData", payload: {
-                isLoading: false, isError: false, data: [{ ...data.data, data: [ ...tmp.data, ...data.data.data ] }]
+                isLoading: false, isError: false, data: { sections: [{ ...data.data, data: [...tmp.sections[0].data, ...data.data.data] }] }
             }
         })
         store.dispatch({ type: "setcontainerLoading", payload: false })
@@ -66,18 +71,18 @@ export function setHomeLocalSearch(payload: boolean) {
 export function InitialPlugin() {
     try {
         const config: SettingsConfig = store.getState().config
-        const loadedPlugins: pluginFormat[] = store.getState().plugin.loadedPlugins
+        const loadedPlugins: playerPluginFormat[] = store.getState().plugin.loadedPlugins
         for (let index = 0; index < loadedPlugins.length; index++) {
             const element = loadedPlugins[index];
             if (element.name == config.plugins.player) {
-                store.dispatch({type: "setPluginPlayer", payload: element})
+                store.dispatch({ type: "setPluginPlayer", payload: element })
                 return
             }
         }
 
-        loadedPlugins.forEach((element: pluginFormat) => {
+        loadedPlugins.forEach((element: playerPluginFormat) => {
             if (element.name == "Allmanga") {
-                store.dispatch({type: "setPluginPlayer", payload: element})
+                store.dispatch({ type: "setPluginPlayer", payload: element })
                 return
             }
         })
@@ -88,15 +93,15 @@ export function InitialPlugin() {
 
 export function ChangePlugin(name: string) {
     try {
-        const loadedPlugins: pluginFormat[] = store.getState().plugin.loadedPlugins
+        const loadedPlugins: playerPluginFormat[] = store.getState().plugin.loadedPlugins
         for (let index = 0; index < loadedPlugins.length; index++) {
             const element = loadedPlugins[index];
             if (element.name == name) {
-                store.dispatch({type: "setPluginPlayer", payload: element})
+                store.dispatch({ type: "setPluginPlayer", payload: element })
                 return
             }
             if (name == "" && element.name == "Allmanga") {
-                store.dispatch({type: "setPluginPlayer", payload: element})
+                store.dispatch({ type: "setPluginPlayer", payload: element })
                 return
             }
         }
@@ -105,7 +110,7 @@ export function ChangePlugin(name: string) {
     }
 }
 
-export function getPluginList(): pluginFormat[] {
+export function getPluginList(): playerPluginFormat[] {
     try {
         return store.getState().plugin.loadedPlugins
     } catch (error) {
@@ -116,7 +121,7 @@ export function getPluginList(): pluginFormat[] {
 
 export function setPluginPlayerCache(element: any) {
     try {
-        store.dispatch({type: "setPlayerPluginCache", payload: element})
+        store.dispatch({ type: "setPlayerPluginCache", payload: element })
     } catch (error) {
         console.error(error)
     }
@@ -132,7 +137,7 @@ export function getPlayerPluginCache(): any {
 
 export function ResetPluginPlayerCache() {
     try {
-        store.dispatch({type: "setPlayerPluginCache", payload: undefined})
+        store.dispatch({ type: "setPlayerPluginCache", payload: undefined })
     } catch (error) {
         console.error(error)
     }

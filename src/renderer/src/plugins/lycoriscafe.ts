@@ -1,5 +1,5 @@
 import { timeToSeconds } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, playerChapterList, playerData, playerSubtitlesFormat, pluginFormat } from "@renderer/utils/GlobalInterface";
+import { AnimeData, cardData, episodeList, playerChapterList, playerData, playerPluginFormat, playerSubtitlesFormat } from "@renderer/utils/GlobalInterface";
 import { getPlayerPluginCache, setPluginPlayerCache } from "@renderer/utils/pluginApi";
 
 const WEB = "https://www.lycoris.cafe"
@@ -224,7 +224,7 @@ async function searchAnime(name: string, page: number, _params?: { genres?: stri
     return data
 }
 
-export const lycorisCafe: pluginFormat = {
+export const lycorisCafe: playerPluginFormat = {
     version: "1.0",
     name: "Lycoris.cafe",
     author: "Owca525",
