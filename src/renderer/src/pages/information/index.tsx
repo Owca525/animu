@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { AnimeData, notificationProps, pluginFormat } from "@renderer/utils/GlobalInterface";
+import { AnimeData, indentityPlayer, notificationProps, pluginFormat } from "@renderer/utils/GlobalInterface";
 import Button from "@renderer/components/buttons";
 import "./information.css"
 import { convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities, getGradientColor, segregatePlugins } from "@renderer/utils/functions";
@@ -19,22 +19,28 @@ import { useQuery } from "react-query";
 
 function information() {
     const navigate = useNavigate()
-    const anime_data: AnimeData = useLocation().state;
+    const tempData: { anime: AnimeData, saveData?: indentityPlayer } = useLocation().state;
 
     const [showWrong, setshowWrong] = useState<boolean>(false)
-    const [secondsLeft, setSecondsLeft] = useState<undefined | number>(anime_data.nextAiringEpisode?.timeUntilAiring);
+    const [secondsLeft, setSecondsLeft] = useState<undefined | number>(tempData.anime.nextAiringEpisode?.timeUntilAiring);
     const [savedata, setsavedata] = useState<{ last_episode: number, last_time: number } | undefined>(undefined)
-    const [currentIDplayer, setCurrentIDplayer] = useState<string | undefined>(anime_data.player_ID)
+    const [currentIDplayer, setCurrentIDplayer] = useState<string | undefined>(tempData.anime.player_ID)
 
     const { data: episodeData, isError: isEpisodeError, isFetching: isEpisodeLoading, refetch } = useQuery({
-        queryKey: [{ data: anime_data, player_id: currentIDplayer }],
+        queryKey: [{ data: tempData.anime, player_id: currentIDplayer }],
         queryFn: async ({ queryKey }) => {
+            let plugin: pluginFormat = store.getState().plugin.playerPlugin
+            if (!plugin || !plugin.player) return
             const [data] = queryKey;
             if (data.data.id == "") {
                 ChangePlugin("Allmanga")
-                return store.getState().plugin.playerPlugin.player.animeDataList(data.data, "")
+                return plugin.player.animeDataList(data.data, "")
             }
-            if (store.getState().plugin.playerPlugin) return store.getState().plugin.playerPlugin.player.animeDataList(data.player_id ? undefined : data.data, data.player_id)
+            if (tempData.saveData && tempData.saveData.pluginName == plugin.name) {
+                return plugin.player.animeDataList(data.player_id ? undefined : data.data, data.player_id)
+            }
+            ChangePlugin(plugin.name)
+            return plugin.player.animeDataList(data.data, undefined)
         },
         refetchOnWindowFocus: false,
         staleTime: 2 * 60 * 60 * 1000,
@@ -69,8 +75,8 @@ function information() {
         let currentPlayerPlugin: pluginFormat = store.getState().plugin.playerPlugin
         if (!currentPlayerPlugin.player) return
 
-        let cardAnime = (await ReadHistory()).filter((element) => element.AnimeData.id == anime_data.id)
-        let cardAnimeContinueWatch = (await ReadContinue()).filter((element) => element.AnimeData.id == anime_data.id)
+        let cardAnime = (await ReadHistory()).filter((element) => element.AnimeData.id == tempData.anime.id)
+        let cardAnimeContinueWatch = (await ReadContinue()).filter((element) => element.AnimeData.id == tempData.anime.id)
 
         if (cardAnimeContinueWatch.length > 0) {
             let animeContinue = cardAnimeContinueWatch[0].saveData
@@ -94,13 +100,13 @@ function information() {
             state: {
                 data: {
                     AnimeData: {
-                        ...anime_data,
+                        ...tempData.anime,
                         player_ID: episodeData?.player_id
                     },
                     saveData: {
                         last_Time: savedata && savedata.last_episode.toString() === episode ? savedata.last_time : 0,
                         type: type,
-                        player_ID: anime_data.player_ID,
+                        player_ID: tempData.anime.player_ID,
                         episode: episode
                     }
                 },
@@ -129,7 +135,7 @@ function information() {
     }
 
     useHotkeys("tab", () => {
-        console.log(anime_data, savedata)
+        console.log(tempData.anime, savedata)
     })
 
     useHotkeys("esc", () => {
@@ -145,7 +151,7 @@ function information() {
     console.log(episodeData, isEpisodeError, isEpisodeLoading)
 
     function checkEpisodes() {
-        if (anime_data.status == "NOT_YET_RELEASED") return true
+        if (tempData.anime.status == "NOT_YET_RELEASED") return true
         if (!episodeData && !isEpisodeLoading && !isEpisodeError) return true
         if (episodeData && episodeData.episodesData && episodeData.episodesData.length <= 0) return true
         return false
@@ -155,7 +161,7 @@ function information() {
         <>
             <main className="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>
                 <div className="information-banner">
-                    <img className={anime_data.bannerImage ? "information-banner-image" : "information-banner-image-blur"} onError={() => setBannerIsError(() => true)} onLoad={() => setBannerLoadingData(() => false)} src={anime_data.bannerImage ? anime_data.bannerImage : anime_data.coverImage ? anime_data.coverImage : ""} style={isBannerLoading ? { display: "none" } : isBannerError ? { display: "none" } : { animation: "fadeIn 0.3s forwards" }} />
+                    <img className={tempData.anime.bannerImage ? "information-banner-image" : "information-banner-image-blur"} onError={() => setBannerIsError(() => true)} onLoad={() => setBannerLoadingData(() => false)} src={tempData.anime.bannerImage ? tempData.anime.bannerImage : tempData.anime.coverImage ? tempData.anime.coverImage : ""} style={isBannerLoading ? { display: "none" } : isBannerError ? { display: "none" } : { animation: "fadeIn 0.3s forwards" }} />
                     {isBannerLoading && isBannerError == false && <div className="information-banner-image-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div>}
                     {isBannerError && isBannerLoading == false && <div className="information-banner-image-placeholder"><span className="material-symbols-outlined">error</span></div>}
                     <div className="information-fade"></div>
@@ -166,24 +172,24 @@ function information() {
 
                     <div className="information-top">
                         <div className="information-image-container">
-                            {anime_data.averageScore && <div className="information-score" style={{ border: `3px solid ${getGradientColor(anime_data.averageScore)}` }}>{anime_data.averageScore}%</div>}
-                            <img className="information-cover" onClick={() => anime_data.coverImage && SaveCoverToClipboard(anime_data.coverImage)} onError={() => setCoverIsError(() => true)} onLoad={() => setCoverIsLoading(() => false)} src={anime_data.coverImage ? anime_data.coverImage : ""} style={isCoverLoading ? { display: "none" } : isCoverError ? { display: "none" } : { animation: "fadeIn 0.3s forwards" }}></img>
+                            {tempData.anime.averageScore && <div className="information-score" style={{ border: `3px solid ${getGradientColor(tempData.anime.averageScore)}` }}>{tempData.anime.averageScore}%</div>}
+                            <img className="information-cover" onClick={() => tempData.anime.coverImage && SaveCoverToClipboard(tempData.anime.coverImage)} onError={() => setCoverIsError(() => true)} onLoad={() => setCoverIsLoading(() => false)} src={tempData.anime.coverImage ? tempData.anime.coverImage : ""} style={isCoverLoading ? { display: "none" } : isCoverError ? { display: "none" } : { animation: "fadeIn 0.3s forwards" }}></img>
                             {isCoverLoading && isCoverError == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined home-loading-animation">progress_activity</span></div>}
                             {isCoverError && isCoverLoading == false && <div className="information-cover-placeholder"><span className="material-symbols-outlined">error</span></div>}
 
                             <div className="information-title-small-container">
-                                <div className="information-title-small">{anime_data.title.romaji}</div>
-                                <div className="information-title-small2">{anime_data.title.english ? anime_data.title.english : anime_data.title.native}</div>
+                                <div className="information-title-small">{tempData.anime.title.romaji}</div>
+                                <div className="information-title-small2">{tempData.anime.title.english ? tempData.anime.title.english : tempData.anime.title.native}</div>
                             </div>
                         </div>
                         <div className="information-description">
-                            <div className="information-title">{anime_data.title.romaji}</div>
-                            <div className="information-title2">{anime_data.title.english ? anime_data.title.english : anime_data.title.native}</div>
-                            {decodeHtmlEntities(anime_data.description ? anime_data.description : t("information.descriptionnotfound"))}
+                            <div className="information-title">{tempData.anime.title.romaji}</div>
+                            <div className="information-title2">{tempData.anime.title.english ? tempData.anime.title.english : tempData.anime.title.native}</div>
+                            {decodeHtmlEntities(tempData.anime.description ? tempData.anime.description : t("information.descriptionnotfound"))}
                         </div>
                         <div className="information-bar">
-                            <Button titleButton={t("information.bar.anilist")} icon="open_in_new" ButtonClass="information-bar-icon" onClick={() => window.api.open(`https://anilist.co/anime/${anime_data.id}`)} />
-                            {anime_data.trailer && anime_data.trailer.site == "youtube" && <Button titleButton={t("information.bar.trailer")} icon="theaters" ButtonClass="information-bar-icon" onClick={() => window.api.open(`https://www.youtube.com/watch?v=${anime_data.trailer?.id}`)} />}
+                            <Button titleButton={t("information.bar.anilist")} icon="open_in_new" ButtonClass="information-bar-icon" onClick={() => window.api.open(`https://anilist.co/anime/${tempData.anime.id}`)} />
+                            {tempData.anime.trailer && tempData.anime.trailer.site == "youtube" && <Button titleButton={t("information.bar.trailer")} icon="theaters" ButtonClass="information-bar-icon" onClick={() => window.api.open(`https://www.youtube.com/watch?v=${tempData.anime.trailer?.id}`)} />}
                         </div>
                     </div>
 
@@ -191,66 +197,66 @@ function information() {
 
                         <div className="information-info">
 
-                            {anime_data.nextAiringEpisode && anime_data.player_ID == undefined &&
+                            {tempData.anime.nextAiringEpisode && tempData.anime.player_ID == undefined &&
                                 <div className="information-info-content">
-                                    <div className="information-content-title">{t("information.airing")}: {anime_data.nextAiringEpisode.episode}</div>
+                                    <div className="information-content-title">{t("information.airing")}: {tempData.anime.nextAiringEpisode.episode}</div>
                                     {`${time?.days}d ${time?.hours}h ${time?.minutes}m ${time?.seconds}s`}
                                 </div>
                             }
 
-                            {anime_data.format &&
+                            {tempData.anime.format &&
                                 <div className="information-info-content">
                                     <div className="information-content-title">{t("information.format")}</div>
-                                    {t(`anime_formats.${anime_data.format.toLowerCase()}`)}
+                                    {t(`anime_formats.${tempData.anime.format.toLowerCase()}`)}
                                 </div>
                             }
 
-                            {anime_data.episodes &&
+                            {tempData.anime.episodes &&
                                 <div className="information-info-content">
                                     <div className="information-content-title">{t("information.episodes")}</div>
-                                    {anime_data.episodes}
+                                    {tempData.anime.episodes}
                                 </div>
                             }
 
-                            {anime_data.duration &&
+                            {tempData.anime.duration &&
                                 <div className="information-info-content">
                                     <div className="information-content-title">{t("information.duration")}</div>
-                                    {anime_data.duration} {t("global.minutes")}
+                                    {tempData.anime.duration} {t("global.minutes")}
                                 </div>
                             }
 
-                            {anime_data.status &&
+                            {tempData.anime.status &&
                                 <div className="information-info-content">
                                     <div className="information-content-title">{t("information.status")}</div>
-                                    {t(`anime_statuses.${anime_data.status.toLowerCase()}`)}
+                                    {t(`anime_statuses.${tempData.anime.status.toLowerCase()}`)}
                                 </div>
                             }
 
-                            {anime_data.startDate && (anime_data.startDate.year != undefined && anime_data.startDate.day != undefined && anime_data.startDate.month != undefined) &&
+                            {tempData.anime.startDate && (tempData.anime.startDate.year != undefined && tempData.anime.startDate.day != undefined && tempData.anime.startDate.month != undefined) &&
                                 <div className="information-info-content">
                                     <div className="information-content-title">{t("information.startdate")}</div>
-                                    {convertDateToFormattedString(anime_data.startDate.year, anime_data.startDate.month, anime_data.startDate.day, undefined, undefined)}
+                                    {convertDateToFormattedString(tempData.anime.startDate.year, tempData.anime.startDate.month, tempData.anime.startDate.day, undefined, undefined)}
                                 </div>
                             }
 
-                            {anime_data.endDate && (anime_data.endDate.year != undefined && anime_data.endDate.day != undefined && anime_data.endDate.month != undefined) &&
+                            {tempData.anime.endDate && (tempData.anime.endDate.year != undefined && tempData.anime.endDate.day != undefined && tempData.anime.endDate.month != undefined) &&
                                 <div className="information-info-content">
                                     <div className="information-content-title">{t("information.endate")}</div>
-                                    {convertDateToFormattedString(anime_data.endDate.year, anime_data.endDate.month, anime_data.endDate.day, undefined, undefined)}
+                                    {convertDateToFormattedString(tempData.anime.endDate.year, tempData.anime.endDate.month, tempData.anime.endDate.day, undefined, undefined)}
                                 </div>
                             }
 
-                            {anime_data.season && anime_data.seasonYear &&
+                            {tempData.anime.season && tempData.anime.seasonYear &&
                                 <div className="information-info-content">
                                     <div className="information-content-title">{t("information.season")}</div>
-                                    {t(`anime_seasons.${anime_data.season.toLowerCase()}`)} {anime_data.seasonYear}
+                                    {t(`anime_seasons.${tempData.anime.season.toLowerCase()}`)} {tempData.anime.seasonYear}
                                 </div>
                             }
 
-                            {anime_data.source &&
+                            {tempData.anime.source &&
                                 <div className="information-info-content">
                                     <div className="information-content-title">{t("information.source")}</div>
-                                    {t(`anime_source.${anime_data.source.toLowerCase().replaceAll("_", "")}`)}
+                                    {t(`anime_source.${tempData.anime.source.toLowerCase().replaceAll("_", "")}`)}
                                 </div>
                             }
 
@@ -269,28 +275,28 @@ function information() {
                                 </div>
                                 {showWrong == false &&
                                     <>
-                                        {isEpisodeLoading == false && isEpisodeError == false && episodeData && episodeData.episodesData && episodeData.episodesData.length > 0 && anime_data.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && (
+                                        {isEpisodeLoading == false && isEpisodeError == false && episodeData && episodeData.episodesData && episodeData.episodesData.length > 0 && tempData.anime.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && (
                                             <>
                                                 {episodeData.episodesData.map((episode) => episode.episodes.length > 0 ? (
                                                     <Drop LeftHeader={t(`information.types.${episode.type}`)} RightHeader={t("information.listEpisodes", { number: episode.episodes.length })} content={makeButtons(episode.episodes, episode.type)} />
                                                 ) : "")}
                                             </>
                                         )}
-                                        {isEpisodeLoading && anime_data.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
+                                        {isEpisodeLoading && tempData.anime.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && <div className="information-loading-container"><span className="information-loading material-symbols-outlined">progress_activity</span></div>}
                                         {isEpisodeError && isEpisodeLoading == false && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}
                                         {checkEpisodes() && <div className="information-loading-container"><span className="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}
                                     </>}
                             </div>
 
 
-                            {anime_data.characters && anime_data.characters.length > 0 &&
+                            {tempData.anime.characters && tempData.anime.characters.length > 0 &&
                                 <div className="information-characters">
                                     <div className="information-characters-title">
                                         {t("information.characters")}
                                     </div>
 
                                     <div className="information-characters-container">
-                                        {anime_data.characters.map((character) =>
+                                        {tempData.anime.characters.map((character) =>
                                             <div className="information-characters-card" onClick={() => window.api.open(`https://anilist.co/character/${character.character.id}`)}>
                                                 <img className="information-characters-card-cover" src={character.character.image}></img>
                                                 <div className="information-characters-card-description">
@@ -303,14 +309,14 @@ function information() {
                                 </div>
                             }
 
-                            {anime_data.characters && anime_data.characters.map((tmp) => tmp.voiceActor).filter((item) => item != undefined).length > 0 &&
+                            {tempData.anime.characters && tempData.anime.characters.map((tmp) => tmp.voiceActor).filter((item) => item != undefined).length > 0 &&
                                 <div className="information-characters">
                                     <div className="information-characters-title">
                                         {t("information.actors")}
                                     </div>
 
                                     <div className="information-characters-container">
-                                        {anime_data.characters.map((character) => (character.voiceActor != undefined &&
+                                        {tempData.anime.characters.map((character) => (character.voiceActor != undefined &&
                                             <div className="information-characters-card" onClick={() => window.api.open(`https://anilist.co/staff/${character.voiceActor ? character.voiceActor.id : ""}`)}>
                                                 <img className="information-characters-card-cover" src={character.voiceActor.image}></img>
                                                 <div className="information-characters-card-description">
@@ -329,7 +335,7 @@ function information() {
 
                 <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
             </main>
-            {showWrong && <ContainerWrong name={anime_data.title.romaji} refetchfunc={(id?: string) => {setshowWrong(() => false);setCurrentIDplayer(() => id); refetch()}} exitfunc={() => setshowWrong(() => false)} />}
+            {showWrong && <ContainerWrong name={tempData.anime.title.romaji} refetchfunc={(id?: string) => {setshowWrong(() => false);setCurrentIDplayer(() => id); refetch()}} exitfunc={() => setshowWrong(() => false)} />}
         </>
     )
 }

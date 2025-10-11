@@ -64,7 +64,7 @@ const Card: React.FC<{ card: cardData, disableinformation?: boolean }> = ({ card
     }
 
     navigate("/info", {
-      state: card.AnimeData,
+      state: { anime: card.AnimeData, saveData: card.saveData },
     });
   }
 
