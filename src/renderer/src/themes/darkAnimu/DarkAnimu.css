@@ -534,19 +534,18 @@ th {
 
 .settings-keybind-check,
 .settings-keybind-check-active {
-  background-color: var(--bg3);
+  /* background-color: var(--bg3); */
   border-radius: 12px;
-  border: 2px solid var(--bg3);
+  border: 2px solid rgb(0, 0, 0, 0);
   color: var(--text);
 }
 
 .settings-keybind-check:hover {
-  background-color: var(--bg4);
+  border-color: var(--neutral1);
 }
 
 .settings-keybind-check-active {
   border-color: var(--neutral1);
-  background-color: var(--bg4);
 }
 
 
@@ -588,7 +587,7 @@ th {
 
 .settings-input-container {
   border-radius: 12px;
-  background-color: var(--bg3);
+  /* background-color: var(--bg3); */
 }
 
 .settings-input-field, .settings-input-field-hide-type {
