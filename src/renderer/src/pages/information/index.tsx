@@ -22,7 +22,7 @@ function information() {
     const tempData: { anime: AnimeData, saveData?: indentityPlayer } = useLocation().state;
 
     const [showWrong, setshowWrong] = useState<boolean>(false)
-    const [secondsLeft, setSecondsLeft] = useState<undefined | number>(tempData.anime.nextAiringEpisode ? tempData.anime.nextAiringEpisode.timeUntilAiring : undefined);
+    const [secondsLeft, setSecondsLeft] = useState<undefined | number>(tempData.anime.nextAiringEpisode?.timeUntilAiring);
     const [savedata, setsavedata] = useState<{ last_episode: number, last_time: number } | undefined>(undefined)
     const [currentIDplayer, setCurrentIDplayer] = useState<string | undefined>(tempData.anime.player_ID)
 

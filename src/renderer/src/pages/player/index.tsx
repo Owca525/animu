@@ -75,7 +75,7 @@ const player = () => {
             return
         }
         if (config.Player.general.PlayerBehavior === "home") navigate("/")
-        else navigate("/info", { state: anime_data.data.AnimeData })
+        else navigate("/info", { state: { anime: anime_data.data.AnimeData, saveData: anime_data.data.saveData } })
     }
     if (isLoading == false && data && data.length <= 0) {
         loadingAnimation(leave, { title: anime_data.data.AnimeData.title, ep: extractionData.actual, format: anime_data.data.AnimeData.format }, extractionData)
