@@ -1,9 +1,9 @@
 
-import { useQuery } from "react-query";
+// import { useQuery } from "react-query";
 import { useLocation, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react";
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
-import { cardData, SettingsConfig } from "@renderer/utils/GlobalInterface";
+import { cardData, playerData, SettingsConfig } from "@renderer/utils/GlobalInterface";
 import { useSelector } from "react-redux";
 import { t } from "i18next";
 
@@ -25,16 +25,38 @@ const player = () => {
     const [extractionData, setextractionData] = useState<{ actual: string, type: string, episodelist: { ep: string, img?: string, title?: string }[], time: number }>({ actual: anime_data.data.saveData ? anime_data.data.saveData.episode : "1", type: anime_data.data.saveData ? anime_data.data.saveData.type : "sub", episodelist: anime_data.episodelist, time: anime_data.data.saveData ? anime_data.data.saveData?.last_Time : 0 })
     const [externalPlayerType, setexternalPlayerType] = useState<"Movian" | "VLC" | "Mpv" | "ChromeCast">(config.Player.external.type)
 
-    const { data, isLoading, refetch } = useQuery({
-        queryKey: [extractionData.type, extractionData.actual, anime_data.data.AnimeData.player_ID],
-        queryFn: async ({ queryKey }) => {
-            const [type, actual, player_id] = queryKey;
-            return pluginPlayer.player.getUrls(type, actual, player_id)
-        },
-        refetchOnWindowFocus: false,
-        staleTime: 2 * 60 * 60 * 1000,
-        cacheTime: 2 * 60 * 60 * 1000
-    });
+    const [isLoading, setIsLoading] = useState<boolean>(true)
+    const [data, setData] = useState<playerData[] | undefined>(undefined)
+
+    // TODO: FIX USE QUERY SOMEDAY
+    // const { data, isFetching: isLoading, refetch } = useQuery({
+    //     queryKey: [extractionData.type, extractionData.actual, anime_data.data.AnimeData.player_ID],
+    //     queryFn: async ({ queryKey }) => {
+    //         const [type, actual, player_id] = queryKey;
+    //         return await pluginPlayer.player.getUrls(type, actual, player_id)
+    //     },
+    //     refetchOnWindowFocus: false,
+    //     staleTime: 2 * 60 * 60 * 1000,
+    //     cacheTime: 2 * 60 * 60 * 1000
+    // });
+
+    async function fetchEpisode() {
+        try {
+            setIsLoading(() => true)
+            setData(() => undefined)
+            let data = await pluginPlayer.player.getUrls(extractionData.type, extractionData.actual, anime_data.data.AnimeData.player_ID)
+            setData(() => data)
+            setIsLoading(() => false)
+        } catch (error) {
+            console.error(error, "fetchEpisode")
+            setIsLoading(() => false)
+            setData(() => undefined)
+        }
+    }
+
+    useEffect(() => {
+        fetchEpisode()
+    }, [])
 
     function setNewEpisode(ep: string) {
         setextractionData((old) => {
@@ -44,7 +66,7 @@ const player = () => {
                 actual: ep
             }
         })
-        refetch()
+        fetchEpisode()
     }
 
     useEffect(() => {
@@ -83,7 +105,7 @@ const player = () => {
             type: "refresh",
             title: t("player.error.notfound"),
             buttons: {
-                firstbutton: () => refetch(),
+                firstbutton: () => fetchEpisode(),
                 secondbutton: () => leave()
             }
         })
