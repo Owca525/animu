@@ -884,11 +884,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     }
 
     function getCurrentImage(): string | undefined {
+        const episode = getEpisode("next")
+        if (!episode) return undefined
         for (let index = 0; index < temp.episodes.length; index++) {
             const element = temp.episodes[index];
-            if (element.ep == temp.episode && element.img) return element.img
+            if (element.ep == episode.ep && element.img) return element.img
         }
         return undefined
+
+
     }
 
     const uptoNextVariants = {

@@ -919,7 +919,7 @@ function settings() {
                             <div className="settings-setting-container"><div className="settings-user-title">KartQ</div>  {t("credits.kartq")}</div>
                             <div className="settings-setting-container"><div className="settings-user-title">DawoleQ</div>  {t("credits.dawoleq")}</div>
                             <div className="settings-setting-container"><div className="settings-user-title">Ary</div>  {t("credits.ary")}</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">Rain_kyle</div>  {t("credits.ryne_kyle")}</div>
+                            <div className="settings-setting-container"><div className="settings-user-title">Rain_kyle</div>  {t("credits.rain_kyle")}</div>
                             <div className="settings-setting-container"><div className="settings-user-title">AkaShiro</div>  {t("credits.akashiro")}</div>
                         </div>
                         <div className="settings-page-container">

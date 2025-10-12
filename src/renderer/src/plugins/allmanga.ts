@@ -237,9 +237,9 @@ export async function getInformation(animeData?: AnimeData, anime_id?: string): 
         break
       }
 
-      precentageNative.push({ name: element.AnimeData.title.native, prec: similarityText(animeData.title.native.toLowerCase(), element.AnimeData.title.native.toLowerCase()), data: element.AnimeData });
-      precentageRomaji.push({ name: element.AnimeData.title.romaji, prec: similarityText(animeData.title.romaji.toLowerCase(), element.AnimeData.title.romaji.toLowerCase()), data: element.AnimeData });
-      precentageEnglish.push({ name: element.AnimeData.title.english ? element.AnimeData.title.english.toLowerCase() : "", prec: similarityText(animeData.title.english?.toLowerCase(), element.AnimeData.title.english?.toLowerCase()), data: element.AnimeData });
+      if (element.AnimeData.title.native) precentageNative.push({ name: element.AnimeData.title.native, prec: similarityText(animeData.title.native, element.AnimeData.title.native), data: element.AnimeData });
+      if (element.AnimeData.title.romaji) precentageRomaji.push({ name: element.AnimeData.title.romaji, prec: similarityText(animeData.title.romaji.toLowerCase(), element.AnimeData.title.romaji.toLowerCase()), data: element.AnimeData });
+      if (element.AnimeData.title.english) precentageEnglish.push({ name: element.AnimeData.title.english.toLowerCase(), prec: similarityText(animeData.title.english?.toLowerCase(), element.AnimeData.title.english?.toLowerCase()), data: element.AnimeData });
     };
     console.log(precentageEnglish, precentageNative, precentageRomaji)
 
@@ -396,7 +396,7 @@ async function searchAnime(name: string, page: number, _params?: { genres?: stri
 }
 
 export const infoPluginPlayer: playerPluginFormat = {
-  version: "1.1",
+  version: "1.2",
   name: "Allmanga",
   author: "Owca525",
   icon: "https://allmanga.to/android-icon-192x192.png",
