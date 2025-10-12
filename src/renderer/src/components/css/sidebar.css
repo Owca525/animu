@@ -86,28 +86,3 @@
     font-size: 1.2em;
     padding-right: 12px;
 }
-
-/* for very small window sizes */
-@media (max-width: 600px) {
-
-    .sidebar-logo-icon-container,
-    .sidebar-container-max {
-        width: clamp(175px, 40vw, 200px);
-    }
-    
-    .sidebar-container-min, .shadow-sidebar {
-        width: clamp(50px, 9vw, 66px);
-        min-width: fit-content;
-    }
-    
-    /* .settings-container .sidebar-logo-icon-container,
-    .settings-container .sidebar-container-max {
-        width: 130px;
-    } */
-}
-@media (max-width: 465px) {
-    .sidebar-logo-icon-container,
-    .sidebar-container-max {
-        width: clamp(175px, 70vw, 200px);
-    }
-}
