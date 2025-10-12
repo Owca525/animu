@@ -62,9 +62,12 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
     try {
         let animeEpisodes = JSON.parse(atob(decodeData))
         for (const key in animeEpisodes) {
+            let res = detectResoltion(key)
+            if (res == "Unknown") continue
             currentEpisode.push({
-                res: detectResoltion(key),
-                url: animeEpisodes[key]
+                res: res,
+                url: animeEpisodes[key],
+                defaultSubtitles: res == "Source"
             })
         }
     } catch (error) {
