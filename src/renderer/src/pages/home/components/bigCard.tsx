@@ -19,7 +19,7 @@ const BigCard: React.FC<bigCardProps> = ({ data, ref }) => {
 
     function openInformation() {
         navigate("/info", {
-            state: data.AnimeData,
+            state: { anime: data.AnimeData },
         });
     }
 
