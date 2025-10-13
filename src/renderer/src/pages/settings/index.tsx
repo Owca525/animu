@@ -260,7 +260,6 @@ function settings() {
                                     }
                                 />
                             </div> */}
-                            <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.general.language")}
                                 <div className="settings-helpicon-space">
