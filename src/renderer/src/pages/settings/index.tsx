@@ -25,6 +25,7 @@ import { ContinueCheckConversion, ContinueDetectVersion } from "@renderer/utils/
 import { HistoryCheckConvert, HistoryDetectVersion } from "@renderer/utils/history/history";
 import { checkUpdate } from "@renderer/utils/update";
 import { InitialPlugin } from "@renderer/utils/pluginApi";
+import ButtonGroup from "./components/buttonGroup";
 
 function settings() {
     const navigate = useNavigate();
@@ -318,14 +319,11 @@ function settings() {
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.general.checkupdates")}
-                                <Dropdown
-                                    options={[
-                                        { label: t("settings.general.onstart"), onClick: () => handleChange("update.type", "On Start") },
-                                        { label: t("settings.general.everyday"), onClick: () => handleChange("update.type", "Every Day") },
-                                        { label: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
+                                <ButtonGroup selectedValue={t(`settings.general.${config.new.update.type.toLowerCase().replaceAll(" ", "")}`)} listValues={[
+                                        { value: t("settings.general.onstart"), onClick: () => handleChange("update.type", "On Start") },
+                                        { value: t("settings.general.everyday"), onClick: () => handleChange("update.type", "Every Day") },
+                                        { value: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
                                     ]}
-                                    disableX
-                                    buttonText={t(`settings.general.${config.new.update.type.toLowerCase().replaceAll(" ", "")}`)}
                                 />
                             </div>
                         </div>
@@ -458,13 +456,10 @@ function settings() {
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.player.playerexitbechaviour")}
-                                <Dropdown
-                                    options={[
-                                        { label: t("settings.player.playerbeexit.information"), onClick: () => handleChange("Player.general.PlayerBehavior", "information") },
-                                        { label: t("settings.player.playerbeexit.home"), onClick: () => handleChange("Player.general.PlayerBehavior", "home") },
+                                <ButtonGroup selectedValue={t(`settings.player.playerbeexit.${config.new.Player.general.PlayerBehavior}`)} listValues={[
+                                        { value: t("settings.player.playerbeexit.information"), onClick: () => handleChange("Player.general.PlayerBehavior", "information") },
+                                        { value: t("settings.player.playerbeexit.home"), onClick: () => handleChange("Player.general.PlayerBehavior", "home") },
                                     ]}
-                                    buttonText={t(`settings.player.playerbeexit.${config.new.Player.general.PlayerBehavior}`)}
-                                    disableX
                                 />
                             </div>
                             <div className="settings-line"></div>
@@ -535,14 +530,11 @@ function settings() {
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.upNext.upNextStyle")}
-                                <Dropdown
-                                    options={[
-                                        { label: t("settings.upNext.var1"), onClick: () => handleChange("Player.upToNextEpisode.variants", "var1") },
-                                        { label: t("settings.upNext.var2"), onClick: () => handleChange("Player.upToNextEpisode.variants", "var2") },
-                                        { label: t("settings.upNext.old"), onClick: () => handleChange("Player.upToNextEpisode.variants", "old") },
-                                    ]}
-                                    buttonText={t(`settings.upNext.${config.new.Player.upToNextEpisode.variants}`)}
-                                    disableX
+                                <ButtonGroup selectedValue={t(`settings.upNext.${config.new.Player.upToNextEpisode.variants}`)} listValues={[
+                                        { value: t("settings.upNext.var1"), onClick: () => handleChange("Player.upToNextEpisode.variants", "var1") },
+                                        { value: t("settings.upNext.var2"), onClick: () => handleChange("Player.upToNextEpisode.variants", "var2") },
+                                        { value: t("settings.upNext.old"), onClick: () => handleChange("Player.upToNextEpisode.variants", "old") },
+                                ]}                                    
                                 />
                             </div>
                         </div>
@@ -660,14 +652,11 @@ function settings() {
                             <div className="settings-line"></div>
                             <div className="settings-setting-container">
                                 {t("settings.player.type")}
-                                <Dropdown
-                                    options={[
-                                        { label: t("settings.player.file"), onClick: () => handleChange("Player.screenShot.saveType", "File") },
-                                        { label: t("settings.player.clipboard"), onClick: () => handleChange("Player.screenShot.saveType", "Clipboard") },
-                                        { label: t("settings.player.both"), onClick: () => handleChange("Player.screenShot.saveType", "Both") },
+                                <ButtonGroup selectedValue={t(`settings.player.${config.new.Player.screenShot.saveType.toLowerCase()}`)} listValues={[
+                                        { value: t("settings.player.file"), onClick: () => handleChange("Player.screenShot.saveType", "File") },
+                                        { value: t("settings.player.clipboard"), onClick: () => handleChange("Player.screenShot.saveType", "Clipboard") },
+                                        { value: t("settings.player.both"), onClick: () => handleChange("Player.screenShot.saveType", "Both") },
                                     ]}
-                                    buttonText={config.new.Player.screenShot.saveType}
-                                    disableX
                                 />
                             </div>
                             <div className="settings-line"></div>
