@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { AnimeData, notificationProps, playerPluginFormat } from "@renderer/utils/GlobalInterface";
+import { AnimeData, indentityPlayer, notificationProps, playerPluginFormat } from "@renderer/utils/GlobalInterface";
 import Button from "@renderer/components/buttons";
 import "./information.css"
 import { convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities, getGradientColor, segregatePlugins } from "@renderer/utils/functions";
@@ -24,20 +24,18 @@ function information() {
     const [currentIDplayer, setCurrentIDplayer] = useState<string | undefined>(tempData.anime.player_ID)
 
     const { data: episodeData, isError: isEpisodeError, isFetching: isEpisodeLoading, refetch } = useQuery({
-        queryKey: [{ data: tempData.anime, player_id: currentIDplayer }],
-        queryFn: async ({ queryKey }) => {
+        queryKey: [],
+        queryFn: async () => {
             let plugin: playerPluginFormat = store.getState().plugin.playerPlugin
             if (!plugin || !plugin.player) return
-            const [data] = queryKey;
-            if (data.data.id == "") {
-                ChangePlugin("Allmanga")
-                return plugin.player.animeDataList(data.data, undefined)
+            if (tempData.anime.id == "") {
+                return plugin.player.animeDataList(tempData.anime, undefined)
             }
             if (tempData.saveData && tempData.saveData.pluginName == plugin.name) {
-                return plugin.player.animeDataList(data.player_id ? undefined : data.data, data.player_id)
+                return plugin.player.animeDataList(tempData.anime.player_ID ? undefined : tempData.anime, tempData.anime.player_ID)
             }
             ChangePlugin(plugin.name)
-            return plugin.player.animeDataList(data.data, undefined)
+            return plugin.player.animeDataList(tempData.anime, currentIDplayer)
         },
         refetchOnWindowFocus: false,
         staleTime: 2 * 60 * 60 * 1000,
