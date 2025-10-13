@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { AnimeData, indentityPlayer, notificationProps, pluginFormat } from "@renderer/utils/GlobalInterface";
+import { AnimeData, notificationProps, playerPluginFormat } from "@renderer/utils/GlobalInterface";
 import Button from "@renderer/components/buttons";
 import "./information.css"
 import { convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities, getGradientColor, segregatePlugins } from "@renderer/utils/functions";
@@ -26,7 +26,7 @@ function information() {
     const { data: episodeData, isError: isEpisodeError, isFetching: isEpisodeLoading, refetch } = useQuery({
         queryKey: [{ data: tempData.anime, player_id: currentIDplayer }],
         queryFn: async ({ queryKey }) => {
-            let plugin: pluginFormat = store.getState().plugin.playerPlugin
+            let plugin: playerPluginFormat = store.getState().plugin.playerPlugin
             if (!plugin || !plugin.player) return
             const [data] = queryKey;
             if (data.data.id == "") {

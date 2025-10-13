@@ -3,7 +3,7 @@ import { homeData } from "../GlobalInterface";
 const initialState: homeData = {
     isLoading: false,
     isError: false,
-    data: [],
+    data: { sections: [] },
     search: "",
     page: 1,
     stopScrolling: false,
