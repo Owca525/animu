@@ -147,8 +147,9 @@ td {
   justify-content: space-between;
 }
 
-.settings-table-button {
+.settings-table-button * {
   cursor: pointer;
+  transition: background-color 100ms ease-in-out;
 }
 
 .settings-extensions-icon {
