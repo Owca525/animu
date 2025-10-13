@@ -10,8 +10,6 @@ import ContainerWrong from "./components/containerWrong";
 import { useHotkeys } from "react-hotkeys-hook";
 import { toast } from "react-toastify";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
-import { ReadHistory } from "@renderer/utils/history/history";
-import { ReadContinue } from "@renderer/utils/history/continueWatch";
 import store from "@renderer/utils/store";
 import Dropdown from "@renderer/components/dropDown";
 import { ChangePlugin } from "@renderer/utils/pluginApi";
@@ -23,7 +21,6 @@ function information() {
 
     const [showWrong, setshowWrong] = useState<boolean>(false)
     const [secondsLeft, setSecondsLeft] = useState<undefined | number>(tempData.anime.nextAiringEpisode?.timeUntilAiring);
-    const [savedata, setsavedata] = useState<{ last_episode: number, last_time: number } | undefined>(undefined)
     const [currentIDplayer, setCurrentIDplayer] = useState<string | undefined>(tempData.anime.player_ID)
 
     const { data: episodeData, isError: isEpisodeError, isFetching: isEpisodeLoading, refetch } = useQuery({
@@ -34,7 +31,7 @@ function information() {
             const [data] = queryKey;
             if (data.data.id == "") {
                 ChangePlugin("Allmanga")
-                return plugin.player.animeDataList(data.data, "")
+                return plugin.player.animeDataList(data.data, undefined)
             }
             if (tempData.saveData && tempData.saveData.pluginName == plugin.name) {
                 return plugin.player.animeDataList(data.player_id ? undefined : data.data, data.player_id)
@@ -71,25 +68,7 @@ function information() {
 
     const time = convertSeconds(secondsLeft)
 
-    async function initialInformation() {
-        let currentPlayerPlugin: playerPluginFormat = store.getState().plugin.playerPlugin
-        if (!currentPlayerPlugin.player) return
-
-        let cardAnime = (await ReadHistory()).filter((element) => element.AnimeData.id == tempData.anime.id)
-        let cardAnimeContinueWatch = (await ReadContinue()).filter((element) => element.AnimeData.id == tempData.anime.id)
-
-        if (cardAnimeContinueWatch.length > 0) {
-            let animeContinue = cardAnimeContinueWatch[0].saveData
-            if (animeContinue) setsavedata(() => { return { last_episode: parseInt(animeContinue.episode), last_time: animeContinue.last_Time } })
-        }
-        if (cardAnime.length > 0 && cardAnimeContinueWatch.length <= 0) {
-            let animeHistory = cardAnime[0].saveData
-            if (animeHistory) setsavedata(() => { return { last_episode: parseInt(animeHistory.episode), last_time: animeHistory.last_Time } })
-        }
-    }
-
     useEffect(() => {
-        initialInformation()
         document.querySelectorAll('*').forEach((element: any) => {
             element.tabIndex = -1
         });
@@ -104,7 +83,7 @@ function information() {
                         player_ID: episodeData?.player_id
                     },
                     saveData: {
-                        last_Time: savedata && savedata.last_episode.toString() === episode ? savedata.last_time : 0,
+                        last_Time: tempData.saveData && tempData.saveData.episode.toString() === episode ? tempData.saveData.last_Time : 0,
                         type: type,
                         player_ID: tempData.anime.player_ID,
                         episode: episode
@@ -128,14 +107,14 @@ function information() {
         return (
             <div className='information-buttons-episode-container'>
                 {episode.map((data) => (
-                    <div className={`information-episode-button ${savedata && parseInt(data.ep) < savedata.last_episode ? "watched" : ""} ${savedata && parseInt(data.ep) == savedata.last_episode && savedata.last_time != 0 ? "watching" : savedata && parseInt(data.ep) == savedata.last_episode ? "watched" : ""}`} onClick={() => enterPlayer(episode, type, data.ep)}>{data.ep}</div>
+                    <div className={`information-episode-button ${tempData.saveData && parseInt(data.ep) < parseInt(tempData.saveData.episode) ? "watched" : ""} ${tempData.saveData && parseInt(data.ep) == parseInt(tempData.saveData.episode) && tempData.saveData.last_Time != 0 ? "watching" : tempData.saveData && parseInt(data.ep) == parseInt(tempData.saveData.episode) ? "watched" : ""}`} onClick={() => enterPlayer(episode, type, data.ep)}>{data.ep}</div>
                 ))}
             </div>
         )
     }
 
     useHotkeys("tab", () => {
-        console.log(tempData.anime, savedata)
+        console.log(tempData.anime, tempData.saveData)
     })
 
     useHotkeys("esc", () => {
