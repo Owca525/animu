@@ -15,12 +15,14 @@ interface sidebarProps {
         top: sidebarData[]
         bottom: sidebarData[]
     }
+    activeElement?: boolean
 }
 
-const Sidebar: React.FC<sidebarProps> = ({ showLogo = false, data, onChange, openSidebar }) => {
+const Sidebar: React.FC<sidebarProps> = ({ showLogo = false, data, onChange, openSidebar, activeElement }) => {
     const [sidebarHover, setHover] = useState<boolean>(false)
     const sidebarRef = useRef<HTMLDivElement>(null);
     const [version, setversion] = useState<string>("")
+    const currentButton = useRef<number>(activeElement ? 0 : -1)
 
     const getVersion = async (): Promise<void> => setversion(await window.backend.version())
 
@@ -48,7 +50,8 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo = false, data, onChange, ope
         setHover((prev) => !prev)
     })
 
-    function hideSidebar(event, func) {
+    function hideSidebar(event, func, num?: number) {
+        if (activeElement && num != undefined) currentButton.current = num
         setHover((prev) => !prev)
         if (!func) return
         func(event)
@@ -79,6 +82,11 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo = false, data, onChange, ope
         return "sidebar-min-button-container"
     }
 
+    function checkNumber(num: number): string {
+        if (num == currentButton.current) return "active"
+        return ""
+    }
+
     return (
         <motion.div className={detectSidebarState()} ref={sidebarRef}
             initial={showLogo ? "visible" : "hidden"}
@@ -98,7 +106,12 @@ const Sidebar: React.FC<sidebarProps> = ({ showLogo = false, data, onChange, ope
                 <div className={`sidebar-top ${detectSidebarStateContainers()}`}>
                     {!showLogo && <Button icon={"arrow_back"} content={detectSidebarStateButton("Hide Sidebar")} onClick={(event) => { setHomeLocalSearch(false); hideSidebar(event, undefined) }} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />}
                     <div className="sidebar-black-line"></div>
-                    {data.top.map((value) => <Button icon={value.icon} content={detectSidebarStateButton(value.text)} onClick={(event) => { setHomeLocalSearch(false); hideSidebar(event, value.onClick) }} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />)}
+                    {data.top.map((value, i) => <Button icon={value.icon} 
+                        content={detectSidebarStateButton(value.text)} 
+                        onClick={(event) => { setHomeLocalSearch(false); hideSidebar(event, value.onClick, i) }} 
+                        ButtonClass={`${detectSidebarStateClass()} ${checkNumber(i)}`} 
+                        iconClassName={`sidebar-button ${checkNumber(i)}`} />
+                    )}
                 </div>
                 <div className={`sidebar-bottom ${detectSidebarStateContainers()}`}>
                     <div className="sidebar-black-line"></div>

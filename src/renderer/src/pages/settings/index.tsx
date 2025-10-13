@@ -227,6 +227,7 @@ function settings() {
             <Sidebar
                 data={sidebarData}
                 showLogo
+                activeElement
             />
             <div className="settings-shadow-sidebar"></div>
             <motion.div variants={saveCommunicateAnimation} initial={"hidden"} animate={isSaving ? "visible" : "hidden"} transition={{ duration: 0.2 }} className="settings-save-content">

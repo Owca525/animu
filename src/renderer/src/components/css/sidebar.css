@@ -31,6 +31,10 @@
     height: max-content;
 }
 
+.sidebar-button-min.active, .sidebar-button.active {
+    background-color: var(--bg4);
+}
+
 .sidebar-top, .sidebar-bottom {
     margin: 4px;
     width: max-content;
