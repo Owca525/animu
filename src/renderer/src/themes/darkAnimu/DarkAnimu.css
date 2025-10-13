@@ -489,8 +489,15 @@ th {
   border: 3px solid var(--bg4);
 }
 
-.settings-table-button:hover {
+.settings-table-button:hover * {
   background-color: var(--bg4);
+}
+
+.settings-table-button:hover td:first-child {
+  border-radius: 12px 0 0 12px;
+}
+.settings-table-button:hover td:last-child {
+  border-radius: 0 12px 12px 0;
 }
 
 .settings-extensions-background {
