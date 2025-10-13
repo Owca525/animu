@@ -16,13 +16,21 @@ const BigCardsContainer: React.FC<BigCardsContainerProps> = ({ data }) => {
     const [cardWidth, setCardWidth] = useState(0);
 
     useEffect(() => {
+        handleUpdate()
+        window.addEventListener("resize", handleUpdate)
+        return () => {
+            window.removeEventListener("resize", handleUpdate)
+        }
+    }, []);
+
+    function handleUpdate() {
         if (cardRef.current) {
             const style = window.getComputedStyle(cardRef.current);
             const width = cardRef.current.offsetWidth;
             const gap = parseInt(style.marginRight || "0", 10);
             setCardWidth(width + gap);
         }
-    }, []);
+    }
 
     function handleStart(e: React.MouseEvent | React.TouchEvent) {
         setIsDragging(true);
