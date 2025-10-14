@@ -6,7 +6,6 @@ import { t } from "i18next";
 import { useSelector } from "react-redux";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import {
-  capitalizeFirstLetter,
   convertSeconds,
   CreateContextMenuOptions,
   getGradientColor,
@@ -152,10 +151,10 @@ const Card: React.FC<{ card: cardData, disableinformation?: boolean }> = ({ card
     }
     let bottom: JSX.Element[] = []
     if (card.AnimeData.format) {
-      bottom = [...bottom, <>{capitalizeFirstLetter(card.AnimeData.format)}</>]
+      bottom = [...bottom, <>{t(`anime_formats.${card.AnimeData.format.toLowerCase()}`)}</>]
     }
     if (!card.AnimeData.format && card.AnimeData.type) {
-      bottom = [...bottom, <>{capitalizeFirstLetter(card.AnimeData.type)}</>]
+      bottom = [...bottom, <>{t(`anime_source.${card.AnimeData.type.toLowerCase().replaceAll("_", "")}`)}</>]
     }
     if (card.AnimeData.episodes && card.AnimeData.format?.toUpperCase() != "MOVIE") {
       bottom = [...bottom, <>{bottom.length !== 0 && <span className="card-dot">·</span>}{t("card_information.episodes", { ep: card.AnimeData.episodes })}</>]
