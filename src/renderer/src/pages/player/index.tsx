@@ -35,7 +35,7 @@ const player = () => {
         queryKey: [anime_data.data.AnimeData.player_ID],
         queryFn: async ({ queryKey }) => {
             const [player_id] = queryKey;
-            return await pluginPlayer.player.getUrls(extractionData.current.type, extractionData.current.actual, player_id)
+            return await pluginPlayer.player.extractPlayerData(extractionData.current.type, extractionData.current.actual, player_id)
         },
         refetchOnWindowFocus: false,
         staleTime: 2 * 60 * 60 * 1000,

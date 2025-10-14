@@ -24,7 +24,7 @@ const containerWrong: React.FC<containerwrongprops> = ({ name, exitfunc, refetch
         queryKey: [searchName],
         queryFn: async ({ queryKey }) => {
             const [name] = queryKey;
-            if (store.getState().plugin.playerPlugin.player) return await store.getState().plugin.playerPlugin.player.search(name, 1)
+            if (store.getState().plugin.playerPlugin.player) return await store.getState().plugin.playerPlugin.player.searchAnime(name, 1)
             return []
         },
         refetchOnWindowFocus: false,

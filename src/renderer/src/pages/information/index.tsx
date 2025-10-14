@@ -30,13 +30,13 @@ function information() {
             let [ playerID ] = queryKey
             if (!plugin || !plugin.player) return
             if (tempData.anime.id == "") {
-                return plugin.player.animeDataList(tempData.anime, undefined)
+                return plugin.player.extractEpisodeList(tempData.anime, undefined)
             }
             if (tempData.saveData && tempData.saveData.pluginName == plugin.name) {
-                return plugin.player.animeDataList(playerID.player_ID ? undefined : tempData.anime, playerID.player_ID)
+                return plugin.player.extractEpisodeList(playerID.player_ID ? undefined : tempData.anime, playerID.player_ID)
             }
             ChangePlugin(plugin.name)
-            return plugin.player.animeDataList(tempData.anime, currentIDplayer)
+            return plugin.player.extractEpisodeList(tempData.anime, currentIDplayer)
         },
         refetchOnWindowFocus: false,
         staleTime: 2 * 60 * 60 * 1000,

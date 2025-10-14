@@ -177,11 +177,10 @@ export const AniZone: playerPluginFormat = {
     name: "AniZone",
     author: "Owca525",
     player: {
-        getUrls: getURLFromPlayer,
-        animeDataList: getEpisodeList,
-        episodeList: extractEpisodeList,
-        animeList: getAnimeCards,
-        search: searchAnime
+        extractPlayerData: getURLFromPlayer,
+        extractEpisodeList: getEpisodeList,
+        extractOnlyEpisodesList: extractEpisodeList,
+        searchAnime: searchAnime
     },
     preferedLang: ["en"]
 }

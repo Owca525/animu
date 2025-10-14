@@ -145,25 +145,27 @@ export async function recentAnime(page: number = 1) {
 
   if (anime == null) {
     await setHomeData(async () => {
-      return [
-        {
-          title: "Recent Anime",
-          data: []
-        }
-      ]
-    })
-    return
-  }
-
-  await setHomeData(async () => {
-    return [
-      {
-        title: "Recent Anime",
-        data: animeData,
-        onScrollDownFunction: (page) => recentAnime(page)
+      return {
+        sections: [
+          {
+            title: "Recent Anime",
+            data: []
+          }
+        ]
       }
-    ]
-  })
+    })
+    await setHomeData(async () => {
+      return {
+        sections: [
+          {
+            title: "Recent Anime",
+            data: animeData,
+            onScrollDownFunction: (page) => recentAnime(page)
+          }
+        ]
+      }
+    })
+  }
 }
 
 async function getAnimeList(anime: AnimeData): Promise<cardData[]> {
@@ -198,20 +200,20 @@ export async function extractInformation(type: "all" | "episodes", id: string): 
 
   return [
     {
-      episodes: episodes.length !== anime_data.availableEpisodes.sub 
-        ? episodes.slice(0, anime_data.availableEpisodes.sub != 0 ? anime_data.availableEpisodes.sub - 1 : 0) 
+      episodes: episodes.length !== anime_data.availableEpisodes.sub
+        ? episodes.slice(0, anime_data.availableEpisodes.sub != 0 ? anime_data.availableEpisodes.sub - 1 : 0)
         : episodes,
       type: "sub"
     },
     {
-      episodes: episodes.length !== anime_data.availableEpisodes.dub 
-        ? episodes.slice(0, anime_data.availableEpisodes.dub != 0 ? anime_data.availableEpisodes.dub - 1 : 0) 
+      episodes: episodes.length !== anime_data.availableEpisodes.dub
+        ? episodes.slice(0, anime_data.availableEpisodes.dub != 0 ? anime_data.availableEpisodes.dub - 1 : 0)
         : episodes,
       type: "dub"
     },
     {
       episodes: episodes.length !== anime_data.availableEpisodes.raw
-        ? episodes.slice(0, anime_data.availableEpisodes.raw != 0 ? anime_data.availableEpisodes.raw - 1 : 0) 
+        ? episodes.slice(0, anime_data.availableEpisodes.raw != 0 ? anime_data.availableEpisodes.raw - 1 : 0)
         : episodes,
       type: "raw"
     }
@@ -279,7 +281,7 @@ export async function getInformation(animeData?: AnimeData, anime_id?: string): 
 
   let episodeList = await extractInformation("all", anime_id)
   console.log(episodeList)
-  return { player_id: anime_id, episodesData: episodeList as { episodes: { ep: string; img?: string; title?: string }[]; type: string; name?: string }[]};
+  return { player_id: anime_id, episodesData: episodeList as { episodes: { ep: string; img?: string; title?: string }[]; type: string; name?: string }[] };
 }
 
 // { resolution: [{ url: url, res: "1080" }], hostname: new URL(url).hostname, hls: false }
@@ -401,11 +403,10 @@ export const infoPluginPlayer: playerPluginFormat = {
   author: "Owca525",
   icon: "https://allmanga.to/android-icon-192x192.png",
   player: {
-    animeDataList: getInformation,
-    getUrls: extractURLS,
-    episodeList: async (_type, id) => { return await extractInformation("episodes", id) as { ep: string; img?: string; title?: string }[] },
-    animeList: getAnimeList,
-    search: searchAnime
+    extractEpisodeList: getInformation,
+    extractPlayerData: extractURLS,
+    extractOnlyEpisodesList: async (_type, id) => { return await extractInformation("episodes", id) as { ep: string; img?: string; title?: string }[] },
+    searchAnime: searchAnime
   },
   sidebarAddon: [{ icon: "today", text: "Recent Anime", onClick: async () => await recentAnime() }],
   preferedLang: ["en"]

@@ -233,11 +233,10 @@ export const lycorisCafe: playerPluginFormat = {
     author: "Owca525",
     icon: "https://www.lycoris.cafe/favicon.ico",
     player: {
-        getUrls: extractEpisodeData,
-        animeDataList: extractEpisodeDataList,
-        episodeList: extractOnlyEpisodes,
-        animeList: extractAnimeList,
-        search: searchAnime
+        extractPlayerData: extractEpisodeData,
+        extractEpisodeList: extractEpisodeDataList,
+        extractOnlyEpisodesList: extractOnlyEpisodes,
+        searchAnime: searchAnime
     },
     preferedLang: ["pl", "en"]
 }

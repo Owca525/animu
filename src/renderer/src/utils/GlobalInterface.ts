@@ -72,11 +72,20 @@ export interface homeData {
 export interface playerData {
     hostname: string
     hls: boolean
-    resolution: { res: string, url: string, defaultSubtitles?: boolean; }[]
+    resolution: resolutionFormat[]
+    defaultHost?: boolean
     storyboardVTT?: string
     listChapters?: playerChapterList
     chaptersUrl?: string
     subtitles?: playerSubtitlesFormat[]
+    extractResolution?: (episode: string, id: string, type: string, customData?: any) => resolutionFormat[]
+}
+
+export interface resolutionFormat { 
+    res: string,
+    url: string, 
+    reqHeader?: { [key: string]: string },
+    defaultSubtitles?: boolean; 
 }
 
 export interface playerSubtitlesFormat { url: string, lang: string, label: string, format: string }
@@ -139,11 +148,10 @@ export interface playerPluginFormat {
     sidebarAddon?: sidebarData[]
     searchOption?: genres
     player: {
-        getUrls: (type: string, episode: string, id: string) => Promise<playerData[]>
-        animeDataList: (animeData?: AnimeData, anime_id?: string) => Promise<episodeList | undefined>
-        episodeList: (type: string, anime_id: string) => Promise<{ ep: string, img?: string, title?: string }[]>
-        animeList: (name: AnimeData) => Promise<cardData[]>
-        search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => Promise<cardData[]>
+        extractPlayerData: (type: string, episode: string, id: string) => Promise<playerData[]>
+        extractEpisodeList: (animeData?: AnimeData, anime_id?: string) => Promise<episodeList | undefined>
+        extractOnlyEpisodesList: (type: string, anime_id: string) => Promise<{ ep: string, img?: string, title?: string }[]>
+        searchAnime: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => Promise<cardData[]>
     }
 }
 
