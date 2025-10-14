@@ -24,15 +24,16 @@ function information() {
     const [currentIDplayer, setCurrentIDplayer] = useState<string | undefined>(tempData.anime.player_ID)
 
     const { data: episodeData, isError: isEpisodeError, isFetching: isEpisodeLoading, refetch } = useQuery({
-        queryKey: [],
-        queryFn: async () => {
+        queryKey: [tempData.anime],
+        queryFn: async ({ queryKey }) => {
             let plugin: playerPluginFormat = store.getState().plugin.playerPlugin
+            let [ playerID ] = queryKey
             if (!plugin || !plugin.player) return
             if (tempData.anime.id == "") {
                 return plugin.player.animeDataList(tempData.anime, undefined)
             }
             if (tempData.saveData && tempData.saveData.pluginName == plugin.name) {
-                return plugin.player.animeDataList(tempData.anime.player_ID ? undefined : tempData.anime, tempData.anime.player_ID)
+                return plugin.player.animeDataList(playerID.player_ID ? undefined : tempData.anime, playerID.player_ID)
             }
             ChangePlugin(plugin.name)
             return plugin.player.animeDataList(tempData.anime, currentIDplayer)
