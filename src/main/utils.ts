@@ -6,6 +6,9 @@ import fs from "fs";
 import path from "path";
 import { mainWindow } from ".";
 import { exec, execSync } from "child_process";
+import express from "express";
+import { Readable } from "stream";
+
 let rpc: Client | undefined = undefined
 
 // Client id for Discord Rich presence
@@ -233,3 +236,63 @@ export function validUrl(urlString: string): boolean {
         return true;
     } catch (_) { return false }
 }
+
+const createProxyServer = () => {
+  const appServer = express();
+
+  appServer.get("/video", async (req, res) => {
+    const { url: encodedUrl } = req.query as { url?: string };
+
+    if (!encodedUrl) {
+      return res.status(400).send("data not found");
+    }
+    let currentVideoUrl: string;
+    try {
+      currentVideoUrl = Buffer.from(encodedUrl, "base64").toString("utf-8");
+    } catch (err) {
+      return res.status(400).send("base64 error");
+    }
+
+    try {
+      const headers: Record<string, string> = {};
+
+    if (req.headers.range) {
+      const match = req.headers.range.match(/bytes=(\d+)-(\d*)/);
+      if (match) {
+        let start = parseInt(match[1], 10);
+        let end = match[2] ? parseInt(match[2], 10) : start;
+
+        end = start + 100 * 1024 * 1024 - 1;
+
+        headers["Range"] = `bytes=${start}-${end}`;
+      } else {
+        headers["Range"] = "bytes=0-1048576";
+      }
+    }
+
+      const response = await fetch(currentVideoUrl, { headers });
+
+      res.status(response.status);
+      response.headers.forEach((value, key) => res.setHeader(key, value));
+
+      if (response.body) {
+        const nodeStream = Readable.fromWeb(response.body as any);
+        nodeStream.pipe(res);
+      } else {
+        res.status(500).send("No Response");
+      }
+      return
+    } catch (err) {
+      console.error("error:", err);
+      res.status(500).send("error");
+      return
+    }
+  });
+
+  appServer.listen(3001, () =>
+    console.log("Video Proxy: http://localhost:3001")
+  );
+};
+
+
+createProxyServer()

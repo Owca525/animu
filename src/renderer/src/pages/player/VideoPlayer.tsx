@@ -30,6 +30,7 @@ import JASSUB from "jassub";
 import workerUrl from "jassub/dist/jassub-worker.js?url";
 import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
 
+
 function addTime(durration: number): string {
     const now = new Date();
     let [sec, min, hour] = formatTime(durration).split(":").reverse()
@@ -234,7 +235,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         setCurrentResoltion(data.resolution[0])
         setListResolution(() => data.resolution)
         setPlayer(() => data)
-        videoRef.current.src = data.resolution[0].url
+        videoRef.current.src = `http://localhost:3001/video?url=${btoa(data.resolution[0].url)}`
         videoRef.current.currentTime = time
     }
 
