@@ -151,17 +151,17 @@ export async function refetchHistory() {
     if (!data.data) return
     if (data.data.sections.length > 2) return
     if (data.data.sections.length <= 0) return
-    if (data.data.sections.length == 1 && data.data[0].title == t("global.continuewatch")) {
+    if (data.data.sections.length == 1 && data.data.sections[0].title == t("global.continuewatch")) {
         await setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: await ReadContinue(), horizontal: false }] }))
         return
     }
 
-    if (data.data.sections.length == 1 && data.data[0].title == t("global.history")) {
+    if (data.data.sections.length == 1 && data.data.sections[0].title == t("global.history")) {
         await setHomeData(async () => ({ sections: [{ title: t("global.history"), data: await ReadHistory(), horizontal: false }] }))
         return
     }
 
-    if (data.data[0].title == t("global.continuewatch") && data.data[1].title == t("global.history")) {
+    if (data.data.sections[0].title == t("global.continuewatch") && data.data.sections[1].title == t("global.history")) {
         await setHomeData(async () => ({
             sections: [
                 {
