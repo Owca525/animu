@@ -242,7 +242,7 @@ const createProxyServer = () => {
 
   appServer.get("/video", async (req, res) => {
     const { url: encodedUrl } = req.query as { url?: string };
-    if (!encodedUrl) return res.status(400).send("Brak URL filmu");
+    if (!encodedUrl) return res.status(400).send("Url not found");
 
     const currentVideoUrl = Buffer.from(encodedUrl, "base64").toString("utf-8");
 
@@ -269,7 +269,7 @@ const createProxyServer = () => {
       response.headers.forEach((value, key) => res.setHeader(key, value));
 
       if (!response.body) {
-        res.status(500).send("Brak body");
+        res.status(500).send("body not found");
         return;
       }
 
