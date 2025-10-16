@@ -29,10 +29,10 @@ function information() {
             let plugin: playerPluginFormat = store.getState().plugin.playerPlugin
             let [ playerID ] = queryKey
             if (!plugin || !plugin.player) return
-            if (tempData.anime.id == "") {
+            if (tempData.anime.id == "" && !currentIDplayer) {
                 return plugin.player.extractEpisodeList(tempData.anime, undefined)
             }
-            if (tempData.saveData && tempData.saveData.pluginName == plugin.name) {
+            if (tempData.saveData && tempData.saveData.pluginName == plugin.name && !currentIDplayer) {
                 return plugin.player.extractEpisodeList(playerID.player_ID ? undefined : tempData.anime, playerID.player_ID)
             }
             ChangePlugin(plugin.name)
@@ -113,7 +113,9 @@ function information() {
     }
 
     useHotkeys("tab", () => {
-        console.log(tempData.anime, tempData.saveData)
+        console.log(tempData)
+        console.log(currentIDplayer)
+        console.log(episodeData, isEpisodeError, isEpisodeLoading)
     })
 
     useHotkeys("esc", () => {
@@ -125,8 +127,6 @@ function information() {
         ChangePlugin(name)
         refetch()
     }
-
-    console.log(episodeData, isEpisodeError, isEpisodeLoading)
 
     function checkEpisodes() {
         if (tempData.anime.status == "NOT_YET_RELEASED") return true
