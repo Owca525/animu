@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, Menu } from 'electron'
+import { app, shell, BrowserWindow, Menu, session } from 'electron'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { join } from 'path'
 
@@ -29,7 +29,9 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
-      webSecurity: false
+      webSecurity: false,
+      allowRunningInsecureContent: false,
+      nodeIntegration: true,
     },
     title: title
   })
@@ -52,6 +54,11 @@ function createWindow(): void {
     pipWindow.setAlwaysOnTop(true, 'screen-saver');
   };
 
+  session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+    details.requestHeaders['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/143.0';
+    callback({ requestHeaders: details.requestHeaders });
+  });
+  
   if (process.env.NODE_ENV === 'development') {
     mainWindow.setTitle(title + " developer")
     mainWindow.webContents.openDevTools()

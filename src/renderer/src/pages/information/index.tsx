@@ -256,7 +256,7 @@ function information() {
                                         {isEpisodeLoading == false && isEpisodeError == false && episodeData && episodeData.episodesData && episodeData.episodesData.length > 0 && tempData.anime.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED" && (
                                             <>
                                                 {episodeData.episodesData.map((episode) => episode.episodes.length > 0 ? (
-                                                    <Drop LeftHeader={t(`information.types.${episode.type}`)} RightHeader={t("information.listEpisodes", { number: episode.episodes.length })} content={makeButtons(episode.episodes, episode.type)} />
+                                                    <Drop LeftHeader={episode.name ? episode.name : t(`information.types.${episode.type}`)} RightHeader={t("information.listEpisodes", { number: episode.episodes.length })} content={makeButtons(episode.episodes, episode.type)} />
                                                 ) : "")}
                                             </>
                                         )}

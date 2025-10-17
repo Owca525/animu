@@ -2,6 +2,7 @@ import { lazy, RefObject, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "react-toastify"
 import Hls from "hls.js"
+import * as mpegts from 'mpegts.js';
 
 // Components
 import NerdStats from "./components/nerdStats"
@@ -29,7 +30,8 @@ import JASSUB from "jassub";
 
 import workerUrl from "jassub/dist/jassub-worker.js?url";
 import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
-
+import { useHotkeys } from "react-hotkeys-hook"
+import { mpegtsCustomLoader } from "@renderer/utils/mpegtsCustomLoader";
 
 function addTime(durration: number): string {
     const now = new Date();
@@ -39,14 +41,31 @@ function addTime(durration: number): string {
     if (min) now.setMinutes(now.getMinutes() + parseInt(min));
     if (sec) {
         let tmp = parseInt(sec)
-        if (tmp <= 59) now.setSeconds(now.getSeconds() + (tmp-1))
-        if (tmp <= 0) now.setSeconds(now.getSeconds() + (tmp+2))
+        if (tmp <= 59) now.setSeconds(now.getSeconds() + (tmp - 1))
+        if (tmp <= 0) now.setSeconds(now.getSeconds() + (tmp + 2))
     };
 
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
 
     return `${hours}:${minutes}`;
+}
+
+async function fetchData(tmpData: { episode: string, id?: string, type: string, playerData: playerData }, func: (episode: string, type: string, playerData: playerData, customData?: any, id?: string) => Promise<playerData | undefined>): Promise<{ succes: boolean, data: playerData | undefined }> {
+    try {
+        console.log(tmpData)
+        let data = await func(tmpData.episode, tmpData.type, tmpData.playerData, undefined, tmpData.id)
+        return {
+            succes: true,
+            data: data
+        }
+    } catch (error) {
+        console.error(error, "fetchData player")
+        return {
+            succes: false,
+            data: undefined
+        }
+    }
 }
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
@@ -148,8 +167,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     }
 
     useEffect(() => {
-        // import("../../utils/filesMange/history").then(({ SaveHistory }) => SaveHistory({ id: id, img: img, title: title, text: t('general.LastWatch', { episode: episode.ep }) }))
-        checkUrl(player_data[0])
+        let defaulthost = player_data[0]
+        for (let index = 0; index < player_data.length; index++) {
+            const element = player_data[index];
+            if (element.defaultHost) defaulthost = element
+        }
+        checkUrl(defaulthost)
         handleVolume(PlayerVolume, true)
         handleMouseMove()
         if (config.Player.general.AutoFullscreen) {
@@ -195,13 +218,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         videoRef.current.currentTime = time
     }
 
-    function setNewUrl(host: string) {
-        if (player_data.length <= 1) return
-        const value = player_data.findIndex((value) => value.hostname == host)
-        if (value < 0) return
-        if (player_data[value + 1] == undefined) return
-        checkUrl(player_data[value + 1])
-    }
+    // function setNewUrl(host: string) {
+    //     if (player_data.length <= 1) return
+    //     const value = player_data.findIndex((value) => value.hostname == host)
+    //     if (value < 0) return
+    //     if (player_data[value + 1] == undefined) return
+    //     checkUrl(player_data[value + 1])
+    // }
 
     async function setDefaultSubtitles(data: playerSubtitlesFormat[]) {
         if (data.length <= 0) return
@@ -217,25 +240,39 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     async function checkUrl(data: playerData) {
         if (!videoRef.current) return
-        if (data.resolution.length <= 0) {
+        let currentplayer = data
+        if (currentplayer.extractResolution) {
+            let tmp = await fetchData({
+                episode: temp.episode,
+                id: anime_data.AnimeData.player_ID,
+                type: "",
+                playerData: currentplayer
+            }, currentplayer.extractResolution)
+            console.log(tmp)
+            if (tmp.succes && tmp.data) currentplayer = tmp.data
+        }
+
+        console.log(currentplayer)
+
+        if (currentplayer.resolution.length <= 0) {
             toast.info(t("player.errors.missingResoltions"), notificationProps)
             setResError(() => true)
             return
         }
         const time = videoRef.current.currentTime
-        if (data.subtitles) setListSubtitles(() => [{ url: "", format: "", lang: "", label: "Off" }, ...data.subtitles as playerSubtitlesFormat[]])
-        if (data.storyboardVTT) setThumbnail(await VTTstoryBoardParser(data.storyboardVTT))
-        if (data.resolution[0].defaultSubtitles && data.subtitles) setDefaultSubtitles(data.subtitles)
-        if (data.hls) {
-            setPlayer(() => data)
-            await runHLS(data.resolution[0].url, data.hostname)
+        if (currentplayer.subtitles) setListSubtitles(() => [{ url: "", format: "", lang: "", label: "Off" }, ...currentplayer.subtitles as playerSubtitlesFormat[]])
+        if (currentplayer.storyboardVTT) setThumbnail(await VTTstoryBoardParser(currentplayer.storyboardVTT))
+        if (currentplayer.resolution[0].defaultSubtitles && currentplayer.subtitles) setDefaultSubtitles(currentplayer.subtitles)
+        if (currentplayer.hls) {
+            setPlayer(() => currentplayer)
+            await runHLS(currentplayer.resolution[0].url, currentplayer.resolution[0].reqHeader)
             return
         }
         if (hls) hls.destroy()
-        setCurrentResoltion(data.resolution[0])
-        setListResolution(() => data.resolution)
-        setPlayer(() => data)
-        videoRef.current.src = `http://localhost:3001/video?url=${btoa(data.resolution[0].url)}`
+        setCurrentResoltion(currentplayer.resolution[0])
+        setListResolution(() => currentplayer.resolution)
+        setPlayer(() => currentplayer)
+        videoRef.current.src = `http://localhost:3001/video?url=${btoa(currentplayer.resolution[0].url)}`
         videoRef.current.currentTime = time
     }
 
@@ -250,10 +287,52 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         }
     }
 
-    async function runHLS(url: string, host: string) {
+    function runMPEGTS() {
+        const player = mpegts.default.createPlayer(
+            {
+                type: 'hls',
+            },
+            {
+                enableWorker: true,
+                enableStashBuffer: false,
+                lazyLoad: false,
+            }
+        );
+        player.attachMediaElement(videoRef.current!);
+        player.load();
+        player.play();
+        console.log(player)
+        if (videoRef.current) console.log("Support audio/mp4;codecs=mp4a.40.1",[videoRef.current.canPlayType("audio/mp4;codecs=mp4a.40.1")])
+    }
+
+    async function runHLS(url: string, header?: { [key: string]: string }) {
+        if (videoRef.current) console.log("Support audio/mp4;codecs=mp4a.40.1",[videoRef.current.canPlayType("audio/mp4;codecs=mp4a.40.1")])
         const hls = new Hls({
             maxBufferLength: 60,
             autoStartLoad: true,
+            loader: class extends Hls.DefaultConfig.loader {
+                load(context: any, config: any, callbacks: any) {
+                    window.api.request.advanceRequest(context.url, { method: "GET", headers: header }).then((data) => {
+                        let currentData: any = data.text
+                        if (!data.success) {
+                            callbacks.onError({ type: 'network', details: "Failed Requestc", fatal: true }, context)
+                            return
+                        }
+                        if (context.responseType == "arraybuffer") currentData = data.buffer
+                        callbacks.onSuccess({ data: currentData, url: context.url }, {
+                            loaded: data.buffer.byteLength,
+                            total: data.buffer.byteLength,
+                            abort: true,
+                            retry: config.maxRetry,
+                            chunkCount: 0,
+                            bwEstimate: 0,
+                            loading: { start: 0, first: 0, end: 0 },
+                            parsing: { start: 0, end: 0 },
+                            buffering: { start: 0, first: 0, end: 0 }
+                        }, context);
+                    });
+                }
+            },
         });
 
         setHls(() => hls)
@@ -281,25 +360,30 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             });
 
             hls.on(Hls.Events.ERROR, (_event, data) => {
+                console.error("HLS", _event, data)
                 if (data.fatal) {
                     let message: string
                     switch (data.type) {
                         case Hls.ErrorTypes.NETWORK_ERROR:
                             message = t('player.errors.MEDIA_ERR_NETWORK')
-                            hls.destroy()
+                            // hls.destroy()
                             // TODO: Update this, may make bug
-                            setNewUrl(host)
+                            // setNewUrl(host.hostname)
+                            hls.destroy();
                             // hls.startLoad();
                             break;
                         case Hls.ErrorTypes.MEDIA_ERROR:
                             message = t('player.errors.MEDIA_ERR_DECODE')
-                            hls.recoverMediaError();
-                            break;
+                            // hls.recoverMediaError();
+                            // runMPEGTS()
+                            hls.destroy();
+                            return
                         default:
                             message = t('player.errors.default')
                             hls.destroy();
                             break;
                     }
+                    hls.destroy();
                     toast.error(message, notificationProps);
                 }
             });
@@ -524,7 +608,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
         if (!currentPlayer) return
         let index = player_data.findIndex((element) => element.hostname == currentPlayer.hostname)
-        if (player_data[index + 1]) checkUrl(player_data[index + 1])
+        // if (player_data[index + 1]) checkUrl(player_data[index + 1])
     }
 
     function setTimeVideo(value: number) {
@@ -556,13 +640,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         if (keys == "CTRL+SHIFT+D") {
             setshowNerdStats((prev) => !prev)
         }
-        console.log(keys)
         keybinds(keys)
     })
 
-    // useHotkeys("d", () => {
-    //     console.log(player_data, temp, currentSubtitles)
-    // })
+    useHotkeys("d", () => {
+        console.log(player_data, temp, currentSubtitles)
+    })
 
     function setEpisode(type: "next" | "prev") {
         let ep = temp.episodes.findIndex((item) => item.ep === temp.episode)
@@ -988,7 +1071,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                         </>
                     }
 
-                    {resolutionNotFound && 
+                    {resolutionNotFound &&
                         <motion.div className="player-loading-animation-container player-buffering-animation"
                             variants={hiddenVariants}
                             initial="visible"

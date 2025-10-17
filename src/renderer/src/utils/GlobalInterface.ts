@@ -69,23 +69,25 @@ export interface homeData {
     filterTags: FilterParams | undefined
 }
 
+// TODO: Make better format
 export interface playerData {
     hostname: string
     hls: boolean
     resolution: resolutionFormat[]
+    splitResHLS?: boolean
     defaultHost?: boolean
     storyboardVTT?: string
     listChapters?: playerChapterList
     chaptersUrl?: string
     subtitles?: playerSubtitlesFormat[]
-    extractResolution?: (episode: string, id: string, type: string, customData?: any) => resolutionFormat[]
+    extractResolution?: (episode: string, type: string, playerData: playerData, customData?: any, id?: string) => Promise<playerData | undefined>
 }
 
-export interface resolutionFormat { 
+export interface resolutionFormat {
     res: string,
-    url: string, 
+    url: string,
     reqHeader?: { [key: string]: string },
-    defaultSubtitles?: boolean; 
+    defaultSubtitles?: boolean;
 }
 
 export interface playerSubtitlesFormat { url: string, lang: string, label: string, format: string }
@@ -131,11 +133,11 @@ export type ContextMenuProps = {
     deletion?: boolean
 }[]
 
-export interface themeMetadata { 
-    version?: string; 
-    author?: string; 
-    pathcss: string; 
-    animuTitle?: string; 
+export interface themeMetadata {
+    version?: string;
+    author?: string;
+    pathcss: string;
+    animuTitle?: string;
     name: string;
 }
 
@@ -279,7 +281,7 @@ export interface SettingsConfig {
 }
 
 export interface dialogProps {
-    type: "error" | "info" | "refresh" | "none" 
+    type: "error" | "info" | "refresh" | "none"
     title: string
     description?: string
     buttons: {
@@ -299,9 +301,9 @@ export interface Thumbnail {
 };
 
 export interface FilterParams {
-  genres?: string[];
-  years?: string;
-  seasons?: string;
-  format?: string[];
-  airing?: string;
+    genres?: string[];
+    years?: string;
+    seasons?: string;
+    format?: string[];
+    airing?: string;
 };
