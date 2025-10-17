@@ -222,32 +222,47 @@ export async function extractInformation(type: "all" | "episodes", id: string): 
 
 function findAnime(animeList: cardData[], anime: AnimeData): string | undefined {
   try {
+    console.log("First Check", animeList)
     // FIRST CHECK
     if (animeList.length <= 0) return undefined
     if (animeList.length == 1) return animeList[0].AnimeData.player_ID
 
     // Second Check
     let seasonYearFilter = animeList.filter((element) => element.AnimeData.seasonYear == anime.seasonYear)
+    console.log("Second Check", seasonYearFilter)
     if (seasonYearFilter.length <= 0) return undefined
     if (seasonYearFilter.length == 1) return seasonYearFilter[0].AnimeData.player_ID
 
     // Third Check
     let seasonFilter = seasonYearFilter.filter((element) => makeSmallText(element.AnimeData.season) == makeSmallText(anime.season))
+    console.log("Third Check", seasonYearFilter)
     if (seasonFilter.length <= 0) return undefined
     if (seasonFilter.length == 1) return seasonFilter[0].AnimeData.player_ID
 
     // Four Check
-    let formatFilter = seasonFilter.filter((element) => makeSmallText(element.AnimeData.format) == makeSmallText(anime.format))
+    let episodesFilter: cardData[] | undefined = undefined
+    if (anime.episodes) {
+      episodesFilter = seasonFilter.filter((element) => element.AnimeData.episodes == anime.episodes)
+      console.log("Four Check", episodesFilter)
+      if (episodesFilter.length <= 0) return undefined
+      if (episodesFilter.length == 1) return episodesFilter[0].AnimeData.player_ID
+    }
+
+    // Five Check
+    let durationFilter: cardData[] = []
+    if (episodesFilter) durationFilter = episodesFilter.filter((element) => element.AnimeData.duration == anime.duration)
+    else durationFilter = seasonFilter.filter((element) => element.AnimeData.duration == anime.duration)
+    console.log("Five Check", durationFilter)
+    if (durationFilter.length <= 0) return undefined
+    if (durationFilter.length == 1) return durationFilter[0].AnimeData.player_ID
+
+    // Six Check
+    let formatFilter = durationFilter.filter((element) => makeSmallText(element.AnimeData.format) == makeSmallText(anime.format))
+    console.log("Six Check", formatFilter)
     if (formatFilter.length <= 0) return undefined
     if (formatFilter.length == 1) return formatFilter[0].AnimeData.player_ID
 
-    // Five Check
-    if (!anime.episodes) return formatFilter[0].AnimeData.player_ID
-    let episodesFilter = formatFilter.filter((element) => element.AnimeData.episodes == anime.episodes)
-    if (episodesFilter.length <= 0) return undefined
-    if (episodesFilter.length == 1) return episodesFilter[0].AnimeData.player_ID
-
-    return episodesFilter[0].AnimeData.player_ID
+    return formatFilter[0].AnimeData.player_ID
   } catch (error) {
     console.error("Allmanga findAnime error", error)
     return animeList[0].AnimeData.player_ID
