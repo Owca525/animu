@@ -329,3 +329,8 @@ export function getEpisodeDay(unixTime: number, episode: number): string {
     let todayName = days[episodeDate.getDay()]
     return t("week.infoCommunicat", { ep: episode, day: todayName, hours: todayHours });
 }
+
+export function makeSmallText(text: string | undefined) {
+    if (!text) return text
+    return text.toLowerCase()
+}
