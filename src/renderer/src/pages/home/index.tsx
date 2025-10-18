@@ -83,6 +83,7 @@ const Home = () => {
   useEffect(() => {
     if (homeCache.data.sections.length <= 0) return
     if (homeCache.data.sections.length != 1) return
+    if (homeCache.stopScrolling) return
     if (!divRef.current) return
     if ((divRef.current.scrollHeight > divRef.current.clientHeight) == false && homeCache.data.sections[0].onScrollDownFunction) {
       store.dispatch({ type: "setPage", payload: homeCache.page + 1 });
