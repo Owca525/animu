@@ -54,7 +54,7 @@ const BigCard: React.FC<bigCardProps> = ({ data, ref }) => {
                             }
                         </div>
                         <div className="big-card-information-bottom">
-                            <Button content='Open' ButtonClass='big-card-button' onClick={openInformation} />
+                            <Button content='More Information' ButtonClass='big-card-button' onClick={openInformation} />
                             {data.AnimeData.nextAiringEpisode &&
                                 <div className="big-card-information-date">{getEpisodeDay(data.AnimeData.nextAiringEpisode.airingAt, data.AnimeData.nextAiringEpisode.episode)}</div>
                             }

@@ -2,7 +2,7 @@ export const notificationProps = {
     closeOnClick: true,
     autoClose: 3000,
     pauseOnHover: true,
-    hideProgressBar: true
+    theme: "dark"
 }
 
 export interface AnimeData {

@@ -205,3 +205,8 @@ td {
       width: 60%;
     }
 }
+
+.settings-custom-space {
+  display: flex;
+  gap: 4px;
+}

@@ -24,7 +24,7 @@
 .big-card-container-buttons {
     display: flex;
     gap: 4px;
-    margin-top: -25px;
+    margin-top: -20px;
     z-index: 1;
 }
 

@@ -841,6 +841,17 @@ function settings() {
                                     }
                                 />
                             </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Toast Notification Test
+                                <span className="settings-custom-space">
+                                    <Button content="info" onClick={() => toast.info("Test Notification", notificationProps)} />
+                                    <Button content="success" onClick={() => toast.success("Test Notification", notificationProps)} />
+                                    <Button content="warning" onClick={() => toast.warning("Test Notification", notificationProps)} />
+                                    <Button content="error" onClick={() => toast.error("Test Notification", notificationProps)} />
+                                    <Button content="default" onClick={() => toast("Test Notification", notificationProps)} />
+                                </span>
+                            </div>
                         </div>
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.devmode.information")}</div>
