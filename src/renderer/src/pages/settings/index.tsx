@@ -61,7 +61,7 @@ function settings() {
                 onClick: () => setCategory(() => "history"),
             },
             {
-                icon: "history",
+                icon: "info",
                 text: t("global.about"),
                 onClick: () => setCategory(() => "about"),
             },
