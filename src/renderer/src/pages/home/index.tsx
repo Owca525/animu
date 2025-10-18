@@ -160,7 +160,7 @@ const Home = () => {
 
   // TODO: napraw wyszukiwanie itp
   async function OnSearch(text: string) {
-    if (!homeCache.localSearch) {
+    if (!homeCache.localSearch && homeCache.search != text) {
       store.dispatch({ type: "setSearch", payload: text });
       store.dispatch({ type: "setPage", payload: 1 });
       homeStopScrolling(false);

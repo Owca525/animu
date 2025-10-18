@@ -12,21 +12,21 @@ interface InputProps {
 const Input: React.FC<InputProps> = ({ type = "text", InputClass, placeholder, onKeyDown, defaultValue }) => {
     const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
     const inputRef = useRef<HTMLInputElement>(null)
-    // const [cacheText, setCacheText] = useState<string>("")
+    const [cacheText, setCacheText] = useState<string>("")
 
     function handleData(event) {
         if (!onKeyDown) return
-        // if (cacheText == event.currentTarget.value) return
+        if (cacheText == event.currentTarget.value) return
         if (debounceTimeout) clearTimeout(debounceTimeout);
         if (event.code == "Enter") {
-            // setCacheText(event.currentTarget.value)
+            setCacheText(event.currentTarget.value)
             onKeyDown(event.currentTarget.value)
             return
         }
 
         const newTimeout = setTimeout(() => {
             if (inputRef.current) {
-                // setCacheText(inputRef.current.value)
+                setCacheText(inputRef.current.value)
                 onKeyDown(inputRef.current.value)
             }
         }, 300);
