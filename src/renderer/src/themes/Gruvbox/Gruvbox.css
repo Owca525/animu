@@ -3,17 +3,34 @@
 :root {
   --text: #ebdbb2;
   --text-gray: #d5c4a1;
-
+  
   /* Background */
   --bg: #1d2021; /* First layer, background only */
-  --bg2: #282828; /* Second layer, use in sidebar, header */
+  --bg2: #242424; /* Second layer, use in sidebar, header */
   --bg3: #32302f; /* Thirt layer, use in button etc */
   --bg4: #3c3836; /* Fourth layer, use in hover button etc */
+  --bg5: #504945; /* Fourth layer, use in hover button etc */
 
   /* accent */
   --neutral1: #df6616;
   --neutral2: #fe8019;
   --neutral3: #ff8828;
+
   --red: #a62b1d;
   --blue: #076678;
+  --orange: var(--neutral2);
+  --green: #427b58;
+
+  /* DarkerAnimu compatibility */
+  --first-layer: var(--bg); /* First layer, background only */
+  --second-layer: var(--bg2); /* Second layer, used in sidebar, header */
+  --third-layer: var(--bg3); /* Third layer, used in button etc */
+  --fourth-layer: var(--bg4); /* Fourth layer, used in hover button etc */
+  --five-layer: var(--bg5);
+
+  /* Colors */
+  --green-one: var(--green); /* boders, some buttons etc */
+  --orange-one: var(--orange);
+  --blue-one: var(--blue);
+  --red-one: var(--red);
 }
