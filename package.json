@@ -37,7 +37,6 @@
     "ini": "^5.0.0",
     "jassub": "^1.8.6",
     "material-symbols": "^0.36.3",
-    "mpegts.js": "^1.8.0",
     "react-hotkeys-hook": "^5.2.0",
     "react-i18next": "^16.0.0",
     "react-query": "^3.39.3",

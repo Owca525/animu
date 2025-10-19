@@ -3,10 +3,9 @@ import { playerPluginFormat } from "../GlobalInterface";
 import { AniZone } from "@renderer/plugins/anizone";
 import { lycorisCafe } from "@renderer/plugins/lycoriscafe";
 import { infoPlugin } from "@renderer/plugins/anilistApi";
-import { GojoLive } from "@renderer/plugins/gojoLive";
 
 const initialState = {
-    loadedPlugins: [infoPluginPlayer, AniZone, lycorisCafe, GojoLive] as playerPluginFormat[],
+    loadedPlugins: [infoPluginPlayer, AniZone, lycorisCafe] as playerPluginFormat[],
     informationPlugin: infoPlugin,
     playerPlugin: undefined,
     playerPluginCache: undefined

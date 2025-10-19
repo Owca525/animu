@@ -2,7 +2,6 @@ import { lazy, RefObject, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "react-toastify"
 import Hls from "hls.js"
-import * as mpegts from 'mpegts.js';
 
 // Components
 import NerdStats from "./components/nerdStats"
@@ -287,26 +286,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         }
     }
 
-    function runMPEGTS() {
-        const player = mpegts.default.createPlayer(
-            {
-                type: 'hls',
-            },
-            {
-                enableWorker: true,
-                enableStashBuffer: false,
-                lazyLoad: false,
-            }
-        );
-        player.attachMediaElement(videoRef.current!);
-        player.load();
-        player.play();
-        console.log(player)
-        if (videoRef.current) console.log("Support audio/mp4;codecs=mp4a.40.1",[videoRef.current.canPlayType("audio/mp4;codecs=mp4a.40.1")])
-    }
-
     async function runHLS(url: string, header?: { [key: string]: string }) {
-        if (videoRef.current) console.log("Support audio/mp4;codecs=mp4a.40.1",[videoRef.current.canPlayType("audio/mp4;codecs=mp4a.40.1")])
         const hls = new Hls({
             maxBufferLength: 60,
             autoStartLoad: true,

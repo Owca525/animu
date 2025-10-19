@@ -5,11 +5,12 @@ const BACKEND = "https://backend.animetsu.bz"
 const WEBSITE = "https://animetsu.bz/"
 
 const HEADER = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0',
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
     'Origin': WEBSITE,
     'Referer': WEBSITE
 }
 
+// TODO: Fix or add support somehow audio/mp4;codecs=mp4a.40.1 to hls because most of the url use this
 async function extractEpisodeList(animeData?: AnimeData, anime_id?: string, onlyEpisodes?: boolean): Promise<episodeList | undefined> {
     try {
         let animeID = anime_id
