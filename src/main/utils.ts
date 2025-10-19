@@ -242,16 +242,14 @@ const createProxyServer = () => {
 
     appServer.get("/video", async (req, res) => {
         const { url: encodedUrl } = req.query as { url?: string };
+        if (!encodedUrl) return res.status(400).send("Url not found");
 
-        if (!encodedUrl) {
-            return res.status(400).send("data not found");
-        }
-        let currentVideoUrl: string;
-        try {
-            currentVideoUrl = Buffer.from(encodedUrl, "base64").toString("utf-8");
-        } catch (err) {
-            return res.status(400).send("base64 error");
-        }
+        const currentVideoUrl = Buffer.from(encodedUrl, "base64").toString("utf-8");
+
+        let aborted = false;
+        req.on("close", () => {
+            aborted = true;
+        });
 
         try {
             const headers: Record<string, string> = {};
@@ -259,14 +257,9 @@ const createProxyServer = () => {
             if (req.headers.range) {
                 const match = req.headers.range.match(/bytes=(\d+)-(\d*)/);
                 if (match) {
-                    let start = parseInt(match[1], 10);
-                    let end = match[2] ? parseInt(match[2], 10) : start;
-
-                    end = start + 100 * 1024 * 1024 - 1;
-
+                    const start = parseInt(match[1], 10);
+                    const end = start + 10 * 1024 * 1024 - 1;
                     headers["Range"] = `bytes=${start}-${end}`;
-                } else {
-                    headers["Range"] = "bytes=0-1048576";
                 }
             }
 
@@ -275,16 +268,34 @@ const createProxyServer = () => {
             res.status(response.status);
             response.headers.forEach((value, key) => res.setHeader(key, value));
 
-            if (response.body) {
-                const nodeStream = Readable.fromWeb(response.body as any);
-                nodeStream.pipe(res);
-            } else {
-                res.status(500).send("No Response");
+            if (!response.body) {
+                res.status(500).send("body not found");
+                return;
             }
+
+            const nodeStream = Readable.fromWeb(response.body as any);
+
+            req.on("close", () => {
+                try {
+                    nodeStream.destroy();
+                    (response.body as any)?.cancel?.();
+                } catch { }
+            });
+
+            nodeStream.on("error", (err) => {
+                if (!aborted) {
+                    console.error("Stream error:", err.message);
+                    res.end();
+                }
+            });
+
+            nodeStream.pipe(res);
             return
-        } catch (err) {
-            console.error("error:", err);
-            res.status(500).send("error");
+        } catch (err: any) {
+            if (!aborted) {
+                console.error("Proxy error:", err.message);
+                res.status(500).send("error");
+            }
             return
         }
     });
