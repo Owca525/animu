@@ -139,7 +139,7 @@ function loadingAnimation(leave: () => void, anime_data: { title: { english?: st
         <div className="player-loading-container" style={{ backgroundImage: `url(${getCurrentImage(currentdata)})` }}>
             <div className="player-loading-container-black"></div>
             <div className="player-loading-top">
-                <Button icon='arrow_back' ButtonClass='player-buttons' onClick={leave} />
+                <Button icon='arrow_back' ButtonClass='player-buttons' iconClassName="player-button-icons" onClick={leave} />
                 <div className="player-title ">{detectTitle(anime_data)}</div>
             </div>
             <div className="player-loading-animation-container" style={{ maxHeight: "min-content" }}>

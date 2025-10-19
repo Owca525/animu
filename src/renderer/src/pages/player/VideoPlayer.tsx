@@ -1044,7 +1044,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
             <div className="video-overlay">
                 <div className={checkUptoNext() ? isVisible ? 'video-top' : 'video-top player-hidden' : 'video-top'}>
-                    <Button icon='arrow_back' ButtonClass='player-buttons' onClick={async () => await exitPlayer()} />
+                    <Button icon='arrow_back' ButtonClass='player-buttons' iconClassName="player-button-icons" onClick={async () => await exitPlayer()} />
                     <div className="player-title ">{detectTitle({ title: anime_data.AnimeData.title, ep: temp.episode, format: anime_data.AnimeData.format })}</div>
                 </div>
                 <div className="video-center"> {/* video-center-container */}
