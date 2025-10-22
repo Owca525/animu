@@ -30,7 +30,6 @@ import JASSUB from "jassub";
 import workerUrl from "jassub/dist/jassub-worker.js?url";
 import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
 import { useHotkeys } from "react-hotkeys-hook"
-import { mpegtsCustomLoader } from "@renderer/utils/mpegtsCustomLoader";
 
 function addTime(durration: number): string {
     const now = new Date();
@@ -262,7 +261,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         if (currentplayer.subtitles) setListSubtitles(() => [{ url: "", format: "", lang: "", label: "Off" }, ...currentplayer.subtitles as playerSubtitlesFormat[]])
         if (currentplayer.storyboardVTT) setThumbnail(await VTTstoryBoardParser(currentplayer.storyboardVTT))
         if (currentplayer.resolution[0].defaultSubtitles && currentplayer.subtitles) setDefaultSubtitles(currentplayer.subtitles)
-        if (currentplayer.hls) {
+        if (currentplayer.resolution[0].hls) {
             setPlayer(() => currentplayer)
             await runHLS(currentplayer.resolution[0].url, currentplayer.resolution[0].reqHeader)
             return
@@ -586,8 +585,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         }
         toast.error(message, notificationProps);
 
-        if (!currentPlayer) return
-        let index = player_data.findIndex((element) => element.hostname == currentPlayer.hostname)
+        // if (!currentPlayer) return
+        // let index = player_data.findIndex((element) => element.hostname == currentPlayer.hostname)
         // if (player_data[index + 1]) checkUrl(player_data[index + 1])
     }
 
@@ -925,7 +924,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         return { ...thumbnails, metadata: metadata };
     }
 
-    function generateOpeningEnding(data: playerChapterList) {
+    function generateOpeningEnding(data: playerChapterList[]) {
         if (!videoRef.current) return
         let tmp: { left: number, width: number, name?: string, type: "opening" | "ending" | "other" }[] = []
         for (let index = 0; index < data.length; index++) {

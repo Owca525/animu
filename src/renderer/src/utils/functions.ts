@@ -276,12 +276,12 @@ export function timeToSeconds(time: string): number {
     return hours * 3600 + minutes * 60 + seconds;
 }
 
-export async function convertChaptersVTT(url: string): Promise<playerChapterList> {
+export async function convertChaptersVTT(url: string): Promise<playerChapterList[]> {
     let req = await window.api.request.get(url, { "User-Agent": navigator.userAgent }, "text")
     if (!req.success) return []
     let lines = req.data.split("\n") as string
 
-    let finnalListChapters: playerChapterList = []
+    let finnalListChapters: playerChapterList[] = []
     for (let i = 0; i < lines.length; i++) {
         if (lines[i].includes("-->")) {
             const [start, end] = lines[i].split(" --> ");

@@ -310,7 +310,6 @@ createProxyServer()
 
 ipcMain.handle('advanceRequest', async (_, url: string, options?: { method: "POST" | "GET", headers: { [key: string]: string } }) => {
     const response = await fetch(url, options);
-    console.log(response)
     if (!response.ok) return { text: "", buffer: [], status: response.status, statusText: response.statusText, url: response.url, success: response.ok }
     let cloned = response.clone()
     return {

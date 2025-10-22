@@ -1,5 +1,5 @@
 import { timeToSeconds } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, playerChapterList, playerData, playerPluginFormat, playerSubtitlesFormat } from "@renderer/utils/GlobalInterface";
+import { AnimeData, cardData, episodeList, playerChapterList, playerData, playerPluginFormat, playerSubtitlesFormat, resolutionFormat } from "@renderer/utils/GlobalInterface";
 import { getPlayerPluginCache, setPluginPlayerCache } from "@renderer/utils/pluginApi";
 
 const WEB = "https://www.lycoris.cafe"
@@ -45,9 +45,9 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
     let req = await requestToApi(id)
     if (!req) return []
     let episodes = req.data.anime["episodes"]
-    let currentEpisode: { res: string, url: string; defaultSubtitles?: boolean; }[] = []
+    let currentEpisode: resolutionFormat[] = []
     let subtitles: playerSubtitlesFormat[] = []
-    let chapters: playerChapterList = []
+    let chapters: playerChapterList[] = []
 
     let tmp = episodes.find((element) => parseInt(element.number) == parseInt(episode))
     if (!tmp) return []
@@ -67,7 +67,7 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
             currentEpisode.push({
                 res: res,
                 url: animeEpisodes[key],
-                defaultSubtitles: res == "Source"
+                defaultSubtitles: res == "Source",
             })
         }
     } catch (error) {
@@ -92,7 +92,6 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
 
     return [{
         hostname: "lycoris.cafe",
-        hls: false,
         resolution: currentEpisode.sort((a, b) => Number(a.res) - Number(b.res)).reverse(),
         listChapters: chapters,
         subtitles: subtitles

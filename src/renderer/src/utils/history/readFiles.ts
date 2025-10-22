@@ -29,11 +29,11 @@ export async function DeleteFromFile(data: cardData, file: string) {
         let index = -1
         if (data.AnimeData.id == "") {
             index = list.findIndex(
-                (item) => item.saveData?.episode === data.saveData?.episode && item.AnimeData.title.romaji === data.AnimeData.title.romaji
+                (item) => item.AnimeData.title.romaji === data.AnimeData.title.romaji
             );
         } else {
             index = list.findIndex(
-                (item) => item.saveData?.episode === data.saveData?.episode && item.AnimeData.id === data.AnimeData.id
+                (item) => item.AnimeData.id === data.AnimeData.id
             );
         }
 

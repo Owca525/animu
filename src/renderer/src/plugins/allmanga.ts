@@ -304,9 +304,9 @@ async function getURLS(url: string): Promise<playerData | undefined> {
     if (!element.src) return
     const urlObject = new URL(element.src);
     if (element.mp4) {
-      listUrls = { resolution: [{ url: element.src, res: "1080" }], hostname: urlObject.hostname, hls: false }
+      listUrls = { resolution: [{ url: element.src, res: "1080", hls: false }], hostname: urlObject.hostname }
     } else {
-      listUrls = { resolution: [{ url: element.src, res: "" }], hostname: urlObject.hostname, hls: true }
+      listUrls = { resolution: [{ url: element.src, res: "", hls: true }], hostname: urlObject.hostname }
     }
   });
   return listUrls
@@ -331,13 +331,22 @@ export async function extractURLS(type: string, episode: string, id: string): Pr
 
   console.log(resp.data.episode.episodeInfo.vidInforssub)
   if (type == "dub" && resp.data.episode.episodeInfo.vidInforsdub) {
-    data.push({ hostname: "wp.youtube-anime.com", hls: false, resolution: [{ res: resp.data.episode.episodeInfo.vidInforsdub.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.episode.episodeInfo.vidInforsdub.vidPath}` }] })
+    data.push({ hostname: "wp.youtube-anime.com", resolution: [{
+      res: resp.data.episode.episodeInfo.vidInforsdub.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.episode.episodeInfo.vidInforsdub.vidPath}`,
+      hls: false
+    }] })
   }
   if (type == "raw" && resp.data.episode.episodeInfo.vidInforsraw) {
-    data.push({ hostname: "wp.youtube-anime.com", hls: false, resolution: [{ res: resp.data.episode.episodeInfo.vidInforsraw.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.episode.episodeInfo.vidInforsraw.vidPath}` }] })
+    data.push({ hostname: "wp.youtube-anime.com", resolution: [{
+      res: resp.data.episode.episodeInfo.vidInforsraw.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.episode.episodeInfo.vidInforsraw.vidPath}`,
+      hls: false
+    }] })
   }
   if (type == "sub" && resp.data.episode.episodeInfo.vidInforssub) {
-    data.push({ hostname: "wp.youtube-anime.com", hls: false, resolution: [{ res: resp.data.episode.episodeInfo.vidInforssub.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.episode.episodeInfo.vidInforssub.vidPath}` }] })
+    data.push({ hostname: "wp.youtube-anime.com", resolution: [{
+      res: resp.data.episode.episodeInfo.vidInforssub.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.episode.episodeInfo.vidInforssub.vidPath}`,
+      hls: false
+    }] })
   }
 
   return data

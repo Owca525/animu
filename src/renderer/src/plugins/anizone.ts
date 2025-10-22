@@ -40,7 +40,7 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
         }
     }
 
-    let chapterList: playerChapterList = []
+    let chapterList: playerChapterList[] = []
     if (chapters.length > 0) {
         let data = await convertChaptersVTT(chapters[0][0])
         for (let index = 0; index < data.length; index++) {
@@ -67,12 +67,11 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
 
     return [{
         hostname: "Anizone.to",
-        hls: true,
         subtitles: subList,
         listChapters: chapterList,
-        chaptersUrl: chapters.length > 0 ? chapters[0][0] : undefined,
+        external: chapters.length > 0 ? { chaptersUrl: chapters[0][0] } : undefined,
         storyboardVTT: storyboard.length > 0 ? storyboard[0][0] : undefined,
-        resolution: [{ res: "", url: urls[0][0], defaultSubtitles: true }]
+        resolution: [{ res: "", url: urls[0][0], defaultSubtitles: true, hls: true }]
     }]
 }
 

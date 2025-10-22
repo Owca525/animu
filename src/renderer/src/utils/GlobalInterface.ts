@@ -66,33 +66,36 @@ export interface homeData {
     stopScrolling: boolean
     containerLoading: boolean
     localSearch: boolean
-    filterTags: FilterParams | undefined
+    filterTags?: FilterParams
 }
 
-// TODO: Make better format
 export interface playerData {
     hostname: string
-    hls: boolean
     resolution: resolutionFormat[]
-    splitResHLS?: boolean
+    splitHLS?: boolean
     defaultHost?: boolean
     storyboardVTT?: string
-    listChapters?: playerChapterList
-    chaptersUrl?: string
+    listChapters?: playerChapterList[]
     subtitles?: playerSubtitlesFormat[]
+    external?: externalPlayerFormat
     extractResolution?: (episode: string, type: string, playerData: playerData, customData?: any, id?: string) => Promise<playerData | undefined>
 }
 
 export interface resolutionFormat {
     res: string,
     url: string,
+    hls?: boolean
     reqHeader?: { [key: string]: string },
     defaultSubtitles?: boolean;
 }
 
+export interface externalPlayerFormat {
+    chaptersUrl: string
+}
+
 export interface playerSubtitlesFormat { url: string, lang: string, label: string, format: string }
 
-export type playerChapterList = { start: number, end: number, type: "opening" | "ending" | "other", name?: string }[]
+export type playerChapterList = { start: number, end: number, type: "opening" | "ending" | "other", name?: string }
 
 export interface indentityPlayer {
     pluginName: string
@@ -146,6 +149,7 @@ export interface playerPluginFormat {
     name: string
     author: string
     icon?: string
+    urlWebsite?: string
     preferedLang: string[]
     sidebarAddon?: sidebarData[]
     searchOption?: genres
