@@ -55,7 +55,7 @@ body {
 
 ::-webkit-scrollbar-thumb {
   border-radius: 10px;
-  background-color: var(--fourth-layer);
+  background-color: var(--five-layer);
 }
 
 .Toastify__toast {
