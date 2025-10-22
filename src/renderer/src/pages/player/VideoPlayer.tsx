@@ -23,7 +23,6 @@ import PlayerEpisodeElement from "./components/playerEpisodeElement"
 import { convert } from "subtitle-converter";
 // import { useHotkeys } from "react-hotkeys-hook"
 import i18n from "@renderer/utils/i18n"
-import store from "@renderer/utils/store"
 import html2canvas from "html2canvas"
 import JASSUB from "jassub";
 
@@ -71,7 +70,7 @@ const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75"
 interface VideoPlayerProps {
     player_data: playerData[]
     anime_data: cardData
-    temp: { episode: string, type: string, episodes: { ep: string, img?: string, title?: string }[] }
+    temp: { episode: string, type: string, episodes: { ep: string, img?: string, title?: string }[], pluginName: string }
     setNextEpisode: (value: string) => void
     volumeCacheFunc: (value: number) => void
     PlayerVolume: number
@@ -430,7 +429,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             SaveContinue({
                 AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
                 saveData: {
-                    pluginName: store.getState().plugin.playerPlugin.name,
+                    pluginName: temp.pluginName,
                     last_Time: videoRef.current.currentTime,
                     episode: temp.episode,
                     type: temp.type

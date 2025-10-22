@@ -91,22 +91,24 @@ export function InitialPlugin() {
     }
 }
 
-export function ChangePlugin(name: string) {
+export function ChangePlugin(name: string): playerPluginFormat {
+    const loadedPlugins: playerPluginFormat[] = store.getState().plugin.loadedPlugins
     try {
-        const loadedPlugins: playerPluginFormat[] = store.getState().plugin.loadedPlugins
         for (let index = 0; index < loadedPlugins.length; index++) {
             const element = loadedPlugins[index];
             if (element.name == name) {
                 store.dispatch({ type: "setPluginPlayer", payload: element })
-                return
+                return element
             }
             if (name == "" && element.name == "Allmanga") {
                 store.dispatch({ type: "setPluginPlayer", payload: element })
-                return
+                return element
             }
         }
+        return loadedPlugins[0]
     } catch (error) {
         console.error(error)
+        return loadedPlugins[0]
     }
 }
 

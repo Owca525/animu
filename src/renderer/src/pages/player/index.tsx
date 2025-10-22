@@ -16,8 +16,9 @@ import ExternalPlayer from "./externalPlayer";
 
 import VideoPlayer from "./VideoPlayer";
 import { useQuery } from "react-query";
+
 const player = () => {
-    const anime_data: { data: cardData, episodelist: { ep: string, img?: string, title?: string }[], continueWatch?: boolean } = useLocation().state
+    const anime_data: { data: cardData, episodelist: { ep: string, img?: string, title?: string }[], pluginName: string, continueWatch?: boolean } = useLocation().state
     const navigate = useNavigate()
     const config: SettingsConfig = useSelector((data: any) => data.config);
 
@@ -54,7 +55,7 @@ const player = () => {
     useEffect(() => {
         SaveHistory({
             saveData: {
-                pluginName: anime_data.data.saveData && anime_data.data.saveData.pluginName == "" ? "Allmanga" : config.plugins.player,
+                pluginName: anime_data.pluginName,
                 last_Time: 0,
                 type: extractionData.current.type,
                 episode: extractionData.current.actual.toString()
@@ -114,7 +115,7 @@ const player = () => {
             <VideoPlayer
                 player_data={data}
                 anime_data={anime_data.data}
-                temp={{ episode: extractionData.current.actual, type: extractionData.current.type, episodes: extractionData.current.episodelist }}
+                temp={{ episode: extractionData.current.actual, type: extractionData.current.type, episodes: extractionData.current.episodelist, pluginName: anime_data.pluginName }}
                 setNextEpisode={setNewEpisode}
                 volumeCacheFunc={setPlayerVolume}
                 PlayerVolume={playerVolume}

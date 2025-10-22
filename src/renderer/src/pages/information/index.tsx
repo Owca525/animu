@@ -26,17 +26,16 @@ function information() {
     const { data: episodeData, isError: isEpisodeError, isFetching: isEpisodeLoading, refetch } = useQuery({
         queryKey: [tempData.current.anime],
         queryFn: async ({ queryKey }) => {
-            let plugin: playerPluginFormat = store.getState().plugin.playerPlugin
+            console.log(tempData.current)
+            let plugin: playerPluginFormat = ChangePlugin(tempData.current.saveData ? tempData.current.saveData.pluginName :
+                store.getState().plugin.playerPlugin.name
+            )
             let [ playerID ] = queryKey
-            console.log(playerID, tempData)
+            console.log(playerID, tempData, plugin)
             if (!plugin || !plugin.player) return
             if (tempData.current.anime.id == "" && !currentIDplayer.current) {
                 return plugin.player.extractEpisodeList(tempData.current.anime, undefined)
             }
-            if (tempData.current.saveData && tempData.current.saveData.pluginName == plugin.name && !currentIDplayer.current) {
-                return plugin.player.extractEpisodeList(playerID.player_ID ? undefined : tempData.current.anime, playerID.player_ID)
-            }
-            ChangePlugin(plugin.name)
             return plugin.player.extractEpisodeList(tempData.current.anime, currentIDplayer.current)
         },
         refetchOnWindowFocus: false,
@@ -83,7 +82,6 @@ function information() {
         }
         if (history.length > 0) {
             tempData.current = { ...tempData.current, saveData: history[0].saveData }
-            return
         }
     }, [])
 
@@ -102,7 +100,8 @@ function information() {
                         episode: episode
                     }
                 },
-                episodelist: episodes
+                episodelist: episodes,
+                pluginName: store.getState().plugin.playerPlugin.name
             }
         })
     }
