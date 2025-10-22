@@ -69,6 +69,11 @@ export interface homeData {
     filterTags?: FilterParams
 }
 
+export interface globalDataFormat {
+    incognito: boolean, 
+    history: { continue: cardData[], history: cardData[] }
+}
+
 export interface playerData {
     hostname: string
     resolution: resolutionFormat[]

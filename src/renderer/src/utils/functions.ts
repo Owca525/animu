@@ -152,12 +152,12 @@ export async function refetchHistory() {
     if (data.data.sections.length > 2) return
     if (data.data.sections.length <= 0) return
     if (data.data.sections.length == 1 && data.data.sections[0].title == t("global.continuewatch")) {
-        await setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: await ReadContinue(), horizontal: false }] }))
+        await setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: store.getState().global.history.continue, horizontal: false }] }))
         return
     }
 
     if (data.data.sections.length == 1 && data.data.sections[0].title == t("global.history")) {
-        await setHomeData(async () => ({ sections: [{ title: t("global.history"), data: await ReadHistory(), horizontal: false }] }))
+        await setHomeData(async () => ({ sections: [{ title: t("global.history"), data: store.getState().global.history.history, horizontal: false }] }))
         return
     }
 
@@ -168,13 +168,13 @@ export async function refetchHistory() {
                     title: t("global.continuewatch"),
                     data: await ReadContinue(20),
                     horizontal: true,
-                    onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: await ReadContinue(), horizontal: false }] }))
+                    onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: store.getState().global.history.continue, horizontal: false }] }))
                 },
                 {
                     title: t("global.history"),
                     data: await ReadHistory(20),
                     horizontal: true,
-                    onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.history"), data: await ReadHistory(), horizontal: false }] }))
+                    onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.history"), data: store.getState().global.history.history, horizontal: false }] }))
                 },
             ]
         }))

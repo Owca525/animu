@@ -12,7 +12,11 @@ export async function ReadFile(file: string): Promise<cardData[]> {
         const dataFile = await window.api.os.read(await appConfigDirPath + `/${file}.json`)
         const data = JSON.parse(dataFile) as cardData[];
         if (data.length <= 0) return []
-        return checkAnimeDuplicate(data).map((value: cardData) => { return { ...value, deletionCard: () => DeleteFromFile({ ...value, deletionCard: () => "", }, file) } }).reverse()
+        let animeList = checkAnimeDuplicate(data).map((value: cardData) => { return { ...value, deletionCard: () => DeleteFromFile({ ...value, deletionCard: () => "", }, file) } }).reverse()
+        store.dispatch({
+            type: file == "continueWatch" ? "setNewContinueWatch" : "setNewHistory", payload: animeList
+        })
+        return animeList
     } catch (Error) {
         console.error(`${Error} in ReadFile`)
         return [];
@@ -40,6 +44,9 @@ export async function DeleteFromFile(data: cardData, file: string) {
         if (index != -1) list.splice(index, 1);
 
         window.api.os.write(await appConfigDirPath + `/${file}.json`, JSON.stringify(list))
+        store.dispatch({
+            type: file == "continueWatch" ? "setNewContinueWatch" : "setNewHistory", payload: list
+        })
         refetchHistory()
 
         if (data.deletionCard) {
@@ -84,6 +91,10 @@ export async function SaveToFile(data: cardData, file: string): Promise<boolean>
 
         tmpData.push(data);
         window.api.os.write(await appConfigDirPath + `/${file}.json`, JSON.stringify(checkAnimeDuplicate(tmpData)))
+        store.dispatch({
+            type: file == "continueWatch" ? "setNewContinueWatch" : "setNewHistory", payload: tmpData
+        })
+        refetchHistory()
         return true
     } catch (Error) {
         console.error(`${Error} in SaveToFile`)
