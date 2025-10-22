@@ -423,7 +423,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         // Checking to save history
         if (!config) return
         if (!videoRef.current) return
-
         if (
             videoRef.current.currentTime >= parseInt(config.History.continue.MinimalTimeSave.toString()) &&
             videoRef.current.currentTime <= videoRef.current.duration - parseInt(config.History.continue.MaximizeTimeSave.toString())

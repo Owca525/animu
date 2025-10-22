@@ -28,6 +28,7 @@ function information() {
         queryFn: async ({ queryKey }) => {
             let plugin: playerPluginFormat = store.getState().plugin.playerPlugin
             let [ playerID ] = queryKey
+            console.log(playerID, tempData)
             if (!plugin || !plugin.player) return
             if (tempData.current.anime.id == "" && !currentIDplayer.current) {
                 return plugin.player.extractEpisodeList(tempData.current.anime, undefined)

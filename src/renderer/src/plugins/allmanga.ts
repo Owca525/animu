@@ -327,22 +327,22 @@ export async function extractURLS(type: string, episode: string, id: string): Pr
     if (tmp) data.push(tmp)
   }
 
-  console.log(resp.data.episode.episodeInfo.vidInforssub)
-  if (type == "dub" && resp.data.episode.episodeInfo.vidInforsdub) {
+  console.log(resp.data.data.episode.episodeInfo.vidInforssub)
+  if (type == "dub" && resp.data.data.episode.episodeInfo.vidInforsdub) {
     data.push({ hostname: "wp.youtube-anime.com", resolution: [{
-      res: resp.data.episode.episodeInfo.vidInforsdub.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.episode.episodeInfo.vidInforsdub.vidPath}`,
+      res: resp.data.data.episode.episodeInfo.vidInforsdub.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.data.episode.episodeInfo.vidInforsdub.vidPath}`,
       hls: false
     }] })
   }
-  if (type == "raw" && resp.data.episode.episodeInfo.vidInforsraw) {
+  if (type == "raw" && resp.data.data.episode.episodeInfo.vidInforsraw) {
     data.push({ hostname: "wp.youtube-anime.com", resolution: [{
-      res: resp.data.episode.episodeInfo.vidInforsraw.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.episode.episodeInfo.vidInforsraw.vidPath}`,
+      res: resp.data.data.episode.episodeInfo.vidInforsraw.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.data.episode.episodeInfo.vidInforsraw.vidPath}`,
       hls: false
     }] })
   }
-  if (type == "sub" && resp.data.episode.episodeInfo.vidInforssub) {
+  if (type == "sub" && resp.data.data.episode.episodeInfo.vidInforssub) {
     data.push({ hostname: "wp.youtube-anime.com", resolution: [{
-      res: resp.data.episode.episodeInfo.vidInforssub.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.episode.episodeInfo.vidInforssub.vidPath}`,
+      res: resp.data.data.episode.episodeInfo.vidInforssub.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.data.episode.episodeInfo.vidInforssub.vidPath}`,
       hls: false
     }] })
   }
