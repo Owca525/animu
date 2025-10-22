@@ -144,6 +144,7 @@ function information() {
 
     function checkEpisodes() {
         if (tempData.current.anime.status == "NOT_YET_RELEASED") return true
+        if (isEpisodeLoading) return false
         if (!episodeData && !isEpisodeLoading && !isEpisodeError) return true
         if (episodeData && episodeData.episodesData && episodeData.episodesData.length <= 0) return true
         return false
