@@ -16,7 +16,7 @@
   --red-one: #932F2F;
 
   /* other */
-  --player-bg-containers: color-mix(in srgb, var(--third-layer) 80%, transparent);
+  --player-bg-containers: color-mix(in srgb, var(--fourth-layer) 80%, transparent);
   --invisible: rgba(0, 0, 0, 0);
   /* is used in player button */
   --black: rgba(0, 0, 0);
@@ -356,19 +356,21 @@ body {
   color: var(--green-one);
 }
 
-.information-episode-button.watched,
-.information-episode-button-full.watched {
+.information-episode-button.watched {
   border-color: var(--green-one);
 }
 
-.information-episode-button.watching,
-.information-episode-button-full.watching {
+.information-episode-button.watching {
   border-color: var(--orange-one);
 }
 
-.information-episode-button.current,
-.information-episode-button-full.current {
+.information-episode-button.current {
   border-color: var(--orange-one);
+}
+
+.information-episode-button.current:hover {
+  background-color: var(--orange-one);
+  color: var(--text);
 }
 
 .information-select-episode {
@@ -758,13 +760,19 @@ th {
   background-color: var(--invisible);
   color: var(--text);
   text-shadow: 2px 2px 10px var(--first-layer);
+  font-size: 1.7em;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  line-height: 1.8
 }
 
 .player-settings-container {
   border-radius: 8px;
-  background-color: var(--second-layer);
+  background-color: color-mix(in srgb, var(--second-layer) 90%, transparent);
   color: var(--text);
-  border: 2px solid var(--fourth-layer);
+  border: 2px solid var(--invisible);
 }
 
 .player-settings-button,
@@ -780,7 +788,8 @@ th {
 
 .player-settings-button:hover,
 .player-settings-button-back:hover {
-  background-color: var(--third-layer);
+  background-color: var(--five-layer);
+  color: var(--green-one);
 }
 
 .player-settings-button-text-gray {
@@ -853,18 +862,9 @@ th {
 }
 
 .player-select-episode-container {
-  background-color: var(--second-layer);
   border-radius: 8px;
-  border: 2px solid var(--fourth-layer);
-}
-
-.information-episode-button-full {
-  border-radius: 12px;
-  border: 1px solid var(--invisible);
-}
-
-.information-episode-button-full:hover {
-  background-color: var(--fourth-layer);
+  background-color: color-mix(in srgb, var(--second-layer) 90%, transparent);
+  border: 2px solid var(--invisible);
 }
 
 .player-subtitle-container {
@@ -958,7 +958,7 @@ th {
 }
 
 .seekbar-box {
-  background-color: color-mix(in srgb, var(--five-layer) 50%, transparent) !important;
+  background-color: color-mix(in srgb, var(--five-layer) 80%, transparent) !important;
   border-radius: 12px;
 }
 

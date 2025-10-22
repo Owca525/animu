@@ -1106,8 +1106,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                             <div className="player-volume-seek">
                                 <SeekBar currentValue={volume} maxValue={100} onSeek={value => handleVolume(value)} classes={{ container: "player-seekbar" }} />
                             </div>
-                            <PlayerButton icon={"picture_in_picture"} onClick={handlePictureInPicture} title={detectDisableTooltips("Picture In Picture")} ButtonClass="player-buttons" />
-                            <PlayerButton icon={"video_library"} title={detectDisableTooltips("Select Episode")} ButtonClass="player-buttons" onClick={() => { setShowSelectEpisode((prev) => !prev); setcurrentSettings(() => false) }} />
+                            {/* TODO: Improve picture in picture */}
+                            {/* <PlayerButton icon={"picture_in_picture"} onClick={handlePictureInPicture} title={detectDisableTooltips("Picture In Picture")} ButtonClass="player-buttons" /> */}
+                            {temp.episodes.length >= 2 && <PlayerButton icon={"video_library"} title={detectDisableTooltips("Select Episode")} ButtonClass="player-buttons" onClick={() => { setShowSelectEpisode((prev) => !prev); setcurrentSettings(() => false) }} />}
                             <motion.div
                                 initial={{ opacity: 0, display: "none" }} animate={isShowSelectEpisode ? { opacity: 1, display: "" } : { opacity: 0, display: "none" }} transition={{ duration: 0.2 }}
                                 className="player-select-episode-container"
