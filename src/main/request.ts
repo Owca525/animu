@@ -1,6 +1,6 @@
 import { ipcMain } from "electron";
 
-ipcMain.handle('fetch-data', async (_event, url: string, header: Record<string, string>, type: "json" | "text" = "json"): Promise<{ success: boolean; data?: any; status?: number; statusText?: string; error?: unknown; }> => {
+ipcMain.handle('fetch-data', async (_event, url: string, header: Record<string, string>, type: "json" | "text" = "json"): Promise<{ success: boolean; data: any; status: number; statusText: string; error?: unknown; }> => {
     try {
         const response = await fetch(url, {
             method: 'GET',
@@ -9,20 +9,20 @@ ipcMain.handle('fetch-data', async (_event, url: string, header: Record<string, 
 
         if (response.ok && type == "json") {
             const data = await response.json()
-            return { success: true, data }
+            return { success: true, data, status: response.status, statusText: response.statusText }
         }
         if (response.ok && type == "text") {
             const data = await response.text()
-            return { success: true, data }
+            return { success: true, data, status: response.status, statusText: response.statusText }
         }
-        return { success: false, status: response.status, statusText: response.statusText }
+        return { success: false, data: undefined, status: response.status, statusText: response.statusText }
     } catch (error) {
-        return { success: false, error: (error as Error).message }
+        return { success: false, error: (error as Error).message, status: 1, data: undefined, statusText: (error as Error).message }
     }
 }
 )
 
-ipcMain.handle('send-post', async (_event, url: string, header: Record<string, string>, body?: { query: string, variables: Object }): Promise<{ success: boolean; data?: any; status?: number; statusText?: string; error?: unknown; }> => {
+ipcMain.handle('send-post', async (_event, url: string, header: Record<string, string>, body?: { query: string, variables: Object }, type: "json" | "text" = "json"): Promise<{ success: boolean; data: any; status: number; statusText: string; error?: unknown; }> => {
     try {
         const response = await fetch(url, {
             method: 'POST',
@@ -30,13 +30,31 @@ ipcMain.handle('send-post', async (_event, url: string, header: Record<string, s
             body: JSON.stringify(body)
         })
 
-        if (response.ok) {
+        if (response.ok && type == "json") {
             const data = await response.json()
-            return { success: true, data }
+            return { success: true, data, status: response.status, statusText: response.statusText }
         }
-        return { success: false, status: response.status, statusText: response.statusText }
+        if (response.ok && type == "text") {
+            const data = await response.text()
+            return { success: true, data, status: response.status, statusText: response.statusText }
+        }
+        return { success: false, status: response.status, statusText: response.statusText, data: undefined }
     } catch (error) {
-        return { success: false, error: (error as Error).message }
+        return { success: false, error: (error as Error).message, status: 1, data: undefined, statusText: (error as Error).message }
     }
 }
 )
+
+ipcMain.handle('advanceRequest', async (_, url: string, options?: { method: "POST" | "GET", headers: { [key: string]: string } }) => {
+    const response = await fetch(url, options);
+    if (!response.ok) return { text: "", buffer: [], status: response.status, statusText: response.statusText, url: response.url, success: response.ok }
+    let cloned = response.clone()
+    return {
+        text: await response.text(),
+        buffer: Buffer.from(await cloned.arrayBuffer()),
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url,
+        success: response.ok
+    };
+});

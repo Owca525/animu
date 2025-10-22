@@ -23,8 +23,8 @@ if (process.contextIsolated) {
       request: {
         get: (url: string, header: Record<string, string>, type?: "json" | "text") =>
           ipcRenderer.invoke("fetch-data", url, header, type),
-        post: (url: string, header: Record<string, string>, body?: { query: any, variables: Object }) =>
-          ipcRenderer.invoke("send-post", url, header, body),
+        post: (url: string, header: Record<string, string>, body?: { query: any, variables: Object }, type?: "json" | "text") =>
+          ipcRenderer.invoke("send-post", url, header, body, type),
         advanceRequest: (url: string, options?: { method: "POST" | "GET", header: Record<string, string> }) => ipcRenderer.invoke('advanceRequest', url, options),
       },
       rpc: {

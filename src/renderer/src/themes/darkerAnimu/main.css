@@ -267,8 +267,14 @@ body {
 
 /* Information */
 
-.information-episode-button-watched {
-  border-color: var(--green-one);
+.information-episode-button.watched:hover {
+  background-color: var(--green-one);
+  color: var(--text);
+}
+
+.information-episode-button.watching:hover {
+  background-color: var(--orange-one);
+  color: var(--text);
 }
 
 .information {

@@ -25,16 +25,16 @@ declare global {
           type?: "json" | "text"
         ) => Promise<{
           success: boolean;
-          data?: any;
-          status?: number;
-          statusText?: string;
+          data: any;
+          status: number;
+          statusText: string;
           error?: unknown;
         }>;
-        post: (url: string, header: Record<string, string>, body?: { query: any, variables: Object }) => Promise<{
+        post: (url: string, header: Record<string, string>, body?: { query: any, variables: Object }, type?: "json" | "text") => Promise<{
           success: boolean;
-          data?: any;
-          status?: number;
-          statusText?: string;
+          data: any;
+          status: number;
+          statusText: string;
           error?: unknown;
         }>;
         advanceRequest: (url: string, options?: { method: "POST" | "GET", headers?: { [key: string]: string } }) => Promise<{ text: string, buffer: Buffer, status: number, statusText: string, url: string, success: boolean }>
