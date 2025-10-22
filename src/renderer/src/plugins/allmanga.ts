@@ -187,8 +187,7 @@ async function getAnimeList(anime: AnimeData): Promise<cardData[]> {
 export async function extractInformation(type: "all" | "episodes", id: string): Promise<{ episodes: { ep: string; img?: string; title?: string }[]; type: string; name?: string }[] | { ep: string; img?: string; title?: string }[]> {
   let variables = `{"_id":"${id}"}`;
   const resp = await sendToAPI(variables, HASH_INFO, header);
-  if (!resp.success) return []
-  console.log(resp)
+  if (!resp.success || !resp.data.data.show) return []
   let anime_data = resp.data.data.show
   let episodes = await getEpisodeList(id, { start: parseInt(anime_data.availableEpisodesDetail.sub.at(-1)), end: parseInt(anime_data.availableEpisodesDetail.sub[0]) })
   if (episodes.length <= 0) return []
