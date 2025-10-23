@@ -41,7 +41,7 @@ const ContextMenu: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             {children}
             {isOpen && data && data.length != 0 && event && (
                 <div 
-                    onMouseLeave={() => CloseContextMenu()}
+                    // onMouseLeave={() => CloseContextMenu()}
                     className="contextmenu-container"
                     style={{
                         position: 'absolute',

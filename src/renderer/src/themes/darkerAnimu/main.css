@@ -1088,17 +1088,22 @@ th {
   border-radius: 4px;
 }
 
+.contextmenu-option {
+  transition: all 150ms ease;
+}
+
 .contextmenu-option:hover {
-  background-color: var(--fourth-layer);
+  background-color: var(--five-layer);
+  color: var(--green-one);
 }
 
 .contextmenu-option-line {
-  background-color: var(--second-layer);
+  background-color: var(--five-layer);
   border-radius: 12px;
 }
 
 .contextmenu-option-deletion {
-  background-color: color-mix(in srgb, rgb(255, 0, 0) 20%, transparent);
+  background-color: var(--red-one);
 }
 
 .contextmenu-option,
