@@ -91,7 +91,8 @@ const player = () => {
         loadingAnimation(leave, { title: anime_data.data.AnimeData.title, ep: extractionData.current.actual, format: anime_data.data.AnimeData.format }, extractionData.current)
         showDialog({
             type: "error",
-            title: t("player.error.notfound"),
+            title: "Error In Player",
+            description: t("player.error.notfound"),
             buttons: {
                 firstbutton: () => refetch(),
                 secondbutton: () => leave()
