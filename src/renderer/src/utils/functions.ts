@@ -210,7 +210,8 @@ export function CreateContextMenuOptions(start?: ContextMenuProps, center?: Cont
     ContextMenu.push({
         option: i18n.t("dialog.exit"), onClick: () => showDialog({
             type: "info",
-            title: i18n.t("global.exitAnimu"),
+            title: "Action",
+            description: i18n.t("global.exitAnimu"),
             buttons: {
                 firstbutton: () => window.BrowserWindow.exit(),
                 secondbutton: () => ""
