@@ -11,11 +11,11 @@
 
 .dialog-container {
     display: grid;
-    padding: 15px;
-    gap: 6px;
+    padding: 18px;
+    gap: 12px;
     min-width: min-content;
     max-width: 400px;
-    width: clamp(30px, 20vw, 400px);
+    width: clamp(50px, 25vw, 400px);
 }
 
 .dialog-title {
@@ -27,7 +27,7 @@
 }
 
 .dialog-icon {
-    /* Jeśli chcesz zwiększyć ikone itp to możesz tu dodać */
+    font-size: 1.4em;
 }
 
 .dialog-description {

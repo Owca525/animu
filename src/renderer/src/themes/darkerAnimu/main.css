@@ -16,6 +16,8 @@
   --blue-background: #212328;
   --blue-text: #BFCBE3;
   --red-one: #932F2F;
+  --red-background: #2E2121;
+  --red-text: #EAD6D6;
 
   /* other */
   --player-bg-containers: color-mix(in srgb, var(--fourth-layer) 80%, transparent);
@@ -94,6 +96,34 @@ body {
 .dialog-container {
   background-color: var(--second-layer);
   border-radius: 12px;
+}
+
+.dialog-button.error {
+  padding: 10px 20px;
+  background-color: var(--red-one) !important;
+}
+
+.dialog-container.error {
+  background-color: var(--red-background);
+  border: 2px solid var(--red-one);
+}
+
+.dialog-title.error, .dialog-description.error {
+  color: var(--red-text);
+}
+
+.dialog-button.info {
+  padding: 10px 20px;
+  background-color: var(--blue-one) !important;
+}
+
+.dialog-container.info {
+  background-color: var(--blue-background);
+  border: 2px solid var(--blue-one);
+}
+
+.dialog-title.info, .dialog-description.info {
+  color: var(--blue-text);
 }
 
 

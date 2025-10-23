@@ -291,7 +291,7 @@ export interface SettingsConfig {
 }
 
 export interface dialogProps {
-    type: "error" | "info" | "refresh" | "none"
+    type: "error" | "info" | "none"
     title: string
     description?: string
     buttons: {

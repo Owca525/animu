@@ -90,7 +90,7 @@ const player = () => {
     if (isLoading == false && data && data.length <= 0) {
         loadingAnimation(leave, { title: anime_data.data.AnimeData.title, ep: extractionData.current.actual, format: anime_data.data.AnimeData.format }, extractionData.current)
         showDialog({
-            type: "refresh",
+            type: "error",
             title: t("player.error.notfound"),
             buttons: {
                 firstbutton: () => refetch(),

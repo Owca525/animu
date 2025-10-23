@@ -840,6 +840,34 @@ function settings() {
                                     <Button content="default" onClick={() => toast("Test Notification", notificationProps)} />
                                 </span>
                             </div>
+                            <div className="settings-line"></div>
+                            <div className="settings-setting-container">
+                                Dialog Test
+                                <span className="settings-custom-space">
+                                    <Button content="error" onClick={() => 
+                                        showDialog({
+                                            type: "error",
+                                            title: "Error in Player",
+                                            description: t("player.error.notfound"),
+                                            buttons: {
+                                                firstbutton: () => "",
+                                                secondbutton: () => ""
+                                            }
+                                        })
+                                    } />
+                                    <Button content="info" onClick={() => 
+                                        showDialog({
+                                            type: "info",
+                                            title: "Info in Player",
+                                            description: t("player.error.notfound"),
+                                            buttons: {
+                                                firstbutton: () => "",
+                                                secondbutton: () => ""
+                                            }
+                                        })
+                                    } />
+                                </span>
+                            </div>
                         </div>
                         <div className="settings-page-container">
                             <div className="settings-page-title">{t("settings.devmode.information")}</div>
