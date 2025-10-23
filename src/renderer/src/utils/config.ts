@@ -150,7 +150,7 @@ export async function saveConfig(content: SettingsConfig): Promise<boolean> {
         store.dispatch({ type: "setConfig", payload: content })
         return true
     } catch (Error) {
-        console.error(`Error in saveConfig`);
+        console.error(`${Error} in saveConfig`);
         return false
     }
 }
