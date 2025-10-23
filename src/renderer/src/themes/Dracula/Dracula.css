@@ -19,6 +19,7 @@
   --blue: #8be9fd;
   --orange: #ffb86c;
   --green: #50fa7b;
+  --red-background: #ae4750;
   
   /* DarkerAnimu compatibility */
   --first-layer: var(--bg); /* First layer, background only */
@@ -34,6 +35,5 @@
   --red-one: var(--red);
   --blue-background: var(--bg2);
   --blue-text: var(--text);
-  --red-background: var(--bg2);
   --red-text: var(--text);
 }
