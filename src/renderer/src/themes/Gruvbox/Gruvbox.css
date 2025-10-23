@@ -35,4 +35,6 @@
   --red-one: var(--red);
   --blue-background: var(--bg2);
   --blue-text: var(--text);
+  --red-background: var(--bg2);
+  --red-text: var(--text);
 }
