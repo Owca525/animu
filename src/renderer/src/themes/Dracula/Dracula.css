@@ -32,4 +32,6 @@
   --orange-one: var(--orange);
   --blue-one: var(--blue);
   --red-one: var(--red);
+  --blue-background: var(--bg2);
+  --blue-text: var(--text);
 }
