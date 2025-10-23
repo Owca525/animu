@@ -13,6 +13,8 @@
   --green-one: #549E72; /* boders, some buttons etc */
   --orange-one: #CA6931;
   --blue-one: #385DA9;
+  --blue-background: #212328;
+  --blue-text: #BFCBE3;
   --red-one: #932F2F;
 
   /* other */
@@ -544,9 +546,13 @@ body {
 }
 
 .settings-save-content {
-  background-color: var(--second-layer);
+  background-color: var(--blue-background);
   border-radius: 12px;
-  border: 2px solid var(--fourth-layer);
+  border: 2px solid var(--blue-one);
+}
+
+.settings-save-title {
+  color: var(--blue-text);
 }
 
 .settings-container-extensions {
