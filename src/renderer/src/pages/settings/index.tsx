@@ -11,7 +11,7 @@ import { ContextMenuProps, notificationProps, playerPluginFormat, SettingsConfig
 import { useSelector } from "react-redux";
 import i18n from "i18next"
 import { checkPictureFolder, saveConfig } from "@renderer/utils/config";
-import { calculateZoomLevel, changeTheme, convertKeybinds, convertPath } from "@renderer/utils/functions";
+import { calculateZoomLevel, changeTheme, convertKeybinds, convertPath, updateObjectConfig } from "@renderer/utils/functions";
 import CheckKeybind from "./components/checkKeybind";
 import { showDialog } from "@renderer/utils/context/DialogContext";
 import store from "@renderer/utils/store";
@@ -127,19 +127,7 @@ function settings() {
 
     function handleChange(path: string, value: string | number | boolean) {
         setConfig((prevConfig) => {
-            const keys = path.split('.')
-            const newConfig = prevConfig.new
-
-            let current: any = newConfig
-            for (let i = 0; i < keys.length - 1; i++) {
-                const key = keys[i]
-
-                if (!current[key]) current[key] = {}
-                current = current[key]
-            }
-
-            current[keys[keys.length - 1]] = value
-            return { old: prevConfig.old, new: newConfig }
+            return { old: prevConfig.old, new: updateObjectConfig(path, value, prevConfig.new) }
         })
     }
 

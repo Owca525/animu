@@ -1,6 +1,7 @@
 import ini from "ini";
 import { SettingsConfig } from "./GlobalInterface";
 import { convertPath } from "./functions";
+import store from "./store";
 
 export const defaultConfig: SettingsConfig = {
     firstStart: true,
@@ -30,7 +31,8 @@ export const defaultConfig: SettingsConfig = {
             PlayerBehavior: "information",
             autoSkipOpenings: false,
             autoSkipEndings: false,
-            showBrokenBuffer: false
+            showBrokenBuffer: false,
+            minusTime: false
         },
         screenShot: {
             alwaysAsk: true,
@@ -145,6 +147,7 @@ export async function saveConfig(content: SettingsConfig): Promise<boolean> {
     try {
         const data = ini.stringify(content);
         window.api.os.write(await appConfigDirPath + "/config.ini", data);
+        store.dispatch({ type: "setConfig", payload: content })
         return true
     } catch (Error) {
         console.error(`Error in saveConfig`);

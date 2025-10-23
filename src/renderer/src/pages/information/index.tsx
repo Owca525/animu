@@ -33,6 +33,9 @@ function information() {
             let [ playerID ] = queryKey
             console.log(playerID, tempData, plugin)
             if (!plugin || !plugin.player) return
+            if (!tempData.current.saveData?.pluginName) {
+                return plugin.player.extractEpisodeList(tempData.current.anime, undefined)
+            }
             if (tempData.current.anime.id == "" && !currentIDplayer.current) {
                 return plugin.player.extractEpisodeList(tempData.current.anime, undefined)
             }

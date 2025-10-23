@@ -735,6 +735,16 @@ th {
   border-radius: 60px;
   background-color: var(--player-bg-containers);
   color: var(--text);
+  outline: 2px solid var(--invisible);
+  transition: all 150ms ease;
+}
+
+.player-time-display:hover {
+  outline-color: var(--green-one);
+}
+
+.player-time-display-current {
+  font-weight: 800;
 }
 
 .player-buttons {

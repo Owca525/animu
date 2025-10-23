@@ -1,5 +1,5 @@
 import { t } from "i18next";
-import { ContextMenuProps, homeData, playerChapterList, themeMetadata } from "./GlobalInterface";
+import { ContextMenuProps, homeData, playerChapterList, SettingsConfig, themeMetadata } from "./GlobalInterface";
 import store from "./store";
 import { getPluginList, setHomeData } from "./pluginApi";
 import { ReadContinue } from "./history/continueWatch";
@@ -333,4 +333,20 @@ export function getEpisodeDay(unixTime: number, episode: number): string {
 export function makeSmallText(text: string | undefined) {
     if (!text) return text
     return text.toLowerCase()
+}
+
+export function updateObjectConfig(path: string, value: string | number | boolean, config: SettingsConfig): SettingsConfig {
+    const keys = path.split('.')
+    const newConfig = config
+
+    let current: any = newConfig
+    for (let i = 0; i < keys.length - 1; i++) {
+        const key = keys[i]
+
+        if (!current[key]) current[key] = {}
+        current = current[key]
+    }
+
+    current[keys[keys.length - 1]] = value
+    return newConfig
 }

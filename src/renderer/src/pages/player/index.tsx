@@ -53,6 +53,7 @@ const player = () => {
     }
 
     useEffect(() => {
+        console.log("SAVE HISTORY", anime_data.pluginName)
         SaveHistory({
             saveData: {
                 pluginName: anime_data.pluginName,
@@ -71,6 +72,10 @@ const player = () => {
     useHotkeys("Escape", async () => {
         await leave()
     });
+
+    useHotkeys("]", () => {
+        console.log(anime_data, extractionData)
+    })
 
     async function leave() {
         window.BrowserWindow.setFullscreen(false)

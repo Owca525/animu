@@ -10,7 +10,7 @@ const DeveloperStats = lazy(() => import('./components/developerStats'));
 // css
 import { cardData, ContextMenuProps, notificationProps, playerChapterList, playerData, playerSubtitlesFormat, SettingsConfig, Thumbnail } from "@renderer/utils/GlobalInterface"
 import { useSelector } from "react-redux"
-import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory, toSeconds } from "@renderer/utils/functions"
+import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory, toSeconds, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
 import { DeleteFromContinue, SaveContinue } from "@renderer/utils/history/continueWatch"
@@ -29,6 +29,7 @@ import JASSUB from "jassub";
 import workerUrl from "jassub/dist/jassub-worker.js?url";
 import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
 import { useHotkeys } from "react-hotkeys-hook"
+import { saveConfig } from "@renderer/utils/config"
 
 function addTime(durration: number): string {
     const now = new Date();
@@ -102,6 +103,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     const playAnimationTimeout = useRef<NodeJS.Timeout | null>(null);
     const [isShowSelectEpisode, setShowSelectEpisode] = useState<boolean>(false)
     const [buttonSkipTime, setButtonSkipTime] = useState<number>(15)
+    const [minusTimeState, setminusTimeState] = useState<boolean>(config.Player.general.minusTime)
     const [IsRunningButtonSkipTime, setIsRunningButtonSkipTime] = useState<boolean>(false)
     const [IsDisableButtonSkipTimerOpening, setIsDisableButtonSkipTimerOpening] = useState<boolean>(false)
     const [IsDisableButtonSkipTimerEnding, setIsDisableButtonSkipTimerEnding] = useState<boolean>(false)
@@ -972,6 +974,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         return undefined
     }
 
+    function calculateChaptersTime(): string | undefined {
+        if (!currentPlayer || !currentPlayer.listChapters) return
+        if (currentPlayer.listChapters.length <= 0) return
+        if (!videoRef.current) return
+        let newTime = videoRef.current.duration
+        for (let index = 0; index < currentPlayer.listChapters.length; index++) {
+            const element = currentPlayer.listChapters[index];
+            if (element.type == "opening") {
+                newTime = newTime - (element.end - element.start)
+            }
+            if (element.type == "ending") {
+                newTime = newTime - (element.end - element.start)
+            }
+        }
+        return formatTime(newTime)
+    }
+
     return (
         <div className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
             <div ref={screenshotWrapper} className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} >
@@ -1092,8 +1111,21 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                             {getEpisode("next") !== undefined &&
                                 <PlayerButton icon='skip_next' ButtonClass='material-symbols-outlined player-buttons' title={t('player.next', { ep: getEpisode("next")?.ep })} onClick={() => setEpisode("next")} />
                             }
-                            <div className="player-time-display">
-                                {formatTime(currentTime)} / {formatTime(videoRef.current?.duration)}
+                            <div className="player-time-display"
+                                onClick={() => {saveConfig(updateObjectConfig("Player.general.minusTime", !minusTimeState, config)); setminusTimeState((prev) => !prev)}}
+                            >
+                                <div className="player-time-display-current">
+                                    {minusTimeState ? `-${formatTime(videoRef.current ? videoRef.current.duration - currentTime : 0)}` : 
+                                        formatTime(currentTime)
+                                    }
+                                </div> 
+                                    / 
+                                <div className="player-time-display-durration">{formatTime(videoRef.current?.duration)}</div>
+                                {calculateChaptersTime() &&
+                                    <div className="player-time-display-chaptersTime">
+                                        ({calculateChaptersTime()})
+                                    </div>
+                                }
                             </div>
                             <div className="player-end-time-display">
                                 {t("player.episodeEndsOn", { time: addTime(videoRef.current?.duration ? (videoRef.current.duration - currentTime) : 0) })}
