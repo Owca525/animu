@@ -93,7 +93,8 @@ function settings() {
         if (config.new.Developer.DeveloperMode) return
         showDialog({
             type: "info",
-            title: t("settings.turnDeveloper"),
+            title: "Action",
+            description: t("settings.turnDeveloper"),
             buttons: {
                 firstbutton: () => handleChange("Developer.DeveloperMode", true),
                 secondbutton: () => handleChange("Developer.DeveloperMode", false)
