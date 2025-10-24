@@ -301,6 +301,10 @@ body {
 
 /* Information */
 
+.information-fade {
+    background: linear-gradient(to bottom, #0000 60%, var(--first-layer));
+}
+
 .information-episode-button.watched:hover {
   background-color: var(--green-one);
   color: var(--text);
