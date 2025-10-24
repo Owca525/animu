@@ -26,4 +26,5 @@
 
   /* Colors */
   --red-one: var(--red);
+  --green-one: var(--neutral1); /* boders, some buttons etc */
 }
