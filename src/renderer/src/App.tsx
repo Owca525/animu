@@ -1,13 +1,10 @@
 import { Routes, Route, HashRouter } from 'react-router-dom'
-import { Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import 'material-symbols'
 
 import Home from "./pages/home/index"
-import Information from "./pages/information/index"
-import Settings from "./pages/settings/index"
-import Player from "./pages/player/index"
 
 // Temporally
 import "./themes/darkerAnimu/main.css"
@@ -23,6 +20,10 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { notificationProps } from './utils/GlobalInterface';
 import { InitialPlugin } from './utils/pluginApi';
 import { DetectOldVersionHistory } from './utils/FilesManager/readFiles';
+
+const Information = lazy(() => import("./pages/information/index"));
+const Player = lazy(() => import("./pages/player/index"));
+const Settings = lazy(() => import("./pages/settings/index"));
 
 function App() {
   const [isLoading, setIsLoading] = useState<boolean>(true)
