@@ -29,7 +29,7 @@
   --five-layer: var(--bg5);
 
   /* Colors */
-  --green-one: var(--green); /* boders, some buttons etc */
+  --green-one: var(--neutral1); /* boders, some buttons etc */
   --orange-one: var(--orange);
   --blue-one: var(--blue);
   --red-one: var(--red);

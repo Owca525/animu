@@ -26,7 +26,7 @@
   --five-layer: var(--bg5);
 
   /* Colors */
-  --green-one: var(--green); /* boders, some buttons etc */
+  --green-one: var(--neutral1); /* boders, some buttons etc */
   --red-one: var(--red);
 }
 
