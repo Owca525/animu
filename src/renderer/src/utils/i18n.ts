@@ -2,6 +2,7 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
 async function getAllLangFiles() {
+  await window.api.os.checkOldConfig()
   let langFiles = await window.api.getListLang()
   let res = {}
   for (let index = 0; index < langFiles.length; index++) {

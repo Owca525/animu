@@ -46,7 +46,6 @@ function App() {
   })
 
   async function initialAnimu() {
-    await window.api.os.checkOldConfig()
     await LoadConfig()
     DetectOldVersionHistory()
     setTextLoading(() => "Loading Plugins...")
