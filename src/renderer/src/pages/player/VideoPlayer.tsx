@@ -8,7 +8,7 @@ import NerdStats from "./components/nerdStats"
 const DeveloperStats = lazy(() => import('./components/developerStats'));
 
 // css
-import { cardData, ContextMenuProps, notificationProps, playerChapterList, playerData, playerSubtitlesFormat, SettingsConfig, Thumbnail } from "@renderer/utils/GlobalInterface"
+import { AnimeData, ContextMenuProps, indentityPlayer, notificationProps, playerChapterList, playerData, playerSubtitlesFormat, SettingsConfig, Thumbnail } from "@renderer/utils/GlobalInterface"
 import { useSelector } from "react-redux"
 import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory, toSeconds, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
@@ -70,8 +70,11 @@ const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75"
 
 interface VideoPlayerProps {
     player_data: playerData[]
-    anime_data: cardData
-    temp: { episode: string, type: string, episodes: { ep: string, img?: string, title?: string }[], pluginName: string }
+    anime_data: {
+        AnimeData: AnimeData,
+        saveData: indentityPlayer
+    }
+    temp: { episode: string, type: string, episodes: { ep: string, img?: string, title?: string }[] }
     setNextEpisode: (value: string) => void
     volumeCacheFunc: (value: number) => void
     PlayerVolume: number
@@ -288,8 +291,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     async function runHLS(url: string, header?: { [key: string]: string }) {
         const hls = new Hls({
-            maxBufferLength: 60,
+            maxBufferLength: 120,
             autoStartLoad: true,
+            startLevel: 2,
             loader: class extends Hls.DefaultConfig.loader {
                 load(context: any, config: any, callbacks: any) {
                     window.api.request.advanceRequest(context.url, { method: "GET", headers: header }).then((data) => {
@@ -326,6 +330,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
             hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
                 const resolutions = data.levels.map((level) => level.height);
+                console.log(resolutions, hls.levels.length - 1, data.levels)
                 if (data.audioTracks.length > 0) {
                     for (let index = 0; index < data.audioTracks.length; index++) {
                         const element = data.audioTracks[index];
@@ -335,27 +340,27 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 }
                 resolutions.reverse()
                 setListResolution(resolutions.map((val) => { return { res: val.toString(), url: "" } }))
-                hls.currentLevel = hls.levels.findIndex(level => level.height === resolutions[0]);
                 setCurrentResoltion({ res: resolutions[0].toString(), url: "" })
+                hls.currentLevel = hls.levels.length - 1;
+                console.log(hls.currentLevel, hls)
             });
 
             hls.on(Hls.Events.ERROR, (_event, data) => {
                 console.error("HLS", _event, data)
                 if (data.fatal) {
-                    let message: string
+                    let message: string | undefined
                     switch (data.type) {
                         case Hls.ErrorTypes.NETWORK_ERROR:
-                            message = t('player.errors.MEDIA_ERR_NETWORK')
+                            // message = t('player.errors.MEDIA_ERR_NETWORK')
                             // hls.destroy()
                             // TODO: Update this, may make bug
                             // setNewUrl(host.hostname)
-                            hls.destroy();
-                            // hls.startLoad();
+                            hls.startLoad();
+                            hls.currentLevel = hls.levels.length - 1;
                             break;
                         case Hls.ErrorTypes.MEDIA_ERROR:
                             message = t('player.errors.MEDIA_ERR_DECODE')
-                            // hls.recoverMediaError();
-                            // runMPEGTS()
+                            // hls.recoverMediaError()
                             hls.destroy();
                             return
                         default:
@@ -363,8 +368,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                             hls.destroy();
                             break;
                     }
-                    hls.destroy();
-                    toast.error(message, notificationProps);
+                    if (message) toast.error(message, notificationProps);
                 }
             });
         }
@@ -431,7 +435,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             SaveContinue({
                 AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
                 saveData: {
-                    pluginName: temp.pluginName,
+                    pluginName: anime_data.saveData.pluginName,
                     last_Time: videoRef.current.currentTime,
                     episode: temp.episode,
                     type: temp.type
@@ -441,7 +445,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             DeleteFromContinue({
                 AnimeData: { ...anime_data.AnimeData },
                 saveData: {
-                    pluginName: "",
+                    pluginName: anime_data.saveData.pluginName,
                     last_Time: 0,
                     episode: temp.episode,
                     type: temp.type

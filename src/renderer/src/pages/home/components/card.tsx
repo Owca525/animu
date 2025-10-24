@@ -37,19 +37,16 @@ const Card: React.FC<{ card: cardData, disableinformation?: boolean }> = ({ card
       card.saveData.episode != "" &&
       card.saveData.last_Time != 0
     ) {
-      if (config.plugins.player != card.saveData.pluginName) await ChangePlugin(card.saveData.pluginName)
+      if (config.plugins.player != card.saveData.pluginName) ChangePlugin(card.saveData.pluginName)
       let episodeList = await store.getState().plugin.playerPlugin.player.extractOnlyEpisodesList(
         card.saveData.type,
         card.AnimeData.player_ID
       )
       navigate("/player", {
         state: {
-          data: {
-            AnimeData: card.AnimeData,
-            saveData: {...card.saveData, pluginName: card.saveData.pluginName == "" ? "Allmanga" : ""},
-          },
+          data: card.AnimeData,
+          save: card.saveData,
           episodelist: episodeList,
-          continueWatch: true
         },
       });
       return;

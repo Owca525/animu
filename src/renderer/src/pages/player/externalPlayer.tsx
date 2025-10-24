@@ -2,7 +2,7 @@
 
 import Button from "@renderer/components/buttons"
 import "./components/css/externalPlayer.css"
-import { cardData, notificationProps, playerData, playerSubtitlesFormat, SettingsConfig } from "@renderer/utils/GlobalInterface"
+import { AnimeData, indentityPlayer, notificationProps, playerData, playerSubtitlesFormat, SettingsConfig } from "@renderer/utils/GlobalInterface"
 import { detectTitle, isNumberString } from "@renderer/utils/functions"
 import { useEffect, useRef, useState } from "react"
 import { toast } from "react-toastify"
@@ -13,7 +13,10 @@ import { motion } from "framer-motion"
 import { t } from "i18next"
 
 interface ExternalplayerProps {
-    animeData: cardData
+    animeData: {
+        AnimeData: AnimeData,
+        saveData: indentityPlayer
+    }
     playerData: playerData[]
     time: number
     setNextEpisode: (value: string) => void

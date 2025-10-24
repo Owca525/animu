@@ -312,42 +312,54 @@ async function getURLS(url: string): Promise<playerData | undefined> {
 export async function extractURLS(type: string, episode: string, id: string): Promise<playerData[]> {
   let variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${episode}"}`
   const resp = await sendToAPI(variables, HASH_PLAYER, header)
-  if (!resp.success) return []
-  const sources = resp.data.data.episode.sourceUrls
-  const urls = sources
-    .map((tmp: { sourceUrl: string; sourceName: string }) =>
-      findUrl(tmp.sourceUrl, tmp.sourceName)
-    )
-    .filter((item: string) => item !== undefined)
+  try {
+    if (!resp.success) return []
+    console.log(resp)
+    const sources = resp.data.data.episode.sourceUrls
+    const urls = sources
+      .map((tmp: { sourceUrl: string; sourceName: string }) =>
+        findUrl(tmp.sourceUrl, tmp.sourceName)
+      )
+      .filter((item: string) => item !== undefined)
 
-  let data: playerData[] = []
-  for (let i = 0; i < urls.length; i++) {
-    const element = urls[i];
-    let tmp = await getURLS(element)
-    if (tmp) data.push(tmp)
-  }
+    let data: playerData[] = []
+    for (let i = 0; i < urls.length; i++) {
+      const element = urls[i];
+      let tmp = await getURLS(element)
+      if (tmp) data.push(tmp)
+    }
 
-  console.log(resp.data.data.episode.episodeInfo.vidInforssub)
-  if (type == "dub" && resp.data.data.episode.episodeInfo.vidInforsdub) {
-    data.push({ hostname: "wp.youtube-anime.com", resolution: [{
-      res: resp.data.data.episode.episodeInfo.vidInforsdub.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.data.episode.episodeInfo.vidInforsdub.vidPath}`,
-      hls: false
-    }] })
-  }
-  if (type == "raw" && resp.data.data.episode.episodeInfo.vidInforsraw) {
-    data.push({ hostname: "wp.youtube-anime.com", resolution: [{
-      res: resp.data.data.episode.episodeInfo.vidInforsraw.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.data.episode.episodeInfo.vidInforsraw.vidPath}`,
-      hls: false
-    }] })
-  }
-  if (type == "sub" && resp.data.data.episode.episodeInfo.vidInforssub) {
-    data.push({ hostname: "wp.youtube-anime.com", resolution: [{
-      res: resp.data.data.episode.episodeInfo.vidInforssub.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.data.episode.episodeInfo.vidInforssub.vidPath}`,
-      hls: false
-    }] })
-  }
+    console.log(resp.data.data.episode.episodeInfo.vidInforssub)
+    if (type == "dub" && resp.data.data.episode.episodeInfo.vidInforsdub) {
+      data.push({
+        hostname: "wp.youtube-anime.com", resolution: [{
+          res: resp.data.data.episode.episodeInfo.vidInforsdub.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.data.episode.episodeInfo.vidInforsdub.vidPath}`,
+          hls: false
+        }]
+      })
+    }
+    if (type == "raw" && resp.data.data.episode.episodeInfo.vidInforsraw) {
+      data.push({
+        hostname: "wp.youtube-anime.com", resolution: [{
+          res: resp.data.data.episode.episodeInfo.vidInforsraw.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.data.episode.episodeInfo.vidInforsraw.vidPath}`,
+          hls: false
+        }]
+      })
+    }
+    if (type == "sub" && resp.data.data.episode.episodeInfo.vidInforssub) {
+      data.push({
+        hostname: "wp.youtube-anime.com", resolution: [{
+          res: resp.data.data.episode.episodeInfo.vidInforssub.vidResolution.toString(), url: `https://wp.youtube-anime.com/aln.youtube-anime.com${resp.data.data.episode.episodeInfo.vidInforssub.vidPath}`,
+          hls: false
+        }]
+      })
+    }
 
-  return data
+    return data
+  } catch (error) {
+    console.log(`${error} in extractURLS`, resp)
+    return []
+  }
 }
 
 export async function convertToNewData(id: string): Promise<cardData | undefined> {

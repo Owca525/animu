@@ -21,16 +21,18 @@ function information() {
     const currentIDplayer = useRef<string | undefined>(tempData.current.anime.player_ID)
 
     const [showWrong, setshowWrong] = useState<boolean>(false)
+    const currentPlugin = useRef<string>(tempData.current.saveData && tempData.current.saveData.pluginName ?
+        tempData.current.saveData.pluginName :
+        store.getState().plugin.playerPlugin.name
+    )
     const [secondsLeft, setSecondsLeft] = useState<undefined | number>(tempData.current.anime.nextAiringEpisode?.timeUntilAiring);
 
     const { data: episodeData, isError: isEpisodeError, isFetching: isEpisodeLoading, refetch } = useQuery({
         queryKey: [tempData.current.anime],
         queryFn: async ({ queryKey }) => {
             console.log(tempData.current)
-            let plugin: playerPluginFormat = ChangePlugin(tempData.current.saveData ? tempData.current.saveData.pluginName :
-                store.getState().plugin.playerPlugin.name
-            )
-            let [ playerID ] = queryKey
+            let plugin: playerPluginFormat = ChangePlugin(currentPlugin.current)
+            let [playerID] = queryKey
             console.log(playerID, tempData, plugin)
             if (!plugin || !plugin.player) return
             if (!tempData.current.saveData?.pluginName && !currentIDplayer) {
@@ -92,19 +94,16 @@ function information() {
         navigate("/player", {
             state: {
                 data: {
-                    AnimeData: {
-                        ...tempData.current.anime,
-                        player_ID: episodeData?.player_id
-                    },
-                    saveData: {
-                        last_Time: tempData.current.saveData && tempData.current.saveData.episode.toString() === episode ? tempData.current.saveData.last_Time : 0,
-                        type: type,
-                        player_ID: tempData.current.anime.player_ID,
-                        episode: episode
-                    }
+                    ...tempData.current.anime,
+                    player_ID: currentIDplayer.current
+                },
+                save: {
+                    last_Time: tempData.current.saveData && tempData.current.saveData.episode.toString() === episode ? tempData.current.saveData.last_Time : 0,
+                    type: type,
+                    pluginName: currentPlugin.current,
+                    episode: episode
                 },
                 episodelist: episodes,
-                pluginName: store.getState().plugin.playerPlugin.name
             }
         })
     }
@@ -141,6 +140,7 @@ function information() {
 
     async function refreashInformation(name: string) {
         ChangePlugin(name)
+        currentPlugin.current = name
         refetch()
     }
 
@@ -330,7 +330,7 @@ function information() {
 
                 <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
             </main>
-            {showWrong && <ContainerWrong name={tempData.current.anime.title.romaji} refetchfunc={(id?: string) => {setshowWrong(() => false);currentIDplayer.current = id; refetch()}} exitfunc={() => setshowWrong(() => false)} />}
+            {showWrong && <ContainerWrong name={tempData.current.anime.title.romaji} refetchfunc={(id?: string) => { setshowWrong(() => false); currentIDplayer.current = id; refetch() }} exitfunc={() => setshowWrong(() => false)} />}
         </>
     )
 }
