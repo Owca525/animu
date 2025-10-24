@@ -10,7 +10,7 @@ import Settings from "./pages/settings/index"
 import Player from "./pages/player/index"
 
 // Temporally
-import "./themes/darkAnimu/DarkAnimu.css"
+import "./themes/darkerAnimu/main.css"
 import { checkConfig, readConfig } from './utils/config';
 import store from './utils/store';
 

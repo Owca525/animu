@@ -147,16 +147,18 @@ body {
 /* Input */
 
 .input {
-  /*border: none;*/
+  border: none;
   border-radius: 8px;
   background-color: var(--third-layer);
   color: var(--text);
-  border: 2px solid var(--invisible);
+  /* border: 2px solid var(--invisible); */
+  outline: 2px solid var(--invisible);
   transition: all 0.1s ease;
 }
 
 .input:hover {
-  border-color: var(--green-one);
+  /* border-color: var(--green-one); */
+  outline-color: var(--green-one);
 }
 
 .input:focus {
