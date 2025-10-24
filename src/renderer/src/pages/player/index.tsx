@@ -66,7 +66,7 @@ const player = () => {
                 ...anime_data.data,
                 nextAiringEpisode: undefined
             }
-        }, "history.json")
+        }, "history")
         refetchHistory()
     }
 

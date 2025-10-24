@@ -265,6 +265,7 @@ const createProxyServer = () => {
             }
 
             const response = await fetch(currentVideoUrl, { headers });
+            console.log(response)
 
             res.status(response.status);
             response.headers.forEach((value, key) => res.setHeader(key, value));

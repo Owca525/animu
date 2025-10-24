@@ -441,9 +441,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             videoRef.current.currentTime >= parseInt(config.History.continue.MinimalTimeSave.toString()) &&
             videoRef.current.currentTime <= videoRef.current.duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
         ) {
-            SaveToFile(futureHistory, "continueWatch.json")
+            SaveToFile(futureHistory, "continueWatch")
         } else {
-            DeleteFromFile(futureHistory, "continueWatch.json")
+            DeleteFromFile(futureHistory, "continueWatch")
         }
         refetchHistory()
     }

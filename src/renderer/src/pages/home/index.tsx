@@ -99,14 +99,14 @@ const Home = () => {
       sections: [
         {
           title: t("global.continuewatch"),
-          data: (await ReadFile("continueWatch.json")).slice(0, 20),
+          data: (await ReadFile("continueWatch")).slice(0, 20),
           horizontal: true,
           onTitleClick: () =>
             setHomeData(async () => ({
               sections: [
                 {
                   title: t("global.continuewatch"),
-                  data: await ReadFile("continueWatch.json"),
+                  data: await ReadFile("continueWatch"),
                   horizontal: false,
                 },
               ],
@@ -114,14 +114,14 @@ const Home = () => {
         },
         {
           title: t("global.history"),
-          data: (await ReadFile("history.json")).slice(0, 20),
+          data: (await ReadFile("history")).slice(0, 20),
           horizontal: true,
           onTitleClick: () =>
             setHomeData(async () => ({
               sections: [
                 {
                   title: t("global.history"),
-                  data: await ReadFile("history.json"),
+                  data: await ReadFile("history"),
                   horizontal: false,
                 },
               ],
@@ -186,7 +186,7 @@ const Home = () => {
       homeCache.data[0].title == t("global.history")
     ) {
       HomeData = {
-        sections: [{ ...homeCache.data[0], data: await ReadFile("history.json") }],
+        sections: [{ ...homeCache.data[0], data: await ReadFile("history") }],
       };
     }
     if (
@@ -194,7 +194,7 @@ const Home = () => {
       homeCache.data[0].title == t("global.continuewatch")
     ) {
       HomeData = {
-        sections: [{ ...homeCache.data[0], data: await ReadFile("continueWatch.json") }],
+        sections: [{ ...homeCache.data[0], data: await ReadFile("continueWatch") }],
       };
     }
 
