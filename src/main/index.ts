@@ -55,6 +55,12 @@ function createWindow(): void {
     pipWindow.setAlwaysOnTop(true, 'screen-saver');
   };
 
+  const args = process.argv.slice(1);
+  const isDevTools = args.includes("--dev-tools") || args.includes("--devtools");
+  if (isDevTools) {
+    mainWindow.webContents.openDevTools({ mode: "detach" });
+  }
+
   session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
     details.requestHeaders['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/143.0';
     callback({ requestHeaders: details.requestHeaders });
