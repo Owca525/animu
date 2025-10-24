@@ -16,13 +16,13 @@ import ExternalPlayer from "./externalPlayer";
 import VideoPlayer from "./VideoPlayer";
 import { useQuery } from "react-query";
 import { SaveToFile } from "@renderer/utils/FilesManager/readFiles";
+import { ChangePlugin } from "@renderer/utils/pluginApi";
 
 const player = () => {
     const anime_data: { data: AnimeData, save: indentityPlayer, episodelist: { ep: string, img?: string, title?: string }[] } = useLocation().state
     const navigate = useNavigate()
     const config: SettingsConfig = useSelector((data: any) => data.config);
 
-    const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
     const [playerVolume, setPlayerVolume] = useState<number>(config.Player.general.Volume)
     const extractionData = useRef<{ actual: string, type: string, episodelist: { ep: string, img?: string, title?: string }[], time: number }>({
         actual: anime_data.save.episode,
@@ -36,6 +36,8 @@ const player = () => {
         queryKey: [anime_data.data.player_ID],
         queryFn: async ({ queryKey }) => {
             const [player_id] = queryKey;
+            if (!player_id) return console.error("THIS CAN'T HAPPEN IF Happen then something is wrong with player_id, queryFetch/player", player_id)
+            let pluginPlayer = ChangePlugin(anime_data.save.pluginName)
             return await pluginPlayer.player.extractPlayerData(extractionData.current.type, extractionData.current.actual, player_id)
         },
         refetchOnWindowFocus: false,
@@ -75,7 +77,7 @@ const player = () => {
     });
 
     useHotkeys("m", () => {
-        console.log(anime_data, extractionData)
+        console.log(anime_data, extractionData, data)
     })
 
     useEffect(() => {

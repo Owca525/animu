@@ -95,7 +95,7 @@ function information() {
             state: {
                 data: {
                     ...tempData.current.anime,
-                    player_ID: currentIDplayer.current
+                    player_ID: currentIDplayer.current ? currentIDplayer.current : episodeData?.player_id
                 },
                 save: {
                     last_Time: tempData.current.saveData && tempData.current.saveData.episode.toString() === episode ? tempData.current.saveData.last_Time : 0,

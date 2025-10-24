@@ -1,6 +1,5 @@
 import { timeToSeconds } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, playerChapterList, playerData, playerPluginFormat, playerSubtitlesFormat, resolutionFormat } from "@renderer/utils/GlobalInterface";
-import { getPlayerPluginCache, setPluginPlayerCache } from "@renderer/utils/pluginApi";
 
 const WEB = "https://www.lycoris.cafe"
 
@@ -29,16 +28,10 @@ function detectResoltion(text: string): string {
 }
 
 async function requestToApi(anime_id: string): Promise<{ data: any } | undefined> {
-    let cache = await getPlayerPluginCache()
-    if (cache && cache.anime_id == anime_id) {
-        return cache
-    } else {
-        let url = `${WEB}/api/anime/${anime_id}`
-        let req = await window.api.request.get(url, HEADER);
-        if (!req.success) return undefined
-        await setPluginPlayerCache({ anime_id: anime_id, data: req.data })
-        return { data: req.data }
-    }
+    let url = `${WEB}/api/anime/${anime_id}`
+    let req = await window.api.request.get(url, HEADER);
+    if (!req.success) return undefined
+    return { data: req.data }
 }
 
 async function extractEpisodeData(_type: string, episode: string, id: string): Promise<playerData[]> {
@@ -61,8 +54,10 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
 
     try {
         let animeEpisodes = JSON.parse(atob(decodeData))
+        console.log(animeEpisodes)
         for (const key in animeEpisodes) {
             let res = detectResoltion(key)
+            if (animeEpisodes[key].length <= 0) continue 
             if (res == "Unknown") continue
             currentEpisode.push({
                 res: res,
