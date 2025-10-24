@@ -47,33 +47,19 @@ declare global {
         runDiscordRPC: () => void;
       }
       os: {
-        getPath: (
-          name:
-            | "home"
-            | "appData"
-            | "userData"
-            | "sessionData"
-            | "temp"
-            | "exe"
-            | "module"
-            | "desktop"
-            | "documents"
-            | "downloads"
-            | "music"
-            | "pictures"
-            | "videos"
-            | "recent"
-            | "logs"
-            | "crashDumps"
-        ) => Promise<string>;
         exists: (path: string) => Promise<boolean>;
         write: (path: string, data: string, format?: string) => Promise<boolean>
-        read: (path: string, format?: string) => Promise<any>;
-        mkdir: (path: string) => Promise<boolean>;
+        read: (path: string, format?: string) => Promise<string | NonSharedBuffer | undefined>;
         saveDialog: (fileName: string, data: any, title: string, name: string, extensions: string[], format?: string) => Promise<boolean>
         openDialog: (path?: string, name?: string, extensions?: string[]) => Promise<string>
         getPathProgram: (program: string) => Promise<string>
+        checkOldConfig: () => Promise<void>
+        checkPictureFolder: () => Promise<string>
+        getConfigPath: () => Promise<string>
       };
+      backup: {
+        make: () => Promise<{ success: boolean, error: any }>
+      }
       runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string}, type: "mpv" | "vlc") => any
       getlistThemes: () => Promise<{ version?: string; autor?: string; pathcss: string; animuTitle?: string; name: string; pathIcon?: string }[]>
       getOSDetails: () => Promise<{ platform: NodeJS.Platform, release: string, arch: string }>

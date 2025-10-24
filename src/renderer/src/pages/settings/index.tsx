@@ -10,7 +10,7 @@ import { t } from "i18next"
 import { ContextMenuProps, notificationProps, playerPluginFormat, SettingsConfig, themeMetadata } from "@renderer/utils/GlobalInterface";
 import { useSelector } from "react-redux";
 import i18n from "i18next"
-import { checkPictureFolder, saveConfig } from "@renderer/utils/config";
+import { saveConfig } from "@renderer/utils/FilesManager/config";
 import { calculateZoomLevel, changeTheme, convertKeybinds, convertPath, updateObjectConfig } from "@renderer/utils/functions";
 import CheckKeybind from "./components/checkKeybind";
 import { showDialog } from "@renderer/utils/context/DialogContext";
@@ -21,11 +21,10 @@ import { motion } from "framer-motion";
 import { useHotkeys } from "react-hotkeys-hook";
 import HelpIcon from "./components/helpIcon";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
-import { ContinueCheckConversion, ContinueDetectVersion } from "@renderer/utils/history/continueWatch";
-import { HistoryCheckConvert, HistoryDetectVersion } from "@renderer/utils/history/history";
 import { checkUpdate } from "@renderer/utils/update";
 import { InitialPlugin } from "@renderer/utils/pluginApi";
 import ButtonGroup from "./components/buttonGroup";
+import { DetectOldVersionHistory } from "@renderer/utils/FilesManager/readFiles";
 
 function settings() {
     const navigate = useNavigate();
@@ -71,7 +70,7 @@ function settings() {
                 icon: "folder",
                 text: t("global.cfglocation"),
                 onClick: async () =>
-                    await window.api.open(await window.api.os.getPath("userData")),
+                    await window.api.open(await window.api.os.getConfigPath()),
             },
             {
                 icon: "home",
@@ -148,7 +147,7 @@ function settings() {
     }, [])
 
     async function ChangeScreenshot(path: string | any) {
-        if (!path) handleChange("Player.screenShot.path", await checkPictureFolder())
+        if (!path) handleChange("Player.screenShot.path", await window.api.os.checkPictureFolder())
         else handleChange("Player.screenShot.path", path)
     }
 
@@ -194,14 +193,7 @@ function settings() {
 
     async function buttonCheck() {
         toast.info(t("settings.history.check_start"), notificationProps)
-        await ContinueCheckConversion()
-        await HistoryCheckConvert()
-        if (await HistoryDetectVersion()) {
-            toast.info(t("settings.history.history_good"), notificationProps)
-        }
-        if (await ContinueDetectVersion()) {
-            toast.info(t("settings.history.continue_good"), notificationProps)
-        }
+        await DetectOldVersionHistory()
     }
 
     async function discord_server() {
@@ -261,7 +253,7 @@ function settings() {
                                         placeholderChange={() => t(`lang.${config.new.General.language}`)}
                                         disableX
                                     />
-                                    <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getPath("userData")}/lang`))} />
+                                    <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getConfigPath()}/lang`))} />
                                 </div>
                             </div>
                             <div className="settings-line"></div>
@@ -275,7 +267,7 @@ function settings() {
                                         buttonText={config.new.General.theme}
                                         disableX
                                     />
-                                    <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getPath("userData")}/themes`))} />
+                                    <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getConfigPath()}/themes`))} />
                                 </div>
                             </div>
                             <div className="settings-line"></div>

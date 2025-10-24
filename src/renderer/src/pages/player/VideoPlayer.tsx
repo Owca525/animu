@@ -13,7 +13,6 @@ import { useSelector } from "react-redux"
 import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory, toSeconds, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
-import { DeleteFromContinue, SaveContinue } from "@renderer/utils/history/continueWatch"
 import useKeyPress from "@renderer/utils/hooks/useKeyPress"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
 import PlayerSettings from "./components/PlayerSettings"
@@ -29,7 +28,8 @@ import JASSUB from "jassub";
 import workerUrl from "jassub/dist/jassub-worker.js?url";
 import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
 import { useHotkeys } from "react-hotkeys-hook"
-import { saveConfig } from "@renderer/utils/config"
+import { saveConfig } from "@renderer/utils/FilesManager/config"
+import { DeleteFromFile, SaveToFile } from "@renderer/utils/FilesManager/readFiles"
 
 function addTime(durration: number): string {
     const now = new Date();
@@ -428,29 +428,22 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         // Checking to save history
         if (!config) return
         if (!videoRef.current) return
+        let futureHistory = {
+            AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
+            saveData: {
+                pluginName: anime_data.saveData.pluginName,
+                last_Time: videoRef.current.currentTime,
+                episode: temp.episode,
+                type: temp.type
+            }
+        }
         if (
             videoRef.current.currentTime >= parseInt(config.History.continue.MinimalTimeSave.toString()) &&
             videoRef.current.currentTime <= videoRef.current.duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
         ) {
-            SaveContinue({
-                AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
-                saveData: {
-                    pluginName: anime_data.saveData.pluginName,
-                    last_Time: videoRef.current.currentTime,
-                    episode: temp.episode,
-                    type: temp.type
-                }
-            })
+            SaveToFile(futureHistory, "continueWatch.json")
         } else {
-            DeleteFromContinue({
-                AnimeData: { ...anime_data.AnimeData },
-                saveData: {
-                    pluginName: anime_data.saveData.pluginName,
-                    last_Time: 0,
-                    episode: temp.episode,
-                    type: temp.type
-                }
-            })
+            DeleteFromFile(futureHistory, "continueWatch.json")
         }
         refetchHistory()
     }
@@ -1116,14 +1109,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                                 <PlayerButton icon='skip_next' ButtonClass='material-symbols-outlined player-buttons' title={t('player.next', { ep: getEpisode("next")?.ep })} onClick={() => setEpisode("next")} />
                             }
                             <div className="player-time-display"
-                                onClick={() => {saveConfig(updateObjectConfig("Player.general.minusTime", !minusTimeState, config)); setminusTimeState((prev) => !prev)}}
+                                onClick={() => { saveConfig(updateObjectConfig("Player.general.minusTime", !minusTimeState, config)); setminusTimeState((prev) => !prev) }}
                             >
                                 <div className="player-time-display-current">
-                                    {minusTimeState ? `-${formatTime(videoRef.current ? videoRef.current.duration - currentTime : 0)}` : 
+                                    {minusTimeState ? `-${formatTime(videoRef.current ? videoRef.current.duration - currentTime : 0)}` :
                                         formatTime(currentTime)
                                     }
-                                </div> 
-                                    / 
+                                </div>
+                                /
                                 <div className="player-time-display-durration">{formatTime(videoRef.current?.duration)}</div>
                                 {calculateChaptersTime() &&
                                     <div className="player-time-display-chaptersTime">

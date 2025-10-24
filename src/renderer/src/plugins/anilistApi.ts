@@ -387,6 +387,16 @@ function getSeasonFromDate() {
   return { season, seasonYear: year };
 }
 
+export async function searchForConvertAnime(text: string) {
+  let variables: any = {
+    page: 1,
+    sort: "SEARCH_MATCH",
+    type: "ANIME",
+    search: text
+  }
+  return await sendToApi(variables, graphicApi)
+}
+
 async function SearchAnilistApi(text: string, page: number, params?: FilterParams): Promise<void> {
   let variables: any = {
     page: page,

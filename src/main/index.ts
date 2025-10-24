@@ -10,6 +10,7 @@ import "./os"
 import "./update"
 import "./request"
 import "./streaming"
+import "./backup"
 
 export let mainWindow: BrowserWindow | undefined
 

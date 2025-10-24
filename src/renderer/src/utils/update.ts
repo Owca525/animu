@@ -1,23 +1,28 @@
 import { toast } from "react-toastify";
-import { saveConfig } from "./config";
+import { saveConfig } from "./FilesManager/config";
 import { notificationProps } from "./GlobalInterface";
 import { t } from "i18next";
 import store from "./store";
 
 export async function checkUpdate(alwaysShow: boolean = false) {
-    let update = await window.api.update.checkUpdate()
-    console.log(update)
-    if (update.available) {
-        toast.info(t('update.available', { ver: update.version }), { ...notificationProps, onClick: () => { window.api.update.downloadUpdate(); downloadUpdate(toast.loading(t("update.progress", { procent: 0 }), notificationProps)) } });
-    } else if (alwaysShow) {
-        toast.info(t("update.same", notificationProps))
-    }
-    
-    let config = store.getState().config
-    if (config) {
-        const currentDate = new Date();
-        config.update.lastTime = currentDate.toString()
-        saveConfig(config)
+    try {
+        let update = await window.api.update.checkUpdate()
+        console.log(update)
+        if (update.available) {
+            toast.info(t('update.available', { ver: update.version }), { ...notificationProps, onClick: () => { window.api.update.downloadUpdate(); downloadUpdate(toast.loading(t("update.progress", { procent: 0 }), notificationProps)) } });
+        } else if (alwaysShow) {
+            toast.info(t("update.same", notificationProps))
+        }
+        
+        let config = store.getState().config
+        if (config) {
+            const currentDate = new Date();
+            config.update.lastTime = currentDate.toString()
+            saveConfig(config)
+        }
+    } catch (error) {
+        console.error("Error in checkUpdate", error)
+        toast.error("Failed Check is update avaible")
     }
 }
 

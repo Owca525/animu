@@ -1,4 +1,4 @@
-import { defaultConfig } from "../config";
+import { defaultConfig } from "../FilesManager/config";
 
 const userReducer = (state = defaultConfig, action) => {
   switch (action.type) {

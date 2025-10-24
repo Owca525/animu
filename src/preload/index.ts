@@ -33,32 +33,18 @@ if (process.contextIsolated) {
         runDiscordRPC: () => ipcRenderer.invoke("runDiscordRPC"),
       },
       os: {
-        getPath: (
-          name:
-            | "home"
-            | "appData"
-            | "userData"
-            | "sessionData"
-            | "temp"
-            | "exe"
-            | "module"
-            | "desktop"
-            | "documents"
-            | "downloads"
-            | "music"
-            | "pictures"
-            | "videos"
-            | "recent"
-            | "logs"
-            | "crashDumps"
-        ) => ipcRenderer.invoke("getPath", name),
         exists: (path: string) => ipcRenderer.invoke("exist", path),
         write: (path: string, data: string, format?: string) => ipcRenderer.invoke("write", path, data, format),
         read: (path: string, format?: string) => ipcRenderer.invoke("read", path, format),
-        mkdir: (path: string) => ipcRenderer.invoke("mkdir", path),
         saveDialog: (fileName: string, data: any, title: string, name: string, extensions: string[], format?: string) => ipcRenderer.invoke("saveDialog", fileName, data, title, name, extensions, format),
         openDialog: (path?: string, name?: string, extensions?: string[]) => ipcRenderer.invoke("openDialog", path, name, extensions),
-        getPathProgram: (program: string) => ipcRenderer.invoke("getPathProgram", program) 
+        getPathProgram: (program: string) => ipcRenderer.invoke("getPathProgram", program),
+        checkOldConfig: () => ipcRenderer.invoke("checkOldConfig"),
+        checkPictureFolder: () => ipcRenderer.invoke("createPictureFolder"),
+        getConfigPath: () => ipcRenderer.invoke("getConfigPath")
+      },
+      backup: {
+        make: () => ipcRenderer.invoke("makeBackup")
       },
       runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string}, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", videoData, type),
       getlistThemes: () => ipcRenderer.invoke("get-css-files"),

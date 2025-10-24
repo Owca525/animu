@@ -72,7 +72,7 @@ async function extractResolutions(episode: string, type: string, playerData: pla
 
         return {
             ...playerData,
-            splitResHLS: resolutions[0].res != "master",
+            // splitResHLS: resolutions[0].res != "master",
             resolution: resolutions,
             subtitles: subtitles,
             listChapters: response.data["skips"] ? [
@@ -95,7 +95,7 @@ async function exctractPlayerData(_type: string, episode: string, id: string): P
             const element = response.data[index];
             data.push({
                 hostname: element["id"],
-                hls: true,
+                // hls: true,
                 defaultHost: element["default"],
                 resolution: [],
                 extractResolution: async (episode: string, _type: string, playerData, _customData?: any, id?: string) => await extractResolutions(episode, "sub", playerData, element["id"], id)
@@ -103,7 +103,7 @@ async function exctractPlayerData(_type: string, episode: string, id: string): P
             if (element["hasDub"]) {
                 data.push({
                     hostname: `${element["id"]} (dub)`,
-                    hls: true,
+                    // hls: true,
                     defaultHost: false,
                     resolution: [],
                     extractResolution: async (episode: string, _type: string, playerData, _customData?: any, id?: string) => await extractResolutions(episode, "dub", playerData, element["id"], id)

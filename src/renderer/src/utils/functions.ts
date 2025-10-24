@@ -2,8 +2,6 @@ import { t } from "i18next";
 import { ContextMenuProps, homeData, playerChapterList, SettingsConfig, themeMetadata } from "./GlobalInterface";
 import store from "./store";
 import { getPluginList, setHomeData } from "./pluginApi";
-import { ReadContinue } from "./history/continueWatch";
-import { ReadHistory } from "./history/history";
 import { showDialog } from "./context/DialogContext";
 import i18n from "./i18n";
 import { DropdownOption } from "@renderer/components/dropDown";
@@ -166,13 +164,13 @@ export async function refetchHistory() {
             sections: [
                 {
                     title: t("global.continuewatch"),
-                    data: await ReadContinue(20),
+                    data: store.getState().global.history.continue.slice(0, 20),
                     horizontal: true,
                     onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: store.getState().global.history.continue, horizontal: false }] }))
                 },
                 {
                     title: t("global.history"),
-                    data: await ReadHistory(20),
+                    data: store.getState().global.history.history.slice(0, 20),
                     horizontal: true,
                     onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.history"), data: store.getState().global.history.history, horizontal: false }] }))
                 },

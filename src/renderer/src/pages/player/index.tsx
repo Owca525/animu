@@ -8,7 +8,6 @@ import { useSelector } from "react-redux";
 import { t } from "i18next";
 
 import "./player.css"
-import { SaveHistory } from "@renderer/utils/history/history";
 import { detectTitle, refetchHistory } from "@renderer/utils/functions";
 import { useHotkeys } from "react-hotkeys-hook";
 import Button from "@renderer/components/buttons";
@@ -16,6 +15,7 @@ import ExternalPlayer from "./externalPlayer";
 
 import VideoPlayer from "./VideoPlayer";
 import { useQuery } from "react-query";
+import { SaveToFile } from "@renderer/utils/FilesManager/readFiles";
 
 const player = () => {
     const anime_data: { data: AnimeData, save: indentityPlayer, episodelist: { ep: string, img?: string, title?: string }[] } = useLocation().state
@@ -55,7 +55,7 @@ const player = () => {
 
     function updateHistory() {
         console.log("SAVE HISTORY", anime_data.save.pluginName)
-        SaveHistory({
+        SaveToFile({
             saveData: {
                 pluginName: anime_data.save.pluginName,
                 last_Time: 0,
@@ -66,7 +66,7 @@ const player = () => {
                 ...anime_data.data,
                 nextAiringEpisode: undefined
             }
-        })
+        }, "history.json")
         refetchHistory()
     }
 

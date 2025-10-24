@@ -1,7 +1,6 @@
 import ini from "ini";
-import { SettingsConfig } from "./GlobalInterface";
-import { convertPath } from "./functions";
-import store from "./store";
+import { SettingsConfig } from "../GlobalInterface";
+import store from "../store";
 
 export const defaultConfig: SettingsConfig = {
     firstStart: true,
@@ -37,7 +36,7 @@ export const defaultConfig: SettingsConfig = {
         screenShot: {
             alwaysAsk: true,
             saveType: "File",
-            path: await checkPictureFolder(),
+            path: await window.api.os.checkPictureFolder(),
         },
         external: {
             enable: false,
@@ -107,16 +106,6 @@ export const defaultConfig: SettingsConfig = {
     }
 };
 
-const appConfigDirPath = window.api.os.getPath("userData");
-
-export async function checkPictureFolder(): Promise<string> {
-    const path = await window.api.os.getPath("pictures");
-    const picturePath = await convertPath(`${path}/animu`)
-    if (await window.api.os.exists(picturePath)) return picturePath;
-    window.api.os.mkdir(picturePath);
-    return picturePath;
-}
-
 function deepMerge(target: any, source: any): any {
     for (const key in source) {
         if (source[key] && typeof source[key] === "object") {
@@ -134,7 +123,8 @@ function deepMerge(target: any, source: any): any {
 export async function readConfig(): Promise<SettingsConfig> {
     try {
         if (await checkConfig() == false) return defaultConfig
-        const content = await window.api.os.read(await appConfigDirPath + "/config.ini");
+        const content = await window.api.os.read("config.ini");
+        if (typeof content != "string") return defaultConfig
         const loadedConfig = ini.parse(content) as SettingsConfig;
         return deepMerge(defaultConfig, loadedConfig);
     } catch (error) {
@@ -146,7 +136,7 @@ export async function readConfig(): Promise<SettingsConfig> {
 export async function saveConfig(content: SettingsConfig): Promise<boolean> {
     try {
         const data = ini.stringify(content);
-        window.api.os.write(await appConfigDirPath + "/config.ini", data);
+        window.api.os.write("config.ini", data);
         store.dispatch({ type: "setConfig", payload: content })
         return true
     } catch (Error) {
@@ -158,7 +148,7 @@ export async function saveConfig(content: SettingsConfig): Promise<boolean> {
 async function createConfig() {
     try {
         const content = ini.stringify(defaultConfig);
-        await window.api.os.write(await appConfigDirPath + "/config.ini", content)
+        await window.api.os.write("config.ini", content)
     } catch (Error) {
         console.error(`${Error} in createConfig`);
     }
@@ -166,10 +156,7 @@ async function createConfig() {
 
 export async function checkConfig(): Promise<boolean> {
     try {
-        if (await window.api.os.exists(await appConfigDirPath)) return true;
-        else await window.api.os.mkdir(await appConfigDirPath);
-
-        if (await window.api.os.exists(await appConfigDirPath + "/config.ini") == false)
+        if (await window.api.os.exists("config.ini") == false)
             await createConfig();
         return true
     } catch (Error) {

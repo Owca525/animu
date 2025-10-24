@@ -21,13 +21,12 @@ import {
   setHomeData,
   setHomeLocalSearch,
 } from "@renderer/utils/pluginApi";
-import { ReadContinue } from "@renderer/utils/history/continueWatch";
-import { ReadHistory } from "@renderer/utils/history/history";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import { CreateContextMenuOptions } from "@renderer/utils/functions";
 import Filter from "./components/filter";
 import Button from "@renderer/components/buttons";
 import BigCardsContainer from "./components/bigCardsContainer";
+import { ReadFile } from "@renderer/utils/FilesManager/readFiles";
 // import WelcomeScreen from "./components/welcomeScreen"
 
 const Home = () => {
@@ -100,14 +99,14 @@ const Home = () => {
       sections: [
         {
           title: t("global.continuewatch"),
-          data: await ReadContinue(20),
+          data: (await ReadFile("continueWatch.json")).slice(0, 20),
           horizontal: true,
           onTitleClick: () =>
             setHomeData(async () => ({
               sections: [
                 {
                   title: t("global.continuewatch"),
-                  data: await ReadContinue(),
+                  data: await ReadFile("continueWatch.json"),
                   horizontal: false,
                 },
               ],
@@ -115,14 +114,14 @@ const Home = () => {
         },
         {
           title: t("global.history"),
-          data: await ReadHistory(20),
+          data: (await ReadFile("history.json")).slice(0, 20),
           horizontal: true,
           onTitleClick: () =>
             setHomeData(async () => ({
               sections: [
                 {
                   title: t("global.history"),
-                  data: await ReadHistory(),
+                  data: await ReadFile("history.json"),
                   horizontal: false,
                 },
               ],
@@ -187,7 +186,7 @@ const Home = () => {
       homeCache.data[0].title == t("global.history")
     ) {
       HomeData = {
-        sections: [{ ...homeCache.data[0], data: await ReadHistory() }],
+        sections: [{ ...homeCache.data[0], data: await ReadFile("history.json") }],
       };
     }
     if (
@@ -195,7 +194,7 @@ const Home = () => {
       homeCache.data[0].title == t("global.continuewatch")
     ) {
       HomeData = {
-        sections: [{ ...homeCache.data[0], data: await ReadContinue() }],
+        sections: [{ ...homeCache.data[0], data: await ReadFile("continueWatch.json") }],
       };
     }
 

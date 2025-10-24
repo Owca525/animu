@@ -72,7 +72,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         if (!currentHost.current) return
         let subsList: string[] = []
         if (currentHost.current.subtitles) subsList = currentHost.current.subtitles.map(el => el.url)
-        await window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.mpvPath, time: time, subs: { subList: subsList, sid: getNumberOfSub(currentHost.current.subtitles) }, chapters: currentHost.current.chaptersUrl }, "mpv")
+        await window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.mpvPath, time: time, subs: { subList: subsList, sid: getNumberOfSub(currentHost.current.subtitles) }, chapters: currentHost.current.external?.chaptersUrl }, "mpv")
     }
 
     async function runVlcPlayer(url?: string) {
@@ -84,7 +84,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     }
 
     async function runChromeCast(device: { host: string, port: number, name: string }) {
-        if (currentHost.current && currentHost.current.hls) {
+        if (currentHost.current && currentHost.current.resolution[0].hls) {
             toast.error(t("externalPlayer.failed.chromecast"))
             return
         }

@@ -10,6 +10,7 @@ import express from "express";
 import { Readable } from "stream";
 
 let rpc: Client | undefined = undefined
+let newConfigPath = path.join(app.getPath("userData"), "animuConfig")
 
 // Client id for Discord Rich presence
 export const CLIENT_ID = '1320810160205070377';
@@ -202,9 +203,9 @@ ipcMain.handle('get-lang-files', async (): Promise<{ data: any, lang: string }[]
 });
 
 function checkConfigFolder(folder: string): string | undefined {
-    if (fs.existsSync(`${app.getPath("userData")}/${folder}`)) return `${app.getPath("userData")}/${folder}`
-    fs.mkdirSync(`${app.getPath("userData")}/${folder}`)
-    return `${app.getPath("userData")}/${folder}`
+    if (fs.existsSync(`${newConfigPath}/${folder}`)) return `${newConfigPath}/${folder}`
+    fs.mkdirSync(`${newConfigPath}/${folder}`)
+    return `${newConfigPath}/${folder}`
 }
 
 async function takeFileExtensionAndPath(dir: string, format: string): Promise<string[]> {
