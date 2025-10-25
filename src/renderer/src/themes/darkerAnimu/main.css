@@ -635,11 +635,11 @@ th {
   background-color: var(--fourth-layer);
   box-shadow: inset 0 0 5px rgb(0, 0, 0, 0.2);
   border-radius: 20px;
-  outline: 2px solid var(--invisible);
+  outline: 2px solid var(--invisible) !important;
 }
 
 .checkbox:hover {
-  outline-color: var(--orange-one);
+  outline-color: var(--orange-one) !important;
 }
 
 .checkbox::before {

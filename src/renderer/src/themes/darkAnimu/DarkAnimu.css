@@ -1006,3 +1006,25 @@ th {
 .information-containerwrong-center {
     border: 1px solid white;
 }
+
+/* Button groups */
+.button-group-button:hover {
+    background-color: var(--bg1);
+}
+
+.button-group-button.active {
+    background-color: var(--bg1);
+}
+
+.button-group-button.active:hover {
+    background-color: var(--bg4);
+}
+
+.button-group-button {
+    background-color: var(--bg3);
+    border: 2px solid var(--bg4);
+}
+
+.settings-input-content {
+    background-color: var(--bg3);
+}

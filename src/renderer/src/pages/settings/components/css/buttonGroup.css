@@ -5,23 +5,9 @@
 
 .button-group-button {
     padding: 6px 8px 6px 8px;
-    background-color: var(--bg3);
     font-size: 1.1em;
-    border: 2px solid var(--bg4);
     cursor: pointer;
     transition: background-color 150ms ease-in-out;
-}
-
-.button-group-button:hover {
-    background-color: var(--bg1);
-}
-
-.button-group-button.active {
-    background-color: var(--bg1);
-}
-
-.button-group-button.active:hover {
-    background-color: var(--bg4);
 }
 
 .button-group-button:first-child {
