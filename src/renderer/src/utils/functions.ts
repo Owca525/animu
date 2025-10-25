@@ -1,5 +1,5 @@
 import { t } from "i18next";
-import { ContextMenuProps, homeData, playerChapterList, SettingsConfig, themeMetadata } from "./GlobalInterface";
+import { cardData, ContextMenuProps, homeData, playerChapterList, SettingsConfig, themeMetadata } from "./GlobalInterface";
 import store from "./store";
 import { getPluginList, setHomeData } from "./pluginApi";
 import { showDialog } from "./context/DialogContext";
@@ -149,30 +149,35 @@ export async function refetchHistory() {
     if (!data.data) return
     if (data.data.sections.length > 2) return
     if (data.data.sections.length <= 0) return
+    let history: cardData[] = store.getState().global.history.history
+    let continueWatch: cardData[] = store.getState().global.history.continue
     if (data.data.sections.length == 1 && data.data.sections[0].title == t("global.continuewatch")) {
-        await setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: store.getState().global.history.continue, horizontal: false }] }))
+        await setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: continueWatch, horizontal: false }] }))
         return
     }
 
     if (data.data.sections.length == 1 && data.data.sections[0].title == t("global.history")) {
-        await setHomeData(async () => ({ sections: [{ title: t("global.history"), data: store.getState().global.history.history, horizontal: false }] }))
+        await setHomeData(async () => ({ sections: [{ title: t("global.history"), data: history, horizontal: false }] }))
         return
     }
+
+    let newHistory = history.reverse()
+    let newcontinueWatch = continueWatch.reverse()
 
     if (data.data.sections[0].title == t("global.continuewatch") && data.data.sections[1].title == t("global.history")) {
         await setHomeData(async () => ({
             sections: [
                 {
                     title: t("global.continuewatch"),
-                    data: store.getState().global.history.continue.slice(0, 20),
+                    data: newcontinueWatch.slice(0, 20),
                     horizontal: true,
-                    onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: store.getState().global.history.continue, horizontal: false }] }))
+                    onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: continueWatch, horizontal: false }] }))
                 },
                 {
                     title: t("global.history"),
-                    data: store.getState().global.history.history.slice(0, 20),
+                    data: newHistory.slice(0, 20),
                     horizontal: true,
-                    onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.history"), data: store.getState().global.history.history, horizontal: false }] }))
+                    onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.history"), data: history, horizontal: false }] }))
                 },
             ]
         }))
