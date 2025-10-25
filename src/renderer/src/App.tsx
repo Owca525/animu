@@ -19,7 +19,7 @@ import ErrorBoundary from './utils/ErrorBoundary';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { notificationProps } from './utils/GlobalInterface';
 import { InitialPlugin } from './utils/pluginApi';
-import { DetectOldVersionHistory } from './utils/FilesManager/readFiles';
+import { DetectOldVersionHistory, ReadFile } from './utils/FilesManager/readFiles';
 
 const Information = lazy(() => import("./pages/information/index"));
 const Player = lazy(() => import("./pages/player/index"));
@@ -52,6 +52,8 @@ function App() {
     setTextLoading(() => "Loading Plugins...")
     InitialPlugin()
     setIsLoading(() => false)
+    ReadFile("history")
+    ReadFile("continueWatch")
     runCheckUpdate()
   }
 

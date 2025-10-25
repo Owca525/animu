@@ -13,7 +13,7 @@ import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import store from "@renderer/utils/store";
 import Dropdown from "@renderer/components/dropDown";
 import { ChangePlugin } from "@renderer/utils/pluginApi";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 
 function information() {
     const navigate = useNavigate()
@@ -27,6 +27,7 @@ function information() {
     )
     const [secondsLeft, setSecondsLeft] = useState<undefined | number>(tempData.current.anime.nextAiringEpisode?.timeUntilAiring);
 
+    const queryClient = useQueryClient()
     const { data: episodeData, isError: isEpisodeError, isFetching: isEpisodeLoading, refetch } = useQuery({
         queryKey: [tempData.current.anime],
         queryFn: async ({ queryKey }) => {
@@ -139,6 +140,7 @@ function information() {
     })
 
     async function refreashInformation(name: string) {
+        queryClient.cancelQueries()
         ChangePlugin(name)
         currentPlugin.current = name
         refetch()
