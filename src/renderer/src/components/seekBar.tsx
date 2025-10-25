@@ -161,15 +161,17 @@ const SeekBar: React.FC<SeekBarProps> = ({
   return (
     <div
       tabIndex={-1}
-      ref={seekBarRef}
       className={`seekBar-container ${classes?.container}`}
-      onClick={setPosition}
-      onMouseDown={() => setdrage(() => true)}
-      onMouseUp={() => setdrage(() => false)}
-      onMouseLeave={() => { setdrage(() => false); setshow(() => false) }}
-      onMouseEnter={() => setshow(() => true)}
-      onMouseMove={handleMouseMove}
     >
+      <div className="seekbar-shadow"
+        onClick={setPosition}
+        onMouseDown={() => setdrage(() => true)}
+        onMouseUp={() => setdrage(() => false)}
+        onMouseLeave={() => { setdrage(() => false); setshow(() => false) }}
+        onMouseEnter={() => setshow(() => true)}
+        onMouseMove={handleMouseMove}
+        ref={seekBarRef}
+      ></div>
       {/* {secondBarValue && <div className="seekbar-progress-second" style={{ width: `${secondBarValue}%` }} />} */}
       {secondBarValues &&
         <div className="seekbar-buffer-wrapper">
