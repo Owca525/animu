@@ -347,6 +347,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
             hls.on(Hls.Events.ERROR, (_event, data) => {
                 console.error("HLS", _event, data)
+                hls.currentLevel = hls.levels.length - 1;
                 if (data.fatal) {
                     let message: string | undefined
                     switch (data.type) {
@@ -356,7 +357,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                             // TODO: Update this, may make bug
                             // setNewUrl(host.hostname)
                             hls.startLoad();
-                            hls.currentLevel = hls.levels.length - 1;
                             break;
                         case Hls.ErrorTypes.MEDIA_ERROR:
                             message = t('player.errors.MEDIA_ERR_DECODE')
