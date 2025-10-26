@@ -48,7 +48,7 @@ ipcMain.handle("getPathProgram", async (_event, program: string): Promise<string
 });
 
 ipcMain.handle("write", (_event, pathStr: string, data: string, format?: WriteFileOptions): boolean => {
-  if (data.includes("data:image/png;base64,")) {
+  if (pathStr.includes(".png")) {
     return write(pathStr, data, format)
   }
   return write(path.join(newConfigPath, pathStr), data, format)
