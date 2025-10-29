@@ -1,15 +1,16 @@
 import { homeData } from "../GlobalInterface";
 
 const initialState: homeData = {
-    isLoading: false,
-    isError: false,
-    data: { sections: [] },
-    search: "",
-    page: 1,
-    stopScrolling: false,
-    containerLoading: false,
-    localSearch: false,
-    filterTags: undefined
+  isLoading: false,
+  isError: false,
+  data: { sections: [] },
+  search: "",
+  page: 1,
+  stopScrolling: false,
+  localSearch: false,
+  filterTags: undefined,
+  mainContainer: undefined,
+  onScrollContainer: undefined
 };
 
 const userReducer = (state = initialState, action) => {
@@ -26,14 +27,16 @@ const userReducer = (state = initialState, action) => {
       return { ...state, page: action.payload };
     case "setStopScrolling":
       return { ...state, stopScrolling: action.payload };
-    case "setcontainerLoading":
-      return { ...state, containerLoading: action.payload };
     case "setLocalSearch":
       return { ...state, localSearch: action.payload };
     case "setTags":
       return { ...state, filterTags: action.payload };
+    case "setMainContainer":
+      return { ...state, mainContainer: action.payload };
+    case "setonScrollContainer":
+      return { ...state, onScrollContainer: action.payload };
     case "resetHomeData":
-        return { ...initialState };
+      return { ...initialState };
     default:
       return state;
   }

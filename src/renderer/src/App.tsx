@@ -41,7 +41,6 @@ function App() {
   })
 
   useHotkeys("ctrl+i", () => {
-    console.log(store.getState().config)
     store.dispatch({ type: "setIcognitoMode", payload: !store.getState().global.incognito })
     toast.info(`Incognito Mode: ${store.getState().global.incognito ? "On" : "Off"}`, notificationProps)
   })

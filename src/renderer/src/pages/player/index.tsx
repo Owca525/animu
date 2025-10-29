@@ -56,7 +56,6 @@ const player = () => {
     }
 
     function updateHistory() {
-        console.log("SAVE HISTORY", anime_data.save.pluginName)
         SaveToFile({
             saveData: {
                 pluginName: anime_data.save.pluginName,

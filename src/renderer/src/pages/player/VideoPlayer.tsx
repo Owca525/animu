@@ -51,7 +51,6 @@ function addTime(durration: number): string {
 
 async function fetchData(tmpData: { episode: string, id?: string, type: string, playerData: playerData }, func: (episode: string, type: string, playerData: playerData, customData?: any, id?: string) => Promise<playerData | undefined>): Promise<{ succes: boolean, data: playerData | undefined }> {
     try {
-        console.log(tmpData)
         let data = await func(tmpData.episode, tmpData.type, tmpData.playerData, undefined, tmpData.id)
         return {
             succes: true,
@@ -250,11 +249,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 type: "",
                 playerData: currentplayer
             }, currentplayer.extractResolution)
-            console.log(tmp)
             if (tmp.succes && tmp.data) currentplayer = tmp.data
         }
-
-        console.log(currentplayer)
 
         if (currentplayer.resolution.length <= 0) {
             toast.info(t("player.errors.missingResoltions"), notificationProps)
@@ -330,7 +326,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
             hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
                 const resolutions = data.levels.map((level) => level.height);
-                console.log(resolutions, hls.levels.length - 1, data.levels)
                 if (data.audioTracks.length > 0) {
                     for (let index = 0; index < data.audioTracks.length; index++) {
                         const element = data.audioTracks[index];
@@ -342,7 +337,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                 setListResolution(resolutions.map((val) => { return { res: val.toString(), url: "" } }))
                 setCurrentResoltion({ res: resolutions[0].toString(), url: "" })
                 hls.currentLevel = hls.levels.length - 1;
-                console.log(hls.currentLevel, hls)
             });
 
             hls.on(Hls.Events.ERROR, (_event, data) => {
@@ -815,8 +809,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             const canvas = await html2canvas(screenshotWrapper.current);
             screenshot = canvas.toDataURL("image/png");
         }
-
-        console.log(screenshot)
 
         if (screenshot == "data:,") {
             toast.error(t("player.toastscreenshot.failed"), notificationProps);

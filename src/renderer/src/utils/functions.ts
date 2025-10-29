@@ -171,13 +171,19 @@ export async function refetchHistory() {
                     title: t("global.continuewatch"),
                     data: newcontinueWatch.slice(0, 20),
                     horizontal: true,
-                    onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: continueWatch, horizontal: false }] }))
+                    titlevent: {
+                        onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: continueWatch, horizontal: false }] })),
+                        onTitleClickContext: ""
+                    }
                 },
                 {
                     title: t("global.history"),
                     data: newHistory.slice(0, 20),
                     horizontal: true,
-                    onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.history"), data: history, horizontal: false }] }))
+                    titlevent: {
+                        onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.history"), data: history, horizontal: false }] })),
+                        onTitleClickContext: ""
+                    }
                 },
             ]
         }))

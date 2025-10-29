@@ -30,11 +30,8 @@ function information() {
     const queryClient = useQueryClient()
     const { data: episodeData, isError: isEpisodeError, isFetching: isEpisodeLoading, refetch } = useQuery({
         queryKey: [tempData.current.anime],
-        queryFn: async ({ queryKey }) => {
-            console.log(tempData.current)
+        queryFn: async () => {
             let plugin: playerPluginFormat = ChangePlugin(currentPlugin.current)
-            let [playerID] = queryKey
-            console.log(playerID, tempData, plugin)
             if (!plugin || !plugin.player) return
             if (!tempData.current.saveData?.pluginName && !currentIDplayer) {
                 return plugin.player.extractEpisodeList(tempData.current.anime, undefined)

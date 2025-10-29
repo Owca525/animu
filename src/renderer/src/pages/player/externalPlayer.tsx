@@ -101,7 +101,6 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     }
 
     function ChangeResolution(data: { res: string, url: string }) {
-        console.log(data)
         setCurrentResolution(() => data.res)
         setCurrentUrl(() => data.url)
     }

@@ -13,6 +13,7 @@ import {
 // import { extractInformation } from "@renderer/plugins/allmanga";
 import { ChangePlugin } from "@renderer/utils/pluginApi";
 import store from "@renderer/utils/store";
+import i18n from "@renderer/utils/i18n";
 
 const Card: React.FC<{ card: cardData, disableinformation?: boolean }> = ({ card, disableinformation = false }) => {
   const navigate = useNavigate();
@@ -148,7 +149,11 @@ const Card: React.FC<{ card: cardData, disableinformation?: boolean }> = ({ card
     }
     let bottom: JSX.Element[] = []
     if (card.AnimeData.format) {
-      bottom = [...bottom, <>{t(`anime_formats.${card.AnimeData.format.toLowerCase()}`)}</>]
+      let check = i18n.exists(`anime_formats.${card.AnimeData.format.toLowerCase()}`)
+      bottom = [...bottom, <>{
+        check ?
+          t(`anime_formats.${card.AnimeData.format.toLowerCase()}`) : t(`anime_source.${card.AnimeData.format.toLowerCase()}`)
+      }</>]
     }
     if (!card.AnimeData.format && card.AnimeData.type) {
       bottom = [...bottom, <>{t(`anime_source.${card.AnimeData.type.toLowerCase().replaceAll("_", "")}`)}</>]

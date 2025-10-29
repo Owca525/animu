@@ -11,7 +11,7 @@ import {
   containerData,
   FilterParams,
   homeData,
-  informationPluginFormat,
+  informationPluginManagerFormat,
   SettingsConfig,
 } from "@renderer/utils/GlobalInterface";
 import { t } from "i18next";
@@ -31,7 +31,7 @@ import { ReadFile } from "@renderer/utils/FilesManager/readFiles";
 
 const Home = () => {
   const navigate = useNavigate();
-  const plugin: informationPluginFormat = useSelector(
+  const plugin: informationPluginManagerFormat = useSelector(
     (plugin: any) => plugin.plugin.informationPlugin
   );
   const homeCache: homeData = useSelector((cache: any) => cache.home);
@@ -42,14 +42,12 @@ const Home = () => {
 
   const divRef = useRef<HTMLDivElement | null>(null);
 
-  console.log(homeCache)
-
   let sidebarData = {
     top: [
       {
         icon: "home",
         text: t("global.home"),
-        onClick: plugin.info.home,
+        onClick: plugin.home,
       },
       {
         icon: "history",
@@ -74,21 +72,10 @@ const Home = () => {
   }
 
   useEffect(() => {
-    if (homeCache.data.sections.length <= 0) plugin.info.home()
+    if (homeCache.data.sections.length <= 0) plugin.home()
     if (config.General.discordRPC)
       window.api.rpc.setActivity(undefined, t("discordrpc.home"));
   }, []);
-
-  useEffect(() => {
-    if (homeCache.data.sections.length <= 0) return
-    if (homeCache.data.sections.length != 1) return
-    if (homeCache.stopScrolling) return
-    if (!divRef.current) return
-    if ((divRef.current.scrollHeight > divRef.current.clientHeight) == false && homeCache.data.sections[0].onScrollDownFunction) {
-      store.dispatch({ type: "setPage", payload: homeCache.page + 1 });
-      homeCache.data.sections[0].onScrollDownFunction(homeCache.page + 1);
-    }
-  }, [homeCache.data])
 
   async function history(): Promise<{
     topCards?: containerData;
@@ -101,61 +88,53 @@ const Home = () => {
           title: t("global.continuewatch"),
           data: (await ReadFile("continueWatch")).slice(0, 20),
           horizontal: true,
-          onTitleClick: () =>
-            setHomeData(async () => ({
-              sections: [
-                {
-                  title: t("global.continuewatch"),
-                  data: await ReadFile("continueWatch"),
-                  horizontal: false,
-                },
-              ],
-            })),
+          // onTitleClick: () =>
+          //   setHomeData(async () => ({
+          //     sections: [
+          //       {
+          //         title: t("global.continuewatch"),
+          //         data: await ReadFile("continueWatch"),
+          //         horizontal: false,
+          //       },
+          //     ],
+          //   })),
         },
         {
           title: t("global.history"),
           data: (await ReadFile("history")).slice(0, 20),
           horizontal: true,
-          onTitleClick: () =>
-            setHomeData(async () => ({
-              sections: [
-                {
-                  title: t("global.history"),
-                  data: await ReadFile("history"),
-                  horizontal: false,
-                },
-              ],
-            })),
+          // onTitleClick: () =>
+          //   setHomeData(async () => ({
+          //     sections: [
+          //       {
+          //         title: t("global.history"),
+          //         data: await ReadFile("history"),
+          //         horizontal: false,
+          //       },
+          //     ],
+          //   })),
         },
       ],
     };
   }
-  const handleScroll = () => {
-    if (!homeCache.data) return;
+  function handleScroll() {
     if (!divRef.current) return;
+    store.dispatch({
+      type: "setMainContainer", payload: {
+        scrollLeft: divRef.current.scrollLeft,
+        scrollTop: divRef.current.scrollTop,
+        offsetHeight: divRef.current.offsetHeight,
+        scrollHeight: divRef.current.scrollHeight,
+        clientHeight: divRef.current.clientHeight
+      }
+    })
+    if (homeCache.onScrollContainer) homeCache.onScrollContainer()
 
     const scrollTop = divRef.current.scrollTop;
     const scrollHeight = divRef.current.scrollHeight - divRef.current.clientHeight;
     const scrollPercent = (scrollTop / scrollHeight) * 100;
     if (parseInt(scrollPercent.toFixed(0)) >= 20) setHeaderActive(() => true)
     else setHeaderActive(() => false)
-
-    if (homeCache.data.sections.length > 1) return;
-
-    const currentPos = -divRef.current.scrollTop + divRef.current.scrollHeight;
-    const endPosition = divRef.current.offsetHeight;
-    const isFUCKINGBottom = parseInt(currentPos.toFixed(0)) <= endPosition + 30;
-    if (
-      isFUCKINGBottom &&
-      homeCache.stopScrolling == false &&
-      homeCache.data.sections.length === 1
-    ) {
-      if (homeCache.data.sections[0].onScrollDownFunction) {
-        store.dispatch({ type: "setPage", payload: homeCache.page + 1 });
-        homeCache.data.sections[0].onScrollDownFunction(homeCache.page + 1);
-      }
-      return;
-    }
   };
 
   // TODO: napraw wyszukiwanie itp
@@ -164,7 +143,7 @@ const Home = () => {
       store.dispatch({ type: "setSearch", payload: text });
       store.dispatch({ type: "setPage", payload: 1 });
       homeStopScrolling(false);
-      plugin.info.search(text, 1, store.getState().home.filterTags);
+      plugin.searchAnime(text, 1, store.getState().home.filterTags);
       return;
     }
 
@@ -241,8 +220,6 @@ const Home = () => {
     return data;
   }
 
-  // console.log(isOpenSidebar);
-
   return (
     <main
       className={`home ${homeCache.data && !homeCache.data.topCards ? "active" : ""}`}
@@ -265,7 +242,7 @@ const Home = () => {
           <div className="home-filter-void">
             <Filter
               onChange={onChange}
-              filter={plugin.searchOption}
+              filter={plugin.currentPlugin.metadata.searchOption}
               custonClass={`${homeCache.data && homeCache.data.topCards ? "home-header-background" : ""} ${headerActive ? "color" : ""}`}
             />
           </div>
@@ -313,7 +290,7 @@ const Home = () => {
                 data={element.data}
                 horizontal={element.horizontal}
                 onScrollDownFunction={element.onScrollDownFunction}
-                onTitleClick={element.onTitleClick}
+                titlevent={element.titlevent}
               />
             ))}
           {homeCache.isError == false &&

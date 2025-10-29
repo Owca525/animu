@@ -128,7 +128,6 @@ export async function readConfig(): Promise<SettingsConfig> {
         const loadedConfig = ini.parse(content) as SettingsConfig;
         return deepMerge(defaultConfig, loadedConfig);
     } catch (error) {
-        console.log(error)
         return defaultConfig
     }
 }

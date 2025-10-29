@@ -54,7 +54,6 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
 
     try {
         let animeEpisodes = JSON.parse(atob(decodeData))
-        console.log(animeEpisodes)
         for (const key in animeEpisodes) {
             let res = detectResoltion(key)
             if (animeEpisodes[key].length <= 0) continue 
@@ -140,11 +139,9 @@ async function extractAnimeList(data: AnimeData): Promise<cardData[]> {
 }
 
 async function extractEpisodeDataList(animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> {
-    console.log(animeData, anime_id)
     let animeID = anime_id;
     if (!animeID && animeData) {
         let animeList = await extractAnimeList(animeData)
-        console.log(animeList)
         if (animeList.length <= 0) return
         animeID = animeList[0].AnimeData.player_ID
     }
@@ -152,7 +149,6 @@ async function extractEpisodeDataList(animeData?: AnimeData, anime_id?: string):
 
     let req = await requestToApi(animeID)
     if (!req) return
-    console.log(req)
     let tmpEpisodes = req.data.anime["episodes"]
     let episodes: { ep: string, img?: string, title?: string }[] = tmpEpisodes.map((ep) => {
         return {
@@ -184,7 +180,6 @@ async function extractOnlyEpisodes(_type: string, anime_id: string): Promise<{ e
 }
 
 function convertToAnimeData(data: any): AnimeData | undefined {
-    console.log(data)
     try {
         return {
             characters: [],

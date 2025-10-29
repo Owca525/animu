@@ -26,7 +26,6 @@ const Dropdown: React.FC<DropdownProps> = ({ options = [], placeholder = '', pla
     setIsOpen(false)
     if (option.onClick) option.onClick(option.label)
     setText(() => option.label)
-    if (placeholderChange) console.log(placeholderChange())
     if (placeholderChange) setText(() => placeholderChange())
   }
 

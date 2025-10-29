@@ -76,11 +76,9 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
 }
 
 async function getEpisodeList(animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> {
-    console.log(animeData, anime_id)
     let idAnime = anime_id
     if (!idAnime && animeData) {
         let data = await getAnimeCards(animeData)
-        console.log(data)
         if (data.length <= 0) return
         idAnime = data[0].AnimeData.player_ID
     }
@@ -127,7 +125,6 @@ async function getAnimeCards(data: AnimeData): Promise<cardData[]> {
             let animeID = [...element[0].matchAll(/wire:key=["']([^"']+)["']/g)]
             let animeIMG = [...element[0].matchAll(/src=["'](https:\/\/anizone\.to\/images\/anime\/[^"']+)["']/g)]
             let animeTITLE = [...element[0].matchAll(/alt=["']([^"']+)["']/g)]
-            console.log(animeID, animeIMG, animeTITLE)
             finnallData.push({ AnimeData: {
                 characters: [],
                 studios: [],
@@ -152,7 +149,6 @@ async function getAnimeCards(data: AnimeData): Promise<cardData[]> {
 
 async function extractEpisodeList(_type: string, anime_id: string): Promise<{ ep: string; img?: string; title?: string; }[]> {
     let data = await getEpisodeList(undefined, anime_id)
-    console.log(data)
     if (!data) return []
     return data.episodesData[0].episodes
 }

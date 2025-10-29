@@ -29,9 +29,7 @@ export async function UpdateHomeData(func: () => Promise<{ data: containerData, 
     try {
         homeStopScrolling(false)
         if (store.getState().home.isLoading) return
-        store.dispatch({ type: "setcontainerLoading", payload: true })
         let data = await func()
-        console.log(data, func)
         let tmp: { topCards?: containerData, sections: containerData[] } = store.getState().home.data
 
         if (data.data.data.length < data.maxPage) homeStopScrolling(true)
@@ -41,9 +39,7 @@ export async function UpdateHomeData(func: () => Promise<{ data: containerData, 
                 isLoading: false, isError: false, data: { sections: [{ ...data.data, data: [...tmp.sections[0].data, ...data.data.data] }] }
             }
         })
-        store.dispatch({ type: "setcontainerLoading", payload: false })
     } catch (error) {
-        store.dispatch({ type: "setcontainerLoading", payload: false })
         console.error(error)
     }
 }

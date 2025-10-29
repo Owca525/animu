@@ -13,7 +13,6 @@ async function getAllLangFiles() {
       console.error(error, "getAllLangFiles")
     }
   }
-  console.log(res)
   return res
 }
 

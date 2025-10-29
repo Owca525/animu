@@ -53,13 +53,13 @@ function decodeText(textString: string): string {
 async function sendToAPI(variables: string, hash: string, header: any): Promise<{ success: boolean; data: any; status: number; statusText: string; error?: unknown; }> {
   let url = `${API_WEB}/api?variables=${variables}&extensions={"persistedQuery":{"version":1,"sha256Hash": "${hash}"}}`
   let data = await window.api.request.get(url, header)
-  if (!data.success) console.log("Allmanga request", data, url, header)
+  if (!data.success) console.error("Allmanga request", data, url, header)
   return data
 }
 
 async function sendRequest(url: string, header: any): Promise<{ success: boolean; data: any; status: number; statusText: string; error?: unknown; }> {
   let data = await window.api.request.get(url, header)
-  if (!data.success) console.log("Allmanga request", data, url, header)
+  if (!data.success) console.error("Allmanga request", data, url, header)
   return data
 }
 
@@ -179,7 +179,7 @@ async function getAnimeList(anime: AnimeData): Promise<cardData[]> {
     }
     return returnData
   } catch (error) {
-    console.log(`Error in getAnimeList allmanga: ${error}`)
+    console.error(`Error in getAnimeList allmanga: ${error}`)
     return []
   }
 }
@@ -219,20 +219,20 @@ export async function extractInformation(type: "all" | "episodes", id: string): 
 
 function findAnime(animeList: cardData[], anime: AnimeData): string | undefined {
   try {
-    console.log("First Check", animeList)
+    console.info("First Check", animeList)
     // FIRST CHECK
     if (animeList.length <= 0) return undefined
     if (animeList.length == 1) return animeList[0].AnimeData.player_ID
 
     // Second Check
     let seasonYearFilter = animeList.filter((element) => element.AnimeData.seasonYear == anime.seasonYear)
-    console.log("Second Check", seasonYearFilter)
+    console.info("Second Check", seasonYearFilter)
     if (seasonYearFilter.length <= 0) return undefined
     if (seasonYearFilter.length == 1) return seasonYearFilter[0].AnimeData.player_ID
 
     // Third Check
     let seasonFilter = seasonYearFilter.filter((element) => makeSmallText(element.AnimeData.season) == makeSmallText(anime.season))
-    console.log("Third Check", seasonYearFilter)
+    console.info("Third Check", seasonYearFilter)
     if (seasonFilter.length <= 0) return undefined
     if (seasonFilter.length == 1) return seasonFilter[0].AnimeData.player_ID
 
@@ -240,7 +240,7 @@ function findAnime(animeList: cardData[], anime: AnimeData): string | undefined 
     let episodesFilter: cardData[] | undefined = undefined
     if (anime.episodes) {
       episodesFilter = seasonFilter.filter((element) => element.AnimeData.episodes == anime.episodes)
-      console.log("Four Check", episodesFilter)
+      console.info("Four Check", episodesFilter)
       if (episodesFilter.length <= 0) return undefined
       if (episodesFilter.length == 1) return episodesFilter[0].AnimeData.player_ID
     }
@@ -249,13 +249,13 @@ function findAnime(animeList: cardData[], anime: AnimeData): string | undefined 
     let durationFilter: cardData[] = []
     if (episodesFilter) durationFilter = episodesFilter.filter((element) => element.AnimeData.duration == anime.duration)
     else durationFilter = seasonFilter.filter((element) => element.AnimeData.duration == anime.duration)
-    console.log("Five Check", durationFilter)
+    console.info("Five Check", durationFilter)
     if (durationFilter.length <= 0) return undefined
     if (durationFilter.length == 1) return durationFilter[0].AnimeData.player_ID
 
     // Six Check
     let formatFilter = durationFilter.filter((element) => makeSmallText(element.AnimeData.format) == makeSmallText(anime.format))
-    console.log("Six Check", formatFilter)
+    console.info("Six Check", formatFilter)
     if (formatFilter.length <= 0) return undefined
     if (formatFilter.length == 1) return formatFilter[0].AnimeData.player_ID
 
@@ -268,17 +268,14 @@ function findAnime(animeList: cardData[], anime: AnimeData): string | undefined 
 
 export async function getInformation(animeData?: AnimeData, anime_id?: string): Promise<episodeList> {
   try {
-    console.log(animeData, anime_id)
     let tmpAnimeID = anime_id
     if (animeData && !tmpAnimeID) {
       let data = await getAnimeList(animeData);
       tmpAnimeID = findAnime(data, animeData)
     };
-    console.log(tmpAnimeID)
     if (!tmpAnimeID || tmpAnimeID == "") return { player_id: "", episodesData: [] }
 
     let episodeList = await extractInformation("all", tmpAnimeID)
-    console.log(episodeList)
     return { player_id: tmpAnimeID, episodesData: episodeList as { episodes: { ep: string; img?: string; title?: string }[]; type: string; name?: string }[] };
   } catch (error) {
     console.error("Allmanga getInformation error", error)
@@ -292,7 +289,6 @@ async function getURLS(url: string): Promise<playerData | undefined> {
   const links = await sendRequest(`http://allanime.day${url.replace("clock", "clock.json")}`, {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0'
   })
-  console.log(url, links)
   if (!links.success) return undefined
 
   let listUrls: playerData | undefined
@@ -314,7 +310,6 @@ export async function extractURLS(type: string, episode: string, id: string): Pr
   const resp = await sendToAPI(variables, HASH_PLAYER, header)
   try {
     if (!resp.success) return []
-    console.log(resp)
     const sources = resp.data.data.episode.sourceUrls
     const urls = sources
       .map((tmp: { sourceUrl: string; sourceName: string }) =>
@@ -329,7 +324,6 @@ export async function extractURLS(type: string, episode: string, id: string): Pr
       if (tmp) data.push(tmp)
     }
 
-    console.log(resp.data.data.episode.episodeInfo.vidInforssub)
     if (type == "dub" && resp.data.data.episode.episodeInfo.vidInforsdub) {
       data.push({
         hostname: "wp.youtube-anime.com", resolution: [{
@@ -357,7 +351,7 @@ export async function extractURLS(type: string, episode: string, id: string): Pr
 
     return data
   } catch (error) {
-    console.log(`${error} in extractURLS`, resp)
+    console.error(`${error} in extractURLS`, resp)
     return []
   }
 }
@@ -398,7 +392,6 @@ export async function getEpisodeList(anime_id: string, episode: { start: number,
   try {
     let variables = `{"showId":"${anime_id}","episodeNumStart":${episode.start},"episodeNumEnd":${episode.end}}`
     const resp = await sendToAPI(variables, HASH_DATA, header)
-    console.log(variables, resp)
     if (!resp.success) return []
     if ("errors" in resp.data.data) return []
     if (!resp.data.data.episodeInfos) return []

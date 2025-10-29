@@ -15,11 +15,9 @@ async function extractEpisodeList(animeData?: AnimeData, anime_id?: string, only
     try {
         let animeID = anime_id
         if (animeData) animeID = animeData.id
-        console.log(animeID)
         if (!animeID) return
 
         let response = await window.api.request.get(`${BACKEND}/api/anime/eps/${animeID}`, HEADER);
-        console.log(response)
         if (!response.success || !response.data) return
         let episodes = response.data.map((element) => {
             return {
