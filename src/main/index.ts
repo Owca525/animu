@@ -2,6 +2,8 @@ import { app, shell, BrowserWindow, Menu, session } from 'electron'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { join } from 'path'
 
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
+
 // Files import
 import icon from '../../resources/icon.png?asset'
 import "./utils"
@@ -100,8 +102,16 @@ function createWindow(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
-  electronApp.setAppUserModelId('com.electron')
+app.whenReady().then(async () => {
+  // TODO: Maybe someday add for users
+  try {
+    const name = await installExtension(REACT_DEVELOPER_TOOLS, { loadExtensionOptions: { allowFileAccess: true } });
+    console.log(`Added Extension:  ${name.name}`);
+  } catch (err) {
+    console.log('An error occurred: ', err);
+  }
+
+  electronApp.setAppUserModelId('com.animu')
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
