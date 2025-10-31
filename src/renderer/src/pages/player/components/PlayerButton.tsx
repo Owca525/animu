@@ -33,7 +33,7 @@ const PlayerButton: React.FC<PlayerButtonProps> = ({ icon, title, onClick, Butto
     return (
         <div className="player-button-up-text-container" onMouseOver={positionTooltip}>
             {title && <div className="player-button-up-text" ref={containerRef}>{title}</div>}
-            <Button icon={icon} ButtonClass={ButtonClass} onClick={onClick} />
+            <Button icon={icon} iconClassName="player-button-icons" ButtonClass={ButtonClass} onClick={onClick} />
         </div>
     )
 }

@@ -3,12 +3,11 @@
 import { useLocation, useNavigate } from "react-router-dom"
 import { useEffect, useRef, useState } from "react";
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
-import { cardData, SettingsConfig } from "@renderer/utils/GlobalInterface";
+import { AnimeData, indentityPlayer, SettingsConfig } from "@renderer/utils/types";
 import { useSelector } from "react-redux";
 import { t } from "i18next";
 
 import "./player.css"
-import { SaveHistory } from "@renderer/utils/history/history";
 import { detectTitle, refetchHistory } from "@renderer/utils/functions";
 import { useHotkeys } from "react-hotkeys-hook";
 import Button from "@renderer/components/buttons";
@@ -16,26 +15,30 @@ import ExternalPlayer from "./externalPlayer";
 
 import VideoPlayer from "./VideoPlayer";
 import { useQuery } from "react-query";
+import { SaveToFile } from "@renderer/utils/FilesManager/readFiles";
+import { ChangePlugin } from "@renderer/utils/pluginApi";
+
 const player = () => {
-    const anime_data: { data: cardData, episodelist: { ep: string, img?: string, title?: string }[], continueWatch?: boolean } = useLocation().state
+    const anime_data: { data: AnimeData, save: indentityPlayer, episodelist: { ep: string, img?: string, title?: string }[] } = useLocation().state
     const navigate = useNavigate()
     const config: SettingsConfig = useSelector((data: any) => data.config);
 
-    const pluginPlayer = useSelector((plugin: any) => plugin.plugin.playerPlugin);
     const [playerVolume, setPlayerVolume] = useState<number>(config.Player.general.Volume)
     const extractionData = useRef<{ actual: string, type: string, episodelist: { ep: string, img?: string, title?: string }[], time: number }>({
-        actual: anime_data.data.saveData ? anime_data.data.saveData.episode : "1",
-        type: anime_data.data.saveData ? anime_data.data.saveData.type : "sub",
+        actual: anime_data.save.episode,
+        type: anime_data.save.type,
         episodelist: anime_data.episodelist,
-        time: anime_data.data.saveData ? anime_data.data.saveData?.last_Time : 0
+        time: anime_data.save.last_Time
     })
     const [externalPlayerType, setexternalPlayerType] = useState<"Movian" | "VLC" | "Mpv" | "ChromeCast">(config.Player.external.type)
 
     const { data, isFetching: isLoading, refetch } = useQuery({
-        queryKey: [anime_data.data.AnimeData.player_ID],
+        queryKey: [anime_data.data.player_ID],
         queryFn: async ({ queryKey }) => {
             const [player_id] = queryKey;
-            return await pluginPlayer.player.getUrls(extractionData.current.type, extractionData.current.actual, player_id)
+            if (!player_id) return console.error("THIS CAN'T HAPPEN IF Happen then something is wrong with player_id, queryFetch/player", player_id)
+            let pluginPlayer = ChangePlugin(anime_data.save.pluginName)
+            return await pluginPlayer.player.extractPlayerData(extractionData.current.type, extractionData.current.actual, player_id)
         },
         refetchOnWindowFocus: false,
         staleTime: 2 * 60 * 60 * 1000,
@@ -49,48 +52,59 @@ const player = () => {
             actual: ep
         }
         refetch()
+        updateHistory()
     }
 
-    useEffect(() => {
-        SaveHistory({
+    function updateHistory() {
+        console.log("SAVE HISTORY", anime_data.save.pluginName)
+        SaveToFile({
             saveData: {
-                pluginName: anime_data.data.saveData && anime_data.data.saveData.pluginName == "" ? "Allmanga" : config.plugins.player,
+                pluginName: anime_data.save.pluginName,
                 last_Time: 0,
                 type: extractionData.current.type,
                 episode: extractionData.current.actual.toString()
             },
             AnimeData: {
-                ...anime_data.data.AnimeData,
+                ...anime_data.data,
                 nextAiringEpisode: undefined
             }
-        })
+        }, "history")
         refetchHistory()
-    }, [extractionData])
+    }
 
     useHotkeys("Escape", async () => {
         await leave()
     });
 
+    useHotkeys("m", () => {
+        console.log(anime_data, extractionData, data)
+    })
+
+    useEffect(() => {
+        updateHistory()
+    },[])
+
     async function leave() {
         window.BrowserWindow.setFullscreen(false)
         closeDialog()
-        if (anime_data.continueWatch) {
+        if (anime_data.save.last_Time != 0) {
             navigate("/")
             return
         }
         if (config.Player.general.PlayerBehavior === "home") navigate("/")
-        else navigate("/info", { state: { anime: anime_data.data.AnimeData, saveData: anime_data.data.saveData } })
+        else navigate("/info", { state: { anime: anime_data.data, saveData: anime_data.save } })
     }
     if (isLoading == false && data && data.length <= 0) {
-        loadingAnimation(leave, { title: anime_data.data.AnimeData.title, ep: extractionData.current.actual, format: anime_data.data.AnimeData.format }, extractionData.current)
         showDialog({
-            type: "refresh",
-            title: t("player.error.notfound"),
+            type: "error",
+            title: "Error In Player",
+            description: t("player.error.notfound"),
             buttons: {
                 firstbutton: () => refetch(),
                 secondbutton: () => leave()
             }
         })
+        loadingAnimation(leave, { title: anime_data.data.title, ep: extractionData.current.actual, format: anime_data.data.format }, extractionData.current)
         return
     }
 
@@ -98,7 +112,10 @@ const player = () => {
     if (data && isLoading == false && config.Player.external.enable) {
         return (
             <ExternalPlayer
-                animeData={anime_data.data}
+                animeData={{
+                    AnimeData: anime_data.data,
+                    saveData: anime_data.save
+                }}
                 playerData={data}
                 time={extractionData.current.time}
                 setNextEpisode={setNewEpisode}
@@ -113,8 +130,11 @@ const player = () => {
         return (
             <VideoPlayer
                 player_data={data}
-                anime_data={anime_data.data}
-                temp={{ episode: extractionData.current.actual, type: extractionData.current.type, episodes: extractionData.current.episodelist }}
+                anime_data={{
+                    AnimeData: anime_data.data,
+                    saveData: anime_data.save
+                }}
+                temp={{ episode: extractionData.current.actual, type: extractionData.current.type, episodes: extractionData.current.episodelist}}
                 setNextEpisode={setNewEpisode}
                 volumeCacheFunc={setPlayerVolume}
                 PlayerVolume={playerVolume}
@@ -123,7 +143,7 @@ const player = () => {
             />
         )
     }
-    return loadingAnimation(leave, { title: anime_data.data.AnimeData.title, ep: extractionData.current.actual, format: anime_data.data.AnimeData.format }, extractionData.current)
+    return loadingAnimation(leave, { title: anime_data.data.title, ep: extractionData.current.actual, format: anime_data.data.format }, extractionData.current)
 }
 
 function getCurrentImage(currentdata: { actual: string, type: string, episodelist: { ep: string, img?: string, title?: string }[], time: number }): string | undefined {
@@ -139,7 +159,7 @@ function loadingAnimation(leave: () => void, anime_data: { title: { english?: st
         <div className="player-loading-container" style={{ backgroundImage: `url(${getCurrentImage(currentdata)})` }}>
             <div className="player-loading-container-black"></div>
             <div className="player-loading-top">
-                <Button icon='arrow_back' ButtonClass='player-buttons' onClick={leave} />
+                <Button icon='arrow_back' ButtonClass='player-buttons' iconClassName="player-button-icons" onClick={leave} />
                 <div className="player-title ">{detectTitle(anime_data)}</div>
             </div>
             <div className="player-loading-animation-container" style={{ maxHeight: "min-content" }}>

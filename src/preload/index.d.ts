@@ -1,4 +1,5 @@
 import { ElectronAPI } from "@electron-toolkit/preload";
+import { cardData, SettingsConfig } from "@renderer/utils/types";
 
 declare global {
   interface Window {
@@ -25,18 +26,19 @@ declare global {
           type?: "json" | "text"
         ) => Promise<{
           success: boolean;
-          data?: any;
-          status?: number;
-          statusText?: string;
+          data: any;
+          status: number;
+          statusText: string;
           error?: unknown;
         }>;
-        post: (url: string, header: Record<string, string>, body?: { query: any, variables: Object }) => Promise<{
+        post: (url: string, header: Record<string, string>, body?: { query: any, variables: Object }, type?: "json" | "text") => Promise<{
           success: boolean;
-          data?: any;
-          status?: number;
-          statusText?: string;
+          data: any;
+          status: number;
+          statusText: string;
           error?: unknown;
         }>;
+        advanceRequest: (url: string, options?: { method: "POST" | "GET", headers?: { [key: string]: string } }) => Promise<{ text: string, buffer: Buffer, status: number, statusText: string, url: string, success: boolean }>
       };
       rpc: {
         setActivity: (
@@ -46,37 +48,22 @@ declare global {
         runDiscordRPC: () => void;
       }
       os: {
-        getPath: (
-          name:
-            | "home"
-            | "appData"
-            | "userData"
-            | "sessionData"
-            | "temp"
-            | "exe"
-            | "module"
-            | "desktop"
-            | "documents"
-            | "downloads"
-            | "music"
-            | "pictures"
-            | "videos"
-            | "recent"
-            | "logs"
-            | "crashDumps"
-        ) => Promise<string>;
         exists: (path: string) => Promise<boolean>;
         write: (path: string, data: string, format?: string) => Promise<boolean>
-        read: (path: string, format?: string) => Promise<any>;
-        mkdir: (path: string) => Promise<boolean>;
+        read: (path: string, format?: string) => Promise<string | NonSharedBuffer | undefined>;
         saveDialog: (fileName: string, data: any, title: string, name: string, extensions: string[], format?: string) => Promise<boolean>
         openDialog: (path?: string, name?: string, extensions?: string[]) => Promise<string>
-        getPathProgram: (program: string) => Promise<string>
+        getConfigPath: () => Promise<string>
       };
+      backup: {
+        make: () => Promise<{ success: boolean, error: any }>
+      }
       runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string}, type: "mpv" | "vlc") => any
       getlistThemes: () => Promise<{ version?: string; autor?: string; pathcss: string; animuTitle?: string; name: string; pathIcon?: string }[]>
       getOSDetails: () => Promise<{ platform: NodeJS.Platform, release: string, arch: string }>
       getListLang: () => Promise<{ data: any, lang: string }[]>
+      getConfig: () => Promise<SettingsConfig>
+      getHistory: () => Promise<{ continue: cardData[], history: cardData[] }>
     };
     backend: {
       ipcRenderer: {

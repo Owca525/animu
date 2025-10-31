@@ -1,112 +1,93 @@
-import { Routes, Route, HashRouter } from 'react-router-dom'
-import { Suspense, useEffect, useState } from 'react'
-import { toast, ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css';
 import 'material-symbols'
-
-import Home from "./pages/home/index"
-import Information from "./pages/information/index"
-import Settings from "./pages/settings/index"
-import Player from "./pages/player/index"
-
-// Temporally
-import "./themes/darkAnimu/DarkAnimu.css"
-import { checkConfig, readConfig } from './utils/config';
-import store from './utils/store';
+import "./App.css"
+import "./themes/darkerAnimu/main.css"
 
 import "./utils/i18n"
-import { CheckContinue } from './utils/history/continueWatch';
-import { CheckHistory } from './utils/history/history';
 import { checkUpdate } from './utils/update';
 import { calculateZoomLevel, changeTheme, checkDate } from './utils/functions';
-import i18n from './utils/i18n';
-import ErrorBoundary from './utils/ErrorBoundary';
-import { useHotkeys } from 'react-hotkeys-hook';
-import { notificationProps } from './utils/GlobalInterface';
+// import ErrorBoundary from './utils/ErrorBoundary';
+// import { notificationProps } from './utils/GlobalInterface';
 import { InitialPlugin } from './utils/pluginApi';
+import { createShortcut } from '@solid-primitives/keyboard';
+import { onMount, Suspense, ErrorBoundary } from 'solid-js';
+import { HashRouter, Route } from "@solidjs/router";
+
+import Home from "./pages/home/index2";
+import Information from "./pages/information/index";
+import Settings from "./pages/settings/index";
+// import Player from "./pages/player/index";
+import toast, { Toaster } from 'solid-toast';
+import { getConfig, setConfig } from './utils/stores/config';
+import { getGlobalCache, setGlobalHistory, setIncognitoMode } from './utils/stores/global';
+import i18n from './utils/i18n';
+import { getPlayerPLugin } from './utils/stores/plugins';
 
 function App() {
-  const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [textLoading, setTextLoading] = useState<string>("Loading Config...")
-  
-  useHotkeys("F12", () => {
-    if (store.getState().config.Developer.DevTools) window.BrowserWindow.openDevTools()
+  createShortcut(["F12"], () => {
+    if (getConfig().Developer.DevTools) window.BrowserWindow.openDevTools()
   })
 
-  useHotkeys("ctrl+shift+r", async () => {
-    if (store.getState().config.Developer.DeveloperMode) {
-      await changeTheme(store.getState().config.General.theme)
-      toast.info("Reloaded Theme", notificationProps)
+  createShortcut(["Control", "Shift", "R"], async () => {
+    if (getConfig().Developer.DeveloperMode) {
+      await changeTheme(getConfig().General.theme)
+      toast.success("Reloaded Theme")
     }
   })
 
-  useHotkeys("ctrl+i", () => {
-    console.log(store.getState().config)
-    store.dispatch({ type: "setIcognitoMode", payload: !store.getState().global.incognito })
-    toast.info(`Incognito Mode: ${store.getState().global.incognito ? "On" : "Off"}`, notificationProps)
+  createShortcut(["Control", "I"], () => {
+    setIncognitoMode(!getGlobalCache().incognito)
+    toast.success(`Incognito Mode: ${getGlobalCache().incognito ? "On" : "Off"}`)
   })
 
-  async function initialAnimu() {
-    await LoadConfig()
-    setTextLoading(() => "Loading Plugins...")
+  createShortcut(["D"], () => {
+    console.log(getConfig())
+    console.log(getPlayerPLugin())
+    console.log(getGlobalCache())
+  })
+
+  onMount(async () => {
+    setConfig(await window.api.getConfig())
+    setGlobalHistory(await window.api.getHistory())
     InitialPlugin()
-    setIsLoading(() => false)
-  }
-
-  useEffect(() => {
-    initialAnimu()
-  }, [])
-
-  if (isLoading) return AppLoading(textLoading)
+    LoadConfig()
+    // runCheckUpdate()
+  })
 
   return (
-    <ErrorBoundary>
-      <ToastContainer />
+    <ErrorBoundary fallback={(err) => {
+      console.log(err)
+      return <div>Error: {err.toString()}</div>
+    }}>
+      <Toaster position="top-right" />
       <HashRouter>
-        <Suspense fallback={AppLoading()}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/info" element={<Information />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/player" element={<Player />} />
-          </Routes>
+        <Suspense >
+          <Route path="/" component={Home} />
+          <Route path="/info" component={Information} />
+          <Route path="/settings" component={Settings} />
+          {/* <Route path="/player" component={Player} /> */}
         </Suspense>
       </HashRouter>
     </ErrorBoundary>
   )
 }
 
-function AppLoading(text?: string) {
-  return (
-    <div className='app-loading-container'>
-      <div className="material-symbols-outlined app-loading-animation">progress_activity</div>
-      {text && <div className="app-loading-information">{text}</div>}
-    </div>
-  )
+async function runCheckUpdate() {
+  let config = getConfig()
+  if (config.update.type == "On Start") await checkUpdate()
+  if (config.update.type == "Every Day" && checkDate(config.update.lastTime, "day")) await checkUpdate()
+  if (config.update.type == "Every Week" && checkDate(config.update.lastTime, "week")) await checkUpdate()
 }
 
 async function LoadConfig() {
-  if (!await checkConfig()) return
-  const loadedConnfig = await readConfig()
-
-  if (loadedConnfig.General.discordRPC && window.electronAPI.process.env.NODE_ENV != "development") window.api.rpc.runDiscordRPC()
+  const loadedConnfig = getConfig()
 
   // Loading theme
   await changeTheme(loadedConnfig.General.theme)
 
   i18n.changeLanguage(loadedConnfig.General.language)
   if (loadedConnfig.General.Window.AutoMaximize) window.BrowserWindow.setMaximize()
-  if (loadedConnfig.Developer.DevToolsOnStart) window.BrowserWindow.openDevTools()
   window.BrowserWindow.setZoom(calculateZoomLevel(parseFloat(loadedConnfig.General.Window.Zoom.toString())))
   window.BrowserWindow.setFullscreen(loadedConnfig.General.Window.AutoFullscreen)
-
-  if (loadedConnfig.update.type == "On Start") await checkUpdate()
-  if (loadedConnfig.update.type == "Every Day" && checkDate(loadedConnfig.update.lastTime, "day")) await checkUpdate()
-  if (loadedConnfig.update.type == "Every Week" && checkDate(loadedConnfig.update.lastTime, "week")) await checkUpdate()
-  
-  store.dispatch({ type: "setConfig", payload: loadedConnfig })
-  await CheckContinue()
-  await CheckHistory()
 }
 
 export default App

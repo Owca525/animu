@@ -8,6 +8,7 @@
     outline: none;
     transition: 0.2s;
     margin-right: 1.5em;
+    cursor: pointer;
 }
 
 .checkbox::before {

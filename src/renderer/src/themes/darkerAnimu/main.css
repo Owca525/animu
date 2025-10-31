@@ -1,0 +1,1249 @@
+:root {
+  --text: #EBEBEB;
+  /* is used on regular text */
+  --text-gray: #A0A0A0;
+  /* is used in card continue watch */
+
+  /* Background */
+  --first-layer: #181818;
+  /* First layer, background only */
+  --second-layer: #1F1F1F;
+  /* Second layer, used in sidebar, header */
+  --third-layer: #2D2D2D;
+  /* Third layer, used in button etc */
+  --fourth-layer: #303030;
+  /* Fourth layer, used in hover button etc */
+  --five-layer: #434343;
+
+  /* Colors */
+  --green-one: #549E72;
+  /* boders, some buttons etc */
+  --orange-one: #CA6931;
+  --blue-one: #385DA9;
+  --blue-background: #212328;
+  --blue-text: #BFCBE3;
+  --red-one: #932F2F;
+  --red-background: #2E2121;
+  --red-text: #EAD6D6;
+
+  /* other */
+  --player-bg-containers: color-mix(in srgb, var(--fourth-layer) 80%, transparent);
+  --invisible: rgba(0, 0, 0, 0);
+  /* is used in player button */
+  --black: rgba(0, 0, 0);
+}
+
+
+/* App */
+
+::selection {
+  background-color: var(--green-one);
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24 !important;
+  outline: none !important;
+  border: none !important;
+}
+
+* {
+  font-family: Arial, Helvetica, sans-serif;
+  /* font-size: 1em; */
+}
+
+body {
+  color: var(--text);
+  background-color: var(--first-layer);
+}
+
+::-webkit-scrollbar {
+  background-color: var(--first-layer);
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: var(--five-layer);
+}
+
+.Toastify__toast {
+  background-color: var(--second-layer);
+  border-radius: 12px;
+  color: var(--text);
+  border: none !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* .Toastify__toast--success {
+  border: 2px solid var(--green-one) !important;
+}
+
+.Toastify__toast--info {
+  border: 2px solid var(--blue-one) !important;
+}
+
+.Toastify__toast--warning {
+  border: 2px solid var(--orange-one) !important;
+}
+
+.Toastify__toast--error {
+  border: 2px solid var(--red-one) !important;
+} */
+
+/* DialogContext */
+
+.dialog-main-background {
+  background-color: rgb(0, 0, 0, 0.5);
+}
+
+.dialog-container {
+  background-color: var(--second-layer);
+  border-radius: 12px;
+}
+
+.dialog-button.error {
+  padding: 10px 20px;
+  background-color: var(--red-one) !important;
+}
+
+.dialog-container.error {
+  background-color: var(--red-background);
+  border: 2px solid var(--red-one);
+}
+
+.dialog-title.error,
+.dialog-description.error {
+  color: var(--red-text);
+}
+
+.dialog-button.info {
+  padding: 10px 20px;
+  background-color: var(--blue-one) !important;
+}
+
+.dialog-container.info {
+  background-color: var(--blue-background);
+  border: 2px solid var(--blue-one);
+}
+
+.dialog-title.info,
+.dialog-description.info {
+  color: var(--blue-text);
+}
+
+
+/* Buttons */
+
+.button {
+  border: none;
+  outline: 2px solid var(--invisible);
+  border-radius: 12px;
+
+  background-color: var(--third-layer);
+  color: var(--text);
+}
+
+.button:hover {
+  outline-color: var(--green-one);
+  color: var(--green-one);
+}
+
+
+/* Input */
+
+.input {
+  border: none;
+  border-radius: 8px;
+  background-color: var(--third-layer);
+  color: var(--text);
+  /* border: 2px solid var(--invisible); */
+  outline: 2px solid var(--invisible);
+  transition: all 0.1s ease;
+}
+
+.input:hover {
+  /* border-color: var(--green-one); */
+  outline-color: var(--green-one);
+}
+
+.input:focus {
+  border-color: var(--green-one);
+}
+
+
+/* Sidebar */
+
+.sidebar-button,
+.sidebar-button-min {
+  background-color: var(--second-layer);
+  outline: 2px solid var(--invisible);
+}
+
+.material-symbols-outlined .sidebar-button:hover {
+  outline: none !important;
+}
+
+.sidebar-button:hover,
+.sidebar-button-min:hover {
+  border-color: var(--invisible);
+  outline-color: var(--green-one);
+}
+
+.sidebar-container-min,
+.sidebar-container-max {
+  background-color: var(--second-layer);
+}
+
+.sidebar-black-line {
+  background-color: var(--third-layer);
+  border-radius: 12px;
+}
+
+.sidebar-logo-icon-container {
+  background-color: var(--second-layer);
+  outline: none !important;
+}
+
+.sidebar-button-min.active,
+.sidebar-button.active {
+  color: var(--green-one);
+  background-color: var(--invisible) !important;
+}
+
+/* Home */
+
+.home-header-background {
+  background-color: color-mix(in srgb, var(--first-layer) 90%, transparent) !important;
+  border-color: var(--invisible) !important;
+}
+
+.home-header-container.active {
+  background-color: var(--second-layer);
+  position: static;
+}
+
+.home-header-container.color {
+  background-color: var(--second-layer);
+}
+
+.home-header-background.color {
+  background-color: var(--third-layer) !important;
+}
+
+.home-header-background:hover {
+  border-color: var(--neutral1) !important;
+}
+
+.home-header-sidebar-placeholder {
+  background-color: var(--second-layer) !important;
+  color: var(--second-layer) !important;
+  z-index: -1;
+}
+
+.home-filter-container {
+  background-color: var(--second-layer);
+  border-radius: 12px;
+  border: 2px solid var(--third-layer);
+}
+
+/* Cards */
+
+.card-container:hover {
+  background-color: var(--first-layer);
+  outline-color: var(--green-one);
+}
+
+.card-container {
+  transition: all 150ms ease;
+  outline: 3px solid var(--invisible);
+  border-radius: 8px;
+}
+
+.card-image,
+.card-image-placeholder {
+  border-radius: 8px;
+}
+
+.card-image-placeholder {
+  background-color: var(--second-layer);
+}
+
+.card-delete-icon {
+  background-color: var(--second-layer);
+  border-radius: 50%;
+}
+
+.card-information {
+  background-color: var(--third-layer);
+  border-radius: 12px;
+  border: solid 3px var(--green-one);
+}
+
+.card-information-score {
+  border-radius: 50%;
+  background-color: var(--third-layer);
+  border: 2px solid var(--green-one);
+}
+
+/* Container */
+
+.container-title,
+.container-title-click {
+  border-radius: 12px;
+}
+
+.container-title-click:hover {
+  background-color: var(--third-layer);
+}
+
+.container-title,
+.container-title-click {
+  border-radius: 12px;
+}
+
+.container-tag {
+  border-radius: 6px;
+  background-color: var(--neutral2);
+  border: 2px solid var(--neutral2);
+}
+
+
+/* Information */
+
+.information-fade {
+  background: linear-gradient(to bottom, #0000 60%, var(--first-layer));
+}
+
+.information-episode-button.watched:hover {
+  background-color: var(--green-one);
+  color: var(--text);
+}
+
+.information-episode-button.watching:hover {
+  background-color: var(--orange-one);
+  color: var(--text);
+}
+
+.information {
+  background-color: var(--first-layer);
+  color: var(--text);
+}
+
+.information-top {
+  background-color: var(--second-layer);
+  border-radius: 16px;
+}
+
+.information-cover {
+  border-radius: 16px;
+}
+
+.information-cover-placeholder {
+  border-radius: 12px;
+  background-color: var(--third-layer);
+}
+
+.information-cover,
+.information-cover-placeholder {
+  transition: all 0.1s;
+}
+
+.information-info {
+  background-color: var(--second-layer);
+  border-radius: 16px;
+}
+
+.information-info-content {
+  background-color: var(--third-layer);
+  border-radius: 10px;
+}
+
+.information-episodes {
+  background-color: var(--second-layer);
+  border-radius: 16px;
+}
+
+.information-characters {
+  background-color: var(--second-layer);
+  border-radius: 16px;
+}
+
+.information-characters-card {
+  background-color: var(--third-layer);
+  border-radius: 16px;
+  transition: all 150ms ease;
+}
+
+.information-characters-card:hover {
+  background-color: var(--five-layer);
+}
+
+.information-characters-card-cover {
+  border-radius: 16px;
+}
+
+.information-exit-button {
+  border-radius: 50%;
+}
+
+.information-select-episode:hover {
+  background-color: var(--fourth-layer);
+}
+
+.information-episode-button {
+  background-color: var(--five-layer);
+  border-radius: 8px;
+  border: 2px solid var(--five-layer);
+  transition: all 150ms ease-out;
+}
+
+.information-episode-button:hover {
+  background-color: var(--five-layer);
+  border-color: var(--green-one);
+  color: var(--green-one);
+}
+
+.information-episode-button.watched {
+  border-color: var(--green-one);
+}
+
+.information-episode-button.watching {
+  border-color: var(--orange-one);
+}
+
+.information-episode-button.current {
+  border-color: var(--orange-one);
+}
+
+.information-episode-button.current:hover {
+  background-color: var(--orange-one);
+  color: var(--text);
+}
+
+.information-select-episode {
+  background-color: var(--third-layer);
+  border-radius: 12px;
+}
+
+.information-score {
+  background-color: var(--third-layer);
+  border-radius: 50%;
+}
+
+.information-title2,
+.information-title-small2 {
+  color: var(--text-gray);
+}
+
+.information-bar {
+  background-color: var(--second-layer);
+  border-radius: 18px;
+}
+
+.information-bar-icon {
+  border-radius: 50% !important;
+}
+
+.information-bottom ::-webkit-scrollbar,
+.information-containerwrong-cards ::-webkit-scrollbar,
+.information-containerwrong-container ::-webkit-scrollbar {
+  background-color: var(--second-layer) !important;
+}
+
+.information-bottom ::-webkit-scrollbar-thumb,
+.information-containerwrong-cards ::-webkit-scrollbar-thumb,
+.information-containerwrong-container ::-webkit-scrollbar-thumb {
+  background-color: var(--third-layerc) !important;
+}
+
+.information-episodes-button {
+  background-color: var(--third-layer);
+}
+
+
+/* For smaller devices / window sizes */
+@media (max-width: 1000px) {
+  .information-top {
+    border-radius: 0px;
+  }
+
+  .information-info {
+    border-radius: 0px;
+  }
+
+  .information-info-content {
+    border-radius: 10px;
+  }
+}
+
+/* for very small window sizes */
+@media (max-width: 600px) {
+  .information-info-content {
+    border-radius: 10px;
+  }
+
+  .information-episodes,
+  .information-characters {
+    border-radius: 0px;
+  }
+}
+
+
+/* Drop */
+
+.drop-button {
+  background-color: var(--third-layer);
+  border-radius: 12px;
+  transition: all 150ms ease;
+}
+
+.drop-button:hover {
+  background-color: var(--five-layer);
+}
+
+.drop-content {
+  background-color: var(--third-layer);
+  border-radius: 12px;
+
+  border-top: 0px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+
+  border: 0px solid var(--third-layer);
+}
+
+.drop-content-show {
+  border-width: 2px 0px 0px 0px;
+  border-color: var(--fourth-layer);
+}
+
+.active-drop {
+  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
+
+/* DeveloperStats */
+
+.player-dev-container {
+  background-color: color-mix(in srgb, var(--third-layer) 80%, transparent);
+  border-radius: 12px;
+}
+
+
+/* ExternalPlayer */
+
+.external-player-container ::-webkit-scrollbar {
+  color: var(--third-layer);
+  background-color: var(--third-layer);
+}
+
+.external-player-container ::-webkit-scrollbar-thumb {
+  color: var(--second-layer);
+  background-color: var(--second-layer);
+}
+
+.external-player-container {
+  background-color: var(--second-layer);
+}
+
+.external-button-container {
+  background-color: var(--third-layer);
+  border-radius: 12px;
+}
+
+.external-episodes-container,
+.external-leftpanel-container {
+  background-color: var(--third-layer);
+  border-radius: 12px;
+}
+
+.external-panelbutton {
+  background-color: var(--fourth-layer) !important;
+}
+
+.external-panelbutton-bottomtext {
+  color: var(--text-gray);
+}
+
+.external-leftpanel-topbar {
+  border: 2px solid var(--fourth-layer);
+}
+
+.external-leftpanel-topbar-button {
+  border-radius: 50% !important;
+  background-color: var(--third-layer) !important;
+}
+
+/* Settings */
+
+.settings-page-container {
+  background-color: var(--second-layer);
+  border-radius: 12px;
+}
+
+.settings-line {
+  background-color: var(--third-layer);
+  border-radius: 8px;
+}
+
+.settings-text-space {
+  background-color: var(--third-layer);
+  border-radius: 12px;
+}
+
+.settings-save-content {
+  background-color: var(--blue-background);
+  border-radius: 12px;
+  border: 2px solid var(--blue-one);
+}
+
+.settings-save-title {
+  color: var(--blue-text);
+}
+
+.settings-container-extensions {
+  background-color: var(--second-layer);
+  border-radius: 12px;
+}
+
+th {
+  border: 3px solid var(--fourth-layer);
+}
+
+.settings-table-button:hover * {
+  background-color: var(--fourth-layer);
+}
+
+.settings-table-button:hover td:first-child {
+  border-radius: 12px 0 0 12px;
+}
+
+.settings-table-button:hover td:last-child {
+  border-radius: 0 12px 12px 0;
+}
+
+.settings-extensions-background {
+  background-color: var(--third-layer);
+  border-radius: 6px;
+}
+
+.settings-special-images:hover {
+  background-color: var(--fourth-layer);
+}
+
+.settings-table-button {
+  border-radius: 12px;
+}
+
+.settings-special-images {
+  border-radius: 12px;
+}
+
+
+/* Checkbox */
+
+.checkbox {
+  background-color: var(--fourth-layer);
+  box-shadow: inset 0 0 5px rgb(0, 0, 0, 0.2);
+  border-radius: 20px;
+  outline: 2px solid var(--invisible) !important;
+}
+
+.checkbox:hover {
+  outline-color: var(--orange-one) !important;
+}
+
+.checkbox::before {
+  border-radius: 20px;
+  background-color: var(--text);
+  box-shadow: 0 2px 5px rgb(0, 0, 0, 0.2);
+}
+
+.checkbox:checked {
+  background-color: var(--green-one);
+}
+
+
+/* CheckKeybind */
+
+.settings-keybind-check,
+.settings-keybind-check-active {
+  /* background-color: var(--third-layer); */
+  border-radius: 12px;
+  border: 2px solid rgb(0, 0, 0, 0);
+  color: var(--text);
+}
+
+.settings-input-content {
+  background-color: var(--third-layer);
+}
+
+.settings-keybind-check:hover,
+.settings-keybind-check-active:hover {
+  border-color: var(--green-one);
+}
+
+/* DropDown */
+.dropdown-button {
+  background-color: var(--third-layer);
+  border-radius: 12px;
+  transition: all 150ms ease-in-out;
+  outline: 2px solid var(--invisible);
+}
+
+.dropdown-button:hover {
+  /* background-color: var(--five-layer); */
+  outline-color: var(--green-one);
+}
+
+.dropdown-button-shadow-text {
+  color: var(--text-gray);
+}
+
+.dropdown-button-icon {
+  color: var(--text);
+}
+
+.dropdown-menu {
+  background-color: var(--third-layer);
+  border-radius: 8px;
+}
+
+.dropdown-item {
+  border-radius: 8px;
+}
+
+.dropdown-item:hover {
+  background-color: var(--second-layer);
+}
+
+
+/* SettingsInput */
+
+.settings-input-container {
+  border-radius: 12px;
+  /* background-color: var(--third-layer); */
+}
+
+.settings-input-field,
+.settings-input-field-hide-type {
+  border: none;
+  background-color: var(--third-layer);
+  color: var(--text);
+  border-radius: 12px;
+}
+
+.settings-input-field {
+  border-right: 0px;
+  border-radius: 12px 0px 0px 12px;
+}
+
+.settings-input-type {
+  background-color: var(--third-layer);
+  color: var(--text);
+  border-radius: 0px 12px 12px 0px;
+  border-left: 0px;
+}
+
+.settings-input-container:hover .settings-input-type,
+.settings-input-container:hover .settings-input-field,
+.settings-input-container:hover .settings-input-field-hide-type {
+  background-color: var(--five-layer);
+}
+
+
+.settings-input-field:focus,
+.settings-input-field:active,
+.settings-input-field-hide-type:focus,
+.settings-input-field-hide-type:active,
+.settings-input-field:focus~.settings-input-type,
+.settings-input-field:active~.settings-input-type {
+  border-color: var(--green-one);
+}
+
+
+/* Player */
+
+.player-video-container {
+  background-color: var(--black);
+  color: var(--text);
+}
+
+.player-mask.bottom {
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+}
+
+.player-mask.top {
+  top: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent);
+}
+
+.player-time-display {
+  border-radius: 60px;
+  background-color: var(--player-bg-containers);
+  color: var(--text);
+  outline: 2px solid var(--invisible);
+  transition: all 150ms ease;
+}
+
+.player-time-display:hover {
+  outline-color: var(--green-one);
+}
+
+.player-time-display-current {
+  font-weight: 800;
+}
+
+.player-buttons {
+  border: none;
+  outline: none;
+  color: var(--text);
+  background-color: var(--invisible) !important;
+  border-radius: 60px;
+  width: 50px;
+  height: 50px;
+}
+
+.player-buttons:hover {
+  background-color: var(--player-bg-containers) !important;
+  /* border-color: var(--green-one); */
+}
+
+.player-button-icons {
+  font-size: 1em;
+  text-shadow: 2px 2px 10px var(--first-layer);
+}
+
+.player-button-up-text {
+  bottom: 80px;
+}
+
+.player-title {
+  border-radius: 4px;
+  background-color: var(--invisible);
+  color: var(--text);
+  text-shadow: 2px 2px 10px var(--first-layer);
+  font-size: 1.7em;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  line-height: 1.8
+}
+
+.player-settings-container {
+  border-radius: 8px;
+  background-color: color-mix(in srgb, var(--second-layer) 90%, transparent);
+  color: var(--text);
+  border: 2px solid var(--invisible);
+}
+
+.player-settings-button,
+.player-settings-button-back {
+  border-radius: 6px;
+  color: var(--text);
+}
+
+.player-settings-button-back {
+  border: 2px solid var(--fourth-layer);
+  border-width: 0px 0px 2px 0px;
+}
+
+.player-settings-button:hover,
+.player-settings-button-back:hover {
+  background-color: var(--five-layer);
+  color: var(--green-one);
+}
+
+.player-settings-button-text-gray {
+  color: var(--text-gray);
+}
+
+.player-loading-animation-container {
+  border-radius: 12px;
+  padding: 12px;
+  background-color: var(--player-bg-containers);
+}
+
+.player-up-Next-container-var2 {
+  background: linear-gradient(to left, var(--bg), rgb(0, 0, 0, 0.2));
+  border-radius: 12px !important;
+}
+
+.player-up-Next-background {
+  outline: 3px solid var(--fourth-layer);
+  background-color: var(--fourth-layer);
+  border-radius: 12px !important;
+}
+
+.player-up-Next-background:hover {
+  outline-color: var(--neutral1);
+}
+
+.player-up-Next-button-close {
+  border-radius: 50%;
+  color: var(--text);
+  background-color: var(--fourth-layer);
+  border: 2px solid var(--fourth-layer);
+}
+
+
+.player-up-Next-button-close:hover {
+  border-color: var(--neutral1);
+}
+
+.player-up-Next-container {
+  background-color: var(--black);
+  border-radius: 8px !important;
+}
+
+.player-loading-container {
+  background-color: black;
+}
+
+.player-loading-container-black {
+  background-color: rgb(0, 0, 0, 0.4);
+}
+
+.player-volume-ui-container {
+  background-color: var(--second-layer);
+  border-radius: 12px;
+}
+
+.player-volume-ui-bar-progress {
+  background-color: var(--neutral1);
+  border-radius: 12px;
+}
+
+.player-volume-ui-bar-container {
+  background-color: var(--third-layer);
+  border-radius: 12px;
+}
+
+.player-select-episode-void {
+  background-color: var(--player-bg-containers);
+}
+
+.player-select-episode-container {
+  border-radius: 8px;
+  background-color: color-mix(in srgb, var(--second-layer) 90%, transparent);
+  border: 2px solid var(--invisible);
+}
+
+.player-subtitle-container {
+  color: white;
+}
+
+.player-subtitle-content {
+  background-color: var(--invisible);
+}
+
+.player-skip-chapters-button {
+  background-color: var(--second-layer);
+  color: var(--text);
+  border: 2px solid var(--player-bg-containers);
+  border-radius: 12px;
+}
+
+.player-skip-chapters-button:hover {
+  border-color: var(--neutral1);
+}
+
+.information-episode-button-image {
+  border-radius: 4px;
+}
+
+
+/* Player Button */
+
+
+.player-button-up-text {
+  border-radius: 6px;
+}
+
+.player-button-up-text {
+  background-color: var(--player-bg-containers);
+}
+
+
+/* Player episode element */
+
+
+.player-episode-element-background,
+.player-up-Next-background {
+  border-radius: 8px;
+}
+
+.player-episode-element-container {
+  background: linear-gradient(to left, var(--black), rgb(0, 0, 0, 0.3));
+  border-radius: 8px;
+}
+
+/* nerdStats */
+
+.player-nerd-container {
+  background-color: var(--player-bg-containers);
+  border-radius: 12px;
+  color: var(--text);
+}
+
+
+/* SeekBar */
+.player-seekbar {
+  background-color: var(--player-bg-containers) !important;
+}
+
+.player-seekbar:hover {
+  transform: scaleY(1.5);
+  transition: transform .1s cubic-bezier(0, 0, .2, 1), -webkit-transform .1s cubic-bezier(0, 0, .2, 1);
+}
+
+.player-seekbar:hover .seekbar-thumb {
+  display: none;
+}
+
+.player-seekbar .seekbar-box {
+  transform: translate(-50%, 10%) scaleY(0.70);
+}
+
+.player-seekbar .seekbar-thumbnail {
+  transform: translate(-50%, 10%) scaleY(0.70);
+}
+
+.seekBar-container {
+  background-color: var(--fourth-layer);
+  border-radius: 12px;
+}
+
+.seekbar-buffer-wrapper {
+  border-radius: 12px;
+}
+
+.seekbar-thumb {
+  border-radius: 50%;
+}
+
+.seekbar-box {
+  background-color: color-mix(in srgb, var(--five-layer) 80%, transparent) !important;
+  border-radius: 12px;
+}
+
+.seekbar-thumb,
+.seekbar-progress,
+.seekbar-box.progress {
+  background-color: var(--green-one);
+  border-radius: 12px;
+}
+
+.seekbar-progress {
+  background-color: var(--green-one) !important;
+}
+
+.seekbar-buffer,
+.seekbar-chapters {
+  background-color: color-mix(in srgb, var(--text) 70%, transparent);
+}
+
+.seekbar-chapters {
+  background-color: var(--invisible);
+}
+
+.seekbar-thumbnail {
+  border-radius: 12px;
+  background-color: var(--player-bg-containers);
+}
+
+.seekbar-chapters-opening-ending {
+  background-color: var(--orange-one) !important;
+}
+
+/* player seekbar */
+.video-bottom .seekBar-container {
+  background-color: color-mix(in srgb, var(--five-layer) 40%, transparent) !important;
+  border-radius: 12px;
+}
+
+.video-bottom .seekbar-thumb {
+  border-radius: 50%;
+}
+
+.video-bottom .seekbar-box {
+  background-color: color-mix(in srgb, var(--third-layer) 80%, transparent);
+  border-radius: 12px;
+}
+
+.video-bottom .seekbar-thumb,
+.seekbar-progress,
+.seekbar-box.progress {
+  background-color: var(--green-one);
+  border-radius: 12px;
+}
+
+.video-top,
+.player-loading-top {
+  gap: 3px;
+}
+
+
+/* ContainerWrong */
+
+.information-containerwrong {
+  background-color: var(--second-layer);
+  border: solid 2px var(--third-layer);
+  border-radius: 12px;
+}
+
+.information-containerwrong-void {
+  background-color: color-mix(in srgb, var(--bg) 70%, transparent);
+}
+
+.information-containerwrong-exit-button {
+  border-radius: 50% !important;
+}
+
+
+/* ContextMenu */
+
+
+.contextmenu-container {
+  background-color: var(--third-layer);
+  border-radius: 4px;
+}
+
+.contextmenu-option {
+  transition: all 150ms ease;
+}
+
+.contextmenu-option:hover {
+  background-color: var(--five-layer);
+  color: var(--green-one);
+}
+
+.contextmenu-option-line {
+  background-color: var(--five-layer);
+  border-radius: 12px;
+}
+
+.contextmenu-option-deletion {
+  background-color: var(--red-one);
+}
+
+.contextmenu-option,
+.contextmenu-option-deletion {
+  border-radius: 4px;
+}
+
+
+/* Help icon */
+
+
+.help-icon-description {
+  background-color: #333;
+  color: #fff;
+  border-radius: 4px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Welcome Screen */
+
+
+.welcome-screen-void {
+  background-color: color-mix(in srgb, var(--bg) 80%, transparent);
+}
+
+.welcome-screen-content {
+  background-color: var(--second-layer);
+  border-radius: 12px;
+}
+
+
+/* Container Wrong */
+
+
+.information-containerwrong-text-space {
+  background-color: var(--green-one);
+  border-radius: 12px;
+}
+
+.information-containerwrong-center {
+  border: 1px solid white;
+}
+
+/* Big cards */
+.big-card-information-format,
+.big-card-information-status,
+.big-card-information-episode {
+  background-color: var(--orange-one);
+}
+
+.big-card-background {
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, var(--first-layer) 100%),
+    color-mix(in srgb, var(--first-layer) 20%, transparent);
+}
+
+.big-card-information-genres {
+  background-color: var(--second-layer);
+}
+
+.big-card-button {
+  padding-left: 24px;
+  padding-right: 24px;
+  border: none !important;
+  font-size: 1em;
+  border-radius: 16px;
+  background-color: var(--green-one);
+}
+
+.big-card-button:hover {
+  background-color: var(--fourth-layer);
+}
+
+.big-card-information-date {
+  background-color: var(--green-one);
+  text-shadow: none;
+  font-size: 1.1em;
+}
+
+.big-card-information-score {
+  background-color: var(--third-layer);
+}
+
+/* BigCard Container */
+.big-card-container-button {
+  background-color: var(--third-layer);
+}
+
+.big-card-container-button.active {
+  background-color: var(--text);
+  transform: scale(1.3);
+}
+
+.big-card-container-button:hover {
+  background-color: var(--text-gray);
+}
+
+
+/* ButtonGroup */
+.button-group-button {
+  background-color: var(--second-layer);
+  border: 2px solid var(--fourth-layer);
+}
+
+.button-group-button:hover,
+.button-group-button.active:hover {
+  border-color: var(--green-one);
+  color: var(--green-one);
+  background-color: var(--invisible);
+}
+
+.button-group-button.active {
+  background-color: var(--fourth-layer);
+}

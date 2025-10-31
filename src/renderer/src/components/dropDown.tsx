@@ -1,69 +1,92 @@
-import React, { useEffect, useState } from 'react'
-import "./css/dropDown.css"
+import { createSignal, createEffect, For } from "solid-js";
+import "./css/dropDown.css";
 
 export interface DropdownOption {
-  label: string
-  onClick?: (text: string) => void
+  label: string;
+  onClick?: (text: string) => void;
 }
 
 interface DropdownProps {
-  options: DropdownOption[] | undefined
-  placeholder?: string
+  options?: DropdownOption[];
+  placeholder?: string;
   placeholderChange?: () => string;
-  buttonText?: string
-  disableX?: boolean
-  onClickX?: (text: string) => void
-  dropClassName?: string
+  buttonText?: string;
+  disableX?: boolean;
+  onClickX?: (text: string) => void;
+  dropClassName?: string;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ options = [], placeholder = '', placeholderChange, buttonText = "", onClickX, disableX = false, dropClassName }) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [text, setText] = useState<string>(buttonText)
+export default function Dropdown(props: DropdownProps) {
+  const [isOpen, setIsOpen] = createSignal(false);
+  const [text, setText] = createSignal(props.buttonText ?? "");
 
-  const toggleDropdown = () => setIsOpen(prev => !prev)
+  const toggleDropdown = () => setIsOpen(prev => !prev);
 
   const handleOptionClick = (option: DropdownOption) => {
-    setIsOpen(false)
-    if (option.onClick) option.onClick(option.label)
-    setText(() => option.label)
-    if (placeholderChange) console.log(placeholderChange())
-    if (placeholderChange) setText(() => placeholderChange())
-  }
+    setIsOpen(false);
+    if (option.onClick) option.onClick(option.label);
+    if (props.placeholderChange) {
+      const placeholderText = props.placeholderChange();
+      setText(placeholderText);
+    } else {
+      setText(option.label);
+    }
+  };
 
-  function resetText(event) {
-    event.stopPropagation()
-    if (onClickX) onClickX(text ? text : "")
-    setText(() => "")
-  }
-  // {placeholder != "" ? text == "" ? placeholder : text : buttonText }
+  const resetText = (event: MouseEvent) => {
+    event.stopPropagation();
+    if (props.onClickX) props.onClickX(text() || "");
+    setText("");
+  };
 
-  useEffect(() => {
-    setText(() => buttonText)
-  }, [buttonText])
+  createEffect(() => {
+    setText(props.buttonText ?? "");
+  });
+
+  const displayText = () => {
+    if (props.placeholder && text() === "") return props.placeholder;
+    if (text() !== "") return text();
+    return props.buttonText ?? "";
+  };
 
   return (
-    <div tabIndex={-1} className={`dropdown-container ${dropClassName}`}>
-      <div tabIndex={-1} className={`dropdown-button`} onClick={toggleDropdown}>
-        <div tabIndex={-1} className={`dropdown-button-text ${text == "" && "dropdown-button-shadow-text"} ${options.length <= 1 && "dropdown-button-shadow-text"}`}>{text != "" && text} {placeholder != "" && text == "" && placeholder}</div>
-        {text == "" && !disableX && <div className='material-symbols-outlined dropdown-button-icon'>{isOpen ? "keyboard_arrow_left" : "keyboard_arrow_down"}</div>}
-        {text != "" && !disableX && <div className='material-symbols-outlined dropdown-button-icon' onClick={resetText}>close</div>}
+    <div tabIndex={-1} class={`dropdown-container ${props.dropClassName ?? ""}`}>
+      <div tabIndex={-1} class="dropdown-button" onClick={toggleDropdown}>
+        <div
+          tabIndex={-1}
+          class={`dropdown-button-text ${
+            (text() === "" || (props.options?.length ?? 0) <= 1) ? "dropdown-button-shadow-text" : ""
+          }`}
+        >
+          {displayText()}
+        </div>
+        {text() === "" && !props.disableX && (
+          <div class="material-symbols-outlined dropdown-button-icon">
+            {isOpen() ? "keyboard_arrow_left" : "keyboard_arrow_down"}
+          </div>
+        )}
+        {text() !== "" && !props.disableX && (
+          <div class="material-symbols-outlined dropdown-button-icon" onClick={resetText}>
+            close
+          </div>
+        )}
       </div>
-      {isOpen && options.length > 1 && (
-        <ul className="dropdown-menu" onMouseLeave={() => setIsOpen(false)}>
-          {options.map((option) => (
-            <li
-              key={option.label}
-              className="dropdown-item"
-              onClick={() => handleOptionClick(option)}
-              title={option.label}
-            >
-              {option.label}
-            </li>
-          ))}
+
+      {isOpen() && (props.options?.length ?? 0) > 1 && (
+        <ul class="dropdown-menu" onMouseLeave={() => setIsOpen(false)}>
+          <For each={props.options}>
+            {option => (
+              <li
+                class="dropdown-item"
+                onClick={() => handleOptionClick(option)}
+                title={option.label}
+              >
+                {option.label}
+              </li>
+            )}
+          </For>
         </ul>
       )}
     </div>
-  )
+  );
 }
-
-export default Dropdown

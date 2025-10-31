@@ -1,5 +1,4 @@
 import i18n from 'i18next'
-import { initReactI18next } from 'react-i18next'
 
 async function getAllLangFiles() {
   let langFiles = await window.api.getListLang()
@@ -16,7 +15,7 @@ async function getAllLangFiles() {
   return res
 }
 
-i18n.use(initReactI18next).init({
+i18n.init({
   lng: 'en',
   fallbackLng: 'en',
   debug: true,

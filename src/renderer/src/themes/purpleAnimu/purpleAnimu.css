@@ -9,10 +9,22 @@
   --bg2: #2b2e41; /* Second layer, used in sidebar, header */
   --bg3: #3c415d; /* Thirt layer, used in button etc */
   --bg4: #202332; /* Fourth layer, used in hover button etc */
+  --bg5: #434856;
 
   /* accent */
   --neutral1: var(--text); /* is using on outline, border-color etc */
   --neutral2: #4e59b1; /* not used */
   --neutral3: #3e488e; /* not used */
   --red: red;
+  
+  /* DarkerAnimu compatibility */
+  --first-layer: var(--bg); /* First layer, background only */
+  --second-layer: var(--bg2); /* Second layer, used in sidebar, header */
+  --third-layer: var(--bg3); /* Third layer, used in button etc */
+  --fourth-layer: var(--bg4); /* Fourth layer, used in hover button etc */
+  --five-layer: var(--bg5);
+
+  /* Colors */
+  --red-one: var(--red);
+  --green-one: var(--neutral1); /* boders, some buttons etc */
 }

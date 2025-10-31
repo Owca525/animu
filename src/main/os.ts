@@ -1,17 +1,18 @@
 import { app, dialog, ipcMain } from "electron";
-import { mainWindow } from ".";
-import os from 'os';
+import { mainWindow, newConfigPath } from ".";
 
-import fs, { WriteFileOptions } from "fs";
 import { execSync } from "child_process";
+import { WriteFileOptions, writeFileSync, mkdirSync, existsSync, readFileSync, promises } from "fs";
+import path from "path"
+import os from "os"
 
-function write(path: string, data: string, format?: WriteFileOptions): boolean {
+export function write(path: string, data: string, format?: WriteFileOptions): boolean {
   try {
     if (format) {
-      fs.writeFileSync(path, data, format);
+      writeFileSync(path, data, format);
       return true;
     }
-    fs.writeFileSync(path, data, "utf-8");
+    writeFileSync(path, data, "utf-8");
     return true;
   } catch (error) {
     console.error(error, path)
@@ -19,33 +20,12 @@ function write(path: string, data: string, format?: WriteFileOptions): boolean {
   }
 }
 
-ipcMain.handle(
-  "getPath",
-  (
-    _event,
-    name:
-      | "home"
-      | "appData"
-      | "userData"
-      | "sessionData"
-      | "temp"
-      | "exe"
-      | "module"
-      | "desktop"
-      | "documents"
-      | "downloads"
-      | "music"
-      | "pictures"
-      | "videos"
-      | "recent"
-      | "logs"
-      | "crashDumps"
-  ): string => app.getPath(name)
-);
+ipcMain.handle("exist", (_event, pathStr: string): boolean => {
+  return existsSync(path.join(newConfigPath, pathStr))
+});
 
-ipcMain.handle("exist", (_event, path: string): boolean => {
-  if (fs.existsSync(path)) return true;
-  else return false;
+ipcMain.handle("getConfigPath", (_event): string => {
+  return newConfigPath
 });
 
 ipcMain.handle("getPathProgram", async (_event, program: string): Promise<string> => {
@@ -65,46 +45,25 @@ ipcMain.handle("getPathProgram", async (_event, program: string): Promise<string
   }
 });
 
-ipcMain.handle(
-  "write",
-  (_event, path: string, data: string, format?: WriteFileOptions): boolean =>
-    write(path, data, format)
-);
+ipcMain.handle("write", (_event, pathStr: string, data: string, format?: WriteFileOptions): boolean => {
+  if (pathStr.includes(".png")) {
+    return write(pathStr, data, format)
+  }
+  return write(path.join(newConfigPath, pathStr), data, format)
+});
 
-ipcMain.handle(
-  "read",
-  (_event, path: string, format: WriteFileOptions): any => {
+ipcMain.handle("read",  (_event, pathStr: string, format: WriteFileOptions): string | NonSharedBuffer | undefined => {
     try {
-      if (format) {
-        return fs.readFileSync(path, format);
-      }
-      return fs.readFileSync(path, "utf-8");
+      let tmpPath = path.join(newConfigPath, pathStr)
+      if (format) return readFileSync(tmpPath, format);
+      return readFileSync(tmpPath, "utf-8");
     } catch (error) {
-      return null;
+      return undefined;
     }
   }
 );
 
-ipcMain.handle("mkdir", (_event, path: string): boolean => {
-  try {
-    fs.mkdirSync(path);
-    return true;
-  } catch (error) {
-    return false;
-  }
-});
-
-ipcMain.handle(
-  "saveDialog",
-  async (
-    _event,
-    fileName: string,
-    data: any,
-    title: string,
-    name: string,
-    extensions: string[],
-    format?: string
-  ): Promise<boolean> => {
+ipcMain.handle("saveDialog", async (_event, fileName: string, data: any, title: string, name: string, extensions: string[], format?: string): Promise<boolean> => {
     const { filePath } = await dialog.showSaveDialog({
       title: title,
       defaultPath: fileName,
@@ -115,14 +74,7 @@ ipcMain.handle(
   }
 );
 
-ipcMain.handle(
-  "openDialog",
-  async (
-    _event,
-    path?: string,
-    name?: string,
-    extensions?: string[]
-  ): Promise<string> => {
+ipcMain.handle("openDialog", async (_event, path?: string, name?: string, extensions?: string[]): Promise<string> => {
     if (!mainWindow) return "";
     let dialogProps: Electron.OpenDialogOptions = {
       defaultPath: path,
@@ -141,10 +93,42 @@ ipcMain.handle(
   }
 );
 
-ipcMain.handle('get-os-info', async () => {
+ipcMain.handle('get-os-info', () => {
   return {
     platform: os.platform(),
     release: os.release(),
     arch: os.arch(),
   };
 });
+
+export async function detectOldVersion() {
+  let animuPath = app.getPath("userData")
+  let newConfigPath = path.join(app.getPath("userData"), "animuConfig")
+  if (!existsSync(newConfigPath)) {
+    mkdirSync(newConfigPath);
+  }
+  if (!existsSync(newConfigPath)) {
+    mkdirSync(newConfigPath);
+  }
+
+  const filesToMove = [
+    "history.json",
+    "continueWatch.json",
+    "config.ini",
+    "themes",
+    "lang",
+  ];
+
+  for (const name of filesToMove) {
+    const oldPath = path.join(animuPath, name);
+    const newPath = path.join(newConfigPath, name);
+
+    if (existsSync(oldPath) && !existsSync(newPath)) {
+      try {
+        await promises.rename(oldPath, newPath);
+      } catch (err) {
+        console.error(`Error in detectOldVersion:`, err);
+      }
+    }
+  }
+}

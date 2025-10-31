@@ -1,24 +1,27 @@
-import React, { useState } from 'react'
-import "./css/helpicon.css"
+import { Component, createSignal, Show } from "solid-js";
+import "./css/helpicon.css";
 
 interface HelpIconProps {
-  description: string
+  description: string;
 }
 
-const HelpIcon: React.FC<HelpIconProps> = ({ description }) => {
-  const [isHovered, setIsHovered] = useState(false)
+const HelpIcon: Component<HelpIconProps> = (props) => {
+  const [isHovered, setIsHovered] = createSignal(false);
 
   return (
     <div
       tabIndex={-1}
-      className="help-icon-container"
+      class="help-icon-container"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="material-symbols-outlined help-icon">help</div>
-      {isHovered && <div className="help-icon-description">{description}</div>}
-    </div>
-  )
-}
+      <div class="material-symbols-outlined help-icon">help</div>
 
-export default HelpIcon
+      <Show when={isHovered()}>
+        <div class="help-icon-description">{props.description}</div>
+      </Show>
+    </div>
+  );
+};
+
+export default HelpIcon;

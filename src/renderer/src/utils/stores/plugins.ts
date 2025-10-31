@@ -1,13 +1,14 @@
 import { infoPluginPlayer } from "@renderer/plugins/allmanga";
-import { infoPlugin } from "@renderer/plugins/anilistApi";
-import { pluginFormat } from "../GlobalInterface";
+import { playerPluginFormat } from "../types";
 import { AniZone } from "@renderer/plugins/anizone";
 import { lycorisCafe } from "@renderer/plugins/lycoriscafe";
+import { infoPlugin } from "@renderer/plugins/anilistApi";
+import { createStore } from "solid-js/store";
 
 const initialState = {
-    loadedPlugins: [infoPlugin, infoPluginPlayer, AniZone, lycorisCafe] as pluginFormat[],
+    loadedPlugins: [infoPluginPlayer, AniZone, lycorisCafe] as playerPluginFormat[],
     informationPlugin: infoPlugin,
-    playerPlugin: undefined,
+    playerPlugin: undefined as playerPluginFormat | undefined,
     playerPluginCache: undefined
 };
 
@@ -29,3 +30,11 @@ const userReducer = (state = initialState, action) => {
 };
 
 export default userReducer;
+
+export const [globalState, setGlobalState] = createStore(initialState);
+
+export const getPluginList = () => globalState.loadedPlugins;
+export const getInformationPlugin = () => globalState.informationPlugin;
+export const getPlayerPLugin = () => globalState.playerPlugin;
+export const setPlayerPlugin = (plugin: playerPluginFormat | undefined) => setGlobalState((prev) => ({...prev, playerPlugin: plugin}));
+

@@ -1,17 +1,24 @@
 :root {
-  --text: #cfcfcf; /* is used on regular text */
-  --text-gray: #8d8d8d; /* is used in card continue watch */
+  --text: #cfcfcf;
+  /* is used on regular text */
+  --text-gray: #8d8d8d;
+  /* is used in card continue watch */
 
   /* Background */
-  --bg: #1e1e1e; /* First layer, background only */
-  --bg2: #232323; /* Second layer, used in sidebar, header */
-  --bg3: rgb(46, 46, 46); /* Thirt layer, used in button etc */
-  --bg4: rgb(64, 64, 64); /* Fourth layer, used in hover button etc */
+  --bg: #1e1e1e;
+  /* First layer, background only */
+  --bg2: #232323;
+  /* Second layer, used in sidebar, header */
+  --bg3: rgb(46, 46, 46);
+  /* Thirt layer, used in button etc */
+  --bg4: rgb(64, 64, 64);
+  /* Fourth layer, used in hover button etc */
 
   /* accent */
-  --neutral1: #17964a; /* is using on outline, border-color etc */
+  --neutral1: #17964a;
+  /* is using on outline, border-color etc */
   --neutral2: #19a651;
-  --neutral3: #27ae5d;
+  --neutral3: #4DBC79;
   --red: #861832;
   --blue: #1c1291;
   --light-blue: #2658c4;
@@ -110,7 +117,8 @@ body {
 
 /* Sidebar */
 
-.sidebar-button, .sidebar-button-min {
+.sidebar-button,
+.sidebar-button-min {
   background-color: var(--bg2);
 }
 
@@ -132,7 +140,7 @@ body {
 /* Home */
 
 .home-header {
-  background-color: var(--bg2);
+  /* background-color: var(--bg2); */
 }
 
 .home-header-sidebar-placeholder {
@@ -214,6 +222,10 @@ body {
 
 
 /* Information */
+
+.information-fade {
+  background: linear-gradient(to bottom, #0000 60%, var(--bg));
+}
 
 .information-episode-button-watched {
   border-color: var(--neutral1);
@@ -366,9 +378,11 @@ body {
   .information-info-content {
     border-radius: 10px;
   }
-    .information-episodes, .information-characters {
-        border-radius: 0px;
-    }
+
+  .information-episodes,
+  .information-characters {
+    border-radius: 0px;
+  }
 }
 
 
@@ -489,8 +503,16 @@ th {
   border: 3px solid var(--bg4);
 }
 
-.settings-table-button:hover {
+.settings-table-button:hover * {
   background-color: var(--bg4);
+}
+
+.settings-table-button:hover td:first-child {
+  border-radius: 12px 0 0 12px;
+}
+
+.settings-table-button:hover td:last-child {
+  border-radius: 0 12px 12px 0;
 }
 
 .settings-extensions-background {
@@ -590,7 +612,8 @@ th {
   /* background-color: var(--bg3); */
 }
 
-.settings-input-field, .settings-input-field-hide-type {
+.settings-input-field,
+.settings-input-field-hide-type {
   background-color: var(--bg3);
   color: var(--text);
   border-radius: 12px;
@@ -636,12 +659,12 @@ th {
 
 .player-mask.bottom {
   bottom: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
 }
 
 .player-mask.top {
   top: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.9), transparent);
 }
 
 .player-time-display {
@@ -806,24 +829,25 @@ th {
 
 
 .player-button-up-text {
-    border-radius: 6px;
+  border-radius: 6px;
 }
 
 .player-button-up-text {
-    background-color: var(--player-bg-containers);
+  background-color: var(--player-bg-containers);
 }
 
 
 /* Player episode element */
 
 
-.player-episode-element-background, .player-up-Next-background {
-    border-radius: 8px;
+.player-episode-element-background,
+.player-up-Next-background {
+  border-radius: 8px;
 }
-  
+
 .player-episode-element-container {
-    background: linear-gradient(to left, var(--black), rgb(0, 0, 0, 0.3)); 
-    border-radius: 8px;
+  background: linear-gradient(to left, var(--black), rgb(0, 0, 0, 0.3));
+  border-radius: 8px;
 }
 
 /* nerdStats */
@@ -842,11 +866,13 @@ th {
 
 .player-seekbar:hover {
   transform: scaleY(1.5);
-  transition: transform .1s cubic-bezier(0,0,.2,1),-webkit-transform .1s cubic-bezier(0,0,.2,1);
+  transition: transform .1s cubic-bezier(0, 0, .2, 1), -webkit-transform .1s cubic-bezier(0, 0, .2, 1);
 }
+
 .player-seekbar:hover .seekbar-thumb {
   display: none;
 }
+
 .player-seekbar .seekbar-box {
   transform: translate(-50%, 10%) scaleY(0.70);
 }
@@ -880,21 +906,22 @@ th {
   border-radius: 12px;
 }
 
-.seekbar-buffer, .seekbar-chapters {
-    background-color: color-mix(in srgb, var(--text) 70%, transparent);
+.seekbar-buffer,
+.seekbar-chapters {
+  background-color: color-mix(in srgb, var(--text) 70%, transparent);
 }
 
 .seekbar-chapters {
-    background-color: var(--invisible);
+  background-color: var(--invisible);
 }
 
 .seekbar-thumbnail {
-    border-radius: 12px;
-    background-color: var(--player-bg-containers);
+  border-radius: 12px;
+  background-color: var(--player-bg-containers);
 }
 
 .seekbar-chapters-opening-ending {
-    background-color: var(--light-blue) !important;
+  background-color: var(--light-blue) !important;
 }
 
 /* player seekbar */
@@ -979,12 +1006,12 @@ th {
 
 
 .welcome-screen-void {
-    background-color: color-mix(in srgb, var(--bg) 80%, transparent);
+  background-color: color-mix(in srgb, var(--bg) 80%, transparent);
 }
 
 .welcome-screen-content {
-    background-color: var(--bg2);
-    border-radius: 12px;
+  background-color: var(--bg2);
+  border-radius: 12px;
 }
 
 
@@ -992,10 +1019,32 @@ th {
 
 
 .information-containerwrong-text-space {
-    background-color: var(--neutral1);
-    border-radius: 12px;
+  background-color: var(--neutral1);
+  border-radius: 12px;
 }
 
 .information-containerwrong-center {
-    border: 1px solid white;
+  border: 1px solid white;
+}
+
+/* Button groups */
+.button-group-button:hover {
+  background-color: var(--bg1);
+}
+
+.button-group-button.active {
+  background-color: var(--bg1);
+}
+
+.button-group-button.active:hover {
+  background-color: var(--bg4);
+}
+
+.button-group-button {
+  background-color: var(--bg3);
+  border: 2px solid var(--bg4);
+}
+
+.settings-input-content {
+  background-color: var(--bg3);
 }

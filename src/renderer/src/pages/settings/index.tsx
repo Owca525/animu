@@ -2,67 +2,66 @@ import Sidebar from "@renderer/components/sidebar";
 import CheckBox from "./components/checkBox";
 import SettingsInput from "./components/settingsInput";
 import "./settings.css";
-import { useNavigate } from "react-router-dom";
 import Dropdown from "../../components/dropDown";
-import { useEffect, useState } from "react";
 import Button from "@renderer/components/buttons";
 import { t } from "i18next"
-import { ContextMenuProps, notificationProps, pluginFormat, SettingsConfig, themeMetadata } from "@renderer/utils/GlobalInterface";
-import { useSelector } from "react-redux";
+import { ContextMenuProps, playerPluginFormat, SettingsConfig, themeMetadata } from "@renderer/utils/types";
 import i18n from "i18next"
-import { checkPictureFolder, saveConfig } from "@renderer/utils/config";
-import { calculateZoomLevel, changeTheme, convertKeybinds, convertPath } from "@renderer/utils/functions";
+import { saveConfig } from "@renderer/utils/FilesManager/config";
+import { calculateZoomLevel, changeTheme, convertKeybinds, convertPath, updateObjectConfig } from "@renderer/utils/functions";
 import CheckKeybind from "./components/checkKeybind";
 import { showDialog } from "@renderer/utils/context/DialogContext";
-import store from "@renderer/utils/store";
-import { toast } from "react-toastify";
 import SeekBar from "@renderer/components/seekBar";
-import { motion } from "framer-motion";
-import { useHotkeys } from "react-hotkeys-hook";
 import HelpIcon from "./components/helpIcon";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
-import { ContinueCheckConversion, ContinueDetectVersion } from "@renderer/utils/history/continueWatch";
-import { HistoryCheckConvert, HistoryDetectVersion } from "@renderer/utils/history/history";
 import { checkUpdate } from "@renderer/utils/update";
 import { InitialPlugin } from "@renderer/utils/pluginApi";
+import ButtonGroup from "./components/buttonGroup";
+import { DetectOldVersionHistory } from "@renderer/utils/FilesManager/readFiles";
+import toast from "solid-toast";
+import { useNavigate } from "@solidjs/router";
+import { getConfig, setConfig } from "@renderer/utils/stores/config";
+import { getPluginList } from "@renderer/utils/stores/plugins";
+import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
+import { createShortcut } from "@solid-primitives/keyboard";
 
 function settings() {
     const navigate = useNavigate();
-    const cfg: SettingsConfig = useSelector((data: any) => data.config);
-    const pluginList: pluginFormat[] = useSelector((data: any) => data.plugin.loadedPlugins);
-    const [category, setCategory] = useState<string>("general");
-    const [config, setConfig] = useState<{ old: SettingsConfig, new: SettingsConfig }>({ old: structuredClone(cfg), new: structuredClone(cfg) })
-    const [themes, setThemes] = useState<{ label: string, onClick?: () => void }[]>([])
-    const [versions] = useState(window.electronAPI.process.versions)
-    const [isSaving, setSaving] = useState<boolean>(false)
-    const [themeMetadata, setthemeMetadata] = useState<themeMetadata | undefined>(undefined)
+    const cfg: SettingsConfig = JSON.parse(JSON.stringify(getConfig()));
+    const pluginList: playerPluginFormat[] = getPluginList();
+    const [category, setCategory] = createSignal<string>("general");
+    const [config, setNewConfig] = createSignal<{ old: SettingsConfig, new: SettingsConfig }>({ old: structuredClone(cfg), new: structuredClone(cfg) })
+    const [themes, setThemes] = createSignal<{ label: string, onClick?: () => void }[]>([])
+    const [versions] = createSignal(window.electronAPI.process.versions)
+    const [isSaving, setSaving] = createSignal<boolean>(false)
+    const [themeMetadata, setthemeMetadata] = createSignal<themeMetadata | undefined>(undefined)
 
     let sidebarData = {
         top: [
             {
                 icon: "manufacturing",
                 text: t("global.general"),
-                onClick: () => setCategory(() => "general"),
+                onClick: () => setCategory("general"),
             },
             {
                 icon: "movie",
                 text: t("global.player"),
-                onClick: () => setCategory(() => "player"),
+                onClick: () => setCategory("player"),
             },
             {
                 icon: "extension",
                 text: t("global.extensions"),
-                onClick: () => setCategory(() => "extensions"),
+                onClick: () => setCategory("extensions"),
             },
             {
                 icon: "history",
                 text: t("global.history"),
-                onClick: () => setCategory(() => "history"),
+                onClick: () => setCategory("history"),
             },
             {
-                icon: "history",
+                icon: "info",
                 text: t("global.about"),
-                onClick: () => setCategory(() => "about"),
+                onClick: () => setCategory("about"),
             },
         ],
         bottom: [
@@ -70,29 +69,30 @@ function settings() {
                 icon: "folder",
                 text: t("global.cfglocation"),
                 onClick: async () =>
-                    await window.api.open(await window.api.os.getPath("userData")),
+                    await window.api.open(await window.api.os.getConfigPath()),
             },
             {
                 icon: "home",
                 text: t("global.home"),
-                onClick: () => { navigate("/"); resetConfig() },
+                onClick: () => { navigate("/"); resetNewConfig() },
             },
         ],
     };
 
-    if (config.new.Developer.DeveloperMode) {
+    if (config().new.Developer.DeveloperMode) {
         sidebarData.top.push({
             icon: "code",
             text: t("global.dev"),
-            onClick: () => setCategory(() => "developer")
+            onClick: () => setCategory("developer" as any)
         })
     }
 
-    useHotkeys(["ctrl+d"], () => {
-        if (config.new.Developer.DeveloperMode) return
+    createShortcut(["Control", "d"], () => {
+        if (config().new.Developer.DeveloperMode) return
         showDialog({
             type: "info",
-            title: t("settings.turnDeveloper"),
+            title: "Action",
+            description: t("settings.turnDeveloper"),
             buttons: {
                 firstbutton: () => handleChange("Developer.DeveloperMode", true),
                 secondbutton: () => handleChange("Developer.DeveloperMode", false)
@@ -100,9 +100,8 @@ function settings() {
         })
     })
 
-    useHotkeys(["esc"], () => {
+    createShortcut(["Escape"], () => {
         navigate("/");
-        resetConfig()
     })
 
     let ContextMenu: ContextMenuProps = [
@@ -120,68 +119,64 @@ function settings() {
         }
     ]
 
-    if (config.new.Developer.DeveloperMode) {
+    if (config().new.Developer.DeveloperMode) {
         ContextMenu.push({ option: t("contextMenu.devtools"), onClick: window.BrowserWindow.openDevTools })
     }
 
     function handleChange(path: string, value: string | number | boolean) {
-        setConfig((prevConfig) => {
-            const keys = path.split('.')
-            const newConfig = prevConfig.new
-
-            let current: any = newConfig
-            for (let i = 0; i < keys.length - 1; i++) {
-                const key = keys[i]
-
-                if (!current[key]) current[key] = {}
-                current = current[key]
-            }
-
-            current[keys[keys.length - 1]] = value
-            return { old: prevConfig.old, new: newConfig }
+        setNewConfig((prevConfig) => {
+            return { old: prevConfig.old, new: updateObjectConfig(path, value, prevConfig.new) }
         })
     }
 
-    useEffect(() => {
-        if (JSON.stringify(config.old) != JSON.stringify(config.new)) setSaving(() => true)
-    }, [config])
+    createEffect(() => {
+        if (JSON.stringify(config().old) != JSON.stringify(config().new)) setSaving(() => true)
+    })
 
-    useEffect(() => {
+    createEffect(() => {
+        console.log(category())
+    })
+
+    onMount(() => {
         window.api.getlistThemes().then((data) => {
             let themes = data.map((element) => { return { label: element.name, onClick: () => { changeTheme(element.name); handleChange("General.theme", element.name); setthemeMetadata(() => element) } } })
             setThemes(() => themes)
             data.forEach(element => {
-                if (element.name == config.new.General.theme) setthemeMetadata(() => element)
+                if (element.name == config().new.General.theme) setthemeMetadata(() => element)
             });
         })
-        if (config.new.General.discordRPC) window.api.rpc.setActivity(undefined, t("discordrpc.settings"))
-    }, [])
+        if (config().new.General.discordRPC) window.api.rpc.setActivity(undefined, t("discordrpc.settings"))
+    });
+
+    onCleanup(() => {
+        resetNewConfig()
+    })
 
     async function ChangeScreenshot(path: string | any) {
-        if (!path) handleChange("Player.screenShot.path", await checkPictureFolder())
-        else handleChange("Player.screenShot.path", path)
+        if (!path) return 
+        handleChange("Player.screenShot.path", path)
     }
 
     function saveNewConfig() {
         try {
-            store.dispatch({ type: "setConfig", payload: config.new })
-            setConfig((prev) => {
+            setConfig(config().new)
+            setNewConfig((prev) => {
                 return { old: structuredClone(prev.new), new: structuredClone(prev.new) }
             })
             setSaving(() => false)
-            saveConfig(config.new)
-            setDynamicZoom(config.new.General.Window.Zoom)
+            saveConfig(config().new)
+            setDynamicZoom(config().new.General.Window.Zoom)
             InitialPlugin()
-            toast.success(t("settings.saving.done"), notificationProps)
+            toast.success(t("settings.saving.done"))
         } catch (error) {
-            toast.success(t("settings.saving.error"), notificationProps)
+            toast.success(t("settings.saving.error"))
         }
     }
 
-    function resetConfig() {
-        setConfig((prev) => {
-            ChangeLanguage(config.old.General.language)
-            changeTheme(config.old.General.theme)
+    function resetNewConfig() {
+        setNewConfig((prev) => {
+            ChangeLanguage(config().old.General.language)
+            changeTheme(config().old.General.theme)
             return { old: structuredClone(prev.old), new: structuredClone(prev.old) }
         })
         InitialPlugin()
@@ -197,21 +192,9 @@ function settings() {
         window.BrowserWindow.setZoom(calculateZoomLevel(value))
     }
 
-    const saveCommunicateAnimation = {
-        hidden: { y: 200 },
-        visible: { y: 0 },
-    };
-
     async function buttonCheck() {
-        toast.info(t("settings.history.check_start"), notificationProps)
-        await ContinueCheckConversion()
-        await HistoryCheckConvert()
-        if (await HistoryDetectVersion()) {
-            toast.info(t("settings.history.history_good"), notificationProps)
-        }
-        if (await ContinueDetectVersion()) {
-            toast.info(t("settings.history.continue_good"), notificationProps)
-        }
+        toast(t("settings.history.check_start"))
+        await DetectOldVersionHistory()
     }
 
     async function discord_server() {
@@ -222,29 +205,28 @@ function settings() {
     }
 
     return (
-        <main className="settings-container" onContextMenu={(event) => OpenContextMenu(ContextMenu, event)}>
+        <main class="settings-container" onContextMenu={(event) => OpenContextMenu(ContextMenu, event)}>
             <Sidebar
-                data={sidebarData}
-                sidebarClass={{
-                    container: "settings-sidebar-container",
-                    sidebar: "settings-sidebar",
-                }}
-                hideButton
+                data={sidebarData as any}
                 showLogo
+                activeElement
             />
-            <motion.div variants={saveCommunicateAnimation} initial={"hidden"} animate={isSaving ? "visible" : "hidden"} transition={{ duration: 0.2 }} className="settings-save-content">
-                <div className="settings-save-title">{t("settings.saving.notification")}</div>
-                <div className="settings-save-buttons">
-                    <Button content={t("dialog.yes")} onClick={saveNewConfig} />
-                    <Button content={t("dialog.reset")} onClick={resetConfig} />
+            <div class="settings-shadow-sidebar"></div>
+            {isSaving() && 
+                <div class="settings-save-content">
+                    <div class="settings-save-title">{t("settings.saving.notification")}</div>
+                    <div class="settings-save-buttons">
+                        <Button content={t("dialog.yes")} onClick={saveNewConfig} />
+                        <Button content={t("dialog.reset")} onClick={resetNewConfig} />
+                    </div>
                 </div>
-            </motion.div>
-            <div className="settings-content-container">
-                {category == "general" && (
+            }
+            <div class="settings-content-container">
+                {category() == "general" && (
                     <>
-                        <div className="settings-page-container">
-                            <div className="settings-page-title">{t("global.general")}</div>
-                            <div className="settings-setting-container">
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("global.general")}</div>
+                            {/* <div class="settings-setting-container">
                                 {t("settings.general.hideSidebar")}
                                 <CheckBox
                                     checked={config.new.General.HideSidebar}
@@ -253,8 +235,8 @@ function settings() {
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.general.hoverSidebar")}
                                 <CheckBox
                                     checked={config.new.General.HoverSidebar}
@@ -262,349 +244,339 @@ function settings() {
                                         handleChange('General.HoverSidebar', checked)
                                     }
                                 />
-                            </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            </div> */}
+                            <div class="settings-setting-container">
                                 {t("settings.general.language")}
-                                <div className="settings-helpicon-space">
+                                <div class="settings-helpicon-space">
                                     <Dropdown
                                         options={Object.keys(i18n.store.data).map(element => {
                                             return { label: t(`lang.${element}`), onClick: () => ChangeLanguage(element) }
                                         })}
-                                        buttonText={t(`lang.${config.new.General.language}`)}
-                                        placeholderChange={() => t(`lang.${config.new.General.language}`)}
+                                        buttonText={t(`lang.${config().new.General.language}`)}
+                                        placeholderChange={() => t(`lang.${config().new.General.language}`)}
                                         disableX
                                     />
-                                    <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getPath("userData")}/lang`))} />
+                                    <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getConfigPath()}/lang`))} />
                                 </div>
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.general.theme")}
-                                <div className="settings-helpicon-space">
-                                    {themeMetadata && themeMetadata.author && <div className="settings-text-space">{themeMetadata.author}</div>}
-                                    {themeMetadata && themeMetadata.version && <div className="settings-text-space">{themeMetadata.version}</div>}
+                                <div class="settings-helpicon-space">
+                                    {themeMetadata() && themeMetadata()?.author && <div class="settings-text-space">{themeMetadata()?.author}</div>}
+                                    {themeMetadata() && themeMetadata()?.version && <div class="settings-text-space">{themeMetadata()?.version}</div>}
                                     <Dropdown
-                                        options={themes}
-                                        buttonText={config.new.General.theme}
+                                        options={themes()}
+                                        buttonText={config().new.General.theme}
                                         disableX
                                     />
-                                    <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getPath("userData")}/themes`))} />
+                                    <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getConfigPath()}/themes`))} />
                                 </div>
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.general.discordrpc")}
                                 <CheckBox
-                                    checked={config.new.General.discordRPC}
+                                    checked={config().new.General.discordRPC}
                                     onChecked={(checked) =>
                                         handleChange('General.discordRPC', checked)
                                     }
                                 />
                             </div>
                         </div>
-                        <div className="settings-page-container">
-                            <div className="settings-page-title">{t("settings.general.updates")}</div>
-                            <div className="settings-setting-container">
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("settings.general.updates")}</div>
+                            <div class="settings-setting-container">
                                 {t("settings.general.checkupdate")}
                                 <Button content={t("settings.general.checkupdates")} icon="update" onClick={() => checkUpdate(true)} />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.general.updates")}
                                 <CheckBox
-                                    checked={config.new.update.enable}
+                                    checked={config().new.update.enable}
                                     onChecked={(checked) =>
                                         handleChange('update.enable', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.general.checkupdates")}
-                                <Dropdown
-                                    options={[
-                                        { label: t("settings.general.onstart"), onClick: () => handleChange("update.type", "On Start") },
-                                        { label: t("settings.general.everyday"), onClick: () => handleChange("update.type", "Every Day") },
-                                        { label: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
+                                <ButtonGroup selectedValue={t(`settings.general.${config().new.update.type.toLowerCase().replaceAll(" ", "")}`)} listValues={[
+                                        { value: t("settings.general.onstart"), onClick: () => handleChange("update.type", "On Start") },
+                                        { value: t("settings.general.everyday"), onClick: () => handleChange("update.type", "Every Day") },
+                                        { value: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
                                     ]}
-                                    disableX
-                                    buttonText={t(`settings.general.${config.new.update.type.toLowerCase().replaceAll(" ", "")}`)}
                                 />
                             </div>
                         </div>
-                        <div className="settings-page-container">
-                            <div className="settings-page-title">{t("settings.general.window")}</div>
-                            <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">{t("settings.general.maximize")}<HelpIcon description={t("settings.tips.automaximize")} /></span>
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("settings.general.window")}</div>
+                            <div class="settings-setting-container">
+                                <span class="settings-helpicon-space">{t("settings.general.maximize")}<HelpIcon description={t("settings.tips.automaximize")} /></span>
                                 <CheckBox
-                                    checked={config.new.General.Window.AutoMaximize}
+                                    checked={config().new.General.Window.AutoMaximize}
                                     onChecked={(checked) =>
                                         handleChange('General.Window.AutoMaximize', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">{t("settings.general.fullscreen")}<HelpIcon description={t("settings.tips.autofullscreen")} /></span>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                <span class="settings-helpicon-space">{t("settings.general.fullscreen")}<HelpIcon description={t("settings.tips.autofullscreen")} /></span>
                                 <CheckBox
-                                    checked={config.new.General.Window.AutoFullscreen}
+                                    checked={config().new.General.Window.AutoFullscreen}
                                     onChecked={(checked) =>
                                         handleChange('General.Window.AutoFullscreen', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.general.zoom")}
-                                <div className="settings-setting-seekbar-container">
+                                <div class="settings-setting-seekbar-container">
                                     <span>50%</span>
-                                    <SeekBar maxValue={200} minValue={50} type="procent" currentValue={config.new.General.Window.Zoom} onSeek={(value) => { handleChange("General.Window.Zoom", parseInt(value.toFixed(0))) }} />
+                                    <SeekBar maxValue={200} minValue={50} type="procent" currentValue={config().new.General.Window.Zoom} onSeek={(value) => { handleChange("General.Window.Zoom", parseInt(value.toFixed(0))) }} />
                                     <span>200%</span>
                                 </div>
                             </div>
                         </div>
                     </>
                 )}
-                {category == "player" && (
+                {category() == "player" && (
                     <>
-                        <div className="settings-page-container">
-                            <div className="settings-page-title">{t("global.general")}</div>
-                            <div className="settings-setting-container">
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("global.general")}</div>
+                            <div class="settings-setting-container">
                                 {t("settings.player.play")}
                                 <CheckBox
-                                    checked={config.new.Player.general.Autoplay}
+                                    checked={config().new.Player.general.Autoplay}
                                     onChecked={(checked) =>
                                         handleChange('Player.general.Autoplay', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">{t("settings.general.fullscreen")}<HelpIcon description={t("settings.tips.autofullscreenplayer")} /></span>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                <span class="settings-helpicon-space">{t("settings.general.fullscreen")}<HelpIcon description={t("settings.tips.autofullscreenplayer")} /></span>
                                 <CheckBox
-                                    checked={config.new.Player.general.AutoFullscreen}
+                                    checked={config().new.Player.general.AutoFullscreen}
                                     onChecked={(checked) =>
                                         handleChange('Player.general.AutoFullscreen', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.player.skip")}
                                 <CheckBox
-                                    checked={config.new.Player.general.AutoSkipEpisode}
+                                    checked={config().new.Player.general.AutoSkipEpisode}
                                     onChecked={(checked) =>
                                         handleChange('Player.general.AutoSkipEpisode', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.player.volume")}
                                 <SettingsInput
                                     iconChar="%"
                                     type="number"
                                     onKeyDown={(text) => handleChange("Player.general.Volume", parseInt(text))}
-                                    startValue={config.new.Player.general.Volume.toString()}
+                                    startValue={config().new.Player.general.Volume.toString()}
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">{t("settings.player.longskip")}<HelpIcon description={t("settings.tips.longskip")} /></span>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                <span class="settings-helpicon-space">{t("settings.player.longskip")}<HelpIcon description={t("settings.tips.longskip")} /></span>
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
                                     onKeyDown={(text) => handleChange("Player.general.LongTimeSkipForward", parseInt(text))}
-                                    startValue={config.new.Player.general.LongTimeSkipForward.toString()}
+                                    startValue={config().new.Player.general.LongTimeSkipForward.toString()}
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">{t("settings.player.longskipb")}<HelpIcon description={t("settings.tips.longskip")} /></span>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                <span class="settings-helpicon-space">{t("settings.player.longskipb")}<HelpIcon description={t("settings.tips.longskip")} /></span>
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
                                     onKeyDown={(text) => handleChange("Player.general.LongTimeSkipBack", parseInt(text))}
-                                    startValue={config.new.Player.general.LongTimeSkipBack.toString()}
+                                    startValue={config().new.Player.general.LongTimeSkipBack.toString()}
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">{t("settings.player.shortskip")}<HelpIcon description={t("settings.tips.shotskip")} /></span>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                <span class="settings-helpicon-space">{t("settings.player.shortskip")}<HelpIcon description={t("settings.tips.shotskip")} /></span>
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
                                     onKeyDown={(text) => handleChange("Player.general.TimeSkipRight", parseInt(text))}
-                                    startValue={config.new.Player.general.TimeSkipRight.toString()}
+                                    startValue={config().new.Player.general.TimeSkipRight.toString()}
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">{t("settings.player.shortskipb")}<HelpIcon description={t("settings.tips.shotskip")} /></span>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                <span class="settings-helpicon-space">{t("settings.player.shortskipb")}<HelpIcon description={t("settings.tips.shotskip")} /></span>
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
                                     onKeyDown={(text) => handleChange("Player.general.TimeSkipLeft", parseInt(text))}
-                                    startValue={config.new.Player.general.TimeSkipLeft.toString()}
+                                    startValue={config().new.Player.general.TimeSkipLeft.toString()}
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.player.stretching")}
                                 <CheckBox
-                                    checked={config.new.Player.general.VideoStreching}
+                                    checked={config().new.Player.general.VideoStreching}
                                     onChecked={(checked) =>
                                         handleChange('Player.general.VideoStreching', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.player.playerexitbechaviour")}
-                                <Dropdown
-                                    options={[
-                                        { label: t("settings.player.playerbeexit.information"), onClick: () => handleChange("Player.general.PlayerBehavior", "information") },
-                                        { label: t("settings.player.playerbeexit.home"), onClick: () => handleChange("Player.general.PlayerBehavior", "home") },
+                                <ButtonGroup selectedValue={t(`settings.player.playerbeexit.${config().new.Player.general.PlayerBehavior}`)} listValues={[
+                                        { value: t("settings.player.playerbeexit.information"), onClick: () => handleChange("Player.general.PlayerBehavior", "information") },
+                                        { value: t("settings.player.playerbeexit.home"), onClick: () => handleChange("Player.general.PlayerBehavior", "home") },
                                     ]}
-                                    buttonText={t(`settings.player.playerbeexit.${config.new.Player.general.PlayerBehavior}`)}
-                                    disableX
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.player.skipOpening")}
                                 <CheckBox
-                                    checked={config.new.Player.general.autoSkipOpenings}
+                                    checked={config().new.Player.general.autoSkipOpenings}
                                     onChecked={(checked) =>
                                         handleChange('Player.general.autoSkipOpenings', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.player.skipEnding")}
                                 <CheckBox
-                                    checked={config.new.Player.general.autoSkipEndings}
+                                    checked={config().new.Player.general.autoSkipEndings}
                                     onChecked={(checked) =>
                                         handleChange('Player.general.autoSkipEndings', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                <span class="settings-helpicon-space">
                                     {t("settings.player.showBrokenBuffer")}
                                     <HelpIcon description={t("settings.tips.brokenBuffer")} />
                                 </span>
                                 <CheckBox
-                                    checked={config.new.Player.general.showBrokenBuffer}
+                                    checked={config().new.Player.general.showBrokenBuffer}
                                     onChecked={(checked) =>
                                         handleChange('Player.general.showBrokenBuffer', checked)
                                     }
                                 />
                             </div>
                         </div>
-                        <div className="settings-page-container">
-                            <div className="settings-page-title">{t("settings.player.uptonextep")}</div>
-                            <div className="settings-setting-container">
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("settings.player.uptonextep")}</div>
+                            <div class="settings-setting-container">
                                 {t("global.enable")}
                                 <CheckBox
-                                    checked={config.new.Player.upToNextEpisode.enable}
+                                    checked={config().new.Player.upToNextEpisode.enable}
                                     onChecked={(checked) =>
                                         handleChange('Player.upToNextEpisode.enable', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.player.notif_interval")}
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
                                     onKeyDown={(text) => handleChange("Player.upToNextEpisode.interval", parseInt(text))}
-                                    startValue={config.new.Player.upToNextEpisode.interval.toString()}
+                                    startValue={config().new.Player.upToNextEpisode.interval.toString()}
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.player.epshorter")}
                                 <SettingsInput
                                     iconChar="m"
                                     type="number"
                                     onKeyDown={(text) => handleChange("Player.upToNextEpisode.durationShow", parseInt(text))}
-                                    startValue={config.new.Player.upToNextEpisode.durationShow.toString()}
+                                    startValue={config().new.Player.upToNextEpisode.durationShow.toString()}
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.upNext.upNextStyle")}
-                                <Dropdown
-                                    options={[
-                                        { label: t("settings.upNext.var1"), onClick: () => handleChange("Player.upToNextEpisode.variants", "var1") },
-                                        { label: t("settings.upNext.var2"), onClick: () => handleChange("Player.upToNextEpisode.variants", "var2") },
-                                        { label: t("settings.upNext.old"), onClick: () => handleChange("Player.upToNextEpisode.variants", "old") },
-                                    ]}
-                                    buttonText={t(`settings.upNext.${config.new.Player.upToNextEpisode.variants}`)}
-                                    disableX
+                                <ButtonGroup selectedValue={t(`settings.upNext.${config().new.Player.upToNextEpisode.variants}`)} listValues={[
+                                        { value: t("settings.upNext.var1"), onClick: () => handleChange("Player.upToNextEpisode.variants", "var1") },
+                                        { value: t("settings.upNext.var2"), onClick: () => handleChange("Player.upToNextEpisode.variants", "var2") },
+                                        { value: t("settings.upNext.old"), onClick: () => handleChange("Player.upToNextEpisode.variants", "old") },
+                                ]}                                    
                                 />
                             </div>
                         </div>
-                        <div className="settings-page-container">
-                            <div className="settings-page-title">{"Player Animations"}</div>
-                            <div className="settings-setting-container">
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{"Player Animations"}</div>
+                            <div class="settings-setting-container">
                                 {t("settings.playerUI.dvolumeanimation")}
                                 <CheckBox
-                                    checked={config.new.Player.ui.DisableVolumeAnimation}
+                                    checked={config().new.Player.ui.DisableVolumeAnimation}
                                     onChecked={(checked) =>
                                         handleChange('Player.ui.DisableVolumeAnimation', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.playerUI.dspaceanimation")}
                                 <CheckBox
-                                    checked={config.new.Player.ui.DisableSpaceAnimation}
+                                    checked={config().new.Player.ui.DisableSpaceAnimation}
                                     onChecked={(checked) =>
                                         handleChange('Player.ui.DisableSpaceAnimation', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.playerUI.dskipanimation")}
                                 <CheckBox
-                                    checked={config.new.Player.ui.DisableSkipAnimation}
+                                    checked={config().new.Player.ui.DisableSkipAnimation}
                                     onChecked={(checked) =>
                                         handleChange('Player.ui.DisableSkipAnimation', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.playerUI.dloadinganimation")}
                                 <CheckBox
-                                    checked={config.new.Player.ui.DisableLoadingAnimation}
+                                    checked={config().new.Player.ui.DisableLoadingAnimation}
                                     onChecked={(checked) =>
                                         handleChange('Player.ui.DisableLoadingAnimation', checked)
                                     }
                                 />
                             </div>
                         </div>
-                        <div className="settings-page-container">
-                            <div className="settings-page-title">{t("settings.player.external")}</div>
-                            <div className="settings-setting-container">
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("settings.player.external")}</div>
+                            <div class="settings-setting-container">
                                 {t("settings.player.enable_external")}
                                 <CheckBox
-                                    checked={config.new.Player.external.enable}
+                                    checked={config().new.Player.external.enable}
                                     onChecked={(checked) =>
                                         handleChange('Player.external.enable', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.player.select_player")}
                                 <Dropdown
                                     options={[
@@ -613,291 +585,325 @@ function settings() {
                                         { label: "VLC", onClick: () => handleChange("Player.external.type", "VLC") },
                                         { label: "ChromeCast", onClick: () => handleChange("Player.external.type", "ChromeCast") }
                                     ]}
-                                    buttonText={config.new.Player.external.type}
+                                    buttonText={config().new.Player.external.type}
                                     disableX
                                 />
                             </div>
-                            {config.new.Player.external.type != "ChromeCast" && <div className="settings-line"></div>}
-                            {config.new.Player.external.type === "Movian" &&
-                                <div className="settings-setting-container">
+                            {config().new.Player.external.type != "ChromeCast" && <div class="settings-line"></div>}
+                            {config().new.Player.external.type === "Movian" &&
+                                <div class="settings-setting-container">
                                     {t("settings.player.movianip")}
                                     <SettingsInput
                                         iconChar=" "
                                         type="text"
                                         onKeyDown={(text) => handleChange("Player.external.movianIP", text)}
-                                        startValue={config.new.Player.external.movianIP}
+                                        startValue={config().new.Player.external.movianIP}
                                     />
                                 </div>
                             }
-                            {config.new.Player.external.type === "Mpv" &&
-                                <div className="settings-setting-container">
+                            {config().new.Player.external.type === "Mpv" &&
+                                <div class="settings-setting-container">
                                     {t("settings.player.mpvpath")}
                                     <SettingsInput
                                         type="text"
                                         onKeyDown={(text) => handleChange("Player.external.mpvPath", text)}
-                                        startValue={config.new.Player.external.mpvPath}
+                                        startValue={config().new.Player.external.mpvPath}
                                     />
                                 </div>
                             }
-                            {config.new.Player.external.type === "VLC" &&
-                                <div className="settings-setting-container">
+                            {config().new.Player.external.type === "VLC" &&
+                                <div class="settings-setting-container">
                                     {t("settings.player.vlcpath")}
                                     <SettingsInput
                                         type="text"
                                         onKeyDown={(text) => handleChange("Player.external.vlcPath", text)}
-                                        startValue={config.new.Player.external.vlcPath}
+                                        startValue={config().new.Player.external.vlcPath}
                                     />
                                 </div>
                             }
                         </div>
-                        <div className="settings-page-container">
-                            <div className="settings-page-title">{t("settings.player.screenshot")}</div>
-                            <div className="settings-setting-container">
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("settings.player.screenshot")}</div>
+                            <div class="settings-setting-container">
                                 {t("settings.player.screenask")}
                                 <CheckBox
-                                    checked={config.new.Player.screenShot.alwaysAsk}
+                                    checked={config().new.Player.screenShot.alwaysAsk}
                                     onChecked={(checked) =>
                                         handleChange('Player.screenShot.alwaysAsk', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.player.type")}
-                                <Dropdown
-                                    options={[
-                                        { label: t("settings.player.file"), onClick: () => handleChange("Player.screenShot.saveType", "File") },
-                                        { label: t("settings.player.clipboard"), onClick: () => handleChange("Player.screenShot.saveType", "Clipboard") },
-                                        { label: t("settings.player.both"), onClick: () => handleChange("Player.screenShot.saveType", "Both") },
+                                <ButtonGroup selectedValue={t(`settings.player.${config().new.Player.screenShot.saveType.toLowerCase()}`)} listValues={[
+                                        { value: t("settings.player.file"), onClick: () => handleChange("Player.screenShot.saveType", "File") },
+                                        { value: t("settings.player.clipboard"), onClick: () => handleChange("Player.screenShot.saveType", "Clipboard") },
+                                        { value: t("settings.player.both"), onClick: () => handleChange("Player.screenShot.saveType", "Both") },
                                     ]}
-                                    buttonText={config.new.Player.screenShot.saveType}
-                                    disableX
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
-                                <div className="settings-mini-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                <div class="settings-mini-container">
                                     {t("settings.player.path")}
-                                    <span className="settings-text-space">{config.new.Player.screenShot.path}</span>
+                                    <span class="settings-text-space">{config().new.Player.screenShot.path}</span>
                                 </div>
                                 <Button content={t("settings.player.changelocaton")} onClick={async () => await ChangeScreenshot(await window.api.os.openDialog(undefined, undefined, ["openDirectory"]))} />
                             </div>
                         </div>
-                        <div className="settings-page-container">
-                            <div className="settings-page-title">{t("settings.player.keybind")}</div>
-                            <div className="settings-setting-container">
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("settings.player.keybind")}</div>
+                            <div class="settings-setting-container">
                                 {t("settings.player.keybinds.pause")}
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.Pause)} keyBind={(keys) => handleChange("Player.keybinds.Pause", keys)} />
+                                <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.Pause)} keyBind={(keys) => handleChange("Player.keybinds.Pause", keys)} />
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 {t("settings.player.keybinds.fullscreen")}
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.Fullscreen)} keyBind={(keys) => handleChange("Player.keybinds.Fullscreen", keys)} />
+                                <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.Fullscreen)} keyBind={(keys) => handleChange("Player.keybinds.Fullscreen", keys)} />
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 {t("settings.player.keybinds.exitplayer")}
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.ExitPlayer)} keyBind={(keys) => handleChange("Player.keybinds.ExitPlayer", keys)} />
+                                <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.ExitPlayer)} keyBind={(keys) => handleChange("Player.keybinds.ExitPlayer", keys)} />
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 {t("settings.player.keybinds.lskipforward")}
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.LongTimeSkipForward)} keyBind={(keys) => handleChange("Player.keybinds.LongTimeSkipForward", keys)} />
+                                <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.LongTimeSkipForward)} keyBind={(keys) => handleChange("Player.keybinds.LongTimeSkipForward", keys)} />
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 {t("settings.player.keybinds.lskipbackward")}
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.LongTimeSkipBack)} keyBind={(keys) => handleChange("Player.keybinds.LongTimeSkipBack", keys)} />
+                                <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.LongTimeSkipBack)} keyBind={(keys) => handleChange("Player.keybinds.LongTimeSkipBack", keys)} />
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 {t("settings.player.keybinds.skipforward")}
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.TimeSkipRight)} keyBind={(keys) => handleChange("Player.keybinds.TimeSkipRight", keys)} />
+                                <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.TimeSkipRight)} keyBind={(keys) => handleChange("Player.keybinds.TimeSkipRight", keys)} />
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 {t("settings.player.keybinds.skipbackward")}
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.TimeSkipLeft)} keyBind={(keys) => handleChange("Player.keybinds.TimeSkipLeft", keys)} />
+                                <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.TimeSkipLeft)} keyBind={(keys) => handleChange("Player.keybinds.TimeSkipLeft", keys)} />
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 {t("settings.player.keybinds.fskipforward")}
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.FrameSkipForward)} keyBind={(keys) => handleChange("Player.keybinds.FrameSkipForward", keys)} />
+                                <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.FrameSkipForward)} keyBind={(keys) => handleChange("Player.keybinds.FrameSkipForward", keys)} />
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 {t("settings.player.keybinds.fskipbackward")}
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.FrameSkipForward)} keyBind={(keys) => handleChange("Player.keybinds.FrameSkipForward", keys)} />
+                                <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.FrameSkipForward)} keyBind={(keys) => handleChange("Player.keybinds.FrameSkipForward", keys)} />
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 {t("settings.player.keybinds.nextepisode")}
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.NextEpisode)} keyBind={(keys) => handleChange("Player.keybinds.NextEpisode", keys)} />
+                                <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.NextEpisode)} keyBind={(keys) => handleChange("Player.keybinds.NextEpisode", keys)} />
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 {t("settings.player.keybinds.prevepisode")}
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.PrevEpisode)} keyBind={(keys) => handleChange("Player.keybinds.PrevEpisode", keys)} />
+                                <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.PrevEpisode)} keyBind={(keys) => handleChange("Player.keybinds.PrevEpisode", keys)} />
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 {t("settings.player.keybinds.skipOpeningEnding")}
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.skipOpeningEnding)} keyBind={(keys) => handleChange("Player.keybinds.skipOpeningEnding", keys)} />
+                                <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.skipOpeningEnding)} keyBind={(keys) => handleChange("Player.keybinds.skipOpeningEnding", keys)} />
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 {t("settings.player.keybinds.toggleSubtitles")}
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.toggleSubtitles)} keyBind={(keys) => handleChange("Player.keybinds.toggleSubtitles", keys)} />
+                                <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.toggleSubtitles)} keyBind={(keys) => handleChange("Player.keybinds.toggleSubtitles", keys)} />
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 {t("settings.player.keybinds.pip")}
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.PictureInPicture)} keyBind={(keys) => handleChange("Player.keybinds.PictureInPicture", keys)} />
+                                <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.PictureInPicture)} keyBind={(keys) => handleChange("Player.keybinds.PictureInPicture", keys)} />
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 {t("settings.player.keybinds.volumeup")}
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.VolumeUp)} keyBind={(keys) => handleChange("Player.keybinds.VolumeUp", keys)} />
+                                <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.VolumeUp)} keyBind={(keys) => handleChange("Player.keybinds.VolumeUp", keys)} />
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 {t("settings.player.keybinds.volumedown")}
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.VolumeDown)} keyBind={(keys) => handleChange("Player.keybinds.VolumeDown", keys)} />
+                                <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.VolumeDown)} keyBind={(keys) => handleChange("Player.keybinds.VolumeDown", keys)} />
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 {t("settings.player.keybinds.volumemute")}
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.VolumeMute)} keyBind={(keys) => handleChange("Player.keybinds.VolumeMute", keys)} />
+                                <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.VolumeMute)} keyBind={(keys) => handleChange("Player.keybinds.VolumeMute", keys)} />
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 {t("settings.player.keybinds.screenshot")}
-                                <CheckKeybind content={convertKeybinds(config.new.Player.keybinds.ScreenShot)} keyBind={(keys) => handleChange("Player.keybinds.ScreenShot", keys)} />
+                                <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.ScreenShot)} keyBind={(keys) => handleChange("Player.keybinds.ScreenShot", keys)} />
                             </div>
                         </div>
                     </>
                 )}
-                {category == "history" && (
+                {category() == "history" && (
                     <>
-                        <div className="settings-page-container">
-                            <div className="settings-page-title">{t("global.general")}</div>
-                            <div className="settings-setting-container">
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("global.general")}</div>
+                            <div class="settings-setting-container">
                                 {t("settings.history.limited")}
                                 <CheckBox
-                                    checked={config.new.History.history.LimitedHistory}
+                                    checked={config().new.History.history.LimitedHistory}
                                     onChecked={(checked) =>
                                         handleChange('History.history.LimitedHistory', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.history.limit")}
                                 <SettingsInput
                                     iconChar=" "
                                     type="number"
                                     onKeyDown={(text) => handleChange("History.history.maxSave", parseInt(text))}
-                                    startValue={config.new.History.history.maxSave.toString()}
+                                    startValue={config().new.History.history.maxSave.toString()}
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.history.check_history")}
                                 <Button content={t("settings.history.check")} onClick={buttonCheck} />
                             </div>
                         </div>
-                        <div className="settings-page-container">
-                            <div className="settings-page-title">{t("global.continuewatch")}</div>
-                            <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">{t("settings.history.startsave")}<HelpIcon description={t("settings.tips.continuewatchsavehistory")} /></span>
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("global.continuewatch")}</div>
+                            <div class="settings-setting-container">
+                                <span class="settings-helpicon-space">{t("settings.history.startsave")}<HelpIcon description={t("settings.tips.continuewatchsavehistory")} /></span>
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
                                     onKeyDown={(text) => handleChange("History.continue.MinimalTimeSave", parseInt(text))}
-                                    startValue={config.new.History.continue.MinimalTimeSave.toString()}
+                                    startValue={config().new.History.continue.MinimalTimeSave.toString()}
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
-                                <span className="settings-helpicon-space">{t("settings.history.stopsave")}<HelpIcon description={t("settings.tips.continuewatchsavehistory")} /></span>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                <span class="settings-helpicon-space">{t("settings.history.stopsave")}<HelpIcon description={t("settings.tips.continuewatchsavehistory")} /></span>
                                 <SettingsInput
                                     iconChar="s"
                                     type="number"
                                     onKeyDown={(text) => handleChange("History.continue.MaximizeTimeSave", parseInt(text))}
-                                    startValue={config.new.History.continue.MaximizeTimeSave.toString()}
+                                    startValue={config().new.History.continue.MaximizeTimeSave.toString()}
                                 />
                             </div>
                         </div>
                     </>
                 )}
-                {category == "developer" && (
+                {category() == "developer" && (
                     <>
-                        <div className="settings-page-container">
-                            <div className="settings-page-title">{"DevTools"}</div>
-                            <div className="settings-setting-container">
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{"DevTools"}</div>
+                            <div class="settings-setting-container">
                                 {t("settings.devmode.developermode")}
                                 <CheckBox
-                                    checked={config.new.Developer.DeveloperMode}
+                                    checked={config().new.Developer.DeveloperMode}
                                     onChecked={(checked) =>
                                         handleChange('Developer.DeveloperMode', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.devmode.tornondevtools")}
                                 <CheckBox
-                                    checked={config.new.Developer.DevTools}
+                                    checked={config().new.Developer.DevTools}
                                     onChecked={(checked) =>
                                         handleChange('Developer.DevTools', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.devmode.devtoolsonstart")}
                                 <CheckBox
-                                    checked={config.new.Developer.DevToolsOnStart}
+                                    checked={config().new.Developer.DevToolsOnStart}
                                     onChecked={(checked) =>
                                         handleChange('Developer.DevToolsOnStart', checked)
                                     }
                                 />
                             </div>
-                            <div className="settings-line"></div>
-                            <div className="settings-setting-container">
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 {t("settings.devmode.playerdebug")}
                                 <CheckBox
-                                    checked={config.new.Developer.playerDebug}
+                                    checked={config().new.Developer.playerDebug}
                                     onChecked={(checked) =>
                                         handleChange('Developer.playerDebug', checked)
                                     }
                                 />
                             </div>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                Toast Notification Test
+                                <span class="settings-custom-space">
+                                    <Button content="success" onClick={() => toast.success("Test Notification")} />
+                                    <Button content="error" onClick={() => toast.error("Test Notification")} />
+                                    <Button content="default" onClick={() => toast("Test Notification")} />
+                                </span>
+                            </div>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                Dialog Test
+                                <span class="settings-custom-space">
+                                    <Button content="error" onClick={() => 
+                                        showDialog({
+                                            type: "error",
+                                            title: "Error in Player",
+                                            description: t("player.error.notfound"),
+                                            buttons: {
+                                                firstbutton: () => "",
+                                                secondbutton: () => ""
+                                            }
+                                        })
+                                    } />
+                                    <Button content="info" onClick={() => 
+                                        showDialog({
+                                            type: "info",
+                                            title: "Info in Player",
+                                            description: t("player.error.notfound"),
+                                            buttons: {
+                                                firstbutton: () => "",
+                                                secondbutton: () => ""
+                                            }
+                                        })
+                                    } />
+                                </span>
+                            </div>
                         </div>
-                        <div className="settings-page-container">
-                            <div className="settings-page-title">{t("settings.devmode.information")}</div>
-                            <div className="settings-setting-container">
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("settings.devmode.information")}</div>
+                            <div class="settings-setting-container">
                                 <span>{t("settings.devmode.electronver")}</span>
-                                <span>{versions.electron}</span>
+                                <span>{versions().electron}</span>
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 <span>{t("settings.devmode.chromiumver")}</span>
-                                <span>{versions.chrome}</span>
+                                <span>{versions().chrome}</span>
                             </div>
-                            <div className="settings-setting-container">
+                            <div class="settings-setting-container">
                                 <span>{t("settings.devmode.nodever")}</span>
-                                <span>{versions.node}</span>
+                                <span>{versions().node}</span>
                             </div>
                         </div>
                     </>
                 )}
-                {category == "extensions" &&
-                    <div className="settings-page-container">
-                        <div className="settings-page-title">{t("global.extensions")}</div>
-                        <div className="settings-container-extensions">
-                            <table className="settings-table-extensions">
-                                <tr>
+                {category() == "extensions" &&
+                    <div class="settings-page-container">
+                        <div class="settings-page-title">{t("global.extensions")}</div>
+                        <div class="settings-container-extensions">
+                            <table class="settings-table-extensions">
+                                {/* TODO: Change style of extension tab (this make creash idk why) */}
+                                {/* <tr>
                                     <th>{t("settings.extensions.name")}</th>
                                     <th>{t("settings.extensions.author")}</th>
                                     <th>{t("settings.extensions.version")}</th>
                                     <th>{t("settings.extensions.type")}</th>
-                                </tr>
+                                </tr> */}
                                 {pluginList.map((plugin) => (
-                                    <tr className="settings-table-button">
-                                        <td className="settings-extensions-title">{plugin.icon ? <img className="settings-extensions-icon" src={plugin.icon} /> : <div className="settings-extensions-icon-placeholder"></div>}{plugin.name}</td>
-                                        <td><div className="settings-extensions-background">{plugin.author}</div></td>
-                                        <td><div className="settings-extensions-background">{plugin.version}</div></td>
+                                    <tr class="settings-table-button">
+                                        <td class="settings-extensions-title">{plugin.icon ? <img class="settings-extensions-icon" src={plugin.icon} /> : <div class="settings-extensions-icon-placeholder"></div>}{plugin.name}</td>
+                                        <td><div class="settings-extensions-background">{plugin.author}</div></td>
+                                        <td><div class="settings-extensions-background">{plugin.version}</div></td>
                                         <td>
-                                            <div className="settings-extensions-button-container">
-                                                <div className="settings-extensions-type-container">
-                                                    {plugin.information && <div className="settings-extensions-background">{t("settings.extensions.information")}</div>}
-                                                    {plugin.player && <div className="settings-extensions-background">{t("global.player")}</div>}
+                                            <div class="settings-extensions-button-container">
+                                                <div class="settings-extensions-type-container">
+                                                    {plugin.player && <div class="settings-extensions-background">{t("global.player")}</div>}
                                                 </div>
-                                                <div className="settings-helpicon-space">
-                                                    <CheckBox checked={config.new.plugins.player == plugin.name ? true : plugin.name == "AnilistApi" ? true : false} onChecked={() => plugin.name != "AnilistApi" ? handleChange('plugins.player', plugin.name) : ""} />
+                                                <div class="settings-helpicon-space">
+                                                    <CheckBox checked={config().new.plugins.player == plugin.name ? true : plugin.name == "AnilistApi" ? true : false} onChecked={() => plugin.name != "AnilistApi" ? handleChange('plugins.player', plugin.name) : ""} />
                                                     {/* <Button icon="settings" ButtonClass="settings-extensions-button" /> */}
                                                 </div>
                                             </div>
@@ -908,29 +914,29 @@ function settings() {
                         </div>
                     </div>
                 }
-                {category == "about" &&
+                {category() == "about" &&
                     <>
-                        <div className="settings-page-container">
-                            <div className="settings-page-title">{t("settings.general.links")}</div>
-                            <div className="settings-special-container">
-                                <img className="settings-special-images" onClick={() => window.api.open("https://github.com/Owca525/animu")} src="https://github.com/fluidicon.png" alt="Github Logo" />
-                                <img className="settings-special-images" onClick={discord_server} src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg" alt="Discord Logo" />
-                                <img className="settings-special-images" onClick={() => window.api.open("https://buymeacoffee.com/owca525")} src="https://studio.buymeacoffee.com/assets/img/bmc-meta-new/new/android-icon-192x192.png" alt="Buymeacoffee logo" />
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("settings.general.links")}</div>
+                            <div class="settings-special-container">
+                                <img class="settings-special-images" onClick={() => window.api.open("https://github.com/Owca525/animu")} src="https://github.com/fluidicon.png" alt="Github Logo" />
+                                <img class="settings-special-images" onClick={discord_server} src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg" alt="Discord Logo" />
+                                <img class="settings-special-images" onClick={() => window.api.open("https://buymeacoffee.com/owca525")} src="https://studio.buymeacoffee.com/assets/img/bmc-meta-new/new/android-icon-192x192.png" alt="Buymeacoffee logo" />
                             </div>
                         </div>
-                        <div className="settings-page-container">
-                            <div className="settings-page-title">{t("settings.general.credits")}</div>
-                            <div className="settings-setting-container"><span className="settings-user-title">Owca525</span> {t("credits.owca525")}</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">KartQ</div>  {t("credits.kartq")}</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">DawoleQ</div>  {t("credits.dawoleq")}</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">Ary</div>  {t("credits.ary")}</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">Rain_kyle</div>  {t("credits.rain_kyle")}</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">AkaShiro</div>  {t("credits.akashiro")}</div>
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("settings.general.credits")}</div>
+                            <div class="settings-setting-container"><span class="settings-user-title">Owca525</span> {t("credits.owca525")}</div>
+                            <div class="settings-setting-container"><div class="settings-user-title">KartQ</div>  {t("credits.kartq")}</div>
+                            <div class="settings-setting-container"><div class="settings-user-title">DawoleQ</div>  {t("credits.dawoleq")}</div>
+                            <div class="settings-setting-container"><div class="settings-user-title">Ary</div>  {t("credits.ary")}</div>
+                            <div class="settings-setting-container"><div class="settings-user-title">Rain_kyle</div>  {t("credits.rain_kyle")}</div>
+                            <div class="settings-setting-container"><div class="settings-user-title">AkaShiro</div>  {t("credits.akashiro")}</div>
                         </div>
-                        <div className="settings-page-container">
-                            <div className="settings-page-title">{t("settings.general.specialthanks")}</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">Talon</div> {t("credits.talon")}</div>
-                            <div className="settings-setting-container"><div className="settings-user-title">Zomi</div> {t("credits.zomi")}</div>
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("settings.general.specialthanks")}</div>
+                            <div class="settings-setting-container"><div class="settings-user-title">Talon</div> {t("credits.talon")}</div>
+                            <div class="settings-setting-container"><div class="settings-user-title">Zomi</div> {t("credits.zomi")}</div>
                         </div>
                     </>
                 }

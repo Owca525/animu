@@ -1,12 +1,21 @@
-import "./css/checkBox.css"
+import { Component } from "solid-js";
+import "./css/checkBox.css";
 
-interface checkBoxProps {
-    onChecked?: (check: boolean) => void,
-    checked?: boolean
+interface CheckBoxProps {
+  onChecked?: (check: boolean) => void;
+  checked?: boolean;
 }
 
-const checkBox: React.FC<checkBoxProps> = ({ onChecked = () => {}, checked }) => {
-  return <input tabIndex={-1} className="checkbox" type="checkbox" checked={checked} onChange={(event) => onChecked(event.target.checked)}/>
-}
+const CheckBox: Component<CheckBoxProps> = (props) => {
+  return (
+    <input
+      tabIndex={-1}
+      class="checkbox"
+      type="checkbox"
+      checked={props.checked}
+      onChange={(event) => props.onChecked?.(event.currentTarget.checked)}
+    />
+  );
+};
 
-export default checkBox
+export default CheckBox;

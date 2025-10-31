@@ -1,17 +1,17 @@
-import React, { useState } from "react";
-import { dialogProps } from "../GlobalInterface";
-import Button from "@renderer/components/buttons";
-import "./css/DialogContext.css"
+import { createSignal, JSX } from "solid-js";
+import { Motion } from "@motionone/solid";
 import { t } from "i18next";
-import { motion } from "framer-motion";
+import Button from "@renderer/components/buttons";
+import type { dialogProps } from "../types";
+import "./css/DialogContext.css";
 
-let showDialog: (data: dialogProps) => void = () => { };
-let closeDialog: () => void = () => { };
-let dialogIsOpen: () => boolean = (): any => { };
+let showDialog: (data: dialogProps) => void = () => {};
+let closeDialog: () => void = () => {};
+let dialogIsOpen: () => boolean = () => false;
 
-const DialogContext: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [data, setData] = useState<dialogProps | null>();
+export function DialogProvider(props: { children: JSX.Element }) {
+  const [isOpen, setIsOpen] = createSignal(false);
+  const [data, setData] = createSignal<dialogProps | null>(null);
 
   showDialog = (dialogData: dialogProps) => {
     setData(dialogData);
@@ -23,36 +23,60 @@ const DialogContext: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     setData(null);
   };
 
-  dialogIsOpen = (): boolean => isOpen
+  dialogIsOpen = () => isOpen();
+
+  const getClass = () => {
+    if (data()?.type === "info") return "info";
+    if (data()?.type === "error") return "error";
+    return "";
+  };
 
   return (
     <>
-      {children}
-      {isOpen && data && (
-        <main className="dialog-main-background">
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.1 }} className="dialog-container">
-            <div className="dialog-title">
-              {data.title}
-              {data.type != "none" && data.type != "refresh" && (
-                <span className="dialog-icon material-symbols-outlined">{data.type}</span>
-              )}
+      {props.children}
+      {isOpen() && data() && (
+        <main class="dialog-main-background">
+          <Motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.1 }}
+            class={`dialog-container ${getClass()}`}
+          >
+            <div class={`dialog-title ${getClass()}`}>
+              <div class="material-symbols-outlined dialog-icon">
+                {data()?.type === "error" && "error"}
+                {data()?.type === "info" && "info"}
+              </div>
+              {data()?.title}
             </div>
-            <div className="dialog-description">{data.description}</div>
-            <div className="dialog-buttons">
-              {data.type == "refresh" && <>
-                <Button content={t("dialog.exit")} onClick={() => { data.buttons.secondbutton(); closeDialog() }} />
-                <Button content={t("dialog.retry")} onClick={() => { data.buttons.firstbutton(); closeDialog() }} />
-              </>}
-              {data.type != "refresh" && <>
-                <Button content={t("dialog.yes")} onClick={() => { data.buttons.firstbutton(); closeDialog() }} />
-                <Button content={t("dialog.no")} onClick={() => { data.buttons.secondbutton(); closeDialog() }} />
-              </>}
+
+            <div class={`dialog-description ${getClass()}`}>
+              {data()?.description}
             </div>
-          </motion.div>
+
+            <div class={`dialog-buttons ${getClass()}`}>
+              <Button
+                content={t("dialog.yes")}
+                ButtonClass={`dialog-button ${getClass()}`}
+                onClick={() => {
+                  data()?.buttons.firstbutton();
+                  closeDialog();
+                }}
+              />
+              <Button
+                content={t("dialog.no")}
+                ButtonClass={`dialog-button ${getClass()}`}
+                onClick={() => {
+                  data()?.buttons.secondbutton();
+                  closeDialog();
+                }}
+              />
+            </div>
+          </Motion.div>
         </main>
       )}
     </>
   );
-};
+}
 
-export { DialogContext, showDialog, closeDialog, dialogIsOpen };
+export { showDialog, closeDialog, dialogIsOpen };

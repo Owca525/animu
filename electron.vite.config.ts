@@ -1,7 +1,6 @@
 import { resolve } from 'path'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
-import react from '@vitejs/plugin-react'
-import { viteStaticCopy } from 'vite-plugin-static-copy';
+import solid from 'vite-plugin-solid'
 
 export default defineConfig({
   main: {
@@ -16,35 +15,6 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src')
       }
     },
-    build: {
-      minify: 'terser',
-      terserOptions: {
-        compress: {
-          drop_console: false,
-        },
-        mangle: true,
-      },
-      reportCompressedSize: true,
-      cssCodeSplit: false
-    },
-    plugins: [
-      react(),
-      viteStaticCopy({
-        targets: [
-          {
-            src: 'src/themes/*',
-            dest: 'assets/themes'
-          },
-          {
-            src: "../../node_modules/jassub/dist/default.woff2",
-            dest: "assets",
-          },
-          {
-            src: 'src/utils/lang/*',
-            dest: 'assets/lang'
-          },
-        ],
-      }),
-    ]
+    plugins: [solid()]
   }
 })

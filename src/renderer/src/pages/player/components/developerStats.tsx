@@ -1,4 +1,4 @@
-import { playerData } from "@renderer/utils/GlobalInterface"
+import { playerData } from "@renderer/utils/types"
 import "./css/developerStats.css"
 
 interface developerStatsProps {

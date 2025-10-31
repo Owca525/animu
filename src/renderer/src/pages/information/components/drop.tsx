@@ -1,30 +1,35 @@
-import React, { useState } from 'react'
-import "./css/drop.css"
-import { motion } from 'framer-motion'
+import { Component, createSignal, Show } from "solid-js";
+import "./css/drop.css";
 
-interface dropData {
-    content: React.ReactNode
-    LeftHeader: string
-    RightHeader: string
+interface DropProps {
+  content: any;
+  LeftHeader: string;
+  RightHeader: string;
 }
 
-const Drop: React.FC<dropData> = ({ content, LeftHeader, RightHeader }) => {
-    const [isOpen, setIsOpen] = useState(false)
+const Drop: Component<DropProps> = (props) => {
+  const [isOpen, setIsOpen] = createSignal(false);
 
-    const dropVariants = {
-        hidden: { opacity: 0, height: 0 },
-        visible: { opacity: 1, height: "max-content" },
-    };
-
-    return (
-        <div className="drop-container">
-            <div className={`drop-button ${isOpen ? "active-drop" : ""}`} onClick={() => setIsOpen((prev) => !prev)}>
-                <div className="drop-header">{LeftHeader}</div>
-                <div className="drop-header">{RightHeader} <div className="episodes-arrow material-symbols-outlined">{isOpen ? "arrow_drop_up" : "arrow_drop_down"}</div></div>
-            </div>
-            <motion.div variants={dropVariants} initial={"hidden"} animate={isOpen ? "visible" : "hidden"} transition={{duration: 0.2}} className={`drop-content ${isOpen ? "drop-content-show" : ""}`}>{content}</motion.div>
+  return (
+    <div class="drop-container">
+      <div
+        class={`drop-button ${isOpen() ? "active-drop" : ""}`}
+        onClick={() => setIsOpen((prev) => !prev)}
+      >
+        <div class="drop-header">{props.LeftHeader}</div>
+        <div class="drop-header">
+          {props.RightHeader}
+          <div class="episodes-arrow material-symbols-outlined">
+            {isOpen() ? "arrow_drop_up" : "arrow_drop_down"}
+          </div>
         </div>
-    )
-}
+      </div>
 
-export default Drop
+      <div class={`drop-content ${isOpen() ? "drop-content-show" : ""}`}>
+        <Show when={isOpen()}>{props.content}</Show>
+      </div>
+    </div>
+  );
+};
+
+export default Drop;

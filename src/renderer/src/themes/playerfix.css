@@ -8,10 +8,23 @@
   --bg3: rgb(46, 46, 46); /* Thirt layer, used in button etc */
   --bg4: rgb(64, 64, 64); /* Fourth layer, used in hover button etc */
 
-  /* accent */
+  /* Background */
+  --first-layer: #181818; /* First layer, background only */
+  --second-layer: #1F1F1F; /* Second layer, used in sidebar, header */
+  --third-layer: #2D2D2D; /* Third layer, used in button etc */
+  --fourth-layer: #303030; /* Fourth layer, used in hover button etc */
+  --five-layer: #434343;
+
+  /* Colors */
+  --green-one: var(--neutral1); /* boders, some buttons etc */
+  --orange-one: #CA6931;
+  --blue-one: #385DA9;
+  --blue-background: #212328;
+  --blue-text: #BFCBE3;
+  --red-one: #932F2F;
 
   /* other */
-  --player-bg-containers: color-mix(in srgb, var(--bg3) 70%, transparent);
+  --player-bg-containers: color-mix(in srgb, var(--third-layer) 80%, transparent);
   --invisible: rgba(0, 0, 0, 0);
   /* is used in player button */
   --black: rgba(0, 0, 0);

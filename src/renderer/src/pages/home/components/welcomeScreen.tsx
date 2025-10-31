@@ -4,7 +4,7 @@ import icon from "../../../../../../resources/icon.png"
 import Button from "@renderer/components/buttons"
 import Dropdown from "@renderer/components/dropDown"
 import i18n from "@renderer/utils/i18n"
-import { SettingsConfig } from "@renderer/utils/GlobalInterface"
+import { SettingsConfig } from "@renderer/utils/types"
 import { useSelector } from "react-redux"
 import { useState } from "react"
 

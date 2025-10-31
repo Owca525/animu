@@ -2,7 +2,7 @@
 
 import Button from "@renderer/components/buttons"
 import "./components/css/externalPlayer.css"
-import { cardData, notificationProps, playerData, playerSubtitlesFormat, SettingsConfig } from "@renderer/utils/GlobalInterface"
+import { AnimeData, indentityPlayer, notificationProps, playerData, playerSubtitlesFormat, SettingsConfig } from "@renderer/utils/types"
 import { detectTitle, isNumberString } from "@renderer/utils/functions"
 import { useEffect, useRef, useState } from "react"
 import { toast } from "react-toastify"
@@ -13,7 +13,10 @@ import { motion } from "framer-motion"
 import { t } from "i18next"
 
 interface ExternalplayerProps {
-    animeData: cardData
+    animeData: {
+        AnimeData: AnimeData,
+        saveData: indentityPlayer
+    }
     playerData: playerData[]
     time: number
     setNextEpisode: (value: string) => void
@@ -69,7 +72,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         if (!currentHost.current) return
         let subsList: string[] = []
         if (currentHost.current.subtitles) subsList = currentHost.current.subtitles.map(el => el.url)
-        await window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.mpvPath, time: time, subs: { subList: subsList, sid: getNumberOfSub(currentHost.current.subtitles) }, chapters: currentHost.current.chaptersUrl }, "mpv")
+        await window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.mpvPath, time: time, subs: { subList: subsList, sid: getNumberOfSub(currentHost.current.subtitles) }, chapters: currentHost.current.external?.chaptersUrl }, "mpv")
     }
 
     async function runVlcPlayer(url?: string) {
@@ -81,7 +84,7 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     }
 
     async function runChromeCast(device: { host: string, port: number, name: string }) {
-        if (currentHost.current && currentHost.current.hls) {
+        if (currentHost.current && currentHost.current.resolution[0].hls) {
             toast.error(t("externalPlayer.failed.chromecast"))
             return
         }

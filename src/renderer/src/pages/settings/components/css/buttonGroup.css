@@ -1,0 +1,18 @@
+.button-group-container {
+    display: flex;
+    align-items: center;
+}
+
+.button-group-button {
+    padding: 6px 8px 6px 8px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 150ms ease-in-out;
+}
+
+.button-group-button:first-child {
+    border-radius: 12px 0px 0px 12px;
+}
+.button-group-button:last-child {
+    border-radius: 0px 12px 12px 0px;
+}

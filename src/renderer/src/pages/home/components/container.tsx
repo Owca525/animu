@@ -1,4 +1,4 @@
-import { containerData } from "@renderer/utils/GlobalInterface"
+import { containerData } from "@renderer/utils/types"
 import "./css/container.css"
 import Card from "./card"
 import { useRef } from "react"

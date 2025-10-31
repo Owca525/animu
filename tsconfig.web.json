@@ -5,10 +5,10 @@
     "src/renderer/src/**/*",
     "src/renderer/src/**/*.tsx",
     "src/preload/*.d.ts"
-, "src/renderer/src/plugins/allmanga.ts"  ],
+, "src/renderer/src/utils/types.ts"  ],
   "compilerOptions": {
     "composite": true,
-    "jsx": "react-jsx",
+    "jsxImportSource": "solid-js",
     "baseUrl": ".",
     "paths": {
       "@renderer/*": [

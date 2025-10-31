@@ -1,42 +1,52 @@
-import { useRef, useState } from "react"
-import "./css/input.css"
+import { createSignal } from "solid-js";
+import "./css/input.css";
 
 interface InputProps {
-    type?: "text" | "password" | "number"
-    InputClass?: string
-    placeholder?: string
-    onKeyDown?: (text: string) => void
-    defaultValue?: string
+  type?: "text" | "password" | "number";
+  InputClass?: string;
+  placeholder?: string;
+  onKeyDown?: (text: string) => void;
+  defaultValue?: string;
 }
 
-const Input: React.FC<InputProps> = ({ type = "text", InputClass, placeholder, onKeyDown, defaultValue }) => {
-    const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
-    const inputRef = useRef<HTMLInputElement>(null)
-    // const [cacheText, setCacheText] = useState<string>("")
+export default function Input(props: InputProps) {
+  const [cacheText, setCacheText] = createSignal("");
+  const [debounceTimeout, setDebounceTimeout] = createSignal<number | null>(null);
+  let inputRef: HTMLInputElement | undefined;
 
-    function handleData(event) {
-        if (!onKeyDown) return
-        // if (cacheText == event.currentTarget.value) return
-        if (debounceTimeout) clearTimeout(debounceTimeout);
-        if (event.code == "Enter") {
-            // setCacheText(event.currentTarget.value)
-            onKeyDown(event.currentTarget.value)
-            return
-        }
+  const handleData = (event: KeyboardEvent & { currentTarget: HTMLInputElement }) => {
+    if (!props.onKeyDown) return;
 
-        const newTimeout = setTimeout(() => {
-            if (inputRef.current) {
-                // setCacheText(inputRef.current.value)
-                onKeyDown(inputRef.current.value)
-            }
-        }, 300);
+    const value = event.currentTarget.value;
+    if (cacheText() === value) return;
 
-        setDebounceTimeout(newTimeout);
+    if (debounceTimeout()) clearTimeout(debounceTimeout()!);
+
+    if (event.code === "Enter") {
+      setCacheText(value);
+      props.onKeyDown(value);
+      return;
     }
 
-    return (
-        <input tabIndex={-1} defaultValue={defaultValue} type={type} ref={inputRef} className={"input " + InputClass} placeholder={placeholder} onKeyDown={handleData} />
-    )
-}
+    const newTimeout = setTimeout(() => {
+      if (inputRef) {
+        setCacheText(inputRef.value);
+        props.onKeyDown!(inputRef.value);
+      }
+    }, 300);
 
-export default Input
+    setDebounceTimeout(newTimeout as unknown as number);
+  };
+
+  return (
+    <input
+      tabIndex={-1}
+      ref={(el) => (inputRef = el!)}
+      type={props.type ?? "text"}
+      class={"input " + (props.InputClass ?? "")}
+      placeholder={props.placeholder}
+      value={props.defaultValue}
+      onKeyDown={handleData}
+    />
+  );
+}

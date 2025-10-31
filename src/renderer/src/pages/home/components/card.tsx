@@ -1,65 +1,62 @@
-import { cardData, ContextMenuProps, SettingsConfig } from "@renderer/utils/GlobalInterface";
+import { cardData, ContextMenuProps, SettingsConfig } from "@renderer/utils/types";
 import "./css/card.css";
-import { useNavigate } from "react-router-dom";
-import { JSX, useRef, useState } from "react";
+import { useNavigate } from "@solidjs/router";
+import { JSX, createSignal } from "solid-js";
 import { t } from "i18next";
-import { useSelector } from "react-redux";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import {
-  capitalizeFirstLetter,
   convertSeconds,
   CreateContextMenuOptions,
   getGradientColor,
 } from "@renderer/utils/functions";
-// import { extractInformation } from "@renderer/plugins/allmanga";
 import { ChangePlugin } from "@renderer/utils/pluginApi";
-import store from "@renderer/utils/store";
+import { getConfig } from "@renderer/utils/stores/config";
+import { getPlayerPLugin } from "@renderer/utils/stores/plugins";
 
-const Card: React.FC<{ card: cardData, disableinformation?: boolean }> = ({ card, disableinformation = false }) => {
+interface CardProps {
+  card: cardData;
+  disableinformation?: boolean;
+}
+
+const Card = (props: CardProps) => {
   const navigate = useNavigate();
-  const [isLoading, setLoading] = useState<boolean>(true);
-  const [isError, setisError] = useState<boolean>(false);
-  const [isOut, setisOut] = useState<boolean>(false);
-  const config: SettingsConfig = useSelector((data: any) => data.config);
-  const cardRef = useRef<HTMLDivElement | null>(null);
+  const [isLoading, setLoading] = createSignal(true);
+  const [isError, setIsError] = createSignal(false);
+  const [isOut, setIsOut] = createSignal(false);
+  let cardRef: HTMLDivElement | undefined;
+
+  const config: SettingsConfig = getConfig();
 
   async function sendToInformation() {
+    const { card } = props;
+
     if (card.onClick) {
       card.onClick(card.AnimeData);
       return;
     }
 
     if (card.saveData && card.saveData.last_Time != 0 && card.saveData.pluginName == config.plugins.player) {
-      await ChangePlugin(card.saveData.pluginName)
+      await ChangePlugin(card.saveData.pluginName);
     }
 
-    if (
-      card.saveData &&
-      card.saveData.episode != "" &&
-      card.saveData.last_Time != 0
-    ) {
-      if (config.plugins.player != card.saveData.pluginName) await ChangePlugin(card.saveData.pluginName)
-      let episodeList = await store.getState().plugin.playerPlugin.player.episodeList(
-        card.saveData.type,
-        card.AnimeData.player_ID
-      )
+    if (card.saveData && card.saveData.episode != "" && card.saveData.last_Time != 0) {
+      if (config.plugins.player != card.saveData.pluginName)
+        ChangePlugin(card.saveData.pluginName);
+
+      const episodeList = await getPlayerPLugin()?.player.extractOnlyEpisodesList(card.saveData.type, card.AnimeData.player_ID as string);
+
       navigate("/player", {
         state: {
-          data: {
-            AnimeData: card.AnimeData,
-            saveData: {...card.saveData, pluginName: card.saveData.pluginName == "" ? "Allmanga" : ""},
-          },
+          data: card.AnimeData,
+          save: card.saveData,
           episodelist: episodeList,
-          continueWatch: true
         },
       });
       return;
     }
 
     if (card.AnimeData.id === "") {
-      // navigate("/info", {
-      //   state: await extractInformation(card.AnimeData.player_ID ? card.AnimeData.player_ID : ""),
-      // });
+      // np. extractInformation(card.AnimeData.player_ID)
       return;
     }
 
@@ -68,112 +65,133 @@ const Card: React.FC<{ card: cardData, disableinformation?: boolean }> = ({ card
     });
   }
 
-  // function runDeletionFunction(event) {
-  //   event.preventDefault()
-  //   event.stopPropagation()
-  //   if (deletionCard) deletionCard()
-  // }
-
   function checkState() {
-    if (isLoading) return { display: "none" };
-    if (isError) return { display: "none" };
+    if (isLoading()) return { display: "none" };
+    if (isError()) return { display: "none" };
     return { animation: "fadeIn 0.3s forwards" };
   }
 
-  let CenterContextMenu: ContextMenuProps = [
+  const CenterContextMenu: ContextMenuProps = [
     {
       option: t("contextMenu.copytitle"),
-      onClick: () => window.api.saveToClipboard("text", card.AnimeData.title.romaji),
+      onClick: () =>
+        window.api.saveToClipboard("text", props.card.AnimeData.title.romaji),
     },
     {
       option: t("contextMenu.copycover"),
       onClick: () =>
-        card.AnimeData.coverImage
-          ? window.api.saveToClipboard("image", card.AnimeData.coverImage)
+        props.card.AnimeData.coverImage
+          ? window.api.saveToClipboard("image", props.card.AnimeData.coverImage)
           : "",
     },
   ];
 
-  if (card.deletionCard) {
-    CenterContextMenu.push({
-      option: t("contextMenu.delete"),
-      deletion: true,
-      onClick: card.deletionCard,
-    });
-  }
-
   function checkOutOfBound() {
-    if (!cardRef.current) return;
-    const infoRect = cardRef.current.getBoundingClientRect();
+    if (!cardRef) return;
+    const infoRect = cardRef.getBoundingClientRect();
     const windowWidth = window.innerWidth;
-    const cardLeft = infoRect.left;
-    if (windowWidth - cardLeft < 500) {
-      setisOut(() => true);
+    if (windowWidth - infoRect.left < 500) {
+      setIsOut(true);
     } else {
-      setisOut(() => false);
+      setIsOut(false);
     }
   }
 
   function ConvertTimeToText(): string {
-    const time = convertSeconds(card.AnimeData.nextAiringEpisode?.timeUntilAiring);
-    if (time?.days != 0) {
-      return t("card_information.ep_airing_day", { day: time?.days })
-    }
-    if (time.hours != 0) {
-      return t("card_information.ep_airing_hours", { hours: time?.hours })
-    }
-    if (time.minutes != 0) {
-      return t("card_information.ep_airing_minutes", { min: time?.minutes })
-    }
-    return t("card_information.ep_airing_today")
+    const time = convertSeconds(props.card.AnimeData.nextAiringEpisode?.timeUntilAiring);
+    if (!time) return "";
+    if (time.days != 0) return t("card_information.ep_airing_day", { day: time.days });
+    if (time.hours != 0) return t("card_information.ep_airing_hours", { hours: time.hours });
+    if (time.minutes != 0) return t("card_information.ep_airing_minutes", { min: time.minutes });
+    return t("card_information.ep_airing_today");
   }
 
-
   function GenerateInformation() {
-    if (disableinformation) return
-    if (!card.AnimeData.studios && !card.AnimeData.status && !card.AnimeData.genres && !card.AnimeData.description) return undefined
-    let information: JSX.Element[] = []
+    const card = props.card;
+    if (props.disableinformation) return;
+    if (!card.AnimeData.studios && !card.AnimeData.status && !card.AnimeData.genres && !card.AnimeData.description)
+      return undefined;
+
+    const info: JSX.Element[] = [];
+
     if (card.AnimeData.averageScore) {
-      information = [...information, <div className="card-information-score" style={{ border: `3px solid ${getGradientColor(card.AnimeData.averageScore)}` }}>{card.AnimeData.averageScore}%</div>]
+      info.push(
+        <div
+          class="card-information-score"
+          style={{ border: `3px solid ${getGradientColor(card.AnimeData.averageScore)}` }}
+        >
+          {card.AnimeData.averageScore}%
+        </div>
+      );
     }
+
     if (card.AnimeData.nextAiringEpisode && !card.saveData) {
-      information = [...information, <div className="card-information-text card-information-top">{t("card_information.ep_airing", { ep: card.AnimeData.nextAiringEpisode.episode, text: ConvertTimeToText() })}</div>]
+      info.push(
+        <div class="card-information-text card-information-top">
+          {t("card_information.ep_airing", {
+            ep: card.AnimeData.nextAiringEpisode.episode,
+            text: ConvertTimeToText(),
+          })}
+        </div>
+      );
     }
-    if ((!card.AnimeData.nextAiringEpisode || card.saveData) && (card.AnimeData.season && card.AnimeData.seasonYear)) {
-      information = [...information, <div className="card-information-text card-information-top">{t(`anime_seasons.${card.AnimeData.season.toLowerCase()}`)} {card.AnimeData.seasonYear}</div>]
+
+    if ((!card.AnimeData.nextAiringEpisode || card.saveData) && card.AnimeData.season && card.AnimeData.seasonYear) {
+      info.push(
+        <div class="card-information-text card-information-top">
+          {t(`anime_seasons.${card.AnimeData.season.toLowerCase()}`)} {card.AnimeData.seasonYear}
+        </div>
+      );
     } else if (!(card.AnimeData.season && card.AnimeData.seasonYear) && !card.AnimeData.nextAiringEpisode) {
-      information = [...information, <div className="card-information-text card-information-top">TBA</div>]
+      info.push(<div class="card-information-text card-information-top">TBA</div>);
     }
+
     if (card.AnimeData.studios.length > 0) {
-      information = [...information, <div className="card-information-text">{card.AnimeData.studios[0]}</div>]
+      info.push(<div class="card-information-text">{card.AnimeData.studios[0]}</div>);
+    } else if (card.AnimeData.status) {
+      info.push(
+        <div class="card-information-text">
+          {t(`anime_statuses.${card.AnimeData.status.toLowerCase()}`)}
+        </div>
+      );
     }
-    if (card.AnimeData.studios.length <= 0 && card.AnimeData.status) {
-      information = [...information, <div className="card-information-text">{t(`anime_statuses.${card.AnimeData.status.toLowerCase()}`)}</div>]
-    }
-    let bottom: JSX.Element[] = []
+
+    const bottom: JSX.Element[] = [];
+
     if (card.AnimeData.format) {
-      bottom = [...bottom, <>{capitalizeFirstLetter(card.AnimeData.format)}</>]
+      bottom.push(<>{t(`anime_formats.${card.AnimeData.format.toLowerCase()}`)}</>);
+    } else if (card.AnimeData.type) {
+      bottom.push(<>{t(`anime_source.${card.AnimeData.type.toLowerCase().replaceAll("_", "")}`)}</>);
     }
-    if (!card.AnimeData.format && card.AnimeData.type) {
-      bottom = [...bottom, <>{capitalizeFirstLetter(card.AnimeData.type)}</>]
-    }
+
     if (card.AnimeData.episodes && card.AnimeData.format?.toUpperCase() != "MOVIE") {
-      bottom = [...bottom, <>{bottom.length !== 0 && <span className="card-dot">·</span>}{t("card_information.episodes", { ep: card.AnimeData.episodes })}</>]
+      bottom.push(
+        <>
+          {bottom.length !== 0 && <span class="card-dot">·</span>}
+          {t("card_information.episodes", { ep: card.AnimeData.episodes })}
+        </>
+      );
     } else if (card.AnimeData.duration) {
-      bottom = [...bottom, <>{bottom.length !== 0 && <span className="card-dot">·</span>}{t("card_information.minutes", { min: card.AnimeData.duration })}</>]
+      bottom.push(
+        <>
+          {bottom.length !== 0 && <span class="card-dot">·</span>}
+          {t("card_information.minutes", { min: card.AnimeData.duration })}
+        </>
+      );
     }
-    information = [...information, <div className="card-information-text">{bottom}</div>]
-    return <>{information}</>
+
+    info.push(<div class="card-information-text">{bottom}</div>);
+    return <>{info}</>;
   }
 
   return (
     <div
       tabIndex={-1}
       ref={cardRef}
-      className="card-container"
+      class="card-container"
       onClick={sendToInformation}
       onMouseOver={checkOutOfBound}
-      title={card.AnimeData.title.romaji}
+      title={props.card.AnimeData.title.romaji}
       onContextMenu={(event) =>
         OpenContextMenu(
           CreateContextMenuOptions(
@@ -184,41 +202,40 @@ const Card: React.FC<{ card: cardData, disableinformation?: boolean }> = ({ card
         )
       }
     >
-      {GenerateInformation() && <div
-        className={`card-information ${isOut ? "card-information-left" : "card-information-right"}`}
-      >
-        {GenerateInformation()}
-      </div>}
-      {card.AnimeData.coverImage && (
+      {GenerateInformation() && (
+        <div
+          class={`card-information ${isOut() ? "card-information-left" : "card-information-right"}`}
+        >
+          {GenerateInformation()}
+        </div>
+      )}
+      {props.card.AnimeData.coverImage && (
         <img
-          src={card.AnimeData.coverImage}
-          className="card-image"
-          onLoad={() => setLoading(() => false)}
-          onError={() => setisError(() => true)}
+          src={props.card.AnimeData.coverImage}
+          class="card-image"
+          onLoad={() => setLoading(false)}
+          onError={() => setIsError(true)}
           style={checkState()}
         />
       )}
-      {isLoading && isError == false && (
-        <div className="card-image-placeholder">
-          <span className="material-symbols-outlined home-loading-animation">
-            progress_activity
-          </span>
+      {isLoading() && !isError() && (
+        <div class="card-image-placeholder">
+          <span class="material-symbols-outlined home-loading-animation">progress_activity</span>
         </div>
       )}
-      {isError && (
-        <div className="card-image-placeholder">
-          <span className="material-symbols-outlined">error</span>
+      {isError() && (
+        <div class="card-image-placeholder">
+          <span class="material-symbols-outlined">error</span>
         </div>
       )}
-      <div className="card-title">{card.AnimeData.title.romaji}</div>
-      {card.saveData && card.saveData.episode && (
-        <div className="card-continue-watch-text">
-          {card.saveData.last_Time != 0 && card.saveData.type != ""
-            ? t("history.continue", { ep: card.saveData.episode })
-            : t("history.history", { ep: card.saveData.episode })}
+      <div class="card-title">{props.card.AnimeData.title.romaji}</div>
+      {props.card.saveData && props.card.saveData.episode && (
+        <div class="card-continue-watch-text">
+          {props.card.saveData.last_Time != 0 && props.card.saveData.type != ""
+            ? t("history.continue", { ep: props.card.saveData.episode })
+            : t("history.history", { ep: props.card.saveData.episode })}
         </div>
       )}
-      {/* {deletionCard && <div className="card-delete-icon material-symbols-outlined" onClick={runDeletionFunction}>close</div>} */}
     </div>
   );
 };

@@ -1,91 +1,88 @@
+import { createSignal, onCleanup, Component, For, Show, onMount } from "solid-js";
 import { convertKeybinds } from "@renderer/utils/functions";
-import { useEffect, useState } from "react";
-import "./css/CheckKeybind.css"
+import "./css/CheckKeybind.css";
 
 interface CheckKeybindProps {
-    content: string
-    keyBind?: (keys: string) => void
+  content: string;
+  keyBind?: (keys: string) => void;
 }
 
-const CheckKeybind: React.FC<CheckKeybindProps> = ({ content, keyBind }) => {
-  const [pressedKeys, setPressedKeys] = useState<string[]>([]);
-  const [keysUp, setKeysUp] = useState<string[]>([]);
-  const [isActive, setActive] = useState<boolean>(false)
+const CheckKeybind: Component<CheckKeybindProps> = (props) => {
+  const [pressedKeys, setPressedKeys] = createSignal<string[]>([]);
+  const [keysUp, setKeysUp] = createSignal<string[]>([]);
+  const [isActive, setActive] = createSignal(false);
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    event.preventDefault()
-    setPressedKeys((previus) => {
-      if (!previus.includes(convertKeybinds(event.key))) {
-        previus.push(convertKeybinds(event.key))
-        return previus
-      }
-      return previus
-    })
-    setKeysUp((previus) => {
-      if (!previus.includes(convertKeybinds(event.key))) {
-        previus.push(convertKeybinds(event.key))
-        return previus
-      }
-      return previus
-    })
-  };
-  const handleKeyUp = (event: KeyboardEvent) => {
-    event.preventDefault()
-    setKeysUp((previus) => {
-      const index = previus.findIndex((item) => item === event.key);
-      previus.splice(index, 1)
-      return previus
-    })
-    if (keysUp.length <= 0) removeEvents()
-    if (keysUp.length >= 3) removeEvents()
+    event.preventDefault();
+    const key = convertKeybinds(event.key);
+
+    setPressedKeys((prev) => (prev.includes(key) ? prev : [...prev, key]));
+    setKeysUp((prev) => (prev.includes(key) ? prev : [...prev, key]));
   };
 
+  const handleKeyUp = (event: KeyboardEvent) => {
+    event.preventDefault();
+    const key = convertKeybinds(event.key);
+    setKeysUp((prev) => prev.filter((k) => k !== key));
+
+    if (keysUp().length <= 0 || keysUp().length >= 3) removeEvents();
+  };
 
   const handleBlur = () => {
-    removeEvents()
-    if (keyBind) keyBind(content)
+    removeEvents();
+    props.keyBind?.(props.content);
   };
 
-  useEffect(() => {
-    if (isActive) {
-      window.addEventListener('keydown', handleKeyDown, { passive: true });
-      window.addEventListener('keyup', handleKeyUp, { passive: true });
-      window.addEventListener('blur', handleBlur);
-    }
-  }, [isActive])
-
-  function removeEvents() {
-    if (keyBind) keyBind(pressedKeys.join('+'))
-    setActive(() => false)
+  const removeEvents = () => {
+    props.keyBind?.(pressedKeys().join("+"));
+    setActive(false);
     setPressedKeys([]);
-    window.removeEventListener('keydown', handleKeyDown);
-    window.removeEventListener('keyup', handleKeyUp);
-    window.removeEventListener('blur', handleBlur);
-  }
+    window.removeEventListener("keydown", handleKeyDown);
+    window.removeEventListener("keyup", handleKeyUp);
+    window.removeEventListener("blur", handleBlur);
+  };
+
+  onMount(() => {
+    if (isActive()) {
+      window.addEventListener("keydown", handleKeyDown, { passive: true });
+      window.addEventListener("keyup", handleKeyUp, { passive: true });
+      window.addEventListener("blur", handleBlur);
+
+      onCleanup(() => {
+        window.removeEventListener("keydown", handleKeyDown);
+        window.removeEventListener("keyup", handleKeyUp);
+        window.removeEventListener("blur", handleBlur);
+      });
+    }
+  });
 
   return (
-    <div onClick={() => setActive((prev) => !prev)} tabIndex={-1} className={isActive ? "settings-keybind-check-active" : "settings-keybind-check"}>
-      {/* {pressedKeys.length > 0 ? pressedKeys.join('+') : content} */}
-      { pressedKeys.length <= 0 &&
-        content.split("+").map((elemnt, index, list) => (
-          <>
-            <div className="settings-input-content">{elemnt}</div>
-            {index != list.length-1 && <>+</>}
-          </>
-          )
-        )
-      }
-      { pressedKeys.length > 0 &&
-        pressedKeys.map((elemnt, index, list) => (
-          <>
-            <div className="settings-input-content">{elemnt}</div>
-            {index != list.length-1 && <>+</>}
-          </>
-          )
-        )
-      }
+    <div
+      tabIndex={-1}
+      class={isActive() ? "settings-keybind-check-active" : "settings-keybind-check"}
+      onClick={() => setActive((prev) => !prev)}
+    >
+      <Show when={pressedKeys().length <= 0} fallback={
+        <For each={pressedKeys()}>
+          {(element, index) => (
+            <>
+              <div class="settings-input-content">{element}</div>
+              <Show when={index() !== pressedKeys().length - 1}>+</Show>
+            </>
+          )}
+        </For>
+      }>
+        <For each={props.content.split("+")}>
+          {(element, index) => (
+            <>
+              <div class="settings-input-content">{element}</div>
+              <Show when={index() !== props.content.split("+").length - 1}>+</Show>
+            </>
+          )}
+        </For>
+      </Show>
     </div>
-  )
-}
+  );
+};
 
-export default CheckKeybind
+export default CheckKeybind;

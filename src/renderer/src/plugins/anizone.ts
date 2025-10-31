@@ -1,5 +1,5 @@
 import { convertChaptersVTT } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, playerChapterList, playerData, pluginFormat } from "@renderer/utils/GlobalInterface";
+import { AnimeData, cardData, episodeList, playerChapterList, playerData, playerPluginFormat } from "@renderer/utils/types";
 
 const WEB = "https://anizone.to"
 const CARDS_REGEX = /<div[^>]*class=["']grid grid-cols-1 2xl:grid-cols-2 gap-4["'][^>]*>(.*?)<\/div>/gs
@@ -40,7 +40,7 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
         }
     }
 
-    let chapterList: playerChapterList = []
+    let chapterList: playerChapterList[] = []
     if (chapters.length > 0) {
         let data = await convertChaptersVTT(chapters[0][0])
         for (let index = 0; index < data.length; index++) {
@@ -67,12 +67,11 @@ async function getURLFromPlayer(_type: string, episode: string, id: string): Pro
 
     return [{
         hostname: "Anizone.to",
-        hls: true,
         subtitles: subList,
         listChapters: chapterList,
-        chaptersUrl: chapters.length > 0 ? chapters[0][0] : undefined,
+        external: chapters.length > 0 ? { chaptersUrl: chapters[0][0] } : undefined,
         storyboardVTT: storyboard.length > 0 ? storyboard[0][0] : undefined,
-        resolution: [{ res: "", url: urls[0][0], defaultSubtitles: true }]
+        resolution: [{ res: "", url: urls[0][0], defaultSubtitles: true, hls: true }]
     }]
 }
 
@@ -172,16 +171,15 @@ async function searchAnime(name: string, _page: number, _params?: { genres?: str
     })
 }
 
-export const AniZone: pluginFormat = {
+export const AniZone: playerPluginFormat = {
     version: "1.1",
     name: "AniZone",
     author: "Owca525",
     player: {
-        getUrls: getURLFromPlayer,
-        animeDataList: getEpisodeList,
-        episodeList: extractEpisodeList,
-        animeList: getAnimeCards,
-        search: searchAnime
+        extractPlayerData: getURLFromPlayer,
+        extractEpisodeList: getEpisodeList,
+        extractOnlyEpisodesList: extractEpisodeList,
+        searchAnime: searchAnime
     },
     preferedLang: ["en"]
 }

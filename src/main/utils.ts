@@ -2,10 +2,14 @@ import { app, clipboard, ipcMain, nativeImage, shell } from "electron"
 import { Client } from "@xhayper/discord-rpc";
 import { ActivityType } from "discord-api-types/v10"
 
-import fs from "fs";
-import path from "path";
-import { mainWindow } from ".";
+import path from "path"
+import fs from "fs"
+import { mainWindow, newConfigPath } from ".";
 import { exec, execSync } from "child_process";
+import express from "express";
+import { Readable } from "stream";
+import os from "os"
+
 let rpc: Client | undefined = undefined
 
 // Client id for Discord Rich presence
@@ -46,7 +50,7 @@ ipcMain.handle('runExternalPlayer', (_event, videoData: { url: string, path: str
     let path = videoData.path
     if (!fs.existsSync(videoData.path) && !flatpakList) return
     if (flatpakList) path = `flatpak run ${path}`
-    if (videoData.path.replaceAll(" ", "") == "") return
+    if (videoData.path.replace(" ", "") == "") return
     switch (type) {
         case "mpv":
             let subtitlesFiles: string = ""
@@ -199,9 +203,9 @@ ipcMain.handle('get-lang-files', async (): Promise<{ data: any, lang: string }[]
 });
 
 function checkConfigFolder(folder: string): string | undefined {
-    if (fs.existsSync(`${app.getPath("userData")}/${folder}`)) return `${app.getPath("userData")}/${folder}`
-    fs.mkdirSync(`${app.getPath("userData")}/${folder}`)
-    return `${app.getPath("userData")}/${folder}`
+    if (fs.existsSync(`${newConfigPath}/${folder}`)) return `${newConfigPath}/${folder}`
+    fs.mkdirSync(`${newConfigPath}/${folder}`)
+    return `${newConfigPath}/${folder}`
 }
 
 async function takeFileExtensionAndPath(dir: string, format: string): Promise<string[]> {
@@ -232,4 +236,107 @@ export function validUrl(urlString: string): boolean {
         new URL(urlString);
         return true;
     } catch (_) { return false }
+}
+
+const createProxyServer = () => {
+    const appServer = express();
+
+    appServer.get("/video", async (req, res) => {
+        const { url: encodedUrl } = req.query as { url?: string };
+        if (!encodedUrl) return res.status(400).send("Url not found");
+
+        const currentVideoUrl = Buffer.from(encodedUrl, "base64").toString("utf-8");
+
+        let aborted = false;
+        req.on("close", () => {
+            aborted = true;
+        });
+
+        try {
+            const headers: Record<string, string> = {};
+
+            if (req.headers.range) {
+                const match = req.headers.range.match(/bytes=(\d+)-(\d*)/);
+                if (match) {
+                    const start = parseInt(match[1], 10);
+                    const end = start + 10 * 1024 * 1024 - 1;
+                    headers["Range"] = `bytes=${start}-${end}`;
+                }
+            }
+
+            const response = await fetch(currentVideoUrl, { headers });
+            console.log(response)
+
+            res.status(response.status);
+            response.headers.forEach((value, key) => res.setHeader(key, value));
+
+            if (!response.body) {
+                res.status(500).send("body not found");
+                return;
+            }
+
+            const nodeStream = Readable.fromWeb(response.body as any);
+
+            req.on("close", () => {
+                try {
+                    nodeStream.destroy();
+                    (response.body as any)?.cancel?.();
+                } catch { }
+            });
+
+            nodeStream.on("error", (err) => {
+                if (!aborted) {
+                    console.error("Stream error:", err.message);
+                    res.end();
+                }
+            });
+
+            nodeStream.pipe(res);
+            return
+        } catch (err: any) {
+            if (!aborted) {
+                console.error("Proxy error:", err.message);
+                res.status(500).send("error");
+            }
+            return
+        }
+    });
+
+    appServer.listen(3001, () =>
+        console.log("Video Proxy: http://localhost:3001")
+    );
+};
+
+
+createProxyServer()
+
+export function checkPath(program: string) {
+  try {
+    if (os.platform() === "win32") return ""
+    let paths = execSync(`whereis ${program}`).toString().trim().split(" ")
+    if (!(paths.length <= 1)) return paths[1]
+    let flatpakPaths = execSync(`flatpak list --columns=application`).toString().trim().split(" ")
+    for (let index = 0; index < flatpakPaths.length; index++) {
+      const element = flatpakPaths[index];
+      if (element.toLowerCase().includes(program.toLocaleLowerCase())) return element.replace("\n", "")
+    }
+    return ""
+  } catch (error) {
+    console.error(error)
+    return ""
+  }
+}
+
+export function deepMerge(target: any, source: any): any {
+    for (const key in source) {
+        if (source[key] && typeof source[key] === "object") {
+            if (!target[key]) {
+                target[key] = {};
+            }
+            deepMerge(target[key], source[key]);
+        } else {
+            target[key] = source[key];
+        }
+    }
+    return target;
 }

@@ -6,6 +6,16 @@
     width: 100%;
 }
 
+.seekbar-shadow {
+    padding: 13px 0px;
+    position: absolute;
+    cursor: pointer;
+    width: 100%;
+    pointer-events: all;
+    margin-top: -8px;
+    z-index: 5;
+}
+
 .seekbar-progress{
     width: 0%;
     height: 100%;
@@ -69,7 +79,6 @@
     width: 180px;
     top: -130px;
     background-repeat: no-repeat;
-    outline: 3px solid var(--player-bg-containers);
     pointer-events: none;
 }
 

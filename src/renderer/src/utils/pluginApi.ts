@@ -1,63 +1,30 @@
-import { containerData, pluginFormat, SettingsConfig } from "./GlobalInterface";
-import store from "./store";
+import { containerData, playerPluginFormat, SettingsConfig } from "./types";
+import { getConfig } from "./stores/config";
+import { getHomeCache, setAllHomeData, setHomeStopScrolling } from "./stores/home";
+import { getPluginList, setPlayerPlugin } from "./stores/plugins";
 
-export async function setHomeData(func: () => Promise<containerData[]>) {
+export async function setHomeData(func: () => Promise<{ topCards?: containerData, sections: containerData[] }>) {
     try {
-        homeStopScrolling(false)
-        if (store.getState().home.isLoading) return
-        store.dispatch({ type: "setLoadingHome", payload: { isLoading: true } })
+        setHomeStopScrolling(false)
+        if (getHomeCache().isLoading) return
+        setAllHomeData({isLoading: true, isError: false, data: { sections: [] }} as any)
         let data = await func()
-        store.dispatch({
-            type: "setAllHomeData", payload: {
-                isLoading: false, isError: false, data: data
-            }
-        })
+        setAllHomeData({isLoading: false, isError: false, data: data} as any)
     } catch (error) {
-        store.dispatch({
-            type: "setAllHomeData", payload: {
-                isLoading: false, isError: true
-            }
-        })
+        setAllHomeData({isLoading: false, isError: true, data: []} as any)
     }
 }
 
 export async function UpdateHomeData(func: () => Promise<{ data: containerData, maxPage: number }>) {
     try {
-        homeStopScrolling(false)
-        if (store.getState().home.isLoading) return
-        store.dispatch({ type: "setcontainerLoading", payload: true })
+        setHomeStopScrolling(false)
+        let homeCache = getHomeCache()
+        if (homeCache.isLoading) return
         let data = await func()
-        let tmp = store.getState().home.data[0]
+        let tmp: { topCards?: containerData, sections: containerData[] } = homeCache.data
 
-        if (data.data.data.length < data.maxPage) homeStopScrolling(true)
-        
-        store.dispatch({
-            type: "setAllHomeData", payload: {
-                isLoading: false, isError: false, data: [{ ...data.data, data: [ ...tmp.data, ...data.data.data ] }]
-            }
-        })
-        store.dispatch({ type: "setcontainerLoading", payload: false })
-    } catch (error) {
-        store.dispatch({ type: "setcontainerLoading", payload: false })
-        console.error(error)
-    }
-}
-
-export function homeStopScrolling(payload: boolean) {
-    try {
-        store.dispatch({
-            type: "setStopScrolling", payload: payload
-        })
-    } catch (error) {
-        console.error(error)
-    }
-}
-
-export function setHomeLocalSearch(payload: boolean) {
-    try {
-        store.dispatch({
-            type: "setLocalSearch", payload: payload
-        })
+        if (data.data.data.length < data.maxPage) setHomeStopScrolling(true)
+        setAllHomeData({isLoading: false, isError: false, data: { sections: [{ ...data.data, data: [...tmp.sections[0].data, ...data.data.data] }] }} as any)
     } catch (error) {
         console.error(error)
     }
@@ -65,19 +32,19 @@ export function setHomeLocalSearch(payload: boolean) {
 
 export function InitialPlugin() {
     try {
-        const config: SettingsConfig = store.getState().config
-        const loadedPlugins: pluginFormat[] = store.getState().plugin.loadedPlugins
+        const config: SettingsConfig = getConfig()
+        const loadedPlugins: playerPluginFormat[] = getPluginList()
         for (let index = 0; index < loadedPlugins.length; index++) {
             const element = loadedPlugins[index];
             if (element.name == config.plugins.player) {
-                store.dispatch({type: "setPluginPlayer", payload: element})
+                setPlayerPlugin(element)
                 return
             }
         }
 
-        loadedPlugins.forEach((element: pluginFormat) => {
+        loadedPlugins.forEach((element: playerPluginFormat) => {
             if (element.name == "Allmanga") {
-                store.dispatch({type: "setPluginPlayer", payload: element})
+                setPlayerPlugin(element)
                 return
             }
         })
@@ -86,53 +53,46 @@ export function InitialPlugin() {
     }
 }
 
-export function ChangePlugin(name: string) {
+export function ChangePlugin(name: string): playerPluginFormat {
+    const loadedPlugins: playerPluginFormat[] = getPluginList()
     try {
-        const loadedPlugins: pluginFormat[] = store.getState().plugin.loadedPlugins
         for (let index = 0; index < loadedPlugins.length; index++) {
             const element = loadedPlugins[index];
             if (element.name == name) {
-                store.dispatch({type: "setPluginPlayer", payload: element})
-                return
+                setPlayerPlugin(element)
+                return element
             }
             if (name == "" && element.name == "Allmanga") {
-                store.dispatch({type: "setPluginPlayer", payload: element})
-                return
+                setPlayerPlugin(element)
+                return element
             }
         }
+        return loadedPlugins[0]
     } catch (error) {
         console.error(error)
+        return loadedPlugins[0]
     }
 }
 
-export function getPluginList(): pluginFormat[] {
-    try {
-        return store.getState().plugin.loadedPlugins
-    } catch (error) {
-        console.error(error)
-        return []
-    }
-}
+// export function setPluginPlayerCache(element: any) {
+//     try {
+//         store.dispatch({ type: "setPlayerPluginCache", payload: element })
+//     } catch (error) {
+//         console.error(error)
+//     }
+// }
 
-export function setPluginPlayerCache(element: any) {
-    try {
-        store.dispatch({type: "setPlayerPluginCache", payload: element})
-    } catch (error) {
-        console.error(error)
-    }
-}
-
-export function getPlayerPluginCache(): any {
-    try {
-        return store.getState().plugin.playerPluginCache
-    } catch (error) {
-        console.error(error)
-    }
-}
+// export function getPlayerPluginCache(): any {
+//     try {
+//         return store.getState().plugin.playerPluginCache
+//     } catch (error) {
+//         console.error(error)
+//     }
+// }
 
 export function ResetPluginPlayerCache() {
     try {
-        store.dispatch({type: "setPlayerPluginCache", payload: undefined})
+        setPlayerPlugin(undefined)
     } catch (error) {
         console.error(error)
     }

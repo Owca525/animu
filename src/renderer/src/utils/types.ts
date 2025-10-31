@@ -2,7 +2,7 @@ export const notificationProps = {
     closeOnClick: true,
     autoClose: 3000,
     pauseOnHover: true,
-    hideProgressBar: true
+    theme: "dark"
 }
 
 export interface AnimeData {
@@ -58,7 +58,7 @@ export interface AnimeData {
 }
 
 export interface homeData {
-    data: containerData[]
+    data: { topCards?: containerData, sections: containerData[] }
     isLoading: boolean
     isError: boolean
     search: string
@@ -66,22 +66,41 @@ export interface homeData {
     stopScrolling: boolean
     containerLoading: boolean
     localSearch: boolean
-    filterTags: FilterParams | undefined
+    filterTags?: FilterParams
+}
+
+export interface globalDataFormat {
+    incognito: boolean, 
+    history: { continue: cardData[], history: cardData[] }
 }
 
 export interface playerData {
     hostname: string
-    hls: boolean
-    resolution: { res: string, url: string, defaultSubtitles?: boolean; }[]
+    resolution: resolutionFormat[]
+    splitHLS?: boolean
+    defaultHost?: boolean
     storyboardVTT?: string
-    listChapters?: playerChapterList
-    chaptersUrl?: string
+    listChapters?: playerChapterList[]
     subtitles?: playerSubtitlesFormat[]
+    external?: externalPlayerFormat
+    extractResolution?: (episode: string, type: string, playerData: playerData, customData?: any, id?: string) => Promise<playerData | undefined>
+}
+
+export interface resolutionFormat {
+    res: string,
+    url: string,
+    hls?: boolean
+    reqHeader?: { [key: string]: string },
+    defaultSubtitles?: boolean;
+}
+
+export interface externalPlayerFormat {
+    chaptersUrl: string
 }
 
 export interface playerSubtitlesFormat { url: string, lang: string, label: string, format: string }
 
-export type playerChapterList = { start: number, end: number, type: "opening" | "ending" | "other", name?: string }[]
+export type playerChapterList = { start: number, end: number, type: "opening" | "ending" | "other", name?: string }
 
 export interface indentityPlayer {
     pluginName: string
@@ -93,7 +112,6 @@ export interface indentityPlayer {
 export interface cardData {
     AnimeData: AnimeData
     saveData?: indentityPlayer
-    deletionCard?: () => void
     onClick?: (data: AnimeData) => void
 }
 
@@ -112,7 +130,7 @@ export interface containerData {
 export interface sidebarData {
     icon: string
     text: string
-    onClick?: () => void
+    onClick?: () => Promise<void> | void
 }
 
 export type ContextMenuProps = {
@@ -122,34 +140,44 @@ export type ContextMenuProps = {
     deletion?: boolean
 }[]
 
-export interface themeMetadata { 
-    version?: string; 
-    author?: string; 
-    pathcss: string; 
-    animuTitle?: string; 
+export interface themeMetadata {
+    version?: string;
+    author?: string;
+    pathcss: string;
+    animuTitle?: string;
     name: string;
 }
 
-export interface pluginFormat {
+export interface playerPluginFormat {
+    version: string
+    name: string
+    author: string
+    icon?: string
+    urlWebsite?: string
+    preferedLang: string[]
+    sidebarAddon?: sidebarData[]
+    searchOption?: genres
+    player: {
+        extractPlayerData: (type: string, episode: string, id: string) => Promise<playerData[]>
+        extractEpisodeList: (animeData?: AnimeData, anime_id?: string) => Promise<episodeList | undefined>
+        extractOnlyEpisodesList: (type: string, anime_id: string) => Promise<{ ep: string, img?: string, title?: string }[]>
+        searchAnime: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => Promise<cardData[]>
+    }
+}
+
+export interface informationPluginFormat {
     version: string
     name: string
     author: string
     icon?: string
     preferedLang: string[]
-    information?: {
-        pageSize: number
-        search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => void
-        home: () => void
+    pageSize: number
+    info: {
+        search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => Promise<void>
+        home: () => Promise<void>
         anime: (id: string) => Promise<AnimeData | undefined>
-    } | null
-    player?: {
-        getUrls: (type: string, episode: string, id: string) => Promise<playerData[]>
-        animeDataList: (animeData?: AnimeData, anime_id?: string) => Promise<episodeList | undefined>
-        episodeList: (type: string, anime_id: string) => Promise<{ ep: string, img?: string, title?: string }[]>
-        animeList: (name: AnimeData) => Promise<cardData[]>
-        search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => Promise<cardData[]>
-    } | null
-    searchOption?: genres
+    }
+    searchOption: genres
     sidebarAddon?: sidebarData[]
 }
 
@@ -164,8 +192,8 @@ export interface SettingsConfig {
         player: string
     }
     General: {
-        HoverSidebar: boolean
-        HideSidebar: boolean
+        // HoverSidebar: boolean
+        // HideSidebar: boolean
         language: string
         theme: string
         discordRPC: boolean
@@ -190,6 +218,7 @@ export interface SettingsConfig {
             autoSkipOpenings: boolean
             autoSkipEndings: boolean
             showBrokenBuffer: boolean
+            minusTime: boolean
         }
         screenShot: {
             alwaysAsk: boolean
@@ -261,7 +290,7 @@ export interface SettingsConfig {
 }
 
 export interface dialogProps {
-    type: "error" | "info" | "refresh" | "none" 
+    type: "error" | "info" | "none"
     title: string
     description?: string
     buttons: {
@@ -281,9 +310,9 @@ export interface Thumbnail {
 };
 
 export interface FilterParams {
-  genres?: string[];
-  years?: string;
-  seasons?: string;
-  format?: string[];
-  airing?: string;
+    genres?: string[];
+    years?: string;
+    seasons?: string;
+    format?: string[];
+    airing?: string;
 };

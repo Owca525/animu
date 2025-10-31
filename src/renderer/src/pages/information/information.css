@@ -55,7 +55,6 @@
     top: 0;
     z-index: 1;
     position: absolute;
-    background: linear-gradient(to bottom, #0000 60%, var(--bg));
 }
 
 .information-banner-image,
@@ -359,7 +358,6 @@
 
     .information-fade {
         aspect-ratio: 19/4;
-        background: linear-gradient(to bottom, #0000 60%, var(--bg2));
     }
 
     .information-bottom {

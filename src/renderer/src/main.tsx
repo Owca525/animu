@@ -1,14 +1,8 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import { render } from 'solid-js/web'
 import App from './App'
-import { Provider } from 'react-redux';
-import './App.css'
-
-// Import language support
-import { QueryClient, QueryClientProvider } from 'react-query'
-import store from './utils/store';
-import { DialogContext } from './utils/context/DialogContext';
-import { ContextMenu } from './utils/context/ContextMenu';
+import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
+import { DialogProvider } from "./utils/context/DialogContext";
+import { ContextMenu } from "./utils/context/ContextMenu";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,16 +12,17 @@ const queryClient = new QueryClient({
   },
 })
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <DialogContext>
+render(
+  () => (
+    <DialogProvider>
       <ContextMenu>
         <QueryClientProvider client={queryClient}>
-          <Provider store={store}>
+          {/* <StoreProvider> */}
             <App />
-          </Provider>
+          {/* </StoreProvider> */}
         </QueryClientProvider>
       </ContextMenu>
-    </DialogContext>
-  </React.StrictMode>
-)
+    </DialogProvider>
+  ),
+  document.getElementById("root") as HTMLElement
+);

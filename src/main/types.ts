@@ -1,0 +1,273 @@
+import { app } from "electron"
+import path from "path"
+import { checkPath } from "./utils"
+
+export interface SettingsConfig {
+    firstStart: boolean
+    plugins: {
+        // information: string
+        player: string
+    }
+    General: {
+        // HoverSidebar: boolean
+        // HideSidebar: boolean
+        language: string
+        theme: string
+        discordRPC: boolean
+        Window: {
+            AutoMaximize: boolean
+            AutoFullscreen: boolean
+            Zoom: number
+        }
+    }
+    Player: {
+        general: {
+            Autoplay: boolean
+            AutoFullscreen: boolean
+            AutoSkipEpisode: boolean
+            Volume: number
+            LongTimeSkipForward: number | string
+            LongTimeSkipBack: number | string
+            TimeSkipLeft: number | string
+            TimeSkipRight: number | string
+            VideoStreching: boolean,
+            PlayerBehavior: "home" | "information"
+            autoSkipOpenings: boolean
+            autoSkipEndings: boolean
+            showBrokenBuffer: boolean
+            minusTime: boolean
+        }
+        screenShot: {
+            alwaysAsk: boolean
+            saveType: "File" | "Clipboard" | "Both"
+            path: string
+        },
+        external: {
+            enable: boolean,
+            type: "Movian" | "VLC" | "Mpv" | "ChromeCast",
+            movianIP: string
+            vlcPath: string
+            mpvPath: string
+        }
+        upToNextEpisode: {
+            enable: boolean
+            interval: number
+            durationShow: number
+            variants: "var1" | "var2" | "old"
+        }
+        ui: {
+            DisableVolumeAnimation: boolean,
+            DisableSpaceAnimation: boolean,
+            DisableSkipAnimation: boolean,
+            DisableLoadingAnimation: boolean
+        }
+        keybinds: {
+            Pause: string
+            LongTimeSkipForward: string
+            LongTimeSkipBack: string
+            TimeSkipLeft: string
+            TimeSkipRight: string
+            Fullscreen: string
+            ExitPlayer: string
+            NextEpisode: string
+            PrevEpisode: string
+            FrameSkipBack: string
+            FrameSkipForward: string
+            VolumeUp: string
+            VolumeDown: string
+            VolumeMute: string
+            ScreenShot: string
+            PictureInPicture: string
+            toggleSubtitles: string
+            skipOpeningEnding: string
+        }
+    }
+    History: {
+        history: {
+            LimitedHistory: boolean
+            maxSave: number | string
+            AlwaysAsk: boolean
+        }
+        continue: {
+            MinimalTimeSave: number | string
+            MaximizeTimeSave: number | string
+        }
+    }
+    Developer: {
+        DeveloperMode: boolean
+        DevTools: boolean
+        DevToolsOnStart: boolean
+        playerDebug: boolean
+    }
+    update: {
+        lastTime: string
+        type: "On Start" | "Every Day" | "Every Week"
+        enable: boolean
+    }
+}
+
+export interface AnimeData {
+    averageScore?: number | undefined
+    bannerImage?: string | undefined
+    coverImage?: string | undefined
+    description?: string | undefined
+    duration?: number | undefined
+    endDate?: {
+        day: number
+        month: number
+        year: number
+    } | undefined
+    episodes?: number | undefined
+    format?: string | undefined
+    genres: Array<String> | undefined
+    nextAiringEpisode?: {
+        airingAt: number
+        episode: number
+        timeUntilAiring: number
+    } | undefined
+    popularity?: number | undefined
+    season?: string | undefined
+    seasonYear?: number | undefined
+    startDate?: {
+        day: number
+        month: number
+        year: number
+    } | undefined
+    characters: {
+        role: string,
+        character: {
+            id: string,
+            name: string,
+            image: string
+        },
+        voiceActor?: {
+            id: string,
+            name: string,
+            image: string
+        }
+    }[]
+    source?: string | undefined
+    status?: string | undefined
+    studios: string[]
+    title: { english?: string, native: string, romaji: string }
+    type?: string | undefined
+    episodesList?: { episodes: { ep: string, img?: string, title?: string }[], type: string, name?: string }[]
+    player_ID?: string
+    id: string
+    malID?: string
+    trailer?: { id: string, site: string } | undefined
+}
+
+export interface indentityPlayer {
+    pluginName: string
+    last_Time: number
+    episode: string
+    type: string
+}
+
+export interface cardData {
+    AnimeData: AnimeData
+    saveData?: indentityPlayer
+    onClick?: (data: AnimeData) => void
+}
+
+export const defaultConfig: SettingsConfig = {
+    firstStart: true,
+    General: {
+        language: "en",
+        theme: "DarkerAnimu",
+        Window: {
+            AutoMaximize: false,
+            AutoFullscreen: false,
+            Zoom: 100,
+        },
+        discordRPC: true
+    },
+    Player: {
+        general: {
+            Autoplay: true,
+            AutoFullscreen: false,
+            AutoSkipEpisode: true,
+            Volume: 25,
+            LongTimeSkipForward: 90,
+            LongTimeSkipBack: 90,
+            TimeSkipLeft: 5,
+            TimeSkipRight: 5,
+            VideoStreching: false,
+            PlayerBehavior: "information",
+            autoSkipOpenings: false,
+            autoSkipEndings: false,
+            showBrokenBuffer: false,
+            minusTime: false
+        },
+        screenShot: {
+            alwaysAsk: true,
+            saveType: "File",
+            path: path.join(app.getPath("pictures"), "animu"),
+        },
+        external: {
+            enable: false,
+            type: "Mpv",
+            movianIP: "localhost:42000",
+            mpvPath: checkPath("mpv"),
+            vlcPath: checkPath("vlc")
+        },
+        upToNextEpisode: {
+            enable: true,
+            interval: 15,
+            durationShow: 5,
+            variants: "var1"
+        },
+        keybinds: {
+            Pause: " ",
+            LongTimeSkipForward: "ArrowUp",
+            LongTimeSkipBack: "ArrowDown",
+            TimeSkipLeft: "ArrowLeft",
+            TimeSkipRight: "ArrowRight",
+            Fullscreen: "F",
+            ExitPlayer: "Escape",
+            NextEpisode: "PageUp",
+            PrevEpisode: "PageDown",
+            FrameSkipBack: ",",
+            FrameSkipForward: ".",
+            VolumeDown: "9",
+            VolumeUp: "0",
+            VolumeMute: "m",
+            ScreenShot: "f10",
+            PictureInPicture: "P",
+            toggleSubtitles: "C",
+            skipOpeningEnding: "S"
+        },
+        ui: {
+            DisableVolumeAnimation: false,
+            DisableSpaceAnimation: false,
+            DisableSkipAnimation: false,
+            DisableLoadingAnimation: false
+        }
+    },
+    History: {
+        history: {
+            LimitedHistory: false,
+            maxSave: 50,
+            AlwaysAsk: true
+        },
+        continue: {
+            MinimalTimeSave: 20,
+            MaximizeTimeSave: 100,
+        },
+    },
+    Developer: {
+        DeveloperMode: false,
+        DevTools: false,
+        DevToolsOnStart: false,
+        playerDebug: false
+    },
+    update: {
+        lastTime: "0",
+        type: "On Start",
+        enable: true
+    },
+    plugins: {
+        player: "Allmanga"
+    }
+};

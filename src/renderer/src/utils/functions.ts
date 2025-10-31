@@ -1,12 +1,13 @@
 import { t } from "i18next";
-import { ContextMenuProps, homeData, playerChapterList, themeMetadata } from "./GlobalInterface";
-import store from "./store";
-import { getPluginList, setHomeData } from "./pluginApi";
-import { ReadContinue } from "./history/continueWatch";
-import { ReadHistory } from "./history/history";
+import { cardData, ContextMenuProps, homeData, playerChapterList, SettingsConfig, themeMetadata } from "./types";
+import { setHomeData } from "./pluginApi";
 import { showDialog } from "./context/DialogContext";
 import i18n from "./i18n";
 import { DropdownOption } from "@renderer/components/dropDown";
+import { getHomeCache } from "./stores/home";
+import { getGlobalCache } from "./stores/global";
+import { getConfig } from "./stores/config";
+import { getPluginList } from "./stores/plugins";
 
 export function decodeHtmlEntities(str: string) {
     const parser = new DOMParser();
@@ -147,36 +148,42 @@ export function convertMsToMinutes(ms: number): number {
 }
 
 export async function refetchHistory() {
-    let data: homeData = store.getState().home
-    if (data.data.length > 2) return
-    if (data.data.length <= 0) return
-    if (data.data.length == 1 && data.data[0].title == t("global.continuewatch")) {
-        await setHomeData(async () => [{ title: t("global.continuewatch"), data: await ReadContinue(), horizontal: false }])
+    let data: homeData = getHomeCache()
+    if (!data.data) return
+    if (data.data.sections.length > 2) return
+    if (data.data.sections.length <= 0) return
+    let history: cardData[] = getGlobalCache().history.history
+    let continueWatch: cardData[] = getGlobalCache().history.continue
+    if (data.data.sections.length == 1 && data.data.sections[0].title == t("global.continuewatch")) {
+        await setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: continueWatch, horizontal: false }] }))
         return
     }
 
-    if (data.data.length == 1 && data.data[0].title == t("global.history")) {
-        await setHomeData(async () => [{ title: t("global.history"), data: await ReadHistory(), horizontal: false }])
+    if (data.data.sections.length == 1 && data.data.sections[0].title == t("global.history")) {
+        await setHomeData(async () => ({ sections: [{ title: t("global.history"), data: history, horizontal: false }] }))
         return
     }
 
-    if (data.data[0].title == t("global.continuewatch") && data.data[1].title == t("global.history")) {
-        await setHomeData(async () => {
-            return [
+    let newHistory = history.reverse()
+    let newcontinueWatch = continueWatch.reverse()
+
+    if (data.data.sections[0].title == t("global.continuewatch") && data.data.sections[1].title == t("global.history")) {
+        await setHomeData(async () => ({
+            sections: [
                 {
                     title: t("global.continuewatch"),
-                    data: await ReadContinue(20),
+                    data: newcontinueWatch.slice(0, 20),
                     horizontal: true,
-                    onTitleClick: () => setHomeData(async () => [{ title: t("global.continuewatch"), data: await ReadContinue(), horizontal: false }])
+                    onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: continueWatch, horizontal: false }] }))
                 },
                 {
                     title: t("global.history"),
-                    data: await ReadHistory(20),
+                    data: newHistory.slice(0, 20),
                     horizontal: true,
-                    onTitleClick: () => setHomeData(async () => [{ title: t("global.history"), data: await ReadHistory(), horizontal: false }])
+                    onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.history"), data: history, horizontal: false }] }))
                 },
             ]
-        })
+        }))
         return
     }
 }
@@ -204,12 +211,13 @@ export function CreateContextMenuOptions(start?: ContextMenuProps, center?: Cont
             ContextMenu.push(element)
         }
     }
-    let config = store.getState().config
+    let config = getConfig()
     if (config.Developer.DeveloperMode) ContextMenu.push({ option: i18n.t("contextMenu.devtools"), onClick: window.BrowserWindow.openDevTools })
     ContextMenu.push({
         option: i18n.t("dialog.exit"), onClick: () => showDialog({
             type: "info",
-            title: i18n.t("global.exitAnimu"),
+            title: "Action",
+            description: i18n.t("global.exitAnimu"),
             buttons: {
                 firstbutton: () => window.BrowserWindow.exit(),
                 secondbutton: () => ""
@@ -275,12 +283,12 @@ export function timeToSeconds(time: string): number {
     return hours * 3600 + minutes * 60 + seconds;
 }
 
-export async function convertChaptersVTT(url: string): Promise<playerChapterList> {
+export async function convertChaptersVTT(url: string): Promise<playerChapterList[]> {
     let req = await window.api.request.get(url, { "User-Agent": navigator.userAgent }, "text")
     if (!req.success) return []
     let lines = req.data.split("\n") as string
 
-    let finnalListChapters: playerChapterList = []
+    let finnalListChapters: playerChapterList[] = []
     for (let i = 0; i < lines.length; i++) {
         if (lines[i].includes("-->")) {
             const [start, end] = lines[i].split(" --> ");
@@ -309,4 +317,43 @@ export function segregatePlugins(func: (name: string) => void): DropdownOption[]
     }
 
     return list
+}
+
+export function getEpisodeDay(unixTime: number, episode: number): string {
+    const episodeDate = new Date(unixTime * 1000);
+    const today = new Date();
+
+    const isToday =
+        episodeDate.getFullYear() === today.getFullYear() &&
+        episodeDate.getMonth() === today.getMonth() &&
+        episodeDate.getDate() === today.getDate();
+
+
+    let todayHours = `${episodeDate.getHours().toString().padStart(2, "0")}:${episodeDate.getMinutes().toString().padStart(2, "0")}`
+    if (isToday) return t("week.infoCommunicatToday", { ep: episode, day: t("week.today"), hours: todayHours });
+
+    const days = [t("week.sunday"), t("week.monday"), t("week.tuesday"), t("week.wednesday"), t("week.thursday"), t("week.friday"), t("week.saturday")];
+    let todayName = days[episodeDate.getDay()]
+    return t("week.infoCommunicat", { ep: episode, day: todayName, hours: todayHours });
+}
+
+export function makeSmallText(text: string | undefined) {
+    if (!text) return text
+    return text.toLowerCase()
+}
+
+export function updateObjectConfig(path: string, value: string | number | boolean, config: SettingsConfig): SettingsConfig {
+    const keys = path.split('.')
+    const newConfig = config
+
+    let current: any = newConfig
+    for (let i = 0; i < keys.length - 1; i++) {
+        const key = keys[i]
+
+        if (!current[key]) current[key] = {}
+        current = current[key]
+    }
+
+    current[keys[keys.length - 1]] = value
+    return newConfig
 }

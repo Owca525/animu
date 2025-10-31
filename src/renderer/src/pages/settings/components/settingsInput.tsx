@@ -1,23 +1,32 @@
-import "./css/settingsInput.css"
+import { Component } from "solid-js";
+import "./css/settingsInput.css";
 
-interface settingsInputProsps {
-    type?: "number" | "text",
-    iconChar?: string
-    onKeyDown?: (text: string) => void
-    startValue?: string
+interface SettingsInputProps {
+  type?: "number" | "text";
+  iconChar?: string;
+  onKeyDown?: (text: string) => void;
+  startValue?: string;
 }
 
-const SettingsInput: React.FC<settingsInputProsps> = ({ type = "text", iconChar = "", onKeyDown, startValue }) => {
-    function handleData(event) {
-        if (!onKeyDown) return
-        onKeyDown(event.target.value)
-    }
+const SettingsInput: Component<SettingsInputProps> = (props) => {
+  const handleData = (event: InputEvent & { currentTarget: HTMLInputElement }) => {
+    if (!props.onKeyDown) return;
+    props.onKeyDown(event.currentTarget.value);
+  };
 
-    return (
-        <div tabIndex={-1} className="settings-input-container">
-            <input className={iconChar == "" ? "settings-input-field-hide-type" : "settings-input-field"} type={type} value={startValue} onChange={handleData} />{iconChar != "" && <div className="settings-input-type">{iconChar}</div>}
-        </div>
-    )
-}
+  return (
+    <div tabIndex={-1} class="settings-input-container">
+      <input
+        class={props.iconChar === "" ? "settings-input-field-hide-type" : "settings-input-field"}
+        type={props.type ?? "text"}
+        value={props.startValue}
+        onInput={handleData}
+      />
+      {props.iconChar !== "" && (
+        <div class="settings-input-type">{props.iconChar}</div>
+      )}
+    </div>
+  );
+};
 
-export default SettingsInput
+export default SettingsInput;

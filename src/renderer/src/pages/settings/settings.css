@@ -4,6 +4,7 @@
   align-items: center;
   width: 100%;
   margin: 15px;
+  height: 40px;
 }
 
 .settings-container {
@@ -146,8 +147,9 @@ td {
   justify-content: space-between;
 }
 
-.settings-table-button {
+.settings-table-button * {
   cursor: pointer;
+  transition: background-color 100ms ease-in-out;
 }
 
 .settings-extensions-icon {
@@ -202,4 +204,9 @@ td {
     .settings-setting-seekbar-container {
       width: 60%;
     }
+}
+
+.settings-custom-space {
+  display: flex;
+  gap: 4px;
 }

@@ -1,214 +1,214 @@
+import { createSignal, createEffect, For } from "solid-js";
 import { formatTime } from '@renderer/utils/functions';
-import React, { useEffect, useRef, useState } from 'react';
-
-import "./css/seekBar.css"
-import { Thumbnail } from '@renderer/utils/GlobalInterface';
+import type { Thumbnail } from '@renderer/utils/types';
+import "./css/seekBar.css";
 
 interface SeekBarProps {
-  maxValue: number | undefined;
+  maxValue?: number;
   minValue?: number;
-  currentValue: number | undefined;
+  currentValue?: number;
   onSeek: (value: number) => void;
-  type?: "value" | "float" | "time" | "procent"
-  classes?: { container?: string, progress?: string, thumb?: string, box?: string }
-  screen?: boolean
-  secondBarValues?: { position: number, width: number }[]
-  thumbnail?: Thumbnail
-  chapterList?: { left: number, width: number, name?: string, type: "opening" | "ending" | "other" }[]
+  type?: "value" | "float" | "time" | "procent";
+  classes?: { container?: string; progress?: string; thumb?: string; box?: string };
+  screen?: boolean;
+  secondBarValues?: { position: number; width: number }[];
+  thumbnail?: Thumbnail;
+  chapterList?: { left: number; width: number; name?: string; type: "opening" | "ending" | "other" }[];
 }
 
-const SeekBar: React.FC<SeekBarProps> = ({
-  maxValue,
-  minValue = 0,
-  currentValue,
-  onSeek,
-  type = "value",
-  classes,
-  screen = false,
-  secondBarValues,
-  thumbnail,
-  chapterList
-}) => {
-  const [value, setValue] = useState(currentValue);
-  const [drag, setdrage] = useState<boolean>(false);
-  const [show, setshow] = useState<boolean>(false);
+export default function SeekBar(props: SeekBarProps) {
+  const [value, setValue] = createSignal(props.currentValue);
+  const [drag, setDrag] = createSignal(false);
+  const [show, setShow] = createSignal(false);
 
-  const seekBarRef = useRef<HTMLDivElement | null>(null);
-  const seekBarProgress = useRef<HTMLDivElement | null>(null);
-  const seekbarThumb = useRef<HTMLDivElement | null>(null);
-  const seekbarBox = useRef<HTMLDivElement | null>(null);
-  const seekbarThumbnail = useRef<HTMLImageElement | null>(null);
-  const seekbarChapterText = useRef<HTMLImageElement | null>(null);
+  let seekBarRef: HTMLDivElement | undefined;
+  let seekBarProgress: HTMLDivElement | undefined;
+  let seekbarThumb: HTMLDivElement | undefined;
+  let seekbarBox: HTMLDivElement | undefined;
+  let seekbarThumbnail: HTMLDivElement | undefined;
+  let seekbarChapterText: HTMLDivElement | undefined;
 
-  useEffect(() => {
-    setValue(currentValue);
-    updateSeekBar(value)
-  }, [currentValue]);
+  createEffect(() => {
+    setValue(props.currentValue);
+    updateSeekBar(value());
+  });
 
   function updateSeekBar(val: number | undefined) {
-    if (!seekBarProgress.current || !seekbarThumb.current || !seekbarBox.current) return;
-    if (val === undefined || maxValue === undefined) return;
+    if (!seekBarProgress || !seekbarThumb || !seekbarBox) return;
+    if (val === undefined || props.maxValue === undefined) return;
 
-    const clampedVal = Math.max(minValue, Math.min(val, maxValue));
-    const percent = ((clampedVal - minValue) / (maxValue - minValue)) * 100;
-    seekBarProgress.current.style.width = `${percent}%`;
-    seekbarThumb.current.style.left = `${percent}%`;
+    const clampedVal = Math.max(props.minValue ?? 0, Math.min(val, props.maxValue));
+    const percent = ((clampedVal - (props.minValue ?? 0)) / ((props.maxValue ?? 1) - (props.minValue ?? 0))) * 100;
+
+    seekBarProgress.style.width = `${percent}%`;
+    seekbarThumb.style.left = `${percent}%`;
   }
 
-  function setPosition(event: React.MouseEvent<HTMLDivElement> | MouseEvent) {
-    if (!maxValue || !seekBarRef.current) return;
+  function setPosition(event: MouseEvent) {
+    if (!props.maxValue || !seekBarRef) return;
 
-    const rect = seekBarRef.current.getBoundingClientRect();
+    const rect = seekBarRef.getBoundingClientRect();
     const offsetX = event.clientX - rect.left;
-    const newValue = (offsetX / rect.width) * (maxValue - minValue) + minValue;
+    const newValue = (offsetX / rect.width) * ((props.maxValue ?? 0) - (props.minValue ?? 0)) + (props.minValue ?? 0);
 
-    if (newValue >= minValue && newValue <= maxValue) {
+    if (newValue >= (props.minValue ?? 0) && newValue <= (props.maxValue ?? 0)) {
       setValue(newValue);
-      onSeek(newValue);
+      props.onSeek(newValue);
       updateSeekBar(newValue);
     }
   }
 
-  function setPositionBox(event: React.MouseEvent<HTMLDivElement> | MouseEvent) {
-    if (!maxValue || !seekBarRef.current || !seekbarBox.current) {
-      setshow(false);
+  function setPositionBox(event: MouseEvent) {
+    if (!props.maxValue || !seekBarRef || !seekbarBox) {
+      setShow(false);
       return;
     }
 
-    const rect = seekBarRef.current.getBoundingClientRect();
+    const rect = seekBarRef.getBoundingClientRect();
     const offsetX = event.clientX - rect.left;
-    const newValue = (offsetX / rect.width) * (maxValue - minValue) + minValue;
+    const newValue = (offsetX / rect.width) * ((props.maxValue ?? 0) - (props.minValue ?? 0)) + (props.minValue ?? 0);
 
-    if (newValue < minValue || newValue > maxValue) return;
+    if (newValue < (props.minValue ?? 0) || newValue > (props.maxValue ?? 0)) return;
 
-    const percent = ((newValue - minValue) / (maxValue - minValue)) * 100;
-    seekbarBox.current.style.left = `${percent}%`;
-    setChapterBoxPosition(`${percent}%`, percent)
+    const percent = ((newValue - (props.minValue ?? 0)) / ((props.maxValue ?? 0) - (props.minValue ?? 0))) * 100;
+    seekbarBox.style.left = `${percent}%`;
+    setChapterBoxPosition(`${percent}%`, percent);
 
-    if (screen) {
+    if (props.screen) {
       if (percent > 98) {
-        seekbarBox.current.style.left = `98%`
-        setChapterBoxPosition(`98%`, percent)
-      };
+        seekbarBox.style.left = `98%`;
+        setChapterBoxPosition(`98%`, percent);
+      }
       if (percent < 1.5) {
-        seekbarBox.current.style.left = `1.5%`
-        setChapterBoxPosition(`1.5%`, percent)
-      };
+        seekbarBox.style.left = `1.5%`;
+        setChapterBoxPosition(`1.5%`, percent);
+      }
     }
-    if (thumbnail) setThumbnailPosition(percent)
-    if (type === "value") seekbarBox.current.innerHTML = newValue.toFixed(0);
-    if (type === "float") seekbarBox.current.innerHTML = newValue.toFixed(1);
-    if (type === "time") seekbarBox.current.innerHTML = formatTime(newValue);
-    if (type === "procent") seekbarBox.current.innerHTML = `${newValue.toFixed(0)}%`
+
+    if (props.thumbnail) setThumbnailPosition(percent);
+
+    if (props.type === "value") seekbarBox.innerHTML = newValue.toFixed(0);
+    if (props.type === "float") seekbarBox.innerHTML = newValue.toFixed(1);
+    if (props.type === "time") seekbarBox.innerHTML = formatTime(newValue);
+    if (props.type === "procent") seekbarBox.innerHTML = `${newValue.toFixed(0)}%`;
   }
 
   function setThumbnailPosition(percent: number) {
-    if (!thumbnail) return
-    if (!maxValue) return
+    if (!props.thumbnail || !seekbarThumbnail || !props.maxValue) return;
 
-    thumbnail.metadata.forEach((value) => {
-      let startPercent = (value.start / maxValue) * 100
-      let endPercent = (value.end / maxValue) * 100
+    props.thumbnail.metadata.forEach((value) => {
+      const startPercent = (value.start / props.maxValue!) * 100;
+      const endPercent = (value.end / props.maxValue!) * 100;
 
-      if (
-        percent >= startPercent &&
-        percent <= endPercent &&
-        seekbarThumbnail.current
-      ) {
-        const thumb = seekbarThumbnail.current
-        const container = thumb.parentElement
-        if (!container) return
+      if (percent >= startPercent && percent <= endPercent && seekbarThumbnail) {
+        const thumb = seekbarThumbnail;
+        const container = thumb.parentElement;
+        if (!container) return;
 
-        thumb.style.backgroundPosition = `-${value.imgX}px -${value.imgY}px`
+        thumb.style.backgroundPosition = `-${value.imgX}px -${value.imgY}px`;
 
-        const containerWidth = container.clientWidth
-        const thumbWidth = thumb.offsetWidth
-        let centerPx = (percent / 100) * containerWidth
-        const halfThumb = thumbWidth / 2
-        if (centerPx < halfThumb) centerPx = halfThumb
-        if (centerPx > containerWidth - halfThumb) {
-          centerPx = containerWidth - halfThumb
-        }
+        const containerWidth = container.clientWidth;
+        const thumbWidth = thumb.offsetWidth;
+        let centerPx = (percent / 100) * containerWidth;
+        const halfThumb = thumbWidth / 2;
+        if (centerPx < halfThumb) centerPx = halfThumb;
+        if (centerPx > containerWidth - halfThumb) centerPx = containerWidth - halfThumb;
+
         if (centerPx > 0) {
-          thumb.style.left = `${centerPx}px`
-          setChapterBoxPosition(`${centerPx}px`, percent)
+          thumb.style.left = `${centerPx}px`;
+          setChapterBoxPosition(`${centerPx}px`, percent);
         }
       }
-    })
+    });
   }
 
   function setChapterBoxPosition(variable: string, percent: number) {
-    if (!chapterList) return
-    if (!seekbarChapterText.current) return
-    for (let index = 0; index < chapterList.length; index++) {
-      const element = chapterList[index];
-      seekbarChapterText.current.innerHTML = ""
-      seekbarChapterText.current.style.display = "none"
-      if (percent >= element.left && percent <= (element.left + element.width) && element.name) {
-        seekbarChapterText.current.style.left = variable
-        seekbarChapterText.current.innerHTML = element.name
-        seekbarChapterText.current.style.display = ""
-        return
+    if (!props.chapterList || !seekbarChapterText) return;
+
+    for (let index = 0; index < props.chapterList.length; index++) {
+      const element = props.chapterList[index];
+      seekbarChapterText.innerHTML = "";
+      seekbarChapterText.style.display = "none";
+
+      if (percent >= element.left && percent <= element.left + element.width && element.name) {
+        seekbarChapterText.style.left = variable;
+        seekbarChapterText.innerHTML = element.name;
+        seekbarChapterText.style.display = "";
+        return;
       }
     }
   }
 
-  function handleMouseMove(event: React.MouseEvent<HTMLDivElement> | MouseEvent) {
-    setPositionBox(event)
-    if (drag) setPosition(event)
-  };
+  function handleMouseMove(event: MouseEvent) {
+    setPositionBox(event);
+    if (drag()) setPosition(event);
+  }
 
   return (
-    <div
-      tabIndex={-1}
-      ref={seekBarRef}
-      className={`seekBar-container ${classes?.container}`}
-      onClick={setPosition}
-      onMouseDown={() => setdrage(() => true)}
-      onMouseUp={() => setdrage(() => false)}
-      onMouseLeave={() => { setdrage(() => false); setshow(() => false) }}
-      onMouseEnter={() => setshow(() => true)}
-      onMouseMove={handleMouseMove}
-    >
-      {/* {secondBarValue && <div className="seekbar-progress-second" style={{ width: `${secondBarValue}%` }} />} */}
-      {secondBarValues &&
-        <div className="seekbar-buffer-wrapper">
-          {secondBarValues.map((buffer) => <div className="seekbar-buffer" style={{ left: `${buffer.position}%`, width: `${buffer.width}%` }}></div>)}
+    <div tabIndex={-1} class={`seekBar-container ${props.classes?.container ?? ""}`}>
+      <div
+        class="seekbar-shadow"
+        ref={(el) => (seekBarRef = el!)}
+        onClick={(e) => setPosition(e as MouseEvent)}
+        onMouseDown={() => setDrag(true)}
+        onMouseUp={() => setDrag(false)}
+        onMouseLeave={() => { setDrag(false); setShow(false); }}
+        onMouseEnter={() => setShow(true)}
+        onMouseMove={(e) => handleMouseMove(e as MouseEvent)}
+      />
+      {props.secondBarValues && (
+        <div class="seekbar-buffer-wrapper">
+          <For each={props.secondBarValues}>
+            {(buffer) => (
+              <div class="seekbar-buffer" style={{ left: `${buffer.position}%`, width: `${buffer.width}%` }} />
+            )}
+          </For>
         </div>
-      }
-      {chapterList && chapterList.length > 0 &&
-        <div className="seekbar-chapters-wrapper">
-          {chapterList.map((chapter) => <div className={`seekbar-chapters ${chapter.type == "opening" || chapter.type == "ending" ? "seekbar-chapters-opening-ending" :""}`} style={{ left: `${chapter.left}%`, width: `${chapter.width}%` }}></div>)}
+      )}
+      {props.chapterList && props.chapterList.length > 0 && (
+        <div class="seekbar-chapters-wrapper">
+          <For each={props.chapterList}>
+            {(chapter) => (
+              <div
+                class={`seekbar-chapters ${
+                  chapter.type === "opening" || chapter.type === "ending"
+                    ? "seekbar-chapters-opening-ending"
+                    : ""
+                }`}
+                style={{ left: `${chapter.left}%`, width: `${chapter.width}%` }}
+              />
+            )}
+          </For>
         </div>
-      }
+      )}
 
+      <div ref={(el) => (seekBarProgress = el!)} class={`seekbar-progress ${props.classes?.progress ?? ""}`} />
+      <div ref={(el) => (seekbarThumb = el!)} class={`seekbar-thumb ${props.classes?.thumb ?? ""}`} />
       <div
-        tabIndex={-1}
-        ref={seekBarProgress}
-        className={`seekbar-progress ${classes?.progress}`}
+        ref={(el) => (seekbarBox = el!)}
+        class={`seekbar-box ${props.classes?.box ?? ""}`}
+        style={{ "display": show() ? "block" : "none" }}
       />
-      <div
-        tabIndex={-1}
-        ref={seekbarThumb}
-        className={`seekbar-thumb ${classes?.thumb}`}
-      />
-      <div tabIndex={-1} ref={seekbarBox} style={show ? { display: "block" } : { display: "none" }} className={`seekbar-box ${classes?.box}`}></div>
-      <div className="seekbar-content-wrapper" style={show ? { display: "block" } : { display: "none" }}>
-        {thumbnail && 
+      <div class="seekbar-content-wrapper" style={{ "display": show() ? "block" : "none" }}>
+        {props.thumbnail && (
           <div
-            tabIndex={-1}
-            ref={seekbarThumbnail}
-            style={show ? { display: "block", backgroundImage: `url(${thumbnail.src})` } : { display: "none" }}
-            className="seekbar-thumbnail"
+            ref={(el) => (seekbarThumbnail = el!)}
+            class="seekbar-thumbnail"
+            style={{
+              "display": show() ? "block" : "none",
+              "background-image": `url(${props.thumbnail.src})`,
+            }}
           />
-        }
-
-        {chapterList && chapterList.length > 0 && 
-          <div tabIndex={-1} ref={seekbarChapterText} className={`seekbar-box ${thumbnail ? "seekbar-chapter-box-thumbnails" : "seekbar-chapter-box"} ${classes?.box}`}></div>
-        }
+        )}
+        {props.chapterList && props.chapterList.length > 0 && (
+          <div
+            ref={(el) => (seekbarChapterText = el!)}
+            class={`seekbar-box ${
+              props.thumbnail ? "seekbar-chapter-box-thumbnails" : "seekbar-chapter-box"
+            } ${props.classes?.box ?? ""}`}
+          />
+        )}
       </div>
     </div>
   );
-};
-
-export default SeekBar;
+}

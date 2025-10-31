@@ -19,10 +19,6 @@
     z-index: 1;
 }
 
-.card-container:hover {
-    transform: scale(1.02);
-}
-
 .card-image, .card-image-placeholder {
     max-width: 260px;
     max-height: 220px;

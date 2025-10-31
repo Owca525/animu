@@ -1,126 +1,139 @@
-import { useEffect, useRef, useState } from "react"
-import Button from "./buttons"
-import "./css/sidebar.css"
-import icon from "../../../../resources/icon.png"
-import { SettingsConfig, sidebarData } from "@renderer/utils/GlobalInterface"
-import { motion } from "framer-motion"
-import { useHotkeys } from "react-hotkeys-hook"
-import { setHomeLocalSearch } from "@renderer/utils/pluginApi"
-import { useSelector } from "react-redux"
+import { createSignal, createEffect, onCleanup, For, onMount } from "solid-js";
+import Button from "./buttons";
+import "./css/sidebar.css";
+import icon from "../../../../resources/icon.png";
+import { sidebarData } from "@renderer/utils/types";
+import { motion } from "@motionone/solid";
+import { createShortcut } from "@solid-primitives/keyboard";
+import { setHomeLocalSearch } from "@renderer/utils/stores/home";
 
-interface sidebarProps {
-    showLogo?: boolean
-    hideButton?: boolean
-    sidebarClass?: {
-        container?: string
-        sidebar?: string
-    }
-    data: {
-        top: sidebarData[]
-        bottom: sidebarData[]
-    }
+interface SidebarProps {
+  showLogo?: boolean;
+  openSidebar?: boolean;
+  onChange?: (isOpen: boolean) => void;
+  data: {
+    top: sidebarData[];
+    bottom: sidebarData[];
+  };
+  activeElement?: boolean;
 }
 
-const Sidebar: React.FC<sidebarProps> = ({ showLogo, sidebarClass, data, hideButton = false }) => {
-    const [sidebarHover, setHover] = useState<boolean>(false)
-    const sidebarRef = useRef<HTMLDivElement>(null);
-    const [version, setversion] = useState<string>("")
-    const config: SettingsConfig = useSelector((data: any) => data.config);
+export default function Sidebar(props: SidebarProps) {
+  const [sidebarHover, setHover] = createSignal(false);
+  const [version, setVersion] = createSignal("");
+  let currentButton = props.activeElement ? 0 : -1;
 
-    const getVersion = async (): Promise<void> => setversion(await window.backend.version())
+  const getVersion = async () => {
+    const ver = await window.backend.version();
+    setVersion(ver);
+  };
 
-    const handleClickOutside = (event: MouseEvent) => {
-        let data = event.target as HTMLElement
-        if (data.classList.contains("sidebar-button")) return
-        if (data.classList.contains("sidebar-hide-button")) return
-        setHover(() => false)
-    };
+  createEffect(() => {
+    if (props.onChange) props.onChange(sidebarHover());
+    if (props.openSidebar) setHover(props.openSidebar);
+  });
 
-    useEffect(() => {
-        getVersion()
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [])
+  const handleClickOutside = (event: MouseEvent) => {
+    const data = event.target as HTMLElement;
+    if (data.classList.contains("sidebar-button")) return;
+    if (data.classList.contains("sidebar-hide-button")) return;
+    setHover(false);
+  };
 
-    useHotkeys("Tab", () => {
-        setHover((prev) => !prev)
-    })
+  onMount(() => {
+    getVersion();
+    document.addEventListener("mousedown", handleClickOutside);
+    onCleanup(() => document.removeEventListener("mousedown", handleClickOutside));
+  })
 
-    function hideSidebar(event, func) {
-        if (!func) return
-        func(event)
-        setHover((prev) => !prev)
-    }
+  createShortcut(["Tab"], () => setHover((prev) => !prev));
 
-    const sidebarVariants = {
-        hidden: { opacity: 1, x: -200 },
-        visible: { opacity: 1, x: 0 },
-    };
+  function hideSidebar(event: MouseEvent, func?: (event: MouseEvent) => void, num?: number) {
+    if (props.activeElement && num != undefined) currentButton = num;
+    setHover((prev) => !prev);
+    if (func) func(event);
+  }
 
-    function detectSidebarStateButton(text: string): string | undefined {
-        if (showLogo) return text
-        if (sidebarHover) return text
-        if (!config.General.HideSidebar) return undefined
-        if (hideButton) return text
-        return undefined
-    }
+  function detectSidebarStateButton(text: string): string | undefined {
+    return sidebarHover() ? text : undefined;
+  }
 
-    function detectSidebarState() {
-        if (showLogo) return "sidebar-container-max"
-        if (sidebarHover) return "sidebar-container-max"
-        if (!config.General.HideSidebar) return "sidebar-container-min"
-        return "sidebar-container-max"
-    }
+  function detectSidebarState() {
+    return sidebarHover() ? "sidebar-container-max" : "sidebar-container-min";
+  }
 
-    function detectSidebarStateClass() {
-        if (showLogo) return "sidebar-button"
-        if (sidebarHover) return "sidebar-button"
-        if (!config.General.HideSidebar) return "sidebar-button-min"
-        return "sidebar-button"
-    }
+  function detectSidebarStateClass() {
+    return sidebarHover() ? "sidebar-button" : "sidebar-button-min";
+  }
 
-    function detectSidebarStateContainers() {
-        if (showLogo) return "sidebar-max-button-container"
-        if (sidebarHover) return "sidebar-max-button-container"
-        if (!config.General.HideSidebar) return "sidebar-min-button-container"
-        return "sidebar-max-button-container"
-    }
+  function detectSidebarStateContainers() {
+    return sidebarHover() ? "sidebar-max-button-container" : "sidebar-min-button-container";
+  }
 
-    return (
-        <div tabIndex={-1} className={"sidebar-main-container " + sidebarClass?.container}>
-            {!hideButton && (
-                <div className="sidebar-hide-container">
-                    <Button icon="menu" ButtonClass="sidebar-hide-button" onClick={() => setHover((prev) => !prev)} iconClassName="sidebar-hide-button" />
-                </div>
-            )}
-            {showLogo && (
-                <div className="sidebar-logo-icon-container">
-                    <img src={icon} alt={version} className="sidebar-image" />
-                    <div className="sidebar-version">{`v${version}`}</div>
-                </div>
-            )}
-            <motion.div className={detectSidebarState()} ref={sidebarRef}
-                initial={showLogo || !config.General.HideSidebar ? "visible" : "hidden"}
-                animate={!config.General.HideSidebar ? "visible" : hideButton == false ? sidebarHover ? "visible" : "hidden" : "visible"}
-                variants={sidebarVariants}
-                transition={{ duration: 0.2 }}
-                onMouseEnter={() => config.General.HoverSidebar && setHover(() => true)}
-                onMouseLeave={() => !config.General.HideSidebar && setHover(() => false)}
-            >
+  function checkNumber(num: number) {
+    return num === currentButton ? "active" : "";
+  }
 
-                <div className={`sidebar-top ${detectSidebarStateContainers()}`}>
-                    {showLogo && <div className="sidebar-black-line"></div>}
-                    {data.top.map((value) => <Button icon={value.icon} content={detectSidebarStateButton(value.text)} onClick={(event) => {setHomeLocalSearch(false); hideSidebar(event, value.onClick); setHover((prev) => !prev)}} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />)}
-                </div>
-                <div className={`sidebar-bottom ${detectSidebarStateContainers()}`}>
-                    <div className="sidebar-black-line"></div>
-                    {data.bottom.map((value) => <Button icon={value.icon} content={detectSidebarStateButton(value.text)} onClick={(event) => {setHomeLocalSearch(false); hideSidebar(event, value.onClick); setHover((prev) => !prev)}} ButtonClass={detectSidebarStateClass()} iconClassName="sidebar-button" />)}
-                </div>
-            </motion.div>
+  return (
+    <div
+      class={detectSidebarState()}
+      onMouseEnter={() => props.showLogo && setHover(true)}
+      onMouseLeave={() => props.showLogo && setHover(false)}
+    >
+      {props.showLogo && (
+        <div class="sidebar-logo-icon-container">
+          <img src={icon} alt={version()} class="sidebar-image" />
+          {sidebarHover() && <div class="sidebar-version">v{version()}</div>}
         </div>
-    )
+      )}
+      <div class="sidebar-buttons-content">
+        <div class={`sidebar-top ${detectSidebarStateContainers()}`}>
+          {!props.showLogo && (
+            <Button
+              icon="arrow_back"
+              content={detectSidebarStateButton("Hide Sidebar")}
+              onClick={(event) => {
+                setHomeLocalSearch(false);
+                hideSidebar(event as any);
+              }}
+              ButtonClass={detectSidebarStateClass()}
+              iconClassName="sidebar-button"
+            />
+          )}
+          <div class="sidebar-black-line"></div>
+          <For each={props.data.top}>
+            {(value, i) => (
+              <Button
+                icon={value.icon}
+                content={detectSidebarStateButton(value.text)}
+                onClick={(event) => {
+                  setHomeLocalSearch(false);
+                  hideSidebar(event as any, value.onClick, i());
+                }}
+                ButtonClass={`${detectSidebarStateClass()} ${checkNumber(i())}`}
+                iconClassName={`sidebar-button ${checkNumber(i())}`}
+              />
+            )}
+          </For>
+        </div>
+        <div class={`sidebar-bottom ${detectSidebarStateContainers()}`}>
+          <div class="sidebar-black-line"></div>
+          <For each={props.data.bottom}>
+            {(value) => (
+              <Button
+                icon={value.icon}
+                content={detectSidebarStateButton(value.text)}
+                onClick={(event) => {
+                  setHomeLocalSearch(false);
+                  hideSidebar(event as any, value.onClick);
+                }}
+                ButtonClass={detectSidebarStateClass()}
+                iconClassName="sidebar-button"
+              />
+            )}
+          </For>
+        </div>
+      </div>
+    </div>
+  );
 }
-
-export default Sidebar
