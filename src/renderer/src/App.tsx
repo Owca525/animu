@@ -9,10 +9,10 @@ import { calculateZoomLevel, changeTheme, checkDate } from './utils/functions';
 // import { notificationProps } from './utils/GlobalInterface';
 import { InitialPlugin } from './utils/pluginApi';
 import { createShortcut } from '@solid-primitives/keyboard';
-import { onMount, Suspense, ErrorBoundary } from 'solid-js';
+import { onMount, Suspense, ErrorBoundary, createSignal, Show } from 'solid-js';
 import { HashRouter, Route } from "@solidjs/router";
 
-import Home from "./pages/home/index2";
+import Home from "./pages/home/index";
 import Information from "./pages/information/index";
 import Settings from "./pages/settings/index";
 // import Player from "./pages/player/index";
@@ -23,6 +23,8 @@ import i18n from './utils/i18n';
 import { getPlayerPLugin } from './utils/stores/plugins';
 
 function App() {
+  const [isInitation, setInitation] = createSignal<boolean>(true)
+
   createShortcut(["F12"], () => {
     if (getConfig().Developer.DevTools) window.BrowserWindow.openDevTools()
   })
@@ -50,24 +52,27 @@ function App() {
     setGlobalHistory(await window.api.getHistory())
     InitialPlugin()
     LoadConfig()
-    // runCheckUpdate()
+    setInitation(false)
+    runCheckUpdate()
   })
 
   return (
-    <ErrorBoundary fallback={(err) => {
-      console.log(err)
-      return <div>Error: {err.toString()}</div>
-    }}>
-      <Toaster position="top-right" />
-      <HashRouter>
-        <Suspense >
-          <Route path="/" component={Home} />
-          <Route path="/info" component={Information} />
-          <Route path="/settings" component={Settings} />
-          {/* <Route path="/player" component={Player} /> */}
-        </Suspense>
-      </HashRouter>
-    </ErrorBoundary>
+    <Show when={isInitation() == false}>
+      <ErrorBoundary fallback={(err) => {
+        console.log(err)
+        return <div>Error: {err.toString()}</div>
+      }}>
+        <Toaster position="top-right" />
+        <HashRouter>
+          <Suspense >
+            <Route path="/" component={Home} />
+            <Route path="/info" component={Information} />
+            <Route path="/settings" component={Settings} />
+            {/* <Route path="/player" component={Player} /> */}
+          </Suspense>
+        </HashRouter>
+      </ErrorBoundary>
+    </Show>
   )
 }
 

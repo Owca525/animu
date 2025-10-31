@@ -19,6 +19,7 @@
 
 .drop-content-show {
     padding: 12px;
+    height: max-content;
 }
 
 .drop-container {

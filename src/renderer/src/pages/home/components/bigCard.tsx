@@ -1,14 +1,14 @@
 import { getEpisodeDay, getGradientColor } from '@renderer/utils/functions';
 import { cardData } from '@renderer/utils/types';
-import React from 'react';
 import "./css/bigcard.css"
 import { t } from 'i18next';
 import Button from '@renderer/components/buttons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@solidjs/router';
+import { Component, For, Show } from 'solid-js';
 
 type bigCardProps = { data: cardData, ref?: any }
 
-const BigCard: React.FC<bigCardProps> = ({ data, ref }) => {
+const BigCard: Component<bigCardProps> = ({ data, ref }) => {
     const navigate = useNavigate();
 
     function formatEpisode(): string {
@@ -24,40 +24,42 @@ const BigCard: React.FC<bigCardProps> = ({ data, ref }) => {
     }
 
     return (
-        <div className="big-card-content" ref={ref} style={{ backgroundImage: `url(${data.AnimeData.bannerImage ?? data.AnimeData.coverImage})` }}>
-            <div className={`big-card-background ${!data.AnimeData.bannerImage ? "big-card-blur" : ""}`}>
-                <div className="big-card-information">
-                    <div className="big-card-information-image-container">
-                        <img src={data.AnimeData.coverImage} className="card-image big-card-information-image" />
+        <div class="big-card-content" ref={ref} style={{ "background-image": `url(${data.AnimeData.bannerImage ?? data.AnimeData.coverImage})` }}>
+            <div class={`big-card-background ${!data.AnimeData.bannerImage ? "big-card-blur" : ""}`}>
+                <div class="big-card-information">
+                    <div class="big-card-information-image-container">
+                        <img src={data.AnimeData.coverImage} class="card-image big-card-information-image" />
                         {data.AnimeData.averageScore &&
-                            <div className="big-card-information-score" style={{ border: `3px solid ${getGradientColor(data.AnimeData.averageScore)}` }}>
+                            <div class="big-card-information-score" style={{ border: `3px solid ${getGradientColor(data.AnimeData.averageScore)}` }}>
                                 {data.AnimeData.averageScore}%
                             </div>
                         }
                     </div>
-                    <div className="big-card-information-content">
-                        <div className="big-card-information-title">{data.AnimeData.title.romaji}</div>
-                        <div className="big-card-information-genres-content">
-                            {data.AnimeData.genres && data.AnimeData.genres.map((value) =>
-                                <div className="big-card-information-genres">{value}</div>
-                            )}
+                    <div class="big-card-information-content">
+                        <div class="big-card-information-title">{data.AnimeData.title.romaji}</div>
+                        <div class="big-card-information-genres-content">
+                            <Show when={data.AnimeData.genres}>
+                                <For each={data.AnimeData.genres}>
+                                    {(value) => (<div class="big-card-information-genres">{value as string}</div>)}
+                                </For>
+                            </Show>
                         </div>
-                        <div className="big-card-information-others">
-                            {data.AnimeData.format &&
-                                <div className="big-card-information-format">{t(`anime_formats.${data.AnimeData.format.toLowerCase()}`)}</div>
-                            }
-                            {data.AnimeData.status &&
-                                <div className="big-card-information-status">{t(`anime_statuses.${data.AnimeData.status.toLowerCase()}`)}</div>
-                            }
-                            {data.AnimeData.episodes &&
-                                <div className="big-card-information-episode">{formatEpisode() != "" ? `${formatEpisode()} /` : ""} {data.AnimeData.episodes} Episodes</div>
-                            }
+                        <div class="big-card-information-others">
+                            <Show when={data.AnimeData.format}>
+                                <div class="big-card-information-format">{t(`anime_formats.${data.AnimeData.format?.toLowerCase()}`)}</div>
+                            </Show>
+                            <Show when={data.AnimeData.status}>
+                                <div class="big-card-information-status">{t(`anime_statuses.${data.AnimeData.status?.toLowerCase()}`)}</div>
+                            </Show>
+                            <Show when={data.AnimeData.episodes}>
+                                <div class="big-card-information-episode">{formatEpisode() != "" ? `${formatEpisode()} /` : ""} {data.AnimeData.episodes} Episodes</div>
+                            </Show>
                         </div>
-                        <div className="big-card-information-bottom">
+                        <div class="big-card-information-bottom">
                             <Button content='More Information' ButtonClass='big-card-button' onClick={openInformation} />
-                            {data.AnimeData.nextAiringEpisode &&
-                                <div className="big-card-information-date">{getEpisodeDay(data.AnimeData.nextAiringEpisode.airingAt, data.AnimeData.nextAiringEpisode.episode)}</div>
-                            }
+                            <Show when={data.AnimeData.nextAiringEpisode}>
+                                <div class="big-card-information-date">{getEpisodeDay(data.AnimeData.nextAiringEpisode?.airingAt!, data.AnimeData.nextAiringEpisode?.episode!)}</div>
+                            </Show>
                         </div>
                     </div>
                 </div>
