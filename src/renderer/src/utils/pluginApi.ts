@@ -4,12 +4,14 @@ import { getHomeCache, setAllHomeData, setHomeStopScrolling } from "./stores/hom
 import { getPluginList, setPlayerPlugin } from "./stores/plugins";
 
 export async function setHomeData(func: () => Promise<{ topCards?: containerData, sections: containerData[] }>) {
+    console.log("setHomeData")
     try {
         setHomeStopScrolling(false)
         if (getHomeCache().isLoading) return
         setAllHomeData({isLoading: true, isError: false, data: { sections: [] }} as any)
-        let data = await func()
-        setAllHomeData({isLoading: false, isError: false, data: data} as any)
+        // let data = await func()
+        // console.log(data)
+        setAllHomeData({isLoading: false, isError: false, data: []} as any)
     } catch (error) {
         setAllHomeData({isLoading: false, isError: true, data: []} as any)
     }

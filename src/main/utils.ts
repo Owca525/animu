@@ -1,4 +1,4 @@
-import { app, clipboard, ipcMain, nativeImage, shell } from "electron"
+import { clipboard, ipcMain, nativeImage, shell } from "electron"
 import { Client } from "@xhayper/discord-rpc";
 import { ActivityType } from "discord-api-types/v10"
 
@@ -42,8 +42,6 @@ ipcMain.handle('setActivity', (_event, details?: string, state?: string, time?: 
 ipcMain.handle('runDiscordRPC', (_event) => {
     setupDiscordRPC()
 })
-
-ipcMain.handle('getVersion', (_event): String => app.getVersion())
 
 ipcMain.handle('runExternalPlayer', (_event, videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc"): any => {
     let flatpakList = execSync(`flatpak list --columns=application`).toString().trim().split(" ").includes(videoData.path)

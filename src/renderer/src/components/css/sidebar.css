@@ -31,6 +31,10 @@
     height: max-content;
 }
 
+.sidebar-container-min.hidden {
+    display: none;
+}
+
 .sidebar-button-min.active, .sidebar-button.active {
     background-color: var(--bg4);
 }

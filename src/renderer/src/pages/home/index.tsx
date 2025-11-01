@@ -23,8 +23,9 @@ import { getInformationPlugin, getPlayerPLugin } from "@renderer/utils/stores/pl
 import { useNavigate } from "@solidjs/router";
 import { getHomeCache, setHomeLocalSearch, setHomeSearch, setHomeSearchPage, setHomeSearchTags, setHomeStopScrolling } from "@renderer/utils/stores/home";
 import { getConfig } from "@renderer/utils/stores/config";
-import { createEffect, createSignal, For, onMount, Show } from "solid-js";
+import { createEffect, createSignal, For, Match, onMount, Show, Switch } from "solid-js";
 import { getGlobalCache } from "@renderer/utils/stores/global";
+import { createShortcut } from "@solid-primitives/keyboard";
 // import WelcomeScreen from "./components/welcomeScreen"
 
 const Home = () => {
@@ -36,8 +37,6 @@ const Home = () => {
   const [headerActive, setHeaderActive] = createSignal<boolean>(false)
 
   let divRef: HTMLDivElement | undefined;
-
-  console.log(homeCache)
 
   let sidebarData = {
     top: [
@@ -77,11 +76,11 @@ const Home = () => {
   })
 
   createEffect(() => {
-    let home = homeCache()
-    if (home.data.sections.length <= 0) return
-    if (home.data.sections.length != 1) return
-    if (home.stopScrolling) return
     if (!divRef) return
+    let home = homeCache()
+    if (!home.data.sections) return
+    if (home.data.sections.length <= 0 || home.data.sections.length != 1) return
+    if (home.stopScrolling) return
     if ((divRef.scrollHeight > divRef.clientHeight) == false && home.data.sections[0].onScrollDownFunction) {
       setHomeSearchPage(home.page + 1)
       home.data.sections[0].onScrollDownFunction(home.page + 1);
@@ -161,6 +160,7 @@ const Home = () => {
   // TODO: napraw wyszukiwanie itp
   async function OnSearch(text: string) {
     let home = homeCache()
+    console.log("sex")
     if (!home.localSearch && home.search != text) {
       setHomeSearch(text)
       setHomeSearchPage(1)
@@ -169,10 +169,10 @@ const Home = () => {
       return;
     }
 
-    if (text == "" || text == " ") {
-      await setHomeData(history);
-      return;
-    }
+    // if (text == "" || text == " ") {
+    //   await setHomeData(history);
+    //   return;
+    // }
 
     // TODO: Fix search history
     // let HomeData = home.data;
@@ -277,47 +277,50 @@ const Home = () => {
           <BigCardsContainer data={homeCache().data.topCards as containerData} />
         </Show>
         <div
-          class={`home-container ${homeCache().isLoading && "home-loading-container"} ${homeCache().isError && "home-loading-container"} ${homeCache().data && homeCache().data.sections.length <= 0 && "home-loading-container"}`}
+          class={`home-container ${homeCache().isLoading && "home-loading-container"} ${homeCache().isError && "home-loading-container"} ${homeCache().data && homeCache().data.sections && homeCache().data.sections.length <= 0 && "home-loading-container"}`}
         >
-          <Show when={homeCache().isLoading && homeCache().isError == false}>
-            <div class="material-symbols-outlined home-loading-animation">
-              progress_activity
-            </div>
-          </Show>
-          <Show when={homeCache().isError && homeCache().isLoading == false}>
-            <div class="home-error-container">
-              <span class="material-symbols-outlined home-error-icon">
-                error
-              </span>
-              {t("home.error")}
-            </div>
-          </Show>
-          <Show when={homeCache().isLoading == false && homeCache().isError == false && homeCache().data && homeCache().data.sections.length > 0}>
-            <For each={homeCache().data.sections}>
-              {(element) => (
-                <Container
-                  tags={
-                    homeCache().filterTags && homeCache().data && homeCache().data.sections.length == 1
-                      ? CreateTagList()
-                      : undefined
-                  }
-                  title={element.title}
-                  data={element.data}
-                  horizontal={element.horizontal}
-                  onScrollDownFunction={element.onScrollDownFunction}
-                  onTitleClick={element.onTitleClick}
-                />
-              )}
-            </For>
-          </Show>
-          <Show when={homeCache().isError == false && homeCache().isLoading == false && homeCache().data && homeCache().data.sections.length <= 0}>
-            <div class="home-empty-container">
-              <span class="material-symbols-outlined home-empty-icon">
-                search_off
-              </span>
-              {t("home.nothingfound")}
-            </div>
-          </Show>
+          <Switch>
+            <Match when={homeCache().isLoading && homeCache().isError == false}>
+              <div class="material-symbols-outlined home-loading-animation">
+                progress_activity
+              </div>
+            </Match>
+            <Match when={homeCache().isError && homeCache().isLoading == false}>
+              <div class="home-error-container">
+                <span class="material-symbols-outlined home-error-icon">
+                  error
+                </span>
+                {t("home.error")}
+              </div>
+            </Match>
+            <Match when={homeCache().isError == false && homeCache().isLoading == false && homeCache().data && homeCache().data.sections && homeCache().data.sections.length <= 0}>
+              <div class="home-empty-container">
+                <span class="material-symbols-outlined home-empty-icon">
+                  search_off
+                </span>
+                {t("home.nothingfound")}
+              </div>
+            </Match>
+
+            <Match when={homeCache().isLoading == false && homeCache().isError == false && homeCache().data && homeCache().data.sections && homeCache().data.sections.length > 0}>
+              <For each={homeCache().data.sections}>
+                {(element) => (
+                  <Container
+                    tags={
+                      homeCache().filterTags && homeCache().data && homeCache().data.sections.length == 1
+                        ? CreateTagList()
+                        : undefined
+                    }
+                    title={element.title}
+                    data={element.data}
+                    horizontal={element.horizontal}
+                    onScrollDownFunction={element.onScrollDownFunction}
+                    onTitleClick={element.onTitleClick}
+                  />
+                )}
+              </For>
+            </Match>
+          </Switch>
         </div>
       </div>
     </main>
