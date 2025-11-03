@@ -28,8 +28,6 @@ ipcMain.handle('fetch-data', async (_event, url: string, header: Record<string, 
 )
 
 ipcMain.handle('send-post', async (_event, url: string, header: Record<string, string>, body?: { query: string, variables: Object }, type: "json" | "text" = "json"): Promise<{ success: boolean; data: any; status: number; statusText: string; error?: unknown; }> => {
-    console.log("Test")
-    return { success: false, data: [], status: 400, statusText: "test" }
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), 5000);
     try {

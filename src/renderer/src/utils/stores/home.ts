@@ -8,9 +8,10 @@ const initialState: homeData = {
     search: "",
     page: 1,
     stopScrolling: false,
-    containerLoading: false,
+    // containerLoading: false,
     localSearch: false,
-    filterTags: undefined
+    filterTags: undefined,
+    mainContainer: undefined
 };
 
 export const [globalState, setGlobalState] = createStore(initialState);

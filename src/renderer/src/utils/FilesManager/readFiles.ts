@@ -6,7 +6,7 @@ import { searchForConvertAnime } from "@renderer/plugins/anilistApi";
 import { getGlobalCache, setGlobalHistory } from "../stores/global";
 import toast from "solid-toast";
 
-export async function DeleteFromFile(data: cardData, file: string) {
+export async function DeleteFromFile(data: cardData, file: string, notification: boolean = false) {
     try {
         if (getGlobalCache().incognito) return
         if (!data.saveData) return
@@ -32,22 +32,23 @@ export async function DeleteFromFile(data: cardData, file: string) {
         if (file == "history") setGlobalHistory({ history: list } as any)
         refetchHistory()
 
-        if (data.saveData) {
-            if (file === "continueWatch") {
-                toast.success(i18n.t("history.continuesaved"))
-            } else if (file === "history") {
-                toast.success(i18n.t("history.historysaved"))
-            }
+        if (!(!data.saveData && !notification)) return true
+
+        if (file === "continueWatch") {
+            toast.success(i18n.t("history.continuesaved"))
+        } 
+        if (file === "history") {
+            toast.success(i18n.t("history.historysaved"))
         }
         return true
     } catch (Error) {
         console.error(`${Error} in DeleteFromFile`)
-        if (data.saveData) {
-            if (file === "continueWatch") {
-                toast.error(i18n.t("history.continuefailed"))
-            } else if (file === "history") {
-                toast.error(i18n.t("history.historyfailed"))
-            }
+        if (!(!data.saveData && !notification)) return false
+        if (file === "continueWatch") {
+            toast.error(i18n.t("history.continuefailed"))
+        } 
+        if (file === "history") {
+            toast.error(i18n.t("history.historyfailed"))
         }
         return false
     }
@@ -87,7 +88,7 @@ export async function SaveToFile(data: cardData, file: string): Promise<boolean>
 
 export async function CheckFile(file: string): Promise<boolean> {
     try {
-        if (await window.api.os.exists(`${file}.json`) == false ) {
+        if (await window.api.os.exists(`${file}.json`) == false) {
             await window.api.os.write(
                 `${file}.json`,
                 JSON.stringify([])
@@ -131,7 +132,7 @@ async function convertToNewVersion(data: { id: string, title: string, img: strin
             }
             animeList.push(
                 {
-                    ...reqAnime[0], 
+                    ...reqAnime[0],
                     saveData: {
                         pluginName: "Allmanga",
                         last_Time: anime.player ? anime.player.episode.time : 0,
@@ -156,7 +157,7 @@ export async function DetectOldVersionHistory() {
         if (tmpHistory) {
             let history = JSON.parse(tmpHistory as string)
             if (Array.isArray(history)) {
-                if ("id" in history[0]){
+                if ("id" in history[0]) {
                     await CreateBackup()
                     toast.success("Detected Old history")
                     await window.api.os.write("history.json", JSON.stringify(await convertToNewVersion(history)))
@@ -165,15 +166,15 @@ export async function DetectOldVersionHistory() {
         }
         let tmpcontinueWatch = await window.api.os.read("continueWatch.json")
         if (tmpcontinueWatch) {
-        let continueWatch = JSON.parse(tmpcontinueWatch as string)
+            let continueWatch = JSON.parse(tmpcontinueWatch as string)
             if ("continue" in continueWatch) {
                 if ("id" in continueWatch["continue"][0]) {
                     toast.success("Detected Old Continue Watch")
                     await window.api.os.write("continueWatch.json", JSON.stringify(await convertToNewVersion(continueWatch)))
                 }
+            }
         }
-        }
-    
+
     } catch (error) {
         toast.error("Failed Convert all History")
         console.error("Error in DetectOldVersionHistory", error)

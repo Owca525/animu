@@ -96,18 +96,19 @@ function information() {
     })
 
     function enterPlayer(episodes: { ep: string, img?: string, title?: string }[], type: string, episode: string) {
-        let tmp = tempData()
+        let tmp = JSON.parse(JSON.stringify(tempData()))
         if (!tmp.saveData) return
+        console.log(tmp)
         navigate("/player", {
             state: {
                 data: {
-                    ...tempData().anime,
-                    player_ID: currentIDplayer()
+                    ...tmp.anime,
+                    player_ID: currentIDplayer() ? JSON.parse(JSON.stringify(currentIDplayer())) : episodeResponse.data?.player_id
                 },
                 save: {
                     last_Time: tmp.saveData.episode.toString() === episode ? tmp.saveData.last_Time : 0,
                     type: type,
-                    pluginName: currentPlugin(),
+                    pluginName: currentIDplayer() ? JSON.parse(JSON.stringify(currentIDplayer())) : episodeResponse.data?.player_id,
                     episode: episode
                 },
                 episodelist: episodes,

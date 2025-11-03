@@ -7,7 +7,6 @@ import {
   containerData,
   FilterParams,
   homeData,
-  informationPluginFormat,
   SettingsConfig,
 } from "@renderer/utils/types";
 import { t } from "i18next";
@@ -25,12 +24,12 @@ import { getHomeCache, setHomeLocalSearch, setHomeSearch, setHomeSearchPage, set
 import { getConfig } from "@renderer/utils/stores/config";
 import { createEffect, createSignal, For, Match, onMount, Show, Switch } from "solid-js";
 import { getGlobalCache } from "@renderer/utils/stores/global";
-import { createShortcut } from "@solid-primitives/keyboard";
+// import { createShortcut } from "@solid-primitives/keyboard";
 // import WelcomeScreen from "./components/welcomeScreen"
 
 const Home = () => {
   const navigate = useNavigate();
-  const plugin: informationPluginFormat = getInformationPlugin()
+  const plugin = getInformationPlugin()
   const [homeCache] = createSignal<homeData>(getHomeCache());
   const pluginPlayer = getPlayerPLugin();
   const [isOpenSidebar, setOpenSidebar] = createSignal<boolean>(false);
@@ -43,7 +42,7 @@ const Home = () => {
       {
         icon: "home",
         text: t("global.home"),
-        onClick: plugin.info.home,
+        onClick: plugin.home,
       },
       {
         icon: "history",
@@ -68,7 +67,7 @@ const Home = () => {
   }
 
   onMount(() => {
-    if (homeCache().data.sections.length <= 0) plugin.info.home()
+    if (homeCache().data.sections.length <= 0) plugin.home()
     const config: SettingsConfig = JSON.parse(JSON.stringify(getConfig()));
     console.log(config)
     if (config.General.discordRPC)
@@ -81,10 +80,10 @@ const Home = () => {
     if (!home.data.sections) return
     if (home.data.sections.length <= 0 || home.data.sections.length != 1) return
     if (home.stopScrolling) return
-    if ((divRef.scrollHeight > divRef.clientHeight) == false && home.data.sections[0].onScrollDownFunction) {
-      setHomeSearchPage(home.page + 1)
-      home.data.sections[0].onScrollDownFunction(home.page + 1);
-    }
+    // if ((divRef.scrollHeight > divRef.clientHeight) == false && home.data.sections[0].onScrollDownFunction) {
+    //   setHomeSearchPage(home.page + 1)
+    //   home.data.sections[0].onScrollDownFunction(home.page + 1);
+    // }
   })
 
   async function history(): Promise<{
@@ -99,31 +98,31 @@ const Home = () => {
           title: t("global.continuewatch"),
           data: history.continue.slice(0, 20),
           horizontal: true,
-          onTitleClick: () =>
-            setHomeData(async () => ({
-              sections: [
-                {
-                  title: t("global.continuewatch"),
-                  data: history.continue,
-                  horizontal: false,
-                },
-              ],
-            })),
+          // onTitleClick: () =>
+          //   setHomeData(async () => ({
+          //     sections: [
+          //       {
+          //         title: t("global.continuewatch"),
+          //         data: history.continue,
+          //         horizontal: false,
+          //       },
+          //     ],
+          //   })),
         },
         {
           title: t("global.history"),
           data: history.history.slice(0, 20),
           horizontal: true,
-          onTitleClick: () =>
-            setHomeData(async () => ({
-              sections: [
-                {
-                  title: t("global.history"),
-                  data: history.history,
-                  horizontal: false,
-                },
-              ],
-            })),
+          // onTitleClick: () =>
+          //   setHomeData(async () => ({
+          //     sections: [
+          //       {
+          //         title: t("global.history"),
+          //         data: history.history,
+          //         horizontal: false,
+          //       },
+          //     ],
+          //   })),
         },
       ],
     };
@@ -149,10 +148,10 @@ const Home = () => {
       home.stopScrolling == false &&
       home.data.sections.length === 1
     ) {
-      if (home.data.sections[0].onScrollDownFunction) {
-        setHomeSearchPage(home.page + 1)
-        home.data.sections[0].onScrollDownFunction(home.page + 1);
-      }
+      // if (home.data.sections[0].onScrollDownFunction) {
+      //   setHomeSearchPage(home.page + 1)
+      //   home.data.sections[0].onScrollDownFunction(home.page + 1);
+      // }
       return;
     }
   };
@@ -165,7 +164,7 @@ const Home = () => {
       setHomeSearch(text)
       setHomeSearchPage(1)
       setHomeStopScrolling(false);
-      plugin.info.search(text, 1, home.filterTags);
+      plugin.searchAnime(text, 1, home.filterTags);
       return;
     }
 
@@ -259,7 +258,7 @@ const Home = () => {
           <div class="home-filter-void">
             <Filter
               onChange={onChange}
-              filter={plugin.searchOption}
+              filter={plugin.currentPlugin.metadata.searchOption}
               custonClass={`${homeCache().data && homeCache().data.topCards ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
             />
           </div>
@@ -315,7 +314,7 @@ const Home = () => {
                     data={element.data}
                     horizontal={element.horizontal}
                     onScrollDownFunction={element.onScrollDownFunction}
-                    onTitleClick={element.onTitleClick}
+                    // onTitle={element.onTitleClick}
                   />
                 )}
               </For>

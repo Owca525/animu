@@ -5,7 +5,7 @@ import Button from "@renderer/components/buttons"
 import { t } from "i18next"
 import { Component, For, Show } from "solid-js"
 
-const Container: Component<containerData> = ({ title, data, horizontal = false, onTitleClick, tags }) => {
+const Container: Component<containerData> = ({ title, data, horizontal = false, tags }) => {
   let container: HTMLDivElement | undefined
 
   function handleButtonScroll(num: number) {
@@ -21,7 +21,7 @@ const Container: Component<containerData> = ({ title, data, horizontal = false, 
     <div tabIndex={-1} class="main-container">
         <div tabIndex={-1} class="container-title-container">
           <Show when={title}>
-            <div class={onTitleClick ? "container-title-click" : "container-title"} onClick={onTitleClick}>{title}</div>
+            <div class={false ? "container-title-click" : "container-title"}>{title}</div>
           </Show>
           <Show when={tags}>
             <For each={tags}>

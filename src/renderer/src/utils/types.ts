@@ -64,13 +64,20 @@ export interface homeData {
     search: string
     page: number
     stopScrolling: boolean
-    containerLoading: boolean
     localSearch: boolean
     filterTags?: FilterParams
+    mainContainer: {
+        scrollLeft: number,
+        scrollTop: number,
+        offsetHeight: number,
+        scrollHeight: number,
+        clientHeight: number
+    } | undefined
+    onScrollContainer?: () => void 
 }
 
 export interface globalDataFormat {
-    incognito: boolean, 
+    incognito: boolean,
     history: { continue: cardData[], history: cardData[] }
 }
 
@@ -112,6 +119,7 @@ export interface indentityPlayer {
 export interface cardData {
     AnimeData: AnimeData
     saveData?: indentityPlayer
+    deletionCard?: () => void
     onClick?: (data: AnimeData) => void
 }
 
@@ -119,8 +127,11 @@ export interface containerData {
     title?: string
     data: cardData[]
     horizontal?: boolean
-    onScrollDownFunction?: (page: number) => void
-    onTitleClick?: () => void
+    onScrollDownFunction?: (title: string | undefined, page: number, params?: genresSearchFormat) => Promise<{ data: cardData[], maxPage: number }>
+    titlevent?: {
+        onTitleClick?: (context: any) => void
+        onTitleClickContext: any
+    }
     tags?: {
         remover: () => void
         name: string
@@ -130,7 +141,7 @@ export interface containerData {
 export interface sidebarData {
     icon: string
     text: string
-    onClick?: () => Promise<void> | void
+    onClick?: () => void
 }
 
 export type ContextMenuProps = {
@@ -161,7 +172,7 @@ export interface playerPluginFormat {
         extractPlayerData: (type: string, episode: string, id: string) => Promise<playerData[]>
         extractEpisodeList: (animeData?: AnimeData, anime_id?: string) => Promise<episodeList | undefined>
         extractOnlyEpisodesList: (type: string, anime_id: string) => Promise<{ ep: string, img?: string, title?: string }[]>
-        searchAnime: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => Promise<cardData[]>
+        searchAnime: (name: string, page: number, params?: genresSearchFormat) => Promise<cardData[]>
     }
 }
 
@@ -173,7 +184,7 @@ export interface informationPluginFormat {
     preferedLang: string[]
     pageSize: number
     info: {
-        search: (name: string, page: number, params?: { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }) => Promise<void>
+        search: (name: string, page: number, params?: genresSearchFormat) => Promise<void>
         home: () => Promise<void>
         anime: (id: string) => Promise<AnimeData | undefined>
     }
@@ -181,7 +192,36 @@ export interface informationPluginFormat {
     sidebarAddon?: sidebarData[]
 }
 
+export interface newInformationPluginFormat {
+    metadata: {
+        version: string
+        name: string
+        pageSize: number
+        searchOption: genres
+    }
+    search(
+        context: { name: string, page: number, params?: genresSearchFormat },
+        callbacks: { onSuccess: (data: containerData) => void, onError: (error: string) => void }
+    ): Promise<void>
+    home(
+        callbacks: { onSuccess: (data: { topCards?: containerData, sections: containerData[] }) => void, onError: (error: string) => void }
+    ): Promise<void>
+    anime(
+        context: { id: string },
+    ): Promise<AnimeData | undefined>
+    onTitleClick(content: any, callbacks: { onSuccess: (data: containerData) => void, onError: (error: string) => void }): Promise<void>
+}
+
+export interface informationPluginManagerFormat {
+    currentPlugin: newInformationPluginFormat
+    searchAnime(name: string, page: number, params?: genresSearchFormat): void
+    home(): void
+    anime(id: string): Promise<AnimeData | undefined>
+    onTitleClick(content: any): void
+}
+
 export type genres = { genres: string[], seasons: string[], years: string[], format: string[], statuses: string[] }
+export interface genresSearchFormat { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }
 
 export interface episodeList { player_id: string, episodesData: { episodes: { ep: string, img?: string, title?: string }[], type: string, name?: string }[] }
 

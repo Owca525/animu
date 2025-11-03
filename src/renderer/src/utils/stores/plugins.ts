@@ -2,12 +2,12 @@ import { infoPluginPlayer } from "@renderer/plugins/allmanga";
 import { playerPluginFormat } from "../types";
 import { AniZone } from "@renderer/plugins/anizone";
 import { lycorisCafe } from "@renderer/plugins/lycoriscafe";
-import { infoPlugin } from "@renderer/plugins/anilistApi";
 import { createStore } from "solid-js/store";
+import { informationPluginManager } from "../pluginManager";
 
 const initialState = {
     loadedPlugins: [infoPluginPlayer, AniZone, lycorisCafe] as playerPluginFormat[],
-    informationPlugin: infoPlugin,
+    informationPlugin: new informationPluginManager(),
     playerPlugin: undefined as playerPluginFormat | undefined,
     playerPluginCache: undefined
 };

@@ -1,38 +1,39 @@
-import { useEffect, useRef } from "react";
+import { onMount, onCleanup } from "solid-js";
 import { convertKeybinds } from "../functions";
 
-const useKeyPress = (func: (keybinds: string) => void) => {
-  const keysRef = useRef<string[]>([]);
-  const funcRef = useRef(func);
+export function useKeyPress(func: (keybinds: string) => void) {
+  let keysRef: string[] = [];
+  let funcRef = func;
 
-  useEffect(() => {
-    funcRef.current = func;
-  }, [func]);
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const key = convertKeybinds(event.key);
-      if (!keysRef.current.includes(key)) {
-        keysRef.current.push(key);
-        funcRef.current(keysRef.current.join("+"));
-        return
-      }
-      funcRef.current(key);
-    };
-
-    const handleKeyUp = (event: KeyboardEvent) => {
-      const key = convertKeybinds(event.key);
-      keysRef.current = keysRef.current.filter((k) => k !== key);
-      funcRef.current(keysRef.current.join("+"));
-    };
-
-    window.addEventListener('keydown', handleKeyDown, { passive: true });
-    window.addEventListener('keyup', handleKeyUp, { passive: true });
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
+  const setFunc = (newFunc: typeof func) => {
+    funcRef = newFunc;
+  };
+  
+  const handleKeyDown = (event: KeyboardEvent) => {
+    const key = convertKeybinds(event.key);
+    if (!keysRef.includes(key)) {
+      keysRef.push(key);
+      funcRef(keysRef.join("+"));
+      return;
     }
-  }, [])
-};
+    funcRef(key);
+  };
 
-export default useKeyPress;
+  const handleKeyUp = (event: KeyboardEvent) => {
+    const key = convertKeybinds(event.key);
+    keysRef = keysRef.filter((k) => k !== key);
+    funcRef(keysRef.join("+"));
+  };
+
+  onMount(() => {
+    window.addEventListener("keydown", handleKeyDown, { passive: true });
+    window.addEventListener("keyup", handleKeyUp, { passive: true });
+  });
+
+  onCleanup(() => {
+    window.removeEventListener("keydown", handleKeyDown);
+    window.removeEventListener("keyup", handleKeyUp);
+  });
+
+  return { setFunc };
+}

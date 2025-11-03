@@ -1,23 +1,17 @@
-import { lazy, RefObject, useEffect, useRef, useState } from "react"
-import { useTranslation } from "react-i18next"
-import { toast } from "react-toastify"
 import Hls from "hls.js"
 
 // Components
-import NerdStats from "./components/nerdStats"
-const DeveloperStats = lazy(() => import('./components/developerStats'));
+// import NerdStats from "./components/nerdStats"
+// const DeveloperStats = lazy(() => import('./components/developerStats'));
 
 // css
-import { AnimeData, ContextMenuProps, indentityPlayer, notificationProps, playerChapterList, playerData, playerSubtitlesFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
-import { useSelector } from "react-redux"
+import { AnimeData, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
 import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory, toSeconds, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
-import useKeyPress from "@renderer/utils/hooks/useKeyPress"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
 import PlayerSettings from "./components/PlayerSettings"
 import PlayerButton from "./components/PlayerButton"
-import { motion } from "framer-motion"
 import PlayerEpisodeElement from "./components/playerEpisodeElement"
 import { convert } from "subtitle-converter";
 // import { useHotkeys } from "react-hotkeys-hook"
@@ -27,9 +21,14 @@ import JASSUB from "jassub";
 
 import workerUrl from "jassub/dist/jassub-worker.js?url";
 import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
-import { useHotkeys } from "react-hotkeys-hook"
 import { saveConfig } from "@renderer/utils/FilesManager/config"
 import { DeleteFromFile, SaveToFile } from "@renderer/utils/FilesManager/readFiles"
+import { Component, createSignal, For, onMount, Show, Switch } from "solid-js"
+import { getConfig } from "@renderer/utils/stores/config"
+import toast from "solid-toast"
+import { t } from "i18next"
+import { createShortcut } from "@solid-primitives/keyboard"
+import { useKeyPress } from "@renderer/utils/hooks/useKeyPress"
 
 function addTime(durration: number): string {
     const now = new Date();
@@ -82,93 +81,92 @@ interface VideoPlayerProps {
     exitFromPlayer: () => void
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp, setNextEpisode, volumeCacheFunc, PlayerVolume = 0, time, exitFromPlayer }) => {
-    // Translation 
-    const { t } = useTranslation()
-    const config: SettingsConfig = useSelector((data: any) => data.config);
+const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, temp, setNextEpisode, volumeCacheFunc, PlayerVolume = 0, time, exitFromPlayer }) => {
+    const config: SettingsConfig = getConfig();
 
     // ref for html object
-    const videoRef = useRef<HTMLVideoElement | null>(null)
-    const containerRef = useRef<HTMLDivElement | null>(null)
-    const hideTimer = useRef<NodeJS.Timeout | null>(null)
-    const hideChapterButtonTimer = useRef<NodeJS.Timeout | null>(null)
-    const screenshotWrapper = useRef<HTMLDivElement | null>(null)
+    let videoRef: HTMLVideoElement | undefined
+    let containerRef: HTMLDivElement | undefined
+    let hideTimer: NodeJS.Timeout | undefined
+    let hideChapterButtonTimer: NodeJS.Timeout | undefined
+    let screenshotWrapper: HTMLDivElement | undefined
+    let volumeTimeout: NodeJS.Timeout | undefined
+    let playAnimationTimeout: NodeJS.Timeout | undefined
+    let buttonSkipLeft: NodeJS.Timeout | undefined
+    let buttonSkipRight: NodeJS.Timeout | undefined
+    let assSubContainer: HTMLDivElement | undefined
+    let vttSubRef: HTMLTrackElement | undefined
 
     // Variable
-    const [volume, setVolume] = useState<number>(PlayerVolume)
-    const [currentTime, setcurrentTime] = useState<number>(0)
-    const [currentBuffer, setBuffered] = useState<{ position: number, width: number }[]>([])
+    const [volume, setVolume] = createSignal<number>(PlayerVolume)
+    const [currentTime, setcurrentTime] = createSignal<number>(0)
+    const [durrationTime, setdurrationTime] = createSignal<number>(0)
+    const [currentBuffer, setBuffered] = createSignal<{ position: number, width: number }[]>([])
 
     // UI
-    const [isVolume, setShowVolume] = useState<boolean>(false)
-    const volumeTimeout = useRef<NodeJS.Timeout | null>(null);
-    const [isShowPlay, setShowPlay] = useState<boolean>(false)
-    const playAnimationTimeout = useRef<NodeJS.Timeout | null>(null);
-    const [isShowSelectEpisode, setShowSelectEpisode] = useState<boolean>(false)
-    const [buttonSkipTime, setButtonSkipTime] = useState<number>(15)
-    const [minusTimeState, setminusTimeState] = useState<boolean>(config.Player.general.minusTime)
-    const [IsRunningButtonSkipTime, setIsRunningButtonSkipTime] = useState<boolean>(false)
-    const [IsDisableButtonSkipTimerOpening, setIsDisableButtonSkipTimerOpening] = useState<boolean>(false)
-    const [IsDisableButtonSkipTimerEnding, setIsDisableButtonSkipTimerEnding] = useState<boolean>(false)
-    const [currentSkipButton, setcurrentSkipButton] = useState<{ text: string, onClick: () => void, type: "opening" | "ending" | "" }>({ text: "", onClick: () => "", type: "" })
+    const [isVolume, setShowVolume] = createSignal<boolean>(false)
+    const [isShowPlay, setShowPlay] = createSignal<boolean>(false)
+    const [isShowSelectEpisode, setShowSelectEpisode] = createSignal<boolean>(false)
+    const [buttonSkipTime, setButtonSkipTime] = createSignal<number>(15)
+    const [minusTimeState, setminusTimeState] = createSignal<boolean>(config.Player.general.minusTime)
+    const [IsRunningButtonSkipTime, setIsRunningButtonSkipTime] = createSignal<boolean>(false)
+    const [IsDisableButtonSkipTimerOpening, setIsDisableButtonSkipTimerOpening] = createSignal<boolean>(false)
+    const [IsDisableButtonSkipTimerEnding, setIsDisableButtonSkipTimerEnding] = createSignal<boolean>(false)
+    const [currentSkipButton, setcurrentSkipButton] = createSignal<{ text: string, onClick: () => void, type: "opening" | "ending" | "" }>({ text: "", onClick: () => "", type: "" })
 
-    const buttonSkipLeft = useRef<NodeJS.Timeout | null>(null);
-    const [isShowButtonSkipLeft, setShowButtonSkipLeft] = useState<boolean>(false)
-    const buttonSkipRight = useRef<NodeJS.Timeout | null>(null);
-    const [isShowButtonSkipRight, setShowButtonSkipRight] = useState<boolean>(false)
+    const [isShowButtonSkipLeft, setShowButtonSkipLeft] = createSignal<boolean>(false)
+    const [isShowButtonSkipRight, setShowButtonSkipRight] = createSignal<boolean>(false)
 
     // States
-    const [isMuted, setMuted] = useState<boolean>(false)
-    const [isVisible, setIsVisible] = useState<boolean>(true)
-    const [isWaitingPlayer, setWaitingPlayer] = useState<boolean>(true)
-    const [isPlaying, setIsPlaying] = useState<boolean>(config.Player.general.Autoplay)
-    const [isFullscreen, setIsFullscreen] = useState<boolean>(false)
+    const [isMuted, setMuted] = createSignal<boolean>(false)
+    const [isVisible, setIsVisible] = createSignal<boolean>(true)
+    const [isWaitingPlayer, setWaitingPlayer] = createSignal<boolean>(true)
+    const [isPlaying, setIsPlaying] = createSignal<boolean>(config.Player.general.Autoplay)
+    const [isFullscreen, setIsFullscreen] = createSignal<boolean>(false)
 
     // Resolution
-    const [ListResolution, setListResolution] = useState<{ res: string, url: string }[]>([])
-    const [currentResolution, setCurrentResoltion] = useState<{ res: string, url: string } | undefined>(undefined)
+    const [ListResolution, setListResolution] = createSignal<{ res: string, url: string }[]>([])
+    const [currentResolution, setCurrentResoltion] = createSignal<{ res: string, url: string } | undefined>(undefined)
 
     // Up Next
-    const [timeNextEpisode, setTimeNextEpisode] = useState<number>(config.Player.upToNextEpisode.durationShow)
-    const [isUpNextEpisode, setUpNextEpisode] = useState<boolean>(false)
-    const [isHideUpNextEpisode, setHideUpNextEpisode] = useState<boolean>(false)
-    const [currentPlayer, setPlayer] = useState<playerData | undefined>(undefined)
+    const [timeNextEpisode, setTimeNextEpisode] = createSignal<number>(config.Player.upToNextEpisode.durationShow)
+    const [isUpNextEpisode, setUpNextEpisode] = createSignal<boolean>(false)
+    const [isHideUpNextEpisode, setHideUpNextEpisode] = createSignal<boolean>(false)
+    const [currentPlayer, setPlayer] = createSignal<playerData | undefined>(undefined)
 
     // other
-    const [currentSettings, setcurrentSettings] = useState<boolean>(false)
-    const [showNerdStats, setshowNerdStats] = useState<boolean>(false)
-    const [resolutionNotFound, setResError] = useState<boolean>(false)
-    const [hls, setHls] = useState<Hls | undefined>(undefined);
-    const [chapterList, setChapterList] = useState<{ left: number, width: number, name?: string, type: "opening" | "ending" | "other" }[]>([])
+    const [currentSettings, setcurrentSettings] = createSignal<boolean>(false)
+    const [showNerdStats, setshowNerdStats] = createSignal<boolean>(false)
+    const [resolutionNotFound, setResError] = createSignal<boolean>(false)
+    const [hls, setHls] = createSignal<Hls | undefined>(undefined);
+    const [chapterList, setChapterList] = createSignal<{ left: number, width: number, name?: string, type: "opening" | "ending" | "other" }[]>([])
 
     // Subtitles
-    const [vttUrl, setVttUrl] = useState<string | undefined>(undefined);
-    const [ListSubtitles, setListSubtitles] = useState<playerSubtitlesFormat[]>([])
-    const [lastSubtitles, setlastSubtitles] = useState<playerSubtitlesFormat | undefined>(undefined)
-    const [currentASSubtitles, setASSubtitles] = useState<JASSUB | undefined>(undefined)
-    const [currentSubtitles, setSubtitles] = useState<playerSubtitlesFormat | undefined>(undefined)
-    const assSubContainer = useRef<HTMLDivElement | null>(null);
-    const vttSubRef = useRef<HTMLTrackElement | null>(null);
-    const [currentCue, setCue] = useState<string | undefined>(undefined);
+    const [vttUrl, setVttUrl] = createSignal<string | undefined>(undefined);
+    const [ListSubtitles, setListSubtitles] = createSignal<playerSubtitlesFormat[]>([])
+    const [lastSubtitles, setlastSubtitles] = createSignal<playerSubtitlesFormat | undefined>(undefined)
+    const [currentASSubtitles, setASSubtitles] = createSignal<JASSUB | undefined>(undefined)
+    const [currentSubtitles, setSubtitles] = createSignal<playerSubtitlesFormat | undefined>(undefined)
+    const [currentCue, setCue] = createSignal<string | undefined>(undefined);
 
     // Audio Tracks
-    const [audioTrackList, setAudioTrackList] = useState<{ id: number, lang?: string, label: string }[]>([]);
-    const [currentAudioTrack, setCurrentAudioTrack] = useState<{ id: number, lang?: string, label: string } | undefined>();
+    const [audioTrackList, setAudioTrackList] = createSignal<{ id: number, lang?: string, label: string }[]>([]);
+    const [currentAudioTrack, setCurrentAudioTrack] = createSignal<{ id: number, lang?: string, label: string } | undefined>();
 
     // Thumbnail
-    const [thumbnails, setThumbnail] = useState<Thumbnail | undefined>(undefined);
+    const [thumbnails, setThumbnail] = createSignal<Thumbnail | undefined>(undefined);
 
     function handleMouseMove() {
         setIsVisible(true)
-        if (hideTimer.current) {
-            clearTimeout(hideTimer.current)
+        if (hideTimer) {
+            clearTimeout(hideTimer)
         }
-        if (currentSettings == false && isShowSelectEpisode == false) {
-            hideTimer.current = setTimeout(() => setIsVisible(false), 2000)
+        if (currentSettings() == false && isShowSelectEpisode() == false) {
+            hideTimer = setTimeout(() => setIsVisible(false), 2000)
         }
     }
 
-    useEffect(() => {
+    onMount(() => {
         let defaulthost = player_data[0]
         for (let index = 0; index < player_data.length; index++) {
             const element = player_data[index];
@@ -181,11 +179,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             window.BrowserWindow.setFullscreen(true)
             setIsFullscreen(true)
         }
-        if (videoRef.current) {
-            videoRef.current.currentTime = time
+        if (videoRef) {
+            videoRef.currentTime = time
             setcurrentTime(() => time)
         }
-    }, [])
+    })
 
     // player Functions
     async function enterFullscreen() {
@@ -199,25 +197,25 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     }
 
     function setSpeed(speed: string) {
-        if (!videoRef.current) return
-        videoRef.current.playbackRate = parseFloat(speed)
+        if (!videoRef) return
+        videoRef.playbackRate = parseFloat(speed)
     }
 
     function setNewResolution(data: { res: string, url: string; defaultSubtitles?: boolean; } | undefined) {
         if (!data) return
-        if (!videoRef.current) return
-        const time = videoRef.current.currentTime
-        if (data.defaultSubtitles) setDefaultSubtitles(ListSubtitles)
+        if (!videoRef) return
+        const time = videoRef.currentTime
+        if (data.defaultSubtitles) setDefaultSubtitles(ListSubtitles())
         else setNewSubtitles(ListSubtitles[0])
 
-        if (hls && data.url == "") {
+        if (hls() && data.url == "") {
             setCurrentResoltion(data)
-            hls.currentLevel = hls.levels.findIndex(level => level.height === parseInt(data.res));
+            hls()!.currentLevel = hls()!.levels.findIndex(level => level.height === parseInt(data.res));
             return
         }
         setCurrentResoltion(data)
-        videoRef.current.src = data.url
-        videoRef.current.currentTime = time
+        videoRef.src = data.url
+        videoRef.currentTime = time
     }
 
     // function setNewUrl(host: string) {
@@ -241,7 +239,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     }
 
     async function checkUrl(data: playerData) {
-        if (!videoRef.current) return
+        if (!videoRef) return
         let currentplayer = data
         if (currentplayer.extractResolution) {
             let tmp = await fetchData({
@@ -257,11 +255,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         console.log(currentplayer)
 
         if (currentplayer.resolution.length <= 0) {
-            toast.info(t("player.errors.missingResoltions"), notificationProps)
+            toast.success(t("player.errors.missingResoltions"))
             setResError(() => true)
             return
         }
-        const time = videoRef.current.currentTime
+        const time = videoRef.currentTime
         if (currentplayer.subtitles) setListSubtitles(() => [{ url: "", format: "", lang: "", label: "Off" }, ...currentplayer.subtitles as playerSubtitlesFormat[]])
         if (currentplayer.storyboardVTT) setThumbnail(await VTTstoryBoardParser(currentplayer.storyboardVTT))
         if (currentplayer.resolution[0].defaultSubtitles && currentplayer.subtitles) setDefaultSubtitles(currentplayer.subtitles)
@@ -270,22 +268,21 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             await runHLS(currentplayer.resolution[0].url, currentplayer.resolution[0].reqHeader)
             return
         }
-        if (hls) hls.destroy()
+        if (hls()) hls()!.destroy()
         setCurrentResoltion(currentplayer.resolution[0])
         setListResolution(() => currentplayer.resolution)
         setPlayer(() => currentplayer)
-        videoRef.current.src = `http://localhost:3001/video?url=${btoa(currentplayer.resolution[0].url)}`
-        videoRef.current.currentTime = time
+        videoRef.src = `http://localhost:3001/video?url=${btoa(currentplayer.resolution[0].url)}`
+        videoRef.currentTime = time
     }
 
     function changeAudioTrack(data: { id: number, lang?: string, label: string }) {
+        if (!hls()) return
         try {
-            if (hls) {
-                hls.audioTrack = data.id
-                setCurrentAudioTrack(() => data)
-            }
+            hls()!.audioTrack = data.id
+            setCurrentAudioTrack(() => data)
         } catch (error) {
-            toast.error("Failed Changing audio", notificationProps)
+            toast.error("Failed Changing audio")
         }
     }
 
@@ -321,12 +318,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
         setHls(() => hls)
 
-        if (Hls.isSupported() && videoRef.current) {
-            const time = videoRef.current.currentTime
+        if (Hls.isSupported() && videoRef) {
+            const time = videoRef.currentTime
             hls.loadSource(url);
-            hls.attachMedia(videoRef.current);
+            hls.attachMedia(videoRef);
 
-            videoRef.current.currentTime = time
+            videoRef.currentTime = time
 
             hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
                 const resolutions = data.levels.map((level) => level.height);
@@ -368,31 +365,31 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                             hls.destroy();
                             break;
                     }
-                    if (message) toast.error(message, notificationProps);
+                    if (message) toast.error(message);
                 }
             });
         }
     }
 
     function handleVolume(value: number, dontShow: boolean = false) {
-        if (!videoRef.current) return
-        videoRef.current.volume = value / 100
+        if (!videoRef) return
+        videoRef.volume = value / 100
         setVolume(() => value)
         volumeCacheFunc(value)
         if (dontShow) return
         setTimeoutForElement(volumeTimeout, setShowVolume)
     }
 
-    function setTimeoutForElement(element: RefObject<NodeJS.Timeout | null>, func: (initialState: boolean) => void) {
-        if (element.current) clearTimeout(element.current)
+    function setTimeoutForElement(element: NodeJS.Timeout | undefined, func: (initialState: boolean) => void) {
+        if (element) clearTimeout(element)
         func(true)
-        volumeTimeout.current = setTimeout(() => {
+        volumeTimeout = setTimeout(() => {
             func(false)
         }, 500);
     }
 
     function togglePlay() {
-        const video = videoRef.current
+        const video = videoRef
         if (!video) return
 
         setIsPlaying(prev => {
@@ -404,16 +401,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             return true
         })
 
-        if (playAnimationTimeout.current) clearTimeout(playAnimationTimeout.current)
+        if (playAnimationTimeout) clearTimeout(playAnimationTimeout)
         setShowPlay(() => true)
-        playAnimationTimeout.current = setTimeout(() => {
+        playAnimationTimeout = setTimeout(() => {
             setShowPlay(() => false)
         }, 300);
     }
 
     function setMutedToPlayer() {
         setMuted((prev) => !prev)
-        handleVolume(volume)
+        handleVolume(volume())
     }
 
     async function exitPlayer() {
@@ -427,19 +424,19 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     function saveContinueProgress() {
         // Checking to save history
         if (!config) return
-        if (!videoRef.current) return
+        if (!videoRef) return
         let futureHistory = {
             AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
             saveData: {
                 pluginName: anime_data.saveData.pluginName,
-                last_Time: videoRef.current.currentTime,
+                last_Time: videoRef.currentTime,
                 episode: temp.episode,
                 type: temp.type
             }
         }
         if (
-            videoRef.current.currentTime >= parseInt(config.History.continue.MinimalTimeSave.toString()) &&
-            videoRef.current.currentTime <= videoRef.current.duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
+            videoRef.currentTime >= parseInt(config.History.continue.MinimalTimeSave.toString()) &&
+            videoRef.currentTime <= videoRef.duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
         ) {
             SaveToFile(futureHistory, "continueWatch")
         } else {
@@ -449,7 +446,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     }
 
     async function handlePictureInPicture() {
-        const video = videoRef.current;
+        const video = videoRef;
 
         try {
             if (document.pictureInPictureElement) {
@@ -467,13 +464,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     };
 
     function startChapterSkipTime() {
-        if (IsRunningButtonSkipTime) return
+        if (IsRunningButtonSkipTime()) return
 
         setIsRunningButtonSkipTime(() => true)
 
-        hideChapterButtonTimer.current = setInterval(() => {
+        hideChapterButtonTimer = setInterval(() => {
             setButtonSkipTime((prev) => {
-                if (prev <= 1 || IsRunningButtonSkipTime) {
+                if (prev <= 1 || IsRunningButtonSkipTime()) {
                     clearChapterSkipTime()
                     return 15;
                 }
@@ -483,23 +480,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     };
 
     function clearChapterSkipTime() {
-        if (!hideChapterButtonTimer.current) return
-        clearInterval(hideChapterButtonTimer.current)
+        if (!hideChapterButtonTimer) return
+        clearInterval(hideChapterButtonTimer)
         setButtonSkipTime(15)
         setIsRunningButtonSkipTime(() => false)
     }
 
     function updateProgress() {
-        if (!videoRef.current) return
+        if (!videoRef) return
         saveContinueProgress()
-        setcurrentTime(videoRef.current.currentTime)
+        setcurrentTime(videoRef.currentTime)
         checkUpNext()
         handleProgress()
 
-        if (currentPlayer && currentPlayer.listChapters) {
-            currentPlayer.listChapters.forEach(element => {
-                if (!videoRef.current) return
-                let currentTime = videoRef.current.currentTime
+        if (currentPlayer() && currentPlayer()!.listChapters) {
+            currentPlayer()!.listChapters!.forEach(element => {
+                if (!videoRef) return
+                let currentTime = videoRef.currentTime
                 if (currentTime >= element.start && currentTime <= element.end && element.type == "opening") {
                     if (config.Player.general.autoSkipOpenings) change_time(element.end)
                     if (!IsDisableButtonSkipTimerOpening && !config.Player.general.autoSkipOpenings) {
@@ -520,26 +517,26 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         }
 
         // Update RPC
-        if (config.General.discordRPC) window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(videoRef.current.currentTime)} / ${formatTime(videoRef.current.duration)}`)
-        if (config.Player.general.AutoSkipEpisode && videoRef.current.duration == videoRef.current.currentTime) setEpisode("next")
+        if (config.General.discordRPC) window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(videoRef.currentTime)} / ${formatTime(videoRef.duration)}`)
+        if (config.Player.general.AutoSkipEpisode && videoRef.duration == videoRef.currentTime) setEpisode("next")
     }
 
     function checkUpNext() {
         // checking to show Up next communicat
         if (!config) return
-        if (!videoRef.current) return
+        if (!videoRef) return
         if (!config.Player.upToNextEpisode.enable) return
-        if (!currentPlayer) return
-        const duration = videoRef.current.duration
-        const currentTime = videoRef.current.currentTime
+        if (!currentPlayer()) return
+        const duration = videoRef.duration
+        const currentTime = videoRef.currentTime
 
         if (duration <= config.Player.upToNextEpisode.durationShow * 60) return
 
         let showUpToNext: boolean = false
         let timeDelete: number = ((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
-        if (currentPlayer.listChapters) {
-            for (let index = 0; index < currentPlayer.listChapters.length; index++) {
-                const element = currentPlayer.listChapters[index];
+        if (currentPlayer()!.listChapters) {
+            for (let index = 0; index < currentPlayer()!.listChapters!.length; index++) {
+                const element = currentPlayer()!.listChapters![index];
                 if (currentTime >= element.start && currentTime <= element.end && element.type == "ending") {
                     showUpToNext = true
                     timeDelete = ((parseInt(duration.toFixed(0)) - (parseInt(duration.toFixed(0)) - element.start)) - parseInt(currentTime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
@@ -549,7 +546,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             showUpToNext = currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
         }
 
-        if (isHideUpNextEpisode == false && temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] != null && showUpToNext) {
+        if (isHideUpNextEpisode() == false && temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] != null && showUpToNext) {
             setUpNextEpisode(true)
             setTimeNextEpisode(timeDelete)
         } else {
@@ -557,10 +554,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             setUpNextEpisode(false)
         }
 
-        if (isHideUpNextEpisode == false && timeNextEpisode <= 0) setEpisode("next")
+        if (isHideUpNextEpisode() == false && timeNextEpisode() <= 0) setEpisode("next")
     }
 
-    function videoErrorHandler(event: React.SyntheticEvent<HTMLVideoElement, Event>) {
+    function videoErrorHandler(event) {
         const Error = event.currentTarget.error
         var message: string
         if (!Error) return
@@ -580,7 +577,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
             default:
                 message = t('player.errors.default')
         }
-        toast.error(message, notificationProps);
+        toast.error(message);
 
         // if (!currentPlayer) return
         // let index = player_data.findIndex((element) => element.hostname == currentPlayer.hostname)
@@ -588,19 +585,19 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     }
 
     function setTimeVideo(value: number) {
-        if (!videoRef.current) return
-        videoRef.current.currentTime = value
+        if (!videoRef) return
+        videoRef.currentTime = value
         setcurrentTime(() => value)
-        if (!isNaN(value) && config && value > videoRef.current.duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
+        if (!isNaN(value) && config && value > videoRef.duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
             setHideUpNextEpisode(true)
         }
 
-        if (currentPlayer && currentPlayer.listChapters) {
-            currentPlayer.listChapters.forEach(element => {
-                if (!(value >= element.start && value <= element.end) && element.type == "opening" && currentSkipButton.type == "opening") {
+        if (currentPlayer() && currentPlayer()!.listChapters) {
+            currentPlayer()!.listChapters!.forEach(element => {
+                if (!(value >= element.start && value <= element.end) && element.type == "opening" && currentSkipButton().type == "opening") {
                     clearChapterSkipTime()
                 }
-                if (!(value >= element.start && value <= element.end) && element.type == "ending" && currentSkipButton.type == 'ending') {
+                if (!(value >= element.start && value <= element.end) && element.type == "ending" && currentSkipButton().type == 'ending') {
                     clearChapterSkipTime()
                 }
             })
@@ -608,8 +605,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     }
 
     function change_time(time: number) {
-        if (!videoRef.current) return
-        videoRef.current.currentTime = time
+        if (!videoRef) return
+        videoRef.currentTime = time
     }
 
     useKeyPress((keys: string) => {
@@ -619,7 +616,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         keybinds(keys)
     })
 
-    useHotkeys("d", () => {
+    createShortcut(["d"], () => {
         console.log(player_data, temp, currentSubtitles)
     })
 
@@ -649,21 +646,21 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     }
 
     async function setNewSubtitles(sub: playerSubtitlesFormat) {
-        if (!videoRef.current) return
+        if (!videoRef) return
 
         // This clear subtitles but this dosen't work on dev Because react second render
-        if (currentASSubtitles) {
+        if (currentASSubtitles()) {
             // currentASSubtitles.hide()
-            currentASSubtitles.destroy()
-            currentASSubtitles._canvas.remove()
+            currentASSubtitles()!.destroy()
+            currentASSubtitles()!._canvas.remove()
             setASSubtitles(() => undefined)
         }
 
-        if (window.electronAPI.process.env.NODE_ENV == "development" && currentASSubtitles && assSubContainer.current) {
-            assSubContainer.current.innerHTML = ""
+        if (window.electronAPI.process.env.NODE_ENV == "development" && currentASSubtitles() && assSubContainer) {
+            assSubContainer.innerHTML = ""
         }
 
-        if (vttUrl) {
+        if (vttUrl()) {
             setVttUrl(() => undefined)
             setCue(() => undefined)
         }
@@ -675,7 +672,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
         if (sub.format == "ass") {
             const renderer = new JASSUB({
-                video: videoRef.current,
+                video: videoRef,
                 subUrl: sub.url,
                 workerUrl,
                 wasmUrl,
@@ -692,14 +689,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
         const blob = new Blob([vtt.subtitle], { type: "text/vtt" });
         setVttUrl(URL.createObjectURL(blob));
         setSubtitles(() => sub)
-        let track = videoRef.current.textTracks[0]
+        let track = videoRef.textTracks[0]
         track.mode = "hidden"
         track.oncuechange = onChangeTrackText;
     }
 
     function keybinds(event: string) {
-        if (videoRef.current) {
-            var time_now = videoRef.current.currentTime
+        if (videoRef) {
+            var time_now = videoRef.currentTime
             switch (event.toLowerCase()) {
                 case convertKeybinds(config.Player.keybinds.Pause.toLowerCase()).toLowerCase():
                     togglePlay()
@@ -739,10 +736,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     updateProgress()
                     break
                 case convertKeybinds(config.Player.keybinds.VolumeDown.toLowerCase()).toLowerCase():
-                    handleVolume((videoRef.current.volume * 100) - 1)
+                    handleVolume((videoRef.volume * 100) - 1)
                     break
                 case convertKeybinds(config.Player.keybinds.VolumeUp.toLowerCase()).toLowerCase():
-                    handleVolume((videoRef.current.volume * 100) + 1)
+                    handleVolume((videoRef.volume * 100) + 1)
                     break
                 case convertKeybinds(config.Player.keybinds.ScreenShot.toLowerCase()).toLowerCase():
                     takeScreenshot()
@@ -763,8 +760,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     toggleSubtitles()
                     break
                 case convertKeybinds(config.Player.keybinds.skipOpeningEnding.toLowerCase()).toLowerCase():
-                    if (currentSkipButton.type == "ending") setHideUpNextEpisode(true)
-                    currentSkipButton.onClick()
+                    if (currentSkipButton().type == "ending") setHideUpNextEpisode(true)
+                    currentSkipButton().onClick()
                     break
             }
         }
@@ -772,18 +769,18 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     function toggleSubtitles(): any {
         if (ListSubtitles.length <= 0) return
-        if (currentSubtitles && currentSubtitles.label != "Off") {
-            setlastSubtitles(() => currentSubtitles)
+        if (currentSubtitles() && currentSubtitles()!.label != "Off") {
+            setlastSubtitles(() => currentSubtitles())
             setNewSubtitles(ListSubtitles[0])
             return
         }
-        if (lastSubtitles) setNewSubtitles(lastSubtitles)
+        if (lastSubtitles()) setNewSubtitles(lastSubtitles()!)
     }
 
     async function takeScreenshot() {
-        if (!screenshotWrapper.current) return
+        if (!screenshotWrapper) return
         if (config == null) return
-        if (!videoRef.current) return
+        if (!videoRef) return
 
         const currentDate: Date = new Date();
         const [year, month, day, hour, minute, second] = [
@@ -799,27 +796,27 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
         let screenshot: string = "data:,"
 
-        if (currentASSubtitles) {
+        if (currentASSubtitles()) {
             const outputCanvas = document.createElement("canvas");
             const ctx = outputCanvas.getContext("2d");
             if (!ctx) {
-                toast.error(t("player.toastscreenshot.failed"), notificationProps);
+                toast.error(t("player.toastscreenshot.failed"));
                 return
             };
-            outputCanvas.width = videoRef.current.videoWidth;
-            outputCanvas.height = videoRef.current.videoHeight;
-            ctx.drawImage(videoRef.current, 0, 0, videoRef.current.videoWidth, videoRef.current.videoHeight);
-            ctx.drawImage(currentASSubtitles._canvas, 0, 0, videoRef.current.videoWidth, videoRef.current.videoHeight);
+            outputCanvas.width = videoRef.videoWidth;
+            outputCanvas.height = videoRef.videoHeight;
+            ctx.drawImage(videoRef, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
+            ctx.drawImage(currentASSubtitles()!._canvas, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
             screenshot = outputCanvas.toDataURL("image/png");
         } else {
-            const canvas = await html2canvas(screenshotWrapper.current);
+            const canvas = await html2canvas(screenshotWrapper);
             screenshot = canvas.toDataURL("image/png");
         }
 
         console.log(screenshot)
 
         if (screenshot == "data:,") {
-            toast.error(t("player.toastscreenshot.failed"), notificationProps);
+            toast.error(t("player.toastscreenshot.failed"));
             return
         }
         if (config.Player.screenShot.saveType == "Clipboard" || config.Player.screenShot.saveType == "Both") {
@@ -829,17 +826,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     'image/png': blob,
                 }),
             ]);
-            toast.success(t("player.toastscreenshot.doneclip"), notificationProps);
+            toast.success(t("player.toastscreenshot.doneclip"));
             if (config.Player.screenShot.saveType == "Clipboard") return
         }
 
         if (config.Player.screenShot.alwaysAsk) var resp = await window.api.os.saveDialog(`${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot.replace(/^data:image\/png;base64,/, ''), `screenshot${formatedDate}.png`, "png", ["PNG"], "base64")
         else var resp = await window.api.os.write(`${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot.replace(/^data:image\/png;base64,/, ''), "base64")
         if (resp) {
-            toast.success(t("player.toastscreenshot.donefile", { path: config.Player.screenShot.path }), notificationProps);
+            toast.success(t("player.toastscreenshot.donefile", { path: config.Player.screenShot.path }));
             return;
         }
-        toast.error(t("player.toastscreenshot.failed"), notificationProps);
+        toast.error(t("player.toastscreenshot.failed"));
         return;
     };
 
@@ -849,7 +846,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
 
     const handleProgress = () => {
         if (!config.Player.general.showBrokenBuffer && !hls) return
-        const video = videoRef.current;
+        const video = videoRef;
         if (video && video.duration > 0 && video.buffered.length > 0) {
             let timestamps: { position: number, width: number }[] = []
             for (let index = 0; index < video.buffered.length; index++) {
@@ -868,8 +865,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     }
 
     function detectDisableTooltips(text: string): string | undefined {
-        if (isShowSelectEpisode) return undefined
-        if (currentSettings) return undefined
+        if (isShowSelectEpisode()) return undefined
+        if (currentSettings()) return undefined
         return text
     }
 
@@ -922,23 +919,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     }
 
     function generateOpeningEnding(data: playerChapterList[]) {
-        if (!videoRef.current) return
+        if (!videoRef) return
         let tmp: { left: number, width: number, name?: string, type: "opening" | "ending" | "other" }[] = []
         for (let index = 0; index < data.length; index++) {
             const element = data[index];
-            tmp.push({ left: (element.start / videoRef.current.duration) * 100, width: ((element.end - element.start) / videoRef.current.duration) * 100, name: element.name, type: element.type })
+            tmp.push({ left: (element.start / videoRef.duration) * 100, width: ((element.end - element.start) / videoRef.duration) * 100, name: element.name, type: element.type })
         }
         setChapterList(() => tmp)
     }
 
     function getcurrentChapter(): string | undefined {
-        if (!currentPlayer) return undefined
-        if (!currentPlayer.listChapters) return undefined
-        if (!videoRef.current) return undefined
+        if (!currentPlayer()) return undefined
+        if (!currentPlayer()!.listChapters) return undefined
+        if (!videoRef) return undefined
 
-        for (let index = 0; index < currentPlayer.listChapters.length; index++) {
-            const element = currentPlayer.listChapters[index];
-            if (videoRef.current.currentTime >= element.start && videoRef.current.currentTime <= element.end && element.name) return element.name
+        for (let index = 0; index < currentPlayer()!.listChapters!.length; index++) {
+            const element = currentPlayer()!.listChapters![index];
+            if (videoRef.currentTime >= element.start && videoRef.currentTime <= element.end && element.name) return element.name
         }
         return undefined
     }
@@ -961,7 +958,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     }
 
     function checkUptoNext() {
-        if (config.Player.upToNextEpisode.variants == "old" && isUpNextEpisode == false) return false
+        if (config.Player.upToNextEpisode.variants == "old" && isUpNextEpisode() == false) return false
         return true
     }
 
@@ -972,12 +969,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     }
 
     function calculateChaptersTime(): string | undefined {
-        if (!currentPlayer || !currentPlayer.listChapters) return
-        if (currentPlayer.listChapters.length <= 0) return
-        if (!videoRef.current) return
-        let newTime = videoRef.current.duration
-        for (let index = 0; index < currentPlayer.listChapters.length; index++) {
-            const element = currentPlayer.listChapters[index];
+        if (!currentPlayer() || !currentPlayer()!.listChapters) return
+        if (currentPlayer()!.listChapters!.length <= 0) return
+        if (!videoRef) return
+        let newTime = videoRef.duration
+        for (let index = 0; index < currentPlayer()!.listChapters!.length; index++) {
+            const element = currentPlayer()!.listChapters![index];
             if (element.type == "opening") {
                 newTime = newTime - (element.end - element.start)
             }
@@ -989,283 +986,265 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
     }
 
     return (
-        <div className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
-            <div ref={screenshotWrapper} className={isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} >
+        <div class={isVisible() ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
+            <div ref={screenshotWrapper} class={isVisible() ? "player-video-container" : "player-video-container player-hide-cursor"} >
                 <video
                     ref={videoRef}
-                    className="video-player"
+                    class="video-player"
                     onTimeUpdate={updateProgress}
                     onProgress={updateProgress}
                     onSeeked={updateProgress}
                     onClick={() => { togglePlay(); setcurrentSettings(() => false); setShowSelectEpisode(() => false) }}
-                    autoPlay={isPlaying}
+                    autoplay={isPlaying()}
                     onWaiting={() => { setWaitingPlayer(() => true) }}
                     onCanPlay={() => { setWaitingPlayer(() => false) }}
                     onError={(error) => videoErrorHandler(error)}
-                    onLoadedMetadata={() => {
+                    onLoadedMetadata={(event) => {
                         updateProgress()
-                        if (currentPlayer && currentPlayer.listChapters) {
-                            generateOpeningEnding(currentPlayer.listChapters)
+                        setdurrationTime(event.currentTarget.duration)
+                        if (currentPlayer() && currentPlayer()!.listChapters) {
+                            generateOpeningEnding(currentPlayer()!.listChapters!)
                         }
                     }}
                     preload="auto"
-                    muted={isMuted}
-                    style={config.Player.general.VideoStreching ? { objectFit: "cover" } : {}}
+                    muted={isMuted()}
+                    style={config.Player.general.VideoStreching ? { "object-fit": "cover" } : {}}
                 >
                     <track
-                        src={vttUrl}
+                        src={vttUrl()}
                         kind="subtitles"
                         default
                         ref={vttSubRef}
                     />
                 </video>
-                {currentCue && (
-                    <div className={`player-subtitle-container ${isVisible ? "up" : "down"}`}>
-                        {currentCue.split("\n").map((text) => (
-                            <span className="player-subtitle-content">{text}</span>
-                        ))}
+                <Show when={currentCue()}>
+                    <div class={`player-subtitle-container ${isVisible() ? "up" : "down"}`}>
+                        <For each={currentCue()!.split("\n")}>
+                            {(text) => (
+                                <span class="player-subtitle-content">{text}</span>
+                            )}
+                        </For>
                     </div>
-                )}
+                </Show>
                 <div ref={assSubContainer} style={{ position: "absolute", top: "0", left: "0" }}></div>
             </div>
-            {isVisible &&
+            <Show when={isVisible()}>
                 <>
-                    <div className="player-mask top"></div>
-                    <div className="player-mask bottom"></div>
+                    <div class="player-mask top"></div>
+                    <div class="player-mask bottom"></div>
                 </>
-            }
+            </Show>
 
-            <div className="video-overlay">
-                <div className={checkUptoNext() ? isVisible ? 'video-top' : 'video-top player-hidden' : 'video-top'}>
+            <div class="video-overlay">
+                <div class={checkUptoNext() ? isVisible() ? 'video-top' : 'video-top player-hidden' : 'video-top'}>
                     <Button icon='arrow_back' ButtonClass='player-buttons' iconClassName="player-button-icons" onClick={async () => await exitPlayer()} />
-                    <div className="player-title ">{detectTitle({ title: anime_data.AnimeData.title, ep: temp.episode, format: anime_data.AnimeData.format })}</div>
+                    <div class="player-title ">{detectTitle({ title: anime_data.AnimeData.title, ep: temp.episode, format: anime_data.AnimeData.format })}</div>
                 </div>
-                <div className="video-center"> {/* video-center-container */}
-                    {!config.Player.ui.DisableSkipAnimation &&
+                <div class="video-center"> {/* video-center-container */}
+                    <Show when={!config.Player.ui.DisableSkipAnimation}>
                         <>
-                            <motion.div
-                                variants={hiddenVariants}
-                                animate={isShowButtonSkipLeft ? "visible" : "hidden"}
-                                initial="hidden"
-                                transition={{ duration: 0.4 }}
-                                className="player-loading-animation-container player-fast-rewind-ui"
-                            >
-                                <div className="material-symbols-outlined player-icon-ui">fast_rewind</div>
-                            </motion.div>
-                            <motion.div
-                                variants={hiddenVariants}
-                                animate={isShowButtonSkipRight ? "visible" : "hidden"}
-                                initial="hidden"
-                                transition={{ duration: 0.4 }}
-                                className="player-loading-animation-container player-fast-forward-ui"
-                            >
-                                <div className="material-symbols-outlined player-icon-ui">fast_forward</div>
-                            </motion.div>
+                            <Show when={isShowButtonSkipLeft()}>
+                                <div class="player-loading-animation-container player-fast-rewind-ui">
+                                    <div class="material-symbols-outlined player-icon-ui">fast_rewind</div>
+                                </div>
+                            </Show>
+                            <Show when={isShowButtonSkipRight()}>
+                                <div class="player-loading-animation-container player-fast-forward-ui">
+                                    <div class="material-symbols-outlined player-icon-ui">fast_forward</div>
+                                </div>
+                            </Show>
                         </>
-                    }
+                    </Show>
 
-                    {resolutionNotFound &&
-                        <motion.div className="player-loading-animation-container player-buffering-animation"
-                            variants={hiddenVariants}
-                            initial="visible"
-                            transition={{ duration: 0.4 }}
-                        >
-                            <div className="player-icon-ui material-symbols-outlined">error</div>
-                        </motion.div>
-                    }
+                    <Show when={resolutionNotFound()}>
+                        <div class="player-loading-animation-container player-buffering-animation">
+                            <div class="player-icon-ui material-symbols-outlined">error</div>
+                        </div>
+                    </Show>
 
-                    {!config.Player.ui.DisableLoadingAnimation && !resolutionNotFound &&
-                        <motion.div className="player-loading-animation-container player-buffering-animation"
-                            variants={hiddenVariants}
-                            animate={isWaitingPlayer ? "visible" : "hidden"}
-                            initial="hidden"
-                            transition={{ duration: 0.4 }}
-                        >
-                            <div className="player-waiting material-symbols-outlined">progress_activity</div>
-                        </motion.div>
-                    }
-                    {!config.Player.ui.DisableSpaceAnimation &&
-                        <motion.div className="player-loading-animation-container"
-                            variants={hiddenVariants}
-                            animate={isShowPlay && isWaitingPlayer == false ? "visible" : "hidden"}
-                            initial="hidden"
-                            transition={{ duration: 0.2 }}
-                        >
-                            <div className="player-icon-ui material-symbols-outlined">{isPlaying ? "pause" : "play_arrow"}</div>
-                        </motion.div>
-                    }
+                    <Show when={!config.Player.ui.DisableLoadingAnimation && !resolutionNotFound() && isWaitingPlayer()}>
+                        <div class="player-loading-animation-container player-buffering-animation">
+                            <div class="player-waiting material-symbols-outlined">progress_activity</div>
+                        </div>
+                    </Show>
+                    <Show when={!config.Player.ui.DisableSpaceAnimation && isShowPlay() && isWaitingPlayer() == false}>
+                        <div class="player-loading-animation-container">
+                            <div class="player-icon-ui material-symbols-outlined">{isPlaying() ? "pause" : "play_arrow"}</div>
+                        </div>
+                    </Show>
                 </div>
-                <div className={isVisible && checkUptoNext() ? 'video-bottom' : 'video-bottom player-hidden'}>
-                    <SeekBar chapterList={chapterList} thumbnail={thumbnails} secondBarValues={currentBuffer} currentValue={currentTime} maxValue={videoRef.current?.duration} onSeek={value => { setTimeVideo(value) }} type="time" classes={{ container: "player-seekbar" }} screen={true} />
-                    <div className="player-bottom-section">
-                        <div className="player-left">
-                            {getEpisode("prev") !== undefined &&
+                <div class={isVisible() && checkUptoNext() ? 'video-bottom' : 'video-bottom player-hidden'}>
+                    <SeekBar chapterList={chapterList()} thumbnail={thumbnails()} secondBarValues={currentBuffer()} currentValue={currentTime()} maxValue={videoRef?.duration} onSeek={value => { setTimeVideo(value) }} type="time" classes={{ container: "player-seekbar" }} screen={true} />
+                    <div class="player-bottom-section">
+                        <div class="player-left">
+                            <Show when={getEpisode("prev") !== undefined}>
                                 <PlayerButton title={t('player.previous', { ep: getEpisode("prev")?.ep })} icon='skip_previous'
                                     onClick={() => setEpisode("prev")}
                                     ButtonClass="player-buttons" />
-                            }
-                            <PlayerButton icon={isPlaying ? "pause" : "play_arrow"} title={isPlaying ? t('player.Pause') : t('player.play')} ButtonClass="player-buttons" onClick={togglePlay} />
-                            {getEpisode("next") !== undefined &&
+                            </Show>
+                            <PlayerButton icon={isPlaying() ? "pause" : "play_arrow"} title={isPlaying() ? t('player.Pause') : t('player.play')} ButtonClass="player-buttons" onClick={togglePlay} />
+
+                            <Show when={getEpisode("next") !== undefined}>
                                 <PlayerButton icon='skip_next' ButtonClass='material-symbols-outlined player-buttons' title={t('player.next', { ep: getEpisode("next")?.ep })} onClick={() => setEpisode("next")} />
-                            }
-                            <div className="player-time-display"
+                            </Show>
+                            <div class="player-time-display"
                                 onClick={() => { saveConfig(updateObjectConfig("Player.general.minusTime", !minusTimeState, config)); setminusTimeState((prev) => !prev) }}
                             >
-                                <div className="player-time-display-current">
-                                    {minusTimeState ? `-${formatTime(videoRef.current ? videoRef.current.duration - currentTime : 0)}` :
-                                        formatTime(currentTime)
-                                    }
+                                <div class="player-time-display-current">
+                                    <Show when={minusTimeState()} fallback={formatTime(currentTime())}>
+                                        {`-${formatTime(videoRef ? videoRef.duration - currentTime() : 0)}`}
+                                    </Show>
                                 </div>
                                 /
-                                <div className="player-time-display-durration">{formatTime(videoRef.current?.duration)}</div>
-                                {calculateChaptersTime() &&
-                                    <div className="player-time-display-chaptersTime">
+                                <div class="player-time-display-durration">{formatTime(durrationTime())}</div>
+                                <Show when={calculateChaptersTime()}>
+                                    <div class="player-time-display-chaptersTime">
                                         ({calculateChaptersTime()})
                                     </div>
-                                }
+                                </Show>
                             </div>
-                            <div className="player-end-time-display">
-                                {t("player.episodeEndsOn", { time: addTime(videoRef.current?.duration ? (videoRef.current.duration - currentTime) : 0) })}
+                            <div class="player-end-time-display">
+                                {t("player.episodeEndsOn", { time: addTime(videoRef?.duration ? (videoRef.duration - currentTime()) : 0) })}
                             </div>
                         </div>
-                        <div className="player-right">
-                            {getcurrentChapter() && <span>{t("player.chapter", { name: getcurrentChapter() })}</span>}
-                            <PlayerButton icon={isMuted ? 'volume_off' : 'volume_up'} title={isMuted ? t("player.unmute") : t("player.mute")} ButtonClass="player-buttons volume-button" onClick={setMutedToPlayer} />
-                            <div className="player-volume-seek">
-                                <SeekBar currentValue={volume} maxValue={100} onSeek={value => handleVolume(value)} classes={{ container: "player-seekbar" }} />
+                        <div class="player-right">
+                            <Show when={getcurrentChapter()}>
+                                <span>{t("player.chapter", { name: getcurrentChapter() })}</span>
+                            </Show>
+
+                            <PlayerButton icon={isMuted() ? 'volume_off' : 'volume_up'} title={isMuted() ? t("player.unmute") : t("player.mute")} ButtonClass="player-buttons volume-button" onClick={setMutedToPlayer} />
+
+                            <div class="player-volume-seek">
+                                <SeekBar currentValue={volume()} maxValue={100} onSeek={value => handleVolume(value)} classes={{ container: "player-seekbar" }} />
                             </div>
+
                             {/* TODO: Improve picture in picture */}
                             {/* <PlayerButton icon={"picture_in_picture"} onClick={handlePictureInPicture} title={detectDisableTooltips("Picture In Picture")} ButtonClass="player-buttons" /> */}
-                            {temp.episodes.length >= 2 && <PlayerButton icon={"video_library"} title={detectDisableTooltips("Select Episode")} ButtonClass="player-buttons" onClick={() => { setShowSelectEpisode((prev) => !prev); setcurrentSettings(() => false) }} />}
-                            <motion.div
-                                initial={{ opacity: 0, display: "none" }} animate={isShowSelectEpisode ? { opacity: 1, display: "" } : { opacity: 0, display: "none" }} transition={{ duration: 0.2 }}
-                                className="player-select-episode-container"
-                            >
-                                <div className="player-select-episode-title">{t("player.changeEpisode")}</div>
-                                {!countImages(temp.episodes) &&
-                                    <div className="player-select-episode-content">
-                                        {temp.episodes.map((element) => (
-                                            <div className={`information-episode-button ${parseInt(element.ep) < parseInt(temp.episode) ? "watched" : ""} ${parseInt(element.ep) == parseInt(temp.episode) ? "current" : ""}`} onClick={() => setNextEpisode(element.ep)}>{element.ep}</div>
-                                        ))}
-                                    </div>
-                                }
-                                {countImages(temp.episodes) &&
-                                    <div className="player-select-episode-content-list">
-                                        {temp.episodes.map((element) => (
-                                            <PlayerEpisodeElement nextEpisode={setNextEpisode} animeTitle={anime_data.AnimeData.title.romaji} episodes={element} currentEpisode={temp.episode} />
-                                        ))}
-                                    </div>
-                                }
-                            </motion.div>
+
+                            <Show when={temp.episodes.length >= 2}>
+                                <PlayerButton icon={"video_library"} title={detectDisableTooltips("Select Episode")} ButtonClass="player-buttons" onClick={() => { setShowSelectEpisode((prev) => !prev); setcurrentSettings(() => false) }} />
+                            </Show>
+                            <Show when={isShowSelectEpisode()}>
+                                <div class="player-select-episode-container" >
+                                    <div class="player-select-episode-title">{t("player.changeEpisode")}</div>
+                                    <Show when={!countImages(temp.episodes)}
+                                        fallback={
+                                            <div class="player-select-episode-content-list">
+                                                <For each={temp.episodes}>
+                                                    {(element) => (
+                                                        <PlayerEpisodeElement nextEpisode={setNextEpisode} animeTitle={anime_data.AnimeData.title.romaji} episodes={element} currentEpisode={temp.episode} />
+                                                    )}
+                                                </For>
+                                            </div>
+                                        }
+                                    >
+                                        <div class="player-select-episode-content">
+                                            <For each={temp.episodes}>
+                                                {(element) => (
+                                                    <div class={`information-episode-button ${parseInt(element.ep) < parseInt(temp.episode) ? "watched" : ""} ${parseInt(element.ep) == parseInt(temp.episode) ? "current" : ""}`}
+                                                        onClick={() => setNextEpisode(element.ep)}
+                                                    >
+                                                        {element.ep}
+                                                    </div>
+                                                )}
+                                            </For>
+                                        </div>
+                                    </Show>
+                                </div>
+                            </Show>
                             <PlayerSettings
-                                state={currentSettings}
+                                state={currentSettings()}
                                 sources={
                                     player_data.map((val) => { return { name: val.hostname, change: () => checkUrl(player_data[player_data.findIndex((item) => item.hostname === val.hostname)]) } })
                                 }
                                 resolution={
-                                    ListResolution.map((val) => { return { res: val.res, change: () => setNewResolution(val) } })
+                                    ListResolution().map((val) => { return { res: val.res, change: () => setNewResolution(val) } })
                                 }
                                 speed={speed.map((val) => { return { speed: parseFloat(val), change: () => setSpeed(val) } })}
                                 subtitles={
-                                    ListSubtitles.map((val) => { return { sub: val.label, change: () => setNewSubtitles(val) } })
+                                    ListSubtitles().map((val) => { return { sub: val.label, change: () => setNewSubtitles(val) } })
                                 }
                                 audioTrack={
-                                    audioTrackList.map((val) => { return { track: val.label, change: () => changeAudioTrack(val) } })
+                                    audioTrackList().map((val) => { return { track: val.label, change: () => changeAudioTrack(val) } })
                                 }
                                 disableSettings={() => setcurrentSettings(() => false)}
                                 current={{
-                                    currentHost: currentPlayer ? currentPlayer.hostname : t("player.other.unknown"),
-                                    currentResolution: currentResolution ? currentResolution.res : t("player.other.unknown"),
-                                    currentSpeed: videoRef.current?.playbackRate ? videoRef.current?.playbackRate : 1,
-                                    currentSub: currentSubtitles ? currentSubtitles.label : t("player.other.off"),
-                                    currentTrack: currentAudioTrack ? currentAudioTrack.label : t("player.other.default")
+                                    currentHost: currentPlayer() ? currentPlayer()!.hostname : t("player.other.unknown"),
+                                    currentResolution: currentResolution() ? currentResolution()!.res : t("player.other.unknown"),
+                                    currentSpeed: videoRef?.playbackRate ? videoRef?.playbackRate : 1,
+                                    currentSub: currentSubtitles() ? currentSubtitles()!.label : t("player.other.off"),
+                                    currentTrack: currentAudioTrack() ? currentAudioTrack()!.label : t("player.other.default")
                                 }}
                             />
                             <PlayerButton icon="settings" ButtonClass="player-buttons" title={detectDisableTooltips(t('global.settings'))} onClick={() => { setcurrentSettings((prev) => !prev); setShowSelectEpisode(() => false) }} />
-                            <PlayerButton icon={isFullscreen ? 'fullscreen_exit' : 'fullscreen'} ButtonClass="player-buttons" title={detectDisableTooltips(t('player.fullscreen'))} onClick={async () => await enterFullscreen()} />
+                            <PlayerButton icon={isFullscreen() ? 'fullscreen_exit' : 'fullscreen'} ButtonClass="player-buttons" title={detectDisableTooltips(t('player.fullscreen'))} onClick={async () => await enterFullscreen()} />
                         </div>
                     </div>
                 </div>
             </div>
-            <motion.button onClick={_event => { if (currentSkipButton.type == "ending") setHideUpNextEpisode(true); currentSkipButton.onClick() }} variants={hiddenVariants} initial="hidden" animate={IsRunningButtonSkipTime ? "visible" : "hidden"} className="player-skip-chapters-button">{currentSkipButton.text}, {`${buttonSkipTime}s`}</motion.button>
-            {config.Player.upToNextEpisode.variants == "old" && (
-                <motion.div variants={uptoNextVariants} transition={{ duration: 0.2 }} animate={isUpNextEpisode ? "visible" : "hidden"} initial={"hidden"} className="player-up-Next-container old">
-                    <div className="player-up-Next-Title old">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>
-                    <div className="player-up-Next-Anime old">{t("player.upNext.titleAnime", { ep: getEpisode("next")?.ep, title: anime_data.AnimeData.title.romaji })}</div>
-                    <div className="player-up-Next-Buttons old">
+            <Show when={IsRunningButtonSkipTime()}>
+                <button onClick={() => {
+                    if (currentSkipButton().type == "ending") setHideUpNextEpisode(true); currentSkipButton().onClick()
+                }} class="player-skip-chapters-button">
+                    {currentSkipButton().text}, {`${buttonSkipTime()}s`}
+                </button>
+            </Show>
+            <Show when={config.Player.upToNextEpisode.variants == "old" && isUpNextEpisode()}>
+                <div class="player-up-Next-container old">
+                    <div class="player-up-Next-Title old">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>
+                    <div class="player-up-Next-Anime old">{t("player.upNext.titleAnime", { ep: getEpisode("next")?.ep, title: anime_data.AnimeData.title.romaji })}</div>
+                    <div class="player-up-Next-Buttons old">
                         <Button content={t("player.upNext.nextEp")} ButtonClass='player-up-Next-Button old' onClick={() => setEpisode("next")} />
                         <Button content={t("player.upNext.hide")} ButtonClass='player-up-Next-Button old' onClick={() => { setHideUpNextEpisode(true); setUpNextEpisode(false) }} />
                     </div>
-                </motion.div>
-            )}
-            {config.Player.upToNextEpisode.variants == "var2" &&
-                <motion.div
-                    variants={uptoNextVariants}
-                    transition={{ duration: 0.2 }}
-                    animate={isUpNextEpisode ? "visible" : "hidden"}
-                    initial={"hidden"}
-                    className="player-up-Next-background"
-                    style={{ backgroundImage: `url(${getCurrentImage()})` }}
-                    onClick={() => setEpisode("next")}
-                >
-                    <div className="player-up-Next-container-var2 ">
-                        <span className="material-symbols-outlined player-up-Next-icon">skip_next</span>
-                        <div className="player-up-Next-content var2">
-                            <div className="player-up-Next-title">{anime_data.AnimeData.title.romaji}</div>
-                            <div className="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: getEpisode("next")?.ep })}</div>
-                            <div className="player-up-Next-text">{t("player.upNext.nextPlaying", { time: parseInt(timeNextEpisode.toString()) })}</div>
+                </div>
+            </Show>
+            <Show when={config.Player.upToNextEpisode.variants == "var2" && isUpNextEpisode()}>
+                <div class="player-up-Next-background" style={{ "background-image": `url(${getCurrentImage()})` }}
+                    onClick={() => setEpisode("next")}>
+                    <div class="player-up-Next-container-var2 ">
+                        <span class="material-symbols-outlined player-up-Next-icon">skip_next</span>
+                        <div class="player-up-Next-content var2">
+                            <div class="player-up-Next-title">{anime_data.AnimeData.title.romaji}</div>
+                            <div class="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: getEpisode("next")?.ep })}</div>
+                            <div class="player-up-Next-text">{t("player.upNext.nextPlaying", { time: parseInt(timeNextEpisode.toString()) })}</div>
                         </div>
                     </div>
-                    <button className="material-symbols-outlined player-up-Next-button-close" onClick={(event) => {
+                    <button class="material-symbols-outlined player-up-Next-button-close" onClick={(event) => {
                         event.stopPropagation();
                         setHideUpNextEpisode(true);
                         setUpNextEpisode(false)
                     }
                     }>close</button>
-                </motion.div>
-            }
-            {config.Player.upToNextEpisode.variants == "var1" &&
-                <motion.div
-                    variants={uptoNextVariants}
-                    transition={{ duration: 0.2 }}
-                    animate={isUpNextEpisode ? "visible" : "hidden"}
-                    initial={"hidden"}
-                    className="player-up-Next-container"
-                    onClick={() => setEpisode("next")}
-                >
-                    <img src={getCurrentImage()} className="player-up-Next-image" />
-                    <span className="material-symbols-outlined player-up-Next-icon">skip_next</span>
-                    <div className="player-up-Next-content">
-                        <div className="player-up-Next-title">{anime_data.AnimeData.title.romaji}</div>
-                        <div className="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: getEpisode("next")?.ep })}</div>
-                        <div className="player-up-Next-text">{t("player.upNext.nextPlaying", { time: parseInt(timeNextEpisode.toString()) })}</div>
+                </div>
+            </Show>
+            <Show when={config.Player.upToNextEpisode.variants == "var1" && isUpNextEpisode()}>
+                <div class="player-up-Next-container" onClick={() => setEpisode("next")}>
+                    <img src={getCurrentImage()} class="player-up-Next-image" />
+                    <span class="material-symbols-outlined player-up-Next-icon">skip_next</span>
+                    <div class="player-up-Next-content">
+                        <div class="player-up-Next-title">{anime_data.AnimeData.title.romaji}</div>
+                        <div class="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: getEpisode("next")?.ep })}</div>
+                        <div class="player-up-Next-text">{t("player.upNext.nextPlaying", { time: parseInt(timeNextEpisode.toString()) })}</div>
                     </div>
-                    <button className="material-symbols-outlined player-up-Next-button-close" onClick={(event) => {
+                    <button class="material-symbols-outlined player-up-Next-button-close" onClick={(event) => {
                         event.stopPropagation();
                         setHideUpNextEpisode(true);
                         setUpNextEpisode(false)
                     }
                     }>close</button>
-                </motion.div>
-            }
-            {!config.Player.ui.DisableVolumeAnimation &&
-                <motion.div className="player-volume-ui-container"
-                    variants={{
-                        hidden: { x: 400 },
-                        visible: { x: 0 },
-                    }}
-                    animate={isVolume ? "visible" : "hidden"}
-                    initial="hidden"
-                    transition={{ duration: 0.2 }}
-                >
-                    <span className="player-volume-ui-icon material-symbols-outlined">{isMuted ? 'volume_off' : 'volume_up'}</span>
-                    <div className="player-volume-ui-bar-container">
-                        <div className="player-volume-ui-bar-progress" style={{ width: `${volume}%` }}></div>
+                </div>
+            </Show>
+            <Show when={!config.Player.ui.DisableVolumeAnimation && isVolume()}>
+                <div class="player-volume-ui-container">
+                    <span class="player-volume-ui-icon material-symbols-outlined">{isMuted() ? 'volume_off' : 'volume_up'}</span>
+                    <div class="player-volume-ui-bar-container">
+                        <div class="player-volume-ui-bar-progress" style={{ "width": `${volume()}%` }}></div>
                     </div>
-                    <span className="player-volume-ui-text">{parseInt(volume.toString())}%</span>
-                </motion.div>
-            }
-            {showNerdStats && (
+                    <span class="player-volume-ui-text">{parseInt(volume().toString())}%</span>
+                </div>
+            </Show>
+            {/* {showNerdStats && (
                 <NerdStats video={videoRef} volume={volume} currentTime={currentTime} />
             )}
             {config.Developer.playerDebug && (
@@ -1290,7 +1269,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ player_data, anime_data, temp
                     showNerdStats={showNerdStats}
                     PlayerVolume={PlayerVolume}
                 />
-            )}
+            )} */}
         </div>
     )
 }

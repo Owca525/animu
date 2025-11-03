@@ -15,7 +15,7 @@ import { HashRouter, Route } from "@solidjs/router";
 import Home from "./pages/home/index";
 import Information from "./pages/information/index";
 import Settings from "./pages/settings/index";
-// import Player from "./pages/player/index";
+import Player from "./pages/player/index";
 import toast, { Toaster } from 'solid-toast';
 import { getConfig, setConfig } from './utils/stores/config';
 import { getGlobalCache, setGlobalHistory, setIncognitoMode } from './utils/stores/global';
@@ -68,7 +68,7 @@ function App() {
             <Route path="/" component={Home} />
             <Route path="/info" component={Information} />
             <Route path="/settings" component={Settings} />
-            {/* <Route path="/player" component={Player} /> */}
+            <Route path="/player" component={Player} />
           </Suspense>
         </HashRouter>
       </ErrorBoundary>
