@@ -72,10 +72,9 @@ export default function PlayerSettings(props: playerSettingsProps) {
                     </div>
                 </Show>
                 <Show when={currentSettings() === "source"}>
-                    <PlayerSettingsButton onClick={() => setcurrentSettings("settings")}
-                        icon="arrow_back"
-                        rightText={t("player.settings.source")}
-                    />
+                    <div tabIndex={-1} class="player-settings-button-back" onClick={() => setcurrentSettings("settings")}>
+                        <span tabIndex={-1} class="material-symbols-outlined">arrow_back</span><span>{t("player.settings.source")}</span>
+                    </div>
                     <For each={props.sources}>
                         {(data) => (
                             <PlayerSettingsButton onClick={() => reset(data.change)}

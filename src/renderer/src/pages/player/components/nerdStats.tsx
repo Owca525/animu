@@ -1,23 +1,20 @@
-import { RefObject } from "react"
 import "./css/nerdStats.css"
 
 interface nerdStatsProps {
-    video: RefObject<HTMLVideoElement | null>
+    video: HTMLVideoElement | undefined
     volume: number
     currentTime: number
 }
 
-const nerdStats: React.FC<nerdStatsProps> = ({ video, volume, currentTime }) => {
-    if (!video.current) return
+export default function nerdStats(props: nerdStatsProps) {
+    if (!props.video) return
     return (
-        <div className="player-nerd-container">
-            <div className="player-nerd-element">Frames: <span className="player-nerd-element">{video.current.getVideoPlaybackQuality().totalVideoFrames}</span></div>
-            <div className="player-nerd-element">Dropped Frames: <span className="player-nerd-element">{video.current.getVideoPlaybackQuality().droppedVideoFrames}</span></div>
-            <div className="player-nerd-element">Volume: <span className="player-nerd-element">{volume}%</span></div>
-            <div className="player-nerd-element">CurrentTime: <span className="player-nerd-element">{currentTime}</span></div>
-            <div className="player-nerd-element">Duration: <span className="player-nerd-element">{video.current.duration}</span></div>
+        <div class="player-nerd-container">
+            <div class="player-nerd-element">Frames: <span class="player-nerd-element">{props.video.getVideoPlaybackQuality().totalVideoFrames}</span></div>
+            <div class="player-nerd-element">Dropped Frames: <span class="player-nerd-element">{props.video.getVideoPlaybackQuality().droppedVideoFrames}</span></div>
+            <div class="player-nerd-element">Volume: <span class="player-nerd-element">{props.volume}%</span></div>
+            <div class="player-nerd-element">CurrentTime: <span class="player-nerd-element">{props.currentTime}</span></div>
+            <div class="player-nerd-element">Duration: <span class="player-nerd-element">{props.video.duration}</span></div>
         </div>
     )
 }
-
-export default nerdStats

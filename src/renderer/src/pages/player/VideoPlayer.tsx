@@ -1,10 +1,5 @@
 import Hls from "hls.js"
 
-// Components
-// import NerdStats from "./components/nerdStats"
-// const DeveloperStats = lazy(() => import('./components/developerStats'));
-
-// css
 import { AnimeData, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
 import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory, toSeconds, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
@@ -14,7 +9,6 @@ import PlayerSettings from "./components/PlayerSettings"
 import PlayerButton from "./components/PlayerButton"
 import PlayerEpisodeElement from "./components/playerEpisodeElement"
 import { convert } from "subtitle-converter";
-// import { useHotkeys } from "react-hotkeys-hook"
 import i18n from "@renderer/utils/i18n"
 import html2canvas from "html2canvas"
 import JASSUB from "jassub";
@@ -23,12 +17,14 @@ import workerUrl from "jassub/dist/jassub-worker.js?url";
 import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
 import { saveConfig } from "@renderer/utils/FilesManager/config"
 import { DeleteFromFile, SaveToFile } from "@renderer/utils/FilesManager/readFiles"
-import { Component, createSignal, For, onMount, Show, Switch } from "solid-js"
+import { Component, createSignal, For, onMount, Show } from "solid-js"
 import { getConfig } from "@renderer/utils/stores/config"
 import toast from "solid-toast"
 import { t } from "i18next"
 import { createShortcut } from "@solid-primitives/keyboard"
 import { useKeyPress } from "@renderer/utils/hooks/useKeyPress"
+import DeveloperStats from "./components/developerStats"
+import NerdStats from "./components/nerdStats"
 
 function addTime(durration: number): string {
     const now = new Date();
@@ -421,22 +417,21 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         exitFromPlayer()
     }
 
-    function saveContinueProgress() {
+    function saveContinueProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
         // Checking to save history
         if (!config) return
-        if (!videoRef) return
         let futureHistory = {
             AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
             saveData: {
                 pluginName: anime_data.saveData.pluginName,
-                last_Time: videoRef.currentTime,
+                last_Time: event.currentTarget.currentTime,
                 episode: temp.episode,
                 type: temp.type
             }
         }
         if (
-            videoRef.currentTime >= parseInt(config.History.continue.MinimalTimeSave.toString()) &&
-            videoRef.currentTime <= videoRef.duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
+            event.currentTarget.currentTime >= parseInt(config.History.continue.MinimalTimeSave.toString()) &&
+            event.currentTarget.currentTime <= event.currentTarget.duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
         ) {
             SaveToFile(futureHistory, "continueWatch")
         } else {
@@ -486,17 +481,16 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         setIsRunningButtonSkipTime(() => false)
     }
 
-    function updateProgress() {
-        if (!videoRef) return
-        saveContinueProgress()
-        setcurrentTime(videoRef.currentTime)
-        checkUpNext()
-        handleProgress()
+    function updateProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
+        setcurrentTime(event.currentTarget.currentTime)
+        saveContinueProgress(event)
+        checkUpNext(event)
+        handleProgress(event)
 
         if (currentPlayer() && currentPlayer()!.listChapters) {
             currentPlayer()!.listChapters!.forEach(element => {
-                if (!videoRef) return
-                let currentTime = videoRef.currentTime
+    
+                let currentTime = event.currentTarget.currentTime
                 if (currentTime >= element.start && currentTime <= element.end && element.type == "opening") {
                     if (config.Player.general.autoSkipOpenings) change_time(element.end)
                     if (!IsDisableButtonSkipTimerOpening && !config.Player.general.autoSkipOpenings) {
@@ -517,18 +511,17 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }
 
         // Update RPC
-        if (config.General.discordRPC) window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(videoRef.currentTime)} / ${formatTime(videoRef.duration)}`)
-        if (config.Player.general.AutoSkipEpisode && videoRef.duration == videoRef.currentTime) setEpisode("next")
+        if (config.General.discordRPC) window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`)
+        if (config.Player.general.AutoSkipEpisode && event.currentTarget.duration == event.currentTarget.currentTime) setEpisode("next")
     }
 
-    function checkUpNext() {
+    function checkUpNext(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
         // checking to show Up next communicat
         if (!config) return
-        if (!videoRef) return
         if (!config.Player.upToNextEpisode.enable) return
         if (!currentPlayer()) return
-        const duration = videoRef.duration
-        const currentTime = videoRef.currentTime
+        const duration = event.currentTarget.duration
+        const currentTime = event.currentTarget.currentTime
 
         if (duration <= config.Player.upToNextEpisode.durationShow * 60) return
 
@@ -704,22 +697,18 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 case convertKeybinds(config.Player.keybinds.TimeSkipRight.toLowerCase()).toLowerCase():
                     change_time((time_now += parseInt(config.Player.general.TimeSkipRight.toString())))
                     setTimeoutForElement(buttonSkipRight, setShowButtonSkipRight)
-                    updateProgress()
                     break
                 case convertKeybinds(config.Player.keybinds.TimeSkipLeft.toLowerCase()).toLowerCase():
                     change_time((time_now -= parseInt(config.Player.general.TimeSkipLeft.toString())))
                     setTimeoutForElement(buttonSkipLeft, setShowButtonSkipLeft)
-                    updateProgress()
                     break
                 case convertKeybinds(config.Player.keybinds.LongTimeSkipForward.toLowerCase()).toLowerCase():
                     change_time((time_now += parseInt(config.Player.general.LongTimeSkipForward.toString())))
                     setTimeoutForElement(buttonSkipRight, setShowButtonSkipRight)
-                    updateProgress()
                     break
                 case convertKeybinds(config.Player.keybinds.LongTimeSkipBack.toLowerCase()).toLowerCase():
                     change_time((time_now -= parseInt(config.Player.general.LongTimeSkipBack.toString())))
                     setTimeoutForElement(buttonSkipLeft, setShowButtonSkipLeft)
-                    updateProgress()
                     break
                 case convertKeybinds(config.Player.keybinds.Fullscreen.toLowerCase()).toLowerCase():
                     enterFullscreen()
@@ -729,11 +718,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     break
                 case convertKeybinds(config.Player.keybinds.FrameSkipForward.toLowerCase()).toLowerCase():
                     change_time((time_now += 0.0416))
-                    updateProgress()
                     break
                 case convertKeybinds(config.Player.keybinds.FrameSkipBack.toLowerCase()).toLowerCase():
                     change_time((time_now -= 0.0416))
-                    updateProgress()
                     break
                 case convertKeybinds(config.Player.keybinds.VolumeDown.toLowerCase()).toLowerCase():
                     handleVolume((videoRef.volume * 100) - 1)
@@ -844,9 +831,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         { option: t("contextMenu.nerdstats"), onClick: () => setshowNerdStats((prev) => !prev) }
     ]
 
-    const handleProgress = () => {
-        if (!config.Player.general.showBrokenBuffer && !hls) return
-        const video = videoRef;
+    function handleProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
+        if (!config.Player.general.showBrokenBuffer && !hls()) return
+        const video = event.currentTarget;
         if (video && video.duration > 0 && video.buffered.length > 0) {
             let timestamps: { position: number, width: number }[] = []
             for (let index = 0; index < video.buffered.length; index++) {
@@ -858,11 +845,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             setBuffered(() => timestamps);
         }
     };
-
-    const hiddenVariants = {
-        hidden: { opacity: 0, display: "none" },
-        visible: { opacity: 1, display: "" },
-    }
 
     function detectDisableTooltips(text: string): string | undefined {
         if (isShowSelectEpisode()) return undefined
@@ -952,11 +934,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     }
 
-    const uptoNextVariants = {
-        hidden: { opacity: 0, x: 400, display: "none" },
-        visible: { opacity: 1, x: 0, display: "" },
-    }
-
     function checkUptoNext() {
         if (config.Player.upToNextEpisode.variants == "old" && isUpNextEpisode() == false) return false
         return true
@@ -1000,7 +977,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     onCanPlay={() => { setWaitingPlayer(() => false) }}
                     onError={(error) => videoErrorHandler(error)}
                     onLoadedMetadata={(event) => {
-                        updateProgress()
+                        updateProgress(event)
                         setdurrationTime(event.currentTarget.duration)
                         if (currentPlayer() && currentPlayer()!.listChapters) {
                             generateOpeningEnding(currentPlayer()!.listChapters!)
@@ -1115,7 +1092,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                             <PlayerButton icon={isMuted() ? 'volume_off' : 'volume_up'} title={isMuted() ? t("player.unmute") : t("player.mute")} ButtonClass="player-buttons volume-button" onClick={setMutedToPlayer} />
 
                             <div class="player-volume-seek">
-                                <SeekBar currentValue={volume()} maxValue={100} onSeek={value => handleVolume(value)} classes={{ container: "player-seekbar" }} />
+                                <SeekBar currentValue={volume()} maxValue={100} onSeek={value => handleVolume(value)} classes={{ "container": "player-seekbar" }} type="procent" />
                             </div>
 
                             {/* TODO: Improve picture in picture */}
@@ -1244,32 +1221,31 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     <span class="player-volume-ui-text">{parseInt(volume().toString())}%</span>
                 </div>
             </Show>
-            {/* {showNerdStats && (
-                <NerdStats video={videoRef} volume={volume} currentTime={currentTime} />
-            )}
-            {config.Developer.playerDebug && (
+            <Show when={showNerdStats()}>
+                <NerdStats video={videoRef} volume={volume()} currentTime={currentTime()} />
+            </Show>
+            <Show when={config.Developer.playerDebug}>
                 <DeveloperStats
-                    isMuted={isMuted}
-                    isFullscreen={isFullscreen}
-                    isHideUpNextEpisode={isHideUpNextEpisode}
-                    isPlaying={isPlaying}
-                    isUpNextEpisode={isUpNextEpisode}
-                    isVisible={isVisible}
-                    isWaitingPlayer={isWaitingPlayer}
-                    ListResolution={ListResolution.map((val) => val.res)}
-                    currentHost={currentPlayer ? currentPlayer.hostname : "Unknown"}
-                    currentResolution={currentResolution ? currentResolution.res : "Unknown"}
-                    currentSettings={currentSettings}
-                    hls={hls}
+                    isMuted={isMuted()}
+                    isFullscreen={isFullscreen()}
+                    isHideUpNextEpisode={isHideUpNextEpisode()}
+                    isPlaying={isPlaying()}
+                    isUpNextEpisode={isUpNextEpisode()}
+                    isVisible={isVisible()}
+                    isWaitingPlayer={isWaitingPlayer()}
+                    ListResolution={ListResolution().map((val) => val.res)}
+                    currentHost={currentPlayer() ? currentPlayer()?.hostname as string : "Unknown"}
+                    currentResolution={currentResolution() ? currentResolution()?.res as string : "Unknown"}
+                    currentSettings={currentSettings()}
                     time={time}
-                    timeNextEpisode={timeNextEpisode}
+                    timeNextEpisode={timeNextEpisode()}
                     episode={{ ep: temp.episode, type: temp.type }}
                     episodes={temp.episodes}
                     episodesUrl={player_data}
-                    showNerdStats={showNerdStats}
+                    showNerdStats={showNerdStats()}
                     PlayerVolume={PlayerVolume}
                 />
-            )} */}
+            </Show>
         </div>
     )
 }

@@ -23,41 +23,34 @@ interface developerStatsProps {
     currentHost: string
     currentSettings: boolean
     showNerdStats: boolean
-    hls: any
 }
 
-const developerStats: React.FC<developerStatsProps> = ({ isMuted, isVisible, isWaitingPlayer, isPlaying, isFullscreen, ListResolution,
-    currentResolution, timeNextEpisode, isHideUpNextEpisode, isUpNextEpisode, episodes, episode, PlayerVolume, time, episodesUrl, currentHost,
-    currentSettings, showNerdStats, hls
- }) => {
+export default function developerStats(props: developerStatsProps) {
     return (
-        <div className="player-dev-container">
-            <div className="player-dev-header">States</div>
-            <div className="player-dev-text">isMuted: <span className="player-dev-text">{isMuted.toString()}</span></div>
-            <div className="player-dev-text">isVisible: <span className="player-dev-text">{isVisible.toString()}</span></div>
-            <div className="player-dev-text">isWaitingPlayer: <span className="player-dev-text">{isWaitingPlayer.toString()}</span></div>
-            <div className="player-dev-text">isPlaying: <span className="player-dev-text">{isPlaying.toString()}</span></div>
-            <div className="player-dev-text">isFullscreen: <span className="player-dev-text">{isFullscreen.toString()}</span></div>
-            <div className="player-dev-header">Resolution</div>
-            <div className="player-dev-text">ListResolution: <span className="player-dev-text">{ListResolution.toString()}</span></div>
-            <div className="player-dev-text">currentResolution: <span className="player-dev-text">{currentResolution.toString()}</span></div>
-            <div className="player-dev-header">Up Next</div>
-            <div className="player-dev-text">timeNextEpisode: <span className="player-dev-text">{timeNextEpisode.toString()}</span></div>
-            <div className="player-dev-text">isUpNextEpisode: <span className="player-dev-text">{isUpNextEpisode.toString()}</span></div>
-            <div className="player-dev-text">isHideUpNextEpisode: <span className="player-dev-text">{isHideUpNextEpisode.toString()}</span></div>
-            <div className="player-dev-header">Data</div>
-            <div className="player-dev-text">episodes: <span className="player-dev-text">{episodes.toString()}</span></div>
-            <div className="player-dev-text">episode: <span className="player-dev-text">{episode.ep}, {episode.type}</span></div>
-            <div className="player-dev-text">PlayerVolume: <span className="player-dev-text">{PlayerVolume.toString()}</span></div>
-            <div className="player-dev-text">time: <span className="player-dev-text">{time.toString()}</span></div>
-            <div className="player-dev-text">episodesUrl: <span className="player-dev-text">{episodesUrl.length}</span></div>
-            <div className="player-dev-header">Other</div>
-            <div className="player-dev-text">currentHost: <span className="player-dev-text">{currentHost.toString()}</span></div>
-            <div className="player-dev-text">currentSettings: <span className="player-dev-text">{currentSettings.toString()}</span></div>
-            <div className="player-dev-text">showNerdStats: <span className="player-dev-text">{showNerdStats.toString()}</span></div>
-            <div className="player-dev-text">hls: <span className="player-dev-text">{hls ? hls.toString() : "null"}</span></div>
+        <div class="player-dev-container">
+            <div class="player-dev-header">States</div>
+            <div class="player-dev-text">isMuted: <span class="player-dev-text">{props.isMuted.toString()}</span></div>
+            <div class="player-dev-text">isVisible: <span class="player-dev-text">{props.isVisible.toString()}</span></div>
+            <div class="player-dev-text">isWaitingPlayer: <span class="player-dev-text">{props.isWaitingPlayer.toString()}</span></div>
+            <div class="player-dev-text">isPlaying: <span class="player-dev-text">{props.isPlaying.toString()}</span></div>
+            <div class="player-dev-text">isFullscreen: <span class="player-dev-text">{props.isFullscreen.toString()}</span></div>
+            <div class="player-dev-header">Resolution</div>
+            <div class="player-dev-text">ListResolution: <span class="player-dev-text">{props.ListResolution.toString()}</span></div>
+            <div class="player-dev-text">currentResolution: <span class="player-dev-text">{props.currentResolution.toString()}</span></div>
+            <div class="player-dev-header">Up Next</div>
+            <div class="player-dev-text">timeNextEpisode: <span class="player-dev-text">{props.timeNextEpisode.toString()}</span></div>
+            <div class="player-dev-text">isUpNextEpisode: <span class="player-dev-text">{props.isUpNextEpisode.toString()}</span></div>
+            <div class="player-dev-text">isHideUpNextEpisode: <span class="player-dev-text">{props.isHideUpNextEpisode.toString()}</span></div>
+            <div class="player-dev-header">Data</div>
+            <div class="player-dev-text">episodes: <span class="player-dev-text">{props.episodes.toString()}</span></div>
+            <div class="player-dev-text">episode: <span class="player-dev-text">{props.episode.ep}, {props.episode.type}</span></div>
+            <div class="player-dev-text">PlayerVolume: <span class="player-dev-text">{props.PlayerVolume.toString()}</span></div>
+            <div class="player-dev-text">time: <span class="player-dev-text">{props.time.toString()}</span></div>
+            <div class="player-dev-text">episodesUrl: <span class="player-dev-text">{props.episodesUrl.length}</span></div>
+            <div class="player-dev-header">Other</div>
+            <div class="player-dev-text">currentHost: <span class="player-dev-text">{props.currentHost.toString()}</span></div>
+            <div class="player-dev-text">currentSettings: <span class="player-dev-text">{props.currentSettings.toString()}</span></div>
+            <div class="player-dev-text">showNerdStats: <span class="player-dev-text">{props.showNerdStats.toString()}</span></div>
         </div>
     )
 }
-
-export default developerStats
