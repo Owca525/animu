@@ -45,7 +45,7 @@ export default function Input(props: InputProps) {
       type={props.type ?? "text"}
       class={"input " + (props.InputClass ?? "")}
       placeholder={props.placeholder}
-      value={props.defaultValue}
+      value={props.defaultValue ? props.defaultValue : ""}
       onKeyDown={handleData}
     />
   );

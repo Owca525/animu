@@ -2,7 +2,7 @@ import Button from "./buttons"
 import "./css/sidebar.css"
 import icon from "../../../../resources/icon.png"
 import { sidebarData } from "@renderer/utils/types"
-import { Component, createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js"
+import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js"
 import { createShortcut } from "@solid-primitives/keyboard"
 import { setHomeLocalSearch } from "@renderer/utils/stores/home"
 
@@ -16,12 +16,12 @@ interface sidebarProps {
   }
   activeElement?: boolean
 }
-
-const Sidebar: Component<sidebarProps> = ({ showLogo = false, data, onChange, openSidebar, activeElement }) => {
+// Component<sidebarProps> = ({ showLogo = false, data, onChange, openSidebar, activeElement }) =>
+export default function Sidebar(props: sidebarProps) {
   const [sidebarHover, setHover] = createSignal<boolean>(false)
   const animuVersion = window.electronAPI.process.env.npm_package_version
   let sidebarRef: HTMLDivElement | undefined;
-  const [currentButton, setCurrentButton] = createSignal<number>(activeElement ? 0 : -1)
+  const [currentButton, setCurrentButton] = createSignal<number>(props.activeElement ? 0 : -1)
 
   const handleClickOutside = (event: MouseEvent) => {
     let data = event.target as HTMLElement
@@ -31,8 +31,8 @@ const Sidebar: Component<sidebarProps> = ({ showLogo = false, data, onChange, op
   };
 
   createEffect(() => {
-    if (onChange) onChange(sidebarHover())
-    if (openSidebar) setHover(openSidebar)
+    if (props.onChange) props.onChange(sidebarHover())
+    if (props.openSidebar) setHover(props.openSidebar)
   })
 
   onMount(() => {
@@ -47,7 +47,7 @@ const Sidebar: Component<sidebarProps> = ({ showLogo = false, data, onChange, op
   })
 
   function hideSidebar(event, func, num?: number) {
-    if (activeElement && num != undefined) setCurrentButton(num)
+    if (props.activeElement && num != undefined) setCurrentButton(num)
     setHover((prev) => !prev)
     if (!func) return
     func(event)
@@ -60,7 +60,7 @@ const Sidebar: Component<sidebarProps> = ({ showLogo = false, data, onChange, op
 
   function detectSidebarState() {
     if (sidebarHover()) return "sidebar-container-max"
-    return `sidebar-container-min ${!showLogo ? "hidden" : ""}`
+    return `sidebar-container-min ${!props.showLogo ? "hidden" : ""}`
   }
 
   function detectSidebarStateClass() {
@@ -84,10 +84,10 @@ const Sidebar: Component<sidebarProps> = ({ showLogo = false, data, onChange, op
       // animate={showLogo ? "visible" : sidebarHover ? "visible" : "hidden"}
       // variants={sidebarVariants}
       // transition={{ duration: 0.2 }}
-      onMouseEnter={() => showLogo && setHover(() => true)}
-      onMouseLeave={() => showLogo && setHover(() => false)}
+      onMouseEnter={() => props.showLogo && setHover(() => true)}
+      onMouseLeave={() => props.showLogo && setHover(() => false)}
     >
-      <Show when={showLogo}>
+      <Show when={props.showLogo}>
         <div class="sidebar-logo-icon-container">
           <img src={icon} alt={animuVersion} class="sidebar-image" />
           <Show when={sidebarHover()}>
@@ -97,7 +97,7 @@ const Sidebar: Component<sidebarProps> = ({ showLogo = false, data, onChange, op
       </Show>
       <div class="sidebar-buttons-content">
         <div class={`sidebar-top ${detectSidebarStateContainers()}`}>
-          <Show when={!showLogo}>
+          <Show when={!props.showLogo}>
             <Button icon={"arrow_back"}
               content={detectSidebarStateButton("Hide Sidebar")}
               onClick={(event) => { setHomeLocalSearch(false); hideSidebar(event, undefined) }}
@@ -106,7 +106,7 @@ const Sidebar: Component<sidebarProps> = ({ showLogo = false, data, onChange, op
             />
           </Show>
           <div class="sidebar-black-line"></div>
-          <For each={data.top}>
+          <For each={props.data.top}>
             {(value, i) => (
               <Button icon={value.icon}
                 content={detectSidebarStateButton(value.text)}
@@ -118,7 +118,7 @@ const Sidebar: Component<sidebarProps> = ({ showLogo = false, data, onChange, op
         </div>
         <div class={`sidebar-bottom ${detectSidebarStateContainers()}`}>
           <div class="sidebar-black-line"></div>
-          <For each={data.bottom}>
+          <For each={props.data.bottom}>
             {(value) => (
               <Button icon={value.icon} 
                 content={detectSidebarStateButton(value.text)} 
@@ -132,5 +132,3 @@ const Sidebar: Component<sidebarProps> = ({ showLogo = false, data, onChange, op
     </div>
   )
 }
-
-export default Sidebar

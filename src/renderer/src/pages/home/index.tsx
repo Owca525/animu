@@ -10,9 +10,6 @@ import {
   SettingsConfig,
 } from "@renderer/utils/types";
 import { t } from "i18next";
-import {
-  setHomeData,
-} from "@renderer/utils/pluginApi";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import { CreateContextMenuOptions } from "@renderer/utils/functions";
 import Filter from "./components/filter";
@@ -20,7 +17,7 @@ import Button from "@renderer/components/buttons";
 import BigCardsContainer from "./components/bigCardsContainer";
 import { getInformationPlugin, getPlayerPLugin } from "@renderer/utils/stores/plugins";
 import { useNavigate } from "@solidjs/router";
-import { getHomeCache, setHomeLocalSearch, setHomeSearch, setHomeSearchPage, setHomeSearchTags, setHomeStopScrolling } from "@renderer/utils/stores/home";
+import { getHomeCache, setAllHomeData, setHomeLocalSearch, setHomeSearch, setHomeSearchPage, setHomeSearchTags, setHomeStopScrolling } from "@renderer/utils/stores/home";
 import { getConfig } from "@renderer/utils/stores/config";
 import { createEffect, createSignal, For, Match, onMount, Show, Switch } from "solid-js";
 import { getGlobalCache } from "@renderer/utils/stores/global";
@@ -47,7 +44,7 @@ const Home = () => {
       {
         icon: "history",
         text: t("global.history"),
-        onClick: () => setHomeData(history),
+        onClick: history,
       },
     ],
     bottom: [
@@ -77,6 +74,7 @@ const Home = () => {
   createEffect(() => {
     if (!divRef) return
     let home = homeCache()
+    console.log(home)
     if (!home.data.sections) return
     if (home.data.sections.length <= 0 || home.data.sections.length != 1) return
     if (home.stopScrolling) return
@@ -86,17 +84,17 @@ const Home = () => {
     // }
   })
 
-  async function history(): Promise<{
-    topCards?: containerData;
-    sections: containerData[];
-  }> {
+  function history() {
     setHomeLocalSearch(true);
     let history = JSON.parse(JSON.stringify(getGlobalCache().history))
-    return {
+    let historyCache = history.continue.reverse().slice(0, 20)
+    let continueWatchCache = history.history.reverse().slice(0, 20)
+
+    let data = {
       sections: [
         {
           title: t("global.continuewatch"),
-          data: history.continue.slice(0, 20),
+          data: historyCache,
           horizontal: true,
           // onTitleClick: () =>
           //   setHomeData(async () => ({
@@ -111,7 +109,7 @@ const Home = () => {
         },
         {
           title: t("global.history"),
-          data: history.history.slice(0, 20),
+          data: continueWatchCache,
           horizontal: true,
           // onTitleClick: () =>
           //   setHomeData(async () => ({
@@ -126,6 +124,7 @@ const Home = () => {
         },
       ],
     };
+    setAllHomeData({ data: data } as any)
   }
   const handleScroll = () => {
     let home = homeCache()
