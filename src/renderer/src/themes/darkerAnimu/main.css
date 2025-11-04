@@ -235,7 +235,7 @@ body {
 }
 
 .home-header-background:hover {
-  border-color: var(--neutral1) !important;
+  border-color: var(--green-one) !important;
 }
 
 .home-header-sidebar-placeholder {
@@ -872,7 +872,7 @@ th {
 }
 
 .player-up-Next-container-var2 {
-  background: linear-gradient(to left, var(--bg), rgb(0, 0, 0, 0.2));
+  background: linear-gradient(to left, var(--player-bg-containers), rgb(0, 0, 0, 0.2));
   border-radius: 12px !important;
 }
 
@@ -883,7 +883,7 @@ th {
 }
 
 .player-up-Next-background:hover {
-  outline-color: var(--neutral1);
+  outline-color: var(--green-one);
 }
 
 .player-up-Next-button-close {
@@ -895,7 +895,7 @@ th {
 
 
 .player-up-Next-button-close:hover {
-  border-color: var(--neutral1);
+  border-color: var(--green-one);
 }
 
 .player-up-Next-container {
@@ -917,7 +917,7 @@ th {
 }
 
 .player-volume-ui-bar-progress {
-  background-color: var(--neutral1);
+  background-color: var(--green-one);
   border-radius: 12px;
 }
 
@@ -952,7 +952,7 @@ th {
 }
 
 .player-skip-chapters-button:hover {
-  border-color: var(--neutral1);
+  border-color: var(--green-one);
 }
 
 .information-episode-button-image {
