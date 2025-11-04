@@ -10,10 +10,11 @@ import Dropdown from "@renderer/components/dropDown";
 import { ChangePlugin } from "@renderer/utils/pluginApi";
 import { useQuery, useQueryClient } from "@tanstack/solid-query";
 import { useLocation, useNavigate } from "@solidjs/router";
-import { createEffect, createSignal, For, onMount, Show } from "solid-js";
+import { createEffect, createSignal, For, Match, onMount, Show, Switch } from "solid-js";
 import { getGlobalCache } from "@renderer/utils/stores/global";
 import { getPlayerPLugin } from "@renderer/utils/stores/plugins";
 import toast from "solid-toast";
+import CharacterCards from "./components/characterCard";
 
 function information() {
     const navigate = useNavigate()
@@ -23,13 +24,14 @@ function information() {
 
     const [showWrong, setshowWrong] = createSignal<boolean>(false)
     const [currentPlugin, setCurrentPlugin] = createSignal<string | undefined>(getPlayerPLugin()?.name)
-    const [secondsLeft, setSecondsLeft] = createSignal<undefined | number>(tempData().anime.nextAiringEpisode?.timeUntilAiring);
+    const [secondsLeft, setSecondsLeft] = createSignal<undefined | { left: number, converted: { days: number; hours: number; minutes: number; seconds: number; } | undefined }>(undefined);
 
     const queryClient = useQueryClient()
     const episodeResponse = useQuery(() => ({
         queryKey: [tempData().anime],
         queryFn: async ({ queryKey }) => {
             console.log(tempData())
+            if (tempData().anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED") return { player_id: "", episodesData: [] }
             let tmp = currentPlugin()
             if (!tmp) return
 
@@ -59,23 +61,23 @@ function information() {
 
     createEffect(() => {
         let seconds = secondsLeft()
-        if (seconds && seconds <= 0) return;
+        if (seconds && seconds.left <= 0) return;
         const intervalId = setInterval(() => {
             setSecondsLeft(prev => {
                 if (!prev) return undefined
-                if (prev <= 1) {
+                if (prev.left <= 1) {
                     clearInterval(intervalId);
-                    return 0;
+                    return { left: 0, converted: convertSeconds(0) };
                 }
-                return prev - 1;
+                return { left: prev.left - 1, converted: convertSeconds(prev.left - 1) };
             });
         }, 1000);
         return () => clearInterval(intervalId);
     });
 
-    const time = convertSeconds(secondsLeft())
-
     onMount(() => {
+        if (tempData().anime.nextAiringEpisode?.timeUntilAiring) 
+            setSecondsLeft({ left: tempData().anime.nextAiringEpisode?.timeUntilAiring as number, converted: convertSeconds(tempData().anime.nextAiringEpisode?.timeUntilAiring) })
         document.querySelectorAll('*').forEach((element: any) => {
             element.tabIndex = -1
         });
@@ -172,13 +174,13 @@ function information() {
         episodeResponse.refetch()
     }
 
-    function checkEpisodes() {
-        if (tempData().anime.status == "NOT_YET_RELEASED") return true
-        if (episodeResponse.isLoading) return false
-        if (!episodeResponse.data && !episodeResponse.isLoading && !episodeResponse.isError) return true
-        if (episodeResponse.data && episodeResponse.data.episodesData.length <= 0) return true
-        return false
-    }
+    // function checkEpisodes() {
+    //     if (tempData().anime.status == "NOT_YET_RELEASED") return true
+    //     if (episodeResponse.isLoading) return false
+    //     if (!episodeResponse.data && !episodeResponse.isLoading && !episodeResponse.isError) return true
+    //     if (episodeResponse.data && episodeResponse.data.episodesData.length <= 0) return true
+    //     return false
+    // }
 
     return (
         <>
@@ -239,7 +241,8 @@ function information() {
                                     <div class="information-content-title">
                                         {t("information.airing")}: {tempData().anime.nextAiringEpisode?.episode}
                                     </div>
-                                    {`${time?.days}d ${time?.hours}h ${time?.minutes}m ${time?.seconds}s`}
+                                    {/* TODO: make better timer */}
+                                    {`${secondsLeft()?.converted?.days}d ${secondsLeft()?.converted?.hours}h ${secondsLeft()?.converted?.minutes}m ${secondsLeft()?.converted?.seconds}s`}
                                 </div>
                             </Show>
 
@@ -319,74 +322,77 @@ function information() {
                                     </div>
                                 </div>
                                 <Show when={showWrong() == false}>
-                                    <Show when={episodeResponse.isLoading == false && episodeResponse.isError == false && episodeResponse.data && episodeResponse.data.episodesData && episodeResponse.data.episodesData.length > 0 && tempData().anime.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED"}>
-                                        <For each={episodeResponse.data?.episodesData}>
-                                            {(episode) => (
-                                                <Drop LeftHeader={episode.name ? episode.name : t(`information.types.${episode.type}`)} RightHeader={t("information.listEpisodes", { number: episode.episodes.length })} content={makeButtons(episode.episodes, episode.type)} />
-                                            )}
-                                        </For>
-                                    </Show>
-
-                                    <Show when={episodeResponse.isLoading && tempData().anime.status?.toUpperCase().replaceAll(" ", "_") != "NOT_YET_RELEASED"}>
-                                        <div class="information-loading-container"><span class="information-loading material-symbols-outlined">progress_activity</span></div>
-                                    </Show>
-                                    <Show when={episodeResponse.isError && episodeResponse.isLoading == false}>
-                                        <div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>
-                                    </Show>
-                                    <Show when={checkEpisodes()}>
-                                        <div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>
-                                    </Show>
+                                    <Switch>
+                                        <Match when={episodeResponse.isPending}>
+                                            <div class="information-loading-container"><span class="information-loading material-symbols-outlined">progress_activity</span></div>
+                                        </Match>
+                                        <Match when={episodeResponse.isError}>
+                                            <div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>
+                                        </Match>
+                                        <Match when={episodeResponse.data}>
+                                            <For each={episodeResponse.data?.episodesData} fallback={<div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}>
+                                                {(episode) => {
+                                                    if (episode.episodes.length <= 0) return <></>
+                                                    return <Drop LeftHeader={episode.name ? episode.name : t(`information.types.${episode.type}`)} RightHeader={t("information.listEpisodes", { number: episode.episodes.length })} content={makeButtons(episode.episodes, episode.type)} />
+                                                }}
+                                            </For>
+                                        </Match>
+                                    </Switch>
                                 </Show>
                             </div>
-
-
-                            {tempData().anime.characters && tempData().anime.characters.length > 0 &&
+                            
+                            <Show when={tempData().anime.characters && tempData().anime.characters.length > 0}>
                                 <div class="information-characters">
                                     <div class="information-characters-title">
                                         {t("information.characters")}
                                     </div>
 
                                     <div class="information-characters-container">
-                                        {tempData().anime.characters.map((character) =>
-                                            <div class="information-characters-card" onClick={() => window.api.open(`https://anilist.co/character/${character.character.id}`)}>
-                                                <img class="information-characters-card-cover" src={character.character.image}></img>
-                                                <div class="information-characters-card-description">
-                                                    <span class="information-character-name">{character.character.name}</span>
-                                                    <span class="information-character-role">{t(`information.role.${character.role.toLowerCase()}`)}</span>
-                                                </div>
-                                            </div>
-                                        )}
+                                        <For each={tempData().anime.characters}>
+                                            {(character) => (
+                                                <CharacterCards 
+                                                    id={character.character.id} 
+                                                    image={character.character.image} 
+                                                    name={character.character.name} 
+                                                    role={t(`information.role.${character.role.toLowerCase()}`)}
+                                                    onClick={() => window.api.open(`https://anilist.co/character/${character.character.id}`)}
+                                                />
+                                            )}
+                                        </For>
                                     </div>
                                 </div>
-                            }
+                            </Show>
 
-                            {tempData().anime.characters && tempData().anime.characters.map((tmp) => tmp.voiceActor).filter((item) => item != undefined).length > 0 &&
+                            <Show when={tempData().anime.characters && tempData().anime.characters.map((tmp) => tmp.voiceActor).filter((item) => item != undefined).length > 0}>
                                 <div class="information-characters">
                                     <div class="information-characters-title">
-                                        {t("information.actors")}
+                                        {t("information.characters")}
                                     </div>
 
                                     <div class="information-characters-container">
-                                        {tempData().anime.characters.map((character) => (character.voiceActor != undefined &&
-                                            <div class="information-characters-card" onClick={() => window.api.open(`https://anilist.co/staff/${character.voiceActor ? character.voiceActor.id : ""}`)}>
-                                                <img class="information-characters-card-cover" src={character.voiceActor.image}></img>
-                                                <div class="information-characters-card-description">
-                                                    <span class="information-character-name">{character.voiceActor.name}</span>
-                                                    <span class="information-character-role">{t("information.actor_as", { actor: character.character.name })}</span>
-                                                </div>
-                                            </div>
-                                        )
-                                        )}
+                                        <For each={tempData().anime.characters}>
+                                            {(character) => (
+                                                <CharacterCards 
+                                                    id={character.voiceActor?.id as string} 
+                                                    image={character.voiceActor?.image as string} 
+                                                    name={character.voiceActor?.name as string} 
+                                                    role={t("information.actor_as", { actor: character.character.name })}
+                                                    onClick={() => window.api.open(`https://anilist.co/staff/${character.voiceActor ? character.voiceActor.id : ""}`)}
+                                                />
+                                            )}
+                                        </For>
                                     </div>
                                 </div>
-                            }
+                            </Show>
                         </div>
                     </div>
                 </div>
 
                 <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
             </main>
-            {showWrong() && <ContainerWrong name={tempData().anime.title.romaji} refetchfunc={(id?: string) => { setshowWrong(() => false); setCurrentId(id); episodeResponse.refetch() }} exitfunc={() => setshowWrong(() => false)} />}
+            <Show when={showWrong()}>
+                <ContainerWrong name={tempData().anime.title.romaji} refetchfunc={(id?: string) => { setshowWrong(() => false); setCurrentId(id); episodeResponse.refetch() }} exitfunc={() => setshowWrong(() => false)} />
+            </Show>
         </>
     )
 }
