@@ -31,8 +31,8 @@ export default function Sidebar(props: sidebarProps) {
   };
 
   createEffect(() => {
-    if (props.onChange) props.onChange(sidebarHover())
     if (props.openSidebar) setHover(props.openSidebar)
+    if (props.onChange) props.onChange(sidebarHover())
   })
 
   onMount(() => {
