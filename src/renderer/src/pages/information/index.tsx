@@ -78,9 +78,11 @@ function information() {
     onMount(() => {
         if (tempData().anime.nextAiringEpisode?.timeUntilAiring) 
             setSecondsLeft({ left: tempData().anime.nextAiringEpisode?.timeUntilAiring as number, converted: convertSeconds(tempData().anime.nextAiringEpisode?.timeUntilAiring) })
+        
         document.querySelectorAll('*').forEach((element: any) => {
             element.tabIndex = -1
         });
+
         if (tempData().anime.id == "") return
         let tempHistory: { continue: cardData[]; history: cardData[]; } = getGlobalCache().history
 
@@ -99,8 +101,8 @@ function information() {
 
     function enterPlayer(episodes: { ep: string, img?: string, title?: string }[], type: string, episode: string) {
         let tmp = JSON.parse(JSON.stringify(tempData()))
-        if (!tmp.saveData) return
-        console.log(tmp)
+        let lastTime = 0
+        if (tmp.saveData && tmp.saveData.episode.toString() === episode) lastTime = tmp.saveData.last_Time
         navigate("/player", {
             state: {
                 data: {
@@ -108,7 +110,7 @@ function information() {
                     player_ID: currentIDplayer() ? JSON.parse(JSON.stringify(currentIDplayer())) : episodeResponse.data?.player_id
                 },
                 save: {
-                    last_Time: tmp.saveData.episode.toString() === episode ? tmp.saveData.last_Time : 0,
+                    last_Time: lastTime,
                     type: type,
                     pluginName: currentIDplayer() ? JSON.parse(JSON.stringify(currentIDplayer())) : episodeResponse.data?.player_id,
                     episode: episode

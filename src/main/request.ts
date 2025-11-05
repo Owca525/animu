@@ -20,7 +20,8 @@ ipcMain.handle('fetch-data', async (_event, url: string, header: Record<string, 
         }
         return { success: false, data: undefined, status: response.status, statusText: response.statusText }
     } catch (error) {
-        return { success: false, error: (error as Error).message, status: 1, data: undefined, statusText: (error as Error).message }
+        console.error(error)
+        return { success: false, error: (error as Error).message, status: 500, data: undefined, statusText: "Backend Error" }
     } finally {
         clearTimeout(id);
     }
@@ -50,7 +51,8 @@ ipcMain.handle('send-post', async (_event, url: string, header: Record<string, s
         }
         return { success: false, status: response.status, statusText: response.statusText, data: undefined }
     } catch (error) {
-        return { success: false, error: (error as Error).message, status: 1, data: undefined, statusText: (error as Error).message }
+        console.error(error)
+        return { success: false, error: (error as Error).message, status: 500, data: undefined, statusText: "Backend Error" }
     } finally {
         clearTimeout(id);
     }
@@ -58,15 +60,27 @@ ipcMain.handle('send-post', async (_event, url: string, header: Record<string, s
 )
 
 ipcMain.handle('advanceRequest', async (_, url: string, options?: { method: "POST" | "GET", headers: { [key: string]: string } }) => {
-    const response = await fetch(url, options);
-    if (!response.ok) return { text: "", buffer: [], status: response.status, statusText: response.statusText, url: response.url, success: response.ok }
-    let cloned = response.clone()
-    return {
-        text: await response.text(),
-        buffer: Buffer.from(await cloned.arrayBuffer()),
-        status: response.status,
-        statusText: response.statusText,
-        url: response.url,
-        success: response.ok
-    };
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) return { text: "", buffer: [], status: response.status, statusText: response.statusText, url: response.url, success: response.ok }
+        let cloned = response.clone()
+        return {
+            text: await response.text(),
+            buffer: Buffer.from(await cloned.arrayBuffer()),
+            status: response.status,
+            statusText: response.statusText,
+            url: response.url,
+            success: response.ok
+        };
+    } catch (error) {
+        console.error(error)
+        return {
+            text: (error as Error).message,
+            buffer: Buffer.from(""),
+            status: 500,
+            statusText: "Backend Error",
+            url: url,
+            success: false
+        }
+    }
 });

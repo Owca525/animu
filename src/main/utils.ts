@@ -251,7 +251,9 @@ const createProxyServer = () => {
         });
 
         try {
-            const headers: Record<string, string> = {};
+            const headers: Record<string, string> = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/143.0"
+            };
 
             if (req.headers.range) {
                 const match = req.headers.range.match(/bytes=(\d+)-(\d*)/);
@@ -264,6 +266,11 @@ const createProxyServer = () => {
 
             const response = await fetch(currentVideoUrl, { headers });
             console.log(response)
+            if (response.status == 403) {
+                res.status(response.status)
+                res.end();
+                return
+            }
 
             res.status(response.status);
             response.headers.forEach((value, key) => res.setHeader(key, value));
@@ -279,7 +286,7 @@ const createProxyServer = () => {
                 try {
                     nodeStream.destroy();
                     (response.body as any)?.cancel?.();
-                } catch { }
+                } catch (error) { console.error(error) }
             });
 
             nodeStream.on("error", (err) => {

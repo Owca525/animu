@@ -22,7 +22,7 @@ export async function checkUpdate(alwaysShow: boolean = false) {
       toast.success(t("update.same"));
     }
 
-    const config = structuredClone(getConfig());
+    const config = JSON.parse(JSON.stringify(getConfig()));
     config.update.lastTime = new Date().toString();
     saveConfig(config);
   } catch (error) {

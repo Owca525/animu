@@ -1,7 +1,7 @@
-import { cardData, ContextMenuProps, SettingsConfig } from "@renderer/utils/types";
+import { cardData, ContextMenuProps } from "@renderer/utils/types";
 import "./css/card.css";
 import { useNavigate } from "@solidjs/router";
-import { JSX, createSignal } from "solid-js";
+import { Component, JSX, Match, Show, Switch, createSignal } from "solid-js";
 import { t } from "i18next";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import {
@@ -10,45 +10,33 @@ import {
   getGradientColor,
 } from "@renderer/utils/functions";
 import { ChangePlugin } from "@renderer/utils/pluginApi";
-import { getConfig } from "@renderer/utils/stores/config";
-import { getPlayerPLugin } from "@renderer/utils/stores/plugins";
 
 interface CardProps {
   card: cardData;
   disableinformation?: boolean;
 }
 
-const Card = (props: CardProps) => {
+const Card: Component<CardProps> = ({ card, disableinformation }) => {
   const navigate = useNavigate();
   const [isLoading, setLoading] = createSignal(true);
   const [isError, setIsError] = createSignal(false);
   const [isOut, setIsOut] = createSignal(false);
   let cardRef: HTMLDivElement | undefined;
 
-  const config: SettingsConfig = getConfig();
-
   async function sendToInformation() {
-    const { card } = props;
-
     if (card.onClick) {
       card.onClick(card.AnimeData);
       return;
     }
 
-    if (card.saveData && card.saveData.last_Time != 0 && card.saveData.pluginName == config.plugins.player) {
-      await ChangePlugin(card.saveData.pluginName);
-    }
-
     if (card.saveData && card.saveData.episode != "" && card.saveData.last_Time != 0) {
-      if (config.plugins.player != card.saveData.pluginName)
-        ChangePlugin(card.saveData.pluginName);
-
-      const episodeList = await getPlayerPLugin()?.player.extractOnlyEpisodesList(card.saveData.type, card.AnimeData.player_ID as string);
+      const currentPLugin = ChangePlugin(card.saveData.pluginName)
+      const episodeList = currentPLugin.player.extractOnlyEpisodesList(card.saveData.type, card.AnimeData.player_ID as string);
 
       navigate("/player", {
         state: {
-          data: card.AnimeData,
-          save: card.saveData,
+          data: JSON.parse(JSON.stringify(card.AnimeData)),
+          save: JSON.parse(JSON.stringify(card.saveData)),
           episodelist: episodeList,
         },
       });
@@ -61,7 +49,7 @@ const Card = (props: CardProps) => {
     }
 
     navigate("/info", {
-      state: { anime: card.AnimeData, saveData: card.saveData },
+      state: { anime: JSON.parse(JSON.stringify(card.AnimeData)) },
     });
   }
 
@@ -75,13 +63,13 @@ const Card = (props: CardProps) => {
     {
       option: t("contextMenu.copytitle"),
       onClick: () =>
-        window.api.saveToClipboard("text", props.card.AnimeData.title.romaji),
+        window.api.saveToClipboard("text", card.AnimeData.title.romaji),
     },
     {
       option: t("contextMenu.copycover"),
       onClick: () =>
-        props.card.AnimeData.coverImage
-          ? window.api.saveToClipboard("image", props.card.AnimeData.coverImage)
+        card.AnimeData.coverImage
+          ? window.api.saveToClipboard("image", card.AnimeData.coverImage)
           : "",
     },
   ];
@@ -98,7 +86,7 @@ const Card = (props: CardProps) => {
   }
 
   function ConvertTimeToText(): string {
-    const time = convertSeconds(props.card.AnimeData.nextAiringEpisode?.timeUntilAiring);
+    const time = convertSeconds(card.AnimeData.nextAiringEpisode?.timeUntilAiring);
     if (!time) return "";
     if (time.days != 0) return t("card_information.ep_airing_day", { day: time.days });
     if (time.hours != 0) return t("card_information.ep_airing_hours", { hours: time.hours });
@@ -107,11 +95,6 @@ const Card = (props: CardProps) => {
   }
 
   function GenerateInformation() {
-    const card = props.card;
-    if (props.disableinformation) return;
-    if (!card.AnimeData.studios && !card.AnimeData.status && !card.AnimeData.genres && !card.AnimeData.description)
-      return undefined;
-
     const info: JSX.Element[] = [];
 
     if (card.AnimeData.averageScore) {
@@ -191,7 +174,7 @@ const Card = (props: CardProps) => {
       class="card-container"
       onClick={sendToInformation}
       onMouseOver={checkOutOfBound}
-      title={props.card.AnimeData.title.romaji}
+      title={card.AnimeData.title.romaji}
       onContextMenu={(event) =>
         OpenContextMenu(
           CreateContextMenuOptions(
@@ -202,40 +185,38 @@ const Card = (props: CardProps) => {
         )
       }
     >
-      {GenerateInformation() && (
-        <div
-          class={`card-information ${isOut() ? "card-information-left" : "card-information-right"}`}
-        >
-          {GenerateInformation()}
-        </div>
-      )}
-      {props.card.AnimeData.coverImage && (
-        <img
-          src={props.card.AnimeData.coverImage}
-          class="card-image"
-          onLoad={() => setLoading(false)}
-          onError={() => setIsError(true)}
-          style={checkState()}
-        />
-      )}
-      {isLoading() && !isError() && (
-        <div class="card-image-placeholder">
-          <span class="material-symbols-outlined home-loading-animation">progress_activity</span>
-        </div>
-      )}
-      {isError() && (
-        <div class="card-image-placeholder">
-          <span class="material-symbols-outlined">error</span>
-        </div>
-      )}
-      <div class="card-title">{props.card.AnimeData.title.romaji}</div>
-      {props.card.saveData && props.card.saveData.episode && (
-        <div class="card-continue-watch-text">
-          {props.card.saveData.last_Time != 0 && props.card.saveData.type != ""
-            ? t("history.continue", { ep: props.card.saveData.episode })
-            : t("history.history", { ep: props.card.saveData.episode })}
-        </div>
-      )}
+      <Show when={!disableinformation && card.AnimeData.studios && card.AnimeData.status && card.AnimeData.genres && card.AnimeData.description}>
+          <div class={`card-information ${isOut() ? "card-information-left" : "card-information-right"}`}>
+            {GenerateInformation()}
+          </div>
+      </Show>
+      <Switch>
+        <Match when={card.AnimeData.coverImage}>
+          <img
+            src={card.AnimeData.coverImage}
+            class="card-image"
+            onLoad={() => setLoading(false)}
+            onError={() => setIsError(true)}
+            style={checkState()}
+          />
+        </Match>
+        <Match when={isLoading()}>
+          <div class="card-image-placeholder">
+            <span class="material-symbols-outlined home-loading-animation">progress_activity</span>
+          </div>
+        </Match>
+        <Match when={isError()}>
+          <div class="card-image-placeholder">
+            <span class="material-symbols-outlined">error</span>
+          </div>
+        </Match>
+      </Switch>
+      <div class="card-title">{card.AnimeData.title.romaji}</div>
+      <Show when={card.saveData && card.saveData.episode}>
+        <Show when={card.saveData?.last_Time != 0 && card.saveData?.type != ""} fallback={t("history.history", { ep: card.saveData?.episode })}>
+          {t("history.continue", { ep: card.saveData?.episode })}
+        </Show>
+      </Show>
     </div>
   );
 };

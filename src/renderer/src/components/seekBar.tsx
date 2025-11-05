@@ -87,8 +87,6 @@ export default function SeekBar(props: SeekBarProps) {
 
     if (props.thumbnail) setThumbnailPosition(percent);
 
-    console.log(newValue)
-
     if (props.type === "value") seekbarBox.innerHTML = newValue.toFixed(0);
     if (props.type === "float") seekbarBox.innerHTML = newValue.toFixed(1);
     if (props.type === "time") seekbarBox.innerHTML = formatTime(newValue);

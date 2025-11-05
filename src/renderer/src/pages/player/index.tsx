@@ -49,12 +49,12 @@ const player = () => {
     // const [externalPlayerType, setexternalPlayerType] = createSignal<"Movian" | "VLC" | "Mpv" | "ChromeCast">(config.Player.external.type)
 
     const response = useQuery(() => ({
-        queryKey: [anime_data.data?.player_ID],
+        queryKey: [anime_data.data?.player_ID, extractionData().actual],
         queryFn: async ({ queryKey }) => {
-            const [player_id] = queryKey;
-            if (!player_id) return console.error("THIS CAN'T HAPPEN IF Happen then something is wrong with player_id, queryFetch/player", player_id)
+            const [player_id, episode] = queryKey;
+            if (!player_id || !episode) return console.error("THIS CAN'T HAPPEN IF Happen then something is wrong with player_id, episode, queryFetch/player", player_id)
             let pluginPlayer = ChangePlugin(anime_data.save?.pluginName ? anime_data.save.pluginName : "")
-            return await pluginPlayer.player.extractPlayerData(extractionData().type, extractionData().actual, player_id)
+            return await pluginPlayer.player.extractPlayerData(extractionData().type, episode, player_id)
         },
         refetchOnWindowFocus: false,
         staleTime: 2 * 60 * 60 * 1000,
