@@ -1,5 +1,4 @@
 import { createSignal, JSX } from "solid-js";
-import { Motion } from "@motionone/solid";
 import { t } from "i18next";
 import Button from "@renderer/components/buttons";
 import type { dialogProps } from "../types";
@@ -36,10 +35,10 @@ export function DialogProvider(props: { children: JSX.Element }) {
       {props.children}
       {isOpen() && data() && (
         <main class="dialog-main-background">
-          <Motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.1 }}
+          <div
+            // initial={{ scale: 0 }}
+            // animate={{ scale: 1 }}
+            // transition={{ duration: 0.1 }}
             class={`dialog-container ${getClass()}`}
           >
             <div class={`dialog-title ${getClass()}`}>
@@ -72,7 +71,7 @@ export function DialogProvider(props: { children: JSX.Element }) {
                 }}
               />
             </div>
-          </Motion.div>
+          </div>
         </main>
       )}
     </>
