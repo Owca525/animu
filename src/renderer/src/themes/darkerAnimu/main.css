@@ -699,6 +699,7 @@ th {
 .dropdown-button:hover {
   /* background-color: var(--five-layer); */
   outline-color: var(--green-one);
+  color: var(--green-one);
 }
 
 .dropdown-button-shadow-text {
@@ -712,6 +713,11 @@ th {
 .dropdown-menu {
   background-color: var(--third-layer);
   border-radius: 8px;
+  border: 2px solid var(--five-layer);
+}
+
+.dropdown-menu::-webkit-scrollbar {
+  width: 4px;
 }
 
 .dropdown-item {
@@ -719,7 +725,8 @@ th {
 }
 
 .dropdown-item:hover {
-  background-color: var(--second-layer);
+  background-color: var(--five-layer);
+  color: var(--green-one);
 }
 
 

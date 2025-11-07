@@ -2,6 +2,7 @@
   position: relative;
   display: flex;
   justify-content: center;
+  user-select: none;
 }
 
 .dropdown-button {
@@ -38,7 +39,6 @@
   position: absolute;
   padding: 4px;
   display: grid;
-  align-items: start;
   width: 100%;
   flex-direction: column;
   list-style: none;
@@ -55,7 +55,6 @@
   font-size: 1em;
   transition: background-color 150ms ease;
   overflow: hidden;
-  text-align: end;
   text-overflow: ellipsis;
   white-space: nowrap;
 
