@@ -51,21 +51,6 @@
     font-size: 0.7em;
 }
 
-.card-delete-icon {
-  display: none;
-  position: absolute;
-  padding: 4px;
-  top: 0;
-  right: 1;
-  left: 0;
-  z-index: 10000;
-  margin: 1px;
-}
-
-.card-container:hover .card-delete-icon {
-  display: block;
-} 
-
 .card-information {
     display: none;
     position: absolute;

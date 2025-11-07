@@ -31,7 +31,7 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
 
     if (card.saveData && card.saveData.episode != "" && card.saveData.last_Time != 0) {
       const currentPLugin = ChangePlugin(card.saveData.pluginName)
-      const episodeList = currentPLugin.player.extractOnlyEpisodesList(card.saveData.type, card.AnimeData.player_ID as string);
+      const episodeList = await currentPLugin.player.extractOnlyEpisodesList(card.saveData.type, card.AnimeData.player_ID as string);
 
       navigate("/player", {
         state: {
@@ -213,8 +213,8 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
       </Switch>
       <div class="card-title">{card.AnimeData.title.romaji}</div>
       <Show when={card.saveData && card.saveData.episode}>
-        <Show when={card.saveData?.last_Time != 0 && card.saveData?.type != ""} fallback={t("history.history", { ep: card.saveData?.episode })}>
-          {t("history.continue", { ep: card.saveData?.episode })}
+        <Show when={card.saveData?.last_Time != 0 && card.saveData?.type != ""} fallback={<div class="card-continue-watch-text">{t("history.history", { ep: card.saveData?.episode })}</div>}>
+          <div class="card-continue-watch-text">{t("history.continue", { ep: card.saveData?.episode })}</div>
         </Show>
       </Show>
     </div>
