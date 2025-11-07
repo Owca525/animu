@@ -10,7 +10,7 @@ import Dropdown from "@renderer/components/dropDown";
 import { ChangePlugin } from "@renderer/utils/pluginApi";
 import { useQuery, useQueryClient } from "@tanstack/solid-query";
 import { useLocation, useNavigate } from "@solidjs/router";
-import { createEffect, createSignal, For, Match, onMount, Show, Switch } from "solid-js";
+import { createSignal, For, Match, onCleanup, onMount, Show, Switch } from "solid-js";
 import { getGlobalCache } from "@renderer/utils/stores/global";
 import { getPlayerPLugin } from "@renderer/utils/stores/plugins";
 import toast from "solid-toast";
@@ -59,26 +59,23 @@ function information() {
     const [isCoverLoading, setCoverIsLoading] = createSignal<boolean>(true)
     const [isCoverError, setCoverIsError] = createSignal<boolean>(false)
 
-    createEffect(() => {
-        let seconds = secondsLeft()
-        if (seconds && seconds.left <= 0) return;
-        const intervalId = setInterval(() => {
-            setSecondsLeft(prev => {
-                if (!prev) return undefined
-                if (prev.left <= 1) {
-                    clearInterval(intervalId);
-                    return { left: 0, converted: convertSeconds(0) };
-                }
-                return { left: prev.left - 1, converted: convertSeconds(prev.left - 1) };
-            });
-        }, 1000);
-        return () => clearInterval(intervalId);
-    });
+    let seconds = secondsLeft()
+    if (seconds && seconds.left <= 0) return;
+    const intervalId = setInterval(() => {
+        setSecondsLeft(prev => {
+            if (!prev) return undefined
+            if (prev.left <= 1) {
+                clearInterval(intervalId);
+                return { left: 0, converted: convertSeconds(0) };
+            }
+            return { left: prev.left - 1, converted: convertSeconds(prev.left - 1) };
+        });
+    }, 1000);
 
     onMount(() => {
-        if (tempData().anime.nextAiringEpisode?.timeUntilAiring) 
+        if (tempData().anime.nextAiringEpisode?.timeUntilAiring)
             setSecondsLeft({ left: tempData().anime.nextAiringEpisode?.timeUntilAiring as number, converted: convertSeconds(tempData().anime.nextAiringEpisode?.timeUntilAiring) })
-        
+
         document.querySelectorAll('*').forEach((element: any) => {
             element.tabIndex = -1
         });
@@ -98,6 +95,8 @@ function information() {
             setTmpData({ ...tempData(), saveData: history[0].saveData })
         }
     })
+
+    onCleanup(() => clearInterval(intervalId))
 
     function enterPlayer(episodes: { ep: string, img?: string, title?: string }[], type: string, episode: string) {
         let tmp = JSON.parse(JSON.stringify(tempData()))
@@ -342,7 +341,7 @@ function information() {
                                     </Switch>
                                 </Show>
                             </div>
-                            
+
                             <Show when={tempData().anime.characters && tempData().anime.characters.length > 0}>
                                 <div class="information-characters">
                                     <div class="information-characters-title">
@@ -352,10 +351,10 @@ function information() {
                                     <div class="information-characters-container">
                                         <For each={tempData().anime.characters}>
                                             {(character) => (
-                                                <CharacterCards 
-                                                    id={character.character.id} 
-                                                    image={character.character.image} 
-                                                    name={character.character.name} 
+                                                <CharacterCards
+                                                    id={character.character.id}
+                                                    image={character.character.image}
+                                                    name={character.character.name}
                                                     role={t(`information.role.${character.role.toLowerCase()}`)}
                                                     onClick={() => window.api.open(`https://anilist.co/character/${character.character.id}`)}
                                                 />
@@ -374,10 +373,10 @@ function information() {
                                     <div class="information-characters-container">
                                         <For each={tempData().anime.characters}>
                                             {(character) => (
-                                                <CharacterCards 
-                                                    id={character.voiceActor?.id as string} 
-                                                    image={character.voiceActor?.image as string} 
-                                                    name={character.voiceActor?.name as string} 
+                                                <CharacterCards
+                                                    id={character.voiceActor?.id as string}
+                                                    image={character.voiceActor?.image as string}
+                                                    name={character.voiceActor?.name as string}
                                                     role={t("information.actor_as", { actor: character.character.name })}
                                                     onClick={() => window.api.open(`https://anilist.co/staff/${character.voiceActor ? character.voiceActor.id : ""}`)}
                                                 />
