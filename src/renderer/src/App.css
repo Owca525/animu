@@ -3,7 +3,11 @@
   padding: 0;
   outline: none;
 }
-body {
+/* html {
+  font-size: clamp(12px, 1.2vw, 16px);
+} */
+
+body, #root {
   width: 100vw;
   height: 100vh;
 
@@ -51,7 +55,7 @@ input[type="number"]::-webkit-outer-spin-button {
   font-size: 1.1em;
 }
 
-.app-loading-animation {
+/* .app-loading-animation {
   animation: spin 1s linear infinite;
   width: min-content;
   height: min-content;
@@ -68,6 +72,10 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 .app-loading-information {
   font-size: 1.2em;
+} */
+
+.loading-animation {
+  animation: spin 1s linear infinite;
 }
 
 /* animation */

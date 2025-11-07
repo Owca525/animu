@@ -186,28 +186,28 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
       }
     >
       <Show when={!disableinformation && card.AnimeData.studios && card.AnimeData.status && card.AnimeData.genres && card.AnimeData.description}>
-          <div class={`card-information ${isOut() ? "card-information-left" : "card-information-right"}`}>
-            {GenerateInformation()}
-          </div>
+        <div class={`card-information ${isOut() ? "card-information-left" : "card-information-right"}`}>
+          {GenerateInformation()}
+        </div>
+      </Show>
+      <Show when={card.AnimeData.coverImage}>
+        <img
+          src={card.AnimeData.coverImage}
+          class="card-image"
+          onLoad={() => setLoading(false)}
+          onError={() => setIsError(true)}
+          style={checkState()}
+        />
       </Show>
       <Switch>
-        <Match when={card.AnimeData.coverImage}>
-          <img
-            src={card.AnimeData.coverImage}
-            class="card-image"
-            onLoad={() => setLoading(false)}
-            onError={() => setIsError(true)}
-            style={checkState()}
-          />
-        </Match>
         <Match when={isLoading()}>
           <div class="card-image-placeholder">
-            <span class="material-symbols-outlined home-loading-animation">progress_activity</span>
+            <span class="material-symbols-outlined loading-animation icon">progress_activity</span>
           </div>
         </Match>
         <Match when={isError()}>
           <div class="card-image-placeholder">
-            <span class="material-symbols-outlined">error</span>
+            <span class="material-symbols-outlined icon">error</span>
           </div>
         </Match>
       </Switch>

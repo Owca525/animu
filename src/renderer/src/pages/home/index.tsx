@@ -134,7 +134,7 @@ const Home = () => {
     const scrollTop = divRef.scrollTop;
     const scrollHeight = divRef.scrollHeight - divRef.clientHeight;
     const scrollPercent = (scrollTop / scrollHeight) * 100;
-    if (parseInt(scrollPercent.toFixed(0)) >= 20) setHeaderActive(() => true)
+    if (parseInt(scrollPercent.toFixed(0)) >= 15) setHeaderActive(() => true)
     else setHeaderActive(() => false)
 
     if (home.data.sections.length > 1) return;
@@ -158,7 +158,6 @@ const Home = () => {
   // TODO: napraw wyszukiwanie itp
   async function OnSearch(text: string) {
     let home = homeCache()
-    console.log("sex")
     if (!home.localSearch && home.search != text) {
       setHomeSearch(text)
       setHomeSearchPage(1)
@@ -237,11 +236,17 @@ const Home = () => {
 
   return (
     <main
-      class={`home ${homeCache().data && !homeCache().data.topCards ? "active" : ""}`}
+      class={`home-main ${homeCache().data && !homeCache().data.topCards ? "active" : ""}`}
       onContextMenu={(event) =>
         OpenContextMenu(CreateContextMenuOptions(), event)
       }
     >
+      <Sidebar
+        data={sidebarData}
+        openSidebar={isOpenSidebar()}
+        onChange={() => setOpenSidebar(false)}
+      />
+
       <div class={`home-header-container ${homeCache().data && !homeCache().data.topCards ? "active" : ""} ${headerActive() ? "color" : ""}`}>
         <Button
           icon="menu"
@@ -263,44 +268,36 @@ const Home = () => {
           </div>
         </div>
       </div>
-
-      <Sidebar
-        data={sidebarData}
-        openSidebar={isOpenSidebar()}
-        onChange={() => setOpenSidebar(false)}
-      />
-
-      <div class="home-content" onScroll={handleScroll} ref={divRef}>
-        <Show when={homeCache().data && homeCache().data.topCards}>
-          <BigCardsContainer data={homeCache().data.topCards as containerData} />
-        </Show>
-        <div
-          class={`home-container ${homeCache().isLoading && "home-loading-container"} ${homeCache().isError && "home-loading-container"} ${homeCache().data && homeCache().data.sections && homeCache().data.sections.length <= 0 && "home-loading-container"}`}
-        >
-          <Switch>
-            <Match when={homeCache().isLoading && homeCache().isError == false}>
-              <div class="material-symbols-outlined home-loading-animation">
+      
+      <div class="home-main-content" onScroll={handleScroll} ref={divRef}>
+        <Switch>
+          <Match when={homeCache().isLoading && homeCache().isError == false}>
+            <div class="home-notification-container">
+              <div class="material-symbols-outlined loading-animation icon">
                 progress_activity
               </div>
-            </Match>
-            <Match when={homeCache().isError && homeCache().isLoading == false}>
-              <div class="home-error-container">
-                <span class="material-symbols-outlined home-error-icon">
-                  error
-                </span>
-                {t("home.error")}
-              </div>
-            </Match>
-            <Match when={homeCache().isError == false && homeCache().isLoading == false && homeCache().data && homeCache().data.sections && homeCache().data.sections.length <= 0}>
-              <div class="home-empty-container">
-                <span class="material-symbols-outlined home-empty-icon">
-                  search_off
-                </span>
-                {t("home.nothingfound")}
-              </div>
-            </Match>
-
+            </div>
+          </Match>
+          <Match when={homeCache().isError && homeCache().isLoading == false}>
+            <div class="home-notification-container">
+              <span class="material-symbols-outlined icon">
+                error
+              </span>
+              {t("home.error")}
+            </div>
+          </Match>
+          <Match when={homeCache().isError == false && homeCache().isLoading == false && homeCache().data && homeCache().data.sections && homeCache().data.sections.length <= 0}>
+            <div class="home-notification-container">
+              <span class="material-symbols-outlined icon">
+                search_off
+              </span>
+              {t("home.nothingfound")}
+            </div>
+          </Match>
             <Match when={homeCache().isLoading == false && homeCache().isError == false && homeCache().data && homeCache().data.sections && homeCache().data.sections.length > 0}>
+              <Show when={homeCache().data && homeCache().data.topCards}>
+                <BigCardsContainer data={homeCache().data.topCards as containerData} />
+              </Show>
               <For each={homeCache().data.sections}>
                 {(element) => (
                   <Container
@@ -313,13 +310,12 @@ const Home = () => {
                     data={element.data}
                     horizontal={element.horizontal}
                     onScrollDownFunction={element.onScrollDownFunction}
-                    // onTitle={element.onTitleClick}
+                  // onTitle={element.onTitleClick}
                   />
                 )}
               </For>
             </Match>
-          </Switch>
-        </div>
+        </Switch>
       </div>
     </main>
   );

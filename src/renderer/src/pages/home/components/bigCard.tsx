@@ -58,7 +58,7 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
                         <div class="big-card-information-bottom">
                             <Button content='More Information' ButtonClass='big-card-button' onClick={openInformation} />
                             <Show when={data.AnimeData.nextAiringEpisode}>
-                                <div class="big-card-information-date">{getEpisodeDay(data.AnimeData.nextAiringEpisode?.airingAt!, data.AnimeData.nextAiringEpisode?.episode!)}</div>
+                                <div class="big-card-information-date">{getEpisodeDay(data.AnimeData.nextAiringEpisode?.timeUntilAiring!, data.AnimeData.nextAiringEpisode?.episode!)}</div>
                             </Show>
                         </div>
                     </div>
