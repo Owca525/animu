@@ -966,6 +966,16 @@ th {
   border-radius: 4px;
 }
 
+.information-characters-container::-webkit-scrollbar {
+  width: 4px;
+  height: 8px;
+  background-color: var(--first-layer) !important; 
+}
+
+.information-characters-container::-webkit-scrollbar-thumb {
+  background-color: var(--five-layer) !important;
+}
+
 
 /* Player Button */
 
