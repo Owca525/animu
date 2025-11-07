@@ -21,6 +21,7 @@ import { getConfig, setConfig } from './utils/stores/config';
 import { getGlobalCache, setGlobalHistory, setIncognitoMode } from './utils/stores/global';
 import i18n from './utils/i18n';
 import { getPlayerPLugin } from './utils/stores/plugins';
+import LocalErrorBoundary from './utils/ErrorBoundary';
 
 function App() {
   const [isInitation, setInitation] = createSignal<boolean>(true)
@@ -58,10 +59,7 @@ function App() {
 
   return (
     <Show when={isInitation() == false}>
-      <ErrorBoundary fallback={(err) => {
-        console.log(err)
-        return <div>Error: {err.toString()}</div>
-      }}>
+      <ErrorBoundary fallback={LocalErrorBoundary}>
         <Toaster position="top-right" />
         <HashRouter>
           <Suspense >
