@@ -1,9 +1,14 @@
 .big-cards-container-content {
     display: flex;
     overflow-x: hidden;
-    scroll-snap-type: x mandatory;
     width: 100vw;
+    cursor: grabbing;
+}
+
+.big-cards-container-content.active {
+    scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
+    cursor: grab;
 }
 
 .big-card-container-button {

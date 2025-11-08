@@ -20,7 +20,7 @@ ipcMain.handle('fetch-data', async (_event, url: string, header: Record<string, 
         }
         return { success: false, data: undefined, status: response.status, statusText: response.statusText }
     } catch (error) {
-        console.error(error)
+        console.error(`Error in fetch-data: ${(error as Error).message} ${(error as Error).name} ${(error as Error).cause} \n ${(error as Error).stack}`)
         return { success: false, error: (error as Error).message, status: 500, data: undefined, statusText: "Backend Error" }
     } finally {
         clearTimeout(id);
@@ -51,7 +51,7 @@ ipcMain.handle('send-post', async (_event, url: string, header: Record<string, s
         }
         return { success: false, status: response.status, statusText: response.statusText, data: undefined }
     } catch (error) {
-        console.error(error)
+        console.error(`Error in send-post: ${(error as Error).message} ${(error as Error).name} ${(error as Error).cause} \n ${(error as Error).stack}`)
         return { success: false, error: (error as Error).message, status: 500, data: undefined, statusText: "Backend Error" }
     } finally {
         clearTimeout(id);
@@ -73,7 +73,7 @@ ipcMain.handle('advanceRequest', async (_, url: string, options?: { method: "POS
             success: response.ok
         };
     } catch (error) {
-        console.error(error)
+        console.error(`Error in advanceRequest: ${(error as Error).message} ${(error as Error).name} ${(error as Error).cause} \n ${(error as Error).stack}`)
         return {
             text: (error as Error).message,
             buffer: Buffer.from(""),
