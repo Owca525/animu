@@ -171,6 +171,11 @@ export interface cardData {
     onClick?: (data: AnimeData) => void
 }
 
+export interface requestResponseVideo {
+    url: string
+    header: { [key: string]: string }
+}
+
 export const defaultConfig: SettingsConfig = {
     firstStart: true,
     General: {

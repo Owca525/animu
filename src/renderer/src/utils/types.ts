@@ -98,6 +98,7 @@ export interface resolutionFormat {
     url: string,
     hls?: boolean
     reqHeader?: { [key: string]: string },
+    doNotUseBackend?: boolean
     defaultSubtitles?: boolean;
 }
 

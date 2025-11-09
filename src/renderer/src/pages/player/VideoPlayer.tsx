@@ -268,7 +268,14 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         setCurrentResoltion(currentplayer.resolution[0])
         setListResolution(() => currentplayer.resolution)
         setPlayer(() => currentplayer)
-        videoRef.src = `http://localhost:3001/video?url=${btoa(currentplayer.resolution[0].url)}`
+        // TODO: Fix this can be work using fetch
+        if (currentplayer.resolution[0].doNotUseBackend) {
+            videoRef.src = currentplayer.resolution[0].url
+        } else {
+            videoRef.src = `http://localhost:3001/video?url=${btoa(JSON.stringify(
+                { url: currentplayer.resolution[0].url, header: currentplayer.resolution[0].reqHeader }
+            ))}`
+        }
         videoRef.currentTime = time
     }
 

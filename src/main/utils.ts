@@ -9,6 +9,7 @@ import { exec, execSync } from "child_process";
 import express from "express";
 import { Readable } from "stream";
 import os from "os"
+import { requestResponseVideo } from "./types";
 
 let rpc: Client | undefined = undefined
 
@@ -243,7 +244,8 @@ const createProxyServer = () => {
         const { url: encodedUrl } = req.query as { url?: string };
         if (!encodedUrl) return res.status(400).send("Url not found");
 
-        const currentVideoUrl = Buffer.from(encodedUrl, "base64").toString("utf-8");
+        const currentVideoUrl: requestResponseVideo = JSON.parse(Buffer.from(encodedUrl, "base64").toString("utf-8"));
+        const hostname = new URL(currentVideoUrl.url)
 
         let aborted = false;
         req.on("close", () => {
@@ -251,20 +253,19 @@ const createProxyServer = () => {
         });
 
         try {
-            const headers: Record<string, string> = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/143.0"
+            console.log(req.headers)
+            delete req.headers["referer"]
+            let headers: Record<string, string> = {
+                ...req.headers,
+                host: hostname.hostname,
+                "sec-ch-ua-platform": '"Windows"'
             };
 
-            if (req.headers.range) {
-                const match = req.headers.range.match(/bytes=(\d+)-(\d*)/);
-                if (match) {
-                    const start = parseInt(match[1], 10);
-                    const end = start + 10 * 1024 * 1024 - 1;
-                    headers["Range"] = `bytes=${start}-${end}`;
-                }
-            }
+            delete headers["sec-ch-ua"]
 
-            const response = await fetch(currentVideoUrl, { headers });
+            console.log(headers)
+
+            const response = await fetch(currentVideoUrl.url, { headers });
             console.log(response)
             if (response.status == 403) {
                 res.status(response.status)
