@@ -58,13 +58,13 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
       const currentPLugin = ChangePlugin(card.saveData.pluginName)
       const episodeList = await currentPLugin.player.extractOnlyEpisodesList(card.saveData.type, card.AnimeData.player_ID as string);
 
-      navigate("/player", {
-        state: {
-          data: JSON.parse(JSON.stringify(card.AnimeData)),
-          save: JSON.parse(JSON.stringify(card.saveData)),
-          episodelist: episodeList,
-        },
-      });
+      localStorage.setItem("playerCache", JSON.stringify({
+        data: JSON.parse(JSON.stringify(card.AnimeData)),
+        save: JSON.parse(JSON.stringify(card.saveData)),
+        episodelist: episodeList,
+      }))
+
+      navigate("/player");
       return;
     }
 
@@ -73,9 +73,8 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
       return;
     }
 
-    navigate("/info", {
-      state: { anime: JSON.parse(JSON.stringify(card.AnimeData)) },
-    });
+    localStorage.setItem("informationCache", JSON.stringify({ anime: card.AnimeData }))
+    navigate("/info");
   }
 
   function checkState() {

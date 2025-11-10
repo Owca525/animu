@@ -9,7 +9,7 @@ import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import Dropdown from "@renderer/components/dropDown";
 import { ChangePlugin } from "@renderer/utils/pluginApi";
 import { useQuery, useQueryClient } from "@tanstack/solid-query";
-import { useLocation, useNavigate } from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
 import { createSignal, For, Match, onCleanup, onMount, Show, Switch } from "solid-js";
 import { getGlobalCache } from "@renderer/utils/stores/global";
 import { getPlayerPLugin } from "@renderer/utils/stores/plugins";
@@ -17,9 +17,8 @@ import toast from "solid-toast";
 import CharacterCards from "./components/characterCard";
 
 function information() {
-    const navigate = useNavigate()
-    const location = useLocation<{ anime: AnimeData; saveData?: indentityPlayer }>();
-    const [tempData, setTmpData] = createSignal<{ anime: AnimeData, saveData?: indentityPlayer }>(location.state as any)
+    const navigate = useNavigate();
+    const [tempData, setTmpData] = createSignal<{ anime: AnimeData, saveData?: indentityPlayer }>(JSON.parse(localStorage.getItem("informationCache") as string) as any)
     const [currentIDplayer, setCurrentId] = createSignal<string | undefined>(tempData().anime.player_ID)
 
     const [showWrong, setshowWrong] = createSignal<boolean>(false)
@@ -88,11 +87,13 @@ function information() {
         if (continueHistory.length > 0) {
             setCurrentPlugin(continueHistory[0].saveData?.pluginName)
             setTmpData({ ...tempData(), saveData: continueHistory[0].saveData })
+            localStorage.setItem("informationCache", JSON.stringify({ ...tempData(), saveData: continueHistory[0].saveData }))
             return
         }
         if (history.length > 0) {
             setCurrentPlugin(history[0].saveData?.pluginName)
             setTmpData({ ...tempData(), saveData: history[0].saveData })
+            localStorage.setItem("informationCache", JSON.stringify({ ...tempData(), saveData: history[0].saveData }))
         }
     })
 
@@ -102,21 +103,20 @@ function information() {
         let tmp = JSON.parse(JSON.stringify(tempData()))
         let lastTime = 0
         if (tmp.saveData && tmp.saveData.episode.toString() === episode) lastTime = tmp.saveData.last_Time
-        navigate("/player", {
-            state: {
-                data: {
-                    ...tmp.anime,
-                    player_ID: currentIDplayer() ? JSON.parse(JSON.stringify(currentIDplayer())) : episodeResponse.data?.player_id
-                },
-                save: {
-                    last_Time: lastTime,
-                    type: type,
-                    pluginName: currentIDplayer() ? JSON.parse(JSON.stringify(currentIDplayer())) : episodeResponse.data?.player_id,
-                    episode: episode
-                },
-                episodelist: episodes,
-            }
-        })
+        localStorage.setItem("playerCache", JSON.stringify({
+            data: {
+                ...tmp.anime,
+                player_ID: currentIDplayer() ? JSON.parse(JSON.stringify(currentIDplayer())) : episodeResponse.data?.player_id
+            },
+            save: {
+                last_Time: lastTime,
+                type: type,
+                pluginName: currentIDplayer() ? JSON.parse(JSON.stringify(currentIDplayer())) : episodeResponse.data?.player_id,
+                episode: episode
+            },
+            episodelist: episodes,
+        }))
+        navigate("/player")
     }
 
     async function SaveCoverToClipboard(url: string | undefined) {

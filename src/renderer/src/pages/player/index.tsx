@@ -1,7 +1,7 @@
 
 // import { useQuery } from "react-query";
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
-import { AnimeData, indentityPlayer, SettingsConfig } from "@renderer/utils/types";
+import { AnimeData, SettingsConfig } from "@renderer/utils/types";
 import { t } from "i18next";
 
 import "./player.css"
@@ -12,15 +12,14 @@ import Button from "@renderer/components/buttons";
 import VideoPlayer from "./VideoPlayer";
 import { SaveToFile } from "@renderer/utils/FilesManager/readFiles";
 import { ChangePlugin } from "@renderer/utils/pluginApi";
-import { useLocation, useNavigate } from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
 import { getConfig } from "@renderer/utils/stores/config";
 import { createSignal, Match, onMount, Switch } from "solid-js";
 import { useQuery } from "@tanstack/solid-query";
 import { createShortcut } from "@solid-primitives/keyboard";
 
 const player = () => {
-    const location = useLocation<{ data: AnimeData, save: indentityPlayer, episodelist: { ep: string, img?: string, title?: string }[] }>()
-    const anime_data = location.state
+    const anime_data = JSON.parse(localStorage.getItem("playerCache") as any)
     const navigate = useNavigate()
     const config: SettingsConfig = getConfig();
 
