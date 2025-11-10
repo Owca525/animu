@@ -37,7 +37,7 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
       },
       {
         rootMargin: "100px",
-        threshold: 0.1,
+        threshold: 0,
       }
     );
 
