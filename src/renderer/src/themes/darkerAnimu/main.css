@@ -848,7 +848,7 @@ th {
   border-radius: 8px;
   background-color: color-mix(in srgb, var(--second-layer) 90%, transparent);
   color: var(--text);
-  border: 2px solid var(--invisible);
+  border: 2px solid var(--five-layer);
 }
 
 .player-settings-button,
@@ -858,7 +858,7 @@ th {
 }
 
 .player-settings-button-back {
-  border: 2px solid var(--fourth-layer);
+  border: 3px solid var(--five-layer);
   border-width: 0px 0px 2px 0px;
 }
 
@@ -940,7 +940,7 @@ th {
 .player-select-episode-container {
   border-radius: 8px;
   background-color: color-mix(in srgb, var(--second-layer) 90%, transparent);
-  border: 2px solid var(--invisible);
+  border: 2px solid var(--five-layer);
 }
 
 .player-subtitle-container {
