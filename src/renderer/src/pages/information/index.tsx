@@ -15,6 +15,7 @@ import { getGlobalCache } from "@renderer/utils/stores/global";
 import { getPlayerPLugin } from "@renderer/utils/stores/plugins";
 import toast from "solid-toast";
 import CharacterCards from "./components/characterCard";
+import { createShortcut } from "@solid-primitives/keyboard";
 
 function information() {
     const navigate = useNavigate();
@@ -157,16 +158,16 @@ function information() {
         )
     }
 
-    // useHotkeys("tab", () => {
-    //     console.log(tempData())
-    //     console.log(currentIDplayer.current)
-    //     console.log(episodeData, isEpisodeError, episodeData.isLoading)
-    // })
+    createShortcut(["tab"], () => {
+        console.log(tempData())
+        console.log(currentIDplayer())
+        console.log(episodeResponse, episodeResponse.error, episodeResponse.isLoading)
+    })
 
-    // useHotkeys("esc", () => {
-    //     if (showWrong) setshowWrong(() => false)
-    //     else navigate("/")
-    // })
+    createShortcut(["Escape"], () => {
+        if (showWrong()) setshowWrong(() => false)
+        else navigate("/")
+    })
 
     async function refreashInformation(name: string) {
         queryClient.cancelQueries()

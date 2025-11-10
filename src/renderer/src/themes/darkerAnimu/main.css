@@ -12,7 +12,7 @@
   --third-layer: #2D2D2D;
   /* Third layer, used in button etc */
   --fourth-layer: #303030;
-  /* Fourth layer, used in hover button etc */
+  /* Fourth layer, used in hover button, border etc */
   --five-layer: #434343;
 
   /* Colors */
@@ -247,7 +247,7 @@ body {
 .home-filter-container {
   background-color: var(--second-layer);
   border-radius: 12px;
-  border: 2px solid var(--third-layer);
+  border: 2px solid var(--five-layer);
 }
 
 /* Cards */

@@ -335,6 +335,10 @@
     font-size: 2em;
 }
 
+.information-episodes, .information-characters, .information-info {
+    animation: firstShow 0.2s ease forwards;
+}
+
 /* For smaller devices / window sizes */
 @media (max-width: 1000px) {
     .information-top {

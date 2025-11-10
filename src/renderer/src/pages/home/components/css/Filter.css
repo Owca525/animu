@@ -13,6 +13,7 @@
     gap: 8px;
     translate: -38%;
     flex-direction: column;
+    animation: firstShow 0.2s ease forwards;
 }
 
 .home-filter-container-horizontal {
