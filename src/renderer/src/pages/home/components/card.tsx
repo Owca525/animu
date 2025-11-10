@@ -29,10 +29,12 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setCardVisible(true);
-            observer.unobserve(entry.target);
-          }
+          entry.target.classList.toggle("show", entry.isIntersecting)
+          setCardVisible(entry.isIntersecting)
+          // if (entry.isIntersecting) {
+          //   setCardVisible(true);
+          //   observer.unobserve(entry.target);
+          // }
         });
       },
       {
@@ -194,7 +196,7 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
     <div
       tabIndex={-1}
       ref={cardRef}
-      class={`card-container ${isCardVisible() ? "show" : ""}`}
+      class="card-container"
       onClick={sendToInformation}
       onMouseOver={checkOutOfBound}
       title={card.AnimeData.title.romaji}
