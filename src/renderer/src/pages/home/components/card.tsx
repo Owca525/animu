@@ -1,7 +1,7 @@
 import { cardData, ContextMenuProps } from "@renderer/utils/types";
 import "./css/card.css";
 import { useNavigate } from "@solidjs/router";
-import { Component, JSX, Match, Show, Switch, createSignal } from "solid-js";
+import { Component, JSX, Match, Show, Switch, createSignal, onMount, onCleanup } from "solid-js";
 import { t } from "i18next";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import {
@@ -21,7 +21,30 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
   const [isLoading, setLoading] = createSignal(true);
   const [isError, setIsError] = createSignal(false);
   const [isOut, setIsOut] = createSignal(false);
+  const [isCardVisible, setCardVisible] = createSignal(false);
   let cardRef: HTMLDivElement | undefined;
+
+  onMount(() => {
+    if (!cardRef) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setCardVisible(true);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        rootMargin: "100px",
+        threshold: 0.1,
+      }
+    );
+
+    observer.observe(cardRef);
+
+    onCleanup(() => observer.disconnect());
+  })
 
   async function sendToInformation() {
     if (card.onClick) {
@@ -171,7 +194,7 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
     <div
       tabIndex={-1}
       ref={cardRef}
-      class="card-container"
+      class={`card-container ${isCardVisible() ? "show" : ""}`}
       onClick={sendToInformation}
       onMouseOver={checkOutOfBound}
       title={card.AnimeData.title.romaji}
@@ -190,7 +213,7 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
           {GenerateInformation()}
         </div>
       </Show>
-      <Show when={card.AnimeData.coverImage}>
+      <Show when={card.AnimeData.coverImage && isCardVisible()}>
         <img
           src={card.AnimeData.coverImage}
           class="card-image"

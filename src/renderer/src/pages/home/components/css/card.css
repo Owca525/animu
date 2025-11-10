@@ -13,10 +13,18 @@
     box-sizing: border-box;
 
     scroll-snap-align: start;
-    transform: scale(1);
     transition: transform 0.3s ease;
     user-select: none;
+    z-index: -1;
+
+    opacity: 0;
+    transform: translateY(100px);
+}
+
+.card-container.show {
     z-index: 1;
+    opacity: 1;
+    transform: translateY(0px);
 }
 
 .card-image, .card-image-placeholder {
