@@ -22,6 +22,8 @@
     flex-direction: column;
     gap: 8px;
     position: relative;
+    opacity: 0;
+    animation: firstShow 0.2s ease forwards;
 }
 
 .container-data {

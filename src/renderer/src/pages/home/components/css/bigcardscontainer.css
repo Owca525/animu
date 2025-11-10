@@ -3,6 +3,8 @@
     overflow-x: hidden;
     width: 100vw;
     cursor: grabbing;
+    opacity: 0;
+    animation: firstShow 0.5s ease forwards;
 }
 
 .big-cards-container-content.active {

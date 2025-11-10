@@ -18,7 +18,7 @@
     z-index: -1;
 
     opacity: 0;
-    transform: translateY(100px);
+    transform: translateY(-20px);
 }
 
 .card-container.show {
