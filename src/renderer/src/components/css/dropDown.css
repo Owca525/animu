@@ -46,6 +46,7 @@
   z-index: 1000;
   max-height: 300px;
   overflow: auto;
+  animation: firstShow 0.2s ease forwards;
 }
 
 .dropdown-item {
