@@ -70,6 +70,7 @@
     padding: 12px;
     margin-top: 8px;
     gap: 4px;
+    animation: firstShow 0.1s ease forwards;
 }
 
 .card-information-score {
