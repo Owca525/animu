@@ -16,6 +16,7 @@
     min-width: min-content;
     max-width: 400px;
     width: clamp(50px, 25vw, 400px);
+    animation: firstShow 0.2s ease forwards;
 }
 
 .dialog-title {

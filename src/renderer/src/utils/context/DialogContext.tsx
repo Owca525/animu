@@ -36,9 +36,6 @@ export function DialogProvider(props: { children: JSX.Element }) {
       {isOpen() && data() && (
         <main class="dialog-main-background">
           <div
-            // initial={{ scale: 0 }}
-            // animate={{ scale: 1 }}
-            // transition={{ duration: 0.1 }}
             class={`dialog-container ${getClass()}`}
           >
             <div class={`dialog-title ${getClass()}`}>
