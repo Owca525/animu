@@ -133,10 +133,6 @@ function settings() {
         if (JSON.stringify(config().old) != JSON.stringify(config().new)) setSaving(() => true)
     })
 
-    createEffect(() => {
-        console.log(category())
-    })
-
     onMount(() => {
         window.api.getlistThemes().then((data) => {
             let themes = data.map((element) => { return { label: element.name, onClick: () => { changeTheme(element.name); handleChange("General.theme", element.name); setthemeMetadata(() => element) } } })
