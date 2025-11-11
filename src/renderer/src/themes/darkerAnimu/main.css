@@ -434,7 +434,7 @@ body {
   border-radius: 50%;
 }
 
-.information-title2,
+.information-mini-title,
 .information-title-small2 {
   color: var(--text-gray);
 }

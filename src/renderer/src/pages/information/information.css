@@ -137,7 +137,7 @@
     display: none;
 }
 
-.information-title2 {
+.information-mini-title {
     font-size: 0.75em;
     width: 90%;
     padding-bottom: 10px;
@@ -264,9 +264,41 @@
     left: 8px;
 }
 
-.information-description {
+.information-text-container {
     overflow: hidden;
     width: 100%;
+}
+
+.information-description {
+    line-height: 1.3;
+    height: max-content;
+    max-height: 140px;
+    overflow: hidden;
+    display: -webkit-box;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+.information-description.moretext {
+    height: 100%;
+    max-height: none;
+}
+
+.information-description-toggle {
+    display: none !important; 
+    user-select: none;
+    cursor: pointer;
+    position: relative;
+    padding-top: 20px;
+    margin-top: -40px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    font-size: 1em;
+    background: linear-gradient(to top, var(--second-layer), transparent);
+}
+
+.information-description-toggle.show {
+    display: flex !important;
 }
 
 .information-buttons-episode-container {
@@ -274,6 +306,7 @@
     justify-content: start;
     gap: 0.5em;
     flex-wrap: wrap;
+    padding: 12px;
 }
 
 .information-episode-button {

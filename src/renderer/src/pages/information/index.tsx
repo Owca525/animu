@@ -19,10 +19,14 @@ import { createShortcut } from "@solid-primitives/keyboard";
 
 function information() {
     const navigate = useNavigate();
+    let descriptionRef: HTMLDivElement | undefined
+
+
     const [tempData, setTmpData] = createSignal<{ anime: AnimeData, saveData?: indentityPlayer }>(JSON.parse(localStorage.getItem("informationCache") as string) as any)
     const [currentIDplayer, setCurrentId] = createSignal<string | undefined>(tempData().anime.player_ID)
 
     const [showWrong, setshowWrong] = createSignal<boolean>(false)
+    const [isNeedMore, setNeedMore] = createSignal<boolean>(false)
     const [currentPlugin, setCurrentPlugin] = createSignal<string | undefined>(getPlayerPLugin()?.name)
     const [secondsLeft, setSecondsLeft] = createSignal<undefined | { left: number, converted: { days: number; hours: number; minutes: number; seconds: number; } | undefined }>(undefined);
 
@@ -79,6 +83,11 @@ function information() {
         document.querySelectorAll('*').forEach((element: any) => {
             element.tabIndex = -1
         });
+
+        if (descriptionRef && descriptionRef.scrollHeight > descriptionRef.clientHeight) {
+            setNeedMore(true)
+            // descriptionRef.classList.add("moretext")
+        }
 
         if (tempData().anime.id == "") return
         let tempHistory: { continue: cardData[]; history: cardData[]; } = getGlobalCache().history
@@ -222,10 +231,17 @@ function information() {
                                 <div class="information-title-small2">{tempData().anime.title.english ? tempData().anime.title.english : tempData().anime.title.native}</div>
                             </div>
                         </div>
-                        <div class="information-description">
+                        <div class="information-text-container">
                             <div class="information-title">{tempData().anime.title.romaji}</div>
-                            <div class="information-title2">{tempData().anime.title.english ? tempData().anime.title.english : tempData().anime.title.native}</div>
-                            {decodeHtmlEntities(tempData().anime.description ?? t("information.descriptionnotfound"))}
+                            <div class="information-mini-title">{tempData().anime.title.english ? tempData().anime.title.english : tempData().anime.title.native}</div>
+                            <div class="information-description" ref={descriptionRef}>
+                                {decodeHtmlEntities(tempData().anime.description ?? t("information.descriptionnotfound"))}
+                            </div>
+                            <span class={`information-description-toggle ${isNeedMore() ? "show" : ""}`}
+                                onclick={() => descriptionRef?.classList.add("moretext")}
+                            >
+                                Show More
+                            </span>
                         </div>
                         <div class="information-bar">
                             <Button titleButton={t("information.bar.anilist")} icon="open_in_new" ButtonClass="information-bar-icon" onClick={() => window.api.open(`https://anilist.co/anime/${tempData().anime.id}`)} />

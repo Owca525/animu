@@ -12,14 +12,14 @@
 }
 
 .drop-content {
-    padding: 0px;
     overflow: hidden;
-    height: 0px;
+    transition: height 250ms ease-in-out;
+    height: 0;
+    interpolate-size: allow-keywords;
 }
 
-.drop-content-show {
-    padding: 12px;
-    height: max-content;
+.drop-content.expand {
+    height: auto;
 }
 
 .drop-container {

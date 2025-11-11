@@ -1,4 +1,4 @@
-import { Component, createSignal, Show } from "solid-js";
+import { Component, createSignal } from "solid-js";
 import "./css/drop.css";
 
 interface DropProps {
@@ -25,8 +25,8 @@ const Drop: Component<DropProps> = (props) => {
         </div>
       </div>
 
-      <div class={`drop-content ${isOpen() ? "drop-content-show" : ""}`}>
-        <Show when={isOpen()}>{props.content}</Show>
+      <div class={`drop-content ${isOpen() ? "expand" : ""}`}>
+        {props.content}
       </div>
     </div>
   );
