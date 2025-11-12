@@ -335,9 +335,9 @@ export interface dialogProps {
     title: string
     description?: string
     buttons: {
-        firstbutton: () => void
-        secondbutton: () => void
-    }
+        title: string,
+        onClick: () => void
+    }[]
 }
 
 export interface Thumbnail {

@@ -22,7 +22,8 @@
         "exit": "Exit",
         "reset": "Reset",
         "reload": "Reload",
-        "open": "Open"
+        "open": "Open",
+        "return": "Return"
     },
     "home": {
         "search": "Search...",

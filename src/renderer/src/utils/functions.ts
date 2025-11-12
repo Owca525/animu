@@ -1,6 +1,5 @@
 import { t } from "i18next";
 import { cardData, ContextMenuProps, homeData, playerChapterList, SettingsConfig, themeMetadata } from "./types";
-import { setHomeData } from "./pluginApi";
 import { showDialog } from "./context/DialogContext";
 import i18n from "./i18n";
 import { DropdownOption } from "@renderer/components/dropDown";
@@ -168,22 +167,24 @@ export async function refetchHistory() {
     let newcontinueWatch = continueWatch.reverse()
 
     if (data.data.sections[0].title == t("global.continuewatch") && data.data.sections[1].title == t("global.history")) {
-        setAllHomeData({ data: {
-            sections: [
-                {
-                    title: t("global.continuewatch"),
-                    data: newcontinueWatch.slice(0, 20),
-                    horizontal: true,
-                    // onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: continueWatch, horizontal: false }] }))
-                },
-                {
-                    title: t("global.history"),
-                    data: newHistory.slice(0, 20),
-                    horizontal: true,
-                    // onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.history"), data: history, horizontal: false }] }))
-                },
-            ]
-        }} as any)
+        setAllHomeData({
+            data: {
+                sections: [
+                    {
+                        title: t("global.continuewatch"),
+                        data: newcontinueWatch.slice(0, 20),
+                        horizontal: true,
+                        // onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: continueWatch, horizontal: false }] }))
+                    },
+                    {
+                        title: t("global.history"),
+                        data: newHistory.slice(0, 20),
+                        horizontal: true,
+                        // onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.history"), data: history, horizontal: false }] }))
+                    },
+                ]
+            }
+        } as any)
         return
     }
 }
@@ -218,10 +219,16 @@ export function CreateContextMenuOptions(start?: ContextMenuProps, center?: Cont
             type: "info",
             title: "Action",
             description: i18n.t("global.exitAnimu"),
-            buttons: {
-                firstbutton: () => window.BrowserWindow.exit(),
-                secondbutton: () => ""
-            }
+            buttons: [
+                {
+                    title: t("dialog.yes"),
+                    onClick: () => window.BrowserWindow.exit()
+                },
+                {
+                    title: t("dialog.no"),
+                    onClick: () => ""
+                },
+            ]
         })
     })
     return ContextMenu

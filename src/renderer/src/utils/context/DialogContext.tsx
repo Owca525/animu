@@ -1,76 +1,67 @@
-import { createSignal, JSX } from "solid-js";
-import { t } from "i18next";
+import { createSignal, For, JSX, Show } from "solid-js";
 import Button from "@renderer/components/buttons";
 import type { dialogProps } from "../types";
 import "./css/DialogContext.css";
 
-let showDialog: (data: dialogProps) => void = () => {};
-let closeDialog: () => void = () => {};
+let showDialog: (data: dialogProps) => void = () => { };
+let closeDialog: () => void = () => { };
 let dialogIsOpen: () => boolean = () => false;
 
 export function DialogProvider(props: { children: JSX.Element }) {
   const [isOpen, setIsOpen] = createSignal(false);
-  const [data, setData] = createSignal<dialogProps | null>(null);
+  const [data, setData] = createSignal<dialogProps | undefined>(undefined);
+  let dialogRef: HTMLDialogElement | undefined
 
   showDialog = (dialogData: dialogProps) => {
     setData(dialogData);
     setIsOpen(true);
+    if (dialogRef) dialogRef.showModal()
   };
 
   closeDialog = () => {
     setIsOpen(false);
-    setData(null);
+    setData(undefined);
+    if (dialogRef) dialogRef.close()
   };
 
   dialogIsOpen = () => isOpen();
 
-  const getClass = () => {
-    if (data()?.type === "info") return "info";
-    if (data()?.type === "error") return "error";
-    return "";
-  };
-
   return (
     <>
       {props.children}
-      {isOpen() && data() && (
-        <main class="dialog-main-background">
-          <div
-            class={`dialog-container ${getClass()}`}
-          >
-            <div class={`dialog-title ${getClass()}`}>
-              <div class="material-symbols-outlined dialog-icon">
-                {data()?.type === "error" && "error"}
-                {data()?.type === "info" && "info"}
-              </div>
-              {data()?.title}
+      <Show when={data()}>
+        <dialog
+          class={`dialog-container ${data()?.type}`}
+          ref={dialogRef}
+        >
+          <div class={`dialog-title ${data()?.type}`}>
+            <div class="material-symbols-outlined dialog-icon">
+              {data()?.type === "error" && "error"}
+              {data()?.type === "info" && "info"}
             </div>
-
-            <div class={`dialog-description ${getClass()}`}>
-              {data()?.description}
-            </div>
-
-            <div class={`dialog-buttons ${getClass()}`}>
-              <Button
-                content={t("dialog.yes")}
-                ButtonClass={`dialog-button ${getClass()}`}
-                onClick={() => {
-                  data()?.buttons.firstbutton();
-                  closeDialog();
-                }}
-              />
-              <Button
-                content={t("dialog.no")}
-                ButtonClass={`dialog-button ${getClass()}`}
-                onClick={() => {
-                  data()?.buttons.secondbutton();
-                  closeDialog();
-                }}
-              />
-            </div>
+            {data()?.title}
           </div>
-        </main>
-      )}
+
+          <div class={`dialog-description ${data()?.type}`}>
+            {data()?.description}
+          </div>
+
+          <div class={`dialog-buttons ${data()?.type}`}>
+            <For each={data()?.buttons}>
+              {(button) => (
+                <Button
+                  content={button.title}
+                  ButtonClass={`dialog-button ${data()?.type}`}
+                  onClick={() => {
+                    button.onClick();
+                    closeDialog();
+                  }}
+                />
+              )}
+            </For>
+          </div>
+        </dialog>
+      </Show>
     </>
   );
 }

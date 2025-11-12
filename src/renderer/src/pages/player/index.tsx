@@ -30,10 +30,10 @@ const player = () => {
             type: "error",
             title: "Error In Player",
             description: "Missing data to extract urls",
-            buttons: {
-                firstbutton: () => "",
-                secondbutton: () => leave()
-            }
+            buttons: [{
+                title: t("dialog.return"),
+                onClick: () => navigate("/")
+            }]
         })
         return
     }
@@ -105,10 +105,16 @@ const player = () => {
             type: "error",
             title: "Error In Player",
             description: t("player.error.notfound"),
-            buttons: {
-                firstbutton: () => response.refetch(),
-                secondbutton: () => leave()
-            }
+            buttons: [
+                {
+                    title: t("dialog.return"),
+                    onClick: () => navigate("/")
+                },
+                {
+                    title: t("dialog.retry"),
+                    onClick: () => response.refetch()
+                }
+            ]
         })
         return loadingAnimation(leave, { data: anime_data?.data as any, ep: extractionData().actual }, extractionData())
     }
@@ -157,7 +163,7 @@ const player = () => {
                         AnimeData: anime_data.data,
                         saveData: anime_data.save
                     }}
-                    temp={{ episode: extractionData().actual, type: extractionData().type, episodes: extractionData().episodelist}}
+                    temp={{ episode: extractionData().actual, type: extractionData().type, episodes: extractionData().episodelist }}
                     setNextEpisode={setNewEpisode}
                     volumeCacheFunc={setPlayerVolume}
                     PlayerVolume={playerVolume()}

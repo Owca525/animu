@@ -105,6 +105,11 @@ body {
   border-radius: 12px;
 }
 
+.dialog-container::backdrop {
+  backdrop-filter: blur(4px);
+  background-color: color-mix(in srgb, var(--first-layer) 50%, transparent);
+}
+
 .dialog-button.error {
   padding: 10px 20px;
   background-color: var(--red-one) !important;

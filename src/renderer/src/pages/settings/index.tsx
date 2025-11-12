@@ -93,10 +93,16 @@ function settings() {
             type: "info",
             title: "Action",
             description: t("settings.turnDeveloper"),
-            buttons: {
-                firstbutton: () => handleChange("Developer.DeveloperMode", true),
-                secondbutton: () => handleChange("Developer.DeveloperMode", false)
-            }
+            buttons: [
+                {
+                    title: t("dialog.yes"),
+                    onClick: () => handleChange("Developer.DeveloperMode", true)
+                },
+                {
+                    title: t("dialog.no"),
+                    onClick: () => handleChange("Developer.DeveloperMode", false)
+                }
+            ]
         })
     })
 
@@ -110,11 +116,18 @@ function settings() {
         {
             option: t("dialog.exit"), onClick: () => showDialog({
                 type: "info",
-                title: t("global.exitAnimu"),
-                buttons: {
-                    firstbutton: () => window.BrowserWindow.exit(),
-                    secondbutton: () => ""
-                }
+                title: "Action",
+                description: t("global.exitAnimu"),
+                buttons: [
+                    {
+                        title: t("dialog.yes"),
+                        onClick: () => window.BrowserWindow.exit()
+                    },
+                    {
+                        title: t("dialog.no"),
+                        onClick: () => ""
+                    },
+                ]
             })
         }
     ]
@@ -839,10 +852,10 @@ function settings() {
                                             type: "error",
                                             title: "Error in Player",
                                             description: t("player.error.notfound"),
-                                            buttons: {
-                                                firstbutton: () => "",
-                                                secondbutton: () => ""
-                                            }
+                                            buttons: [{
+                                                title: t("dialog.exit"),
+                                                onClick: () => ""
+                                            }]
                                         })
                                     } />
                                     <Button content="info" onClick={() => 
@@ -850,10 +863,10 @@ function settings() {
                                             type: "info",
                                             title: "Info in Player",
                                             description: t("player.error.notfound"),
-                                            buttons: {
-                                                firstbutton: () => "",
-                                                secondbutton: () => ""
-                                            }
+                                            buttons: [{
+                                                title: t("dialog.exit"),
+                                                onClick: () => ""
+                                            }]
                                         })
                                     } />
                                 </span>
