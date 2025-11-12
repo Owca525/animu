@@ -16,17 +16,17 @@ export default function Input(props: InputProps) {
 
   const handleData = (event: KeyboardEvent & { currentTarget: HTMLInputElement }) => {
     if (!props.onKeyDown) return;
+    console.log(event)
 
     const value = event.currentTarget.value;
-    if (cacheText() === value) return;
-
-    if (debounceTimeout()) clearTimeout(debounceTimeout()!);
-
     if (event.code === "Enter") {
       setCacheText(value);
       props.onKeyDown(value);
       return;
     }
+
+    if (cacheText() === value) return;
+    if (debounceTimeout()) clearTimeout(debounceTimeout()!);
 
     const newTimeout = setTimeout(() => {
       if (inputRef) {
