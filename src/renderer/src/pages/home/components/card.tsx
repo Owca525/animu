@@ -31,10 +31,7 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
         entries.forEach((entry) => {
           entry.target.classList.toggle("show", entry.isIntersecting)
           setCardVisible(entry.isIntersecting)
-          // if (entry.isIntersecting) {
-          //   setCardVisible(true);
-          //   observer.unobserve(entry.target);
-          // }
+          if (entry.isIntersecting) observer.unobserve(entry.target)
         });
       },
       {

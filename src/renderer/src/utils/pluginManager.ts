@@ -41,7 +41,7 @@ export class informationPluginManager implements informationPluginManagerFormat 
                 let tmp: { topCards?: containerData, sections: containerData[] } = getHomeCache().data
                 let newData: containerData = data
                 if (tmp.sections.length > 0) newData = { ...newData, data: { ...tmp.sections[0].data, ...newData.data } }
-                setAllHomeData({ data: { sections: [newData] }, isLoading: true, isError: false, } as any)
+                setAllHomeData({ data: { sections: [newData] }, isLoading: false, isError: false, } as any)
             },
             onError: function (_error: string): void {
                 setAllHomeData({ data: { sections: [] }, isLoading: false, isError: true, } as any)

@@ -4,7 +4,7 @@ import icon from "../../../../resources/icon.png"
 import { sidebarData } from "@renderer/utils/types"
 import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js"
 import { createShortcut } from "@solid-primitives/keyboard"
-import { setHomeLocalSearch } from "@renderer/utils/stores/home"
+import { setHomeLocalSearch, setHomeSearchPage } from "@renderer/utils/stores/home"
 
 interface sidebarProps {
   showLogo?: boolean
@@ -100,7 +100,7 @@ export default function Sidebar(props: sidebarProps) {
           <Show when={!props.showLogo}>
             <Button icon={"arrow_back"}
               content={detectSidebarStateButton("Hide Sidebar")}
-              onClick={(event) => { setHomeLocalSearch(false); hideSidebar(event, undefined) }}
+              onClick={(event) => { setHomeLocalSearch(false); setHomeSearchPage(1); hideSidebar(event, undefined) }}
               ButtonClass={detectSidebarStateClass()}
               iconClassName="sidebar-button"
             />
@@ -110,7 +110,7 @@ export default function Sidebar(props: sidebarProps) {
             {(value, i) => (
               <Button icon={value.icon}
                 content={detectSidebarStateButton(value.text)}
-                onClick={(event) => { setHomeLocalSearch(false); hideSidebar(event, value.onClick, i()) }}
+                onClick={(event) => { setHomeLocalSearch(false); setHomeSearchPage(1); hideSidebar(event, value.onClick, i()) }}
                 ButtonClass={`${detectSidebarStateClass()} ${checkNumber(i())}`}
                 iconClassName={`sidebar-button ${checkNumber(i())}`} />
             )}
@@ -122,7 +122,7 @@ export default function Sidebar(props: sidebarProps) {
             {(value) => (
               <Button icon={value.icon} 
                 content={detectSidebarStateButton(value.text)} 
-                onClick={(event) => { setHomeLocalSearch(false); hideSidebar(event, value.onClick) }} 
+                onClick={(event) => { setHomeLocalSearch(false); setHomeSearchPage(1); hideSidebar(event, value.onClick) }} 
                 ButtonClass={detectSidebarStateClass()} 
                 iconClassName="sidebar-button" />
             )}

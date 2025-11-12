@@ -1,6 +1,7 @@
 import { genYearsList } from "@renderer/utils/functions";
 import { cardData, containerData, genresSearchFormat, newInformationPluginFormat } from "@renderer/utils/types";
 import { t } from "i18next";
+import { unwrap } from "solid-js/store";
 
 const pageSize = 20
 
@@ -496,8 +497,7 @@ export default class AnilistApi implements newInformationPluginFormat {
   async onTitleClick(content: any, callbacks: { onSuccess: (data: containerData) => void; onError: (error: string) => void; }): Promise<void> {
     try {
       // FIXME FIX DUPLICATION
-      let tmp: { params: any, title: string } = content.content
-      console.log(tmp.params)
+      let tmp: { params: any, title: string } = unwrap(content.content)
       let data = {
         title: tmp.title,
         data: await sendToApi(tmp.params, graphicApi),

@@ -310,6 +310,7 @@ const Home = () => {
                     data={element.data}
                     horizontal={element.horizontal}
                     onScrollDownFunction={element.onScrollDownFunction}
+                    titlevent={element.titlevent}
                   // onTitle={element.onTitleClick}
                   />
                 )}
