@@ -53,10 +53,10 @@
 * {
   font-family: Arial, Helvetica, sans-serif;
   /* font-size: 1em; */
+  color: var(--text);
 }
 
 body {
-  color: var(--text);
   background-color: var(--first-layer);
 }
 
@@ -458,6 +458,11 @@ body {
 .information-containerwrong-cards ::-webkit-scrollbar-thumb,
 .information-containerwrong-container ::-webkit-scrollbar-thumb {
   background-color: var(--third-layerc) !important;
+}
+
+.information-containerwrong::backdrop {
+  backdrop-filter: blur(4px);
+  background-color: color-mix(in srgb, var(--first-layer) 50%, transparent);
 }
 
 .information-episodes-button {
@@ -1114,10 +1119,6 @@ th {
   background-color: var(--second-layer);
   border: solid 2px var(--third-layer);
   border-radius: 12px;
-}
-
-.information-containerwrong-void {
-  background-color: color-mix(in srgb, var(--bg) 70%, transparent);
 }
 
 .information-containerwrong-exit-button {

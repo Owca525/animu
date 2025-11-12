@@ -1,14 +1,8 @@
-.information-containerwrong-void {
-    width: 100vw;
-    height: 100vh;
-    z-index: 1000;
-    position: fixed;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .information-containerwrong {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 80%;
     height: 80%;
     padding: 24px 24px 6px 24px;
@@ -17,6 +11,7 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    overflow: visible;
 }
 
 .information-containerwrong-top {
@@ -80,7 +75,7 @@
     top: 0;
     right: 1;
     left: 0;
-    margin: -24px;
+    margin: -18px;
 }
 
 .information-containerwrong-container {
@@ -99,7 +94,7 @@
 .information-containerwrong-cards {
     display: grid;
     overflow: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
     height: 100%;
     grid-template-columns: repeat(auto-fit, minmax(150px, max-content));
     gap: 4px;

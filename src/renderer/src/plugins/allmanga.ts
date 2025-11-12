@@ -191,9 +191,8 @@ export async function extractInformation(type: "all" | "episodes", id: string): 
   if (!resp.success || !resp.data.data.show) return []
   let anime_data = resp.data.data.show
   let episodes = await getEpisodeList(id, { start: parseInt(anime_data.availableEpisodesDetail.sub.at(-1)), end: parseInt(anime_data.availableEpisodesDetail.sub[0]) })
-  console.log(episodes)
   if (episodes.length <= 0) return []
-  
+
   episodes = episodes.sort((a, b) => Number(a.ep) - Number(b.ep))
   if (type == "episodes") return episodes
 
