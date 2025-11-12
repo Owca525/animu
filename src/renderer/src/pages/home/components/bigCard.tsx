@@ -18,9 +18,8 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
     }
 
     function openInformation() {
-        navigate("/info", {
-            state: { anime: data.AnimeData },
-        });
+        localStorage.setItem("informationCache", JSON.stringify({ anime: data.AnimeData }))
+        navigate("/info");
     }
 
     return (

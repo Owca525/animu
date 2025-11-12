@@ -63,8 +63,6 @@ function information() {
     const [isCoverLoading, setCoverIsLoading] = createSignal<boolean>(true)
     const [isCoverError, setCoverIsError] = createSignal<boolean>(false)
 
-    let seconds = secondsLeft()
-    if (seconds && seconds.left <= 0) return;
     const intervalId = setInterval(() => {
         setSecondsLeft(prev => {
             if (!prev) return undefined
