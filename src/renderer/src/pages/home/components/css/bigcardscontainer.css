@@ -1,16 +1,10 @@
 .big-cards-container-content {
     display: flex;
     overflow-x: hidden;
-    width: 100vw;
-    cursor: grabbing;
-    opacity: 0;
-    animation: firstShow 0.5s ease forwards;
-}
-
-.big-cards-container-content.active {
     scroll-snap-type: x mandatory;
+    width: 100vw;
     scroll-behavior: smooth;
-    cursor: grab;
+    animation: firstShow 0.5s ease forwards;
 }
 
 .big-card-container-button {
