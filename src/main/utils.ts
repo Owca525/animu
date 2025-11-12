@@ -258,7 +258,8 @@ const createProxyServer = () => {
             let headers: Record<string, string> = {
                 ...req.headers,
                 host: hostname.hostname,
-                "sec-ch-ua-platform": '"Windows"'
+                "sec-ch-ua-platform": '"Windows"',
+                ...currentVideoUrl.header
             };
 
             delete headers["sec-ch-ua"]
