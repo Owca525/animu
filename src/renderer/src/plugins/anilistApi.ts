@@ -360,8 +360,6 @@ async function sendPost(variable: any, query: any): Promise<{ success: boolean; 
 }
 
 async function sendToApi(variable: any, query: any): Promise<cardData[]> {
-  console.log("api anilist")
-  return []
   let data = await window.api.request.post("https://graphql.anilist.co", header, { query: query, variables: variable })
   if (data.success) {
     return data.data.data.Page.media.map((data) => Convert(data))

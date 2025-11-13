@@ -1,6 +1,8 @@
 import i18n from 'i18next'
+import en from "./lang/en.json"
 
 async function getAllLangFiles() {
+  if (!window.api) return { en: { translation: en } }
   let langFiles = await window.api.getListLang()
   let res = {}
   for (let index = 0; index < langFiles.length; index++) {

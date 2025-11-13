@@ -120,7 +120,8 @@ const player = () => {
     }
 
     async function leave() {
-        window.BrowserWindow.setFullscreen(false)
+        if (window.api) window.BrowserWindow.setFullscreen(false)
+        else document.exitFullscreen()
         closeDialog()
         if (!anime_data) return
         if (anime_data.save?.last_Time != 0) {

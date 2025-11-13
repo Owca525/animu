@@ -1,5 +1,6 @@
 import Button from '@renderer/components/buttons';
 import { t } from 'i18next';
+import { openUrlFolder } from './functions';
 
 function LocalErrorBoundary(error: any) {
     console.error(error)
@@ -9,7 +10,7 @@ function LocalErrorBoundary(error: any) {
         let title = error.message
         let body = error.stack
         let url = `https://github.com/Owca525/animu/issues/new?title=${title}&body=${body}&labels=bug`
-        window.api.open(url)
+        openUrlFolder(url)
     }
 
     return (
@@ -18,7 +19,7 @@ function LocalErrorBoundary(error: any) {
             <div class="main-error-button-container">
                 <Button content={t("errorboundary.gotohome")} ButtonClass='error-button' onClick={() => window.location.href = `${window.location.origin}${window.location.pathname}`} />
                 <Button content={"Send Issue to github"} ButtonClass='error-button' onClick={() => createIssue()} />
-                <Button content={t("errorboundary.leaveanimu")} ButtonClass='error-button' onClick={() => window.BrowserWindow.exit()} />
+                <Button content={t("errorboundary.leaveanimu")} ButtonClass='error-button' onClick={() => window.api ? window.BrowserWindow.exit() : ""} />
             </div>
             <div class="main-error-show">
                 {t("errorboundary.errormessage", { error: error.toString() })}

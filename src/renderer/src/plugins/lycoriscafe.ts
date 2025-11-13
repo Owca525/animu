@@ -1,4 +1,4 @@
-import { timeToSeconds } from "@renderer/utils/functions";
+import { request, timeToSeconds } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, playerChapterList, playerData, playerPluginFormat, playerSubtitlesFormat, resolutionFormat } from "@renderer/utils/types";
 
 const WEB = "https://www.lycoris.cafe"
@@ -29,9 +29,9 @@ function detectResoltion(text: string): string {
 
 async function requestToApi(anime_id: string): Promise<{ data: any } | undefined> {
     let url = `${WEB}/api/anime/${anime_id}`
-    let req = await window.api.request.get(url, HEADER);
+    let req = await request(url, { headers: HEADER });
     if (!req.success) return undefined
-    return { data: req.data }
+    return { data: req.json }
 }
 
 async function extractEpisodeData(_type: string, episode: string, id: string): Promise<playerData[]> {
@@ -45,11 +45,11 @@ async function extractEpisodeData(_type: string, episode: string, id: string): P
     let tmp = episodes.find((element) => parseInt(element.number) == parseInt(episode))
     if (!tmp) return []
 
-    let reqID = await window.api.request.get(`${WEB}/api/watch/getVideoLink?id=${tmp.id}`, HEADER, "text");
+    let reqID = await request(`${WEB}/api/watch/getVideoLink?id=${tmp.id}`, { headers: HEADER });
     if (!reqID.success) return []
     // if (!reqID.data.endWith("LC")) return []
 
-    let decodeData = reqID.data.slice(0, -2)
+    let decodeData = reqID.text.slice(0, -2)
     decodeData = decodeData.split("").reverse().map(el => String.fromCharCode(el.charCodeAt(0) - 7)).join("")
 
     try {
@@ -128,10 +128,10 @@ function convertAnime(data: any): cardData | undefined {
 
 async function extractAnimeList(data: AnimeData): Promise<cardData[]> {
     let url = `https://www.lycoris.cafe/api/search?page=1&pageSize=12&search=${convertText(data.title.romaji)}&genres=&status=&format=&year=&season=&source=&sortField=popularity&sortDirection=desc&preferRomaji=true`
-    const req = await window.api.request.get(url, HEADER);
-    if (!req.success) return []
+    const req = await request(url, { headers: HEADER });
+    if (!req.success || !req.json) return []
     let endData: cardData[] = []
-    req.data.data.forEach(element => {
+    req.json.data.forEach(element => {
         let tmp = convertAnime(element)
         if (tmp) endData.push(tmp)
     });
@@ -213,10 +213,10 @@ function convertToAnimeData(data: any): AnimeData | undefined {
 
 async function searchAnime(name: string, page: number, _params?: { genres?: string[]; years?: string; seasons?: string; format?: string[]; airing?: string; }): Promise<cardData[]> {
     let url = `https://www.lycoris.cafe/api/search?page=${page}&pageSize=12&search=${name}&genres=&status=&format=&year=&season=&source=&sortField=popularity&sortDirection=desc&preferRomaji=true`
-    const req = await window.api.request.get(url, HEADER);
-    if (!req.success) return []
+    const req = await request(url, { headers: HEADER });
+    if (!req.success || !req.json) return []
 
-    let data = req.data.data.map((element) => { return { AnimeData: convertToAnimeData(element) } })
+    let data = req.json.data.map((element) => { return { AnimeData: convertToAnimeData(element) } })
     if (!data) return []
     return data
 }

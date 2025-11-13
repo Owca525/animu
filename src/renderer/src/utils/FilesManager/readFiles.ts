@@ -11,8 +11,14 @@ export async function DeleteFromFile(data: cardData, file: string, notification:
         if (getGlobalCache().incognito) return
         if (!data.saveData) return
         await CheckFile(file)
-        const saveFile = await window.api.os.read(`${file}.json`)
-        if (typeof saveFile != "string") return console.error(`Wrong data in DeleteFromFile`, saveFile)
+        let saveFile;
+        if (window.api) {
+            saveFile = await window.api.os.read(`${file}.json`)
+            if (typeof saveFile != "string") return console.error(`Wrong data in DeleteFromFile`, saveFile)
+        } else {
+            saveFile = localStorage.getItem(file)
+        }
+
         const list = JSON.parse(saveFile) as cardData[];
         let index = -1
         if (data.AnimeData.id == "") {
@@ -27,7 +33,8 @@ export async function DeleteFromFile(data: cardData, file: string, notification:
 
         if (index != -1) list.splice(index, 1);
 
-        await window.api.os.write(`${file}.json`, JSON.stringify(list))
+        if (window.api) await window.api.os.write(`${file}.json`, JSON.stringify(list))
+        else localStorage.setItem(file, JSON.stringify(list))
         if (file == "continueWatch") setGlobalHistory({ continue: list } as any)
         if (file == "history") setGlobalHistory({ history: list } as any)
         refetchHistory()
@@ -58,8 +65,14 @@ export async function SaveToFile(data: cardData, file: string): Promise<boolean>
     try {
         if (getGlobalCache().incognito) return true
         await CheckFile(file)
-        const saveFile = await window.api.os.read(`${file}.json`);
-        if (typeof saveFile != "string") return false
+        let saveFile;
+        if (window.api) {
+            const saveFile = await window.api.os.read(`${file}.json`);
+            if (typeof saveFile != "string") return false
+        } else {
+            saveFile = localStorage.getItem(file)
+        }
+
         const tmpData = JSON.parse(saveFile) as cardData[];
         let index = -1
         if (data.AnimeData.id == "") {
@@ -75,7 +88,8 @@ export async function SaveToFile(data: cardData, file: string): Promise<boolean>
         if (index != -1) tmpData.splice(index, 1);
 
         tmpData.push(data);
-        await window.api.os.write(`${file}.json`, JSON.stringify(checkAnimeDuplicate(tmpData)))
+        if (window.api) await window.api.os.write(`${file}.json`, JSON.stringify(checkAnimeDuplicate(tmpData)))
+        else localStorage.setItem(file, JSON.stringify(checkAnimeDuplicate(tmpData)))
         if (file == "continueWatch") setGlobalHistory({ continue: tmpData } as any)
         if (file == "history") setGlobalHistory({ history: tmpData } as any)
         refetchHistory()
@@ -88,6 +102,7 @@ export async function SaveToFile(data: cardData, file: string): Promise<boolean>
 
 export async function CheckFile(file: string): Promise<boolean> {
     try {
+        if (!window.api) return true
         if (await window.api.os.exists(`${file}.json`) == false) {
             await window.api.os.write(
                 `${file}.json`,
@@ -153,6 +168,7 @@ async function convertToNewVersion(data: { id: string, title: string, img: strin
 
 export async function DetectOldVersionHistory() {
     try {
+        if (!window.api) return
         let tmpHistory = await window.api.os.read("history.json")
         if (tmpHistory) {
             let history = JSON.parse(tmpHistory as string)

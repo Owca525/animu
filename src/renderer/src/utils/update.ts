@@ -5,6 +5,7 @@ import { getConfig } from "./stores/config";
 
 export async function checkUpdate(alwaysShow: boolean = false) {
   try {
+    if (!window.api) return
     const update = await window.api.update.checkUpdate();
     console.log(update);
 

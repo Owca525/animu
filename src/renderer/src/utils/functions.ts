@@ -70,6 +70,7 @@ export function formatTime(seconds: number | undefined): string {
 }
 
 export async function changeTheme(name: string) {
+    if (!window.api) return
     let old = document.getElementById("theme-stylesheet") as HTMLLinkElement
     if (old) old.remove()
     document.title = ""
@@ -213,7 +214,7 @@ export function CreateContextMenuOptions(start?: ContextMenuProps, center?: Cont
         }
     }
     let config = getConfig()
-    if (config.Developer.DeveloperMode) ContextMenu.push({ option: i18n.t("contextMenu.devtools"), onClick: window.BrowserWindow.openDevTools })
+    if (config.Developer.DeveloperMode && window.api) ContextMenu.push({ option: i18n.t("contextMenu.devtools"), onClick: window.BrowserWindow.openDevTools })
     ContextMenu.push({
         option: i18n.t("dialog.exit"), onClick: () => showDialog({
             type: "info",
@@ -222,7 +223,7 @@ export function CreateContextMenuOptions(start?: ContextMenuProps, center?: Cont
             buttons: [
                 {
                     title: t("dialog.yes"),
-                    onClick: () => window.BrowserWindow.exit()
+                    onClick: () => window.api ? window.BrowserWindow.exit() : ""
                 },
                 {
                     title: t("dialog.no"),
@@ -269,7 +270,7 @@ export function detectTitle(data: { title: { english?: string | undefined; nativ
 }
 
 export async function convertPath(path: string) {
-    if ((await window.api.getOSDetails()).platform == "win32") return path.replace("/", "\\")
+    if ((await window.api.getOSDetails()).platform == "win32" && !window.api) return path.replace("/", "\\")
     return path
 }
 
@@ -291,9 +292,9 @@ export function timeToSeconds(time: string): number {
 }
 
 export async function convertChaptersVTT(url: string): Promise<playerChapterList[]> {
-    let req = await window.api.request.get(url, { "User-Agent": navigator.userAgent }, "text")
-    if (!req.success) return []
-    let lines = req.data.split("\n") as string
+    let req = await fetch(url)
+    if (!req.ok) return []
+    let lines = (await req.text()).split("\n")
 
     let finnalListChapters: playerChapterList[] = []
     for (let i = 0; i < lines.length; i++) {
@@ -363,4 +364,78 @@ export function updateObjectConfig(path: string, value: string | number | boolea
 
     current[keys[keys.length - 1]] = value
     return newConfig
+}
+
+export async function request(url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string } }): Promise<{ text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: { [key: string]: string } }> {
+    try {
+        if (window.api) return await window.api.request.advanceRequest(url, options)
+
+        let response = await fetch("/api/request", {
+            method: "POST",
+            body: JSON.stringify({
+                requestOptions: options
+            })
+        })
+
+        if (!response.ok) return { text: "", buffer: [] as any, status: response.status, statusText: response.statusText, url: response.url, success: response.ok, json: undefined, responseHeader: response.headers as any }
+        let bufferCloned = response.clone()
+        let jsontext;
+        let text = "";
+
+        try {
+            jsontext = await response.json()
+        } catch (error) {}
+        try {
+            text = await response.text()
+        } catch (error) {}
+
+        return {
+            text: text,
+            json: jsontext,
+            buffer: Buffer.from(await bufferCloned.arrayBuffer()),
+            status: response.status,
+            statusText: response.statusText,
+            url: response.url,
+            success: response.ok,
+            responseHeader: response.headers as any
+        };
+    } catch (error) {
+        console.error("error in requestGET", error)
+        return {
+            text: (error as Error).message,
+            json: undefined,
+            buffer: Buffer.from(""),
+            status: 500,
+            statusText: "Error",
+            url: url,
+            success: false,
+            responseHeader: {}
+        }
+    }
+}
+
+export async function SaveToClipboard(type: "text" | "image", content: string) {
+    if (window.api) return window.api.saveToClipboard(type, content)
+    if (type == "image") {
+        const blob = await (await fetch(content)).blob()
+        const item = new ClipboardItem({ [blob.type]: blob });
+        await navigator.clipboard.write([item]);
+        return
+    }
+
+    const blob = new Blob([content], { type: "text/plain" });
+    const item = new ClipboardItem({ "text/plain": blob });
+    await navigator.clipboard.write([item]);
+    return
+}
+
+export function openUrlFolder(content: string) {
+    if (window.api) return window.api.open(content)
+    return window.open(content, "_blank");
+}
+
+export function toggleFullscreen(toggle: boolean = false) {
+    if (window.api) return window.BrowserWindow.setFullscreen(toggle)
+    if (toggle) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
 }

@@ -8,6 +8,7 @@ import {
   convertSeconds,
   CreateContextMenuOptions,
   getGradientColor,
+  SaveToClipboard,
 } from "@renderer/utils/functions";
 import { ChangePlugin } from "@renderer/utils/pluginApi";
 
@@ -84,13 +85,13 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
     {
       option: t("contextMenu.copytitle"),
       onClick: () =>
-        window.api.saveToClipboard("text", card.AnimeData.title.romaji),
+        SaveToClipboard("text", card.AnimeData.title.romaji),
     },
     {
       option: t("contextMenu.copycover"),
       onClick: () =>
         card.AnimeData.coverImage
-          ? window.api.saveToClipboard("image", card.AnimeData.coverImage)
+          ? SaveToClipboard("image", card.AnimeData.coverImage)
           : "",
     },
   ];

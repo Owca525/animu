@@ -1,4 +1,4 @@
-import { convertChaptersVTT } from "@renderer/utils/functions";
+import { convertChaptersVTT, request } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, playerChapterList, playerData, playerPluginFormat } from "@renderer/utils/types";
 
 const WEB = "https://anizone.to"
@@ -16,10 +16,10 @@ function convertText(text: string) {
 async function getURLFromPlayer(_type: string, episode: string, id: string): Promise<playerData[]> {
     let url = `${WEB}/anime/${id}/${episode}`
 
-    const req = await window.api.request.get(url, HEADER, "text");
+    const req = await request(url, { headers: HEADER });
     if (!req.success) return []
 
-    let data = req.data as string
+    let data = req.text as string
     let storyboard = [...data.matchAll(/https:\/\/seiryuu\.vid-cdn\.xyz\/[a-z0-9-]+\/storyboard\.vtt/gi)]
     let chapters = [...data.matchAll(/https:\/\/seiryuu\.vid-cdn\.xyz\/[a-z0-9-]+\/chapters\.vtt/gi)]
     let urls = [...data.matchAll(/https:\/\/seiryuu\.vid-cdn\.xyz\/[a-z0-9-]+\/master\.m3u8/gi)]
@@ -87,9 +87,9 @@ async function getEpisodeList(animeData?: AnimeData, anime_id?: string): Promise
     if (!idAnime) return
 
     let url = `${WEB}/anime/${idAnime}`
-    const req = await window.api.request.get(url, HEADER, "text");
+    const req = await request(url, { headers: HEADER });
     if (!req.success) return undefined
-    let data = req.data as string
+    let data = req.text as string
     let tmpData = [...data.matchAll(/<ul.*?>(.*?)<\/ul>/gs)]
     let urls = [...tmpData[0][0].matchAll(/href=["'](https:\/\/anizone\.to\/anime\/[^\s"']+)["']/g)]
     let dataList = [...data.matchAll(/<div[^>]*class="(?=[^"]*text-slate-100)(?=[^"]*text-xs)(?=[^"]*lg:text-base)(?=[^"]*flex)(?=[^"]*flex-wrap)(?=[^"]*justify-center)(?=[^"]*gap-2)(?=[^"]*sm:gap-6)[^"]*"[^>]*>[\s\S]*?<\/div>/g)]
@@ -117,9 +117,9 @@ async function getEpisodeList(animeData?: AnimeData, anime_id?: string): Promise
 async function getAnimeCards(data: AnimeData): Promise<cardData[]> {
     try {
         let url = `${WEB}/anime?search=${convertText(data.title.romaji)}`
-        const req = await window.api.request.get(url, HEADER, "text");
+        const req = await request(url, { headers: HEADER });
         if (!req.success) return []
-        let tmp = [...req.data.matchAll(CARDS_REGEX)]
+        let tmp = [...req.text.matchAll(CARDS_REGEX)]
         if (tmp.length <= 0) return []
         let finnallData: cardData[] = []
         for (let index = 0; index < tmp.length; index++) {

@@ -52,10 +52,8 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
     // Running Players
     async function RunMovian(url?: string) {
         if (!url) return
-        let req = await window.api.request.get(`http://${config.Player.external.movianIP}/showtime/open?url=${encodeURIComponent(url)}`, {})
-        if (!req.success && req.error == "fetch failed") {
-            toast.error(t("externalPlayer.failed.movian"), notificationProps)
-        }
+        let req = await fetch(`http://${config.Player.external.movianIP}/showtime/open?url=${encodeURIComponent(url)}`)
+        if (!req.ok) toast.error(t("externalPlayer.failed.movian"), notificationProps)
     }
 
     function getNumberOfSub(data: playerSubtitlesFormat[] | undefined) {

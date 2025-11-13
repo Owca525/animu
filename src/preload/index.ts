@@ -25,7 +25,7 @@ if (process.contextIsolated) {
           ipcRenderer.invoke("fetch-data", url, header, type),
         post: (url: string, header: Record<string, string>, body?: { query: any, variables: Object }, type?: "json" | "text") =>
           ipcRenderer.invoke("send-post", url, header, body, type),
-        advanceRequest: (url: string, options?: { method: "POST" | "GET", header: Record<string, string> }) => ipcRenderer.invoke('advanceRequest', url, options),
+        advanceRequest: (url: string, options?: { method?: "POST" | "GET", header?: Record<string, string> }) => ipcRenderer.invoke('advanceRequest', url, options),
       },
       rpc: {
         setActivity: (details: string | undefined, state: string | undefined) =>

@@ -67,7 +67,7 @@ const Home = () => {
     if (homeCache().data.sections.length <= 0) plugin.home()
     const config: SettingsConfig = JSON.parse(JSON.stringify(getConfig()));
     console.log(config)
-    if (config.General.discordRPC)
+    if (config.General.discordRPC && window.api)
       window.api.rpc.setActivity(undefined, t("discordrpc.home"));
   })
 

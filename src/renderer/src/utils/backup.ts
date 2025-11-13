@@ -1,6 +1,7 @@
 import toast from "solid-toast"
 
 export async function CreateBackup() {
+    if (!window.api) return
     let data = await window.api.backup.make()
     if (!data.success) {
         toast.error("Failed Maked backup")

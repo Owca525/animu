@@ -1,4 +1,4 @@
-import { genYearsList } from "@renderer/utils/functions";
+import { genYearsList, request } from "@renderer/utils/functions";
 import { cardData, containerData, genresSearchFormat, newInformationPluginFormat } from "@renderer/utils/types";
 import { t } from "i18next";
 import { unwrap } from "solid-js/store";
@@ -355,14 +355,14 @@ function Convert(convert: any): cardData {
 
 // WHY THE FUCK THIS DOESN'T WORK IF I CALL window.api.request.post IN CreateHomePage
 // Jeśli api anilist jest offline to daje "Forbidden" w statusText i error 403 request 
-async function sendPost(variable: any, query: any): Promise<{ success: boolean; data?: any; status?: number; statusText?: string; error?: unknown; }> {
-  return await window.api.request.post("https://graphql.anilist.co", header, { query: query, variables: variable })
+async function sendPost(variable: any, query: any) {
+  return await request("https://graphql.anilist.co",  { method: "POST", headers: header, body: JSON.stringify({ query: query, variables: variable }) } as any)
 }
 
 async function sendToApi(variable: any, query: any): Promise<cardData[]> {
-  let data = await window.api.request.post("https://graphql.anilist.co", header, { query: query, variables: variable })
-  if (data.success) {
-    return data.data.data.Page.media.map((data) => Convert(data))
+  let data = await request("https://graphql.anilist.co",  { method: "POST", headers: header, body: JSON.stringify({ query: query, variables: variable }) } as any)
+  if (data.success && data.json) {
+    return data.json.data.Page.media.map((data) => Convert(data))
   }
   return []
 }
@@ -387,11 +387,11 @@ function getSeasonFromDate() {
   return { season, seasonYear: year };
 }
 
-async function getGenres(): Promise<string[]> {
-  let data = await window.api.request.post("https://graphql.anilist.co", header, { query: genres, variables: "" })
-  if (data.success) return data.data.data.GenreCollection
-  return []
-}
+// async function getGenres(): Promise<string[]> {
+//   let data = await window.api.request.post("https://graphql.anilist.co", header, { query: genres, variables: "" })
+//   if (data.success) return data.data.data.GenreCollection
+//   return []
+// }
 
 export default class AnilistApi implements newInformationPluginFormat {
   metadata = {
@@ -444,11 +444,11 @@ export default class AnilistApi implements newInformationPluginFormat {
     try {
       let season = getSeasonFromDate()
       let data = await sendPost({ season: season.season, seasonYear: season.seasonYear }, graphicHomeApi)
-      if (!data.success) return callbacks.onError("Anilist isn't accessible")
+      if (!data.success || !data.json) return callbacks.onError("Anilist isn't accessible")
       let home: containerData[] = [
         {
           title: t("home.trending_now"),
-          data: data.data.data.trending.media.map((anime) => Convert(anime)),
+          data: data.json.data.trending.media.map((anime) => Convert(anime)),
           horizontal: true,
           titlevent: {
             onTitleClickContext: { params: tendingAnime, title: t("home.trending_now") }
@@ -456,7 +456,7 @@ export default class AnilistApi implements newInformationPluginFormat {
         },
         {
           title: t("home.popular_in_this_season"),
-          data: data.data.data.season.media.map((anime) => Convert(anime)),
+          data: data.json.data.season.media.map((anime) => Convert(anime)),
           horizontal: true,
           titlevent: {
             onTitleClickContext: {
@@ -471,7 +471,7 @@ export default class AnilistApi implements newInformationPluginFormat {
         },
         {
           title: t("home.all_time_popular"),
-          data: data.data.data.popular.media.map((anime) => Convert(anime)),
+          data: data.json.data.popular.media.map((anime) => Convert(anime)),
           horizontal: true,
           titlevent: {
             onTitleClickContext: { params: allPopular, title: t("home.all_time_popular") }
@@ -487,8 +487,8 @@ export default class AnilistApi implements newInformationPluginFormat {
   async anime(context: { id: string; }) {
     try {
       let req = await sendPost({ id: context.id }, graphicApIDAnime)
-      if (!req.success) return
-      return Convert(req.data.data.Media).AnimeData
+      if (!req.success || !req.json) return
+      return Convert(req.json.data.Media).AnimeData
     } catch (error) {
       console.error("Uknown error in anime/anilistapi", error)
       return

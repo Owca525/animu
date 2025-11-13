@@ -1,7 +1,7 @@
 import { AnimeData, cardData, indentityPlayer, playerPluginFormat } from "@renderer/utils/types";
 import Button from "@renderer/components/buttons";
 import "./information.css"
-import { convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities, getGradientColor, segregatePlugins } from "@renderer/utils/functions";
+import { convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities, getGradientColor, openUrlFolder, SaveToClipboard, segregatePlugins } from "@renderer/utils/functions";
 import { t } from "i18next"
 import Drop from "./components/drop";
 import ContainerWrong from "./components/containerWrong";
@@ -129,7 +129,7 @@ function information() {
 
     async function SaveCoverToClipboard(url: string | undefined) {
         if (!url) return
-        if (await window.api.saveToClipboard("image", url)) {
+        if (await SaveToClipboard("image", url)) {
             toast.success(t("information.notification.coverdone"))
         } else {
             toast.error(t("information.notification.coverfailed"))
@@ -242,9 +242,9 @@ function information() {
                             </span>
                         </div>
                         <div class="information-bar">
-                            <Button titleButton={t("information.bar.anilist")} icon="open_in_new" ButtonClass="information-bar-icon" onClick={() => window.api.open(`https://anilist.co/anime/${tempData().anime.id}`)} />
+                            <Button titleButton={t("information.bar.anilist")} icon="open_in_new" ButtonClass="information-bar-icon" onClick={() => openUrlFolder(`https://anilist.co/anime/${tempData().anime.id}`)} />
                             <Show when={tempData().anime.trailer}>
-                                <Button titleButton={t("information.bar.trailer")} icon="theaters" ButtonClass="information-bar-icon" onClick={() => window.api.open(`https://www.youtube.com/watch?v=${tempData().anime.trailer?.id}`)} />
+                                <Button titleButton={t("information.bar.trailer")} icon="theaters" ButtonClass="information-bar-icon" onClick={() => openUrlFolder(`https://www.youtube.com/watch?v=${tempData().anime.trailer?.id}`)} />
                             </Show>
                         </div>
                     </div>
@@ -371,7 +371,7 @@ function information() {
                                                     image={character.character.image}
                                                     name={character.character.name}
                                                     role={t(`information.role.${character.role.toLowerCase()}`)}
-                                                    onClick={() => window.api.open(`https://anilist.co/character/${character.character.id}`)}
+                                                    onClick={() => openUrlFolder(`https://anilist.co/character/${character.character.id}`)}
                                                 />
                                             )}
                                         </For>
@@ -393,7 +393,7 @@ function information() {
                                                     image={character.voiceActor?.image as string}
                                                     name={character.voiceActor?.name as string}
                                                     role={t("information.actor_as", { actor: character.character.name })}
-                                                    onClick={() => window.api.open(`https://anilist.co/staff/${character.voiceActor ? character.voiceActor.id : ""}`)}
+                                                    onClick={() => openUrlFolder(`https://anilist.co/staff/${character.voiceActor ? character.voiceActor.id : ""}`)}
                                                 />
                                             )}
                                         </For>

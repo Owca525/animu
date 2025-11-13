@@ -8,7 +8,7 @@ import { t } from "i18next"
 import { ContextMenuProps, playerPluginFormat, SettingsConfig, themeMetadata } from "@renderer/utils/types";
 import i18n from "i18next"
 import { saveConfig } from "@renderer/utils/FilesManager/config";
-import { calculateZoomLevel, changeTheme, convertKeybinds, convertPath, updateObjectConfig } from "@renderer/utils/functions";
+import { calculateZoomLevel, changeTheme, convertKeybinds, convertPath, openUrlFolder, request, updateObjectConfig } from "@renderer/utils/functions";
 import CheckKeybind from "./components/checkKeybind";
 import { showDialog } from "@renderer/utils/context/DialogContext";
 import SeekBar from "@renderer/components/seekBar";
@@ -22,7 +22,7 @@ import toast from "solid-toast";
 import { useNavigate } from "@solidjs/router";
 import { getConfig, setConfig } from "@renderer/utils/stores/config";
 import { getPluginList } from "@renderer/utils/stores/plugins";
-import { createEffect, createSignal, onCleanup, onMount } from "solid-js";
+import { createEffect, createSignal, onCleanup, onMount, Show } from "solid-js";
 import { createShortcut } from "@solid-primitives/keyboard";
 
 function settings() {
@@ -66,18 +66,22 @@ function settings() {
         ],
         bottom: [
             {
-                icon: "folder",
-                text: t("global.cfglocation"),
-                onClick: async () =>
-                    await window.api.open(await window.api.os.getConfigPath()),
-            },
-            {
                 icon: "home",
                 text: t("global.home"),
                 onClick: () => { navigate("/"); resetNewConfig() },
             },
         ],
     };
+
+    if (window.api) {
+        sidebarData.bottom.push({
+            icon: "folder",
+            text: t("global.cfglocation"),
+            onClick: async () =>
+                await window.api.open(await window.api.os.getConfigPath()),
+        })
+        sidebarData.bottom.reverse()
+    }
 
     if (config().new.Developer.DeveloperMode) {
         sidebarData.top.push({
@@ -121,7 +125,7 @@ function settings() {
                 buttons: [
                     {
                         title: t("dialog.yes"),
-                        onClick: () => window.BrowserWindow.exit()
+                        onClick: () => window.api ? window.BrowserWindow.exit() : ""
                     },
                     {
                         title: t("dialog.no"),
@@ -132,7 +136,7 @@ function settings() {
         }
     ]
 
-    if (config().new.Developer.DeveloperMode) {
+    if (config().new.Developer.DeveloperMode && window.api) {
         ContextMenu.push({ option: t("contextMenu.devtools"), onClick: window.BrowserWindow.openDevTools })
     }
 
@@ -147,6 +151,7 @@ function settings() {
     })
 
     onMount(() => {
+        if (!window.api) return
         window.api.getlistThemes().then((data) => {
             let themes = data.map((element) => { return { label: element.name, onClick: () => { changeTheme(element.name); handleChange("General.theme", element.name); setthemeMetadata(() => element) } } })
             setThemes(() => themes)
@@ -162,7 +167,7 @@ function settings() {
     })
 
     async function ChangeScreenshot(path: string | any) {
-        if (!path) return 
+        if (!path) return
         handleChange("Player.screenShot.path", path)
     }
 
@@ -198,6 +203,7 @@ function settings() {
     }
 
     function setDynamicZoom(value: number) {
+        if (!window.api) return
         window.BrowserWindow.setZoom(calculateZoomLevel(value))
     }
 
@@ -207,10 +213,9 @@ function settings() {
     }
 
     async function discord_server() {
-        let url = "https://raw.githubusercontent.com/Owca525/animu/refs/heads/unstable/assets/discord.txt"
-        let data = await window.api.request.get(url, { "User-Agent": navigator.userAgent }, "text")
+        let data = await request("https://raw.githubusercontent.com/Owca525/animu/refs/heads/unstable/assets/discord.txt")
         if (!data.success) return
-        window.api.open(data.data)
+        openUrlFolder(data.text)
     }
 
     return (
@@ -221,7 +226,7 @@ function settings() {
                 activeElement
             />
             <div class="settings-shadow-sidebar"></div>
-            {isSaving() && 
+            {isSaving() &&
                 <div class="settings-save-content">
                     <div class="settings-save-title">{t("settings.saving.notification")}</div>
                     <div class="settings-save-buttons">
@@ -265,7 +270,9 @@ function settings() {
                                         placeholderChange={() => t(`lang.${config().new.General.language}`)}
                                         disableX
                                     />
-                                    <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getConfigPath()}/lang`))} />
+                                    <Show when={window.api}>
+                                        <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getConfigPath()}/lang`))} />
+                                    </Show>
                                 </div>
                             </div>
                             <div class="settings-line"></div>
@@ -279,7 +286,9 @@ function settings() {
                                         buttonText={config().new.General.theme}
                                         disableX
                                     />
-                                    <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getConfigPath()}/themes`))} />
+                                    <Show when={window.api}>
+                                        <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getConfigPath()}/themes`))} />
+                                    </Show>
                                 </div>
                             </div>
                             <div class="settings-line"></div>
@@ -313,10 +322,10 @@ function settings() {
                             <div class="settings-setting-container">
                                 {t("settings.general.checkupdates")}
                                 <ButtonGroup selectedValue={t(`settings.general.${config().new.update.type.toLowerCase().replaceAll(" ", "")}`)} listValues={[
-                                        { value: t("settings.general.onstart"), onClick: () => handleChange("update.type", "On Start") },
-                                        { value: t("settings.general.everyday"), onClick: () => handleChange("update.type", "Every Day") },
-                                        { value: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
-                                    ]}
+                                    { value: t("settings.general.onstart"), onClick: () => handleChange("update.type", "On Start") },
+                                    { value: t("settings.general.everyday"), onClick: () => handleChange("update.type", "Every Day") },
+                                    { value: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
+                                ]}
                                 />
                             </div>
                         </div>
@@ -450,9 +459,9 @@ function settings() {
                             <div class="settings-setting-container">
                                 {t("settings.player.playerexitbechaviour")}
                                 <ButtonGroup selectedValue={t(`settings.player.playerbeexit.${config().new.Player.general.PlayerBehavior}`)} listValues={[
-                                        { value: t("settings.player.playerbeexit.information"), onClick: () => handleChange("Player.general.PlayerBehavior", "information") },
-                                        { value: t("settings.player.playerbeexit.home"), onClick: () => handleChange("Player.general.PlayerBehavior", "home") },
-                                    ]}
+                                    { value: t("settings.player.playerbeexit.information"), onClick: () => handleChange("Player.general.PlayerBehavior", "information") },
+                                    { value: t("settings.player.playerbeexit.home"), onClick: () => handleChange("Player.general.PlayerBehavior", "home") },
+                                ]}
                                 />
                             </div>
                             <div class="settings-line"></div>
@@ -524,10 +533,10 @@ function settings() {
                             <div class="settings-setting-container">
                                 {t("settings.upNext.upNextStyle")}
                                 <ButtonGroup selectedValue={t(`settings.upNext.${config().new.Player.upToNextEpisode.variants}`)} listValues={[
-                                        { value: t("settings.upNext.var1"), onClick: () => handleChange("Player.upToNextEpisode.variants", "var1") },
-                                        { value: t("settings.upNext.var2"), onClick: () => handleChange("Player.upToNextEpisode.variants", "var2") },
-                                        { value: t("settings.upNext.old"), onClick: () => handleChange("Player.upToNextEpisode.variants", "old") },
-                                ]}                                    
+                                    { value: t("settings.upNext.var1"), onClick: () => handleChange("Player.upToNextEpisode.variants", "var1") },
+                                    { value: t("settings.upNext.var2"), onClick: () => handleChange("Player.upToNextEpisode.variants", "var2") },
+                                    { value: t("settings.upNext.old"), onClick: () => handleChange("Player.upToNextEpisode.variants", "old") },
+                                ]}
                                 />
                             </div>
                         </div>
@@ -646,20 +655,22 @@ function settings() {
                             <div class="settings-setting-container">
                                 {t("settings.player.type")}
                                 <ButtonGroup selectedValue={t(`settings.player.${config().new.Player.screenShot.saveType.toLowerCase()}`)} listValues={[
-                                        { value: t("settings.player.file"), onClick: () => handleChange("Player.screenShot.saveType", "File") },
-                                        { value: t("settings.player.clipboard"), onClick: () => handleChange("Player.screenShot.saveType", "Clipboard") },
-                                        { value: t("settings.player.both"), onClick: () => handleChange("Player.screenShot.saveType", "Both") },
-                                    ]}
+                                    { value: t("settings.player.file"), onClick: () => handleChange("Player.screenShot.saveType", "File") },
+                                    { value: t("settings.player.clipboard"), onClick: () => handleChange("Player.screenShot.saveType", "Clipboard") },
+                                    { value: t("settings.player.both"), onClick: () => handleChange("Player.screenShot.saveType", "Both") },
+                                ]}
                                 />
                             </div>
-                            <div class="settings-line"></div>
-                            <div class="settings-setting-container">
-                                <div class="settings-mini-container">
-                                    {t("settings.player.path")}
-                                    <span class="settings-text-space">{config().new.Player.screenShot.path}</span>
+                            <Show when={window.api}>
+                                <div class="settings-line"></div>
+                                <div class="settings-setting-container">
+                                    <div class="settings-mini-container">
+                                        {t("settings.player.path")}
+                                        <span class="settings-text-space">{config().new.Player.screenShot.path}</span>
+                                    </div>
+                                    <Button content={t("settings.player.changelocaton")} onClick={async () => await ChangeScreenshot(await window.api.os.openDialog(undefined, undefined, ["openDirectory"]))} />
                                 </div>
-                                <Button content={t("settings.player.changelocaton")} onClick={async () => await ChangeScreenshot(await window.api.os.openDialog(undefined, undefined, ["openDirectory"]))} />
-                            </div>
+                            </Show>
                         </div>
                         <div class="settings-page-container">
                             <div class="settings-page-title">{t("settings.player.keybind")}</div>
@@ -847,7 +858,7 @@ function settings() {
                             <div class="settings-setting-container">
                                 Dialog Test
                                 <span class="settings-custom-space">
-                                    <Button content="error" onClick={() => 
+                                    <Button content="error" onClick={() =>
                                         showDialog({
                                             type: "error",
                                             title: "Error in Player",
@@ -858,7 +869,7 @@ function settings() {
                                             }]
                                         })
                                     } />
-                                    <Button content="info" onClick={() => 
+                                    <Button content="info" onClick={() =>
                                         showDialog({
                                             type: "info",
                                             title: "Info in Player",
@@ -928,9 +939,9 @@ function settings() {
                         <div class="settings-page-container">
                             <div class="settings-page-title">{t("settings.general.links")}</div>
                             <div class="settings-special-container">
-                                <img class="settings-special-images" onClick={() => window.api.open("https://github.com/Owca525/animu")} src="https://github.com/fluidicon.png" alt="Github Logo" />
+                                <img class="settings-special-images" onClick={() => openUrlFolder("https://github.com/Owca525/animu")} src="https://github.com/fluidicon.png" alt="Github Logo" />
                                 <img class="settings-special-images" onClick={discord_server} src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg" alt="Discord Logo" />
-                                <img class="settings-special-images" onClick={() => window.api.open("https://buymeacoffee.com/owca525")} src="https://studio.buymeacoffee.com/assets/img/bmc-meta-new/new/android-icon-192x192.png" alt="Buymeacoffee logo" />
+                                <img class="settings-special-images" onClick={() => openUrlFolder("https://buymeacoffee.com/owca525")} src="https://studio.buymeacoffee.com/assets/img/bmc-meta-new/new/android-icon-192x192.png" alt="Buymeacoffee logo" />
                             </div>
                         </div>
                         <div class="settings-page-container">

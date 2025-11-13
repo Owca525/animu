@@ -59,28 +59,42 @@ ipcMain.handle('send-post', async (_event, url: string, header: Record<string, s
 }
 )
 
-ipcMain.handle('advanceRequest', async (_, url: string, options?: { method: "POST" | "GET", headers: { [key: string]: string } }) => {
+ipcMain.handle('advanceRequest', async (_, url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string } }) => {
     try {
         const response = await fetch(url, options);
-        if (!response.ok) return { text: "", buffer: [], status: response.status, statusText: response.statusText, url: response.url, success: response.ok }
-        let cloned = response.clone()
+        if (!response.ok) return { text: "", buffer: [], status: response.status, statusText: response.statusText, url: response.url, success: response.ok, json: undefined, responseHeader: response.headers }
+        let bufferCloned = response.clone()
+        let jsontext;
+        let text = "";
+
+        try {
+            jsontext = await response.json()
+        } catch (error) {}
+        try {
+            text = await response.text()
+        } catch (error) {}
+
         return {
-            text: await response.text(),
-            buffer: Buffer.from(await cloned.arrayBuffer()),
+            text: text,
+            json: jsontext,
+            buffer: Buffer.from(await bufferCloned.arrayBuffer()),
             status: response.status,
             statusText: response.statusText,
             url: response.url,
-            success: response.ok
+            success: response.ok,
+            responseHeader: response.headers
         };
     } catch (error) {
         console.error(`Error in advanceRequest: ${(error as Error).message} ${(error as Error).name} ${(error as Error).cause} \n ${(error as Error).stack}`)
         return {
             text: (error as Error).message,
+            json: undefined,
             buffer: Buffer.from(""),
             status: 500,
             statusText: "Backend Error",
             url: url,
-            success: false
+            success: false,
+            responseHeader: {}
         }
     }
 });

@@ -38,7 +38,7 @@ declare global {
           statusText: string;
           error?: unknown;
         }>;
-        advanceRequest: (url: string, options?: { method: "POST" | "GET", headers?: { [key: string]: string } }) => Promise<{ text: string, buffer: Buffer, status: number, statusText: string, url: string, success: boolean }>
+        advanceRequest: (url: string, options?: { method?: "POST" | "GET", header?: Record<string, string> }) => Promise<{ text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: { [key: string]: string } }>
       };
       rpc: {
         setActivity: (

@@ -22,20 +22,22 @@ import { getGlobalCache, setGlobalHistory, setIncognitoMode } from './utils/stor
 import i18n from './utils/i18n';
 import { getPlayerPLugin } from './utils/stores/plugins';
 import LocalErrorBoundary from './utils/ErrorBoundary';
+import { defaultConfigWeb } from './utils/FilesManager/config';
 
 function App() {
   const [isInitation, setInitation] = createSignal<boolean>(true)
 
-  createShortcut(["F12"], () => {
-    if (getConfig().Developer.DevTools) window.BrowserWindow.openDevTools()
-  })
-
-  createShortcut(["Control", "Shift", "R"], async () => {
-    if (getConfig().Developer.DeveloperMode) {
-      await changeTheme(getConfig().General.theme)
-      toast.success("Reloaded Theme")
-    }
-  })
+  if (window.api) {
+    createShortcut(["F12"], () => {
+      if (getConfig().Developer.DevTools) window.BrowserWindow.openDevTools()
+    })
+    createShortcut(["Control", "Shift", "R"], async () => {
+      if (getConfig().Developer.DeveloperMode) {
+        await changeTheme(getConfig().General.theme)
+        toast.success("Reloaded Theme")
+      }
+    })
+  }
 
   createShortcut(["Control", "I"], () => {
     setIncognitoMode(!getGlobalCache().incognito)
@@ -49,12 +51,22 @@ function App() {
   })
 
   onMount(async () => {
-    setConfig(await window.api.getConfig())
-    setGlobalHistory(await window.api.getHistory())
+    if (window.api) {
+      setConfig(await window.api.getConfig())
+      setGlobalHistory(await window.api.getHistory())
+    } else {
+      if (!localStorage.getItem("config")) localStorage.setItem("config", JSON.stringify(defaultConfigWeb))
+      if (!localStorage.getItem("history")) localStorage.setItem("history", JSON.stringify([]))
+      if (!localStorage.getItem("continueWatch")) localStorage.setItem("continueWatch", JSON.stringify([]))
+      setConfig(JSON.parse(localStorage.getItem("config") as any))
+      setGlobalHistory({ continue: JSON.parse(localStorage.getItem("continueWatch") as any), history: JSON.parse(localStorage.getItem("history") as any) })
+    }
     InitialPlugin()
     LoadConfig()
     setInitation(false)
-    runCheckUpdate()
+    if (window.api) {
+      runCheckUpdate()
+    }
   })
 
   return (
@@ -82,6 +94,7 @@ async function runCheckUpdate() {
 }
 
 async function LoadConfig() {
+  if (!window.api) return
   const loadedConnfig = getConfig()
 
   // Loading theme

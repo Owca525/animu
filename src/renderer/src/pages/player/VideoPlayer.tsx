@@ -1,7 +1,7 @@
 import Hls from "hls.js"
 
 import { AnimeData, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
-import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory, toSeconds, updateObjectConfig } from "@renderer/utils/functions"
+import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory, request, toggleFullscreen, toSeconds, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
@@ -172,7 +172,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         handleVolume(PlayerVolume, true)
         handleMouseMove()
         if (config.Player.general.AutoFullscreen) {
-            window.BrowserWindow.setFullscreen(true)
+            toggleFullscreen(true)
             setIsFullscreen(true)
         }
         if (videoRef) {
@@ -183,11 +183,14 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     // player Functions
     async function enterFullscreen() {
-        if (await window.BrowserWindow.isFullscreen()) {
-            window.BrowserWindow.setFullscreen(false)
+        if (window.api && await window.BrowserWindow.isFullscreen()) {
+            toggleFullscreen(false)
+            setIsFullscreen(false)
+        } else if (document.fullscreenElement) {
+            toggleFullscreen(false)
             setIsFullscreen(false)
         } else {
-            window.BrowserWindow.setFullscreen(true)
+            toggleFullscreen(true)
             setIsFullscreen(true)
         }
     }
@@ -296,7 +299,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             startLevel: 2,
             loader: class extends Hls.DefaultConfig.loader {
                 load(context: any, config: any, callbacks: any) {
-                    window.api.request.advanceRequest(context.url, { method: "GET", headers: header }).then((data) => {
+                    request(context.url, { method: "GET", headers: header }).then((data) => {
                         let currentData: any = data.text
                         if (!data.success) {
                             callbacks.onError({ type: 'network', details: "Failed Requestc", fatal: true }, context)
@@ -420,7 +423,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (document.pictureInPictureElement) {
             await document.exitPictureInPicture();
         }
-        window.BrowserWindow.setFullscreen(false)
+        toggleFullscreen(false)
         exitFromPlayer()
     }
 
@@ -518,7 +521,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }
 
         // Update RPC
-        if (config.General.discordRPC) window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`)
+        if (config.General.discordRPC && window.api) window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`)
         if (config.Player.general.AutoSkipEpisode && event.currentTarget.duration == event.currentTarget.currentTime) setEpisode("next")
     }
 
@@ -682,10 +685,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             return
         }
 
-        let data = await window.api.request.get(sub.url, { "User-Agent": navigator.userAgent }, "text")
+        let data = await request(sub.url)
         if (!data.success) return
 
-        const vtt = await convert(data.data, ".vtt", { removeTextFormatting: true });
+        const vtt = await convert(data.text, ".vtt", { removeTextFormatting: true });
         const blob = new Blob([vtt.subtitle], { type: "text/vtt" });
         setVttUrl(URL.createObjectURL(blob));
         setSubtitles(() => sub)
@@ -824,6 +827,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             if (config.Player.screenShot.saveType == "Clipboard") return
         }
 
+        if (!window.api) return
+
         if (config.Player.screenShot.alwaysAsk) var resp = await window.api.os.saveDialog(`${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot.replace(/^data:image\/png;base64,/, ''), `screenshot${formatedDate}.png`, "png", ["PNG"], "base64")
         else var resp = await window.api.os.write(`${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot.replace(/^data:image\/png;base64,/, ''), "base64")
         if (resp) {
@@ -870,9 +875,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     }
 
     async function VTTstoryBoardParser(url: string) {
-        let data = await window.api.request.get(url, { "User-Agent": navigator.userAgent }, "text")
+        let data = await request(url)
         if (!data.success) return
-        const lines = data.data.split("\n").map((l: string) => l.trim());
+        const lines = data.text.split("\n").map((l: string) => l.trim());
         let thumbnails: Thumbnail = { src: "", metadata: [] };
         const src: string = url.slice(0, url.lastIndexOf("/") + 1)
         let metadata: { start: number; end: number; imgX: number; imgY: number; }[] = []
