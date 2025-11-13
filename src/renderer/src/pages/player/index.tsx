@@ -70,13 +70,13 @@ const player = () => {
         updateHistory()
     }
 
-    function updateHistory() {
+    function updateHistory(mount?: boolean) {
         if (!anime_data || !anime_data.data) return
         console.log("SAVE HISTORY", anime_data.save?.pluginName ? anime_data.save.pluginName : "")
         SaveToFile({
             saveData: {
                 pluginName: anime_data.save?.pluginName ? anime_data.save.pluginName : "",
-                last_Time: 0,
+                last_Time: mount ? anime_data.save?.last_time : 0,
                 type: extractionData().type,
                 episode: extractionData().actual.toString()
             },
@@ -97,7 +97,7 @@ const player = () => {
     })
 
     onMount(() => {
-        updateHistory()
+        updateHistory(true)
     })
 
     function showErrorDialog() {
