@@ -1,9 +1,86 @@
-import { genYearsList, request } from "@renderer/utils/functions";
+import { genYearsList, getWeek, request } from "@renderer/utils/functions";
 import { cardData, containerData, genresSearchFormat, newInformationPluginFormat } from "@renderer/utils/types";
 import { t } from "i18next";
 import { unwrap } from "solid-js/store";
 
 const pageSize = 20
+
+const animeData = `
+      id
+      title {
+        english
+        romaji
+        native
+      }
+      coverImage {
+        extraLarge
+        large
+      }
+      startDate {
+        year
+        month
+        day
+      }
+      endDate {
+        year
+        month
+        day
+      }
+      bannerImage
+      season
+      seasonYear
+      description
+      type
+      format
+      status(version: 2)
+      episodes
+      duration
+      genres
+      source
+      averageScore
+      trailer {
+        id
+        site
+      }
+      nextAiringEpisode {
+        airingAt
+        timeUntilAiring
+        episode
+      }
+      characters(perPage: 10) {
+        edges {
+          role
+          node {
+            id
+            name {
+              full
+            }
+            image {
+              large
+            }
+          }
+          voiceActors(language: JAPANESE) {
+            id
+            name {
+              full
+            }
+            language
+            image {
+              large
+            }
+          }
+        }
+      }
+      studios(isMain: true) {
+        edges {
+          isMain
+          node {
+            id
+            name
+          }
+        }
+      }
+`
 
 const graphicApi = `
 query(
@@ -79,85 +156,27 @@ query(
       sort: $sort,
       isAdult: $isAdult
     ) {
-      id
-      title {
-        english
-        romaji
-        native
-      }
-      coverImage {
-        extraLarge
-        large
-      }
-      startDate {
-        year
-        month
-        day
-      }
-      endDate {
-        year
-        month
-        day
-      }
-      bannerImage
-      season
-      seasonYear
-      description
-      type
-      format
-      status(version: 2)
-      episodes
-      duration
-      genres
-      source
-      averageScore
-      trailer {
-        id
-        site
-      }
-      nextAiringEpisode {
-        airingAt
-        timeUntilAiring
-        episode
-      }
-      characters(perPage: 10) {
-        edges {
-          role
-          node {
-            id
-            name {
-              full
-            }
-            image {
-              large
-            }
-          }
-          voiceActors(language: JAPANESE) {
-            id
-            name {
-              full
-            }
-            language
-            image {
-              large
-            }
-          }
-        }
-      }
-      studios(isMain: true) {
-        edges {
-          isMain
-          node {
-            id
-            name
-          }
-        }
-      }
+      ${animeData}
     }
   }
 }
 `;
 
+const graphicAiringAnime = `
+query AiringAnimes($page: Int, $perPage: Int, $sort: [AiringSort], $airingAtGreater: Int, $airingAtLesser: Int) {
+    Page(page: $page, perPage: $perPage) {
+        airingSchedules(sort: $sort, airingAt_greater: $airingAtGreater, airingAt_lesser: $airingAtLesser) {
+        id
+        airingAt
+        episode
+
+        media {
+          ${animeData}
+        }
+      }
+    }
+}
+`
 
 const graphicHomeApi = `
   query (
@@ -182,63 +201,7 @@ const graphicHomeApi = `
   }
 
   fragment media on Media {
-    id
-    title { english romaji native }
-    coverImage { extraLarge large }
-    startDate { year month day }
-    endDate { year month day }
-    bannerImage
-    season
-    seasonYear
-    description
-    type
-    format
-    source
-    status(version: 2)
-    episodes
-    duration
-    genres
-    averageScore
-    popularity
-    trailer {
-      id
-      site
-    }
-    nextAiringEpisode {
-      airingAt
-      timeUntilAiring
-      episode
-    }
-    characters(perPage: 10) {
-      edges {
-        role
-        node {
-          id
-          name {
-            full
-          }
-          image {
-            large
-          }
-        }
-        voiceActors(language: JAPANESE) {
-          id
-          name {
-            full
-          }
-          language
-          image {
-            large
-          }
-        }
-      }
-    }
-    studios(isMain: true) {
-      edges {
-        isMain
-        node { id name }
-      }
-    }
+    ${animeData}
   }
 `;
 
@@ -247,63 +210,7 @@ query(
   $id: Int!
 ) {
   Media(id: $id, type: ANIME) {
-    id
-    title { english romaji native }
-    coverImage { extraLarge large }
-    startDate { year month day }
-    endDate { year month day }
-    bannerImage
-    season
-    seasonYear
-    description
-    type
-    format
-    source
-    status(version: 2)
-    episodes
-    duration
-    genres
-    averageScore
-    popularity
-    trailer {
-      id
-      site
-    }
-    nextAiringEpisode {
-      airingAt
-      timeUntilAiring
-      episode
-    }
-    characters(perPage: 10) {
-      edges {
-        role
-        node {
-          id
-          name {
-            full
-          }
-          image {
-            large
-          }
-        }
-        voiceActors(language: JAPANESE) {
-          id
-          name {
-            full
-          }
-          language
-          image {
-            large
-          }
-        }
-      }
-    }
-    studios(isMain: true) {
-      edges {
-        isMain
-        node { id name }
-      }
-    }
+    ${animeData}
   }
 }
 `;
@@ -356,11 +263,11 @@ function Convert(convert: any): cardData {
 // WHY THE FUCK THIS DOESN'T WORK IF I CALL window.api.request.post IN CreateHomePage
 // Jeśli api anilist jest offline to daje "Forbidden" w statusText i error 403 request 
 async function sendPost(variable: any, query: any) {
-  return await request("https://graphql.anilist.co",  { method: "POST", headers: header, body: JSON.stringify({ query: query, variables: variable }) } as any)
+  return await request("https://graphql.anilist.co", { method: "POST", headers: header, body: JSON.stringify({ query: query, variables: variable }) } as any)
 }
 
 async function sendToApi(variable: any, query: any): Promise<cardData[]> {
-  let data = await request("https://graphql.anilist.co",  { method: "POST", headers: header, body: JSON.stringify({ query: query, variables: variable }) } as any)
+  let data = await request("https://graphql.anilist.co", { method: "POST", headers: header, body: JSON.stringify({ query: query, variables: variable }) } as any)
   if (data.success && data.json) {
     return data.json.data.Page.media.map((data) => Convert(data))
   }
@@ -406,6 +313,20 @@ export default class AnilistApi implements newInformationPluginFormat {
       statuses: ["Releasing", "Finished", "Not Yet Released", "Cancelled"]
     }
   };
+  // async schedule(context: { airingStart: number; airingEnd: number; }, callbacks: { onSuccess: (data: containerData) => void; onError: (error: string) => void; }) {
+  //   let week = getWeek()
+  //   console.log(week)
+  //   let variables = {
+  //     page: 1,
+  //     perPage: 50,
+  //     sort: ["TIME"],
+  //     airingAtGreater: week.startWeekUnix,
+  //     airingAtLesser: week.endWeekUnix
+  //   }
+
+  //   console.log(await sendPost(variables, graphicAiringAnime))
+  // }
+
   async search(context: { name: string; page: number; params?: genresSearchFormat; }, callbacks: { onSuccess: (data: containerData) => void; onError: (error: string) => void; }) {
     try {
       let variables: any = {

@@ -371,23 +371,24 @@ export async function request(url: string, options?: { method?: "POST" | "GET", 
     try {
         if (window.api) return await window.api.request.advanceRequest(url, options)
 
-        let response = await fetch("/api/request", {
+        const response = await fetch("/api/request", {
             method: "POST",
             body: JSON.stringify({
                 requestOptions: options
             })
         })
+        const respTextClone = response.clone()
+        let text = "";
+        try {
+            text = await respTextClone.text()
+        } catch (error) {}
 
-        if (!response.ok) return { text: "", buffer: [] as any, status: response.status, statusText: response.statusText, url: response.url, success: response.ok, json: undefined, responseHeader: response.headers as any }
+        if (!response.ok) return { text: text, buffer: [] as any, status: response.status, statusText: response.statusText, url: response.url, success: response.ok, json: undefined, responseHeader: response.headers as any }
         let bufferCloned = response.clone()
         let jsontext;
-        let text = "";
 
         try {
             jsontext = await response.json()
-        } catch (error) {}
-        try {
-            text = await response.text()
         } catch (error) {}
 
         return {
@@ -439,4 +440,19 @@ export function toggleFullscreen(toggle: boolean = false) {
     if (window.api) return window.BrowserWindow.setFullscreen(toggle)
     if (toggle) document.documentElement.requestFullscreen();
     else document.exitFullscreen();
+}
+
+export function getWeek(): { startWeekUnix: number, endWeekUnix: number, startWeekDay: number, endWeekDay: number, month: number } {
+    let today = new Date()
+    let startWeek = new Date()
+    let endWeek = new Date()
+    startWeek.setDate(today.getDate() - today.getDay())
+    endWeek.setDate(startWeek.getDate() + 7)
+    return {
+        startWeekUnix: Math.floor(startWeek.getTime() / 1000),
+        endWeekUnix: Math.floor(endWeek.getTime() / 1000),
+        startWeekDay: startWeek.getDate(),
+        endWeekDay: endWeek.getDate(),
+        month: today.getMonth()
+    }
 }

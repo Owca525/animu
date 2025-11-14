@@ -17,6 +17,16 @@ export class informationPluginManager implements informationPluginManagerFormat 
             }
         });
     };
+    // schedule = (airingStart?: number, airingEnd?: number): void => {
+    //     this.currentPlugin.schedule({ airingStart, airingEnd }, {
+    //         onSuccess: function (data: containerData): void {
+    //             throw new Error("Function not implemented.");
+    //         },
+    //         onError: function (error: string): void {
+    //             throw new Error("Function not implemented.");
+    //         }
+    //     })
+    // }
     home = () => {
         setAllHomeData({ data: { sections: [] }, isLoading: true, isError: false, } as any)
         this.currentPlugin.home({

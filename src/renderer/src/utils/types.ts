@@ -211,6 +211,10 @@ export interface newInformationPluginFormat {
     anime(
         context: { id: string },
     ): Promise<AnimeData | undefined>
+    // schedule(
+    //     context: { airingStart?: number, airingEnd?: number },
+    //     callbacks: { onSuccess: (data: containerData) => void, onError: (error: string) => void }
+    // )
     onTitleClick(content: any, callbacks: { onSuccess: (data: containerData) => void, onError: (error: string) => void }): Promise<void>
 }
 
@@ -220,6 +224,7 @@ export interface informationPluginManagerFormat {
     home(): void
     anime(id: string): Promise<AnimeData | undefined>
     onTitleClick(content: any): void
+    // schedule(airingStart?: number, airingEnd?: number): void
 }
 
 export type genres = { genres: string[], seasons: string[], years: string[], format: string[], statuses: string[] }

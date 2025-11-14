@@ -62,16 +62,17 @@ ipcMain.handle('send-post', async (_event, url: string, header: Record<string, s
 ipcMain.handle('advanceRequest', async (_, url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string } }) => {
     try {
         const response = await fetch(url, options);
-        if (!response.ok) return { text: "", buffer: [], status: response.status, statusText: response.statusText, url: response.url, success: response.ok, json: undefined, responseHeader: response.headers }
+        const respTextClone = response.clone()
+        let text = "";
+        try {
+            text = await respTextClone.text()
+        } catch (error) {}
+        if (!response.ok) return { text: text, buffer: [], status: response.status, statusText: response.statusText, url: response.url, success: response.ok, json: undefined, responseHeader: response.headers }
         let bufferCloned = response.clone()
         let jsontext;
-        let text = "";
 
         try {
             jsontext = await response.json()
-        } catch (error) {}
-        try {
-            text = await response.text()
         } catch (error) {}
 
         return {
