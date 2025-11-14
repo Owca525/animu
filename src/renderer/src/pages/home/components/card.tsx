@@ -57,8 +57,8 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
       const episodeList = await currentPLugin.player.extractOnlyEpisodesList(card.saveData.type, card.AnimeData.player_ID as string);
 
       localStorage.setItem("playerCache", JSON.stringify({
-        data: JSON.parse(JSON.stringify(card.AnimeData)),
-        save: JSON.parse(JSON.stringify(card.saveData)),
+        data: (card.AnimeData),
+        save: (card.saveData),
         episodelist: episodeList,
       }))
 

@@ -7,6 +7,7 @@ import { getHomeCache, setAllHomeData } from "./stores/home";
 import { getGlobalCache } from "./stores/global";
 import { getConfig } from "./stores/config";
 import { getPluginList } from "./stores/plugins";
+import { unwrap } from "solid-js/store";
 
 export function decodeHtmlEntities(str: string) {
     const parser = new DOMParser();
@@ -152,8 +153,8 @@ export async function refetchHistory() {
     if (!data.data) return
     if (data.data.sections.length > 2) return
     if (data.data.sections.length <= 0) return
-    let history: cardData[] = JSON.parse(JSON.stringify(getGlobalCache().history.history))
-    let continueWatch: cardData[] = JSON.parse(JSON.stringify(getGlobalCache().history.continue))
+    let history: cardData[] = unwrap(getGlobalCache().history.history)
+    let continueWatch: cardData[] = unwrap(getGlobalCache().history.continue)
     if (data.data.sections.length == 1 && data.data.sections[0].title == t("global.continuewatch")) {
         setAllHomeData({ data: { sections: [{ title: t("global.continuewatch"), data: continueWatch, horizontal: false }] } } as any)
         return

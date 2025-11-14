@@ -24,10 +24,11 @@ import { getConfig, setConfig } from "@renderer/utils/stores/config";
 import { getPluginList } from "@renderer/utils/stores/plugins";
 import { createEffect, createSignal, onCleanup, onMount, Show } from "solid-js";
 import { createShortcut } from "@solid-primitives/keyboard";
+import { unwrap } from "solid-js/store";
 
 function settings() {
     const navigate = useNavigate();
-    const cfg: SettingsConfig = JSON.parse(JSON.stringify(getConfig()));
+    const cfg: SettingsConfig = unwrap(getConfig());
     const pluginList: playerPluginFormat[] = getPluginList();
     const [category, setCategory] = createSignal<string>("general");
     const [config, setNewConfig] = createSignal<{ old: SettingsConfig, new: SettingsConfig }>({ old: structuredClone(cfg), new: structuredClone(cfg) })

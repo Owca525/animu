@@ -21,6 +21,7 @@ import { getHomeCache, setAllHomeData, setHomeLocalSearch, setHomeSearch, setHom
 import { getConfig } from "@renderer/utils/stores/config";
 import { createEffect, createSignal, For, Match, onMount, Show, Switch } from "solid-js";
 import { getGlobalCache } from "@renderer/utils/stores/global";
+import { unwrap } from "solid-js/store";
 // import { createShortcut } from "@solid-primitives/keyboard";
 // import WelcomeScreen from "./components/welcomeScreen"
 
@@ -65,7 +66,7 @@ const Home = () => {
 
   onMount(() => {
     if (homeCache().data.sections.length <= 0) plugin.home()
-    const config: SettingsConfig = JSON.parse(JSON.stringify(getConfig()));
+    const config: SettingsConfig = unwrap(getConfig());
     console.log(config)
     if (config.General.discordRPC && window.api)
       window.api.rpc.setActivity(undefined, t("discordrpc.home"));
@@ -86,7 +87,7 @@ const Home = () => {
 
   function history() {
     setHomeLocalSearch(true);
-    let history = JSON.parse(JSON.stringify(getGlobalCache().history))
+    let history = unwrap(getGlobalCache().history)
     let historyCache = history.continue.reverse().slice(0, 20)
     let continueWatchCache = history.history.reverse().slice(0, 20)
 

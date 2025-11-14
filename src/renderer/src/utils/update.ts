@@ -2,6 +2,7 @@ import toast from "solid-toast";
 import { saveConfig } from "./FilesManager/config";
 import { t } from "i18next";
 import { getConfig } from "./stores/config";
+import { unwrap } from "solid-js/store";
 
 export async function checkUpdate(alwaysShow: boolean = false) {
   try {
@@ -23,7 +24,7 @@ export async function checkUpdate(alwaysShow: boolean = false) {
       toast.success(t("update.same"));
     }
 
-    const config = JSON.parse(JSON.stringify(getConfig()));
+    const config = unwrap(getConfig());
     config.update.lastTime = new Date().toString();
     saveConfig(config);
   } catch (error) {

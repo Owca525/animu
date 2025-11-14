@@ -16,6 +16,7 @@ import { getPlayerPLugin } from "@renderer/utils/stores/plugins";
 import toast from "solid-toast";
 import CharacterCards from "./components/characterCard";
 import { createShortcut } from "@solid-primitives/keyboard";
+import { unwrap } from "solid-js/store";
 
 function information() {
     const navigate = useNavigate();
@@ -108,18 +109,18 @@ function information() {
     onCleanup(() => clearInterval(intervalId))
 
     function enterPlayer(episodes: { ep: string, img?: string, title?: string }[], type: string, episode: string) {
-        let tmp = JSON.parse(JSON.stringify(tempData()))
+        let tmp = unwrap(tempData())
         let lastTime = 0
         if (tmp.saveData && tmp.saveData.episode.toString() === episode) lastTime = tmp.saveData.last_Time
         localStorage.setItem("playerCache", JSON.stringify({
             data: {
                 ...tmp.anime,
-                player_ID: currentIDplayer() ? JSON.parse(JSON.stringify(currentIDplayer())) : episodeResponse.data?.player_id
+                player_ID: currentIDplayer() ? unwrap(currentIDplayer()) : episodeResponse.data?.player_id
             },
             save: {
                 last_Time: lastTime,
                 type: type,
-                pluginName: currentIDplayer() ? JSON.parse(JSON.stringify(currentIDplayer())) : episodeResponse.data?.player_id,
+                pluginName: currentIDplayer() ? unwrap(currentIDplayer()) : episodeResponse.data?.player_id,
                 episode: episode
             },
             episodelist: episodes,
