@@ -146,6 +146,20 @@
       "background": "背景角色"
     }
   },
+  "externalPlayer": {
+    "running": "正在執行 {{player}}",
+    "episodes": "集數",
+    "chromeCast": {
+      "disconnected": "已中斷連線",
+      "search": "搜尋中..."
+    },
+    "failed": {
+      "movian": "無法執行 Movian",
+      "chromecast": "ChromeCast 不支援 m3u8 格式",
+      "player": "找不到播放器",
+      "resolution": "找不到解析度"
+    }
+  },
   "settings": {
     "turnDeveloper": "開啟開發者工具",
     "general": {
@@ -231,20 +245,6 @@
       "dskipanimation": "停用跳過動畫",
       "dspaceanimation": "停用空白鍵動畫",
       "dvolumeanimation": "停用音量動畫"
-    },
-    "externalPlayer": {
-      "running": "正在執行 {{player}}",
-      "episodes": "集數",
-      "chromeCast": {
-        "disconnected": "已中斷連線",
-        "search": "搜尋中..."
-      },
-      "failed": {
-        "movian": "無法執行 Movian",
-        "chromecast": "ChromeCast 不支援 m3u8 格式",
-        "player": "找不到播放器",
-        "resolution": "找不到解析度"
-      }
     },
     "history": {
       "limited": "限制保存歷史紀錄",

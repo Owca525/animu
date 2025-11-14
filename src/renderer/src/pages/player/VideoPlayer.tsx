@@ -44,10 +44,10 @@ function addTime(durration: number): string {
     return `${hours}:${minutes}`;
 }
 
-async function fetchData(tmpData: { episode: string, id?: string, type: string, playerData: playerData }, func: (episode: string, type: string, playerData: playerData, customData?: any, id?: string) => Promise<playerData | undefined>): Promise<{ succes: boolean, data: playerData | undefined }> {
+async function fetchData(tmpData: { episode: string, id?: string, type: string, playerData: playerData }, func: (episode: string, type: string, playerData: playerData, id?: string) => Promise<playerData | undefined>): Promise<{ succes: boolean, data: playerData | undefined }> {
     try {
         console.log(tmpData)
-        let data = await func(tmpData.episode, tmpData.type, tmpData.playerData, undefined, tmpData.id)
+        let data = await func(tmpData.episode, tmpData.type, tmpData.playerData, tmpData.id)
         return {
             succes: true,
             data: data
@@ -765,10 +765,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     }
 
     function toggleSubtitles(): any {
-        if (ListSubtitles.length <= 0) return
+        if (ListSubtitles().length <= 0) return
         if (currentSubtitles() && currentSubtitles()!.label != "Off") {
             setlastSubtitles(() => currentSubtitles())
-            setNewSubtitles(ListSubtitles[0])
+            setNewSubtitles(ListSubtitles()[0])
             return
         }
         if (lastSubtitles()) setNewSubtitles(lastSubtitles()!)

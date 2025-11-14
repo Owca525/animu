@@ -1,13 +1,12 @@
 
 // import { useQuery } from "react-query";
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
-import { AnimeData, SettingsConfig } from "@renderer/utils/types";
+import { AnimeData, playerData, SettingsConfig } from "@renderer/utils/types";
 import { t } from "i18next";
 
 import "./player.css"
 import { detectTitle, refetchHistory } from "@renderer/utils/functions";
 import Button from "@renderer/components/buttons";
-// import ExternalPlayer from "./externalPlayer";
 
 import VideoPlayer from "./VideoPlayer";
 import { SaveToFile } from "@renderer/utils/FilesManager/readFiles";
@@ -17,6 +16,7 @@ import { getConfig } from "@renderer/utils/stores/config";
 import { createSignal, Match, onMount, Switch } from "solid-js";
 import { useQuery } from "@tanstack/solid-query";
 import { createShortcut } from "@solid-primitives/keyboard";
+import ExternalPlayer from "./externalPlayer";
 
 const player = () => {
     const anime_data = JSON.parse(localStorage.getItem("playerCache") as any)
@@ -45,7 +45,7 @@ const player = () => {
         episodelist: anime_data.episodelist,
         time: anime_data.save.last_Time
     })
-    // const [externalPlayerType, setexternalPlayerType] = createSignal<"Movian" | "VLC" | "Mpv" | "ChromeCast">(config.Player.external.type)
+    const [externalPlayerType, setexternalPlayerType] = createSignal<"Movian" | "VLC" | "Mpv" | "ChromeCast">(config.Player.external.type)
 
     const response = useQuery(() => ({
         queryKey: [anime_data.data?.player_ID, extractionData().actual],
@@ -132,23 +132,6 @@ const player = () => {
         else navigate("/info", { state: { anime: anime_data.data, saveData: anime_data.save } })
     }
 
-    // // External Player
-    // if (response.data && response.isLoading == false && config.Player.external.enable) {
-    //     return (
-    //         <ExternalPlayer
-    //             animeData={{
-    //                 AnimeData: anime_data.data,
-    //                 saveData: anime_data.save
-    //             }}
-    //             playerData={response.data}
-    //             time={extractionData().time}
-    //             setNextEpisode={setNewEpisode}
-    //             now_episodes={{ episode: extractionData().actual, type: extractionData().type, episodes: extractionData().episodelist }}
-    //             externalPlayerData={{ onChage: (data) => setexternalPlayerType(data), current: externalPlayerType }}
-    //         />
-    //     )
-    // }
-
     return (
         <Switch fallback={showErrorDialog()}>
             <Match when={response.isError || response.isLoading == false && response.data && response.data.length <= 0}>
@@ -156,6 +139,19 @@ const player = () => {
             </Match>
             <Match when={response.isLoading && response.isError == false}>
                 {loadingAnimation(leave, { data: anime_data?.data as any, ep: extractionData().actual }, extractionData())}
+            </Match>
+            <Match when={response.data && response.isLoading == false && response.isError == false && config.Player.external.enable}>
+                <ExternalPlayer
+                    animeData={{
+                        AnimeData: anime_data.data,
+                        saveData: anime_data.save
+                    }}
+                    playerData={response.data as playerData[]}
+                    time={extractionData().time}
+                    setNextEpisode={setNewEpisode}
+                    now_episodes={{ episode: extractionData().actual, type: extractionData().type, episodes: extractionData().episodelist }}
+                    externalPlayerData={{ onChage: (data) => setexternalPlayerType(data), current: externalPlayerType() }}
+                />
             </Match>
             <Match when={response.data && response.isLoading == false && response.isError == false}>
                 <VideoPlayer

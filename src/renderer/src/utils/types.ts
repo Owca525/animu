@@ -90,7 +90,7 @@ export interface playerData {
     listChapters?: playerChapterList[]
     subtitles?: playerSubtitlesFormat[]
     external?: externalPlayerFormat
-    extractResolution?: (episode: string, type: string, playerData: playerData, customData?: any, id?: string) => Promise<playerData | undefined>
+    extractResolution?: (episode: string, type: string, playerData: playerData, id?: string) => Promise<playerData | undefined>
 }
 
 export interface resolutionFormat {
@@ -100,6 +100,7 @@ export interface resolutionFormat {
     reqHeader?: { [key: string]: string },
     doNotUseBackend?: boolean
     defaultSubtitles?: boolean;
+    isDubbing: () => Promise<resolutionFormat | undefined>
 }
 
 export interface externalPlayerFormat {

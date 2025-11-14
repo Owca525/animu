@@ -145,6 +145,20 @@
       "background": "Tło"
     }
   },
+  "externalPlayer": {
+    "running": "Uruchomiono {{player}}",
+    "episodes": "Odcinki",
+    "chromeCast": {
+      "disconnected": "rozłączono",
+      "search": "Wyszukiwanie..."
+    },
+    "failed": {
+      "movian": "Nie udało się uruchomić Movian",
+      "chromecast": "ChromeCast nie obsługuje formatu m3u8",
+      "player": "Nie znaleziono odtwarzacza",
+      "resolution": "Nie znaleziono rozdzielczości"
+    }
+  },
   "settings": {
     "turnDeveloper": "Włącz tryb deweloperski",
     "general": {
@@ -230,20 +244,6 @@
       "dskipanimation": "Wyłącz animację przewijania",
       "dspaceanimation": "Wyłącz animację spacji",
       "dvolumeanimation": "Wyłącz animację głośności"
-    },
-    "externalPlayer": {
-      "running": "Uruchomiono {{player}}",
-      "episodes": "Odcinki",
-      "chromeCast": {
-        "disconnected": "rozłączono",
-        "search": "Wyszukiwanie..."
-      },
-      "failed": {
-        "movian": "Nie udało się uruchomić Movian",
-        "chromecast": "ChromeCast nie obsługuje formatu m3u8",
-        "player": "Nie znaleziono odtwarzacza",
-        "resolution": "Nie znaleziono rozdzielczości"
-      }
     },
     "history": {
       "limited": "Ogranicz zapis historii",

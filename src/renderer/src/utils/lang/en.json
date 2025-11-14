@@ -92,7 +92,7 @@
         "visualnovel": "Visual Novel",
         "doujinshi": "Doujinshi",
         "comic": "Comic",
-        "liveaction": "Live Action", 
+        "liveaction": "Live Action",
         "game": "Game",
         "multimediaproject": "Multimedia Project",
         "picturebook": "Picture Book",
@@ -144,6 +144,20 @@
             "main": "Main",
             "supporting": "Supporting",
             "background": "Background"
+        }
+    },
+    "externalPlayer": {
+        "running": "Running {{player}}",
+        "episodes": "Episodes",
+        "chromeCast": {
+            "disconnected": "disconnected",
+            "search": "Searching..."
+        },
+        "failed": {
+            "movian": "Failed to run Movian",
+            "chromecast": "ChromeCast Doesn't support m3u8 format",
+            "player": "Players Not Found",
+            "resolution": "Resolution not found"
         }
     },
     "settings": {
@@ -232,20 +246,6 @@
             "dspaceanimation": "Disable Space Animation",
             "dvolumeanimation": "Disable Volume Animation"
         },
-        "externalPlayer": {
-            "running": "Running {{player}}",
-            "episodes": "Episodes",
-            "chromeCast": {
-                "disconnected": "disconnected",
-                "search": "Searching..."
-            },
-            "failed": {
-                "movian": "Failed to run Movian",
-                "chromecast": "ChromeCast Doesn't support m3u8 format",
-                "player": "Players Not Found",
-                "resolution": "Resolution not found"
-            }
-        },
         "history": {
             "limited": "Limited Save History",
             "limit": "Limit For History",
@@ -293,7 +293,7 @@
             "var1": "Variant 1",
             "var2": "Variant 2",
             "old": "Variant Old",
-            "upNextStyle": "Up To Next Style Variants" 
+            "upNextStyle": "Up To Next Style Variants"
         }
     },
     "player": {
@@ -400,7 +400,7 @@
         "owca525": "Animu Creator",
         "kartq": "Helper",
         "dawoleq": "Programmer Helper",
-        "ary": "Designer", 
+        "ary": "Designer",
         "rain_kyle": "Chinese Translation",
         "akashiro": "Russian Translation",
         "talon": "For making a discord server",

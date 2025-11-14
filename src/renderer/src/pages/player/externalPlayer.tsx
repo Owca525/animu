@@ -2,15 +2,15 @@
 
 import Button from "@renderer/components/buttons"
 import "./components/css/externalPlayer.css"
-import { AnimeData, indentityPlayer, notificationProps, playerData, playerSubtitlesFormat, SettingsConfig } from "@renderer/utils/types"
+import { AnimeData, indentityPlayer, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig } from "@renderer/utils/types"
 import { detectTitle, isNumberString } from "@renderer/utils/functions"
-import { useEffect, useRef, useState } from "react"
-import { toast } from "react-toastify"
-import { useNavigate } from "react-router-dom"
-import { useSelector } from "react-redux"
 import Dropdown from "@renderer/components/dropDown"
-import { motion } from "framer-motion"
 import { t } from "i18next"
+import { Component, createEffect, createSignal, For, onMount, Show } from "solid-js"
+import { useNavigate } from "@solidjs/router"
+import { getConfig } from "@renderer/utils/stores/config"
+import toast from "solid-toast"
+import { unwrap } from "solid-js/store"
 
 interface ExternalplayerProps {
     animeData: {
@@ -30,63 +30,70 @@ function filterTextChromeCast(text: string) {
     return text.substring(0, index).replaceAll("-", " ")
 }
 
-const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes, playerData, setNextEpisode, time, externalPlayerData }) => {
+const ExternalPlayer: Component<ExternalplayerProps> = ({ animeData, now_episodes, playerData, setNextEpisode, time, externalPlayerData }) => {
     const navigate = useNavigate()
-    const config: SettingsConfig = useSelector((data: any) => data.config);
-    const [AnimeTitle, _setAnimeTitle] = useState<string>(() => detectTitle({ title: animeData.AnimeData.title, ep: now_episodes.episode, format: animeData.AnimeData.format }))
+    const config: SettingsConfig = getConfig();
+    const AnimeTitle = detectTitle({ title: animeData.AnimeData.title, ep: now_episodes.episode, format: animeData.AnimeData.format })
 
     // Player Related
-    const [resolutionList, setResolutionList] = useState<{ res: string, url: string }[]>([])
-    // const [currentHost, setCurrentHost] = useState<playerData | undefined>(undefined)
-    const currentHost = useRef<playerData | undefined>(undefined)
-    const [currentResolution, setCurrentResolution] = useState<string>(t("global.notFound"))
-    const [currentUrl, setCurrentUrl] = useState<string | undefined>(undefined)
-    const [currentPlayer, setCurrentPlayer] = useState<"Movian" | "VLC" | "Mpv" | "ChromeCast">(externalPlayerData.current)
+    const [currentHost, setCurrentHost] = createSignal<playerData | undefined>(undefined)
+    const [currentResolution, setCurrentResolution] = createSignal<resolutionFormat | undefined>(undefined)
+    // t("global.notFound")
+    const [currentPlayer, setCurrentPlayer] = createSignal<"Movian" | "VLC" | "Mpv" | "ChromeCast">(externalPlayerData.current)
 
     // Chomecast Related
-    const [chromCastDeviceList, setchromCastDeviceList] = useState<{ host: string, port: number, name: string }[]>([])
-    const [isSearchChromecastHidded, setisSearchChromecastHidded] = useState<boolean>(false)
-    const [secondsLeft, setSecondsLeft] = useState<number>(0);
-    const [isChromeCastSearch, setisChromeCastSearch] = useState<boolean>(false);
+    const [chromCastDeviceList, setchromCastDeviceList] = createSignal<{ host: string, port: number, name: string }[]>([])
+    const [isSearchChromecastHidded, setisSearchChromecastHidded] = createSignal<boolean>(false)
+    const [_secondsLeft, setSecondsLeft] = createSignal<number>(0);
+    const [isChromeCastSearch, setisChromeCastSearch] = createSignal<boolean>(false);
 
     // Running Players
     async function RunMovian(url?: string) {
         if (!url) return
         let req = await fetch(`http://${config.Player.external.movianIP}/showtime/open?url=${encodeURIComponent(url)}`)
-        if (!req.ok) toast.error(t("externalPlayer.failed.movian"), notificationProps)
+        if (!req.ok) toast.error(t("externalPlayer.failed.movian"))
     }
 
     function getNumberOfSub(data: playerSubtitlesFormat[] | undefined) {
         if (!data) return 0
         for (let index = 0; index < data.length; index++) {
             const element = data[index];
-            if (!element.label.includes("Forced")) return index+1
+            if (!element.label.includes("Forced")) return index + 1
         }
         return 0
     }
 
-    async function runMpvPlayer(url?: string) {
-        if (!url) return
-        if (!currentHost.current) return
+    async function runMpvPlayer() {
+        if (!currentResolution() || !currentHost()) return
         let subsList: string[] = []
-        if (currentHost.current.subtitles) subsList = currentHost.current.subtitles.map(el => el.url)
-        await window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.mpvPath, time: time, subs: { subList: subsList, sid: getNumberOfSub(currentHost.current.subtitles) }, chapters: currentHost.current.external?.chaptersUrl }, "mpv")
+        if (currentHost()?.subtitles) subsList = currentHost()?.subtitles?.map(el => el.url) as string[]
+        await window.api.runExternaPlayer({ url: currentResolution()?.url as string, 
+            title: AnimeTitle, 
+            path: config.Player.external.mpvPath, 
+            time: time, 
+            subs: { subList: subsList, sid: getNumberOfSub(currentHost()?.subtitles) }, 
+            chapters: currentHost()?.external?.chaptersUrl 
+        }, "mpv")
     }
 
-    async function runVlcPlayer(url?: string) {
-        if (!url) return
-        if (!currentHost.current) return
+    async function runVlcPlayer() {
+        if (!currentResolution() || !currentHost()) return
         let subsList: string[] = []
-        if (currentHost.current.subtitles) subsList = currentHost.current.subtitles.map(el => el.url)
-        await window.api.runExternaPlayer({ url: url, title: AnimeTitle, path: config.Player.external.vlcPath, time: time, subs: { subList: subsList, sid: getNumberOfSub(currentHost.current.subtitles) } }, "vlc")
+        if (currentHost()?.subtitles) subsList = currentHost()?.subtitles?.map(el => el.url) as string[]
+        await window.api.runExternaPlayer({ url: currentResolution()?.url as string, 
+            title: AnimeTitle, 
+            path: config.Player.external.vlcPath, 
+            time: time, 
+            subs: { subList: subsList, sid: getNumberOfSub(currentHost()?.subtitles) } 
+        }, "vlc")
     }
 
     async function runChromeCast(device: { host: string, port: number, name: string }) {
-        if (currentHost.current && currentHost.current.resolution[0].hls) {
+        if (!currentResolution() || currentResolution()?.hls) {
             toast.error(t("externalPlayer.failed.chromecast"))
             return
         }
-        if (currentUrl) await window.api.chromecast.connect(device, { title: AnimeTitle, time: time, url: currentUrl, type: "video/mp4" })
+        await window.api.chromecast.connect(device, { title: AnimeTitle, time: time, url: currentResolution()?.url as any, type: "video/mp4" })
     }
 
     function setEpisode(type: "next" | "prev") {
@@ -98,64 +105,55 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         setNextEpisode(now_episodes.episodes[ep].ep)
     }
 
-    function ChangeResolution(data: { res: string, url: string }) {
-        console.log(data)
-        setCurrentResolution(() => data.res)
-        setCurrentUrl(() => data.url)
-    }
-
     function ChangeHost(data: playerData) {
-        currentHost.current = data
-        setResolutionList(() => data.resolution)
+        setCurrentHost(data)
+        setCurrentResolution(() => data.resolution[0])
+        RunPlayers()
     }
 
-    function RunPlayers(url?: string, type?: "Movian" | "VLC" | "Mpv" | "ChromeCast") {
-        let tempType = currentPlayer != type && type ? type : currentPlayer
-        let temp = currentUrl
-        if (url) temp = url
-        if (tempType === "Movian") RunMovian(temp)
-        if (tempType === "Mpv") runMpvPlayer(temp)
-        if (tempType === "VLC") runVlcPlayer(temp)
-        externalPlayerData.onChage(tempType)
-        if (tempType !== "ChromeCast") toast.success(t("externalPlayer.running", { player: tempType }), notificationProps)
-        if (tempType === "ChromeCast") startSearchChromeCast()
+    function RunPlayers() {
+        if (!currentHost()) return
+        if (currentPlayer() === "Movian") RunMovian()
+        if (currentPlayer() === "Mpv") runMpvPlayer()
+        if (currentPlayer() === "VLC") runVlcPlayer()
+        externalPlayerData.onChage(currentPlayer())
+        if (currentPlayer() !== "ChromeCast") toast.success(t("externalPlayer.running", { player: currentPlayer() }))
+        if (currentPlayer() === "ChromeCast") startSearchChromeCast()
     }
 
-    useEffect(() => {
+    onMount(() => {
         if (playerData.length <= 0) {
-            toast.error(t("externalPlayer.failed.player"), notificationProps)
+            toast.error(t("externalPlayer.failed.player"))
             return
         }
-        
-        currentHost.current = playerData[0]
-        if (playerData[0].resolution.length <= 0) {
-            toast.error(t("externalPlayer.failed.resolution"), notificationProps)
-            return
-        }
-        setResolutionList(() => playerData[0].resolution)
-        setCurrentResolution(() => playerData[0].resolution[0].res)
-        setCurrentUrl(() => playerData[0].resolution[0].url)
 
-        RunPlayers(playerData[0].resolution[0].url)
-        
+        setCurrentHost(playerData[0])
+        if (playerData[0].resolution.length <= 0) {
+            toast.error(t("externalPlayer.failed.resolution"))
+            return
+        }
+        setCurrentResolution(() => playerData[0].resolution[0])
+
+        RunPlayers()
+
         document.querySelectorAll('*').forEach((element: any) => {
             element.tabIndex = -1
         });
-    }, [])
+    })
 
-    useEffect(() => {
-        if (secondsLeft <= 0) {
-            stopSearchChromeCast()
-            return
-        }
-        const intervalId = setInterval(() => {
-            setSecondsLeft(prev => {
-                refetchChromeCastDevices()
-                return prev - 1
-            });
-        }, 1000);
-        return () => clearInterval(intervalId);
-    }, [secondsLeft]);
+    // useEffect(() => {
+    //     if (secondsLeft <= 0) {
+    //         stopSearchChromeCast()
+    //         return
+    //     }
+    //     const intervalId = setInterval(() => {
+    //         setSecondsLeft(prev => {
+    //             refetchChromeCastDevices()
+    //             return prev - 1
+    //         });
+    //     }, 1000);
+    //     return () => clearInterval(intervalId);
+    // }, [secondsLeft]);
 
     async function refetchChromeCastDevices() {
         setchromCastDeviceList(await window.api.chromecast.deviceList())
@@ -173,76 +171,106 @@ const ExternalPlayer: React.FC<ExternalplayerProps> = ({ animeData, now_episodes
         window.api.chromecast.stopSearch()
     }
 
-    const chromecastSearchContainerVariants = {
-        invisible: { opacity: 0, x: -500 },
-        hidden: { opacity: 1, x: -230 },
-        visible: { opacity: 1, x: 0 },
-    };
+    createEffect(() => {
+        console.log(currentResolution())
+    })
+    // const chromecastSearchContainerVariants = {
+    //     invisible: { opacity: 0, x: -500 },
+    //     hidden: { opacity: 1, x: -230 },
+    //     visible: { opacity: 1, x: 0 },
+    // };
+
+    function checkCurrentResolution(): string {
+        if (!currentResolution()) return t("global.notFound")
+        if (currentResolution()?.hls) return "HLS Mode"
+        if (isNumberString(currentResolution()?.res as string)) return `${unwrap(currentResolution()?.res)}p`
+        return currentResolution()?.res as string
+    }
 
     return (
-        <div className="external-player-container">
-            <div className="external-player-container-player">
-                <div className="external-player-top">
-                    <div className="video-top">
+        <div class="external-player-container">
+            <div class="external-player-container-player">
+                <div class="external-player-top">
+                    <div class="video-top">
                         <Button icon="arrow_back" ButtonClass="player-buttons" onClick={() => navigate("/")} />
-                        <div className="player-title">{AnimeTitle}</div>
+                        <div class="player-title">{AnimeTitle}</div>
                     </div>
-                    <div className="external-dropdown">
+                    <div class="external-dropdown">
                         <Dropdown options={[
-                            { label: "Mpv", onClick: () => { setCurrentPlayer(() => "Mpv"), RunPlayers(undefined, "Mpv") } },
-                            { label: "VLC", onClick: () => { setCurrentPlayer(() => "VLC"), RunPlayers(undefined, "VLC") } },
-                            { label: "Movian", onClick: () => { setCurrentPlayer(() => "Movian"), RunPlayers(undefined, "Movian") } },
-                            { label: "ChromeCast", onClick: () => { setCurrentPlayer(() => "ChromeCast"), RunPlayers(undefined, "ChromeCast") } }
+                            { label: "Mpv", onClick: () => { setCurrentPlayer(() => "Mpv"), RunPlayers() } },
+                            { label: "VLC", onClick: () => { setCurrentPlayer(() => "VLC"), RunPlayers() } },
+                            { label: "Movian", onClick: () => { setCurrentPlayer(() => "Movian"), RunPlayers() } },
+                            { label: "ChromeCast", onClick: () => { setCurrentPlayer(() => "ChromeCast"), RunPlayers() } }
                         ]} placeholder={t("global.notFound")} buttonText={config.Player.external.type} disableX
                         />
-                        {/* FIXME: Fix changing resolution */}
-                        <Dropdown placeholder={t("global.notFound")} buttonText={currentResolution != "" ?  isNumberString(currentResolution) ? `${currentResolution}p` : currentResolution : t("global.notFound")} options={resolutionList.map((element) => { return { label: isNumberString(element.res) ? `${element.res}p` : element.res, onClick: () => ChangeResolution(element) } })} disableX />
-                        <Dropdown placeholder={t("global.notFound")} buttonText={currentHost.current ? currentHost.current.hostname : t("global.notFound")} options={playerData.map((element) => { return { label: element.hostname, onClick: () => ChangeHost(element) } })} disableX />
+                        <Show when={currentResolution()}>
+                            <Dropdown 
+                                placeholder={t("global.notFound")} 
+                                buttonText={checkCurrentResolution()} 
+                                options={currentHost()?.resolution.map((element) => { 
+                                    let res = unwrap(element.res)
+                                    return { label: isNumberString(res) ? `${res}p` : res, onClick: () => {setCurrentResolution(element); RunPlayers()} }
+                                 })} 
+                                disableX 
+                            />
+                        </Show>
+                        <Dropdown 
+                            placeholder={t("global.notFound")} 
+                            buttonText={currentHost() ? currentHost()?.hostname : t("global.notFound")} 
+                            options={playerData.map((element) => { return { label: element.hostname, onClick: () => ChangeHost(element) } })} 
+                            disableX 
+                        />
                     </div>
                 </div>
-                <div className="external-player-center">
-                    <div className="external-button-container">
+                <div class="external-player-center">
+                    <div class="external-button-container">
                         <Button icon='skip_previous' ButtonClass="player-buttons" onClick={() => setEpisode("prev")} />
-                        <Button icon='replay' ButtonClass="player-buttons" onClick={() => RunPlayers(currentUrl, currentPlayer)} />
+                        <Button icon='replay' ButtonClass="player-buttons" onClick={() => RunPlayers()} />
                         <Button icon='skip_next' ButtonClass="player-buttons" onClick={() => setEpisode("next")} />
                     </div>
                 </div>
-                <div className="external-episodes-container">
-                    <div className="external-episodes-title">{t("externalPlayer.failed.episodes")}</div>
-                    <div className="external-episodes">
+                <div class="external-episodes-container">
+                    <div class="external-episodes-title">{t("externalPlayer.episodes")}</div>
+                    <div class="external-episodes">
                         {now_episodes.episodes.map((num) => (
-                            <div className='information-episode-button' onClick={() => setNextEpisode(num.ep)}>{num.ep}</div>
+                            <div class='information-episode-button' onClick={() => setNextEpisode(num.ep)}>{num.ep}</div>
                         ))}
                     </div>
                 </div>
             </div>
-            <motion.div className="external-player-container-player-chromecast"
-                variants={chromecastSearchContainerVariants}
-                initial={"invisible"}
-                animate={currentPlayer == "ChromeCast" ? isSearchChromecastHidded ? "visible" : "hidden" : "invisible"}
-                onMouseEnter={() => setisSearchChromecastHidded(() => true)}
-                onMouseLeave={() => setisSearchChromecastHidded(() => false)}
-                transition={{ duration: 0.2 }}
-            >
-                <div className="external-leftpanel-container">
-                    <div className="external-leftpanel-topbar">
-                        <button className="button external-leftpanel-topbar-button material-symbols-outlined" onClick={() => isChromeCastSearch ? stopSearchChromeCast() : startSearchChromeCast()}>{isChromeCastSearch ? "close" : "search"}</button>
-                        <button className="button external-leftpanel-topbar-button material-symbols-outlined" onClick={refetchChromeCastDevices}>refresh</button>
-                    </div>
-                    <div className="external-leftpanel">
-                        {chromCastDeviceList.map((element) => (
-                            <button className="button external-panelbutton" onClick={async () => await runChromeCast(element)}>
-                                <div className="external-panelbutton-icon material-symbols-outlined">cast</div>
-                                <div className="external-button-textcontainer">
-                                    <span className="external-panelbutton-title">{filterTextChromeCast(element.name)}</span>
-                                    <span className="external-panelbutton-bottomtext">{t("externalPlayer.chromeCast.disconnected")}</span>
-                                </div>
+
+            <Show when={currentPlayer() == "ChromeCast" && isSearchChromecastHidded()}>
+                <div class="external-player-container-player-chromecast"
+                    onMouseEnter={() => setisSearchChromecastHidded(() => true)}
+                    onMouseLeave={() => setisSearchChromecastHidded(() => false)}
+                >
+                    <div class="external-leftpanel-container">
+                        <div class="external-leftpanel-topbar">
+                            <button class="button external-leftpanel-topbar-button material-symbols-outlined" 
+                                onClick={() => isChromeCastSearch() ? stopSearchChromeCast() : startSearchChromeCast()}>
+                                    {isChromeCastSearch() ? "close" : "search"}
                             </button>
-                        ))}
-                        {isChromeCastSearch && <div className="external-panel-search-text">{t("externalPlayer.chromeCast.search")}</div>}
+                            <button class="button external-leftpanel-topbar-button material-symbols-outlined" onClick={refetchChromeCastDevices}>refresh</button>
+                        </div>
+                        <div class="external-leftpanel">
+                            <For each={chromCastDeviceList()}>
+                                {(element) => (
+                                    <button class="button external-panelbutton" onClick={async () => await runChromeCast(element)}>
+                                        <div class="external-panelbutton-icon material-symbols-outlined">cast</div>
+                                        <div class="external-button-textcontainer">
+                                            <span class="external-panelbutton-title">{filterTextChromeCast(element.name)}</span>
+                                            <span class="external-panelbutton-bottomtext">{t("externalPlayer.chromeCast.disconnected")}</span>
+                                        </div>
+                                    </button>
+                                )}
+                            </For>
+                            <Show when={isChromeCastSearch()}>
+                                <div class="external-panel-search-text">{t("externalPlayer.chromeCast.search")}</div>
+                            </Show>
+                        </div>
                     </div>
                 </div>
-            </motion.div>
+            </Show>
         </div>
     )
 }
