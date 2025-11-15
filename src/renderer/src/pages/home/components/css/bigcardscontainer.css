@@ -4,7 +4,6 @@
     scroll-snap-type: x mandatory;
     width: 100vw;
     scroll-behavior: smooth;
-    animation: firstShow 0.5s ease forwards;
 }
 
 .big-card-container-button {

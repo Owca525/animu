@@ -28,11 +28,11 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
                 <div class="big-card-information">
                     <div class="big-card-information-image-container">
                         <img src={data.AnimeData.coverImage} class="card-image big-card-information-image" />
-                        {data.AnimeData.averageScore &&
+                        <Show when={data.AnimeData.averageScore}>
                             <div class="big-card-information-score" style={{ border: `3px solid ${getGradientColor(data.AnimeData.averageScore)}` }}>
                                 {data.AnimeData.averageScore}%
                             </div>
-                        }
+                        </Show>
                     </div>
                     <div class="big-card-information-content">
                         <div class="big-card-information-title">{data.AnimeData.title.romaji}</div>
