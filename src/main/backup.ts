@@ -6,7 +6,7 @@ import { newConfigPath } from ".";
 
 let backupFolder = path.join(app.getPath("userData"), "animuBackup")
 
-ipcMain.handle("makeBackup", async (_event) => {
+export async function createBackup() {
     try {
         checkBackupFolder()
         const now = new Date();
@@ -16,7 +16,9 @@ ipcMain.handle("makeBackup", async (_event) => {
     } catch (err: any) {
         return { success: false, error: err.message };
     }
-});
+}
+
+ipcMain.handle("makeBackup", async (_event) => createBackup());
 
 async function checkBackupFolder() {
     if (!fs.existsSync(backupFolder)) {

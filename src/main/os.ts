@@ -6,6 +6,7 @@ import { WriteFileOptions, writeFileSync, mkdirSync, existsSync, readFileSync, p
 import path from "path"
 import os from "os"
 import { cardData } from "./types";
+import { createBackup } from "./backup";
 
 export function write(path: string, data: string, format?: WriteFileOptions): boolean {
   try {
@@ -139,6 +140,7 @@ export async function convertToNewFormat() {
     let newConfigPath = path.join(app.getPath("userData"), "animuConfig")
     if (!existsSync(path.join(newConfigPath, "history.json"))) return
     if (!existsSync(path.join(newConfigPath, "continueWatch.json"))) return
+    await createBackup()
 
     let tmpHistoria = readFileSync(path.join(newConfigPath, "history.json"), "utf-8")
     let historyData: cardData[]  = JSON.parse(tmpHistoria)
@@ -156,7 +158,6 @@ export async function convertToNewFormat() {
             ...element.saveData,
           }
         }
-        console.log(card)
         historyData.splice(historyIndex, 1)
         historyData.push(card as any)
       };
