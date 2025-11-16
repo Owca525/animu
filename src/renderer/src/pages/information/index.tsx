@@ -1,4 +1,4 @@
-import { AnimeData, cardData, indentityPlayer, playerPluginFormat } from "@renderer/utils/types";
+import { AnimeData, indentityPlayer, playerPluginFormat } from "@renderer/utils/types";
 import Button from "@renderer/components/buttons";
 import "./information.css"
 import { convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities, getGradientColor, openUrlFolder, SaveToClipboard, segregatePlugins } from "@renderer/utils/functions";
@@ -21,7 +21,6 @@ import { unwrap } from "solid-js/store";
 function information() {
     const navigate = useNavigate();
     let descriptionRef: HTMLDivElement | undefined
-
 
     const [tempData, setTmpData] = createSignal<{ anime: AnimeData, saveData?: indentityPlayer }>(JSON.parse(localStorage.getItem("informationCache") as string) as any)
     const [currentIDplayer, setCurrentId] = createSignal<string | undefined>(tempData().anime.player_ID)
@@ -89,16 +88,9 @@ function information() {
         }
 
         if (tempData().anime.id == "") return
-        let tempHistory: { continue: cardData[]; history: cardData[]; } = getGlobalCache().history
+        let tempHistory = unwrap(getGlobalCache().history)
 
-        let continueHistory = tempHistory.continue.filter((anime) => anime.AnimeData.id == tempData().anime.id)
-        let history = tempHistory.history.filter((anime) => anime.AnimeData.id == tempData().anime.id)
-        if (continueHistory.length > 0) {
-            setCurrentPlugin(continueHistory[0].saveData?.pluginName)
-            setTmpData({ ...tempData(), saveData: continueHistory[0].saveData })
-            localStorage.setItem("informationCache", JSON.stringify({ ...tempData(), saveData: continueHistory[0].saveData }))
-            return
-        }
+        let history = tempHistory.filter((anime) => anime.AnimeData.id == tempData().anime.id)
         if (history.length > 0) {
             setCurrentPlugin(history[0].saveData?.pluginName)
             setTmpData({ ...tempData(), saveData: history[0].saveData })
@@ -112,19 +104,19 @@ function information() {
         let tmp = unwrap(tempData())
         let lastTime = 0
         if (tmp.saveData && tmp.saveData.episode.toString() === episode) lastTime = tmp.saveData.last_Time
-        localStorage.setItem("playerCache", JSON.stringify({
+        localStorage.setItem("playerCache", JSON.stringify(unwrap({
             data: {
                 ...tmp.anime,
-                player_ID: currentIDplayer() ? unwrap(currentIDplayer()) : episodeResponse.data?.player_id
+                player_ID: currentIDplayer() ? currentIDplayer() : episodeResponse.data?.player_id
             },
             save: {
                 last_Time: lastTime,
                 type: type,
-                pluginName: currentIDplayer() ? unwrap(currentIDplayer()) : episodeResponse.data?.player_id,
+                pluginName: getPlayerPLugin()?.name,
                 episode: episode
             },
             episodelist: episodes,
-        }))
+        })))
         navigate("/player")
     }
 
@@ -138,16 +130,17 @@ function information() {
     }
 
     function makeButtons(episode: { ep: string, img?: string, title?: string }[], type: string) {
+        let tmpSaveData = tempData()
         return (
             <div class="information-buttons-episode-container">
                 <For each={episode}>
                     {(data) => {
-                        const saveData = tempData()?.saveData;
+                        const saveData = tmpSaveData.saveData;
                         const epNum = parseInt(data.ep);
                         const savedEp = parseInt(saveData?.episode ?? "0");
                         const isWatched = saveData && epNum < savedEp;
-                        const isWatching = saveData && epNum === savedEp && saveData.last_Time !== 0;
-                        const isWatchedEqual = saveData && epNum === savedEp && saveData.last_Time === 0;
+                        const isWatching = saveData && epNum === savedEp && (saveData.last_Time !== 0 || saveData.isStarted);
+                        const isWatchedEqual = saveData && epNum === savedEp && saveData.last_Time === 0 && !saveData.isStarted;
 
                         return (
                             <div

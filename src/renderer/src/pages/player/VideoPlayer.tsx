@@ -16,7 +16,7 @@ import JASSUB from "jassub";
 import workerUrl from "jassub/dist/jassub-worker.js?url";
 import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
 import { saveConfig } from "@renderer/utils/FilesManager/config"
-import { DeleteFromFile, SaveToFile } from "@renderer/utils/FilesManager/readFiles"
+import { SaveHistory } from "@renderer/utils/FilesManager/history"
 import { Component, createSignal, For, onMount, Show } from "solid-js"
 import { getConfig } from "@renderer/utils/stores/config"
 import toast from "solid-toast"
@@ -25,6 +25,7 @@ import { createShortcut } from "@solid-primitives/keyboard"
 import { useKeyPress } from "@renderer/utils/hooks/useKeyPress"
 import DeveloperStats from "./components/developerStats"
 import NerdStats from "./components/nerdStats"
+import { unwrap } from "solid-js/store"
 
 function addTime(durration: number): string {
     const now = new Date();
@@ -430,22 +431,34 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     function saveContinueProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
         // Checking to save history
         if (!config) return
+        if (currentTime() <= parseInt(config.History.continue.MinimalTimeSave.toString())) return
         let futureHistory = {
             AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
             saveData: {
                 pluginName: anime_data.saveData.pluginName,
                 last_Time: event.currentTarget.currentTime,
                 episode: temp.episode,
-                type: temp.type
+                type: temp.type,
+                isStarted: false,
             }
         }
         if (
             event.currentTarget.currentTime >= parseInt(config.History.continue.MinimalTimeSave.toString()) &&
             event.currentTarget.currentTime <= event.currentTarget.duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
         ) {
-            SaveToFile(futureHistory, "continueWatch")
+            SaveHistory(unwrap(futureHistory))
         } else {
-            DeleteFromFile(futureHistory, "continueWatch")
+            SaveHistory(unwrap({
+                    AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
+                    saveData: {
+                        pluginName: anime_data.saveData.pluginName,
+                        last_Time: 0,
+                        episode: temp.episode,
+                        type: temp.type,
+                        isStarted: false,
+                    }
+                }
+            ))
         }
         refetchHistory()
     }

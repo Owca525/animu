@@ -78,7 +78,7 @@ export interface homeData {
 
 export interface globalDataFormat {
     incognito: boolean,
-    history: { continue: cardData[], history: cardData[] }
+    history: cardData[]
 }
 
 export interface playerData {
@@ -116,12 +116,12 @@ export interface indentityPlayer {
     last_Time: number
     episode: string
     type: string
+    isStarted?: boolean
 }
 
 export interface cardData {
     AnimeData: AnimeData
     saveData?: indentityPlayer
-    deletionCard?: () => void
     onClick?: (data: AnimeData) => void
 }
 

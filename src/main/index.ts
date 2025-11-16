@@ -12,7 +12,7 @@ import "./update"
 import "./request"
 import "./streaming"
 import "./backup"
-import { detectOldVersion, write } from './os'
+import { convertToNewFormat, detectOldVersion, write } from './os'
 import { existsSync, readFileSync } from 'fs'
 import { cardData, defaultConfig, SettingsConfig } from './types';
 import { deepMerge, setupDiscordRPC } from './utils';
@@ -21,7 +21,6 @@ export let mainWindow: BrowserWindow | undefined
 export let newConfigPath = path.join(app.getPath("userData"), "animuConfig")
 export let config: SettingsConfig = defaultConfig
 let historyData: cardData[] = []
-let continueWatchData: cardData[] = []
 
 function createWindow(): void {
   let title = 'Animu v' + app.getVersion()
@@ -76,7 +75,7 @@ function createWindow(): void {
     details.requestHeaders['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/143.0';
     callback({ requestHeaders: details.requestHeaders });
   });
-  
+
   if (process.env.NODE_ENV === 'development') {
     mainWindow.setTitle(title + " developer")
     mainWindow.webContents.openDevTools()
@@ -137,6 +136,7 @@ app.on('window-all-closed', () => {
 async function initialBackend() {
   try {
     await detectOldVersion()
+    await convertToNewFormat()
 
     if (existsSync(path.join(newConfigPath, "config.ini"))) {
       let data = readFileSync(path.join(newConfigPath, "config.ini"), "utf-8")
@@ -151,10 +151,10 @@ async function initialBackend() {
       historyData = JSON.parse(data)
     }
 
-      if (existsSync(path.join(newConfigPath, "continueWatch.json"))) {
-      let data = readFileSync(path.join(newConfigPath, "continueWatch.json"), "utf-8")
-      continueWatchData = JSON.parse(data)
-    }
+    // if (existsSync(path.join(newConfigPath, "continueWatch.json"))) {
+    //   let data = readFileSync(path.join(newConfigPath, "continueWatch.json"), "utf-8")
+    //   continueWatchData = JSON.parse(data)
+    // }
 
   } catch (error) {
     console.error("Failed Initial Backend", error)
@@ -162,4 +162,4 @@ async function initialBackend() {
 }
 
 ipcMain.handle('getConfig', () => config);
-ipcMain.handle('getHistory', () => ({ continue: continueWatchData, history: historyData }));
+ipcMain.handle('getHistory', () => historyData);

@@ -17,7 +17,7 @@ import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import { checkUpdate } from "@renderer/utils/update";
 import { InitialPlugin } from "@renderer/utils/pluginApi";
 import ButtonGroup from "./components/buttonGroup";
-import { DetectOldVersionHistory } from "@renderer/utils/FilesManager/readFiles";
+import { DetectOldVersionHistory } from "@renderer/utils/FilesManager/history";
 import toast from "solid-toast";
 import { useNavigate } from "@solidjs/router";
 import { getConfig, setConfig } from "@renderer/utils/stores/config";

@@ -2,9 +2,10 @@ import { app, dialog, ipcMain } from "electron";
 import { mainWindow, newConfigPath } from ".";
 
 import { execSync } from "child_process";
-import { WriteFileOptions, writeFileSync, mkdirSync, existsSync, readFileSync, promises } from "fs";
+import { WriteFileOptions, writeFileSync, mkdirSync, existsSync, readFileSync, promises, rmSync } from "fs";
 import path from "path"
 import os from "os"
+import { cardData } from "./types";
 
 export function write(path: string, data: string, format?: WriteFileOptions): boolean {
   try {
@@ -130,5 +131,40 @@ export async function detectOldVersion() {
         console.error(`Error in detectOldVersion:`, err);
       }
     }
+  }
+}
+
+export async function convertToNewFormat() {
+  try {
+    let newConfigPath = path.join(app.getPath("userData"), "animuConfig")
+    if (!existsSync(path.join(newConfigPath, "history.json"))) return
+    if (!existsSync(path.join(newConfigPath, "continueWatch.json"))) return
+
+    let tmpHistoria = readFileSync(path.join(newConfigPath, "history.json"), "utf-8")
+    let historyData: cardData[]  = JSON.parse(tmpHistoria)
+    
+    let tmpContinue = readFileSync(path.join(newConfigPath, "continueWatch.json"), "utf-8")
+    let continueWatchData: cardData[] = JSON.parse(tmpContinue)
+    
+    for (let index = 0; index < continueWatchData.length; index++) {
+      const element = continueWatchData[index];
+      let historyIndex = historyData.findIndex((value) => element.AnimeData.id == value.AnimeData.id)
+      if (index != -1) {
+        let card = {
+          ...historyData[historyIndex],
+          saveData: {
+            ...element.saveData,
+          }
+        }
+        console.log(card)
+        historyData.splice(historyIndex, 1)
+        historyData.push(card as any)
+      };
+    }
+
+    write(path.join(newConfigPath, "history.json"), JSON.stringify(historyData.reverse()))
+    rmSync(path.join(newConfigPath, "continueWatch.json"))
+  } catch (error) {
+    console.error("Error convertToNewFormat", error)
   }
 }

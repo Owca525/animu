@@ -153,20 +153,16 @@ export async function refetchHistory() {
     if (!data.data) return
     if (data.data.sections.length > 2) return
     if (data.data.sections.length <= 0) return
-    let history: cardData[] = unwrap(getGlobalCache().history.history)
-    let continueWatch: cardData[] = unwrap(getGlobalCache().history.continue)
+    let history = getHistory()
     if (data.data.sections.length == 1 && data.data.sections[0].title == t("global.continuewatch")) {
-        setAllHomeData({ data: { sections: [{ title: t("global.continuewatch"), data: continueWatch, horizontal: false }] } } as any)
+        setAllHomeData({ data: { sections: [{ title: t("global.continuewatch"), data: history.continue, horizontal: false }] } } as any)
         return
     }
 
     if (data.data.sections.length == 1 && data.data.sections[0].title == t("global.history")) {
-        setAllHomeData({ data: { sections: [{ title: t("global.history"), data: history, horizontal: false }] } } as any)
+        setAllHomeData({ data: { sections: [{ title: t("global.history"), data: history.history, horizontal: false }] } } as any)
         return
     }
-
-    let newHistory = history.reverse()
-    let newcontinueWatch = continueWatch.reverse()
 
     if (data.data.sections[0].title == t("global.continuewatch") && data.data.sections[1].title == t("global.history")) {
         setAllHomeData({
@@ -174,13 +170,13 @@ export async function refetchHistory() {
                 sections: [
                     {
                         title: t("global.continuewatch"),
-                        data: newcontinueWatch.slice(0, 20),
+                        data: history.continue.slice(0, 20),
                         horizontal: true,
                         // onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: continueWatch, horizontal: false }] }))
                     },
                     {
                         title: t("global.history"),
-                        data: newHistory.slice(0, 20),
+                        data: history.history.slice(0, 20),
                         horizontal: true,
                         // onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.history"), data: history, horizontal: false }] }))
                     },
@@ -454,5 +450,20 @@ export function getWeek(): { startWeekUnix: number, endWeekUnix: number, startWe
         startWeekDay: startWeek.getDate(),
         endWeekDay: endWeek.getDate(),
         month: today.getMonth()
+    }
+}
+
+export function getHistory() {
+    let global = unwrap(getGlobalCache().history)
+    let continueWatch: cardData[] = []
+    for (let index = 0; index < global.length; index++) {
+        const element = global[index];
+        if (element.saveData && (element.saveData.last_Time != 0 || element.saveData.isStarted)) {
+            continueWatch.push(element)
+        }
+    }
+    return {
+        continue: continueWatch,
+        history: global.map((value) => ({...value, saveData: { ...value.saveData, last_Time: 0 }}))
     }
 }

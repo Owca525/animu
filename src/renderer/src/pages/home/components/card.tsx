@@ -11,6 +11,8 @@ import {
   SaveToClipboard,
 } from "@renderer/utils/functions";
 import { ChangePlugin } from "@renderer/utils/pluginApi";
+import { DeleteFromHistory, SaveHistory } from "@renderer/utils/FilesManager/history";
+import { unwrap } from "solid-js/store";
 
 interface CardProps {
   card: cardData;
@@ -52,7 +54,7 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
       return;
     }
 
-    if (card.saveData && card.saveData.episode != "" && card.saveData.last_Time != 0) {
+    if (card.saveData && card.saveData.episode != "" && (card.saveData.last_Time != 0 || card.saveData.isStarted)) {
       const currentPLugin = ChangePlugin(card.saveData.pluginName)
       const episodeList = await currentPLugin.player.extractOnlyEpisodesList(card.saveData.type, card.AnimeData.player_ID as string);
 
@@ -71,8 +73,23 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
       return;
     }
 
-    localStorage.setItem("informationCache", JSON.stringify({ anime: card.AnimeData }))
+    localStorage.setItem("informationCache", JSON.stringify({ anime: card.AnimeData, saveData: card.saveData }))
     navigate("/info");
+  }
+
+  function deleteCard() {
+    if (card.saveData && card.saveData.episode != "" && (card.saveData.last_Time != 0 || card.saveData.isStarted)) {
+      SaveHistory(unwrap({
+        ...card,
+        saveData: {
+          ...card.saveData,
+          last_Time: 0,
+          isStarted: false,
+        }
+      }))
+    } else {
+      DeleteFromHistory(card)
+    }
   }
 
   function checkState() {
@@ -81,20 +98,29 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
     return { animation: "fadeIn 0.3s forwards" };
   }
 
-  const CenterContextMenu: ContextMenuProps = [
+  let CenterContextMenu: ContextMenuProps = [
     {
       option: t("contextMenu.copytitle"),
       onClick: () =>
         SaveToClipboard("text", card.AnimeData.title.romaji),
-    },
-    {
+    }
+  ];
+
+  if (card.AnimeData.coverImage) {
+    CenterContextMenu.push({
       option: t("contextMenu.copycover"),
       onClick: () =>
         card.AnimeData.coverImage
           ? SaveToClipboard("image", card.AnimeData.coverImage)
           : "",
-    },
-  ];
+    })
+  }
+
+  CenterContextMenu.push({
+    option: t("contextMenu.delete"),
+    deletion: true,
+    onClick: deleteCard,
+  });
 
   function checkOutOfBound() {
     if (!cardRef) return;

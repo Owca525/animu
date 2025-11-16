@@ -57,9 +57,8 @@ function App() {
     } else {
       if (!localStorage.getItem("config")) localStorage.setItem("config", JSON.stringify(defaultConfigWeb))
       if (!localStorage.getItem("history")) localStorage.setItem("history", JSON.stringify([]))
-      if (!localStorage.getItem("continueWatch")) localStorage.setItem("continueWatch", JSON.stringify([]))
       setConfig(JSON.parse(localStorage.getItem("config") as any))
-      setGlobalHistory({ continue: JSON.parse(localStorage.getItem("continueWatch") as any), history: JSON.parse(localStorage.getItem("history") as any) })
+      setGlobalHistory(JSON.parse(localStorage.getItem("history") as any))
     }
     InitialPlugin()
     LoadConfig()

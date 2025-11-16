@@ -63,7 +63,7 @@ declare global {
       getOSDetails: () => Promise<{ platform: NodeJS.Platform, release: string, arch: string }>
       getListLang: () => Promise<{ data: any, lang: string }[]>
       getConfig: () => Promise<SettingsConfig>
-      getHistory: () => Promise<{ continue: cardData[], history: cardData[] }>
+      getHistory: () => Promise<cardData[]>
     };
     backend: {
       ipcRenderer: {

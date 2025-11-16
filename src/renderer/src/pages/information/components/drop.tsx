@@ -1,4 +1,4 @@
-import { Component, createSignal } from "solid-js";
+import { createSignal } from "solid-js";
 import "./css/drop.css";
 
 interface DropProps {
@@ -7,7 +7,7 @@ interface DropProps {
   RightHeader: string;
 }
 
-const Drop: Component<DropProps> = (props) => {
+export default function Drop(props: DropProps) {
   const [isOpen, setIsOpen] = createSignal(false);
 
   return (
@@ -31,5 +31,3 @@ const Drop: Component<DropProps> = (props) => {
     </div>
   );
 };
-
-export default Drop;

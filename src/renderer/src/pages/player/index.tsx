@@ -1,7 +1,7 @@
 
 // import { useQuery } from "react-query";
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
-import { AnimeData, playerData, SettingsConfig } from "@renderer/utils/types";
+import { AnimeData, indentityPlayer, playerData, SettingsConfig } from "@renderer/utils/types";
 import { t } from "i18next";
 
 import "./player.css"
@@ -9,7 +9,7 @@ import { detectTitle, refetchHistory } from "@renderer/utils/functions";
 import Button from "@renderer/components/buttons";
 
 import VideoPlayer from "./VideoPlayer";
-import { SaveToFile } from "@renderer/utils/FilesManager/readFiles";
+import { SaveHistory } from "@renderer/utils/FilesManager/history";
 import { ChangePlugin } from "@renderer/utils/pluginApi";
 import { useNavigate } from "@solidjs/router";
 import { getConfig } from "@renderer/utils/stores/config";
@@ -19,7 +19,7 @@ import { createShortcut } from "@solid-primitives/keyboard";
 import ExternalPlayer from "./externalPlayer";
 
 const player = () => {
-    const anime_data = JSON.parse(localStorage.getItem("playerCache") as any)
+    const anime_data: { data: AnimeData, save: indentityPlayer, episodelist: { ep: string, img?: string, title?: string }[] } = JSON.parse(localStorage.getItem("playerCache") as any)
     const navigate = useNavigate()
     const config: SettingsConfig = getConfig();
 
@@ -73,10 +73,11 @@ const player = () => {
     function updateHistory() {
         if (!anime_data || !anime_data.data) return
         console.log("SAVE HISTORY", anime_data.save?.pluginName ? anime_data.save.pluginName : "")
-        SaveToFile({
+        SaveHistory({
             saveData: {
                 pluginName: anime_data.save?.pluginName ? anime_data.save.pluginName : "",
                 last_Time: 0,
+                isStarted: true,
                 type: extractionData().type,
                 episode: extractionData().actual.toString()
             },
@@ -84,7 +85,7 @@ const player = () => {
                 ...anime_data.data,
                 nextAiringEpisode: undefined
             }
-        }, "history")
+        })
         refetchHistory()
     }
 
@@ -97,7 +98,19 @@ const player = () => {
     })
 
     onMount(() => {
-        updateHistory()
+        SaveHistory({
+            saveData: {
+                pluginName: anime_data.save?.pluginName ? anime_data.save.pluginName : "",
+                last_Time: anime_data.save.last_Time,
+                isStarted: anime_data.save.last_Time == 0,
+                type: extractionData().type,
+                episode: extractionData().actual.toString()
+            },
+            AnimeData: {
+                ...anime_data.data,
+                nextAiringEpisode: undefined
+            }
+        })
     })
 
     function showErrorDialog() {

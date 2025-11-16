@@ -1,119 +1,86 @@
 import { refetchHistory } from "../functions";
 import { cardData } from "../types";
-import i18n from "../i18n";
+// import i18n from "../i18n";
 import { CreateBackup } from "../backup";
 import { searchForConvertAnime } from "@renderer/plugins/anilistApi";
 import { getGlobalCache, setGlobalHistory } from "../stores/global";
 import toast from "solid-toast";
+import { unwrap } from "solid-js/store";
 
-export async function DeleteFromFile(data: cardData, file: string, notification: boolean = false) {
+export async function DeleteFromHistory(data: cardData, notification: boolean = false) {
     try {
         if (getGlobalCache().incognito) return
         if (!data.saveData) return
-        await CheckFile(file)
-        let saveFile;
-        if (window.api) {
-            saveFile = await window.api.os.read(`${file}.json`)
-            if (typeof saveFile != "string") return console.error(`Wrong data in DeleteFromFile`, saveFile)
-        } else {
-            saveFile = localStorage.getItem(file)
-        }
+        let historyCache = unwrap(getGlobalCache().history);
 
-        const list = JSON.parse(saveFile) as cardData[];
         let index = -1
         if (data.AnimeData.id == "") {
-            index = list.findIndex(
+            index = historyCache.findIndex(
                 (item) => item.AnimeData.title.romaji === data.AnimeData.title.romaji
             );
         } else {
-            index = list.findIndex(
+            index = historyCache.findIndex(
                 (item) => item.AnimeData.id === data.AnimeData.id
             );
         }
 
-        if (index != -1) list.splice(index, 1);
+        if (index != -1) historyCache.splice(index, 1);
 
-        if (window.api) await window.api.os.write(`${file}.json`, JSON.stringify(list))
-        else localStorage.setItem(file, JSON.stringify(list))
-        if (file == "continueWatch") setGlobalHistory({ continue: list } as any)
-        if (file == "history") setGlobalHistory({ history: list } as any)
+        if (window.api) await window.api.os.write(`history.json`, JSON.stringify(historyCache))
+        else localStorage.setItem("history", JSON.stringify(historyCache))
+        setGlobalHistory(historyCache)
         refetchHistory()
 
         if (!(!data.saveData && !notification)) return true
 
-        if (file === "continueWatch") {
-            toast.success(i18n.t("history.continuesaved"))
-        } 
-        if (file === "history") {
-            toast.success(i18n.t("history.historysaved"))
-        }
+        // TODO: Napraw żeby pokazywało status
+        // if (file === "continueWatch") {
+        //     toast.success(i18n.t("history.continuesaved"))
+        // } 
+        // if (file === "history") {
+        //     toast.success(i18n.t("history.historysaved"))
+        // }
         return true
     } catch (Error) {
         console.error(`${Error} in DeleteFromFile`)
         if (!(!data.saveData && !notification)) return false
-        if (file === "continueWatch") {
-            toast.error(i18n.t("history.continuefailed"))
-        } 
-        if (file === "history") {
-            toast.error(i18n.t("history.historyfailed"))
-        }
+        // if (file === "continueWatch") {
+        //     toast.error(i18n.t("history.continuefailed"))
+        // } 
+        // if (file === "history") {
+        //     toast.error(i18n.t("history.historyfailed"))
+        // }
         return false
     }
 }
 
-export async function SaveToFile(data: cardData, file: string): Promise<boolean> {
+export async function SaveHistory(data: cardData): Promise<boolean> {
     try {
         if (getGlobalCache().incognito) return true
-        await CheckFile(file)
-        let saveFile;
-        if (window.api) {
-            const saveFile = await window.api.os.read(`${file}.json`);
-            if (typeof saveFile != "string") return false
-        } else {
-            saveFile = localStorage.getItem(file)
-        }
+        let historyCache = unwrap(getGlobalCache().history);
 
-        const tmpData = JSON.parse(saveFile) as cardData[];
         let index = -1
         if (data.AnimeData.id == "") {
-            index = tmpData.findIndex(
+            index = historyCache.findIndex(
                 (item) => item.AnimeData.player_ID === data.AnimeData.player_ID
             );
         } else {
-            index = tmpData.findIndex(
+            index = historyCache.findIndex(
                 (item) => item.AnimeData.id === data.AnimeData.id
             );
         }
 
-        if (index != -1) tmpData.splice(index, 1);
-
-        tmpData.push(data);
-        if (window.api) await window.api.os.write(`${file}.json`, JSON.stringify(checkAnimeDuplicate(tmpData)))
-        else localStorage.setItem(file, JSON.stringify(checkAnimeDuplicate(tmpData)))
-        if (file == "continueWatch") setGlobalHistory({ continue: tmpData } as any)
-        if (file == "history") setGlobalHistory({ history: tmpData } as any)
+        if (index != -1) historyCache.splice(index, 1);
+        console.log(data)
+        historyCache.unshift(data);
+        if (window.api) await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(historyCache)))
+        else localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(historyCache)))
+        setGlobalHistory(historyCache)
         refetchHistory()
         return true
     } catch (Error) {
         console.error(`${Error} in SaveToFile`)
         return false
-    }
-}
-
-export async function CheckFile(file: string): Promise<boolean> {
-    try {
-        if (!window.api) return true
-        if (await window.api.os.exists(`${file}.json`) == false) {
-            await window.api.os.write(
-                `${file}.json`,
-                JSON.stringify([])
-            );
-            return true
-        }
-        return false
-    } catch (Error) {
-        console.error(`${Error} in CheckFile`)
-        return true
     }
 }
 

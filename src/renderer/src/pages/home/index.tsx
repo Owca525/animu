@@ -11,7 +11,7 @@ import {
 } from "@renderer/utils/types";
 import { t } from "i18next";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
-import { CreateContextMenuOptions } from "@renderer/utils/functions";
+import { CreateContextMenuOptions, getHistory } from "@renderer/utils/functions";
 import Filter from "./components/filter";
 import Button from "@renderer/components/buttons";
 import BigCardsContainer from "./components/bigCardsContainer";
@@ -20,7 +20,6 @@ import { useNavigate } from "@solidjs/router";
 import { getHomeCache, setAllHomeData, setHomeLocalSearch, setHomeSearch, setHomeSearchPage, setHomeSearchTags, setHomeStopScrolling } from "@renderer/utils/stores/home";
 import { getConfig } from "@renderer/utils/stores/config";
 import { createEffect, createSignal, For, Match, onMount, Show, Switch } from "solid-js";
-import { getGlobalCache } from "@renderer/utils/stores/global";
 import { unwrap } from "solid-js/store";
 // import { createShortcut } from "@solid-primitives/keyboard";
 // import WelcomeScreen from "./components/welcomeScreen"
@@ -87,15 +86,15 @@ const Home = () => {
 
   function history() {
     setHomeLocalSearch(true);
-    let history = unwrap(getGlobalCache().history)
-    let historyCache = history.continue.reverse().slice(0, 20)
-    let continueWatchCache = history.history.reverse().slice(0, 20)
+    let history = getHistory()
+
+    console.log(history)
 
     let data = {
       sections: [
         {
           title: t("global.continuewatch"),
-          data: historyCache,
+          data: history.continue.slice(0, 20),
           horizontal: true,
           // onTitleClick: () =>
           //   setHomeData(async () => ({
@@ -110,7 +109,7 @@ const Home = () => {
         },
         {
           title: t("global.history"),
-          data: continueWatchCache,
+          data: history.history.slice(0, 20),
           horizontal: true,
           // onTitleClick: () =>
           //   setHomeData(async () => ({
