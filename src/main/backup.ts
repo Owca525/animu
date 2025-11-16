@@ -1,5 +1,5 @@
 import { app, ipcMain } from "electron";
-import fs from "fs"
+import fs, { readdirSync } from "fs"
 import archiver from "archiver";
 import path from "path";
 import { newConfigPath } from ".";
@@ -17,8 +17,27 @@ export async function createBackup() {
         return { success: false, error: err.message };
     }
 }
+// TODO: end making system backup
+export async function getBackupList() {
+    try {
+        let backupFiles = readdirSync(backupFolder)
+        return backupFiles.map((value) => {
+            let match = value.match(/backup_(\d{4})-(\d{2})-(\d{2})-(\d{2})-(\d{2})-(\d{2})/)
+            if (!match) return
+            const [_, year, month, day, hour, minute, second] = match
+            return {
+                file: value,
+                date: new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`)
+            }
+        })
+    } catch (error) {
+        console.error(error)
+        return []
+    }
+}
 
 ipcMain.handle("makeBackup", async (_event) => createBackup());
+ipcMain.handle("backupList", async (_event) => getBackupList());
 
 async function checkBackupFolder() {
     if (!fs.existsSync(backupFolder)) {

@@ -43,7 +43,8 @@ if (process.contextIsolated) {
         getConfigPath: () => ipcRenderer.invoke("getConfigPath")
       },
       backup: {
-        make: () => ipcRenderer.invoke("makeBackup")
+        make: () => ipcRenderer.invoke("makeBackup"),
+        list: () => ipcRenderer.invoke("backupList")
       },
       runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string}, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", videoData, type),
       getlistThemes: () => ipcRenderer.invoke("get-css-files"),
