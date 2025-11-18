@@ -133,7 +133,7 @@ app.on('window-all-closed', () => {
   }
 })
 
-async function initialBackend() {
+export async function initialBackend() {
   try {
     await detectOldVersion()
     await convertToNewFormat()

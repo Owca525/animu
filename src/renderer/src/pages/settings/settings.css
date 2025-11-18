@@ -189,6 +189,34 @@ td {
   gap: 4px;
 }
 
+.settings-button-backup {
+  padding: 12px;
+  user-select: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1.1em;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-button-backup:hover {
+  background-color: var(--five-layer);
+  color: var(--green-one);
+}
+
+.settings-button-date {
+  background-color: var(--five-layer);
+  padding: 6px;
+  border-radius: 12px;
+}
+
+.settings-backup-container {
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
 /* for very small window sizes */
 @media (max-width: 600px) {
 

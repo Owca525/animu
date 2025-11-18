@@ -178,6 +178,7 @@
       "onstart": "啟動時",
       "everyday": "每天",
       "everyweek": "每周",
+      "everymonth": "Every Month",
       "hideSidebar": "隱藏側邊攔",
       "hoverSidebar": "滑鼠移動至側邊欄時顯示",
       "discordrpc": "Discord 狀態顯示",

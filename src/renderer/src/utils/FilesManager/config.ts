@@ -113,5 +113,11 @@ export const defaultConfigWeb: SettingsConfig = {
     },
     plugins: {
         player: "Allmanga"
+    },
+    backup: {
+        enable: false,
+        lastCheck: 0,
+        check: "Every Day",
+        maxBackups: 3
     }
 };

@@ -103,6 +103,11 @@ async function LoadConfig() {
   if (loadedConnfig.General.Window.AutoMaximize) window.BrowserWindow.setMaximize()
   window.BrowserWindow.setZoom(calculateZoomLevel(parseFloat(loadedConnfig.General.Window.Zoom.toString())))
   window.BrowserWindow.setFullscreen(loadedConnfig.General.Window.AutoFullscreen)
+
+  // TODO: ADD Checking
+  if (loadedConnfig.backup.enable) {
+
+  }
 }
 
 export default App

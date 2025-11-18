@@ -58,6 +58,7 @@ declare global {
       backup: {
         make: () => Promise<{ success: boolean, error: any }>
         list: () => Promise<{ file: string, date: Date }[]>
+        restore: (file: string) => Promise<{ success: boolean, error?: number }>
       }
       runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string}, type: "mpv" | "vlc") => any
       getlistThemes: () => Promise<{ version?: string; autor?: string; pathcss: string; animuTitle?: string; name: string; pathIcon?: string }[]>

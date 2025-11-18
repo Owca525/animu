@@ -178,6 +178,7 @@
             "onstart": "On Start",
             "everyday": "Every day",
             "everyweek": "Every Week",
+            "everymonth": "Every Month",
             "hideSidebar": "Hide Sidebar",
             "hoverSidebar": "Hover Sidebar",
             "discordrpc": "Discord RPC",

@@ -323,6 +323,12 @@ export interface SettingsConfig {
             MaximizeTimeSave: number | string
         }
     }
+    backup: {
+        enable: boolean,
+        lastCheck: number,
+        maxBackups: number,
+        check: "Every Day" | "Every Week" | "Every Month"
+    }
     Developer: {
         DeveloperMode: boolean
         DevTools: boolean

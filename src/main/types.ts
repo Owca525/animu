@@ -93,6 +93,12 @@ export interface SettingsConfig {
             MaximizeTimeSave: number | string
         }
     }
+    backup: {
+        enable: boolean,
+        lastCheck: number,
+        maxBackups: number,
+        check: "Every Day" | "Every Week" | "Every Month"
+    }
     Developer: {
         DeveloperMode: boolean
         DevTools: boolean
@@ -274,5 +280,11 @@ export const defaultConfig: SettingsConfig = {
     },
     plugins: {
         player: "Allmanga"
+    },
+    backup: {
+        enable: false,
+        lastCheck: 0,
+        check: "Every Day",
+        maxBackups: 3
     }
 };

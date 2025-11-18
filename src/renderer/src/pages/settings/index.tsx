@@ -22,9 +22,11 @@ import toast from "solid-toast";
 import { useNavigate } from "@solidjs/router";
 import { getConfig, setConfig } from "@renderer/utils/stores/config";
 import { getPluginList } from "@renderer/utils/stores/plugins";
-import { createEffect, createSignal, onCleanup, onMount, Show } from "solid-js";
+import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { createShortcut } from "@solid-primitives/keyboard";
 import { unwrap } from "solid-js/store";
+import SettingsDrop from "./components/settingsDrop";
+import { CreateBackup, RestoreBackup } from "@renderer/utils/backup";
 
 function settings() {
     const navigate = useNavigate();
@@ -36,6 +38,7 @@ function settings() {
     const [versions] = createSignal(window.electronAPI.process.versions)
     const [isSaving, setSaving] = createSignal<boolean>(false)
     const [themeMetadata, setthemeMetadata] = createSignal<themeMetadata | undefined>(undefined)
+    const [backupList, setBackupList] = createSignal<{ date: Date, file: string }[]>([])
 
     let sidebarData = {
         top: [
@@ -151,8 +154,9 @@ function settings() {
         if (JSON.stringify(config().old) != JSON.stringify(config().new)) setSaving(() => true)
     })
 
-    onMount(() => {
+    onMount(async () => {
         if (!window.api) return
+        setBackupList(await window.api.backup.list())
         window.api.getlistThemes().then((data) => {
             let themes = data.map((element) => { return { label: element.name, onClick: () => { changeTheme(element.name); handleChange("General.theme", element.name); setthemeMetadata(() => element) } } })
             setThemes(() => themes)
@@ -217,6 +221,23 @@ function settings() {
         let data = await request("https://raw.githubusercontent.com/Owca525/animu/refs/heads/unstable/assets/discord.txt")
         if (!data.success) return
         openUrlFolder(data.text)
+    }
+
+    function backupWarning(file: string, date: string) {
+        showDialog({
+            type: "info",
+            title: "Action",
+            description: `Do you want restore backup from ${date}?`,
+            buttons: [{
+                title: "No",
+                onClick: () => ""
+            },
+            {
+                title: "Yes",
+                onClick: () => RestoreBackup(file),
+            }
+            ]
+        })
     }
 
     return (
@@ -795,6 +816,57 @@ function settings() {
                                 startValue={config().new.History.continue.MaximizeTimeSave.toString()}
                             />
                         </div>
+                    </div>
+                    <div class="settings-page-container">
+                        <div class="settings-page-title">{"Backup"}</div>
+                        <div class="settings-setting-container">
+                            {"Backup Making"}
+                            <Button content="Make New Backup" onClick={CreateBackup}/>
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {"Enable Backups"}
+                            <CheckBox
+                                checked={config().new.backup.enable}
+                                onChecked={(checked) =>
+                                    handleChange('backup.enable', checked)
+                                }
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {"When Making Backup"}
+                            <ButtonGroup selectedValue={t(`settings.general.${config().new.backup.check.toLowerCase().replaceAll(" ", "")}`)} listValues={[
+                                { value: t("settings.general.everyday"), onClick: () => handleChange("update.type", "Every Day") },
+                                { value: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
+                                { value: t("settings.general.everymonth"), onClick: () => handleChange("update.type", "Every Month") },
+                            ]}
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {"Max number of backups"}
+                            <SettingsInput
+                                iconChar=""
+                                type="number"
+                                onKeyDown={(text) => handleChange("backup.maxBackups", parseInt(text))}
+                                startValue={config().new.backup.maxBackups.toString()}
+                            />
+                        </div>
+                        <SettingsDrop LeftHeader="Backups" content={
+                            <div class="settings-backup-container">
+                                <For each={backupList().reverse()}>
+                                    {(value) => {
+                                        const [year, month, day, hour, min] = [value.date.getFullYear(), value.date.getMonth(), value.date.getDate(), value.date.getHours(), value.date.getMinutes()]             
+                                        return (
+                                            <span class="settings-button-backup" onclick={() => backupWarning(value.file, `${year}/${month}/${day} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`)}>
+                                                Backup From <span class="settings-button-date">{`${year}/${month}/${day} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`}</span>
+                                            </span>
+                                        )
+                                    }}
+                                </For>
+                            </div>
+                        } />
                     </div>
                 </Show>
                 <Show when={category() == "developer"}>

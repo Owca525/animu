@@ -44,7 +44,8 @@ if (process.contextIsolated) {
       },
       backup: {
         make: () => ipcRenderer.invoke("makeBackup"),
-        list: () => ipcRenderer.invoke("backupList")
+        list: () => ipcRenderer.invoke("backupList"),
+        restore: (file: string) => ipcRenderer.invoke("restoreBackup", file)
       },
       runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string}, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", videoData, type),
       getlistThemes: () => ipcRenderer.invoke("get-css-files"),

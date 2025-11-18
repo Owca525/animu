@@ -10,3 +10,10 @@ export async function CreateBackup() {
     }
     toast.success("Backup created succesfuly")
 }
+
+export async function RestoreBackup(file: string) {
+    const backupProgress = await window.api.backup.restore(file)
+    if (backupProgress.error) return toast.error("Failed making backup")
+    toast.success("Succesfully restored backup, restart application now")
+    return location.reload()
+}

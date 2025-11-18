@@ -1,0 +1,30 @@
+.settings-drop-container {
+    width: 100%;
+}
+
+.settings-drop-button {
+    background-color: var(--third-layer);
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    cursor: pointer;
+    user-select: none; 
+}
+.settings-drop-button:hover {
+    background-color: var(--five-layer);
+}
+
+.settings-drop-content {
+    background-color: var(--third-layer);
+    border-radius: 0px 0px 12px 12px;
+    overflow: hidden;
+    transition: height 250ms ease-in-out;
+    height: 0;
+    interpolate-size: allow-keywords;
+}
+
+.settings-drop-content.expand {
+    height: auto;
+}

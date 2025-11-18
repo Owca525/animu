@@ -41,7 +41,8 @@
     "material-symbols": "^0.39.0",
     "solid-i18n": "^1.1.0",
     "solid-toast": "^0.5.0",
-    "subtitle-converter": "^3.0.12"
+    "subtitle-converter": "^3.0.12",
+    "unzipper": "^0.12.3"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",
@@ -49,6 +50,7 @@
     "@electron-toolkit/tsconfig": "^2.0.0",
     "@types/archiver": "^7.0.0",
     "@types/node": "^24.9.2",
+    "@types/unzipper": "^0.10.11",
     "electron": "^39.1.1",
     "electron-builder": "^26.0.12",
     "electron-vite": "^4.0.1",

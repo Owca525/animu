@@ -1,8 +1,9 @@
 import { app, ipcMain } from "electron";
-import fs, { readdirSync } from "fs"
+import fs, { existsSync, readdirSync } from "fs"
 import archiver from "archiver";
 import path from "path";
-import { newConfigPath } from ".";
+import { initialBackend, newConfigPath } from ".";
+import * as unzipper from "unzipper"
 
 let backupFolder = path.join(app.getPath("userData"), "animuBackup")
 
@@ -17,7 +18,7 @@ export async function createBackup() {
         return { success: false, error: err.message };
     }
 }
-// TODO: end making system backup
+
 export async function getBackupList() {
     try {
         let backupFiles = readdirSync(backupFolder)
@@ -35,7 +36,23 @@ export async function getBackupList() {
         return []
     }
 }
+// Error: 2, missing file
+// Error: 1, Uknown Error
+export async function RestoreBackup(file: string): Promise<{ success: boolean, error?: number }> {
+    try {
+        if (!existsSync(path.join(backupFolder, file))) return { success: false, error: 2 }
+        await fs.rmdirSync(path.join(app.getPath("userData"), "animuConfig"), { recursive: true })
+        const directory = await unzipper.Open.file(path.join(backupFolder, file))
+        await directory.extract({ path: path.join(app.getPath("userData"), "animuConfig") })
+        await initialBackend()
+        return { success: true }
+    } catch (error) {
+        console.error("Error when restoring backup", error)
+        return { success: false, error: 1 }
+    }
+}
 
+ipcMain.handle("restoreBackup", async (_event, file: string) => RestoreBackup(file));
 ipcMain.handle("makeBackup", async (_event) => createBackup());
 ipcMain.handle("backupList", async (_event) => getBackupList());
 

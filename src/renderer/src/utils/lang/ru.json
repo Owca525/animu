@@ -178,6 +178,7 @@
       "onstart": "При запуске",
       "everyday": "Каждый день",
       "everyweek": "Каждую неделю",
+      "everymonth": "Every Month",
       "hideSidebar": "Скрыть боковую панель",
       "hoverSidebar": "При наведении на боковую панель",
       "discordrpc": "Discord RPC",
