@@ -192,6 +192,10 @@ body {
   outline: none !important;
 }
 
+.sidebar-button:hover .material-symbols-outlined {
+  color: var(--green-one);
+}
+
 .sidebar-button:hover,
 .sidebar-button-min:hover {
   border-color: var(--invisible);
