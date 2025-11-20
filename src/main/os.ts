@@ -151,7 +151,7 @@ export async function convertToNewFormat() {
     for (let index = 0; index < continueWatchData.length; index++) {
       const element = continueWatchData[index];
       let historyIndex = historyData.findIndex((value) => element.AnimeData.id == value.AnimeData.id)
-      if (index != -1) {
+      if (historyIndex != -1) {
         let card = {
           ...historyData[historyIndex],
           saveData: {
