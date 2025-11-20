@@ -43,15 +43,17 @@ export function convertSeconds(totalSeconds: number | undefined) {
     return { days, hours, minutes, seconds };
 }
 
-export function checkDate(date: string, type: "week" | "day") {
+export function checkDate(date: string | number, type: "Every Day" | "Every Week" | "Every Month") {
     const givenDate = new Date(date);
     const currentDate = new Date();
     const milliseconds = currentDate.getTime() - givenDate.getTime();
     switch (type) {
-        case "week":
+        case "Every Week":
             return milliseconds >= 7 * 24 * 60 * 60 * 1000;
-        case "day":
+        case "Every Day":
             return milliseconds >= 24 * 60 * 60 * 1000;
+        case "Every Month": 
+            return milliseconds >= (24 * 60 * 60 * 1000) * 30;
     }
 }
 

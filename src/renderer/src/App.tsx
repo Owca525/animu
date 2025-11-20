@@ -4,7 +4,7 @@ import "./themes/darkerAnimu/main.css"
 
 import "./utils/i18n"
 import { checkUpdate } from './utils/update';
-import { calculateZoomLevel, changeTheme, checkDate } from './utils/functions';
+import { calculateZoomLevel, changeTheme, checkDate, updateObjectConfig } from './utils/functions';
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
 import { InitialPlugin } from './utils/pluginApi';
@@ -23,6 +23,7 @@ import i18n from './utils/i18n';
 import { getPlayerPLugin } from './utils/stores/plugins';
 import LocalErrorBoundary from './utils/ErrorBoundary';
 import { defaultConfigWeb } from './utils/FilesManager/config';
+import { CreateBackup } from './utils/backup';
 
 function App() {
   const [isInitation, setInitation] = createSignal<boolean>(true)
@@ -88,8 +89,7 @@ function App() {
 async function runCheckUpdate() {
   let config = getConfig()
   if (config.update.type == "On Start") await checkUpdate()
-  if (config.update.type == "Every Day" && checkDate(config.update.lastTime, "day")) await checkUpdate()
-  if (config.update.type == "Every Week" && checkDate(config.update.lastTime, "week")) await checkUpdate()
+  if (checkDate(config.update.lastTime, config.update.type as any)) await checkUpdate()
 }
 
 async function LoadConfig() {
@@ -104,10 +104,11 @@ async function LoadConfig() {
   window.BrowserWindow.setZoom(calculateZoomLevel(parseFloat(loadedConnfig.General.Window.Zoom.toString())))
   window.BrowserWindow.setFullscreen(loadedConnfig.General.Window.AutoFullscreen)
 
-  // TODO: ADD Checking
-  if (loadedConnfig.backup.enable) {
-
-  }
+  if (!loadedConnfig.backup.enable) return
+  if (!checkDate(loadedConnfig.backup.lastCheck, loadedConnfig.backup.check)) return
+  CreateBackup()
+  updateObjectConfig("backup.lastCheck", new Date().getTime(), loadedConnfig)
+  // TODO: add backend refreas
 }
 
 export default App
