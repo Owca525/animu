@@ -1193,7 +1193,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             </Show>
             <Show when={config.Player.upToNextEpisode.variants == "old" && isUpNextEpisode()}>
                 <div class="player-up-Next-container old">
-                    <div class="player-up-Next-Title old">{t("player.upNext.title", { sec: parseInt(timeNextEpisode.toString()) })}</div>
+                    <div class="player-up-Next-Title old">{t("player.upNext.title", { sec: parseInt(timeNextEpisode().toString()) })}</div>
                     <div class="player-up-Next-Anime old">{t("player.upNext.titleAnime", { ep: getEpisode("next")?.ep, title: anime_data.AnimeData.title.romaji })}</div>
                     <div class="player-up-Next-Buttons old">
                         <Button content={t("player.upNext.nextEp")} ButtonClass='player-up-Next-Button old' onClick={() => setEpisode("next")} />
@@ -1209,7 +1209,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                         <div class="player-up-Next-content var2">
                             <div class="player-up-Next-title">{anime_data.AnimeData.title.romaji}</div>
                             <div class="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: getEpisode("next")?.ep })}</div>
-                            <div class="player-up-Next-text">{t("player.upNext.nextPlaying", { time: parseInt(timeNextEpisode.toString()) })}</div>
+                            <div class="player-up-Next-text">{t("player.upNext.nextPlaying", { time: parseInt(timeNextEpisode().toString()) })}</div>
                         </div>
                     </div>
                     <button class="material-symbols-outlined player-up-Next-button-close" onClick={(event) => {
@@ -1227,7 +1227,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     <div class="player-up-Next-content">
                         <div class="player-up-Next-title">{anime_data.AnimeData.title.romaji}</div>
                         <div class="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: getEpisode("next")?.ep })}</div>
-                        <div class="player-up-Next-text">{t("player.upNext.nextPlaying", { time: parseInt(timeNextEpisode.toString()) })}</div>
+                        <div class="player-up-Next-text">{t("player.upNext.nextPlaying", { time: parseInt(timeNextEpisode().toString()) })}</div>
                     </div>
                     <button class="material-symbols-outlined player-up-Next-button-close" onClick={(event) => {
                         event.stopPropagation();
