@@ -36,6 +36,7 @@ linux:
     - AppImage
     - deb
     - zip
+    - flatpak
   maintainer: https://github.com/Owca525
   category: AudioVideo
 appImage:
