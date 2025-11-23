@@ -16,7 +16,6 @@ import Home from "./pages/home/index";
 import Information from "./pages/information/index";
 import Settings from "./pages/settings/index";
 import Player from "./pages/player/index";
-import toast, { Toaster } from 'solid-toast';
 import { getConfig, setConfig } from './utils/stores/config';
 import { getGlobalCache, setGlobalHistory, setIncognitoMode } from './utils/stores/global';
 import i18n from './utils/i18n';
@@ -24,6 +23,7 @@ import { getPlayerPLugin } from './utils/stores/plugins';
 import LocalErrorBoundary from './utils/ErrorBoundary';
 import { defaultConfigWeb } from './utils/FilesManager/config';
 import { CreateBackup } from './utils/backup';
+import { toast } from './utils/context/ToastNotification';
 
 function App() {
   const [isInitation, setInitation] = createSignal<boolean>(true)
@@ -35,14 +35,14 @@ function App() {
     createShortcut(["Control", "Shift", "R"], async () => {
       if (getConfig().Developer.DeveloperMode) {
         await changeTheme(getConfig().General.theme)
-        toast.success("Reloaded Theme")
+        toast("Reloaded Theme")
       }
     })
   }
 
   createShortcut(["Control", "I"], () => {
     setIncognitoMode(!getGlobalCache().incognito)
-    toast.success(`Incognito Mode: ${getGlobalCache().incognito ? "On" : "Off"}`)
+    toast(`Incognito Mode: ${getGlobalCache().incognito ? "On" : "Off"}`)
   })
 
   createShortcut(["D"], () => {
@@ -72,7 +72,6 @@ function App() {
   return (
     <Show when={isInitation() == false}>
       <ErrorBoundary fallback={LocalErrorBoundary}>
-        <Toaster position="top-right" />
         <HashRouter>
           <Suspense >
             <Route path="/" component={Home} />

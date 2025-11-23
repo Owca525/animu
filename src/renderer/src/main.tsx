@@ -3,6 +3,7 @@ import App from './App'
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import { DialogProvider } from "./utils/context/DialogContext";
 import { ContextMenu } from "./utils/context/ContextMenu";
+import { ToastProvider } from './utils/context/ToastNotification';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,9 +18,9 @@ render(
     <DialogProvider>
       <ContextMenu>
         <QueryClientProvider client={queryClient}>
-          {/* <StoreProvider> */}
+          <ToastProvider>
             <App />
-          {/* </StoreProvider> */}
+          </ToastProvider>
         </QueryClientProvider>
       </ContextMenu>
     </DialogProvider>

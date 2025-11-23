@@ -21,6 +21,8 @@ import { getHomeCache, setAllHomeData, setHomeLocalSearch, setHomeSearch, setHom
 import { getConfig } from "@renderer/utils/stores/config";
 import { createEffect, createSignal, For, Match, onMount, Show, Switch } from "solid-js";
 import { unwrap } from "solid-js/store";
+import { createShortcut } from "@solid-primitives/keyboard";
+import { toast } from "@renderer/utils/context/ToastNotification";
 // import { createShortcut } from "@solid-primitives/keyboard";
 // import WelcomeScreen from "./components/welcomeScreen"
 
@@ -82,6 +84,10 @@ const Home = () => {
     //   setHomeSearchPage(home.page + 1)
     //   home.data.sections[0].onScrollDownFunction(home.page + 1);
     // }
+  })
+
+  createShortcut(["m"], () => {
+    toast("Test Notification", { type: "info", removeTimer: true })
   })
 
   function history() {

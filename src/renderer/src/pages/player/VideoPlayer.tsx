@@ -19,13 +19,13 @@ import { saveConfig } from "@renderer/utils/FilesManager/config"
 import { SaveHistory } from "@renderer/utils/FilesManager/history"
 import { Component, createSignal, For, onMount, Show } from "solid-js"
 import { getConfig } from "@renderer/utils/stores/config"
-import toast from "solid-toast"
 import { t } from "i18next"
 import { createShortcut } from "@solid-primitives/keyboard"
 import { useKeyPress } from "@renderer/utils/hooks/useKeyPress"
 import DeveloperStats from "./components/developerStats"
 import NerdStats from "./components/nerdStats"
 import { unwrap } from "solid-js/store"
+import { toast } from "@renderer/utils/context/ToastNotification"
 
 function addTime(durration: number): string {
     const now = new Date();
@@ -255,7 +255,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         console.log(currentplayer)
 
         if (currentplayer.resolution.length <= 0) {
-            toast.success(t("player.errors.missingResoltions"))
+            toast(t("player.errors.missingResoltions"), { type: "error" })
             setResError(() => true)
             return
         }
@@ -289,7 +289,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             hls()!.audioTrack = data.id
             setCurrentAudioTrack(() => data)
         } catch (error) {
-            toast.error("Failed Changing audio")
+            toast("Failed Changing audio", { type: "error" })
         }
     }
 
@@ -372,7 +372,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                             hls.destroy();
                             break;
                     }
-                    if (message) toast.error(message);
+                    if (message) toast(message, { type: "error" });
                 }
             });
         }
@@ -477,7 +477,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             }
         } catch (error) {
             console.error('Error PiP:', error);
-            toast.error("Failed open Picture in Picture Mode")
+            toast("Failed open Picture in Picture Mode", { type: "error" })
         }
     };
 
@@ -593,7 +593,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             default:
                 message = t('player.errors.default')
         }
-        toast.error(message);
+        toast(message, { type: "error" });
 
         // if (!currentPlayer) return
         // let index = player_data.findIndex((element) => element.hostname == currentPlayer.hostname)
@@ -810,7 +810,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             const outputCanvas = document.createElement("canvas");
             const ctx = outputCanvas.getContext("2d");
             if (!ctx) {
-                toast.error(t("player.toastscreenshot.failed"));
+                toast(t("player.toastscreenshot.failed"), { type: "error" });
                 return
             };
             outputCanvas.width = videoRef.videoWidth;
@@ -826,7 +826,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         console.log(screenshot)
 
         if (screenshot == "data:,") {
-            toast.error(t("player.toastscreenshot.failed"));
+            toast(t("player.toastscreenshot.failed"), { type: "error" });
             return
         }
         if (config.Player.screenShot.saveType == "Clipboard" || config.Player.screenShot.saveType == "Both") {
@@ -836,7 +836,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     'image/png': blob,
                 }),
             ]);
-            toast.success(t("player.toastscreenshot.doneclip"));
+            toast(t("player.toastscreenshot.doneclip"), { type: "success" });
             if (config.Player.screenShot.saveType == "Clipboard") return
         }
 
@@ -845,10 +845,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (config.Player.screenShot.alwaysAsk) var resp = await window.api.os.saveDialog(`${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot.replace(/^data:image\/png;base64,/, ''), `screenshot${formatedDate}.png`, "png", ["PNG"], "base64")
         else var resp = await window.api.os.write(`${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot.replace(/^data:image\/png;base64,/, ''), "base64")
         if (resp) {
-            toast.success(t("player.toastscreenshot.donefile", { path: config.Player.screenShot.path }));
+            toast(t("player.toastscreenshot.donefile", { path: config.Player.screenShot.path }), { type: "success" });
             return;
         }
-        toast.error(t("player.toastscreenshot.failed"));
+        toast(t("player.toastscreenshot.failed"), { type: "error" });
         return;
     };
 

@@ -13,10 +13,10 @@ import { useNavigate } from "@solidjs/router";
 import { createSignal, For, Match, onCleanup, onMount, Show, Switch } from "solid-js";
 import { getGlobalCache } from "@renderer/utils/stores/global";
 import { getPlayerPLugin } from "@renderer/utils/stores/plugins";
-import toast from "solid-toast";
 import CharacterCards from "./components/characterCard";
 import { createShortcut } from "@solid-primitives/keyboard";
 import { unwrap } from "solid-js/store";
+import { toast } from "@renderer/utils/context/ToastNotification";
 
 function information() {
     const navigate = useNavigate();
@@ -124,9 +124,9 @@ function information() {
     async function SaveCoverToClipboard(url: string | undefined) {
         if (!url) return
         if (await SaveToClipboard("image", url)) {
-            toast.success(t("information.notification.coverdone"))
+            toast(t("information.notification.coverdone"))
         } else {
-            toast.error(t("information.notification.coverfailed"))
+            toast(t("information.notification.coverfailed"))
         }
     }
 

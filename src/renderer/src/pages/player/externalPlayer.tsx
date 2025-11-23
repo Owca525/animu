@@ -9,8 +9,8 @@ import { t } from "i18next"
 import { Component, createEffect, createSignal, For, onMount, Show } from "solid-js"
 import { useNavigate } from "@solidjs/router"
 import { getConfig } from "@renderer/utils/stores/config"
-import toast from "solid-toast"
 import { unwrap } from "solid-js/store"
+import { toast } from "@renderer/utils/context/ToastNotification"
 
 interface ExternalplayerProps {
     animeData: {
@@ -51,7 +51,7 @@ const ExternalPlayer: Component<ExternalplayerProps> = ({ animeData, now_episode
     async function RunMovian(url?: string) {
         if (!url) return
         let req = await fetch(`http://${config.Player.external.movianIP}/showtime/open?url=${encodeURIComponent(url)}`)
-        if (!req.ok) toast.error(t("externalPlayer.failed.movian"))
+        if (!req.ok) toast(t("externalPlayer.failed.movian"), { type: "error" })
     }
 
     function getNumberOfSub(data: playerSubtitlesFormat[] | undefined) {
@@ -90,7 +90,7 @@ const ExternalPlayer: Component<ExternalplayerProps> = ({ animeData, now_episode
 
     async function runChromeCast(device: { host: string, port: number, name: string }) {
         if (!currentResolution() || currentResolution()?.hls) {
-            toast.error(t("externalPlayer.failed.chromecast"))
+            toast(t("externalPlayer.failed.chromecast"), { type: "error" })
             return
         }
         await window.api.chromecast.connect(device, { title: AnimeTitle, time: time, url: currentResolution()?.url as any, type: "video/mp4" })
@@ -117,19 +117,19 @@ const ExternalPlayer: Component<ExternalplayerProps> = ({ animeData, now_episode
         if (currentPlayer() === "Mpv") runMpvPlayer()
         if (currentPlayer() === "VLC") runVlcPlayer()
         externalPlayerData.onChage(currentPlayer())
-        if (currentPlayer() !== "ChromeCast") toast.success(t("externalPlayer.running", { player: currentPlayer() }))
+        if (currentPlayer() !== "ChromeCast") toast(t("externalPlayer.running", { player: currentPlayer() }), { type: "success" })
         if (currentPlayer() === "ChromeCast") startSearchChromeCast()
     }
 
     onMount(() => {
         if (playerData.length <= 0) {
-            toast.error(t("externalPlayer.failed.player"))
+            toast(t("externalPlayer.failed.player"), { type: "error" })
             return
         }
 
         setCurrentHost(playerData[0])
         if (playerData[0].resolution.length <= 0) {
-            toast.error(t("externalPlayer.failed.resolution"))
+            toast(t("externalPlayer.failed.resolution"), { type: "error" })
             return
         }
         setCurrentResolution(() => playerData[0].resolution[0])

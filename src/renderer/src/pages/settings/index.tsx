@@ -18,7 +18,6 @@ import { checkUpdate } from "@renderer/utils/update";
 import { InitialPlugin } from "@renderer/utils/pluginApi";
 import ButtonGroup from "./components/buttonGroup";
 import { DetectOldVersionHistory } from "@renderer/utils/FilesManager/history";
-import toast from "solid-toast";
 import { useNavigate } from "@solidjs/router";
 import { getConfig, setConfig } from "@renderer/utils/stores/config";
 import { getPluginList } from "@renderer/utils/stores/plugins";
@@ -27,6 +26,7 @@ import { createShortcut } from "@solid-primitives/keyboard";
 import { unwrap } from "solid-js/store";
 import SettingsDrop from "./components/settingsDrop";
 import { CreateBackup, RestoreBackup } from "@renderer/utils/backup";
+import { toast } from "@renderer/utils/context/ToastNotification";
 
 function settings() {
     const navigate = useNavigate();
@@ -186,9 +186,9 @@ function settings() {
             saveConfig(config().new)
             setDynamicZoom(config().new.General.Window.Zoom)
             InitialPlugin()
-            toast.success(t("settings.saving.done"))
+            toast(t("settings.saving.done"), { type: "success" })
         } catch (error) {
-            toast.success(t("settings.saving.error"))
+            toast(t("settings.saving.error"), { type: "success" })
         }
     }
 
@@ -915,9 +915,10 @@ function settings() {
                         <div class="settings-setting-container">
                             Toast Notification Test
                             <span class="settings-custom-space">
-                                <Button content="success" onClick={() => toast.success("Test Notification")} />
+                                {/* TODO: ADD SUPPORT FOR NEW TOAST NOTIFICATIONS */}
+                                {/* <Button content="success" onClick={() => toast.success("Test Notification")} />
                                 <Button content="error" onClick={() => toast.error("Test Notification")} />
-                                <Button content="default" onClick={() => toast("Test Notification")} />
+                                <Button content="default" onClick={() => toast("Test Notification")} /> */}
                             </span>
                         </div>
                         <div class="settings-line"></div>

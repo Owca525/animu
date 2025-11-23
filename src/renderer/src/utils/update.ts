@@ -1,8 +1,8 @@
-import toast from "solid-toast";
 import { saveConfig } from "./FilesManager/config";
 import { t } from "i18next";
 import { getConfig } from "./stores/config";
 import { unwrap } from "solid-js/store";
+import { toast } from "./context/ToastNotification";
 
 export async function checkUpdate(alwaysShow: boolean = false) {
   try {
@@ -11,7 +11,7 @@ export async function checkUpdate(alwaysShow: boolean = false) {
     console.log(update);
 
     if (update.available) {
-      const id = toast.loading(t("update.progress", { procent: 0 }));
+      const id = toast(t("update.progress", { procent: 0 }));
 
       toast(t("update.available", { ver: update.version }), {
         duration: 5000,
@@ -21,7 +21,7 @@ export async function checkUpdate(alwaysShow: boolean = false) {
         // },
       });
     } else if (alwaysShow) {
-      toast.success(t("update.same"));
+      toast(t("update.same"), { type: "success" });
     }
 
     const config = unwrap(getConfig());
@@ -29,19 +29,19 @@ export async function checkUpdate(alwaysShow: boolean = false) {
     saveConfig(config);
   } catch (error) {
     console.error("Error in checkUpdate", error);
-    toast.error("Failed to check for updates");
+    toast("Failed to check for updates", { type: "error" });
   }
 }
-
+// TODO: Fix updates
 export function downloadUpdate(updateNotification: string) {
-  window.api.update.updateProgress((_event, percent) => {
-    toast.loading(t("update.progress", { procent: percent.toFixed(1) }), {
-      id: updateNotification,
-    });
+  // window.api.update.updateProgress((_event, percent) => {
+  //   toast.loading(t("update.progress", { procent: percent.toFixed(1) }), {
+  //     id: updateNotification,
+  //   });
 
-    if (percent.toFixed(0) === "100") {
-      toast.dismiss(updateNotification);
-      toast.success(t("update.done"));
-    }
-  });
+  //   if (percent.toFixed(0) === "100") {
+  //     toast.dismiss(updateNotification);
+  //     toast(t("update.done"), { type: "success" });
+  //   }
+  // });
 }
