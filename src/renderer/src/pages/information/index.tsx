@@ -185,6 +185,41 @@ function information() {
     //     return false
     // }
 
+    // let text = ""
+    // let synonyms = tempData().anime.synonyms
+    // if (synonyms) {
+    //     for (let index = 0; index < synonyms.length; index++) {
+    //         const element = synonyms[index]
+    //         text = text + `${element} \u25CF `
+    //     }
+    // }
+    // const keys = Object.keys(tempData().anime.title)
+    // for (let index = 0; index < keys.length; index++) {
+    //     const element = tempData().anime.title[keys[index]]
+    //     console.log(element)
+    //     if (element) text = text + `${element} \u25CF `
+    // }
+    // return text.replace(/(\u25CF\s)(?!.*\u25CF\s)/, "")
+    function createMiniTitle(): string {
+        let text = ""
+        let synonyms = tempData().anime.synonyms
+        if (synonyms) {
+            for (let index = 0; index < synonyms.length; index++) {
+                const element = synonyms[index]
+                text = text + `${element} ${index != synonyms.length-1 ? "\u25CF" : ""} `
+            }
+            return text
+        } else {
+            const keys = Object.keys(tempData().anime.title)
+            for (let index = 0; index < keys.length; index++) {
+                const element = tempData().anime.title[keys[index]]
+                console.log(element)
+                if (element) text = text + `${element} ${index != keys.length-1 ? "\u25CF" : ""} `
+            }
+            return text
+        }
+    }
+
     return (
         <>
             <main class="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>
@@ -225,7 +260,7 @@ function information() {
                         </div>
                         <div class="information-text-container">
                             <div class="information-title">{tempData().anime.title.romaji}</div>
-                            <div class="information-mini-title">{tempData().anime.title.english ? tempData().anime.title.english : tempData().anime.title.native}</div>
+                            <div class="information-mini-title">{createMiniTitle()}</div>
                             <div class="information-description" ref={descriptionRef}>
                                 {decodeHtmlEntities(tempData().anime.description ?? t("information.descriptionnotfound"))}
                             </div>

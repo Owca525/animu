@@ -1,4 +1,4 @@
-import { genYearsList, getWeek, request } from "@renderer/utils/functions";
+import { genYearsList, request } from "@renderer/utils/functions";
 import { cardData, containerData, genresSearchFormat, newInformationPluginFormat } from "@renderer/utils/types";
 import { t } from "i18next";
 import { unwrap } from "solid-js/store";
@@ -37,6 +37,7 @@ const animeData = `
       duration
       genres
       source
+      synonyms
       averageScore
       trailer {
         id
@@ -162,21 +163,21 @@ query(
 }
 `;
 
-const graphicAiringAnime = `
-query AiringAnimes($page: Int, $perPage: Int, $sort: [AiringSort], $airingAtGreater: Int, $airingAtLesser: Int) {
-    Page(page: $page, perPage: $perPage) {
-        airingSchedules(sort: $sort, airingAt_greater: $airingAtGreater, airingAt_lesser: $airingAtLesser) {
-        id
-        airingAt
-        episode
+// const graphicAiringAnime = `
+// query AiringAnimes($page: Int, $perPage: Int, $sort: [AiringSort], $airingAtGreater: Int, $airingAtLesser: Int) {
+//     Page(page: $page, perPage: $perPage) {
+//         airingSchedules(sort: $sort, airingAt_greater: $airingAtGreater, airingAt_lesser: $airingAtLesser) {
+//         id
+//         airingAt
+//         episode
 
-        media {
-          ${animeData}
-        }
-      }
-    }
-}
-`
+//         media {
+//           ${animeData}
+//         }
+//       }
+//     }
+// }
+// `
 
 const graphicHomeApi = `
   query (
@@ -211,15 +212,45 @@ query(
 ) {
   Media(id: $id, type: ANIME) {
     ${animeData}
+    recommendations(perPage: 7, sort: [RATING_DESC, ID]) {
+      pageInfo {
+        total
+      }
+      nodes {
+        id
+        rating
+        userRating
+        mediaRecommendation {
+          id
+          title {
+            userPreferred
+          }
+          format
+          type
+          status(version: 2)
+          bannerImage
+          coverImage {
+            large
+          }
+        }
+        user {
+          id
+          name
+          avatar {
+            large
+          }
+        }
+      }
+    }
   }
 }
 `;
 
-const genres = `
-query {
-  GenreCollection
-}
-`
+// const genres = `
+// query {
+//   GenreCollection
+// }
+// `
 
 const header = {
   "Content-Type": "application/json",

@@ -47,6 +47,7 @@ export interface AnimeData {
     }[]
     source?: string | undefined
     status?: string | undefined
+    synonyms?: string[],
     studios: string[]
     title: { english?: string, native: string, romaji: string }
     type?: string | undefined
