@@ -443,6 +443,15 @@ body {
   border-radius: 50%;
 }
 
+.information-mini-title.click, .information-title-small.click {
+  cursor: pointer;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
 .information-mini-title,
 .information-title-small2 {
   color: var(--text-gray);

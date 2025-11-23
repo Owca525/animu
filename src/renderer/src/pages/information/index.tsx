@@ -27,6 +27,7 @@ function information() {
 
     const [showWrong, setshowWrong] = createSignal<boolean>(false)
     const [isNeedMore, setNeedMore] = createSignal<boolean>(false)
+    const [moreMiniTitle, setmoreMiniTitle] = createSignal<boolean>(false)
     const [currentPlugin, setCurrentPlugin] = createSignal<string | undefined>(getPlayerPLugin()?.name)
     const [secondsLeft, setSecondsLeft] = createSignal<undefined | { left: number, converted: { days: number; hours: number; minutes: number; seconds: number; } | undefined }>(undefined);
 
@@ -185,39 +186,19 @@ function information() {
     //     return false
     // }
 
-    // let text = ""
-    // let synonyms = tempData().anime.synonyms
-    // if (synonyms) {
-    //     for (let index = 0; index < synonyms.length; index++) {
-    //         const element = synonyms[index]
-    //         text = text + `${element} \u25CF `
-    //     }
-    // }
-    // const keys = Object.keys(tempData().anime.title)
-    // for (let index = 0; index < keys.length; index++) {
-    //     const element = tempData().anime.title[keys[index]]
-    //     console.log(element)
-    //     if (element) text = text + `${element} \u25CF `
-    // }
-    // return text.replace(/(\u25CF\s)(?!.*\u25CF\s)/, "")
     function createMiniTitle(): string {
-        let text = ""
         let synonyms = tempData().anime.synonyms
-        if (synonyms) {
-            for (let index = 0; index < synonyms.length; index++) {
-                const element = synonyms[index]
-                text = text + `${element} ${index != synonyms.length-1 ? "\u25CF" : ""} `
-            }
-            return text
-        } else {
-            const keys = Object.keys(tempData().anime.title)
-            for (let index = 0; index < keys.length; index++) {
-                const element = tempData().anime.title[keys[index]]
-                console.log(element)
-                if (element) text = text + `${element} ${index != keys.length-1 ? "\u25CF" : ""} `
-            }
-            return text
+        let titles: string[] = []
+        if (synonyms) synonyms.forEach((value) => titles.push(value))
+        
+        const keys = Object.keys(tempData().anime.title)
+        for (let index = 0; index < keys.length; index++) {
+            const element = tempData().anime.title[keys[index]]
+            if (element) titles.push(element)
         }
+        titles = [...new Set(titles)]
+        let text = titles.join(" \u25CF ")
+        return text.replace(/(\u25CF\s)(?!.*\u25CF\s)/, "")
     }
 
     return (
@@ -254,13 +235,12 @@ function information() {
                             </Show>
 
                             <div class="information-title-small-container">
-                                <div class="information-title-small">{tempData().anime.title.romaji}</div>
-                                <div class="information-title-small2">{tempData().anime.title.english ? tempData().anime.title.english : tempData().anime.title.native}</div>
+                                <div class={`information-title-small ${moreMiniTitle() == false ? "click" : ""}`} onclick={() => setmoreMiniTitle(true)}>{createMiniTitle()}</div>
                             </div>
                         </div>
                         <div class="information-text-container">
                             <div class="information-title">{tempData().anime.title.romaji}</div>
-                            <div class="information-mini-title">{createMiniTitle()}</div>
+                            <div class={`information-mini-title ${moreMiniTitle() == false ? "click" : ""}`} onclick={() => setmoreMiniTitle(true)}>{createMiniTitle()}</div>
                             <div class="information-description" ref={descriptionRef}>
                                 {decodeHtmlEntities(tempData().anime.description ?? t("information.descriptionnotfound"))}
                             </div>
