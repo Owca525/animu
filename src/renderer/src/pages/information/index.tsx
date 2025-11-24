@@ -234,9 +234,9 @@ function information() {
                                 <div class="information-cover-placeholder"><span class="material-symbols-outlined">error</span></div>
                             </Show>
 
-                            <div class="information-title-small-container">
+                            {/* <div class="information-title-small-container">
                                 <div class={`information-title-small ${moreMiniTitle() == false ? "click" : ""}`} onclick={() => setmoreMiniTitle(true)}>{createMiniTitle()}</div>
-                            </div>
+                            </div> */}
                         </div>
                         <div class="information-text-container">
                             <div class="information-title">{tempData().anime.title.romaji}</div>
