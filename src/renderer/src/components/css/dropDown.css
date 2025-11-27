@@ -46,7 +46,8 @@
   z-index: 1000;
   max-height: 300px;
   overflow: auto;
-  animation: firstShow 0.2s ease forwards;
+  animation: dropDownExpand 0.2s ease forwards;
+  transform-origin: top;
 }
 
 .dropdown-item {
@@ -68,6 +69,17 @@
   width: 24px;
   height: 24px;
 }
+
+/* ANIMATION */
+@keyframes dropDownExpand {
+  0% {
+    transform: scaleY(0);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
 
 /* for very small window sizes */
 @media (max-width: 600px) {
