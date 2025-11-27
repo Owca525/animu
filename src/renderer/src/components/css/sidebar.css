@@ -2,6 +2,10 @@
     width: clamp(155px, 20vw, 200px);
 }
 
+.sidebar-container-max.show {
+    animation: sidebarShow 0.2s ease forwards;
+}
+
 .sidebar-container-min, .settings-shadow-sidebar {
     width: clamp(50px, 7.3vw, 66px);
 }
@@ -32,7 +36,7 @@
 }
 
 .sidebar-container-min.hidden {
-    display: none;
+    animation: sidebarHidden 0.2s ease forwards;
 }
 
 .sidebar-button-min.active, .sidebar-button.active {
@@ -93,4 +97,22 @@
 .sidebar-version {
     font-size: 1.2em;
     padding-right: 12px;
+}
+
+/* Animation */
+@keyframes sidebarShow {
+  0% {
+    transform: translateX(-150px);
+  }
+  100% {
+    transform: translateX(0px);
+  }
+}
+@keyframes sidebarHidden {
+  0% {
+    transform: translateX(0px);
+  }
+  100% {
+    transform: translateX(-150px);
+  }
 }

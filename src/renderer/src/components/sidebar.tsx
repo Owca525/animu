@@ -59,7 +59,7 @@ export default function Sidebar(props: sidebarProps) {
   }
 
   function detectSidebarState() {
-    if (sidebarHover()) return "sidebar-container-max"
+    if (sidebarHover()) return `sidebar-container-max ${!props.showLogo ? "show" : ""}`
     return `sidebar-container-min ${!props.showLogo ? "hidden" : ""}`
   }
 
