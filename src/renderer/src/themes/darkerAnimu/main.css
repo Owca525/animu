@@ -100,17 +100,13 @@ body {
 /* DialogContext */
 
 .dialog-main-background {
-  background-color: rgb(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  background-color: color-mix(in srgb, var(--first-layer) 50%, transparent);
 }
 
 .dialog-container {
   background-color: var(--second-layer);
   border-radius: 12px;
-}
-
-.dialog-container::backdrop {
-  backdrop-filter: blur(4px);
-  background-color: color-mix(in srgb, var(--first-layer) 50%, transparent);
 }
 
 .dialog-button.error {
