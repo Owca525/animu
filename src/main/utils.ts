@@ -260,6 +260,7 @@ function createProxyServer() {
             if (range) fetchHeaders["Range"] = range;
 
             const response = await fetch(currentVideoUrl.url, { headers: fetchHeaders });
+            console.log(response)
 
             if (!response.ok) {
                 res.status(response.status).send("Failed to fetch video");
