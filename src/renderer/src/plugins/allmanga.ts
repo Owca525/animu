@@ -405,7 +405,7 @@ export async function getEpisodeList(anime_id: string, episode: { start: number,
     const resp = await sendToAPI(variables, HASH_DATA, header)
     console.log(variables, resp)
     if (!resp.success || !resp.json) return []
-    if ("errors" in resp.json.data) return []
+    if ("errors" in resp.json) return []
     if (!resp.json.data.episodeInfos) return []
     return await formatEpisodeData(resp.json.data.episodeInfos)
   } catch (Error) {

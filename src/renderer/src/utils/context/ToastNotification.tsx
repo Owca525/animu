@@ -1,4 +1,4 @@
-import { createContext, useContext, createSignal, JSX, For } from "solid-js";
+import { createContext, createSignal, JSX, For } from "solid-js";
 import { Portal } from "solid-js/web";
 import { v4 as uuidv4 } from 'uuid';
 import "./css/ToastNotification.css"
