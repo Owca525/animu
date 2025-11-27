@@ -1,4 +1,4 @@
-import { clipboard, ipcMain, nativeImage, shell } from "electron"
+import { app, clipboard, ipcMain, nativeImage, shell } from "electron"
 import { Client } from "@xhayper/discord-rpc";
 import { ActivityType } from "discord-api-types/v10"
 
@@ -335,3 +335,5 @@ export function deepMerge(target: any, source: any): any {
     }
     return target;
 }
+
+ipcMain.handle("animuVersion", () => app.getVersion())

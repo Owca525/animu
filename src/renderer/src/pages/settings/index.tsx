@@ -39,8 +39,29 @@ function settings() {
     const [isSaving, setSaving] = createSignal<boolean>(false)
     const [themeMetadata, setthemeMetadata] = createSignal<themeMetadata | undefined>(undefined)
     const [backupList, setBackupList] = createSignal<{ date: Date, file: string }[]>([])
+    const [ContextMenu, setContextMenu] = createSignal<ContextMenuProps>([
+        { option: t("dialog.reload"), onClick: () => location.reload() },
+        { option: "", line: true },
+        {
+            option: t("dialog.exit"), onClick: () => showDialog({
+                type: "info",
+                title: "Action",
+                description: t("global.exitAnimu"),
+                buttons: [
+                    {
+                        title: t("dialog.yes"),
+                        onClick: () => window.api ? window.BrowserWindow.exit() : ""
+                    },
+                    {
+                        title: t("dialog.no"),
+                        onClick: () => ""
+                    },
+                ]
+            })
+        }
+    ])
 
-    let sidebarData = {
+    const [sidebarData, setSidebarData] = createSignal({
         top: [
             {
                 icon: "manufacturing",
@@ -75,23 +96,22 @@ function settings() {
                 onClick: () => { navigate("/"); resetNewConfig() },
             },
         ],
-    };
+    });
 
     if (window.api) {
-        sidebarData.bottom.push({
-            icon: "folder",
-            text: t("global.cfglocation"),
-            onClick: async () =>
-                await window.api.open(await window.api.os.getConfigPath()),
-        })
-        sidebarData.bottom.reverse()
-    }
-
-    if (config().new.Developer.DeveloperMode) {
-        sidebarData.top.push({
-            icon: "code",
-            text: t("global.dev"),
-            onClick: () => setCategory("developer" as any)
+        setSidebarData((prev) => {
+            return {
+                ...prev,
+                bottom: [
+                    ...prev.bottom,
+                    {
+                        icon: "folder",
+                        text: t("global.cfglocation"),
+                        onClick: async () =>
+                            await window.api.open(await window.api.os.getConfigPath()),
+                    }
+                ]
+            }
         })
     }
 
@@ -104,7 +124,7 @@ function settings() {
             buttons: [
                 {
                     title: t("dialog.yes"),
-                    onClick: () => handleChange("Developer.DeveloperMode", true)
+                    onClick: () => {handleChange("Developer.DeveloperMode", true);turnOnDeveloperMode()}
                 },
                 {
                     title: t("dialog.no"),
@@ -117,32 +137,6 @@ function settings() {
     createShortcut(["Escape"], () => {
         navigate("/");
     })
-
-    let ContextMenu: ContextMenuProps = [
-        { option: t("dialog.reload"), onClick: () => location.reload() },
-        { option: "", line: true },
-        {
-            option: t("dialog.exit"), onClick: () => showDialog({
-                type: "info",
-                title: "Action",
-                description: t("global.exitAnimu"),
-                buttons: [
-                    {
-                        title: t("dialog.yes"),
-                        onClick: () => window.api ? window.BrowserWindow.exit() : ""
-                    },
-                    {
-                        title: t("dialog.no"),
-                        onClick: () => ""
-                    },
-                ]
-            })
-        }
-    ]
-
-    if (config().new.Developer.DeveloperMode && window.api) {
-        ContextMenu.push({ option: t("contextMenu.devtools"), onClick: window.BrowserWindow.openDevTools })
-    }
 
     function handleChange(path: string, value: string | number | boolean) {
         setNewConfig((prevConfig) => {
@@ -165,6 +159,7 @@ function settings() {
             });
         })
         if (config().new.General.discordRPC) window.api.rpc.setActivity(undefined, t("discordrpc.settings"))
+        turnOnDeveloperMode()
     });
 
     onCleanup(() => {
@@ -174,6 +169,25 @@ function settings() {
     async function ChangeScreenshot(path: string | any) {
         if (!path) return
         handleChange("Player.screenShot.path", path)
+    }
+
+    function turnOnDeveloperMode() {
+        if (config().new.Developer.DeveloperMode && window.api) {
+            setContextMenu((prev) => [...prev, { option: t("contextMenu.devtools"), onClick: window.BrowserWindow.openDevTools }])
+        }
+        if (config().new.Developer.DeveloperMode) {
+            setSidebarData((prev) => ({
+                ...prev,
+                top: [
+                    ...prev.top,
+                    {
+                        icon: "code",
+                        text: t("global.dev"),
+                        onClick: () => setCategory("developer" as any)
+                    }
+                ]
+            }))
+        }
     }
 
     function saveNewConfig() {
@@ -241,9 +255,9 @@ function settings() {
     }
 
     return (
-        <main class="settings-container" onContextMenu={(event) => OpenContextMenu(ContextMenu, event)}>
+        <main class="settings-container" onContextMenu={(event) => OpenContextMenu(ContextMenu(), event)}>
             <Sidebar
-                data={sidebarData as any}
+                data={sidebarData() as any}
                 showLogo
                 activeElement
             />
@@ -821,7 +835,7 @@ function settings() {
                         <div class="settings-page-title">{"Backup"}</div>
                         <div class="settings-setting-container">
                             {"Backup Making"}
-                            <Button content="Make New Backup" onClick={CreateBackup}/>
+                            <Button content="Make New Backup" onClick={CreateBackup} />
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
@@ -857,7 +871,7 @@ function settings() {
                             <div class="settings-backup-container">
                                 <For each={backupList().reverse()}>
                                     {(value) => {
-                                        const [year, month, day, hour, min] = [value.date.getFullYear(), value.date.getMonth(), value.date.getDate(), value.date.getHours(), value.date.getMinutes()]             
+                                        const [year, month, day, hour, min] = [value.date.getFullYear(), value.date.getMonth(), value.date.getDate(), value.date.getHours(), value.date.getMinutes()]
                                         return (
                                             <span class="settings-button-backup" onclick={() => backupWarning(value.file, `${year}/${month}/${day} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`)}>
                                                 Backup From <span class="settings-button-date">{`${year}/${month}/${day} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`}</span>
@@ -915,10 +929,9 @@ function settings() {
                         <div class="settings-setting-container">
                             Toast Notification Test
                             <span class="settings-custom-space">
-                                {/* TODO: ADD SUPPORT FOR NEW TOAST NOTIFICATIONS */}
-                                {/* <Button content="success" onClick={() => toast.success("Test Notification")} />
-                                <Button content="error" onClick={() => toast.error("Test Notification")} />
-                                <Button content="default" onClick={() => toast("Test Notification")} /> */}
+                                <Button content="success" onClick={() => toast("Test Notification", {type: "success"})} />
+                                <Button content="error" onClick={() => toast("Test Notification", {type: "error"})} />
+                                <Button content="default" onClick={() => toast("Test Notification")} />
                             </span>
                         </div>
                         <div class="settings-line"></div>

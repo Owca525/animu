@@ -60,6 +60,7 @@ if (process.contextIsolated) {
         invoke: (channel: string, ...args: any[]): Promise<any> =>
           ipcRenderer.invoke(channel, ...args),
       },
+      version: () => ipcRenderer.invoke("animuVersion")
     });
     contextBridge.exposeInMainWorld("electronAPI", electronAPI)
     contextBridge.exposeInMainWorld("BrowserWindow", {
