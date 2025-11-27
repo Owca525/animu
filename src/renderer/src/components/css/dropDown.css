@@ -43,7 +43,7 @@
   flex-direction: column;
   list-style: none;
   margin: 0;
-  z-index: 1000;
+  z-index: 1000 !important;
   max-height: 300px;
   overflow: auto;
   animation: dropDownExpand 0.2s ease forwards;
