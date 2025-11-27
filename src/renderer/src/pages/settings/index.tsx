@@ -110,7 +110,7 @@ function settings() {
                         onClick: async () =>
                             await window.api.open(await window.api.os.getConfigPath()),
                     }
-                ]
+                ].reverse()
             }
         })
     }
