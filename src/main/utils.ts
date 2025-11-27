@@ -237,58 +237,52 @@ export function validUrl(urlString: string): boolean {
     } catch (_) { return false }
 }
 
-const createProxyServer = () => {
+function createProxyServer() {
     const appServer = express();
 
     appServer.get("/video", async (req, res) => {
         const { url: encodedUrl } = req.query as { url?: string };
         if (!encodedUrl) return res.status(400).send("Url not found");
 
-        const currentVideoUrl: requestResponseVideo = JSON.parse(Buffer.from(encodedUrl, "base64").toString("utf-8"));
-        const hostname = new URL(currentVideoUrl.url)
+        const currentVideoUrl: requestResponseVideo =
+            JSON.parse(Buffer.from(encodedUrl, "base64").toString("utf-8"));
 
-        let aborted = false;
-        req.on("close", () => {
-            aborted = true;
-        });
+        const range = req.headers.range;
+        const headers: Record<string, string> = {
+            ...req.headers,
+            ...currentVideoUrl.header,
+        };
+        delete headers["sec-ch-ua"];
+        delete headers["referer"];
 
         try {
-            console.log(req.headers)
-            delete req.headers["referer"]
-            let headers: Record<string, string> = {
-                ...req.headers,
-                host: hostname.hostname,
-                "sec-ch-ua-platform": '"Windows"',
-                ...currentVideoUrl.header
-            };
+            const fetchHeaders: Record<string, string> = {};
+            if (range) fetchHeaders["Range"] = range;
 
-            delete headers["sec-ch-ua"]
+            const response = await fetch(currentVideoUrl.url, { headers: fetchHeaders });
 
-            console.log(headers)
-
-            const response = await fetch(currentVideoUrl.url, { headers });
-            console.log(response)
-            if (response.status == 403) {
-                res.status(response.status)
-                res.end();
-                return
+            if (!response.ok) {
+                res.status(response.status).send("Failed to fetch video");
+                return;
             }
 
             res.status(response.status);
             response.headers.forEach((value, key) => res.setHeader(key, value));
 
             if (!response.body) {
-                res.status(500).send("body not found");
+                res.status(500).send("No body in response");
                 return;
             }
 
             const nodeStream = Readable.fromWeb(response.body as any);
 
+            let aborted = false;
             req.on("close", () => {
+                aborted = true;
                 try {
                     nodeStream.destroy();
                     (response.body as any)?.cancel?.();
-                } catch (error) { console.error(error) }
+                } catch { }
             });
 
             nodeStream.on("error", (err) => {
@@ -299,39 +293,32 @@ const createProxyServer = () => {
             });
 
             nodeStream.pipe(res);
-            return
         } catch (err: any) {
-            if (!aborted) {
-                console.error("Proxy error:", err.message);
-                res.status(500).send("error");
-            }
-            return
+            console.error("Proxy error:", err.message);
+            if (!res.headersSent) res.status(500).send("Proxy error");
         }
     });
 
-    appServer.listen(3001, () =>
-        console.log("Video Proxy: http://localhost:3001")
-    );
+    appServer.listen(3001, () => console.log("Video Proxy: http://localhost:3001"));
 };
-
 
 createProxyServer()
 
 export function checkPath(program: string) {
-  try {
-    if (os.platform() === "win32") return ""
-    let paths = execSync(`whereis ${program}`).toString().trim().split(" ")
-    if (!(paths.length <= 1)) return paths[1]
-    let flatpakPaths = execSync(`flatpak list --columns=application`).toString().trim().split(" ")
-    for (let index = 0; index < flatpakPaths.length; index++) {
-      const element = flatpakPaths[index];
-      if (element.toLowerCase().includes(program.toLocaleLowerCase())) return element.replace("\n", "")
+    try {
+        if (os.platform() === "win32") return ""
+        let paths = execSync(`whereis ${program}`).toString().trim().split(" ")
+        if (!(paths.length <= 1)) return paths[1]
+        let flatpakPaths = execSync(`flatpak list --columns=application`).toString().trim().split(" ")
+        for (let index = 0; index < flatpakPaths.length; index++) {
+            const element = flatpakPaths[index];
+            if (element.toLowerCase().includes(program.toLocaleLowerCase())) return element.replace("\n", "")
+        }
+        return ""
+    } catch (error) {
+        console.error(error)
+        return ""
     }
-    return ""
-  } catch (error) {
-    console.error(error)
-    return ""
-  }
 }
 
 export function deepMerge(target: any, source: any): any {
