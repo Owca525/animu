@@ -29,6 +29,7 @@ interface ToastContextType {
 };
 
 const ToastContext = createContext<ToastContextType>();
+let toastAPI: ToastContextType | undefined;
 
 export function ToastProvider(props: { children: JSX.Element }) {
     const [toasts, setToasts] = createSignal<ToastProps[]>([]);
@@ -57,6 +58,7 @@ export function ToastProvider(props: { children: JSX.Element }) {
 
     return (
         <ToastContext.Provider value={{ addToast, updateToast, removeToast }}>
+            {(() => { toastAPI = { addToast, updateToast, removeToast }; return null; })()}
             {props.children}
 
             <Portal>
@@ -75,19 +77,17 @@ export function ToastProvider(props: { children: JSX.Element }) {
 }
 
 export function toast(msg: string, options?: ToastOptions) {
-    let toast = useContext(ToastContext)
-    if (!toast) return
-    return toast.addToast(msg, { ...defaultOptions, ...options })
+    console.log(toastAPI)
+    if (!toastAPI) return;
+    return toastAPI.addToast(msg, { ...defaultOptions, ...options })
 }
 
 export function updateToast(id: string, msg: string) {
-    let toast = useContext(ToastContext)
-    if (!toast) return
-    return toast.updateToast(id, msg)
+    if (!toastAPI) return;
+    return toastAPI.updateToast(id, msg)
 }
 
 export function removeToast(id: string) {
-    let toast = useContext(ToastContext)
-    if (!toast) return
-    return toast.removeToast(id)
+    if (!toastAPI) return;
+    return toastAPI.removeToast(id)
 }
