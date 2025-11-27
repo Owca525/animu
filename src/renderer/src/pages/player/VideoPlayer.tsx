@@ -335,6 +335,13 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
                 const resolutions = data.levels.map((level) => level.height);
                 console.log(resolutions, hls.levels.length - 1, data.levels)
+                data.levels.forEach(level => {
+                    // I added Ignore because this give me a error "Cannot assign to 'audioCodec' because it is a read-only property." but i can assign then is good
+                    // @ts-ignore
+                    if (!level.audioCodec) level.audioCodec = "mp4a.40.5"
+                    // @ts-ignore
+                    else level.audioCodec = level.audioCodec.replaceAll('mp4a.40.2', 'mp4a.40.5')
+                });
                 if (data.audioTracks.length > 0) {
                     for (let index = 0; index < data.audioTracks.length; index++) {
                         const element = data.audioTracks[index];

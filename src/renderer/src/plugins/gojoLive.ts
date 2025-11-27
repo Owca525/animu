@@ -45,11 +45,12 @@ async function extractEpisodeList(animeData?: AnimeData, anime_id?: string, only
     }
 }
 
-async function extractResolutions(episode: string, type: string, playerData: playerData, customData?: any, id?: string): Promise<playerData | undefined> {
+async function extractResolutions(episode: string, type: string, playerData: playerData, server?: any, id?: string): Promise<playerData | undefined> {
     try {
-        if (!customData) return undefined
-        let response = await window.api.request.get(`${BACKEND}/api/anime/tiddies?server=${customData}&id=${id}&num=${episode}&subType=${type}`, HEADER);
-        console.log(response)
+        console.log(episode, type, playerData, server, id)
+        if (!server) return undefined
+        let response = await window.api.request.get(`${BACKEND}/api/anime/tiddies?server=${server}&id=${id}&num=${episode}&subType=${type}`, HEADER);
+        console.log(response, `${BACKEND}/api/anime/tiddies?server=${server}&id=${id}&num=${episode}&subType=${type}`, HEADER)
         if (!response.success || !response.data) return undefined
         let subtitles: playerSubtitlesFormat[] = []
         if (response.data["subtitles"]) {
@@ -63,6 +64,7 @@ async function extractResolutions(episode: string, type: string, playerData: pla
             res: element["quality"],
             url: element["url"],
             defaultSubtitles: subtitles.length > 0,
+            hls: true,
             reqHeader: {
                 ...HEADER,
             }
@@ -93,20 +95,19 @@ async function exctractPlayerData(_type: string, episode: string, id: string): P
         let data: playerData[] = []
         for (let index = 0; index < response.data.length; index++) {
             const element = response.data[index];
+            console.log(element)
             data.push({
                 hostname: element["id"],
-                // hls: true,
                 defaultHost: element["default"],
                 resolution: [],
-                extractResolution: async (episode: string, _type: string, playerData, _customData?: any, id?: string) => await extractResolutions(episode, "sub", playerData, element["id"], id)
+                extractResolution: async (episode: string, _type: string, playerData, id?: string) => await extractResolutions(episode, "sub", playerData, element["id"], id)
             })
             if (element["hasDub"]) {
                 data.push({
                     hostname: `${element["id"]} (dub)`,
-                    // hls: true,
                     defaultHost: false,
                     resolution: [],
-                    extractResolution: async (episode: string, _type: string, playerData, _customData?: any, id?: string) => await extractResolutions(episode, "dub", playerData, element["id"], id)
+                    extractResolution: async (episode: string, _type: string, playerData, id?: string) => await extractResolutions(episode, "dub", playerData, element["id"], id)
                 })
             }
         }

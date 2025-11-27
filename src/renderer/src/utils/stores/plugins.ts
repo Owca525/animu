@@ -4,9 +4,10 @@ import { AniZone } from "@renderer/plugins/anizone";
 import { lycorisCafe } from "@renderer/plugins/lycoriscafe";
 import { createStore } from "solid-js/store";
 import { informationPluginManager } from "../pluginManager";
+import { GojoLive } from "@renderer/plugins/gojoLive";
 
 const initialState = {
-    loadedPlugins: [infoPluginPlayer, AniZone, lycorisCafe] as playerPluginFormat[],
+    loadedPlugins: [infoPluginPlayer, AniZone, lycorisCafe, GojoLive] as playerPluginFormat[],
     informationPlugin: new informationPluginManager(),
     playerPlugin: undefined as playerPluginFormat | undefined,
     playerPluginCache: undefined
