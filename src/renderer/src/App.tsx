@@ -45,12 +45,6 @@ function App() {
     toast(`Incognito Mode: ${getGlobalCache().incognito ? "On" : "Off"}`)
   })
 
-  createShortcut(["D"], () => {
-    console.log(getConfig())
-    console.log(getPlayerPLugin())
-    console.log(getGlobalCache())
-  })
-
   onMount(async () => {
     if (window.api) {
       setConfig(await window.api.getConfig())
