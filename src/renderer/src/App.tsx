@@ -19,7 +19,6 @@ import Player from "./pages/player/index";
 import { getConfig, setConfig } from './utils/stores/config';
 import { getGlobalCache, setGlobalHistory, setIncognitoMode } from './utils/stores/global';
 import i18n from './utils/i18n';
-import { getPlayerPLugin } from './utils/stores/plugins';
 import LocalErrorBoundary from './utils/ErrorBoundary';
 import { defaultConfigWeb } from './utils/FilesManager/config';
 import { CreateBackup } from './utils/backup';

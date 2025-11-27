@@ -19,8 +19,8 @@ interface sidebarProps {
 // Component<sidebarProps> = ({ showLogo = false, data, onChange, openSidebar, activeElement }) =>
 export default function Sidebar(props: sidebarProps) {
   const [sidebarHover, setHover] = createSignal<boolean>(false)
-  const animuVersion = window.electronAPI.process.env.npm_package_version
   let sidebarRef: HTMLDivElement | undefined;
+  const [animuVersion, setVersion] = createSignal<string>("")
   const [currentButton, setCurrentButton] = createSignal<number>(props.activeElement ? 0 : -1)
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -35,7 +35,8 @@ export default function Sidebar(props: sidebarProps) {
     if (props.onChange) props.onChange(sidebarHover())
   })
 
-  onMount(() => {
+  onMount(async () => {
+    setVersion(await window.backend.version())
     document.addEventListener('mousedown', handleClickOutside);
   })
   onCleanup(() => {
@@ -89,9 +90,9 @@ export default function Sidebar(props: sidebarProps) {
     >
       <Show when={props.showLogo}>
         <div class="sidebar-logo-icon-container">
-          <img src={icon} alt={animuVersion} class="sidebar-image" />
+          <img src={icon} alt={animuVersion()} class="sidebar-image" />
           <Show when={sidebarHover()}>
-            <div class="sidebar-version">v{animuVersion}</div>
+            <div class="sidebar-version">v{animuVersion()}</div>
           </Show>
         </div>
       </Show>
