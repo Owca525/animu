@@ -74,7 +74,7 @@ async function extractResolutions(episode: string, type: string, playerData: pla
 
         return {
             ...playerData,
-            // splitResHLS: resolutions[0].res != "master",
+            splitHLS: resolutions[0].res != "master",
             resolution: resolutions,
             subtitles: subtitles,
             listChapters: response.data["skips"] ? [

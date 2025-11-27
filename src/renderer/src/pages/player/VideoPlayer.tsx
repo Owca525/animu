@@ -1,6 +1,6 @@
 import Hls from "hls.js"
 
-import { AnimeData, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
+import { AnimeData, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
 import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory, request, toggleFullscreen, toSeconds, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
@@ -122,8 +122,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [isFullscreen, setIsFullscreen] = createSignal<boolean>(false)
 
     // Resolution
-    const [ListResolution, setListResolution] = createSignal<{ res: string, url: string }[]>([])
-    const [currentResolution, setCurrentResoltion] = createSignal<{ res: string, url: string } | undefined>(undefined)
+    const [ListResolution, setListResolution] = createSignal<resolutionFormat[]>([])
+    const [currentResolution, setCurrentResoltion] = createSignal<resolutionFormat | undefined>(undefined)
 
     // Up Next
     const [timeNextEpisode, setTimeNextEpisode] = createSignal<number>(config.Player.upToNextEpisode.durationShow)
@@ -201,20 +201,27 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         videoRef.playbackRate = parseFloat(speed)
     }
 
-    function setNewResolution(data: { res: string, url: string; defaultSubtitles?: boolean; } | undefined) {
+    function setNewResolution(data: resolutionFormat | undefined) {
         if (!data) return
         if (!videoRef) return
         const time = videoRef.currentTime
         if (data.defaultSubtitles) setDefaultSubtitles(ListSubtitles())
         else setNewSubtitles(ListSubtitles[0])
+        setCurrentResoltion(data)
 
-        if (hls() && data.url == "") {
-            setCurrentResoltion(data)
-            hls()!.currentLevel = hls()!.levels.findIndex(level => level.height === parseInt(data.res));
+        if (hls() && data.hls) {
+            if (data.url == "") hls()!.currentLevel = hls()!.levels.findIndex(level => level.height === parseInt(data.res));
+            else runHLS(data, currentPlayer()?.splitHLS)
             return
         }
-        setCurrentResoltion(data)
-        videoRef.src = data.url
+
+        if (data.doNotUseBackend) {
+            videoRef.src = data.url
+        } else {
+            videoRef.src = `http://localhost:3001/video?url=${btoa(JSON.stringify(
+                { url: data.url, header: data.reqHeader }
+            ))}`
+        }
         videoRef.currentTime = time
     }
 
@@ -263,15 +270,20 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (currentplayer.subtitles) setListSubtitles(() => [{ url: "", format: "", lang: "", label: "Off" }, ...currentplayer.subtitles as playerSubtitlesFormat[]])
         if (currentplayer.storyboardVTT) setThumbnail(await VTTstoryBoardParser(currentplayer.storyboardVTT))
         if (currentplayer.resolution[0].defaultSubtitles && currentplayer.subtitles) setDefaultSubtitles(currentplayer.subtitles)
+        if (currentplayer.resolution[0].hls && currentplayer.splitHLS) {
+            setListResolution(currentplayer.resolution)
+            setCurrentResoltion(currentplayer.resolution[0])
+        }
         if (currentplayer.resolution[0].hls) {
             setPlayer(() => currentplayer)
-            await runHLS(currentplayer.resolution[0].url, currentplayer.resolution[0].reqHeader)
+            await runHLS(currentplayer.resolution[0], currentplayer.splitHLS)
             return
         }
         if (hls()) hls()!.destroy()
         setCurrentResoltion(currentplayer.resolution[0])
         setListResolution(() => currentplayer.resolution)
         setPlayer(() => currentplayer)
+
         // TODO: Fix this can be work using fetch
         if (currentplayer.resolution[0].doNotUseBackend) {
             videoRef.src = currentplayer.resolution[0].url
@@ -293,14 +305,14 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }
     }
 
-    async function runHLS(url: string, header?: { [key: string]: string }) {
+    async function runHLS(resolution: resolutionFormat, splitHls: boolean = false) {
         const hls = new Hls({
             maxBufferLength: 120,
             autoStartLoad: true,
             startLevel: 2,
             loader: class extends Hls.DefaultConfig.loader {
                 load(context: any, config: any, callbacks: any) {
-                    request(context.url, { method: "GET", headers: header }).then((data) => {
+                    request(context.url, { method: "GET", headers: resolution.reqHeader }).then((data) => {
                         let currentData: any = data.text
                         if (!data.success) {
                             callbacks.onError({ type: 'network', details: "Failed Requestc", fatal: true }, context)
@@ -327,14 +339,19 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         if (Hls.isSupported() && videoRef) {
             const time = videoRef.currentTime
-            hls.loadSource(url);
+            hls.loadSource(resolution.url);
             hls.attachMedia(videoRef);
 
             videoRef.currentTime = time
 
             hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
-                const resolutions = data.levels.map((level) => level.height);
-                console.log(resolutions, hls.levels.length - 1, data.levels)
+                if (!splitHls) {
+                    const resolutions = data.levels.map((level) => level.height);
+                    resolutions.reverse()
+                    setListResolution(resolutions.map((val) => { return { res: val.toString(), url: "" } }))
+                    setCurrentResoltion({ res: resolutions[0].toString(), url: "" })
+                    hls.currentLevel = hls.levels.length - 1;
+                }
                 data.levels.forEach(level => {
                     // I added Ignore because this give me a error "Cannot assign to 'audioCodec' because it is a read-only property." but i can assign then is good
                     // @ts-ignore
@@ -342,18 +359,13 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     // @ts-ignore
                     else level.audioCodec = level.audioCodec.replaceAll('mp4a.40.2', 'mp4a.40.5')
                 });
-                if (data.audioTracks.length > 0) {
+                if (data.audioTracks.length > 1) {
                     for (let index = 0; index < data.audioTracks.length; index++) {
                         const element = data.audioTracks[index];
                         if (element.default) setCurrentAudioTrack(() => { return { id: element.id, label: element.name, lang: element.lang } })
                     }
                     setAudioTrackList(data.audioTracks.map((element) => { return { id: element.id, label: element.name, lang: element.lang } }))
                 }
-                resolutions.reverse()
-                setListResolution(resolutions.map((val) => { return { res: val.toString(), url: "" } }))
-                setCurrentResoltion({ res: resolutions[0].toString(), url: "" })
-                hls.currentLevel = hls.levels.length - 1;
-                console.log(hls.currentLevel, hls)
             });
 
             hls.on(Hls.Events.ERROR, (_event, data) => {
@@ -456,15 +468,15 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             SaveHistory(unwrap(futureHistory))
         } else {
             SaveHistory(unwrap({
-                    AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
-                    saveData: {
-                        pluginName: anime_data.saveData.pluginName,
-                        last_Time: 0,
-                        episode: temp.episode,
-                        type: temp.type,
-                        isStarted: false,
-                    }
+                AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
+                saveData: {
+                    pluginName: anime_data.saveData.pluginName,
+                    last_Time: 0,
+                    episode: temp.episode,
+                    type: temp.type,
+                    isStarted: false,
                 }
+            }
             ))
         }
         refetchHistory()
@@ -519,7 +531,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         if (currentPlayer() && currentPlayer()!.listChapters) {
             currentPlayer()!.listChapters!.forEach(element => {
-    
                 let currentTime = event.currentTarget.currentTime
                 if (currentTime >= element.start && currentTime <= element.end && element.type == "opening") {
                     if (config.Player.general.autoSkipOpenings) change_time(element.end)
@@ -640,7 +651,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     })
 
     createShortcut(["d"], () => {
-        console.log(player_data, temp, currentSubtitles)
+        console.log(player_data, temp, currentSubtitles(), currentPlayer())
     })
 
     function setEpisode(type: "next" | "prev") {
@@ -1167,7 +1178,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                                     player_data.map((val) => { return { name: val.hostname, change: () => checkUrl(player_data[player_data.findIndex((item) => item.hostname === val.hostname)]) } })
                                 }
                                 resolution={
-                                    ListResolution().map((val) => { return { res: val.res, change: () => setNewResolution(val) } })
+                                    ListResolution().map((val) => { return { res: val.res, change: () => setNewResolution(val as any) } })
                                 }
                                 speed={speed.map((val) => { return { speed: parseFloat(val), change: () => setSpeed(val) } })}
                                 subtitles={

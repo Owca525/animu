@@ -101,7 +101,7 @@ export interface resolutionFormat {
     reqHeader?: { [key: string]: string },
     doNotUseBackend?: boolean
     defaultSubtitles?: boolean;
-    isDubbing: () => Promise<resolutionFormat | undefined>
+    isDubbing?: () => Promise<resolutionFormat | undefined>
 }
 
 export interface externalPlayerFormat {

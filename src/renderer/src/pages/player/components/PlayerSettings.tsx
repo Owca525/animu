@@ -1,7 +1,7 @@
 import "./css/playersettings.css"
 import { isNumberString } from "@renderer/utils/functions"
 import { t } from "i18next"
-import { createSignal, For, Show } from "solid-js"
+import { createEffect, createSignal, For, Show } from "solid-js"
 import PlayerSettingsButton from "./playerSettingsButton"
 
 interface playerSettingsProps {
@@ -35,6 +35,10 @@ export default function PlayerSettings(props: playerSettingsProps) {
     //     visible: { opacity: 1, x: 0, display: "", position: "" },
     // };
 
+    createEffect(() => {
+        console.log(currentSettings())
+    })
+
     return (
         <Show when={props.state}>
             <div class="player-settings-container">
@@ -58,11 +62,11 @@ export default function PlayerSettings(props: playerSettingsProps) {
                             rightText={props.current.currentTrack}
                             isGray={props.audioTrack.length <= 1}
                         />
-                        <PlayerSettingsButton onClick={() => props.subtitles.length >= 1 ? setcurrentSettings("sub") : ""}
+                        <PlayerSettingsButton onClick={() => props.subtitles.length > 1 ? setcurrentSettings("subtitles") : ""}
                             icon="subtitles"
                             leftText={t("player.settings.subtitles")}
                             rightText={props.current.currentSub}
-                            isGray={props.subtitles.length <= 0}
+                            isGray={props.subtitles.length <= 1}
                         />
                         <PlayerSettingsButton onClick={() => setcurrentSettings("speed")}
                             icon="speed"
@@ -97,7 +101,7 @@ export default function PlayerSettings(props: playerSettingsProps) {
                         )}
                     </For>
                 </Show>
-                <Show when={currentSettings() === "res"}>
+                <Show when={currentSettings() === "subtitles"}>
                     <div tabIndex={-1} class="player-settings-button-back" onClick={() => setcurrentSettings("settings")}>
                         <span tabIndex={-1} class="material-symbols-outlined">arrow_back</span><span>{t("player.settings.subtitles")}</span>
                     </div>
