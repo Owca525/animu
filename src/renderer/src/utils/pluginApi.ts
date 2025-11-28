@@ -32,7 +32,7 @@ export async function UpdateHomeData(func: () => Promise<{ data: containerData, 
     }
 }
 
-export function InitialPlugin() {
+export function InitialPlayerPlugin() {
     try {
         const config: SettingsConfig = getConfig()
         const loadedPlugins: playerPluginFormat[] = getPluginList()

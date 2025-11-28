@@ -50,7 +50,7 @@
 }
 
 .information-containerwrong-error-icon, .information-containerwrong-loading-icon {
-    font-size: 3em;
+    font-size: 3em !important;
 }
 
 .information-containerwrong-loading-icon {

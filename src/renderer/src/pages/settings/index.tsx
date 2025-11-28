@@ -15,7 +15,7 @@ import SeekBar from "@renderer/components/seekBar";
 import HelpIcon from "./components/helpIcon";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import { checkUpdate } from "@renderer/utils/update";
-import { InitialPlugin } from "@renderer/utils/pluginApi";
+import { InitialPlayerPlugin } from "@renderer/utils/pluginApi";
 import ButtonGroup from "./components/buttonGroup";
 import { DetectOldVersionHistory } from "@renderer/utils/FilesManager/history";
 import { useNavigate } from "@solidjs/router";
@@ -199,7 +199,7 @@ function settings() {
             setSaving(() => false)
             saveConfig(config().new)
             setDynamicZoom(config().new.General.Window.Zoom)
-            InitialPlugin()
+            InitialPlayerPlugin()
             toast(t("settings.saving.done"), { type: "success" })
         } catch (error) {
             toast(t("settings.saving.error"), { type: "success" })
@@ -212,7 +212,7 @@ function settings() {
             changeTheme(config().old.General.theme)
             return { old: structuredClone(prev.old), new: structuredClone(prev.old) }
         })
-        InitialPlugin()
+        InitialPlayerPlugin()
         setSaving(() => false)
     }
 

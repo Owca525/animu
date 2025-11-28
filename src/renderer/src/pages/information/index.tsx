@@ -212,7 +212,7 @@ function information() {
                         style={isBannerLoading() ? { display: "none" } : isBannerError() ? { display: "none" } : { animation: "fadeIn 0.3s forwards" }}
                     />
                     <Show when={isBannerLoading() && isBannerError() == false}>
-                        <div class="information-banner-image-placeholder"><span class="material-symbols-outlined home-loading-animation">progress_activity</span></div>
+                        <div class="information-banner-image-placeholder"><span class="material-symbols-outlined home-loading-animation icon">progress_activity</span></div>
                     </Show>
                     <Show when={isBannerError() && isBannerLoading() == false}>
                         <div class="information-banner-image-placeholder"><span class="material-symbols-outlined">error</span></div>
@@ -228,7 +228,7 @@ function information() {
                             {tempData().anime.averageScore && <div class="information-score" style={{ border: `3px solid ${getGradientColor(tempData().anime.averageScore)}` }}>{tempData().anime.averageScore}%</div>}
                             <img class="information-cover" onClick={() => tempData().anime.coverImage && SaveCoverToClipboard(tempData().anime.coverImage)} onError={() => setCoverIsError(() => true)} onLoad={() => setCoverIsLoading(() => false)} src={tempData().anime.coverImage ? tempData().anime.coverImage : ""} style={isCoverLoading() ? { display: "none" } : isCoverError() ? { display: "none" } : { animation: "fadeIn 0.3s forwards" }}></img>
                             <Show when={isCoverLoading() && isCoverError() == false}>
-                                <div class="information-cover-placeholder"><span class="material-symbols-outlined home-loading-animation">progress_activity</span></div>
+                                <div class="information-cover-placeholder"><span class="material-symbols-outlined home-loading-animation icon">progress_activity</span></div>
                             </Show>
                             <Show when={isCoverError() && isCoverLoading() == false}>
                                 <div class="information-cover-placeholder"><span class="material-symbols-outlined">error</span></div>
@@ -349,7 +349,7 @@ function information() {
                                 <Show when={showWrong() == false}>
                                     <Switch>
                                         <Match when={episodeResponse.isPending}>
-                                            <div class="information-loading-container"><span class="information-loading material-symbols-outlined">progress_activity</span></div>
+                                            <div class="information-loading-container"><span class="material-symbols-outlined information-loading">progress_activity</span></div>
                                         </Match>
                                         <Match when={episodeResponse.isError}>
                                             <div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>

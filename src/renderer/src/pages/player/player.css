@@ -151,7 +151,7 @@
 }
 
 .player-waiting {
-  font-size: 72px;
+  font-size: 4em !important;
   animation: spin 1s linear infinite;
 }
 
@@ -436,7 +436,7 @@
 
 /* UI */
 .player-icon-ui {
-  font-size: 72px;
+  font-size: 4em !important;
 }
 
 .player-subtitle-container {

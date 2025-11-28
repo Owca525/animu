@@ -55,6 +55,35 @@ input[type="number"]::-webkit-outer-spin-button {
   font-size: 1.1em;
 }
 
+.animu-initial-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  gap: 24px;
+}
+
+.animu-initial-icon {
+  width: 150px;
+}
+
+.animu-initial-state {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.animu-initial-text {
+  font-size: 1.2em;
+}
+
+.animu-initial-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 /* .app-loading-animation {
   animation: spin 1s linear infinite;
   width: min-content;

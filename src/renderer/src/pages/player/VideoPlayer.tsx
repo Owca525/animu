@@ -1084,7 +1084,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
                     <Show when={!config.Player.ui.DisableLoadingAnimation && !resolutionNotFound() && isWaitingPlayer()}>
                         <div class="player-loading-animation-container player-buffering-animation">
-                            <div class="player-waiting material-symbols-outlined">progress_activity</div>
+                            <div class="material-symbols-outlined player-waiting">progress_activity</div>
                         </div>
                     </Show>
                     <Show when={!config.Player.ui.DisableSpaceAnimation && isShowPlay() && isWaitingPlayer() == false}>

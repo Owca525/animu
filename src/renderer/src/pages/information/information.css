@@ -322,7 +322,7 @@
 }
 
 .information-loading {
-    font-size: 3em;
+    font-size: 3em !important;
     animation: spin 1s linear infinite;
 }
 
