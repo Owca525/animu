@@ -181,6 +181,13 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             videoRef.currentTime = time
             setcurrentTime(() => time)
         }
+        if ("mediaSession" in navigator) {
+            navigator.mediaSession.setActionHandler("play", () => togglePlay());
+            navigator.mediaSession.setActionHandler("pause", () => togglePlay());
+            navigator.mediaSession.setActionHandler("previoustrack", () => setEpisode("prev"));
+            navigator.mediaSession.setActionHandler("nexttrack", () => setEpisode("next"));
+            navigator.mediaSession.setActionHandler("stop", () => togglePlay());
+        }
     })
 
     onCleanup(() => {
