@@ -320,7 +320,7 @@ export function segregatePlugins(func: (name: string) => void): DropdownOption[]
     let list: DropdownOption[] = []
     for (let index = 0; index < data.length; index++) {
         const element = data[index];
-        if (element.player) list.push({ label: element.name, onClick: () => func(element.name) })
+        list.push({ label: element.metadata.name, onClick: () => func(element.metadata.name) })
     }
 
     return list
@@ -468,4 +468,10 @@ export function getHistory() {
         continue: continueWatch,
         history: global.map((value) => ({...value, saveData: { ...value.saveData, last_Time: 0 }}))
     }
+}
+
+export function convertText(text: string) {
+    let uri = encodeURI(text.replaceAll("[", "").replaceAll("]", ""))
+    return uri.replaceAll("+", "%2B")
+        .replaceAll("%20", "+")
 }

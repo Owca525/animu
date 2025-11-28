@@ -1,10 +1,54 @@
-import AnilistApi from "@renderer/plugins/newAnilistApi";
-import { containerData, genresSearchFormat, informationPluginManagerFormat, newInformationPluginFormat } from "./types";
+import AnilistApi from "@renderer/plugins/anilistApi";
+import { containerData, genresSearchFormat, informationPluginManagerFormat, informationPluginFormat, playerPluginManagerFormat, playerPluginFormat } from "./types";
 import { getHomeCache, setAllHomeData } from "./stores/home";
+import { setPlayerPlugin, setPluginPlayerList } from "./stores/plugins";
+import Allmanga from "@renderer/plugins/allmanga";
+import Anizone from "@renderer/plugins/anizone";
+import GojoLive from "@renderer/plugins/gojoLive";
+import LycorisCafe from "@renderer/plugins/lycoriscafe";
+import { getConfig } from "./stores/config";
+
+export class PlayerPluginManager implements playerPluginManagerFormat {
+    currentPlugin: playerPluginFormat | undefined;
+    pluginList: playerPluginFormat[] = [
+        new Allmanga,
+        new Anizone,
+        new GojoLive,
+        new LycorisCafe,
+    ];
+    changePlugin = (plugin_id: string): playerPluginFormat => {
+        const loadedPlugins: playerPluginFormat[] = this.pluginList
+        try {
+            for (let index = 0; index < loadedPlugins.length; index++) {
+                const element = loadedPlugins[index]
+                if (element.metadata.name == plugin_id) {
+                    setPlayerPlugin(element)
+                    return element
+                }
+                if (plugin_id == "" && element.metadata.name == "Allmanga") {
+                    setPlayerPlugin(element)
+                    return element
+                }
+            }
+            return loadedPlugins[0]
+        } catch (error) {
+            console.error(error)
+            return loadedPlugins[0]
+        }
+    }
+    initialPlugins = (): void => {
+        setPluginPlayerList(this.pluginList)
+        const config = getConfig()
+        for (let index = 0; index < this.pluginList.length; index++) {
+            const element = this.pluginList[index];
+            if (element.metadata.name == config.plugins.player) setPlayerPlugin(element)
+        }
+    }
+}
 
 export class informationPluginManager implements informationPluginManagerFormat {
-    //   private plugins: newInformationPluginFormat[] = [];
-    currentPlugin: newInformationPluginFormat = new AnilistApi()
+    //   private plugins: informationPluginFormat[] = [];
+    currentPlugin: informationPluginFormat = new AnilistApi()
 
     searchAnime = (name: string, page: number, params?: genresSearchFormat) => {
         setAllHomeData({ data: { sections: [] }, isLoading: true, isError: false, } as any)

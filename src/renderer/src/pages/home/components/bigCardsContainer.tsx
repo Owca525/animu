@@ -32,7 +32,6 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
     });
 
     function handleUpdate() {
-        console.log(cardRef)
         if (!cardRef) return
         const style = window.getComputedStyle(cardRef);
         const width = cardRef.offsetWidth;
@@ -74,7 +73,6 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
             left: index * cardWidth(),
             behavior: "smooth",
         });
-        console.log(cardWidth())
         setCurrentIndex(index);
         restartAutoSlide();
     }

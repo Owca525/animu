@@ -27,7 +27,6 @@ const Container: Component<containerData> = ({ title, data, horizontal = false, 
   const cardResponse = useQuery(() => ({
     queryKey: [currentPage()],
     queryFn: async ({ queryKey }) => {
-      console.log(queryKey)
       const homeCache = unwrap(getHomeCache())
       if (!onScrollDownFunction) return ""
       let tmp = await onScrollDownFunction(homeCache.search, unwrap(currentPage()), homeCache.filterTags)

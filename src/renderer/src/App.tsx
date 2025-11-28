@@ -26,12 +26,12 @@ import { defaultConfigWeb } from './utils/FilesManager/config';
 import { getConfig, setConfig } from './utils/stores/config';
 import { getGlobalCache, setGlobalHistory, setIncognitoMode } from './utils/stores/global';
 import { HashRouter, Route } from '@solidjs/router';
-import { InitialPlayerPlugin } from './utils/pluginApi';
 import { toast } from './utils/context/ToastNotification';
 import './App.css';
 import './themes/darkerAnimu/main.css';
 import './utils/i18n';
 import 'material-symbols';
+import { pluginManager } from './utils/stores/plugins';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -71,12 +71,10 @@ function App() {
     LoadConfig()
     
     setinitialState({ text: "Loading Plugin", plugin: false })
-    InitialPlayerPlugin()
+    pluginManager().initialPlugins()
     setInitation(false)
     
-    if (window.api) {
-      runCheckUpdate()
-    }
+    if (window.api) runCheckUpdate()
   })
 
   return (

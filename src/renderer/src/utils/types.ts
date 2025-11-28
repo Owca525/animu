@@ -74,7 +74,7 @@ export interface homeData {
         scrollHeight: number,
         clientHeight: number
     } | undefined
-    onScrollContainer?: () => void 
+    onScrollContainer?: () => void
 }
 
 export interface globalDataFormat {
@@ -163,39 +163,23 @@ export interface themeMetadata {
 }
 
 export interface playerPluginFormat {
-    version: string
-    name: string
-    author: string
-    icon?: string
-    urlWebsite?: string
-    preferedLang: string[]
-    sidebarAddon?: sidebarData[]
-    searchOption?: genres
-    player: {
-        extractPlayerData: (type: string, episode: string, id: string) => Promise<playerData[]>
-        extractEpisodeList: (animeData?: AnimeData, anime_id?: string) => Promise<episodeList | undefined>
-        extractOnlyEpisodesList: (type: string, anime_id: string) => Promise<{ ep: string, img?: string, title?: string }[]>
-        searchAnime: (name: string, page: number, params?: genresSearchFormat) => Promise<cardData[]>
+    metadata: {
+        version: string
+        name: string
+        author: string
+        icon?: string
+        urlWebsite?: string
+        supportLang: string[]
+        // sidebarAddon?: sidebarData[]
+        searchOption?: genres
     }
+    extractPlayerData(type: string, episode: string, id: string): Promise<playerData[]>
+    extractEpisodeList(animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined>
+    extractOnlyEpisodesList(type: string, anime_id: string): Promise<{ ep: string, img?: string, title?: string }[]>
+    searchAnime(name: string, page: number, params?: genresSearchFormat): Promise<cardData[]>
 }
 
 export interface informationPluginFormat {
-    version: string
-    name: string
-    author: string
-    icon?: string
-    preferedLang: string[]
-    pageSize: number
-    info: {
-        search: (name: string, page: number, params?: genresSearchFormat) => Promise<void>
-        home: () => Promise<void>
-        anime: (id: string) => Promise<AnimeData | undefined>
-    }
-    searchOption: genres
-    sidebarAddon?: sidebarData[]
-}
-
-export interface newInformationPluginFormat {
     metadata: {
         version: string
         name: string
@@ -219,8 +203,15 @@ export interface newInformationPluginFormat {
     onTitleClick(content: any, callbacks: { onSuccess: (data: containerData) => void, onError: (error: string) => void }): Promise<void>
 }
 
+export interface playerPluginManagerFormat {
+    currentPlugin: playerPluginFormat | undefined
+    pluginList: playerPluginFormat[]
+    changePlugin(plugin_id: string): playerPluginFormat
+    initialPlugins(): void
+}
+
 export interface informationPluginManagerFormat {
-    currentPlugin: newInformationPluginFormat
+    currentPlugin: informationPluginFormat
     searchAnime(name: string, page: number, params?: genresSearchFormat): void
     home(): void
     anime(id: string): Promise<AnimeData | undefined>

@@ -15,7 +15,7 @@ import { CreateContextMenuOptions, getHistory } from "@renderer/utils/functions"
 import Filter from "./components/filter";
 import Button from "@renderer/components/buttons";
 import BigCardsContainer from "./components/bigCardsContainer";
-import { getInformationPlugin, getPlayerPLugin } from "@renderer/utils/stores/plugins";
+import { getInformationPlugin } from "@renderer/utils/stores/plugins";
 import { useNavigate } from "@solidjs/router";
 import { getHomeCache, setAllHomeData, setHomeLocalSearch, setHomeSearch, setHomeSearchPage, setHomeSearchTags, setHomeStopScrolling } from "@renderer/utils/stores/home";
 import { getConfig } from "@renderer/utils/stores/config";
@@ -30,7 +30,7 @@ const Home = () => {
   const navigate = useNavigate();
   const plugin = getInformationPlugin()
   const [homeCache] = createSignal<homeData>(getHomeCache());
-  const pluginPlayer = getPlayerPLugin();
+  // const pluginPlayer = getPlayerPLugin();
   const [isOpenSidebar, setOpenSidebar] = createSignal<boolean>(false);
   const [headerActive, setHeaderActive] = createSignal<boolean>(false)
 
@@ -58,17 +58,16 @@ const Home = () => {
     ],
   };
 
-  if (pluginPlayer && pluginPlayer.sidebarAddon) {
-    sidebarData = {
-      bottom: [...sidebarData.bottom],
-      top: [...sidebarData.top, ...pluginPlayer.sidebarAddon] as any,
-    };
-  }
+  // if (pluginPlayer && pluginPlayer.sidebarAddon) {
+  //   sidebarData = {
+  //     bottom: [...sidebarData.bottom],
+  //     top: [...sidebarData.top, ...pluginPlayer.sidebarAddon] as any,
+  //   };
+  // }
 
   onMount(() => {
     if (homeCache().data.sections.length <= 0) plugin.home()
     const config: SettingsConfig = unwrap(getConfig());
-    console.log(config)
     if (config.General.discordRPC && window.api)
       window.api.rpc.setActivity(undefined, t("discordrpc.home"));
   })
@@ -76,7 +75,6 @@ const Home = () => {
   createEffect(() => {
     if (!divRef) return
     let home = homeCache()
-    console.log(home)
     if (!home.data.sections) return
     if (home.data.sections.length <= 0 || home.data.sections.length != 1) return
     if (home.stopScrolling) return
@@ -93,8 +91,6 @@ const Home = () => {
   function history() {
     setHomeLocalSearch(true);
     let history = getHistory()
-
-    console.log(history)
 
     let data = {
       sections: [
@@ -237,8 +233,6 @@ const Home = () => {
 
     return data;
   }
-
-  // console.log(isOpenSidebar);
 
   return (
     <main

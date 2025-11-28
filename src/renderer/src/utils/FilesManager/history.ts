@@ -69,7 +69,6 @@ export async function SaveHistory(data: cardData): Promise<boolean> {
         }
 
         if (index != -1) historyCache.splice(index, 1);
-        console.log(data)
         historyCache.unshift(data);
         if (window.api) await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(historyCache)))
         else localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(historyCache)))

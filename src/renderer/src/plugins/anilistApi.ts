@@ -1,5 +1,5 @@
 import { genYearsList, request } from "@renderer/utils/functions";
-import { cardData, containerData, genresSearchFormat, newInformationPluginFormat } from "@renderer/utils/types";
+import { cardData, containerData, genresSearchFormat, informationPluginFormat } from "@renderer/utils/types";
 import { t } from "i18next";
 import { unwrap } from "solid-js/store";
 
@@ -331,7 +331,7 @@ function getSeasonFromDate() {
 //   return []
 // }
 
-export default class AnilistApi implements newInformationPluginFormat {
+export default class AnilistApi implements informationPluginFormat {
   metadata = {
     version: "2.0",
     name: "AnilistApi",
@@ -488,8 +488,6 @@ export default class AnilistApi implements newInformationPluginFormat {
         ...variable,
         type: "ANIME",
       }
-
-      console.log(variables)
 
       if (title && !(title.replaceAll(" ", "") == "")) {
         variables = { ...variables, search: title }

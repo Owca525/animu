@@ -7,12 +7,11 @@ import Drop from "./components/drop";
 import ContainerWrong from "./components/containerWrong";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import Dropdown from "@renderer/components/dropDown";
-import { ChangePlugin } from "@renderer/utils/pluginApi";
 import { useQuery, useQueryClient } from "@tanstack/solid-query";
 import { useNavigate } from "@solidjs/router";
 import { createSignal, For, Match, onCleanup, onMount, Show, Switch } from "solid-js";
 import { getGlobalCache } from "@renderer/utils/stores/global";
-import { getPlayerPLugin } from "@renderer/utils/stores/plugins";
+import { getPlayerPLugin, pluginManager } from "@renderer/utils/stores/plugins";
 import CharacterCards from "./components/characterCard";
 import { createShortcut } from "@solid-primitives/keyboard";
 import { unwrap } from "solid-js/store";
@@ -28,29 +27,29 @@ function information() {
     const [showWrong, setshowWrong] = createSignal<boolean>(false)
     const [isNeedMore, setNeedMore] = createSignal<boolean>(false)
     const [moreMiniTitle, setmoreMiniTitle] = createSignal<boolean>(false)
-    const [currentPlugin, setCurrentPlugin] = createSignal<string | undefined>(getPlayerPLugin()?.name)
+    const [currentPlugin, setCurrentPlugin] = createSignal<string | undefined>(getPlayerPLugin()?.metadata.name)
     const [secondsLeft, setSecondsLeft] = createSignal<undefined | { left: number, converted: { days: number; hours: number; minutes: number; seconds: number; } | undefined }>(undefined);
 
     const queryClient = useQueryClient()
     const episodeResponse = useQuery(() => ({
         queryKey: [tempData().anime],
         queryFn: async ({ queryKey }) => {
-            console.log(tempData())
+            (tempData())
             if (tempData().anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED") return { player_id: "", episodesData: [] }
-            let tmp = currentPlugin()
-            if (!tmp) return
+            let pluginName = currentPlugin()
+            if (!pluginName) return
 
-            let plugin: playerPluginFormat = ChangePlugin(tmp)
+            let plugin: playerPluginFormat = pluginManager().changePlugin(pluginName)
             let [playerID] = queryKey
-            console.log(playerID, tempData(), plugin)
-            if (!plugin || !plugin.player) return
+            (playerID, tempData(), plugin)
+            if (!plugin) return
             if (!tempData().saveData?.pluginName && !currentIDplayer()) {
-                return plugin.player.extractEpisodeList(tempData().anime, undefined)
+                return plugin.extractEpisodeList(tempData().anime, undefined)
             }
             if (tempData().anime.id == "" && !currentIDplayer()) {
-                return plugin.player.extractEpisodeList(tempData().anime, undefined)
+                return plugin.extractEpisodeList(tempData().anime, undefined)
             }
-            return plugin.player.extractEpisodeList(tempData().anime, currentIDplayer())
+            return plugin.extractEpisodeList(tempData().anime, currentIDplayer())
         },
         refetchOnWindowFocus: false,
         staleTime: 2 * 60 * 60 * 1000,
@@ -113,7 +112,7 @@ function information() {
             save: {
                 last_Time: lastTime,
                 type: type,
-                pluginName: getPlayerPLugin()?.name,
+                pluginName: getPlayerPLugin()?.metadata.name,
                 episode: episode
             },
             episodelist: episodes,
@@ -173,7 +172,7 @@ function information() {
 
     async function refreashInformation(name: string) {
         queryClient.cancelQueries()
-        ChangePlugin(name)
+        pluginManager().changePlugin(name)
         setCurrentPlugin(name)
         episodeResponse.refetch()
     }
@@ -342,7 +341,7 @@ function information() {
                                 <div class="information-episodes-top-content">
                                     <Button ButtonClass="information-episodes-button" icon="search" onClick={() => setshowWrong(() => true)} />
                                     <div class="information-episodes-space">
-                                        <Dropdown options={segregatePlugins(refreashInformation)} disableX buttonText={getPlayerPLugin()?.name} />
+                                        <Dropdown options={segregatePlugins(refreashInformation)} disableX buttonText={getPlayerPLugin()?.metadata.name} />
                                         <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(currentPlugin()!)} />
                                     </div>
                                 </div>

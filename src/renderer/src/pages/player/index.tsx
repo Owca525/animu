@@ -10,20 +10,20 @@ import Button from "@renderer/components/buttons";
 
 import VideoPlayer from "./VideoPlayer";
 import { SaveHistory } from "@renderer/utils/FilesManager/history";
-import { ChangePlugin } from "@renderer/utils/pluginApi";
 import { useNavigate } from "@solidjs/router";
 import { getConfig } from "@renderer/utils/stores/config";
 import { createSignal, Match, onMount, Switch } from "solid-js";
 import { useQuery } from "@tanstack/solid-query";
 import { createShortcut } from "@solid-primitives/keyboard";
 import ExternalPlayer from "./externalPlayer";
+import { pluginManager } from "@renderer/utils/stores/plugins";
 
 const player = () => {
     const anime_data: { data: AnimeData, save: indentityPlayer, episodelist: { ep: string, img?: string, title?: string }[] } = JSON.parse(localStorage.getItem("playerCache") as any)
     const navigate = useNavigate()
     const config: SettingsConfig = getConfig();
 
-    console.log(anime_data)
+    (anime_data)
 
     if (!anime_data || !anime_data.save || !anime_data.episodelist || !anime_data.data) {
         showDialog({
@@ -52,8 +52,8 @@ const player = () => {
         queryFn: async ({ queryKey }) => {
             const [player_id, episode, animeType] = queryKey;
             if (!player_id || !episode || !animeType) return console.error("THIS CAN'T HAPPEN IF Happen then something is wrong with player_id, episode, queryFetch/player", queryKey)
-            let pluginPlayer = ChangePlugin(anime_data.save?.pluginName ? anime_data.save.pluginName : "")
-            return await pluginPlayer.player.extractPlayerData(animeType, episode, player_id)
+            let pluginPlayer = pluginManager().changePlugin(anime_data.save?.pluginName ? anime_data.save.pluginName : "")
+            return await pluginPlayer.extractPlayerData(animeType, episode, player_id)
         },
         refetchOnWindowFocus: false,
         staleTime: 2 * 60 * 60 * 1000,
@@ -92,10 +92,6 @@ const player = () => {
     createShortcut(["Escape"], async () => {
         await leave()
     });
-
-    createShortcut(["m"], () => {
-        console.log(anime_data, extractionData, response)
-    })
 
     onMount(() => {
         SaveHistory({

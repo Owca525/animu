@@ -10,10 +10,10 @@ import {
   getGradientColor,
   SaveToClipboard,
 } from "@renderer/utils/functions";
-import { ChangePlugin } from "@renderer/utils/pluginApi";
 import { DeleteFromHistory, SaveHistory } from "@renderer/utils/FilesManager/history";
 import { unwrap } from "solid-js/store";
 import { removeToast, toast } from "@renderer/utils/context/ToastNotification";
+import { pluginManager } from "@renderer/utils/stores/plugins";
 
 interface CardProps {
   card: cardData;
@@ -57,8 +57,8 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
 
     if (card.saveData && card.saveData.episode != "" && (card.saveData.last_Time != 0 || card.saveData.isStarted)) {
       let idToast = toast("Fetching Episode List", { type: "loading", removeTimer: true })
-      const currentPLugin = ChangePlugin(card.saveData.pluginName)
-      const episodeList = await currentPLugin.player.extractOnlyEpisodesList(card.saveData.type, card.AnimeData.player_ID as string);
+      const currentPLugin = pluginManager().changePlugin(card.saveData.pluginName)
+      const episodeList = await currentPLugin.extractOnlyEpisodesList(card.saveData.type, card.AnimeData.player_ID as string);
 
       localStorage.setItem("playerCache", JSON.stringify({
         data: (card.AnimeData),

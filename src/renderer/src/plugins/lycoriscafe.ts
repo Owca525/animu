@@ -1,16 +1,8 @@
 import { request, timeToSeconds } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, playerChapterList, playerData, playerPluginFormat, playerSubtitlesFormat, resolutionFormat } from "@renderer/utils/types";
-
+import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat } from "@renderer/utils/types";
 const WEB = "https://www.lycoris.cafe"
-
 const HEADER = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0'
-}
-
-function convertText(text: string) {
-    let uri = encodeURI(text.replaceAll("[", "").replaceAll("]", ""))
-    return uri.replaceAll("+", "%2B")
-        .replaceAll("%20", "+")
 }
 
 function detectResoltion(text: string): string {
@@ -27,164 +19,7 @@ function detectResoltion(text: string): string {
     return "Unknown"
 }
 
-async function requestToApi(anime_id: string): Promise<{ data: any } | undefined> {
-    let url = `${WEB}/api/anime/${anime_id}`
-    let req = await request(url, { headers: HEADER });
-    if (!req.success) return undefined
-    return { data: req.json }
-}
-
-async function extractEpisodeData(_type: string, episode: string, id: string): Promise<playerData[]> {
-    let req = await requestToApi(id)
-    if (!req) return []
-    let episodes = req.data.anime["episodes"]
-    let currentEpisode: resolutionFormat[] = []
-    let subtitles: playerSubtitlesFormat[] = []
-    let chapters: playerChapterList[] = []
-
-    let tmp = episodes.find((element) => parseInt(element.number) == parseInt(episode))
-    if (!tmp) return []
-
-    let reqID = await request(`${WEB}/api/watch/getVideoLink?id=${tmp.id}`, { headers: HEADER });
-    if (!reqID.success) return []
-    // if (!reqID.data.endWith("LC")) return []
-
-    let decodeData = reqID.text.slice(0, -2)
-    decodeData = decodeData.split("").reverse().map(el => String.fromCharCode(el.charCodeAt(0) - 7)).join("")
-
-    try {
-        let animeEpisodes = JSON.parse(atob(decodeData))
-        console.log(animeEpisodes)
-        for (const key in animeEpisodes) {
-            let res = detectResoltion(key)
-            if (animeEpisodes[key].length <= 0) continue 
-            if (res == "Unknown") continue
-            currentEpisode.push({
-                res: res,
-                url: animeEpisodes[key],
-                defaultSubtitles: res == "Source",
-            })
-        }
-    } catch (error) {
-        console.error(error, atob(decodeData), decodeData, reqID)
-    }
-
-    if (tmp["subtitles"]["EN"]) subtitles.push({
-        url: tmp["subtitles"]["EN"],
-        lang: "en",
-        label: "English",
-        format: "ass"
-    })
-    if (tmp["subtitles"]["PL"]) subtitles.push({
-        url: tmp["subtitles"]["PL"],
-        lang: "pl",
-        label: "Polish",
-        format: "ass"
-    })
-    let extractedChapters = JSON.parse(tmp["markerPeriods"])
-    if (extractedChapters[0] && timeToSeconds(extractedChapters[0]["endTime"]) >= 0) chapters.push({ start: timeToSeconds(extractedChapters[0]["startTime"]), end: timeToSeconds(extractedChapters[0]["endTime"]), type: "opening", name: "Opening" })
-    if (extractedChapters[1] && timeToSeconds(extractedChapters[1]["endTime"]) >= 0) chapters.push({ start: timeToSeconds(extractedChapters[1]["startTime"]), end: timeToSeconds(extractedChapters[1]["endTime"]), type: "ending", name: "Ending" })
-
-    return [{
-        hostname: "lycoris.cafe",
-        resolution: currentEpisode.sort((a, b) => Number(a.res) - Number(b.res)).reverse(),
-        listChapters: chapters,
-        subtitles: subtitles
-    }]
-}
-
-function convertAnime(data: any): cardData | undefined {
-    try {
-        return {
-            AnimeData: {
-                characters: [],
-                title: {
-                    english: data["englishTitle"],
-                    native: "",
-                    romaji: data["title"]
-                },
-                id: "",
-                player_ID: data["id"],
-                genres: data["genres"],
-                averageScore: data["rating"] * 10,
-                season: data["season"],
-                source: data["source"],
-                status: data["status"],
-                studios: [data["studio"]],
-                description: data["synopsis"],
-                format: data["format"],
-                coverImage: data["poster"],
-                bannerImage: data["background"],
-                seasonYear: data["seasonYear"],
-                popularity: data["popularity"],
-                episodes: data["totalEpisodes"]
-            }
-        }
-    } catch (error) {
-        console.error(error)
-        return
-    }
-}
-
-async function extractAnimeList(data: AnimeData): Promise<cardData[]> {
-    let url = `https://www.lycoris.cafe/api/search?page=1&pageSize=12&search=${convertText(data.title.romaji)}&genres=&status=&format=&year=&season=&source=&sortField=popularity&sortDirection=desc&preferRomaji=true`
-    const req = await request(url, { headers: HEADER });
-    if (!req.success || !req.json) return []
-    let endData: cardData[] = []
-    req.json.data.forEach(element => {
-        let tmp = convertAnime(element)
-        if (tmp) endData.push(tmp)
-    });
-
-    return endData
-}
-
-async function extractEpisodeDataList(animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> {
-    console.log(animeData, anime_id)
-    let animeID = anime_id;
-    if (!animeID && animeData) {
-        let animeList = await extractAnimeList(animeData)
-        console.log(animeList)
-        if (animeList.length <= 0) return
-        animeID = animeList[0].AnimeData.player_ID
-    }
-    if (!animeID) return
-
-    let req = await requestToApi(animeID)
-    if (!req) return
-    console.log(req)
-    let tmpEpisodes = req.data.anime["episodes"]
-    let episodes: { ep: string, img?: string, title?: string }[] = tmpEpisodes.map((ep) => {
-        return {
-            ep: ep["number"],
-            img: ep["thumbnail"],
-            title: ep["title"]
-        }
-    })
-
-    return {
-        player_id: animeID,
-        episodesData: [{ episodes: episodes, type: "sub", name: "Subtitles" }]
-    }
-}
-
-async function extractOnlyEpisodes(_type: string, anime_id: string): Promise<{ ep: string; img?: string; title?: string; }[]> {
-    let req = await requestToApi(anime_id)
-    if (!req) return []
-    let tmpEpisodes = req.data.anime["episodes"]
-    let episodes: { ep: string, img?: string, title?: string }[] = tmpEpisodes.map((ep) => {
-        return {
-            ep: ep["number"],
-            img: ep["thumbnail"],
-            title: ep["title"]
-        }
-    })
-
-    return episodes
-}
-
 function convertToAnimeData(data: any): AnimeData | undefined {
-    console.log(data)
     try {
         return {
             characters: [],
@@ -211,26 +46,128 @@ function convertToAnimeData(data: any): AnimeData | undefined {
     }
 }
 
-async function searchAnime(name: string, page: number, _params?: { genres?: string[]; years?: string; seasons?: string; format?: string[]; airing?: string; }): Promise<cardData[]> {
-    let url = `https://www.lycoris.cafe/api/search?page=${page}&pageSize=12&search=${name}&genres=&status=&format=&year=&season=&source=&sortField=popularity&sortDirection=desc&preferRomaji=true`
-    const req = await request(url, { headers: HEADER });
-    if (!req.success || !req.json) return []
-
-    let data = req.json.data.map((element) => { return { AnimeData: convertToAnimeData(element) } })
-    if (!data) return []
-    return data
+async function requestToApi(anime_id: string): Promise<{ data: any } | undefined> {
+    let url = `${WEB}/api/anime/${anime_id}`
+    let req = await request(url, { headers: HEADER });
+    if (!req.success) return undefined
+    return { data: req.json }
 }
 
-export const lycorisCafe: playerPluginFormat = {
-    version: "1.0",
-    name: "Lycoris.cafe",
-    author: "Owca525",
-    icon: "https://www.lycoris.cafe/favicon.ico",
-    player: {
-        extractPlayerData: extractEpisodeData,
-        extractEpisodeList: extractEpisodeDataList,
-        extractOnlyEpisodesList: extractOnlyEpisodes,
-        searchAnime: searchAnime
-    },
-    preferedLang: ["pl", "en"]
+export default class LycorisCafe implements playerPluginFormat {
+    metadata: playerPluginFormat["metadata"] = {
+        version: "1.1",
+        name: "Lycoris.cafe",
+        author: "Owca525",
+        icon: "https://www.lycoris.cafe/favicon.ico",
+        urlWebsite: WEB,
+        supportLang: ["pl"]
+    };
+
+    extractPlayerData = async (_type: string, episode: string, id: string): Promise<playerData[]> => {
+        let req = await requestToApi(id)
+        if (!req) return []
+        let episodes = req.data.anime["episodes"]
+        let currentEpisode: resolutionFormat[] = []
+        let subtitles: playerSubtitlesFormat[] = []
+        let chapters: playerChapterList[] = []
+
+        let tmp = episodes.find((element) => parseInt(element.number) == parseInt(episode))
+        if (!tmp) return []
+
+        let reqID = await request(`${WEB}/api/watch/getVideoLink?id=${tmp.id}`, { headers: HEADER });
+        if (!reqID.success) return []
+        // if (!reqID.data.endWith("LC")) return []
+
+        let decodeData = reqID.text.slice(0, -2)
+        decodeData = decodeData.split("").reverse().map(el => String.fromCharCode(el.charCodeAt(0) - 7)).join("")
+
+        try {
+            let animeEpisodes = JSON.parse(atob(decodeData))
+            for (const key in animeEpisodes) {
+                let res = detectResoltion(key)
+                if (animeEpisodes[key].length <= 0) continue 
+                if (res == "Unknown") continue
+                currentEpisode.push({
+                    res: res,
+                    url: animeEpisodes[key],
+                    defaultSubtitles: res == "Source",
+                })
+            }
+        } catch (error) {
+            console.error(error, atob(decodeData), decodeData, reqID)
+        }
+
+        if (tmp["subtitles"]["EN"]) subtitles.push({
+            url: tmp["subtitles"]["EN"],
+            lang: "en",
+            label: "English",
+            format: "ass"
+        })
+        if (tmp["subtitles"]["PL"]) subtitles.push({
+            url: tmp["subtitles"]["PL"],
+            lang: "pl",
+            label: "Polish",
+            format: "ass"
+        })
+        let extractedChapters = JSON.parse(tmp["markerPeriods"])
+        if (extractedChapters[0] && timeToSeconds(extractedChapters[0]["endTime"]) >= 0) chapters.push({ start: timeToSeconds(extractedChapters[0]["startTime"]), end: timeToSeconds(extractedChapters[0]["endTime"]), type: "opening", name: "Opening" })
+        if (extractedChapters[1] && timeToSeconds(extractedChapters[1]["endTime"]) >= 0) chapters.push({ start: timeToSeconds(extractedChapters[1]["startTime"]), end: timeToSeconds(extractedChapters[1]["endTime"]), type: "ending", name: "Ending" })
+
+        return [{
+            hostname: "lycoris.cafe",
+            resolution: currentEpisode.sort((a, b) => Number(a.res) - Number(b.res)).reverse(),
+            listChapters: chapters,
+            subtitles: subtitles
+        }]
+    }
+    extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {
+        let animeID = anime_id;
+        
+        if (!animeID && animeData) {
+            let animeList = await this.searchAnime(animeData.title.romaji, 1)
+            if (animeList.length <= 0) return
+            animeID = animeList[0].AnimeData.id
+        }
+        if (!animeID) return
+
+        let req = await requestToApi(animeID)
+        if (!req) return
+        let tmpEpisodes = req.data.anime["episodes"]
+        let episodes: { ep: string, img?: string, title?: string }[] = tmpEpisodes.map((ep) => {
+            return {
+                ep: ep["number"],
+                img: ep["thumbnail"],
+                title: ep["title"]
+            }
+        })
+
+        return {
+            player_id: animeID,
+            episodesData: [{ episodes: episodes, type: "sub", name: "Subtitles" }]
+        }
+    }
+    extractOnlyEpisodesList = async (_type: string, anime_id: string): Promise<{ ep: string; img?: string; title?: string; }[]> => {
+        let req = await requestToApi(anime_id)
+        if (!req) return []
+        let tmpEpisodes = req.data.anime["episodes"]
+        let episodes: { ep: string, img?: string, title?: string }[] = tmpEpisodes.map((ep) => {
+            return {
+                ep: ep["number"],
+                img: ep["thumbnail"],
+                title: ep["title"]
+            }
+        })
+
+        return episodes
+    }
+    searchAnime = async (name: string, page: number, _params?: genresSearchFormat): Promise<cardData[]> => {
+        let url = `https://www.lycoris.cafe/api/search?page=${page}&pageSize=12&search=${name}&genres=&status=&format=&year=&season=&source=&sortField=popularity&sortDirection=desc&preferRomaji=true`
+        const req = await request(url, { headers: HEADER });
+        if (!req.success || !req.json) return []
+
+        let data: cardData[] = req.json.data.map((element) => { return { AnimeData: convertToAnimeData(element) } })
+        if (!data) return []
+        return data
+    }
+
 }

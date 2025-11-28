@@ -20,7 +20,6 @@ import { SaveHistory } from "@renderer/utils/FilesManager/history"
 import { Component, createSignal, For, onCleanup, onMount, Show } from "solid-js"
 import { getConfig } from "@renderer/utils/stores/config"
 import { t } from "i18next"
-import { createShortcut } from "@solid-primitives/keyboard"
 import { useKeyPress } from "@renderer/utils/hooks/useKeyPress"
 import DeveloperStats from "./components/developerStats"
 import NerdStats from "./components/nerdStats"
@@ -47,7 +46,7 @@ function addTime(durration: number): string {
 
 async function fetchData(tmpData: { episode: string, id?: string, type: string, playerData: playerData }, func: (episode: string, type: string, playerData: playerData, id?: string) => Promise<playerData | undefined>): Promise<{ succes: boolean, data: playerData | undefined }> {
     try {
-        console.log(tmpData)
+        (tmpData)
         let data = await func(tmpData.episode, tmpData.type, tmpData.playerData, tmpData.id)
         return {
             succes: true,
@@ -271,11 +270,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 type: "",
                 playerData: currentplayer
             }, currentplayer.extractResolution)
-            console.log(tmp)
             if (tmp.succes && tmp.data) currentplayer = tmp.data
         }
-
-        console.log(currentplayer)
 
         if (currentplayer.resolution.length <= 0) {
             toast(t("player.errors.missingResoltions"), { type: "error" })
@@ -668,10 +664,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         keybinds(keys)
     })
 
-    createShortcut(["d"], () => {
-        console.log(player_data, temp, currentSubtitles(), currentPlayer())
-    })
-
     function setEpisode(type: "next" | "prev") {
         let ep = temp.episodes.findIndex((item) => item.ep === temp.episode)
         if (ep < 0) return
@@ -858,8 +850,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             const canvas = await html2canvas(screenshotWrapper);
             screenshot = canvas.toDataURL("image/png");
         }
-
-        console.log(screenshot)
 
         if (screenshot == "data:,") {
             toast(t("player.toastscreenshot.failed"), { type: "error" });

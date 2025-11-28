@@ -5,10 +5,9 @@ import Card from '@renderer/pages/home/components/card';
 import Input from '@renderer/components/input';
 import Dropdown from '@renderer/components/dropDown';
 import { segregatePlugins } from '@renderer/utils/functions';
-import { ChangePlugin } from '@renderer/utils/pluginApi';
 import { Component, createSignal, For, onMount, Show } from 'solid-js';
 import { useQuery } from '@tanstack/solid-query';
-import { getPlayerPLugin } from '@renderer/utils/stores/plugins';
+import { getPlayerPLugin, pluginManager } from '@renderer/utils/stores/plugins';
 
 interface ContainerWrongProps {
     name: string;
@@ -30,7 +29,7 @@ const ContainerWrong: Component<ContainerWrongProps> = ({ name, exitfunc, refetc
             const [name] = queryKey;
             let plugin = getPlayerPLugin()
             if (plugin)
-                return await plugin.player.searchAnime(name, 1);
+                return await plugin.searchAnime(name, 1);
             return [];
         },
         refetchOnWindowFocus: false,
@@ -47,9 +46,9 @@ const ContainerWrong: Component<ContainerWrongProps> = ({ name, exitfunc, refetc
                     onKeyDown={(text) => setSearchName(text)}
                 />
                 <Dropdown
-                    options={segregatePlugins((name) => { ChangePlugin(name); response.refetch(); })}
+                    options={segregatePlugins((name) => { pluginManager().changePlugin(name); response.refetch(); })}
                     disableX
-                    buttonText={getPlayerPLugin()?.name}
+                    buttonText={getPlayerPLugin()?.metadata.name}
                 />
                 {/* <Button icon='tune'/> */}
             </div>

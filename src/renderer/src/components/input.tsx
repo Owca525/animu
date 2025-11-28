@@ -16,7 +16,6 @@ export default function Input(props: InputProps) {
 
   const handleData = (event: KeyboardEvent & { currentTarget: HTMLInputElement }) => {
     if (!props.onKeyDown) return;
-    console.log(event)
 
     const value = event.currentTarget.value;
     if (event.code === "Enter") {

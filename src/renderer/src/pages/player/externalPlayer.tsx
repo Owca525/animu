@@ -171,9 +171,6 @@ const ExternalPlayer: Component<ExternalplayerProps> = ({ animeData, now_episode
         window.api.chromecast.stopSearch()
     }
 
-    createEffect(() => {
-        console.log(currentResolution())
-    })
     // const chromecastSearchContainerVariants = {
     //     invisible: { opacity: 0, x: -500 },
     //     hidden: { opacity: 1, x: -230 },

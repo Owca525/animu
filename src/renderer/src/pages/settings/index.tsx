@@ -15,12 +15,11 @@ import SeekBar from "@renderer/components/seekBar";
 import HelpIcon from "./components/helpIcon";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import { checkUpdate } from "@renderer/utils/update";
-import { InitialPlayerPlugin } from "@renderer/utils/pluginApi";
 import ButtonGroup from "./components/buttonGroup";
 import { DetectOldVersionHistory } from "@renderer/utils/FilesManager/history";
 import { useNavigate } from "@solidjs/router";
 import { getConfig, setConfig } from "@renderer/utils/stores/config";
-import { getPluginList } from "@renderer/utils/stores/plugins";
+import { getPluginList, pluginManager } from "@renderer/utils/stores/plugins";
 import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { createShortcut } from "@solid-primitives/keyboard";
 import { unwrap } from "solid-js/store";
@@ -199,7 +198,7 @@ function settings() {
             setSaving(() => false)
             saveConfig(config().new)
             setDynamicZoom(config().new.General.Window.Zoom)
-            InitialPlayerPlugin()
+            pluginManager().initialPlugins()
             toast(t("settings.saving.done"), { type: "success" })
         } catch (error) {
             toast(t("settings.saving.error"), { type: "success" })
@@ -212,7 +211,7 @@ function settings() {
             changeTheme(config().old.General.theme)
             return { old: structuredClone(prev.old), new: structuredClone(prev.old) }
         })
-        InitialPlayerPlugin()
+        pluginManager().initialPlugins()
         setSaving(() => false)
     }
 
@@ -994,16 +993,16 @@ function settings() {
                                 </tr> */}
                                 {pluginList.map((plugin) => (
                                     <tr class="settings-table-button">
-                                        <td class="settings-extensions-title">{plugin.icon ? <img class="settings-extensions-icon" src={plugin.icon} /> : <div class="settings-extensions-icon-placeholder"></div>}{plugin.name}</td>
-                                        <td><div class="settings-extensions-background">{plugin.author}</div></td>
-                                        <td><div class="settings-extensions-background">{plugin.version}</div></td>
+                                        <td class="settings-extensions-title">{plugin.metadata.icon ? <img class="settings-extensions-icon" src={plugin.metadata.icon} /> : <div class="settings-extensions-icon-placeholder"></div>}{plugin.metadata.name}</td>
+                                        <td><div class="settings-extensions-background">{plugin.metadata.author}</div></td>
+                                        <td><div class="settings-extensions-background">{plugin.metadata.version}</div></td>
                                         <td>
                                             <div class="settings-extensions-button-container">
                                                 <div class="settings-extensions-type-container">
-                                                    {plugin.player && <div class="settings-extensions-background">{t("global.player")}</div>}
+                                                    <div class="settings-extensions-background">{t("global.player")}</div>
                                                 </div>
                                                 <div class="settings-helpicon-space">
-                                                    <CheckBox checked={config().new.plugins.player == plugin.name ? true : plugin.name == "AnilistApi" ? true : false} onChecked={() => plugin.name != "AnilistApi" ? handleChange('plugins.player', plugin.name) : ""} />
+                                                    <CheckBox checked={config().new.plugins.player == plugin.metadata.name ? true : plugin.metadata.name == "AnilistApi" ? true : false} onChecked={() => plugin.metadata.name != "AnilistApi" ? handleChange('plugins.player', plugin.metadata.name) : ""} />
                                                     {/* <Button icon="settings" ButtonClass="settings-extensions-button" /> */}
                                                 </div>
                                             </div>

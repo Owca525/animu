@@ -35,10 +35,6 @@ export default function PlayerSettings(props: playerSettingsProps) {
     //     visible: { opacity: 1, x: 0, display: "", position: "" },
     // };
 
-    createEffect(() => {
-        console.log(currentSettings())
-    })
-
     return (
         <Show when={props.state}>
             <div class="player-settings-container">
