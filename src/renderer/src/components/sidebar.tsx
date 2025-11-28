@@ -1,10 +1,17 @@
-import Button from "./buttons"
-import "./css/sidebar.css"
-import icon from "../../../../resources/icon.png"
-import { sidebarData } from "@renderer/utils/types"
-import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js"
-import { createShortcut } from "@solid-primitives/keyboard"
-import { setHomeLocalSearch, setHomeSearchPage } from "@renderer/utils/stores/home"
+import Button from './buttons';
+import icon from '../../../../resources/icon.png';
+import {
+  createEffect,
+  createSignal,
+  For,
+  onCleanup,
+  onMount,
+  Show
+  } from 'solid-js';
+import { createShortcut } from '@solid-primitives/keyboard';
+import { setHomeSearchPage } from '@renderer/utils/stores/home';
+import { sidebarData } from '@renderer/utils/types';
+import './css/sidebar.css';
 
 interface sidebarProps {
   showLogo?: boolean
@@ -101,7 +108,7 @@ export default function Sidebar(props: sidebarProps) {
           <Show when={!props.showLogo}>
             <Button icon={"arrow_back"}
               content={detectSidebarStateButton("Hide Sidebar")}
-              onClick={(event) => { setHomeLocalSearch(false); setHomeSearchPage(1); hideSidebar(event, undefined) }}
+              onClick={(event) => { setHomeSearchPage(1); hideSidebar(event, undefined) }}
               ButtonClass={detectSidebarStateClass()}
               iconClassName="sidebar-button"
             />
@@ -111,7 +118,7 @@ export default function Sidebar(props: sidebarProps) {
             {(value, i) => (
               <Button icon={value.icon}
                 content={detectSidebarStateButton(value.text)}
-                onClick={(event) => { setHomeLocalSearch(false); setHomeSearchPage(1); hideSidebar(event, value.onClick, i()) }}
+                onClick={(event) => { setHomeSearchPage(1); hideSidebar(event, value.onClick, i()) }}
                 ButtonClass={`${detectSidebarStateClass()} ${checkNumber(i())}`}
                 iconClassName={`sidebar-button ${checkNumber(i())}`} />
             )}
@@ -123,7 +130,7 @@ export default function Sidebar(props: sidebarProps) {
             {(value) => (
               <Button icon={value.icon} 
                 content={detectSidebarStateButton(value.text)} 
-                onClick={(event) => { setHomeLocalSearch(false); setHomeSearchPage(1); hideSidebar(event, value.onClick) }} 
+                onClick={(event) => { setHomeSearchPage(1); hideSidebar(event, value.onClick) }} 
                 ButtonClass={detectSidebarStateClass()} 
                 iconClassName="sidebar-button" />
             )}

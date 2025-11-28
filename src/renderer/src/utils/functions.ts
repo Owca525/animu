@@ -3,7 +3,7 @@ import { cardData, ContextMenuProps, homeData, playerChapterList, SettingsConfig
 import { showDialog } from "./context/DialogContext";
 import i18n from "./i18n";
 import { DropdownOption } from "@renderer/components/dropDown";
-import { getHomeCache, setAllHomeData } from "./stores/home";
+import { getHomeCache, setHomeNewData } from "./stores/home";
 import { getGlobalCache } from "./stores/global";
 import { getConfig } from "./stores/config";
 import { getPluginList } from "./stores/plugins";
@@ -52,7 +52,7 @@ export function checkDate(date: string | number, type: "Every Day" | "Every Week
             return milliseconds >= 7 * 24 * 60 * 60 * 1000;
         case "Every Day":
             return milliseconds >= 24 * 60 * 60 * 1000;
-        case "Every Month": 
+        case "Every Month":
             return milliseconds >= (24 * 60 * 60 * 1000) * 30;
     }
 }
@@ -152,39 +152,57 @@ export function convertMsToMinutes(ms: number): number {
 
 export async function refetchHistory() {
     let data: homeData = getHomeCache()
-    if (!data.data) return
-    if (data.data.sections.length > 2) return
-    if (data.data.sections.length <= 0) return
+    if (data.activePage != "history") return
     let history = getHistory()
-    if (data.data.sections.length == 1 && data.data.sections[0].title == t("global.continuewatch")) {
-        setAllHomeData({ data: { sections: [{ title: t("global.continuewatch"), data: history.continue, horizontal: false }] } } as any)
+    if (data.data.sections[0].title == t("global.continuewatch")) {
+        setHomeNewData({ sections: [{ title: t("global.continuewatch"), data: history.continue, horizontal: false }] })
         return
     }
 
-    if (data.data.sections.length == 1 && data.data.sections[0].title == t("global.history")) {
-        setAllHomeData({ data: { sections: [{ title: t("global.history"), data: history.history, horizontal: false }] } } as any)
+    if (data.data.sections[0].title == t("global.history")) {
+        setHomeNewData({ sections: [{ title: t("global.history"), data: history.history as cardData[], horizontal: false }] })
         return
     }
 
     if (data.data.sections[0].title == t("global.continuewatch") && data.data.sections[1].title == t("global.history")) {
-        setAllHomeData({
-            data: {
-                sections: [
-                    {
-                        title: t("global.continuewatch"),
-                        data: history.continue.slice(0, 20),
-                        horizontal: true,
-                        // onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.continuewatch"), data: continueWatch, horizontal: false }] }))
-                    },
-                    {
-                        title: t("global.history"),
-                        data: history.history.slice(0, 20),
-                        horizontal: true,
-                        // onTitleClick: () => setHomeData(async () => ({ sections: [{ title: t("global.history"), data: history, horizontal: false }] }))
-                    },
-                ]
-            }
-        } as any)
+        setHomeNewData({
+            sections: [
+                {
+                    title: t("global.continuewatch"),
+                    data: history.continue.slice(0, 20),
+                    horizontal: true,
+                    titlevent: {
+                        onTitleClick: () =>
+                            setHomeNewData({
+                                sections: [
+                                    {
+                                        title: t("global.continuewatch"),
+                                        data: history.continue,
+                                        horizontal: false,
+                                    },
+                                ],
+                            }),
+                    }
+                },
+                {
+                    title: t("global.history"),
+                    data: history.history.slice(0, 20) as cardData[],
+                    horizontal: true,
+                    titlevent: {
+                        onTitleClick: () =>
+                            setHomeNewData({
+                                sections: [
+                                    {
+                                        title: t("global.history"),
+                                        data: history.history as any,
+                                        horizontal: false,
+                                    },
+                                ],
+                            })
+                    }
+                },
+            ]
+        })
         return
     }
 }
@@ -379,7 +397,7 @@ export async function request(url: string, options?: { method?: "POST" | "GET", 
         let text = "";
         try {
             text = await respTextClone.text()
-        } catch (error) {}
+        } catch (error) { }
 
         if (!response.ok) return { text: text, buffer: [] as any, status: response.status, statusText: response.statusText, url: response.url, success: response.ok, json: undefined, responseHeader: response.headers as any }
         let bufferCloned = response.clone()
@@ -387,7 +405,7 @@ export async function request(url: string, options?: { method?: "POST" | "GET", 
 
         try {
             jsontext = await response.json()
-        } catch (error) {}
+        } catch (error) { }
 
         return {
             text: text,
@@ -466,7 +484,7 @@ export function getHistory() {
     }
     return {
         continue: continueWatch,
-        history: global.map((value) => ({...value, saveData: { ...value.saveData, last_Time: 0 }}))
+        history: global.map((value) => ({ ...value, saveData: { ...value.saveData, last_Time: 0 } }))
     }
 }
 

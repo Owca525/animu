@@ -25,7 +25,8 @@
     "open": "Otwórz"
   },
   "home": {
-    "search": "Szukaj...",
+    "search": "Szukaj Anime...",
+    "historySearch": "Szukaj w histori...",
     "nothingfound": "Nic nie znaleziono",
     "error": "Wystąpił błąd",
     "trending_now": "Popularne teraz",

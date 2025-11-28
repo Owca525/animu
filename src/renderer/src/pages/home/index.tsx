@@ -1,28 +1,43 @@
-// Home css
-import "./home.css";
-import Input from "@renderer/components/input";
-import Sidebar from "@renderer/components/sidebar";
-import Container from "./components/container";
+import BigCardsContainer from './components/bigCardsContainer';
+import Button from '@renderer/components/buttons';
+import Container from './components/container';
+import Filter from './components/filter';
+import Input from '@renderer/components/input';
+import Sidebar from '@renderer/components/sidebar';
+import { CreateContextMenuOptions, getHistory } from '@renderer/utils/functions';
 import {
+  createSignal,
+  For,
+  Match,
+  onMount,
+  Show,
+  Switch
+} from 'solid-js';
+import { getConfig } from '@renderer/utils/stores/config';
+import {
+  getHomeCache,
+  setAllHomeData,
+  setHomeActivePage,
+  setHomeNewData,
+  setHomeSearch,
+  setHomeSearchPage,
+  setHomeSearchTags,
+  setHomeStopScrolling
+} from '@renderer/utils/stores/home';
+import { getInformationPlugin } from '@renderer/utils/stores/plugins';
+import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
+import { t } from 'i18next';
+import { unwrap } from 'solid-js/store';
+import { useNavigate } from '@solidjs/router';
+import './home.css';
+// Home css
+import {
+  cardData,
   containerData,
   FilterParams,
   homeData,
   SettingsConfig,
 } from "@renderer/utils/types";
-import { t } from "i18next";
-import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
-import { CreateContextMenuOptions, getHistory } from "@renderer/utils/functions";
-import Filter from "./components/filter";
-import Button from "@renderer/components/buttons";
-import BigCardsContainer from "./components/bigCardsContainer";
-import { getInformationPlugin } from "@renderer/utils/stores/plugins";
-import { useNavigate } from "@solidjs/router";
-import { getHomeCache, setAllHomeData, setHomeLocalSearch, setHomeSearch, setHomeSearchPage, setHomeSearchTags, setHomeStopScrolling } from "@renderer/utils/stores/home";
-import { getConfig } from "@renderer/utils/stores/config";
-import { createEffect, createSignal, For, Match, onMount, Show, Switch } from "solid-js";
-import { unwrap } from "solid-js/store";
-import { createShortcut } from "@solid-primitives/keyboard";
-import { toast } from "@renderer/utils/context/ToastNotification";
 // import { createShortcut } from "@solid-primitives/keyboard";
 // import WelcomeScreen from "./components/welcomeScreen"
 
@@ -41,7 +56,7 @@ const Home = () => {
       {
         icon: "home",
         text: t("global.home"),
-        onClick: plugin.home,
+        onClick: () => { setHomeActivePage("home"); plugin.home() },
       },
       {
         icon: "history",
@@ -66,63 +81,52 @@ const Home = () => {
   // }
 
   onMount(() => {
+    setHomeActivePage("home")
     if (homeCache().data.sections.length <= 0) plugin.home()
     const config: SettingsConfig = unwrap(getConfig());
     if (config.General.discordRPC && window.api)
       window.api.rpc.setActivity(undefined, t("discordrpc.home"));
   })
 
-  createEffect(() => {
-    if (!divRef) return
-    let home = homeCache()
-    if (!home.data.sections) return
-    if (home.data.sections.length <= 0 || home.data.sections.length != 1) return
-    if (home.stopScrolling) return
-    // if ((divRef.scrollHeight > divRef.clientHeight) == false && home.data.sections[0].onScrollDownFunction) {
-    //   setHomeSearchPage(home.page + 1)
-    //   home.data.sections[0].onScrollDownFunction(home.page + 1);
-    // }
-  })
-
-  createShortcut(["m"], () => {
-    toast("Test Notification", { type: "info", removeTimer: true })
-  })
-
   function history() {
-    setHomeLocalSearch(true);
+    setHomeActivePage("history");
     let history = getHistory()
 
-    let data = {
+    let data: homeData["data"] = {
       sections: [
         {
           title: t("global.continuewatch"),
           data: history.continue.slice(0, 20),
           horizontal: true,
-          // onTitleClick: () =>
-          //   setHomeData(async () => ({
-          //     sections: [
-          //       {
-          //         title: t("global.continuewatch"),
-          //         data: history.continue,
-          //         horizontal: false,
-          //       },
-          //     ],
-          //   })),
+          titlevent: {
+            onTitleClick: () =>
+              setHomeNewData({
+                sections: [
+                  {
+                    title: t("global.continuewatch"),
+                    data: history.continue,
+                    horizontal: false,
+                  },
+                ],
+              }),
+          }
         },
         {
           title: t("global.history"),
-          data: history.history.slice(0, 20),
+          data: history.history.slice(0, 20) as any,
           horizontal: true,
-          // onTitleClick: () =>
-          //   setHomeData(async () => ({
-          //     sections: [
-          //       {
-          //         title: t("global.history"),
-          //         data: history.history,
-          //         horizontal: false,
-          //       },
-          //     ],
-          //   })),
+          titlevent: {
+            onTitleClick: () =>
+              setHomeNewData({
+                sections: [
+                  {
+                    title: t("global.history"),
+                    data: history.history as any,
+                    horizontal: false,
+                  },
+                ],
+              })
+          }
         },
       ],
     };
@@ -138,29 +142,12 @@ const Home = () => {
     const scrollPercent = (scrollTop / scrollHeight) * 100;
     if (parseInt(scrollPercent.toFixed(0)) >= 15) setHeaderActive(() => true)
     else setHeaderActive(() => false)
-
-    if (home.data.sections.length > 1) return;
-
-    const currentPos = -divRef.scrollTop + divRef.scrollHeight;
-    const endPosition = divRef.offsetHeight;
-    const isFUCKINGBottom = parseInt(currentPos.toFixed(0)) <= endPosition + 30;
-    if (
-      isFUCKINGBottom &&
-      home.stopScrolling == false &&
-      home.data.sections.length === 1
-    ) {
-      // if (home.data.sections[0].onScrollDownFunction) {
-      //   setHomeSearchPage(home.page + 1)
-      //   home.data.sections[0].onScrollDownFunction(home.page + 1);
-      // }
-      return;
-    }
   };
 
   // TODO: napraw wyszukiwanie itp
   async function OnSearch(text: string) {
     let home = homeCache()
-    if (!home.localSearch && home.search != text) {
+    if (home.search != text && home.activePage == "home") {
       setHomeSearch(text)
       setHomeSearchPage(1)
       setHomeStopScrolling(false);
@@ -168,41 +155,35 @@ const Home = () => {
       return;
     }
 
-    // if (text == "" || text == " ") {
-    //   await setHomeData(history);
-    //   return;
-    // }
+    if (home.activePage != "history") return
+    let history = getHistory()
+    let finnalContainer: containerData[] = []
+    let historySearch = history.history.filter((data) =>
+      data.AnimeData.title.romaji.toLowerCase().includes(text.toLowerCase())
+    );
+    let continueSearch = history.history.filter((data) =>
+      data.AnimeData.title.romaji.toLowerCase().includes(text.toLowerCase())
+    );
 
-    // TODO: Fix search history
-    // let HomeData = home.data;
-    // if (!HomeData || !home.data) return;
-    // if ( home.data.sections.length == 2 || home.data.sections.length == 0 ) {
-    //   HomeData = await history();
-    // }
-    // if (home.data.sections.length == 1 && home.data[0].title == t("global.history")) {
-    //   HomeData = {
-    //     sections: [{ ...home.data[0], data: await ReadFile("history") }],
-    //   };
-    // }
-    // if (
-    //   home.data.sections.length == 1 &&
-    //   home.data[0].title == t("global.continuewatch")
-    // ) {
-    //   HomeData = {
-    //     sections: [{ ...home.data[0], data: await ReadFile("continueWatch") }],
-    //   };
-    // }
+    if (continueSearch.length > 0) finnalContainer.push({
+      title: t("global.continuewatch"),
+      data: continueSearch as cardData[],
+      horizontal: historySearch.length <= 0
+    })
 
-    // let newData = HomeData.sections.map((containerData) => {
-    //   let data = containerData.data.filter((data) =>
-    //     data.AnimeData.title.romaji.toLowerCase().includes(text.toLowerCase())
-    //   );
-    //   if (data.length == 0) return;
-    //   return { ...containerData, data: data };
-    // });
-    // setHomeData(async () => ({
-    //   sections: newData.filter((value) => value != undefined),
-    // }));
+    if (historySearch.length > 0) finnalContainer.push({
+      title: t("global.history"),
+      data: historySearch as cardData[],
+      horizontal: historySearch.length <= 0
+    })
+
+    if (continueSearch.length <= 0 && historySearch.length <= 0) finnalContainer.push({
+      title: t("global.history"),
+      data: [],
+      horizontal: true
+    })
+
+    setHomeNewData({ sections: finnalContainer })
   }
 
   function onChange(params?: FilterParams, removeParam?: string) {
@@ -245,6 +226,7 @@ const Home = () => {
         data={sidebarData}
         openSidebar={isOpenSidebar()}
         onChange={() => setOpenSidebar(false)}
+        activeElement
       />
 
       <div class={`home-header-container ${homeCache().data && !homeCache().data.topCards ? "active" : ""} ${headerActive() ? "color" : ""}`}>
@@ -255,7 +237,7 @@ const Home = () => {
         />
         <div class="home-header-search">
           <Input
-            placeholder={t("home.search")}
+            placeholder={getHomeCache().activePage == "history" ? t("home.historySearch") : t("home.search")}
             InputClass={`${homeCache().data && homeCache().data.topCards ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
             onKeyDown={OnSearch}
           />
@@ -268,7 +250,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-      
+
       <div class="home-main-content" onScroll={handleScroll} ref={divRef}>
         <Switch>
           <Match when={homeCache().isLoading && homeCache().isError == false}>
@@ -294,28 +276,28 @@ const Home = () => {
               {t("home.nothingfound")}
             </div>
           </Match>
-            <Match when={homeCache().isLoading == false && homeCache().isError == false && homeCache().data && homeCache().data.sections && homeCache().data.sections.length > 0}>
-              <Show when={homeCache().data && homeCache().data.topCards}>
-                <BigCardsContainer data={homeCache().data.topCards as containerData} />
-              </Show>
-              <For each={homeCache().data.sections}>
-                {(element) => (
-                  <Container
-                    tags={
-                      homeCache().filterTags && homeCache().data && homeCache().data.sections.length == 1
-                        ? CreateTagList()
-                        : undefined
-                    }
-                    title={element.title}
-                    data={element.data}
-                    horizontal={element.horizontal}
-                    onScrollDownFunction={element.onScrollDownFunction}
-                    titlevent={element.titlevent}
-                  // onTitle={element.onTitleClick}
-                  />
-                )}
-              </For>
-            </Match>
+          <Match when={homeCache().isLoading == false && homeCache().isError == false && homeCache().data && homeCache().data.sections && homeCache().data.sections.length > 0}>
+            <Show when={homeCache().data && homeCache().data.topCards}>
+              <BigCardsContainer data={homeCache().data.topCards as containerData} />
+            </Show>
+            <For each={homeCache().data.sections}>
+              {(element) => (
+                <Container
+                  tags={
+                    homeCache().filterTags && homeCache().data && homeCache().data.sections.length == 1
+                      ? CreateTagList()
+                      : undefined
+                  }
+                  title={element.title}
+                  data={element.data}
+                  horizontal={element.horizontal}
+                  onScrollDownFunction={element.onScrollDownFunction}
+                  titlevent={element.titlevent}
+                // onTitle={element.onTitleClick}
+                />
+              )}
+            </For>
+          </Match>
         </Switch>
       </div>
     </main>

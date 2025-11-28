@@ -65,7 +65,7 @@ export interface homeData {
     search: string
     page: number
     stopScrolling: boolean
-    localSearch: boolean
+    activePage: string
     filterTags?: FilterParams
     mainContainer: {
         scrollLeft: number,
@@ -132,8 +132,8 @@ export interface containerData {
     horizontal?: boolean
     onScrollDownFunction?: (title: string | undefined, page: number, params?: genresSearchFormat) => Promise<{ data: cardData[], maxPage: number }>
     titlevent?: {
-        onTitleClick?: (context: any) => void
-        onTitleClickContext: any
+        onTitleClick: (context: any) => void
+        onTitleClickContext?: any
     }
     tags?: {
         remover: () => void

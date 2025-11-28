@@ -26,7 +26,8 @@
         "return": "Return"
     },
     "home": {
-        "search": "Search...",
+        "search": "Search Anime...",
+        "historySearch": "Search History...",
         "nothingfound": "Nothing Found Here",
         "error": "Error Occured",
         "trending_now": "Trending Now",
