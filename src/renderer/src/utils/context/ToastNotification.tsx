@@ -1,13 +1,15 @@
-import { createContext, createSignal, JSX, For } from "solid-js";
+import { createContext, createSignal, JSX, For, createEffect } from "solid-js";
 import { Portal } from "solid-js/web";
 import { v4 as uuidv4 } from 'uuid';
 import "./css/ToastNotification.css"
 
-interface ToastProps {
+type ToastProps = {
     id: string;
     message: string;
     options?: ToastOptions;
 };
+
+type expandedToastProps = ToastProps & { animation: boolean }
 
 interface ToastOptions {
     type?: "success" | "error" | "info" | "warning",
@@ -32,28 +34,32 @@ const ToastContext = createContext<ToastContextType>();
 let toastAPI: ToastContextType | undefined;
 
 export function ToastProvider(props: { children: JSX.Element }) {
-    const [toasts, setToasts] = createSignal<ToastProps[]>([]);
+    const [toasts, setToasts] = createSignal<expandedToastProps[]>([]);
 
     function addToast(message: string, options: ToastOptions) {
         const id = uuidv4();
         let duration = options.duration;
-        setToasts(prev => [...prev, { id, message, options }]);
+        setToasts(prev => [...prev, { id, message, options, animation: false }]);
 
         if (!options.removeTimer) {
             setTimeout(() => {
-                setToasts(prev => prev.filter(t => t.id !== id));
+                removeToast(id)
             }, duration);
         }
 
         return id
     };
 
+    createEffect(() => {
+        console.log(toasts())
+    })
+
     function updateToast(id: string, msg: string) {
         setToasts((prevToast) => prevToast.map((tost) => tost.id == id ? { ...tost, message: msg } : tost))
     };
 
     function removeToast(id: string) {
-        setToasts(prev => prev.filter(t => t.id !== id))
+        setToasts(prev => prev.map(t => t.id == id ? ({ ...t, animation: true }) : t))
     };
 
     return (
@@ -65,7 +71,11 @@ export function ToastProvider(props: { children: JSX.Element }) {
                 <div class="toast-container">
                     <For each={toasts()}>
                         {toast => (
-                            <div class={`toast ${toast.options?.type}`}>
+                            <div class={`toast ${toast.options?.type} ${toast.animation ? "disable" : ""}`}
+                                onanimationend={(event) => {
+                                    if (event.target.classList.contains("disable")) setToasts(prev => prev.filter(t => t.id !== toast.id))
+                                }}
+                            >
                                 {toast.message}
                             </div>
                         )}

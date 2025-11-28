@@ -16,19 +16,45 @@
   font-size: 1.2em;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   background-color: var(--fourth-layer);
+  animation: ToastSlideIn 0.2s ease;
+}
+.toast.disable {
+  animation: ToastSlideOut 0.2s ease;
 }
 
 .toast.info {
   background-color: var(--blue-background);
   color: var(--blue-text);
+  border: 2px solid var(--blue-one);
 }
 
 .toast.success {
   background-color: var(--green-background);
   color: var(--green-text);
+  border: 2px solid var(--green-one);
 }
 
 .toast.error {
   background-color: var(--red-background);
   color: var(--red-text);
+  border: 2px solid var(--red-one);
+}
+
+/* ANIMATION */
+@keyframes ToastSlideIn {
+  0% {
+    transform: translateX(200px);
+  }
+  100% {
+    transform: translateX(0px);
+  }
+}
+
+@keyframes ToastSlideOut {
+  0% {
+    transform: translateX(0px);
+  }
+  100% {
+    transform: translateX(1000px);
+  }
 }
