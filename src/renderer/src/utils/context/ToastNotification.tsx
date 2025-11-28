@@ -1,4 +1,4 @@
-import { createContext, createSignal, JSX, For, createEffect } from "solid-js";
+import { createContext, createSignal, JSX, For, Show } from "solid-js";
 import { Portal } from "solid-js/web";
 import { v4 as uuidv4 } from 'uuid';
 import "./css/ToastNotification.css"
@@ -12,7 +12,7 @@ type ToastProps = {
 type expandedToastProps = ToastProps & { animation: boolean }
 
 interface ToastOptions {
-    type?: "success" | "error" | "info" | "warning",
+    type?: "success" | "error" | "info" | "warning" | "loading",
     duration?: number,
     onClick?: () => void;
     removeTimer?: boolean
@@ -50,10 +50,6 @@ export function ToastProvider(props: { children: JSX.Element }) {
         return id
     };
 
-    createEffect(() => {
-        console.log(toasts())
-    })
-
     function updateToast(id: string, msg: string) {
         setToasts((prevToast) => prevToast.map((tost) => tost.id == id ? { ...tost, message: msg } : tost))
     };
@@ -76,6 +72,9 @@ export function ToastProvider(props: { children: JSX.Element }) {
                                     if (event.target.classList.contains("disable")) setToasts(prev => prev.filter(t => t.id !== toast.id))
                                 }}
                             >
+                                <Show when={toast.options?.type == "loading"}>
+                                    <span class="material-symbols-outlined loading-animation">progress_activity</span>
+                                </Show>
                                 {toast.message}
                             </div>
                         )}
@@ -87,17 +86,16 @@ export function ToastProvider(props: { children: JSX.Element }) {
 }
 
 export function toast(msg: string, options?: ToastOptions) {
-    console.log(toastAPI)
-    if (!toastAPI) return;
+    if (!toastAPI) return "";
     return toastAPI.addToast(msg, { ...defaultOptions, ...options })
 }
 
 export function updateToast(id: string, msg: string) {
-    if (!toastAPI) return;
+    if (!toastAPI) return "";
     return toastAPI.updateToast(id, msg)
 }
 
 export function removeToast(id: string) {
-    if (!toastAPI) return;
+    if (!toastAPI) return "";
     return toastAPI.removeToast(id)
 }

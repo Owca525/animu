@@ -13,6 +13,8 @@
   border-radius: 12px;
   width: clamp(270px, 20vw, 330px);
   display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 1.2em;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   background-color: var(--fourth-layer);

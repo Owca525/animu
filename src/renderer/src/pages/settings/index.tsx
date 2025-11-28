@@ -931,6 +931,7 @@ function settings() {
                             <span class="settings-custom-space">
                                 <Button content="success" onClick={() => toast("Test Notification", {type: "success"})} />
                                 <Button content="error" onClick={() => toast("Test Notification", {type: "error"})} />
+                                <Button content="loading" onClick={() => toast("Test Notification", {type: "loading"})} />
                                 <Button content="default" onClick={() => toast("Test Notification")} />
                             </span>
                         </div>
