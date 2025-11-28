@@ -2,7 +2,6 @@ import { refetchHistory } from "../functions";
 import { cardData } from "../types";
 // import i18n from "../i18n";
 import { CreateBackup } from "../backup";
-import { searchForConvertAnime } from "@renderer/plugins/anilistApi";
 import { getGlobalCache, setGlobalHistory } from "../stores/global";
 import { unwrap } from "solid-js/store";
 
@@ -107,7 +106,8 @@ async function convertToNewVersion(data: { id: string, title: string, img: strin
     for (let index = 0; index < data.length; index++) {
         const anime = data[index];
         try {
-            let reqAnime = await searchForConvertAnime(anime.title)
+            //  await searchForConvertAnime(anime.title)
+            let reqAnime = "" as any
             if (reqAnime.length <= 0) {
                 failed += 1
                 continue
