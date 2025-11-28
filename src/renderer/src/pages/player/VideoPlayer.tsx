@@ -17,7 +17,7 @@ import workerUrl from "jassub/dist/jassub-worker.js?url";
 import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
 import { saveConfig } from "@renderer/utils/FilesManager/config"
 import { SaveHistory } from "@renderer/utils/FilesManager/history"
-import { Component, createSignal, For, onMount, Show } from "solid-js"
+import { Component, createSignal, For, onCleanup, onMount, Show } from "solid-js"
 import { getConfig } from "@renderer/utils/stores/config"
 import { t } from "i18next"
 import { createShortcut } from "@solid-primitives/keyboard"
@@ -120,6 +120,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [isWaitingPlayer, setWaitingPlayer] = createSignal<boolean>(true)
     const [isPlaying, setIsPlaying] = createSignal<boolean>(config.Player.general.Autoplay)
     const [isFullscreen, setIsFullscreen] = createSignal<boolean>(false)
+    const [isCleanup, setCleanup] = createSignal<boolean>(false)
 
     // Resolution
     const [ListResolution, setListResolution] = createSignal<resolutionFormat[]>([])
@@ -180,6 +181,14 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             videoRef.currentTime = time
             setcurrentTime(() => time)
         }
+    })
+
+    onCleanup(() => {
+        setCleanup(true)
+        if (hls()) hls()?.destroy()
+        if (currentASSubtitles()) currentASSubtitles()?.destroy()
+        if (videoRef) videoRef.src = ""
+        videoRef = undefined
     })
 
     // player Functions
@@ -391,7 +400,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                             hls.destroy();
                             break;
                     }
-                    if (message) toast(message, { type: "error" });
+                    if (message && !isCleanup()) toast(message, { type: "error" });
                 }
             });
         }
@@ -451,6 +460,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         // Checking to save history
         if (!config) return
         if (currentTime() <= parseInt(config.History.continue.MinimalTimeSave.toString())) return
+        if (isCleanup()) return
         let futureHistory = {
             AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
             saveData: {
@@ -595,6 +605,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         const Error = event.currentTarget.error
         var message: string
         if (!Error) return
+        if (isCleanup()) return
         switch (Error.code) {
             case Error.MEDIA_ERR_ABORTED:
                 message = t('player.errors.MEDIA_ERR_ABORTED')
