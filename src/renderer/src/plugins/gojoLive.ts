@@ -1,4 +1,4 @@
-import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerData, playerSubtitlesFormat, resolutionFormat } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerData, playerSubtitlesFormat, resolutionFormat, playerChapterList } from "@renderer/utils/types";
 import { t } from "i18next";
 
 const BACKEND = "https://backend.animetsu.bz"
@@ -33,15 +33,17 @@ async function extractResolutions(episode: string, type: string, playerData: pla
             }
         }))
 
+        let chapters: playerChapterList[] = response.data["skips"] ? [
+            { start: response.data["skips"]["op"]["startTime"], end: response.data["skips"]["op"]["endTime"], type: "opening" },
+            { start: response.data["skips"]["ed"]["startTime"], end: response.data["skips"]["ed"]["endTime"], type: "ending" }
+        ] : []
+
         return {
             ...playerData,
             splitHLS: resolutions[0].res != "master",
             resolution: resolutions,
             subtitles: subtitles,
-            listChapters: response.data["skips"] ? [
-                { start: response.data["skips"]["op"]["startTime"], end: response.data["skips"]["op"]["endTime"], type: "opening" },
-                { start: response.data["skips"]["ed"]["startTime"], end: response.data["skips"]["ed"]["endTime"], type: "ending" }
-            ] : undefined
+            listChapters: chapters.filter(chapter => !(chapter.start === 0 && chapter.end === 0))
         }
     } catch (error) {
         console.error("extractResolutions/GojoLive", error)
