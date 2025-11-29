@@ -7,4 +7,5 @@
     padding: clamp(4px, 1vw, 12px);
     transition: all 0.1s ease;
     user-select: none;
+    overflow: hidden;
 }
