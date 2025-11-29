@@ -22,13 +22,18 @@ interface sidebarProps {
     bottom: sidebarData[]
   }
   activeElement?: boolean
+  setAciveElement?: number
 }
 // Component<sidebarProps> = ({ showLogo = false, data, onChange, openSidebar, activeElement }) =>
 export default function Sidebar(props: sidebarProps) {
   const [sidebarHover, setHover] = createSignal<boolean>(false)
   let sidebarRef: HTMLDivElement | undefined;
   const [animuVersion, setVersion] = createSignal<string>("")
-  const [currentButton, setCurrentButton] = createSignal<number>(props.activeElement ? 0 : -1)
+  const [currentButton, setCurrentButton] = createSignal<number>(
+    props.activeElement ?
+    props.setAciveElement ? props.setAciveElement : 0
+    : -1
+  )
 
   const handleClickOutside = (event: MouseEvent) => {
     let data = event.target as HTMLElement

@@ -56,7 +56,7 @@ const Home = () => {
       {
         icon: "home",
         text: t("global.home"),
-        onClick: () => { setHomeActivePage("home"); plugin.home() },
+        onClick: () => { setHomeActivePage(t("global.home")); plugin.home() },
       },
       {
         icon: "history",
@@ -81,7 +81,6 @@ const Home = () => {
   // }
 
   onMount(() => {
-    setHomeActivePage("home")
     if (homeCache().data.sections.length <= 0) plugin.home()
     const config: SettingsConfig = unwrap(getConfig());
     if (config.General.discordRPC && window.api)
@@ -89,7 +88,7 @@ const Home = () => {
   })
 
   function history() {
-    setHomeActivePage("history");
+    setHomeActivePage(t("global.history"));
     let history = getHistory()
 
     let data: homeData["data"] = {
@@ -215,6 +214,16 @@ const Home = () => {
     return data;
   }
 
+  function getSidebarNumber() {
+    let home = homeCache()
+    for (let index = 0; index < sidebarData.top.length; index++) {
+      const element = sidebarData.top[index];
+      console.log(element, home.activePage)
+      if (element.text == home.activePage) return index
+    }
+    return 0
+  }
+
   return (
     <main
       class={`home-main ${homeCache().data && !homeCache().data.topCards ? "active" : ""}`}
@@ -227,6 +236,7 @@ const Home = () => {
         openSidebar={isOpenSidebar()}
         onChange={() => setOpenSidebar(false)}
         activeElement
+        setAciveElement={getSidebarNumber()}
       />
 
       <div class={`home-header-container ${homeCache().data && !homeCache().data.topCards ? "active" : ""} ${headerActive() ? "color" : ""}`}>

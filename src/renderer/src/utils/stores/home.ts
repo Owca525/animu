@@ -1,5 +1,6 @@
 import { createStore } from 'solid-js/store';
 import { FilterParams, homeData } from '../types';
+import { t } from 'i18next';
 
 const initialState: homeData = {
     isLoading: false,
@@ -10,7 +11,7 @@ const initialState: homeData = {
     stopScrolling: false,
     filterTags: undefined,
     mainContainer: undefined,
-    activePage: ""
+    activePage: t("global.home")
 };
 
 export const [globalState, setGlobalState] = createStore(initialState);
