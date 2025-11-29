@@ -32,9 +32,10 @@ function information() {
 
     const queryClient = useQueryClient()
     const episodeResponse = useQuery(() => ({
-        queryKey: [tempData().anime, currentIDplayer()],
+        queryKey: [currentIDplayer()],
         queryFn: async ({ queryKey }) => {
-            const [_anime, player_id] = queryKey;
+            const [player_id] = queryKey;
+            console.log(player_id, tempData())
             if (tempData().anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED") return { player_id: "", episodesData: [] }
             let pluginName = currentPlugin()
             if (!pluginName) return
@@ -47,7 +48,7 @@ function information() {
             if (tempData().anime.id == "" && !player_id) {
                 return plugin.extractEpisodeList(tempData().anime, undefined)
             }
-            return plugin.extractEpisodeList(tempData().anime, player_id as any)
+            return plugin.extractEpisodeList(tempData().anime, player_id as string)
         },
         refetchOnWindowFocus: false,
         staleTime: 2 * 60 * 60 * 1000,
@@ -170,6 +171,7 @@ function information() {
 
     async function refreashInformation(name: string) {
         queryClient.cancelQueries()
+        setCurrentId(undefined)
         pluginManager().changePlugin(name)
         setCurrentPlugin(name)
         episodeResponse.refetch()
