@@ -541,6 +541,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         saveContinueProgress(event)
         checkUpNext(event)
         handleProgress(event)
+        // TODO: ADD SECURITY FOR CHAPTERS IF THEY HAD START AND END TIME 0
 
         if (currentPlayer() && currentPlayer()!.listChapters) {
             currentPlayer()!.listChapters!.forEach(element => {
