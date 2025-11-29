@@ -520,7 +520,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         hideChapterButtonTimer = setInterval(() => {
             setButtonSkipTime((prev) => {
-                if (prev <= 1 || IsRunningButtonSkipTime()) {
+                console.log(prev)
+                if (prev <= 1) {
                     clearChapterSkipTime()
                     return 15;
                 }
@@ -541,33 +542,32 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         saveContinueProgress(event)
         checkUpNext(event)
         handleProgress(event)
-        // TODO: ADD SECURITY FOR CHAPTERS IF THEY HAD START AND END TIME 0
-
-        if (currentPlayer() && currentPlayer()!.listChapters) {
-            currentPlayer()!.listChapters!.forEach(element => {
-                let currentTime = event.currentTarget.currentTime
-                if (currentTime >= element.start && currentTime <= element.end && element.type == "opening") {
-                    if (config.Player.general.autoSkipOpenings) change_time(element.end)
-                    if (!IsDisableButtonSkipTimerOpening && !config.Player.general.autoSkipOpenings) {
-                        setcurrentSkipButton(() => { return { text: "Skip Opening", onClick: () => { clearChapterSkipTime(); change_time(element.end) }, type: "opening" } })
-                        startChapterSkipTime()
-                        setIsDisableButtonSkipTimerOpening(() => true)
-                    }
-                }
-                if (currentTime >= element.start && currentTime <= element.end && element.type == "ending") {
-                    if (config.Player.general.autoSkipEndings) change_time(element.end)
-                    if (!IsDisableButtonSkipTimerEnding) {
-                        setcurrentSkipButton(() => { return { text: "Skip Ending", onClick: () => { clearChapterSkipTime(); change_time(element.end) }, type: "ending" } })
-                        startChapterSkipTime()
-                        setIsDisableButtonSkipTimerEnding(() => true)
-                    }
-                }
-            });
-        }
 
         // Update RPC
         if (config.General.discordRPC && window.api) window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`)
         if (config.Player.general.AutoSkipEpisode && event.currentTarget.duration == event.currentTarget.currentTime) setEpisode("next")
+        // TODO: ADD SECURITY FOR CHAPTERS IF THEY HAD START AND END TIME 0
+
+        if (!currentPlayer() && !currentPlayer()!.listChapters) return
+        currentPlayer()!.listChapters!.forEach(element => {
+            let currentTime = event.currentTarget.currentTime
+            if (currentTime >= element.start && currentTime <= element.end && element.type == "opening") {
+                if (config.Player.general.autoSkipOpenings) change_time(element.end)
+                if (!IsDisableButtonSkipTimerOpening() && !config.Player.general.autoSkipOpenings) {
+                    setcurrentSkipButton(() => { return { text: "Skip Opening", onClick: () => { clearChapterSkipTime(); change_time(element.end) }, type: "opening" } })
+                    startChapterSkipTime()
+                    setIsDisableButtonSkipTimerOpening(() => true)
+                }
+            }
+            if (currentTime >= element.start && currentTime <= element.end && element.type == "ending") {
+                if (config.Player.general.autoSkipEndings) change_time(element.end)
+                if (!IsDisableButtonSkipTimerEnding()) {
+                    setcurrentSkipButton(() => { return { text: "Skip Ending", onClick: () => { clearChapterSkipTime(); change_time(element.end) }, type: "ending" } })
+                    startChapterSkipTime()
+                    setIsDisableButtonSkipTimerEnding(() => true)
+                }
+            }
+        });
     }
 
     function checkUpNext(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
