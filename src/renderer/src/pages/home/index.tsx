@@ -146,7 +146,7 @@ const Home = () => {
   // TODO: napraw wyszukiwanie itp
   async function OnSearch(text: string) {
     let home = homeCache()
-    if (home.search != text && home.activePage == "home") {
+    if (home.search != text && home.activePage == t("global.home")) {
       setHomeSearch(text)
       setHomeSearchPage(1)
       setHomeStopScrolling(false);
@@ -154,7 +154,7 @@ const Home = () => {
       return;
     }
 
-    if (home.activePage != "history") return
+    if (home.activePage != t("global.history")) return
     let history = getHistory()
     let finnalContainer: containerData[] = []
     let historySearch = history.history.filter((data) =>
@@ -218,7 +218,6 @@ const Home = () => {
     let home = homeCache()
     for (let index = 0; index < sidebarData.top.length; index++) {
       const element = sidebarData.top[index];
-      console.log(element, home.activePage)
       if (element.text == home.activePage) return index
     }
     return 0
@@ -249,6 +248,7 @@ const Home = () => {
           <Input
             placeholder={getHomeCache().activePage == "history" ? t("home.historySearch") : t("home.search")}
             InputClass={`${homeCache().data && homeCache().data.topCards ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
+            defaultValue={homeCache().search}
             onKeyDown={OnSearch}
           />
           <div class="home-filter-void">
