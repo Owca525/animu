@@ -154,12 +154,12 @@ export async function refetchHistory() {
     let data: homeData = getHomeCache()
     if (data.activePage != "history") return
     let history = getHistory()
-    if (data.data.sections[0].title == t("global.continuewatch")) {
+    if (data.data.sections[0].title == t("global.continuewatch") && data.data.sections.length != 2) {
         setHomeNewData({ sections: [{ title: t("global.continuewatch"), data: history.continue, horizontal: false }] })
         return
     }
 
-    if (data.data.sections[0].title == t("global.history")) {
+    if (data.data.sections[0].title == t("global.history") && data.data.sections.length != 2) {
         setHomeNewData({ sections: [{ title: t("global.history"), data: history.history as cardData[], horizontal: false }] })
         return
     }
