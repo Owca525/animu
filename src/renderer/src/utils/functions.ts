@@ -483,7 +483,7 @@ export function getHistory() {
     }
     return {
         continue: continueWatch,
-        history: global.map((value) => ({ ...value, saveData: { ...value.saveData, last_Time: 0 } }))
+        history: global.map((value) => ({ ...value, saveData: { ...value.saveData, last_Time: 0, isStarted: false } }))
     }
 }
 
