@@ -32,7 +32,7 @@ function information() {
 
     const queryClient = useQueryClient()
     const episodeResponse = useQuery(() => ({
-        queryKey: [currentIDplayer()],
+        queryKey: [currentIDplayer(), tempData().anime],
         queryFn: async ({ queryKey }) => {
             const [player_id] = queryKey;
             console.log(player_id, tempData())
