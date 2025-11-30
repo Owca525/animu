@@ -82,6 +82,16 @@ export interface globalDataFormat {
     history: cardData[]
 }
 
+export type playerDataExtended = playerData & {
+    episode: {
+        currentEpisode: string
+        episodeList: string[]
+        anime: AnimeData
+        animeID: string
+        type: string
+    }
+}
+
 export interface playerData {
     hostname: string
     resolution: resolutionFormat[]
@@ -91,7 +101,7 @@ export interface playerData {
     listChapters?: playerChapterList[]
     subtitles?: playerSubtitlesFormat[]
     external?: externalPlayerFormat
-    extractResolution?: (episode: string, type: string, playerData: playerData, id?: string) => Promise<playerData | undefined>
+    extractResolution?: (playerData: playerDataExtended) => Promise<playerData | undefined>
 }
 
 export interface resolutionFormat {

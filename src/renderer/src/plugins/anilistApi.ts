@@ -416,7 +416,10 @@ export default class AnilistApi implements informationPluginFormat {
     try {
       let season = getSeasonFromDate()
       let data = await sendPost({ season: season.season, seasonYear: season.seasonYear }, graphicHomeApi)
-      if (!data.success || !data.json) return callbacks.onError("Anilist isn't accessible")
+      if (!data.success || !data.json) {
+        console.log(data)
+        return callbacks.onError("Anilist isn't accessible")
+      }
       let home: containerData[] = [
         {
           title: t("home.trending_now"),

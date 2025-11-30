@@ -1,6 +1,6 @@
 import Hls from "hls.js"
 
-import { AnimeData, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
+import { AnimeData, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerDataExtended, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
 import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory, request, toggleFullscreen, toSeconds, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
@@ -24,7 +24,7 @@ import { useKeyPress } from "@renderer/utils/hooks/useKeyPress"
 import DeveloperStats from "./components/developerStats"
 import NerdStats from "./components/nerdStats"
 import { unwrap } from "solid-js/store"
-import { toast } from "@renderer/utils/context/ToastNotification"
+import { removeToast, toast } from "@renderer/utils/context/ToastNotification"
 
 function addTime(durration: number): string {
     const now = new Date();
@@ -44,20 +44,13 @@ function addTime(durration: number): string {
     return `${hours}:${minutes}`;
 }
 
-async function fetchData(tmpData: { episode: string, id?: string, type: string, playerData: playerData }, func: (episode: string, type: string, playerData: playerData, id?: string) => Promise<playerData | undefined>): Promise<{ succes: boolean, data: playerData | undefined }> {
+async function fetchResolutions(tmpData: playerDataExtended, func: playerData["extractResolution"]): Promise<{ success: boolean, data: playerData | undefined }> {
+    if (!func) return{ success: false, data: undefined }
     try {
-        (tmpData)
-        let data = await func(tmpData.episode, tmpData.type, tmpData.playerData, tmpData.id)
-        return {
-            succes: true,
-            data: data
-        }
+        return { success: true, data: await func(tmpData) }
     } catch (error) {
-        console.error(error, "fetchData player")
-        return {
-            succes: false,
-            data: undefined
-        }
+        console.error(error, "fetchResolutions player")
+        return { success: false, data: undefined }
     }
 }
 
@@ -98,6 +91,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [currentTime, setcurrentTime] = createSignal<number>(0)
     const [durrationTime, setdurrationTime] = createSignal<number>(0)
     const [currentBuffer, setBuffered] = createSignal<{ position: number, width: number }[]>([])
+    const [playerData, updatePlayerData] = createSignal<playerData[]>(player_data)
 
     // UI
     const [isVolume, setShowVolume] = createSignal<boolean>(false)
@@ -164,18 +158,16 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     }
 
     onMount(() => {
-        let defaulthost = player_data[0]
-        for (let index = 0; index < player_data.length; index++) {
-            const element = player_data[index];
+        let defaulthost = playerData()[0]
+        for (let index = 0; index < playerData().length; index++) {
+            const element = playerData()[index];
             if (element.defaultHost) defaulthost = element
         }
-        checkUrl(defaulthost)
+        runNewPlayer(defaulthost)
         handleVolume(PlayerVolume, true)
         handleMouseMove()
-        if (config.Player.general.AutoFullscreen) {
-            toggleFullscreen(true)
-            setIsFullscreen(true)
-        }
+        
+        if (config.Player.general.AutoFullscreen) enterFullscreen()
         if (videoRef) {
             videoRef.currentTime = time
             setcurrentTime(() => time)
@@ -241,11 +233,11 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     }
 
     // function setNewUrl(host: string) {
-    //     if (player_data.length <= 1) return
-    //     const value = player_data.findIndex((value) => value.hostname == host)
+    //     if (playerData().length <= 1) return
+    //     const value = playerData().findIndex((value) => value.hostname == host)
     //     if (value < 0) return
-    //     if (player_data[value + 1] == undefined) return
-    //     checkUrl(player_data[value + 1])
+    //     if (playerData()[value + 1] == undefined) return
+    //     runNewPlayer(playerData()[value + 1])
     // }
 
     async function setDefaultSubtitles(data: playerSubtitlesFormat[]) {
@@ -260,17 +252,27 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         setNewSubtitles(data[0])
     }
 
-    async function checkUrl(data: playerData) {
+    async function runNewPlayer(data: playerData) {
+        // TODO: Add support for dubbing toggle
         if (!videoRef) return
         let currentplayer = data
         if (currentplayer.extractResolution) {
-            let tmp = await fetchData({
-                episode: temp.episode,
-                id: anime_data.AnimeData.player_ID,
-                type: "",
-                playerData: currentplayer
+            const idToast = toast("Fetching Resolution", { type: "loading", removeTimer: true })
+            let tmp = await fetchResolutions({
+                ...currentplayer,
+                episode: {
+                    currentEpisode: temp.episode,
+                    episodeList: temp.episodes.map((ep) => ep.ep),
+                    anime: anime_data.AnimeData,
+                    animeID: anime_data.AnimeData.player_ID as string,
+                    type: temp.type
+                }
             }, currentplayer.extractResolution)
-            if (tmp.succes && tmp.data) currentplayer = tmp.data
+            removeToast(idToast)
+            if (tmp.success && tmp.data) {
+                currentplayer = tmp.data
+                updatePlayerData((prev) => prev.map((player) => player.hostname == tmp.data?.hostname ? tmp.data : player))
+            }
         }
 
         if (currentplayer.resolution.length <= 0) {
@@ -278,30 +280,33 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             setResError(() => true)
             return
         }
+
         const time = videoRef.currentTime
         if (currentplayer.subtitles) setListSubtitles(() => [{ url: "", format: "", lang: "", label: "Off" }, ...currentplayer.subtitles as playerSubtitlesFormat[]])
         if (currentplayer.storyboardVTT) setThumbnail(await VTTstoryBoardParser(currentplayer.storyboardVTT))
-        if (currentplayer.resolution[0].defaultSubtitles && currentplayer.subtitles) setDefaultSubtitles(currentplayer.subtitles)
-        if (currentplayer.resolution[0].hls && currentplayer.splitHLS) {
+        const currentRes = currentplayer.resolution[0]
+        
+        if (currentRes.defaultSubtitles && currentplayer.subtitles) setDefaultSubtitles(currentplayer.subtitles)
+        if (currentRes.hls && currentplayer.splitHLS) {
             setListResolution(currentplayer.resolution)
-            setCurrentResoltion(currentplayer.resolution[0])
+            setCurrentResoltion(currentRes)
         }
-        if (currentplayer.resolution[0].hls) {
+        if (currentRes.hls) {
             setPlayer(() => currentplayer)
-            await runHLS(currentplayer.resolution[0], currentplayer.splitHLS)
+            await runHLS(currentRes, currentplayer.splitHLS)
             return
         }
         if (hls()) hls()!.destroy()
-        setCurrentResoltion(currentplayer.resolution[0])
+        setCurrentResoltion(currentRes)
         setListResolution(() => currentplayer.resolution)
         setPlayer(() => currentplayer)
 
         // TODO: Fix this can be work using fetch
-        if (currentplayer.resolution[0].doNotUseBackend) {
-            videoRef.src = currentplayer.resolution[0].url
+        if (currentRes.doNotUseBackend) {
+            videoRef.src = currentRes.url
         } else {
             videoRef.src = `http://localhost:3001/video?url=${btoa(JSON.stringify(
-                { url: currentplayer.resolution[0].url, header: currentplayer.resolution[0].reqHeader }
+                { url: currentRes.url, header: currentRes.reqHeader }
             ))}`
         }
         videoRef.currentTime = time
@@ -625,8 +630,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         toast(message, { type: "error" });
 
         // if (!currentPlayer) return
-        // let index = player_data.findIndex((element) => element.hostname == currentPlayer.hostname)
-        // if (player_data[index + 1]) checkUrl(player_data[index + 1])
+        // let index = playerData().findIndex((element) => element.hostname == currentPlayer.hostname)
+        // if (playerData()[index + 1]) runNewPlayer(playerData()[index + 1])
     }
 
     function setTimeVideo(value: number) {
@@ -1181,7 +1186,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                             <PlayerSettings
                                 state={currentSettings()}
                                 sources={
-                                    player_data.map((val) => { return { name: val.hostname, change: () => checkUrl(player_data[player_data.findIndex((item) => item.hostname === val.hostname)]) } })
+                                    playerData().map((val) => { return { name: val.hostname, change: () => runNewPlayer(playerData()[playerData().findIndex((item) => item.hostname === val.hostname)]) } })
                                 }
                                 resolution={
                                     ListResolution().map((val) => { return { res: val.res, change: () => setNewResolution(val as any) } })
@@ -1292,7 +1297,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     timeNextEpisode={timeNextEpisode()}
                     episode={{ ep: temp.episode, type: temp.type }}
                     episodes={temp.episodes}
-                    episodesUrl={player_data}
+                    episodesUrl={playerData()}
                     showNerdStats={showNerdStats()}
                     PlayerVolume={PlayerVolume}
                 />

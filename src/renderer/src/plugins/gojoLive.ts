@@ -1,4 +1,4 @@
-import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerData, playerSubtitlesFormat, resolutionFormat, playerChapterList } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerData, playerSubtitlesFormat, resolutionFormat, playerChapterList, playerDataExtended } from "@renderer/utils/types";
 import { t } from "i18next";
 
 const BACKEND = "https://backend.animetsu.bz"
@@ -71,16 +71,16 @@ export default class GojoLive implements playerPluginFormat {
                     hostname: element["id"],
                     defaultHost: element["default"],
                     resolution: [],
-                    extractResolution: async (episode: string, _type: string, playerData, id?: string) => await extractResolutions(episode, "sub", playerData, element["id"], id)
+                    extractResolution: async (playerData: playerDataExtended) => await extractResolutions(episode, "sub", playerData, element["id"], id)
                 })
-                if (element["hasDub"]) {
-                    data.push({
-                        hostname: `${element["id"]} (dub)`,
-                        defaultHost: false,
-                        resolution: [],
-                        extractResolution: async (episode: string, _type: string, playerData, id?: string) => await extractResolutions(episode, "dub", playerData, element["id"], id)
-                    })
-                }
+                // if (element["hasDub"]) {
+                //     data.push({
+                //         hostname: `${element["id"]} (dub)`,
+                //         defaultHost: false,
+                //         resolution: [],
+                //         extractResolution: async (episode: string, _type: string, playerData, id?: string) => await extractResolutions(episode, "dub", playerData, element["id"], id)
+                //     })
+                // }
             }
 
             return data
