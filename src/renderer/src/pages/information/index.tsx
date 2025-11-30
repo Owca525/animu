@@ -1,21 +1,37 @@
-import { AnimeData, indentityPlayer, playerPluginFormat } from "@renderer/utils/types";
-import Button from "@renderer/components/buttons";
-import "./information.css"
-import { convertDateToFormattedString, convertSeconds, CreateContextMenuOptions, decodeHtmlEntities, getGradientColor, openUrlFolder, SaveToClipboard, segregatePlugins } from "@renderer/utils/functions";
-import { t } from "i18next"
-import Drop from "./components/drop";
-import ContainerWrong from "./components/containerWrong";
-import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
-import Dropdown from "@renderer/components/dropDown";
-import { useQuery, useQueryClient } from "@tanstack/solid-query";
-import { useNavigate } from "@solidjs/router";
-import { createSignal, For, Match, onCleanup, onMount, Show, Switch } from "solid-js";
-import { getGlobalCache } from "@renderer/utils/stores/global";
-import { getPlayerPLugin, pluginManager } from "@renderer/utils/stores/plugins";
-import CharacterCards from "./components/characterCard";
-import { createShortcut } from "@solid-primitives/keyboard";
-import { unwrap } from "solid-js/store";
-import { toast } from "@renderer/utils/context/ToastNotification";
+import Button from '@renderer/components/buttons';
+import CharacterCards from './components/characterCard';
+import ContainerWrong from './components/containerWrong';
+import Drop from './components/drop';
+import Dropdown from '@renderer/components/dropDown';
+import { AnimeData, episodeList, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
+import {
+    convertDateToFormattedString,
+    convertSeconds,
+    CreateContextMenuOptions,
+    decodeHtmlEntities,
+    getGradientColor,
+    openUrlFolder,
+    SaveToClipboard,
+    segregatePlugins
+    } from '@renderer/utils/functions';
+import {
+    createSignal,
+    For,
+    Match,
+    onCleanup,
+    onMount,
+    Show,
+    Switch
+    } from 'solid-js';
+import { createShortcut } from '@solid-primitives/keyboard';
+import { getGlobalCache } from '@renderer/utils/stores/global';
+import { getPlayerPLugin, pluginManager } from '@renderer/utils/stores/plugins';
+import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
+import { t } from 'i18next';
+import { toast } from '@renderer/utils/context/ToastNotification';
+import { unwrap } from 'solid-js/store';
+import { useNavigate } from '@solidjs/router';
+import './information.css';
 
 function information() {
     const navigate = useNavigate();
@@ -27,33 +43,8 @@ function information() {
     const [showWrong, setshowWrong] = createSignal<boolean>(false)
     const [isNeedMore, setNeedMore] = createSignal<boolean>(false)
     const [moreMiniTitle, setmoreMiniTitle] = createSignal<boolean>(false)
-    const [currentPlugin, setCurrentPlugin] = createSignal<string | undefined>(getPlayerPLugin()?.metadata.name)
+    const [currentPlugin, setCurrentPlugin] = createSignal<string | undefined>(tempData().saveData ? tempData().saveData?.pluginName : getPlayerPLugin()?.metadata.name)
     const [secondsLeft, setSecondsLeft] = createSignal<undefined | { left: number, converted: { days: number; hours: number; minutes: number; seconds: number; } | undefined }>(undefined);
-
-    const queryClient = useQueryClient()
-    const episodeResponse = useQuery(() => ({
-        queryKey: [currentIDplayer(), tempData().anime],
-        queryFn: async ({ queryKey }) => {
-            const [player_id] = queryKey;
-            console.log(player_id, tempData())
-            if (tempData().anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED") return { player_id: "", episodesData: [] }
-            let pluginName = currentPlugin()
-            if (!pluginName) return
-
-            let plugin: playerPluginFormat = pluginManager().changePlugin(pluginName)
-            if (!plugin) return
-            if (!tempData().saveData?.pluginName && !player_id) {
-                return plugin.extractEpisodeList(tempData().anime, undefined)
-            }
-            if (tempData().anime.id == "" && !player_id) {
-                return plugin.extractEpisodeList(tempData().anime, undefined)
-            }
-            return plugin.extractEpisodeList(tempData().anime, player_id as string)
-        },
-        refetchOnWindowFocus: false,
-        staleTime: 2 * 60 * 60 * 1000,
-        cacheTime: 2 * 60 * 60 * 1000
-    }))
 
     // Banner
     const [isBannerLoading, setBannerLoadingData] = createSignal<boolean>(true)
@@ -61,6 +52,11 @@ function information() {
     // Cover
     const [isCoverLoading, setCoverIsLoading] = createSignal<boolean>(true)
     const [isCoverError, setCoverIsError] = createSignal<boolean>(false)
+
+    // Episodes
+    const [episodeResponse, setEpisodeResponse] = createSignal<episodeList | undefined>(undefined)
+    const [isLoadingEpisodes, setisLoadingEpisodes] = createSignal<boolean>(true)
+    const [isErrorEpisodes, setisErrorEpisodes] = createSignal<boolean>(false)
 
     const intervalId = setInterval(() => {
         setSecondsLeft(prev => {
@@ -95,9 +91,42 @@ function information() {
             setTmpData({ ...tempData(), saveData: history[0].saveData })
             localStorage.setItem("informationCache", JSON.stringify({ ...tempData(), saveData: history[0].saveData }))
         }
+        fetchEpisodes()
     })
 
-    onCleanup(() => clearInterval(intervalId))
+    onCleanup(() => {
+        clearInterval(intervalId)
+        setTmpData(undefined as any)
+    })
+
+    async function fetchEpisodes() {
+        try {
+            // if (animeData.anime.id == "" && !player_id) return setEpisodeResponse(await plugin.extractEpisodeList(animeData.anime, undefined)) deprecated
+            setisLoadingEpisodes(true)
+            setisErrorEpisodes(false)
+            setEpisodeResponse(undefined)
+            let animeData = unwrap(tempData())
+            if (animeData.anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED") return { player_id: "", episodesData: [] }
+
+            let player_id = currentIDplayer()
+            let plugin: playerPluginFormat = pluginManager().changePlugin(currentPlugin() as string)
+            if (!plugin) return
+            let response = await plugin.extractEpisodeList(animeData.anime, player_id)
+            setEpisodeResponse(response)
+            if (!response) {
+                setisLoadingEpisodes(false)
+                setisErrorEpisodes(true)
+            } else {
+                setisLoadingEpisodes(false)
+            }
+            return 
+        } catch (error) {
+            toast('Error Fetching Episodes', { type: "error" })
+            setisLoadingEpisodes(false)
+            setisErrorEpisodes(true)
+            return
+        }
+    }
 
     function enterPlayer(episodes: { ep: string, img?: string, title?: string }[], type: string, episode: string) {
         let tmp = unwrap(tempData())
@@ -106,7 +135,7 @@ function information() {
         localStorage.setItem("playerCache", JSON.stringify(unwrap({
             data: {
                 ...tmp.anime,
-                player_ID: currentIDplayer() ? currentIDplayer() : episodeResponse.data?.player_id
+                player_ID: currentIDplayer() ? currentIDplayer() : episodeResponse()?.player_id
             },
             save: {
                 last_Time: lastTime,
@@ -161,7 +190,6 @@ function information() {
     createShortcut(["tab"], () => {
         console.log(tempData())
         console.log(currentIDplayer())
-        console.log(episodeResponse, episodeResponse.error, episodeResponse.isLoading)
     })
 
     createShortcut(["Escape"], () => {
@@ -170,11 +198,10 @@ function information() {
     })
 
     async function refreashInformation(name: string) {
-        queryClient.cancelQueries()
         setCurrentId(undefined)
         pluginManager().changePlugin(name)
         setCurrentPlugin(name)
-        episodeResponse.refetch()
+        fetchEpisodes()
     }
 
     // function checkEpisodes() {
@@ -341,20 +368,20 @@ function information() {
                                 <div class="information-episodes-top-content">
                                     <Button ButtonClass="information-episodes-button" icon="search" onClick={() => setshowWrong(() => true)} />
                                     <div class="information-episodes-space">
-                                        <Dropdown options={segregatePlugins(refreashInformation)} disableX buttonText={getPlayerPLugin()?.metadata.name} />
-                                        <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(currentPlugin()!)} />
+                                        <Dropdown options={segregatePlugins(refreashInformation)} disableX buttonText={currentPlugin()} />
+                                        <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(getPlayerPLugin()?.metadata.name as string)} />
                                     </div>
                                 </div>
                                 <Show when={showWrong() == false}>
                                     <Switch>
-                                        <Match when={episodeResponse.isPending}>
+                                        <Match when={isLoadingEpisodes()}>
                                             <div class="information-loading-container"><span class="material-symbols-outlined information-loading">progress_activity</span></div>
                                         </Match>
-                                        <Match when={episodeResponse.isError}>
+                                        <Match when={isErrorEpisodes()}>
                                             <div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>
                                         </Match>
-                                        <Match when={episodeResponse.data}>
-                                            <For each={episodeResponse.data?.episodesData} fallback={<div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}>
+                                        <Match when={episodeResponse()}>
+                                            <For each={episodeResponse()?.episodesData} fallback={<div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}>
                                                 {(episode) => {
                                                     if (episode.episodes.length <= 0) return <></>
                                                     return <Drop LeftHeader={episode.name ? episode.name : t(`information.types.${episode.type}`)} RightHeader={t("information.listEpisodes", { number: episode.episodes.length })} content={makeButtons(episode.episodes, episode.type)} />
@@ -415,7 +442,7 @@ function information() {
                 <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
             </main>
             <Show when={showWrong()}>
-                <ContainerWrong name={tempData().anime.title.romaji} refetchfunc={(id?: string) => { setshowWrong(() => false); setCurrentId(id); episodeResponse.refetch() }} exitfunc={() => setshowWrong(() => false)} />
+                <ContainerWrong name={tempData().anime.title.romaji} refetchfunc={(id?: string) => { setshowWrong(() => false); setCurrentId(id); fetchEpisodes() }} exitfunc={() => setshowWrong(() => false)} />
             </Show>
         </>
     )
