@@ -167,7 +167,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         handleVolume(PlayerVolume, true)
         handleMouseMove()
         
-        if (config.Player.general.AutoFullscreen) enterFullscreen()
+        if (config.Player.general.AutoFullscreen) {
+            toggleFullscreen(true)
+            setIsFullscreen(true)
+        }
         if (videoRef) {
             videoRef.currentTime = time
             setcurrentTime(() => time)
@@ -553,8 +556,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (config.Player.general.AutoSkipEpisode && event.currentTarget.duration == event.currentTarget.currentTime) setEpisode("next")
         // TODO: ADD SECURITY FOR CHAPTERS IF THEY HAD START AND END TIME 0
 
-        if (!currentPlayer() && !currentPlayer()!.listChapters) return
-        currentPlayer()!.listChapters!.forEach(element => {
+        let player = currentPlayer()
+
+        if (!player || !player!.listChapters) return
+        player.listChapters.forEach(element => {
             let currentTime = event.currentTarget.currentTime
             if (!(currentTime >= element.start && currentTime <= element.end)) return
             if (config.Player.general.autoSkipOpenings || config.Player.general.autoSkipEndings) return change_time(element.end)
