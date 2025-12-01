@@ -26,7 +26,7 @@ const defaultOptions: ToastOptions = {
 
 interface ToastContextType {
     addToast: (msg: string, options: ToastOptions) => string;
-    updateToast: (id: string, msg: string) => void;
+    updateToast: (id: string, msg: string, options?: ToastOptions) => void;
     removeToast: (id: string) => void;
 };
 
@@ -50,8 +50,19 @@ export function ToastProvider(props: { children: JSX.Element }) {
         return id
     };
 
-    function updateToast(id: string, msg: string) {
-        setToasts((prevToast) => prevToast.map((tost) => tost.id == id ? { ...tost, message: msg } : tost))
+    function updateToast(id: string, msg: string, options?: ToastOptions) {
+        setToasts((prevToast) => prevToast.map((tost) => {
+            if (tost.id == id) {
+                console.log(tost.options, options)
+                if (tost.options && tost.options.removeTimer && !options?.removeTimer) {
+                    setTimeout(() => {
+                        removeToast(id)
+                    }, options?.duration ? options.duration : defaultOptions.duration);
+                }
+                return { ...tost, message: msg, options: { ...tost.options, ...options } }
+            }
+            return tost
+        }))
     };
 
     function removeToast(id: string) {
@@ -75,6 +86,15 @@ export function ToastProvider(props: { children: JSX.Element }) {
                                 <Show when={toast.options?.type == "loading"}>
                                     <span class="material-symbols-outlined loading-animation">progress_activity</span>
                                 </Show>
+                                <Show when={toast.options?.type == "success"}>
+                                    <span class="material-symbols-outlined">check_circle</span>
+                                </Show>
+                                <Show when={toast.options?.type == "error"}>
+                                    <span class="material-symbols-outlined">cancel</span>
+                                </Show>
+                                <Show when={toast.options?.type == "info"}>
+                                    <span class="material-symbols-outlined">info</span>
+                                </Show>
                                 {toast.message}
                             </div>
                         )}
@@ -90,9 +110,9 @@ export function toast(msg: string, options?: ToastOptions) {
     return toastAPI.addToast(msg, { ...defaultOptions, ...options })
 }
 
-export function updateToast(id: string, msg: string) {
+export function updateToast(id: string, msg: string, options?: ToastOptions) {
     if (!toastAPI) return "";
-    return toastAPI.updateToast(id, msg)
+    return toastAPI.updateToast(id, msg, options)
 }
 
 export function removeToast(id: string) {
