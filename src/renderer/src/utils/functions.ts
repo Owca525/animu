@@ -368,7 +368,7 @@ export function makeSmallText(text: string | undefined) {
 
 export function updateObjectConfig(path: string, value: string | number | boolean, config: SettingsConfig): SettingsConfig {
     const keys = path.split('.')
-    const newConfig = config
+    const newConfig = unwrap(config)
 
     let current: any = newConfig
     for (let i = 0; i < keys.length - 1; i++) {

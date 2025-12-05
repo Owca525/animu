@@ -139,7 +139,7 @@ function settings() {
 
     function handleChange(path: string, value: string | number | boolean) {
         setNewConfig((prevConfig) => {
-            return { old: prevConfig.old, new: updateObjectConfig(path, value, prevConfig.new) }
+            return { old: prevConfig.old, new: updateObjectConfig(path, value, unwrap(prevConfig.new)) }
         })
     }
 

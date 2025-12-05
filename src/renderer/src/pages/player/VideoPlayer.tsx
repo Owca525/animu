@@ -1116,7 +1116,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                                 <PlayerButton icon='skip_next' ButtonClass='player-buttons' title={t('player.next', { ep: getEpisode("next")?.ep })} onClick={() => setEpisode("next")} />
                             </Show>
                             <div class="player-time-display"
-                                onClick={() => { saveConfig(updateObjectConfig("Player.general.minusTime", !minusTimeState, config)); setminusTimeState((prev) => !prev) }}
+                                onClick={() => { saveConfig(updateObjectConfig("Player.general.minusTime", !minusTimeState, unwrap(config))); setminusTimeState((prev) => !prev) }}
                             >
                                 <div class="player-time-display-current">
                                     <Show when={minusTimeState()} fallback={formatTime(currentTime())}>
