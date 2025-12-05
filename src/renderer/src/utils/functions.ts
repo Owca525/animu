@@ -492,3 +492,28 @@ export function convertText(text: string) {
     return uri.replaceAll("+", "%2B")
         .replaceAll("%20", "+")
 }
+
+export function decryptAES(ciphertext: string, key: string): string | undefined {
+    try {
+        const raw = CryptoJS.enc.Base64.parse(ciphertext);
+        const iv = CryptoJS.lib.WordArray.create(raw.words.slice(0, 4), 16);
+        const encrypted = CryptoJS.lib.WordArray.create(
+            raw.words.slice(4),
+            raw.sigBytes - 16
+        );
+        const decrypted = CryptoJS.AES.decrypt(
+            { ciphertext: encrypted } as any,
+            CryptoJS.enc.Utf8.parse(key),
+            {
+                iv,
+                mode: CryptoJS.mode.CBC,
+                padding: CryptoJS.pad.Pkcs7
+            }
+        );
+        const text = decrypted.toString(CryptoJS.enc.Utf8);
+        return text || undefined;
+    } catch (error) {
+        console.log("Error in decryptAES", error)
+        return undefined;
+    }
+}

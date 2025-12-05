@@ -24,7 +24,7 @@ import {
   setHomeSearchTags,
   setHomeStopScrolling
 } from '@renderer/utils/stores/home';
-import { getInformationPlugin } from '@renderer/utils/stores/plugins';
+import { getInformationPlugin, getPlayerPLugin } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { t } from 'i18next';
 import { unwrap } from 'solid-js/store';
@@ -40,6 +40,8 @@ import {
 } from "@renderer/utils/types";
 // import { createShortcut } from "@solid-primitives/keyboard";
 // import WelcomeScreen from "./components/welcomeScreen"
+import CryptoJS from "crypto-js";
+import { createShortcut } from '@solid-primitives/keyboard';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -222,6 +224,12 @@ const Home = () => {
     }
     return 0
   }
+
+  // createShortcut(["h"], () => {
+  //   let plugin = getPlayerPLugin()
+  //   if (!plugin) return
+  //   plugin.searchAnime("Oshi no ko", 1)
+  // })
 
   return (
     <main

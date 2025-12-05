@@ -7,6 +7,7 @@ import Anizone from "@renderer/plugins/anizone";
 import GojoLive from "@renderer/plugins/gojoLive";
 import LycorisCafe from "@renderer/plugins/lycoriscafe";
 import { getConfig } from "./stores/config";
+// import Aowu from "@renderer/plugins/aowu";
 
 export class PlayerPluginManager implements playerPluginManagerFormat {
     currentPlugin: playerPluginFormat | undefined;
@@ -15,6 +16,7 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
         new Anizone,
         new GojoLive,
         new LycorisCafe,
+        // new Aowu,
     ];
     changePlugin = (plugin_id: string): playerPluginFormat => {
         const loadedPlugins: playerPluginFormat[] = this.pluginList

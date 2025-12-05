@@ -23,8 +23,6 @@ const player = () => {
     const navigate = useNavigate()
     const config: SettingsConfig = getConfig();
 
-    (anime_data)
-
     if (!anime_data || !anime_data.save || !anime_data.episodelist || !anime_data.data) {
         showDialog({
             type: "error",
