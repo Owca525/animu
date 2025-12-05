@@ -101,12 +101,12 @@ function information() {
 
     async function fetchEpisodes() {
         try {
+            let animeData = unwrap(tempData())
+            if (animeData.anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED") return
             // if (animeData.anime.id == "" && !player_id) return setEpisodeResponse(await plugin.extractEpisodeList(animeData.anime, undefined)) deprecated
             setisLoadingEpisodes(true)
             setisErrorEpisodes(false)
             setEpisodeResponse(undefined)
-            let animeData = unwrap(tempData())
-            if (animeData.anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED") return { player_id: "", episodesData: [] }
 
             let player_id = currentIDplayer()
             let plugin: playerPluginFormat = pluginManager().changePlugin(currentPlugin() as string)
