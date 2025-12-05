@@ -561,7 +561,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         player.listChapters.forEach(element => {
             let currentTime = event.currentTarget.currentTime
             if (!(currentTime >= element.start && currentTime <= element.end)) return
-            if (config.Player.general.autoSkipOpenings || config.Player.general.autoSkipEndings) return change_time(element.end)
+            if (config.Player.general.autoSkipOpenings || config.Player.general.autoSkipEndings) return setTimeVideo(element.end)
 
             if (element.type == "opening" && !IsDisableButtonSkipTimerOpening()) {
                 setcurrentSkipButton(() => { return { text: "Skip Opening", time: element.end, type: "opening" } })
@@ -580,6 +580,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (!config) return
         if (!config.Player.upToNextEpisode.enable) return
         if (!currentPlayer()) return
+        // TODO: FIX CHECKUPNEXT DOSEN'T SHOW
         const duration = event.currentTarget.duration
         const currentTime = event.currentTarget.currentTime
 
@@ -656,11 +657,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 }
             })
         }
-    }
-
-    function change_time(time: number) {
-        if (!videoRef) return
-        videoRef.currentTime = time
     }
 
     useKeyPress((keys: string) => {
@@ -752,19 +748,19 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     togglePlay()
                     break
                 case convertKeybinds(config.Player.keybinds.TimeSkipRight.toLowerCase()).toLowerCase():
-                    change_time((time_now += parseInt(config.Player.general.TimeSkipRight.toString())))
+                    setTimeVideo((time_now += parseInt(config.Player.general.TimeSkipRight.toString())))
                     setTimeoutForElement(buttonSkipRight, setShowButtonSkipRight)
                     break
                 case convertKeybinds(config.Player.keybinds.TimeSkipLeft.toLowerCase()).toLowerCase():
-                    change_time((time_now -= parseInt(config.Player.general.TimeSkipLeft.toString())))
+                    setTimeVideo((time_now -= parseInt(config.Player.general.TimeSkipLeft.toString())))
                     setTimeoutForElement(buttonSkipLeft, setShowButtonSkipLeft)
                     break
                 case convertKeybinds(config.Player.keybinds.LongTimeSkipForward.toLowerCase()).toLowerCase():
-                    change_time((time_now += parseInt(config.Player.general.LongTimeSkipForward.toString())))
+                    setTimeVideo((time_now += parseInt(config.Player.general.LongTimeSkipForward.toString())))
                     setTimeoutForElement(buttonSkipRight, setShowButtonSkipRight)
                     break
                 case convertKeybinds(config.Player.keybinds.LongTimeSkipBack.toLowerCase()).toLowerCase():
-                    change_time((time_now -= parseInt(config.Player.general.LongTimeSkipBack.toString())))
+                    setTimeVideo((time_now -= parseInt(config.Player.general.LongTimeSkipBack.toString())))
                     setTimeoutForElement(buttonSkipLeft, setShowButtonSkipLeft)
                     break
                 case convertKeybinds(config.Player.keybinds.Fullscreen.toLowerCase()).toLowerCase():
@@ -774,10 +770,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     exitPlayer()
                     break
                 case convertKeybinds(config.Player.keybinds.FrameSkipForward.toLowerCase()).toLowerCase():
-                    change_time((time_now += 0.0416))
+                    setTimeVideo((time_now += 0.0416))
                     break
                 case convertKeybinds(config.Player.keybinds.FrameSkipBack.toLowerCase()).toLowerCase():
-                    change_time((time_now -= 0.0416))
+                    setTimeVideo((time_now -= 0.0416))
                     break
                 case convertKeybinds(config.Player.keybinds.VolumeDown.toLowerCase()).toLowerCase():
                     handleVolume((videoRef.volume * 100) - 1)
@@ -806,7 +802,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 case convertKeybinds(config.Player.keybinds.skipOpeningEnding.toLowerCase()).toLowerCase():
                     if (currentSkipButton().time <= 0) return
                     if (currentSkipButton().type == "ending") setHideUpNextEpisode(true)
-                    change_time(currentSkipButton().time)
+                    setTimeVideo(currentSkipButton().time)
                     break
             }
         }
@@ -1217,7 +1213,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             <Show when={IsRunningButtonSkipTime()}>
                 <button onClick={() => {
                     if (currentSkipButton().type == "ending") setHideUpNextEpisode(true);
-                    change_time(currentSkipButton().time)
+                    setTimeVideo(currentSkipButton().time)
                     clearChapterSkipTime()
                 }} class="player-skip-chapters-button">
                     {currentSkipButton().text}, {`${buttonSkipTime()}s`}
