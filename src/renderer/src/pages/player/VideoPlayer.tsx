@@ -528,7 +528,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         hideChapterButtonTimer = setInterval(() => {
             setButtonSkipTime((prev) => {
-                console.log(prev)
                 if (prev <= 1) {
                     clearChapterSkipTime()
                     return 15;
@@ -1008,13 +1007,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (!currentPlayer() || !currentPlayer()!.listChapters) return
         if (currentPlayer()!.listChapters!.length <= 0) return
         if (!videoRef) return
-        let newTime = videoRef.duration
+        let newTime = durrationTime()
         for (let index = 0; index < currentPlayer()!.listChapters!.length; index++) {
             const element = currentPlayer()!.listChapters![index];
-            if (element.type == "opening") {
-                newTime = newTime - (element.end - element.start)
-            }
-            if (element.type == "ending") {
+            if (element.type == "opening" || element.type == "ending") {
                 newTime = newTime - (element.end - element.start)
             }
         }
