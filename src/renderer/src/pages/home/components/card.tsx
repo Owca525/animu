@@ -14,6 +14,7 @@ import { DeleteFromHistory, SaveHistory } from "@renderer/utils/FilesManager/his
 import { unwrap } from "solid-js/store";
 import { removeToast, toast } from "@renderer/utils/context/ToastNotification";
 import { pluginManager } from "@renderer/utils/stores/plugins";
+import i18n from "@renderer/utils/i18n";
 
 interface CardProps {
   card: cardData;
@@ -192,10 +193,12 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
 
     const bottom: JSX.Element[] = [];
 
-    if (card.AnimeData.format) {
-      bottom.push(<>{t(`anime_formats.${card.AnimeData.format.toLowerCase()}`)}</>);
+    if (card.AnimeData.format && i18n.exists(`anime_formats.${card.AnimeData.format.toLowerCase()}`)) {
+      bottom.push(t(`anime_formats.${card.AnimeData.format.toLowerCase()}`));
+    } else if (card.AnimeData.format && i18n.exists(`anime_genres.${card.AnimeData.format.toLowerCase()}`)) {
+      bottom.push(t(`anime_genres.${card.AnimeData.format.toLowerCase()}`))
     } else if (card.AnimeData.type) {
-      bottom.push(<>{t(`anime_source.${card.AnimeData.type.toLowerCase().replaceAll("_", "")}`)}</>);
+      bottom.push(t(`anime_source.${card.AnimeData.type.toLowerCase().replaceAll("_", "")}`));
     }
 
     if (card.AnimeData.episodes && card.AnimeData.format?.toUpperCase() != "MOVIE") {
@@ -215,7 +218,7 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
     }
 
     info.push(<div class="card-information-text">{bottom}</div>);
-    return <>{info}</>;
+    return info;
   }
 
   return (
