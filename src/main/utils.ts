@@ -45,11 +45,15 @@ ipcMain.handle('runDiscordRPC', (_event) => {
 })
 
 ipcMain.handle('runExternalPlayer', (_event, videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc"): any => {
-    let flatpakList = execSync(`flatpak list --columns=application`).toString().trim().split(" ").includes(videoData.path)
+    if (videoData.path.replace(" ", "") == "") return
+    let flatpakList = false
+    if (os.platform() != "win32") {
+        flatpakList = execSync(`flatpak list --columns=application`).toString().trim().split(" ").includes(videoData.path)
+    }
+
     let path = videoData.path
     if (!fs.existsSync(videoData.path) && !flatpakList) return
     if (flatpakList) path = `flatpak run ${path}`
-    if (videoData.path.replace(" ", "") == "") return
     switch (type) {
         case "mpv":
             let subtitlesFiles: string = ""
@@ -310,7 +314,7 @@ export function checkPath(program: string) {
         if (os.platform() === "win32") return ""
         let paths = execSync(`whereis ${program}`).toString().trim().split(" ")
         if (!(paths.length <= 1)) return paths[1]
-        let flatpakPaths = execSync(`flatpak list --columns=application`).toString().trim().split(" ")
+        let flatpakPaths = execSync(`flatpak list --columns=application`).toString().trim().split("\n")
         for (let index = 0; index < flatpakPaths.length; index++) {
             const element = flatpakPaths[index];
             if (element.toLowerCase().includes(program.toLocaleLowerCase())) return element.replace("\n", "")
