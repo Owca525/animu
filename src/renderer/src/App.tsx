@@ -32,6 +32,8 @@ import './themes/darkerAnimu/main.css';
 import './utils/i18n';
 import 'material-symbols';
 import { pluginManager } from './utils/stores/plugins';
+import { setHomeActivePage } from './utils/stores/home';
+import { t } from 'i18next';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -69,7 +71,8 @@ function App() {
     }
     setinitialState({ text: "Loading Config", plugin: false })
     LoadConfig()
-    
+    setHomeActivePage(t("global.home"))
+
     setinitialState({ text: "Loading Plugin", plugin: false })
     pluginManager().initialPlugins()
     setInitation(false)
