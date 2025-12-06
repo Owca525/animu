@@ -223,8 +223,7 @@ function information() {
             if (element) titles.push(element)
         }
         titles = [...new Set(titles)]
-        let text = titles.join(" \u25CF ")
-        return text.replace(/(\u25CF\s)(?!.*\u25CF\s)/, "")
+        return titles.join(" \u25CF ")
     }
 
     return (
