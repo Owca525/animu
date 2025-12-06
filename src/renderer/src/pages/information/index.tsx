@@ -11,7 +11,6 @@ import {
     decodeHtmlEntities,
     getGradientColor,
     openUrlFolder,
-    SaveToClipboard,
     segregatePlugins
     } from '@renderer/utils/functions';
 import {
@@ -32,6 +31,7 @@ import { toast } from '@renderer/utils/context/ToastNotification';
 import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './information.css';
+import ImageViewer from '@renderer/components/imageViewer';
 
 function information() {
     const navigate = useNavigate();
@@ -42,6 +42,7 @@ function information() {
 
     const [showWrong, setshowWrong] = createSignal<boolean>(false)
     const [isNeedMore, setNeedMore] = createSignal<boolean>(false)
+    const [showImages, setShowImages] = createSignal<boolean>(false)
     const [moreMiniTitle, setmoreMiniTitle] = createSignal<boolean>(false)
     const [currentPlugin, setCurrentPlugin] = createSignal<string | undefined>(tempData().saveData ? tempData().saveData?.pluginName : getPlayerPLugin()?.metadata.name)
     const [secondsLeft, setSecondsLeft] = createSignal<undefined | { left: number, converted: { days: number; hours: number; minutes: number; seconds: number; } | undefined }>(undefined);
@@ -148,15 +149,6 @@ function information() {
         navigate("/player")
     }
 
-    async function SaveCoverToClipboard(url: string | undefined) {
-        if (!url) return
-        if (await SaveToClipboard("image", url)) {
-            toast(t("information.notification.coverdone"))
-        } else {
-            toast(t("information.notification.coverfailed"))
-        }
-    }
-
     function makeButtons(episode: { ep: string, img?: string, title?: string }[], type: string) {
         let tmpSaveData = tempData()
         return (
@@ -251,7 +243,7 @@ function information() {
                     <div class="information-top">
                         <div class="information-image-container">
                             {tempData().anime.averageScore && <div class="information-score" style={{ border: `3px solid ${getGradientColor(tempData().anime.averageScore)}` }}>{tempData().anime.averageScore}%</div>}
-                            <img class="information-cover" onClick={() => tempData().anime.coverImage && SaveCoverToClipboard(tempData().anime.coverImage)} onError={() => setCoverIsError(() => true)} onLoad={() => setCoverIsLoading(() => false)} src={tempData().anime.coverImage ? tempData().anime.coverImage : ""} style={isCoverLoading() ? { display: "none" } : isCoverError() ? { display: "none" } : { animation: "fadeIn 0.3s forwards" }}></img>
+                            <img class="information-cover" onClick={() => setShowImages(true)} onError={() => setCoverIsError(() => true)} onLoad={() => setCoverIsLoading(() => false)} src={tempData().anime.coverImage ? tempData().anime.coverImage : ""} style={isCoverLoading() ? { display: "none" } : isCoverError() ? { display: "none" } : { animation: "fadeIn 0.3s forwards" }}></img>
                             <Show when={isCoverLoading() && isCoverError() == false}>
                                 <div class="information-cover-placeholder"><span class="material-symbols-outlined home-loading-animation icon">progress_activity</span></div>
                             </Show>
@@ -442,6 +434,10 @@ function information() {
             </main>
             <Show when={showWrong()}>
                 <ContainerWrong name={tempData().anime.title.romaji} refetchfunc={(id?: string) => { setshowWrong(() => false); setCurrentId(id); fetchEpisodes() }} exitfunc={() => setshowWrong(() => false)} />
+            </Show>
+
+            <Show when={showImages()}>
+                <ImageViewer files={[tempData().anime.coverImage as string, tempData().anime.bannerImage as string].filter((value) => value != null)} disable={() => setShowImages(false)}/>
             </Show>
         </>
     )

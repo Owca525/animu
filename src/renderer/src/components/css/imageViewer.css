@@ -1,0 +1,69 @@
+.imageViewer-main-container {
+    position: absolute;
+    z-index: 999;
+    background-color: color-mix(in srgb, var(--second-layer) 80%, transparent);
+    backdrop-filter: blur(6px);
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    user-select: none;
+}
+
+.imageViewer-control-space {
+    overflow: hidden;
+    position: relative;
+    height: max-content;
+    width: 100vw;
+    height: 100vh;
+    user-select: none;
+}
+
+.imageViewer-image {
+    pointer-events: none;
+    transform-origin: center;
+}
+
+.imageViewer-navigation-bar {
+    position: absolute;
+    display: flex;
+    gap: 24px;
+    top: 0;
+    margin: 24px;
+}
+
+.imageViewer-bar {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background-color: var(--third-layer);
+    border-radius: 12px;
+    outline: 2px solid var(--five-layer);
+}
+.imageViewer-exit-button {
+    padding: 16px;
+}
+
+.imageViewer-button {
+    background-color: rgb(0, 0, 0, 0.0) !important;
+}
+
+.imageViewer-bottom-informations {
+    position: absolute;
+    bottom: 0;
+    margin: 12px;
+    display: flex;
+    width: 99%;
+    justify-content: space-between;
+}
+
+.imageViewer-left-button, .imageViewer-right-button {
+    position: absolute;
+    margin: 14px;
+}
+
+.imageViewer-right-button {
+    right: 0;
+    transform: rotate(180deg);
+}
