@@ -120,11 +120,13 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
     })
   }
 
-  CenterContextMenu.push({
-    option: t("contextMenu.delete"),
-    deletion: true,
-    onClick: deleteCard,
-  });
+  if (card.saveData) {
+    CenterContextMenu.push({
+      option: t("contextMenu.delete"),
+      deletion: true,
+      onClick: deleteCard,
+    });
+  }
 
   function checkOutOfBound() {
     if (!cardRef) return;
