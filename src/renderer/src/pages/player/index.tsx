@@ -68,7 +68,6 @@ const player = () => {
             actual: ep
         }))
         response.Refetch([anime_data.data?.player_ID, extractionData().actual, extractionData().type])
-        console.log("Response refetch", ep)
         updateHistory()
     }
 
@@ -123,7 +122,7 @@ const player = () => {
                 },
                 {
                     title: t("dialog.retry"),
-                    onClick: () => response.Refetch([anime_data.data?.player_ID, extractionData().actual, extractionData().type])
+                    onClick: () => response.Refetch([anime_data.data?.player_ID, extractionData().actual, extractionData().type], true)
                 }
             ]
         })

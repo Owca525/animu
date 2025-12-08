@@ -43,8 +43,12 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
         const config = getConfig()
         for (let index = 0; index < this.pluginList.length; index++) {
             const element = this.pluginList[index];
-            if (element.metadata.name == config.plugins.player) setPlayerPlugin(element)
+            if (element.metadata.name == config.plugins.player) {
+                setPlayerPlugin(element)
+                return
+            }
         }
+        setPlayerPlugin(this.pluginList[0])
     }
 }
 

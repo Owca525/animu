@@ -20,6 +20,7 @@ async function generateSha256(text: any) {
 export function useResponse<T, TData>(options: UseQueryOptions<T, TData>) {
     const [loading, setLoading] = createSignal<boolean>(true);
     const [error, setError] = createSignal<boolean>(false);
+    const [forceRefetch, setForceRefetch] = createSignal<boolean>(false);
     const { queryKey: rawKey, queryFn, cacheTime, removeOnClenup } = options;
 
     const [queryData, setQueryData] = createSignal<T[]>(rawKey);
@@ -33,9 +34,9 @@ export function useResponse<T, TData>(options: UseQueryOptions<T, TData>) {
         async () => {
             const queryKey = getQueryKey()
             const sha256 = await generateSha256(queryKey)
-            console.log(sha256, queryKey)
-            if (cacheTime && cache.has(sha256)) return cache.get(sha256)
-            
+            if (cacheTime && !forceRefetch() && cache.has(sha256)) return cache.get(sha256)
+            setForceRefetch(false)
+
             let data = await queryFn(queryKey)
             if (cacheTime) makeCache(data, sha256)
             return data
@@ -50,8 +51,9 @@ export function useResponse<T, TData>(options: UseQueryOptions<T, TData>) {
         }, cacheTime);
     }
 
-    function Refetch(queryKey?: T[]) {
+    function Refetch(queryKey?: T[], force?: boolean) {
         if (queryKey) setQueryData(queryKey)
+        if (force) setForceRefetch(force)
         refetch()
     }
 

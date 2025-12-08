@@ -3,7 +3,7 @@ import CharacterCards from './components/characterCard';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
-import { AnimeData, episodeList, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
+import { AnimeData, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
 import {
     convertDateToFormattedString,
     convertSeconds,
@@ -27,11 +27,11 @@ import { getGlobalCache } from '@renderer/utils/stores/global';
 import { getPlayerPLugin, pluginManager } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { t } from 'i18next';
-import { toast } from '@renderer/utils/context/ToastNotification';
 import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './information.css';
 import ImageViewer from '@renderer/components/imageViewer';
+import { useResponse } from '@renderer/utils/hooks/useResponse';
 
 function information() {
     const navigate = useNavigate();
@@ -54,10 +54,21 @@ function information() {
     const [isCoverLoading, setCoverIsLoading] = createSignal<boolean>(true)
     const [isCoverError, setCoverIsError] = createSignal<boolean>(false)
 
-    // Episodes
-    const [episodeResponse, setEpisodeResponse] = createSignal<episodeList | undefined>(undefined)
-    const [isLoadingEpisodes, setisLoadingEpisodes] = createSignal<boolean>(true)
-    const [isErrorEpisodes, setisErrorEpisodes] = createSignal<boolean>(false)
+    const episodeResponse = useResponse({
+        queryKey: [tempData(), currentIDplayer(), currentPlugin()],
+        queryFn: async (queryKey) => {
+            const [animeData, player_id, pluginName] = queryKey;
+            if (typeof animeData != "object") return
+            if (animeData.anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED") return
+            // if (animeData.anime.id == "" && !player_id) return setEpisodeResponse(await plugin.extractEpisodeList(animeData.anime, undefined)) deprecated
+
+            let plugin: playerPluginFormat = pluginManager().changePlugin(pluginName as string)
+            if (!plugin) return
+            let response = await plugin.extractEpisodeList(animeData.anime, player_id as string)
+            return response
+        },
+        cacheTime: 2 * 60 * 60 * 1000,
+    })
 
     const intervalId = setInterval(() => {
         setSecondsLeft(prev => {
@@ -92,42 +103,12 @@ function information() {
             setTmpData({ ...tempData(), saveData: history[0].saveData })
             localStorage.setItem("informationCache", JSON.stringify({ ...tempData(), saveData: history[0].saveData }))
         }
-        fetchEpisodes()
     })
 
     onCleanup(() => {
         clearInterval(intervalId)
         setTmpData(undefined as any)
     })
-
-    async function fetchEpisodes() {
-        try {
-            let animeData = unwrap(tempData())
-            if (animeData.anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED") return
-            // if (animeData.anime.id == "" && !player_id) return setEpisodeResponse(await plugin.extractEpisodeList(animeData.anime, undefined)) deprecated
-            setisLoadingEpisodes(true)
-            setisErrorEpisodes(false)
-            setEpisodeResponse(undefined)
-
-            let player_id = currentIDplayer()
-            let plugin: playerPluginFormat = pluginManager().changePlugin(currentPlugin() as string)
-            if (!plugin) return
-            let response = await plugin.extractEpisodeList(animeData.anime, player_id)
-            setEpisodeResponse(response)
-            if (!response) {
-                setisLoadingEpisodes(false)
-                setisErrorEpisodes(true)
-            } else {
-                setisLoadingEpisodes(false)
-            }
-            return 
-        } catch (error) {
-            toast('Error Fetching Episodes', { type: "error" })
-            setisLoadingEpisodes(false)
-            setisErrorEpisodes(true)
-            return
-        }
-    }
 
     function enterPlayer(episodes: { ep: string, img?: string, title?: string }[], type: string, episode: string) {
         let tmp = unwrap(tempData())
@@ -136,7 +117,7 @@ function information() {
         localStorage.setItem("playerCache", JSON.stringify(unwrap({
             data: {
                 ...tmp.anime,
-                player_ID: currentIDplayer() ? currentIDplayer() : episodeResponse()?.player_id
+                player_ID: currentIDplayer() ? currentIDplayer() : episodeResponse.data()?.player_id
             },
             save: {
                 last_Time: lastTime,
@@ -182,6 +163,7 @@ function information() {
     createShortcut(["tab"], () => {
         console.log(tempData())
         console.log(currentIDplayer())
+        console.log(getPlayerPLugin())
     })
 
     createShortcut(["Escape"], () => {
@@ -189,11 +171,12 @@ function information() {
         else navigate("/")
     })
 
-    async function refreashInformation(name: string) {
+    async function refreashInformation(name: string, force: boolean = false) {
+        console.log(name)
         setCurrentId(undefined)
         pluginManager().changePlugin(name)
         setCurrentPlugin(name)
-        fetchEpisodes()
+        episodeResponse.Refetch([tempData(), currentIDplayer(), currentPlugin()], force)
     }
 
     // function checkEpisodes() {
@@ -360,19 +343,19 @@ function information() {
                                     <Button ButtonClass="information-episodes-button" icon="search" onClick={() => setshowWrong(() => true)} />
                                     <div class="information-episodes-space">
                                         <Dropdown options={segregatePlugins(refreashInformation)} disableX buttonText={currentPlugin()} />
-                                        <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(getPlayerPLugin()?.metadata.name as string)} />
+                                        <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(getPlayerPLugin()?.metadata.name as string, true)} />
                                     </div>
                                 </div>
                                 <Show when={showWrong() == false}>
                                     <Switch>
-                                        <Match when={isLoadingEpisodes()}>
+                                        <Match when={episodeResponse.loading()}>
                                             <div class="information-loading-container"><span class="material-symbols-outlined information-loading">progress_activity</span></div>
                                         </Match>
-                                        <Match when={isErrorEpisodes()}>
+                                        <Match when={episodeResponse.error()}>
                                             <div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>
                                         </Match>
-                                        <Match when={episodeResponse()}>
-                                            <For each={episodeResponse()?.episodesData} fallback={<div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}>
+                                        <Match when={episodeResponse.data()}>
+                                            <For each={episodeResponse.data()?.episodesData} fallback={<div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}>
                                                 {(episode) => {
                                                     if (episode.episodes.length <= 0) return <></>
                                                     return <Drop LeftHeader={episode.name ? episode.name : t(`information.types.${episode.type}`)} RightHeader={t("information.listEpisodes", { number: episode.episodes.length })} content={makeButtons(episode.episodes, episode.type)} />
@@ -433,7 +416,7 @@ function information() {
                 <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
             </main>
             <Show when={showWrong()}>
-                <ContainerWrong name={tempData().anime.title.romaji} refetchfunc={(id?: string) => { setshowWrong(() => false); setCurrentId(id); fetchEpisodes() }} exitfunc={() => setshowWrong(() => false)} />
+                <ContainerWrong name={tempData().anime.title.romaji} refetchfunc={(id?: string) => { setshowWrong(() => false); setCurrentId(id); episodeResponse.Refetch([tempData(), id, currentPlugin()]) }} exitfunc={() => setshowWrong(() => false)} />
             </Show>
 
             <Show when={showImages()}>
