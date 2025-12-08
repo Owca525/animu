@@ -566,12 +566,13 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             if (element.type == "opening" && !IsDisableButtonSkipTimerOpening()) {
                 setcurrentSkipButton(() => { return { text: "Skip Opening", time: element.end, type: "opening" } })
                 setIsDisableButtonSkipTimerOpening(() => true)
+                startChapterSkipTime()
             }
             if (element.type == "ending" && !IsDisableButtonSkipTimerEnding()) {
                 setcurrentSkipButton(() => { return { text: "Skip Ending", time: element.end, type: "ending" } })
                 setIsDisableButtonSkipTimerEnding(() => true)
+                startChapterSkipTime()
             }
-            startChapterSkipTime()
         });
     }
 
@@ -1212,7 +1213,11 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             </div>
             <Show when={IsRunningButtonSkipTime()}>
                 <button onClick={() => {
-                    if (currentSkipButton().type == "ending") setHideUpNextEpisode(true);
+                    if (currentSkipButton().type == "ending") {
+                        setHideUpNextEpisode(true)
+                        setIsDisableButtonSkipTimerEnding(true)
+                    };
+                    if (currentSkipButton().type == "opening") setIsDisableButtonSkipTimerOpening(true)
                     setTimeVideo(currentSkipButton().time)
                     clearChapterSkipTime()
                 }} class="player-skip-chapters-button">
