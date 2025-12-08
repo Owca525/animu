@@ -671,7 +671,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (ep < 0) return
         if (type == 'prev') ep = ep - 1
         if (type == 'next') ep = ep + 1
-        if (temp.episodes[ep].ep === undefined)
+        if (temp.episodes[ep].ep === undefined) return
         return setNextEpisode(temp.episodes[ep].ep)
     }
 
