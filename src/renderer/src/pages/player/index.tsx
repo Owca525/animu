@@ -1,7 +1,7 @@
 
 // import { useQuery } from "react-query";
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
-import { AnimeData, indentityPlayer, playerData, SettingsConfig } from "@renderer/utils/types";
+import { AnimeData, indentityPlayer, SettingsConfig } from "@renderer/utils/types";
 import { t } from "i18next";
 
 import "./player.css"
@@ -13,10 +13,10 @@ import { SaveHistory } from "@renderer/utils/FilesManager/history";
 import { useNavigate } from "@solidjs/router";
 import { getConfig } from "@renderer/utils/stores/config";
 import { createSignal, Match, onMount, Switch } from "solid-js";
-import { useQuery } from "@tanstack/solid-query";
 import { createShortcut } from "@solid-primitives/keyboard";
 import ExternalPlayer from "./externalPlayer";
 import { pluginManager } from "@renderer/utils/stores/plugins";
+import { useResponse } from "@renderer/utils/hooks/useResponse";
 
 const player = () => {
     const anime_data: { data: AnimeData, save: indentityPlayer, episodelist: { ep: string, img?: string, title?: string }[] } = JSON.parse(localStorage.getItem("playerCache") as any)
@@ -45,18 +45,21 @@ const player = () => {
     })
     const [externalPlayerType, setexternalPlayerType] = createSignal<"Movian" | "VLC" | "Mpv" | "ChromeCast">(config.Player.external.type)
 
-    const response = useQuery(() => ({
-        queryKey: [anime_data.data?.player_ID, extractionData().actual, extractionData().type],
-        queryFn: async ({ queryKey }) => {
-            const [player_id, episode, animeType] = queryKey;
-            if (!player_id || !episode || !animeType) return console.error("THIS CAN'T HAPPEN IF Happen then something is wrong with player_id, episode, queryFetch/player", queryKey)
-            let pluginPlayer = pluginManager().changePlugin(anime_data.save?.pluginName ? anime_data.save.pluginName : "")
-            return await pluginPlayer.extractPlayerData(animeType, episode, player_id)
-        },
-        refetchOnWindowFocus: false,
-        staleTime: 2 * 60 * 60 * 1000,
-        cacheTime: 2 * 60 * 60 * 1000
-    }));
+    const response = useResponse(
+        {
+            queryKey: [anime_data.data?.player_ID, extractionData().actual, extractionData().type],
+            queryFn: async (queryKey) => {
+                const [player_id, episode, animeType] = queryKey;
+                if (!player_id || !episode || !animeType) {
+                    console.error("THIS CAN'T HAPPEN IF Happen then something is wrong with player_id, episode, queryFetch/player", queryKey)
+                    return []
+                }
+                let pluginPlayer = pluginManager().changePlugin(anime_data.save?.pluginName ? anime_data.save.pluginName : "")
+                return await pluginPlayer.extractPlayerData(animeType, episode, player_id)
+            },
+            cacheTime: 60 * 60 * 1000,
+        }
+    )
 
     function setNewEpisode(ep: string) {
         setExtractionData((prev) => ({
@@ -64,7 +67,7 @@ const player = () => {
             time: 0,
             actual: ep
         }))
-        response.refetch()
+        response.Refetch([anime_data.data?.player_ID, extractionData().actual, extractionData().type])
         console.log("Response refetch", ep)
         updateHistory()
     }
@@ -120,7 +123,7 @@ const player = () => {
                 },
                 {
                     title: t("dialog.retry"),
-                    onClick: () => response.refetch()
+                    onClick: () => response.Refetch([anime_data.data?.player_ID, extractionData().actual, extractionData().type])
                 }
             ]
         })
@@ -141,29 +144,29 @@ const player = () => {
     }
 
     return (
-        <Switch fallback={showErrorDialog()}>
-            <Match when={response.isError || response.isLoading == false && response.data && response.data.length <= 0}>
+        <Switch>
+            <Match when={response.error() || !response.loading() && response.data() && response.data()!.length <= 0}>
                 {showErrorDialog()}
             </Match>
-            <Match when={response.isLoading && response.isError == false}>
+            <Match when={response.loading() && !response.error()}>
                 {loadingAnimation(leave, { data: anime_data?.data as any, ep: extractionData().actual }, extractionData())}
             </Match>
-            <Match when={response.data && response.isLoading == false && response.isError == false && config.Player.external.enable}>
+            <Match when={response.data() && !response.loading() && !response.error() && config.Player.external.enable}>
                 <ExternalPlayer
                     animeData={{
                         AnimeData: anime_data.data,
                         saveData: anime_data.save
                     }}
-                    playerData={response.data as playerData[]}
+                    playerData={response.data()!}
                     time={extractionData().time}
                     setNextEpisode={setNewEpisode}
                     now_episodes={{ episode: extractionData().actual, type: extractionData().type, episodes: extractionData().episodelist }}
                     externalPlayerData={{ onChage: (data) => setexternalPlayerType(data), current: externalPlayerType() }}
                 />
             </Match>
-            <Match when={response.data && response.isLoading == false && response.isError == false}>
+            <Match when={response.data() && !response.loading() && !response.error()}>
                 <VideoPlayer
-                    player_data={response.data as any}
+                    player_data={response.data()!}
                     anime_data={{
                         AnimeData: anime_data.data,
                         saveData: anime_data.save
