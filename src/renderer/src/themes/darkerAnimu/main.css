@@ -272,11 +272,11 @@ body {
 }
 
 .card-image,
-.card-image-placeholder {
+.card-image-placeholder, .big-card-image-placehorder-container {
   border-radius: 8px;
 }
 
-.card-image-placeholder {
+.card-image-placeholder, .big-card-image-placehorder-container {
   background-color: var(--second-layer);
 }
 

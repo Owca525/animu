@@ -1,7 +1,7 @@
 import { containerData } from '@renderer/utils/types';
 import "./css/bigcardscontainer.css"
 import BigCard from './bigCard';
-import { Component, createEffect, createSignal, For, onCleanup, onMount } from 'solid-js';
+import { Component, createSignal, For, onCleanup, onMount } from 'solid-js';
 
 type BigCardsContainerProps = { data: containerData }
 
@@ -18,18 +18,16 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
     onMount(() => {
         handleUpdate()
         window.addEventListener("resize", handleUpdate)
-    })
-
-    createEffect(() => {
         startAutoSlide();
         if (!divRef) return;
         divRef.addEventListener("scroll", handleScroll);
-        onCleanup(() => {
-            divRef?.removeEventListener("scroll", handleScroll);
-            stopAutoSlide()
-            window.removeEventListener("resize", handleUpdate)
-        })
-    });
+    })
+
+    onCleanup(() => {
+        divRef?.removeEventListener("scroll", handleScroll);
+        stopAutoSlide()
+        window.removeEventListener("resize", handleUpdate)
+    })
 
     function handleUpdate() {
         if (!cardRef) return
@@ -78,8 +76,7 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
     }
 
     function startAutoSlide() {
-        if (!divRef || !cardWidth) return;
-
+        if (!divRef || !cardWidth()) return;
         if (intervalRef) clearInterval(intervalRef);
         intervalRef = setInterval(() => {
             setCurrentIndex((prev) => {
@@ -100,9 +97,8 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
         startAutoSlide();
     };
 
-
     return (
-        <div class="big-card-container">
+        <main class="big-card-container">
             <div class={`big-cards-container-content`} ref={el => divRef = el}
                 onMouseDown={handleStart}
                 onMouseMove={handleMove}
@@ -119,13 +115,23 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
                 </For>
             </div>
             <div class="big-card-container-buttons">
+                <span class='material-symbols-outlined big-card-container-navigaton-button' onclick={() => {
+                    if (!divRef) return
+                    restartAutoSlide()
+                    divRef.scrollLeft = (currentIndex() - 1) * cardWidth()
+                }}>keyboard_arrow_left</span>
                 <For each={data.data}>
                     {(_el, i) => (
                         <div class={`big-card-container-button ${currentIndex() === i() ? "active" : ""}`} onClick={() => handleDotClick(i())}></div>
                     )}
                 </For>
+                <span class='material-symbols-outlined big-card-container-navigaton-button' onclick={() => {
+                    if (!divRef) return
+                    restartAutoSlide()
+                    divRef.scrollLeft = (currentIndex() + 1) * cardWidth()
+                }}>keyboard_arrow_right</span>
             </div>
-        </div>
+        </main>
     );
 };
 

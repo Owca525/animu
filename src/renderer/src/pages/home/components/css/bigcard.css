@@ -16,6 +16,12 @@
     -webkit-user-select: none;
 }
 
+.big-card-information-image.hidden {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
 .big-card-background {
     display: flex;
     width: 100%;

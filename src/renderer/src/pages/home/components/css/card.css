@@ -27,7 +27,7 @@
     transform: translateY(0px);
 }
 
-.card-image, .card-image-placeholder {
+.card-image, .card-image-placeholder, .big-card-image-placehorder-container {
     max-width: 260px;
     max-height: 220px;
     width: max-content;
@@ -36,7 +36,7 @@
     z-index: 1;
 }
 
-.card-image-placeholder {
+.card-image-placeholder, .big-card-image-placehorder-container {
     width: max-content;
     height: 220px;
     display: flex;

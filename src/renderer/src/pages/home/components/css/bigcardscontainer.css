@@ -26,10 +26,23 @@
     gap: 4px;
     margin-top: -20px;
     z-index: 1;
+    align-items: center;
 }
 
 .big-card-container {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.big-card-container-navigaton-button {
+    padding: 4px;
+    user-select: none;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all 150ms ease-in-out;
+}
+
+.big-card-container-navigaton-button:hover {
+    background-color: var(--fourth-layer);
 }
