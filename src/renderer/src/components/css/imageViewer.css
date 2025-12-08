@@ -9,15 +9,20 @@
     height: 100vh;
     justify-content: center;
     user-select: none;
+    animation: fadeIn 100ms ease-in;
 }
 
-.imageViewer-control-space {
+.imageViewer-control-space, .imageViewer-placeholder-container {
     overflow: hidden;
     position: relative;
     height: max-content;
     width: 100vw;
     height: 100vh;
     user-select: none;
+}
+
+.imageViewer-control-space.hidden {
+    opacity: 0;
 }
 
 .imageViewer-image {
@@ -56,6 +61,7 @@
     display: flex;
     width: 99%;
     justify-content: space-between;
+    text-shadow: 0px 2px 10px var(--black);
 }
 
 .imageViewer-left-button, .imageViewer-right-button {
@@ -66,4 +72,17 @@
 .imageViewer-right-button {
     right: 0;
     transform: rotate(180deg);
+}
+
+.imageViewer-placeholder-container {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.imageViewer-loading, .imageViewer-error {
+    font-size: 4em !important;
+    text-shadow: 0px 0px 20px var(--black);
 }

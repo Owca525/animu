@@ -13,6 +13,8 @@ export default function ImageViewer(props: { files: string[], disable: () => voi
     const [start, setStart] = createSignal({ x: 0, y: 0 });
     const [file, setFile] = createSignal(props.files.length == 0 ? "" : props.files[0]);
     const [currentFile, setCurrentFile] = createSignal(0);
+    const [isImageLoading, setImageLoading] = createSignal<boolean>(true);
+    const [isImageError, setImageError] = createSignal<boolean>(false);
 
     let container: HTMLDivElement | undefined;
     let img: HTMLImageElement | undefined;
@@ -38,13 +40,6 @@ export default function ImageViewer(props: { files: string[], disable: () => voi
             console.error(error)
             toast("Failed Save Image", {type: "error"})
             return
-        }
-    }
-
-    function changeImage(num: number) {
-        if (props.files[num]) {
-            setFile(props.files[num])
-            setCurrentFile(num)
         }
     }
 
@@ -86,7 +81,7 @@ export default function ImageViewer(props: { files: string[], disable: () => voi
                 style={{
                     cursor: dragging() ? "grabbing" : "grab",
                 }}
-                class="imageViewer-control-space"
+                class={`imageViewer-control-space ${isImageError() || isImageLoading() ? "hidden" : ""}`}
                 onWheel={onWheel}
                 onMouseDown={onMouseDown}
                 onMouseMove={onMouseMove}
@@ -98,7 +93,15 @@ export default function ImageViewer(props: { files: string[], disable: () => voi
                 <img
                     src={file()}
                     ref={img}
-                    onload={centerImage}
+                    onload={() => {
+                        centerImage()
+                        setImageLoading(false)
+                    }}
+                    onError={() => {
+                        setImageLoading(false)
+                        setImageError(true)
+                        toast("Failed Load Image", {type: "error"})
+                    }}
                     style={{
                         transform: `translate(${pos().x}px, ${pos().y}px) scale(${scale()})`,
                     }}
@@ -114,12 +117,30 @@ export default function ImageViewer(props: { files: string[], disable: () => voi
                     <Button icon="file_copy" ButtonClass="imageViewer-button" onClick={SaveCoverToClipboard} />
                 </div>
             </div>
+            <Show when={isImageError() || isImageLoading()}>
+                <div class="imageViewer-placeholder-container">
+                    <Show when={isImageLoading()}>
+                        <span class="material-symbols-outlined loading-animation imageViewer-loading">progress_activity</span>
+                    </Show>
+                    <Show when={isImageError()}>
+                        <span class="material-symbols-outlined imageViewer-error">error</span>
+                    </Show>
+                </div>
+            </Show>
             <div class="imageViewer-bottom-informations">
                 Zoom: {scale().toFixed(2)}x
             </div>
             <Show when={props.files.length > 1}>
-                <Button icon="arrow_back" ButtonClass="imageViewer-left-button" onClick={() => changeImage(currentFile() - 1)} />
-                <Button icon="arrow_back" ButtonClass="imageViewer-right-button" onClick={() => changeImage(currentFile() + 1)} />
+                <Button icon="arrow_back" ButtonClass="imageViewer-left-button" onClick={() => {
+                    onDoubleClick()
+                    setCurrentFile((i) => (i - 1 + props.files.length) % props.files.length)
+                    setFile(props.files[currentFile()])
+                }} />
+                <Button icon="arrow_back" ButtonClass="imageViewer-right-button" onClick={() => {
+                    onDoubleClick()
+                    setCurrentFile((i) => (i + 1) % props.files.length)
+                    setFile(props.files[currentFile()])
+                }} />
             </Show>
         </main>
     );
