@@ -668,11 +668,11 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     function setEpisode(type: "next" | "prev") {
         let ep = temp.episodes.findIndex((item) => item.ep === temp.episode)
-        if (ep < 0) return
+        if (ep < 0) return toast("Episode is ep < 0", { type: "error" })
         if (type == 'prev') ep = ep - 1
         if (type == 'next') ep = ep + 1
-        if (temp.episodes[ep].ep === undefined) return
-        setNextEpisode(temp.episodes[ep].ep)
+        if (temp.episodes[ep].ep === undefined) return toast("Episode is undefined", { type: "error" })
+        return setNextEpisode(temp.episodes[ep].ep)
     }
 
     function onChangeTrackText(event: Event) {

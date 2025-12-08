@@ -65,6 +65,7 @@ const player = () => {
             actual: ep
         }))
         response.refetch()
+        console.log("Response refetch", ep)
         updateHistory()
     }
 
