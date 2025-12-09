@@ -134,7 +134,7 @@ const Home = () => {
   // TODO: napraw wyszukiwanie itp
   async function OnSearch(text: string) {
     let home = homeCache()
-    if (home.search != text && home.activePage == t("global.home")) {
+    if (home.activePage == t("global.home")) {
       setHomeSearch(text)
       setHomeSearchPage(1)
       setHomeStopScrolling(false);

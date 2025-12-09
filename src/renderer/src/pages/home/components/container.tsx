@@ -94,7 +94,7 @@ const Container: Component<containerData> = ({ title, data, horizontal = false, 
         <Show when={tags}>
           <For each={tags}>
             {(element) => (
-              <div onClick={element.remover} class="container-tag">{element.name} <span class="container-tag-icon material-symbols-outlined">close</span></div>
+              <div onClick={element.remover} class="container-tag">{element.name} <span class="material-symbols-outlined container-tag-icon">close</span></div>
             )}
           </For>
         </Show>

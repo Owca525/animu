@@ -315,10 +315,13 @@ body {
 
 .container-tag {
   border-radius: 6px;
-  background-color: var(--neutral2);
-  border: 2px solid var(--neutral2);
+  background-color: var(--green-one);
+  outline: 2px solid var(--green-one);
+  transition: all 100ms ease-in-out;
 }
-
+.container-tag:hover {
+  background-color: var(--five-layer);
+}
 
 /* Information */
 
