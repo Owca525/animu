@@ -5,27 +5,30 @@ import Button from "@renderer/components/buttons"
 import { t } from "i18next"
 import { Component, createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js"
 import { useQuery } from "@tanstack/solid-query"
-import { getHomeCache, setHomeSearchPage, setHomeStopScrolling } from "@renderer/utils/stores/home"
+import { getHomeCache, setAllHomeData, setHomeSearchPage, setHomeStopScrolling } from "@renderer/utils/stores/home"
 import { unwrap } from "solid-js/store"
+import { toast } from "@renderer/utils/context/ToastNotification"
 
-const Container: Component<containerData> = ({ title, data, horizontal = false, tags, titlevent, onScrollDownFunction }) => {
+const Container: Component<containerData> = ({ title, data, horizontal = false, tags, onTitleClick, onScrollDownFunction }) => {
   let container: HTMLDivElement | undefined
   const [currentPage, setcurrentPage] = createSignal(unwrap(getHomeCache().page))
   const [animeCards, setAnimeCards] = createSignal<cardData[]>(data)
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
+        console.log(entry)
         if (entry.isIntersecting) {
           setHomeSearchPage(currentPage() + 1)
           setcurrentPage(currentPage() + 1)
           cardResponse.refetch()
+          observer.unobserve(entry.target)
         }
       });
     }
   );
 
   const cardResponse = useQuery(() => ({
-    queryKey: [currentPage()],
+    queryKey: [currentPage(), title],
     queryFn: async () => {
       const homeCache = unwrap(getHomeCache())
       if (!onScrollDownFunction) return ""
@@ -70,16 +73,23 @@ const Container: Component<containerData> = ({ title, data, horizontal = false, 
     if (currentValue >= maxScrolLeft) container.scrollLeft = 0
   }
 
-  function handleTitleFunction() {
-    if (!titlevent || !titlevent.onTitleClick) return
-    titlevent.onTitleClick(titlevent.onTitleClickContext)
+  async function handleTitleClick() {
+    try {
+      if (!onTitleClick) return
+      setAllHomeData({ isLoading: true, data: { sections: [] }, isError: false } as any)
+      const resp = await onTitleClick()
+      setAllHomeData({ isLoading: false, data: { sections: [resp] }, isError: false } as any)
+    } catch (error) {
+      toast("Error Fetching Category", { type: "error" })
+      setAllHomeData({ isLoading: false, data: { sections: [] }, isError: true } as any)
+    }
   }
 
   return (
     <div tabIndex={-1} class="main-container">
       <div tabIndex={-1} class="container-title-container">
         <Show when={title}>
-          <div class={titlevent ? "container-title-click" : "container-title"} onclick={handleTitleFunction}>{title}</div>
+          <div class={onTitleClick ? "container-title-click" : "container-title"} onclick={handleTitleClick}>{title}</div>
         </Show>
         <Show when={tags}>
           <For each={tags}>

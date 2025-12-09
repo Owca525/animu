@@ -1,6 +1,6 @@
 import AnilistApi from "@renderer/plugins/anilistApi";
 import { containerData, genresSearchFormat, informationPluginManagerFormat, informationPluginFormat, playerPluginManagerFormat, playerPluginFormat } from "./types";
-import { getHomeCache, setAllHomeData } from "./stores/home";
+import { setAllHomeData } from "./stores/home";
 import { setPlayerPlugin, setPluginPlayerList } from "./stores/plugins";
 import Allmanga from "@renderer/plugins/allmanga";
 import Anizone from "@renderer/plugins/anizone";
@@ -81,7 +81,7 @@ export class informationPluginManager implements informationPluginManagerFormat 
         setAllHomeData({ data: { sections: [] }, isLoading: true, isError: false, } as any)
         this.currentPlugin.home({
             onSuccess: (data: { topCards?: containerData; sections: containerData[]; }) => {
-                setAllHomeData({ data: { topCards: data.topCards, sections: data.sections.map((element) => ({ ...element, titlevent: { ...element.titlevent, onTitleClick: this.onTitleClick } })) }, 
+                setAllHomeData({ data: { topCards: data.topCards, sections: data.sections }, 
                     isLoading: false, 
                     isError: false, 
                 } as any)
@@ -93,19 +93,5 @@ export class informationPluginManager implements informationPluginManagerFormat 
     }
     anime = async (id: string) => {
         return await this.currentPlugin.anime({ id: id })
-    }
-    onTitleClick = (content: any) => {
-        setAllHomeData({ data: { sections: [] }, isLoading: true, isError: false, } as any)
-        this.currentPlugin.onTitleClick({ content: content } ,{
-            onSuccess: function (data: containerData): void {
-                let tmp: { topCards?: containerData, sections: containerData[] } = getHomeCache().data
-                let newData: containerData = data
-                if (tmp.sections.length > 0) newData = { ...newData, data: { ...tmp.sections[0].data, ...newData.data } }
-                setAllHomeData({ data: { sections: [newData] }, isLoading: false, isError: false, } as any)
-            },
-            onError: function (_error: string): void {
-                setAllHomeData({ data: { sections: [] }, isLoading: false, isError: true, } as any)
-            }
-        })
     }
 }

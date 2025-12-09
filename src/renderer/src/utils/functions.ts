@@ -171,35 +171,21 @@ export async function refetchHistory() {
                     title: t("global.continuewatch"),
                     data: history.continue.slice(0, 20),
                     horizontal: true,
-                    titlevent: {
-                        onTitleClick: () =>
-                            setHomeNewData({
-                                sections: [
-                                    {
-                                        title: t("global.continuewatch"),
-                                        data: history.continue,
-                                        horizontal: false,
-                                    },
-                                ],
-                            }),
-                    }
+                    onTitleClick: async () => ({
+                        title: t("global.continuewatch"),
+                        data: history.continue,
+                        horizontal: false,
+                    })
                 },
                 {
                     title: t("global.history"),
                     data: history.history.slice(0, 20) as cardData[],
                     horizontal: true,
-                    titlevent: {
-                        onTitleClick: () =>
-                            setHomeNewData({
-                                sections: [
-                                    {
-                                        title: t("global.history"),
-                                        data: history.history as any,
-                                        horizontal: false,
-                                    },
-                                ],
-                            })
-                    }
+                    onTitleClick: async () => ({
+                        title: t("global.history"),
+                        data: history.history as any,
+                        horizontal: false,
+                    })
                 },
             ]
         })

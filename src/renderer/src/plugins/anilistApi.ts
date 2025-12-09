@@ -331,6 +331,23 @@ function getSeasonFromDate() {
 //   return []
 // }
 
+async function fetchCategory(params: any, title: string): Promise<containerData> {
+  const globalParams = params
+  let container: containerData = {
+    title: title,
+    data: await sendToApi(params, graphicApi),
+    onScrollDownFunction: async (_search, page, _params) => {
+      let resp = await sendToApi({...globalParams, page: page}, graphicApi)
+      console.log(globalParams, page, resp)
+      return {
+        maxPage: pageSize,
+        data: resp
+      }
+    }
+  }
+  return container
+}
+
 export default class AnilistApi implements informationPluginFormat {
   metadata = {
     version: "2.0",
@@ -425,32 +442,26 @@ export default class AnilistApi implements informationPluginFormat {
           title: t("home.trending_now"),
           data: data.json.data.trending.media.map((anime) => Convert(anime)),
           horizontal: true,
-          titlevent: {
-            onTitleClickContext: { params: tendingAnime, title: t("home.trending_now") }
-          }
+          onTitleClick: async () => await fetchCategory(tendingAnime, t("home.trending_now")),
         },
         {
           title: t("home.popular_in_this_season"),
           data: data.json.data.season.media.map((anime) => Convert(anime)),
           horizontal: true,
-          titlevent: {
-            onTitleClickContext: {
+          onTitleClick: async () => await fetchCategory({
               params: {
                 page: 1,
                 season: season.season,
                 seasonYear: season.seasonYear,
                 type: "ANIME"
               }, title: t("home.popular_in_this_season")
-            }
-          }
+            }, t("home.popular_in_this_season")),
         },
         {
           title: t("home.all_time_popular"),
           data: data.json.data.popular.media.map((anime) => Convert(anime)),
           horizontal: true,
-          titlevent: {
-            onTitleClickContext: { params: allPopular, title: t("home.all_time_popular") }
-          }
+          onTitleClick: async () => await fetchCategory(allPopular, t("home.all_time_popular")),
         }
       ]
       callbacks.onSuccess({ sections: home, topCards: home[0] })

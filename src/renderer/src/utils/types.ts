@@ -140,11 +140,8 @@ export interface containerData {
     title?: string
     data: cardData[]
     horizontal?: boolean
-    onScrollDownFunction?: (title: string | undefined, page: number, params?: genresSearchFormat) => Promise<{ data: cardData[], maxPage: number }>
-    titlevent?: {
-        onTitleClick: (context: any) => void
-        onTitleClickContext?: any
-    }
+    onScrollDownFunction?: (search: string | undefined, page: number, params?: genresSearchFormat) => Promise<{ data: cardData[], maxPage: number }>
+    onTitleClick?: () => Promise<containerData>
     tags?: {
         remover: () => void
         name: string
@@ -225,7 +222,6 @@ export interface informationPluginManagerFormat {
     searchAnime(name: string, page: number, params?: genresSearchFormat): void
     home(): void
     anime(id: string): Promise<AnimeData | undefined>
-    onTitleClick(content: any): void
     // schedule(airingStart?: number, airingEnd?: number): void
 }
 
