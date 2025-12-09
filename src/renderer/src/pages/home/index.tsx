@@ -63,7 +63,7 @@ const Home = () => {
       {
         icon: "history",
         text: t("global.history"),
-        onClick: history,
+        onClick: setHistory,
       },
     ],
     bottom: [
@@ -89,7 +89,7 @@ const Home = () => {
       window.api.rpc.setActivity(undefined, t("discordrpc.home"));
   })
 
-  function history() {
+  function setHistory() {
     setHomeActivePage(t("global.history"));
     let history = getHistory()
 
@@ -143,6 +143,10 @@ const Home = () => {
     }
 
     if (home.activePage != t("global.history")) return
+    if (text.replaceAll(" ", "") == "") {
+      setHistory()
+      return
+    } 
     let history = getHistory()
     let finnalContainer: containerData[] = []
     let historySearch = history.history.filter((data) =>
