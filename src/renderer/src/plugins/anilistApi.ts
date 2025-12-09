@@ -1,7 +1,6 @@
 import { genYearsList, request } from "@renderer/utils/functions";
 import { cardData, containerData, genresSearchFormat, informationPluginFormat } from "@renderer/utils/types";
 import { t } from "i18next";
-import { unwrap } from "solid-js/store";
 
 const pageSize = 20
 
@@ -337,7 +336,7 @@ async function fetchCategory(params: any, title: string): Promise<containerData>
     title: title,
     data: await sendToApi(params, graphicApi),
     onScrollDownFunction: async (_search, page, _params) => {
-      let resp = await sendToApi({...globalParams, page: page}, graphicApi)
+      let resp = await sendToApi({ ...globalParams, page: page }, graphicApi)
       console.log(globalParams, page, resp)
       return {
         maxPage: pageSize,
@@ -346,6 +345,38 @@ async function fetchCategory(params: any, title: string): Promise<containerData>
     }
   }
   return container
+}
+
+async function searchOnAnilist(_name: string, page: number, params?: genresSearchFormat): Promise<{ data: cardData[]; maxPage: number; }> {
+  try {
+    let variables: any = {
+      page: page,
+      sort: "SEARCH_MATCH",
+      type: "ANIME"
+    }
+
+    if (params) {
+      if (params) variables = { ...variables, genres: params.genres }
+      if (params.genres) variables = { ...variables, genres: params.genres }
+      if (params.genres) variables = { ...variables, genres: params.genres }
+      if (params.years) variables = { ...variables, seasonYear: parseInt(params.years) }
+      if (params.seasons) variables = { ...variables, season: params.seasons.toUpperCase() }
+      if (params.format) variables = { ...variables, format: params.format.map((tmp) => tmp.toUpperCase().replaceAll(" ", "_")) }
+      if (params.airing) variables = { ...variables, status: params.airing.toUpperCase().replaceAll(" ", "_") }
+    }
+
+    const resp = await sendToApi(variables, graphicApi)
+    return {
+      data: resp,
+      maxPage: pageSize
+    }
+  } catch (error) {
+    console.error("Error in searchOnAnilist/anilist", error)
+    return {
+      data: [],
+      maxPage: pageSize
+    }
+  }
 }
 
 export default class AnilistApi implements informationPluginFormat {
@@ -418,12 +449,11 @@ export default class AnilistApi implements informationPluginFormat {
         if (context.params.airing) variables = { ...variables, status: context.params.airing.toUpperCase().replaceAll(" ", "_") }
       }
 
-      let data = {
+      callbacks.onSuccess({
         title: title,
         data: await sendToApi(variables, graphicApi),
-        // onScrollDownFunction: (currentPage: number) => SearchAnilistApi(text, currentPage, params)
-      }
-      callbacks.onSuccess(data)
+        onScrollDownFunction: async (search, page, params) => await searchOnAnilist(search ? search : "", page, params)
+      })
     } catch (error) {
       console.error("Error in search/Anilistapi", error)
       callbacks.onError(`${error}`)
@@ -449,13 +479,13 @@ export default class AnilistApi implements informationPluginFormat {
           data: data.json.data.season.media.map((anime) => Convert(anime)),
           horizontal: true,
           onTitleClick: async () => await fetchCategory({
-              params: {
-                page: 1,
-                season: season.season,
-                seasonYear: season.seasonYear,
-                type: "ANIME"
-              }, title: t("home.popular_in_this_season")
-            }, t("home.popular_in_this_season")),
+            params: {
+              page: 1,
+              season: season.season,
+              seasonYear: season.seasonYear,
+              type: "ANIME"
+            }, title: t("home.popular_in_this_season")
+          }, t("home.popular_in_this_season")),
         },
         {
           title: t("home.all_time_popular"),
@@ -478,57 +508,6 @@ export default class AnilistApi implements informationPluginFormat {
     } catch (error) {
       console.error("Uknown error in anime/anilistapi", error)
       return
-    }
-  }
-  async onTitleClick(content: any, callbacks: { onSuccess: (data: containerData) => void; onError: (error: string) => void; }): Promise<void> {
-    try {
-      // FIXME FIX DUPLICATION
-      let tmp: { params: any, title: string } = unwrap(content.content)
-      let data = {
-        title: tmp.title,
-        data: await sendToApi(tmp.params, graphicApi),
-        onScrollDownFunction: async (title, page, params) => await this.updateCategory(tmp.params, title, page, params)
-      }
-      callbacks.onSuccess(data)
-    } catch (error) {
-      console.error("Error in onTitleClick/anilistapi", error)
-      callbacks.onError("Uknown error")
-    }
-  }
-
-  async updateCategory(variable: any, title: string | undefined, page: number, params?: genresSearchFormat): Promise<{ data: cardData[], maxPage: number }> {
-    try {
-      let variables: any = {
-        ...variable,
-        type: "ANIME",
-      }
-
-      if (title && !(title.replaceAll(" ", "") == "")) {
-        variables = { ...variables, search: title }
-        title = `Searching: ${title}`
-      }
-
-      if (params && params.genres) {
-        variables = { ...variables, genres: params.genres }
-      }
-      if (params && params.years) {
-        variables = { ...variables, seasonYear: parseInt(params.years) }
-      }
-      if (params && params.seasons) {
-        variables = { ...variables, season: params.seasons.toUpperCase() }
-      }
-      if (params && params.format) {
-        variables = { ...variables, format: params.format.map((tmp) => tmp.toUpperCase().replaceAll(" ", "_")) }
-      }
-      if (params && params.airing) {
-        variables = { ...variables, status: params.airing.toUpperCase().replaceAll(" ", "_") }
-      }
-
-      let data = await sendToApi({ variable: variables, page: page }, graphicApi)
-      return { data, maxPage: this.metadata.pageSize }
-    } catch (error) {
-      console.error("Error in updateCategory/anilistapi", error)
-      return { data: [], maxPage: this.metadata.pageSize }
     }
   }
 }

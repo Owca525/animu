@@ -207,7 +207,6 @@ export interface informationPluginFormat {
     //     context: { airingStart?: number, airingEnd?: number },
     //     callbacks: { onSuccess: (data: containerData) => void, onError: (error: string) => void }
     // )
-    onTitleClick(content: any, callbacks: { onSuccess: (data: containerData) => void, onError: (error: string) => void }): Promise<void>
 }
 
 export interface playerPluginManagerFormat {
