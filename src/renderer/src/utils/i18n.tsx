@@ -44,9 +44,10 @@ function replaceTemplate(template: string, values?: { [key: string]: string | nu
   });
 }
 
-function getValueByPath<T>(obj: T, path: string): any {
+function getValueByPath<T>(obj: T, path: string): string {
   try {
-    return path.split('.').reduce((acc: any, key) => acc?.[key], obj);
+    let value = path.split('.').reduce((acc: any, key) => acc?.[key], obj)
+    return value == undefined ? path : value;
   } catch (error) {
     console.error("Error in getValueByPath/i18n", error)
     return path
@@ -63,8 +64,8 @@ export function I18nProvider(props: { config: i18nConfig; children: any }) {
 
   function t(key: string, replace?: { [key: string]: string | number | undefined }) {
     const dict = dictionaries()[currentLang()];
-    let value = replaceTemplate(getValueByPath(dict, key), replace)
-    if (value != key) return value
+    let value = getValueByPath(dict, key)
+    if (value != key) return replaceTemplate(value, replace)
     console.error(`Missing key in ${currentLang()} lang: ${key}`)
     if (props.config.fallbackLang) {
       const fallback = dictionaries()[props.config.fallbackLang]
