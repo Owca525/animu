@@ -69,6 +69,7 @@ function information() {
             return response
         },
         cacheTime: 2 * 60 * 60 * 1000,
+        disable: true,
     })
 
     const intervalId = setInterval(() => {
@@ -104,6 +105,7 @@ function information() {
             setTmpData({ ...tempData(), saveData: history[0].saveData })
             localStorage.setItem("informationCache", JSON.stringify({ ...tempData(), saveData: history[0].saveData }))
         }
+        episodeResponse.Refetch([tempData(), currentIDplayer(), currentPlugin()])
     })
 
     onCleanup(() => {

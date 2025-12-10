@@ -1,10 +1,11 @@
-import { createSignal, createResource, createEffect, onCleanup, Accessor } from "solid-js";
+import { createSignal, onCleanup, Accessor, onMount } from "solid-js";
 
 type UseQueryOptions<T, TData> = {
     queryKey: T[];
     queryFn: (Key: T[]) => Promise<TData>;
     cacheTime?: number
     removeOnClenup?: boolean
+    disable?: boolean
 };
 
 let cache: Map<string, any> = new Map();
@@ -20,9 +21,11 @@ async function generateSha256(text: any) {
 export function useResponse<T, TData>(options: UseQueryOptions<T, TData>) {
     const [loading, setLoading] = createSignal<boolean>(true);
     const [error, setError] = createSignal<boolean>(false);
+    const [data, setData] = createSignal<TData>()
     const [forceRefetch, setForceRefetch] = createSignal<boolean>(false);
-    const { queryKey: rawKey, queryFn, cacheTime, removeOnClenup } = options;
+    const { queryKey: rawKey, queryFn, cacheTime, removeOnClenup, disable } = options;
 
+    const [dissable, setDissable] = createSignal<boolean>(disable ? true : false);
     const [queryData, setQueryData] = createSignal<T[]>(rawKey);
     function getQueryKey() {
         return queryData().map((value) => typeof value === "function" ? (value as Accessor<T>)() : value)
@@ -30,18 +33,37 @@ export function useResponse<T, TData>(options: UseQueryOptions<T, TData>) {
 
     let cacheTimeOut: NodeJS.Timeout | undefined
 
-    const [data, { refetch }] = createResource(
-        async () => {
+    // Changing to fetch because i can't manage when useResource start request
+    async function fetchData() {
+        setLoading(true)
+        setError(false)
+
+        try {
+            console.log(dissable())
+            if (dissable()) return undefined
             const queryKey = getQueryKey()
             const sha256 = await generateSha256(queryKey)
-            if (cacheTime && !forceRefetch() && cache.has(sha256)) return cache.get(sha256)
+            if (cacheTime && !forceRefetch() && cache.has(sha256)) {
+                setLoading(false)
+                setError(false)
+                return setData(cache.get(sha256))
+            }
             setForceRefetch(false)
+
+            console.log(queryKey)
 
             let data = await queryFn(queryKey)
             if (cacheTime) makeCache(data, sha256)
-            return data
+            
+            setData(data as any)
+            setLoading(false)
+            setError(false)
+        } catch (error) {
+            setError(true)
+            setLoading(false)
+            setData(undefined)
         }
-    );
+    }
 
     async function makeCache(data: any, sha256: string) {
         if (!cacheTime) return
@@ -52,15 +74,16 @@ export function useResponse<T, TData>(options: UseQueryOptions<T, TData>) {
     }
 
     function Refetch(queryKey?: T[], force?: boolean) {
+        setDissable(false)
         if (queryKey) setQueryData(queryKey)
         if (force) setForceRefetch(force)
-        refetch()
+        fetchData()
     }
 
-    createEffect(() => {
-        setLoading(data.loading);
-        setError(data.error);
-    });
+    onMount(async () => {
+        if (dissable()) return
+        await fetchData()
+    })
 
     onCleanup(() => {
         if (removeOnClenup && cacheTimeOut) clearInterval(cacheTimeOut)
