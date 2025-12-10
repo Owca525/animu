@@ -115,21 +115,13 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
                 </For>
             </div>
             <div class="big-card-container-buttons">
-                <span class='material-symbols-outlined big-card-container-navigaton-button' onclick={() => {
-                    if (!divRef) return
-                    restartAutoSlide()
-                    divRef.scrollLeft = (currentIndex() - 1) * cardWidth()
-                }}>keyboard_arrow_left</span>
+                <span class='material-symbols-outlined big-card-container-navigaton-button' onclick={() => handleDotClick(data.data[currentIndex()-1] != undefined ? currentIndex() - 1 : data.data.length)}>keyboard_arrow_left</span>
                 <For each={data.data}>
                     {(_el, i) => (
                         <div class={`big-card-container-button ${currentIndex() === i() ? "active" : ""}`} onClick={() => handleDotClick(i())}></div>
                     )}
                 </For>
-                <span class='material-symbols-outlined big-card-container-navigaton-button' onclick={() => {
-                    if (!divRef) return
-                    restartAutoSlide()
-                    divRef.scrollLeft = (currentIndex() + 1) * cardWidth()
-                }}>keyboard_arrow_right</span>
+                <span class='material-symbols-outlined big-card-container-navigaton-button' onclick={() => handleDotClick(data.data[currentIndex()+1] != undefined ? currentIndex() + 1 : 0)}>keyboard_arrow_right</span>
             </div>
         </main>
     );
