@@ -1,36 +1,57 @@
-import Sidebar from "@renderer/components/sidebar";
-import CheckBox from "./components/checkBox";
-import SettingsInput from "./components/settingsInput";
-import "./settings.css";
-import Dropdown from "../../components/dropDown";
-import Button from "@renderer/components/buttons";
-import { t } from "i18next"
-import { ContextMenuProps, playerPluginFormat, SettingsConfig, themeMetadata } from "@renderer/utils/types";
-import i18n from "i18next"
-import { saveConfig } from "@renderer/utils/FilesManager/config";
-import { calculateZoomLevel, changeTheme, convertKeybinds, convertPath, openUrlFolder, request, updateObjectConfig } from "@renderer/utils/functions";
-import CheckKeybind from "./components/checkKeybind";
-import { showDialog } from "@renderer/utils/context/DialogContext";
-import SeekBar from "@renderer/components/seekBar";
-import HelpIcon from "./components/helpIcon";
-import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
-import { checkUpdate } from "@renderer/utils/update";
-import ButtonGroup from "./components/buttonGroup";
-import { DetectOldVersionHistory } from "@renderer/utils/FilesManager/history";
-import { useNavigate } from "@solidjs/router";
-import { getConfig, setConfig } from "@renderer/utils/stores/config";
-import { getPluginList, pluginManager } from "@renderer/utils/stores/plugins";
-import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js";
-import { createShortcut } from "@solid-primitives/keyboard";
-import { unwrap } from "solid-js/store";
-import SettingsDrop from "./components/settingsDrop";
-import { CreateBackup, RestoreBackup } from "@renderer/utils/backup";
-import { toast } from "@renderer/utils/context/ToastNotification";
+import Button from '@renderer/components/buttons';
+import ButtonGroup from './components/buttonGroup';
+import CheckBox from './components/checkBox';
+import CheckKeybind from './components/checkKeybind';
+import Dropdown from '../../components/dropDown';
+import HelpIcon from './components/helpIcon';
+import SeekBar from '@renderer/components/seekBar';
+import SettingsDrop from './components/settingsDrop';
+import SettingsInput from './components/settingsInput';
+import Sidebar from '@renderer/components/sidebar';
+import {
+    calculateZoomLevel,
+    changeTheme,
+    convertKeybinds,
+    convertPath,
+    openUrlFolder,
+    request,
+    updateObjectConfig
+    } from '@renderer/utils/functions';
+import { checkUpdate } from '@renderer/utils/update';
+import {
+    ContextMenuProps,
+    playerPluginFormat,
+    SettingsConfig,
+    themeMetadata
+    } from '@renderer/utils/types';
+import { CreateBackup, RestoreBackup } from '@renderer/utils/backup';
+import {
+    createEffect,
+    createSignal,
+    For,
+    onCleanup,
+    onMount,
+    Show
+    } from 'solid-js';
+import { createShortcut } from '@solid-primitives/keyboard';
+import { DetectOldVersionHistory } from '@renderer/utils/FilesManager/history';
+import { getConfig, setConfig } from '@renderer/utils/stores/config';
+import { getPluginList, pluginManager } from '@renderer/utils/stores/plugins';
+import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
+import { saveConfig } from '@renderer/utils/FilesManager/config';
+import { showDialog } from '@renderer/utils/context/DialogContext';
+import { toast } from '@renderer/utils/context/ToastNotification';
+import { unwrap } from 'solid-js/store';
+import { useNavigate } from '@solidjs/router';
+import './settings.css';
+import { useI18n } from '@renderer/utils/i18n';
 
 function settings() {
     const navigate = useNavigate();
     const cfg: SettingsConfig = unwrap(getConfig());
     const pluginList: playerPluginFormat[] = getPluginList();
+    const { t, changeLanguage, listLang } = useI18n()
+
     const [category, setCategory] = createSignal<string>("general");
     const [config, setNewConfig] = createSignal<{ old: SettingsConfig, new: SettingsConfig }>({ old: structuredClone(cfg), new: structuredClone(cfg) })
     const [themes, setThemes] = createSignal<{ label: string, onClick?: () => void }[]>([])
@@ -207,7 +228,7 @@ function settings() {
 
     function resetNewConfig() {
         setNewConfig((prev) => {
-            ChangeLanguage(config().old.General.language)
+            setNewLang(config().old.General.language)
             changeTheme(config().old.General.theme)
             return { old: structuredClone(prev.old), new: structuredClone(prev.old) }
         })
@@ -215,8 +236,8 @@ function settings() {
         setSaving(() => false)
     }
 
-    function ChangeLanguage(lang: string) {
-        i18n.changeLanguage(lang)
+    function setNewLang(lang: string) {
+        changeLanguage(lang)
         handleChange("General.language", lang)
     }
 
@@ -297,8 +318,8 @@ function settings() {
                             {t("settings.general.language")}
                             <div class="settings-helpicon-space">
                                 <Dropdown
-                                    options={Object.keys(i18n.store.data).map(element => {
-                                        return { label: t(`lang.${element}`), onClick: () => ChangeLanguage(element) }
+                                    options={listLang().map(element => {
+                                        return { label: t(`lang.${element}`), onClick: () => setNewLang(element) }
                                     })}
                                     buttonText={t(`lang.${config().new.General.language}`)}
                                     placeholderChange={() => t(`lang.${config().new.General.language}`)}

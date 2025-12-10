@@ -1,13 +1,12 @@
-import { t } from "i18next";
 import { cardData, ContextMenuProps, homeData, playerChapterList, SettingsConfig, themeMetadata } from "./types";
 import { showDialog } from "./context/DialogContext";
-import i18n from "./i18n";
 import { DropdownOption } from "@renderer/components/dropDown";
 import { getHomeCache, setHomeNewData } from "./stores/home";
 import { getGlobalCache } from "./stores/global";
 import { getConfig } from "./stores/config";
 import { getPluginList } from "./stores/plugins";
 import { unwrap } from "solid-js/store";
+import { t, useI18n } from "./i18n";
 
 export function decodeHtmlEntities(str: string) {
     const parser = new DOMParser();
@@ -21,7 +20,8 @@ export function convertDateToFormattedString(year: number | undefined, month: nu
     if (hour == undefined) hour = 0
     if (minute == undefined) minute = 0
     if (day == undefined) day = 0
-    return new Intl.DateTimeFormat(i18n.language, { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(year, month, day, hour, minute));
+    const { currentLang } = useI18n()
+    return new Intl.DateTimeFormat(currentLang(), { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(year, month, day, hour, minute));
 }
 
 export function capitalizeFirstLetter(text: string | undefined | null) {
@@ -201,7 +201,7 @@ export function CreateContextMenuOptions(start?: ContextMenuProps, center?: Cont
             ContextMenu.push(element)
         }
     }
-    ContextMenu.push({ option: i18n.t("dialog.reload"), onClick: () => location.reload() })
+    ContextMenu.push({ option: t("dialog.reload"), onClick: () => location.reload() })
     if (center) {
         ContextMenu.push({ option: "", line: true })
         for (let index = 0; index < center.length; index++) {
@@ -217,12 +217,12 @@ export function CreateContextMenuOptions(start?: ContextMenuProps, center?: Cont
         }
     }
     let config = getConfig()
-    if (config.Developer.DeveloperMode && window.api) ContextMenu.push({ option: i18n.t("contextMenu.devtools"), onClick: window.BrowserWindow.openDevTools })
+    if (config.Developer.DeveloperMode && window.api) ContextMenu.push({ option: t("contextMenu.devtools"), onClick: window.BrowserWindow.openDevTools })
     ContextMenu.push({
-        option: i18n.t("dialog.exit"), onClick: () => showDialog({
+        option: t("dialog.exit"), onClick: () => showDialog({
             type: "info",
             title: "Action",
-            description: i18n.t("global.exitAnimu"),
+            description: t("global.exitAnimu"),
             buttons: [
                 {
                     title: t("dialog.yes"),

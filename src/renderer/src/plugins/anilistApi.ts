@@ -1,6 +1,5 @@
 import { genYearsList, request } from "@renderer/utils/functions";
 import { cardData, containerData, genresSearchFormat, informationPluginFormat } from "@renderer/utils/types";
-import { t } from "i18next";
 
 const pageSize = 20
 
@@ -469,13 +468,13 @@ export default class AnilistApi implements informationPluginFormat {
       }
       let home: containerData[] = [
         {
-          title: t("home.trending_now"),
+          title: "home.trending_now",
           data: data.json.data.trending.media.map((anime) => Convert(anime)),
           horizontal: true,
-          onTitleClick: async () => await fetchCategory(tendingAnime, t("home.trending_now")),
+          onTitleClick: async () => await fetchCategory(tendingAnime, "home.trending_now"),
         },
         {
-          title: t("home.popular_in_this_season"),
+          title: "home.popular_in_this_season",
           data: data.json.data.season.media.map((anime) => Convert(anime)),
           horizontal: true,
           onTitleClick: async () => await fetchCategory({
@@ -484,14 +483,14 @@ export default class AnilistApi implements informationPluginFormat {
               season: season.season,
               seasonYear: season.seasonYear,
               type: "ANIME"
-            }, title: t("home.popular_in_this_season")
-          }, t("home.popular_in_this_season")),
+            }, title: "home.popular_in_this_season"
+          }, "home.popular_in_this_season"),
         },
         {
-          title: t("home.all_time_popular"),
+          title: "home.all_time_popular",
           data: data.json.data.popular.media.map((anime) => Convert(anime)),
           horizontal: true,
-          onTitleClick: async () => await fetchCategory(allPopular, t("home.all_time_popular")),
+          onTitleClick: async () => await fetchCategory(allPopular, "home.all_time_popular"),
         }
       ]
       callbacks.onSuccess({ sections: home, topCards: home[0] })

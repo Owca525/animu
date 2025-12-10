@@ -1,6 +1,5 @@
 import './css/containerWrong.css';
 import Button from '@renderer/components/buttons';
-import { t } from 'i18next';
 import Card from '@renderer/pages/home/components/card';
 import Input from '@renderer/components/input';
 import Dropdown from '@renderer/components/dropDown';
@@ -8,6 +7,7 @@ import { segregatePlugins } from '@renderer/utils/functions';
 import { Component, createSignal, For, onMount, Show } from 'solid-js';
 import { useQuery } from '@tanstack/solid-query';
 import { getPlayerPLugin, pluginManager } from '@renderer/utils/stores/plugins';
+import { useI18n } from '@renderer/utils/i18n';
 
 interface ContainerWrongProps {
     name: string;
@@ -16,6 +16,8 @@ interface ContainerWrongProps {
 }
 
 const ContainerWrong: Component<ContainerWrongProps> = ({ name, exitfunc, refetchfunc }) => {
+    const { t } = useI18n()
+    
     const [searchName, setSearchName] = createSignal(name);
     let containerRef: HTMLDialogElement | undefined
 

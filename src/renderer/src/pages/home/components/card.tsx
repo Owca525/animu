@@ -2,7 +2,6 @@ import { cardData, ContextMenuProps } from "@renderer/utils/types";
 import "./css/card.css";
 import { useNavigate } from "@solidjs/router";
 import { Component, JSX, Match, Show, Switch, createSignal, onMount, onCleanup } from "solid-js";
-import { t } from "i18next";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import {
   convertSeconds,
@@ -14,7 +13,7 @@ import { DeleteFromHistory, SaveHistory } from "@renderer/utils/FilesManager/his
 import { unwrap } from "solid-js/store";
 import { removeToast, toast } from "@renderer/utils/context/ToastNotification";
 import { pluginManager } from "@renderer/utils/stores/plugins";
-import i18n from "@renderer/utils/i18n";
+import { useI18n } from "@renderer/utils/i18n";
 
 interface CardProps {
   card: cardData;
@@ -22,6 +21,8 @@ interface CardProps {
 }
 
 const Card: Component<CardProps> = ({ card, disableinformation }) => {
+  const { t, pathExist } = useI18n()
+  
   const navigate = useNavigate();
   const [isLoading, setLoading] = createSignal(true);
   const [isError, setIsError] = createSignal(false);
@@ -195,9 +196,9 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
 
     const bottom: JSX.Element[] = [];
 
-    if (card.AnimeData.format && i18n.exists(`anime_formats.${card.AnimeData.format.toLowerCase()}`)) {
+    if (card.AnimeData.format && pathExist(`anime_formats.${card.AnimeData.format.toLowerCase()}`)) {
       bottom.push(t(`anime_formats.${card.AnimeData.format.toLowerCase()}`));
-    } else if (card.AnimeData.format && i18n.exists(`anime_genres.${card.AnimeData.format.toLowerCase()}`)) {
+    } else if (card.AnimeData.format && pathExist(`anime_genres.${card.AnimeData.format.toLowerCase()}`)) {
       bottom.push(t(`anime_genres.${card.AnimeData.format.toLowerCase()}`))
     } else if (card.AnimeData.type) {
       bottom.push(t(`anime_source.${card.AnimeData.type.toLowerCase().replaceAll("_", "")}`));

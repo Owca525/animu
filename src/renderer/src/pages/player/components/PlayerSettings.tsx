@@ -1,8 +1,8 @@
 import "./css/playersettings.css"
 import { isNumberString } from "@renderer/utils/functions"
-import { t } from "i18next"
-import { createEffect, createSignal, For, Show } from "solid-js"
+import { createSignal, For, Show } from "solid-js"
 import PlayerSettingsButton from "./playerSettingsButton"
+import { useI18n } from "@renderer/utils/i18n"
 
 interface playerSettingsProps {
     sources: { name: string, change: () => void }[]
@@ -23,6 +23,7 @@ interface playerSettingsProps {
 
 export default function PlayerSettings(props: playerSettingsProps) {
     const [currentSettings, setcurrentSettings] = createSignal<string>("settings")
+    const { t } = useI18n()
 
     function reset(func: () => void) {
         func()

@@ -71,7 +71,7 @@ export function ToastProvider(props: { children: JSX.Element }) {
 
     return (
         <ToastContext.Provider value={{ addToast, updateToast, removeToast }}>
-            {(() => { toastAPI = { addToast, updateToast, removeToast }; return null; })()}
+            {(() => { toastAPI = { addToast, updateToast, removeToast }; return undefined; })()}
             {props.children}
 
             <Portal>

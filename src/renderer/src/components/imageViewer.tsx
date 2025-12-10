@@ -3,10 +3,12 @@ import "./css/imageViewer.css"
 import Button from "./buttons";
 import { request, SaveToClipboard } from "@renderer/utils/functions";
 import { toast } from "@renderer/utils/context/ToastNotification";
-import { t } from "i18next";
+import { useI18n } from "@renderer/utils/i18n";
 
 export default function ImageViewer(props: { files: string[], disable: () => void }) {
     const defaultValue = 1
+    const { t } = useI18n()
+    
     const [scale, setScale] = createSignal(defaultValue);
     const [pos, setPos] = createSignal({ x: 0, y: 0 });
     const [dragging, setDragging] = createSignal(false);

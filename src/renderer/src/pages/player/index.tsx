@@ -1,8 +1,5 @@
-
-// import { useQuery } from "react-query";
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
 import { AnimeData, indentityPlayer, SettingsConfig } from "@renderer/utils/types";
-import { t } from "i18next";
 
 import "./player.css"
 import { detectTitle, refetchHistory } from "@renderer/utils/functions";
@@ -17,8 +14,10 @@ import { createShortcut } from "@solid-primitives/keyboard";
 import ExternalPlayer from "./externalPlayer";
 import { pluginManager } from "@renderer/utils/stores/plugins";
 import { useResponse } from "@renderer/utils/hooks/useResponse";
+import { useI18n } from "@renderer/utils/i18n";
 
 const player = () => {
+    const { t } = useI18n()
     const anime_data: { data: AnimeData, save: indentityPlayer, episodelist: { ep: string, img?: string, title?: string }[] } = JSON.parse(localStorage.getItem("playerCache") as any)
     const navigate = useNavigate()
     const config: SettingsConfig = getConfig();

@@ -1,14 +1,15 @@
 import { getEpisodeDay, getGradientColor } from '@renderer/utils/functions';
 import { cardData } from '@renderer/utils/types';
 import "./css/bigcard.css"
-import { t } from 'i18next';
 import Button from '@renderer/components/buttons';
 import { useNavigate } from '@solidjs/router';
 import { Component, createSignal, For, Show } from 'solid-js';
+import { useI18n } from '@renderer/utils/i18n';
 
 type bigCardProps = { data: cardData, ref?: any }
 
 const BigCard: Component<bigCardProps> = ({ data, ref }) => {
+    const { t } = useI18n()
     const navigate = useNavigate();
 
     const [isImageLoading, setLoadingImage] = createSignal<boolean>(true)

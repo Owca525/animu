@@ -1,5 +1,5 @@
 import Home from './pages/home/index';
-import i18n from './utils/i18n';
+import { useI18n } from './utils/i18n';
 import icon from '../../../build/icon.png';
 import Information from './pages/information/index';
 import LocalErrorBoundary from './utils/ErrorBoundary';
@@ -33,12 +33,12 @@ import './utils/i18n';
 import 'material-symbols';
 import { pluginManager } from './utils/stores/plugins';
 import { setHomeActivePage } from './utils/stores/home';
-import { t } from 'i18next';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
 
 function App() {
+  const { t, changeLanguage } = useI18n()
   const [isInitation, setInitation] = createSignal<boolean>(true)
   const [initialState, setinitialState] = createSignal<{ text: string, plugin: boolean }>({ text: "Loading History", plugin: false })
 
@@ -80,6 +80,26 @@ function App() {
     if (window.api) runCheckUpdate()
   })
 
+  async function LoadConfig() {
+    if (!window.api) return
+    const loadedConnfig = getConfig()
+
+    // Loading theme
+    await changeTheme(loadedConnfig.General.theme)
+
+    changeLanguage(loadedConnfig.General.language)
+    if (loadedConnfig.General.Window.AutoMaximize) window.BrowserWindow.setMaximize()
+    window.BrowserWindow.setZoom(calculateZoomLevel(parseFloat(loadedConnfig.General.Window.Zoom.toString())))
+    window.BrowserWindow.setFullscreen(loadedConnfig.General.Window.AutoFullscreen)
+
+    if (!loadedConnfig.backup.enable) return
+    if (!checkDate(loadedConnfig.backup.lastCheck, loadedConnfig.backup.check)) return
+    CreateBackup()
+    updateObjectConfig("backup.lastCheck", new Date().getTime(), loadedConnfig)
+    // TODO: add backend refreas
+  }
+
+
   return (
     <Switch>
       <Match when={isInitation()}>
@@ -114,25 +134,6 @@ async function runCheckUpdate() {
   let config = getConfig()
   if (config.update.type == "On Start") await checkUpdate()
   if (checkDate(config.update.lastTime, config.update.type as any)) await checkUpdate()
-}
-
-async function LoadConfig() {
-  if (!window.api) return
-  const loadedConnfig = getConfig()
-
-  // Loading theme
-  await changeTheme(loadedConnfig.General.theme)
-
-  i18n.changeLanguage(loadedConnfig.General.language)
-  if (loadedConnfig.General.Window.AutoMaximize) window.BrowserWindow.setMaximize()
-  window.BrowserWindow.setZoom(calculateZoomLevel(parseFloat(loadedConnfig.General.Window.Zoom.toString())))
-  window.BrowserWindow.setFullscreen(loadedConnfig.General.Window.AutoFullscreen)
-
-  if (!loadedConnfig.backup.enable) return
-  if (!checkDate(loadedConnfig.backup.lastCheck, loadedConnfig.backup.check)) return
-  CreateBackup()
-  updateObjectConfig("backup.lastCheck", new Date().getTime(), loadedConnfig)
-  // TODO: add backend refreas
 }
 
 export default App

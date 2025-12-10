@@ -2,14 +2,15 @@ import { cardData, containerData } from "@renderer/utils/types"
 import "./css/container.css"
 import Card from "./card"
 import Button from "@renderer/components/buttons"
-import { t } from "i18next"
 import { Component, createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js"
 import { useQuery } from "@tanstack/solid-query"
 import { getHomeCache, setAllHomeData, setHomeSearchPage, setHomeStopScrolling } from "@renderer/utils/stores/home"
 import { unwrap } from "solid-js/store"
 import { toast } from "@renderer/utils/context/ToastNotification"
+import { useI18n } from "@renderer/utils/i18n"
 
 const Container: Component<containerData> = ({ title, data, horizontal = false, tags, onTitleClick, onScrollDownFunction }) => {
+  const { t, pathExist } = useI18n()
   let container: HTMLDivElement | undefined
   const [currentPage, setcurrentPage] = createSignal(unwrap(getHomeCache().page))
   const [animeCards, setAnimeCards] = createSignal<cardData[]>(data)
@@ -89,7 +90,7 @@ const Container: Component<containerData> = ({ title, data, horizontal = false, 
     <div tabIndex={-1} class="main-container">
       <div tabIndex={-1} class="container-title-container">
         <Show when={title}>
-          <div class={onTitleClick ? "container-title-click" : "container-title"} onclick={handleTitleClick}>{title}</div>
+          <div class={onTitleClick ? "container-title-click" : "container-title"} onclick={handleTitleClick}>{title && pathExist(title) ? t(title) : title}</div>
         </Show>
         <Show when={tags}>
           <For each={tags}>

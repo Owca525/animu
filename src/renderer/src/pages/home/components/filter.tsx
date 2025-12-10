@@ -1,15 +1,17 @@
 import Dropdown from "@renderer/components/dropDown"
 import "./css/Filter.css"
 import Button from "@renderer/components/buttons"
-import { t } from "i18next"
 import { FilterParams, homeData } from "@renderer/utils/types"
 import { createSignal, onCleanup, onMount, Show } from "solid-js"
 import { getHomeCache } from "@renderer/utils/stores/home"
+import { useI18n } from "@renderer/utils/i18n"
 
 interface filterProps { custonClass?: string, onChange: (params?: FilterParams, removeParam?: string) => void, filter: { genres: string[], seasons: string[], years: string[], format: string[], statuses: string[] } }
 
 // { onChange, filter, custonClass }
 export default function Filter(props: filterProps) {
+    const { t } = useI18n()
+    
     const [showFilter, setShowFilter] = createSignal<boolean>(false)
     const homeCache: homeData = getHomeCache();
     let containerRef: HTMLDivElement | undefined;

@@ -5,12 +5,12 @@ import "./components/css/externalPlayer.css"
 import { AnimeData, indentityPlayer, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig } from "@renderer/utils/types"
 import { detectTitle, isNumberString } from "@renderer/utils/functions"
 import Dropdown from "@renderer/components/dropDown"
-import { t } from "i18next"
-import { Component, createEffect, createSignal, For, onMount, Show } from "solid-js"
+import { Component, createSignal, For, onMount, Show } from "solid-js"
 import { useNavigate } from "@solidjs/router"
 import { getConfig } from "@renderer/utils/stores/config"
 import { unwrap } from "solid-js/store"
 import { toast } from "@renderer/utils/context/ToastNotification"
+import { useI18n } from "@renderer/utils/i18n"
 
 interface ExternalplayerProps {
     animeData: {
@@ -31,6 +31,8 @@ function filterTextChromeCast(text: string) {
 }
 
 const ExternalPlayer: Component<ExternalplayerProps> = ({ animeData, now_episodes, playerData, setNextEpisode, time, externalPlayerData }) => {
+    const { t } = useI18n()
+    
     const navigate = useNavigate()
     const config: SettingsConfig = getConfig();
     const AnimeTitle = detectTitle({ title: animeData.AnimeData.title, ep: now_episodes.episode, format: animeData.AnimeData.format })

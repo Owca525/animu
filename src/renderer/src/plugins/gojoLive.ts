@@ -1,5 +1,5 @@
+import { t } from "@renderer/utils/i18n";
 import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerData, playerSubtitlesFormat, resolutionFormat, playerChapterList, playerDataExtended } from "@renderer/utils/types";
-import { t } from "i18next";
 
 const BACKEND = "https://backend.animetsu.bz"
 const WEBSITE = "https://animetsu.bz/"

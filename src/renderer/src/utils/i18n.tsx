@@ -1,0 +1,104 @@
+import { createContext, useContext, createSignal, onMount } from "solid-js";
+import en from "./lang/en.json"
+
+async function getAllLangFiles() {
+  if (!window.api) return { en: { translation: en } }
+  let langFiles = await window.api.getListLang()
+  let res = {}
+  for (let index = 0; index < langFiles.length; index++) {
+    const element = langFiles[index];
+    try {
+      res[element.lang] = JSON.parse(element.data)
+    } catch (error) {
+      console.error(error, "getAllLangFiles")
+    }
+  }
+  return res
+}
+
+type Messages = Record<string, string | object>;
+type Dictionaries = Record<string, Messages>;
+type i18nConfig = {
+  defaultLang?: string,
+  // dictionaries: Dictionaries,
+  fallbackLang?: string,
+}
+type i18ncontext = {
+  currentLang: () => string;
+  t: (key: string, replace?: { [key: string]: string | number | undefined }) => string;
+  changeLanguage: (l: string) => void;
+  listLang: () => string[];
+  pathExist: (key: string) => boolean
+}
+
+const I18nContext = createContext<i18ncontext>();
+
+let i18nContext: i18ncontext | undefined
+
+function replaceTemplate(template: string, values?: { [key: string]: string | number | undefined }) {
+  if (!values) return template
+  return template.replace(/\{\{(.*?)\}\}/g, (_, key) => {
+    const trimmed = key.trim();
+    const val = values[trimmed];
+    return val !== undefined ? String(val) : `{{${trimmed}}}`;
+  });
+}
+
+function getValueByPath<T>(obj: T, path: string): any {
+  try {
+    return path.split('.').reduce((acc: any, key) => acc?.[key], obj);
+  } catch (error) {
+    console.error("Error in getValueByPath/i18n", error)
+    return path
+  }
+}
+// FIXME: Napraw odświerzanie języka w danych mniejscach
+export function I18nProvider(props: { config: i18nConfig; children: any }) {
+  const [currentLang, changeLanguage] = createSignal(props.config.defaultLang ? props.config.defaultLang :"en");
+  const [dictionaries, setDictionaries] = createSignal<Dictionaries>({})
+
+  onMount(async () => {
+    setDictionaries(await getAllLangFiles())
+  })
+
+  function t(key: string, replace?: { [key: string]: string | number | undefined }) {
+    const dict = dictionaries()[currentLang()];
+    let value = replaceTemplate(getValueByPath(dict, key), replace)
+    if (value != key) return value
+    console.error(`Missing key in ${currentLang()} lang: ${key}`)
+    if (props.config.fallbackLang) {
+      const fallback = dictionaries()[props.config.fallbackLang]
+      value = replaceTemplate(getValueByPath(fallback, key), replace)
+      if (value != key) return value
+    }
+    return key;
+  };
+
+  function listLang() {
+    const dict = dictionaries();
+    if (!dict) return []
+    return Object.keys(dict).map((value) => value)
+  }
+
+  function pathExist(key: string) {
+    const dict = dictionaries()[currentLang()];
+    let value = getValueByPath(dict, key)
+    return value != key ? true : false
+  }
+
+  return (
+    <I18nContext.Provider value={{ currentLang, t, changeLanguage, listLang, pathExist }}>
+      {(() => { i18nContext = { currentLang, t, changeLanguage, listLang, pathExist }; return undefined; })()}
+      {props.children}
+    </I18nContext.Provider>
+  );
+}
+
+export function useI18n() {
+  return useContext(I18nContext)!;
+}
+
+export function t(key: string, replace?: { [key: string]: string | number }) {
+  if (!i18nContext) return key
+  return i18nContext.t(key, replace)
+}

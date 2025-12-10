@@ -37,11 +37,9 @@
     "express": "^5.1.0",
     "hls.js": "^1.6.15",
     "html2canvas": "^1.4.1",
-    "i18next": "^25.6.3",
     "ini": "^6.0.0",
     "jassub": "^1.8.6",
     "material-symbols": "^0.40.0",
-    "solid-i18n": "^1.1.0",
     "subtitle-converter": "^3.0.12",
     "unzipper": "^0.12.3",
     "uuid": "^13.0.0"

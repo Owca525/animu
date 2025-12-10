@@ -9,7 +9,6 @@ import PlayerSettings from "./components/PlayerSettings"
 import PlayerButton from "./components/PlayerButton"
 import PlayerEpisodeElement from "./components/playerEpisodeElement"
 import { convert } from "subtitle-converter";
-import i18n from "@renderer/utils/i18n"
 import html2canvas from "html2canvas"
 import JASSUB from "jassub";
 
@@ -19,12 +18,12 @@ import { saveConfig } from "@renderer/utils/FilesManager/config"
 import { SaveHistory } from "@renderer/utils/FilesManager/history"
 import { Component, createSignal, For, onCleanup, onMount, Show } from "solid-js"
 import { getConfig } from "@renderer/utils/stores/config"
-import { t } from "i18next"
 import { useKeyPress } from "@renderer/utils/hooks/useKeyPress"
 import DeveloperStats from "./components/developerStats"
 import NerdStats from "./components/nerdStats"
 import { unwrap } from "solid-js/store"
 import { removeToast, toast } from "@renderer/utils/context/ToastNotification"
+import { useI18n } from "@renderer/utils/i18n"
 
 function addTime(durration: number): string {
     const now = new Date();
@@ -72,6 +71,7 @@ interface VideoPlayerProps {
 
 const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, temp, setNextEpisode, volumeCacheFunc, PlayerVolume = 0, time, exitFromPlayer }) => {
     const config: SettingsConfig = getConfig();
+    const { t, currentLang } = useI18n()
 
     // ref for html object
     let videoRef: HTMLVideoElement | undefined
@@ -247,7 +247,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (data.length <= 0) return
         for (let index = 0; index < data.length; index++) {
             const element = data[index];
-            if (element.lang == i18n.language && !element.label.includes("Forced")) {
+            if (element.lang == currentLang() && !element.label.includes("Forced")) {
                 setNewSubtitles(element)
                 return
             }

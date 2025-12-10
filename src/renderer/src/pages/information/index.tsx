@@ -26,14 +26,15 @@ import { createShortcut } from '@solid-primitives/keyboard';
 import { getGlobalCache } from '@renderer/utils/stores/global';
 import { getPlayerPLugin, pluginManager } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
-import { t } from 'i18next';
 import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './information.css';
 import ImageViewer from '@renderer/components/imageViewer';
 import { useResponse } from '@renderer/utils/hooks/useResponse';
+import { useI18n } from '@renderer/utils/i18n';
 
 function information() {
+    const { t } = useI18n()
     const navigate = useNavigate();
     let descriptionRef: HTMLDivElement | undefined
 

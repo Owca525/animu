@@ -1,8 +1,8 @@
 import { saveConfig } from "./FilesManager/config";
-import { t } from "i18next";
 import { getConfig } from "./stores/config";
 import { unwrap } from "solid-js/store";
 import { toast } from "./context/ToastNotification";
+import { t } from "./i18n";
 
 export async function checkUpdate(alwaysShow: boolean = false) {
   try {

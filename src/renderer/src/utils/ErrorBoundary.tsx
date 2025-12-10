@@ -1,9 +1,10 @@
 import Button from '@renderer/components/buttons';
-import { t } from 'i18next';
 import { openUrlFolder } from './functions';
+import { useI18n } from './i18n';
 
 function LocalErrorBoundary(error: any) {
     console.error(error)
+    const { t } = useI18n()
 
     function createIssue() {
         // https://github.com/{owner}/{repo}/issues/new?title={title}&body={data}&labels={label}

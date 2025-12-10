@@ -5,6 +5,9 @@
     "target": "esnext",
     "module": "commonjs",
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "types": ["vite/client"]
   }
 }
