@@ -1,12 +1,14 @@
-import { Component, JSX, createSignal, onCleanup, For } from "solid-js";
+import { Component, JSX, createSignal, onCleanup, For, Show } from "solid-js";
 import "./css/ContextMenu.css";
 import { ContextMenuProps } from "../types";
+import { useI18n } from "../i18n";
 
 // Sygnały globalne do otwierania/zamykania menu
-let openMenuSignal: (data: ContextMenuProps, event: MouseEvent) => void = () => {};
-let closeMenuSignal: () => void = () => {};
+let openMenuSignal: (data: ContextMenuProps, event: MouseEvent) => void = () => { };
+let closeMenuSignal: () => void = () => { };
 
 const ContextMenu: Component<{ children: JSX.Element }> = (props) => {
+  const { t, pathExist } = useI18n()
   const [isOpen, setIsOpen] = createSignal(false);
   const [data, setData] = createSignal<ContextMenuProps | null>(null);
   const [event, setEvent] = createSignal<MouseEvent | null>(null);
@@ -42,7 +44,7 @@ const ContextMenu: Component<{ children: JSX.Element }> = (props) => {
   return (
     <>
       {props.children}
-      {isOpen() && data() && data()!.length !== 0 && event() && (
+      <Show when={isOpen() && data() && data()!.length !== 0 && event()}>
         <div
           class="contextmenu-container"
           style={{
@@ -64,13 +66,13 @@ const ContextMenu: Component<{ children: JSX.Element }> = (props) => {
                     option.onClick?.();
                   }}
                 >
-                  {option.option}
+                  {pathExist(option.option) ? t(option.option) : option.option}
                 </div>
               )
             }
           </For>
         </div>
-      )}
+      </Show>
     </>
   );
 };

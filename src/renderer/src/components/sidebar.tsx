@@ -12,6 +12,7 @@ import { createShortcut } from '@solid-primitives/keyboard';
 import { setHomeSearchPage } from '@renderer/utils/stores/home';
 import { sidebarData } from '@renderer/utils/types';
 import './css/sidebar.css';
+import { useI18n } from '@renderer/utils/i18n';
 
 interface sidebarProps {
   showLogo?: boolean
@@ -26,14 +27,17 @@ interface sidebarProps {
 }
 // Component<sidebarProps> = ({ showLogo = false, data, onChange, openSidebar, activeElement }) =>
 export default function Sidebar(props: sidebarProps) {
+  const { t, pathExist } = useI18n()
+
   const [sidebarHover, setHover] = createSignal<boolean>(false)
-  let sidebarRef: HTMLDivElement | undefined;
   const [animuVersion, setVersion] = createSignal<string>("")
   const [currentButton, setCurrentButton] = createSignal<number>(
     props.activeElement ?
     props.setAciveElement ? props.setAciveElement : 0
     : -1
   )
+
+  let sidebarRef: HTMLDivElement | undefined;
 
   const handleClickOutside = (event: MouseEvent) => {
     let data = event.target as HTMLElement
@@ -67,7 +71,7 @@ export default function Sidebar(props: sidebarProps) {
   }
 
   function detectSidebarStateButton(text: string): string | undefined {
-    if (sidebarHover()) return text
+    if (sidebarHover()) return pathExist(text) ? t(text) : text
     return undefined
   }
 

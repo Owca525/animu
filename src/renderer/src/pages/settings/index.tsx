@@ -60,10 +60,10 @@ function settings() {
     const [themeMetadata, setthemeMetadata] = createSignal<themeMetadata | undefined>(undefined)
     const [backupList, setBackupList] = createSignal<{ date: Date, file: string }[]>([])
     const [ContextMenu, setContextMenu] = createSignal<ContextMenuProps>([
-        { option: t("dialog.reload"), onClick: () => location.reload() },
+        { option: "dialog.reload", onClick: () => location.reload() },
         { option: "", line: true },
         {
-            option: t("dialog.exit"), onClick: () => showDialog({
+            option: "dialog.exit", onClick: () => showDialog({
                 type: "info",
                 title: "Action",
                 description: t("global.exitAnimu"),
@@ -85,17 +85,17 @@ function settings() {
         top: [
             {
                 icon: "manufacturing",
-                text: t("global.general"),
+                text: "global.general",
                 onClick: () => setCategory("general"),
             },
             {
                 icon: "movie",
-                text: t("global.player"),
+                text: "global.player",
                 onClick: () => setCategory("player"),
             },
             {
                 icon: "extension",
-                text: t("global.extensions"),
+                text: "global.extensions",
                 onClick: () => setCategory("extensions"),
             },
             {
@@ -105,14 +105,14 @@ function settings() {
             },
             {
                 icon: "info",
-                text: t("global.about"),
+                text: "global.about",
                 onClick: () => setCategory("about"),
             },
         ],
         bottom: [
             {
                 icon: "home",
-                text: t("global.home"),
+                text: "global.home",
                 onClick: () => { navigate("/"); resetNewConfig() },
             },
         ],
@@ -126,7 +126,7 @@ function settings() {
                     ...prev.bottom,
                     {
                         icon: "folder",
-                        text: t("global.cfglocation"),
+                        text: "global.cfglocation",
                         onClick: async () =>
                             await window.api.open(await window.api.os.getConfigPath()),
                     }
@@ -190,10 +190,9 @@ function settings() {
         if (!path) return
         handleChange("Player.screenShot.path", path)
     }
-
     function turnOnDeveloperMode() {
         if (config().new.Developer.DeveloperMode && window.api) {
-            setContextMenu((prev) => [...prev, { option: t("contextMenu.devtools"), onClick: window.BrowserWindow.openDevTools }])
+            setContextMenu((prev) => [prev[0], prev[1], { option: "contextMenu.devtools", onClick: window.BrowserWindow.openDevTools }, prev[2]])
         }
         if (config().new.Developer.DeveloperMode) {
             setSidebarData((prev) => ({
@@ -202,7 +201,7 @@ function settings() {
                     ...prev.top,
                     {
                         icon: "code",
-                        text: t("global.dev"),
+                        text: "global.dev",
                         onClick: () => setCategory("developer" as any)
                     }
                 ]
