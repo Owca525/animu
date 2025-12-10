@@ -22,7 +22,7 @@ import {
   Suspense,
   Switch
   } from 'solid-js';
-import { defaultConfigWeb } from './utils/FilesManager/config';
+import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import { getConfig, setConfig } from './utils/stores/config';
 import { getGlobalCache, setGlobalHistory, setIncognitoMode } from './utils/stores/global';
 import { HashRouter, Route } from '@solidjs/router';
@@ -95,7 +95,7 @@ function App() {
     if (!loadedConnfig.backup.enable) return
     if (!checkDate(loadedConnfig.backup.lastCheck, loadedConnfig.backup.check)) return
     CreateBackup()
-    updateObjectConfig("backup.lastCheck", new Date().getTime(), loadedConnfig)
+    saveConfig(updateObjectConfig("backup.lastCheck", new Date().getTime(), loadedConnfig))
     // TODO: add backend refreas
   }
 
