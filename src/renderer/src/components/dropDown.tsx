@@ -1,4 +1,4 @@
-import { createSignal, createEffect, For } from "solid-js";
+import { createSignal, For, Show } from "solid-js";
 import "./css/dropDown.css";
 
 export interface DropdownOption {
@@ -39,10 +39,6 @@ export default function Dropdown(props: DropdownProps) {
     setText("");
   };
 
-  createEffect(() => {
-    setText(props.buttonText ?? "");
-  });
-
   const displayText = () => {
     if (props.placeholder && text() === "") return props.placeholder;
     if (text() !== "") return text();
@@ -50,7 +46,7 @@ export default function Dropdown(props: DropdownProps) {
   };
 
   return (
-    <div tabIndex={-1} class={`dropdown-container ${props.dropClassName ?? ""}`}>
+    <div tabIndex={-1} class={`dropdown-container ${props.dropClassName ?? ""}`} onMouseLeave={() => setIsOpen(false)}>
       <div tabIndex={-1} class="dropdown-button" onClick={toggleDropdown}>
         <div
           tabIndex={-1}
@@ -60,20 +56,20 @@ export default function Dropdown(props: DropdownProps) {
         >
           {displayText()}
         </div>
-        {text() === "" && !props.disableX && (
+        <Show when={text() === "" && !props.disableX}>
           <div class="material-symbols-outlined dropdown-button-icon">
             {isOpen() ? "keyboard_arrow_left" : "keyboard_arrow_down"}
           </div>
-        )}
-        {text() !== "" && !props.disableX && (
+        </Show>
+        <Show when={text() !== "" && !props.disableX}>
           <div class="material-symbols-outlined dropdown-button-icon" onClick={resetText}>
             close
           </div>
-        )}
+        </Show>
       </div>
 
-      {isOpen() && (props.options?.length ?? 0) > 1 && (
-        <ul class="dropdown-menu" onMouseLeave={() => setIsOpen(false)}>
+      <Show when={isOpen() && (props.options?.length ?? 0) > 1}>
+        <ul class="dropdown-menu">
           <For each={props.options}>
             {option => (
               <li
@@ -86,7 +82,7 @@ export default function Dropdown(props: DropdownProps) {
             )}
           </For>
         </ul>
-      )}
+      </Show>
     </div>
   );
 }
