@@ -46,7 +46,7 @@ export default function Dropdown(props: DropdownProps) {
   };
 
   return (
-    <div tabIndex={-1} class={`dropdown-container ${props.dropClassName ?? ""}`} onMouseLeave={() => setIsOpen(false)}>
+    <div tabIndex={-1} class={`dropdown-container ${props.dropClassName ?? ""}`}>
       <div tabIndex={-1} class="dropdown-button" onClick={toggleDropdown}>
         <div
           tabIndex={-1}
