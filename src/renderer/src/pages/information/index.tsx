@@ -394,7 +394,7 @@ function information() {
                             <Show when={tempData().anime.characters && tempData().anime.characters.map((tmp) => tmp.voiceActor).filter((item) => item != undefined).length > 0}>
                                 <div class="information-characters">
                                     <div class="information-characters-title">
-                                        {t("information.characters")}
+                                        {t("information.actors")}
                                     </div>
 
                                     <div class="information-characters-container">
