@@ -18,10 +18,12 @@
   font-size: 1.2em;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   background-color: var(--fourth-layer);
-  animation: ToastSlideIn 0.2s ease;
 }
 .toast.disable {
   animation: ToastSlideOut 0.2s ease;
+}
+.toast.show {
+  animation: ToastSlideIn 0.2s ease;
 }
 
 .toast.info {
@@ -40,6 +42,11 @@
   background-color: var(--red-background);
   color: var(--red-text);
   border: 2px solid var(--red-one);
+}
+
+.toast.click {
+  cursor: pointer;
+  user-select: none;
 }
 
 /* ANIMATION */

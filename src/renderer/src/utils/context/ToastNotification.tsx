@@ -9,13 +9,14 @@ type ToastProps = {
     options?: ToastOptions;
 };
 
-type expandedToastProps = ToastProps & { animation: boolean }
+type expandedToastProps = ToastProps & { animation: boolean, updated: boolean, timer: NodeJS.Timeout | undefined }
 
 interface ToastOptions {
     type?: "success" | "error" | "info" | "warning" | "loading",
     duration?: number,
     onClick?: () => void;
     removeTimer?: boolean
+    removeClick?: boolean
 }
 
 const defaultOptions: ToastOptions = {
@@ -39,29 +40,29 @@ export function ToastProvider(props: { children: JSX.Element }) {
     function addToast(message: string, options: ToastOptions) {
         const id = uuidv4();
         let duration = options.duration;
-        setToasts(prev => [...prev, { id, message, options, animation: false }]);
-
+        let timer: NodeJS.Timeout | undefined
         if (!options.removeTimer) {
-            setTimeout(() => {
+            timer = setTimeout(() => {
                 removeToast(id)
             }, duration);
         }
-
+        setToasts(prev => [...prev, { id, message, options, animation: false, updated: false, timer }]);
         return id
     };
 
     function updateToast(id: string, msg: string, options?: ToastOptions) {
         setToasts((prevToast) => prevToast.map((tost) => {
-            if (tost.id == id) {
-                console.log(tost.options, options)
-                if (tost.options && tost.options.removeTimer && !options?.removeTimer) {
-                    setTimeout(() => {
-                        removeToast(id)
-                    }, options?.duration ? options.duration : defaultOptions.duration);
-                }
-                return { ...tost, message: msg, options: { ...tost.options, ...options } }
+            if (tost.id != id) return tost
+            let timer: NodeJS.Timeout | undefined
+
+            console.log(tost.options, options)
+            if (tost.options && tost.options.removeTimer && !options?.removeTimer) {
+                clearInterval(tost.timer)
+                timer = setTimeout(() => {
+                    removeToast(id)
+                }, options?.duration ? options.duration : defaultOptions.duration);
             }
-            return tost
+            return { ...tost, message: msg, options: { ...tost.options, ...options }, updated: true, timer }
         }))
     };
 
@@ -78,7 +79,11 @@ export function ToastProvider(props: { children: JSX.Element }) {
                 <div class="toast-container">
                     <For each={toasts()}>
                         {toast => (
-                            <div class={`toast ${toast.options?.type} ${toast.animation ? "disable" : ""}`}
+                            <div class={`toast ${!toast.updated && !toast.animation ? "show" : ""} ${toast.options?.type} ${toast.animation && !toast.updated ? "disable" : ""} ${toast.options?.removeClick || !toast.options?.onClick ? "" : "click"}`}
+                                onclick={() => {
+                                    if (toast.options?.onClick) toast.options.onClick()
+                                    if (!toast.options?.removeClick) removeToast(toast.id)
+                                }}
                                 onanimationend={(event) => {
                                     if (event.target.classList.contains("disable")) setToasts(prev => prev.filter(t => t.id !== toast.id))
                                 }}

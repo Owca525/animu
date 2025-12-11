@@ -1,7 +1,7 @@
 import { saveConfig } from "./FilesManager/config";
 import { getConfig } from "./stores/config";
 import { unwrap } from "solid-js/store";
-import { toast } from "./context/ToastNotification";
+import { toast, updateToast } from "./context/ToastNotification";
 import { t } from "./i18n";
 
 export async function checkUpdate(alwaysShow: boolean = false) {
@@ -11,14 +11,13 @@ export async function checkUpdate(alwaysShow: boolean = false) {
     console.log(update);
 
     if (update.available) {
-      const id = toast(t("update.progress", { procent: 0 }));
-
-      toast(t("update.available", { ver: update.version }), {
+      const id = toast(t("update.available", { ver: update.version }), {
         duration: 5000,
-        // onClick: () => {
-        //   window.api.update.downloadUpdate();
-        //   downloadUpdate(id);
-        // },
+        removeClick: true,
+        onClick: () => {
+          window.api.update.downloadUpdate();
+          downloadUpdate(id);
+        },
       });
     } else if (alwaysShow) {
       toast(t("update.same"), { type: "success" });
@@ -32,16 +31,18 @@ export async function checkUpdate(alwaysShow: boolean = false) {
     toast("Failed to check for updates", { type: "error" });
   }
 }
-// TODO: Fix updates
-export function downloadUpdate(updateNotification: string) {
-  // window.api.update.updateProgress((_event, percent) => {
-  //   toast.loading(t("update.progress", { procent: percent.toFixed(1) }), {
-  //     id: updateNotification,
-  //   });
 
-  //   if (percent.toFixed(0) === "100") {
-  //     toast.dismiss(updateNotification);
-  //     toast(t("update.done"), { type: "success" });
-  //   }
-  // });
+export function downloadUpdate(updateNotification: string) {
+  window.api.update.updateProgress((_event, percent) => {
+    updateToast(updateNotification, t("update.progress", { procent: percent.toFixed(1) }), {
+      type: "loading",
+      removeTimer: true,
+      removeClick: true,
+      onClick: undefined
+    });
+
+    if (percent.toFixed(0) === "100") {
+      updateToast(updateNotification, t("update.done"), { type: "success", removeTimer: false, removeClick: false });
+    }
+  });
 }
