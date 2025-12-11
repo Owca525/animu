@@ -46,7 +46,7 @@ const animeData = `
         timeUntilAiring
         episode
       }
-      characters(perPage: 10) {
+      characters(perPage: 30) {
         edges {
           role
           node {
