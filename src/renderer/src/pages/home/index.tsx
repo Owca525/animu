@@ -56,7 +56,7 @@ const Home = () => {
       {
         icon: "home",
         text: t("global.home"),
-        onClick: () => { setHomeActivePage(t("global.home")); plugin.home() },
+        onClick: () => { setHomeActivePage(t("global.home")); setHomeSearchTags(undefined); plugin.home() },
       },
       {
         icon: "history",
@@ -88,6 +88,7 @@ const Home = () => {
   })
 
   function setHistory() {
+    setHomeSearchTags(undefined)
     setHomeActivePage(t("global.history"));
     let history = getHistory()
 
