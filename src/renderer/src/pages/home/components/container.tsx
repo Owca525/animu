@@ -8,6 +8,7 @@ import { getHomeCache, setAllHomeData, setHomeSearchPage, setHomeStopScrolling }
 import { unwrap } from "solid-js/store"
 import { toast } from "@renderer/utils/context/ToastNotification"
 import { useI18n } from "@renderer/utils/i18n"
+import { getInformationPlugin } from "@renderer/utils/stores/plugins"
 
 const Container: Component<containerData> = ({ title, data, horizontal = false, tags, onTitleClick, onScrollDownFunction }) => {
   const { t, pathExist } = useI18n()
@@ -17,8 +18,8 @@ const Container: Component<containerData> = ({ title, data, horizontal = false, 
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        console.log(entry)
-        if (entry.isIntersecting) {
+        const homeCache = unwrap(getHomeCache())
+        if (entry.isIntersecting && !homeCache.stopScrolling) {
           setHomeSearchPage(currentPage() + 1)
           setcurrentPage(currentPage() + 1)
           cardResponse.refetch()
@@ -32,6 +33,7 @@ const Container: Component<containerData> = ({ title, data, horizontal = false, 
     queryKey: [currentPage(), title],
     queryFn: async () => {
       const homeCache = unwrap(getHomeCache())
+      if (homeCache.stopScrolling) return
       if (!onScrollDownFunction) return ""
       let tmp = await onScrollDownFunction(homeCache.search, unwrap(currentPage()), homeCache.filterTags)
       if (tmp.data.length < tmp.maxPage) setHomeStopScrolling(true);
@@ -61,6 +63,8 @@ const Container: Component<containerData> = ({ title, data, horizontal = false, 
     if (horizontal) return
     const lastCard = document.querySelector(".card-container:last-child")
     if (!lastCard) return
+    let plugin = getInformationPlugin()
+    if (animeCards().length < plugin.currentPlugin.metadata.pageSize) setHomeStopScrolling(true)
     observer.observe(lastCard)
   }
 
