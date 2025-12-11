@@ -385,7 +385,7 @@ body {
 
 .information-characters-card {
   background-color: var(--third-layer);
-  border-radius: 16px;
+  border-radius: 8px;
   transition: all 150ms ease;
 }
 
@@ -394,7 +394,7 @@ body {
 }
 
 .information-characters-card-cover {
-  border-radius: 16px;
+  border-radius: 4px;
 }
 
 .information-exit-button {

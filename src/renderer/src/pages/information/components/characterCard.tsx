@@ -1,3 +1,5 @@
+import "./css/characterCard.css"
+
 interface characterCardsProps {
     id: string,
     name: string,

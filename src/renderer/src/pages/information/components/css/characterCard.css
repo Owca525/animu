@@ -1,0 +1,51 @@
+/* TODO: KARTQ ADD MINI CARDS */
+
+/* .information-characters-card {
+    min-height: 160px;
+    width: 180px;
+    display: flex;
+    overflow: hidden;
+    flex-direction: column;
+    align-self: center;
+    padding: 4px;
+    gap: 4px;
+}
+
+.information-characters-card-cover {
+    max-height: 130px;
+    width: max-content;
+    height: max-content;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    user-select: none;
+}
+
+.information-characters-card-description {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+} */
+
+/* .information-characters-card-description {
+    width: 100%;
+    height: 100%;
+    text-align: right;
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+}
+
+.information-character-name, .information-character-role {
+    position: absolute;
+    right: 15px;
+    margin-left: 5px;
+}
+
+.information-character-name {
+    top: 15px;
+}
+
+.information-character-role {
+    bottom: 15px;
+} */

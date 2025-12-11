@@ -404,7 +404,7 @@ function information() {
                                                     id={character.voiceActor?.id as string}
                                                     image={character.voiceActor?.image as string}
                                                     name={character.voiceActor?.name as string}
-                                                    role={t("information.actor_as", { actor: character.character.name })}
+                                                    role={character.character.name }
                                                     onClick={() => openUrlFolder(`https://anilist.co/staff/${character.voiceActor ? character.voiceActor.id : ""}`)}
                                                 />
                                             )}
