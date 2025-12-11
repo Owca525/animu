@@ -409,15 +409,6 @@
     .information-description {
         font-size: 0.9em;
     }
-
-    .information-characters-card {
-        width: 20%;
-        min-width: 200px;
-        height: 90px;
-        display: flex;
-        overflow: hidden;
-        font-size: 0.8rem;
-    }
     
     .information-bar {
         margin-right: 0px;
