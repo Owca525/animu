@@ -1193,7 +1193,7 @@ th {
 
 
 .welcome-screen-void {
-  background-color: color-mix(in srgb, var(--bg) 80%, transparent);
+  background-color: color-mix(in srgb, var(--first-layer) 80%, transparent);
 }
 
 .welcome-screen-content {
