@@ -1011,6 +1011,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 newTime = newTime - (element.end - element.start)
             }
         }
+        if (newTime <= 0) return undefined
         return formatTime(newTime)
     }
 
