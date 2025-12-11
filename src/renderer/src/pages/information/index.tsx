@@ -101,9 +101,15 @@ function information() {
 
         let history = tempHistory.filter((anime) => anime.AnimeData.id == tempData().anime.id)
         if (history.length > 0) {
-            setCurrentPlugin(history[0].saveData?.pluginName)
-            setTmpData({ ...tempData(), saveData: history[0].saveData })
-            localStorage.setItem("informationCache", JSON.stringify({ ...tempData(), saveData: history[0].saveData }))
+            let plugin: playerPluginFormat = pluginManager().changePlugin(history[0].saveData?.pluginName as string)
+            if (plugin && plugin.metadata.name != history[0].saveData?.pluginName) {
+                setCurrentPlugin(plugin.metadata.name)
+                setCurrentId(undefined)
+            }
+            else setCurrentPlugin(history[0].saveData?.pluginName)
+
+            setTmpData({ ...tempData(), saveData: { ...history[0].saveData, pluginName: unwrap(currentPlugin()) as string } as indentityPlayer } )
+            localStorage.setItem("informationCache", JSON.stringify({ ...tempData(), saveData: { ...history[0].saveData, pluginName: unwrap(currentPlugin()) as string } as indentityPlayer }))
         }
         episodeResponse.Refetch([tempData(), currentIDplayer(), currentPlugin()])
     })
