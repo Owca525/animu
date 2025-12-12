@@ -196,31 +196,6 @@
     z-index: 2;
 }
 
-.information-characters {
-    width: 100%;
-    min-height: 25px;
-    height: min-content;
-    gap: 12px;
-    box-sizing: border-box;
-    padding-top: 12px;
-    overflow: hidden;
-    z-index: 1 !important;
-}
-
-.information-characters-container {
-    padding: 15px 12px 12px 12px;
-    display: flex;
-    gap: 15px;
-    overflow-x: scroll;
-    cursor: pointer;
-}
-
-.information-characters-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    padding-left: 12px;
-}
-
 .information-exit-button {
     position: fixed;
     z-index: 7;

@@ -1,16 +1,17 @@
 import "./css/characterCard.css"
 
-interface characterCardsProps {
+export interface characterCardsProps {
     id: string,
     name: string,
     image: string,
     role: string,
-    onClick?: () => void
+    onClick?: () => void,
+    ref?: HTMLDivElement 
 }
 
 export default function CharacterCards(props: characterCardsProps) {
     return (
-        <div class="information-characters-card" onClick={props.onClick}>
+        <div class="information-characters-card" onClick={props.onClick} ref={props.ref}>
             <img class="information-characters-card-cover" src={props.image}></img>
             <div class="information-characters-card-description">
                 <span class="information-character-name">{props.name}</span>

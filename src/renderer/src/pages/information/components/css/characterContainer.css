@@ -1,0 +1,61 @@
+.information-characters {
+    width: 100%;
+    min-height: 25px;
+    height: min-content;
+    gap: 12px;
+    box-sizing: border-box;
+    padding-top: 12px;
+    overflow: hidden;
+    z-index: 1 !important;
+}
+
+.information-characters-container {
+    padding: 15px 12px 12px 12px;
+    display: flex;
+    gap: 15px;
+    overflow: hidden;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+}
+
+.information-characters-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding-left: 12px;
+}
+
+.information-character-button-left, .information-character-button-right {
+    position: absolute;
+    top: 44%;
+    margin: 0px 4px;
+    transition: opacity 1s ease;
+    user-select: none;
+}
+
+.information-character-button-left {
+    left: 0;
+}
+
+.information-character-button-right {
+    right: 0;
+}
+
+/* TODO: FIX ANIMATION */
+.information-characters-container:hover .information-character-button-left{
+    animation: slideLeft 0.1s forwards;
+    opacity: 1;
+}
+
+.information-characters-container:hover .information-character-button-right {
+    animation: slideRight 0.1s forwards;
+    opacity: 1;
+}
+
+.information-characters-container:not(:hover) .information-character-button-left{
+    animation: slideOutLeft 0.1s forwards;
+}
+
+.information-characters-container:not(:hover) .information-character-button-right {
+    animation: slideOutRight 0.1s forwards;
+}

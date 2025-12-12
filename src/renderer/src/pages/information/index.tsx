@@ -1,5 +1,4 @@
 import Button from '@renderer/components/buttons';
-import CharacterCards from './components/characterCard';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
@@ -32,6 +31,7 @@ import './information.css';
 import ImageViewer from '@renderer/components/imageViewer';
 import { useResponse } from '@renderer/utils/hooks/useResponse';
 import { useI18n } from '@renderer/utils/i18n';
+import CharacterContainer from './components/characterContainer';
 
 function information() {
     const { t } = useI18n()
@@ -373,47 +373,23 @@ function information() {
                             </div>
 
                             <Show when={tempData().anime.characters && tempData().anime.characters.length > 0}>
-                                <div class="information-characters">
-                                    <div class="information-characters-title">
-                                        {t("information.characters")}
-                                    </div>
-
-                                    <div class="information-characters-container">
-                                        <For each={tempData().anime.characters}>
-                                            {(character) => (
-                                                <CharacterCards
-                                                    id={character.character.id}
-                                                    image={character.character.image}
-                                                    name={character.character.name}
-                                                    role={t(`information.role.${character.role.toLowerCase()}`)}
-                                                    onClick={() => openUrlFolder(`https://anilist.co/character/${character.character.id}`)}
-                                                />
-                                            )}
-                                        </For>
-                                    </div>
-                                </div>
+                                <CharacterContainer title={t("information.characters")} cards={tempData().anime.characters.map((char) => ({
+                                    id: char.character.id,
+                                    image: char.character.image,
+                                    name: char.character.name,
+                                    role: t(`information.role.${char.role.toLowerCase()}`),
+                                    onClick: () => openUrlFolder(`https://anilist.co/character/${char.character.id}`)
+                                }))}/>
                             </Show>
 
                             <Show when={tempData().anime.characters && tempData().anime.characters.map((tmp) => tmp.voiceActor).filter((item) => item != undefined).length > 0}>
-                                <div class="information-characters">
-                                    <div class="information-characters-title">
-                                        {t("information.actors")}
-                                    </div>
-
-                                    <div class="information-characters-container">
-                                        <For each={tempData().anime.characters}>
-                                            {(character) => (
-                                                <CharacterCards
-                                                    id={character.voiceActor?.id as string}
-                                                    image={character.voiceActor?.image as string}
-                                                    name={character.voiceActor?.name as string}
-                                                    role={character.character.name }
-                                                    onClick={() => openUrlFolder(`https://anilist.co/staff/${character.voiceActor ? character.voiceActor.id : ""}`)}
-                                                />
-                                            )}
-                                        </For>
-                                    </div>
-                                </div>
+                                <CharacterContainer title={t("information.actors")} cards={tempData().anime.characters.map((char) => ({
+                                    id: char.voiceActor?.id as string,
+                                    image: char.voiceActor?.image as string,
+                                    name: char.voiceActor?.name as string,
+                                    role: char.character.name,
+                                    onClick: () => openUrlFolder(`https://anilist.co/staff/${char.voiceActor ? char.voiceActor.id : ""}`)
+                                }))}/>
                             </Show>
                         </div>
                     </div>
