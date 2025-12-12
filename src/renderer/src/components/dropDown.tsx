@@ -1,4 +1,4 @@
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, For, onMount, Show } from "solid-js";
 import "./css/dropDown.css";
 
 export interface DropdownOption {
@@ -18,7 +18,11 @@ interface DropdownProps {
 
 export default function Dropdown(props: DropdownProps) {
   const [isOpen, setIsOpen] = createSignal(false);
-  const [text, setText] = createSignal(props.buttonText ?? "");
+  const [text, setText] = createSignal(props.buttonText);
+
+  onMount(() => {
+    setText(props.buttonText)
+  })
 
   const toggleDropdown = () => setIsOpen(prev => !prev);
 
@@ -28,9 +32,7 @@ export default function Dropdown(props: DropdownProps) {
     if (props.placeholderChange) {
       const placeholderText = props.placeholderChange();
       setText(placeholderText);
-    } else {
-      setText(option.label);
-    }
+    } else setText(option.label);
   };
 
   const resetText = (event: MouseEvent) => {
@@ -40,9 +42,9 @@ export default function Dropdown(props: DropdownProps) {
   };
 
   const displayText = () => {
-    if (props.placeholder && text() === "") return props.placeholder;
-    if (text() !== "") return text();
-    return props.buttonText ?? "";
+    if (props.placeholder && !text()) return props.placeholder;
+    if (text() != "") return text();
+    return props.buttonText;
   };
 
   return (

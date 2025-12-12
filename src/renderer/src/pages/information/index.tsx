@@ -45,7 +45,7 @@ function information() {
     const [isNeedMore, setNeedMore] = createSignal<boolean>(false)
     const [showImages, setShowImages] = createSignal<boolean>(false)
     const [moreMiniTitle, setmoreMiniTitle] = createSignal<boolean>(false)
-    const [currentPlugin, setCurrentPlugin] = createSignal<string | undefined>(tempData().saveData ? tempData().saveData?.pluginName : getPlayerPLugin()?.metadata.name)
+    const [currentPlugin, setCurrentPlugin] = createSignal<string | undefined>(undefined)
     const [secondsLeft, setSecondsLeft] = createSignal<undefined | { left: number, converted: { days: number; hours: number; minutes: number; seconds: number; } | undefined }>(undefined);
 
     // Banner
@@ -91,10 +91,9 @@ function information() {
             element.tabIndex = -1
         });
 
-        if (descriptionRef && descriptionRef.scrollHeight > descriptionRef.clientHeight) {
-            setNeedMore(true)
-            // descriptionRef.classList.add("moretext")
-        }
+        if (descriptionRef && descriptionRef.scrollHeight > descriptionRef.clientHeight) setNeedMore(true)
+
+        console.log(tempData())
 
         if (tempData().anime.id == "") return
         let tempHistory = unwrap(getGlobalCache().history)
@@ -102,11 +101,9 @@ function information() {
         let history = tempHistory.filter((anime) => anime.AnimeData.id == tempData().anime.id)
         if (history.length > 0) {
             let plugin: playerPluginFormat = pluginManager().changePlugin(history[0].saveData?.pluginName as string)
-            if (plugin && plugin.metadata.name != history[0].saveData?.pluginName) {
-                setCurrentPlugin(plugin.metadata.name)
-                setCurrentId(undefined)
-            }
-            else setCurrentPlugin(history[0].saveData?.pluginName)
+            console.log(history[0].saveData?.pluginName, plugin)
+            if (plugin && plugin.metadata.name != history[0].saveData?.pluginName) setCurrentId(undefined)
+            setCurrentPlugin(plugin.metadata.name)
 
             setTmpData({ ...tempData(), saveData: { ...history[0].saveData, pluginName: unwrap(currentPlugin()) as string } as indentityPlayer } )
             localStorage.setItem("informationCache", JSON.stringify({ ...tempData(), saveData: { ...history[0].saveData, pluginName: unwrap(currentPlugin()) as string } as indentityPlayer }))
