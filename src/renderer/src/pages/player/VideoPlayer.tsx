@@ -1134,7 +1134,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                                 </Show>
                             </div>
                             <div class="player-end-time-display">
-                                {t("player.episodeEndsOn", { time: addTime(videoRef?.duration ? (videoRef.duration - currentTime()) : 0) })}
+                                {t("player.episodeEndsOn", { time: addTime(durrationTime() - currentTime()) })}
                             </div>
                         </div>
                         <div class="player-right">
