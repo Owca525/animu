@@ -13,6 +13,7 @@ import {
     segregatePlugins
     } from '@renderer/utils/functions';
 import {
+    createEffect,
     createSignal,
     For,
     Match,
@@ -83,7 +84,15 @@ function information() {
         });
     }, 1000);
 
+    createEffect(() => {
+        console.log(episodeResponse.data())
+    })
+
     onMount(() => {
+        let plugin = pluginManager().currentPlugin
+        if (plugin) setCurrentPlugin(plugin.metadata.name)
+        console.log(plugin)
+
         if (tempData().anime.nextAiringEpisode?.timeUntilAiring)
             setSecondsLeft({ left: tempData().anime.nextAiringEpisode?.timeUntilAiring as number, converted: convertSeconds(tempData().anime.nextAiringEpisode?.timeUntilAiring) })
 
@@ -92,8 +101,6 @@ function information() {
         });
 
         if (descriptionRef && descriptionRef.scrollHeight > descriptionRef.clientHeight) setNeedMore(true)
-
-        console.log(tempData())
 
         if (tempData().anime.id == "") return
         let tempHistory = unwrap(getGlobalCache().history)
@@ -359,6 +366,9 @@ function information() {
                                         </Match>
                                         <Match when={episodeResponse.error()}>
                                             <div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>
+                                        </Match>
+                                        <Match when={episodeResponse.data() == undefined}>
+                                            <div class="information-loading-container"><span class="information-error material-symbols-outlined">search_off</span>Nothing Found</div>
                                         </Match>
                                         <Match when={episodeResponse.data()}>
                                             <For each={episodeResponse.data()?.episodesData} fallback={<div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}>

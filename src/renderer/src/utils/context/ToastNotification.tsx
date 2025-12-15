@@ -56,7 +56,7 @@ export function ToastProvider(props: { children: JSX.Element }) {
             let timer: NodeJS.Timeout | undefined
 
             console.log(tost.options, options)
-            if (tost.options && tost.options.removeTimer && !options?.removeTimer) {
+            if (!options?.removeTimer) {
                 clearInterval(tost.timer)
                 timer = setTimeout(() => {
                     removeToast(id)
@@ -67,7 +67,7 @@ export function ToastProvider(props: { children: JSX.Element }) {
     };
 
     function removeToast(id: string) {
-        setToasts(prev => prev.map(t => t.id == id ? ({ ...t, animation: true }) : t))
+        setToasts(prev => prev.map(t => t.id == id ? ({ ...t, animation: true, updated: false }) : t))
     };
 
     return (
