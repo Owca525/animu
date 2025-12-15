@@ -126,7 +126,7 @@ function information() {
     function enterPlayer(episodes: { ep: string, img?: string, title?: string }[], type: string, episode: string) {
         let tmp = unwrap(tempData())
         let lastTime = 0
-        if (tmp.saveData && tmp.saveData.episode.toString() === episode) lastTime = tmp.saveData.last_Time
+        if (tmp.saveData && tmp.saveData.episode.toString() === episode.toString()) lastTime = tmp.saveData.last_Time
         localStorage.setItem("playerCache", JSON.stringify(unwrap({
             data: {
                 ...tmp.anime,
