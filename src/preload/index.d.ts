@@ -53,7 +53,8 @@ declare global {
         read: (path: string, format?: string) => Promise<string | NonSharedBuffer | undefined>;
         saveDialog: (fileName: string, data: any, title: string, name: string, extensions: string[], format?: string) => Promise<boolean>
         openDialog: (path?: string, name?: string, extensions?: string[]) => Promise<string>
-        getConfigPath: () => Promise<string>
+        getConfigPath: () => Promise<string>,
+        getBrowserConfigPath: () => Promise<string>
       };
       backup: {
         make: () => Promise<{ success: boolean, error: any }>

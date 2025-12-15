@@ -267,7 +267,7 @@ function settings() {
             },
             {
                 title: "Yes",
-                onClick: () => RestoreBackup(file),
+                onClick: async () => {RestoreBackup(file);setBackupList(await window.api.backup.list())},
             }
             ]
         })
@@ -886,14 +886,14 @@ function settings() {
                                 startValue={config().new.backup.maxBackups.toString()}
                             />
                         </div>
-                        <SettingsDrop LeftHeader="Backups" content={
+                        <SettingsDrop LeftHeader="Backups" leftbutton={{ icon: "folder", onClick: async () => window.api.open(await convertPath(`${await window.api.os.getBrowserConfigPath()}/animuBackup`)) }} content={
                             <div class="settings-backup-container">
                                 <For each={backupList().reverse()}>
                                     {(value) => {
                                         const [year, month, day, hour, min] = [value.date.getFullYear(), value.date.getMonth(), value.date.getDate(), value.date.getHours(), value.date.getMinutes()]
                                         return (
                                             <span class="settings-button-backup" onclick={() => backupWarning(value.file, `${year}/${month}/${day} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`)}>
-                                                Backup From <span class="settings-button-date">{`${year}/${month}/${day} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`}</span>
+                                                Backup From <span class="settings-button-date">{`${year}/${month.toString().padStart(2, "0")}/${day.toString().padStart(2, "0")} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`}</span>
                                             </span>
                                         )
                                     }}

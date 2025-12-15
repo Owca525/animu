@@ -30,6 +30,10 @@ ipcMain.handle("getConfigPath", (_event): string => {
   return newConfigPath
 });
 
+ipcMain.handle("getBrowserConfigPath", (_event): string => {
+  return app.getPath("userData")
+});
+
 ipcMain.handle("getPathProgram", async (_event, program: string): Promise<string> => {
   try {
     if (os.platform() === "win32") return ""

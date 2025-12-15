@@ -24,13 +24,13 @@ export async function getBackupList() {
         let backupFiles = readdirSync(backupFolder)
         return backupFiles.map((value) => {
             let match = value.match(/backup_(\d{4})-(\d{2})-(\d{2})-(\d{2})-(\d{2})-(\d{2})/)
-            if (!match) return
+            if (!match) return 
             const [_, year, month, day, hour, minute, second] = match
             return {
                 file: value,
                 date: new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`)
             }
-        })
+        }).filter(item => item !== undefined)
     } catch (error) {
         console.error(error)
         return []
@@ -54,7 +54,7 @@ export async function RestoreBackup(file: string): Promise<{ success: boolean, e
 
 ipcMain.handle("restoreBackup", async (_event, file: string) => RestoreBackup(file));
 ipcMain.handle("makeBackup", async (_event) => createBackup());
-ipcMain.handle("backupList", async (_event) => getBackupList());
+ipcMain.handle("backupList", async (_event) => (await getBackupList()).sort((a, b) => a.date.getTime() - b.date.getTime()));
 
 async function checkBackupFolder() {
     if (!fs.existsSync(backupFolder)) {
