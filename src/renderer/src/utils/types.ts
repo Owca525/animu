@@ -162,11 +162,18 @@ export type ContextMenuProps = {
 }[]
 
 export interface themeMetadata {
-    version?: string;
-    author?: string;
-    pathcss: string;
-    animuTitle?: string;
-    name: string;
+    api?: string,
+    version?: string,
+    author: string,
+    themeName: string
+    mainCSS: string,
+    customTitle?: string,
+    options?: {
+        name: string,
+        dropDown?: { option: string, css: string }[]
+        css?: string,
+        default?: boolean
+    }[]
 }
 
 export interface playerPluginFormat {

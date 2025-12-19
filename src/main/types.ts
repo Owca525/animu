@@ -1,6 +1,7 @@
 import { app } from "electron"
 import path from "path"
 import { checkPath } from "./utils"
+import { z } from "zod";
 
 export interface SettingsConfig {
     firstStart: boolean
@@ -288,3 +289,40 @@ export const defaultConfig: SettingsConfig = {
         maxBackups: 3
     }
 };
+
+export interface themeFormatType {
+    api?: string,
+    version?: string,
+    author: string,
+    themeName: string
+    mainCSS: string,
+    customTitle?: string,
+    options?: {
+        name: string,
+        dropDown?: { option: string, css: string }[]
+        css?: string,
+        default?: boolean
+    }[]
+}
+
+export const ThemeSchema = z.object({
+    api: z.string().optional(),
+    version: z.string().optional(),
+    author: z.string(),
+    themeName: z.string(),
+    mainCSS: z.string(),
+    customTitle: z.string().optional(),
+    options: z.array(
+        z.object({
+            name: z.string(),
+            css: z.string().optional(),
+            default: z.boolean().optional(),
+            dropDown: z.array(
+                z.object({
+                    option: z.string(),
+                    css: z.string()
+                })
+            ).optional()
+        })
+    ).optional()
+});

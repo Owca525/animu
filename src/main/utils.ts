@@ -9,7 +9,7 @@ import { exec, execSync } from "child_process";
 import express from "express";
 import { Readable } from "stream";
 import os from "os"
-import { requestResponseVideo } from "./types";
+import { requestResponseVideo, ThemeSchema } from "./types";
 
 let rpc: Client | undefined = undefined
 
@@ -121,13 +121,14 @@ ipcMain.handle('get-css-files', async (): Promise<{ version?: string; autor?: st
     return [...localList, ...customList]
 });
 
-async function getThemeList(path: string): Promise<{ version?: string; autor?: string; pathcss: string; animuTitle?: string; name: string; }[]> {
-    let listFolder = await fs.promises.readdir(path)
+async function getThemeList(themePath: string): Promise<{ version?: string; autor?: string; pathcss: string; animuTitle?: string; name: string; }[]> {
+    let listFolder = await fs.promises.readdir(themePath)
     let finnalList: any = []
     for (let index = 0; index < listFolder.length; index++) {
         const element = listFolder[index];
-        if (fs.statSync(`${path}/${element}`).isDirectory()) {
-            let theme = await getMetadataTheme(`${path}/${element}`)
+        const folderTheme = path.join(themePath, element)
+        if (fs.statSync(folderTheme).isDirectory()) {
+            let theme = await getMetadataTheme(folderTheme)
             if (theme) finnalList.push(theme)
         }
     }
@@ -136,33 +137,13 @@ async function getThemeList(path: string): Promise<{ version?: string; autor?: s
 
 async function getMetadataTheme(path_theme: string): Promise<{ version?: string; autor?: string; pathcss: string; animuTitle?: string; name: string; } | undefined | {}> {
     try {
-        let themeMetadata = {}
-        if (!fs.existsSync(`${path_theme}/theme.json`)) return undefined
-        let themeJSON = JSON.parse(fs.readFileSync(`${path_theme}/theme.json`, "utf-8"))
+        const pathTheme = path.join(path_theme, "/theme.json")
 
-        if ("version" in themeJSON) {
-            if (themeJSON.version.replace(" ", "") != "") themeMetadata = { ...themeMetadata, version: themeJSON.version }
-        }
-        if ("author" in themeJSON) {
-            if (themeJSON.author.replace(" ", "") != "") themeMetadata = { ...themeMetadata, author: themeJSON.author }
-        }
-        if ("mainCSS" in themeJSON) {
-            if (themeJSON.mainCSS.startsWith(".") && fs.existsSync(`${path_theme}${themeJSON.mainCSS.slice(1)}`)) themeMetadata = { ...themeMetadata, pathcss: `${path_theme}${themeJSON.mainCSS.slice(1)}` }
-            else undefined
-        }
-        else return undefined
-
-        if ("customTitle" in themeJSON) {
-            if (themeJSON.customTitle.replace(" ", "") != "") themeMetadata = { ...themeMetadata, animuTitle: themeJSON.customTitle }
-        }
-        if ("themeName" in themeJSON) {
-            if (themeJSON.themeName.replace(" ", "") != "") themeMetadata = { ...themeMetadata, name: themeJSON.themeName }
-            else themeMetadata = { ...themeMetadata, name: path.basename(path_theme) }
-        }
-
-        return Object.keys(themeMetadata).length <= 0 ? undefined : themeMetadata
+        if (!fs.existsSync(pathTheme)) return undefined
+        let themeJSON = JSON.parse(fs.readFileSync(pathTheme, "utf-8"))
+        return ThemeSchema.parse(themeJSON)
     } catch (error) {
-        console.log(error)
+        console.log("Error parsing theme", error)
         return undefined
     }
 }

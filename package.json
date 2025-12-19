@@ -42,7 +42,8 @@
     "material-symbols": "^0.40.0",
     "subtitle-converter": "^3.0.12",
     "unzipper": "^0.12.3",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "zod": "^4.2.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",

@@ -1,5 +1,5 @@
 import { ElectronAPI } from "@electron-toolkit/preload";
-import { cardData, SettingsConfig } from "@renderer/utils/types";
+import { cardData, SettingsConfig, themeMetadata } from "@renderer/utils/types";
 
 declare global {
   interface Window {
@@ -61,7 +61,7 @@ declare global {
         restore: (file: string) => Promise<{ success: boolean, error?: number }>
       }
       runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string}, type: "mpv" | "vlc") => any
-      getlistThemes: () => Promise<{ version?: string; autor?: string; pathcss: string; animuTitle?: string; name: string; pathIcon?: string }[]>
+      getlistThemes: () => Promise<themeMetadata[]>
       getOSDetails: () => Promise<{ platform: NodeJS.Platform, release: string, arch: string }>
       getListLang: () => Promise<{ data: any, lang: string }[]>
       getConfig: () => Promise<SettingsConfig>

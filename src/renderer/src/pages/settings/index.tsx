@@ -172,10 +172,10 @@ function settings() {
         if (!window.api) return
         setBackupList(await window.api.backup.list())
         window.api.getlistThemes().then((data) => {
-            let themes = data.map((element) => { return { label: element.name, onClick: () => { changeTheme(element.name); handleChange("General.theme", element.name); setthemeMetadata(() => element) } } })
+            let themes = data.map((element) => { return { label: element.themeName, onClick: () => { changeTheme(element.themeName); handleChange("General.theme", element.themeName); setthemeMetadata(() => element) } } })
             setThemes(() => themes)
             data.forEach(element => {
-                if (element.name == config().new.General.theme) setthemeMetadata(() => element)
+                if (element.themeName == config().new.General.theme) setthemeMetadata(() => element)
             });
         })
         if (config().new.General.discordRPC) window.api.rpc.setActivity(undefined, t("discordrpc.settings"))
