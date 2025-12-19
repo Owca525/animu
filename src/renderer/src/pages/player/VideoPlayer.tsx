@@ -304,14 +304,15 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         setListResolution(() => currentplayer.resolution)
         setPlayer(() => currentplayer)
 
-        // TODO: Fix this can be work using fetch
-        if (currentRes.doNotUseBackend) {
-            videoRef.src = currentRes.url
-        } else {
-            videoRef.src = `http://localhost:3001/video?url=${btoa(JSON.stringify(
-                { url: currentRes.url, header: currentRes.reqHeader }
-            ))}`
-        }
+        // if (currentRes.doNotUseBackend) {
+        //     videoRef.src = currentRes.url
+        // } else {
+        //     videoRef.src = `http://localhost:3001/video?url=${btoa(JSON.stringify(
+        //         { url: currentRes.url, header: currentRes.reqHeader }
+        //     ))}`
+        // }
+        
+        videoRef.src = currentRes.url
         videoRef.currentTime = time
     }
 

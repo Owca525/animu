@@ -6,10 +6,10 @@ import path from "path"
 import fs from "fs"
 import { mainWindow, newConfigPath } from ".";
 import { exec, execSync } from "child_process";
-import express from "express";
-import { Readable } from "stream";
+// import express from "express";
+// import { Readable } from "stream";
 import os from "os"
-import { requestResponseVideo } from "./types";
+// import { requestResponseVideo } from "./types";
 
 let rpc: Client | undefined = undefined
 
@@ -241,73 +241,73 @@ export function validUrl(urlString: string): boolean {
     } catch (_) { return false }
 }
 
-function createProxyServer() {
-    const appServer = express();
+// function createProxyServer() {
+//     const appServer = express();
 
-    appServer.get("/video", async (req, res) => {
-        const { url: encodedUrl } = req.query as { url?: string };
-        if (!encodedUrl) return res.status(400).send("Url not found");
+//     appServer.get("/video", async (req, res) => {
+//         const { url: encodedUrl } = req.query as { url?: string };
+//         if (!encodedUrl) return res.status(400).send("Url not found");
 
-        const currentVideoUrl: requestResponseVideo =
-            JSON.parse(Buffer.from(encodedUrl, "base64").toString("utf-8"));
+//         const currentVideoUrl: requestResponseVideo =
+//             JSON.parse(Buffer.from(encodedUrl, "base64").toString("utf-8"));
 
-        const range = req.headers.range;
-        const headers: Record<string, string> = {
-            ...req.headers,
-            ...currentVideoUrl.header,
-        };
-        delete headers["sec-ch-ua"];
-        delete headers["referer"];
+//         const range = req.headers.range;
+//         const headers: Record<string, string> = {
+//             ...req.headers,
+//             ...currentVideoUrl.header,
+//         };
+//         delete headers["sec-ch-ua"];
+//         delete headers["referer"];
 
-        try {
-            const fetchHeaders: Record<string, string> = {};
-            if (range) fetchHeaders["Range"] = range;
+//         try {
+//             const fetchHeaders: Record<string, string> = {};
+//             if (range) fetchHeaders["Range"] = range;
 
-            const response = await fetch(currentVideoUrl.url, { headers: fetchHeaders });
-            console.log(response)
+//             const response = await fetch(currentVideoUrl.url, { headers: fetchHeaders });
+//             console.log(response)
 
-            if (!response.ok) {
-                res.status(response.status).send("Failed to fetch video");
-                return;
-            }
+//             if (!response.ok) {
+//                 res.status(response.status).send("Failed to fetch video");
+//                 return;
+//             }
 
-            res.status(response.status);
-            response.headers.forEach((value, key) => res.setHeader(key, value));
+//             res.status(response.status);
+//             response.headers.forEach((value, key) => res.setHeader(key, value));
 
-            if (!response.body) {
-                res.status(500).send("No body in response");
-                return;
-            }
+//             if (!response.body) {
+//                 res.status(500).send("No body in response");
+//                 return;
+//             }
 
-            const nodeStream = Readable.fromWeb(response.body as any);
+//             const nodeStream = Readable.fromWeb(response.body as any);
 
-            let aborted = false;
-            req.on("close", () => {
-                aborted = true;
-                try {
-                    nodeStream.destroy();
-                    (response.body as any)?.cancel?.();
-                } catch { }
-            });
+//             let aborted = false;
+//             req.on("close", () => {
+//                 aborted = true;
+//                 try {
+//                     nodeStream.destroy();
+//                     (response.body as any)?.cancel?.();
+//                 } catch { }
+//             });
 
-            nodeStream.on("error", (err) => {
-                if (!aborted) {
-                    console.error("Stream error:", err.message);
-                    res.end();
-                }
-            });
+//             nodeStream.on("error", (err) => {
+//                 if (!aborted) {
+//                     console.error("Stream error:", err.message);
+//                     res.end();
+//                 }
+//             });
 
-            nodeStream.pipe(res);
-        } catch (err: any) {
-            console.error("Proxy error:", err.message);
-            if (!res.headersSent) res.status(500).send("Proxy error");
-        }
-    });
+//             nodeStream.pipe(res);
+//         } catch (err: any) {
+//             console.error("Proxy error:", err.message);
+//             if (!res.headersSent) res.status(500).send("Proxy error");
+//         }
+//     });
 
-    appServer.listen(3001, () => console.log("Video Proxy: http://localhost:3001"));
-};
+//     appServer.listen(3001, () => console.log("Video Proxy: http://localhost:3001"));
+// };
 
-createProxyServer()
+// createProxyServer()
 
 export function checkPath(program: string) {
     try {
