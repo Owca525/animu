@@ -176,11 +176,24 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             setcurrentTime(() => time)
         }
         if ("mediaSession" in navigator) {
+            const findedepisode = temp.episodes.findIndex((value) => value.ep == temp.episode)
+            const cover = temp.episodes[findedepisode] ? temp.episodes[findedepisode].img : anime_data.AnimeData.coverImage
+            navigator.mediaSession.metadata = new MediaMetadata({
+                artist: anime_data.AnimeData.studios.length > 0 ? anime_data.AnimeData.studios.length[0] : "",
+                title: anime_data.AnimeData.title.romaji,
+                artwork: [
+                    { sizes: "512x512", src: cover ? cover : "" }
+                ]
+            })
             navigator.mediaSession.setActionHandler("play", () => togglePlay());
             navigator.mediaSession.setActionHandler("pause", () => togglePlay());
             navigator.mediaSession.setActionHandler("previoustrack", () => setEpisode("prev"));
             navigator.mediaSession.setActionHandler("nexttrack", () => setEpisode("next"));
             navigator.mediaSession.setActionHandler("stop", () => togglePlay());
+            navigator.mediaSession.setActionHandler("seekto", (event) => {
+                if (!event.seekTime) return
+                setTimeVideo(event.seekTime)
+            })
         }
     })
 
