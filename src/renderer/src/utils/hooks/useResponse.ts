@@ -39,7 +39,6 @@ export function useResponse<T, TData>(options: UseQueryOptions<T, TData>) {
         setError(false)
 
         try {
-            console.log(dissable())
             if (dissable()) return undefined
             const queryKey = getQueryKey()
             const sha256 = await generateSha256(queryKey)
@@ -49,8 +48,6 @@ export function useResponse<T, TData>(options: UseQueryOptions<T, TData>) {
                 return setData(cache.get(sha256))
             }
             setForceRefetch(false)
-
-            console.log(queryKey)
 
             let data = await queryFn(queryKey)
             if (cacheTime) makeCache(data, sha256)
