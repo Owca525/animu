@@ -331,6 +331,7 @@ function getSeasonFromDate() {
 
 async function fetchCategory(params: any, title: string): Promise<containerData> {
   const globalParams = params
+  console.log(params, title)
   let container: containerData = {
     title: title,
     data: await sendToApi(params, graphicApi),
@@ -478,13 +479,11 @@ export default class AnilistApi implements informationPluginFormat {
           data: data.json.data.season.media.map((anime) => Convert(anime)),
           horizontal: true,
           onTitleClick: async () => await fetchCategory({
-            params: {
               page: 1,
               season: season.season,
               seasonYear: season.seasonYear,
               type: "ANIME"
-            }, title: "home.popular_in_this_season"
-          }, "home.popular_in_this_season"),
+            }, "home.popular_in_this_season"),
         },
         {
           title: "home.all_time_popular",
