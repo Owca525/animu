@@ -337,6 +337,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             maxBufferLength: 120,
             autoStartLoad: true,
             startLevel: 2,
+            lowLatencyMode: false,
             loader: class extends Hls.DefaultConfig.loader {
                 load(context: any, config: any, callbacks: any) {
                     request(context.url, { method: "GET", headers: resolution.reqHeader }).then((data) => {
