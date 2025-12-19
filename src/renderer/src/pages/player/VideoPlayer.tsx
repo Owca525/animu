@@ -235,14 +235,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         videoRef.currentTime = time
     }
 
-    // function setNewUrl(host: string) {
-    //     if (playerData().length <= 1) return
-    //     const value = playerData().findIndex((value) => value.hostname == host)
-    //     if (value < 0) return
-    //     if (playerData()[value + 1] == undefined) return
-    //     runNewPlayer(playerData()[value + 1])
-    // }
-
     async function setDefaultSubtitles(data: playerSubtitlesFormat[]) {
         if (data.length <= 0) return
         for (let index = 0; index < data.length; index++) {
@@ -396,10 +388,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     let message: string | undefined
                     switch (data.type) {
                         case Hls.ErrorTypes.NETWORK_ERROR:
-                            // message = t('player.errors.MEDIA_ERR_NETWORK')
-                            // hls.destroy()
-                            // TODO: Update this, may make bug
-                            // setNewUrl(host.hostname)
                             hls.startLoad();
                             break;
                         case Hls.ErrorTypes.MEDIA_ERROR:
@@ -554,13 +542,13 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         // Update RPC
         if (config.General.discordRPC && window.api) window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`)
         if (config.Player.general.AutoSkipEpisode && event.currentTarget.duration == event.currentTarget.currentTime) setEpisode("next")
-        // TODO: ADD SECURITY FOR CHAPTERS IF THEY HAD START AND END TIME 0
 
         let player = currentPlayer()
 
         if (!player || !player!.listChapters) return
         player.listChapters.forEach(element => {
             let currentTime = event.currentTarget.currentTime
+            if (element.start == 0 && element.end == 0) return
             if (!(currentTime >= element.start && currentTime <= element.end)) return
             if (config.Player.general.autoSkipOpenings || config.Player.general.autoSkipEndings) return setTimeVideo(element.end)
 
@@ -582,7 +570,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (!config) return
         if (!config.Player.upToNextEpisode.enable) return
         if (!currentPlayer()) return
-        // TODO: FIX CHECKUPNEXT DOSEN'T SHOW
         const duration = event.currentTarget.duration
         const currentTime = event.currentTarget.currentTime
 
