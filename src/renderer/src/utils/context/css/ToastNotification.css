@@ -18,6 +18,7 @@
   font-size: 1.2em;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   background-color: var(--fourth-layer);
+  user-select: none;
 }
 .toast.disable {
   animation: ToastSlideOut 0.2s ease;

@@ -102,6 +102,10 @@ async function SearchAnimeInAllmanga(name: string, page: number): Promise<AnimeD
         let variables = `{"search":{"query":"${name.replaceAll('"', "").replaceAll('&', "")}"},"limit":26,"page":${page},"translationType":"sub","countryOrigin":"ALL"}`
         const resp = await requestToApi(variables, HASH_SEARCH, header)
         if (!resp.success || !resp.json) return []
+        if ("errors" in resp.json) {
+            console.info("Allmanga Request show error", resp.json["errors"])
+            return []
+        }
         return resp.json.data.shows.edges.map((card) => converterData(card))
     } catch (error) {
         console.error("SearchAnimeInAllmanga/Allmanga Plugin", error)

@@ -198,6 +198,7 @@ td {
   display: flex;
   align-items: center;
   gap: 12px;
+  transition: all 100ms ease-in-out;
 }
 
 .settings-button-backup:hover {
@@ -209,10 +210,12 @@ td {
   background-color: var(--five-layer);
   padding: 6px;
   border-radius: 12px;
+  outline: 2px solid var(--invisible);
+  transition: all 100ms ease-in-out;
 }
 
 .settings-button-backup:hover .settings-button-date {
-  outline: 2px solid var(--green-one);
+  outline-color:var(--green-one);
 }
 
 .settings-backup-container {

@@ -40,7 +40,8 @@ if (process.contextIsolated) {
         openDialog: (path?: string, name?: string, extensions?: string[]) => ipcRenderer.invoke("openDialog", path, name, extensions),
         getPathProgram: (program: string) => ipcRenderer.invoke("getPathProgram", program),
         checkPictureFolder: () => ipcRenderer.invoke("createPictureFolder"),
-        getConfigPath: () => ipcRenderer.invoke("getConfigPath")
+        getConfigPath: () => ipcRenderer.invoke("getConfigPath"),
+        getBrowserConfigPath: () => ipcRenderer.invoke("getBrowserConfigPath")
       },
       backup: {
         make: () => ipcRenderer.invoke("makeBackup"),

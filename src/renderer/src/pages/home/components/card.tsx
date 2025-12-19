@@ -11,7 +11,7 @@ import {
 } from "@renderer/utils/functions";
 import { DeleteFromHistory, SaveHistory } from "@renderer/utils/FilesManager/history";
 import { unwrap } from "solid-js/store";
-import { removeToast, toast } from "@renderer/utils/context/ToastNotification";
+import { removeToast, toast, updateToast } from "@renderer/utils/context/ToastNotification";
 import { pluginManager } from "@renderer/utils/stores/plugins";
 import { useI18n } from "@renderer/utils/i18n";
 
@@ -61,6 +61,11 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
       let idToast = toast("Fetching Episode List", { type: "loading", removeTimer: true })
       const currentPLugin = pluginManager().changePlugin(card.saveData.pluginName)
       const episodeList = await currentPLugin.extractOnlyEpisodesList(card.saveData.type, card.AnimeData.player_ID as string);
+
+      if (episodeList.length <= 0) {
+        updateToast(idToast, "Failed Fetch episodes", { type: "error", removeTimer: false })
+        return
+      }
 
       localStorage.setItem("playerCache", JSON.stringify({
         data: (card.AnimeData),

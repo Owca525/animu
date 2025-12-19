@@ -176,11 +176,24 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             setcurrentTime(() => time)
         }
         if ("mediaSession" in navigator) {
+            const findedepisode = temp.episodes.findIndex((value) => value.ep == temp.episode)
+            const cover = temp.episodes[findedepisode] ? temp.episodes[findedepisode].img : anime_data.AnimeData.coverImage
+            navigator.mediaSession.metadata = new MediaMetadata({
+                artist: anime_data.AnimeData.studios.length > 0 ? anime_data.AnimeData.studios.length[0] : "",
+                title: anime_data.AnimeData.title.romaji,
+                artwork: [
+                    { sizes: "512x512", src: cover ? cover : "" }
+                ]
+            })
             navigator.mediaSession.setActionHandler("play", () => togglePlay());
             navigator.mediaSession.setActionHandler("pause", () => togglePlay());
             navigator.mediaSession.setActionHandler("previoustrack", () => setEpisode("prev"));
             navigator.mediaSession.setActionHandler("nexttrack", () => setEpisode("next"));
             navigator.mediaSession.setActionHandler("stop", () => togglePlay());
+            navigator.mediaSession.setActionHandler("seekto", (event) => {
+                if (!event.seekTime) return
+                setTimeVideo(event.seekTime)
+            })
         }
     })
 
@@ -225,23 +238,16 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             return
         }
 
-        if (data.doNotUseBackend) {
-            videoRef.src = data.url
-        } else {
-            videoRef.src = `http://localhost:3001/video?url=${btoa(JSON.stringify(
-                { url: data.url, header: data.reqHeader }
-            ))}`
-        }
+        // if (data.doNotUseBackend) {
+        //     videoRef.src = data.url
+        // } else {
+        //     videoRef.src = `http://localhost:3001/video?url=${btoa(JSON.stringify(
+        //         { url: data.url, header: data.reqHeader }
+        //     ))}`
+        // }
+        videoRef.src = data.url
         videoRef.currentTime = time
     }
-
-    // function setNewUrl(host: string) {
-    //     if (playerData().length <= 1) return
-    //     const value = playerData().findIndex((value) => value.hostname == host)
-    //     if (value < 0) return
-    //     if (playerData()[value + 1] == undefined) return
-    //     runNewPlayer(playerData()[value + 1])
-    // }
 
     async function setDefaultSubtitles(data: playerSubtitlesFormat[]) {
         if (data.length <= 0) return
@@ -304,14 +310,15 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         setListResolution(() => currentplayer.resolution)
         setPlayer(() => currentplayer)
 
-        // TODO: Fix this can be work using fetch
-        if (currentRes.doNotUseBackend) {
-            videoRef.src = currentRes.url
-        } else {
-            videoRef.src = `http://localhost:3001/video?url=${btoa(JSON.stringify(
-                { url: currentRes.url, header: currentRes.reqHeader }
-            ))}`
-        }
+        // if (currentRes.doNotUseBackend) {
+        //     videoRef.src = currentRes.url
+        // } else {
+        //     videoRef.src = `http://localhost:3001/video?url=${btoa(JSON.stringify(
+        //         { url: currentRes.url, header: currentRes.reqHeader }
+        //     ))}`
+        // }
+        
+        videoRef.src = currentRes.url
         videoRef.currentTime = time
     }
 
@@ -330,9 +337,11 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             maxBufferLength: 120,
             autoStartLoad: true,
             startLevel: 2,
+            lowLatencyMode: false,
             loader: class extends Hls.DefaultConfig.loader {
                 load(context: any, config: any, callbacks: any) {
                     request(context.url, { method: "GET", headers: resolution.reqHeader }).then((data) => {
+                        console.log(data)
                         let currentData: any = data.text
                         if (!data.success) {
                             callbacks.onError({ type: 'network', details: "Failed Requestc", fatal: true }, context)
@@ -395,10 +404,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     let message: string | undefined
                     switch (data.type) {
                         case Hls.ErrorTypes.NETWORK_ERROR:
-                            // message = t('player.errors.MEDIA_ERR_NETWORK')
-                            // hls.destroy()
-                            // TODO: Update this, may make bug
-                            // setNewUrl(host.hostname)
                             hls.startLoad();
                             break;
                         case Hls.ErrorTypes.MEDIA_ERROR:
@@ -553,13 +558,13 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         // Update RPC
         if (config.General.discordRPC && window.api) window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`)
         if (config.Player.general.AutoSkipEpisode && event.currentTarget.duration == event.currentTarget.currentTime) setEpisode("next")
-        // TODO: ADD SECURITY FOR CHAPTERS IF THEY HAD START AND END TIME 0
 
         let player = currentPlayer()
 
         if (!player || !player!.listChapters) return
         player.listChapters.forEach(element => {
             let currentTime = event.currentTarget.currentTime
+            if (element.start == 0 && element.end == 0) return
             if (!(currentTime >= element.start && currentTime <= element.end)) return
             if (config.Player.general.autoSkipOpenings || config.Player.general.autoSkipEndings) return setTimeVideo(element.end)
 
@@ -581,7 +586,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (!config) return
         if (!config.Player.upToNextEpisode.enable) return
         if (!currentPlayer()) return
-        // TODO: FIX CHECKUPNEXT DOSEN'T SHOW
         const duration = event.currentTarget.duration
         const currentTime = event.currentTarget.currentTime
 

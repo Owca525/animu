@@ -6,14 +6,17 @@
     background-color: var(--third-layer);
     border-radius: 12px;
     display: flex;
+    outline: 2px solid var(--invisible);
     justify-content: space-between;
     align-items: center;
-    padding: 12px;
+    padding: 4px 12px;
     cursor: pointer;
-    user-select: none; 
+    user-select: none;
+    transition: all 100ms ease-in-out;
 }
 .settings-drop-button:hover {
     background-color: var(--five-layer);
+    outline: 2px solid var(--green-one);
 }
 
 .settings-drop-content {
@@ -27,4 +30,10 @@
 
 .settings-drop-content.expand {
     height: auto;
+}
+
+.settings-drop-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
