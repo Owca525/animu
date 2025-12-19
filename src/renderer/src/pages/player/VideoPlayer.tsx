@@ -327,6 +327,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             loader: class extends Hls.DefaultConfig.loader {
                 load(context: any, config: any, callbacks: any) {
                     request(context.url, { method: "GET", headers: resolution.reqHeader }).then((data) => {
+                        console.log(data)
                         let currentData: any = data.text
                         if (!data.success) {
                             callbacks.onError({ type: 'network', details: "Failed Requestc", fatal: true }, context)
