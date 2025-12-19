@@ -225,13 +225,14 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             return
         }
 
-        if (data.doNotUseBackend) {
-            videoRef.src = data.url
-        } else {
-            videoRef.src = `http://localhost:3001/video?url=${btoa(JSON.stringify(
-                { url: data.url, header: data.reqHeader }
-            ))}`
-        }
+        // if (data.doNotUseBackend) {
+        //     videoRef.src = data.url
+        // } else {
+        //     videoRef.src = `http://localhost:3001/video?url=${btoa(JSON.stringify(
+        //         { url: data.url, header: data.reqHeader }
+        //     ))}`
+        // }
+        videoRef.src = data.url
         videoRef.currentTime = time
     }
 
