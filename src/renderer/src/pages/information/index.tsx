@@ -2,7 +2,7 @@ import Button from '@renderer/components/buttons';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
-import { AnimeData, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
+import { AnimeData, ContextMenuProps, deepLinkData, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
 import {
     convertDateToFormattedString,
     convertSeconds,
@@ -10,10 +10,10 @@ import {
     decodeHtmlEntities,
     getGradientColor,
     openUrlFolder,
+    SaveToClipboard,
     segregatePlugins
     } from '@renderer/utils/functions';
 import {
-    createEffect,
     createSignal,
     For,
     Match,
@@ -33,6 +33,7 @@ import ImageViewer from '@renderer/components/imageViewer';
 import { useResponse } from '@renderer/utils/hooks/useResponse';
 import { useI18n } from '@renderer/utils/i18n';
 import CharacterContainer from './components/characterContainer';
+import { getConfig } from '@renderer/utils/stores/config';
 
 function information() {
     const { t } = useI18n()
@@ -48,6 +49,7 @@ function information() {
     const [moreMiniTitle, setmoreMiniTitle] = createSignal<boolean>(false)
     const [currentPlugin, setCurrentPlugin] = createSignal<string | undefined>(undefined)
     const [secondsLeft, setSecondsLeft] = createSignal<undefined | { left: number, converted: { days: number; hours: number; minutes: number; seconds: number; } | undefined }>(undefined);
+    const [contextMenu, setcontextMenu] = createSignal<ContextMenuProps>([])
 
     // Banner
     const [isBannerLoading, setBannerLoadingData] = createSignal<boolean>(true)
@@ -84,11 +86,27 @@ function information() {
         });
     }, 1000);
 
-    createEffect(() => {
-        console.log(episodeResponse.data())
-    })
+    function generateAnimeForContextMenu() {
+        const anime: deepLinkData = {
+            type: "info",
+            title: tempData().anime.title.romaji,
+            img: tempData().anime.coverImage ? tempData()!.anime.coverImage! : "",
+            animeID: tempData().anime.id
+        }
+
+        const config = unwrap(getConfig())
+
+        setcontextMenu([
+            {
+                option: "Copy Anime Link",
+                onClick: async () => await SaveToClipboard("text", `${config.deepLinkURL}/?anime=${btoa(JSON.stringify(anime))}`)
+            }
+        ])
+    }
 
     onMount(() => {
+        generateAnimeForContextMenu()
+
         let plugin = pluginManager().currentPlugin
         if (plugin) setCurrentPlugin(plugin.metadata.name)
         console.log(plugin)
@@ -216,7 +234,7 @@ function information() {
 
     return (
         <>
-            <main class="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(), event)}>
+            <main class="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(contextMenu()), event)}>
                 <div class="information-banner">
                     <img class={tempData().anime.bannerImage ? "information-banner-image" : "information-banner-image-blur"}
                         onError={() => setBannerIsError(() => true)}

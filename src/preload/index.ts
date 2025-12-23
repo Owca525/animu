@@ -48,12 +48,15 @@ if (process.contextIsolated) {
         list: () => ipcRenderer.invoke("backupList"),
         restore: (file: string) => ipcRenderer.invoke("restoreBackup", file)
       },
-      runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string}, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", videoData, type),
+      runExternaPlayer: (videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", videoData, type),
       getlistThemes: () => ipcRenderer.invoke("get-css-files"),
       getOSDetails: () => ipcRenderer.invoke('get-os-info'),
       getListLang: () => ipcRenderer.invoke("get-lang-files"),
       getConfig: () => ipcRenderer.invoke("getConfig"),
-      getHistory: () => ipcRenderer.invoke("getHistory")
+      getHistory: () => ipcRenderer.invoke("getHistory"),
+      onProtocolRequest: (callback: (url: string) => void) => {
+        ipcRenderer.on('protocol-request', (_, url) => callback(url));
+      },
     });
     contextBridge.exposeInMainWorld("backend", {
       Buffer: require("buffer").Buffer,

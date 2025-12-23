@@ -10,7 +10,7 @@ import {
   changeTheme,
   checkDate,
   updateObjectConfig
-  } from './utils/functions';
+} from './utils/functions';
 import { checkUpdate } from './utils/update';
 import { CreateBackup } from './utils/backup';
 import { createShortcut } from '@solid-primitives/keyboard';
@@ -21,7 +21,7 @@ import {
   onMount,
   Suspense,
   Switch
-  } from 'solid-js';
+} from 'solid-js';
 import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import { getConfig, setConfig } from './utils/stores/config';
 import { getGlobalCache, setGlobalHistory, setIncognitoMode } from './utils/stores/global';
@@ -76,7 +76,7 @@ function App() {
     setinitialState({ text: "Loading Plugin", plugin: false })
     pluginManager().initialPlugins()
     setInitation(false)
-    
+
     if (window.api) runCheckUpdate()
   })
 

@@ -1,5 +1,5 @@
-import { app, shell, BrowserWindow, Menu, session, ipcMain } from 'electron'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { app, shell, BrowserWindow, Menu, session, ipcMain, dialog } from 'electron'
+import { optimizer, is } from '@electron-toolkit/utils'
 import path, { join } from 'path'
 import ini from "ini";
 
@@ -16,11 +16,13 @@ import { convertToNewFormat, detectOldVersion, write } from './os'
 import { existsSync, readFileSync } from 'fs'
 import { cardData, defaultConfig, SettingsConfig } from './types';
 import { deepMerge, setupDiscordRPC } from './utils';
+import { electronAppUniversalProtocolClient } from 'electron-app-universal-protocol-client';
 
 export let mainWindow: BrowserWindow | undefined
-export let newConfigPath = path.join(app.getPath("userData"), "animuConfig")
+export const newConfigPath = path.join(app.getPath("userData"), "animuConfig")
 export let config: SettingsConfig = defaultConfig
 let historyData: cardData[] = []
+const PROTOCOL = "animu"
 
 function createWindow(): void {
   let title = 'Animu v' + app.getVersion()
@@ -107,30 +109,53 @@ function createWindow(): void {
   }
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.whenReady().then(async () => {
-  electronApp.setAppUserModelId('com.animu')
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
-  })
-  await initialBackend()
-  createWindow()
-  if (config.General.discordRPC && process.env.NODE_ENV != 'development') {
-    setupDiscordRPC()
-  }
-  // setupDiscordRPC()
+electronAppUniversalProtocolClient
 
-  app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
-})
+const gotTheLock = app.requestSingleInstanceLock()
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on('second-instance', () => {
+    if (!mainWindow) return
+    if (mainWindow.isMinimized()) mainWindow.restore()
+    mainWindow.focus()
+    // dialog.showErrorBox("MESSAGE", `${deepLink}`)
+  })
+
+  app.whenReady().then(async () => {
+
+    app.on('browser-window-created', (_, window) => {
+      optimizer.watchWindowShortcuts(window)
+    })
+    await initialBackend()
+    createWindow()
+    electronAppUniversalProtocolClient.on('request', async (requestUrl) => {
+        if (mainWindow) mainWindow.webContents.send('protocol-request', requestUrl)
+      },
+    );
+    await electronAppUniversalProtocolClient.initialize({
+      protocol: PROTOCOL,
+      mode: 'development',
+    });
+    if (config.General.discordRPC && process.env.NODE_ENV != 'development') setupDiscordRPC()
+
+    app.on('activate', function () {
+      if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    })
+  })
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      app.quit()
+    }
+  })
+}
+
+app.on('open-url', (event, url) => {
+  event.preventDefault()
+  console.log('DEEPLINK:', url)
+  if (window) dialog.showErrorBox("MESSAGE", url)
 })
 
 export async function initialBackend() {

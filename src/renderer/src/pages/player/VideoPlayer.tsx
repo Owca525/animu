@@ -1,7 +1,7 @@
 import Hls from "hls.js"
 
-import { AnimeData, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerDataExtended, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
-import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory, request, toggleFullscreen, toSeconds, updateObjectConfig } from "@renderer/utils/functions"
+import { AnimeData, ContextMenuProps, deepLinkData, indentityPlayer, playerChapterList, playerData, playerDataExtended, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
+import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory, request, SaveToClipboard, toggleFullscreen, toSeconds, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
@@ -886,8 +886,28 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         return;
     };
 
+    function generateShareURL() {
+        const anime: deepLinkData = {
+            type: "player",
+            title: anime_data.AnimeData.title.romaji,
+            img: anime_data.AnimeData.coverImage ? anime_data.AnimeData.coverImage : "",
+            animeID: anime_data.AnimeData.id,
+            player: {
+                plugin: anime_data.saveData.pluginName,
+                type: temp.type,
+                id: anime_data.AnimeData.player_ID as string,
+                episode: temp.episode,
+                time: currentTime()
+            }
+        }
+
+        const config = unwrap(getConfig())
+        SaveToClipboard("text", `${config.deepLinkURL}/?anime=${btoa(JSON.stringify(anime))}`)
+    }
+
     const centerContextMenu: ContextMenuProps = [
-        { option: t("contextMenu.nerdstats"), onClick: () => setshowNerdStats((prev) => !prev) }
+        { option: t("contextMenu.nerdstats"), onClick: () => setshowNerdStats((prev) => !prev) },
+        { option: "Share Anime Episode", onClick: () => generateShareURL() }
     ]
 
     function handleProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {

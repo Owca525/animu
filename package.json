@@ -33,6 +33,7 @@
     "castv2-client": "^1.2.0",
     "cheerio": "^1.1.2",
     "crypto-js": "^4.2.0",
+    "electron-app-universal-protocol-client": "^2.1.1",
     "electron-updater": "^6.6.2",
     "hls.js": "^1.6.15",
     "html2canvas": "^1.4.1",

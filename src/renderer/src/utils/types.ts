@@ -77,9 +77,24 @@ export interface homeData {
     onScrollContainer?: () => void
 }
 
+export interface deepLinkData {
+    type: "info" | "player",
+    title: string,
+    img: string,
+    animeID: string,
+    player?: {
+        plugin: string,
+        type: string,
+        id: string,
+        episode: string,
+        time?: number
+    }
+}
+
 export interface globalDataFormat {
     incognito: boolean,
-    history: cardData[]
+    history: cardData[],
+    deeplinkRunned: boolean
 }
 
 export type playerDataExtended = playerData & {
@@ -238,6 +253,7 @@ export interface episodeList { player_id: string, episodesData: { episodes: { ep
 
 export interface SettingsConfig {
     firstStart: boolean
+    deepLinkURL: string
     plugins: {
         // information: string
         player: string

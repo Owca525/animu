@@ -5,6 +5,7 @@ import { z } from "zod";
 
 export interface SettingsConfig {
     firstStart: boolean
+    deepLinkURL: string
     plugins: {
         // information: string
         player: string
@@ -184,6 +185,7 @@ export interface requestResponseVideo {
 }
 
 export const defaultConfig: SettingsConfig = {
+    deepLinkURL: "https://owca525.github.io/",
     firstStart: true,
     General: {
         language: "en",
@@ -287,7 +289,7 @@ export const defaultConfig: SettingsConfig = {
         lastCheck: 0,
         check: "Every Day",
         maxBackups: 3
-    }
+    },
 };
 
 export interface themeFormatType {

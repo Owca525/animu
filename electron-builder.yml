@@ -1,5 +1,9 @@
 appId: com.animu.app
 productName: animu
+protocols:
+  name: Animu Protocol
+  schemes:
+    - animu
 directories:
   buildResources: build
 files:

@@ -17,6 +17,7 @@ export async function saveConfig(content: SettingsConfig): Promise<boolean> {
 
 export const defaultConfigWeb: SettingsConfig = {
     firstStart: true,
+    deepLinkURL: "https://owca525.github.io/",
     General: {
         language: "en",
         theme: "DarkerAnimu",

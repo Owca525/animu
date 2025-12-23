@@ -24,7 +24,7 @@ import {
   setHomeSearchTags,
   setHomeStopScrolling
 } from '@renderer/utils/stores/home';
-import { getInformationPlugin } from '@renderer/utils/stores/plugins';
+import { getInformationPlugin, pluginManager } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
@@ -33,11 +33,14 @@ import './home.css';
 import {
   cardData,
   containerData,
+  deepLinkData,
   FilterParams,
   homeData,
   SettingsConfig,
 } from "@renderer/utils/types";
 import { useI18n } from '@renderer/utils/i18n';
+import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
+import { getGlobalCache, setDeeplinkRunned } from '@renderer/utils/stores/global';
 // import { createShortcut } from "@solid-primitives/keyboard";
 // import WelcomeScreen from "./components/welcomeScreen"
 const Home = () => {
@@ -81,11 +84,66 @@ const Home = () => {
   // }
 
   onMount(() => {
+    if (!getGlobalCache().deeplinkRunned) {
+      window.api.onProtocolRequest(fetchDeeplinks)
+      setDeeplinkRunned(true)
+    }
+
     if (homeCache().data.sections.length <= 0) plugin.home()
     const config: SettingsConfig = unwrap(getConfig());
     if (config.General.discordRPC && window.api)
       window.api.rpc.setActivity(undefined, t("discordrpc.home"));
   })
+
+  async function fetchDeeplinks(deeplink: string) {
+    if (deeplink.replaceAll(" ", "").length <= 0) return
+    let anime: deepLinkData | undefined;
+    try {
+      anime = JSON.parse(atob(deeplink.replaceAll("animu://", "")))
+    } catch (error) { console.log("Failed fetching Deeplink", error) }
+    if (!anime) return
+
+    const infoPlugin = getInformationPlugin()
+    const idToast = toast("Fetching Anime", { type: "loading", removeTimer: true })
+    const response = await infoPlugin.anime(anime.animeID)
+    if (!response) return updateToast(idToast, "Failed Fetch Anime", { type: "error", removeTimer: false })
+    updateToast(idToast, "Sucesfully Fetched Anime", { type: "success", removeTimer: false })
+
+    if (anime.type == "info") {
+      localStorage.setItem("informationCache", JSON.stringify({ anime: response }))
+      navigate!("/info")
+      return
+    }
+
+    if (!anime.player || anime.type != "player") return toast("Failed Fetch episodes", { type: "error" })
+
+    const toastID = toast("Fetching Episode List", { type: "loading", removeTimer: true })
+    const currentPLugin = pluginManager().changePlugin(anime.player.plugin)
+    const episodeList = await currentPLugin.extractOnlyEpisodesList(anime.player.type, anime.player.id);
+
+    if (episodeList.length <= 0) {
+      updateToast(toastID, "Failed Fetch episodes", { type: "error", removeTimer: false })
+      return
+    }
+
+    removeToast(toastID)
+
+    localStorage.setItem("playerCache", JSON.stringify({
+      data: {
+        ...response,
+        player_ID: anime.player.id
+      },
+      save: {
+        pluginName: currentPLugin.metadata.name,
+        last_Time: anime.player.time,
+        episode: anime.player.episode,
+        type: anime.player.type,
+      },
+      episodelist: episodeList,
+    }))
+
+    navigate("/player");
+  }
 
   function setHistory() {
     setHomeSearchTags(undefined)
@@ -145,7 +203,7 @@ const Home = () => {
     if (text.replaceAll(" ", "") == "") {
       setHistory()
       return
-    } 
+    }
     let history = getHistory()
     let finnalContainer: containerData[] = []
     let historySearch = history.history.filter((data) =>

@@ -67,6 +67,7 @@ declare global {
       getListLang: () => Promise<{ data: any, lang: string }[]>
       getConfig: () => Promise<SettingsConfig>
       getHistory: () => Promise<cardData[]>
+      onProtocolRequest: (callback: (url: string) => void) => void
     };
     backend: {
       ipcRenderer: {
