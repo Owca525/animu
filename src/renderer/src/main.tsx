@@ -6,6 +6,9 @@ import { ContextMenu } from "./utils/context/ContextMenu";
 import { ToastProvider } from './utils/context/ToastNotification';
 import { I18nProvider } from "./utils/i18n"
 
+import "material-symbols/material-symbols-outlined.woff2"
+import "material-symbols/outlined.css"
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

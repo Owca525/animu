@@ -1,5 +1,4 @@
 import Home from './pages/home/index';
-import { useI18n } from './utils/i18n';
 import icon from '../../../build/icon.png';
 import Information from './pages/information/index';
 import LocalErrorBoundary from './utils/ErrorBoundary';
@@ -10,7 +9,7 @@ import {
   changeTheme,
   checkDate,
   updateObjectConfig
-} from './utils/functions';
+  } from './utils/functions';
 import { checkUpdate } from './utils/update';
 import { CreateBackup } from './utils/backup';
 import { createShortcut } from '@solid-primitives/keyboard';
@@ -21,18 +20,18 @@ import {
   onMount,
   Suspense,
   Switch
-} from 'solid-js';
+  } from 'solid-js';
 import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import { getConfig, setConfig } from './utils/stores/config';
 import { getGlobalCache, setGlobalHistory, setIncognitoMode } from './utils/stores/global';
 import { HashRouter, Route } from '@solidjs/router';
+import { pluginManager } from './utils/stores/plugins';
+import { setHomeActivePage } from './utils/stores/home';
 import { toast } from './utils/context/ToastNotification';
+import { useI18n } from './utils/i18n';
 import './App.css';
 import './themes/darkerAnimu/main.css';
 import './utils/i18n';
-import 'material-symbols';
-import { pluginManager } from './utils/stores/plugins';
-import { setHomeActivePage } from './utils/stores/home';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
