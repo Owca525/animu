@@ -82,7 +82,7 @@ export async function changeTheme(name: string) {
     let theme: themeMetadata = themes[0]
 
     themes.forEach((element) => {
-        if (element.name === name) {
+        if (element.themeName === name) {
             theme = element
         }
     })
@@ -90,10 +90,10 @@ export async function changeTheme(name: string) {
     const link = document.createElement('link');
     link.id = 'theme-stylesheet';
     link.rel = 'stylesheet';
-    link.href = theme.pathcss;
+    link.href = theme.mainCSS;
     document.head.appendChild(link);
 
-    if (theme.animuTitle) document.title = theme.animuTitle
+    if (theme.customTitle) document.title = theme.customTitle
 }
 
 export function convertKeybinds(inputString: string) {

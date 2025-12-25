@@ -109,13 +109,11 @@ const Home = () => {
     if (!response) return updateToast(idToast, "Failed Fetch Anime", { type: "error", removeTimer: false })
     updateToast(idToast, "Sucesfully Fetched Anime", { type: "success", removeTimer: false })
 
-    if (anime.type == "info") {
+    if (!anime.player) {
       localStorage.setItem("informationCache", JSON.stringify({ anime: response }))
       navigate!("/info")
       return
     }
-
-    if (!anime.player || anime.type != "player") return toast("Failed Fetch episodes", { type: "error" })
 
     const toastID = toast("Fetching Episode List", { type: "loading", removeTimer: true })
     const currentPLugin = pluginManager().changePlugin(anime.player.plugin)

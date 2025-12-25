@@ -888,9 +888,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     function generateShareURL() {
         const anime: deepLinkData = {
-            type: "player",
-            title: anime_data.AnimeData.title.romaji,
-            img: anime_data.AnimeData.coverImage ? anime_data.AnimeData.coverImage : "",
             animeID: anime_data.AnimeData.id,
             player: {
                 plugin: anime_data.saveData.pluginName,

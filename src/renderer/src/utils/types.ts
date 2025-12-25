@@ -78,9 +78,6 @@ export interface homeData {
 }
 
 export interface deepLinkData {
-    type: "info" | "player",
-    title: string,
-    img: string,
     animeID: string,
     player?: {
         plugin: string,

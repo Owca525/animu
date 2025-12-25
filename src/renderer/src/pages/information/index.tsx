@@ -88,9 +88,6 @@ function information() {
 
     function generateAnimeForContextMenu() {
         const anime: deepLinkData = {
-            type: "info",
-            title: tempData().anime.title.romaji,
-            img: tempData().anime.coverImage ? tempData()!.anime.coverImage! : "",
             animeID: tempData().anime.id
         }
 
