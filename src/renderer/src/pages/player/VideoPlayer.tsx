@@ -678,7 +678,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     })
 
     function setEpisode(type: "next" | "prev") {
-        let ep = temp.episodes.findIndex((item) => item.ep === temp.episode)
+        let ep = temp.episodes.findIndex((item) => item.ep.toString() == temp.episode,toString())
         if (ep < 0) return
         if (type == 'prev') ep = ep - 1
         if (type == 'next') ep = ep + 1
