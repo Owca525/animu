@@ -202,7 +202,7 @@ function loadingAnimation(leave: () => void, anime_data: { data: AnimeData, ep: 
                     ep: currentdata.actual
                 })}</div>
             </div>
-            <div class="player-loading-animation-container" style={{ "max-height": "min-content" }}>
+            <div class="player-loading-animation-container show" style={{ "max-height": "min-content" }}>
                 <div class="material-symbols-outlined player-waiting">progress_activity</div>
             </div>
         </div>

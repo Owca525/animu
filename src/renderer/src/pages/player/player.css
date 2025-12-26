@@ -342,6 +342,15 @@
   z-index: 12;
 }
 
+.player-volume-ui-container.show {
+  animation: volumeBarShow 250ms ease forwards;
+  display: flex;
+}
+
+.player-volume-ui-container.hidden {
+  animation: volumeBarHidden 250ms ease forwards;
+}
+
 .player-volume-ui-bar-progress {
   height: 100%;
   width: 0%;
@@ -362,6 +371,14 @@
 
 .player-loading-animation-container {
   position: absolute;
+  opacity: 0;
+}
+
+.player-loading-animation-container.hidden {
+  animation: fadeOut 250ms ease forwards;
+}
+.player-loading-animation-container.show {
+  animation: fadeIn 250ms ease forwards;
 }
 
 .player-buffering-animation {
@@ -505,4 +522,24 @@
   position: absolute !important;
   left: 0;
   pointer-events: none;
+}
+
+/* ANIMATIONES */
+@keyframes volumeBarShow {
+  0% {
+    transform: translateX(400px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes volumeBarHidden {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(400px);
+    display: none;
+  }
 }

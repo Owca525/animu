@@ -44,7 +44,7 @@ function addTime(durration: number): string {
 }
 
 async function fetchResolutions(tmpData: playerDataExtended, func: playerData["extractResolution"]): Promise<{ success: boolean, data: playerData | undefined }> {
-    if (!func) return{ success: false, data: undefined }
+    if (!func) return { success: false, data: undefined }
     try {
         return { success: true, data: await func(tmpData) }
     } catch (error) {
@@ -128,7 +128,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     // other
     const [currentSettings, setcurrentSettings] = createSignal<boolean>(false)
     const [showNerdStats, setshowNerdStats] = createSignal<boolean>(false)
-    const [resolutionNotFound, setResError] = createSignal<boolean>(false)
+    const [fatalError, setFatalError] = createSignal<boolean>(false)
     const [hls, setHls] = createSignal<Hls | undefined>(undefined);
     const [chapterList, setChapterList] = createSignal<{ left: number, width: number, name?: string, type: "opening" | "ending" | "other" }[]>([])
 
@@ -166,7 +166,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         runNewPlayer(defaulthost)
         handleVolume(PlayerVolume, true)
         handleMouseMove()
-        
+
         if (config.Player.general.AutoFullscreen) {
             toggleFullscreen(true)
             setIsFullscreen(true)
@@ -227,6 +227,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     function setNewResolution(data: resolutionFormat | undefined) {
         if (!data) return
         if (!videoRef) return
+        if (!data.hls) setFatalError(false)
         const time = videoRef.currentTime
         if (data.defaultSubtitles) setDefaultSubtitles(ListSubtitles())
         else setNewSubtitles(ListSubtitles[0])
@@ -264,6 +265,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     async function runNewPlayer(data: playerData) {
         // TODO: Add support for dubbing toggle
         if (!videoRef) return
+        setFatalError(false)
+
         let currentplayer = data
         if (currentplayer.extractResolution) {
             const idToast = toast("Fetching Resolution", { type: "loading", removeTimer: true })
@@ -286,7 +289,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         if (currentplayer.resolution.length <= 0) {
             toast(t("player.errors.missingResoltions"), { type: "error" })
-            setResError(() => true)
+            setFatalError(() => true)
             return
         }
 
@@ -294,7 +297,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (currentplayer.subtitles) setListSubtitles(() => [{ url: "", format: "", lang: "", label: "Off" }, ...currentplayer.subtitles as playerSubtitlesFormat[]])
         if (currentplayer.storyboardVTT) setThumbnail(await VTTstoryBoardParser(currentplayer.storyboardVTT))
         const currentRes = currentplayer.resolution[0]
-        
+
         if (currentRes.defaultSubtitles && currentplayer.subtitles) setDefaultSubtitles(currentplayer.subtitles)
         if (currentRes.hls && currentplayer.splitHLS) {
             setListResolution(currentplayer.resolution)
@@ -317,7 +320,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         //         { url: currentRes.url, header: currentRes.reqHeader }
         //     ))}`
         // }
-        
+
         videoRef.src = currentRes.url
         videoRef.currentTime = time
     }
@@ -405,6 +408,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     switch (data.type) {
                         case Hls.ErrorTypes.NETWORK_ERROR:
                             hls.startLoad();
+                            message = t('player.errors.MEDIA_ERR_NETWORK')
                             break;
                         case Hls.ErrorTypes.MEDIA_ERROR:
                             message = t('player.errors.MEDIA_ERR_DECODE')
@@ -416,6 +420,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                             hls.destroy();
                             break;
                     }
+                    setFatalError(true)
                     if (message && !isCleanup()) toast(message, { type: "error" });
                 }
             });
@@ -637,6 +642,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             default:
                 message = t('player.errors.default')
         }
+        setFatalError(true)
         toast(message, { type: "error" });
 
         // if (!currentPlayer) return
@@ -1093,33 +1099,25 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 </div>
                 <div class="video-center"> {/* video-center-container */}
                     <Show when={!config.Player.ui.DisableSkipAnimation}>
-                        <>
-                            <Show when={isShowButtonSkipLeft()}>
-                                <div class="player-loading-animation-container player-fast-rewind-ui">
-                                    <div class="material-symbols-outlined player-icon-ui">fast_rewind</div>
-                                </div>
-                            </Show>
-                            <Show when={isShowButtonSkipRight()}>
-                                <div class="player-loading-animation-container player-fast-forward-ui">
-                                    <div class="material-symbols-outlined player-icon-ui">fast_forward</div>
-                                </div>
-                            </Show>
-                        </>
-                    </Show>
-
-                    <Show when={resolutionNotFound()}>
-                        <div class="player-loading-animation-container player-buffering-animation">
-                            <div class="player-icon-ui material-symbols-outlined">error</div>
+                        <div class={`player-loading-animation-container player-fast-rewind-ui ${isShowButtonSkipLeft() ? "show" : "hidden"}`}>
+                            <div class="material-symbols-outlined player-icon-ui">fast_rewind</div>
+                        </div>
+                        <div class={`player-loading-animation-container player-fast-forward-ui ${isShowButtonSkipRight() ? "show" : "hidden"}`}>
+                            <div class="material-symbols-outlined player-icon-ui">fast_forward</div>
                         </div>
                     </Show>
 
-                    <Show when={!config.Player.ui.DisableLoadingAnimation && !resolutionNotFound() && isWaitingPlayer()}>
-                        <div class="player-loading-animation-container player-buffering-animation">
+                    <div class={`player-loading-animation-container player-buffering-animation ${fatalError() ? "show" : "hidden"}`}>
+                        <div class="player-icon-ui material-symbols-outlined">error</div>
+                    </div>
+
+                    <Show when={!config.Player.ui.DisableLoadingAnimation}>
+                        <div class={`player-loading-animation-container player-buffering-animation ${!fatalError() && isWaitingPlayer() ? "show" : "hidden"}`}>
                             <div class="material-symbols-outlined player-waiting">progress_activity</div>
                         </div>
                     </Show>
-                    <Show when={!config.Player.ui.DisableSpaceAnimation && isShowPlay() && isWaitingPlayer() == false}>
-                        <div class="player-loading-animation-container">
+                    <Show when={!config.Player.ui.DisableSpaceAnimation}>
+                        <div class={`player-loading-animation-container ${isShowPlay() && !isWaitingPlayer() ? "show" : "hidden"}`}>
                             <div class="player-icon-ui material-symbols-outlined">{isPlaying() ? "pause" : "play_arrow"}</div>
                         </div>
                     </Show>
@@ -1292,8 +1290,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     }>close</button>
                 </div>
             </Show>
-            <Show when={!config.Player.ui.DisableVolumeAnimation && isVolume()}>
-                <div class="player-volume-ui-container">
+            <Show when={!config.Player.ui.DisableVolumeAnimation}>
+                <div class={`player-volume-ui-container ${isVolume() ? "show" : "hidden"}`}>
                     <span class="player-volume-ui-icon material-symbols-outlined">{isMuted() ? 'volume_off' : 'volume_up'}</span>
                     <div class="player-volume-ui-bar-container">
                         <div class="player-volume-ui-bar-progress" style={{ "width": `${volume()}%` }}></div>

@@ -848,7 +848,7 @@ th {
 }
 
 .player-button-icons {
-  font-size: 1em;
+  font-size: 1em !important;
   text-shadow: 2px 2px 10px var(--first-layer);
 }
 
