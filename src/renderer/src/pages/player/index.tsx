@@ -18,7 +18,7 @@ import { useI18n } from "@renderer/utils/i18n";
 
 const player = () => {
     const { t } = useI18n()
-    const anime_data: { data: AnimeData, save: indentityPlayer, episodelist: { ep: string, img?: string, title?: string }[] } = JSON.parse(localStorage.getItem("playerCache") as any)
+    const anime_data: { data: AnimeData, save: indentityPlayer, episodelist: { ep: string, img?: string, title?: string }[], continewatch: boolean } = JSON.parse(localStorage.getItem("playerCache") as any)
     const navigate = useNavigate()
     const config: SettingsConfig = getConfig();
 
@@ -133,12 +133,15 @@ const player = () => {
         else document.exitFullscreen()
         closeDialog()
         if (!anime_data) return
-        if (anime_data.save?.last_Time != 0) {
+        if (anime_data.continewatch) {
             navigate("/")
             return
         }
         if (config.Player.general.PlayerBehavior === "home") navigate("/")
-        else navigate("/info", { state: { anime: anime_data.data, saveData: anime_data.save } })
+        else {
+            localStorage.setItem("informationCache", JSON.stringify({ anime: anime_data.data, saveData: anime_data.save }))
+            navigate("/info")
+        }
     }
 
     return (

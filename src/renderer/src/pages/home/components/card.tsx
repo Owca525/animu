@@ -71,6 +71,7 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
         data: (card.AnimeData),
         save: (card.saveData),
         episodelist: episodeList,
+        continewatch: true,
       }))
       
       removeToast(idToast)
