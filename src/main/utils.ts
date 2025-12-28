@@ -124,16 +124,16 @@ ipcMain.handle('get-css-files', async (): Promise<{ version?: string; autor?: st
 
 async function getThemeList(themePath: string): Promise<{ version?: string; autor?: string; pathcss: string; animuTitle?: string; name: string; }[]> {
     let listFolder = await fs.promises.readdir(themePath)
-    let finnalList: any = []
+    let finallist: any = []
     for (let index = 0; index < listFolder.length; index++) {
         const element = listFolder[index];
         const folderTheme = path.join(themePath, element)
         if (fs.statSync(folderTheme).isDirectory()) {
             let theme = await getMetadataTheme(folderTheme)
-            if (theme) finnalList.push(theme)
+            if (theme) finallist.push(theme)
         }
     }
-    return finnalList
+    return finallist
 }
 
 async function getMetadataTheme(path_theme: string): Promise<{ version?: string; autor?: string; pathcss: string; animuTitle?: string; name: string; } | undefined | {}> {
@@ -142,7 +142,8 @@ async function getMetadataTheme(path_theme: string): Promise<{ version?: string;
 
         if (!fs.existsSync(pathTheme)) return undefined
         let themeJSON = JSON.parse(fs.readFileSync(pathTheme, "utf-8"))
-        return ThemeSchema.parse(themeJSON)
+        const theme = ThemeSchema.parse(themeJSON)
+        return { ...theme, mainCSS: path.join(path_theme, theme.mainCSS) }
     } catch (error) {
         console.log("Error parsing theme", error)
         return undefined
