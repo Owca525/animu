@@ -751,70 +751,74 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     }
 
     function keybinds(event: string) {
-        if (videoRef) {
-            var time_now = videoRef.currentTime
-            switch (event.toLowerCase()) {
-                case convertKeybinds(config.Player.keybinds.Pause.toLowerCase()).toLowerCase():
-                    togglePlay()
-                    break
-                case convertKeybinds(config.Player.keybinds.TimeSkipRight.toLowerCase()).toLowerCase():
-                    setTimeVideo((time_now += parseInt(config.Player.general.TimeSkipRight.toString())))
-                    setTimeoutForElement(buttonSkipRight, setShowButtonSkipRight)
-                    break
-                case convertKeybinds(config.Player.keybinds.TimeSkipLeft.toLowerCase()).toLowerCase():
-                    setTimeVideo((time_now -= parseInt(config.Player.general.TimeSkipLeft.toString())))
-                    setTimeoutForElement(buttonSkipLeft, setShowButtonSkipLeft)
-                    break
-                case convertKeybinds(config.Player.keybinds.LongTimeSkipForward.toLowerCase()).toLowerCase():
-                    setTimeVideo((time_now += parseInt(config.Player.general.LongTimeSkipForward.toString())))
-                    setTimeoutForElement(buttonSkipRight, setShowButtonSkipRight)
-                    break
-                case convertKeybinds(config.Player.keybinds.LongTimeSkipBack.toLowerCase()).toLowerCase():
-                    setTimeVideo((time_now -= parseInt(config.Player.general.LongTimeSkipBack.toString())))
-                    setTimeoutForElement(buttonSkipLeft, setShowButtonSkipLeft)
-                    break
-                case convertKeybinds(config.Player.keybinds.Fullscreen.toLowerCase()).toLowerCase():
-                    enterFullscreen()
-                    break
-                case convertKeybinds(config.Player.keybinds.ExitPlayer.toLowerCase()).toLowerCase():
-                    exitPlayer()
-                    break
-                case convertKeybinds(config.Player.keybinds.FrameSkipForward.toLowerCase()).toLowerCase():
-                    setTimeVideo((time_now += 0.0416))
-                    break
-                case convertKeybinds(config.Player.keybinds.FrameSkipBack.toLowerCase()).toLowerCase():
-                    setTimeVideo((time_now -= 0.0416))
-                    break
-                case convertKeybinds(config.Player.keybinds.VolumeDown.toLowerCase()).toLowerCase():
-                    handleVolume((videoRef.volume * 100) - 1)
-                    break
-                case convertKeybinds(config.Player.keybinds.VolumeUp.toLowerCase()).toLowerCase():
-                    handleVolume((videoRef.volume * 100) + 1)
-                    break
-                case convertKeybinds(config.Player.keybinds.ScreenShot.toLowerCase()).toLowerCase():
-                    takeScreenshot()
-                    break
-                case convertKeybinds(config.Player.keybinds.VolumeMute.toLowerCase()).toLowerCase():
-                    setMutedToPlayer()
-                    break
-                case convertKeybinds(config.Player.keybinds.NextEpisode.toLowerCase()).toLowerCase():
-                    setEpisode("next")
-                    break
-                case convertKeybinds(config.Player.keybinds.PrevEpisode.toLowerCase()).toLowerCase():
-                    setEpisode("prev")
-                    break
-                case convertKeybinds(config.Player.keybinds.PictureInPicture.toLowerCase()).toLowerCase():
-                    handlePictureInPicture()
-                    break
-                case convertKeybinds(config.Player.keybinds.toggleSubtitles.toLowerCase()).toLowerCase():
-                    toggleSubtitles()
-                    break
-                case convertKeybinds(config.Player.keybinds.skipOpeningEnding.toLowerCase()).toLowerCase():
-                    if (currentSkipButton().time <= 0) return
-                    if (currentSkipButton().type == "ending") setHideUpNextEpisode(true)
-                    setTimeVideo(currentSkipButton().time)
-                    break
-            }
+        if (!videoRef) return
+        let time_now = videoRef.currentTime
+        switch (event.toLowerCase()) {
+            case convertKeybinds(config.Player.keybinds.Pause.toLowerCase()).toLowerCase():
+                togglePlay()
+                break
+            case convertKeybinds(config.Player.keybinds.TimeSkipRight.toLowerCase()).toLowerCase():
+                setTimeVideo((time_now += parseInt(config.Player.general.TimeSkipRight.toString())))
+                setTimeoutForElement(buttonSkipRight, setShowButtonSkipRight)
+                break
+            case convertKeybinds(config.Player.keybinds.TimeSkipLeft.toLowerCase()).toLowerCase():
+                setTimeVideo((time_now -= parseInt(config.Player.general.TimeSkipLeft.toString())))
+                setTimeoutForElement(buttonSkipLeft, setShowButtonSkipLeft)
+                break
+            case convertKeybinds(config.Player.keybinds.LongTimeSkipForward.toLowerCase()).toLowerCase():
+                setTimeVideo((time_now += parseInt(config.Player.general.LongTimeSkipForward.toString())))
+                setTimeoutForElement(buttonSkipRight, setShowButtonSkipRight)
+                break
+            case convertKeybinds(config.Player.keybinds.LongTimeSkipBack.toLowerCase()).toLowerCase():
+                setTimeVideo((time_now -= parseInt(config.Player.general.LongTimeSkipBack.toString())))
+                setTimeoutForElement(buttonSkipLeft, setShowButtonSkipLeft)
+                break
+            case convertKeybinds(config.Player.keybinds.Fullscreen.toLowerCase()).toLowerCase():
+                enterFullscreen()
+                break
+            case convertKeybinds(config.Player.keybinds.ExitPlayer.toLowerCase()).toLowerCase():
+                exitPlayer()
+                break
+            case convertKeybinds(config.Player.keybinds.FrameSkipForward.toLowerCase()).toLowerCase():
+                setTimeVideo((time_now += 0.0416))
+                break
+            case convertKeybinds(config.Player.keybinds.FrameSkipBack.toLowerCase()).toLowerCase():
+                setTimeVideo((time_now -= 0.0416))
+                break
+            case convertKeybinds(config.Player.keybinds.VolumeDown.toLowerCase()).toLowerCase():
+                handleVolume((videoRef.volume * 100) - 1)
+                break
+            case convertKeybinds(config.Player.keybinds.VolumeUp.toLowerCase()).toLowerCase():
+                handleVolume((videoRef.volume * 100) + 1)
+                break
+            case convertKeybinds(config.Player.keybinds.ScreenShot.toLowerCase()).toLowerCase():
+                takeScreenshot()
+                break
+            case convertKeybinds(config.Player.keybinds.VolumeMute.toLowerCase()).toLowerCase():
+                setMutedToPlayer()
+                break
+            case convertKeybinds(config.Player.keybinds.NextEpisode.toLowerCase()).toLowerCase():
+                setEpisode("next")
+                break
+            case convertKeybinds(config.Player.keybinds.PrevEpisode.toLowerCase()).toLowerCase():
+                setEpisode("prev")
+                break
+            case convertKeybinds(config.Player.keybinds.PictureInPicture.toLowerCase()).toLowerCase():
+                handlePictureInPicture()
+                break
+            case convertKeybinds(config.Player.keybinds.toggleSubtitles.toLowerCase()).toLowerCase():
+                toggleSubtitles()
+                break
+            case convertKeybinds(config.Player.keybinds.skipOpeningEnding.toLowerCase()).toLowerCase():
+                if (!IsRunningButtonSkipTime()) return
+                if (currentSkipButton().type == "ending") {
+                    setHideUpNextEpisode(true)
+                    setIsDisableButtonSkipTimerEnding(true)
+                };
+                if (currentSkipButton().type == "opening") setIsDisableButtonSkipTimerOpening(true)
+                setTimeVideo(currentSkipButton().time)
+                clearChapterSkipTime()
+                break
         }
     }
 
