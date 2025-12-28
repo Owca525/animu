@@ -28,6 +28,13 @@
   --invisible: rgba(0, 0, 0, 0);
   /* is used in player button */
   --black: rgba(0, 0, 0);
+
+  /* DarkerAnimu compatibility */
+  --first-layer: var(--bg); /* First layer, background only */
+  --second-layer: var(--bg2); /* Second layer, used in sidebar, header */
+  --third-layer: var(--bg3); /* Third layer, used in button etc */
+  --fourth-layer: var(--bg4); /* Fourth layer, used in hover button etc */
+  --green-one: var(--neutral1); /* boders, some buttons etc */
 }
 
 
@@ -88,6 +95,8 @@ body {
   background-color: var(--bg3);
   border-color: var(--bg3);
   color: var(--text);
+  
+  outline: 0px;
 }
 
 .button:hover {
@@ -530,6 +539,10 @@ th {
 
 .settings-special-images {
   border-radius: 12px;
+}
+
+.settings-save-title {
+  color: var(--text);
 }
 
 
@@ -1047,4 +1060,42 @@ th {
 
 .settings-input-content {
   background-color: var(--bg3);
+}
+
+
+.big-card-button {
+  padding-left: 24px;
+  padding-right: 24px;
+  border: none !important;
+  font-size: 1em;
+  border-radius: 16px;
+  background-color: var(--green-one);
+}
+
+.big-card-button:hover {
+  background-color: var(--fourth-layer);
+}
+
+.big-card-information-date {
+  background-color: var(--green-one);
+  text-shadow: none;
+  font-size: 1.1em;
+}
+
+.big-card-information-score {
+  background-color: var(--third-layer);
+}
+
+/* BigCard Container */
+.big-card-container-button {
+  background-color: var(--third-layer);
+}
+
+.big-card-container-button.active {
+  background-color: var(--text);
+  transform: scale(1.3);
+}
+
+.big-card-container-button:hover {
+  background-color: var(--text-gray);
 }
