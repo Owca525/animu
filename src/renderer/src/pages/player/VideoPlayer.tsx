@@ -344,7 +344,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             loader: class extends Hls.DefaultConfig.loader {
                 load(context: any, config: any, callbacks: any) {
                     request(context.url, { method: "GET", headers: resolution.reqHeader }).then((data) => {
-                        console.log(data)
                         let currentData: any = data.text
                         if (!data.success) {
                             callbacks.onError({ type: 'network', details: "Failed Requestc", fatal: true }, context)
@@ -678,7 +677,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     })
 
     function setEpisode(type: "next" | "prev") {
-        let ep = temp.episodes.findIndex((item) => item.ep.toString() == temp.episode,toString())
+        let ep = temp.episodes.findIndex((item) => item.ep.toString() == temp.episode, toString())
         if (ep < 0) return
         if (type == 'prev') ep = ep - 1
         if (type == 'next') ep = ep + 1
@@ -1086,10 +1085,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 <div ref={assSubContainer} style={{ position: "absolute", top: "0", left: "0" }}></div>
             </div>
             <Show when={isVisible()}>
-                <>
-                    <div class="player-mask top"></div>
-                    <div class="player-mask bottom"></div>
-                </>
+                <div class="player-mask top"></div>
+                <div class="player-mask bottom"></div>
             </Show>
 
             <div class="video-overlay">
@@ -1173,34 +1170,32 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                             <Show when={temp.episodes.length >= 2}>
                                 <PlayerButton icon={"video_library"} title={detectDisableTooltips("Select Episode")} ButtonClass="player-buttons" onClick={() => { setShowSelectEpisode((prev) => !prev); setcurrentSettings(() => false) }} />
                             </Show>
-                            <Show when={isShowSelectEpisode()}>
-                                <div class="player-select-episode-container" >
-                                    <div class="player-select-episode-title">{t("player.changeEpisode")}</div>
-                                    <Show when={!countImages(temp.episodes)}
-                                        fallback={
-                                            <div class="player-select-episode-content-list">
-                                                <For each={temp.episodes}>
-                                                    {(element) => (
-                                                        <PlayerEpisodeElement nextEpisode={setNextEpisode} animeTitle={anime_data.AnimeData.title.romaji} episodes={element} currentEpisode={temp.episode} />
-                                                    )}
-                                                </For>
-                                            </div>
-                                        }
-                                    >
-                                        <div class="player-select-episode-content">
+                            <div class={`player-select-episode-container ${isShowSelectEpisode() ? "show" : "hidden"}`} >
+                                <div class="player-select-episode-title">{t("player.changeEpisode")}</div>
+                                <Show when={!countImages(temp.episodes)}
+                                    fallback={
+                                        <div class="player-select-episode-content-list">
                                             <For each={temp.episodes}>
                                                 {(element) => (
-                                                    <div class={`information-episode-button ${parseInt(element.ep) < parseInt(temp.episode) ? "watched" : ""} ${parseInt(element.ep) == parseInt(temp.episode) ? "current" : ""}`}
-                                                        onClick={() => setNextEpisode(element.ep)}
-                                                    >
-                                                        {element.ep}
-                                                    </div>
+                                                    <PlayerEpisodeElement nextEpisode={setNextEpisode} animeTitle={anime_data.AnimeData.title.romaji} episodes={element} currentEpisode={temp.episode} />
                                                 )}
                                             </For>
                                         </div>
-                                    </Show>
-                                </div>
-                            </Show>
+                                    }
+                                >
+                                    <div class="player-select-episode-content">
+                                        <For each={temp.episodes}>
+                                            {(element) => (
+                                                <div class={`information-episode-button ${parseInt(element.ep) < parseInt(temp.episode) ? "watched" : ""} ${parseInt(element.ep) == parseInt(temp.episode) ? "current" : ""}`}
+                                                    onClick={() => setNextEpisode(element.ep)}
+                                                >
+                                                    {element.ep}
+                                                </div>
+                                            )}
+                                        </For>
+                                    </div>
+                                </Show>
+                            </div>
                             <PlayerSettings
                                 state={currentSettings()}
                                 sources={
@@ -1231,21 +1226,19 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     </div>
                 </div>
             </div>
-            <Show when={IsRunningButtonSkipTime()}>
-                <button onClick={() => {
-                    if (currentSkipButton().type == "ending") {
-                        setHideUpNextEpisode(true)
-                        setIsDisableButtonSkipTimerEnding(true)
-                    };
-                    if (currentSkipButton().type == "opening") setIsDisableButtonSkipTimerOpening(true)
-                    setTimeVideo(currentSkipButton().time)
-                    clearChapterSkipTime()
-                }} class="player-skip-chapters-button">
-                    {currentSkipButton().text}, {`${buttonSkipTime()}s`}
-                </button>
-            </Show>
-            <Show when={config.Player.upToNextEpisode.variants == "old" && isUpNextEpisode()}>
-                <div class="player-up-Next-container old">
+            <button onClick={() => {
+                if (currentSkipButton().type == "ending") {
+                    setHideUpNextEpisode(true)
+                    setIsDisableButtonSkipTimerEnding(true)
+                };
+                if (currentSkipButton().type == "opening") setIsDisableButtonSkipTimerOpening(true)
+                setTimeVideo(currentSkipButton().time)
+                clearChapterSkipTime()
+            }} class={`player-skip-chapters-button ${IsRunningButtonSkipTime() ? "show" : "hidden"}`}>
+                {currentSkipButton().text}, {`${buttonSkipTime()}s`}
+            </button>
+            <Show when={config.Player.upToNextEpisode.variants == "old"}>
+                <div class={`player-up-Next-container old  ${isUpNextEpisode() ? "show" : "hidden"}`}>
                     <div class="player-up-Next-Title old">{t("player.upNext.title", { sec: parseInt(timeNextEpisode().toString()) })}</div>
                     <div class="player-up-Next-Anime old">{t("player.upNext.titleAnime", { ep: getEpisode("next")?.ep, title: anime_data.AnimeData.title.romaji })}</div>
                     <div class="player-up-Next-Buttons old">
@@ -1254,8 +1247,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     </div>
                 </div>
             </Show>
-            <Show when={config.Player.upToNextEpisode.variants == "var2" && isUpNextEpisode()}>
-                <div class="player-up-Next-background" style={{ "background-image": `url(${getCurrentImage()})` }}
+            <Show when={config.Player.upToNextEpisode.variants == "var2"}>
+                <div class={`player-up-Next-background ${isUpNextEpisode() ? "show" : "hidden"}`} style={{ "background-image": `url(${getCurrentImage()})` }}
                     onClick={() => setEpisode("next")}>
                     <div class="player-up-Next-container-var2 ">
                         <span class="material-symbols-outlined player-up-Next-icon">skip_next</span>
@@ -1273,8 +1266,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     }>close</button>
                 </div>
             </Show>
-            <Show when={config.Player.upToNextEpisode.variants == "var1" && isUpNextEpisode()}>
-                <div class="player-up-Next-container" onClick={() => setEpisode("next")}>
+            <Show when={config.Player.upToNextEpisode.variants == "var1"}>
+                <div class={`player-up-Next-container ${isUpNextEpisode() ? "show" : "hidden"}`} onClick={() => setEpisode("next")}>
                     <img src={getCurrentImage()} class="player-up-Next-image" />
                     <span class="material-symbols-outlined player-up-Next-icon">skip_next</span>
                     <div class="player-up-Next-content">

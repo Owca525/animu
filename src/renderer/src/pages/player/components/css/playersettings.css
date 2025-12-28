@@ -9,6 +9,12 @@
   max-height: 400px;
   height: min-content;
   overflow-x: hidden;
+
+  transform: translateX(400px);
+  transition: 250ms ease-out;
+}
+.player-settings-container.show {
+  transform: translateX(0px);
 }
 
 .player-settings-button, .player-settings-button-back {

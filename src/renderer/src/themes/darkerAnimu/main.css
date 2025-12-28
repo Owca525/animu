@@ -922,12 +922,12 @@ th {
   border-radius: 50%;
   color: var(--text);
   background-color: var(--fourth-layer);
-  border: 2px solid var(--fourth-layer);
+  outline: 2px solid var(--invisible) !important;
 }
 
 
 .player-up-Next-button-close:hover {
-  border-color: var(--green-one);
+  outline-color: var(--green-one) !important;
 }
 
 .player-up-Next-container {

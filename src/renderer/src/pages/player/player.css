@@ -239,6 +239,13 @@
   gap: 4px;
   align-items: center;
   backdrop-filter: blur(1px);
+
+  transform: translateX(400px);
+  transition: 250ms ease-out;
+}
+
+.player-up-Next-container-var2.show {
+  transform: translateX(0px);
 }
 
 .player-up-Next-background {
@@ -261,7 +268,10 @@
   width: 100%;
 }
 
-.player-up-Next-title, .player-up-Next-episode, .player-up-Next-text, .player-up-Next-icon {
+.player-up-Next-title,
+.player-up-Next-episode,
+.player-up-Next-text,
+.player-up-Next-icon {
   text-shadow: 2px 2px 5px var(--black);
 }
 
@@ -300,6 +310,13 @@
   right: 1%;
   max-width: 450px;
   cursor: pointer;
+
+  transform: translateX(1000px);
+  transition: 250ms ease-out;
+}
+
+.player-up-Next-container.show {
+  transform: translateX(0px);
 }
 
 .player-up-Next-icon {
@@ -340,15 +357,13 @@
   padding: 12px;
   gap: 8px;
   z-index: 12;
+
+  transform: translateX(400px);
+  transition: 250ms ease-out;
 }
 
 .player-volume-ui-container.show {
-  animation: volumeBarShow 250ms ease forwards;
-  display: flex;
-}
-
-.player-volume-ui-container.hidden {
-  animation: volumeBarHidden 250ms ease forwards;
+  transform: translateX(0px);
 }
 
 .player-volume-ui-bar-progress {
@@ -372,13 +387,15 @@
 .player-loading-animation-container {
   position: absolute;
   opacity: 0;
+  transition: 250ms ease-out;
 }
 
 .player-loading-animation-container.hidden {
-  animation: fadeOut 250ms ease forwards;
+  opacity: 0;
 }
+
 .player-loading-animation-container.show {
-  animation: fadeIn 250ms ease forwards;
+  opacity: 1;
 }
 
 .player-buffering-animation {
@@ -415,6 +432,13 @@
 
   overflow: hidden;
   overflow-y: scroll;
+
+  transform: translateX(800px);
+  transition: 250ms ease-out;
+}
+
+.player-select-episode-container.show {
+  transform: translateX(0px);
 }
 
 .player-select-episode-title {
@@ -486,13 +510,19 @@
   padding: 12px;
   font-size: 1.1em;
   cursor: pointer;
+  transform: translateX(-400px);
+  transition: 250ms ease-out;
+}
+.player-skip-chapters-button.show {
+  transform: translateX(0px);
 }
 
 .player-subtitle-container.up {
   bottom: 80px;
 }
 
-.player-fast-forward-ui, .player-fast-rewind-ui {
+.player-fast-forward-ui,
+.player-fast-rewind-ui {
   position: absolute;
 }
 
@@ -522,24 +552,4 @@
   position: absolute !important;
   left: 0;
   pointer-events: none;
-}
-
-/* ANIMATIONES */
-@keyframes volumeBarShow {
-  0% {
-    transform: translateX(400px);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-
-@keyframes volumeBarHidden {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(400px);
-    display: none;
-  }
 }
