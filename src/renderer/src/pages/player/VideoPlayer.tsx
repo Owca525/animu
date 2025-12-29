@@ -478,9 +478,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     function saveContinueProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
         // Checking to save history
+        if (isCleanup()) return
         if (!config) return
         if (currentTime() <= parseInt(config.History.continue.MinimalTimeSave.toString())) return
-        if (isCleanup()) return
         let futureHistory = {
             AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
             saveData: {
@@ -586,28 +586,20 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     }
 
     function checkUpNext(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
+        console.log(isUpNextEpisode(), isHideUpNextEpisode(), timeNextEpisode())
         // checking to show Up next communicat
+        if (!currentPlayer()) return
         if (!config) return
         if (!config.Player.upToNextEpisode.enable) return
-        if (!currentPlayer()) return
         const duration = event.currentTarget.duration
         const currentTime = event.currentTarget.currentTime
 
         if (duration <= config.Player.upToNextEpisode.durationShow * 60) return
 
-        let showUpToNext: boolean = false
+        let showUpToNext: boolean = currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
         let timeDelete: number = ((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
-        if (currentPlayer()!.listChapters) {
-            for (let index = 0; index < currentPlayer()!.listChapters!.length; index++) {
-                const element = currentPlayer()!.listChapters![index];
-                if (currentTime >= element.start && currentTime <= element.end && element.type == "ending") {
-                    showUpToNext = true
-                    timeDelete = ((parseInt(duration.toFixed(0)) - (parseInt(duration.toFixed(0)) - element.start)) - parseInt(currentTime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
-                }
-            }
-        } else {
-            showUpToNext = currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
-        }
+        
+        console.log(showUpToNext, currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString()))
 
         if (isHideUpNextEpisode() == false && temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] != null && showUpToNext) {
             setUpNextEpisode(true)
@@ -1020,7 +1012,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     }
 
     function checkUptoNext() {
-        if (config.Player.upToNextEpisode.variants == "old" && isUpNextEpisode() == false) return false
+        if (config.Player.upToNextEpisode.variants == "old" && isUpNextEpisode()) return false
         return true
     }
 

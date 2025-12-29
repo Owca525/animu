@@ -772,6 +772,10 @@ th {
   border-radius: 8px !important;
 }
 
+.player-up-Next-container.old {
+  background-color: var(--player-bg-containers);
+}
+
 .player-loading-container {
   background-color: black;
 }

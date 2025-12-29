@@ -935,6 +935,10 @@ th {
   border-radius: 8px !important;
 }
 
+.player-up-Next-container.old {
+  background-color: color-mix(in srgb, var(--third-layer) 90%, transparent);
+}
+
 .player-loading-container {
   background-color: black;
 }

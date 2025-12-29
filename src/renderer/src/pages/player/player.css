@@ -194,12 +194,14 @@
   bottom: 30px;
   z-index: 2000;
 
-  width: clamp(20vw, 25vw, 30vw);
+  width: clamp(200px, 25vw, 400px);
 
   padding: 1em;
   display: flex;
   flex-direction: column;
+  align-items: start;
   gap: 1em;
+  cursor:auto;
 }
 
 .player-up-Next-Anime.old,
@@ -212,7 +214,7 @@
 }
 
 .player-up-Next-Title.old {
-  font-size: clamp(1rem, 1.4vw, 2em);
+  font-size: clamp(1rem, 1.4vw, 1.4em);
   font-weight: 500;
 }
 
@@ -224,12 +226,12 @@
 .player-up-Next-Buttons.old {
   display: flex;
   justify-content: end;
-  gap: 1em;
+  gap: 12px;
 }
 
 .player-up-Next-Button.old {
   font-size: clamp(0.5rem, 1.1vw, .8rem);
-  padding: 8px;
+  padding: 10px 12px;
 }
 
 .player-up-Next-container-var2 {
@@ -239,15 +241,13 @@
   gap: 4px;
   align-items: center;
   backdrop-filter: blur(1px);
-
-  transform: translateX(400px);
-  transition: 250ms ease-out;
 }
 
-.player-up-Next-container-var2.show {
+.player-up-Next-background.show {
   transform: translateX(0px);
 }
 
+/* player-up-Next-container-var2 */
 .player-up-Next-background {
   position: absolute;
   bottom: 12%;
@@ -256,6 +256,9 @@
   width: max-content;
   transition: all 100ms ease-in-out;
   cursor: pointer;
+
+  transform: translateX(400px);
+  transition: 250ms ease-out;
 }
 
 .player-up-Next-title,
