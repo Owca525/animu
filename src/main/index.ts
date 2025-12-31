@@ -47,9 +47,9 @@ function createWindow(): void {
     title: title
   })
 
-  mainWindow.on('app-command', (event, command) => {
-    if (command === 'browser-backward' || command === 'browser-forward') event.preventDefault()
-  })
+  mainWindow.webContents.on('will-navigate', (event) => {
+    event.preventDefault();
+  });
 
   global.createPiPWindow = () => {
     pipWindow = new BrowserWindow({
@@ -135,8 +135,8 @@ if (!gotTheLock) {
     await initialBackend()
     createWindow()
     electronAppUniversalProtocolClient.on('request', async (requestUrl) => {
-        if (mainWindow) mainWindow.webContents.send('protocol-request', requestUrl)
-      },
+      if (mainWindow) mainWindow.webContents.send('protocol-request', requestUrl)
+    },
     );
     await electronAppUniversalProtocolClient.initialize({
       protocol: PROTOCOL,
