@@ -47,6 +47,10 @@ function createWindow(): void {
     title: title
   })
 
+  mainWindow.on('app-command', (event, command) => {
+    if (command === 'browser-backward' || command === 'browser-forward') event.preventDefault()
+  })
+
   global.createPiPWindow = () => {
     pipWindow = new BrowserWindow({
       width: 300,
