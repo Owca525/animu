@@ -196,6 +196,7 @@ function information() {
 
     createShortcut(["Escape"], () => {
         if (showWrong()) setshowWrong(() => false)
+        else if (showImages()) setShowImages(false)
         else navigate("/")
     })
 
