@@ -104,6 +104,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [fatalError, setFatalError] = createSignal<boolean>(false)
     const [hls, setHls] = createSignal<Hls | undefined>(undefined);
     const [chapterList, setChapterList] = createSignal<{ left: number, width: number, name?: string, type: "opening" | "ending" | "other" }[]>([])
+    const [videoFrames, setVideoFrames] = createSignal<{ totalVideoFrames: number, droppedVideoFrames: number }>({ totalVideoFrames: 0, droppedVideoFrames: 0 })
 
     // Subtitles
     const [vttUrl, setVttUrl] = createSignal<string | undefined>(undefined);
@@ -236,7 +237,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     }
 
     async function runNewPlayer(data: playerData) {
-        // TODO: Add support for dubbing toggle
         if (!videoRef) return
         setFatalError(false)
 
@@ -532,6 +532,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         saveContinueProgress(event)
         checkUpNext(event)
         handleProgress(event)
+
+        setVideoFrames({ totalVideoFrames: event.currentTarget.getVideoPlaybackQuality().totalVideoFrames, droppedVideoFrames: event.currentTarget.getVideoPlaybackQuality().droppedVideoFrames })
 
         // Update RPC
         if (config.General.discordRPC && window.api) window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`)
@@ -1247,7 +1249,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 </div>
             </Show>
             <Show when={showNerdStats()}>
-                <NerdStats video={videoRef} volume={volume()} currentTime={currentTime()} />
+                <NerdStats duration={durrationTime()} frames={videoFrames()} volume={volume()} currentTime={currentTime()} />
             </Show>
             <Show when={config.Developer.playerDebug}>
                 <DeveloperStats
