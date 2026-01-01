@@ -11,6 +11,7 @@ import Sidebar from '@renderer/components/sidebar';
 import {
     calculateZoomLevel,
     changeTheme,
+    changeTitleAnimu,
     convertKeybinds,
     convertPath,
     openUrlFolder,
@@ -169,6 +170,7 @@ function settings() {
     })
 
     onMount(async () => {
+        changeTitleAnimu(`Animu - ${t("global.settings")}`)
         if (!window.api) return
         setBackupList(await window.api.backup.list())
         window.api.getlistThemes().then((data) => {

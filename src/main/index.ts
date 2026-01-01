@@ -25,7 +25,7 @@ let historyData: cardData[] = []
 const PROTOCOL = "animu"
 
 function createWindow(): void {
-  let title = 'Animu v' + app.getVersion()
+  let title = 'Animu '
   let pipWindow;
 
   // Create the browser window.
@@ -83,7 +83,7 @@ function createWindow(): void {
   });
 
   if (process.env.NODE_ENV === 'development') {
-    mainWindow.setTitle(title + " developer")
+    mainWindow.setTitle(title + " - Development")
     mainWindow.webContents.openDevTools()
   }
 

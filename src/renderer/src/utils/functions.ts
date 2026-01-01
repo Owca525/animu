@@ -93,7 +93,12 @@ export async function changeTheme(name: string) {
     link.href = theme.mainCSS;
     document.head.appendChild(link);
 
-    if (theme.customTitle) document.title = theme.customTitle
+    if (theme.customTitle) changeTitleAnimu(theme.customTitle)
+}
+
+export function changeTitleAnimu(title: string) {
+    const dev = window.electronAPI.process.env.NODE_ENV == "development"
+    document.title = dev ? title + " - Development" : title
 }
 
 export function convertKeybinds(inputString: string) {

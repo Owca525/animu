@@ -4,7 +4,7 @@ import Container from './components/container';
 import Filter from './components/filter';
 import Input from '@renderer/components/input';
 import Sidebar from '@renderer/components/sidebar';
-import { CreateContextMenuOptions, getHistory } from '@renderer/utils/functions';
+import { changeTitleAnimu, CreateContextMenuOptions, getHistory } from '@renderer/utils/functions';
 import {
   createSignal,
   For,
@@ -59,7 +59,7 @@ const Home = () => {
       {
         icon: "home",
         text: t("global.home"),
-        onClick: () => { setHomeActivePage(t("global.home")); setHomeSearchTags(undefined); plugin.home() },
+        onClick: () => { setHomeActivePage(t("global.home")); setHomeSearchTags(undefined); plugin.home(); changeTitleAnimu(`Animu - ${t("global.home")}`) },
       },
       {
         icon: "history",
@@ -84,6 +84,9 @@ const Home = () => {
   // }
 
   onMount(() => {
+    if (getHomeCache().activePage == t("global.history")) changeTitleAnimu(`Animu - ${t("global.history")}`)
+    else changeTitleAnimu(`Animu - ${t("global.home")}`)
+
     if (!getGlobalCache().deeplinkRunned) {
       window.api.onProtocolRequest(fetchDeeplinks)
       setDeeplinkRunned(true)
@@ -146,6 +149,7 @@ const Home = () => {
   function setHistory() {
     setHomeSearchTags(undefined)
     setHomeActivePage(t("global.history"));
+    changeTitleAnimu(`Animu - ${t("global.history")}`)
     let history = getHistory()
 
     let data: homeData["data"] = {

@@ -4,6 +4,7 @@ import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
 import { AnimeData, ContextMenuProps, deepLinkData, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
 import {
+    changeTitleAnimu,
     convertDateToFormattedString,
     convertSeconds,
     CreateContextMenuOptions,
@@ -102,6 +103,7 @@ function information() {
     }
 
     onMount(() => {
+        changeTitleAnimu(`Animu - ${tempData().anime.title.romaji}`)
         generateAnimeForContextMenu()
 
         let plugin = pluginManager().currentPlugin
