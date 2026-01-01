@@ -1,6 +1,6 @@
 import Button from '@renderer/components/buttons';
 import ButtonGroup from './components/buttonGroup';
-import CheckBox from './components/checkBox';
+import CheckBox from '../../components/checkBox';
 import CheckKeybind from './components/checkKeybind';
 import Dropdown from '../../components/dropDown';
 import HelpIcon from './components/helpIcon';

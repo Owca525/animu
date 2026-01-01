@@ -19,6 +19,8 @@ interface playerSettingsProps {
         currentTrack: string
     }
     state: boolean
+    resDubbing?: boolean
+    turnDubbing?: (value: boolean) => void
 }
 
 export default function PlayerSettings(props: playerSettingsProps) {
@@ -35,14 +37,7 @@ export default function PlayerSettings(props: playerSettingsProps) {
         if (!props.state) setcurrentSettings("settings")
     })
 
-    // const settingsContainerVariants = {
-    //     initial: { opacity: 0, x: 100, display: "none", position: "absolute" },
-    //     visible: { opacity: 1, x: 0, display: "", position: "" },
-    // };
-
     return (
-        // <Show when={props.state}>
-        // </Show>
         <div class={`player-settings-container ${props.state ? "show" : "hidden"}`}>
             <Show when={currentSettings() === "settings"}>
                 <div class="player-settings-content">
@@ -63,6 +58,8 @@ export default function PlayerSettings(props: playerSettingsProps) {
                         leftText={t("player.settings.audio")}
                         rightText={props.current.currentTrack}
                         isGray={props.audioTrack.length <= 1}
+                        type={props.resDubbing ? "switch" : undefined}
+                        turnDubbing={props.resDubbing ? props.turnDubbing : undefined}
                     />
                     <PlayerSettingsButton onClick={() => props.subtitles.length > 1 ? setcurrentSettings("subtitles") : ""}
                         icon="subtitles"

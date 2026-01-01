@@ -1,6 +1,6 @@
 import Hls from "hls.js"
 
-import { AnimeData, ContextMenuProps, deepLinkData, indentityPlayer, playerChapterList, playerData, playerDataExtended, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
+import { AnimeData, ContextMenuProps, deepLinkData, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
 import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
@@ -24,17 +24,7 @@ import NerdStats from "./components/nerdStats"
 import { unwrap } from "solid-js/store"
 import { removeToast, toast } from "@renderer/utils/context/ToastNotification"
 import { useI18n } from "@renderer/utils/i18n"
-import { addTime, countImages, VTTstoryBoardParser } from "./playerUtils"
-
-async function fetchResolutions(tmpData: playerDataExtended, func: playerData["extractResolution"]): Promise<{ success: boolean, data: playerData | undefined }> {
-    if (!func) return { success: false, data: undefined }
-    try {
-        return { success: true, data: await func(tmpData) }
-    } catch (error) {
-        console.error(error, "fetchResolutions player")
-        return { success: false, data: undefined }
-    }
-}
+import { addTime, countImages, fetchResolutions, VTTstoryBoardParser } from "./playerUtils"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -269,6 +259,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 updatePlayerData((prev) => prev.map((player) => player.hostname == tmp.data?.hostname ? tmp.data : player))
             }
         }
+        console.log(currentplayer)
 
         if (currentplayer.resolution.length <= 0) {
             toast(t("player.errors.missingResoltions"), { type: "error" })
@@ -673,7 +664,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }
     }
 
-    async function setNewSubtitles(sub: playerSubtitlesFormat) {
+    async function setNewSubtitles(sub: playerSubtitlesFormat | undefined) {
+        if (!sub) return
         if (!videoRef) return
 
         // This clear subtitles but this dosen't work on dev Because react second render
@@ -967,6 +959,40 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         return formatTime(newTime)
     }
 
+    async function changeToDubbing(value: boolean) {
+        const player = currentPlayer()
+        if (!player) return
+        console.log(currentPlayer())
+        
+        if (value && player?.dubResolution) {
+            setListResolution(player.dubResolution)
+            setNewResolution(player.dubResolution[0])
+        } else if (value && player.isDubbing) {
+            const idToast = toast("Fetching Dubbing", { type: "loading", removeTimer: true })
+            const tmp = await fetchResolutions({
+                ...player,
+                episode: {
+                    currentEpisode: temp.episode,
+                    episodeList: temp.episodes.map((ep) => ep.ep),
+                    anime: anime_data.AnimeData,
+                    animeID: anime_data.AnimeData.player_ID as string,
+                    type: temp.type
+                }
+            }, player.isDubbing)
+            console.log(tmp)
+            removeToast(idToast)
+            if (tmp.success && tmp.data) {
+                updatePlayerData((prev) => prev.map((prevplayer) => prevplayer.hostname == player.hostname ? { ...player, dubResolution: tmp.data } : player))
+                setPlayer({ ...player, dubResolution: tmp.data })
+                setListResolution(tmp.data)
+                setNewResolution(tmp.data[0])
+            }
+        } else {
+            setListResolution(player.resolution)
+            setNewResolution(player.resolution[0])
+        }
+    }
+
     return (
         <div class={isVisible() ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
             <div ref={screenshotWrapper} class={isVisible() ? "player-video-container" : "player-video-container player-hide-cursor"} >
@@ -1124,11 +1150,13 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                             </div>
                             <PlayerSettings
                                 state={currentSettings()}
+                                turnDubbing={changeToDubbing}
+                                resDubbing={currentPlayer() && currentPlayer()?.isDubbing ? true : false}
                                 sources={
                                     playerData().map((val) => { return { name: val.hostname, change: () => runNewPlayer(playerData()[playerData().findIndex((item) => item.hostname === val.hostname)]) } })
                                 }
                                 resolution={
-                                    ListResolution().map((val) => { return { res: val.res, change: () => setNewResolution(val as any) } })
+                                    ListResolution().map((val) => { return { res: val.res, change: () => setNewResolution(val) } })
                                 }
                                 speed={speed.map((val) => { return { speed: parseFloat(val), change: () => setSpeed(val) } })}
                                 subtitles={

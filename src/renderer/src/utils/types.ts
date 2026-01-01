@@ -107,6 +107,7 @@ export type playerDataExtended = playerData & {
 export interface playerData {
     hostname: string
     resolution: resolutionFormat[]
+    dubResolution?: resolutionFormat[]
     splitHLS?: boolean
     defaultHost?: boolean
     storyboardVTT?: string
@@ -114,6 +115,7 @@ export interface playerData {
     subtitles?: playerSubtitlesFormat[]
     external?: externalPlayerFormat
     extractResolution?: (playerData: playerDataExtended) => Promise<playerData | undefined>
+    isDubbing?: (playerData: playerDataExtended) => Promise<resolutionFormat[] | undefined>
 }
 
 export interface resolutionFormat {
@@ -123,7 +125,6 @@ export interface resolutionFormat {
     reqHeader?: { [key: string]: string },
     doNotUseBackend?: boolean
     defaultSubtitles?: boolean;
-    isDubbing?: () => Promise<resolutionFormat | undefined>
 }
 
 export interface externalPlayerFormat {

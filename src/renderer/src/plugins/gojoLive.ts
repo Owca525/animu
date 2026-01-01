@@ -71,7 +71,8 @@ export default class GojoLive implements playerPluginFormat {
                     hostname: element["id"],
                     defaultHost: element["default"],
                     resolution: [],
-                    extractResolution: async (playerData: playerDataExtended) => await extractResolutions(episode, "sub", playerData, element["id"], id)
+                    extractResolution: async (playerData: playerDataExtended) => await extractResolutions(episode, "sub", playerData, element["id"], id),
+                    isDubbing: async (playerData: playerDataExtended) => (await extractResolutions(episode, "dub", playerData, element["id"], id))?.resolution
                 })
                 // if (element["hasDub"]) {
                 //     data.push({

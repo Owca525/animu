@@ -1,5 +1,5 @@
 import { formatTime, request, toSeconds } from "@renderer/utils/functions";
-import { Thumbnail } from "@renderer/utils/types";
+import { playerDataExtended, Thumbnail } from "@renderer/utils/types";
 
 export async function VTTstoryBoardParser(url: string) {
     let data = await request(url)
@@ -65,4 +65,14 @@ export function countImages(data: { ep: string, img?: string, title?: string }[]
     }
     if (data.length <= counter) return true
     return false
+}
+
+export async function fetchResolutions<F extends (data: playerDataExtended) => Promise<any>>(tmpData: playerDataExtended, func: F): Promise<{ success: boolean, data: Awaited<ReturnType<F>> | undefined }> {
+    if (!func) return { success: false, data: undefined }
+    try {
+        return { success: true, data: await func(tmpData) }
+    } catch (error) {
+        console.error(error, "fetchResolutions player")
+        return { success: false, data: undefined }
+    }
 }
