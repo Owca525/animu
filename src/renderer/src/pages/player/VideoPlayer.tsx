@@ -169,6 +169,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 setTimeVideo(event.seekTime)
             })
         }
+
+        document.querySelectorAll('*').forEach((element: any) => {
+            element.tabIndex = -1
+        });
     })
 
     onCleanup(() => {
@@ -259,7 +263,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 updatePlayerData((prev) => prev.map((player) => player.hostname == tmp.data?.hostname ? tmp.data : player))
             }
         }
-        console.log(currentplayer)
 
         if (currentplayer.resolution.length <= 0) {
             toast(t("player.errors.missingResoltions"), { type: "error" })

@@ -9,8 +9,9 @@ import { Component, createSignal, For, onMount, Show } from "solid-js"
 import { useNavigate } from "@solidjs/router"
 import { getConfig } from "@renderer/utils/stores/config"
 import { unwrap } from "solid-js/store"
-import { toast } from "@renderer/utils/context/ToastNotification"
+import { removeToast, toast } from "@renderer/utils/context/ToastNotification"
 import { useI18n } from "@renderer/utils/i18n"
+import { fetchResolutions } from "./playerUtils"
 
 interface ExternalplayerProps {
     animeData: {
@@ -38,6 +39,7 @@ const ExternalPlayer: Component<ExternalplayerProps> = ({ animeData, now_episode
     const AnimeTitle = detectTitle({ title: animeData.AnimeData.title, ep: now_episodes.episode, format: animeData.AnimeData.format })
 
     // Player Related
+    const [players, setPlayers] = createSignal<playerData[]>(playerData)
     const [currentHost, setCurrentHost] = createSignal<playerData | undefined>(undefined)
     const [currentResolution, setCurrentResolution] = createSignal<resolutionFormat | undefined>(undefined)
     // t("global.notFound")
@@ -95,6 +97,7 @@ const ExternalPlayer: Component<ExternalplayerProps> = ({ animeData, now_episode
             toast(t("externalPlayer.failed.chromecast"), { type: "error" })
             return
         }
+        return
         await window.api.chromecast.connect(device, { title: AnimeTitle, time: time, url: currentResolution()?.url as any, type: "video/mp4" })
     }
 
@@ -115,26 +118,48 @@ const ExternalPlayer: Component<ExternalplayerProps> = ({ animeData, now_episode
 
     function RunPlayers() {
         if (!currentHost()) return
+        externalPlayerData.onChage(currentPlayer())
+
         if (currentPlayer() === "Movian") RunMovian()
         if (currentPlayer() === "Mpv") runMpvPlayer()
         if (currentPlayer() === "VLC") runVlcPlayer()
-        externalPlayerData.onChage(currentPlayer())
         if (currentPlayer() !== "ChromeCast") toast(t("externalPlayer.running", { player: currentPlayer() }), { type: "success" })
-        if (currentPlayer() === "ChromeCast") startSearchChromeCast()
+        // if (currentPlayer() === "ChromeCast") startSearchChromeCast()
     }
 
-    onMount(() => {
-        if (playerData.length <= 0) {
+    onMount(async () => {
+        if (players().length <= 0) {
             toast(t("externalPlayer.failed.player"), { type: "error" })
             return
         }
+        let player = players()[0]
 
-        setCurrentHost(playerData[0])
-        if (playerData[0].resolution.length <= 0) {
+        setCurrentHost(player)
+        if (player.extractResolution) {
+            const idToast = toast("Fetching Resolution", { type: "loading", removeTimer: true })
+            let tmp = await fetchResolutions({
+                ...player,
+                episode: {
+                    currentEpisode: now_episodes.episode,
+                    episodeList: now_episodes.episodes.map((ep) => ep.ep),
+                    anime: animeData.AnimeData,
+                    animeID: animeData.AnimeData.player_ID as string,
+                    type: now_episodes.type
+                }
+            }, player.extractResolution)
+            removeToast(idToast)
+            if (tmp.success && tmp.data) {
+                player = tmp.data
+                setPlayers((prev) => prev.map((player) => player.hostname == tmp.data?.hostname ? tmp.data : player))
+            }
+        }
+        
+        if (player.resolution.length <= 0) {
             toast(t("externalPlayer.failed.resolution"), { type: "error" })
             return
         }
-        setCurrentResolution(() => playerData[0].resolution[0])
+
+        setCurrentResolution(() => player.resolution[0])
 
         RunPlayers()
 
@@ -142,20 +167,6 @@ const ExternalPlayer: Component<ExternalplayerProps> = ({ animeData, now_episode
             element.tabIndex = -1
         });
     })
-
-    // useEffect(() => {
-    //     if (secondsLeft <= 0) {
-    //         stopSearchChromeCast()
-    //         return
-    //     }
-    //     const intervalId = setInterval(() => {
-    //         setSecondsLeft(prev => {
-    //             refetchChromeCastDevices()
-    //             return prev - 1
-    //         });
-    //     }, 1000);
-    //     return () => clearInterval(intervalId);
-    // }, [secondsLeft]);
 
     async function refetchChromeCastDevices() {
         setchromCastDeviceList(await window.api.chromecast.deviceList())
@@ -172,12 +183,6 @@ const ExternalPlayer: Component<ExternalplayerProps> = ({ animeData, now_episode
         setisChromeCastSearch(() => false)
         window.api.chromecast.stopSearch()
     }
-
-    // const chromecastSearchContainerVariants = {
-    //     invisible: { opacity: 0, x: -500 },
-    //     hidden: { opacity: 1, x: -230 },
-    //     visible: { opacity: 1, x: 0 },
-    // };
 
     function checkCurrentResolution(): string {
         if (!currentResolution()) return t("global.notFound")
@@ -199,7 +204,7 @@ const ExternalPlayer: Component<ExternalplayerProps> = ({ animeData, now_episode
                             { label: "Mpv", onClick: () => { setCurrentPlayer(() => "Mpv"), RunPlayers() } },
                             { label: "VLC", onClick: () => { setCurrentPlayer(() => "VLC"), RunPlayers() } },
                             { label: "Movian", onClick: () => { setCurrentPlayer(() => "Movian"), RunPlayers() } },
-                            { label: "ChromeCast", onClick: () => { setCurrentPlayer(() => "ChromeCast"), RunPlayers() } }
+                            // { label: "ChromeCast", onClick: () => { setCurrentPlayer(() => "ChromeCast"), RunPlayers() } }
                         ]} placeholder={t("global.notFound")} buttonText={config.Player.external.type} disableX
                         />
                         <Show when={currentResolution()}>
@@ -216,7 +221,7 @@ const ExternalPlayer: Component<ExternalplayerProps> = ({ animeData, now_episode
                         <Dropdown 
                             placeholder={t("global.notFound")} 
                             buttonText={currentHost() ? currentHost()?.hostname : t("global.notFound")} 
-                            options={playerData.map((element) => { return { label: element.hostname, onClick: () => ChangeHost(element) } })} 
+                            options={players().map((element) => { return { label: element.hostname, onClick: () => ChangeHost(element) } })} 
                             disableX 
                         />
                     </div>
