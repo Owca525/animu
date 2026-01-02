@@ -1,10 +1,12 @@
-import { getEpisodeDay, getGradientColor } from '@renderer/utils/functions';
-import { cardData } from '@renderer/utils/types';
+import { getEpisodeDay, getGradientColor, getHistory } from '@renderer/utils/functions';
+import { cardData, indentityPlayer } from '@renderer/utils/types';
 import "./css/bigcard.css"
 import Button from '@renderer/components/buttons';
 import { useNavigate } from '@solidjs/router';
 import { Component, createSignal, For, Show } from 'solid-js';
 import { useI18n } from '@renderer/utils/i18n';
+import { pluginManager } from '@renderer/utils/stores/plugins';
+import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
 
 type bigCardProps = { data: cardData, ref?: any }
 
@@ -24,6 +26,72 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
     function openInformation() {
         localStorage.setItem("informationCache", JSON.stringify({ anime: data.AnimeData }))
         navigate("/info");
+    }
+
+    async function goToPlayer(saveData?: indentityPlayer, id?: string): Promise<any> {
+        let plugin = pluginManager().currentPlugin
+        if (saveData) plugin = pluginManager().changePlugin(saveData.pluginName)
+        if (!plugin) return toast("Failed Load Plugin", { type: "error" })
+        
+        const idToast = toast("Fetching Anime", { type: "loading", removeTimer: true })
+        if (!saveData && !id) {
+            const response = await plugin.extractEpisodeList(data.AnimeData)
+            if (!response || response.episodesData.length <= 0) return updateToast(idToast, "Failed Fetching Anime", { type: "error", removeTimer: false })
+            localStorage.setItem("playerCache", JSON.stringify({
+                data: {
+                    ...data.AnimeData,
+                    player_ID: response.player_id
+                },
+                save: {
+                    last_Time: 0,
+                    type: response.episodesData[0].type,
+                    pluginName: plugin.metadata.name,
+                    episode: response.episodesData[0].episodes[0].ep
+                },
+                episodelist: response.episodesData[0].episodes,
+                continewatch: true,
+            }))
+        }
+        if (saveData && id) {
+            const episodeList = await plugin.extractOnlyEpisodesList(saveData.type, id);
+            if (episodeList.length <= 0) {
+                updateToast(idToast, "Failed Fetch episodes", { type: "error", removeTimer: false })
+                return
+            }
+
+            localStorage.setItem("playerCache", JSON.stringify({
+                data: {
+                    ...data.AnimeData,
+                    player_ID: id,
+                },
+                save: saveData,
+                episodelist: episodeList,
+                continewatch: true,
+            }))
+        }
+        
+        removeToast(idToast)
+        navigate("/player")
+    }
+
+    function generateButton() {
+        if (data.AnimeData.status && data.AnimeData.status.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED") return <></>
+        const history = getHistory()
+        const animeContinue = history.continue.find((value) => value.AnimeData.id == data.AnimeData.id)
+        const historyContinue = history.history.find((value) => value.AnimeData.id == data.AnimeData.id)
+
+        console.log(historyContinue, animeContinue)
+
+        try {
+            if (!animeContinue && !historyContinue) return <Button content='Watch Now' ButtonClass='big-card-button' onClick={() => goToPlayer()} />
+            if (animeContinue) return <Button content={`Continue Episode ${animeContinue.saveData?.episode}`} ButtonClass='big-card-button' onClick={() => goToPlayer(animeContinue.saveData, animeContinue.AnimeData.player_ID)} />
+            if (historyContinue && parseInt(historyContinue.saveData.episode!) != historyContinue.AnimeData.episodes) {
+                return <Button content={`Start Episode ${parseInt(historyContinue.saveData.episode!)+1}`} ButtonClass='big-card-button' onClick={() => goToPlayer(historyContinue.saveData as indentityPlayer, historyContinue.AnimeData.player_ID)} />
+            }
+        } catch (error) {}
+        if (!historyContinue) return <></>
+
+        return <Button content={`Start Episode ${historyContinue.saveData.episode}`} ButtonClass='big-card-button' onClick={() => goToPlayer(historyContinue.saveData as indentityPlayer, historyContinue.AnimeData.player_ID)} />
     }
 
     return (
@@ -69,6 +137,7 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
                             </Show>
                         </div>
                         <div class="big-card-information-bottom">
+                            {generateButton()}
                             <Button content='More Information' ButtonClass='big-card-button' onClick={openInformation} />
                             <Show when={data.AnimeData.nextAiringEpisode}>
                                 <div class="big-card-information-date">{getEpisodeDay(data.AnimeData.nextAiringEpisode?.timeUntilAiring!, data.AnimeData.nextAiringEpisode?.episode!)}</div>
