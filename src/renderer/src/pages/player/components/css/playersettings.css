@@ -10,7 +10,7 @@
   height: min-content;
   overflow-x: hidden;
 
-  transform: translateX(400px);
+  transform: translateX(1000px);
   transition: 250ms ease-out;
 }
 .player-settings-container.show {
