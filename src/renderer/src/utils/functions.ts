@@ -85,6 +85,7 @@ export async function changeTheme(name: string[]) {
     for (let index = 0; index < old.length; index++) {
         const element = old[index];
         if (element.id == "theme-stylesheet") continue
+        if (element.crossOrigin) continue
         element.remove()
     }
 
