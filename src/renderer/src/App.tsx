@@ -23,7 +23,7 @@ import {
   } from 'solid-js';
 import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import { getConfig, setConfig } from './utils/stores/config';
-import { getGlobalCache, setGlobalHistory, setIncognitoMode } from './utils/stores/global';
+import { getGlobalCache, setGlobalHistory, setGlobalTheme, setIncognitoMode } from './utils/stores/global';
 import { HashRouter, Route } from '@solidjs/router';
 import { pluginManager } from './utils/stores/plugins';
 import { setHomeActivePage } from './utils/stores/home';
@@ -32,6 +32,7 @@ import { useI18n } from './utils/i18n';
 import './App.css';
 import './themes/darkerAnimu/main.css';
 import './utils/i18n';
+import { unwrap } from 'solid-js/store';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -68,6 +69,9 @@ function App() {
       setConfig(JSON.parse(localStorage.getItem("config") as any))
       setGlobalHistory(JSON.parse(localStorage.getItem("history") as any))
     }
+    setinitialState({ text: "Loading Theme", plugin: false })
+    setGlobalTheme(await window.api.themes.list()) 
+
     setinitialState({ text: "Loading Config", plugin: false })
     LoadConfig()
     setHomeActivePage(t("global.home"))
@@ -79,12 +83,13 @@ function App() {
     if (window.api) runCheckUpdate()
   })
 
-  async function LoadConfig() {
+  function LoadConfig() {
     if (!window.api) return
     const loadedConnfig = getConfig()
+    console.log(unwrap(loadedConnfig))
 
     // Loading theme
-    await changeTheme(loadedConnfig.General.theme)
+    changeTheme(loadedConnfig.General.theme)
 
     changeLanguage(loadedConnfig.General.language)
     if (loadedConnfig.General.Window.AutoMaximize) window.BrowserWindow.setMaximize()

@@ -1,0 +1,49 @@
+.custom-menu-background {
+    width: 100vw;
+    height: 100vh;
+    background-color: color-mix(in srgb, var(--first-layer) 80%, transparent);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+}
+
+.custom-menu-box {
+    width: clamp(250px, 20vw, 400px);
+    height: max-content;
+    background-color: var(--second-layer);
+    padding: 12px;
+    outline: 2px solid var(--third-layer);
+    border-radius: 12px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.custom-menu-content-title {
+    font-size: 1.3em;
+    font-weight: 600;
+}
+
+.custom-menu-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.custom-menu-space {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: space-between;
+}
+
+.custom-menu-exit-button {
+    position: absolute;
+    margin: -46px -39px;
+    border-radius: 12px !important;
+}

@@ -4,7 +4,7 @@
   align-items: center;
   width: 100%;
   margin: 15px;
-  height: 40px;
+  height: max-content;
 }
 
 .settings-container {
@@ -189,7 +189,7 @@ td {
   gap: 4px;
 }
 
-.settings-button-backup {
+.settings-button-backup, .settings-button-theme {
   padding: 12px;
   user-select: none;
   border-radius: 12px;
@@ -201,7 +201,7 @@ td {
   transition: all 100ms ease-in-out;
 }
 
-.settings-button-backup:hover {
+.settings-button-backup:hover, .settings-button-theme:hover {
   background-color: var(--five-layer);
   color: var(--green-one);
 }
@@ -218,10 +218,52 @@ td {
   outline-color:var(--green-one);
 }
 
-.settings-backup-container {
+.settings-backup-container, .settings-theme-container, .settings-theme-spliter {
   padding: 4px;
   display: flex;
   flex-direction: column;
+}
+
+.settings-theme-container {
+  padding: 0px;
+}
+
+.settings-theme-spliter {
+  padding: 6px;
+  gap: 6px;
+}
+
+.settings-theme-span {
+  padding: 6px 12px;
+  font-size: 1.2em;
+  background-color: var(--five-layer);
+  width: max-content;
+  border-radius: 12px;
+  user-select: none;
+}
+
+.settings-settings-theme-button {
+  width: 38px;
+  height: 38px;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--five-layer) !important;
+}
+
+.settings-button-theme {
+  justify-content: space-between;
+}
+
+.settings-button-theme.button {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 12px !important;
+}
+
+.settings-theme-button-span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* for very small window sizes */

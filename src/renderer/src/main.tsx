@@ -5,6 +5,7 @@ import { DialogProvider } from "./utils/context/DialogContext";
 import { ContextMenu } from "./utils/context/ContextMenu";
 import { ToastProvider } from './utils/context/ToastNotification';
 import { I18nProvider } from "./utils/i18n"
+import { MenuContextProvider } from './utils/context/menuContext';
 
 import "material-symbols/material-symbols-outlined.woff2"
 import "material-symbols/outlined.css"
@@ -20,15 +21,17 @@ const queryClient = new QueryClient({
 render(
   () => (
     <I18nProvider config={{ defaultLang: "en", fallbackLang: "en" }}>
-      <DialogProvider>
-        <ContextMenu>
-          <QueryClientProvider client={queryClient}>
-            <ToastProvider>
-              <App />
-            </ToastProvider>
-          </QueryClientProvider>
-        </ContextMenu>
-      </DialogProvider>
+      <MenuContextProvider>
+        <DialogProvider>
+          <ContextMenu>
+            <QueryClientProvider client={queryClient}>
+              <ToastProvider>
+                <App />
+              </ToastProvider>
+            </QueryClientProvider>
+          </ContextMenu>
+        </DialogProvider>
+      </MenuContextProvider>
     </I18nProvider>
   ),
   document.getElementById("root") as HTMLElement

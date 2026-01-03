@@ -17,14 +17,14 @@ import {
     openUrlFolder,
     request,
     updateObjectConfig
-    } from '@renderer/utils/functions';
+} from '@renderer/utils/functions';
 import { checkUpdate } from '@renderer/utils/update';
 import {
     ContextMenuProps,
     playerPluginFormat,
     SettingsConfig,
     themeMetadata
-    } from '@renderer/utils/types';
+} from '@renderer/utils/types';
 import { CreateBackup, RestoreBackup } from '@renderer/utils/backup';
 import {
     createEffect,
@@ -33,7 +33,7 @@ import {
     onCleanup,
     onMount,
     Show
-    } from 'solid-js';
+} from 'solid-js';
 import { createShortcut } from '@solid-primitives/keyboard';
 import { DetectOldVersionHistory } from '@renderer/utils/FilesManager/history';
 import { getConfig, setConfig } from '@renderer/utils/stores/config';
@@ -46,6 +46,8 @@ import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './settings.css';
 import { useI18n } from '@renderer/utils/i18n';
+import { activeThemes, loadedTheme } from '@renderer/utils/stores/global';
+import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 
 function settings() {
     const navigate = useNavigate();
@@ -55,10 +57,9 @@ function settings() {
 
     const [category, setCategory] = createSignal<string>("general");
     const [config, setNewConfig] = createSignal<{ old: SettingsConfig, new: SettingsConfig }>({ old: structuredClone(cfg), new: structuredClone(cfg) })
-    const [themes, setThemes] = createSignal<{ label: string, onClick?: () => void }[]>([])
+    const [themes, setThemes] = createSignal<themeMetadata[]>([])
     const [versions] = createSignal(window.electronAPI.process.versions)
     const [isSaving, setSaving] = createSignal<boolean>(false)
-    const [themeMetadata, setthemeMetadata] = createSignal<themeMetadata | undefined>(undefined)
     const [backupList, setBackupList] = createSignal<{ date: Date, file: string }[]>([])
     const [ContextMenu, setContextMenu] = createSignal<ContextMenuProps>([
         { option: "dialog.reload", onClick: () => location.reload() },
@@ -145,7 +146,7 @@ function settings() {
             buttons: [
                 {
                     title: t("dialog.yes"),
-                    onClick: () => {handleChange("Developer.DeveloperMode", true);turnOnDeveloperMode()}
+                    onClick: () => { handleChange("Developer.DeveloperMode", true); turnOnDeveloperMode() }
                 },
                 {
                     title: t("dialog.no"),
@@ -156,6 +157,7 @@ function settings() {
     })
 
     createShortcut(["Escape"], () => {
+        if (isCustomMenuActive()) return hideCustomMenu()
         navigate("/");
     })
 
@@ -170,16 +172,11 @@ function settings() {
     })
 
     onMount(async () => {
+        setThemes(loadedTheme().filter((val) => !activeThemes().map((val) => val.themeName).includes(val.themeName)))
         changeTitleAnimu(`Animu - ${t("global.settings")}`)
         if (!window.api) return
         setBackupList(await window.api.backup.list())
-        window.api.getlistThemes().then((data) => {
-            let themes = data.map((element) => { return { label: element.themeName, onClick: () => { changeTheme(element.themeName); handleChange("General.theme", element.themeName); setthemeMetadata(() => element) } } })
-            setThemes(() => themes)
-            data.forEach(element => {
-                if (element.themeName == config().new.General.theme) setthemeMetadata(() => element)
-            });
-        })
+
         if (config().new.General.discordRPC) window.api.rpc.setActivity(undefined, t("discordrpc.settings"))
         turnOnDeveloperMode()
     });
@@ -233,6 +230,7 @@ function settings() {
             changeTheme(config().old.General.theme)
             return { old: structuredClone(prev.old), new: structuredClone(prev.old) }
         })
+        setThemes(loadedTheme().filter((val) => !activeThemes().map((val) => val.themeName).includes(val.themeName)))
         pluginManager().initialPlugins()
         setSaving(() => false)
     }
@@ -269,11 +267,44 @@ function settings() {
             },
             {
                 title: "Yes",
-                onClick: async () => {RestoreBackup(file);setBackupList(await window.api.backup.list())},
+                onClick: async () => { RestoreBackup(file); setBackupList(await window.api.backup.list()) },
             }
             ]
         })
     }
+
+    function updateTheme(theme: themeMetadata, remove: boolean = false) {
+        let tmp: string[];
+        if (remove) tmp = activeThemes().filter((val) => val.themeName != theme.themeName).map((value) => value.themeName)
+        else tmp = [...activeThemes().map((value) => value.themeName), theme.themeName]
+
+        if (tmp.length <= 0) tmp.push("DarkerAnimu")
+
+        setThemes(loadedTheme().filter((val) => !tmp.includes(val.themeName)))
+        changeTheme(unwrap(tmp))
+        handleChange("General.theme", unwrap(activeThemes()) as unknown as string)
+    }
+
+    async function openThemeOption(theme: themeMetadata) {
+        const themeConfig = await window.api.themes.config(unwrap(theme))
+        showCustomMenu({
+            title: `Config: ${theme.themeName}`,
+            type: 'themeConfig',
+            theme: theme,
+            config: themeConfig,
+            onChange: async (theme: themeMetadata, change: string, update: string | boolean) => {
+                const record: Record<string, boolean | string> = {
+                    [change]: update
+                }
+                await window.api.themes.writeConfig(unwrap(theme), unwrap(record))
+                if (activeThemes().find((value) => value.themeName == theme.themeName)) updateTheme(theme)
+            },
+        })
+    }
+
+    // createEffect(() => {
+    //     console.log(settingsActiveThemes(), themes())
+    // })
 
     return (
         <main class="settings-container" onContextMenu={(event) => OpenContextMenu(ContextMenu(), event)}>
@@ -333,7 +364,7 @@ function settings() {
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("settings.general.theme")}
+                            {/* {t("settings.general.theme")}
                             <div class="settings-helpicon-space">
                                 {themeMetadata() && themeMetadata()?.author && <div class="settings-text-space">{themeMetadata()?.author}</div>}
                                 {themeMetadata() && themeMetadata()?.version && <div class="settings-text-space">{themeMetadata()?.version}</div>}
@@ -345,7 +376,42 @@ function settings() {
                                 <Show when={window.api}>
                                     <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getConfigPath()}/themes`))} />
                                 </Show>
-                            </div>
+                            </div> */}
+                            <SettingsDrop LeftHeader={t("settings.general.theme")} leftbutton={{ icon: "folder", onClick: async () => window.api.open(await convertPath(`${await window.api.os.getConfigPath()}/themes`)) }} content={
+                                <div class="settings-theme-spliter">
+                                    <span class='settings-theme-span'>Active Theme</span>
+                                    <div class="settings-theme-container">
+                                        <For each={activeThemes()}>
+                                            {(value) => (<div class={`settings-button-theme ${value.options ? "button" : ""}`} onclick={() => updateTheme(value, true)}>
+                                                {value.themeName}
+                                                <span class='settings-theme-button-span'>
+                                                    <Show when={value.options}>
+                                                        <Button icon='settings' ButtonClass="settings-settings-theme-button" onClick={(event) => { event.preventDefault(); openThemeOption(value) }} />
+                                                    </Show>
+                                                    <CheckBox checked />
+                                                </span>
+                                            </div>
+                                            )}
+                                        </For>
+                                    </div>
+                                    <span class='settings-theme-span'>Loaded Theme</span>
+                                    <div class="settings-theme-container">
+                                        <For each={themes()}>
+                                            {(value) => (
+                                                <div class={`settings-button-theme ${value.options ? "button" : ""}`} onclick={() => updateTheme(value)}>
+                                                    {value.themeName}
+                                                    <span class='settings-theme-button-span'>
+                                                        <Show when={value.options}>
+                                                            <Button icon='settings' ButtonClass="settings-settings-theme-button" onClick={(event) => { event.preventDefault(); openThemeOption(value) }} />
+                                                        </Show>
+                                                        <CheckBox checked={false} />
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </For>
+                                    </div>
+                                </div>
+                            } />
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
@@ -950,9 +1016,9 @@ function settings() {
                         <div class="settings-setting-container">
                             Toast Notification Test
                             <span class="settings-custom-space">
-                                <Button content="success" onClick={() => toast("Test Notification", {type: "success"})} />
-                                <Button content="error" onClick={() => toast("Test Notification", {type: "error"})} />
-                                <Button content="loading" onClick={() => toast("Test Notification", {type: "loading"})} />
+                                <Button content="success" onClick={() => toast("Test Notification", { type: "success" })} />
+                                <Button content="error" onClick={() => toast("Test Notification", { type: "error" })} />
+                                <Button content="loading" onClick={() => toast("Test Notification", { type: "loading" })} />
                                 <Button content="default" onClick={() => toast("Test Notification")} />
                             </span>
                         </div>

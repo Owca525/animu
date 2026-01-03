@@ -14,7 +14,7 @@ export interface SettingsConfig {
         // HoverSidebar: boolean
         // HideSidebar: boolean
         language: string
-        theme: string
+        theme: string[]
         discordRPC: boolean
         Window: {
             AutoMaximize: boolean
@@ -189,7 +189,7 @@ export const defaultConfig: SettingsConfig = {
     firstStart: true,
     General: {
         language: "en",
-        theme: "DarkerAnimu",
+        theme: ["DarkerAnimu"],
         Window: {
             AutoMaximize: false,
             AutoFullscreen: false,
@@ -298,7 +298,6 @@ export interface themeFormatType {
     author: string,
     themeName: string
     mainCSS: string,
-    customTitle?: string,
     options?: {
         name: string,
         dropDown?: { option: string, css: string }[]
@@ -313,7 +312,6 @@ export const ThemeSchema = z.object({
     author: z.string(),
     themeName: z.string(),
     mainCSS: z.string(),
-    customTitle: z.string().optional(),
     options: z.array(
         z.object({
             name: z.string(),

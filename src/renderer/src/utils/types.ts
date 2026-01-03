@@ -91,7 +91,9 @@ export interface deepLinkData {
 export interface globalDataFormat {
     incognito: boolean,
     history: cardData[],
-    deeplinkRunned: boolean
+    deeplinkRunned: boolean,
+    loadedTheme: themeMetadata[],
+    activeThemes: themeMetadata[]
 }
 
 export type playerDataExtended = playerData & {
@@ -174,13 +176,13 @@ export type ContextMenuProps = {
     deletion?: boolean
 }[]
 
+// customTitle?: string,
 export interface themeMetadata {
     api?: string,
     version?: string,
     author: string,
     themeName: string
     mainCSS: string,
-    customTitle?: string,
     options?: {
         name: string,
         dropDown?: { option: string, css: string }[]
@@ -260,7 +262,7 @@ export interface SettingsConfig {
         // HoverSidebar: boolean
         // HideSidebar: boolean
         language: string
-        theme: string
+        theme: string[]
         discordRPC: boolean
         Window: {
             AutoMaximize: boolean

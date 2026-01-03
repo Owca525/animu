@@ -2,7 +2,7 @@ import { cardData, ContextMenuProps, homeData, playerChapterList, SettingsConfig
 import { showDialog } from "./context/DialogContext";
 import { DropdownOption } from "@renderer/components/dropDown";
 import { getHomeCache, setHomeNewData } from "./stores/home";
-import { getGlobalCache } from "./stores/global";
+import { getGlobalCache, loadedTheme, setActiveThemes } from "./stores/global";
 import { getConfig } from "./stores/config";
 import { getPluginList } from "./stores/plugins";
 import { unwrap } from "solid-js/store";
@@ -72,28 +72,48 @@ export function formatTime(seconds: number | undefined): string {
     return `${hoursPart}${hoursPart != "" && minutes < 10 ? "0" : ""}${minutes}:${secs < 10 ? '0' : ''}${secs}`;
 }
 
-export async function changeTheme(name: string) {
+function createHTMLLinkElement(css: string) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = css;
+    document.head.appendChild(link);
+}
+
+export async function changeTheme(name: string[]) {
     if (!window.api) return
-    let old = document.getElementById("theme-stylesheet") as HTMLLinkElement
-    if (old) old.remove()
-    document.title = ""
+    let old = document.querySelectorAll<HTMLLinkElement>("link")
+    for (let index = 0; index < old.length; index++) {
+        const element = old[index];
+        if (element.id == "theme-stylesheet") continue
+        element.remove()
+    }
 
-    const themes = await window.api.getlistThemes()
-    let theme: themeMetadata = themes[0]
+    const themes = loadedTheme()
+    let activeTheme: themeMetadata[] = []
+    if (name.length > 0) {
+        for (let index = 0; index < themes.length; index++) {
+            const element = themes[index];
+            if (name.includes(element.themeName)) activeTheme.push(element)
+        }
+    } else activeTheme.push(themes.find((val) => val.themeName == "DarkerAnimu") as themeMetadata)
 
-    themes.forEach((element) => {
-        if (element.themeName === name) {
-            theme = element
+    activeTheme.reverse()
+    setActiveThemes(activeTheme)
+    console.log(activeTheme)
+
+    activeTheme.map(async (theme) => {
+        createHTMLLinkElement(theme.mainCSS)
+
+        if (!theme.options) return
+        const conf = await window.api.themes.config(theme)
+        for (const key in conf) {
+            let content = theme.options.find((value) => value.name == key)
+            if (!content) continue
+
+            if (content.css && conf[key] == true) createHTMLLinkElement(content.css)
+            if (content.dropDown) content.dropDown.map((value) => value.option == conf[key] ? createHTMLLinkElement(value.css) : "")
         }
     })
-
-    const link = document.createElement('link');
-    link.id = 'theme-stylesheet';
-    link.rel = 'stylesheet';
-    link.href = theme.mainCSS;
-    document.head.appendChild(link);
-
-    if (theme.customTitle) changeTitleAnimu(theme.customTitle)
 }
 
 export function changeTitleAnimu(title: string) {

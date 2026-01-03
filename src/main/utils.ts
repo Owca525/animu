@@ -1,15 +1,16 @@
 import { app, clipboard, ipcMain, nativeImage, shell } from "electron"
 import { Client } from "@xhayper/discord-rpc";
 import { ActivityType } from "discord-api-types/v10"
+import ini from "ini";
 
 import path from "path"
 import fs from "fs"
-import { mainWindow, newConfigPath } from ".";
+import { mainWindow, newConfigPath, themeConfigPath } from ".";
 import { exec, execSync } from "child_process";
 // import express from "express";
 // import { Readable } from "stream";
 import os from "os"
-import { ThemeSchema } from "./types";
+import { themeFormatType, ThemeSchema } from "./types";
 // import { requestResponseVideo } from "./types";
 
 let rpc: Client | undefined = undefined
@@ -102,7 +103,7 @@ ipcMain.handle('saveToClipboard', async (_event, type: "text" | "image", content
     }
 })
 
-ipcMain.handle('get-css-files', async (): Promise<{ version?: string; autor?: string; pathcss: string; animuTitle?: string; name: string; }[]> => {
+ipcMain.handle('get-css-files', async (): Promise<themeFormatType[]> => {
     // Directory for local css
     let stylesDir: string = "";
     if (process.env.NODE_ENV === 'development') {
@@ -122,9 +123,9 @@ ipcMain.handle('get-css-files', async (): Promise<{ version?: string; autor?: st
     return [...localList, ...customList]
 });
 
-async function getThemeList(themePath: string): Promise<{ version?: string; autor?: string; pathcss: string; animuTitle?: string; name: string; }[]> {
+async function getThemeList(themePath: string): Promise<themeFormatType[]> {
     let listFolder = await fs.promises.readdir(themePath)
-    let finallist: any = []
+    let finallist: themeFormatType[] = []
     for (let index = 0; index < listFolder.length; index++) {
         const element = listFolder[index];
         const folderTheme = path.join(themePath, element)
@@ -133,10 +134,17 @@ async function getThemeList(themePath: string): Promise<{ version?: string; auto
             if (theme) finallist.push(theme)
         }
     }
-    return finallist
+    return finallist.map((theme) => {
+        if (!theme.options) return theme
+        return {...theme, options: theme.options.map((value) => {
+            if (value.css && value.css.replaceAll(" ", "") != "") return { ...value, css: path.join(path.dirname(theme.mainCSS), value.css) }
+            if (value.dropDown) return { ...value, dropDown: value.dropDown.map((val) => ({ ...val, css: val.css != "" ? path.join(path.dirname(theme.mainCSS), val.css) : "" })) }
+            return value
+        })}
+    })
 }
 
-async function getMetadataTheme(path_theme: string): Promise<{ version?: string; autor?: string; pathcss: string; animuTitle?: string; name: string; } | undefined | {}> {
+async function getMetadataTheme(path_theme: string): Promise<themeFormatType | undefined> {
     try {
         const pathTheme = path.join(path_theme, "/theme.json")
 
@@ -324,3 +332,41 @@ export function deepMerge(target: any, source: any): any {
 }
 
 ipcMain.handle("animuVersion", () => app.getVersion())
+
+ipcMain.handle('getThemeConfig', async (_event, theme: themeFormatType): Promise<Record<string, string | boolean> | {}> => getThemeConfig(theme))
+
+function getThemeConfig(theme: themeFormatType) {
+    if (!fs.existsSync(path.join(themeConfigPath, `${theme.themeName}.ini`))) return generateConfigTheme(theme)
+    return ini.parse(fs.readFileSync(path.join(themeConfigPath, `${theme.themeName}.ini`), "utf-8"))
+}
+
+function generateConfigTheme(theme: themeFormatType) {
+    if (!theme.options) return {}
+
+    let generetatedConfig: Record<string, boolean | string> = {}
+
+    for (let index = 0; index < theme.options.length; index++) {
+        const element = theme.options[index];
+
+        if (element.css != undefined) {
+            generetatedConfig[element.name] = element.default ? element.default : false
+        } else if (element.dropDown) {
+            generetatedConfig[element.name] = element.dropDown[0].option
+        }
+    }
+
+    fs.writeFileSync(path.join(themeConfigPath, `${theme.themeName}.ini`), ini.stringify(generetatedConfig), "utf-8")
+    return generetatedConfig
+}
+
+ipcMain.handle('saveConfigTheme', async (_event, theme: themeFormatType, data: Record<string, boolean | string>): Promise<void> => saveThemeConfig(theme, data))
+
+function saveThemeConfig(theme: themeFormatType, data: Record<string, boolean | string> | {}): any {
+    let content = data
+    if (!fs.existsSync(path.join(themeConfigPath, `${theme.themeName}.ini`))) {
+        content = { ...generateConfigTheme(theme), ...content }
+    } else {
+        content = { ...getThemeConfig(theme), ...content }
+    }
+    fs.writeFileSync(path.join(themeConfigPath, `${theme.themeName}.ini`), ini.stringify(content), "utf-8")
+}

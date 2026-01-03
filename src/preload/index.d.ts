@@ -61,8 +61,12 @@ declare global {
         list: () => Promise<{ file: string, date: Date }[]>
         restore: (file: string) => Promise<{ success: boolean, error?: number }>
       }
+      themes: {
+        list: () => Promise<themeMetadata[]>
+        config: (theme: themeMetadata) => Promise<Record<string, boolean | string> | {}>
+        writeConfig: (theme: themeMetadata, data: Record<string, boolean | string>) => Promise<void>
+      }
       runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string}, type: "mpv" | "vlc") => any
-      getlistThemes: () => Promise<themeMetadata[]>
       getOSDetails: () => Promise<{ platform: NodeJS.Platform, release: string, arch: string }>
       getListLang: () => Promise<{ data: any, lang: string }[]>
       getConfig: () => Promise<SettingsConfig>

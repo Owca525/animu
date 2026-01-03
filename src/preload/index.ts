@@ -48,8 +48,12 @@ if (process.contextIsolated) {
         list: () => ipcRenderer.invoke("backupList"),
         restore: (file: string) => ipcRenderer.invoke("restoreBackup", file)
       },
+      themes: {
+        list: () => ipcRenderer.invoke("get-css-files"),
+        config: (theme) => ipcRenderer.invoke("getThemeConfig", theme),
+        writeConfig: (theme, data: Record<string, boolean | string>) => ipcRenderer.invoke("saveConfigTheme", theme, data)
+      },
       runExternaPlayer: (videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", videoData, type),
-      getlistThemes: () => ipcRenderer.invoke("get-css-files"),
       getOSDetails: () => ipcRenderer.invoke('get-os-info'),
       getListLang: () => ipcRenderer.invoke("get-lang-files"),
       getConfig: () => ipcRenderer.invoke("getConfig"),

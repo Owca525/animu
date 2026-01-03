@@ -13,13 +13,15 @@ import "./request"
 import "./streaming"
 import "./backup"
 import { convertToNewFormat, detectOldVersion, write } from './os'
-import { existsSync, readFileSync } from 'fs'
+import { existsSync, mkdirSync, readFileSync } from 'fs'
 import { cardData, defaultConfig, SettingsConfig } from './types';
 import { deepMerge, setupDiscordRPC } from './utils';
 import { electronAppUniversalProtocolClient } from 'electron-app-universal-protocol-client';
 
 export let mainWindow: BrowserWindow | undefined
 export const newConfigPath = path.join(app.getPath("userData"), "animuConfig")
+export const themeConfigPath = path.join(newConfigPath, "themeConfig")
+export const pluginsConfigPath = path.join(newConfigPath, "pluginsConfig")
 export let config: SettingsConfig = defaultConfig
 let historyData: cardData[] = []
 const PROTOCOL = "animu"
@@ -167,9 +169,14 @@ export async function initialBackend() {
     await detectOldVersion()
     await convertToNewFormat()
 
+    if (!existsSync(themeConfigPath)) mkdirSync(themeConfigPath)
+    if (!existsSync(pluginsConfigPath)) mkdirSync(pluginsConfigPath)
+
     if (existsSync(path.join(newConfigPath, "config.ini"))) {
       let data = readFileSync(path.join(newConfigPath, "config.ini"), "utf-8")
-      config = deepMerge(defaultConfig, ini.parse(data))
+      const content: SettingsConfig = deepMerge(defaultConfig, ini.parse(data))
+      if (typeof content.General.theme === "string") config = { ...content, General: { ...content.General, theme: ["DarkerAnimu"] } }
+      else config = content
     } else {
       write(path.join(newConfigPath, "config.ini"), ini.stringify(defaultConfig))
       console.info("created new config")
