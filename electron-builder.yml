@@ -2,7 +2,7 @@ appId: com.animu.app
 productName: animu
 asar: true
 buildDependenciesFromSource: true
-electronLanguages: en
+electronLanguages: ["en-US"]
 protocols:
   name: Animu Protocol
   schemes:
