@@ -31,15 +31,7 @@ files:
   - '!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}'
   - '!**/{appveyor.yml,.travis.yml,circle.yml}'
   - '!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}'
-  - "!node_modules/cheerio"
-  - "!node_modules/cheerio-select"
-  - "!node_modules/html2canvas"
-  - "!node_modules/jassub"
-  - "!node_modules/rxjs"
-  - "!node_modules/@tanstack"
-  - "!node_modules/loupe"
-  - "!node_modules/@solid-primitives"
-  - "!node_modules/@solidjs"
+  - "!node_modules/**"
 
 win:
   executableName: animu

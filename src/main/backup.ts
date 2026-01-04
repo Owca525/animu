@@ -3,7 +3,7 @@ import fs, { existsSync, readdirSync } from "fs"
 import archiver from "archiver";
 import path from "path";
 import { initialBackend, newConfigPath } from ".";
-import * as unzipper from "unzipper"
+import AdmZip from 'adm-zip'
 
 let backupFolder = path.join(app.getPath("userData"), "animuBackup")
 
@@ -41,9 +41,9 @@ export async function getBackupList() {
 export async function RestoreBackup(file: string): Promise<{ success: boolean, error?: number }> {
     try {
         if (!existsSync(path.join(backupFolder, file))) return { success: false, error: 2 }
-        await fs.rmdirSync(path.join(app.getPath("userData"), "animuConfig"), { recursive: true })
-        const directory = await unzipper.Open.file(path.join(backupFolder, file))
-        await directory.extract({ path: path.join(app.getPath("userData"), "animuConfig") })
+        fs.rmdirSync(path.join(app.getPath("userData"), "animuConfig"))
+        const zip = new AdmZip(path.join(backupFolder, file))
+        zip.extractAllTo(path.join(app.getPath("userData"), "animuConfig"), true)
         await initialBackend()
         return { success: true }
     } catch (error) {

@@ -1,6 +1,6 @@
-import { resolve } from 'path'
-import { defineConfig } from 'electron-vite'
-import solid from 'vite-plugin-solid'
+import { resolve } from 'path';
+import solid from 'vite-plugin-solid';
+import { defineConfig } from 'electron-vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
@@ -9,13 +9,25 @@ export default defineConfig({
       emptyOutDir: true,
       sourcemap: false,
       minify: true,
-    }
+      externalizeDeps: false
+    },
+    plugins: [
+      viteStaticCopy({
+        targets: [
+          {
+            src: "node_modules/castv2/lib/cast_channel.proto",
+            dest: "",
+          }
+        ],
+      }),
+    ]
   },
   preload: {
     build: {
       emptyOutDir: true,
       sourcemap: false,
       minify: true,
+      externalizeDeps: false
     }
   },
   renderer: {

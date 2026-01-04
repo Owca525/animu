@@ -115,8 +115,6 @@ function createWindow(): void {
   }
 }
 
-electronAppUniversalProtocolClient
-
 const gotTheLock = app.requestSingleInstanceLock()
 
 if (!gotTheLock) {
