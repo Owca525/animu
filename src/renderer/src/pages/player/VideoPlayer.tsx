@@ -14,6 +14,7 @@ import JASSUB from "jassub";
 
 import workerUrl from "jassub/dist/jassub-worker.js?url";
 import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
+import modernWasmUrl from 'jassub/dist/jassub-worker-modern.wasm?url'
 import { saveConfig } from "@renderer/utils/FilesManager/config"
 import { SaveHistory } from "@renderer/utils/FilesManager/history"
 import { Component, createSignal, For, onCleanup, onMount, Show } from "solid-js"
@@ -672,6 +673,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     async function setNewSubtitles(sub: playerSubtitlesFormat | undefined) {
         if (!sub) return
         if (!videoRef) return
+        console.log(currentASSubtitles())
 
         // This clear subtitles but this dosen't work on dev Because react second render
         if (currentASSubtitles()) {
@@ -701,6 +703,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 subUrl: sub.url,
                 workerUrl,
                 wasmUrl,
+                modernWasmUrl
             });
             setASSubtitles(renderer)
             setSubtitles(() => sub)
