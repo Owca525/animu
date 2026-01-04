@@ -1,14 +1,22 @@
 import { resolve } from 'path'
-import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
+import { defineConfig } from 'electron-vite'
 import solid from 'vite-plugin-solid'
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()]
+    build: {
+      emptyOutDir: true,
+      sourcemap: false,
+      minify: true,
+    }
   },
   preload: {
-    plugins: [externalizeDepsPlugin()]
+    build: {
+      emptyOutDir: true,
+      sourcemap: false,
+      minify: true,
+    }
   },
   renderer: {
     resolve: {
@@ -37,3 +45,4 @@ export default defineConfig({
     ]
   }
 })
+

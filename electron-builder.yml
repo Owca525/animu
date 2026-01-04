@@ -1,5 +1,8 @@
 appId: com.animu.app
 productName: animu
+asar: true
+buildDependenciesFromSource: true
+electronLanguages: en
 protocols:
   name: Animu Protocol
   schemes:
@@ -10,11 +13,34 @@ files:
   - '!**/.vscode/*'
   - '!src/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
-  - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md,LICENSE}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
-asarUnpack:
-  - resources/**
+  - '!assets/**'
+  - '!resources/**'
+  - '!node_modules/hls.js/**'
+  - '!node_modules/material-symbols/**'
+  - '!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}'
+  - '!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}'
+  - '!**/node_modules/*.d.ts'
+  - '!**/node_modules/.bin'
+  - '!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}'
+  - '!.editorconfig'
+  - '!**/._*'
+  - '!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}'
+  - '!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}'
+  - '!**/{appveyor.yml,.travis.yml,circle.yml}'
+  - '!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}'
+  - "!node_modules/cheerio"
+  - "!node_modules/cheerio-select"
+  - "!node_modules/html2canvas"
+  - "!node_modules/jassub"
+  - "!node_modules/rxjs"
+  - "!node_modules/@tanstack"
+  - "!node_modules/loupe"
+  - "!node_modules/@solid-primitives"
+  - "!node_modules/@solidjs"
+
 win:
   executableName: animu
   target:
