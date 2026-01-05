@@ -282,7 +282,7 @@ function settings() {
 
         setThemes(loadedTheme().filter((val) => !tmp.includes(val.themeName)))
         changeTheme(unwrap(tmp))
-        handleChange("General.theme", unwrap(activeThemes()) as unknown as string)
+        handleChange("General.theme", unwrap(activeThemes().map((val) => val.themeName)) as unknown as string)
     }
 
     async function openThemeOption(theme: themeMetadata) {
@@ -302,9 +302,9 @@ function settings() {
         })
     }
 
-    // createEffect(() => {
-    //     console.log(settingsActiveThemes(), themes())
-    // })
+    createEffect(() => {
+        console.log(config())
+    })
 
     return (
         <main class="settings-container" onContextMenu={(event) => OpenContextMenu(ContextMenu(), event)}>
@@ -382,7 +382,7 @@ function settings() {
                                     <span class='settings-theme-span'>Active Theme</span>
                                     <div class="settings-theme-container">
                                         <For each={activeThemes()}>
-                                            {(value) => (<div class={`settings-button-theme ${value.options ? "button" : ""}`} onclick={() => updateTheme(value, true)}>
+                                            {(value) => (<div class={`settings-button-theme ${value.options ? "button" : ""}`} onclick={() => value.themeName != "DarkerAnimu" ? "" : updateTheme(value, true)}>
                                                 {value.themeName}
                                                 <span class='settings-theme-button-span'>
                                                     <Show when={value.options}>
