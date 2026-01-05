@@ -382,7 +382,7 @@ function settings() {
                                     <span class='settings-theme-span'>Active Theme</span>
                                     <div class="settings-theme-container">
                                         <For each={activeThemes()}>
-                                            {(value) => (<div class={`settings-button-theme ${value.options ? "button" : ""}`} onclick={() => value.themeName != "DarkerAnimu" ? "" : updateTheme(value, true)}>
+                                            {(value) => (<div class={`settings-button-theme ${value.options ? "button" : ""}`} onclick={() => value.themeName != "DarkerAnimu" ? updateTheme(value, true) : ""}>
                                                 {value.themeName}
                                                 <span class='settings-theme-button-span'>
                                                     <Show when={value.options}>
