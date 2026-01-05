@@ -382,7 +382,7 @@ function settings() {
                                                 {value.themeName}
                                                 <span class='settings-theme-button-span'>
                                                     <Show when={value.options}>
-                                                        <Button icon='settings' ButtonClass="settings-settings-theme-button" onClick={(event) => { event.preventDefault(); openThemeOption(value) }} />
+                                                        <Button icon='settings' ButtonClass="settings-settings-theme-button" onClick={(event) => { event.stopPropagation(); openThemeOption(value) }} />
                                                     </Show>
                                                     <CheckBox checked onChecked={() => value.themeName != "DarkerAnimu" ? updateTheme(value, true) : ""} />
                                                 </span>
@@ -398,7 +398,7 @@ function settings() {
                                                     {value.themeName}
                                                     <span class='settings-theme-button-span'>
                                                         <Show when={value.options}>
-                                                            <Button icon='settings' ButtonClass="settings-settings-theme-button" onClick={(event) => { event.preventDefault(); openThemeOption(value) }} />
+                                                            <Button icon='settings' ButtonClass="settings-settings-theme-button" onClick={(event) => { event.stopPropagation(); openThemeOption(value) }} />
                                                         </Show>
                                                         <CheckBox checked={false} onChecked={() => updateTheme(value, true)} />
                                                     </span>
