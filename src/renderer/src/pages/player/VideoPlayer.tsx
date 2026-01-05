@@ -354,6 +354,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             videoRef.currentTime = time
 
             hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
+                setFatalError(false)
                 if (!splitHls) {
                     const resolutions = data.levels.map((level) => level.height);
                     resolutions.reverse()
@@ -397,7 +398,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                             hls.destroy();
                             break;
                     }
-                    setFatalError(true)
                     if (message && !isCleanup()) toast(message, { type: "error" });
                 }
             });
