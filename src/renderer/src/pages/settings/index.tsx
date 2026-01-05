@@ -302,10 +302,6 @@ function settings() {
         })
     }
 
-    createEffect(() => {
-        console.log(config())
-    })
-
     return (
         <main class="settings-container" onContextMenu={(event) => OpenContextMenu(ContextMenu(), event)}>
             <Sidebar
@@ -388,7 +384,7 @@ function settings() {
                                                     <Show when={value.options}>
                                                         <Button icon='settings' ButtonClass="settings-settings-theme-button" onClick={(event) => { event.preventDefault(); openThemeOption(value) }} />
                                                     </Show>
-                                                    <CheckBox checked />
+                                                    <CheckBox checked onChecked={() => value.themeName != "DarkerAnimu" ? updateTheme(value, true) : ""} />
                                                 </span>
                                             </div>
                                             )}
@@ -404,7 +400,7 @@ function settings() {
                                                         <Show when={value.options}>
                                                             <Button icon='settings' ButtonClass="settings-settings-theme-button" onClick={(event) => { event.preventDefault(); openThemeOption(value) }} />
                                                         </Show>
-                                                        <CheckBox checked={false} />
+                                                        <CheckBox checked={false} onChecked={() => updateTheme(value, true)} />
                                                     </span>
                                                 </div>
                                             )}

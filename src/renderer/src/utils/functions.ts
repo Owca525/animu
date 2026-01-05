@@ -97,10 +97,11 @@ export async function changeTheme(name: string[]) {
             if (name.includes(element.themeName)) activeTheme.push(element)
         }
     } else activeTheme.push(themes.find((val) => val.themeName == "DarkerAnimu") as themeMetadata)
-
-    activeTheme.reverse()
+    
+    // activeTheme = name.map((value) => activeTheme[activeTheme.findIndex((vl) => vl.themeName == value)])
     setActiveThemes(activeTheme)
-    console.log(activeTheme)
+    console.log(activeTheme, name)
+    activeTheme.reverse()
 
     activeTheme.map(async (theme) => {
         createHTMLLinkElement(theme.mainCSS)
