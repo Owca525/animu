@@ -27,7 +27,7 @@ import { getGlobalCache, setGlobalHistory, setGlobalTheme, setIncognitoMode } fr
 import { HashRouter, Route } from '@solidjs/router';
 import { pluginManager } from './utils/stores/plugins';
 import { setHomeActivePage } from './utils/stores/home';
-import { toast } from './utils/context/ToastNotification';
+import { toast, updateToast } from './utils/context/ToastNotification';
 import { useI18n } from './utils/i18n';
 import './App.css';
 import './themes/darkerAnimu/main.css';
@@ -48,8 +48,10 @@ function App() {
     })
     createShortcut(["Control", "Shift", "R"], async () => {
       if (getConfig().Developer.DeveloperMode) {
+        const idToast = toast("Reloading Thmes", { type: "loading", removeTimer: true })
+        setGlobalTheme(await window.api.themes.list())
         await changeTheme(getConfig().General.theme)
-        toast("Reloaded Theme")
+        updateToast(idToast, "Reloading Thmes", { type: "success", removeTimer: false })
       }
     })
   }
