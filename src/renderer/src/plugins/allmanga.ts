@@ -325,6 +325,8 @@ export default class Allmanga implements playerPluginFormat {
                 tmpAnimeID = findAnime(data.map((card) => ({ AnimeData: card })), animeData)
             };
 
+            console.log(tmpAnimeID)
+
             if (!tmpAnimeID || tmpAnimeID == "") return
 
             let episodeList = await extractInformation(tmpAnimeID)

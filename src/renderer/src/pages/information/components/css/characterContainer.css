@@ -31,6 +31,7 @@
     margin: 0px 4px;
     transition: opacity 1s ease;
     user-select: none;
+    opacity: 0;
 }
 
 .information-character-button-left {
@@ -41,21 +42,20 @@
     right: 0;
 }
 
-/* TODO: FIX ANIMATION */
-.information-characters-container:hover .information-character-button-left{
+.information-characters:hover .information-character-button-left{
     animation: slideLeft 0.1s forwards;
     opacity: 1;
 }
 
-.information-characters-container:hover .information-character-button-right {
+.information-characters:hover .information-character-button-right {
     animation: slideRight 0.1s forwards;
     opacity: 1;
 }
 
-.information-characters-container:not(:hover) .information-character-button-left{
+.information-characters:not(:hover) .information-character-button-left{
     animation: slideOutLeft 0.1s forwards;
 }
 
-.information-characters-container:not(:hover) .information-character-button-right {
+.information-characters:not(:hover) .information-character-button-right {
     animation: slideOutRight 0.1s forwards;
 }
