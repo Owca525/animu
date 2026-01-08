@@ -93,7 +93,7 @@ export interface globalDataFormat {
     history: cardData[],
     deeplinkRunned: boolean,
     loadedTheme: themeMetadata[],
-    activeThemes: themeMetadata[]
+    activeThemes: Map<number, themeMetadata>
 }
 
 export type playerDataExtended = playerData & {

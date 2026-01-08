@@ -58,6 +58,7 @@ function settings() {
     const [category, setCategory] = createSignal<string>("general");
     const [config, setNewConfig] = createSignal<{ old: SettingsConfig, new: SettingsConfig }>({ old: structuredClone(cfg), new: structuredClone(cfg) })
     const [themes, setThemes] = createSignal<themeMetadata[]>([])
+    const [lastActiveTheme, setLastActiveTheme] = createSignal<Map<number, themeMetadata>>(new Map())
     const [versions] = createSignal(window.electronAPI.process.versions)
     const [isSaving, setSaving] = createSignal<boolean>(false)
     const [backupList, setBackupList] = createSignal<{ date: Date, file: string }[]>([])
@@ -172,7 +173,8 @@ function settings() {
     })
 
     onMount(async () => {
-        setThemes(loadedTheme().filter((val) => !activeThemes().map((val) => val.themeName).includes(val.themeName)))
+        setLastActiveTheme(activeThemes())
+        setThemes(loadedTheme().filter((val) => ![...activeThemes().entries()].map(([_, val]) => val.themeName).includes(val.themeName)))
         changeTitleAnimu(`Animu - ${t("global.settings")}`)
         if (!window.api) return
         setBackupList(await window.api.backup.list())
@@ -210,6 +212,7 @@ function settings() {
 
     function saveNewConfig() {
         try {
+            setLastActiveTheme(activeThemes())
             setConfig(config().new)
             setNewConfig((prev) => {
                 return { old: structuredClone(prev.new), new: structuredClone(prev.new) }
@@ -227,10 +230,10 @@ function settings() {
     function resetNewConfig() {
         setNewConfig((prev) => {
             setNewLang(config().old.General.language)
-            changeTheme(config().old.General.theme)
+            changeTheme(lastActiveTheme())
             return { old: structuredClone(prev.old), new: structuredClone(prev.old) }
         })
-        setThemes(loadedTheme().filter((val) => !activeThemes().map((val) => val.themeName).includes(val.themeName)))
+        setThemes(loadedTheme().filter((val) => ![...activeThemes().entries()].map((v) => v[1].themeName).includes(val.themeName)))
         pluginManager().initialPlugins()
         setSaving(() => false)
     }
@@ -273,16 +276,34 @@ function settings() {
         })
     }
 
-    function updateTheme(theme: themeMetadata, remove: boolean = false) {
-        let tmp: string[];
-        if (remove) tmp = activeThemes().filter((val) => val.themeName != theme.themeName).map((value) => value.themeName)
-        else tmp = [...activeThemes().map((value) => value.themeName), theme.themeName]
+    function updateTheme(theme: themeMetadata, remove: boolean = false, id?: number, num?: number) {
+        let active = unwrap(activeThemes())
+        if (remove == true && id != undefined) active.delete(id)
+        else if (num == undefined) {
+            const lastID = [...active.entries()].at(-1)
+            if (lastID) active.set(lastID[0] + 1, unwrap(theme))
+        }
 
-        if (tmp.length <= 0) tmp.push("DarkerAnimu")
+        if (id != undefined && num != undefined && active.get(id+num)?.themeName != "DarkerAnimu") {
+            active = new Map([...active.entries().map((item) => {
+                if (item[0] === id)
+                    return { ...item, 0: id+num };
+                if (item[0] === id+num)
+                    return { ...item, 0: id }
+                return item;
+            })])
+        }
 
-        setThemes(loadedTheme().filter((val) => !tmp.includes(val.themeName)))
-        changeTheme(unwrap(tmp))
-        handleChange("General.theme", unwrap(activeThemes().map((val) => val.themeName)) as unknown as string)
+        active = new Map([...active.entries()]
+            .sort(([a], [b]) => a - b)
+            .map((item, index) => ({
+                ...item,
+                0: index
+            })));
+
+        setThemes(loadedTheme().filter((val) => ![...active.entries()].map((v) => v[1].themeName).includes(val.themeName)))
+        changeTheme(active)
+        handleChange("General.theme", unwrap([...activeThemes().entries()].map((val) => val[1].themeName)) as unknown as string)
     }
 
     async function openThemeOption(theme: themeMetadata) {
@@ -297,7 +318,7 @@ function settings() {
                     [change]: update
                 }
                 await window.api.themes.writeConfig(unwrap(theme), unwrap(record))
-                if (activeThemes().find((value) => value.themeName == theme.themeName)) updateTheme(theme)
+                updateTheme(theme)
             },
         })
     }
@@ -377,14 +398,18 @@ function settings() {
                                 <div class="settings-theme-spliter">
                                     <span class='settings-theme-span'>Active Theme</span>
                                     <div class="settings-theme-container">
-                                        <For each={activeThemes()}>
-                                            {(value) => (<div class={`settings-button-theme ${value.options ? "button" : ""}`} onclick={() => value.themeName != "DarkerAnimu" ? updateTheme(value, true) : ""}>
+                                        <For each={[...activeThemes().entries()].reverse()}>
+                                            {([id, value]) => (<div class={`settings-button-theme ${value.themeName != "DarkerAnimu" && [...activeThemes().entries()].length > 2 ? "button" : ""}`} onclick={() => value.themeName != "DarkerAnimu" ? updateTheme(value, true, id) : ""}>
                                                 {value.themeName}
                                                 <span class='settings-theme-button-span'>
+                                                    <Show when={value.themeName != "DarkerAnimu" && [...activeThemes().entries()].length > 2}>
+                                                        <Button icon='arrow_drop_up' ButtonClass='settings-settings-theme-button' onClick={(ev) => { ev.stopPropagation(); updateTheme(value, false, id, 1) }} />
+                                                        <Button icon='arrow_drop_down' ButtonClass='settings-settings-theme-button' onClick={(ev) => { ev.stopPropagation(); updateTheme(value, false, id, -1) }} />
+                                                    </Show>
                                                     <Show when={value.options}>
                                                         <Button icon='settings' ButtonClass="settings-settings-theme-button" onClick={(event) => { event.stopPropagation(); openThemeOption(value) }} />
                                                     </Show>
-                                                    <CheckBox checked onChecked={() => value.themeName != "DarkerAnimu" ? updateTheme(value, true) : ""} />
+                                                    <CheckBox checked onChecked={() => value.themeName != "DarkerAnimu" ? updateTheme(value, true, id) : ""} />
                                                 </span>
                                             </div>
                                             )}

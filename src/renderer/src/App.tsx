@@ -33,6 +33,7 @@ import './App.css';
 import './themes/darkerAnimu/main.css';
 import './utils/i18n';
 import { unwrap } from 'solid-js/store';
+import { themeMetadata } from './utils/types';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -50,7 +51,7 @@ function App() {
       if (getConfig().Developer.DeveloperMode) {
         const idToast = toast("Reloading Thmes", { type: "loading", removeTimer: true })
         setGlobalTheme(await window.api.themes.list())
-        await changeTheme(getConfig().General.theme)
+        // await changeTheme(getConfig().General.theme)
         updateToast(idToast, "Reloading Thmes", { type: "success", removeTimer: false })
       }
     })
@@ -88,10 +89,21 @@ function App() {
   function LoadConfig() {
     if (!window.api) return
     const loadedConnfig = getConfig()
-    console.log(unwrap(loadedConnfig))
 
     // Loading theme
-    changeTheme(loadedConnfig.General.theme)
+    const loadedTheme = getGlobalCache().loadedTheme
+    let confTheme = unwrap(loadedConnfig.General.theme)
+    console.log(confTheme)
+    let loadingTheme: Map<number, themeMetadata> = new Map()
+    for (let index = 0; index < confTheme.length; index++) {
+      const element = confTheme[index];
+      const theme = loadedTheme.find((ele) => ele.themeName == element)
+      console.log(theme, element, loadedTheme)
+      if (!theme) continue
+      loadingTheme.set(index, unwrap(theme))
+    }
+    console.log(loadingTheme)
+    changeTheme(loadingTheme)
 
     changeLanguage(loadedConnfig.General.language)
     if (loadedConnfig.General.Window.AutoMaximize) window.BrowserWindow.setMaximize()

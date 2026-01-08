@@ -252,6 +252,7 @@ td {
 
 .settings-button-theme {
   justify-content: space-between;
+  padding: 16px 12px;
 }
 
 .settings-button-theme.button {

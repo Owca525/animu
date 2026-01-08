@@ -79,7 +79,7 @@ function createHTMLLinkElement(css: string) {
     document.head.appendChild(link);
 }
 
-export async function changeTheme(name: string[]) {
+export async function changeTheme(activeTheme: Map<number, themeMetadata>) {
     if (!window.api) return
     let old = document.querySelectorAll<HTMLLinkElement>("link")
     for (let index = 0; index < old.length; index++) {
@@ -89,22 +89,10 @@ export async function changeTheme(name: string[]) {
         element.remove()
     }
 
-    const themes = loadedTheme()
-    let activeTheme: themeMetadata[] = []
-    if (name.length > 0) {
-        for (let index = 0; index < themes.length; index++) {
-            const element = themes[index];
-            if (name.includes(element.themeName)) activeTheme.push(element)
-        }
-    } else activeTheme.push(themes.find((val) => val.themeName == "DarkerAnimu") as themeMetadata)
-    
-    // activeTheme = name.map((value) => activeTheme[activeTheme.findIndex((vl) => vl.themeName == value)])
     setActiveThemes(activeTheme)
-    console.log(activeTheme, name)
-    activeTheme.reverse()
 
-    activeTheme.map(async (theme) => {
-        createHTMLLinkElement(theme.mainCSS)
+    activeTheme.forEach(async (theme) => {
+        if (theme.themeName != "DarkerAnimu") createHTMLLinkElement(theme.mainCSS)
 
         if (!theme.options) return
         const conf = await window.api.themes.config(theme)

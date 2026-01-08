@@ -6,13 +6,13 @@ export const [globalState, setGlobalState] = createStore({
     history: [],
     deeplinkRunned: false,
     loadedTheme: [],
-    activeThemes: [],
+    activeThemes: new Map(),
 } as globalDataFormat);
 
 export const getGlobalCache = () => globalState;
 export const loadedTheme = () => globalState.loadedTheme;
 export const activeThemes = () => globalState.activeThemes;
-export const setActiveThemes = (tmp: themeMetadata[]) => setGlobalState((prev) => ({...prev, activeThemes: tmp}));
+export const setActiveThemes = (tmp: Map<number, themeMetadata>) => setGlobalState((prev) => ({...prev, activeThemes: tmp}));
 export const setGlobalTheme = (tmp: themeMetadata[]) => setGlobalState((prev) => ({...prev, loadedTheme: tmp}));
 export const setIncognitoMode = (tmp: boolean) => setGlobalState((prev) => ({...prev, incognito: tmp}));
 export const setDeeplinkRunned = (tmp: boolean) => setGlobalState((prev) => ({...prev, deeplinkRunned: tmp}));

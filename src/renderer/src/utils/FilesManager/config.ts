@@ -20,7 +20,7 @@ export const defaultConfigWeb: SettingsConfig = {
     deepLinkURL: "https://owca525.github.io/",
     General: {
         language: "en",
-        theme: "DarkerAnimu",
+        theme: ["DarkerAnimu"],
         Window: {
             AutoMaximize: false,
             AutoFullscreen: false,
