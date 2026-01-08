@@ -17,6 +17,8 @@
     width: 118px;
     min-width: 118px;
     box-sizing: border-box;
+    cursor: pointer;
+    user-select: none;
  }
 
 .information-characters-card-cover {
