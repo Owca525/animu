@@ -39,7 +39,7 @@ import { themeMetadata } from './utils/types';
 // import { notificationProps } from './utils/GlobalInterface';
 
 function App() {
-  const { t, changeLanguage } = useI18n()
+  const { changeLanguage } = useI18n()
   const [isInitation, setInitation] = createSignal<boolean>(true)
   const [initialState, setinitialState] = createSignal<{ text: string, plugin: boolean }>({ text: "Loading History", plugin: false })
 
@@ -51,7 +51,18 @@ function App() {
       if (getConfig().Developer.DeveloperMode) {
         const idToast = toast("Reloading Thmes", { type: "loading", removeTimer: true })
         setGlobalTheme(await window.api.themes.list())
-        // await changeTheme(getConfig().General.theme)
+
+        const loadedTheme = getGlobalCache().loadedTheme
+        let confTheme = unwrap(getConfig().General.theme)
+        let loadingTheme: Map<number, themeMetadata> = new Map()
+        for (let index = 0; index < confTheme.length; index++) {
+          const element = confTheme[index];
+          const theme = loadedTheme.find((ele) => ele.themeName == element)
+          if (!theme) continue
+          loadingTheme.set(index, unwrap(theme))
+        }
+        changeTheme(loadingTheme)
+
         updateToast(idToast, "Reloading Thmes", { type: "success", removeTimer: false })
       }
     })
@@ -77,7 +88,7 @@ function App() {
 
     setinitialState({ text: "Loading Config", plugin: false })
     LoadConfig()
-    setHomeActivePage(t("global.home"))
+    setHomeActivePage("home")
 
     setinitialState({ text: "Loading Plugin", plugin: false })
     pluginManager().initialPlugins()
@@ -93,16 +104,13 @@ function App() {
     // Loading theme
     const loadedTheme = getGlobalCache().loadedTheme
     let confTheme = unwrap(loadedConnfig.General.theme)
-    console.log(confTheme)
     let loadingTheme: Map<number, themeMetadata> = new Map()
     for (let index = 0; index < confTheme.length; index++) {
       const element = confTheme[index];
       const theme = loadedTheme.find((ele) => ele.themeName == element)
-      console.log(theme, element, loadedTheme)
       if (!theme) continue
       loadingTheme.set(index, unwrap(theme))
     }
-    console.log(loadingTheme)
     changeTheme(loadingTheme)
 
     changeLanguage(loadedConnfig.General.language)

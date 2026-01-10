@@ -65,7 +65,7 @@ export interface homeData {
     search: string
     page: number
     stopScrolling: boolean
-    activePage: string
+    activePage: "history" | "home" | string
     filterTags?: FilterParams
     mainContainer: {
         scrollLeft: number,

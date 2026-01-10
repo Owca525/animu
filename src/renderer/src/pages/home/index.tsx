@@ -59,7 +59,7 @@ const Home = () => {
       {
         icon: "home",
         text: t("global.home"),
-        onClick: () => { setHomeActivePage(t("global.home")); setHomeSearchTags(undefined); plugin.home(); changeTitleAnimu(`Animu - ${t("global.home")}`) },
+        onClick: () => { setHomeActivePage("home"); setHomeSearchTags(undefined); plugin.home(); changeTitleAnimu(`Animu - ${t("global.home")}`) },
       },
       {
         icon: "history",
@@ -84,7 +84,7 @@ const Home = () => {
   // }
 
   onMount(() => {
-    if (getHomeCache().activePage == t("global.history")) changeTitleAnimu(`Animu - ${t("global.history")}`)
+    if (getHomeCache().activePage == "history") changeTitleAnimu(`Animu - ${t("global.history")}`)
     else changeTitleAnimu(`Animu - ${t("global.home")}`)
 
     if (!getGlobalCache().deeplinkRunned) {
@@ -148,7 +148,7 @@ const Home = () => {
 
   function setHistory() {
     setHomeSearchTags(undefined)
-    setHomeActivePage(t("global.history"));
+    setHomeActivePage("history");
     changeTitleAnimu(`Animu - ${t("global.history")}`)
     let history = getHistory()
 
@@ -193,7 +193,7 @@ const Home = () => {
   // TODO: napraw wyszukiwanie itp
   async function OnSearch(text: string) {
     let home = homeCache()
-    if (home.activePage == t("global.home")) {
+    if (home.activePage == "home") {
       setHomeSearch(text)
       setHomeSearchPage(1)
       setHomeStopScrolling(false);
@@ -201,7 +201,7 @@ const Home = () => {
       return;
     }
 
-    if (home.activePage != t("global.history")) return
+    if (home.activePage != "history") return
     if (text.replaceAll(" ", "") == "") {
       setHistory()
       return
