@@ -221,6 +221,7 @@ function settings() {
             saveConfig(config().new)
             setDynamicZoom(config().new.General.Window.Zoom)
             pluginManager().initialPlugins()
+            window.backend.refresh()
             toast(t("settings.saving.done"), { type: "success" })
         } catch (error) {
             toast(t("settings.saving.error"), { type: "success" })

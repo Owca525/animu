@@ -64,6 +64,7 @@ function App() {
         changeTheme(loadingTheme)
 
         updateToast(idToast, "Reloading Thmes", { type: "success", removeTimer: false })
+        await window.backend.refresh()
       }
     })
   }
@@ -122,7 +123,7 @@ function App() {
     if (!checkDate(loadedConnfig.backup.lastCheck, loadedConnfig.backup.check)) return
     CreateBackup()
     saveConfig(updateObjectConfig("backup.lastCheck", new Date().getTime(), loadedConnfig))
-    // TODO: add backend refreas
+    window.backend.refresh()
   }
 
 

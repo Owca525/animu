@@ -78,6 +78,7 @@ declare global {
         invoke(channel: string, ...args: any[]): Promise<any>;
       };
       version: () => Promise<string>;
+      refresh: () => Promise<void>
     };
     electronAPI: ElectronAPI
     BrowserWindow: {

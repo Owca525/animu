@@ -195,5 +195,7 @@ export async function initialBackend() {
   }
 }
 
+ipcMain.handle('refreshBackend', () => initialBackend());
+
 ipcMain.handle('getConfig', () => config);
 ipcMain.handle('getHistory', () => historyData);
