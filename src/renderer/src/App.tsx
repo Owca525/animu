@@ -9,7 +9,7 @@ import {
   changeTheme,
   checkDate,
   updateObjectConfig
-  } from './utils/functions';
+} from './utils/functions';
 import { checkUpdate } from './utils/update';
 import { CreateBackup } from './utils/backup';
 import { createShortcut } from '@solid-primitives/keyboard';
@@ -20,7 +20,7 @@ import {
   onMount,
   Suspense,
   Switch
-  } from 'solid-js';
+} from 'solid-js';
 import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import { getConfig, setConfig } from './utils/stores/config';
 import { getGlobalCache, setGlobalHistory, setGlobalTheme, setIncognitoMode } from './utils/stores/global';
@@ -66,6 +66,7 @@ function App() {
         updateToast(idToast, "Reloading Thmes", { type: "success", removeTimer: false })
         await window.backend.refresh()
       }
+      await import("./utils/exports")
     })
   }
 
@@ -85,13 +86,24 @@ function App() {
       setGlobalHistory(JSON.parse(localStorage.getItem("history") as any))
     }
     setinitialState({ text: "Loading Theme", plugin: false })
-    setGlobalTheme(await window.api.themes.list()) 
+    setGlobalTheme(await window.api.themes.list())
 
     setinitialState({ text: "Loading Config", plugin: false })
     LoadConfig()
     setHomeActivePage("home")
 
     setinitialState({ text: "Loading Plugin", plugin: false })
+    // const index = `${getRenderPath()}index.js`
+    // const plugins = await window.api.externalPlugins()
+    // plugins.forEach(async (plugin) => {
+    //   const newBlob = new Blob([plugin.content.replaceAll("./index.js", index).replaceAll("index.js", index)], { type: "application/javascript" });
+    //   const newUrl = URL.createObjectURL(newBlob);
+    //   const newModule = await import(newUrl);
+
+    //   const importedPlugin = new newModule.default()
+    //   console.log(importedPlugin)
+    // })
+
     pluginManager().initialPlugins()
     setInitation(false)
 

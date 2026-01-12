@@ -2,6 +2,7 @@ import { app, clipboard, ipcMain, nativeImage, shell } from "electron"
 import { Client } from "@xhayper/discord-rpc";
 import { ActivityType } from "discord-api-types/v10"
 import ini from "ini";
+import crypto from 'crypto';
 
 import path from "path"
 import fs from "fs"
@@ -44,6 +45,36 @@ ipcMain.handle('setActivity', (_event, details?: string, state?: string, time?: 
 
 ipcMain.handle('runDiscordRPC', (_event) => {
     setupDiscordRPC()
+})
+
+function sha256FromString(text) {
+  return crypto
+    .createHash('sha256')
+    .update(text, 'utf8')
+    .digest('hex');
+}
+
+function extractPlugin(folderPlugins: string, type: "official" | "user") {
+    if (!fs.existsSync(folderPlugins)) return []
+    const folder = fs.readdirSync(folderPlugins)
+
+    let files = folder.filter((item) => {
+        return fs.statSync(path.join(folderPlugins, item)).isFile()
+    })
+
+    files = files.filter((ele) => ele.endsWith(".js"))
+    if (files.length <= 0) return []
+
+    return files.map((item) => {
+        const content = fs.readFileSync(path.join(folderPlugins, item), "utf-8")
+        return { file: item, content: content, type, sha256: sha256FromString(content) }
+    })
+}
+
+ipcMain.handle('externalPlugins', (_event) => {
+    const user = extractPlugin(path.join(newConfigPath, "plugins"), "user")
+    const official = extractPlugin(path.join(app.getPath("userData"), "animuPlugins"), "official")
+    return [...user, ...official]
 })
 
 ipcMain.handle('runExternalPlayer', (_event, videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc"): any => {

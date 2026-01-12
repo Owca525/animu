@@ -22,6 +22,8 @@ export let mainWindow: BrowserWindow | undefined
 export const newConfigPath = path.join(app.getPath("userData"), "animuConfig")
 export const themeConfigPath = path.join(newConfigPath, "themeConfig")
 export const pluginsConfigPath = path.join(newConfigPath, "pluginsConfig")
+export const userPlugins = path.join(newConfigPath, "plugins")
+export const animuPlugins = path.join(app.getPath("userData"), "animuPlugins")
 export let config: SettingsConfig = defaultConfig
 let historyData: cardData[] = []
 const PROTOCOL = "animu"
@@ -169,6 +171,8 @@ export async function initialBackend() {
 
     if (!existsSync(themeConfigPath)) mkdirSync(themeConfigPath)
     if (!existsSync(pluginsConfigPath)) mkdirSync(pluginsConfigPath)
+    if (!existsSync(userPlugins)) mkdirSync(userPlugins)
+    if (!existsSync(animuPlugins)) mkdirSync(animuPlugins)
 
     if (existsSync(path.join(newConfigPath, "config.ini"))) {
       let data = readFileSync(path.join(newConfigPath, "config.ini"), "utf-8")

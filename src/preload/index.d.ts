@@ -72,6 +72,7 @@ declare global {
       getConfig: () => Promise<SettingsConfig>
       getHistory: () => Promise<cardData[]>
       onProtocolRequest: (callback: (url: string) => void) => void
+      externalPlugins: () => Promise<{ file: string, content: string, type: "official" | "user", sha256: string }[]>
     };
     backend: {
       ipcRenderer: {

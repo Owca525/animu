@@ -61,6 +61,7 @@ if (process.contextIsolated) {
       onProtocolRequest: (callback: (url: string) => void) => {
         ipcRenderer.on('protocol-request', (_, url) => callback(url));
       },
+      externalPlugins: () => ipcRenderer.invoke("externalPlugins")
     });
     contextBridge.exposeInMainWorld("backend", {
       Buffer: require("buffer").Buffer,

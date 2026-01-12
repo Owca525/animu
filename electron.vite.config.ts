@@ -1,4 +1,5 @@
-import { resolve } from 'path';
+import path, { resolve } from 'path';
+import fs from 'fs';
 import solid from 'vite-plugin-solid';
 import { defineConfig } from 'electron-vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
@@ -36,6 +37,15 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src')
       }
     },
+    build: {
+      rollupOptions: {
+        output: {
+          entryFileNames: "index.js",
+          chunkFileNames: "[name].js",
+          assetFileNames: "[name][extname]"
+        }
+      }
+    },
     plugins: [
       solid(),
       viteStaticCopy({
@@ -54,6 +64,13 @@ export default defineConfig({
           },
         ],
       }),
+      {
+        name: 'delete',
+        closeBundle() {
+          const fileToDelete = path.resolve(__dirname, 'out/renderer/exports.js');
+          if (fs.existsSync(fileToDelete)) fs.unlinkSync(fileToDelete)
+        }
+      }
     ]
   }
 })

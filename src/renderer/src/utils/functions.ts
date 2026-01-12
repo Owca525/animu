@@ -2,7 +2,7 @@ import { cardData, ContextMenuProps, homeData, playerChapterList, SettingsConfig
 import { showDialog } from "./context/DialogContext";
 import { DropdownOption } from "@renderer/components/dropDown";
 import { getHomeCache, setHomeNewData } from "./stores/home";
-import { getGlobalCache, loadedTheme, setActiveThemes } from "./stores/global";
+import { getGlobalCache, setActiveThemes } from "./stores/global";
 import { getConfig } from "./stores/config";
 import { getPluginList } from "./stores/plugins";
 import { unwrap } from "solid-js/store";
@@ -517,4 +517,8 @@ export function decryptAES(ciphertext: string, key: string): string | undefined 
         console.log("Error in decryptAES", error)
         return undefined;
     }
+}
+
+export function getRenderPath(): string {
+    return `${location.origin}${location.pathname.replace("index.html", "")}`
 }
