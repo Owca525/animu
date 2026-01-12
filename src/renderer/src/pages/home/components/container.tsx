@@ -3,12 +3,12 @@ import "./css/container.css"
 import Card from "./card"
 import Button from "@renderer/components/buttons"
 import { Component, createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js"
-import { useQuery } from "@tanstack/solid-query"
 import { getHomeCache, setAllHomeData, setHomeSearchPage, setHomeStopScrolling } from "@renderer/utils/stores/home"
 import { unwrap } from "solid-js/store"
 import { toast } from "@renderer/utils/context/ToastNotification"
 import { useI18n } from "@renderer/utils/i18n"
 import { getInformationPlugin } from "@renderer/utils/stores/plugins"
+import { useResponse } from "@renderer/utils/hooks/useResponse"
 
 const Container: Component<containerData> = ({ title, data, horizontal = false, tags, onTitleClick, onScrollDownFunction }) => {
   const { t, pathExist } = useI18n()
@@ -22,14 +22,14 @@ const Container: Component<containerData> = ({ title, data, horizontal = false, 
         if (entry.isIntersecting && !homeCache.stopScrolling) {
           setHomeSearchPage(currentPage() + 1)
           setcurrentPage(currentPage() + 1)
-          cardResponse.refetch()
+          cardResponse.Refetch([currentPage()+1, title])
           observer.unobserve(entry.target)
         }
       });
     }
   );
 
-  const cardResponse = useQuery(() => ({
+  const cardResponse = useResponse({
     queryKey: [currentPage(), title],
     queryFn: async () => {
       const homeCache = unwrap(getHomeCache())
@@ -40,11 +40,9 @@ const Container: Component<containerData> = ({ title, data, horizontal = false, 
       setAnimeCards((prev) => [...prev, ...tmp.data])
       return ""
     },
-    refetchOnWindowFocus: false,
-    enabled: false,
-    staleTime: 2 * 60 * 60 * 1000,
-    cacheTime: 2 * 60 * 60 * 1000
-  }))
+    cacheTime: 2 * 60 * 60 * 1000,
+    disable: true,
+  })
 
   onMount(() => {
     handleUpdate()

@@ -1,6 +1,6 @@
 import { createSignal, onCleanup, Accessor, onMount } from "solid-js";
 
-type UseQueryOptions<T, TData> = {
+type UseResponseOptions<T, TData> = {
     queryKey: T[];
     queryFn: (Key: T[]) => Promise<TData>;
     cacheTime?: number
@@ -18,7 +18,7 @@ async function generateSha256(text: any) {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-export function useResponse<T, TData>(options: UseQueryOptions<T, TData>) {
+export function useResponse<T, TData>(options: UseResponseOptions<T, TData>) {
     const [loading, setLoading] = createSignal<boolean>(true);
     const [error, setError] = createSignal<boolean>(false);
     const [data, setData] = createSignal<TData>()

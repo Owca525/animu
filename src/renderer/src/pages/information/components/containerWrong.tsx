@@ -4,10 +4,10 @@ import Card from '@renderer/pages/home/components/card';
 import Input from '@renderer/components/input';
 import Dropdown from '@renderer/components/dropDown';
 import { segregatePlugins } from '@renderer/utils/functions';
-import { Component, createSignal, For, onMount, Show } from 'solid-js';
-import { useQuery } from '@tanstack/solid-query';
+import { Component, createEffect, createSignal, For, onMount, Show } from 'solid-js';
 import { getPlayerPLugin, pluginManager } from '@renderer/utils/stores/plugins';
 import { useI18n } from '@renderer/utils/i18n';
+import { useResponse } from '@renderer/utils/hooks/useResponse';
 
 interface ContainerWrongProps {
     name: string;
@@ -25,19 +25,22 @@ const ContainerWrong: Component<ContainerWrongProps> = ({ name, exitfunc, refetc
         if (containerRef) containerRef.showModal()
     })
 
-    const response = useQuery(() => ({
+    const response = useResponse({
         queryKey: [searchName()],
-        queryFn: async ({ queryKey }) => {
+        queryFn: async (queryKey) => {
             const [name] = queryKey;
+            console.log(name)
             let plugin = getPlayerPLugin()
             if (plugin)
                 return await plugin.searchAnime(name, 1);
             return [];
         },
-        refetchOnWindowFocus: false,
-        staleTime: 2 * 60 * 60 * 1000,
-        cacheTime: 2 * 60 * 60 * 1000
-    }))
+        cacheTime: 2 * 60 * 60 * 1000,
+    })
+
+    createEffect(() => {
+        console.log(response.data(), response.loading(), response.error())
+    })
 
     return (
         <dialog class='information-containerwrong' ref={containerRef}>
@@ -45,10 +48,10 @@ const ContainerWrong: Component<ContainerWrongProps> = ({ name, exitfunc, refetc
                 <Input
                     placeholder={t("home.search")}
                     defaultValue={name}
-                    onKeyDown={(text) => setSearchName(text)}
+                    onKeyDown={(text) => {setSearchName(text);response.Refetch([searchName()])}}
                 />
                 <Dropdown
-                    options={segregatePlugins((name) => { pluginManager().changePlugin(name); response.refetch(); })}
+                    options={segregatePlugins((name) => { pluginManager().changePlugin(name); response.Refetch([searchName()]); })}
                     disableX
                     buttonText={getPlayerPLugin()?.metadata.name}
                 />
@@ -62,22 +65,22 @@ const ContainerWrong: Component<ContainerWrongProps> = ({ name, exitfunc, refetc
             </div>
 
             <div class="information-containerwrong-down">
-                <Show when={response.isError || (!response.isLoading && response.data && response.data.length <= 0)}>
+                <Show when={response.error() || (!response.loading() && response.data() && response.data()!.length <= 0)}>
                     <div class="information-containerwrong-error-container">
                         <span class='material-symbols-outlined information-containerwrong-error-icon'>search_off</span>
                         <span class='information-containerwrong-error-text'>{t("home.nothingfound")}</span>
                     </div>
                 </Show>
 
-                <Show when={response.isLoading && !response.isError && !response.data}>
+                <Show when={response.loading() && !response.error() && !response.data()}>
                     <div class="information-containerwrong-error-container">
                         <span class='material-symbols-outlined information-containerwrong-loading-icon'>progress_activity</span>
                     </div>
                 </Show>
 
-                <Show when={!response.isLoading && !response.isError && response.data && response.data.length > 0}>
+                <Show when={!response.loading() && !response.error() && response.data() && response.data()!.length > 0}>
                     <div class="information-containerwrong-cards">
-                        <For each={response.data}>
+                        <For each={response.data()}>
                             {(card) => (
                                 <Card
                                     card={{ AnimeData: card.AnimeData, onClick: () => refetchfunc(card.AnimeData.player_ID) }}
