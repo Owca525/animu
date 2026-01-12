@@ -53,7 +53,7 @@ function App() {
         setGlobalTheme(await window.api.themes.list())
 
         const loadedTheme = getGlobalCache().loadedTheme
-        let confTheme = unwrap(getConfig().General.theme)
+        let confTheme = [...new Set(unwrap(getConfig().General.theme))]
         let loadingTheme: Map<number, themeMetadata> = new Map()
         for (let index = 0; index < confTheme.length; index++) {
           const element = confTheme[index];
@@ -116,7 +116,7 @@ function App() {
 
     // Loading theme
     const loadedTheme = getGlobalCache().loadedTheme
-    let confTheme = unwrap(loadedConnfig.General.theme)
+    let confTheme = [...new Set(unwrap(loadedConnfig.General.theme))]
     let loadingTheme: Map<number, themeMetadata> = new Map()
     for (let index = 0; index < confTheme.length; index++) {
       const element = confTheme[index];

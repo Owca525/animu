@@ -285,11 +285,11 @@ function settings() {
             if (lastID) active.set(lastID[0] + 1, unwrap(theme))
         }
 
-        if (id != undefined && num != undefined && active.get(id+num)?.themeName != "DarkerAnimu") {
+        if (id != undefined && num != undefined && active.get(id + num)?.themeName != "DarkerAnimu") {
             active = new Map([...active.entries().map((item) => {
                 if (item[0] === id)
-                    return { ...item, 0: id+num };
-                if (item[0] === id+num)
+                    return { ...item, 0: id + num };
+                if (item[0] === id + num)
                     return { ...item, 0: id }
                 return item;
             })])
@@ -300,7 +300,11 @@ function settings() {
             .map((item, index) => ({
                 ...item,
                 0: index
-            })));
+            }))
+            .filter(
+                (item, index, self) =>
+                    index === self.findIndex(t => t[1].themeName === item[1].themeName)
+            ))
 
         setThemes(loadedTheme().filter((val) => ![...active.entries()].map((v) => v[1].themeName).includes(val.themeName)))
         changeTheme(active)
@@ -319,7 +323,7 @@ function settings() {
                     [change]: update
                 }
                 await window.api.themes.writeConfig(unwrap(theme), unwrap(record))
-                updateTheme(theme)
+                if (![...activeThemes().entries()].map((v) => v[1].themeName).includes(theme.themeName)) updateTheme(theme)
             },
         })
     }
