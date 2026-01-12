@@ -71,6 +71,16 @@ function extractPlugin(folderPlugins: string, type: "official" | "user") {
     })
 }
 
+export function detectZoom(zoom: number) {
+    try {
+        if (!isNaN(Number(zoom.toString()))) return 1
+        return zoom / 100
+    } catch (error) {
+        console.error("Failed Fetch Zoom", zoom)
+        return 1
+    }
+}
+
 ipcMain.handle('externalPlugins', (_event) => {
     const user = extractPlugin(path.join(newConfigPath, "plugins"), "user")
     const official = extractPlugin(path.join(app.getPath("userData"), "animuPlugins"), "official")

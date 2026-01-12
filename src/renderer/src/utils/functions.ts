@@ -58,9 +58,8 @@ export function checkDate(date: string | number, type: "Every Day" | "Every Week
 }
 
 export function calculateZoomLevel(percentage: number): number {
-    if (isNaN(percentage)) return 0
-    if (percentage < 50 || percentage > 200) return 0
-    return Math.log(percentage / 100) / Math.log(1.2)
+    if (isNaN(percentage)) return 1
+    return percentage / 100
 }
 
 export function formatTime(seconds: number | undefined): string {

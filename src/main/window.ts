@@ -19,7 +19,7 @@ ipcMain.handle('isFullscreen', (_event): boolean => {
 })
 
 ipcMain.on('setZoom', (_event, option: number): void => {
-    if (mainWindow) mainWindow.webContents.setZoomLevel(option)
+    if (mainWindow) mainWindow.webContents.setZoomFactor(option)
 })
 
 ipcMain.on('exit', (_event): void => {

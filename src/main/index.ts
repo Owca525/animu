@@ -15,7 +15,7 @@ import "./backup"
 import { convertToNewFormat, detectOldVersion, write } from './os'
 import { existsSync, mkdirSync, readFileSync } from 'fs'
 import { cardData, defaultConfig, SettingsConfig } from './types';
-import { deepMerge, setupDiscordRPC } from './utils';
+import { deepMerge, detectZoom, setupDiscordRPC } from './utils';
 import { electronAppUniversalProtocolClient } from 'electron-app-universal-protocol-client';
 
 export let mainWindow: BrowserWindow | undefined
@@ -46,7 +46,7 @@ function createWindow(): void {
       sandbox: false,
       webSecurity: false,
       allowRunningInsecureContent: false,
-      nodeIntegration: true,
+      nodeIntegration: false,
     },
     title: title
   })
@@ -115,6 +115,10 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  mainWindow.webContents.on("did-navigate-in-page", () => {
+    if (mainWindow) mainWindow.webContents.setZoomFactor(detectZoom(config.General.Window.Zoom))
+  })
 }
 
 const gotTheLock = app.requestSingleInstanceLock()
