@@ -1,5 +1,5 @@
 import { genYearsList, request } from "@renderer/utils/functions";
-import { cardData, containerData, genresSearchFormat, informationPluginFormat } from "@renderer/utils/types";
+import { AnimeData, cardData, containerData, genresSearchFormat, informationPluginFormat } from "@renderer/utils/types";
 
 const pageSize = 20
 
@@ -76,6 +76,40 @@ const animeData = `
           node {
             id
             name
+          }
+        }
+      }
+      relations {
+        edges {
+          relationType
+          node {
+            id
+            title {
+              romaji
+              english
+              native
+            }
+            coverImage {
+              extraLarge
+              large
+            }
+            bannerImage
+          }
+        }
+      }
+      recommendations(page: 1, perPage: 10) {
+        nodes {
+          mediaRecommendation {
+            id
+            title {
+              romaji
+              english
+              native
+            }
+            coverImage {
+              extraLarge
+              large
+            }
           }
         }
       }
@@ -210,36 +244,6 @@ query(
 ) {
   Media(id: $id, type: ANIME) {
     ${animeData}
-    recommendations(perPage: 7, sort: [RATING_DESC, ID]) {
-      pageInfo {
-        total
-      }
-      nodes {
-        id
-        rating
-        userRating
-        mediaRecommendation {
-          id
-          title {
-            userPreferred
-          }
-          format
-          type
-          status(version: 2)
-          bannerImage
-          coverImage {
-            large
-          }
-        }
-        user {
-          id
-          name
-          avatar {
-            large
-          }
-        }
-      }
-    }
   }
 }
 `;
@@ -269,22 +273,52 @@ const allPopular = {
 
 function Convert(convert: any): cardData {
   let characters: any = []
+  let relations: AnimeData["relations"] = []
+  let recommendations: AnimeData["recommendations"] = []
+
   try {
     for (let index = 0; index < convert.characters.edges.length; index++) {
       const element = convert.characters.edges[index];
       if (element.voiceActors.length === 0) characters.push({ role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full } })
       else characters.push({ role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full }, voiceActor: { id: element.voiceActors[0].id, image: element.voiceActors[0].image.large, name: element.voiceActors[0].name.full } })
     }
-  } catch (error) {
-    console.error(error)
-  }
+  } catch (error) { console.error("AnilistApi/Convert", error) }
+
+  try {
+    if (convert.relations) {
+      convert.relations.edges.forEach(element => {
+        if (!element) return
+        relations.push({
+          id: element.node.id,
+          title: element.node.title,
+          coverImage: element.node.coverImage.extraLarge ? element.node.coverImage.extraLarge : element.node.coverImage.large,
+          relationType: element.relationType
+        })
+      });
+    }
+  } catch (error) { console.error("AnilistApi/Convert", error) }
+
+  try {
+    if (convert.recommendations) {
+      convert.recommendations.nodes.forEach(element => {
+        if (!element) return
+        recommendations.push({
+          id: element.mediaRecommendation.id,
+          title: element.mediaRecommendation.title,
+          coverImage: element.mediaRecommendation.coverImage.extraLarge ? element.mediaRecommendation.coverImage.extraLarge : element.mediaRecommendation.coverImage.large,
+        })
+      });
+    }
+  } catch (error) { console.error("AnilistApi/Convert", error) }
 
   return {
     AnimeData: {
       ...convert,
       coverImage: convert.coverImage.extraLarge ? convert.coverImage.extraLarge : convert.coverImage.large,
       studios: convert.studios.edges.map((studio) => studio.node.name),
-      characters: characters
+      characters: characters,
+      recommendations,
+      relations
     },
   }
 }
@@ -479,11 +513,11 @@ export default class AnilistApi implements informationPluginFormat {
           data: data.json.data.season.media.map((anime) => Convert(anime)),
           horizontal: true,
           onTitleClick: async () => await fetchCategory({
-              page: 1,
-              season: season.season,
-              seasonYear: season.seasonYear,
-              type: "ANIME"
-            }, "home.popular_in_this_season"),
+            page: 1,
+            season: season.season,
+            seasonYear: season.seasonYear,
+            type: "ANIME"
+          }, "home.popular_in_this_season"),
         },
         {
           title: "home.all_time_popular",
@@ -501,6 +535,7 @@ export default class AnilistApi implements informationPluginFormat {
   async anime(context: { id: string; }) {
     try {
       let req = await sendPost({ id: context.id }, graphicApIDAnime)
+      console.log(req)
       if (!req.success || !req.json) return
       return Convert(req.json.data.Media).AnimeData
     } catch (error) {

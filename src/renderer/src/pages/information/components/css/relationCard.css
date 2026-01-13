@@ -1,0 +1,52 @@
+/* .relation-card-background {
+    outline: 2px solid var(--green-one);
+} */
+
+.relation-card-background, .relation-card-container {
+    border-radius: 12px;
+    cursor: pointer;
+    user-select: none;
+    width: 200px;
+    height: 70px;
+}
+
+.relation-card-background {
+    /* position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: -1; */
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.relation-card-container {
+    backdrop-filter: blur(2px);
+    /* padding: 24px 32px; */
+    z-index: 1;
+    border: 3px solid var(--five-layer);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+    text-shadow: 2px 2px 2px var(--black);
+}
+.relation-card-type {
+    font-size: 1.2em;
+    width: 100%;
+}
+
+.relation-card-title {
+    position: absolute;
+    top: -40px;
+    z-index: 1000;
+    background-color: var(--five-layer);
+    border-radius: 12px;
+    width: max-content;
+    padding: 4px;
+    display: none;
+}
+
+.relation-card-container:hover .relation-card-title {
+    display: block;
+}

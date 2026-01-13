@@ -2,7 +2,7 @@ import Button from '@renderer/components/buttons';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
-import { AnimeData, ContextMenuProps, deepLinkData, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
+import { AnimeData, cardData, ContextMenuProps, deepLinkData, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
 import {
     changeTitleAnimu,
     convertDateToFormattedString,
@@ -13,7 +13,7 @@ import {
     openUrlFolder,
     SaveToClipboard,
     segregatePlugins
-    } from '@renderer/utils/functions';
+} from '@renderer/utils/functions';
 import {
     createSignal,
     For,
@@ -22,10 +22,10 @@ import {
     onMount,
     Show,
     Switch
-    } from 'solid-js';
+} from 'solid-js';
 import { createShortcut } from '@solid-primitives/keyboard';
 import { getGlobalCache } from '@renderer/utils/stores/global';
-import { getPlayerPLugin, pluginManager } from '@renderer/utils/stores/plugins';
+import { getInformationPlugin, getPlayerPLugin, pluginManager } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
@@ -35,6 +35,9 @@ import { useResponse } from '@renderer/utils/hooks/useResponse';
 import { useI18n } from '@renderer/utils/i18n';
 import CharacterContainer from './components/characterContainer';
 import { getConfig } from '@renderer/utils/stores/config';
+import Container from '../home/components/container';
+import { toast, updateToast } from '@renderer/utils/context/ToastNotification';
+// import RelationCard from './components/relationCard';
 
 function information() {
     const { t } = useI18n()
@@ -47,6 +50,7 @@ function information() {
     const [showWrong, setshowWrong] = createSignal<boolean>(false)
     const [isNeedMore, setNeedMore] = createSignal<boolean>(false)
     const [showImages, setShowImages] = createSignal<boolean>(false)
+    const [fetchingAnime, setFetchingAnime] = createSignal<boolean>(false)
     const [moreMiniTitle, setmoreMiniTitle] = createSignal<boolean>(false)
     const [currentPlugin, setCurrentPlugin] = createSignal<string | undefined>(undefined)
     const [secondsLeft, setSecondsLeft] = createSignal<undefined | { left: number, converted: { days: number; hours: number; minutes: number; seconds: number; } | undefined }>(undefined);
@@ -64,7 +68,7 @@ function information() {
         queryFn: async (queryKey) => {
             const [animeData, player_id, pluginName] = queryKey;
             if (typeof animeData != "object") return
-            if (animeData.anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED") return
+            if (animeData.anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED" || animeData.anime.format == "MANGA") return
             // if (animeData.anime.id == "" && !player_id) return setEpisodeResponse(await plugin.extractEpisodeList(animeData.anime, undefined)) deprecated
 
             let plugin: playerPluginFormat = pluginManager().changePlugin(pluginName as string)
@@ -81,6 +85,7 @@ function information() {
             if (!prev) return undefined
             if (prev.left <= 1) {
                 clearInterval(intervalId);
+                if (tempData().anime.status == "RELEASING") FetchAnimeForinformation()
                 return { left: 0, converted: convertSeconds(0) };
             }
             return { left: prev.left - 1, converted: convertSeconds(prev.left - 1) };
@@ -102,16 +107,19 @@ function information() {
         ])
     }
 
-    onMount(() => {
+    function initialInformation() {
         changeTitleAnimu(`Animu - ${tempData().anime.title.romaji}`)
         generateAnimeForContextMenu()
 
+        if (tempData().saveData && tempData().anime.status == "RELEASING") FetchAnimeForinformation()
+
         let plugin = pluginManager().currentPlugin
         if (plugin) setCurrentPlugin(plugin.metadata.name)
-        console.log(plugin)
 
-        if (tempData().anime.nextAiringEpisode?.timeUntilAiring)
-            setSecondsLeft({ left: tempData().anime.nextAiringEpisode?.timeUntilAiring as number, converted: convertSeconds(tempData().anime.nextAiringEpisode?.timeUntilAiring) })
+        if (tempData().anime.nextAiringEpisode?.timeUntilAiring) setSecondsLeft({
+            left: tempData().anime.nextAiringEpisode!.timeUntilAiring,
+            converted: convertSeconds(tempData().anime.nextAiringEpisode!.timeUntilAiring)
+        })
 
         document.querySelectorAll('*').forEach((element: any) => {
             element.tabIndex = -1
@@ -129,11 +137,13 @@ function information() {
             if (plugin && plugin.metadata.name != history[0].saveData?.pluginName) setCurrentId(undefined)
             setCurrentPlugin(plugin.metadata.name)
 
-            setTmpData({ ...tempData(), saveData: { ...history[0].saveData, pluginName: unwrap(currentPlugin()) as string } as indentityPlayer } )
+            setTmpData({ ...tempData(), saveData: { ...history[0].saveData, pluginName: unwrap(currentPlugin()) as string } as indentityPlayer })
             localStorage.setItem("informationCache", JSON.stringify({ ...tempData(), saveData: { ...history[0].saveData, pluginName: unwrap(currentPlugin()) as string } as indentityPlayer }))
         }
         episodeResponse.Refetch([tempData(), currentIDplayer(), currentPlugin()])
-    })
+    }
+
+    onMount(() => { initialInformation() })
 
     onCleanup(() => {
         clearInterval(intervalId)
@@ -158,6 +168,36 @@ function information() {
             episodelist: episodes,
         })))
         navigate("/player")
+    }
+
+    async function FetchAnimeForinformation(): Promise<any> {
+        setFetchingAnime(true)
+        const resp = await getInformationPlugin().anime(tempData().anime.id)
+        if (!resp) return setFetchingAnime(false)
+        setFetchingAnime(false)
+        setTmpData((prev) => ({ ...prev, anime: resp }))
+        if (tempData().anime.nextAiringEpisode?.timeUntilAiring) setSecondsLeft({
+            left: tempData().anime.nextAiringEpisode!.timeUntilAiring,
+            converted: convertSeconds(tempData().anime.nextAiringEpisode!.timeUntilAiring)
+        })
+    }
+
+    async function ChangeAnimeInInformation(data: AnimeData): Promise<any> {
+        const idToast = toast("Fetching Anime", { removeTimer: true, type: "loading" })
+        const resp = await getInformationPlugin().anime(data.id)
+        if (!resp) return updateToast(idToast, "Failed Fetch Anime", { type: "error", removeTimer: false })
+        updateToast(idToast, "Succesfully Fetched Anime", { type: "success", removeTimer: false })
+
+        // Reseting Recomendation
+        setTmpData((prev) => ({ ...prev, anime: { ...prev.anime, recommendations: undefined } }))
+
+        document.querySelectorAll("*").forEach((ele) => {
+            ele.scrollTop = 0
+        })
+
+        localStorage.setItem("informationCache", JSON.stringify({ anime: resp, saveData: undefined }))
+        setTmpData({ anime: resp, saveData: undefined })
+        initialInformation()
     }
 
     function makeButtons(episode: { ep: string, img?: string, title?: string }[], type: string) {
@@ -203,7 +243,6 @@ function information() {
     })
 
     async function refreashInformation(name: string, force: boolean = false) {
-        console.log(name)
         setCurrentId(undefined)
         pluginManager().changePlugin(name)
         setCurrentPlugin(name)
@@ -222,7 +261,7 @@ function information() {
         let synonyms = tempData().anime.synonyms
         let titles: string[] = []
         if (synonyms) synonyms.forEach((value) => titles.push(value))
-        
+
         const keys = Object.keys(tempData().anime.title)
         for (let index = 0; index < keys.length; index++) {
             const element = tempData().anime.title[keys[index]]
@@ -292,15 +331,21 @@ function information() {
                     <div class="information-bottom">
 
                         <div class="information-info">
-                            <Show when={tempData().anime.nextAiringEpisode && tempData().anime.player_ID === undefined}>
-                                <div class="information-info-content">
-                                    <div class="information-content-title">
-                                        {t("information.airing")}: {tempData().anime.nextAiringEpisode?.episode}
+                            <Switch>
+                                <Match when={fetchingAnime()}>
+                                    <div class="information-info-content loading">
+                                        <span class='material-symbols-outlined loading-animation icon'>progress_activity</span>
                                     </div>
-                                    {/* TODO: make better timer */}
-                                    {`${secondsLeft()?.converted?.days}d ${secondsLeft()?.converted?.hours}h ${secondsLeft()?.converted?.minutes}m ${secondsLeft()?.converted?.seconds}s`}
-                                </div>
-                            </Show>
+                                </Match>
+                                <Match when={tempData().anime.nextAiringEpisode && tempData().anime.player_ID === undefined && secondsLeft() != undefined && secondsLeft()!.left > 0 && !fetchingAnime()}>
+                                    <div class="information-info-content">
+                                        <div class="information-content-title">
+                                            {t("information.airing")}: {tempData().anime.nextAiringEpisode?.episode}
+                                        </div>
+                                        {`${secondsLeft()?.converted?.days}d ${secondsLeft()?.converted?.hours}h ${secondsLeft()?.converted?.minutes}m ${secondsLeft()?.converted?.seconds}s`}
+                                    </div>
+                                </Match>
+                            </Switch>
 
                             <Show when={tempData().anime.format}>
                                 <div class="information-info-content">
@@ -400,25 +445,59 @@ function information() {
                                 </Show>
                             </div>
 
-                            <Show when={tempData().anime.characters && tempData().anime.characters.length > 0}>
-                                <CharacterContainer title={t("information.characters")} cards={tempData().anime.characters.map((char) => ({
+                            {/* FIXME: FIX THIS FOR 0.8 Update */}
+                            {/* <Show when={tempData().anime.relations && tempData().anime.relations!.length > 0}>
+                                <div class="information-relation-container">
+                                    <For each={tempData().anime.relations}>
+                                        {(rel) => <RelationCard 
+                                            id={rel.id} 
+                                            relationType={rel.relationType} 
+                                            title={rel.title} 
+                                            bannerImage={rel.bannerImage} 
+                                            coverImage={rel.coverImage} 
+                                            onClick={() => ""} 
+                                        />}
+                                    </For>
+                                </div>
+                            </Show> */}
+                            <Show when={tempData().anime.characters && tempData().anime.characters!.length > 0}>
+                                <CharacterContainer title={t("information.characters")} cards={tempData().anime.characters!.map((char) => ({
                                     id: char.character.id,
                                     image: char.character.image,
                                     name: char.character.name,
                                     role: t(`information.role.${char.role.toLowerCase()}`),
                                     onClick: () => openUrlFolder(`https://anilist.co/character/${char.character.id}`)
-                                }))}/>
+                                }))} />
                             </Show>
 
-                            <Show when={tempData().anime.characters && tempData().anime.characters.map((tmp) => tmp.voiceActor).filter((item) => item != undefined).length > 0}>
-                                <CharacterContainer title={t("information.actors")} cards={tempData().anime.characters.map((char) => ({
+                            <Show when={tempData().anime.characters && tempData().anime.characters!.map((tmp) => tmp.voiceActor).filter((item) => item != undefined).length > 0}>
+                                <CharacterContainer title={t("information.actors")} cards={tempData().anime.characters!.map((char) => ({
                                     id: char.voiceActor?.id as string,
                                     image: char.voiceActor?.image as string,
                                     name: char.voiceActor?.name as string,
                                     role: char.character.name,
                                     onClick: () => openUrlFolder(`https://anilist.co/staff/${char.voiceActor ? char.voiceActor.id : ""}`)
-                                }))}/>
+                                }))} />
                             </Show>
+
+                            <Switch>
+                                <Match when={fetchingAnime()}>
+                                    <div class="information-recomendation-loading">
+                                        <span class='material-symbols-outlined loading-animation icon'>progress_activity</span>
+                                    </div>
+                                </Match>
+                                <Match when={tempData().anime.recommendations && tempData().anime.recommendations!.length > 0 && !fetchingAnime()}>
+                                    <Container title='Recomendation' horizontal data={tempData().anime.recommendations!.map((item) => ({
+                                        AnimeData: {
+                                            title: item.title,
+                                            bannerImage: item.bannerImage,
+                                            coverImage: item.coverImage,
+                                            id: item.id.toString(),
+                                        },
+                                        onClick: ChangeAnimeInInformation
+                                    } as cardData))} />
+                                </Match>
+                            </Switch>
                         </div>
                     </div>
                 </div>
@@ -430,7 +509,7 @@ function information() {
             </Show>
 
             <Show when={showImages()}>
-                <ImageViewer files={[tempData().anime.coverImage as string, tempData().anime.bannerImage as string].filter((value) => value != null)} disable={() => setShowImages(false)}/>
+                <ImageViewer files={[tempData().anime.coverImage as string, tempData().anime.bannerImage as string].filter((value) => value != null)} disable={() => setShowImages(false)} />
             </Show>
         </>
     )

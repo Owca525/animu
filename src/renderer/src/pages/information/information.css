@@ -179,6 +179,12 @@
     padding: 14px 10px;
 }
 
+.information-info-content.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .information-content-title {
     font-weight: bold;
     padding-bottom: 6px;
@@ -309,6 +315,24 @@
 
 .information-episodes, .information-characters, .information-info {
     animation: firstShow 0.2s ease forwards;
+}
+
+/* JEBAĆ OVERFLOW */
+.information-relation-container {
+    background-color: var(--second-layer);
+    border-radius: 12px;
+    padding: 8px;
+    display: flex;
+    gap: 12px;
+    /* overflow-x: auto; */
+    z-index: 5;
+}
+
+.information-recomendation-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
 }
 
 /* For smaller devices / window sizes */

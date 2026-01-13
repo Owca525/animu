@@ -18,7 +18,7 @@ export interface AnimeData {
     } | undefined
     episodes?: number | undefined
     format?: string | undefined
-    genres: Array<String> | undefined
+    genres?: Array<String>
     nextAiringEpisode?: {
         airingAt: number
         episode: number
@@ -32,7 +32,7 @@ export interface AnimeData {
         month: number
         year: number
     } | undefined
-    characters: {
+    characters?: {
         role: string,
         character: {
             id: string,
@@ -48,7 +48,7 @@ export interface AnimeData {
     source?: string | undefined
     status?: string | undefined
     synonyms?: string[],
-    studios: string[]
+    studios?: string[]
     title: { english?: string, native: string, romaji: string }
     type?: string | undefined
     episodesList?: { episodes: { ep: string, img?: string, title?: string }[], type: string, name?: string }[]
@@ -56,6 +56,19 @@ export interface AnimeData {
     id: string
     malID?: string
     trailer?: { id: string, site: string } | undefined
+    relations?: {
+        id: number,
+        title: { english?: string, native: string, romaji: string }
+        bannerImage?: string
+        coverImage: string
+        relationType: string
+    }[]
+    recommendations?: {
+        id: number,
+        title: { english?: string, native: string, romaji: string }
+        bannerImage?: string
+        coverImage: string
+    }[]
 }
 
 export interface homeData {

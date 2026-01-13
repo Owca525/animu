@@ -53,6 +53,21 @@
         "not_yet_released": "Not Yet Released",
         "cancelled": "Cancelled"
     },
+    "anime_relationtype": {
+        "adaptation": "Adaptation",
+        "prequel": "Prequel",
+        "sequel": "Sequel",
+        "parent": "Parent",
+        "sidestory": "Side Story",
+        "character": "Character",
+        "summary": "Summary",
+        "alternative": "Alternative",
+        "spinoff": "Spin Off",
+        "other": "Other",
+        "source": "Source",
+        "compilation": "Compilation",
+        "contains": "Contains"
+    },
     "anime_genres": {
         "action": "Action",
         "adventure": "Adventure",

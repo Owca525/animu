@@ -2,7 +2,7 @@ import { cardData, containerData } from "@renderer/utils/types"
 import "./css/container.css"
 import Card from "./card"
 import Button from "@renderer/components/buttons"
-import { Component, createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js"
+import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js"
 import { getHomeCache, setAllHomeData, setHomeSearchPage, setHomeStopScrolling } from "@renderer/utils/stores/home"
 import { unwrap } from "solid-js/store"
 import { toast } from "@renderer/utils/context/ToastNotification"
@@ -10,11 +10,11 @@ import { useI18n } from "@renderer/utils/i18n"
 import { getInformationPlugin } from "@renderer/utils/stores/plugins"
 import { useResponse } from "@renderer/utils/hooks/useResponse"
 
-const Container: Component<containerData> = ({ title, data, horizontal = false, tags, onTitleClick, onScrollDownFunction }) => {
+function Container(props: containerData) {
   const { t, pathExist } = useI18n()
   let container: HTMLDivElement | undefined
   const [currentPage, setcurrentPage] = createSignal(unwrap(getHomeCache().page))
-  const [animeCards, setAnimeCards] = createSignal<cardData[]>(data)
+  const [animeCards, setAnimeCards] = createSignal<cardData[]>(props.data)
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -22,7 +22,7 @@ const Container: Component<containerData> = ({ title, data, horizontal = false, 
         if (entry.isIntersecting && !homeCache.stopScrolling) {
           setHomeSearchPage(currentPage() + 1)
           setcurrentPage(currentPage() + 1)
-          cardResponse.Refetch([currentPage()+1, title])
+          cardResponse.Refetch([currentPage()+1, props.title])
           observer.unobserve(entry.target)
         }
       });
@@ -30,12 +30,12 @@ const Container: Component<containerData> = ({ title, data, horizontal = false, 
   );
 
   const cardResponse = useResponse({
-    queryKey: [currentPage(), title],
+    queryKey: [currentPage(), props.title],
     queryFn: async () => {
       const homeCache = unwrap(getHomeCache())
       if (homeCache.stopScrolling) return
-      if (!onScrollDownFunction) return ""
-      let tmp = await onScrollDownFunction(homeCache.search, unwrap(currentPage()), homeCache.filterTags)
+      if (!props.onScrollDownFunction) return ""
+      let tmp = await props.onScrollDownFunction(homeCache.search, unwrap(currentPage()), homeCache.filterTags)
       if (tmp.data.length < tmp.maxPage) setHomeStopScrolling(true);
       setAnimeCards((prev) => [...prev, ...tmp.data])
       return ""
@@ -58,7 +58,7 @@ const Container: Component<containerData> = ({ title, data, horizontal = false, 
   })
 
   function handleUpdate() {
-    if (horizontal) return
+    if (props.horizontal) return
     const lastCard = document.querySelector(".card-container:last-child")
     if (!lastCard) return
     let plugin = getInformationPlugin()
@@ -78,9 +78,9 @@ const Container: Component<containerData> = ({ title, data, horizontal = false, 
 
   async function handleTitleClick() {
     try {
-      if (!onTitleClick) return
+      if (!props.onTitleClick) return
       setAllHomeData({ isLoading: true, data: { sections: [] }, isError: false } as any)
-      const resp = await onTitleClick()
+      const resp = await props.onTitleClick()
       setAllHomeData({ isLoading: false, data: { sections: [resp] }, isError: false } as any)
     } catch (error) {
       toast("Error Fetching Category", { type: "error" })
@@ -91,11 +91,11 @@ const Container: Component<containerData> = ({ title, data, horizontal = false, 
   return (
     <div tabIndex={-1} class="main-container">
       <div tabIndex={-1} class="container-title-container">
-        <Show when={title}>
-          <div class={onTitleClick ? "container-title-click" : "container-title"} onclick={handleTitleClick}>{title && pathExist(title) ? t(title) : title}</div>
+        <Show when={props.title}>
+          <div class={props.onTitleClick ? "container-title-click" : "container-title"} onclick={handleTitleClick}>{props.title && pathExist(props.title) ? t(props.title) : props.title}</div>
         </Show>
-        <Show when={tags}>
-          <For each={tags}>
+        <Show when={props.tags}>
+          <For each={props.tags}>
             {(element) => (
               <div onClick={element.remover} class="container-tag">{element.name} <span class="material-symbols-outlined container-tag-icon">close</span></div>
             )}
@@ -103,11 +103,11 @@ const Container: Component<containerData> = ({ title, data, horizontal = false, 
         </Show>
       </div>
       <div tabIndex={-1} class={`container-button-container ${animeCards().length <= 0 && " container-error"}`}>
-        <Show when={horizontal && animeCards().length > 0}>
+        <Show when={props.horizontal && animeCards().length > 0}>
           <Button icon="chevron_left" ButtonClass="container-left-skip-button" onClick={() => handleButtonScroll(-120)} />
         </Show>
         <Show when={animeCards().length > 0}>
-          <div tabIndex={-1} class={horizontal ? "container-data-horizontal" : "container-data"} ref={container}>
+          <div tabIndex={-1} class={props.horizontal ? "container-data-horizontal" : "container-data"} ref={container}>
             <For each={animeCards()}>
               {(card) => (<Card card={card} />)}
             </For>
@@ -116,7 +116,7 @@ const Container: Component<containerData> = ({ title, data, horizontal = false, 
         <Show when={animeCards().length <= 0}>
           <div class="home-empty-container container-error-text"><span class="material-symbols-outlined home-empty-icon">search_off</span>{t("home.nothingfound")}</div>
         </Show>
-        <Show when={horizontal && animeCards().length > 0}>
+        <Show when={props.horizontal && animeCards().length > 0}>
           <Button icon="chevron_right" ButtonClass="container-right-skip-button" onClick={() => handleButtonScroll(120)} />
         </Show>
       </div>

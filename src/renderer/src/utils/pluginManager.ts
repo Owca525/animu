@@ -84,6 +84,7 @@ export class informationPluginManager implements informationPluginManagerFormat 
         setAllHomeData({ data: { sections: [] }, isLoading: true, isError: false, } as any)
         this.currentPlugin.home({
             onSuccess: (data: { topCards?: containerData; sections: containerData[]; }) => {
+                console.log(data.sections)
                 setAllHomeData({ data: { topCards: data.topCards, sections: data.sections }, 
                     isLoading: false, 
                     isError: false, 

@@ -1,7 +1,7 @@
 import { cardData, ContextMenuProps } from "@renderer/utils/types";
 import "./css/card.css";
 import { useNavigate } from "@solidjs/router";
-import { Component, JSX, Match, Show, Switch, createSignal, onMount, onCleanup } from "solid-js";
+import { JSX, Match, Show, Switch, createSignal, onMount, onCleanup } from "solid-js";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import {
   convertSeconds,
@@ -20,7 +20,7 @@ interface CardProps {
   disableinformation?: boolean;
 }
 
-const Card: Component<CardProps> = ({ card, disableinformation }) => {
+function Card(props: CardProps) {
   const { t, pathExist } = useI18n()
   
   const navigate = useNavigate();
@@ -52,15 +52,15 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
   })
 
   async function sendToInformation() {
-    if (card.onClick) {
-      card.onClick(card.AnimeData);
+    if (props.card.onClick) {
+      props.card.onClick(props.card.AnimeData);
       return;
     }
 
-    if (card.saveData && card.saveData.episode != "" && (card.saveData.last_Time != 0 || card.saveData.isStarted)) {
+    if (props.card.saveData && props.card.saveData.episode != "" && (props.card.saveData.last_Time != 0 || props.card.saveData.isStarted)) {
       let idToast = toast("Fetching Episode List", { type: "loading", removeTimer: true })
-      const currentPLugin = pluginManager().changePlugin(card.saveData.pluginName)
-      const episodeList = await currentPLugin.extractOnlyEpisodesList(card.saveData.type, card.AnimeData.player_ID as string);
+      const currentPLugin = pluginManager().changePlugin(props.card.saveData.pluginName)
+      const episodeList = await currentPLugin.extractOnlyEpisodesList(props.card.saveData.type, props.card.AnimeData.player_ID as string);
 
       if (episodeList.length <= 0) {
         updateToast(idToast, "Failed Fetch episodes", { type: "error", removeTimer: false })
@@ -68,8 +68,8 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
       }
 
       localStorage.setItem("playerCache", JSON.stringify({
-        data: (card.AnimeData),
-        save: (card.saveData),
+        data: (props.card.AnimeData),
+        save: (props.card.saveData),
         episodelist: episodeList,
         continewatch: true,
       }))
@@ -79,27 +79,27 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
       return;
     }
 
-    if (card.AnimeData.id === "") {
-      // np. extractInformation(card.AnimeData.player_ID)
+    if (props.card.AnimeData.id === "") {
+      // np. extractInformation(props.card.AnimeData.player_ID)
       return;
     }
 
-    localStorage.setItem("informationCache", JSON.stringify({ anime: card.AnimeData, saveData: card.saveData }))
+    localStorage.setItem("informationCache", JSON.stringify({ anime: props.card.AnimeData, saveData: props.card.saveData }))
     navigate("/info");
   }
 
   function deleteCard() {
-    if (card.saveData && card.saveData.episode != "" && (card.saveData.last_Time != 0 || card.saveData.isStarted)) {
+    if (props.card.saveData && props.card.saveData.episode != "" && (props.card.saveData.last_Time != 0 || props.card.saveData.isStarted)) {
       SaveHistory(unwrap({
-        ...card,
+        ...props.card,
         saveData: {
-          ...card.saveData,
+          ...props.card.saveData,
           last_Time: 0,
           isStarted: false,
         }
       }))
     } else {
-      DeleteFromHistory(card)
+      DeleteFromHistory(props.card)
     }
   }
 
@@ -113,21 +113,21 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
     {
       option: t("contextMenu.copytitle"),
       onClick: () =>
-        SaveToClipboard("text", card.AnimeData.title.romaji),
+        SaveToClipboard("text", props.card.AnimeData.title.romaji),
     }
   ];
 
-  if (card.AnimeData.coverImage) {
+  if (props.card.AnimeData.coverImage) {
     CenterContextMenu.push({
       option: t("contextMenu.copycover"),
       onClick: () =>
-        card.AnimeData.coverImage
-          ? SaveToClipboard("image", card.AnimeData.coverImage)
+        props.card.AnimeData.coverImage
+          ? SaveToClipboard("image", props.card.AnimeData.coverImage)
           : "",
     })
   }
 
-  if (card.saveData) {
+  if (props.card.saveData) {
     CenterContextMenu.push({
       option: t("contextMenu.delete"),
       deletion: true,
@@ -147,7 +147,7 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
   }
 
   function ConvertTimeToText(): string {
-    const time = convertSeconds(card.AnimeData.nextAiringEpisode?.timeUntilAiring);
+    const time = convertSeconds(props.card.AnimeData.nextAiringEpisode?.timeUntilAiring);
     if (!time) return "";
     if (time.days != 0) return t("card_information.ep_airing_day", { day: time.days });
     if (time.hours != 0) return t("card_information.ep_airing_hours", { hours: time.hours });
@@ -158,70 +158,70 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
   function GenerateInformation() {
     const info: JSX.Element[] = [];
 
-    if (card.AnimeData.averageScore) {
+    if (props.card.AnimeData.averageScore) {
       info.push(
         <div
           class="card-information-score"
-          style={{ border: `3px solid ${getGradientColor(card.AnimeData.averageScore)}` }}
+          style={{ border: `3px solid ${getGradientColor(props.card.AnimeData.averageScore)}` }}
         >
-          {card.AnimeData.averageScore}%
+          {props.card.AnimeData.averageScore}%
         </div>
       );
     }
 
-    if (card.AnimeData.nextAiringEpisode && !card.saveData) {
+    if (props.card.AnimeData.nextAiringEpisode && !props.card.saveData) {
       info.push(
         <div class="card-information-text card-information-top">
           {t("card_information.ep_airing", {
-            ep: card.AnimeData.nextAiringEpisode.episode,
+            ep: props.card.AnimeData.nextAiringEpisode.episode,
             text: ConvertTimeToText(),
           })}
         </div>
       );
     }
 
-    if ((!card.AnimeData.nextAiringEpisode || card.saveData) && card.AnimeData.season && card.AnimeData.seasonYear) {
+    if ((!props.card.AnimeData.nextAiringEpisode || props.card.saveData) && props.card.AnimeData.season && props.card.AnimeData.seasonYear) {
       info.push(
         <div class="card-information-text card-information-top">
-          {t(`anime_seasons.${card.AnimeData.season.toLowerCase()}`)} {card.AnimeData.seasonYear}
+          {t(`anime_seasons.${props.card.AnimeData.season.toLowerCase()}`)} {props.card.AnimeData.seasonYear}
         </div>
       );
-    } else if (!(card.AnimeData.season && card.AnimeData.seasonYear) && !card.AnimeData.nextAiringEpisode) {
+    } else if (!(props.card.AnimeData.season && props.card.AnimeData.seasonYear) && !props.card.AnimeData.nextAiringEpisode) {
       info.push(<div class="card-information-text card-information-top">TBA</div>);
     }
 
-    if (card.AnimeData.studios.length > 0) {
-      info.push(<div class="card-information-text">{card.AnimeData.studios[0]}</div>);
-    } else if (card.AnimeData.status) {
+    if (props.card.AnimeData.studios && props.card.AnimeData.studios.length > 0) {
+      info.push(<div class="card-information-text">{props.card.AnimeData.studios[0]}</div>);
+    } else if (props.card.AnimeData.status) {
       info.push(
         <div class="card-information-text">
-          {t(`anime_statuses.${card.AnimeData.status.toLowerCase()}`)}
+          {t(`anime_statuses.${props.card.AnimeData.status.toLowerCase()}`)}
         </div>
       );
     }
 
     const bottom: JSX.Element[] = [];
 
-    if (card.AnimeData.format && pathExist(`anime_formats.${card.AnimeData.format.toLowerCase()}`)) {
-      bottom.push(t(`anime_formats.${card.AnimeData.format.toLowerCase()}`));
-    } else if (card.AnimeData.format && pathExist(`anime_genres.${card.AnimeData.format.toLowerCase()}`)) {
-      bottom.push(t(`anime_genres.${card.AnimeData.format.toLowerCase()}`))
-    } else if (card.AnimeData.type) {
-      bottom.push(t(`anime_source.${card.AnimeData.type.toLowerCase().replaceAll("_", "")}`));
+    if (props.card.AnimeData.format && pathExist(`anime_formats.${props.card.AnimeData.format.toLowerCase()}`)) {
+      bottom.push(t(`anime_formats.${props.card.AnimeData.format.toLowerCase()}`));
+    } else if (props.card.AnimeData.format && pathExist(`anime_genres.${props.card.AnimeData.format.toLowerCase()}`)) {
+      bottom.push(t(`anime_genres.${props.card.AnimeData.format.toLowerCase()}`))
+    } else if (props.card.AnimeData.type) {
+      bottom.push(t(`anime_source.${props.card.AnimeData.type.toLowerCase().replaceAll("_", "")}`));
     }
 
-    if (card.AnimeData.episodes && card.AnimeData.format?.toUpperCase() != "MOVIE") {
+    if (props.card.AnimeData.episodes && props.card.AnimeData.format?.toUpperCase() != "MOVIE") {
       bottom.push(
         <>
           {bottom.length !== 0 && <span class="card-dot">·</span>}
-          {t("card_information.episodes", { ep: card.AnimeData.episodes })}
+          {t("card_information.episodes", { ep: props.card.AnimeData.episodes })}
         </>
       );
-    } else if (card.AnimeData.duration) {
+    } else if (props.card.AnimeData.duration) {
       bottom.push(
         <>
           {bottom.length !== 0 && <span class="card-dot">·</span>}
-          {t("card_information.minutes", { min: card.AnimeData.duration })}
+          {t("card_information.minutes", { min: props.card.AnimeData.duration })}
         </>
       );
     }
@@ -237,7 +237,7 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
       class="card-container"
       onClick={sendToInformation}
       onMouseOver={checkOutOfBound}
-      title={card.AnimeData.title.romaji}
+      title={props.card.AnimeData.title.romaji}
       onContextMenu={(event) =>
         OpenContextMenu(
           CreateContextMenuOptions(
@@ -248,14 +248,14 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
         )
       }
     >
-      <Show when={!disableinformation && card.AnimeData.studios && card.AnimeData.status && card.AnimeData.genres && card.AnimeData.description}>
+      <Show when={!props.disableinformation && props.card.AnimeData.studios && props.card.AnimeData.status && props.card.AnimeData.genres && props.card.AnimeData.description}>
         <div class={`card-information ${isOut() ? "card-information-left" : "card-information-right"}`}>
           {GenerateInformation()}
         </div>
       </Show>
-      <Show when={card.AnimeData.coverImage && isCardVisible()}>
+      <Show when={props.card.AnimeData.coverImage && isCardVisible()}>
         <img
-          src={card.AnimeData.coverImage}
+          src={props.card.AnimeData.coverImage}
           class="card-image"
           onLoad={() => setLoading(false)}
           onError={() => setIsError(true)}
@@ -274,10 +274,10 @@ const Card: Component<CardProps> = ({ card, disableinformation }) => {
           </div>
         </Match>
       </Switch>
-      <div class="card-title">{card.AnimeData.title.romaji}</div>
-      <Show when={card.saveData && card.saveData.episode}>
-        <Show when={card.saveData?.last_Time != 0 && card.saveData?.type != ""} fallback={<div class="card-continue-watch-text">{t("history.history", { ep: card.saveData?.episode })}</div>}>
-          <div class="card-continue-watch-text">{t("history.continue", { ep: card.saveData?.episode })}</div>
+      <div class="card-title">{props.card.AnimeData.title.romaji}</div>
+      <Show when={props.card.saveData && props.card.saveData.episode}>
+        <Show when={props.card.saveData?.last_Time != 0 && props.card.saveData?.type != ""} fallback={<div class="card-continue-watch-text">{t("history.history", { ep: props.card.saveData?.episode })}</div>}>
+          <div class="card-continue-watch-text">{t("history.continue", { ep: props.card.saveData?.episode })}</div>
         </Show>
       </Show>
     </div>

@@ -27,6 +27,7 @@
 
 .icon {
     font-size: 2em !important;
+    user-select: none;
 }
 
 /* HEADER */
