@@ -154,7 +154,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             const findedepisode = temp.episodes.findIndex((value) => value.ep == temp.episode)
             const cover = temp.episodes[findedepisode] ? temp.episodes[findedepisode].img : anime_data.AnimeData.coverImage
             navigator.mediaSession.metadata = new MediaMetadata({
-                artist: anime_data.AnimeData.studios.length > 0 ? anime_data.AnimeData.studios.length[0] : "",
+                artist: anime_data.AnimeData.studios && anime_data.AnimeData.studios.length > 0 ? anime_data.AnimeData.studios.length[0] : "",
                 title: anime_data.AnimeData.title.romaji,
                 artwork: [
                     { sizes: "512x512", src: cover ? cover : "" }
@@ -573,11 +573,18 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         const duration = event.currentTarget.duration
         const currentTime = event.currentTarget.currentTime
 
-        if (duration <= config.Player.upToNextEpisode.durationShow * 60) return
+        if (duration <= config.Player.upToNextEpisode.durationShow * 60 && !currentPlayer()!.listChapters) return
 
-        const showUpToNext: boolean = currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
+        let endingChupter: playerChapterList | undefined = undefined
+        if (currentPlayer()!.listChapters) endingChupter = currentPlayer()!.listChapters!.find((cha) => cha.type == "ending")
+
+        if (!endingChupter && currentPlayer()!.listChapters) return
+
+        let showUpToNext: boolean = currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
         let timeDelete: number = ((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
-
+        
+        if (endingChupter) showUpToNext = currentTime >= endingChupter.start
+        
         if (isHideUpNextEpisode() == false && temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] != null && showUpToNext) {
             setUpNextEpisode(true)
             setTimeNextEpisode(timeDelete)
@@ -917,7 +924,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             tmp.push({ left: (element.start / videoRef.duration) * 100, width: ((element.end - element.start) / videoRef.duration) * 100, name: element.name, type: element.type })
         }
         setChapterList(() => tmp)
-    }
+    }   
 
     function getcurrentChapter(): string | undefined {
         if (!currentPlayer()) return undefined
