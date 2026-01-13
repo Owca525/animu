@@ -14,7 +14,7 @@ import JASSUB from "jassub";
 
 import workerUrl from "jassub/dist/jassub-worker.js?url";
 import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
-import modernWasmUrl from 'jassub/dist/jassub-worker-modern.wasm?url'
+// import modernWasmUrl from 'jassub/dist/jassub-worker-modern.wasm?url'
 import { saveConfig } from "@renderer/utils/FilesManager/config"
 import { SaveHistory } from "@renderer/utils/FilesManager/history"
 import { Component, createSignal, For, onCleanup, onMount, Show } from "solid-js"
@@ -710,7 +710,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 subUrl: sub.url,
                 workerUrl,
                 wasmUrl,
-                modernWasmUrl
+                // modernWasmUrl
             });
             setASSubtitles(renderer)
             setSubtitles(() => sub)
