@@ -301,7 +301,7 @@ function Convert(convert: any): cardData {
   try {
     if (convert.recommendations) {
       convert.recommendations.nodes.forEach(element => {
-        if (!element) return
+        if (!element || !element.mediaRecommendation) return
         recommendations.push({
           id: element.mediaRecommendation.id,
           title: element.mediaRecommendation.title,
