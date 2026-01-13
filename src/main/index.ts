@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, Menu, session, ipcMain, dialog } from 'electron'
+import { app, shell, BrowserWindow, Menu, session, ipcMain, dialog, crashReporter } from 'electron'
 import { optimizer, is } from '@electron-toolkit/utils'
 import path, { join } from 'path'
 import ini from "ini";
@@ -27,6 +27,12 @@ export const animuPlugins = path.join(app.getPath("userData"), "animuPlugins")
 export let config: SettingsConfig = defaultConfig
 let historyData: cardData[] = []
 const PROTOCOL = "animu"
+
+crashReporter.start({
+  productName: "animu",
+  compress: true,
+  uploadToServer: false
+})
 
 function createWindow(): void {
   let title = 'Animu '
@@ -202,6 +208,17 @@ export async function initialBackend() {
     console.error("Failed Initial Backend", error)
   }
 }
+
+app.on('render-process-gone', (_event, _webContents, details) => {
+  console.error('RENDERER CRASH', details)
+})
+
+app.on('child-process-gone', (_event, details) => {
+  console.error('CHILD PROCESS CRASH', details)
+})
+
+process.on('uncaughtException', console.error)
+process.on('unhandledRejection', console.error)
 
 ipcMain.handle('refreshBackend', () => initialBackend());
 
