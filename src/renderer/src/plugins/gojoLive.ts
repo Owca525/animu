@@ -1,3 +1,4 @@
+import { request } from "@renderer/utils/functions";
 import { t } from "@renderer/utils/i18n";
 import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerData, playerSubtitlesFormat, resolutionFormat, playerChapterList, playerDataExtended } from "@renderer/utils/types";
 
@@ -13,17 +14,17 @@ const HEADER = {
 async function extractResolutions(episode: string, type: string, playerData: playerData, server?: any, id?: string): Promise<playerData | undefined> {
     try {
         if (!server) return undefined
-        let response = await window.api.request.get(`${BACKEND}/api/anime/tiddies?server=${server}&id=${id}&num=${episode}&subType=${type}`, HEADER);
-        if (!response.success || !response.data) return undefined
+        let response = await request(`${BACKEND}/api/anime/tiddies?server=${server}&id=${id}&num=${episode}&subType=${type}`, { headers: HEADER });
+        if (!response.success || !response.json) return undefined
         let subtitles: playerSubtitlesFormat[] = []
-        if (response.data["subtitles"]) {
-            subtitles = response.data["subtitles"].map((element) => {
+        if (response.json["subtitles"]) {
+            subtitles = response.json["subtitles"].map((element) => {
                 const parts = element["url"].split(".");
                 const lastPart = parts.pop();
                 return { url: element["url"], lang: "en", label: element["lang"], format: lastPart }
             })
         }
-        let resolutions: resolutionFormat[] = response.data["sources"].map((element) => ({
+        let resolutions: resolutionFormat[] = response.json["sources"].map((element) => ({
             res: element["quality"],
             url: element["url"],
             defaultSubtitles: subtitles.length > 0,
@@ -33,9 +34,9 @@ async function extractResolutions(episode: string, type: string, playerData: pla
             }
         }))
 
-        let chapters: playerChapterList[] = response.data["skips"] ? [
-            { start: response.data["skips"]["op"]["startTime"], end: response.data["skips"]["op"]["endTime"], type: "opening" },
-            { start: response.data["skips"]["ed"]["startTime"], end: response.data["skips"]["ed"]["endTime"], type: "ending" }
+        let chapters: playerChapterList[] = response.json["skips"] ? [
+            { start: response.json["skips"]["op"]["startTime"], end: response.json["skips"]["op"]["endTime"], type: "opening" },
+            { start: response.json["skips"]["ed"]["startTime"], end: response.json["skips"]["ed"]["endTime"], type: "ending" }
         ] : []
 
         return {
@@ -53,7 +54,7 @@ async function extractResolutions(episode: string, type: string, playerData: pla
 
 export default class GojoLive implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.1",
+        version: "1.2",
         name: "GojoLive",
         icon: "https://animetsu.bz/android-chrome-512x512.png",
         author: "Owca525",
@@ -62,11 +63,11 @@ export default class GojoLive implements playerPluginFormat {
     };
     extractPlayerData = async (_type: string, episode: string, id: string): Promise<playerData[]> => {
         try {
-            let response = await window.api.request.get(`${BACKEND}/api/anime/servers?id=${id}&num=${episode}`, HEADER);
-            if (!response.success || !response.data) return []
+            let response = await request(`${BACKEND}/api/anime/servers?id=${id}&num=${episode}`, { headers: HEADER });
+            if (!response.success || !response.json) return []
             let data: playerData[] = []
-            for (let index = 0; index < response.data.length; index++) {
-                const element = response.data[index];
+            for (let index = 0; index < response.json.length; index++) {
+                const element = response.json[index];
                 data.push({
                     hostname: element["id"],
                     defaultHost: element["default"],
