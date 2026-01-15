@@ -41,6 +41,7 @@ import {
 import { useI18n } from '@renderer/utils/i18n';
 import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
 import { getGlobalCache, setDeeplinkRunned } from '@renderer/utils/stores/global';
+import { createShortcut } from '@solid-primitives/keyboard';
 // import { createShortcut } from "@solid-primitives/keyboard";
 // import WelcomeScreen from "./components/welcomeScreen"
 const Home = () => {
@@ -58,19 +59,19 @@ const Home = () => {
     top: [
       {
         icon: "home",
-        text: t("global.home"),
-        onClick: () => { setHomeActivePage("home"); setHomeSearchTags(undefined); plugin.home(); changeTitleAnimu(`Animu - ${t("global.home")}`) },
+        text: "global.home",
+        onClick: () => { setHomeActivePage("global.home"); setHomeSearchTags(undefined); plugin.home(); changeTitleAnimu(`Animu - ${t("global.home")}`) },
       },
       {
         icon: "history",
-        text: t("global.history"),
+        text: "global.history",
         onClick: setHistory,
       },
     ],
     bottom: [
       {
         icon: "settings",
-        text: t("global.settings"),
+        text: "global.settings",
         onClick: () => navigate("/settings"),
       },
     ],
@@ -84,7 +85,7 @@ const Home = () => {
   // }
 
   onMount(() => {
-    if (getHomeCache().activePage == "history") changeTitleAnimu(`Animu - ${t("global.history")}`)
+    if (getHomeCache().activePage == "global.history") changeTitleAnimu(`Animu - ${t("global.history")}`)
     else changeTitleAnimu(`Animu - ${t("global.home")}`)
 
     if (!getGlobalCache().deeplinkRunned) {
@@ -146,9 +147,13 @@ const Home = () => {
     navigate("/player");
   }
 
+  createShortcut(["l"], () => {
+    console.log(getHomeCache())
+  })
+
   function setHistory() {
     setHomeSearchTags(undefined)
-    setHomeActivePage("history");
+    setHomeActivePage("global.history");
     changeTitleAnimu(`Animu - ${t("global.history")}`)
     let history = getHistory()
 
@@ -193,7 +198,7 @@ const Home = () => {
   // TODO: napraw wyszukiwanie itp
   async function OnSearch(text: string) {
     let home = homeCache()
-    if (home.activePage == "home") {
+    if (home.activePage == "global.home") {
       setHomeSearch(text)
       setHomeSearchPage(1)
       setHomeStopScrolling(false);
@@ -201,7 +206,7 @@ const Home = () => {
       return;
     }
 
-    if (home.activePage != "history") return
+    if (home.activePage != "global.history") return
     if (text.replaceAll(" ", "") == "") {
       setHistory()
       return
@@ -303,7 +308,7 @@ const Home = () => {
         />
         <div class="home-header-search">
           <Input
-            placeholder={getHomeCache().activePage == "history" ? t("home.historySearch") : t("home.search")}
+            placeholder={getHomeCache().activePage == "global.history" ? t("home.historySearch") : t("home.search")}
             InputClass={`${homeCache().data && homeCache().data.topCards ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
             defaultValue={homeCache().search}
             onKeyDown={OnSearch}

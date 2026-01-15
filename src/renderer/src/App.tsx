@@ -90,7 +90,7 @@ function App() {
 
     setinitialState({ text: "Loading Config", plugin: false })
     LoadConfig()
-    setHomeActivePage("home")
+    setHomeActivePage("global.home")
 
     setinitialState({ text: "Loading Plugin", plugin: false })
     // const index = `${getRenderPath()}index.js`

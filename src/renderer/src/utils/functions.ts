@@ -166,7 +166,7 @@ export function convertMsToMinutes(ms: number): number {
 
 export async function refetchHistory() {
     let data: homeData = getHomeCache()
-    if (data.activePage != "history") return
+    if (data.activePage != "global.history") return
     let history = getHistory()
     if (data.data.sections[0].title == t("global.continuewatch") && data.data.sections.length != 2) {
         setHomeNewData({ sections: [{ title: t("global.continuewatch"), data: history.continue, horizontal: false }] })
