@@ -315,16 +315,18 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     async function runHLS(resolution: resolutionFormat, splitHls: boolean = false) {
         const hls = new Hls({
-            maxBufferLength: 120,
+            maxBufferLength: 140,
             autoStartLoad: true,
-            startLevel: 2,
+            enableWorker: true,
             lowLatencyMode: false,
+            backBufferLength: 90,
             loader: class extends Hls.DefaultConfig.loader {
                 load(context: any, config: any, callbacks: any) {
                     request(context.url, { method: "GET", headers: resolution.reqHeader }).then((data) => {
                         let currentData: any = data.text
                         if (!data.success) {
-                            callbacks.onError({ type: 'network', details: "Failed Requestc", fatal: true }, context)
+                            console.warn("Context:", context, "Data:", data)
+                            callbacks.onError({ type: 'network', details: "Failed Request", fatal: true }, context)
                             return
                         }
                         if (context.responseType == "arraybuffer") currentData = data.buffer
