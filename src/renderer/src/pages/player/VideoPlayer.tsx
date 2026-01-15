@@ -23,7 +23,7 @@ import { useKeyPress } from "@renderer/utils/hooks/useKeyPress"
 import DeveloperStats from "./components/developerStats"
 import NerdStats from "./components/nerdStats"
 import { unwrap } from "solid-js/store"
-import { removeToast, toast } from "@renderer/utils/context/ToastNotification"
+import { removeToast, toast, updateToast } from "@renderer/utils/context/ToastNotification"
 import { useI18n } from "@renderer/utils/i18n"
 import { addTime, countImages, fetchResolutions, VTTstoryBoardParser } from "./playerUtils"
 
@@ -995,13 +995,13 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 }
             }, player.isDubbing)
             console.log(tmp)
-            removeToast(idToast)
             if (tmp.success && tmp.data) {
+                removeToast(idToast)
                 updatePlayerData((prev) => prev.map((prevplayer) => prevplayer.hostname == player.hostname ? { ...player, dubResolution: tmp.data } : player))
                 setPlayer({ ...player, dubResolution: tmp.data })
                 setListResolution(tmp.data)
                 setNewResolution(tmp.data[0])
-            }
+            } else updateToast(idToast, "Failed Fetch Dubbing", { type: "error", removeTimer: false })
         } else {
             setListResolution(player.resolution)
             setNewResolution(player.resolution[0])
