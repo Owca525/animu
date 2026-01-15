@@ -8,6 +8,7 @@ export interface SettingsConfig {
     deepLinkURL: string
     plugins: {
         // information: string
+        userPlugins: boolean
         player: string
     }
     General: {
@@ -282,7 +283,8 @@ export const defaultConfig: SettingsConfig = {
         enable: true
     },
     plugins: {
-        player: "Allmanga"
+        player: "Allmanga",
+        userPlugins: false
     },
     backup: {
         enable: false,

@@ -39,6 +39,7 @@
     "ini": "^6.0.0",
     "jassub": "^1.8.8",
     "material-symbols": "^0.40.2",
+    "semver": "^7.7.3",
     "subtitle-converter": "^3.0.12",
     "uuid": "^13.0.0",
     "zod": "^4.3.5"
@@ -53,6 +54,7 @@
     "@types/crypto-js": "^4.2.2",
     "@types/ini": "^4.1.1",
     "@types/node": "^25.0.6",
+    "@types/semver": "^7.7.1",
     "bufferutil": "^4.1.0",
     "electron": "^39.2.7",
     "electron-builder": "^26.4.0",

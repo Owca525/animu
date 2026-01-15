@@ -262,6 +262,14 @@ export default class Allmanga implements playerPluginFormat {
         supportLang: ["en"],
         urlWebsite: "https://allmanga.to",
     }
+    config: { [key: string]: any; } = {
+        "Webiste": API_WEB,
+        "HASH_SEARCH": HASH_SEARCH,
+        "HASH_INFO": HASH_INFO,
+        "HASH_PLAYER": HASH_PLAYER,
+        "HASH_DATA": HASH_DATA
+    };
+
     async extractPlayerData(type: string, episode: string, id: string) {
         let variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${episode}"}`
         try {

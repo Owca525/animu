@@ -50,6 +50,8 @@ export default class Anizone implements playerPluginFormat {
         supportLang: ["en", "pl", "de"],
         urlWebsite: WEB
     };
+    config?: { [key: string]: any; } | undefined;
+
     extractPlayerData = async (_type: string, episode: string, id: string) => {
         let url = `${WEB}/anime/${id}/${episode}`
 

@@ -65,6 +65,11 @@ declare global {
         list: () => Promise<themeMetadata[]>
         config: (theme: themeMetadata) => Promise<Record<string, boolean | string> | {}>
         writeConfig: (theme: themeMetadata, data: Record<string, boolean | string>) => Promise<void>
+      },
+      plugins: {
+        list: () => Promise<{ file: string, content: string, type: "official" | "user", sha256: string }[]>
+        saveConfig: (name: string, config: { [key: string]: any }) => Promise<void>
+        getConfig: (name: string, config: { [key: string]: any }) => Promise<{ [key: string]: any }>
       }
       runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string}, type: "mpv" | "vlc") => any
       getOSDetails: () => Promise<{ platform: NodeJS.Platform, release: string, arch: string }>
@@ -72,7 +77,6 @@ declare global {
       getConfig: () => Promise<SettingsConfig>
       getHistory: () => Promise<cardData[]>
       onProtocolRequest: (callback: (url: string) => void) => void
-      externalPlugins: () => Promise<{ file: string, content: string, type: "official" | "user", sha256: string }[]>
     };
     backend: {
       ipcRenderer: {

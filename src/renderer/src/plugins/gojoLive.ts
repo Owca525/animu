@@ -53,6 +53,7 @@ async function extractResolutions(episode: string, type: string, playerData: pla
 }
 
 export default class GojoLive implements playerPluginFormat {
+    config: { [key: string]: any; } = {};
     metadata: playerPluginFormat["metadata"] = {
         version: "1.2",
         name: "GojoLive",
@@ -61,6 +62,7 @@ export default class GojoLive implements playerPluginFormat {
         supportLang: ["en"],
         urlWebsite: WEBSITE,
     };
+    
     extractPlayerData = async (_type: string, episode: string, id: string): Promise<playerData[]> => {
         try {
             let response = await request(`${BACKEND}/api/anime/servers?id=${id}&num=${episode}`, { headers: HEADER });

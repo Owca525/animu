@@ -62,6 +62,7 @@ export default class LycorisCafe implements playerPluginFormat {
         urlWebsite: WEB,
         supportLang: ["pl"]
     };
+    config?: { [key: string]: any; } | undefined;
 
     extractPlayerData = async (_type: string, episode: string, id: string): Promise<playerData[]> => {
         let req = await requestToApi(id)

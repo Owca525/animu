@@ -6,7 +6,7 @@ import crypto from 'crypto';
 
 import path from "path"
 import fs from "fs"
-import { mainWindow, newConfigPath, themeConfigPath } from ".";
+import { mainWindow, newConfigPath, pluginsConfigPath, themeConfigPath } from ".";
 import { exec, execSync } from "child_process";
 // import express from "express";
 // import { Readable } from "stream";
@@ -410,4 +410,21 @@ function saveThemeConfig(theme: themeFormatType, data: Record<string, boolean | 
         content = { ...getThemeConfig(theme), ...content }
     }
     fs.writeFileSync(path.join(themeConfigPath, `${theme.themeName}.ini`), ini.stringify(content), "utf-8")
+}
+
+ipcMain.handle("getPluginConfig", (_, name: string, config: { [key: string]: any }) => getPluginConfig(name, config))
+ipcMain.handle("savePluginConfig", (_, name: string, config: { [key: string]: any }) => savePluginConfig(name, config))
+
+function getPluginConfig(name: string, config: { [key: string]: any }) {
+    if (!fs.existsSync(path.join(pluginsConfigPath, `${name}.ini`))) return generetaPluginConfig(name, config)
+    return ini.parse(fs.readFileSync(path.join(pluginsConfigPath, `${name}.ini`), "utf-8"))
+}
+
+function generetaPluginConfig(name: string, config: { [key: string]: any }) {
+    fs.writeFileSync(path.join(pluginsConfigPath, `${name}.ini`), ini.stringify(config), "utf-8")
+    return config
+}
+
+function savePluginConfig(name: string,config: { [key: string]: any }) {
+    fs.writeFileSync(path.join(pluginsConfigPath, `${name}.ini`), ini.stringify(config), "utf-8")
 }

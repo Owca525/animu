@@ -53,6 +53,11 @@ if (process.contextIsolated) {
         config: (theme) => ipcRenderer.invoke("getThemeConfig", theme),
         writeConfig: (theme, data: Record<string, boolean | string>) => ipcRenderer.invoke("saveConfigTheme", theme, data)
       },
+      plugins: {
+        list: () => ipcRenderer.invoke("externalPlugins"),
+        saveConfig: (name: string, config: { [key: string]: any }) => ipcRenderer.invoke("savePluginConfig", name, config),
+        getConfig: (name: string, config: { [key: string]: any }) => ipcRenderer.invoke("getPluginConfig", name, config),
+      },
       runExternaPlayer: (videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", videoData, type),
       getOSDetails: () => ipcRenderer.invoke('get-os-info'),
       getListLang: () => ipcRenderer.invoke("get-lang-files"),
@@ -61,7 +66,6 @@ if (process.contextIsolated) {
       onProtocolRequest: (callback: (url: string) => void) => {
         ipcRenderer.on('protocol-request', (_, url) => callback(url));
       },
-      externalPlugins: () => ipcRenderer.invoke("externalPlugins")
     });
     contextBridge.exposeInMainWorld("backend", {
       Buffer: require("buffer").Buffer,

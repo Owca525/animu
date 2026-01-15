@@ -107,6 +107,15 @@ export interface globalDataFormat {
     deeplinkRunned: boolean,
     loadedTheme: themeMetadata[],
     activeThemes: Map<number, themeMetadata>
+    pluginRepo: {
+        sha256: string,
+        version: string,
+        file: string,
+        name: string,
+        author: string,
+        icon?: string,
+        description?: string
+    }[]
 }
 
 export type playerDataExtended = playerData & {
@@ -215,6 +224,7 @@ export interface playerPluginFormat {
         // sidebarAddon?: sidebarData[]
         searchOption?: genres
     }
+    config?: { [key: string]: any }
     extractPlayerData(type: string, episode: string, id: string): Promise<playerData[]>
     extractEpisodeList(animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined>
     extractOnlyEpisodesList(type: string, anime_id: string): Promise<{ ep: string, img?: string, title?: string }[]>
@@ -256,6 +266,7 @@ export interface informationPluginManagerFormat {
     searchAnime(name: string, page: number, params?: genresSearchFormat): void
     home(): void
     anime(id: string): Promise<AnimeData | undefined>
+    initial(): Promise<void>
     // schedule(airingStart?: number, airingEnd?: number): void
 }
 
@@ -269,6 +280,7 @@ export interface SettingsConfig {
     deepLinkURL: string
     plugins: {
         // information: string
+        userPlugins: boolean
         player: string
     }
     General: {

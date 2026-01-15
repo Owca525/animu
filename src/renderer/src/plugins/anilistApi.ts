@@ -386,7 +386,8 @@ async function searchOnAnilist(_name: string, page: number, params?: genresSearc
     let variables: any = {
       page: page,
       sort: "SEARCH_MATCH",
-      type: "ANIME"
+      type: "ANIME",
+      // isAdult: true
     }
 
     if (params) {
