@@ -329,17 +329,18 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                             callbacks.onError({ type: 'network', details: "Failed Request", fatal: true }, context)
                             return
                         }
+                        const now = performance.now()
                         if (context.responseType == "arraybuffer") currentData = data.buffer
                         callbacks.onSuccess({ data: currentData, url: context.url }, {
                             loaded: data.buffer.byteLength,
                             total: data.buffer.byteLength,
-                            abort: true,
+                            abort: false,
                             retry: config.maxRetry,
                             chunkCount: 0,
                             bwEstimate: 0,
-                            loading: { start: 0, first: 0, end: 0 },
-                            parsing: { start: 0, end: 0 },
-                            buffering: { start: 0, first: 0, end: 0 }
+                            loading: { start: now-10, first: now-5, end: now },
+                            parsing: { start: now, end: now },
+                            buffering: { start: now, first: now, end: now }
                         }, context);
                     });
                 }
