@@ -120,7 +120,7 @@ query(
   $page: Int = 1,
   $id: Int,
   $type: MediaType,
-  $isAdult: Boolean = false,
+  $isAdult: Boolean,
   $search: String,
   $format: [MediaFormat],
   $status: MediaStatus,
@@ -398,6 +398,8 @@ async function searchOnAnilist(_name: string, page: number, params?: genresSearc
       if (params.seasons) variables = { ...variables, season: params.seasons.toUpperCase() }
       if (params.format) variables = { ...variables, format: params.format.map((tmp) => tmp.toUpperCase().replaceAll(" ", "_")) }
       if (params.airing) variables = { ...variables, status: params.airing.toUpperCase().replaceAll(" ", "_") }
+    } else {
+      variables = { ...variables, isAdult: true }
     }
 
     const resp = await sendToApi(variables, graphicApi)
