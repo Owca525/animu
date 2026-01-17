@@ -109,70 +109,6 @@
   margin-bottom: 64px;
 }
 
-.settings-table-extensions {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.settings-container-extensions {
-  width: 100%;
-  margin: 12px;
-  min-height: 500px;
-}
-
-.settings-extensions-button {
-  width: 40px;
-  height: 40px;
-  justify-content: center;
-}
-
-th, td {
-  padding: 6px;
-}
-
-th {
-  text-align: left;
-  font-size: 1.2em;
-  border-width: 0px 0px 2px 0px;
-}
-
-td {
-  font-size: 1.1em;
-  padding: 8px;
-}
-
-.settings-extensions-button-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.settings-table-button * {
-  cursor: pointer;
-  transition: background-color 100ms ease-in-out;
-}
-
-.settings-extensions-icon {
-  width: 40px;
-  height: 40px;
-}
-
-.settings-extensions-background {
-  width: max-content;
-  padding: 4px;
-}
-
-.settings-extensions-title {
-  display: flex;
-  justify-content: start;
-  align-items: center;
-  gap: 12px;
-}
-
-.settings-extensions-icon-placeholder {
-  height: 40px;
-}
-
 .settings-special-images {
   cursor: pointer;
   width: 60px;
@@ -189,7 +125,8 @@ td {
   gap: 4px;
 }
 
-.settings-button-backup, .settings-button-theme {
+.settings-button-backup,
+.settings-button-theme {
   padding: 12px;
   user-select: none;
   border-radius: 12px;
@@ -201,7 +138,8 @@ td {
   transition: all 100ms ease-in-out;
 }
 
-.settings-button-backup:hover, .settings-button-theme:hover {
+.settings-button-backup:hover,
+.settings-button-theme:hover {
   background-color: var(--five-layer);
   color: var(--green-one);
 }
@@ -215,10 +153,12 @@ td {
 }
 
 .settings-button-backup:hover .settings-button-date {
-  outline-color:var(--green-one);
+  outline-color: var(--green-one);
 }
 
-.settings-backup-container, .settings-theme-container, .settings-theme-spliter {
+.settings-backup-container,
+.settings-theme-container,
+.settings-theme-spliter {
   padding: 4px;
   display: flex;
   flex-direction: column;
@@ -267,21 +207,132 @@ td {
   gap: 8px;
 }
 
+.settings-container-extensions-menu {
+  display: flex;
+  width: 100%;
+  padding: 16px;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settings-container-extensions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.settings-container-title {
+  font-size: 1.5em;
+}
+
+.settings-extension-image {
+  width: 48px;
+}
+
+.settings-extension-container {
+  display: flex;
+  flex-direction: column;
+  width: 250px;
+  padding: 14px;
+  border-radius: 16px;
+  background-color: var(--third-layer);
+  gap: 18px;
+  transition: all 150ms ease;
+}
+
+.settings-extension-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2)
+}
+
+.settings-extension-top {
+  display: flex;
+  justify-content: space-between;
+}
+
+.settings-extension-top-left {
+  display: flex;
+  gap: 4px;
+}
+
+.settings-extension-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px;
+}
+
+.settings-extension-name {
+  font-size: 1.1em;
+}
+
+.settings-extension-author {
+  font-size: .9em;
+  color: var(--text-gray);
+}
+
+.settings-extension-mini-button {
+  font-size: .9em;
+  padding: 4px 12px;
+  border: 1px solid var(--green-one);
+  border-radius: 12px;
+  cursor: pointer;
+  user-select: none;
+  color: var(--green-one);
+  transition: all 150ms ease-in-out;
+  height: max-content;
+}
+
+.settings-extension-mini-button:hover {
+  background-color: var(--green-one);
+  color: var(--text);
+}
+
+.settings-extension-top-right {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-extension-version {
+  color: var(--text-gray);
+}
+
+.settings-extension-bottom {
+  display: flex;
+  justify-content: space-between;
+}
+
+.settings-extension-bottom-left {
+  display: grid;
+  align-content: center;
+  height: 100%;
+}
+
+.settings-extension-button {
+  height: 34px;
+  width: 34px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* for very small window sizes */
 @media (max-width: 600px) {
 
-    .settings-container .sidebar-logo-icon-container,
-    .settings-container .sidebar-container-max {
-        width: 130px;
-    }
-    
-    .settings-content-container {
-      font-size: 0.8em;
-    }
+  .settings-container .sidebar-logo-icon-container,
+  .settings-container .sidebar-container-max {
+    width: 130px;
+  }
 
-    .settings-setting-seekbar-container {
-      width: 60%;
-    }
+  .settings-content-container {
+    font-size: 0.8em;
+  }
+
+  .settings-setting-seekbar-container {
+    width: 60%;
+  }
 }
 
 .settings-custom-space {

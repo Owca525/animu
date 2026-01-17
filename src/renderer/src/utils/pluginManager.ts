@@ -46,6 +46,7 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
         }
     }
     initialPlugins = async (): Promise<void> => {
+        if (this.pluginList.length > 0) return
         const localPlugins = [Allmanga, Anizone, GojoLive, LycorisCafe]
         let externalPlugins: any[] = []
         const conf = getConfig()

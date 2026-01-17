@@ -1,5 +1,5 @@
 import Button from './buttons';
-import icon from '../../../../resources/icon.png';
+import icon from '@resources/icon.png';
 import {
   createEffect,
   createSignal,

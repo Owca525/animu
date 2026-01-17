@@ -1,6 +1,6 @@
 import "./css/welcomeScreen.css"
 import { t } from "i18next"
-import icon from "../../../../../../resources/icon.png"
+import icon from "@resources/icon.png"
 import Button from "@renderer/components/buttons"
 import Dropdown from "@renderer/components/dropDown"
 import i18n from "@renderer/utils/i18n"
