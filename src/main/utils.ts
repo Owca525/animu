@@ -164,6 +164,15 @@ ipcMain.handle('get-css-files', async (): Promise<themeFormatType[]> => {
     return [...localList, ...customList]
 });
 
+function getFolderPath(folderPath: string) {
+    try {
+        if (fs.statSync(folderPath).isDirectory()) return folderPath
+        return path.dirname(folderPath)
+    } catch (error) {
+        return folderPath
+    }
+}
+
 async function getThemeList(themePath: string): Promise<themeFormatType[]> {
     let listFolder = await fs.promises.readdir(themePath)
     let finallist: themeFormatType[] = []
@@ -177,9 +186,10 @@ async function getThemeList(themePath: string): Promise<themeFormatType[]> {
     }
     return finallist.map((theme) => {
         if (!theme.options) return theme
+        const mainCSSPath = getFolderPath(theme.mainCSS)
         return {...theme, options: theme.options.map((value) => {
-            if (value.css && value.css.replaceAll(" ", "") != "") return { ...value, css: path.join(path.dirname(theme.mainCSS), value.css) }
-            if (value.dropDown) return { ...value, dropDown: value.dropDown.map((val) => ({ ...val, css: val.css != "" ? path.join(path.dirname(theme.mainCSS), val.css) : "" })) }
+            if (value.css && value.css.replaceAll(" ", "") != "") return { ...value, css: path.join(mainCSSPath, value.css) }
+            if (value.dropDown) return { ...value, dropDown: value.dropDown.map((val) => ({ ...val, css: val.css != "" ? path.join(mainCSSPath, val.css) : "" })) }
             return value
         })}
     })

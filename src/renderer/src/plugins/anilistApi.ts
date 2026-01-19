@@ -382,7 +382,7 @@ async function fetchCategory(params: any, title: string): Promise<containerData>
   return container
 }
 
-async function searchOnAnilist(_name: string, page: number, params?: genresSearchFormat): Promise<{ data: cardData[]; maxPage: number; }> {
+async function searchInAnilist(name: string, page: number, params?: genresSearchFormat): Promise<{ data: cardData[]; maxPage: number; }> {
   try {
     let variables: any = {
       page: page,
@@ -390,6 +390,7 @@ async function searchOnAnilist(_name: string, page: number, params?: genresSearc
       type: "ANIME",
       // isAdult: true
     }
+    if (name.replaceAll(" ", "") != "") variables = { ...variables, search: name }
 
     if (params) {
       if (params) variables = { ...variables, genres: params.genres }
@@ -399,8 +400,6 @@ async function searchOnAnilist(_name: string, page: number, params?: genresSearc
       if (params.seasons) variables = { ...variables, season: params.seasons.toUpperCase() }
       if (params.format) variables = { ...variables, format: params.format.map((tmp) => tmp.toUpperCase().replaceAll(" ", "_")) }
       if (params.airing) variables = { ...variables, status: params.airing.toUpperCase().replaceAll(" ", "_") }
-    } else {
-      variables = { ...variables, isAdult: true }
     }
 
     const resp = await sendToApi(variables, graphicApi)
@@ -409,7 +408,19 @@ async function searchOnAnilist(_name: string, page: number, params?: genresSearc
       maxPage: pageSize
     }
   } catch (error) {
-    console.error("Error in searchOnAnilist/anilist", error)
+    console.error("Error in searchInAnilist/anilist", error)
+    return {
+      data: [],
+      maxPage: pageSize
+    }
+  }
+}
+
+async function searchWrapper(name: string, page: number, params?: genresSearchFormat): Promise<{ data: cardData[]; maxPage: number; }> {
+  try {
+    return await searchInAnilist(name, page, params)
+  } catch (error) {
+    console.error("Error in searchWrapper/anilist", error)
     return {
       data: [],
       maxPage: pageSize
@@ -466,31 +477,15 @@ export default class AnilistApi implements informationPluginFormat {
 
   async search(context: { name: string; page: number; params?: genresSearchFormat; }, callbacks: { onSuccess: (data: containerData) => void; onError: (error: string) => void; }) {
     try {
-      let variables: any = {
-        page: context.page,
-        sort: "SEARCH_MATCH",
-        type: "ANIME"
-      }
       let title: string | undefined = undefined
+      if (!(context.name.replaceAll(" ", "") == "")) title = `Searching: ${context.name}`
 
-      if (!(context.name.replaceAll(" ", "") == "")) {
-        variables = { ...variables, search: context.name }
-        title = `Searching: ${context.name}`
-      }
-      if (context.params) {
-        if (context.params) variables = { ...variables, genres: context.params.genres }
-        if (context.params.genres) variables = { ...variables, genres: context.params.genres }
-        if (context.params.genres) variables = { ...variables, genres: context.params.genres }
-        if (context.params.years) variables = { ...variables, seasonYear: parseInt(context.params.years) }
-        if (context.params.seasons) variables = { ...variables, season: context.params.seasons.toUpperCase() }
-        if (context.params.format) variables = { ...variables, format: context.params.format.map((tmp) => tmp.toUpperCase().replaceAll(" ", "_")) }
-        if (context.params.airing) variables = { ...variables, status: context.params.airing.toUpperCase().replaceAll(" ", "_") }
-      }
+      const resp = await searchInAnilist(context.name, context.page, context.params)
 
       callbacks.onSuccess({
         title: title,
-        data: await sendToApi(variables, graphicApi),
-        onScrollDownFunction: async (search, page, params) => await searchOnAnilist(search ? search : "", page, params)
+        data: resp.data,
+        onScrollDownFunction: async (search, page, params) => await searchWrapper(search ? search : "", page, params)
       })
     } catch (error) {
       console.error("Error in search/Anilistapi", error)

@@ -45,27 +45,31 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
             return loadedPlugins[0]
         }
     }
-    initialPlugins = async (): Promise<void> => {
-        if (this.pluginList.length > 0) return
-        const localPlugins = [Allmanga, Anizone, GojoLive, LycorisCafe]
-        let externalPlugins: any[] = []
+    loadPlugin = async (plugins: { file: string; content: string; type: "official" | "user"; sha256: string; }[], path: string) => {
         const conf = getConfig()
-
-        const index = `${getRenderPath()}index.js`
-        const plugins = await window.api.plugins.list()
-        plugins.forEach(async (plugin) => {
+        let tmp: any[] = []
+        for (let index = 0; index < plugins.length; index++) {
+            const plugin = plugins[index];
+            if (plugin.file == "anilistApi.js") continue
+            if (plugin.type != "official" && !conf.plugins.userPlugins) continue
             try {
-                if (plugin.file == "anilistApi.js") return
-                const newBlob = new Blob([plugin.content.replaceAll("./index.js", index).replaceAll("index.js", index)], { type: "application/javascript" });
+                const newBlob = new Blob([plugin.content.replaceAll("./index.js", path).replaceAll("index.js", path)], { type: "application/javascript" });
                 const newUrl = URL.createObjectURL(newBlob);
-                /* @vite-ignore */
-                const newModule = await import(newUrl);
-                if (plugin.type == "official") externalPlugins.push(newModule.default)
-                else if (conf.plugins.userPlugins) externalPlugins.push(newModule.default)
+                tmp.push(await import(newUrl))
             } catch (error) {
                 console.warn("Failed Load Module", error)
             }
-        })
+        }
+        return tmp
+    }
+
+    initialPlugins = async (): Promise<void> => {
+        if (this.pluginList.length > 0) return
+        const localPlugins = [Allmanga, Anizone, GojoLive, LycorisCafe]
+
+        const index = `${getRenderPath()}index.js`
+        const plugins = await window.api.plugins.list()
+        const externalPlugins: any[] = await this.loadPlugin(plugins, index)
 
         for (let index = 0; index < localPlugins.length; index++) {
             try {
