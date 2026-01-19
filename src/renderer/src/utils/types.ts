@@ -54,6 +54,7 @@ export interface AnimeData {
     episodesList?: { episodes: { ep: string, img?: string, title?: string }[], type: string, name?: string }[]
     player_ID?: string
     id: string
+    isAdult?: boolean
     malID?: string
     trailer?: { id: string, site: string } | undefined
     relations?: {

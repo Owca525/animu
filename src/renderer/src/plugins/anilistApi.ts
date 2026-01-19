@@ -36,6 +36,7 @@ const animeData = `
       genres
       source
       synonyms
+      isAdult
       averageScore
       trailer {
         id
