@@ -1,4 +1,4 @@
-import { cardData, ContextMenuProps, homeData, playerChapterList, SettingsConfig, themeMetadata } from "./types";
+import { cardData, ContextMenuProps, homeData, playerChapterList, playerPluginFormat, SettingsConfig, themeMetadata } from "./types";
 import { showDialog } from "./context/DialogContext";
 import { DropdownOption } from "@renderer/components/dropDown";
 import { getHomeCache, setHomeNewData } from "./stores/home";
@@ -520,4 +520,14 @@ export function decryptAES(ciphertext: string, key: string): string | undefined 
 
 export function getRenderPath(): string {
     return `${location.origin}${location.pathname.replace("index.html", "")}`
+}
+
+export function savePluginConfig(instance: playerPluginFormat, config?: { [key: string]: any }) {
+    if (!config) return
+    window.api.plugins.saveConfig(instance.metadata.name, config)
+}
+
+export async function getPluginConfig(instance: playerPluginFormat): Promise<{ [key: string]: any; } | undefined> {
+    if (!instance.config) return
+    return await window.api.plugins.getConfig(instance.metadata.name, instance.config)
 }

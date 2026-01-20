@@ -461,6 +461,11 @@ export default class AnilistApi implements informationPluginFormat {
       statuses: ["Releasing", "Finished", "Not Yet Released", "Cancelled"]
     }
   };
+
+  config: { [key: string]: any; } = {
+    "Adult Mode": false,
+    "Max Page Size": 20,
+  };
   // async schedule(context: { airingStart: number; airingEnd: number; }, callbacks: { onSuccess: (data: containerData) => void; onError: (error: string) => void; }) {
   //   let week = getWeek()
   //   console.log(week)

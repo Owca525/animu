@@ -1,7 +1,7 @@
 import AnilistApi from "@renderer/plugins/anilistApi";
 import { containerData, genresSearchFormat, informationPluginManagerFormat, informationPluginFormat, playerPluginManagerFormat, playerPluginFormat } from "./types";
 import { setAllHomeData } from "./stores/home";
-import { getPlayerPLugin, setPlayerPlugin, setPluginPlayerList } from "./stores/plugins";
+import { setPlayerPlugin, setPluginPlayerList } from "./stores/plugins";
 import Allmanga from "@renderer/plugins/allmanga";
 import Anizone from "@renderer/plugins/anizone";
 import GojoLive from "@renderer/plugins/gojoLive";
@@ -10,12 +10,6 @@ import { getConfig } from "./stores/config";
 import { getRenderPath } from "./functions";
 import semver from "semver";
 // import Aowu from "@renderer/plugins/aowu";
-
-export function saveConfig(config: { [key: string]: any }) {
-    const manager = getPlayerPLugin()
-    if (!manager) return
-    window.api.plugins.saveConfig(manager.metadata.name, config)
-}
 
 export class PlayerPluginManager implements playerPluginManagerFormat {
     currentPlugin: playerPluginFormat | undefined;
@@ -45,12 +39,12 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
             return loadedPlugins[0]
         }
     }
-    loadPlugin = async (plugins: { file: string; content: string; type: "official" | "user"; sha256: string; }[], path: string) => {
+    loadPlugin = async (plugins: { file: string; content: string; type: "official" | "user"; sha256: string; pluginType: "player" | "information" }[], path: string) => {
         const conf = getConfig()
         let tmp: any[] = []
         for (let index = 0; index < plugins.length; index++) {
             const plugin = plugins[index];
-            if (plugin.file == "anilistApi.js") continue
+            if (plugin.pluginType == "information") continue
             if (plugin.type != "official" && !conf.plugins.userPlugins) continue
             try {
                 const newBlob = new Blob([plugin.content.replaceAll("./index.js", path).replaceAll("index.js", path)], { type: "application/javascript" });
@@ -69,13 +63,13 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
 
         const index = `${getRenderPath()}index.js`
         const plugins = await window.api.plugins.list()
-        const externalPlugins: any[] = await this.loadPlugin(plugins, index)
+        const externalPlugins = await this.loadPlugin(plugins, index)
 
         for (let index = 0; index < localPlugins.length; index++) {
             try {
-                const plugin = localPlugins[index];
+                const plugin = localPlugins[index] as any;
                 const tmp = new plugin
-                if (tmp.config) tmp.config = await window.api.plugins.getConfig(tmp.metadata.name, tmp.config ? tmp.config : {})
+                if (tmp.config) tmp.config = await window.api.plugins.getConfig(tmp.metadata.name, tmp.config)
                 this.pluginList.push(tmp)
             } catch (error) {
                 console.warn("Failed Load Module", error)
@@ -86,14 +80,12 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
             try {
                 const plugin = externalPlugins[index];
                 const tmp = new plugin
-                if (tmp.config) tmp.config = await window.api.plugins.getConfig(tmp.metadata.name, tmp.config ? tmp.config : {})
+                if (tmp.config) tmp.config = await window.api.plugins.getConfig(tmp.metadata.name, tmp.config)
                 this.pluginList.push(tmp)
             } catch (error) {
                 console.warn("Failed Load Module", error)
             }
         }
-
-        console.log(this.pluginList)
 
         this.pluginList = this.pluginList.filter((item, _, arr) => {
             return !arr.some(
@@ -121,19 +113,30 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
 
 export class informationPluginManager implements informationPluginManagerFormat {
     initial = async () => {
-        // TODO: End this
         const conf = getConfig()
+        const path = `${getRenderPath()}index.js`
         const plugins = await window.api.plugins.list()
+        const infoPlugins = plugins.filter((t) => t.pluginType == "information")
+
+        if (infoPlugins.length <= 0) {
+            const tmp = new AnilistApi()
+            if (tmp.config) tmp.config = await window.api.plugins.getConfig(tmp.metadata.name, tmp.config)
+            this.currentPlugin = tmp
+            return
+        }
 
         for (let index = 0; index < plugins.length; index++) {
             const element = plugins[index];
-            if (element.file != "anilistApi.js") continue
+            if (element.pluginType == "player") continue
 
             if (element.type == "official" && !conf.plugins.userPlugins) {
-
+                const newBlob = new Blob([element.content.replaceAll("./index.js", element.file).replaceAll("index.js", path)], { type: "application/javascript" });
+                const newUrl = URL.createObjectURL(newBlob);
+                const tmp = new (await import(newUrl))
+                if (tmp.config) tmp.config = await window.api.plugins.getConfig(tmp.metadata.name, tmp.config)
+                this.currentPlugin = tmp
             }
         }
-
     }
 
     //   private plugins: informationPluginFormat[] = [];

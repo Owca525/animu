@@ -25,7 +25,7 @@ import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import { getConfig, setConfig } from './utils/stores/config';
 import { getGlobalCache, setGlobalHistory, setGlobalTheme, setIncognitoMode } from './utils/stores/global';
 import { HashRouter, Route } from '@solidjs/router';
-import { pluginManager } from './utils/stores/plugins';
+import { getInformationPlugin, pluginManager } from './utils/stores/plugins';
 import { setHomeActivePage } from './utils/stores/home';
 import { toast, updateToast } from './utils/context/ToastNotification';
 import { useI18n } from './utils/i18n';
@@ -93,18 +93,8 @@ function App() {
     setHomeActivePage("global.home")
 
     setinitialState({ text: "Loading Plugin", plugin: false })
-    // const index = `${getRenderPath()}index.js`
-    // const plugins = await window.api.externalPlugins()
-    // plugins.forEach(async (plugin) => {
-    //   const newBlob = new Blob([plugin.content.replaceAll("./index.js", index).replaceAll("index.js", index)], { type: "application/javascript" });
-    //   const newUrl = URL.createObjectURL(newBlob);
-    //   const newModule = await import(newUrl);
-
-    //   const importedPlugin = new newModule.default()
-    //   console.log(importedPlugin)
-    // })
-
-    pluginManager().initialPlugins()
+    await getInformationPlugin().initial()
+    await pluginManager().initialPlugins()
     setInitation(false)
 
     if (window.api) runCheckUpdate()

@@ -67,7 +67,8 @@ function extractPlugin(folderPlugins: string, type: "official" | "user") {
 
     return files.map((item) => {
         const content = fs.readFileSync(path.join(folderPlugins, item), "utf-8")
-        return { file: item, content: content, type, sha256: sha256FromString(content) }
+        const isPlayer = content.includes("extractPlayerData")
+        return { file: item, content: content, type, sha256: sha256FromString(content), pluginType: isPlayer ? "player" : "information" }
     })
 }
 

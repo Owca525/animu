@@ -239,6 +239,7 @@ export interface informationPluginFormat {
         pageSize: number
         searchOption: genres
     }
+    config?: { [key: string]: any }
     search(
         context: { name: string, page: number, params?: genresSearchFormat },
         callbacks: { onSuccess: (data: containerData) => void, onError: (error: string) => void }

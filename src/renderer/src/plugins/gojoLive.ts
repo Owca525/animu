@@ -53,7 +53,6 @@ async function extractResolutions(episode: string, type: string, playerData: pla
 }
 
 export default class GojoLive implements playerPluginFormat {
-    config: { [key: string]: any; } = {};
     metadata: playerPluginFormat["metadata"] = {
         version: "1.2",
         name: "GojoLive",
