@@ -174,6 +174,17 @@ app.on('open-url', (event, url) => {
   if (window) dialog.showErrorBox("MESSAGE", url)
 })
 
+function detectKeybinds(config: SettingsConfig) {
+  let keybinds = config.Player.keybinds
+  const defaultKeybinds = defaultConfig.Player.keybinds
+  for (const key in keybinds) {
+    if (keybinds[key].replaceAll(" ", "") == "") {
+      keybinds = { ...keybinds, [key]: defaultKeybinds[key] }
+    }
+  }
+  return { ...config, Player: { ...config.Player, keybinds: keybinds } }
+}
+
 export async function initialBackend() {
   try {
     await detectOldVersion()
@@ -188,7 +199,7 @@ export async function initialBackend() {
       let data = readFileSync(path.join(newConfigPath, "config.ini"), "utf-8")
       const content: SettingsConfig = deepMerge(defaultConfig, ini.parse(data))
       if (typeof content.General.theme === "string") config = { ...content, General: { ...content.General, theme: ["DarkerAnimu"] } }
-      else config = content
+      else config = detectKeybinds(content)
     } else {
       write(path.join(newConfigPath, "config.ini"), ini.stringify(defaultConfig))
       console.info("created new config")

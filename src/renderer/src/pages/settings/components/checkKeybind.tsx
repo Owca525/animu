@@ -1,4 +1,4 @@
-import { createSignal, onCleanup, Component, For, Show, onMount } from "solid-js";
+import { createSignal, onCleanup, Component, For, Show, createEffect } from "solid-js";
 import { convertKeybinds } from "@renderer/utils/functions";
 import "./css/CheckKeybind.css";
 
@@ -42,19 +42,19 @@ const CheckKeybind: Component<CheckKeybindProps> = (props) => {
     window.removeEventListener("blur", handleBlur);
   };
 
-  onMount(() => {
+  onCleanup(() => {
+    window.removeEventListener("keydown", handleKeyDown);
+    window.removeEventListener("keyup", handleKeyUp);
+    window.removeEventListener("blur", handleBlur);
+  });
+
+  createEffect(() => {
     if (isActive()) {
       window.addEventListener("keydown", handleKeyDown, { passive: true });
       window.addEventListener("keyup", handleKeyUp, { passive: true });
       window.addEventListener("blur", handleBlur);
-
-      onCleanup(() => {
-        window.removeEventListener("keydown", handleKeyDown);
-        window.removeEventListener("keyup", handleKeyUp);
-        window.removeEventListener("blur", handleBlur);
-      });
     }
-  });
+  })
 
   return (
     <div
