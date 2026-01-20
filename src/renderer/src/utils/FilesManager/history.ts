@@ -1,11 +1,12 @@
-import { refetchHistory } from "../functions";
-import { cardData } from "../types";
-// import i18n from "../i18n";
-import { CreateBackup } from "../backup";
-import { getGlobalCache, setGlobalHistory } from "../stores/global";
-import { unwrap } from "solid-js/store";
+import { cardData } from '../types';
+import { CreateBackup } from '../backup';
+import { getGlobalCache, setGlobalHistory } from '../stores/global';
+import { refetchHistory } from '../functions';
+import { toast, updateToast } from '../context/ToastNotification';
+import { unwrap } from 'solid-js/store';
+import { searchInAnilist } from '@renderer/plugins/anilistApi';
 
-export async function DeleteFromHistory(data: cardData, notification: boolean = false) {
+export async function DeleteFromHistory(data: cardData) {
     try {
         if (getGlobalCache().incognito) return
         if (!data.saveData) return
@@ -28,26 +29,9 @@ export async function DeleteFromHistory(data: cardData, notification: boolean = 
         else localStorage.setItem("history", JSON.stringify(historyCache))
         setGlobalHistory(historyCache)
         refetchHistory()
-
-        if (!(!data.saveData && !notification)) return true
-
-        // TODO: Napraw żeby pokazywało status
-        // if (file === "continueWatch") {
-        //     toast.success(i18n.t("history.continuesaved"))
-        // } 
-        // if (file === "history") {
-        //     toast.success(i18n.t("history.historysaved"))
-        // }
         return true
     } catch (Error) {
         console.error(`${Error} in DeleteFromFile`)
-        if (!(!data.saveData && !notification)) return false
-        // if (file === "continueWatch") {
-        //     toast.error(i18n.t("history.continuefailed"))
-        // } 
-        // if (file === "history") {
-        //     toast.error(i18n.t("history.historyfailed"))
-        // }
         return false
     }
 }
@@ -96,24 +80,27 @@ function checkAnimeDuplicate(listcard: cardData[]): cardData[] {
     return Array.from(map.values())
 }
 
-// TODO: ADD SUPPORT FOR NEW TOASTS
 async function convertToNewVersion(data: { id: string, title: string, img: string, player?: { episodes: string[], episode: { type: string, ep: string, time: number } }, text: string }[]) {
     let animeList: cardData[] = []
     let success: number = 0
     let failed: number = 0
-    // let updatedToast = toast.loading(`Converting Success ${success} / Failed ${failed}`)
+    const updatedToast = toast(`Converting Success ${success} / Failed ${failed}`, { type: "loading", removeTimer: true })
     for (let index = 0; index < data.length; index++) {
         const anime = data[index];
         try {
-            //  await searchForConvertAnime(anime.title)
-            let reqAnime = "" as any
-            if (reqAnime.length <= 0) {
+            let reqAnime = await searchInAnilist(anime.title, 1)
+            if (reqAnime.data.length <= 0) {
                 failed += 1
                 continue
             }
+            let aniAnime = reqAnime.data[0]
+            for (let index = 0; index < reqAnime.data.length; index++) {
+                const element = reqAnime.data[index];
+                if (element.AnimeData.coverImage == anime.img) aniAnime = element
+            }
             animeList.push(
                 {
-                    ...reqAnime[0],
+                    ...aniAnime,
                     saveData: {
                         pluginName: "Allmanga",
                         last_Time: anime.player ? anime.player.episode.time : 0,
@@ -126,9 +113,9 @@ async function convertToNewVersion(data: { id: string, title: string, img: strin
         } catch (error) {
             failed += 1
         }
-        // toast.loading(`Converting Success ${success} / Failed ${failed}`, { id: updatedToast })
+        updateToast(updatedToast, `Converting Success ${success} / Failed ${failed}`)
     }
-    // toast.success("Converting Done", { id: updatedToast })
+    updateToast(updatedToast, "Converting Done", { type: "success", removeTimer: false })
     return animeList
 }
 
@@ -141,7 +128,7 @@ export async function DetectOldVersionHistory() {
             if (Array.isArray(history)) {
                 if ("id" in history[0]) {
                     await CreateBackup()
-                    // toast.success("Detected Old history")
+                    toast("Detected Old history")
                     await window.api.os.write("history.json", JSON.stringify(await convertToNewVersion(history)))
                 }
             }
@@ -151,14 +138,14 @@ export async function DetectOldVersionHistory() {
             let continueWatch = JSON.parse(tmpcontinueWatch as string)
             if ("continue" in continueWatch) {
                 if ("id" in continueWatch["continue"][0]) {
-                    // toast.success("Detected Old Continue Watch")
+                    toast("Detected Old Continue Watch", { type: "success" })
                     await window.api.os.write("continueWatch.json", JSON.stringify(await convertToNewVersion(continueWatch)))
                 }
             }
         }
 
     } catch (error) {
-        // toast.error("Failed Convert all History")
+        toast("Failed Convert all History", { type: "error" })
         console.error("Error in DetectOldVersionHistory", error)
     }
 }

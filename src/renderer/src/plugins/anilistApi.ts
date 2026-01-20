@@ -382,7 +382,7 @@ async function fetchCategory(params: any, title: string): Promise<containerData>
   return container
 }
 
-async function searchInAnilist(name: string, page: number, params?: genresSearchFormat): Promise<{ data: cardData[]; maxPage: number; }> {
+export async function searchInAnilist(name: string, page: number, params?: genresSearchFormat): Promise<{ data: cardData[]; maxPage: number; }> {
   try {
     let variables: any = {
       page: page,

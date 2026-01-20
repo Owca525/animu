@@ -88,18 +88,21 @@ function Card(props: CardProps) {
     navigate("/info");
   }
 
-  function deleteCard() {
+  async function deleteCard() {
     if (props.card.saveData && props.card.saveData.episode != "" && (props.card.saveData.last_Time != 0 || props.card.saveData.isStarted)) {
-      SaveHistory(unwrap({
+      if (await SaveHistory(unwrap({
         ...props.card,
         saveData: {
           ...props.card.saveData,
           last_Time: 0,
           isStarted: false,
         }
-      }))
+      }))) {
+        toast(t("history.continuesaved"), { type: "success" })
+      } else toast(t("history.continuefailed"), { type: "error" })
     } else {
-      DeleteFromHistory(props.card)
+      if (await DeleteFromHistory(props.card)) toast(t("history.historysaved"), { type: "success" })
+      else toast(t("history.historyfailed"), { type: "error" })
     }
   }
 
