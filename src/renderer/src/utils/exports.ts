@@ -27,6 +27,4 @@ try {
     request()
     openUrlFolder()
     getRenderPath()
-    savePluginConfig()
-    getPluginConfig()
 } catch (error) {}

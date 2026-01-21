@@ -1,4 +1,4 @@
-import { convertMsToMinutes, getPluginConfig, makeSmallText, request } from "@renderer/utils/functions"
+import { convertMsToMinutes, makeSmallText, request } from "@renderer/utils/functions"
 import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerData } from "@renderer/utils/types"
 
 const HASH_SEARCH = '06327bc10dd682e1ee7e07b6db9c16e9ad2fd56c1b769e47513128cd5c9fc77a'
@@ -269,13 +269,6 @@ export default class Allmanga implements playerPluginFormat {
         "HASH_PLAYER": HASH_PLAYER,
         "HASH_DATA": HASH_DATA
     };
-
-    initialPlugin = async () => {
-        const conf = await getPluginConfig(this)
-        if (conf) this.config = conf
-    }
-
-    constructor() { this.initialPlugin() }
 
     async extractPlayerData(type: string, episode: string, id: string) {
         let variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${episode}"}`
