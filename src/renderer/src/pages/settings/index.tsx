@@ -17,6 +17,7 @@ import {
     convertPath,
     openUrlFolder,
     request,
+    savePluginConfig,
     updateObjectConfig
 } from '@renderer/utils/functions';
 import { checkUpdate } from '@renderer/utils/update';
@@ -39,7 +40,7 @@ import {
 import { createShortcut } from '@solid-primitives/keyboard';
 import { DetectOldVersionHistory } from '@renderer/utils/FilesManager/history';
 import { getConfig, setConfig } from '@renderer/utils/stores/config';
-import { getInformationPlugin, getPlayerPLugin, getPluginList, pluginManager } from '@renderer/utils/stores/plugins';
+import { getInformationPlugin, getPlayerPLugin, getPluginList, pluginManager, setPluginPlayerList } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { saveConfig } from '@renderer/utils/FilesManager/config';
 import { showDialog } from '@renderer/utils/context/DialogContext';
@@ -324,16 +325,17 @@ function settings() {
         const themeConfig = await window.api.themes.config(unwrap(theme))
         showCustomMenu({
             title: `Config: ${theme.themeName}`,
-            type: 'themeConfig',
-            theme: theme,
-            config: themeConfig,
-            onChange: async (theme: themeMetadata, change: string, update: string | boolean) => {
-                const record: Record<string, boolean | string> = {
-                    [change]: update
-                }
-                await window.api.themes.writeConfig(unwrap(theme), unwrap(record))
-                if (![...activeThemes().entries()].map((v) => v[1].themeName).includes(theme.themeName)) updateTheme(theme)
-            },
+            themeConfig: {
+                theme: theme,
+                config: themeConfig,
+                onChange: async (theme: themeMetadata, change: string, update: string | boolean) => {
+                    const record: Record<string, boolean | string> = {
+                        [change]: update
+                    }
+                    await window.api.themes.writeConfig(unwrap(theme), unwrap(record))
+                    if (![...activeThemes().entries()].map((v) => v[1].themeName).includes(theme.themeName)) updateTheme(theme)
+                },
+            }
         })
     }
 
@@ -348,6 +350,34 @@ function settings() {
             setpluginList((prev) => prev.map((pl) => ({ ...pl, active: tmp!.metadata.name == pl.plugin.metadata.name })))
         }
         handleChange("plugins.player", tmp.metadata.name)
+    }
+
+    function openPluginSettings(plugin: playerPluginFormat | informationPluginFormat) {
+        if (!plugin.config) return
+        showCustomMenu({
+            title: `Config: ${plugin.metadata.name}`,
+            pluginConfig: {
+                config: plugin.config,
+                onChange: (v, a) => savePluginSettings(plugin.config as any,v,a, plugin)
+            }
+        })
+    }
+
+    function savePluginSettings(config: { [key: string]: any }, variable: string, change: any, plugin: playerPluginFormat | informationPluginFormat) {
+        let tmpConfig = config
+        for (const key in config) {
+            if (key == variable) tmpConfig = { ...tmpConfig, [key]: change }
+        }
+        savePluginConfig(plugin, tmpConfig)
+        plugin.config = tmpConfig
+        
+        if ("home" in plugin) {
+            getInformationPlugin().currentPlugin = plugin
+            return
+        }
+
+        const listplugins = getPluginList()
+        setPluginPlayerList(listplugins.map((p) => p.metadata.name == plugin.metadata.name ? plugin : p))
     }
 
     return (
@@ -1155,7 +1185,9 @@ function settings() {
                                                     <span class='settings-extension-mini-button' >{"home" in tmp.plugin ? "Information" : "Player"}</span>
                                                 </div>
                                                 <div class='settings-extension-bottom-right'>
-                                                    <Button icon='settings' ButtonClass='settings-extension-button'/>
+                                                    <Show when={tmp.plugin.config}>
+                                                        <Button icon='settings' ButtonClass='settings-extension-button' onClick={() => openPluginSettings(tmp.plugin)}/>
+                                                    </Show>
                                                 </div>
                                             </div>
                                         </div>

@@ -1,24 +1,30 @@
 import { createContext, JSX, For, Show, createSignal } from "solid-js";
 import { Portal } from "solid-js/web";
-import "./css/menuContext.css"
+import "./css/menuContext.css";
 import { themeMetadata } from "../types";
 import CheckBox from "@renderer/components/checkBox";
 import Dropdown from "@renderer/components/dropDown";
 import Button from "@renderer/components/buttons";
+import SettingsInput from "@renderer/pages/settings/components/settingsInput";
 
 interface menuProps {
-    title: string,
-    type: "themeConfig"
-    theme: themeMetadata
-    config: Record<string, string | boolean>
-    onChange: (theme: themeMetadata, change: string, update: string | boolean) => void
+    title: string;
+    themeConfig?: {
+        theme: themeMetadata;
+        config: Record<string, string | boolean>;
+        onChange: (theme: themeMetadata, change: string, update: string | boolean) => void;
+    };
+    pluginConfig?: {
+        config: { [key: string]: any }
+        onChange: (variable: string, change: any) => void
+    }
 }
 
 interface menuContextType {
-    showCustomMenu: (data: menuProps) => void
-    hideCustomMenu: () => void
-    isCustomMenuActive: () => boolean
-};
+    showCustomMenu: (data: menuProps) => void;
+    hideCustomMenu: () => void;
+    isCustomMenuActive: () => boolean;
+}
 
 const menuContext = createContext<menuContextType>();
 let customMenuApi: menuContextType | undefined;
@@ -27,16 +33,25 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
     const [content, setContent] = createSignal<menuProps | undefined>();
 
     function showCustomMenu(data: menuProps) {
-        setContent(data)
+        setContent(data);
     }
 
-    function hideCustomMenu() { setContent(undefined) }
+    function hideCustomMenu() {
+        setContent(undefined);
+    }
 
-    function isCustomMenuActive() { return content() ? true : false }
+    function isCustomMenuActive() {
+        return content() ? true : false;
+    }
 
     return (
-        <menuContext.Provider value={{ showCustomMenu, hideCustomMenu, isCustomMenuActive }}>
-            {(() => { customMenuApi = { showCustomMenu, hideCustomMenu, isCustomMenuActive }; return undefined; })()}
+        <menuContext.Provider
+            value={{ showCustomMenu, hideCustomMenu, isCustomMenuActive }}
+        >
+            {(() => {
+                customMenuApi = { showCustomMenu, hideCustomMenu, isCustomMenuActive };
+                return undefined;
+            })()}
             {props.children}
 
             <Show when={content()}>
@@ -45,23 +60,81 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
                         <div class="custom-menu-box">
                             <span class="custom-menu-content-title">{content()?.title}</span>
                             <div class="custom-menu-content">
-                                <For each={content()?.theme.options}>
-                                    {value => (
-                                        <div class="custom-menu-space">
-                                            {value.name}
-                                            <div class="custom-menu-options">
-                                                <Show when={!value.dropDown}>
-                                                    <CheckBox checked={value.name in content()!.config ? content()!.config[value.name] as boolean : false} onChecked={(val) => content()?.onChange(content()?.theme!, value.name, val)} />
-                                                </Show>
-                                                <Show when={value.dropDown}>
-                                                    <Dropdown disableX buttonText={value.name in content()!.config ? content()!.config[value.name] as string : value.dropDown![0].option} options={value.dropDown?.map((options) => ({ label: options.option, onClick: (text) => content()?.onChange(content()?.theme!, value.name, text) }))}/>
-                                                </Show>
+                                <Show when={content()?.themeConfig}>
+                                    <For each={content()?.themeConfig!.theme.options}>
+                                        {(value) => (
+                                            <div class="custom-menu-space">
+                                                {value.name}
+                                                <div class="custom-menu-options">
+                                                    <Show when={!value.dropDown}>
+                                                        <CheckBox
+                                                            checked={
+                                                                value.name in content()!.themeConfig!.config
+                                                                    ? (content()!.themeConfig!.config[
+                                                                        value.name
+                                                                    ] as boolean)
+                                                                    : false
+                                                            }
+                                                            onChecked={(val) =>
+                                                                content()?.themeConfig!.onChange(
+                                                                    content()?.themeConfig!.theme!,
+                                                                    value.name,
+                                                                    val,
+                                                                )
+                                                            }
+                                                        />
+                                                    </Show>
+                                                    <Show when={value.dropDown}>
+                                                        <Dropdown
+                                                            disableX
+                                                            buttonText={
+                                                                value.name in content()!.themeConfig!.config
+                                                                    ? (content()!.themeConfig!.config[
+                                                                        value.name
+                                                                    ] as string)
+                                                                    : value.dropDown![0].option
+                                                            }
+                                                            options={value.dropDown?.map((options) => ({
+                                                                label: options.option,
+                                                                onClick: (text) =>
+                                                                    content()?.themeConfig!.onChange(
+                                                                        content()?.themeConfig!.theme!,
+                                                                        value.name,
+                                                                        text,
+                                                                    ),
+                                                            }))}
+                                                        />
+                                                    </Show>
+                                                </div>
                                             </div>
-                                        </div>
-                                    )}
-                                </For>
+                                        )}
+                                    </For>
+                                </Show>
+                                <Show when={content()?.pluginConfig}>
+                                    <For each={Object.entries(content()!.pluginConfig!.config)}>
+                                        {(el) => {
+                                            if (typeof el[1] == "string") return (
+                                                <div class="custom-menu-space">
+                                                    {el[0]}
+                                                    <SettingsInput startValue={el[1]} onKeyDown={(v) => content()?.pluginConfig!.onChange(el[0], v)}/>
+                                                </div>
+                                            )
+                                            if (typeof el[1] == "boolean") return (
+                                                <div class="custom-menu-space">
+                                                    {el[0]}
+                                                    <CheckBox checked={el[1]} onChecked={(v) => content()?.pluginConfig!.onChange(el[0], v)}/>
+                                                </div>
+                                            )
+                                            return
+                                        }}
+                                    </For>
+                                </Show>
                             </div>
-                            <Button icon="arrow_back" ButtonClass="custom-menu-exit-button" onClick={hideCustomMenu}/>
+                            <Button
+                                icon="arrow_back"
+                                ButtonClass="custom-menu-exit-button"
+                                onClick={hideCustomMenu}
+                            />
                         </div>
                     </main>
                 </Portal>
@@ -72,15 +145,15 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
 
 export function showCustomMenu(data: menuProps) {
     if (!customMenuApi) return;
-    customMenuApi.showCustomMenu(data)
+    customMenuApi.showCustomMenu(data);
 }
 
 export function hideCustomMenu() {
     if (!customMenuApi) return;
-    customMenuApi.hideCustomMenu()
+    customMenuApi.hideCustomMenu();
 }
 
 export function isCustomMenuActive() {
     if (!customMenuApi) return false;
-    return customMenuApi.isCustomMenuActive()
+    return customMenuApi.isCustomMenuActive();
 }
