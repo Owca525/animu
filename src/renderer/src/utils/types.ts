@@ -237,6 +237,9 @@ export interface informationPluginFormat {
         version: string
         name: string
         pageSize: number
+        author: string
+        icon?: string
+        urlWebsite?: string
         searchOption: genres
     }
     config?: { [key: string]: any }

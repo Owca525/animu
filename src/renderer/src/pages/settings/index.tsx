@@ -22,6 +22,7 @@ import {
 import { checkUpdate } from '@renderer/utils/update';
 import {
     ContextMenuProps,
+    informationPluginFormat,
     playerPluginFormat,
     SettingsConfig,
     themeMetadata
@@ -38,7 +39,7 @@ import {
 import { createShortcut } from '@solid-primitives/keyboard';
 import { DetectOldVersionHistory } from '@renderer/utils/FilesManager/history';
 import { getConfig, setConfig } from '@renderer/utils/stores/config';
-import { getPlayerPLugin, getPluginList, pluginManager } from '@renderer/utils/stores/plugins';
+import { getInformationPlugin, getPlayerPLugin, getPluginList, pluginManager } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { saveConfig } from '@renderer/utils/FilesManager/config';
 import { showDialog } from '@renderer/utils/context/DialogContext';
@@ -62,7 +63,7 @@ function settings() {
     const [versions] = createSignal(window.electronAPI.process.versions)
     const [isSaving, setSaving] = createSignal<boolean>(false)
     const [backupList, setBackupList] = createSignal<{ date: Date, file: string }[]>([])
-    const [pluginList, setpluginList] = createSignal<{ active: boolean, plugin: playerPluginFormat }[]>([])
+    const [pluginList, setpluginList] = createSignal<{ active: boolean, plugin: playerPluginFormat | informationPluginFormat }[]>([])
     const [ContextMenu, setContextMenu] = createSignal<ContextMenuProps>([
         { option: "dialog.reload", onClick: () => location.reload() },
         { option: "", line: true },
@@ -176,10 +177,11 @@ function settings() {
     onMount(async () => {
         const plugin = getPlayerPLugin()
         setLastActiveTheme(activeThemes())
-        setpluginList(getPluginList().map((pl) => {
+        const playerPluginList = getPluginList().map((pl) => {
             if (!plugin) return { active: false, plugin: pl }
             return { active: plugin.metadata.name == pl.metadata.name, plugin: pl }
-        }))
+        })
+        setpluginList([{ active: true, plugin: getInformationPlugin().currentPlugin }, ...playerPluginList])
         setThemes(loadedTheme().filter((val) => ![...activeThemes().entries()].map(([_, val]) => val.themeName).includes(val.themeName)))
         changeTitleAnimu(`Animu - ${t("global.settings")}`)
         if (!window.api) return
@@ -1141,7 +1143,7 @@ function settings() {
                                                     </div>
                                                 </div>
                                                 <div class="settings-extension-top-right">
-                                                    <CheckBox checked={tmp.active} onChecked={(v) => setActivePlugin(v, tmp.plugin)} />
+                                                    <CheckBox checked={tmp.active} onChecked={(v) => "home" in tmp.plugin ? "" : setActivePlugin(v, tmp.plugin as any)} />
                                                     <span class='settings-extension-version'>v{tmp.plugin.metadata.version}</span>
                                                 </div>
                                             </div>
@@ -1150,6 +1152,7 @@ function settings() {
                                                     <Show when={tmp.plugin.metadata.urlWebsite}>
                                                         <span class='settings-extension-mini-button' onclick={() => openUrlFolder(tmp.plugin.metadata.urlWebsite!)}>Website</span>
                                                     </Show>
+                                                    <span class='settings-extension-mini-button' >{"home" in tmp.plugin ? "Information" : "Player"}</span>
                                                 </div>
                                                 <div class='settings-extension-bottom-right'>
                                                     <Button icon='settings' ButtonClass='settings-extension-button'/>

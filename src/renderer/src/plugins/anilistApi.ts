@@ -429,7 +429,7 @@ async function searchWrapper(name: string, page: number, params?: genresSearchFo
 }
 
 export default class AnilistApi implements informationPluginFormat {
-  metadata = {
+  metadata: informationPluginFormat["metadata"] = {
     version: "2.0",
     name: "AnilistApi",
     pageSize: pageSize,
@@ -459,7 +459,10 @@ export default class AnilistApi implements informationPluginFormat {
       years: genYearsList(1940),
       format: ["TV", "Movie", "TV Short", "special", "OVA", "ONA"],
       statuses: ["Releasing", "Finished", "Not Yet Released", "Cancelled"]
-    }
+    },
+    author: "Owca525",
+    urlWebsite: "https://anilist.co",
+    icon: "https://anilist.co/img/icons/icon.svg"
   };
 
   config: { [key: string]: any; } = {

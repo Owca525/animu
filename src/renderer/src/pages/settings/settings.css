@@ -273,7 +273,7 @@
 }
 
 .settings-extension-mini-button {
-  font-size: .9em;
+  font-size: .8em;
   padding: 4px 12px;
   border: 1px solid var(--green-one);
   border-radius: 12px;
@@ -302,12 +302,15 @@
 .settings-extension-bottom {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 .settings-extension-bottom-left {
-  display: grid;
+  display: flex;
   align-content: center;
-  height: 100%;
+  justify-content: center;
+  gap: 6px;
+  height: max-content;
 }
 
 .settings-extension-button {
