@@ -946,6 +946,10 @@ function settings() {
                             {t("settings.player.keybinds.screenshot")}
                             <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.ScreenShot)} keyBind={(keys) => handleChange("Player.keybinds.ScreenShot", keys)} />
                         </div>
+                        <div class="settings-setting-container">
+                            {"Screenshot Without Subttitles"}
+                            <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.noSubbtitlesreenshot)} keyBind={(keys) => handleChange("Player.keybinds.noSubbtitlesreenshot", keys)} />
+                        </div>
                     </div>
                 </Show>
                 <Show when={category() == "files"}>

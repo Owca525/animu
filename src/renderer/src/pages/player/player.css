@@ -539,6 +539,41 @@
   margin-right: clamp(40px, 25vw, 350px);
 }
 
+.player-screenshot-container {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  top: 0;
+  right: 0;
+  margin: 12px;
+  background-color: var(--second-layer);
+  gap: 12px;
+  padding: 0px 12px 0px 0px;
+  border-radius: 8px;
+  cursor: pointer;
+
+  transform: translateX(400px);
+  transition: 150ms ease-out;
+}
+
+.player-screenshot-container.show {
+  transform: translateX(0px);
+}
+
+.player-screenshot-container.click:hover {
+  transform: scale(1.02);
+  background-color: var(--five-layer);
+}
+
+.player-screenshot-text {
+  font-size: 1.2em;
+}
+
+.player-screenshot-image {
+  height: 58px;
+  border-radius: 8px 0px 0px 8px;
+}
+
 @media (max-width: 1000px) {
   .player-end-time-display {
     max-width: 250px;

@@ -83,6 +83,7 @@ export interface SettingsConfig {
             PictureInPicture: string
             toggleSubtitles: string
             skipOpeningEnding: string
+            noSubbtitlesreenshot: string
         }
     }
     History: {
@@ -251,7 +252,8 @@ export const defaultConfig: SettingsConfig = {
             ScreenShot: "f10",
             PictureInPicture: "P",
             toggleSubtitles: "C",
-            skipOpeningEnding: "S"
+            skipOpeningEnding: "S",
+            noSubbtitlesreenshot: "CTRL+f10"
         },
         ui: {
             DisableVolumeAnimation: false,

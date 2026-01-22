@@ -360,6 +360,7 @@ export interface SettingsConfig {
             PictureInPicture: string
             toggleSubtitles: string
             skipOpeningEnding: string
+            noSubbtitlesreenshot: string
         }
     }
     History: {

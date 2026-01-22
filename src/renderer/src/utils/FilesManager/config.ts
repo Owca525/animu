@@ -81,7 +81,8 @@ export const defaultConfigWeb: SettingsConfig = {
             ScreenShot: "f10",
             PictureInPicture: "P",
             toggleSubtitles: "C",
-            skipOpeningEnding: "S"
+            skipOpeningEnding: "S",
+            noSubbtitlesreenshot: "CTRL+f10"
         },
         ui: {
             DisableVolumeAnimation: false,

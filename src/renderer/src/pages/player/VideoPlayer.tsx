@@ -1,7 +1,7 @@
 import Hls from "hls.js"
 
 import { AnimeData, ContextMenuProps, deepLinkData, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
-import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObjectConfig } from "@renderer/utils/functions"
+import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
@@ -59,6 +59,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     let buttonSkipRight: NodeJS.Timeout | undefined
     let assSubContainer: HTMLDivElement | undefined
     let vttSubRef: HTMLTrackElement | undefined
+    let screenShotContainer: HTMLDivElement | undefined
 
     // Variable
     const [volume, setVolume] = createSignal<number>(PlayerVolume)
@@ -121,6 +122,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     // Thumbnail
     const [thumbnails, setThumbnail] = createSignal<Thumbnail | undefined>(undefined);
+
+    // ScreenShot
+    const [screenShot, setScreenShot] = createSignal<{ active: boolean, image: string, click: string }>({ active: false, image: "", click: "" });
 
     function handleMouseMove() {
         setIsVisible(true)
@@ -776,6 +780,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             case convertKeybinds(config.Player.keybinds.ScreenShot.toLowerCase()).toLowerCase():
                 takeScreenshot()
                 break
+            case convertKeybinds(config.Player.keybinds.noSubbtitlesreenshot.toLowerCase()).toLowerCase():
+                takeScreenshot(true)
+                break
             case convertKeybinds(config.Player.keybinds.VolumeMute.toLowerCase()).toLowerCase():
                 setMutedToPlayer()
                 break
@@ -814,7 +821,15 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (lastSubtitles()) setNewSubtitles(lastSubtitles()!)
     }
 
-    async function takeScreenshot() {
+    function showScreenShotSuccess(image: string, click: string) {
+        setScreenShot({ active: true, image: image, click: click })
+        let interval = setInterval(() => {
+            clearInterval(interval)
+            setScreenShot({ active: false, image: image, click: click })
+        }, 3000)
+    }
+
+    async function takeScreenshot(noSubbtitles: boolean = false) {
         if (!screenshotWrapper) return
         if (config == null) return
         if (!videoRef) return
@@ -833,7 +848,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         let screenshot: string = "data:,"
 
-        if (currentASSubtitles()) {
+        if (currentASSubtitles() && !noSubbtitles) {
             const outputCanvas = document.createElement("canvas");
             const ctx = outputCanvas.getContext("2d");
             if (!ctx) {
@@ -854,27 +869,35 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             toast(t("player.toastscreenshot.failed"), { type: "error" });
             return
         }
+        const blob = await (await fetch(screenshot)).blob();
+        const url = URL.createObjectURL(blob);
         if (config.Player.screenShot.saveType == "Clipboard" || config.Player.screenShot.saveType == "Both") {
-            const blob = await (await fetch(screenshot)).blob();
+            setScreenShot({ active: true, image: url, click: "" })
             await navigator.clipboard.write([
                 new ClipboardItem({
                     'image/png': blob,
                 }),
             ]);
-            toast(t("player.toastscreenshot.doneclip"), { type: "success" });
-            if (config.Player.screenShot.saveType == "Clipboard") return
+            if (config.Player.screenShot.saveType == "Clipboard") return showScreenShotSuccess(url, "")
         }
 
-        if (!window.api) return
+        if (window.api) {
+            let resp: boolean = false
 
-        if (config.Player.screenShot.alwaysAsk) var resp = await window.api.os.saveDialog(`${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot.replace(/^data:image\/png;base64,/, ''), `screenshot${formatedDate}.png`, "png", ["PNG"], "base64")
-        else var resp = await window.api.os.write(`${config.Player.screenShot.path}/screenshot${formatedDate}.png`, screenshot.replace(/^data:image\/png;base64,/, ''), "base64")
-        if (resp) {
-            toast(t("player.toastscreenshot.donefile", { path: config.Player.screenShot.path }), { type: "success" });
-            return;
+            if (config.Player.screenShot.alwaysAsk) resp = await window.api.os.saveDialog(
+                `${config.Player.screenShot.path}/screenshot${formatedDate}.png`, 
+                screenshot.replace(/^data:image\/png;base64,/, ''), 
+                `screenshot${formatedDate}.png`, "png", ["PNG"], "base64"
+            )
+            else resp = await window.api.os.write(
+                `${config.Player.screenShot.path}/screenshot${formatedDate}.png`, 
+                screenshot.replace(/^data:image\/png;base64,/, ''), 
+                "base64"
+            )
+
+            if (resp) showScreenShotSuccess(url, `${config.Player.screenShot.path}/screenshot${formatedDate}.png`)
+            else toast(t("player.toastscreenshot.failed"), { type: "error" });
         }
-        toast(t("player.toastscreenshot.failed"), { type: "error" });
-        return;
     };
 
     function generateShareURL() {
@@ -1209,6 +1232,15 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             }} class={`player-skip-chapters-button ${IsRunningButtonSkipTime() ? "show" : "hidden"}`}>
                 {currentSkipButton().text}, {`${buttonSkipTime()}s`}
             </button>
+            <div ref={screenShotContainer} class={`player-screenshot-container ${screenShot().active ? "show" : "hidden"}`} 
+                classList={{ click: screenShot().click != "" }}
+                onclick={() => screenShot().click != "" ? openUrlFolder(screenShot().click) : ""}
+                >
+                <img src={screenShot().image} class="player-screenshot-image"/>
+                <span class="player-screenshot-text">
+                    Screenshot Succesfully Saved
+                </span>
+            </div>
             <Show when={config.Player.upToNextEpisode.variants == "old"}>
                 <div class={`player-up-Next-container old  ${isUpNextEpisode() ? "show" : "hidden"}`}>
                     <div class="player-up-Next-Title old">{t("player.upNext.title", { sec: parseInt(timeNextEpisode().toString()) })}</div>
