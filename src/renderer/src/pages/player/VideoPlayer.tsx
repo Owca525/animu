@@ -590,7 +590,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         let showUpToNext: boolean = currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
         let timeDelete: number = ((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
         
-        if (endingChupter) showUpToNext = currentTime >= endingChupter.start
+        if (endingChupter) {
+            showUpToNext = currentTime >= endingChupter.start
+            timeDelete = ((parseInt(duration.toFixed(0)) - (parseInt(duration.toFixed(0)) - endingChupter.start)) - parseInt(currentTime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
+        }
         
         if (isHideUpNextEpisode() == false && temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] != null && showUpToNext) {
             setUpNextEpisode(true)
