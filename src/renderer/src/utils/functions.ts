@@ -1,12 +1,21 @@
-import { cardData, ContextMenuProps, homeData, informationPluginFormat, playerChapterList, playerPluginFormat, SettingsConfig, themeMetadata } from "./types";
-import { showDialog } from "./context/DialogContext";
-import { DropdownOption } from "@renderer/components/dropDown";
-import { getHomeCache, setHomeNewData } from "./stores/home";
-import { getGlobalCache, setActiveThemes } from "./stores/global";
-import { getConfig } from "./stores/config";
-import { getPluginList } from "./stores/plugins";
-import { unwrap } from "solid-js/store";
-import { t, useI18n } from "./i18n";
+import {
+    cardData,
+    ContextMenuProps,
+    homeData,
+    informationPluginFormat,
+    playerChapterList,
+    playerPluginFormat,
+    SettingsConfig,
+    themeMetadata
+    } from './types';
+import { DropdownOption } from '@renderer/components/dropDown';
+import { getConfig } from './stores/config';
+import { getGlobalCache, setActiveThemes } from './stores/global';
+import { getHomeCache, setHomeNewData } from './stores/home';
+import { showDialog } from './context/DialogContext';
+import { t, useI18n } from './i18n';
+import { unwrap } from 'solid-js/store';
+import { getPluginList } from './stores/plugins';
 
 export function decodeHtmlEntities(str: string) {
     const parser = new DOMParser();
@@ -333,7 +342,7 @@ export async function convertChaptersVTT(url: string): Promise<playerChapterList
 }
 
 export function segregatePlugins(func: (name: string) => void): DropdownOption[] {
-    let data = getPluginList()
+    let data = loadedPluginsList()
     let list: DropdownOption[] = []
     for (let index = 0; index < data.length; index++) {
         const element = data[index];
@@ -530,4 +539,10 @@ export function savePluginConfig(instance: playerPluginFormat | informationPlugi
 export async function getPluginConfig(instance: playerPluginFormat | informationPluginFormat): Promise<{ [key: string]: any; } | undefined> {
     if (!instance.config) return
     return await window.api.plugins.getConfig(instance.metadata.name, instance.config)
+}
+
+export function loadedPluginsList() {
+    const plugins = getPluginList()
+    const hiddenPlugins = new Set(getConfig().plugins.hiddenPlugins)
+    return plugins.filter((p) => !hiddenPlugins.has(p.metadata.name))
 }

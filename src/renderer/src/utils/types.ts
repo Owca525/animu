@@ -284,6 +284,7 @@ export interface SettingsConfig {
     firstStart: boolean
     deepLinkURL: string
     plugins: {
+        hiddenPlugins: string[]
         // information: string
         userPlugins: boolean
         player: string

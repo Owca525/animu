@@ -115,7 +115,8 @@ export const defaultConfigWeb: SettingsConfig = {
     },
     plugins: {
         player: "Allmanga",
-        userPlugins: false
+        userPlugins: false,
+        hiddenPlugins: []
     },
     backup: {
         enable: false,

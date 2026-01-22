@@ -8,7 +8,6 @@ import SeekBar from '@renderer/components/seekBar';
 import SettingsDrop from './components/settingsDrop';
 import SettingsInput from './components/settingsInput';
 import Sidebar from '@renderer/components/sidebar';
-import icon from '@resources/icon.png';
 import {
     calculateZoomLevel,
     changeTheme,
@@ -51,6 +50,7 @@ import './settings.css';
 import { useI18n } from '@renderer/utils/i18n';
 import { activeThemes, loadedTheme } from '@renderer/utils/stores/global';
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
+import SettingsPlugin from './components/settingsPlugin';
 
 function settings() {
     const navigate = useNavigate();
@@ -65,6 +65,7 @@ function settings() {
     const [isSaving, setSaving] = createSignal<boolean>(false)
     const [backupList, setBackupList] = createSignal<{ date: Date, file: string }[]>([])
     const [pluginList, setpluginList] = createSignal<{ active: boolean, plugin: playerPluginFormat | informationPluginFormat }[]>([])
+    const [hiddenPluginList, setHiddenPluginList] = createSignal<string[]>([])
     const [ContextMenu, setContextMenu] = createSignal<ContextMenuProps>([
         { option: "dialog.reload", onClick: () => location.reload() },
         { option: "", line: true },
@@ -165,7 +166,7 @@ function settings() {
         navigate("/");
     })
 
-    function handleChange(path: string, value: string | number | boolean) {
+    function handleChange(path: string, value: string | number | boolean | any) {
         setNewConfig((prevConfig) => {
             return { old: prevConfig.old, new: updateObjectConfig(path, value, unwrap(prevConfig.new)) }
         })
@@ -182,7 +183,8 @@ function settings() {
             if (!plugin) return { active: false, plugin: pl }
             return { active: plugin.metadata.name == pl.metadata.name, plugin: pl }
         })
-        setpluginList([{ active: true, plugin: getInformationPlugin().currentPlugin }, ...playerPluginList])
+        setHiddenPluginList(getConfig().plugins.hiddenPlugins)
+        setpluginList([{ active: true, plugin: getInformationPlugin().currentPlugin }, ...playerPluginList])
         setThemes(loadedTheme().filter((val) => ![...activeThemes().entries()].map(([_, val]) => val.themeName).includes(val.themeName)))
         changeTitleAnimu(`Animu - ${t("global.settings")}`)
         if (!window.api) return
@@ -341,6 +343,11 @@ function settings() {
 
     function setActivePlugin(active: boolean, plugin: playerPluginFormat) {
         let tmp: playerPluginFormat | undefined
+        if (new Set(hiddenPluginList()).has(plugin.metadata.name)) {
+            unHidePlugin(plugin)
+            saveNewConfig()
+        }
+
         if (!active) {
             const plu = pluginList()[0]
             tmp = pluginManager().changePlugin(plu.plugin.metadata.name)
@@ -358,7 +365,7 @@ function settings() {
             title: `Config: ${plugin.metadata.name}`,
             pluginConfig: {
                 config: plugin.config,
-                onChange: (v, a) => savePluginSettings(plugin.config as any,v,a, plugin)
+                onChange: (v, a) => savePluginSettings(plugin.config as any, v, a, plugin)
             }
         })
     }
@@ -370,7 +377,7 @@ function settings() {
         }
         savePluginConfig(plugin, tmpConfig)
         plugin.config = tmpConfig
-        
+
         if ("home" in plugin) {
             getInformationPlugin().currentPlugin = plugin
             return
@@ -378,6 +385,18 @@ function settings() {
 
         const listplugins = getPluginList()
         setPluginPlayerList(listplugins.map((p) => p.metadata.name == plugin.metadata.name ? plugin : p))
+    }
+
+    function hidePlayerPlugin(plugin: playerPluginFormat, active: boolean) {
+        if (active) setActivePlugin(false, plugin)
+
+        setHiddenPluginList((prev) => [...prev, plugin.metadata.name])
+        handleChange("plugins.hiddenPlugins", [...hiddenPluginList()])
+    }
+
+    function unHidePlugin(plugin: playerPluginFormat) {
+        setHiddenPluginList((prev) => prev.filter(i => i !== plugin.metadata.name))
+        handleChange("plugins.hiddenPlugins", [...hiddenPluginList()])
     }
 
     return (
@@ -1163,67 +1182,28 @@ function settings() {
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-container-extensions-menu">
-                            <span class='settings-container-title'>Installed Plugin</span>
+                            <span class='settings-container-title'>Installed Plugin</span>
                             <div class="settings-container-extensions">
                                 <For each={pluginList()}>
                                     {(tmp) => (
-                                        <div class='settings-extension-container'>
-                                            <div class="settings-extension-top">
-                                                <div class="settings-extension-top-left">
-                                                    <img src={tmp.plugin.metadata.icon ? tmp.plugin.metadata.icon : icon} class='settings-extension-image' />
-                                                    <div class="settings-extension-text">
-                                                        <span class='settings-extension-name'>{tmp.plugin.metadata.name}</span>
-                                                        <span class='settings-extension-author'>{tmp.plugin.metadata.author}</span>
-                                                    </div>
-                                                </div>
-                                                <div class="settings-extension-top-right">
-                                                    <CheckBox checked={tmp.active} onChecked={(v) => "home" in tmp.plugin ? "" : setActivePlugin(v, tmp.plugin as any)} />
-                                                    <span class='settings-extension-version'>v{tmp.plugin.metadata.version}</span>
-                                                </div>
-                                            </div>
-                                            <div class="settings-extension-bottom">
-                                                <div class="settings-extension-bottom-left">
-                                                    <Show when={tmp.plugin.metadata.urlWebsite}>
-                                                        <span class='settings-extension-mini-button' onclick={() => openUrlFolder(tmp.plugin.metadata.urlWebsite!)}>Website</span>
-                                                    </Show>
-                                                    <span class='settings-extension-mini-button' >{"home" in tmp.plugin ? "Information" : "Player"}</span>
-                                                </div>
-                                                <div class='settings-extension-bottom-right'>
-                                                    <Show when={tmp.plugin.config}>
-                                                        <Button icon='settings' ButtonClass='settings-extension-button' onClick={() => openPluginSettings(tmp.plugin)}/>
-                                                    </Show>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <Show when={!new Set(hiddenPluginList()).has(tmp.plugin.metadata.name)}>
+                                            <SettingsPlugin active={"home" in tmp.plugin ? true : tmp.active} unHidePlugin={unHidePlugin} plugin={tmp.plugin} hidePlugin={hidePlayerPlugin} pluginSettings={openPluginSettings} setActivePlugin={setActivePlugin} />
+                                        </Show>
                                     )}
                                 </For>
                             </div>
-                            {/* <table class="settings-table-extensions">
-                                <tr>
-                                    <th>{t("settings.extensions.name")}</th>
-                                    <th>{t("settings.extensions.author")}</th>
-                                    <th>{t("settings.extensions.version")}</th>
-                                    <th>{t("settings.extensions.type")}</th>
-                                </tr>
-                                {pluginList.map((plugin) => (
-                                    <tr class="settings-table-button">
-                                        <td class="settings-extensions-title">{plugin.metadata.icon ? <img class="settings-extensions-icon" src={plugin.metadata.icon} /> : <div class="settings-extensions-icon-placeholder"></div>}{plugin.metadata.name}</td>
-                                        <td><div class="settings-extensions-background">{plugin.metadata.author}</div></td>
-                                        <td><div class="settings-extensions-background">{plugin.metadata.version}</div></td>
-                                        <td>
-                                            <div class="settings-extensions-button-container">
-                                                <div class="settings-extensions-type-container">
-                                                    <div class="settings-extensions-background">{t("global.player")}</div>
-                                                </div>
-                                                <div class="settings-helpicon-space">
-                                                    <CheckBox checked={config().new.plugins.player == plugin.metadata.name ? true : plugin.metadata.name == "AnilistApi" ? true : false} onChecked={() => plugin.metadata.name != "AnilistApi" ? handleChange('plugins.player', plugin.metadata.name) : ""} />
-                                                   
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </table> */}
+                            <Show when={hiddenPluginList().length > 0}>
+                                <span class='settings-container-title'>Hidden Plugin</span>
+                                <div class="settings-container-extensions">
+                                    <For each={pluginList()}>
+                                        {(tmp) => (
+                                            <Show when={new Set(hiddenPluginList()).has(tmp.plugin.metadata.name)}>
+                                                <SettingsPlugin isHidden unHidePlugin={unHidePlugin} active={tmp.active} plugin={tmp.plugin} hidePlugin={hidePlayerPlugin} pluginSettings={openPluginSettings} setActivePlugin={setActivePlugin} />
+                                            </Show>
+                                        )}
+                                    </For>
+                                </div>
+                            </Show>
                         </div>
                     </div>
                 </Show>
