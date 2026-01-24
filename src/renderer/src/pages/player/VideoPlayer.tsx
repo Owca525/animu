@@ -586,6 +586,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (currentPlayer()!.listChapters) endingChupter = currentPlayer()!.listChapters!.find((cha) => cha.type == "ending")
 
         if (!endingChupter && currentPlayer()!.listChapters) return
+        if (currentPlayer()!.listChapters && endingChupter && endingChupter.end == 0 && endingChupter.start == 0) return
 
         let showUpToNext: boolean = currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
         let timeDelete: number = ((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
@@ -962,6 +963,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         for (let index = 0; index < currentPlayer()!.listChapters!.length; index++) {
             const element = currentPlayer()!.listChapters![index];
+            if (element.start == 0 && element.end == 0) continue
             if (videoRef.currentTime >= element.start && videoRef.currentTime <= element.end && element.name) return element.name
         }
         return undefined
@@ -995,10 +997,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         let newTime = durrationTime()
         for (let index = 0; index < currentPlayer()!.listChapters!.length; index++) {
             const element = currentPlayer()!.listChapters![index];
+            if (element.end == 0 && element.start == 0) continue
             if (element.type == "opening" || element.type == "ending") {
                 newTime = newTime - (element.end - element.start)
             }
         }
+        if (newTime == durrationTime()) return undefined
         if (newTime <= 0) return undefined
         return formatTime(newTime)
     }
