@@ -13,7 +13,37 @@
     "exitAnimu": "Вы действительно хотите выйти из аниму?",
     "enable": "Включить",
     "extensions": "Расширения",
-    "notFound": "Не найдено"
+    "notFound": "Не найдено",
+    "files": "Files",
+    "themereload": "Reloading Theme",
+    "incognitomode": "Incognito Mode: {{switch}}",
+    "off": "Off",
+    "on": "On",
+    "action": "Action"
+  },
+  "imageviewer": {
+    "failedfetch": "Failed Fetch Image",
+    "failedsave": "Failed Save Image",
+    "failedload": "Failed Load Image",
+    "saving": "Saving Image"
+  },
+  "notification": {
+    "failedplugin": "Failed Load Plugin",
+    "fetchinganime": "Fetching Anime",
+    "failedanime": "Failed Fetching Anime",
+    "failedepisodes": "Failed Fetch episodes",
+    "successanime": "Sucesfully Fetched Anime",
+    "episodesfailed": "Failed Fetch episodes",
+    "episodesfetching": "Fetching Episode List",
+    "fetchresolution": "Fetching Resolution",
+    "failedchangeaudio": "Failed Changing audio",
+    "failedpip": "Failed open Picture in Picture Mode",
+    "fetchingdub": "Fetching Dubbing",
+    "faileddub": "Failed Fetch Dubbing",
+    "test": "Test Notification"
+  },
+  "deeplink": {
+    "failed": "Failed fetching Deeplink"
   },
   "dialog": {
     "yes": "Да",
@@ -22,15 +52,33 @@
     "exit": "Выход",
     "reset": "Сбросить",
     "reload": "Перезагрузить",
-    "open": "Открыть"
+    "open": "Открыть",
+    "return": "Return"
+  },
+  "sidebar": {
+    "hide": "Hide Sidebar"
+  },
+  "types": {
+    "success": "Success",
+    "error": "Error",
+    "loading": "Loading",
+    "default": "Default",
+    "info": "Info"
   },
   "home": {
     "search": "Поиск...",
+    "historySearch": "Search History...",
     "nothingfound": "Здесь ничего не найдено",
     "error": "Произошла ошибка",
     "trending_now": "Популярно сейчас",
     "popular_in_this_season": "Популярно в этом сезоне",
-    "all_time_popular": "Популярно за все время"
+    "all_time_popular": "Популярно за все время",
+    "bigcard": {
+      "information": "More Information",
+      "now": "Watch Now",
+      "start": "Start Episode {{ep}}",
+      "episodes": " Episodes"
+    }
   },
   "contextMenu": {
     "devtools": "Открыть инструменты разработчика",
@@ -50,6 +98,21 @@
     "finished": "Вышел",
     "not_yet_released": "Анонс",
     "cancelled": "Отменено"
+  },
+  "anime_relationtype": {
+    "adaptation": "Adaptation",
+    "prequel": "Prequel",
+    "sequel": "Sequel",
+    "parent": "Parent",
+    "sidestory": "Side Story",
+    "character": "Character",
+    "summary": "Summary",
+    "alternative": "Alternative",
+    "spinoff": "Spin Off",
+    "other": "Other",
+    "source": "Source",
+    "compilation": "Compilation",
+    "contains": "Contains"
   },
   "anime_genres": {
     "action": "Экшен",
@@ -120,6 +183,8 @@
     "errors": "У этого аниме нет эпизодов",
     "wrongtext": "Это не то аниме?",
     "listEpisodes": "{{number}} Эпизодов",
+    "recomendation": "Recomendation",
+    "copylink": "Copy Anime Link",
     "bar": {
       "anilist": "Страница Anilist",
       "trailer": "Трейлер аниме"
@@ -162,6 +227,24 @@
   },
   "settings": {
     "turnDeveloper": "Включить режим разработчика",
+    "theme": {
+      "active": "Active Theme",
+      "loaded": "Loaded Theme"
+    },
+    "backup": {
+      "title": "Backup",
+      "make": "Backup Making",
+      "enable": "Enable Backups",
+      "when": "When Making Backup",
+      "max": "Max number of backups",
+      "backups": "Backups",
+      "from": "Backup From",
+      "newbackup": "Make New Backup",
+      "failed": "Failed Maked backup",
+      "created": "Backup created succesfuly",
+      "restored": "Succesfully restored backup, restart application now",
+      "askrestore": "Do you want restore backup from {{date}}?"
+    },
     "general": {
       "language": "Язык",
       "theme": "Тема",
@@ -238,7 +321,8 @@
         "screenshot": "Сделать скриншот",
         "skipOpeningEnding": "Пропустить опенинг/эндинг",
         "toggleSubtitles": "Переключить субтитры",
-        "pip": "Картинка в картинке"
+        "pip": "Картинка в картинке",
+        "screenshot2": "Screenshot Without Subttitles"
       }
     },
     "playerUI": {
@@ -248,6 +332,7 @@
       "dvolumeanimation": "Отключить анимацию громкости"
     },
     "history": {
+      "managment": "History Managment",
       "limited": "Ограниченное сохранение истории",
       "limit": "Лимит для истории",
       "startsave": "Когда начинать сохранение истории",
@@ -280,7 +365,9 @@
       "information": "Информация",
       "electronver": "Версия Electron",
       "chromiumver": "Версия Chromium",
-      "nodever": "Версия Node"
+      "nodever": "Версия Node",
+      "notificationtest": "Toast Notification Test",
+      "dialogtest": "Dialog Test"
     },
     "extensions": {
       "name": "Название",
@@ -288,7 +375,14 @@
       "version": "Версия",
       "type": "Тип",
       "information": "Информация",
-      "player": "Плеер"
+      "player": "Плеер",
+      "hidden": "Hidden Plugin",
+      "installed": "Installed Plugin",
+      "userplugins": "Use User Plugins",
+      "updateplugin": "Check Plugins Update",
+      "website": "Website",
+      "hideplugin": "Hide Plugin",
+      "unhideplugin": "UnHide Plugin"
     },
     "upNext": {
       "var1": "Вариант 1",
@@ -301,6 +395,8 @@
     "error": {
       "notfound": "Плеер не нашел никаких URL-адресов"
     },
+    "shareanime": "Share Anime Episode",
+    "selectepisode": "Select Episode",
     "TitleEpisode": "Эпизод {{ep}} из {{name}}",
     "TitleMovie": "Фильм: {{name}}",
     "Volume": "Громкость",
@@ -315,13 +411,16 @@
     "mute": "Отключить звук",
     "unmute": "Включить звук",
     "errors": {
+      "error": "Error in Player",
+      "missing": "Missing data to extract urls",
       "extractionError": "Не удалось извлечь URL-адреса плеера: {{error}}",
       "MEDIA_ERR_ABORTED": "Воспроизведение было прервано.",
       "MEDIA_ERR_NETWORK": "Произошла сетевая ошибка при получении видео.",
       "MEDIA_ERR_DECODE": "Произошла ошибка при декодировании видео.",
       "MEDIA_ERR_SRC_NOT_SUPPORTED": "Формат видео или источник не поддерживается.",
       "default": "Произошла неизвестная ошибка.",
-      "missingResoltions": "Плеер не нашел подходящих разрешений видео."
+      "missingResoltions": "Плеер не нашел подходящих разрешений видео.",
+      "notfound": "Failed Find Urls"
     },
     "upNext": {
       "title": "Следующий эпизод начнется через {{sec}} секунд",
@@ -346,7 +445,8 @@
     "toastscreenshot": {
       "failed": "Не удалось сохранить скриншот",
       "doneclip": "Изображение успешно сохранено в буфер обмена",
-      "donefile": "Изображение успешно сохранено в файл"
+      "donefile": "Изображение успешно сохранено в файл",
+      "done": "Screenshot Succesfully Saved"
     }
   },
   "history": {
@@ -358,21 +458,18 @@
     "continuefailed": "Не удалось удалить аниме из 'Продолжить просмотр'"
   },
   "oldBackup": {
-    "backupcontinue": "Резервное копирование старого файла 'Продолжить просмотр': Выполнено",
-    "convertcontinue": "Конвертация 'Продолжить просмотр': Успешно {{success}}, Неудачно {{failed}}",
-    "convertcontinuedone": "Конвертация 'Продолжить просмотр' завершена: Успешно {{success}}, Неудачно {{failed}}",
-    "convertcontinuefailed": "Не удалось конвертировать старый 'Продолжить просмотр' в новый",
-    "backuphistory": "Резервное копирование старого файла истории: Выполнено",
-    "converthistory": "Конвертация истории: Успешно {{success}}, Неудачно {{failed}}",
-    "converthistorydone": "Конвертация истории завершена: Успешно {{success}}, Неудачно {{failed}}",
-    "converthistoryfailed": "Не удалось конвертировать старую историю просмотров в новую",
-    "failedconvert": "Не удалось конвертировать {{title}}"
+    "convert": "Converting Success {{success}} / Failed {{failed}}",
+    "done": "Converting Done",
+    "oldhistory": "Detected Old history",
+    "oldcontinue": "Detected Old Continue Watch",
+    "failedconvertall": "Failed Convert all History"
   },
   "update": {
     "available": "Доступно обновление {{ver}}, нажмите для обновления",
     "progress": "Прогресс загрузки {{procent}}%",
     "done": "Обновление загружено, перезапустите приложение",
-    "same": "У вас установлена последняя версия Animu"
+    "same": "У вас установлена последняя версия Animu",
+    "failed": "Failed to check for updates"
   },
   "discordrpc": {
     "home": "На главной",
@@ -405,6 +502,59 @@
     "rain_kyle": "Китайский перевод",
     "akashiro": "Русский перевод",
     "talon": "Создатель Дискорд сервера",
-    "zomi": "Создатель новый иконки"
+    "zomi": "Создатель новый иконки",
+    "TheCrabeuh": "Tester Animu"
+  },
+  "week": {
+    "infoCommunicat": "Episode {{ep}} {{day}} At {{hours}}",
+    "infoCommunicatToday": "Episode {{ep}} {{day}} At {{hours}}",
+    "today": "Today",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
+  },
+  "lang": {
+    "en": "English",
+    "pl": "Polski",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "it": "Italiano",
+    "pt": "Português",
+    "ru": "Русский",
+    "uk": "Українська",
+    "cs": "Čeština",
+    "sk": "Slovenčina",
+    "sl": "Slovenščina",
+    "hr": "Hrvatski",
+    "sr": "Српски",
+    "bg": "Български",
+    "ro": "Română",
+    "nl": "Nederlands",
+    "sv": "Svenska",
+    "no": "Norsk",
+    "da": "Dansk",
+    "fi": "Suomi",
+    "hu": "Magyar",
+    "el": "Ελληνικά",
+    "tr": "Türkçe",
+    "ar": "العربية",
+    "he": "עברית",
+    "fa": "فارسی",
+    "hi": "हिन्दी",
+    "bn": "বাংলা",
+    "ur": "اردو",
+    "zh": "中文",
+    "ja": "日本語",
+    "ko": "한국어",
+    "id": "Bahasa Indonesia",
+    "ms": "Bahasa Melayu",
+    "th": "ไทย",
+    "vi": "Tiếng Việt",
+    "cn": "中文"
   }
 }
