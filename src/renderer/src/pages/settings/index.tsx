@@ -14,6 +14,8 @@ import {
     changeTitleAnimu,
     convertKeybinds,
     convertPath,
+    detectPluginVersion,
+    fetchPluginRepos,
     openUrlFolder,
     request,
     savePluginConfig,
@@ -1180,6 +1182,14 @@ function settings() {
                                 }
                             />
                         </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            Check Plugins Update
+                            <Button content='Check updates' onClick={async () => {
+                                await fetchPluginRepos()
+                                await detectPluginVersion()
+                            }}/>
+                        </div>/
                         <div class="settings-line"></div>
                         <div class="settings-container-extensions-menu">
                             <span class='settings-container-title'>Installed Plugin</span>
