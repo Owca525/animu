@@ -94,6 +94,7 @@ declare global {
       setZoom: (zoom: number) => void;
       exit: () => void;
       openDevTools: () => void;
+      reload: () => void
     };
   }
 }

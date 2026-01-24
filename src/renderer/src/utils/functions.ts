@@ -228,7 +228,7 @@ export function CreateContextMenuOptions(start?: ContextMenuProps, center?: Cont
             ContextMenu.push(element)
         }
     }
-    ContextMenu.push({ option: t("dialog.reload"), onClick: () => location.reload() })
+    ContextMenu.push({ option: t("dialog.reload"), onClick: () => window.BrowserWindow.reload() })
     if (center) {
         ContextMenu.push({ option: "", line: true })
         for (let index = 0; index < center.length; index++) {

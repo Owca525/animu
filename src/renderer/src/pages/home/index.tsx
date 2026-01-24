@@ -40,7 +40,6 @@ import {
 import { useI18n } from '@renderer/utils/i18n';
 import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
 import { getGlobalCache, setDeeplinkRunned } from '@renderer/utils/stores/global';
-import { createShortcut } from '@solid-primitives/keyboard';
 // import { createShortcut } from "@solid-primitives/keyboard";
 // import WelcomeScreen from "./components/welcomeScreen"
 const Home = () => {
@@ -145,9 +144,6 @@ const Home = () => {
 
     navigate("/player");
   }
-
-  createShortcut(["l"], () => {
-  })
 
   function setHistory() {
     setHomeSearchTags(undefined)

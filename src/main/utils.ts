@@ -1,4 +1,4 @@
-import { app, clipboard, ipcMain, nativeImage, shell } from "electron"
+import { app, BrowserWindow, clipboard, ipcMain, nativeImage, shell } from "electron"
 import { Client } from "@xhayper/discord-rpc";
 import { ActivityType } from "discord-api-types/v10"
 import ini from "ini";
@@ -446,3 +446,7 @@ ipcMain.handle("installPluginUpdate", async (_, plugin: pluginRepoExpanded) => {
     if (!resp.success || !resp.text) return
     fs.writeFileSync(path.join(animuPlugins, path.basename(plugin.file)), resp.text, "utf-8")
 })
+
+ipcMain.on("reload-window", () => {
+  BrowserWindow.getAllWindows()[0].reload();
+});
