@@ -526,7 +526,7 @@ export function decryptAES(ciphertext: string, key: string): string | undefined 
         const text = decrypted.toString(CryptoJS.enc.Utf8);
         return text || undefined;
     } catch (error) {
-        console.log("Error in decryptAES", error)
+        console.error("Error in decryptAES", error)
         return undefined;
     }
 }

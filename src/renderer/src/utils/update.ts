@@ -8,7 +8,6 @@ export async function checkUpdate(alwaysShow: boolean = false) {
   try {
     if (!window.api) return
     const update = await window.api.update.checkUpdate();
-    console.log(update);
 
     if (update.available) {
       const id = toast(t("update.available", { ver: update.version }), {

@@ -80,7 +80,6 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
         const animeContinue = history.continue.find((value) => value.AnimeData.id == data.AnimeData.id)
         const historyContinue = history.history.find((value) => value.AnimeData.id == data.AnimeData.id)
         let airing = data.AnimeData.nextAiringEpisode ? data.AnimeData.nextAiringEpisode.episode : 0
-        console.log(airing)
 
         try {
             if (!animeContinue && !historyContinue) return <Button content={t("home.bigcard.now")} ButtonClass='big-card-button' onClick={() => goToPlayer()} />

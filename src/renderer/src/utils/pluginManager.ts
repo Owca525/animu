@@ -47,7 +47,6 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
             if (plugin.pluginType == "information") continue
             if (plugin.type != "official" && !conf.plugins.userPlugins) continue
             const tmpPlugin = repoPlugins.find((v) => v.name.toLowerCase() == plugin.file.replaceAll(".js", "").toLowerCase())
-            console.log(tmpPlugin, plugin)
             if (tmpPlugin && plugin.type != "user" && tmpPlugin.sha256 != plugin.sha256) continue 
             try {
                 const newBlob = new Blob([detectIndex(plugin.content)], { type: "application/javascript" });

@@ -4,7 +4,7 @@ import Card from '@renderer/pages/home/components/card';
 import Input from '@renderer/components/input';
 import Dropdown from '@renderer/components/dropDown';
 import { segregatePlugins } from '@renderer/utils/functions';
-import { Component, createEffect, createSignal, For, onMount, Show } from 'solid-js';
+import { Component, createSignal, For, onMount, Show } from 'solid-js';
 import { getPlayerPLugin, pluginManager } from '@renderer/utils/stores/plugins';
 import { useI18n } from '@renderer/utils/i18n';
 import { useResponse } from '@renderer/utils/hooks/useResponse';
@@ -29,17 +29,12 @@ const ContainerWrong: Component<ContainerWrongProps> = ({ name, exitfunc, refetc
         queryKey: [searchName()],
         queryFn: async (queryKey) => {
             const [name] = queryKey;
-            console.log(name)
             let plugin = getPlayerPLugin()
             if (plugin)
                 return await plugin.searchAnime(name, 1);
             return [];
         },
         cacheTime: 2 * 60 * 60 * 1000,
-    })
-
-    createEffect(() => {
-        console.log(response.data(), response.loading(), response.error())
     })
 
     return (

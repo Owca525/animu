@@ -367,13 +367,11 @@ function getSeasonFromDate() {
 
 async function fetchCategory(params: any, title: string): Promise<containerData> {
   const globalParams = params
-  console.log(params, title)
   let container: containerData = {
     title: title,
     data: await sendToApi(params, graphicApi),
     onScrollDownFunction: async (_search, page, _params) => {
       let resp = await sendToApi({ ...globalParams, page: page }, graphicApi)
-      console.log(globalParams, page, resp)
       return {
         maxPage: pageSize,
         data: resp
@@ -505,10 +503,7 @@ export default class AnilistApi implements informationPluginFormat {
     try {
       let season = getSeasonFromDate()
       let data = await sendPost({ season: season.season, seasonYear: season.seasonYear, isAdult: this.config["Adult Mode"] }, graphicHomeApi.replaceAll("20", this.config["Max Page Size"]))
-      if (!data.success || !data.json) {
-        console.log(data)
-        return
-      }
+      if (!data.success || !data.json) return
       let home: containerData[] = [
         {
           title: "home.trending_now",
@@ -544,7 +539,6 @@ export default class AnilistApi implements informationPluginFormat {
   anime = async (context: { id: string; }) => {
     try {
       let req = await sendPost({ id: context.id }, graphicApIDAnime)
-      console.log(req)
       if (!req.success || !req.json) return
       return Convert(req.json.data.Media).AnimeData
     } catch (error) {

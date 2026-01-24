@@ -103,7 +103,7 @@ const Home = () => {
     let anime: deepLinkData | undefined;
     try {
       anime = JSON.parse(atob(deeplink.replaceAll("animu://", "")))
-    } catch (error) { console.log(t("deeplink.failed"), error) }
+    } catch (error) { console.error(t("deeplink.failed"), error) }
     if (!anime) return
 
     const infoPlugin = getInformationPlugin()
@@ -147,7 +147,6 @@ const Home = () => {
   }
 
   createShortcut(["l"], () => {
-    console.log(getHomeCache())
   })
 
   function setHistory() {

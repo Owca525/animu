@@ -133,7 +133,6 @@ function information() {
         let history = tempHistory.filter((anime) => anime.AnimeData.id == tempData().anime.id)
         if (history.length > 0) {
             let plugin: playerPluginFormat = pluginManager().changePlugin(history[0].saveData?.pluginName as string)
-            console.log(history[0].saveData?.pluginName, plugin)
             if (plugin && plugin.metadata.name != history[0].saveData?.pluginName) setCurrentId(undefined)
             setCurrentPlugin(plugin.metadata.name)
 
@@ -229,12 +228,6 @@ function information() {
             </div>
         )
     }
-
-    createShortcut(["tab"], () => {
-        console.log(tempData())
-        console.log(currentIDplayer())
-        console.log(getPlayerPLugin())
-    })
 
     createShortcut(["Escape"], () => {
         if (showWrong()) setshowWrong(() => false)

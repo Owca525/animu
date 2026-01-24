@@ -72,7 +72,6 @@ const player = () => {
 
     function updateHistory() {
         if (!anime_data || !anime_data.data) return
-        console.log("SAVE HISTORY", anime_data.save?.pluginName ? anime_data.save.pluginName : "")
         SaveHistory({
             saveData: {
                 pluginName: anime_data.save?.pluginName ? anime_data.save.pluginName : "",

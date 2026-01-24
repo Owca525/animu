@@ -691,7 +691,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     async function setNewSubtitles(sub: playerSubtitlesFormat | undefined) {
         if (!sub) return
         if (!videoRef) return
-        console.log(currentASSubtitles())
 
         // This clear subtitles but this dosen't work on dev Because react second render
         if (currentASSubtitles()) {
@@ -1010,7 +1009,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     async function changeToDubbing(value: boolean) {
         const player = currentPlayer()
         if (!player) return
-        console.log(currentPlayer())
         
         if (value && player?.dubResolution) {
             setListResolution(player.dubResolution)
@@ -1027,7 +1025,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     type: temp.type
                 }
             }, player.isDubbing)
-            console.log(tmp)
             if (tmp.success && tmp.data) {
                 removeToast(idToast)
                 updatePlayerData((prev) => prev.map((prevplayer) => prevplayer.hostname == player.hostname ? { ...player, dubResolution: tmp.data } : player))
