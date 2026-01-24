@@ -1,3 +1,5 @@
+import { UUIDTypes } from "uuid"
+
 export const notificationProps = {
     closeOnClick: true,
     autoClose: 3000,
@@ -108,6 +110,7 @@ export interface globalDataFormat {
     deeplinkRunned: boolean,
     loadedTheme: themeMetadata[],
     activeThemes: Map<number, themeMetadata>
+    token: UUIDTypes | undefined
 }
 
 export type playerDataExtended = playerData & {
@@ -234,16 +237,9 @@ export interface informationPluginFormat {
         searchOption: genres
     }
     config?: { [key: string]: any }
-    search(
-        context: { name: string, page: number, params?: genresSearchFormat },
-        callbacks: { onSuccess: (data: containerData) => void, onError: (error: string) => void }
-    ): Promise<void>
-    home(
-        callbacks: { onSuccess: (data: { topCards?: containerData, sections: containerData[] }) => void, onError: (error: string) => void }
-    ): Promise<void>
-    anime(
-        context: { id: string },
-    ): Promise<AnimeData | undefined>
+    search(name: string, page: number, params?: genresSearchFormat): Promise<containerData | undefined>
+    home(): Promise<{ topCards?: containerData, sections: containerData[] } | undefined>
+    anime(context: { id: string }): Promise<AnimeData | undefined>
     // schedule(
     //     context: { airingStart?: number, airingEnd?: number },
     //     callbacks: { onSuccess: (data: containerData) => void, onError: (error: string) => void }

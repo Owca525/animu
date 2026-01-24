@@ -1,13 +1,12 @@
 import AnilistApi from "@renderer/plugins/anilistApi";
-import { containerData, genresSearchFormat, informationPluginManagerFormat, informationPluginFormat, playerPluginManagerFormat, playerPluginFormat } from "./types";
-import { setAllHomeData } from "./stores/home";
+import { genresSearchFormat, informationPluginManagerFormat, informationPluginFormat, playerPluginManagerFormat, playerPluginFormat } from "./types";
 import { getPluginRepo, setPlayerPlugin, setPluginPlayerList } from "./stores/plugins";
 import Allmanga from "@renderer/plugins/allmanga";
 import Anizone from "@renderer/plugins/anizone";
 import GojoLive from "@renderer/plugins/gojoLive";
 import LycorisCafe from "@renderer/plugins/lycoriscafe";
 import { getConfig } from "./stores/config";
-import { detectIndex, getRenderPath } from "./functions";
+import { detectIndex, getRenderPath, setHomeData } from "./functions";
 import semver from "semver";
 // import Aowu from "@renderer/plugins/aowu";
 
@@ -148,15 +147,7 @@ export class informationPluginManager implements informationPluginManagerFormat 
     currentPlugin: informationPluginFormat = new AnilistApi()
 
     searchAnime = (name: string, page: number, params?: genresSearchFormat) => {
-        setAllHomeData({ data: { sections: [] }, isLoading: true, isError: false, } as any)
-        this.currentPlugin.search({ name, page, params }, {
-            onSuccess: (data: containerData) => {
-                setAllHomeData({ data: { sections: [data] }, isLoading: false, isError: false, } as any)
-            },
-            onError: (_error: string) => {
-                setAllHomeData({ data: { sections: [] }, isLoading: false, isError: true, } as any)
-            }
-        });
+        setHomeData(async () => await this.currentPlugin.search(name, page, params))
     };
     // schedule = (airingStart?: number, airingEnd?: number): void => {
     //     this.currentPlugin.schedule({ airingStart, airingEnd }, {
@@ -169,19 +160,7 @@ export class informationPluginManager implements informationPluginManagerFormat 
     //     })
     // }
     home = () => {
-        setAllHomeData({ data: { sections: [] }, isLoading: true, isError: false, } as any)
-        this.currentPlugin.home({
-            onSuccess: (data: { topCards?: containerData; sections: containerData[]; }) => {
-                setAllHomeData({
-                    data: { topCards: data.topCards, sections: data.sections },
-                    isLoading: false,
-                    isError: false,
-                } as any)
-            },
-            onError: (_error: string) => {
-                setAllHomeData({ data: { sections: [] }, isLoading: false, isError: true, } as any)
-            }
-        })
+        setHomeData(this.currentPlugin.home)
     }
     anime = async (id: string) => {
         return await this.currentPlugin.anime({ id: id })

@@ -1,5 +1,6 @@
 import {
     cardData,
+    containerData,
     ContextMenuProps,
     homeData,
     informationPluginFormat,
@@ -11,13 +12,14 @@ import {
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { getGlobalCache, setActiveThemes } from './stores/global';
-import { getHomeCache, setHomeNewData } from './stores/home';
+import { getGlobalCache, setActiveThemes, setGlobalToken } from './stores/global';
+import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
 import { unwrap } from 'solid-js/store';
 import { getInformationPlugin, getPluginList, getPluginRepo, pluginManager, setPluginRepo } from './stores/plugins';
 import semver from "semver";
+import { v4 as uuidv4 } from 'uuid';
 
 export function decodeHtmlEntities(str: string) {
     const parser = new DOMParser();
@@ -584,4 +586,26 @@ export async function fetchPluginRepos() {
         if (resp.success && resp.json && resp.json != {} as any) resp.json.map((v) => ({ ...v, repoURL: element })).forEach(element => { tmp.push(element) });
     }
     setPluginRepo(tmp)
+}
+
+export async function setHomeData(wrapper?: () => Promise<homeData["data"] | containerData | undefined>, data?: homeData["data"]) {
+    const uuid = uuidv4()
+    try {
+        setGlobalToken(uuid)
+        setAllHomeData({ data: { sections: [] }, isLoading: true, isError: false } as any)
+        if (data) {
+            setAllHomeData({ data: data, isLoading: false, isError: false } as any)
+            return
+        }
+        if (!wrapper) return
+
+        const respons = await wrapper()
+        if (getGlobalCache().token && getGlobalCache().token != uuid) return setGlobalToken(undefined)
+        setGlobalToken(undefined)
+        if (!respons) return setAllHomeData({ data: { sections: [] }, isLoading: false, isError: true } as any)
+        if ("sections" in respons) return setAllHomeData({ data: respons, isLoading: false, isError: false } as any)
+        setAllHomeData({ data: { sections: [respons] }, isLoading: false, isError: false } as any)
+    } catch (error) {
+        setAllHomeData({ data: { sections: [] }, isLoading: false, isError: true, } as any)
+    }
 }

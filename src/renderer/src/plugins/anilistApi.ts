@@ -484,30 +484,30 @@ export default class AnilistApi implements informationPluginFormat {
   //   console.log(await sendPost(variables, graphicAiringAnime))
   // }
 
-  async search(context: { name: string; page: number; params?: genresSearchFormat; }, callbacks: { onSuccess: (data: containerData) => void; onError: (error: string) => void; }) {
+  search = async (name: string, page: number, params?: genresSearchFormat) => {
     try {
       let title: string | undefined = undefined
-      if (!(context.name.replaceAll(" ", "") == "")) title = `Searching: ${context.name}`
+      if (!(name.replaceAll(" ", "") == "")) title = `Searching: ${name}`
 
-      const resp = await searchInAnilist(context.name, context.page, context.params, this.config["Adult Mode"], this.config["Max Page Size"])
+      const resp = await searchInAnilist(name, page, params, this.config["Adult Mode"], this.config["Max Page Size"])
 
-      callbacks.onSuccess({
+      return {
         title: title,
         data: resp.data,
         onScrollDownFunction: async (search, page, params) => await searchWrapper(search ? search : "", page, params, this.config["Adult Mode"], this.config["Max Page Size"])
-      })
+      }
     } catch (error) {
       console.error("Error in search/Anilistapi", error)
-      callbacks.onError(`${error}`)
+      return
     }
   }
-  async home(callbacks: { onSuccess: (data: { topCards?: containerData, sections: containerData[] }) => void; onError: (error: string) => void; }) {
+  home = async () => {
     try {
       let season = getSeasonFromDate()
       let data = await sendPost({ season: season.season, seasonYear: season.seasonYear, isAdult: this.config["Adult Mode"] }, graphicHomeApi.replaceAll("20", this.config["Max Page Size"]))
       if (!data.success || !data.json) {
         console.log(data)
-        return callbacks.onError("Anilist isn't accessible")
+        return
       }
       let home: containerData[] = [
         {
@@ -535,13 +535,13 @@ export default class AnilistApi implements informationPluginFormat {
           onTitleClick: async () => await fetchCategory({...allPopular, isAdult: this.config["Adult Mode"]}, "home.all_time_popular"),
         }
       ]
-      callbacks.onSuccess({ sections: home, topCards: home[0] })
+      return { sections: home, topCards: home[0] }
     } catch (error) {
       console.error("Error in home/anilistapi", error)
-      callbacks.onError("Anilist isn't accessible")
+      return
     }
   }
-  async anime(context: { id: string; }) {
+  anime = async (context: { id: string; }) => {
     try {
       let req = await sendPost({ id: context.id }, graphicApIDAnime)
       console.log(req)

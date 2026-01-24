@@ -1,3 +1,4 @@
+import { UUIDTypes } from "uuid";
 import { cardData, globalDataFormat, themeMetadata } from "../types";
 import { createStore } from "solid-js/store";
 
@@ -7,6 +8,7 @@ export const [globalState, setGlobalState] = createStore({
     deeplinkRunned: false,
     loadedTheme: [],
     activeThemes: new Map(),
+    token: undefined
 } as globalDataFormat);
 
 export const getGlobalCache = () => globalState;
@@ -17,4 +19,5 @@ export const setGlobalTheme = (tmp: themeMetadata[]) => setGlobalState((prev) =>
 export const setIncognitoMode = (tmp: boolean) => setGlobalState((prev) => ({...prev, incognito: tmp}));
 export const setDeeplinkRunned = (tmp: boolean) => setGlobalState((prev) => ({...prev, deeplinkRunned: tmp}));
 export const setGlobalHistory = (tmp: cardData[]) => setGlobalState((prev) => ({...prev, history: [...tmp]}));
+export const setGlobalToken = (tmp: UUIDTypes | undefined) => setGlobalState((prev) => ({...prev, token: tmp}));
 

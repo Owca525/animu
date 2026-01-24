@@ -4,7 +4,7 @@ import Container from './components/container';
 import Filter from './components/filter';
 import Input from '@renderer/components/input';
 import Sidebar from '@renderer/components/sidebar';
-import { changeTitleAnimu, CreateContextMenuOptions, getHistory } from '@renderer/utils/functions';
+import { changeTitleAnimu, CreateContextMenuOptions, getHistory, setHomeData } from '@renderer/utils/functions';
 import {
   createSignal,
   For,
@@ -16,7 +16,6 @@ import {
 import { getConfig } from '@renderer/utils/stores/config';
 import {
   getHomeCache,
-  setAllHomeData,
   setHomeActivePage,
   setHomeNewData,
   setHomeSearch,
@@ -181,7 +180,7 @@ const Home = () => {
         },
       ],
     };
-    setAllHomeData({ data: data } as any)
+    setHomeData(undefined, data)
   }
   const handleScroll = () => {
     let home = homeCache()

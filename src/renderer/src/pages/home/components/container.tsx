@@ -3,12 +3,12 @@ import "./css/container.css"
 import Card from "./card"
 import Button from "@renderer/components/buttons"
 import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js"
-import { getHomeCache, setAllHomeData, setHomeSearchPage, setHomeStopScrolling } from "@renderer/utils/stores/home"
+import { getHomeCache, setHomeSearchPage, setHomeStopScrolling } from "@renderer/utils/stores/home"
 import { unwrap } from "solid-js/store"
-import { toast } from "@renderer/utils/context/ToastNotification"
 import { useI18n } from "@renderer/utils/i18n"
 import { getInformationPlugin } from "@renderer/utils/stores/plugins"
 import { useResponse } from "@renderer/utils/hooks/useResponse"
+import { setHomeData } from "@renderer/utils/functions"
 
 function Container(props: containerData) {
   const { t, pathExist } = useI18n()
@@ -22,7 +22,7 @@ function Container(props: containerData) {
         if (entry.isIntersecting && !homeCache.stopScrolling) {
           setHomeSearchPage(currentPage() + 1)
           setcurrentPage(currentPage() + 1)
-          cardResponse.Refetch([currentPage()+1, props.title])
+          cardResponse.Refetch([currentPage() + 1, props.title])
           observer.unobserve(entry.target)
         }
       });
@@ -77,15 +77,8 @@ function Container(props: containerData) {
   }
 
   async function handleTitleClick() {
-    try {
-      if (!props.onTitleClick) return
-      setAllHomeData({ isLoading: true, data: { sections: [] }, isError: false } as any)
-      const resp = await props.onTitleClick()
-      setAllHomeData({ isLoading: false, data: { sections: [resp] }, isError: false } as any)
-    } catch (error) {
-      toast("Error Fetching Category", { type: "error" })
-      setAllHomeData({ isLoading: false, data: { sections: [] }, isError: true } as any)
-    }
+    if (!props.onTitleClick) return
+    setHomeData(props.onTitleClick)
   }
 
   return (
