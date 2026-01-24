@@ -251,7 +251,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         let currentplayer = data
         if (currentplayer.extractResolution) {
-            const idToast = toast("Fetching Resolution", { type: "loading", removeTimer: true })
+            const idToast = toast(t("notification.fetchresolution"), { type: "loading", removeTimer: true })
             let tmp = await fetchResolutions({
                 ...currentplayer,
                 episode: {
@@ -313,7 +313,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             hls()!.audioTrack = data.id
             setCurrentAudioTrack(() => data)
         } catch (error) {
-            toast("Failed Changing audio", { type: "error" })
+            toast(t("notification.failedchangeaudio"), { type: "error" })
         }
     }
 
@@ -511,7 +511,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             }
         } catch (error) {
             console.error('Error PiP:', error);
-            toast("Failed open Picture in Picture Mode", { type: "error" })
+            toast(t("notification.failedpip"), { type: "error" })
         }
     };
 
@@ -922,7 +922,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     const centerContextMenu: ContextMenuProps = [
         { option: t("contextMenu.nerdstats"), onClick: () => setshowNerdStats((prev) => !prev) },
-        { option: "Share Anime Episode", onClick: () => generateShareURL() }
+        { option: t("player.shareanime"), onClick: () => generateShareURL() }
     ]
 
     function handleProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
@@ -1016,7 +1016,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             setListResolution(player.dubResolution)
             setNewResolution(player.dubResolution[0])
         } else if (value && player.isDubbing) {
-            const idToast = toast("Fetching Dubbing", { type: "loading", removeTimer: true })
+            const idToast = toast(t("notification.fetchingdub"), { type: "loading", removeTimer: true })
             const tmp = await fetchResolutions({
                 ...player,
                 episode: {
@@ -1034,7 +1034,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 setPlayer({ ...player, dubResolution: tmp.data })
                 setListResolution(tmp.data)
                 setNewResolution(tmp.data[0])
-            } else updateToast(idToast, "Failed Fetch Dubbing", { type: "error", removeTimer: false })
+            } else updateToast(idToast, t("notification.faileddub"), { type: "error", removeTimer: false })
         } else {
             setListResolution(player.resolution)
             setNewResolution(player.resolution[0])
@@ -1168,7 +1168,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                             {/* <PlayerButton icon={"picture_in_picture"} onClick={handlePictureInPicture} title={detectDisableTooltips("Picture In Picture")} ButtonClass="player-buttons" /> */}
 
                             <Show when={temp.episodes.length >= 2}>
-                                <PlayerButton icon={"video_library"} title={detectDisableTooltips("Select Episode")} ButtonClass="player-buttons" onClick={() => { setShowSelectEpisode((prev) => !prev); setcurrentSettings(() => false) }} />
+                                <PlayerButton icon={"video_library"} title={detectDisableTooltips(t("player.selectepisode"))} ButtonClass="player-buttons" onClick={() => { setShowSelectEpisode((prev) => !prev); setcurrentSettings(() => false) }} />
                             </Show>
                             <div class={`player-select-episode-container ${isShowSelectEpisode() ? "show" : "hidden"}`} >
                                 <div class="player-select-episode-title">{t("player.changeEpisode")}</div>
@@ -1245,7 +1245,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 >
                 <img src={screenShot().image} class="player-screenshot-image"/>
                 <span class="player-screenshot-text">
-                    Screenshot Succesfully Saved
+                    {t("player.toastscreenshot.done")}
                 </span>
             </div>
             <Show when={config.Player.upToNextEpisode.variants == "old"}>

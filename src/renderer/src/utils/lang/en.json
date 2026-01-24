@@ -13,7 +13,37 @@
         "exitAnimu": "Do you really want exit animu?",
         "enable": "Enable",
         "extensions": "Extensions",
-        "notFound": "Not Found"
+        "notFound": "Not Found",
+        "files": "Files",
+        "themereload": "Reloading Theme",
+        "incognitomode": "Incognito Mode: {{switch}}",
+        "off": "Off",
+        "on": "On",
+        "action": "Action"
+    },
+    "imageviewer": {
+        "failedfetch": "Failed Fetch Image",
+        "failedsave": "Failed Save Image",
+        "failedload": "Failed Load Image",
+        "saving": "Saving Image"
+    },
+    "notification": {
+        "failedplugin": "Failed Load Plugin",
+        "fetchinganime": "Fetching Anime",
+        "failedanime": "Failed Fetching Anime",
+        "failedepisodes": "Failed Fetch episodes",
+        "successanime": "Sucesfully Fetched Anime",
+        "episodesfailed": "Failed Fetch episodes",
+        "episodesfetching": "Fetching Episode List",
+        "fetchresolution": "Fetching Resolution",
+        "failedchangeaudio": "Failed Changing audio",
+        "failedpip": "Failed open Picture in Picture Mode",
+        "fetchingdub": "Fetching Dubbing",
+        "faileddub": "Failed Fetch Dubbing",
+        "test": "Test Notification"
+    },
+    "deeplink": {
+        "failed": "Failed fetching Deeplink"
     },
     "dialog": {
         "yes": "Yes",
@@ -25,6 +55,16 @@
         "open": "Open",
         "return": "Return"
     },
+    "sidebar": {
+        "hide": "Hide Sidebar"
+    },
+    "types": {
+        "success": "Success",
+        "error": "Error",
+        "loading": "Loading",
+        "default": "Default",
+        "info": "Info"
+    },
     "home": {
         "search": "Search Anime...",
         "historySearch": "Search History...",
@@ -32,7 +72,13 @@
         "error": "Error Occured",
         "trending_now": "Trending Now",
         "popular_in_this_season": "Popular In This Season",
-        "all_time_popular": "All Time Popular"
+        "all_time_popular": "All Time Popular",
+        "bigcard": {
+            "information": "More Information",
+            "now": "Watch Now",
+            "start": "Start Episode {{ep}}",
+            "episodes": " Episodes"
+        }
     },
     "contextMenu": {
         "devtools": "Open DevTools",
@@ -137,6 +183,8 @@
         "errors": "This Anime doesn't have any episodes",
         "wrongtext": "Is this the wrong Anime?",
         "listEpisodes": "{{number}} Episodes",
+        "recomendation": "Recomendation",
+        "copylink": "Copy Anime Link",
         "bar": {
             "anilist": "Anilist Page",
             "trailer": "Anime Trailer"
@@ -178,6 +226,24 @@
     },
     "settings": {
         "turnDeveloper": "Turn On Developer Mode",
+        "theme": {
+            "active": "Active Theme",
+            "loaded": "Loaded Theme"
+        },
+        "backup": {
+            "title": "Backup",
+            "make": "Backup Making",
+            "enable": "Enable Backups",
+            "when": "When Making Backup",
+            "max": "Max number of backups",
+            "backups": "Backups",
+            "from": "Backup From",
+            "newbackup": "Make New Backup",
+            "failed": "Failed Maked backup",
+            "created": "Backup created succesfuly",
+            "restored": "Succesfully restored backup, restart application now",
+            "askrestore": "Do you want restore backup from {{date}}?"
+        },
         "general": {
             "language": "Language",
             "theme": "Theme",
@@ -254,7 +320,8 @@
                 "screenshot": "Take a Screenshot",
                 "skipOpeningEnding": "Skip Opening/Ending",
                 "toggleSubtitles": "Toggle Subtitles",
-                "pip": "Picture In Picture"
+                "pip": "Picture In Picture",
+                "screenshot2": "Screenshot Without Subttitles"
             }
         },
         "playerUI": {
@@ -264,6 +331,7 @@
             "dvolumeanimation": "Disable Volume Animation"
         },
         "history": {
+            "managment": "History Managment",
             "limited": "Limited Save History",
             "limit": "Limit For History",
             "startsave": "When to Start Saving History",
@@ -296,7 +364,9 @@
             "information": "Information",
             "electronver": "Electron Version",
             "chromiumver": "Chromium Version",
-            "nodever": "Electron Version"
+            "nodever": "Electron Version",
+            "notificationtest": "Toast Notification Test",
+            "dialogtest": "Dialog Test"
         },
         "extensions": {
             "name": "Name",
@@ -304,7 +374,14 @@
             "version": "Version",
             "type": "Type",
             "information": "Information",
-            "player": "Player"
+            "player": "Player",
+            "hidden": "Hidden Plugin",
+            "installed": "Installed Plugin",
+            "userplugins": "Use User Plugins",
+            "updateplugin": "Check Plugins Update",
+            "website": "Website",
+            "hideplugin": "Hide Plugin",
+            "unhideplugin": "UnHide Plugin"
         },
         "upNext": {
             "var1": "Variant 1",
@@ -317,6 +394,8 @@
         "error": {
             "notfound": "Player didn't find any urls"
         },
+        "shareanime": "Share Anime Episode",
+        "selectepisode": "Select Episode",
         "TitleEpisode": "Episode {{ep}} of {{name}}",
         "TitleMovie": "Movie: {{name}}",
         "Volume": "Volume",
@@ -331,13 +410,16 @@
         "mute": "Mute",
         "unmute": "Unmute",
         "errors": {
+            "error": "Error in Player",
+            "missing": "Missing data to extract urls",
             "extractionError": "Failed Extracting Player Urls: {{error}}",
             "MEDIA_ERR_ABORTED": "The playback was aborted.",
             "MEDIA_ERR_NETWORK": "A network error occurred while fetching the video.",
             "MEDIA_ERR_DECODE": "An error occurred while decoding the video.",
             "MEDIA_ERR_SRC_NOT_SUPPORTED": "The video format or source is not supported.",
             "default": "An unknown error occurred.",
-            "missingResoltions": "Player Didn't Find any video Resolutions"
+            "missingResoltions": "Player Didn't Find any video Resolutions",
+            "notfound": "Failed Find Urls"
         },
         "upNext": {
             "title": "Next Episode Playing in {{sec}} seconds",
@@ -362,7 +444,8 @@
         "toastscreenshot": {
             "failed": "Failed To save Screenshot",
             "doneclip": "Image Saved To the Clipboard Succesfully",
-            "donefile": "Image Saved To File Succesfully"
+            "donefile": "Image Saved To File Succesfully",
+            "done": "Screenshot Succesfully Saved"
         }
     },
     "history": {
@@ -374,21 +457,18 @@
         "continuefailed": "Failed Removing Anime from Continue Watch"
     },
     "oldBackup": {
-        "backupcontinue": "Backing up old Continue Watch file: Done",
-        "convertcontinue": "Converting Continue Watch: Success {{success}}, Failed {{failed}}",
-        "convertcontinuedone": "Converting Continue Watch Done: Succes {{success}}, Failed {{failed}}",
-        "convertcontinuefailed": "Failed to convert old continue watch to new",
-        "backuphistory": "Backing Up old History file: Done",
-        "converthistory": "Convert History: Success {{success}}, Failed {{failed}}",
-        "converthistorydone": "Converting Continue Watch Done: Succes {{success}}, Failed {{failed}}",
-        "converthistoryfailed": "Failed to convert old Watch History to new",
-        "failedconvert": "Failed to Covert {{title}}"
+        "convert": "Converting Success {{success}} / Failed {{failed}}",
+        "done": "Converting Done",
+        "oldhistory": "Detected Old history",
+        "oldcontinue": "Detected Old Continue Watch",
+        "failedconvertall": "Failed Convert all History"
     },
     "update": {
         "available": "Update {{ver}} is available now, click to update",
         "progress": "Download Progress {{procent}}%",
         "done": "Update Downloaded, please restart the application",
-        "same": "You have The newest version of Animu"
+        "same": "You have The newest version of Animu",
+        "failed": "Failed to check for updates"
     },
     "discordrpc": {
         "home": "In home",
@@ -421,7 +501,8 @@
         "rain_kyle": "Chinese Translation",
         "akashiro": "Russian Translation",
         "talon": "For making a discord server",
-        "zomi": "For making a new icon"
+        "zomi": "For making a new icon",
+        "TheCrabeuh": "Tester Animu"
     },
     "week": {
         "infoCommunicat": "Episode {{ep}} {{day}} At {{hours}}",

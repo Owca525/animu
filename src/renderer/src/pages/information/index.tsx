@@ -101,7 +101,7 @@ function information() {
 
         setcontextMenu([
             {
-                option: "Copy Anime Link",
+                option: t("information.copylink"),
                 onClick: async () => await SaveToClipboard("text", `${config.deepLinkURL}/?anime=${btoa(JSON.stringify(anime))}`)
             }
         ])
@@ -183,10 +183,10 @@ function information() {
     }
 
     async function ChangeAnimeInInformation(data: AnimeData): Promise<any> {
-        const idToast = toast("Fetching Anime", { removeTimer: true, type: "loading" })
+        const idToast = toast(t("notification.fetchinganime"), { removeTimer: true, type: "loading" })
         const resp = await getInformationPlugin().anime(data.id)
-        if (!resp) return updateToast(idToast, "Failed Fetch Anime", { type: "error", removeTimer: false })
-        updateToast(idToast, "Succesfully Fetched Anime", { type: "success", removeTimer: false })
+        if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", removeTimer: false })
+        updateToast(idToast,  t("notification.successanime"), { type: "success", removeTimer: false })
 
         // Reseting Recomendation
         setTmpData((prev) => ({ ...prev, anime: { ...prev.anime, recommendations: undefined } }))
@@ -487,7 +487,7 @@ function information() {
                                     </div>
                                 </Match>
                                 <Match when={tempData().anime.recommendations && tempData().anime.recommendations!.length > 0 && !fetchingAnime()}>
-                                    <Container title='Recomendation' horizontal data={tempData().anime.recommendations!.map((item) => ({
+                                    <Container title="information.recomendation" horizontal data={tempData().anime.recommendations!.map((item) => ({
                                         AnimeData: {
                                             title: item.title,
                                             bannerImage: item.bannerImage,

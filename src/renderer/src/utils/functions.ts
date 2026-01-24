@@ -248,7 +248,7 @@ export function CreateContextMenuOptions(start?: ContextMenuProps, center?: Cont
     ContextMenu.push({
         option: t("dialog.exit"), onClick: () => showDialog({
             type: "info",
-            title: "Action",
+            title: t("global.action"),
             description: t("global.exitAnimu"),
             buttons: [
                 {

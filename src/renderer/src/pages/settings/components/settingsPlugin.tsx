@@ -5,6 +5,7 @@ import { CreateContextMenuOptions, openUrlFolder } from "@renderer/utils/functio
 import { informationPluginFormat, playerPluginFormat } from "@renderer/utils/types";
 import { Show } from "solid-js";
 import icon from '@resources/icon.png';
+import { t } from "@renderer/utils/i18n";
 
 interface SettingsPluginProps {
     active: boolean,
@@ -24,8 +25,8 @@ export default function SettingsPlugin(props: SettingsPluginProps) {
                 "home" in props.plugin ? "" :
                     OpenContextMenu(
                         CreateContextMenuOptions(
-                            props.isHidden ?    [{ option: "UnHide Plugin", onClick: () => props.unHidePlugin(props.plugin as playerPluginFormat) }] : 
-                                [{ option: "Hide Plugin", onClick: () => props.hidePlugin(props.plugin as playerPluginFormat, props.active) }]
+                            props.isHidden ?    [{ option: t("settings.extensions.unhideplugin"), onClick: () => props.unHidePlugin(props.plugin as playerPluginFormat) }] : 
+                                [{ option: t("settings.extensions.hideplugin"), onClick: () => props.hidePlugin(props.plugin as playerPluginFormat, props.active) }]
                         ),
                         event
                     )
@@ -46,9 +47,9 @@ export default function SettingsPlugin(props: SettingsPluginProps) {
             <div class="settings-extension-bottom">
                 <div class="settings-extension-bottom-left">
                     <Show when={props.plugin.metadata.urlWebsite}>
-                        <span class='settings-extension-mini-button' onclick={() => openUrlFolder(props.plugin.metadata.urlWebsite!)}>Website</span>
+                        <span class='settings-extension-mini-button' onclick={() => openUrlFolder(props.plugin.metadata.urlWebsite!)}>{t("settings.extensions.website")}</span>
                     </Show>
-                    <span class='settings-extension-mini-button' >{"home" in props.plugin ? "Information" : "Player"}</span>
+                    <span class='settings-extension-mini-button' >{"home" in props.plugin ? t("settings.extensions.information") : t("settings.extensions.player")}</span>
                 </div>
                 <div class='settings-extension-bottom-right'>
                     <Show when={props.plugin.config}>

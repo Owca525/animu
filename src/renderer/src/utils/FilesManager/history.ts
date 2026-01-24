@@ -5,6 +5,7 @@ import { refetchHistory } from '../functions';
 import { toast, updateToast } from '../context/ToastNotification';
 import { unwrap } from 'solid-js/store';
 import { searchInAnilist } from '@renderer/plugins/anilistApi';
+import { t } from '../i18n';
 
 export async function DeleteFromHistory(data: cardData) {
     try {
@@ -84,7 +85,7 @@ async function convertToNewVersion(data: { id: string, title: string, img: strin
     let animeList: cardData[] = []
     let success: number = 0
     let failed: number = 0
-    const updatedToast = toast(`Converting Success ${success} / Failed ${failed}`, { type: "loading", removeTimer: true })
+    const updatedToast = toast(t("oldBackup.convert", { success, failed }), { type: "loading", removeTimer: true })
     for (let index = 0; index < data.length; index++) {
         const anime = data[index];
         try {
@@ -113,9 +114,9 @@ async function convertToNewVersion(data: { id: string, title: string, img: strin
         } catch (error) {
             failed += 1
         }
-        updateToast(updatedToast, `Converting Success ${success} / Failed ${failed}`)
+        updateToast(updatedToast, t("oldBackup.convert", { success, failed }))
     }
-    updateToast(updatedToast, "Converting Done", { type: "success", removeTimer: false })
+    updateToast(updatedToast, "oldBackup.done", { type: "success", removeTimer: false })
     return animeList
 }
 
@@ -128,7 +129,7 @@ export async function DetectOldVersionHistory() {
             if (Array.isArray(history)) {
                 if ("id" in history[0]) {
                     await CreateBackup()
-                    toast("Detected Old history")
+                    toast("oldBackup.oldhistory")
                     await window.api.os.write("history.json", JSON.stringify(await convertToNewVersion(history)))
                 }
             }
@@ -138,14 +139,14 @@ export async function DetectOldVersionHistory() {
             let continueWatch = JSON.parse(tmpcontinueWatch as string)
             if ("continue" in continueWatch) {
                 if ("id" in continueWatch["continue"][0]) {
-                    toast("Detected Old Continue Watch", { type: "success" })
+                    toast("oldBackup.oldcontinue", { type: "success" })
                     await window.api.os.write("continueWatch.json", JSON.stringify(await convertToNewVersion(continueWatch)))
                 }
             }
         }
 
     } catch (error) {
-        toast("Failed Convert all History", { type: "error" })
+        toast("oldBackup.failedconvertall", { type: "error" })
         console.error("Error in DetectOldVersionHistory", error)
     }
 }

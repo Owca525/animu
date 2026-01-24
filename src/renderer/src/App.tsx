@@ -30,7 +30,7 @@ import { HashRouter, Route } from '@solidjs/router';
 import { getInformationPlugin, pluginManager } from './utils/stores/plugins';
 import { setHomeActivePage } from './utils/stores/home';
 import { toast, updateToast } from './utils/context/ToastNotification';
-import { useI18n } from './utils/i18n';
+import { t, useI18n } from './utils/i18n';
 import './App.css';
 import './themes/darkerAnimu/main.css';
 import './utils/i18n';
@@ -51,7 +51,7 @@ function App() {
     })
     createShortcut(["Control", "Shift", "R"], async () => {
       if (getConfig().Developer.DeveloperMode) {
-        const idToast = toast("Reloading Thmes", { type: "loading", removeTimer: true })
+        const idToast = toast(t("global.themereload"), { type: "loading", removeTimer: true })
         setGlobalTheme(await window.api.themes.list())
 
         const loadedTheme = getGlobalCache().loadedTheme
@@ -65,7 +65,7 @@ function App() {
         }
         changeTheme(loadingTheme)
 
-        updateToast(idToast, "Reloading Thmes", { type: "success", removeTimer: false })
+        updateToast(idToast, t("global.themereload"), { type: "success", removeTimer: false })
         await window.backend.refresh()
       }
       await import("./utils/exports")
@@ -74,7 +74,7 @@ function App() {
 
   createShortcut(["Control", "I"], () => {
     setIncognitoMode(!getGlobalCache().incognito)
-    toast(`Incognito Mode: ${getGlobalCache().incognito ? "On" : "Off"}`)
+    toast(t("global.incognitomode", { switch: getGlobalCache().incognito ? t("global.on") : t("global.off") }))
   })
 
   onMount(async () => {

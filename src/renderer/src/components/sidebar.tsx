@@ -116,7 +116,7 @@ export default function Sidebar(props: sidebarProps) {
         <div class={`sidebar-top ${detectSidebarStateContainers()}`}>
           <Show when={!props.showLogo}>
             <Button icon={"arrow_back"}
-              content={detectSidebarStateButton("Hide Sidebar")}
+              content={detectSidebarStateButton(t("sidebar.hide"))}
               onClick={(event) => { setHomeSearchPage(1); hideSidebar(event, undefined) }}
               ButtonClass={detectSidebarStateClass()}
               iconClassName="sidebar-button"

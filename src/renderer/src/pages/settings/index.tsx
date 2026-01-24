@@ -74,7 +74,7 @@ function settings() {
         {
             option: "dialog.exit", onClick: () => showDialog({
                 type: "info",
-                title: "Action",
+                title: t("global.action"),
                 description: t("global.exitAnimu"),
                 buttons: [
                     {
@@ -109,7 +109,7 @@ function settings() {
             },
             {
                 icon: "file_copy",
-                text: "Files",
+                text: "global.files",
                 onClick: () => setCategory("files"),
             },
             {
@@ -148,7 +148,7 @@ function settings() {
         if (config().new.Developer.DeveloperMode) return
         showDialog({
             type: "info",
-            title: "Action",
+            title: t("global.action"),
             description: t("settings.turnDeveloper"),
             buttons: [
                 {
@@ -277,8 +277,8 @@ function settings() {
     function backupWarning(file: string, date: string) {
         showDialog({
             type: "info",
-            title: "Action",
-            description: `Do you want restore backup from ${date}?`,
+            title: t("global.action"),
+            description: t("settings.backup.askrestore", { date }),
             buttons: [{
                 title: "No",
                 onClick: () => ""
@@ -474,7 +474,7 @@ function settings() {
                             </div> */}
                             <SettingsDrop LeftHeader={t("settings.general.theme")} leftbutton={{ icon: "folder", onClick: async () => window.api.open(await convertPath(`${await window.api.os.getConfigPath()}/themes`)) }} content={
                                 <div class="settings-theme-spliter">
-                                    <span class='settings-theme-span'>Active Theme</span>
+                                    <span class='settings-theme-span'>{t("settings.theme.active")}</span>
                                     <div class="settings-theme-container">
                                         <For each={[...activeThemes().entries()].reverse()}>
                                             {([id, value]) => (<div class={`settings-button-theme ${value.themeName != "DarkerAnimu" && [...activeThemes().entries()].length > 2 ? "button" : ""}`} onclick={() => value.themeName != "DarkerAnimu" ? updateTheme(value, true, id) : ""}>
@@ -493,7 +493,7 @@ function settings() {
                                             )}
                                         </For>
                                     </div>
-                                    <span class='settings-theme-span'>Loaded Theme</span>
+                                    <span class='settings-theme-span'>{t("settings.theme.loaded")}</span>
                                     <div class="settings-theme-container">
                                         <For each={themes()}>
                                             {(value) => (
@@ -968,14 +968,14 @@ function settings() {
                             <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.ScreenShot)} keyBind={(keys) => handleChange("Player.keybinds.ScreenShot", keys)} />
                         </div>
                         <div class="settings-setting-container">
-                            {"Screenshot Without Subttitles"}
+                            {t("settings.player.keybinds.screenshot2")}
                             <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.noSubbtitlesreenshot)} keyBind={(keys) => handleChange("Player.keybinds.noSubbtitlesreenshot", keys)} />
                         </div>
                     </div>
                 </Show>
                 <Show when={category() == "files"}>
                     <div class="settings-page-container">
-                        <div class="settings-page-title">{"History Managment"}</div>
+                        <div class="settings-page-title">{t("settings.history.managment")}</div>
                         <div class="settings-setting-container">
                             {t("settings.history.limited")}
                             <CheckBox
@@ -1022,14 +1022,14 @@ function settings() {
                         </div>
                     </div>
                     <div class="settings-page-container">
-                        <div class="settings-page-title">{"Backup"}</div>
+                        <div class="settings-page-title">{t("settings.backup.title")}</div>
                         <div class="settings-setting-container">
-                            {"Backup Making"}
-                            <Button content="Make New Backup" onClick={CreateBackup} />
+                            {t("settings.backup.make")}
+                            <Button content={t("settings.backup.newbackup")} onClick={CreateBackup} />
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {"Enable Backups"}
+                            {t("settings.backup.enable")}
                             <CheckBox
                                 checked={config().new.backup.enable}
                                 onChecked={(checked) =>
@@ -1039,7 +1039,7 @@ function settings() {
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {"When Making Backup"}
+                            {t("settings.backup.when")}
                             <ButtonGroup selectedValue={t(`settings.general.${config().new.backup.check.toLowerCase().replaceAll(" ", "")}`)} listValues={[
                                 { value: t("settings.general.everyday"), onClick: () => handleChange("update.type", "Every Day") },
                                 { value: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
@@ -1049,7 +1049,7 @@ function settings() {
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {"Max number of backups"}
+                            {t("settings.backup.max")}
                             <SettingsInput
                                 iconChar=""
                                 type="number"
@@ -1057,14 +1057,14 @@ function settings() {
                                 startValue={config().new.backup.maxBackups.toString()}
                             />
                         </div>
-                        <SettingsDrop LeftHeader="Backups" leftbutton={{ icon: "folder", onClick: async () => window.api.open(await convertPath(`${await window.api.os.getBrowserConfigPath()}/animuBackup`)) }} content={
+                        <SettingsDrop LeftHeader={t("settings.backup.backups")} leftbutton={{ icon: "folder", onClick: async () => window.api.open(await convertPath(`${await window.api.os.getBrowserConfigPath()}/animuBackup`)) }} content={
                             <div class="settings-backup-container">
                                 <For each={backupList().reverse()}>
                                     {(value) => {
                                         const [year, month, day, hour, min] = [value.date.getFullYear(), value.date.getMonth(), value.date.getDate(), value.date.getHours(), value.date.getMinutes()]
                                         return (
                                             <span class="settings-button-backup" onclick={() => backupWarning(value.file, `${year}/${month}/${day} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`)}>
-                                                Backup From <span class="settings-button-date">{`${year}/${month.toString().padStart(2, "0")}/${day.toString().padStart(2, "0")} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`}</span>
+                                                {t("settings.backup.from")} <span class="settings-button-date">{`${year}/${month.toString().padStart(2, "0")}/${day.toString().padStart(2, "0")} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`}</span>
                                             </span>
                                         )
                                     }}
@@ -1117,22 +1117,22 @@ function settings() {
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            Toast Notification Test
+                            {t("settings.devmode.notificationtest")}
                             <span class="settings-custom-space">
-                                <Button content="success" onClick={() => toast("Test Notification", { type: "success" })} />
-                                <Button content="error" onClick={() => toast("Test Notification", { type: "error" })} />
-                                <Button content="loading" onClick={() => toast("Test Notification", { type: "loading" })} />
-                                <Button content="default" onClick={() => toast("Test Notification")} />
+                                <Button content={t("types.success")} onClick={() => toast(t("notification.test"), { type: "success" })} />
+                                <Button content={t("types.error")} onClick={() => toast(t("notification.test"), { type: "error" })} />
+                                <Button content={t("types.loading")} onClick={() => toast(t("notification.test"), { type: "loading" })} />
+                                <Button content={t("types.default")} onClick={() => toast(t("notification.test"))} />
                             </span>
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            Dialog Test
+                            {t("settings.devmode.dialogtest")}
                             <span class="settings-custom-space">
-                                <Button content="error" onClick={() =>
+                                <Button content={t("types.error")} onClick={() =>
                                     showDialog({
                                         type: "error",
-                                        title: "Error in Player",
+                                        title: t("global.action"),
                                         description: t("player.error.notfound"),
                                         buttons: [{
                                             title: t("dialog.exit"),
@@ -1140,10 +1140,10 @@ function settings() {
                                         }]
                                     })
                                 } />
-                                <Button content="info" onClick={() =>
+                                <Button content={t("types.info")} onClick={() =>
                                     showDialog({
                                         type: "info",
-                                        title: "Info in Player",
+                                        title: t("global.action"),
                                         description: t("player.error.notfound"),
                                         buttons: [{
                                             title: t("dialog.exit"),
@@ -1174,7 +1174,7 @@ function settings() {
                     <div class="settings-page-container">
                         <div class="settings-page-title">{t("global.extensions")}</div>
                         <div class="settings-setting-container">
-                            Use User Plugins
+                            {t("settings.extensions.userplugins")}
                             <CheckBox
                                 checked={config().new.plugins.userPlugins}
                                 onChecked={(checked) =>
@@ -1184,15 +1184,15 @@ function settings() {
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            Check Plugins Update
-                            <Button content='Check updates' onClick={async () => {
+                            {t("settings.extensions.updateplugin")}
+                            <Button content={t("settings.general.checkupdate")} onClick={async () => {
                                 await fetchPluginRepos()
                                 await detectPluginVersion()
                             }}/>
-                        </div>/
+                        </div>
                         <div class="settings-line"></div>
                         <div class="settings-container-extensions-menu">
-                            <span class='settings-container-title'>Installed Plugin</span>
+                            <span class='settings-container-title'>{t("settings.extensions.installed")}</span>
                             <div class="settings-container-extensions">
                                 <For each={pluginList()}>
                                     {(tmp) => (
@@ -1203,7 +1203,7 @@ function settings() {
                                 </For>
                             </div>
                             <Show when={hiddenPluginList().length > 0}>
-                                <span class='settings-container-title'>Hidden Plugin</span>
+                                <span class='settings-container-title'>{t("settings.extensions.hidden")}</span>
                                 <div class="settings-container-extensions">
                                     <For each={pluginList()}>
                                         {(tmp) => (
@@ -1234,6 +1234,7 @@ function settings() {
                         <div class="settings-setting-container"><div class="settings-user-title">Ary</div>  {t("credits.ary")}</div>
                         <div class="settings-setting-container"><div class="settings-user-title">Rain_kyle</div>  {t("credits.rain_kyle")}</div>
                         <div class="settings-setting-container"><div class="settings-user-title">AkaShiro</div>  {t("credits.akashiro")}</div>
+                        <div class="settings-setting-container"><div class="settings-user-title">TheCrabeuh</div>  {t("credits.TheCrabeuh")}</div>
                     </div>
                     <div class="settings-page-container">
                         <div class="settings-page-title">{t("settings.general.specialthanks")}</div>

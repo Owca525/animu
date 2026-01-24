@@ -32,15 +32,15 @@ export default function ImageViewer(props: { files: string[], disable: () => voi
     async function saveAsFile() {
         try {
             let resp = await request(file())
-            if (!resp.success) return toast("Failed Fetch Image", {type: "error"})
+            if (!resp.success) return toast(t("imageviewer.failedfetch"), {type: "error"})
             const pathname = new URL(file()).pathname;
             const filename = pathname.split("/").pop();
-            if (!filename) return toast("Failed Save Image", {type: "error"})
-            window.api.os.saveDialog(filename, resp.buffer, "Saving Image", "Test", [])
+            if (!filename) return toast(t("imageviewer.failedsave"), {type: "error"})
+            window.api.os.saveDialog(filename, resp.buffer, t("imageviewer.saving"), "Test", [])
             return
         } catch (error) {
             console.error(error)
-            toast("Failed Save Image", {type: "error"})
+            toast(t("imageviewer.failedsave"), {type: "error"})
             return
         }
     }
@@ -102,7 +102,7 @@ export default function ImageViewer(props: { files: string[], disable: () => voi
                     onError={() => {
                         setImageLoading(false)
                         setImageError(true)
-                        toast("Failed Load Image", {type: "error"})
+                        toast(t("imageviewer.failedload"), {type: "error"})
                     }}
                     style={{
                         transform: `translate(${pos().x}px, ${pos().y}px) scale(${scale()})`,

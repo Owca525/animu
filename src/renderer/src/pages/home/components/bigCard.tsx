@@ -31,12 +31,12 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
     async function goToPlayer(saveData?: indentityPlayer, id?: string): Promise<any> {
         let plugin = pluginManager().currentPlugin
         if (saveData) plugin = pluginManager().changePlugin(saveData.pluginName)
-        if (!plugin) return toast("Failed Load Plugin", { type: "error" })
+        if (!plugin) return toast(t("notification.failedplugin"), { type: "error" })
         
-        const idToast = toast("Fetching Anime", { type: "loading", removeTimer: true })
+        const idToast = toast(t("notification.fetchinganime"), { type: "loading", removeTimer: true })
         if (!saveData && !id) {
             const response = await plugin.extractEpisodeList(data.AnimeData)
-            if (!response || response.episodesData.length <= 0) return updateToast(idToast, "Failed Fetching Anime", { type: "error", removeTimer: false })
+            if (!response || response.episodesData.length <= 0) return updateToast(idToast, t("notification.failedanime"), { type: "error", removeTimer: false })
             localStorage.setItem("playerCache", JSON.stringify({
                 data: {
                     ...data.AnimeData,
@@ -55,7 +55,7 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
         if (saveData && id) {
             const episodeList = await plugin.extractOnlyEpisodesList(saveData.type, id);
             if (episodeList.length <= 0) {
-                updateToast(idToast, "Failed Fetch episodes", { type: "error", removeTimer: false })
+                updateToast(idToast, t("notification.failedepisodes"), { type: "error", removeTimer: false })
                 return
             }
 
@@ -83,10 +83,10 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
         console.log(airing)
 
         try {
-            if (!animeContinue && !historyContinue) return <Button content='Watch Now' ButtonClass='big-card-button' onClick={() => goToPlayer()} />
-            if (animeContinue) return <Button content={`Continue Episode ${animeContinue.saveData?.episode}`} ButtonClass='big-card-button' onClick={() => goToPlayer(animeContinue.saveData, animeContinue.AnimeData.player_ID)} />
+            if (!animeContinue && !historyContinue) return <Button content={t("home.bigcard.now")} ButtonClass='big-card-button' onClick={() => goToPlayer()} />
+            if (animeContinue) return <Button content={t("history.continue", { ep: animeContinue.saveData?.episode })} ButtonClass='big-card-button' onClick={() => goToPlayer(animeContinue.saveData, animeContinue.AnimeData.player_ID)} />
             if (historyContinue && parseInt(historyContinue.saveData.episode!) <= historyContinue.AnimeData.episodes! && airing < parseInt(historyContinue.saveData.episode!)) {
-                return <Button content={`Start Episode ${parseInt(historyContinue.saveData.episode!)+1}`} ButtonClass='big-card-button' onClick={() => goToPlayer({...historyContinue.saveData, episode: `${parseInt(historyContinue.saveData.episode!)+1}`} as indentityPlayer, historyContinue.AnimeData.player_ID)} />
+                return <Button content={t("home.bigcard.start", { ep: parseInt(historyContinue.saveData.episode!)+1 })} ButtonClass='big-card-button' onClick={() => goToPlayer({...historyContinue.saveData, episode: `${parseInt(historyContinue.saveData.episode!)+1}`} as indentityPlayer, historyContinue.AnimeData.player_ID)} />
             }
         } catch (error) {}
         return <></>
@@ -119,7 +119,7 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
                         <div class="big-card-information-genres-content">
                             <Show when={data.AnimeData.genres}>
                                 <For each={data.AnimeData.genres}>
-                                    {(value) => (<div class="big-card-information-genres">{value as string}</div>)}
+                                    {(value) => (<div class="big-card-information-genres">{t(`anime_genres.${value.toLowerCase()}`)}</div>)}
                                 </For>
                             </Show>
                         </div>
@@ -131,12 +131,12 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
                                 <div class="big-card-information-status">{t(`anime_statuses.${data.AnimeData.status?.toLowerCase()}`)}</div>
                             </Show>
                             <Show when={data.AnimeData.episodes}>
-                                <div class="big-card-information-episode">{formatEpisode() != "" ? `${formatEpisode()} /` : ""} {data.AnimeData.episodes} Episodes</div>
+                                <div class="big-card-information-episode">{formatEpisode() != "" ? `${formatEpisode()} /` : ""} {data.AnimeData.episodes} {t("home.bigcard.episodes")}</div>
                             </Show>
                         </div>
                         <div class="big-card-information-bottom">
                             {generateButton()}
-                            <Button content='More Information' ButtonClass='big-card-button' onClick={openInformation} />
+                            <Button content={t("home.bigcard.information")} ButtonClass='big-card-button' onClick={openInformation} />
                             <Show when={data.AnimeData.nextAiringEpisode}>
                                 <div class="big-card-information-date">{getEpisodeDay(data.AnimeData.nextAiringEpisode?.timeUntilAiring!, data.AnimeData.nextAiringEpisode?.episode!)}</div>
                             </Show>

@@ -25,8 +25,8 @@ const player = () => {
     if (!anime_data || !anime_data.save || !anime_data.episodelist || !anime_data.data) {
         showDialog({
             type: "error",
-            title: "Error In Player",
-            description: "Missing data to extract urls",
+            title: t("player.errors.player"),
+            description: t("player.errors.missing"),
             buttons: [{
                 title: t("dialog.return"),
                 onClick: () => navigate("/")
@@ -113,7 +113,7 @@ const player = () => {
     function showErrorDialog() {
         showDialog({
             type: "error",
-            title: "Error In Player",
+            title: t("player.errors.player"),
             description: t("player.error.notfound"),
             buttons: [
                 {

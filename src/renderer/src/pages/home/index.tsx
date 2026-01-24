@@ -103,14 +103,14 @@ const Home = () => {
     let anime: deepLinkData | undefined;
     try {
       anime = JSON.parse(atob(deeplink.replaceAll("animu://", "")))
-    } catch (error) { console.log("Failed fetching Deeplink", error) }
+    } catch (error) { console.log(t("deeplink.failed"), error) }
     if (!anime) return
 
     const infoPlugin = getInformationPlugin()
-    const idToast = toast("Fetching Anime", { type: "loading", removeTimer: true })
+    const idToast = toast(t("notification.fetchinganime"), { type: "loading", removeTimer: true })
     const response = await infoPlugin.anime(anime.animeID)
-    if (!response) return updateToast(idToast, "Failed Fetch Anime", { type: "error", removeTimer: false })
-    updateToast(idToast, "Sucesfully Fetched Anime", { type: "success", removeTimer: false })
+    if (!response) return updateToast(idToast, t("notification.failedanime"), { type: "error", removeTimer: false })
+    updateToast(idToast, t("notification.successanime"), { type: "success", removeTimer: false })
 
     if (!anime.player) {
       localStorage.setItem("informationCache", JSON.stringify({ anime: response }))
@@ -118,12 +118,12 @@ const Home = () => {
       return
     }
 
-    const toastID = toast("Fetching Episode List", { type: "loading", removeTimer: true })
+    const toastID = toast(t("notification.episodesfetching"), { type: "loading", removeTimer: true })
     const currentPLugin = pluginManager().changePlugin(anime.player.plugin)
     const episodeList = await currentPLugin.extractOnlyEpisodesList(anime.player.type, anime.player.id);
 
     if (episodeList.length <= 0) {
-      updateToast(toastID, "Failed Fetch episodes", { type: "error", removeTimer: false })
+      updateToast(toastID, t("notification.episodesfailed"), { type: "error", removeTimer: false })
       return
     }
 

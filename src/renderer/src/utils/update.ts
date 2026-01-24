@@ -28,7 +28,7 @@ export async function checkUpdate(alwaysShow: boolean = false) {
     saveConfig(config);
   } catch (error) {
     console.error("Error in checkUpdate", error);
-    toast("Failed to check for updates", { type: "error" });
+    toast(t("update.failed"), { type: "error" });
   }
 }
 
