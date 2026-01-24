@@ -546,3 +546,10 @@ export function loadedPluginsList() {
     const hiddenPlugins = new Set(getConfig().plugins.hiddenPlugins)
     return plugins.filter((p) => !hiddenPlugins.has(p.metadata.name))
 }
+
+export function detectIndex(str: string) {
+    const index = `${getRenderPath()}index.js`
+
+    if (str.includes("./index.js")) return str.replaceAll("./index.js", index)
+    else return str.replaceAll("index.js", index)
+}

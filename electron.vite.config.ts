@@ -43,9 +43,11 @@ export default defineConfig({
         output: {
           entryFileNames: "index.js",
           chunkFileNames: "[name].js",
-          assetFileNames: "[name][extname]"
+          assetFileNames: "[name][extname]",
+          minifyInternalExports: false
         }
-      }
+      },
+      minify: false,
     },
     plugins: [
       solid(),

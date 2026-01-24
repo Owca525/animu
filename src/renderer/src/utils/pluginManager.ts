@@ -1,13 +1,13 @@
 import AnilistApi from "@renderer/plugins/anilistApi";
 import { containerData, genresSearchFormat, informationPluginManagerFormat, informationPluginFormat, playerPluginManagerFormat, playerPluginFormat } from "./types";
 import { setAllHomeData } from "./stores/home";
-import { setPlayerPlugin, setPluginPlayerList } from "./stores/plugins";
+import { getPluginRepo, setPlayerPlugin, setPluginPlayerList } from "./stores/plugins";
 import Allmanga from "@renderer/plugins/allmanga";
 import Anizone from "@renderer/plugins/anizone";
 import GojoLive from "@renderer/plugins/gojoLive";
 import LycorisCafe from "@renderer/plugins/lycoriscafe";
 import { getConfig } from "./stores/config";
-import { getRenderPath } from "./functions";
+import { detectIndex, getRenderPath } from "./functions";
 import semver from "semver";
 // import Aowu from "@renderer/plugins/aowu";
 
@@ -39,19 +39,23 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
             return loadedPlugins[0]
         }
     }
-    loadPlugin = async (plugins: { file: string; content: string; type: "official" | "user"; sha256: string; pluginType: "player" | "information" }[], path: string) => {
+    loadPlugin = async (plugins: { file: string; content: string; type: "official" | "user"; sha256: string; pluginType: "player" | "information" }[]) => {
         const conf = getConfig()
+        const repoPlugins = getPluginRepo()
         let tmp: any[] = []
         for (let index = 0; index < plugins.length; index++) {
             const plugin = plugins[index];
             if (plugin.pluginType == "information") continue
             if (plugin.type != "official" && !conf.plugins.userPlugins) continue
+            const tmpPlugin = repoPlugins.find((v) => v.name.toLowerCase() == plugin.file.replaceAll(".js", "").toLowerCase())
+            console.log(tmpPlugin, plugin)
+            if (tmpPlugin && plugin.type != "user" && tmpPlugin.sha256 != plugin.sha256) continue 
             try {
-                const newBlob = new Blob([plugin.content.replaceAll("./index.js", path).replaceAll("index.js", path)], { type: "application/javascript" });
+                const newBlob = new Blob([detectIndex(plugin.content)], { type: "application/javascript" });
                 const newUrl = URL.createObjectURL(newBlob);
-                tmp.push(await import(newUrl))
+                tmp.push((await import(newUrl)).default)
             } catch (error) {
-                console.warn("Failed Load Module", error)
+                console.warn("Failed Load Module", error, plugin, detectIndex(plugin.content))
             }
         }
         return tmp
@@ -61,9 +65,8 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
         if (this.pluginList.length > 0) return
         const localPlugins = [Allmanga, Anizone, GojoLive, LycorisCafe]
 
-        const index = `${getRenderPath()}index.js`
         const plugins = await window.api.plugins.list()
-        const externalPlugins = await this.loadPlugin(plugins, index)
+        const externalPlugins = await this.loadPlugin(plugins)
 
         for (let index = 0; index < localPlugins.length; index++) {
             try {
@@ -72,7 +75,7 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
                 if (tmp.config) tmp.config = await window.api.plugins.getConfig(tmp.metadata.name, tmp.config)
                 this.pluginList.push(tmp)
             } catch (error) {
-                console.warn("Failed Load Module", error)
+                console.warn("Failed Load Module", error, localPlugins[index])
             }
         }
 
@@ -83,7 +86,7 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
                 if (tmp.config) tmp.config = await window.api.plugins.getConfig(tmp.metadata.name, tmp.config)
                 this.pluginList.push(tmp)
             } catch (error) {
-                console.warn("Failed Load Module", error)
+                console.warn("Failed Load Module", error, externalPlugins[index])
             }
         }
 
@@ -117,6 +120,7 @@ export class informationPluginManager implements informationPluginManagerFormat 
         const path = `${getRenderPath()}index.js`
         const plugins = await window.api.plugins.list()
         const infoPlugins = plugins.filter((t) => t.pluginType == "information")
+        const repoPlugins = getPluginRepo()
 
         if (infoPlugins.length <= 0) {
             const tmp = new AnilistApi()
@@ -125,10 +129,11 @@ export class informationPluginManager implements informationPluginManagerFormat 
             return
         }
 
-        for (let index = 0; index < plugins.length; index++) {
-            const element = plugins[index];
-            if (element.pluginType == "player") continue
-
+        for (let index = 0; index < infoPlugins.length; index++) {
+            const element = infoPlugins[index];
+            if (element.file.toLowerCase() != "anilistapi.js") continue
+            const tmpPlugin = repoPlugins.find((v) => v.name.toLowerCase() == element.file.replaceAll(".js", "").toLowerCase())
+            if (tmpPlugin && tmpPlugin.sha256 != element.sha256) continue
             if (element.type == "official" && !conf.plugins.userPlugins) {
                 const newBlob = new Blob([element.content.replaceAll("./index.js", element.file).replaceAll("index.js", path)], { type: "application/javascript" });
                 const newUrl = URL.createObjectURL(newBlob);

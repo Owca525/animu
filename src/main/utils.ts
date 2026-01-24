@@ -6,12 +6,13 @@ import crypto from 'crypto';
 
 import path from "path"
 import fs from "fs"
-import { mainWindow, newConfigPath, pluginsConfigPath, themeConfigPath } from ".";
+import { animuPlugins, mainWindow, newConfigPath, pluginsConfigPath, themeConfigPath } from ".";
 import { exec, execSync } from "child_process";
 // import express from "express";
 // import { Readable } from "stream";
 import os from "os"
-import { themeFormatType, ThemeSchema } from "./types";
+import { pluginRepoExpanded, themeFormatType, ThemeSchema } from "./types";
+import { advanceRequest } from "./request";
 // import { requestResponseVideo } from "./types";
 
 let rpc: Client | undefined = undefined
@@ -439,3 +440,9 @@ function generetaPluginConfig(name: string, config: { [key: string]: any }) {
 function savePluginConfig(name: string,config: { [key: string]: any }) {
     fs.writeFileSync(path.join(pluginsConfigPath, `${name}.ini`), ini.stringify(config), "utf-8")
 }
+
+ipcMain.handle("installPluginUpdate", async (_, plugin: pluginRepoExpanded) => {
+    const resp = await advanceRequest(`${plugin.repoURL}${plugin.file}`)
+    if (!resp.success || !resp.text) return
+    fs.writeFileSync(path.join(animuPlugins, path.basename(plugin.file)), resp.text, "utf-8")
+})

@@ -108,15 +108,6 @@ export interface globalDataFormat {
     deeplinkRunned: boolean,
     loadedTheme: themeMetadata[],
     activeThemes: Map<number, themeMetadata>
-    pluginRepo: {
-        sha256: string,
-        version: string,
-        file: string,
-        name: string,
-        author: string,
-        icon?: string,
-        description?: string
-    }[]
 }
 
 export type playerDataExtended = playerData & {
@@ -288,6 +279,7 @@ export interface SettingsConfig {
         // information: string
         userPlugins: boolean
         player: string
+        repoURL: string[]
     }
     General: {
         // HoverSidebar: boolean
@@ -421,3 +413,26 @@ export interface FilterParams {
     format?: string[];
     airing?: string;
 };
+
+export interface pluginRepo {
+    name: string,
+    file: string,
+    ver: string,
+    author: string,
+    urlWebsite: string,
+    icon?: string,
+    sha256: string,
+    description?: string
+}
+
+export type pluginRepoExpanded = {
+    name: string,
+    file: string,
+    ver: string,
+    author: string,
+    type: "information" | "player"
+    urlWebsite: string,
+    icon?: string,
+    sha256: string,
+    description?: string
+} & { repoURL: string }

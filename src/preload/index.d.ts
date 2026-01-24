@@ -1,5 +1,5 @@
 import { ElectronAPI } from "@electron-toolkit/preload";
-import { cardData, SettingsConfig, themeMetadata } from "@renderer/utils/types";
+import { cardData, pluginRepoExpanded, SettingsConfig, themeMetadata } from "@renderer/utils/types";
 
 declare global {
   interface Window {
@@ -70,6 +70,7 @@ declare global {
         list: () => Promise<{ file: string, content: string, type: "official" | "user", sha256: string, pluginType: "player" | "information" }[]>
         saveConfig: (name: string, config: { [key: string]: any }) => Promise<void>
         getConfig: (name: string, config: { [key: string]: any }) => Promise<{ [key: string]: any }>
+        installUpdate: (plugin: pluginRepoExpanded) => Promise<void>
       }
       runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string}, type: "mpv" | "vlc") => any
       getOSDetails: () => Promise<{ platform: NodeJS.Platform, release: string, arch: string }>

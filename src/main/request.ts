@@ -59,7 +59,7 @@ ipcMain.handle('send-post', async (_event, url: string, header: Record<string, s
 }
 )
 
-ipcMain.handle('advanceRequest', async (_, url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string } }) => {
+export async function advanceRequest(url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string } }) {
     try {
         const response = await fetch(url, options);
         console.log(response)
@@ -99,4 +99,6 @@ ipcMain.handle('advanceRequest', async (_, url: string, options?: { method?: "PO
             responseHeader: {}
         }
     }
-});
+}
+
+ipcMain.handle('advanceRequest', async (_, url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string } }) => await advanceRequest(url, options));

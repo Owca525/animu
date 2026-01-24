@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { electronAPI } from "@electron-toolkit/preload";
+import { pluginRepoExpanded } from "../main/types";
 
 const api = {};
 
@@ -57,6 +58,7 @@ if (process.contextIsolated) {
         list: () => ipcRenderer.invoke("externalPlugins"),
         saveConfig: (name: string, config: { [key: string]: any }) => ipcRenderer.invoke("savePluginConfig", name, config),
         getConfig: (name: string, config: { [key: string]: any }) => ipcRenderer.invoke("getPluginConfig", name, config),
+        installUpdate: (plugin: pluginRepoExpanded) => ipcRenderer.invoke("installPluginUpdate", plugin)
       },
       runExternaPlayer: (videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", videoData, type),
       getOSDetails: () => ipcRenderer.invoke('get-os-info'),

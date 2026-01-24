@@ -11,6 +11,7 @@ export interface SettingsConfig {
         hiddenPlugins: string[]
         userPlugins: boolean
         player: string
+        repoURL: string[]
     }
     General: {
         // HoverSidebar: boolean
@@ -288,7 +289,8 @@ export const defaultConfig: SettingsConfig = {
     plugins: {
         player: "Allmanga",
         userPlugins: false,
-        hiddenPlugins: []
+        hiddenPlugins: [],
+        repoURL: ["https://raw.githubusercontent.com/Owca525/animu-plugins/refs/heads/main"]
     },
     backup: {
         enable: false,
@@ -297,6 +299,18 @@ export const defaultConfig: SettingsConfig = {
         maxBackups: 3
     },
 };
+
+export type pluginRepoExpanded = {
+    name: string,
+    file: string,
+    ver: string,
+    author: string,
+    urlWebsite: string,
+    icon?: string,
+    sha256: string,
+    type: "information" | "player"
+    description?: string
+} & { repoURL: string }
 
 export interface themeFormatType {
     api?: string,

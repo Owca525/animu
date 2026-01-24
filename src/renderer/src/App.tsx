@@ -8,6 +8,7 @@ import {
   calculateZoomLevel,
   changeTheme,
   checkDate,
+  request,
   updateObjectConfig
 } from './utils/functions';
 import { checkUpdate } from './utils/update';
@@ -25,7 +26,7 @@ import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import { getConfig, setConfig } from './utils/stores/config';
 import { getGlobalCache, setGlobalHistory, setGlobalTheme, setIncognitoMode } from './utils/stores/global';
 import { HashRouter, Route } from '@solidjs/router';
-import { getInformationPlugin, pluginManager } from './utils/stores/plugins';
+import { getInformationPlugin, getPluginList, getPluginRepo, pluginManager, setPluginRepo } from './utils/stores/plugins';
 import { setHomeActivePage } from './utils/stores/home';
 import { toast, updateToast } from './utils/context/ToastNotification';
 import { useI18n } from './utils/i18n';
@@ -33,7 +34,8 @@ import './App.css';
 import './themes/darkerAnimu/main.css';
 import './utils/i18n';
 import { unwrap } from 'solid-js/store';
-import { themeMetadata } from './utils/types';
+import { pluginRepoExpanded, themeMetadata } from './utils/types';
+import semver from "semver";
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -93,12 +95,44 @@ function App() {
     setHomeActivePage("global.home")
 
     setinitialState({ text: "Loading Plugin", plugin: false })
+    await fetchPluginRepos()
     await getInformationPlugin().initial()
     await pluginManager().initialPlugins()
     setInitation(false)
+    detectPluginVersion()
 
     if (window.api) runCheckUpdate()
   })
+
+  async function detectPluginVersion() {
+    const plugins = unwrap(getPluginList())
+    const pluginsRepo = unwrap(getPluginRepo())
+    let reInitial = false
+    for (let index = 0; index < plugins.length; index++) {
+      const element = plugins[index];
+      const tmp = pluginsRepo.find((v) => v.name == element.metadata.name)
+      if (!tmp) continue
+      if (semver.gt(semver.coerce(tmp.ver), semver.coerce(element.metadata.version))) {
+        await window.api.plugins.installUpdate(tmp)
+        reInitial = true
+      }
+    }
+    if (reInitial) {
+      await getInformationPlugin().initial()
+      await pluginManager().initialPlugins()
+    }
+  }
+
+  async function fetchPluginRepos() {
+    const config = getConfig()
+    let tmp: pluginRepoExpanded[] = []
+    for (let index = 0; index < config.plugins.repoURL.length; index++) {
+      const element = config.plugins.repoURL[index];
+      const resp = await request(`${element}/database.json`)
+      if (resp.success && resp.json && resp.json != {} as any) resp.json.map((v) => ({ ...v, repoURL: element })).forEach(element => { tmp.push(element) }); 
+    }
+    setPluginRepo(tmp)
+  }
 
   function LoadConfig() {
     if (!window.api) return

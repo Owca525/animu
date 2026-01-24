@@ -7,13 +7,11 @@ export const [globalState, setGlobalState] = createStore({
     deeplinkRunned: false,
     loadedTheme: [],
     activeThemes: new Map(),
-    pluginRepo: []
 } as globalDataFormat);
 
 export const getGlobalCache = () => globalState;
 export const loadedTheme = () => globalState.loadedTheme;
 export const activeThemes = () => globalState.activeThemes;
-export const pluginRepo = () => globalState.pluginRepo;
 export const setActiveThemes = (tmp: Map<number, themeMetadata>) => setGlobalState((prev) => ({...prev, activeThemes: tmp}));
 export const setGlobalTheme = (tmp: themeMetadata[]) => setGlobalState((prev) => ({...prev, loadedTheme: tmp}));
 export const setIncognitoMode = (tmp: boolean) => setGlobalState((prev) => ({...prev, incognito: tmp}));
