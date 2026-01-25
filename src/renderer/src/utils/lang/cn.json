@@ -268,6 +268,7 @@
       "links": "實用連結"
     },
     "player": {
+      "animations": "播放器動畫",
       "play": "自動播放",
       "skip": "跳過",
       "volume": "音量",
@@ -341,7 +342,7 @@
       "check_start": "開始檢查歷史紀錄",
       "history_good": "歷史紀錄正常，無需更改",
       "continue_good": "繼續觀看正常，無需更改",
-      "check": "Check"
+      "check": "檢查/確認"
     },
     "saving": {
       "done": "設定已成功保存",
@@ -382,7 +383,8 @@
       "updateplugin": "檢查外掛更新",
       "website": "官方網站",
       "hideplugin": "隱藏外掛",
-      "unhideplugin": "顯示外掛"
+      "unhideplugin": "顯示外掛",
+      "conf": "設定：{{title}}"
     },
     "upNext": {
       "var1": "樣式 1",

@@ -328,7 +328,7 @@ function settings() {
     async function openThemeOption(theme: themeMetadata) {
         const themeConfig = await window.api.themes.config(unwrap(theme))
         showCustomMenu({
-            title: `Config: ${theme.themeName}`,
+            title: t("settings.extensions.conf", { title: theme.themeName }),
             themeConfig: {
                 theme: theme,
                 config: themeConfig,
@@ -364,7 +364,7 @@ function settings() {
     function openPluginSettings(plugin: playerPluginFormat | informationPluginFormat) {
         if (!plugin.config) return
         showCustomMenu({
-            title: `Config: ${plugin.metadata.name}`,
+            title: t("settings.extensions.conf", { title: plugin.metadata.name }),
             pluginConfig: {
                 config: plugin.config,
                 onChange: (v, a) => savePluginSettings(plugin.config as any, v, a, plugin)
@@ -760,7 +760,7 @@ function settings() {
                         </div>
                     </div>
                     <div class="settings-page-container">
-                        <div class="settings-page-title">{"Player Animations"}</div>
+                        <div class="settings-page-title">{t("settings.player.animations")}</div>
                         <div class="settings-setting-container">
                             {t("settings.playerUI.dvolumeanimation")}
                             <CheckBox

@@ -267,6 +267,7 @@
             "links": "Usefull Links"
         },
         "player": {
+            "animations": "Player Animations",
             "play": "Auto Play",
             "skip": "Automatically Play the Next Episode",
             "volume": "Default Volume",
@@ -381,7 +382,8 @@
             "updateplugin": "Check Plugins Update",
             "website": "Website",
             "hideplugin": "Hide Plugin",
-            "unhideplugin": "UnHide Plugin"
+            "unhideplugin": "UnHide Plugin",
+            "conf": "Config: {{title}}"
         },
         "upNext": {
             "var1": "Variant 1",

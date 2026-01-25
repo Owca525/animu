@@ -268,6 +268,7 @@
       "links": "Полезные ссылки"
     },
     "player": {
+      "animations": "Player Animations",
       "play": "Автовоспроизведение",
       "skip": "Автоматически воспроизводить следующий эпизод",
       "volume": "Громкость по умолчанию",
@@ -382,7 +383,8 @@
       "updateplugin": "Check Plugins Update",
       "website": "Website",
       "hideplugin": "Hide Plugin",
-      "unhideplugin": "UnHide Plugin"
+      "unhideplugin": "UnHide Plugin",
+      "conf": "Config: {{title}}"
     },
     "upNext": {
       "var1": "Вариант 1",
@@ -516,45 +518,5 @@
     "friday": "Friday",
     "saturday": "Saturday",
     "sunday": "Sunday"
-  },
-  "lang": {
-    "en": "English",
-    "pl": "Polski",
-    "de": "Deutsch",
-    "fr": "Français",
-    "es": "Español",
-    "it": "Italiano",
-    "pt": "Português",
-    "ru": "Русский",
-    "uk": "Українська",
-    "cs": "Čeština",
-    "sk": "Slovenčina",
-    "sl": "Slovenščina",
-    "hr": "Hrvatski",
-    "sr": "Српски",
-    "bg": "Български",
-    "ro": "Română",
-    "nl": "Nederlands",
-    "sv": "Svenska",
-    "no": "Norsk",
-    "da": "Dansk",
-    "fi": "Suomi",
-    "hu": "Magyar",
-    "el": "Ελληνικά",
-    "tr": "Türkçe",
-    "ar": "العربية",
-    "he": "עברית",
-    "fa": "فارسی",
-    "hi": "हिन्दी",
-    "bn": "বাংলা",
-    "ur": "اردو",
-    "zh": "中文",
-    "ja": "日本語",
-    "ko": "한국어",
-    "id": "Bahasa Indonesia",
-    "ms": "Bahasa Melayu",
-    "th": "ไทย",
-    "vi": "Tiếng Việt",
-    "cn": "中文"
   }
 }

@@ -255,7 +255,7 @@ async function requestForUrl(url: string): Promise<playerData | undefined> {
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.4",
+        version: "1.5",
         name: "Allmanga",
         author: "Owca525",
         icon: "https://allmanga.to/android-icon-192x192.png",
@@ -263,7 +263,7 @@ export default class Allmanga implements playerPluginFormat {
         urlWebsite: "https://allmanga.to",
     }
     config: { [key: string]: any; } = {
-        "Webiste": API_WEB,
+        "settings.extensions.website": API_WEB,
         "HASH_SEARCH": HASH_SEARCH,
         "HASH_INFO": HASH_INFO,
         "HASH_PLAYER": HASH_PLAYER,

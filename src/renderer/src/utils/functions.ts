@@ -566,7 +566,7 @@ export async function detectPluginVersion() {
         const element = plugins[index];
         const tmp = pluginsRepo.find((v) => v.name == element.metadata.name)
         if (!tmp) continue
-        if (semver.gt(semver.coerce(tmp.ver), semver.coerce(element.metadata.version))) {
+        if (semver.gt(semver.coerce(tmp.ver) as any, semver.coerce(element.metadata.version) as any)) {
             await window.api.plugins.installUpdate(tmp)
             reInitial = true
         }

@@ -118,7 +118,7 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
                         <div class="big-card-information-genres-content">
                             <Show when={data.AnimeData.genres}>
                                 <For each={data.AnimeData.genres}>
-                                    {(value) => (<div class="big-card-information-genres">{t(`anime_genres.${value.toLowerCase()}`)}</div>)}
+                                    {(value) => (<div class="big-card-information-genres">{t(`anime_genres.${value.toLowerCase().replaceAll(" ", "")}`)}</div>)}
                                 </For>
                             </Show>
                         </div>
