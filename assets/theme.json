@@ -1,0 +1,27 @@
+{
+    "api": 1,
+    "author": "example",
+    "mainCSS": "./example.css",
+    "themeName": "Example",
+    "version": "1.0",
+    "options": [
+        {
+            "name": "CheckBox",
+            "css": "./example.css",
+            "default": "false"
+        },
+        {
+            "name": "Dropdown",
+            "dropDown": [
+                {
+                    "option": "Example 1",
+                    "css": "./example.css"
+                },
+                {
+                    "option": "Example 2",
+                    "css": "./example.css"
+                }
+            ]
+        }
+    ]
+}
