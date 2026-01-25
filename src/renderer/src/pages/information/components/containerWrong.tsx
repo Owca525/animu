@@ -26,12 +26,12 @@ const ContainerWrong: Component<ContainerWrongProps> = ({ name, exitfunc, refetc
     })
 
     const response = useResponse({
-        queryKey: [searchName()],
+        queryKey: [searchName(), getPlayerPLugin()],
         queryFn: async (queryKey) => {
             const [name] = queryKey;
             let plugin = getPlayerPLugin()
             if (plugin)
-                return await plugin.searchAnime(name, 1);
+                return await plugin.searchAnime(name as string, 1);
             return [];
         },
         cacheTime: 2 * 60 * 60 * 1000,
@@ -43,10 +43,10 @@ const ContainerWrong: Component<ContainerWrongProps> = ({ name, exitfunc, refetc
                 <Input
                     placeholder={t("home.search")}
                     defaultValue={name}
-                    onKeyDown={(text) => {setSearchName(text);response.Refetch([searchName()])}}
+                    onKeyDown={(text) => {setSearchName(text);response.Refetch([searchName(), getPlayerPLugin()])}}
                 />
                 <Dropdown
-                    options={segregatePlugins((name) => { pluginManager().changePlugin(name); response.Refetch([searchName()]); })}
+                    options={segregatePlugins((name) => { pluginManager().changePlugin(name); response.Refetch([searchName(), getPlayerPLugin()]); })}
                     disableX
                     buttonText={getPlayerPLugin()?.metadata.name}
                 />
