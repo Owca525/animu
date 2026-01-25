@@ -15,7 +15,7 @@ import "./backup"
 import { convertToNewFormat, detectOldVersion, write } from './os'
 import { existsSync, mkdirSync, readFileSync } from 'fs'
 import { cardData, defaultConfig, SettingsConfig } from './types';
-import { deepMerge, detectZoom, setupDiscordRPC } from './utils';
+import { deepMerge, runCheckYT_DLP, detectZoom, setupDiscordRPC } from './utils';
 import { electronAppUniversalProtocolClient } from 'electron-app-universal-protocol-client';
 
 export let mainWindow: BrowserWindow | undefined
@@ -209,6 +209,7 @@ export async function initialBackend() {
       let data = readFileSync(path.join(newConfigPath, "history.json"), "utf-8")
       historyData = JSON.parse(data)
     }
+    runCheckYT_DLP()
 
     // if (existsSync(path.join(newConfigPath, "continueWatch.json"))) {
     //   let data = readFileSync(path.join(newConfigPath, "continueWatch.json"), "utf-8")

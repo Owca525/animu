@@ -6,7 +6,7 @@ import crypto from 'crypto';
 
 import path from "path"
 import fs from "fs"
-import { animuPlugins, mainWindow, newConfigPath, pluginsConfigPath, themeConfigPath } from ".";
+import { animuPlugins, config, mainWindow, newConfigPath, pluginsConfigPath, themeConfigPath } from ".";
 import { exec, execSync } from "child_process";
 // import express from "express";
 // import { Readable } from "stream";
@@ -15,6 +15,7 @@ import { pluginRepoExpanded, themeFormatType, ThemeSchema } from "./types";
 import { advanceRequest } from "./request";
 // import { requestResponseVideo } from "./types";
 
+let yt_dlp_releases_cache: Map<string, any>[] = []
 let rpc: Client | undefined = undefined
 
 // Client id for Discord Rich presence
@@ -49,10 +50,10 @@ ipcMain.handle('runDiscordRPC', (_event) => {
 })
 
 function sha256FromString(text) {
-  return crypto
-    .createHash('sha256')
-    .update(text, 'utf8')
-    .digest('hex');
+    return crypto
+        .createHash('sha256')
+        .update(text, 'utf8')
+        .digest('hex');
 }
 
 function extractPlugin(folderPlugins: string, type: "official" | "user") {
@@ -189,11 +190,13 @@ async function getThemeList(themePath: string): Promise<themeFormatType[]> {
     return finallist.map((theme) => {
         if (!theme.options) return theme
         const mainCSSPath = getFolderPath(theme.mainCSS)
-        return {...theme, options: theme.options.map((value) => {
-            if (value.css && value.css.replaceAll(" ", "") != "") return { ...value, css: path.join(mainCSSPath, value.css) }
-            if (value.dropDown) return { ...value, dropDown: value.dropDown.map((val) => ({ ...val, css: val.css != "" ? path.join(mainCSSPath, val.css) : "" })) }
-            return value
-        })}
+        return {
+            ...theme, options: theme.options.map((value) => {
+                if (value.css && value.css.replaceAll(" ", "") != "") return { ...value, css: path.join(mainCSSPath, value.css) }
+                if (value.dropDown) return { ...value, dropDown: value.dropDown.map((val) => ({ ...val, css: val.css != "" ? path.join(mainCSSPath, val.css) : "" })) }
+                return value
+            })
+        }
     })
 }
 
@@ -437,7 +440,7 @@ function generetaPluginConfig(name: string, config: { [key: string]: any }) {
     return config
 }
 
-function savePluginConfig(name: string,config: { [key: string]: any }) {
+function savePluginConfig(name: string, config: { [key: string]: any }) {
     fs.writeFileSync(path.join(pluginsConfigPath, `${name}.ini`), ini.stringify(config), "utf-8")
 }
 
@@ -448,5 +451,85 @@ ipcMain.handle("installPluginUpdate", async (_, plugin: pluginRepoExpanded) => {
 })
 
 ipcMain.on("reload-window", () => {
-  BrowserWindow.getAllWindows()[0].reload();
+    BrowserWindow.getAllWindows()[0].reload();
 });
+
+function pythonCheck() {
+    return new Promise(resolve => {
+        exec(`python3 --version`, error => {
+            resolve(!error)
+        })
+    })
+}
+
+async function checkExistyt_dlp() {
+    if (await pythonCheck() && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp"))) return true
+
+    if (process.platform == "win32" && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp.exe"))) return true
+    if (process.platform == "linux" && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp_linux"))) return true
+    return false
+}
+
+async function downloadyt_dlp(data: Map<string, any>, name: string) {
+    const resp = await advanceRequest(data["browser_download_url"])
+    console.log(resp)
+    if (!resp.success) return
+    fs.writeFileSync(path.join(app.getPath("appData"), "yt-dlp.json"), JSON.stringify(data), "utf-8")
+    fs.writeFileSync(path.join(app.getPath("appData"), name), resp.buffer, "binary")
+}
+
+async function installyt_dlp(data: Map<string, any>) {
+    console.log(data)
+    for (let index = 0; index < data["assets"].length; index++) {
+        const element = data["assets"][index];
+        if (element["name"] == "yt-dlp" && await pythonCheck()) return await downloadyt_dlp(element, "yt-dlp")
+        if (element["name"] == "yt-dlp.exe" && process.platform == "win32") return await downloadyt_dlp(element, "yt-dlp.exe")
+        if (element["name"] == "yt-dlp_linux" && process.platform == "linux") return await downloadyt_dlp(element, "yt-dlp_linux")
+    }
+}
+
+export async function runCheckYT_DLP() {
+    const yt_dlp_latest = "https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest"
+    const yt_dlp_releases = "https://api.github.com/repos/yt-dlp/yt-dlp/releases"
+
+    const lastest = await advanceRequest(yt_dlp_latest)
+    if (!lastest.success || !lastest.json) return
+    let updated = false
+    if (fs.existsSync(path.join(app.getPath("appData"), "yt-dlp.json"))) {
+        const tmp = JSON.parse(fs.readFileSync(path.join(app.getPath("appData"), "yt-dlp.json"), "utf-8"))
+        if (tmp["tag_name"] == lastest.json["tag_name"]) updated = true
+    }
+
+    console.log(await checkExistyt_dlp())
+
+    if (await checkExistyt_dlp() && updated != false) return
+
+    if (config.yt_dlp.replaceAll(" ", "").length <= 0) {
+        await installyt_dlp(lastest.json)
+        return
+    }
+
+    const resp = await advanceRequest(yt_dlp_releases)
+    if (!resp.success || !resp.json) return
+    yt_dlp_releases_cache = resp.json
+
+    for (let index = 0; index < resp.json.length; index++) {
+        const element = resp.json[index];
+        if (element["tag_name"] == config.yt_dlp) return installyt_dlp(element)
+    }
+}
+
+ipcMain.handle("installyt-dlp", async (_, tag: string) => {
+    for (let index = 0; index < yt_dlp_releases_cache.length; index++) {
+        const element = yt_dlp_releases_cache[index];
+        if (element["tag_name"] == tag) await installyt_dlp(element)
+    }
+})
+ipcMain.handle("getyt-dlp_releases", async () => {
+    if (yt_dlp_releases_cache.length <= 0) {
+        const resp = await advanceRequest("https://api.github.com/repos/yt-dlp/yt-dlp/releases")
+        if (!resp.success || !resp.json) return []
+        yt_dlp_releases_cache = resp.json.map((v) => v["tag_name"])
+    }
+    return yt_dlp_releases_cache.map((v) => v["tag_name"])
+})

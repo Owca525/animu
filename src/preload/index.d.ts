@@ -19,6 +19,11 @@ declare global {
         downloadUpdate: () => void;
         checkUpdate: () => Promise<{ available: boolean, version: string }>
       };
+      yt_dlp: {
+        versionList: () => Promise<string[]>
+        install: (tag: string) => Promise<void>
+        run: (command: string) => Promise<void>
+      },
       request: {
         get: (
           url: string,

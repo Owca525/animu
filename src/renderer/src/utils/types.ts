@@ -270,6 +270,7 @@ export interface episodeList { player_id: string, episodesData: { episodes: { ep
 export interface SettingsConfig {
     firstStart: boolean
     deepLinkURL: string
+    yt_dlp: string
     plugins: {
         hiddenPlugins: string[]
         // information: string

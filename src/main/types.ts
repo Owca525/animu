@@ -6,6 +6,7 @@ import { z } from "zod";
 export interface SettingsConfig {
     firstStart: boolean
     deepLinkURL: string
+    yt_dlp: string
     plugins: {
         // information: string
         hiddenPlugins: string[]
@@ -298,6 +299,7 @@ export const defaultConfig: SettingsConfig = {
         check: "Every Day",
         maxBackups: 3
     },
+    yt_dlp: ""
 };
 
 export type pluginRepoExpanded = {
