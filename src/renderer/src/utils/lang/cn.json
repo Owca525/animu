@@ -14,36 +14,36 @@
     "enable": "允許",
     "extensions": "擴充功能",
     "notFound": "找不到頁面/未找到內容",
-    "files": "Files",
-    "themereload": "Reloading Theme",
-    "incognitomode": "Incognito Mode: {{switch}}",
-    "off": "Off",
-    "on": "On",
-    "action": "Action"
+    "files": "檔案",
+    "themereload": "重新載入主題",
+    "incognitomode": "無痕模式: {{switch}}",
+    "off": "關閉",
+    "on": "開啟",
+    "action": "操作"
   },
   "imageviewer": {
-    "failedfetch": "Failed Fetch Image",
-    "failedsave": "Failed Save Image",
-    "failedload": "Failed Load Image",
-    "saving": "Saving Image"
+    "failedfetch": "圖片取得失敗",
+    "failedsave": "圖片儲存失敗",
+    "failedload": "圖片載入失敗",
+    "saving": "正在儲存圖片"
   },
   "notification": {
-    "failedplugin": "Failed Load Plugin",
-    "fetchinganime": "Fetching Anime",
-    "failedanime": "Failed Fetching Anime",
-    "failedepisodes": "Failed Fetch episodes",
-    "successanime": "Sucesfully Fetched Anime",
-    "episodesfailed": "Failed Fetch episodes",
-    "episodesfetching": "Fetching Episode List",
-    "fetchresolution": "Fetching Resolution",
-    "failedchangeaudio": "Failed Changing audio",
-    "failedpip": "Failed open Picture in Picture Mode",
-    "fetchingdub": "Fetching Dubbing",
-    "faileddub": "Failed Fetch Dubbing",
-    "test": "Test Notification"
+    "failedplugin": "外掛載入失敗",
+    "fetchinganime": "正在取得動畫資料",
+    "failedanime": "動畫資料取得失敗",
+    "failedepisodes": "集數取得失敗",
+    "successanime": "動畫資料取得成功",
+    "episodesfailed": "集數取得失敗",
+    "episodesfetching": "正在取得集數清單",
+    "fetchresolution": "正在取得解析度",
+    "failedchangeaudio": "切換音訊失敗",
+    "failedpip": "無法開啟子母畫面模式",
+    "fetchingdub": "正在取得配音資料",
+    "faileddub": "配音資料取得失敗",
+    "test": "測試通知"
   },
   "deeplink": {
-    "failed": "Failed fetching Deeplink"
+    "failed": "Deep Link 取得失敗"
   },
   "dialog": {
     "yes": "是",
@@ -53,31 +53,31 @@
     "reset": "重新啟動",
     "reload": "重新載入",
     "open": "打開",
-    "return": "Return"
+    "return": "返回"
   },
   "sidebar": {
-    "hide": "Hide Sidebar"
+    "hide": "隱藏側邊欄"
   },
   "types": {
-    "success": "Success",
-    "error": "Error",
-    "loading": "Loading",
-    "default": "Default",
-    "info": "Info"
+    "success": "成功",
+    "error": "錯誤",
+    "loading": "載入中",
+    "default": "預設",
+    "info": "資訊"
   },
   "home": {
     "search": "搜尋",
-    "historySearch": "Search History...",
+    "historySearch": "搜尋紀錄…",
     "nothingfound": "這裡甚麼都沒有",
     "error": "發生錯誤",
     "trending_now": "現在流行",
     "popular_in_this_season": "本季熱門",
     "all_time_popular": "歷來最受歡迎",
     "bigcard": {
-      "information": "More Information",
-      "now": "Watch Now",
-      "start": "Start Episode {{ep}}",
-      "episodes": " Episodes"
+      "information": "更多資訊",
+      "now": "立即觀看",
+      "start": "開始播放第 {{ep}} 集",
+      "episodes": " 集數"
     }
   },
   "contextMenu": {
@@ -100,19 +100,19 @@
     "cancelled": "取消"
   },
   "anime_relationtype": {
-    "adaptation": "Adaptation",
-    "prequel": "Prequel",
-    "sequel": "Sequel",
-    "parent": "Parent",
-    "sidestory": "Side Story",
-    "character": "Character",
-    "summary": "Summary",
-    "alternative": "Alternative",
-    "spinoff": "Spin Off",
-    "other": "Other",
-    "source": "Source",
-    "compilation": "Compilation",
-    "contains": "Contains"
+    "adaptation": "改編作品",
+    "prequel": "前傳",
+    "sequel": "續作",
+    "parent": "母作品",
+    "sidestory": "外傳",
+    "character": "角色",
+    "summary": "總集篇",
+    "alternative": "替代版本",
+    "spinoff": "衍生作品",
+    "other": "其他",
+    "source": "原作",
+    "compilation": "合集",
+    "contains": "包含"
   },
   "anime_genres": {
     "action": "動作",
@@ -183,8 +183,8 @@
     "errors": "這部動畫沒有集數",
     "wrongtext": "這是錯誤的動畫嗎？",
     "listEpisodes": "{{number}} 集",
-    "recomendation": "Recomendation",
-    "copylink": "Copy Anime Link",
+    "recomendation": "推薦",
+    "copylink": "複製動畫連結",
     "bar": {
       "anilist": "Anilist 頁面",
       "trailer": "預告片"
@@ -228,22 +228,22 @@
   "settings": {
     "turnDeveloper": "開啟開發者工具",
     "theme": {
-      "active": "Active Theme",
-      "loaded": "Loaded Theme"
+      "active": "目前使用的主題",
+      "loaded": "已載入的主題"
     },
     "backup": {
-      "title": "Backup",
-      "make": "Backup Making",
-      "enable": "Enable Backups",
-      "when": "When Making Backup",
-      "max": "Max number of backups",
-      "backups": "Backups",
-      "from": "Backup From",
-      "newbackup": "Make New Backup",
-      "failed": "Failed Maked backup",
-      "created": "Backup created succesfuly",
-      "restored": "Succesfully restored backup, restart application now",
-      "askrestore": "Do you want restore backup from {{date}}?"
+      "title": "備份",
+      "make": "正在建立備份",
+      "enable": "啟用備份",
+      "when": "建立備份時",
+      "max": "備份最大數量",
+      "backups": "備份列表",
+      "from": "備份來源",
+      "newbackup": "建立新備份",
+      "failed": "建立備份失敗",
+      "created": "備份建立成功",
+      "restored": "已成功還原備份，請重新啟動應用程式",
+      "askrestore": "是否要從 {{date}} 的備份進行還原?"
     },
     "general": {
       "language": "語言",
@@ -261,7 +261,7 @@
       "onstart": "啟動時",
       "everyday": "每天",
       "everyweek": "每周",
-      "everymonth": "Every Month",
+      "everymonth": "每月",
       "hideSidebar": "隱藏側邊攔",
       "hoverSidebar": "滑鼠移動至側邊欄時顯示",
       "discordrpc": "Discord 狀態顯示",
@@ -322,7 +322,7 @@
         "skipOpeningEnding": "跳過片頭/片尾",
         "toggleSubtitles": "切換字幕",
         "pip": "子母畫面",
-        "screenshot2": "Screenshot Without Subttitles"
+        "screenshot2": "不含字幕截圖"
       }
     },
     "playerUI": {
@@ -332,7 +332,7 @@
       "dvolumeanimation": "停用音量動畫"
     },
     "history": {
-      "managment": "History Managment",
+      "managment": "歷史管理",
       "limited": "限制保存歷史紀錄",
       "limit": "歷史紀錄保存限制",
       "startsave": "開始保存歷史紀錄的時間",
@@ -366,8 +366,8 @@
       "electronver": "Electron 版本",
       "chromiumver": "Chromium 版本",
       "nodever": "Node 版本",
-      "notificationtest": "Toast Notification Test",
-      "dialogtest": "Dialog Test"
+      "notificationtest": "Toast 通知測試",
+      "dialogtest": "對話框測試"
     },
     "extensions": {
       "name": "名稱",
@@ -376,13 +376,13 @@
       "type": "類型",
       "information": "資訊",
       "player": "播放器",
-      "hidden": "Hidden Plugin",
-      "installed": "Installed Plugin",
-      "userplugins": "Use User Plugins",
-      "updateplugin": "Check Plugins Update",
-      "website": "Website",
-      "hideplugin": "Hide Plugin",
-      "unhideplugin": "UnHide Plugin"
+      "hidden": "已隱藏的外掛",
+      "installed": "已安裝的外掛",
+      "userplugins": "使用者外掛",
+      "updateplugin": "檢查外掛更新",
+      "website": "官方網站",
+      "hideplugin": "隱藏外掛",
+      "unhideplugin": "顯示外掛"
     },
     "upNext": {
       "var1": "樣式 1",
@@ -395,8 +395,8 @@
     "error": {
       "notfound": "找不到任何的連結"
     },
-    "shareanime": "Share Anime Episode",
-    "selectepisode": "Select Episode",
+    "shareanime": "分享動畫集數",
+    "selectepisode": "選擇集數",
     "TitleEpisode": "第 {{ep}} 集：{{name}}",
     "TitleMovie": "電影：{{name}}",
     "Volume": "音量",
@@ -411,8 +411,8 @@
     "mute": "靜音",
     "unmute": "取消靜音",
     "errors": {
-      "error": "Error in Player",
-      "missing": "Missing data to extract urls",
+      "error": "播放器錯誤",
+      "missing": "缺少資料無法擷取網址",
       "extractionError": "擷取播放器網址失敗：{{error}}",
       "MEDIA_ERR_ABORTED": "播放已中止",
       "MEDIA_ERR_NETWORK": "下載視頻時發生網絡錯誤",
@@ -420,7 +420,7 @@
       "MEDIA_ERR_SRC_NOT_SUPPORTED": "視頻格式或來源不支持",
       "default": "發生未知錯誤.",
       "missingResoltions": "播放器未找到任何影片解析度",
-      "notfound": "Failed Find Urls"
+      "notfound": "無法找到網址"
     },
     "upNext": {
       "title": "下一集將在 {{sec}} 秒後播放",
@@ -458,18 +458,18 @@
     "continuefailed": "從繼續觀看中移除動畫失敗"
   },
   "oldBackup": {
-    "convert": "Converting Success {{success}} / Failed {{failed}}",
-    "done": "Converting Done",
-    "oldhistory": "Detected Old history",
-    "oldcontinue": "Detected Old Continue Watch",
-    "failedconvertall": "Failed Convert all History"
+    "convert": "轉換成功 {{success}} / 失敗 {{failed}}",
+    "done": "轉換完成",
+    "oldhistory": "偵測到舊的歷史紀錄",
+    "oldcontinue": "偵測到舊的續看紀錄",
+    "failedconvertall": "全部歷史紀錄轉換失敗"
   },
   "update": {
     "available": "更新 {{ver}} 現已可用，點擊更新",
     "progress": "下載進度 {{procent}}%",
     "done": "更新已下載，請重新啟動應用程式",
     "same": "你有最新的動畫集數",
-    "failed": "Failed to check for updates"
+    "failed": "檢查更新失敗"
   },
   "discordrpc": {
     "home": "在首頁",
@@ -503,58 +503,18 @@
     "akashiro": "俄文翻譯",
     "talon": "建立 Discord 伺服器",
     "zomi": "設計新圖示",
-    "TheCrabeuh": "Tester Animu"
+    "TheCrabeuh": "動畫測試者"
   },
   "week": {
-    "infoCommunicat": "Episode {{ep}} {{day}} At {{hours}}",
-    "infoCommunicatToday": "Episode {{ep}} {{day}} At {{hours}}",
-    "today": "Today",
-    "monday": "Monday",
-    "tuesday": "Tuesday",
-    "wednesday": "Wednesday",
-    "thursday": "Thursday",
-    "friday": "Friday",
-    "saturday": "Saturday",
-    "sunday": "Sunday"
-  },
-  "lang": {
-    "en": "English",
-    "pl": "Polski",
-    "de": "Deutsch",
-    "fr": "Français",
-    "es": "Español",
-    "it": "Italiano",
-    "pt": "Português",
-    "ru": "Русский",
-    "uk": "Українська",
-    "cs": "Čeština",
-    "sk": "Slovenčina",
-    "sl": "Slovenščina",
-    "hr": "Hrvatski",
-    "sr": "Српски",
-    "bg": "Български",
-    "ro": "Română",
-    "nl": "Nederlands",
-    "sv": "Svenska",
-    "no": "Norsk",
-    "da": "Dansk",
-    "fi": "Suomi",
-    "hu": "Magyar",
-    "el": "Ελληνικά",
-    "tr": "Türkçe",
-    "ar": "العربية",
-    "he": "עברית",
-    "fa": "فارسی",
-    "hi": "हिन्दी",
-    "bn": "বাংলা",
-    "ur": "اردو",
-    "zh": "中文",
-    "ja": "日本語",
-    "ko": "한국어",
-    "id": "Bahasa Indonesia",
-    "ms": "Bahasa Melayu",
-    "th": "ไทย",
-    "vi": "Tiếng Việt",
-    "cn": "中文"
+    "infoCommunicat": "第 {{ep}} 集 {{day}} {{hours}} 播出",
+    "infoCommunicatToday": "第 {{ep}} 集 今天 {{hours}} 播出",
+    "today": "今天",
+    "monday": "星期一",
+    "tuesday": "星期二",
+    "wednesday": "星期三",
+    "thursday": "星期四",
+    "friday": "星期五",
+    "saturday": "星期六",
+    "sunday": "星期日"
   }
 }
