@@ -30,7 +30,7 @@
     "archiver": "^7.0.1",
     "bonjour": "^3.3.0",
     "castv2-client": "^1.2.0",
-    "cheerio": "^1.1.2",
+    "cheerio": "^1.2.0",
     "crypto-js": "^4.2.0",
     "electron-app-universal-protocol-client": "https://github.com/Owca525/electron-app-universal-protocol-client.git",
     "electron-updater": "^6.7.3",
@@ -56,17 +56,17 @@
     "@types/node": "^25.0.6",
     "@types/semver": "^7.7.1",
     "bufferutil": "^4.1.0",
-    "electron": "^39.2.7",
+    "electron": "^40.0.0",
     "electron-builder": "^26.4.0",
     "electron-vite": "^5.0.0",
     "eslint": "^9.39.2",
     "eslint-plugin-solid": "^0.14.5",
     "node-addon-api": "^8.5.0",
-    "solid-js": "^1.9.5",
+    "solid-js": "^1.9.11",
     "typescript": "^5.8.3",
     "utf-8-validate": "^6.0.6",
     "vite": "^7.3.1",
     "vite-plugin-solid": "^2.11.6",
-    "vite-plugin-static-copy": "^3.1.4"
+    "vite-plugin-static-copy": "^3.1.6"
   }
 }
