@@ -1,11 +1,8 @@
 import { request } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, genresSearchFormat, playerData, playerPluginFormat } from "@renderer/utils/types";
-import * as cheerio from 'cheerio';
 
 const WEBSITE = "https://www.aowu.tv/"
 const SearchPath = "/search/-------------.html?wd="
-
-const cardRegexSearch = /<div[^>]*class=["'][^"']*(?:vod-detail)(?=[^"']*)(?:style-detail)(?=[^"']*)(?:cor4)(?=[^"']*)(?:search-list)[^"']*["'][^>]*>/g;
 
 export default class Aowu implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
@@ -28,13 +25,6 @@ export default class Aowu implements playerPluginFormat {
         try {
             const response = await request(`${WEBSITE}${SearchPath}${encodeURIComponent(name)}`)
             if (!response.success) return []
-            const $ = cheerio.load(response.text);
-            console.log(response)
-            const cards = $('div.vod-detail.style-detail.cor4.search-list')
-            const anime = cards.map((_i, card) => {
-                const playButtons = $(card).find('a.button[target="_blank"]')[0].attribs["href"]
-                console.log(playButtons)
-            })
 
             return []
         } catch (error) {

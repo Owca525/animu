@@ -31,7 +31,6 @@
     "bonjour": "^3.3.0",
     "castv2-client": "^1.2.0",
     "cheerio": "^1.2.0",
-    "crypto-js": "^4.2.0",
     "electron-app-universal-protocol-client": "https://github.com/Owca525/electron-app-universal-protocol-client.git",
     "electron-updater": "^6.7.3",
     "hls.js": "^1.6.15",
