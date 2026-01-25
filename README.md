@@ -3,7 +3,7 @@ The concept is simple: watching anime while having a powerful tool for synchroni
 
 The only problem is that my friend and I have no experience in creating such a project. So, if anyone wants to help, We have [Discord server](https://discord.gg/p4fTqGKgqr)
 
-[Documentation animu](documentation.md)
+[Animu Documentation](documentation.md)
 
 NOTE: Animu does not host or possess any anime and does not promote piracy; it only provides links to these anime.
 
