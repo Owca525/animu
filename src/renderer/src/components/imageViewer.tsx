@@ -130,7 +130,7 @@ export default function ImageViewer(props: { files: string[], disable: () => voi
                 </div>
             </Show>
             <div class="imageViewer-bottom-informations">
-                Zoom: {scale().toFixed(2)}x
+                {t("settings.general.zoom")}: {scale().toFixed(2)}x
             </div>
             <Show when={props.files.length > 1}>
                 <Button icon="arrow_back" ButtonClass="imageViewer-left-button" onClick={() => {

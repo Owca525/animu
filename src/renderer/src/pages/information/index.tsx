@@ -310,7 +310,7 @@ function information() {
                             <span class={`information-description-toggle ${isNeedMore() ? "show" : ""}`}
                                 onclick={() => descriptionRef?.classList.add("moretext")}
                             >
-                                Show More
+                                {t("information.more")}
                             </span>
                         </div>
                         <div class="information-bar">

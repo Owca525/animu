@@ -185,6 +185,7 @@
         "listEpisodes": "{{number}} Episodes",
         "recomendation": "Recomendation",
         "copylink": "Copy Anime Link",
+        "more": "Show More",
         "bar": {
             "anilist": "Anilist Page",
             "trailer": "Anime Trailer"
