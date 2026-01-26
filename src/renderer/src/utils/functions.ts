@@ -609,3 +609,7 @@ export async function setHomeData(wrapper?: () => Promise<homeData["data"] | con
         setAllHomeData({ data: { sections: [] }, isLoading: false, isError: true, } as any)
     }
 }
+
+export async function runYT_DLP(url: string, commands?: string[]) {
+    return await window.api.yt_dlp.run(url, commands)
+}

@@ -1,5 +1,5 @@
-import { convertMsToMinutes, makeSmallText, request } from "@renderer/utils/functions"
-import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerData } from "@renderer/utils/types"
+import { convertMsToMinutes, makeSmallText, request, runYT_DLP } from "@renderer/utils/functions"
+import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerData, resolutionFormat } from "@renderer/utils/types"
 
 const HASH_SEARCH = '06327bc10dd682e1ee7e07b6db9c16e9ad2fd56c1b769e47513128cd5c9fc77a'
 const HASH_INFO = '9d7439c90f203e534ca778c4901f9aa2d3ad42c06243ab2c5e6b79612af32028'
@@ -13,7 +13,8 @@ const header = {
     // "Host": "api.allanime.day"
 }
 
-const source_names = ["Yt-mp4", 'Sak', 'S-mp4', 'Luf-mp4', "Kir", "Default", "Uv-mp4"]
+const source_names = ["Yt-mp4", 'Sak', 'S-mp4', 'Luf-mp4', "Kir", "Default", "Uv-mp4", "Mp4", "Ok"]
+const normalUrls = ["Mp4", "Ok"]
 
 const mapping: Record<string, string> = {
     "79": "A", "7a": "B", "7b": "C", "7c": "D", "7d": "E", "7e": "F", "7f": "G",
@@ -30,10 +31,11 @@ const mapping: Record<string, string> = {
     "11": ")", "12": "*", "13": "+", "14": ",", "03": ";", "05": "=", "1d": "%"
 };
 
-function findUrl(url: string, sourceName: string): string | undefined {
+function findUrl(url: string, sourceName: string): { url: string, decode: boolean } | undefined {
     for (let index = 0; index < source_names.length; index++) {
         const element = source_names[index];
-        if (element.toLowerCase() == sourceName.toLowerCase()) return decodeText(url)
+        if (element.toLowerCase() == sourceName.toLowerCase() && normalUrls.includes(element)) return { url, decode: false }
+        if (element.toLowerCase() == sourceName.toLowerCase()) return { url: decodeText(url), decode: true }
     }
     return
 }
@@ -253,9 +255,38 @@ async function requestForUrl(url: string): Promise<playerData | undefined> {
     return listUrls
 }
 
+async function fetchMP4(hostname: string, url: string): Promise<playerData | undefined> {
+    try {
+        let resoltutions: resolutionFormat[] = [] 
+        const extractedata = await runYT_DLP(url)
+        for (let index = 0; index < extractedata.formats.length; index++) {
+            const element = extractedata.formats[index];
+            if ("container" in element && element["container"] == "mp4_dash") resoltutions.push({
+                res: `${element["height"]}`,
+                url: element["url"],
+                reqHeader: element["http_headers"],
+            })
+            else {
+                // TODO: FIX THIS
+                // resoltutions.push({
+                //     res: element["height"] ? `${element["height"]}` : "1080",
+                //     url: element["url"],
+                //     reqHeader: element["http_headers"]
+                // })
+            }
+        }
+        return {
+            hostname: hostname,
+            resolution: resoltutions
+        }
+    } catch (error) {
+        return undefined
+    }
+}
+
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.5",
+        version: "1.6",
         name: "Allmanga",
         author: "Owca525",
         icon: "https://allmanga.to/android-icon-192x192.png",
@@ -278,18 +309,30 @@ export default class Allmanga implements playerPluginFormat {
 
             let jsonObject = resp.json
             const sources = jsonObject.data.episode.sourceUrls
-            const urls = sources
+            const urls: { url: string, decode: boolean }[] = sources
                 .map((tmp: { sourceUrl: string; sourceName: string }) =>
                     findUrl(tmp.sourceUrl, tmp.sourceName)
                 )
-                .filter((item: string) => item !== undefined)
+                .filter((item) => item !== undefined)
 
             let data: playerData[] = []
             for (let i = 0; i < urls.length; i++) {
                 const element = urls[i];
-                let tmp = await requestForUrl(element)
-                if (tmp) data.push(tmp)
+                if (element.decode) {
+                    let tmp = await requestForUrl(element.url)
+                    if (tmp) data.push(tmp)
+                }
+                if (!element.decode) {
+                    const urlObject = new URL(element.url);
+                    data.push({
+                        hostname: urlObject.hostname,
+                        resolution: [],
+                        extractResolution: async () => await fetchMP4(urlObject.hostname, element.url)
+                    })
+                }
             }
+
+            console.log(data)
 
             if (type == "dub" && jsonObject.data.episode.episodeInfo.vidInforsdub) {
                 data.push({
@@ -328,7 +371,7 @@ export default class Allmanga implements playerPluginFormat {
     async extractEpisodeList(animeData?: AnimeData, anime_id?: string) {
         try {
             let tmpAnimeID = anime_id
-            
+
             if (animeData && !tmpAnimeID) {
                 let data = await SearchAnimeInAllmanga(animeData.title.romaji, 1);
                 tmpAnimeID = findAnime(data.map((card) => ({ AnimeData: card })), animeData)

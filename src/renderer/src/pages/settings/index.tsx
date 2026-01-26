@@ -68,6 +68,7 @@ function settings() {
     const [backupList, setBackupList] = createSignal<{ date: Date, file: string }[]>([])
     const [pluginList, setpluginList] = createSignal<{ active: boolean, plugin: playerPluginFormat | informationPluginFormat }[]>([])
     const [hiddenPluginList, setHiddenPluginList] = createSignal<string[]>([])
+    const [yt_dlprelases, setReleases_yt_dlp] = createSignal<string[]>([])
     const [ContextMenu, setContextMenu] = createSignal<ContextMenuProps>([
         { option: "dialog.reload", onClick: () => location.reload() },
         { option: "", line: true },
@@ -194,6 +195,8 @@ function settings() {
 
         if (config().new.General.discordRPC) window.api.rpc.setActivity(undefined, t("discordrpc.settings"))
         turnOnDeveloperMode()
+
+        setReleases_yt_dlp(await window.api.yt_dlp.versionList())
     });
 
     onCleanup(() => {
@@ -399,6 +402,11 @@ function settings() {
     function unHidePlugin(plugin: playerPluginFormat) {
         setHiddenPluginList((prev) => prev.filter(i => i !== plugin.metadata.name))
         handleChange("plugins.hiddenPlugins", [...hiddenPluginList()])
+    }
+
+    function changeYT_DLP(v: string) {
+        handleChange("yt_dlp", v)
+        window.api.yt_dlp.install(v)
     }
 
     return (
@@ -715,6 +723,13 @@ function settings() {
                                     handleChange('Player.general.showBrokenBuffer', checked)
                                 }
                             />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            <span class="settings-helpicon-space">
+                                {t("settings.yt-dlp")}
+                            </span>
+                            <Dropdown disableX placeholder={yt_dlprelases().length <= 0 ? t("global.notFound") : yt_dlprelases()[0]} options={yt_dlprelases().map((v) => ({ label: v, onClick: () => changeYT_DLP(v) }))} />
                         </div>
                     </div>
                     <div class="settings-page-container">

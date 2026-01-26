@@ -7,7 +7,7 @@ import crypto from 'crypto';
 import path from "path"
 import fs from "fs"
 import { animuPlugins, config, mainWindow, newConfigPath, pluginsConfigPath, themeConfigPath } from ".";
-import { exec, execSync } from "child_process";
+import { exec, execSync, spawn } from "child_process";
 // import express from "express";
 // import { Readable } from "stream";
 import os from "os"
@@ -472,14 +472,12 @@ async function checkExistyt_dlp() {
 
 async function downloadyt_dlp(data: Map<string, any>, name: string) {
     const resp = await advanceRequest(data["browser_download_url"])
-    console.log(resp)
     if (!resp.success) return
-    fs.writeFileSync(path.join(app.getPath("appData"), "yt-dlp.json"), JSON.stringify(data), "utf-8")
-    fs.writeFileSync(path.join(app.getPath("appData"), name), resp.buffer, "binary")
+    fs.writeFileSync(path.join(app.getPath("userData"), "yt-dlp.json"), JSON.stringify(data), "utf-8")
+    fs.writeFileSync(path.join(app.getPath("userData"), name), resp.buffer, "binary")
 }
 
 async function installyt_dlp(data: Map<string, any>) {
-    console.log(data)
     for (let index = 0; index < data["assets"].length; index++) {
         const element = data["assets"][index];
         if (element["name"] == "yt-dlp" && await pythonCheck()) return await downloadyt_dlp(element, "yt-dlp")
@@ -495,14 +493,12 @@ export async function runCheckYT_DLP() {
     const lastest = await advanceRequest(yt_dlp_latest)
     if (!lastest.success || !lastest.json) return
     let updated = false
-    if (fs.existsSync(path.join(app.getPath("appData"), "yt-dlp.json"))) {
-        const tmp = JSON.parse(fs.readFileSync(path.join(app.getPath("appData"), "yt-dlp.json"), "utf-8"))
-        if (tmp["tag_name"] == lastest.json["tag_name"]) updated = true
+    if (fs.existsSync(path.join(app.getPath("userData"), "yt-dlp.json"))) {
+        const tmp = JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), "yt-dlp.json"), "utf-8"))
+        if (tmp["tag_name"] != lastest.json["tag_name"]) updated = true
     }
 
-    console.log(await checkExistyt_dlp())
-
-    if (await checkExistyt_dlp() && updated != false) return
+    if (await checkExistyt_dlp() && updated == false) return
 
     if (config.yt_dlp.replaceAll(" ", "").length <= 0) {
         await installyt_dlp(lastest.json)
@@ -528,8 +524,43 @@ ipcMain.handle("installyt-dlp", async (_, tag: string) => {
 ipcMain.handle("getyt-dlp_releases", async () => {
     if (yt_dlp_releases_cache.length <= 0) {
         const resp = await advanceRequest("https://api.github.com/repos/yt-dlp/yt-dlp/releases")
-        if (!resp.success || !resp.json) return []
+        if (!resp.success || !resp.json) {
+            if (fs.existsSync(path.join(app.getPath("userData"), "yt-dlp.json"))) {
+                const tmp = JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), "yt-dlp.json"), "utf-8"))
+                return [tmp["tag_name"]]
+            }
+            return []
+        }
         yt_dlp_releases_cache = resp.json.map((v) => v["tag_name"])
-    }
-    return yt_dlp_releases_cache.map((v) => v["tag_name"])
+    } else return yt_dlp_releases_cache.map((v) => v["tag_name"])
+    return yt_dlp_releases_cache
 })
+
+ipcMain.handle("run_yt-dlp", async (_, url: string, commands?: string[]) => await getVideoInfo(url, commands))
+
+// "-j",
+// "--no-playlist",
+function getVideoInfo(url: string, commands: string[] = ["-j"]) {
+    return new Promise((resolve, reject) => {
+        const yt = spawn("yt-dlp", [...commands, url]);
+
+        let data = "";
+        let error = "";
+
+        yt.stdout.on("data", chunk => {
+            data += chunk.toString();
+        });
+
+        yt.stderr.on("data", chunk => {
+            error += chunk.toString();
+        });
+
+        yt.on("close", code => {
+            if (code !== 0) {
+                reject(error);
+            } else {
+                resolve(JSON.parse(data));
+            }
+        });
+    });
+}

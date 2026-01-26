@@ -227,6 +227,7 @@
   },
   "settings": {
     "turnDeveloper": "開啟開發者工具",
+    "yt-dlp": "yt-dlp Versions",
     "theme": {
       "active": "目前使用的主題",
       "loaded": "已載入的主題"

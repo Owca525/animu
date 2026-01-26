@@ -226,6 +226,7 @@
   },
   "settings": {
     "turnDeveloper": "Włącz tryb deweloperski",
+    "yt-dlp": "yt-dlp Versions",
     "theme": {
       "active": "Active Theme",
       "loaded": "Loaded Theme"

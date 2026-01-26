@@ -60,6 +60,11 @@ if (process.contextIsolated) {
         getConfig: (name: string, config: { [key: string]: any }) => ipcRenderer.invoke("getPluginConfig", name, config),
         installUpdate: (plugin: pluginRepoExpanded) => ipcRenderer.invoke("installPluginUpdate", plugin)
       },
+      yt_dlp: {
+        versionList: () => ipcRenderer.invoke('getyt-dlp_releases'),
+        install: (tag: string) => ipcRenderer.invoke('installyt-dlp', tag),
+        run: (url: string, commands?: string[]) => ipcRenderer.invoke('run_yt-dlp', url, commands)
+      },
       runExternaPlayer: (videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", videoData, type),
       getOSDetails: () => ipcRenderer.invoke('get-os-info'),
       getListLang: () => ipcRenderer.invoke("get-lang-files"),

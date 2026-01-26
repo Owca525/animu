@@ -227,6 +227,7 @@
   },
   "settings": {
     "turnDeveloper": "Включить режим разработчика",
+    "yt-dlp": "yt-dlp Versions",
     "theme": {
       "active": "Активная тема",
       "loaded": "Загруженная тема"
