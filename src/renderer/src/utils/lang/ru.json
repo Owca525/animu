@@ -227,7 +227,7 @@
   },
   "settings": {
     "turnDeveloper": "Включить режим разработчика",
-    "yt-dlp": "yt-dlp Versions",
+    "yt-dlp": "yt-dlp Версия",
     "theme": {
       "active": "Активная тема",
       "loaded": "Загруженная тема"
@@ -396,7 +396,8 @@
   },
   "player": {
     "error": {
-      "notfound": "Плеер не нашёл URL-адресов"
+      "notfound": "Плеер не нашёл URL-адресов",
+      "player": "Плеер столкнулся с проблемой"
     },
     "shareanime": "Поделиться эпизодом аниме",
     "selectepisode": "Выбрать эпизод",

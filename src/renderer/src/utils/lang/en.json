@@ -395,7 +395,15 @@
     },
     "player": {
         "error": {
-            "notfound": "Player didn't find any urls"
+            "notfound": "Player didn't find any urls",
+            "player": "Video Player found a problem"
+        },
+        "nerdstats": {
+            "frames": "Frames: ",
+            "dframes": "Dropped Frames: ",
+            "volume": "Volume: ",
+            "currentime": "CurrentTime: ",
+            "durration": "Duration: "
         },
         "shareanime": "Share Anime Episode",
         "selectepisode": "Select Episode",

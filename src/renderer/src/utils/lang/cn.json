@@ -227,7 +227,7 @@
   },
   "settings": {
     "turnDeveloper": "開啟開發者工具",
-    "yt-dlp": "yt-dlp Versions",
+    "yt-dlp": "yt-dlp 版本",
     "theme": {
       "active": "目前使用的主題",
       "loaded": "已載入的主題"
@@ -396,7 +396,15 @@
   },
   "player": {
     "error": {
-      "notfound": "找不到任何的連結"
+      "notfound": "找不到任何的連結",
+      "player": "播放器發生問題"
+    },
+    "nerdstats": {
+      "frames": "影格數: ",
+      "dframes": "掉幀數: ",
+      "volume": "音量: ",
+      "currentime": "目前時間: ",
+      "durration": "總長度: "
     },
     "shareanime": "分享動畫集數",
     "selectepisode": "選擇集數",

@@ -395,7 +395,8 @@
   },
   "player": {
     "error": {
-      "notfound": "Odtwarzacz nie znalazł żadnych URL-i"
+      "notfound": "Odtwarzacz nie znalazł żadnych URL-i",
+      "player": "Player found a problem"
     },
     "shareanime": "Share Anime Episode",
     "selectepisode": "Select Episode",
