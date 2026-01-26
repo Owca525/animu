@@ -101,6 +101,63 @@ function App() {
     setInitation(false)
     detectPluginVersion()
 
+    // Code: https://github.com/cynthia2006/hanime-plugin/blob/master/yt_dlp_plugins/extractor/htv.py
+    // const payload = `
+    //   delete globalThis.WorkerGlobalScope;
+    //   var window = new Proxy({
+    //       top: { location: { origin: "" } },
+    //       addEventListener: (e, cb) => {}
+    //   }, {
+    //       set(o, k, v) {
+    //           if (k == "ssignature" || k == "stime") self.postMessage(v)
+
+    //           o[k] = v;
+    //           return true;
+    //       }
+    //   });
+    //   globalThis.window = window;
+    // `
+
+    // const resp = await request("", {
+    //       headers: {
+    //         "Referer": "",
+    //         "Origin": "",
+    //         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:147.0) Gecko/20100101 Firefox/147.0",
+    //       }
+    // })
+    // console.log(resp)
+
+    // const blob = new Blob([payload + resp.text], { type: "text/javascript" });
+    // const url = URL.createObjectURL(blob);
+    // let token = ""
+    // let time = ""
+
+    // const worker = new Worker(url);
+    // worker.onmessage = async (event) => {
+    //   if (typeof event.data == "object") return console.log(event.data)
+    //   if (typeof event.data == "string") token = event.data
+    //   else time = event.data
+    //   console.log(event.data);
+    //   console.log(token, time)
+    //   if (token != "" && time != "") {
+    //     const resp = await request("", { 
+    //       headers: {
+    //         "Accept": "application/json",
+    //         "Referer": "",
+    //         "Origin": "",
+    //         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:147.0) Gecko/20100101 Firefox/147.0",
+    //         "x-signature": token,
+    //         "x-signature-version": "web2",
+    //         "x-time": time,
+    //       }
+    //     })
+    //     console.log(resp)
+    //   }
+    // };
+
+    // setTimeout(() => worker.terminate(), 1000);
+
+
     if (window.api) runCheckUpdate()
   })
 
