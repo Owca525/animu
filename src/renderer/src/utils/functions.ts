@@ -600,8 +600,7 @@ export async function setHomeData(wrapper?: () => Promise<homeData["data"] | con
         if (!wrapper) return
 
         const respons = await wrapper()
-        if (getGlobalCache().token && getGlobalCache().token != uuid) return setGlobalToken(undefined)
-        setGlobalToken(undefined)
+        if (getGlobalCache().token && getGlobalCache().token != uuid) return
         if (!respons) return setAllHomeData({ data: { sections: [] }, isLoading: false, isError: true } as any)
         if ("sections" in respons) return setAllHomeData({ data: respons, isLoading: false, isError: false } as any)
         setAllHomeData({ data: { sections: [respons] }, isLoading: false, isError: false } as any)
