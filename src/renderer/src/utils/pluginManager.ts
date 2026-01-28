@@ -6,7 +6,7 @@ import Anizone from "@renderer/plugins/anizone";
 import GojoLive from "@renderer/plugins/gojoLive";
 import LycorisCafe from "@renderer/plugins/lycoriscafe";
 import { getConfig } from "./stores/config";
-import { detectIndex, getRenderPath, setHomeData } from "./functions";
+import { detectIndex, getPluginInitialConfig, getPluginsList, getRenderPath, setHomeData } from "./functions";
 import semver from "semver";
 // import yummyani from "@renderer/plugins/yummyani";
 // import Aowu from "@renderer/plugins/aowu";
@@ -64,14 +64,14 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
         if (this.pluginList.length > 0) return
         const localPlugins = [Allmanga, Anizone, GojoLive, LycorisCafe]
 
-        const plugins = await window.api.plugins.list()
+        const plugins = await getPluginsList()
         const externalPlugins = await this.loadPlugin(plugins)
 
         for (let index = 0; index < localPlugins.length; index++) {
             try {
                 const plugin = localPlugins[index] as any;
                 const tmp = new plugin
-                if (tmp.config) tmp.config = await window.api.plugins.getConfig(tmp.metadata.name, tmp.config)
+                if (tmp.config) tmp.config = await getPluginInitialConfig(tmp.metadata.name, tmp.config)
                 this.pluginList.push(tmp)
             } catch (error) {
                 console.warn("Failed Load Module", error, localPlugins[index])
@@ -82,7 +82,7 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
             try {
                 const plugin = externalPlugins[index];
                 const tmp = new plugin
-                if (tmp.config) tmp.config = await window.api.plugins.getConfig(tmp.metadata.name, tmp.config)
+                if (tmp.config) tmp.config = await getPluginInitialConfig(tmp.metadata.name, tmp.config)
                 this.pluginList.push(tmp)
             } catch (error) {
                 console.warn("Failed Load Module", error, externalPlugins[index])
@@ -117,13 +117,13 @@ export class informationPluginManager implements informationPluginManagerFormat 
     initial = async () => {
         const conf = getConfig()
         const path = `${getRenderPath()}index.js`
-        const plugins = await window.api.plugins.list()
+        const plugins = await getPluginsList()
         const infoPlugins = plugins.filter((t) => t.pluginType == "information")
         const repoPlugins = getPluginRepo()
 
         if (infoPlugins.length <= 0) {
             const tmp = new AnilistApi()
-            if (tmp.config) tmp.config = await window.api.plugins.getConfig(tmp.metadata.name, tmp.config)
+            if (tmp.config) tmp.config = await getPluginInitialConfig(tmp.metadata.name, tmp.config)
             this.currentPlugin = tmp
             return
         }
@@ -137,7 +137,7 @@ export class informationPluginManager implements informationPluginManagerFormat 
                 const newBlob = new Blob([element.content.replaceAll("./index.js", element.file).replaceAll("index.js", path)], { type: "application/javascript" });
                 const newUrl = URL.createObjectURL(newBlob);
                 const tmp = new (await import(newUrl))
-                if (tmp.config) tmp.config = await window.api.plugins.getConfig(tmp.metadata.name, tmp.config)
+                if (tmp.config) tmp.config = await getPluginInitialConfig(tmp.metadata.name, tmp.config)
                 this.currentPlugin = tmp
             }
         }

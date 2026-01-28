@@ -59,7 +59,7 @@ ipcMain.handle('send-post', async (_event, url: string, header: Record<string, s
 }
 )
 
-export async function advanceRequest(url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string } }) {
+export async function advanceRequest(url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string }, body?: any }) {
     try {
         const response = await fetch(url, options);
         console.log(response)
@@ -69,7 +69,7 @@ export async function advanceRequest(url: string, options?: { method?: "POST" | 
             text = await respTextClone.text()
         } catch (error) {}
         if (!response.ok) return { text: text, buffer: [], status: response.status, statusText: response.statusText, url: response.url, success: response.ok, json: undefined, responseHeader: response.headers }
-        let bufferCloned = response.clone()
+        const bufferCloned = response.clone()
         let jsontext;
 
         try {
@@ -84,7 +84,7 @@ export async function advanceRequest(url: string, options?: { method?: "POST" | 
             statusText: response.statusText,
             url: response.url,
             success: response.ok,
-            responseHeader: response.headers
+            responseHeader: new Map<string, string>(response.headers.entries()),
         };
     } catch (error) {
         console.error(`Error in advanceRequest: ${(error as Error).message} ${(error as Error).name} ${(error as Error).cause} \n ${(error as Error).stack}`)
@@ -101,4 +101,4 @@ export async function advanceRequest(url: string, options?: { method?: "POST" | 
     }
 }
 
-ipcMain.handle('advanceRequest', async (_, url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string } }) => await advanceRequest(url, options));
+ipcMain.handle('advanceRequest', async (_, url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string }, body: any }) => await advanceRequest(url, options));

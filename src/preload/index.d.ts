@@ -43,7 +43,16 @@ declare global {
           statusText: string;
           error?: unknown;
         }>;
-        advanceRequest: (url: string, options?: { method?: "POST" | "GET", header?: Record<string, string> }) => Promise<{ text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: { [key: string]: string } }>
+        advanceRequest: (url: string, options?: { method?: "POST" | "GET", header?: Record<string, string>, body?: any }) => Promise<{
+          text: string,
+          json: { [key: string]: any } | undefined,
+          buffer: Buffer,
+          status: number,
+          statusText: string,
+          url: string,
+          success: boolean,
+          responseHeader: Map<string, string>
+        }>
       };
       rpc: {
         setActivity: (
@@ -77,7 +86,7 @@ declare global {
         getConfig: (name: string, config: { [key: string]: any }) => Promise<{ [key: string]: any }>
         installUpdate: (plugin: pluginRepoExpanded) => Promise<void>
       }
-      runExternaPlayer: (videoData: {url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string}, type: "mpv" | "vlc") => any
+      runExternaPlayer: (videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc") => any
       getOSDetails: () => Promise<{ platform: NodeJS.Platform, release: string, arch: string }>
       getListLang: () => Promise<{ data: any, lang: string }[]>
       getConfig: () => Promise<SettingsConfig>

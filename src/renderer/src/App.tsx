@@ -88,7 +88,7 @@ function App() {
       setGlobalHistory(JSON.parse(localStorage.getItem("history") as any))
     }
     setinitialState({ text: "Loading Theme", plugin: false })
-    setGlobalTheme(await window.api.themes.list())
+    if (window.api) setGlobalTheme(await window.api.themes.list())
 
     setinitialState({ text: "Loading Config", plugin: false })
     LoadConfig()

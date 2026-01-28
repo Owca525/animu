@@ -119,7 +119,8 @@ export async function changeTheme(activeTheme: Map<number, themeMetadata>) {
 }
 
 export function changeTitleAnimu(title: string) {
-    const dev = window.electronAPI.process.env.NODE_ENV == "development"
+    let dev = false
+    if (window.api) dev = window.electronAPI.process.env.NODE_ENV == "development"
     document.title = dev ? title + " - Development" : title
 }
 
@@ -395,13 +396,14 @@ export function updateObjectConfig(path: string, value: string | number | boolea
     return newConfig
 }
 
-export async function request(url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string } }): Promise<{ text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: { [key: string]: string } }> {
+export async function request(url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string }, body?: any }, noCors: boolean = false): Promise<{ text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: Map<string, string> }> {
     try {
         if (window.api) return await window.api.request.advanceRequest(url, options)
 
-        const response = await fetch("/api/request", {
+        const response = await fetch(noCors ? url : "/api/request", noCors ? options : {
             method: "POST",
             body: JSON.stringify({
+                url: url,
                 requestOptions: options
             })
         })
@@ -439,7 +441,7 @@ export async function request(url: string, options?: { method?: "POST" | "GET", 
             statusText: "Error",
             url: url,
             success: false,
-            responseHeader: {}
+            responseHeader: {} as any
         }
     }
 }
@@ -611,4 +613,15 @@ export async function setHomeData(wrapper?: () => Promise<homeData["data"] | con
 
 export async function runYT_DLP(url: string, commands?: string[]) {
     return await window.api.yt_dlp.run(url, commands)
+}
+
+export async function getPluginsList() {
+    if (!window.api) return []
+    return await window.api.plugins.list()
+}
+
+export async function getPluginInitialConfig(name: string, config: { [key: string]: any;}): Promise<{[key: string]: any;}> {
+    if (window.api) return await window.api.plugins.getConfig(name, config)
+    localStorage.setItem(name, JSON.stringify(config))
+    return config
 }
