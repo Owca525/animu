@@ -101,7 +101,24 @@ const Home = () => {
     if (deeplink.replaceAll(" ", "").length <= 0) return
     let anime: deepLinkData | undefined;
     try {
-      anime = JSON.parse(atob(deeplink.replaceAll("animu://", "")))
+      const str = atob(deeplink.replaceAll("animu://", ""))
+      if (str.startsWith("{")) anime = JSON.parse(str)
+      else {
+        const tmp = str.split(",")
+        if (tmp.length <= 0) throw "Failed Parse"
+        if (tmp.length == 1) anime = { animeID: tmp[0] }
+        if (tmp.length != 6) throw "Failed Parse"
+        anime = {
+          animeID: tmp[0],
+          player: {
+            plugin: tmp[1],
+            type: tmp[2],
+            id: tmp[3],
+            episode: tmp[4],
+            time: parseInt(tmp[5])
+          }
+        }
+      }
     } catch (error) { console.error(t("deeplink.failed"), error) }
     if (!anime) return
 

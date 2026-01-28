@@ -2,7 +2,7 @@ import Button from '@renderer/components/buttons';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
-import { AnimeData, cardData, ContextMenuProps, deepLinkData, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
+import { AnimeData, cardData, ContextMenuProps, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
 import {
     changeTitleAnimu,
     convertDateToFormattedString,
@@ -93,16 +93,12 @@ function information() {
     }, 1000);
 
     function generateAnimeForContextMenu() {
-        const anime: deepLinkData = {
-            animeID: tempData().anime.id
-        }
-
         const config = unwrap(getConfig())
 
         setcontextMenu([
             {
                 option: t("information.copylink"),
-                onClick: async () => await SaveToClipboard("text", `${config.deepLinkURL}/?anime=${btoa(JSON.stringify(anime))}`)
+                onClick: async () => await SaveToClipboard("text", `${config.deepLinkURL}/?anime=${btoa(`${tempData().anime.id}`)}`)
             }
         ])
     }
