@@ -267,12 +267,11 @@ async function fetchMP4(hostname: string, url: string): Promise<playerData | und
                 reqHeader: element["http_headers"],
             })
             else {
-                // TODO: FIX THIS
-                // resoltutions.push({
-                //     res: element["height"] ? `${element["height"]}` : "1080",
-                //     url: element["url"],
-                //     reqHeader: element["http_headers"]
-                // })
+                resoltutions.push({
+                    res: element["height"] ? `${element["height"]}` : "1080",
+                    url: element["url"],
+                    reqHeader: element["http_headers"]
+                })
             }
         }
         return {
@@ -286,7 +285,7 @@ async function fetchMP4(hostname: string, url: string): Promise<playerData | und
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.6",
+        version: "1.7",
         name: "Allmanga",
         author: "Owca525",
         icon: "https://allmanga.to/android-icon-192x192.png",
@@ -322,14 +321,15 @@ export default class Allmanga implements playerPluginFormat {
                     let tmp = await requestForUrl(element.url)
                     if (tmp) data.push(tmp)
                 }
-                if (!element.decode) {
-                    const urlObject = new URL(element.url);
-                    data.push({
-                        hostname: urlObject.hostname,
-                        resolution: [],
-                        extractResolution: async () => await fetchMP4(urlObject.hostname, element.url)
-                    })
-                }
+                // TODO: FIX THIS
+                // if (!element.decode) {
+                //     const urlObject = new URL(element.url);
+                //     data.push({
+                //         hostname: urlObject.hostname,
+                //         resolution: [],
+                //         extractResolution: async () => await fetchMP4(urlObject.hostname, element.url)
+                //     })
+                // }
             }
 
             console.log(data)
