@@ -8,6 +8,7 @@ import LycorisCafe from "@renderer/plugins/lycoriscafe";
 import { getConfig } from "./stores/config";
 import { detectIndex, getRenderPath, setHomeData } from "./functions";
 import semver from "semver";
+// import yummyani from "@renderer/plugins/yummyani";
 // import Aowu from "@renderer/plugins/aowu";
 
 export class PlayerPluginManager implements playerPluginManagerFormat {
