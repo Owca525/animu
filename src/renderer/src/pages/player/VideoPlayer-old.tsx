@@ -26,7 +26,6 @@ import { unwrap } from "solid-js/store"
 import { removeToast, toast, updateToast } from "@renderer/utils/context/ToastNotification"
 import { useI18n } from "@renderer/utils/i18n"
 import { addTime, countImages, fetchResolutions, VTTstoryBoardParser } from "./playerUtils"
-import shaka from "shaka-player/dist/shaka-player.compiled.js";
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -44,17 +43,12 @@ interface VideoPlayerProps {
     exitFromPlayer: () => void
 }
 
-export type resoltionFormatExtended = resolutionFormat & {
-    track?: shaka.extern.Track
-}
-
 const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, temp, setNextEpisode, volumeCacheFunc, PlayerVolume = 0, time, exitFromPlayer }) => {
     const config: SettingsConfig = getConfig();
     const { t, currentLang } = useI18n()
 
     // ref for html object
     let videoRef: HTMLVideoElement | undefined
-    let shakaPlayer: shaka.Player | undefined
     let containerRef: HTMLDivElement | undefined
     let hideTimer: NodeJS.Timeout | undefined
     let hideChapterButtonTimer: NodeJS.Timeout | undefined
@@ -95,11 +89,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [isPlaying, setIsPlaying] = createSignal<boolean>(config.Player.general.Autoplay)
     const [isFullscreen, setIsFullscreen] = createSignal<boolean>(false)
     const [isCleanup, setCleanup] = createSignal<boolean>(false)
-    const [playerHeadersTMP, setPLayerHeaderTMP] = createSignal<Map<string, string>>(new Map())
 
     // Resolution
-    const [ListResolution, setListResolution] = createSignal<resoltionFormatExtended[]>([])
-    const [currentResolution, setCurrentResoltion] = createSignal<resoltionFormatExtended | undefined>(undefined)
+    const [ListResolution, setListResolution] = createSignal<resolutionFormat[]>([])
+    const [currentResolution, setCurrentResoltion] = createSignal<resolutionFormat | undefined>(undefined)
 
     // Up Next
     const [timeNextEpisode, setTimeNextEpisode] = createSignal<number>(config.Player.upToNextEpisode.durationShow)
@@ -149,46 +142,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             const element = playerData()[index];
             if (element.defaultHost) defaulthost = element
         }
-
-        shaka.net.NetworkingEngine.registerScheme("https", (type, requests) => {
-            const controller = new AbortController();
-
-            const promise = (async () => {
-                let tmp: any = {}
-                if (currentResolution() && currentResolution()?.reqHeader) tmp = currentResolution()?.reqHeader
-                const resp = await request(type, {
-                    method: requests.method as any,
-                    headers: { ...requests.headers, ...tmp, ...playerHeadersTMP() },
-                    body: requests.body,
-                });
-
-                const headersObj: { [key: string]: string } = {};
-                resp.responseHeader.forEach((value, key) => {
-                    headersObj[key] = value;
-                });
-                setPLayerHeaderTMP(resp.responseHeader)
-
-                return {
-                    data: resp.buffer,
-                    headers: headersObj,
-                    uri: type,
-                    originalUri: type,
-                    originalRequest: requests,
-                };
-            })();
-
-            return new shaka.util.AbortableOperation(promise, async () => controller.abort());
-        });
-
-        shakaPlayer = new shaka.Player(videoRef);
-        shakaPlayer.configure({
-            streaming: {
-                bufferingGoal: 3 * 60,
-                rebufferingGoal: 15,
-                bufferBehind: 3 * 60,
-            }
-        })
-
         runNewPlayer(defaulthost)
         handleVolume(PlayerVolume, true)
         handleMouseMove()
@@ -233,7 +186,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (currentASSubtitles()) currentASSubtitles()?.destroy()
         if (videoRef) videoRef.src = ""
         videoRef = undefined
-        shakaPlayer?.destroy()
     })
 
     // player Functions
@@ -255,12 +207,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         videoRef.playbackRate = parseFloat(speed)
     }
 
-    async function setNewResolution(data: resolutionFormat | undefined) {
+    function setNewResolution(data: resolutionFormat | undefined) {
         if (!data) return
         if (!videoRef) return
-        if (!shakaPlayer) return
-        setPLayerHeaderTMP(new Map())
-        setFatalError(false)
+        if (!data.hls) setFatalError(false)
         const time = videoRef.currentTime
         if (data.defaultSubtitles) setDefaultSubtitles(ListSubtitles())
         else setNewSubtitles(ListSubtitles[0])
@@ -279,10 +229,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         //         { url: data.url, header: data.reqHeader }
         //     ))}`
         // }
-
-        try {
-            await shakaPlayer.load(data.url, time)
-        } catch (error) { shakaPlayerErrorParser(error) }
+        videoRef.src = data.url
+        videoRef.currentTime = time
     }
 
     async function setDefaultSubtitles(data: playerSubtitlesFormat[]) {
@@ -299,8 +247,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     async function runNewPlayer(data: playerData) {
         if (!videoRef) return
-        if (!shakaPlayer) return
-        setPLayerHeaderTMP(new Map())
         setFatalError(false)
 
         let currentplayer = data
@@ -345,43 +291,20 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             return
         }
         if (hls()) hls()!.destroy()
-        
+        setCurrentResoltion(currentRes)
         setListResolution(() => currentplayer.resolution)
         setPlayer(() => currentplayer)
-        setCurrentResoltion(currentRes)
-        try {
-            await shakaPlayer.load(currentRes.url, time)
-        } catch (error) { shakaPlayerErrorParser(error) }
-    }
 
-    function shakaPlayerErrorParser(error: any): any {
-        console.error("Shaka Player Error:", error)
-        if (!("category" in error)) return setFatalError(true)
-        if (error.category == 4 && videoRef && currentResolution()) {
-            videoRef.src = currentResolution()!.url
-            videoRef.currentTime = currentTime()
-            return
-        }
-
-        setFatalError(true)
-        // TODO: Add notification Erros
-        // switch (error.category) {
-        //     case 1:
-        //         break
-        //     case 2:
-        //         break
-        //     case 3:
-        //         break
-        //     case 5:
-        //         break
-        //     case 7:
-        //         break
-        //     case 8:
-        //         break
-        //     case 9:
-        //         break
+        // if (currentRes.doNotUseBackend) {
+        //     videoRef.src = currentRes.url
+        // } else {
+        //     videoRef.src = `http://localhost:3001/video?url=${btoa(JSON.stringify(
+        //         { url: currentRes.url, header: currentRes.reqHeader }
+        //     ))}`
         // }
 
+        videoRef.src = currentRes.url
+        videoRef.currentTime = time
     }
 
     function changeAudioTrack(data: { id: number, lang?: string, label: string }) {
@@ -419,7 +342,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                             retry: config.maxRetry,
                             chunkCount: 0,
                             bwEstimate: 0,
-                            loading: { start: now - 10, first: now - 5, end: now },
+                            loading: { start: now-10, first: now-5, end: now },
                             parsing: { start: now, end: now },
                             buffering: { start: now, first: now, end: now }
                         }, context);
@@ -667,12 +590,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         let showUpToNext: boolean = currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
         let timeDelete: number = ((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
-
+        
         if (endingChupter) {
             showUpToNext = currentTime >= endingChupter.start
             timeDelete = ((parseInt(duration.toFixed(0)) - (parseInt(duration.toFixed(0)) - endingChupter.start)) - parseInt(currentTime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
         }
-
+        
         if (isHideUpNextEpisode() == false && temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] != null && showUpToNext) {
             setUpNextEpisode(true)
             setTimeNextEpisode(timeDelete)
@@ -965,13 +888,13 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             let resp: boolean = false
 
             if (config.Player.screenShot.alwaysAsk) resp = await window.api.os.saveDialog(
-                `${config.Player.screenShot.path}/screenshot${formatedDate}.png`,
-                screenshot.replace(/^data:image\/png;base64,/, ''),
+                `${config.Player.screenShot.path}/screenshot${formatedDate}.png`, 
+                screenshot.replace(/^data:image\/png;base64,/, ''), 
                 `screenshot${formatedDate}.png`, "png", ["PNG"], "base64"
             )
             else resp = await window.api.os.write(
-                `${config.Player.screenShot.path}/screenshot${formatedDate}.png`,
-                screenshot.replace(/^data:image\/png;base64,/, ''),
+                `${config.Player.screenShot.path}/screenshot${formatedDate}.png`, 
+                screenshot.replace(/^data:image\/png;base64,/, ''), 
                 "base64"
             )
 
@@ -1002,7 +925,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     ]
 
     function handleProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
-        // if (!config.Player.general.showBrokenBuffer && !hls()) return
+        if (!config.Player.general.showBrokenBuffer && !hls()) return
         const video = event.currentTarget;
         if (video && video.duration > 0 && video.buffered.length > 0) {
             let timestamps: { position: number, width: number }[] = []
@@ -1030,7 +953,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             tmp.push({ left: (element.start / videoRef.duration) * 100, width: ((element.end - element.start) / videoRef.duration) * 100, name: element.name, type: element.type })
         }
         setChapterList(() => tmp)
-    }
+    }   
 
     function getcurrentChapter(): string | undefined {
         if (!currentPlayer()) return undefined
@@ -1086,7 +1009,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     async function changeToDubbing(value: boolean) {
         const player = currentPlayer()
         if (!player) return
-
+        
         if (value && player?.dubResolution) {
             setListResolution(player.dubResolution)
             setNewResolution(player.dubResolution[0])
@@ -1313,11 +1236,11 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             }} class={`player-skip-chapters-button ${IsRunningButtonSkipTime() ? "show" : "hidden"}`}>
                 {currentSkipButton().text}, {`${buttonSkipTime()}s`}
             </button>
-            <div ref={screenShotContainer} class={`player-screenshot-container ${screenShot().active ? "show" : "hidden"}`}
+            <div ref={screenShotContainer} class={`player-screenshot-container ${screenShot().active ? "show" : "hidden"}`} 
                 classList={{ click: screenShot().click != "" }}
                 onclick={() => screenShot().click != "" ? openUrlFolder(screenShot().click) : ""}
-            >
-                <img src={screenShot().image} class="player-screenshot-image" />
+                >
+                <img src={screenShot().image} class="player-screenshot-image"/>
                 <span class="player-screenshot-text">
                     {t("player.toastscreenshot.done")}
                 </span>

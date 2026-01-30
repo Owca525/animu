@@ -711,7 +711,7 @@ function settings() {
                                 }
                             />
                         </div>
-                        <div class="settings-line"></div>
+                        {/* <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             <span class="settings-helpicon-space">
                                 {t("settings.player.showBrokenBuffer")}
@@ -723,7 +723,7 @@ function settings() {
                                     handleChange('Player.general.showBrokenBuffer', checked)
                                 }
                             />
-                        </div>
+                        </div> */}
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             <span class="settings-helpicon-space">
