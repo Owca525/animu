@@ -1,5 +1,5 @@
 import { makeSmallText, request } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, genresSearchFormat, playerData, playerPluginFormat } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, genresSearchFormat, playerData, playerPluginFormat, resolutionFormat } from "@renderer/utils/types";
 
 const WEBSITE = "https://site.yummyani.me/"
 const API = "https://site.yummyani.me/api"
@@ -72,6 +72,14 @@ function checkAnime(animeList: AnimeData[], anime: AnimeData): string | undefine
     }
 }
 
+function detectPlayer(data: { [key: string]: any }): resolutionFormat[] {
+    switch (data["data"]["player_id"]) {
+        case 1:
+            return [{ res: data["iframe_url"].split('/').at(-1), url: `https:${data["iframe_url"]}` }]
+    }
+    return []
+}
+
 export default class yummyani implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
         version: "1.0",
@@ -84,8 +92,19 @@ export default class yummyani implements playerPluginFormat {
 
     episodesCache: { [key: number]: any } = {}
 
-    extractPlayerData = async (type: string, episode: string, id: string): Promise<playerData[]> => {
-        return []
+    extractPlayerData = async (_type: string, episode: string, id: string): Promise<playerData[]> => {
+        try {
+            // TODO: End this
+            await this.extractEpisodeList(undefined, id)
+            const episodes: any[] = this.episodesCache[id].filter((v) => v["number"] == episode)
+            return episodes.map((v) => ({
+                hostname: v["data"]["dubbing"],
+                resolution: detectPlayer(v)
+            }))
+        } catch (error) {
+            console.error("error in extractPlayerData/yummyami", error)
+            return []
+        }
     }
     extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {
         let id = anime_id
