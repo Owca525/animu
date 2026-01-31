@@ -133,6 +133,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     // ScreenShot
     const [screenShot, setScreenShot] = createSignal<{ active: boolean, image: string, click: string }>({ active: false, image: "", click: "" });
 
+    // const gamepad = useGamepad(0, gamepadControler);
+
     function handleMouseMove() {
         setIsVisible(true)
         if (hideTimer) {
@@ -815,6 +817,19 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         track.mode = "hidden"
         track.oncuechange = onChangeTrackText;
     }
+
+    // function gamepadControler(num: number, pressed: boolean) {
+    //     if (!pressed) return
+    //     if (!videoRef) return
+    //     let time_now = videoRef.currentTime
+
+    //     switch (num) {
+    //         case 0:
+    //             togglePlay()
+    //             break
+            
+    //     }
+    // }
 
     function keybinds(event: string) {
         if (!videoRef) return
