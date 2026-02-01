@@ -37,6 +37,7 @@ import CharacterContainer from './components/characterContainer';
 import { getConfig } from '@renderer/utils/stores/config';
 import Container from '../home/components/container';
 import { toast, updateToast } from '@renderer/utils/context/ToastNotification';
+import { showCustomMenu } from '@renderer/utils/context/menuContext';
 // import RelationCard from './components/relationCard';
 
 function information() {
@@ -314,6 +315,10 @@ function information() {
                             <Show when={tempData().anime.trailer}>
                                 <Button titleButton={t("information.bar.trailer")} icon="theaters" ButtonClass="information-bar-icon" onClick={() => openUrlFolder(`https://www.youtube.com/watch?v=${tempData().anime.trailer?.id}`)} />
                             </Show>
+                            <Button titleButton={"Add To Animulist"} icon="add" ButtonClass="information-bar-icon" onClick={() => showCustomMenu({ title: `Add ${tempData().anime.title.romaji}`, animuList: {
+                                anime: unwrap(tempData().anime),
+                                save: (animulist, anime) => window.api.animulist.add({ AnimeData: anime, animulist }) 
+                            } })} />
                         </div>
                     </div>
 

@@ -348,3 +348,17 @@ export const ThemeSchema = z.object({
         })
     ).optional()
 });
+
+export interface animulistData {
+    AnimeData: AnimeData
+    animulist: {
+        status: "CURRENT" | "PLANNING" | "COMPLETED" | "REPEATING" | "DROPPED" | "PAUSED",
+        score: number,
+        reapeat: number,
+        startWatch: number,
+        endWatch: number,
+        added: number,
+        lastUpdate: number,
+        favorite?: boolean
+    }
+}

@@ -1,12 +1,15 @@
 import { createContext, JSX, For, Show, createSignal } from "solid-js";
 import { Portal } from "solid-js/web";
 import "./css/menuContext.css";
-import { themeMetadata } from "../types";
+import { AnimeData, cardData, themeMetadata } from "../types";
 import CheckBox from "@renderer/components/checkBox";
 import Dropdown from "@renderer/components/dropDown";
 import Button from "@renderer/components/buttons";
 import SettingsInput from "@renderer/pages/settings/components/settingsInput";
 import { useI18n } from "../i18n";
+import Input from "@renderer/components/input";
+import { dateToUnix } from "../functions";
+import { animulistData } from "../stores/global";
 
 interface menuProps {
     title: string;
@@ -18,6 +21,10 @@ interface menuProps {
     pluginConfig?: {
         config: { [key: string]: any }
         onChange: (variable: string, change: any) => void
+    }
+    animuList?: {
+        anime: AnimeData
+        save: (animulist: cardData["animulist"], anime: AnimeData) => void
     }
 }
 
@@ -34,13 +41,21 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
     const { t, pathExist } = useI18n()
     const [content, setContent] = createSignal<menuProps | undefined>();
 
+    const [animuListData, setAnimulistData] = createSignal<cardData["animulist"]>({
+        status: "CURRENT",
+        score: 0,
+        reapeat: 0,
+        startWatch: 0,
+        endWatch: 0,
+        added: 0,
+        lastUpdate: 0
+    });
+
     function showCustomMenu(data: menuProps) {
         setContent(data);
     }
 
-    function hideCustomMenu() {
-        setContent(undefined);
-    }
+    function hideCustomMenu() { setContent(undefined); }
 
     function isCustomMenuActive() {
         return content() ? true : false;
@@ -130,6 +145,28 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
                                             return
                                         }}
                                     </For>
+                                </Show>
+                                <Show when={content()?.animuList}>
+                                    <div class="custom-menu-space">
+                                        Status
+                                        <Dropdown disableX buttonText={animuListData()?.status} options={["CURRENT", "PLANNING", "COMPLETED", "REPEATING", "DROPPED", "PAUSED"].map((v) => ({ label: v, onClick: () => setAnimulistData((p) => ({...p, status: v} as any)) }))} />
+                                    </div>
+                                    <div class="custom-menu-space">
+                                        Score
+                                        <Input type={"number"} defaultValue={animuListData()?.score.toString()} onKeyDown={(v) => setAnimulistData(p => ({ ...p, score: parseInt(v) } as any))}/>
+                                    </div>
+                                    <div class="custom-menu-space">
+                                        Start Date
+                                        <Input type={"date"} onKeyDown={(v) => setAnimulistData(p => ({ ...p, startWatch: dateToUnix(v) }) as any)}/>
+                                    </div>
+                                    <div class="custom-menu-space">
+                                        Finish Date
+                                        <Input type={"date"} onKeyDown={(v) => setAnimulistData(p => ({ ...p, endWatch: dateToUnix(v) }) as any)}/>
+                                    </div>
+                                    <div class="custom-menu-space">
+                                        Save To Animulist
+                                        <Button content="Save" onClick={() => content()?.animuList?.save(animulistData() as any, content()!.animuList!.anime)}/>
+                                    </div>
                                 </Show>
                             </div>
                             <Button

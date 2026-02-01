@@ -25,7 +25,7 @@ import {
 } from 'solid-js';
 import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import { getConfig, setConfig } from './utils/stores/config';
-import { getGlobalCache, setGlobalHistory, setGlobalTheme, setIncognitoMode } from './utils/stores/global';
+import { getGlobalCache, setAnimulistData, setGlobalHistory, setGlobalTheme, setIncognitoMode } from './utils/stores/global';
 import { HashRouter, Route } from '@solidjs/router';
 import { getInformationPlugin, pluginManager } from './utils/stores/plugins';
 import { setHomeActivePage } from './utils/stores/home';
@@ -93,6 +93,9 @@ function App() {
     setinitialState({ text: "Loading Config", plugin: false })
     LoadConfig()
     setHomeActivePage("global.home")
+
+    setinitialState({ text: "Loading AnimuList", plugin: false })
+    setAnimulistData(await window.api.animulist.getDatabase())
 
     setinitialState({ text: "Loading Plugin", plugin: false })
     await fetchPluginRepos()

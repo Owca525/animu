@@ -110,7 +110,8 @@ export interface globalDataFormat {
     deeplinkRunned: boolean,
     loadedTheme: themeMetadata[],
     activeThemes: Map<number, themeMetadata>
-    token: UUIDTypes | undefined
+    token: UUIDTypes | undefined,
+    animuList: { AnimeData: AnimeData, animulist: cardData["animulist"], onClick?: (data: AnimeData) => void }[]
 }
 
 export type playerDataExtended = playerData & {
@@ -165,6 +166,16 @@ export interface indentityPlayer {
 export interface cardData {
     AnimeData: AnimeData
     saveData?: indentityPlayer
+    animulist?: {
+        status: "CURRENT" | "PLANNING" | "COMPLETED" | "REPEATING" | "DROPPED" | "PAUSED",
+        score: number,
+        reapeat: number,
+        startWatch: number,
+        endWatch: number,
+        added: number,
+        lastUpdate: number,
+        favorite?: boolean
+    }
     onClick?: (data: AnimeData) => void
 }
 

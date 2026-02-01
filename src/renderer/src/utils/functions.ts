@@ -625,3 +625,8 @@ export async function getPluginInitialConfig(name: string, config: { [key: strin
     localStorage.setItem(name, JSON.stringify(config))
     return config
 }
+
+export function dateToUnix(dateStr: string): number {
+  const date = new Date(dateStr);
+  return Math.floor(date.getTime() / 1000);
+}

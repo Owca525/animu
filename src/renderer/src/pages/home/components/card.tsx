@@ -14,6 +14,7 @@ import { unwrap } from "solid-js/store";
 import { removeToast, toast, updateToast } from "@renderer/utils/context/ToastNotification";
 import { pluginManager } from "@renderer/utils/stores/plugins";
 import { useI18n } from "@renderer/utils/i18n";
+import { showCustomMenu } from "@renderer/utils/context/menuContext";
 
 interface CardProps {
   card: cardData;
@@ -22,7 +23,7 @@ interface CardProps {
 
 function Card(props: CardProps) {
   const { t, pathExist } = useI18n()
-  
+
   const navigate = useNavigate();
   const [isLoading, setLoading] = createSignal(true);
   const [isError, setIsError] = createSignal(false);
@@ -73,7 +74,7 @@ function Card(props: CardProps) {
         episodelist: episodeList,
         continewatch: true,
       }))
-      
+
       removeToast(idToast)
       navigate("/player");
       return;
@@ -129,6 +130,17 @@ function Card(props: CardProps) {
           : "",
     })
   }
+
+  CenterContextMenu.push({
+    option: "Add To AnimuList",
+    onClick: () =>
+      showCustomMenu({
+        title: `Add ${props.card.AnimeData.title.romaji}`, animuList: {
+          anime: unwrap(props.card.AnimeData),
+          save: (animulist, anime) => window.api.animulist.add({ AnimeData: anime, animulist })
+        }
+      }),
+  });
 
   if (props.card.saveData) {
     CenterContextMenu.push({
