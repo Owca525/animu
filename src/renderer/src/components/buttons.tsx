@@ -1,3 +1,4 @@
+import { Show } from "solid-js";
 import "./css/buttons.css";
 
 interface ButtonProps {
@@ -15,13 +16,17 @@ export default function Button(props: ButtonProps) {
       tabIndex={-1}
       class={"button " + (props.ButtonClass ?? "")}
       onClick={props.onClick}
-      title={props.titleButton ?? ""}
     >
-      {props.icon && (
+      <Show when={props.titleButton}>
+        <span class="button-tooltip">
+          {props.titleButton}
+        </span>
+      </Show>
+      <Show when={props.icon}>
         <span class={"material-symbols-outlined " + (props.iconClassName ?? "")}>
           {props.icon}
         </span>
-      )}
+      </Show>
       {props.content}
     </button>
   );

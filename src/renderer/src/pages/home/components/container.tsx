@@ -15,6 +15,7 @@ function Container(props: containerData) {
   let container: HTMLDivElement | undefined
   const [currentPage, setcurrentPage] = createSignal(unwrap(getHomeCache().page))
   const [animeCards, setAnimeCards] = createSignal<cardData[]>(props.data)
+  const [disableScrollButtons, setDisableScrollButtons] = createSignal<boolean>(false)
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -46,6 +47,8 @@ function Container(props: containerData) {
 
   onMount(() => {
     handleUpdate()
+    checkSkipButtons()
+    window.addEventListener("resize", checkSkipButtons)
   })
 
   createEffect(() => {
@@ -54,8 +57,14 @@ function Container(props: containerData) {
   })
 
   onCleanup(() => {
-    observer.disconnect()
+    window.removeEventListener("resize", checkSkipButtons)
   })
+
+  function checkSkipButtons() {
+    if (!container) return
+    if (container.clientWidth >= container.scrollWidth) setDisableScrollButtons(true)
+    else setDisableScrollButtons(false)
+  }
 
   function handleUpdate() {
     if (props.horizontal) return
@@ -96,9 +105,6 @@ function Container(props: containerData) {
         </Show>
       </div>
       <div tabIndex={-1} class={`container-button-container ${animeCards().length <= 0 && " container-error"}`}>
-        <Show when={props.horizontal && animeCards().length > 0}>
-          <Button icon="chevron_left" ButtonClass="container-left-skip-button" onClick={() => handleButtonScroll(-120)} />
-        </Show>
         <Show when={animeCards().length > 0}>
           <div tabIndex={-1} class={props.horizontal ? "container-data-horizontal" : "container-data"} ref={container}>
             <For each={animeCards()}>
@@ -109,7 +115,8 @@ function Container(props: containerData) {
         <Show when={animeCards().length <= 0}>
           <div class="home-empty-container container-error-text"><span class="material-symbols-outlined home-empty-icon">search_off</span>{t("home.nothingfound")}</div>
         </Show>
-        <Show when={props.horizontal && animeCards().length > 0}>
+        <Show when={disableScrollButtons() == false && (props.horizontal && animeCards().length > 0)}>
+          <Button icon="chevron_left" ButtonClass="container-left-skip-button" onClick={() => handleButtonScroll(-120)} />
           <Button icon="chevron_right" ButtonClass="container-right-skip-button" onClick={() => handleButtonScroll(120)} />
         </Show>
       </div>
