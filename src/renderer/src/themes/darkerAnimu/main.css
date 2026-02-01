@@ -261,13 +261,12 @@ body {
 /* Cards */
 
 .card-container:hover {
-  background-color: var(--first-layer);
-  outline-color: var(--green-one);
+  background-color: var(--third-layer);
+  transform: scale(1.02);
 }
 
 .card-container {
   transition: all 150ms ease;
-  outline: 3px solid var(--invisible);
   border-radius: 8px;
 }
 
@@ -391,6 +390,7 @@ body {
 
 .information-characters-card:hover {
   background-color: var(--five-layer);
+  transform: scale(1.02);
 }
 
 .information-characters-card-cover {
