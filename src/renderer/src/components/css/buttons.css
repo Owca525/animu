@@ -7,5 +7,50 @@
     padding: clamp(4px, 1vw, 12px);
     transition: all 0.1s ease;
     user-select: none;
-    overflow: hidden;
+    anchor-name: ---button;
+    position: relative;
+}
+
+.button-tooltip {
+  position: absolute;
+  position-anchor: ---button;
+  position-fallback: --tooltip-fallback;
+
+  left: anchor(center);
+  bottom: anchor(top);
+  margin-bottom: 80px;
+  margin-left: 10px;
+  transform: translateX(-50%);
+
+  background: var(--five-layer);
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.9em;
+
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 150ms;
+  user-select: none;
+  pointer-events: none;
+}
+
+.button-tooltip-container {
+    position: relative;
+}
+
+.button:hover .button-tooltip {
+  opacity: 1;
+}
+
+@position-fallback --tooltip-fallback {
+  @try {
+    inset-block-end: anchor(top);
+    margin-bottom: 8px;
+  }
+
+  @try {
+    inset-block-start: anchor(bottom);
+    margin-top: 8px;
+  }
 }
