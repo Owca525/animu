@@ -7,6 +7,8 @@ import { Component, createSignal, For, Show } from 'solid-js';
 import { useI18n } from '@renderer/utils/i18n';
 import { pluginManager } from '@renderer/utils/stores/plugins';
 import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
+import { animulistData } from '@renderer/utils/stores/global';
+import { unwrap } from 'solid-js/store';
 
 type bigCardProps = { data: cardData, ref?: any }
 
@@ -24,7 +26,8 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
     }
 
     function openInformation() {
-        localStorage.setItem("informationCache", JSON.stringify({ anime: data.AnimeData }))
+        const animulist = unwrap(animulistData())
+        localStorage.setItem("informationCache", JSON.stringify({ anime: data.AnimeData, animulist: animulist.find((v) => v.AnimeData.id == data.AnimeData.id) }))
         navigate("/info");
     }
 
