@@ -1202,8 +1202,16 @@ function settings() {
                             {t("settings.extensions.updateplugin")}
                             <Button content={t("settings.general.checkupdate")} onClick={async () => {
                                 await fetchPluginRepos()
-                                await detectPluginVersion()
-                            }}/>
+                                await detectPluginVersion(true)
+                                await getInformationPlugin().initial()
+                                await pluginManager().initialPlugins()
+                                const plugin = getPlayerPLugin()
+                                const playerPluginList = getPluginList().map((pl) => {
+                                    if (!plugin) return { active: false, plugin: pl }
+                                    return { active: plugin.metadata.name == pl.metadata.name, plugin: pl }
+                                })
+                                setpluginList([{ active: true, plugin: getInformationPlugin().currentPlugin }, ...playerPluginList])
+                            }} />
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-container-extensions-menu">
