@@ -20,6 +20,7 @@ import { unwrap } from 'solid-js/store';
 import { getInformationPlugin, getPluginList, getPluginRepo, pluginManager, setPluginRepo } from './stores/plugins';
 import semver from "semver";
 import { v4 as uuidv4 } from 'uuid';
+import { toast, updateToast } from './context/ToastNotification';
 
 export function decodeHtmlEntities(str: string) {
     const parser = new DOMParser();
@@ -560,7 +561,7 @@ export function detectIndex(str: string) {
     else return str.replaceAll("index.js", index)
 }
 
-export async function detectPluginVersion() {
+export async function detectPluginVersion(notification: boolean = false) {
     const plugins = unwrap(getPluginList())
     const pluginsRepo = unwrap(getPluginRepo())
     let reInitial = false
@@ -569,8 +570,12 @@ export async function detectPluginVersion() {
         const tmp = pluginsRepo.find((v) => v.name == element.metadata.name)
         if (!tmp) continue
         if (semver.gt(semver.coerce(tmp.ver) as any, semver.coerce(element.metadata.version) as any)) {
-            await window.api.plugins.installUpdate(tmp)
             reInitial = true
+            if (notification) {
+                const id = toast(`Update ${tmp.name} from ${element.metadata.version} to ${tmp.ver}`, { type: "loading", removeTimer: true })
+                await window.api.plugins.installUpdate(tmp)
+                updateToast(id, "Update Succesfully Installed", { type: "success", removeTimer: false })
+            } else await window.api.plugins.installUpdate(tmp)
         }
     }
     if (reInitial) {

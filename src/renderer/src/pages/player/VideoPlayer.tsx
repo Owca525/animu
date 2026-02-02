@@ -664,7 +664,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         let endingChupter: playerChapterList | undefined = undefined
         if (currentPlayer()!.listChapters) endingChupter = currentPlayer()!.listChapters!.find((cha) => cha.type == "ending")
 
-        if (!endingChupter && currentPlayer()!.listChapters) return
         if (currentPlayer()!.listChapters && endingChupter && endingChupter.end == 0 && endingChupter.start == 0) return
 
         let showUpToNext: boolean = currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())

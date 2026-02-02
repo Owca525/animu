@@ -47,8 +47,10 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
             const plugin = plugins[index];
             if (plugin.pluginType == "information") continue
             if (plugin.type != "official" && !conf.plugins.userPlugins) continue
+
             const tmpPlugin = repoPlugins.find((v) => v.name.toLowerCase() == plugin.file.replaceAll(".js", "").toLowerCase())
-            if (tmpPlugin && plugin.type != "user" && tmpPlugin.sha256 != plugin.sha256) continue 
+
+            if (tmpPlugin && plugin.type != "user" && tmpPlugin.sha256 != plugin.sha256) continue
             try {
                 const newBlob = new Blob([detectIndex(plugin.content)], { type: "application/javascript" });
                 const newUrl = URL.createObjectURL(newBlob);
@@ -61,7 +63,7 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
     }
 
     initialPlugins = async (): Promise<void> => {
-        if (this.pluginList.length > 0) return
+        this.pluginList = []
         const localPlugins = [Allmanga, Anizone, GojoLive, LycorisCafe]
 
         const plugins = await getPluginsList()
@@ -96,6 +98,11 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
                     semver.gt(semver.coerce(other.metadata.version) as any, semver.coerce(item.metadata.version) as any)
             );
         })
+
+        this.pluginList = this.pluginList.filter(
+            (item, index, self) =>
+                index === self.findIndex(i => i.metadata.name === item.metadata.name)
+        )
 
         this.currentPlugin = this.pluginList[0]
         setPlayerPlugin(this.pluginList[0])
