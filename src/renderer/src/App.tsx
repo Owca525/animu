@@ -96,10 +96,10 @@ function App() {
 
     setinitialState({ text: "Loading Plugin", plugin: false })
     await fetchPluginRepos()
+    await detectPluginVersion()
     await getInformationPlugin().initial()
     await pluginManager().initialPlugins()
     setInitation(false)
-    detectPluginVersion()
 
     // Code: https://github.com/cynthia2006/hanime-plugin/blob/master/yt_dlp_plugins/extractor/htv.py
     // const payload = `
