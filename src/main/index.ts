@@ -63,6 +63,16 @@ function createWindow(): void {
     event.preventDefault();
   });
 
+  mainWindow.on("focus", () => {
+    if (!mainWindow) return
+    mainWindow.webContents.send("browserWindow:focus", true);
+  });
+
+  mainWindow.on("blur", () => {
+    if (!mainWindow) return
+    mainWindow.webContents.send("browserWindow:focus", false);
+  });
+
   global.createPiPWindow = () => {
     pipWindow = new BrowserWindow({
       width: 300,

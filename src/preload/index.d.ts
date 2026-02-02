@@ -114,7 +114,8 @@ declare global {
       setZoom: (zoom: number) => void;
       exit: () => void;
       openDevTools: () => void;
-      reload: () => void
+      reload: () => void;
+      onWindowFocus: (callback: (focus: boolean) => void) => void
     };
   }
 }
