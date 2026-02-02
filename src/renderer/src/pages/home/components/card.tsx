@@ -92,7 +92,7 @@ function Card(props: CardProps) {
     localStorage.setItem("informationCache", JSON.stringify({ 
       anime: props.card.AnimeData, 
       saveData: props.card.saveData, 
-      animulist: animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id) 
+      animulist: props.card.animulist ? props.card.animulist : animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id) 
     }))
     navigate("/info");
   }
