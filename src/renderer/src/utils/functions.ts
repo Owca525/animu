@@ -639,7 +639,7 @@ export function dateToUnix(dateStr: string): number {
 }
 
 export async function addToAnimuList(animulist: animulistProps, anime: AnimeData, notification: boolean = false) {
-    await window.api.animulist.add({ AnimeData: unwrap(anime), animulist: unwrap(animulist) })
+    await window.api.animulist.add({ AnimeData: {...unwrap(anime), nextAiringEpisode: undefined}, animulist: unwrap(animulist) })
     refreashAnimulist()
     if (notification) toast(`Succesfully Added ${anime.title.romaji} to animulist`)
 }

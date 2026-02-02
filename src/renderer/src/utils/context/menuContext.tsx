@@ -166,7 +166,11 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
                                     </div>
                                     <div class="custom-menu-space">
                                         Save To Animulist
-                                        <Button content="Save" onClick={() => {content()?.animuList?.save({...unwrap(animulistTMPData()), lastUpdate: dateToUnix(new Date().toString()), added: dateToUnix(new Date().toString())} as any, content()!.animuList!.anime);hideCustomMenu()}}/>
+                                        <Button content="Save" onClick={() => {
+                                            content()?.animuList?.save({...unwrap(animulistTMPData()), lastUpdate: dateToUnix(new Date().toString()), added: dateToUnix(new Date().toString())} as any, 
+                                            {...content()!.animuList!.anime, nextAiringEpisode: undefined});
+                                            hideCustomMenu()
+                                        }}/>
                                     </div>
                                 </Show>
                             </div>
