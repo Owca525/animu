@@ -16,10 +16,12 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
     const [cardWidth, setCardWidth] = createSignal(0);
 
     onMount(() => {
-        window.BrowserWindow.onWindowFocus((focus) => {
-            console.log(focus)
+        const callback = window.BrowserWindow.onWindowFocus((focus) => {
             if (focus) restartAutoSlide()
             else stopAutoSlide()
+        })
+        onCleanup(() => {
+            callback()
         })
 
         handleUpdate()

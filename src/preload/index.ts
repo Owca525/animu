@@ -93,7 +93,13 @@ if (process.contextIsolated) {
       exit: () => ipcRenderer.send("exit"),
       openDevTools: () => ipcRenderer.send("openDevTools"),
       reload: () => ipcRenderer.send("reload-window"),
-      onWindowFocus: (callback) => ipcRenderer.on("browserWindow:focus", (_, isFocused) => callback(isFocused))
+      onWindowFocus: (callback) => {
+        const handler = (_, value) => callback(value);
+        ipcRenderer.on("browserWindow:focus", handler);
+        return () => {
+          ipcRenderer.removeListener("browserWindow:focus", handler);
+        };
+      }
     });
   } catch (error) {
     console.error(error);
