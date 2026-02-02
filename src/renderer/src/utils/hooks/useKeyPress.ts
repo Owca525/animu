@@ -26,8 +26,7 @@ export function useKeyPress(func: (keybinds: string) => void) {
   };
 
   onMount(() => {
-    window.BrowserWindow.onWindowFocus((focus) => {
-      console.log("Keypress", focus)
+    const callback = window.BrowserWindow.onWindowFocus((focus) => {
       if (focus) {
         window.addEventListener("keydown", handleKeyDown, { passive: true });
         window.addEventListener("keyup", handleKeyUp, { passive: true });
@@ -35,6 +34,9 @@ export function useKeyPress(func: (keybinds: string) => void) {
         window.removeEventListener("keydown", handleKeyDown);
         window.removeEventListener("keyup", handleKeyUp);
       }
+    })
+    onCleanup(() => {
+      callback()
     })
 
     window.addEventListener("keydown", handleKeyDown, { passive: true });
