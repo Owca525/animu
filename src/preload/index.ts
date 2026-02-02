@@ -92,7 +92,8 @@ if (process.contextIsolated) {
       setZoom: (zoom: number) => ipcRenderer.send("setZoom", zoom),
       exit: () => ipcRenderer.send("exit"),
       openDevTools: () => ipcRenderer.send("openDevTools"),
-      reload: () => ipcRenderer.send("reload-window")
+      reload: () => ipcRenderer.send("reload-window"),
+      onWindowFocus: (callback) => ipcRenderer.on("browserWindow:focus", (_, isFocused) => callback(isFocused))
     });
   } catch (error) {
     console.error(error);
