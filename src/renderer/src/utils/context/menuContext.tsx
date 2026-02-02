@@ -1,7 +1,7 @@
 import { createContext, JSX, For, Show, createSignal } from "solid-js";
 import { Portal } from "solid-js/web";
 import "./css/menuContext.css";
-import { AnimeData, cardData, themeMetadata } from "../types";
+import { AnimeData, animulistProps, themeMetadata } from "../types";
 import CheckBox from "@renderer/components/checkBox";
 import Dropdown from "@renderer/components/dropDown";
 import Button from "@renderer/components/buttons";
@@ -9,7 +9,7 @@ import SettingsInput from "@renderer/pages/settings/components/settingsInput";
 import { useI18n } from "../i18n";
 import Input from "@renderer/components/input";
 import { dateToUnix } from "../functions";
-import { animulistData } from "../stores/global";
+import { unwrap } from "solid-js/store";
 
 interface menuProps {
     title: string;
@@ -24,7 +24,8 @@ interface menuProps {
     }
     animuList?: {
         anime: AnimeData
-        save: (animulist: cardData["animulist"], anime: AnimeData) => void
+        animulist?: animulistProps
+        save: (animulist: animulistProps, anime: AnimeData) => void
     }
 }
 
@@ -41,7 +42,7 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
     const { t, pathExist } = useI18n()
     const [content, setContent] = createSignal<menuProps | undefined>();
 
-    const [animuListData, setAnimulistData] = createSignal<cardData["animulist"]>({
+    const [animulistTMPData, setAnimulistData] = createSignal<animulistProps>(content()?.animuList?.animulist ? content()?.animuList?.animulist : {
         status: "CURRENT",
         score: 0,
         reapeat: 0,
@@ -49,7 +50,7 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
         endWatch: 0,
         added: 0,
         lastUpdate: 0
-    });
+    } as any);
 
     function showCustomMenu(data: menuProps) {
         setContent(data);
@@ -149,11 +150,11 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
                                 <Show when={content()?.animuList}>
                                     <div class="custom-menu-space">
                                         Status
-                                        <Dropdown disableX buttonText={animuListData()?.status} options={["CURRENT", "PLANNING", "COMPLETED", "REPEATING", "DROPPED", "PAUSED"].map((v) => ({ label: v, onClick: () => setAnimulistData((p) => ({...p, status: v} as any)) }))} />
+                                        <Dropdown disableX buttonText={t(`animulist.status.${animulistTMPData()?.status}`)} options={["CURRENT", "PLANNING", "COMPLETED", "REPEATING", "DROPPED", "PAUSED"].map((v) => ({ label: t(`animulist.status.${v}`), onClick: () => setAnimulistData((p) => ({...p, status: v} as any)) }))} />
                                     </div>
                                     <div class="custom-menu-space">
                                         Score
-                                        <Input type={"number"} defaultValue={animuListData()?.score.toString()} onKeyDown={(v) => setAnimulistData(p => ({ ...p, score: parseInt(v) } as any))}/>
+                                        <Input type={"number"} defaultValue={animulistTMPData()?.score.toString()} onKeyDown={(v) => setAnimulistData(p => ({ ...p, score: parseInt(v) } as any))}/>
                                     </div>
                                     <div class="custom-menu-space">
                                         Start Date
@@ -165,7 +166,7 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
                                     </div>
                                     <div class="custom-menu-space">
                                         Save To Animulist
-                                        <Button content="Save" onClick={() => content()?.animuList?.save(animulistData() as any, content()!.animuList!.anime)}/>
+                                        <Button content="Save" onClick={() => {content()?.animuList?.save({...unwrap(animulistTMPData()), lastUpdate: dateToUnix(new Date().toString()), added: dateToUnix(new Date().toString())} as any, content()!.animuList!.anime);hideCustomMenu()}}/>
                                     </div>
                                 </Show>
                             </div>

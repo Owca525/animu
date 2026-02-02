@@ -21,6 +21,16 @@
         "on": "On",
         "action": "Action"
     },
+    "animulist": {
+        "status": {
+            "CURRENT": "Watching",
+            "PLANNING": "Planning",
+            "COMPLETED": "Completed",
+            "REPEATING": "Rewatching",
+            "PAUSED": "Paused",
+            "DROPPED": "Dropped"
+        }
+    },
     "imageviewer": {
         "failedfetch": "Failed Fetch Image",
         "failedsave": "Failed Save Image",

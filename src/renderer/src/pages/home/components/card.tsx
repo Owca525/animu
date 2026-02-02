@@ -4,9 +4,11 @@ import { useNavigate } from "@solidjs/router";
 import { JSX, Match, Show, Switch, createSignal, onMount, onCleanup } from "solid-js";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import {
+  addToAnimuList,
   convertSeconds,
   CreateContextMenuOptions,
   getGradientColor,
+  removeFromAnimulist,
   SaveToClipboard,
 } from "@renderer/utils/functions";
 import { DeleteFromHistory, SaveHistory } from "@renderer/utils/FilesManager/history";
@@ -15,6 +17,7 @@ import { removeToast, toast, updateToast } from "@renderer/utils/context/ToastNo
 import { pluginManager } from "@renderer/utils/stores/plugins";
 import { useI18n } from "@renderer/utils/i18n";
 import { showCustomMenu } from "@renderer/utils/context/menuContext";
+import { animulistData } from "@renderer/utils/stores/global";
 
 interface CardProps {
   card: cardData;
@@ -131,16 +134,24 @@ function Card(props: CardProps) {
     })
   }
 
-  CenterContextMenu.push({
-    option: "Add To AnimuList",
-    onClick: () =>
-      showCustomMenu({
-        title: `Add ${props.card.AnimeData.title.romaji}`, animuList: {
-          anime: unwrap(props.card.AnimeData),
-          save: (animulist, anime) => window.api.animulist.add({ AnimeData: anime, animulist })
-        }
-      }),
-  });
+  if (animulistData().find((v) => v.AnimeData.id == props.card.AnimeData.id) && !props.disableinformation) {
+    CenterContextMenu.push({
+      option: "Remove From Anilist",
+      onClick: () => removeFromAnimulist(props.card.AnimeData.id, true),
+      deletion: true
+    });
+  } else if (!props.disableinformation) {
+    CenterContextMenu.push({
+      option: "Add To AnimuList",
+      onClick: () =>
+        showCustomMenu({
+          title: `Add ${props.card.AnimeData.title.romaji}`, animuList: {
+            anime: unwrap(props.card.AnimeData),
+            save: (animulist, anime) => addToAnimuList(animulist, anime, true)
+          }
+        }),
+    });
+  }
 
   if (props.card.saveData) {
     CenterContextMenu.push({
@@ -203,6 +214,10 @@ function Card(props: CardProps) {
       );
     } else if (!(props.card.AnimeData.season && props.card.AnimeData.seasonYear) && !props.card.AnimeData.nextAiringEpisode) {
       info.push(<div class="card-information-text card-information-top">TBA</div>);
+    }
+
+    if (props.card.animulist) {
+      info.push(<div class="card-information-animulist-status">Status: {t(`animulist.status.${props.card.animulist.status}`)}</div>)
     }
 
     if (props.card.AnimeData.studios && props.card.AnimeData.studios.length > 0) {

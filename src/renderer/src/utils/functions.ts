@@ -1,4 +1,6 @@
 import {
+    AnimeData,
+    animulistProps,
     cardData,
     containerData,
     ContextMenuProps,
@@ -12,7 +14,7 @@ import {
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { getGlobalCache, setActiveThemes, setGlobalToken } from './stores/global';
+import { animulistData, getGlobalCache, setActiveThemes, setAnimulistData, setGlobalToken } from './stores/global';
 import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
@@ -625,13 +627,60 @@ export async function getPluginsList() {
     return await window.api.plugins.list()
 }
 
-export async function getPluginInitialConfig(name: string, config: { [key: string]: any;}): Promise<{[key: string]: any;}> {
+export async function getPluginInitialConfig(name: string, config: { [key: string]: any; }): Promise<{ [key: string]: any; }> {
     if (window.api) return await window.api.plugins.getConfig(name, config)
     localStorage.setItem(name, JSON.stringify(config))
     return config
 }
 
 export function dateToUnix(dateStr: string): number {
-  const date = new Date(dateStr);
-  return Math.floor(date.getTime() / 1000);
+    const date = new Date(dateStr);
+    return Math.floor(date.getTime() / 1000);
+}
+
+export async function addToAnimuList(animulist: animulistProps, anime: AnimeData, notification: boolean = false) {
+    await window.api.animulist.add({ AnimeData: unwrap(anime), animulist: unwrap(animulist) })
+    refreashAnimulist()
+    if (notification) toast(`Succesfully Added ${anime.title.romaji} to animulist`)
+}
+
+export async function removeFromAnimulist(id: string, notification: boolean = false) {
+    await window.api.animulist.delete(unwrap(id))
+    refreashAnimulist()
+    if (notification) toast(`Succesfully Removed From animulist`)
+}
+
+export async function updateDataInAnimulist(id: string, anime: { AnimeData: AnimeData; animulist: animulistProps }, notification: boolean = false) {
+    await window.api.animulist.update(unwrap(id), unwrap(anime))
+    refreashAnimulist()
+    if (notification) toast(`Succesfully Updated in animulist`)
+}
+
+export async function refreashAnimulist() {
+    setAnimulistData(await window.api.animulist.getDatabase())
+    const global = getHomeCache()
+    if (global.activePage != "AnimuList") return
+
+    setHomeData(undefined, {
+        sections: [
+            {
+                data: animulistData()
+            }
+        ]
+    })
+}
+
+export function unixToDateTime(unixTimestamp: number | undefined): string {
+    if (!unixTimestamp || unixTimestamp == 0) return t("player.other.unknown")
+    const date = new Date(unixTimestamp * 1000);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }

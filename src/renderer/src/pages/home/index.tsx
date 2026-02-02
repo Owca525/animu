@@ -39,7 +39,7 @@ import {
 } from "@renderer/utils/types";
 import { useI18n } from '@renderer/utils/i18n';
 import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
-import { getGlobalCache, setDeeplinkRunned } from '@renderer/utils/stores/global';
+import { animulistData, getGlobalCache, setDeeplinkRunned } from '@renderer/utils/stores/global';
 // import { createShortcut } from "@solid-primitives/keyboard";
 // import WelcomeScreen from "./components/welcomeScreen"
 const Home = () => {
@@ -49,6 +49,7 @@ const Home = () => {
   const [homeCache] = createSignal<homeData>(getHomeCache());
   // const pluginPlayer = getPlayerPLugin();
   const [isOpenSidebar, setOpenSidebar] = createSignal<boolean>(false);
+  const [searchText, setSearchText] = createSignal<string>();
   const [headerActive, setHeaderActive] = createSignal<boolean>(false)
 
   let divRef: HTMLDivElement | undefined;
@@ -64,6 +65,11 @@ const Home = () => {
         icon: "history",
         text: "global.history",
         onClick: setHistory,
+      },
+      {
+        icon: "view_list",
+        text: "AnimuList",
+        onClick: setAnimuList,
       },
     ],
     bottom: [
@@ -82,9 +88,25 @@ const Home = () => {
   //   };
   // }
 
+  function detectActivePage() {
+    switch (getHomeCache().activePage) {
+      case "global.history":
+        changeTitleAnimu(`Animu - ${t("global.history")}`)
+        setSearchText(t("home.historySearch"))
+        break
+      case "global.home":
+        changeTitleAnimu(`Animu - ${t("global.home")}`)
+        setSearchText(t("home.search"))
+        break
+      case "AnimuList":
+        changeTitleAnimu(`Animu - AnimuList`)
+        setSearchText("Search in AnimuList...")
+        break
+    }
+  }
+
   onMount(() => {
-    if (getHomeCache().activePage == "global.history") changeTitleAnimu(`Animu - ${t("global.history")}`)
-    else changeTitleAnimu(`Animu - ${t("global.home")}`)
+    detectActivePage()
 
     if (!getGlobalCache().deeplinkRunned) {
       window.api.onProtocolRequest(fetchDeeplinks)
@@ -162,10 +184,25 @@ const Home = () => {
     navigate("/player");
   }
 
+  function setAnimuList() {
+    setHomeSearchTags(undefined)
+    setHomeActivePage("AnimuList");
+    detectActivePage()
+    console.log(animulistData())
+
+    setHomeData(undefined, {
+      sections: [
+        {
+          data: unwrap(animulistData())
+        }
+      ]
+    })
+  }
+
   function setHistory() {
     setHomeSearchTags(undefined)
     setHomeActivePage("global.history");
-    changeTitleAnimu(`Animu - ${t("global.history")}`)
+    detectActivePage()
     let history = getHistory()
 
     let data: homeData["data"] = {
@@ -319,7 +356,7 @@ const Home = () => {
         />
         <div class="home-header-search">
           <Input
-            placeholder={getHomeCache().activePage == "global.history" ? t("home.historySearch") : t("home.search")}
+            placeholder={searchText()}
             InputClass={`${homeCache().data && homeCache().data.topCards ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
             defaultValue={homeCache().search}
             onKeyDown={OnSearch}

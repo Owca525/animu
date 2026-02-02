@@ -87,9 +87,9 @@ declare global {
         installUpdate: (plugin: pluginRepoExpanded) => Promise<void>
       }
       animulist: {
-        add: (anime: { AnimeData: AnimeData, animulist: cardData["animulist"] }) => Promise<void>
+        add: (anime: { AnimeData: AnimeData, animulist: animulistProps }) => Promise<void>
         delete: (id: string) => Promise<boolean>
-        update: (id: string, anime: { AnimeData: AnimeData, animulist: cardData["animulist"] }) => Promise<void>
+        update: (id: string, anime: { AnimeData: AnimeData, animulist: animulistProps }) => Promise<void>
         getDatabase: () => Promise<globalDataFormat["animuList"][]>
       }
       runExternaPlayer: (videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc") => any

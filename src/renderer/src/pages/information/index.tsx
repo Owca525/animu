@@ -2,8 +2,9 @@ import Button from '@renderer/components/buttons';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
-import { AnimeData, cardData, ContextMenuProps, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
+import { AnimeData, animulistProps, cardData, ContextMenuProps, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
 import {
+    addToAnimuList,
     changeTitleAnimu,
     convertDateToFormattedString,
     convertSeconds,
@@ -11,8 +12,10 @@ import {
     decodeHtmlEntities,
     getGradientColor,
     openUrlFolder,
+    removeFromAnimulist,
     SaveToClipboard,
-    segregatePlugins
+    segregatePlugins,
+    unixToDateTime
 } from '@renderer/utils/functions';
 import {
     createSignal,
@@ -45,7 +48,7 @@ function information() {
     const navigate = useNavigate();
     let descriptionRef: HTMLDivElement | undefined
 
-    const [tempData, setTmpData] = createSignal<{ anime: AnimeData, saveData?: indentityPlayer }>(JSON.parse(localStorage.getItem("informationCache") as string) as any)
+    const [tempData, setTmpData] = createSignal<{ anime: AnimeData, saveData?: indentityPlayer, animulist?: animulistProps }>(JSON.parse(localStorage.getItem("informationCache") as string) as any)
     const [currentIDplayer, setCurrentId] = createSignal<string | undefined>(tempData().anime.player_ID)
 
     const [showWrong, setshowWrong] = createSignal<boolean>(false)
@@ -315,10 +318,25 @@ function information() {
                             <Show when={tempData().anime.trailer}>
                                 <Button titleButton={t("information.bar.trailer")} icon="theaters" ButtonClass="information-bar-icon" onClick={() => openUrlFolder(`https://www.youtube.com/watch?v=${tempData().anime.trailer?.id}`)} />
                             </Show>
-                            <Button titleButton={"Add To Animulist"} icon="add" ButtonClass="information-bar-icon" onClick={() => showCustomMenu({ title: `Add ${tempData().anime.title.romaji}`, animuList: {
-                                anime: unwrap(tempData().anime),
-                                save: (animulist, anime) => window.api.animulist.add({ AnimeData: anime, animulist }) 
-                            } })} />
+                            <Switch>
+                                <Match when={tempData().animulist == undefined}>
+                                    <Button titleButton={"Add To Animulist"} icon="add" ButtonClass="information-bar-icon" onClick={() => showCustomMenu({ title: `Add ${tempData().anime.title.romaji}`, animuList: {
+                                        anime: unwrap(tempData().anime),
+                                        save: (animulist, anime) => {addToAnimuList(animulist, anime, true); setTmpData((p) => ({...p, animulist: animulist}))}
+                                    } })} />
+                                </Match>
+                                <Match when={tempData().animulist}>
+                                    <Button titleButton={"Edit Anime"} icon="edit" ButtonClass="information-bar-icon" onClick={() => showCustomMenu({ title: `Edit ${tempData().anime.title.romaji}`, animuList: {
+                                        anime: unwrap(tempData().anime),
+                                        animulist: tempData().animulist,
+                                        save: (animulist, anime) => {addToAnimuList(animulist, anime, true); setTmpData((p) => ({...p, animulist: animulist}))}
+                                    } })} />
+                                    <Button titleButton={"Remove From Animulist"} icon="delete" ButtonClass="information-bar-icon" onClick={() => {
+                                        removeFromAnimulist(tempData().anime.id, true);
+                                        setTmpData((p) => ({...p, animulist: undefined}))
+                                        } } />
+                                </Match>
+                            </Switch>
                         </div>
                     </div>
 
@@ -407,6 +425,26 @@ function information() {
 
 
                         <div class="information-bottom-content">
+                            
+                            <Show when={tempData().animulist}>
+                                <div class='information-animulist-container'>
+                                    <span class='information-animulist-data'>
+                                        Status {t(`animulist.status.${tempData().animulist?.status}`)}
+                                    </span> ·
+                                    <span class='information-animulist-data'>
+                                        Added {unixToDateTime(tempData().animulist?.added)}
+                                    </span> ·
+                                    <span class='information-animulist-data'>
+                                        Started Watching {unixToDateTime(tempData().animulist?.startWatch)}
+                                    </span> ·
+                                    <span class='information-animulist-data'>
+                                        Ended Watch {unixToDateTime(tempData().animulist?.endWatch)}
+                                    </span> ·
+                                    <span class='information-animulist-data'>
+                                        Repeat Watch {tempData().animulist?.reapeat}
+                                    </span>
+                                </div>
+                            </Show>
 
                             <div class="information-episodes">
                                 <div class="information-episodes-top-content">

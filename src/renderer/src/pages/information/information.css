@@ -335,6 +335,14 @@
     height: 200px;
 }
 
+.information-animulist-container {
+    background-color: var(--second-layer);
+    padding: 12px;
+    border-radius: 12px;
+    display: flex;
+    gap: 12px;
+}
+
 /* For smaller devices / window sizes */
 @media (max-width: 1000px) {
     .information-top {

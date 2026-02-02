@@ -111,7 +111,7 @@ export interface globalDataFormat {
     loadedTheme: themeMetadata[],
     activeThemes: Map<number, themeMetadata>
     token: UUIDTypes | undefined,
-    animuList: { AnimeData: AnimeData, animulist: cardData["animulist"], onClick?: (data: AnimeData) => void }[]
+    animuList: { AnimeData: AnimeData, animulist: animulistProps, onClick?: (data: AnimeData) => void }[]
 }
 
 export type playerDataExtended = playerData & {
@@ -163,19 +163,21 @@ export interface indentityPlayer {
     isStarted?: boolean
 }
 
+export interface animulistProps {
+    status: "CURRENT" | "PLANNING" | "COMPLETED" | "REPEATING" | "DROPPED" | "PAUSED",
+    score: number,
+    reapeat: number,
+    startWatch: number,
+    endWatch: number,
+    added: number,
+    lastUpdate: number,
+    favorite?: boolean
+}
+
 export interface cardData {
     AnimeData: AnimeData
     saveData?: indentityPlayer
-    animulist?: {
-        status: "CURRENT" | "PLANNING" | "COMPLETED" | "REPEATING" | "DROPPED" | "PAUSED",
-        score: number,
-        reapeat: number,
-        startWatch: number,
-        endWatch: number,
-        added: number,
-        lastUpdate: number,
-        favorite?: boolean
-    }
+    animulist?: animulistProps
     onClick?: (data: AnimeData) => void
 }
 
