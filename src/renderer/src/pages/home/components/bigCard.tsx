@@ -27,7 +27,8 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
 
     function openInformation() {
         const animulist = unwrap(animulistData())
-        localStorage.setItem("informationCache", JSON.stringify({ anime: data.AnimeData, animulist: animulist.find((v) => v.AnimeData.id == data.AnimeData.id) }))
+        const tmp = animulist.find((v) => v.AnimeData.id == data.AnimeData.id)
+        localStorage.setItem("informationCache", JSON.stringify({ anime: data.AnimeData, animulist: tmp ? tmp.animulist : undefined }))
         navigate("/info");
     }
 

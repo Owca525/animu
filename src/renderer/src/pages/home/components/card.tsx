@@ -89,10 +89,12 @@ function Card(props: CardProps) {
     }
 
     const animulist = unwrap(animulistData())
+    let tmp = props.card.animulist
+    if (!tmp && animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id)) tmp = animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id)?.animulist
     localStorage.setItem("informationCache", JSON.stringify({ 
       anime: props.card.AnimeData, 
       saveData: props.card.saveData, 
-      animulist: props.card.animulist ? props.card.animulist : animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id) 
+      animulist: tmp
     }))
     navigate("/info");
   }
