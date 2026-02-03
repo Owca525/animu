@@ -431,25 +431,40 @@ function information() {
                                 <div class='information-animulist-container'>
                                     <span class='information-animulist-data'>
                                         Status {t(`animulist.status.${tempData().animulist?.status}`)}
-                                    </span> ·
+                                    </span>·
                                     <span class='information-animulist-data'>
                                         Added {unixToDateTime(tempData().animulist?.added).split(" ")[0]}
-                                    </span> ·
+                                    </span>·
                                     <span class='information-animulist-data'>
                                         Started Watching {unixToDateTime(tempData().animulist?.startWatch).split(" ")[0]}
-                                    </span> ·
+                                    </span>·
                                     <span class='information-animulist-data'>
                                         Ended Watch {unixToDateTime(tempData().animulist?.endWatch).split(" ")[0]}
-                                    </span> ·
+                                    </span>·
                                     <span class='information-animulist-data'>
                                         Repeat Watch {tempData().animulist?.reapeat}
                                     </span>
                                 </div>
                             </Show>
 
+                            {/* TODO: FIX SCALING AND THEME */}
+                            {/* <MiniPlayer player_data={{
+                                title: "Frerien Opening",
+                                resolutions: [{
+                                    res: '1080',
+                                    url: ''
+                                }]
+                            }}/> */}
+
                             <div class="information-episodes">
                                 <div class="information-episodes-top-content">
-                                    <Button ButtonClass="information-episodes-button" icon="search" onClick={() => setshowWrong(() => true)} />
+                                    <div class="information-eopsodes-top-left">
+                                        <Button ButtonClass="information-episodes-button" icon="search" onClick={() => setshowWrong(() => true)} />
+                                        {/* <span class='information-eopsodes-top-line'></span>
+                                        <Button content='Episodes' />
+                                        <Button content='Opening' />
+                                        <Button content='Ending' /> */}
+                                    </div>
                                     <div class="information-episodes-space">
                                         <Dropdown options={segregatePlugins(refreashInformation)} disableX buttonText={currentPlugin()} />
                                         <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(getPlayerPLugin()?.metadata.name as string, true)} />

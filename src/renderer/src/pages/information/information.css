@@ -343,6 +343,11 @@
     gap: 12px;
 }
 
+.information-eopsodes-top-left {
+    display: flex;
+    gap: 8px;
+}
+
 /* For smaller devices / window sizes */
 @media (max-width: 1000px) {
     .information-top {
