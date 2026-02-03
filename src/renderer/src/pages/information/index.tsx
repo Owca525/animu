@@ -15,7 +15,8 @@ import {
     removeFromAnimulist,
     SaveToClipboard,
     segregatePlugins,
-    unixToDateTime
+    unixToDateTime,
+    updateDataInAnimulist
 } from '@renderer/utils/functions';
 import {
     createSignal,
@@ -329,7 +330,7 @@ function information() {
                                     <Button titleButton={"Edit Anime"} icon="edit" ButtonClass="information-bar-icon" onClick={() => showCustomMenu({ title: `Edit ${tempData().anime.title.romaji}`, animuList: {
                                         anime: unwrap(tempData().anime),
                                         animulist: tempData().animulist,
-                                        save: (animulist, anime) => {addToAnimuList(animulist, anime, true); setTmpData((p) => ({...p, animulist: animulist}))}
+                                        save: (animulist, anime) => {updateDataInAnimulist(anime.id, { AnimeData: anime, animulist }, true); setTmpData((p) => ({...p, animulist: animulist}))}
                                     } })} />
                                     <Button titleButton={"Remove From Animulist"} icon="delete" ButtonClass="information-bar-icon" onClick={() => {
                                         removeFromAnimulist(tempData().anime.id, true);
@@ -432,13 +433,13 @@ function information() {
                                         Status {t(`animulist.status.${tempData().animulist?.status}`)}
                                     </span> ·
                                     <span class='information-animulist-data'>
-                                        Added {unixToDateTime(tempData().animulist?.added)}
+                                        Added {unixToDateTime(tempData().animulist?.added).split(" ")[0]}
                                     </span> ·
                                     <span class='information-animulist-data'>
-                                        Started Watching {unixToDateTime(tempData().animulist?.startWatch)}
+                                        Started Watching {unixToDateTime(tempData().animulist?.startWatch).split(" ")[0]}
                                     </span> ·
                                     <span class='information-animulist-data'>
-                                        Ended Watch {unixToDateTime(tempData().animulist?.endWatch)}
+                                        Ended Watch {unixToDateTime(tempData().animulist?.endWatch).split(" ")[0]}
                                     </span> ·
                                     <span class='information-animulist-data'>
                                         Repeat Watch {tempData().animulist?.reapeat}

@@ -25,7 +25,10 @@ function saveToDatabase(data: animulistData[]) {
 ipcMain.handle("animulist:saveToDatabase", async (_, data: animulistData) => {
     let database = checkDatabase()
     database.unshift(data)
-    saveToDatabase(database)
+    saveToDatabase(database.filter(
+        (item, index, self) =>
+            index === self.findIndex(i => i.AnimeData.id === item.AnimeData.id)
+    ))
 });
 ipcMain.handle("animulist:deleteFromDatabase", async (_, id: string) => {
     let database = checkDatabase()
