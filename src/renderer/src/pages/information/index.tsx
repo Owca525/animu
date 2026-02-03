@@ -42,7 +42,7 @@ import { getConfig } from '@renderer/utils/stores/config';
 import Container from '../home/components/container';
 import { toast, updateToast } from '@renderer/utils/context/ToastNotification';
 import { showCustomMenu } from '@renderer/utils/context/menuContext';
-// import RelationCard from './components/relationCard';
+import RelationCard from './components/relationCard';
 
 function information() {
     const { t } = useI18n()
@@ -479,7 +479,7 @@ function information() {
                             </div>
 
                             {/* FIXME: FIX THIS FOR 0.8 Update */}
-                            {/* <Show when={tempData().anime.relations && tempData().anime.relations!.length > 0}>
+                            <Show when={tempData().anime.relations && tempData().anime.relations!.length > 0}>
                                 <div class="information-relation-container">
                                     <For each={tempData().anime.relations}>
                                         {(rel) => <RelationCard 
@@ -492,7 +492,7 @@ function information() {
                                         />}
                                     </For>
                                 </div>
-                            </Show> */}
+                            </Show>
                             <Show when={tempData().anime.characters && tempData().anime.characters!.length > 0}>
                                 <CharacterContainer title={t("information.characters")} cards={tempData().anime.characters!.map((char) => ({
                                     id: char.character.id,
