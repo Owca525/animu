@@ -8,7 +8,7 @@ import Button from "@renderer/components/buttons";
 import SettingsInput from "@renderer/pages/settings/components/settingsInput";
 import { useI18n } from "../i18n";
 import Input from "@renderer/components/input";
-import { dateToUnix } from "../functions";
+import { dateToUnix, unixToDateTime } from "../functions";
 import { unwrap } from "solid-js/store";
 
 interface menuProps {
@@ -42,7 +42,7 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
     const { t, pathExist } = useI18n()
     const [content, setContent] = createSignal<menuProps | undefined>();
 
-    const [animulistTMPData, setAnimulistData] = createSignal<animulistProps>(content()?.animuList?.animulist ? content()?.animuList?.animulist : {
+    const [animulistTMPData, setAnimulistData] = createSignal<animulistProps>({
         status: "CURRENT",
         score: 0,
         reapeat: 0,
@@ -50,13 +50,22 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
         endWatch: 0,
         added: 0,
         lastUpdate: 0
-    } as any);
+    });
 
     function showCustomMenu(data: menuProps) {
+        if (data.animuList && data.animuList.animulist) setAnimulistData(data.animuList.animulist)
         setContent(data);
     }
 
-    function hideCustomMenu() { setContent(undefined); }
+    function hideCustomMenu() { setContent(undefined); setAnimulistData({
+        status: "CURRENT",
+        score: 0,
+        reapeat: 0,
+        startWatch: 0,
+        endWatch: 0,
+        added: 0,
+        lastUpdate: 0
+    }) }
 
     function isCustomMenuActive() {
         return content() ? true : false;
@@ -158,11 +167,17 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
                                     </div>
                                     <div class="custom-menu-space">
                                         Start Date
-                                        <Input type={"date"} onKeyDown={(v) => setAnimulistData(p => ({ ...p, startWatch: dateToUnix(v) }) as any)}/>
+                                        <Input type={"date"}
+                                            defaultValue={animulistTMPData().startWatch > 0 ? unixToDateTime(animulistTMPData().startWatch).split(" ")[0] : undefined} 
+                                            onKeyDown={(v) => setAnimulistData(p => ({ ...p, startWatch: dateToUnix(v) }) as any)}
+                                        />
                                     </div>
                                     <div class="custom-menu-space">
                                         Finish Date
-                                        <Input type={"date"} onKeyDown={(v) => setAnimulistData(p => ({ ...p, endWatch: dateToUnix(v) }) as any)}/>
+                                        <Input type={"date"} 
+                                            defaultValue={animulistTMPData().endWatch > 0 ? unixToDateTime(animulistTMPData().endWatch).split(" ")[0] : undefined} 
+                                            onKeyDown={(v) => setAnimulistData(p => ({ ...p, endWatch: dateToUnix(v) }) as any)}
+                                        />
                                     </div>
                                     <div class="custom-menu-space">
                                         Save To Animulist

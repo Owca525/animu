@@ -14,6 +14,8 @@ export default function Input(props: InputProps) {
   const [debounceTimeout, setDebounceTimeout] = createSignal<number | null>(null);
   let inputRef: HTMLInputElement | undefined;
 
+  console.log(props)
+
   const handleData = (event: KeyboardEvent & { currentTarget: HTMLInputElement }) => {
     if (!props.onKeyDown) return;
 
