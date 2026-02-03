@@ -545,6 +545,21 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         // Checking to save history
         if (isCleanup()) return
         if (!config) return
+
+        if (durrationTime() > 10 && currentTime() > durrationTime() - parseInt(config.History.continue.MaximizeTimeSave.toString()) && anime_data.animulist && anime_data.animulist.status == "CURRENT" && anime_data.AnimeData.episodes) {
+            if (temp.episode == anime_data.AnimeData.episodes.toString()) {
+                updateDataInAnimulist(anime_data.AnimeData.id,  {
+                    AnimeData: anime_data.AnimeData,
+                    animulist: {
+                        ...anime_data.animulist,
+                        status: "COMPLETED",
+                        endWatch: anime_data.animulist.endWatch == 0 ? dateToUnix(new Date().toString()) : anime_data.animulist.endWatch,
+                        lastUpdate: dateToUnix(new Date().toString())
+                    }
+                })
+            }
+        }
+
         if (currentTime() <= parseInt(config.History.continue.MinimalTimeSave.toString())) return
         let futureHistory = {
             AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
@@ -673,20 +688,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (endingChupter) {
             showUpToNext = currentTime >= endingChupter.start
             timeDelete = ((parseInt(duration.toFixed(0)) - (parseInt(duration.toFixed(0)) - endingChupter.start)) - parseInt(currentTime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
-        }
-
-        if (showUpToNext && anime_data.animulist && anime_data.animulist.status == "CURRENT" && anime_data.AnimeData.episodes) {
-            if (temp.episode == anime_data.AnimeData.episodes.toString()) {
-                updateDataInAnimulist(anime_data.AnimeData.id,  {
-                    AnimeData: anime_data.AnimeData,
-                    animulist: {
-                        ...anime_data.animulist,
-                        status: "COMPLETED",
-                        endWatch: anime_data.animulist.endWatch == 0 ? dateToUnix(new Date().toString()) : anime_data.animulist.endWatch,
-                        lastUpdate: dateToUnix(new Date().toString())
-                    }
-                })
-            }
         }
 
         if (isHideUpNextEpisode() == false && temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] != null && showUpToNext) {
