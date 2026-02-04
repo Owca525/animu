@@ -44,7 +44,9 @@ export type resoltionFormatExtended = resolutionFormat & {
     track?: shaka.extern.Track
 }
 
-const MiniPlayer: Component<MiniPlayerProps> = ({ player_data }) => {
+// Component<MiniPlayerProps> = ({ props.player_data })
+
+export default function MiniPlayer(props: MiniPlayerProps) {
     const config: SettingsConfig = getConfig();
     const { t, currentLang } = useI18n()
 
@@ -167,7 +169,7 @@ const MiniPlayer: Component<MiniPlayerProps> = ({ player_data }) => {
             }
         })
 
-        runNewPlayer(player_data)
+        runNewPlayer(props.player_data)
         handleVolume(25, true)
         handleMouseMove()
 
@@ -177,9 +179,9 @@ const MiniPlayer: Component<MiniPlayerProps> = ({ player_data }) => {
         }
         if ("mediaSession" in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
-                title: player_data.title,
+                title: props.player_data.title,
                 artwork: [
-                    { sizes: "512x512", src: player_data.thumbnail ? player_data.thumbnail : "" }
+                    { sizes: "512x512", src: props.player_data.thumbnail ? props.player_data.thumbnail : "" }
                 ]
             })
             navigator.mediaSession.setActionHandler("play", () => togglePlay());
@@ -237,7 +239,7 @@ const MiniPlayer: Component<MiniPlayerProps> = ({ player_data }) => {
 
         if (hls() && data.hls) {
             if (data.url == "") hls()!.currentLevel = hls()!.levels.findIndex(level => level.height === parseInt(data.res));
-            else runHLS(data, player_data.splitHLS)
+            else runHLS(data, props.player_data.splitHLS)
             return
         }
         try {
@@ -769,10 +771,10 @@ const MiniPlayer: Component<MiniPlayerProps> = ({ player_data }) => {
 
     function getcurrentChapter(): string | undefined {
         if (!videoRef) return undefined
-        if (!player_data.listChapters) return
+        if (!props.player_data.listChapters) return
 
-        for (let index = 0; index < player_data.listChapters.length; index++) {
-            const element = player_data.listChapters[index];
+        for (let index = 0; index < props.player_data.listChapters.length; index++) {
+            const element = props.player_data.listChapters[index];
             if (element.start == 0 && element.end == 0) continue
             if (videoRef.currentTime >= element.start && videoRef.currentTime <= element.end && element.name) return element.name
         }
@@ -780,12 +782,12 @@ const MiniPlayer: Component<MiniPlayerProps> = ({ player_data }) => {
     }
 
     function calculateChaptersTime(): string | undefined {
-        if (!player_data.listChapters) return
-        if (player_data.listChapters!.length <= 0) return
+        if (!props.player_data.listChapters) return
+        if (props.player_data.listChapters!.length <= 0) return
         if (!videoRef) return
         let newTime = durrationTime()
-        for (let index = 0; index < player_data.listChapters!.length; index++) {
-            const element = player_data.listChapters![index];
+        for (let index = 0; index < props.player_data.listChapters!.length; index++) {
+            const element = props.player_data.listChapters![index];
             if (element.end == 0 && element.start == 0) continue
             if (element.type == "opening" || element.type == "ending") {
                 newTime = newTime - (element.end - element.start)
@@ -812,8 +814,8 @@ const MiniPlayer: Component<MiniPlayerProps> = ({ player_data }) => {
                 onLoadedMetadata={(event) => {
                     updateProgress(event)
                     setdurrationTime(event.currentTarget.duration)
-                    if (player_data.listChapters) {
-                        generateOpeningEnding(player_data.listChapters!)
+                    if (props.player_data.listChapters) {
+                        generateOpeningEnding(props.player_data.listChapters!)
                     }
                 }}
                 preload="auto"
@@ -841,8 +843,8 @@ const MiniPlayer: Component<MiniPlayerProps> = ({ player_data }) => {
     //                 onLoadedMetadata={(event) => {
     //                     updateProgress(event)
     //                     setdurrationTime(event.currentTarget.duration)
-    //                     if (player_data.listChapters) {
-    //                         generateOpeningEnding(player_data.listChapters!)
+    //                     if (props.player_data.listChapters) {
+    //                         generateOpeningEnding(props.player_data.listChapters!)
     //                     }
     //                 }}
     //                 preload="auto"
@@ -874,7 +876,7 @@ const MiniPlayer: Component<MiniPlayerProps> = ({ player_data }) => {
 
     //         <div class="video-overlay">
     //             <div class={isVisible() ? 'video-top' : 'video-top player-hidden'}>
-    //                 <div class="player-title ">{player_data.title}</div>
+    //                 <div class="player-title ">{props.player_data.title}</div>
     //             </div>
     //             <div class="video-center">
     //                 <Show when={!config.Player.ui.DisableSkipAnimation}>
@@ -950,7 +952,7 @@ const MiniPlayer: Component<MiniPlayerProps> = ({ player_data }) => {
     //                             state={currentSettings()}
     //                             turnDubbing={() => ""}
     //                             sources={
-    //                                 player_data.hostname ? [{ name: player_data.hostname, change: () => "" }] : [{ name: t("player.other.unknown"), change: () => "" }]
+    //                                 props.player_data.hostname ? [{ name: props.player_data.hostname, change: () => "" }] : [{ name: t("player.other.unknown"), change: () => "" }]
     //                             }
     //                             resolution={
     //                                 ListResolution().map((val) => { return { res: val.res, change: () => setNewResolution(val) } })
@@ -964,7 +966,7 @@ const MiniPlayer: Component<MiniPlayerProps> = ({ player_data }) => {
     //                             }
     //                             disableSettings={() => setcurrentSettings(() => false)}
     //                             current={{
-    //                                 currentHost: player_data.hostname ? player_data.hostname! : t("player.other.unknown"),
+    //                                 currentHost: props.player_data.hostname ? props.player_data.hostname! : t("player.other.unknown"),
     //                                 currentResolution: currentResolution() ? currentResolution()!.res : t("player.other.unknown"),
     //                                 currentSpeed: videoRef?.playbackRate ? videoRef?.playbackRate : 1,
     //                                 currentSub: currentSubtitles() ? currentSubtitles()!.label : t("player.other.off"),
@@ -1001,5 +1003,3 @@ const MiniPlayer: Component<MiniPlayerProps> = ({ player_data }) => {
     //     </div>
     // )
 }
-
-export default MiniPlayer;

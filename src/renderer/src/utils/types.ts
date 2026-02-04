@@ -446,3 +446,12 @@ export type pluginRepoExpanded = {
     sha256: string,
     description?: string
 } & { repoURL: string }
+
+export interface animeOpeningsFormat {
+    type: "OP" | "EN" | "IN"
+    title: string,
+    resolution: number,
+    size: number,
+    url: string,
+    filename: string
+}

@@ -2,7 +2,7 @@ import Button from '@renderer/components/buttons';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
-import { AnimeData, animulistProps, cardData, ContextMenuProps, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
+import { AnimeData, animeOpeningsFormat, animulistProps, cardData, ContextMenuProps, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
 import {
     addToAnimuList,
     changeTitleAnimu,
@@ -19,6 +19,7 @@ import {
     updateDataInAnimulist
 } from '@renderer/utils/functions';
 import {
+    createEffect,
     createSignal,
     For,
     Match,
@@ -43,6 +44,9 @@ import Container from '../home/components/container';
 import { toast, updateToast } from '@renderer/utils/context/ToastNotification';
 import { showCustomMenu } from '@renderer/utils/context/menuContext';
 import RelationCard from './components/relationCard';
+import ButtonGroup from '../settings/components/buttonGroup';
+import MiniPlayer from '@renderer/components/miniPlayer';
+import { requestAnimeMedia } from '@renderer/utils/animeThemes';
 
 function information() {
     const { t } = useI18n()
@@ -61,12 +65,19 @@ function information() {
     const [secondsLeft, setSecondsLeft] = createSignal<undefined | { left: number, converted: { days: number; hours: number; minutes: number; seconds: number; } | undefined }>(undefined);
     const [contextMenu, setcontextMenu] = createSignal<ContextMenuProps>([])
 
+    // Openings / Endings
+    const [animeMedia, setAnimeMedia] = createSignal<animeOpeningsFormat[]>([])
+    const [currentMedia, setCurrentAnimeMedia] = createSignal<animeOpeningsFormat | undefined>(undefined)
+
     // Banner
     const [isBannerLoading, setBannerLoadingData] = createSignal<boolean>(true)
     const [isBannerError, setBannerIsError] = createSignal<boolean>(false)
     // Cover
     const [isCoverLoading, setCoverIsLoading] = createSignal<boolean>(true)
     const [isCoverError, setCoverIsError] = createSignal<boolean>(false)
+
+    const [activePage, SetactivePage] = createSignal<string>("Episodes")
+    const [showLoadingInEpisodes, SetShowLoadingInEpisodes] = createSignal<boolean>(false)
 
     const episodeResponse = useResponse({
         queryKey: [tempData(), currentIDplayer(), currentPlugin()],
@@ -186,7 +197,7 @@ function information() {
         const idToast = toast(t("notification.fetchinganime"), { removeTimer: true, type: "loading" })
         const resp = await getInformationPlugin().anime(data.id)
         if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", removeTimer: false })
-        updateToast(idToast,  t("notification.successanime"), { type: "success", removeTimer: false })
+        updateToast(idToast, t("notification.successanime"), { type: "success", removeTimer: false })
 
         // Reseting Recomendation
         setTmpData((prev) => ({ ...prev, anime: { ...prev.anime, recommendations: undefined } }))
@@ -198,6 +209,15 @@ function information() {
         localStorage.setItem("informationCache", JSON.stringify({ anime: resp, saveData: undefined }))
         setTmpData({ anime: resp, saveData: undefined })
         initialInformation()
+    }
+
+    async function searchAnimeOpenings() {
+        if (animeMedia().length > 0) return
+        SetShowLoadingInEpisodes(true)
+        setAnimeMedia(await requestAnimeMedia(parseInt(tempData().anime.id)))
+        setCurrentAnimeMedia(animeMedia()[0])
+        console.log(animeMedia())
+        SetShowLoadingInEpisodes(false)
     }
 
     function makeButtons(episode: { ep: string, img?: string, title?: string }[], type: string) {
@@ -242,6 +262,8 @@ function information() {
         setCurrentPlugin(name)
         episodeResponse.Refetch([tempData(), currentIDplayer(), currentPlugin()], force)
     }
+
+    createEffect(() => console.log(currentMedia()))
 
     // function checkEpisodes() {
     //     if (tempData().anime.status == "NOT_YET_RELEASED") return true
@@ -321,21 +343,25 @@ function information() {
                             </Show>
                             <Switch>
                                 <Match when={tempData().animulist == undefined}>
-                                    <Button titleButton={"Add To Animulist"} icon="add" ButtonClass="information-bar-icon" onClick={() => showCustomMenu({ title: `Add ${tempData().anime.title.romaji}`, animuList: {
-                                        anime: unwrap(tempData().anime),
-                                        save: (animulist, anime) => {addToAnimuList(animulist, anime, true); setTmpData((p) => ({...p, animulist: animulist}))}
-                                    } })} />
+                                    <Button titleButton={"Add To Animulist"} icon="add" ButtonClass="information-bar-icon" onClick={() => showCustomMenu({
+                                        title: `Add ${tempData().anime.title.romaji}`, animuList: {
+                                            anime: unwrap(tempData().anime),
+                                            save: (animulist, anime) => { addToAnimuList(animulist, anime, true); setTmpData((p) => ({ ...p, animulist: animulist })) }
+                                        }
+                                    })} />
                                 </Match>
                                 <Match when={tempData().animulist}>
-                                    <Button titleButton={"Edit Anime"} icon="edit" ButtonClass="information-bar-icon" onClick={() => showCustomMenu({ title: `Edit ${tempData().anime.title.romaji}`, animuList: {
-                                        anime: unwrap(tempData().anime),
-                                        animulist: tempData().animulist,
-                                        save: (animulist, anime) => {updateDataInAnimulist(anime.id, { AnimeData: anime, animulist }, true); setTmpData((p) => ({...p, animulist: animulist}))}
-                                    } })} />
+                                    <Button titleButton={"Edit Anime"} icon="edit" ButtonClass="information-bar-icon" onClick={() => showCustomMenu({
+                                        title: `Edit ${tempData().anime.title.romaji}`, animuList: {
+                                            anime: unwrap(tempData().anime),
+                                            animulist: tempData().animulist,
+                                            save: (animulist, anime) => { updateDataInAnimulist(anime.id, { AnimeData: anime, animulist }, true); setTmpData((p) => ({ ...p, animulist: animulist })) }
+                                        }
+                                    })} />
                                     <Button titleButton={"Remove From Animulist"} icon="delete" ButtonClass="information-bar-icon" onClick={() => {
                                         removeFromAnimulist(tempData().anime.id, true);
-                                        setTmpData((p) => ({...p, animulist: undefined}))
-                                        } } />
+                                        setTmpData((p) => ({ ...p, animulist: undefined }))
+                                    }} />
                                 </Match>
                             </Switch>
                         </div>
@@ -426,7 +452,7 @@ function information() {
 
 
                         <div class="information-bottom-content">
-                            
+
                             <Show when={tempData().animulist}>
                                 <div class='information-animulist-container'>
                                     <span class='information-animulist-data'>
@@ -464,46 +490,76 @@ function information() {
                                         <Button content='Episodes' />
                                         <Button content='Opening' />
                                         <Button content='Ending' /> */}
+                                        <ButtonGroup selectedValue={activePage()} listValues={[{
+                                            value: 'Episodes',
+                                            onClick: () => SetactivePage("Episodes")
+                                        }, {
+                                            value: 'Media',
+                                            onClick: () => {SetactivePage("Media");searchAnimeOpenings()}
+                                        }]} />
+                                        {/* {
+                                            value: 'Trailer',
+                                            onClick: () => SetactivePage("Trailer")
+                                        } */}
                                     </div>
                                     <div class="information-episodes-space">
                                         <Dropdown options={segregatePlugins(refreashInformation)} disableX buttonText={currentPlugin()} />
                                         <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(getPlayerPLugin()?.metadata.name as string, true)} />
                                     </div>
                                 </div>
-                                <Show when={showWrong() == false}>
-                                    <Switch>
-                                        <Match when={episodeResponse.loading()}>
-                                            <div class="information-loading-container"><span class="material-symbols-outlined information-loading">progress_activity</span></div>
-                                        </Match>
-                                        <Match when={episodeResponse.error()}>
-                                            <div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>
-                                        </Match>
-                                        <Match when={episodeResponse.data() == undefined}>
-                                            <div class="information-loading-container"><span class="information-error material-symbols-outlined">search_off</span>Nothing Found</div>
-                                        </Match>
-                                        <Match when={episodeResponse.data()}>
-                                            <For each={episodeResponse.data()?.episodesData} fallback={<div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}>
-                                                {(episode) => {
-                                                    if (episode.episodes.length <= 0) return <></>
-                                                    return <Drop LeftHeader={episode.name ? episode.name : t(`information.types.${episode.type}`)} RightHeader={t("information.listEpisodes", { number: episode.episodes.length })} content={makeButtons(episode.episodes, episode.type)} />
-                                                }}
-                                            </For>
-                                        </Match>
-                                    </Switch>
-                                </Show>
+                                <Switch>
+                                    <Match when={showLoadingInEpisodes()}>
+                                        <div class="information-loading-container"><span class="material-symbols-outlined information-loading">progress_activity</span></div>
+                                    </Match>
+                                    <Match when={activePage() == "Media"}>
+                                        <For each={animeMedia()}>
+                                            {(item) => <Button content={item.title} onClick={() => {setCurrentAnimeMedia(undefined);setCurrentAnimeMedia(item)}} />}
+                                        </For>
+                                        <Show when={currentMedia()}>
+                                            <MiniPlayer player_data={{
+                                                title: currentMedia()?.title!,
+                                                resolutions: [{
+                                                    res: currentMedia()?.resolution!.toString()!,
+                                                    url: currentMedia()?.url!
+                                                }]
+                                            }} />
+                                        </Show>
+                                    </Match>
+                                    <Match when={showWrong() == false && activePage() == "Episodes"}>
+                                        <Switch>
+                                            <Match when={episodeResponse.loading()}>
+                                                <div class="information-loading-container"><span class="material-symbols-outlined information-loading">progress_activity</span></div>
+                                            </Match>
+                                            <Match when={episodeResponse.error()}>
+                                                <div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>
+                                            </Match>
+                                            <Match when={episodeResponse.data() == undefined}>
+                                                <div class="information-loading-container"><span class="information-error material-symbols-outlined">search_off</span>Nothing Found</div>
+                                            </Match>
+                                            <Match when={episodeResponse.data()}>
+                                                <For each={episodeResponse.data()?.episodesData} fallback={<div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}>
+                                                    {(episode) => {
+                                                        if (episode.episodes.length <= 0) return <></>
+                                                        return <Drop LeftHeader={episode.name ? episode.name : t(`information.types.${episode.type}`)} RightHeader={t("information.listEpisodes", { number: episode.episodes.length })} content={makeButtons(episode.episodes, episode.type)} />
+                                                    }}
+                                                </For>
+                                            </Match>
+                                        </Switch>
+                                    </Match>
+                                </Switch>
                             </div>
 
                             {/* FIXME: FIX THIS FOR 0.8 Update */}
                             <Show when={tempData().anime.relations && tempData().anime.relations!.length > 0}>
                                 <div class="information-relation-container">
                                     <For each={tempData().anime.relations}>
-                                        {(rel) => <RelationCard 
-                                            id={rel.id} 
-                                            relationType={rel.relationType} 
-                                            title={rel.title} 
-                                            bannerImage={rel.bannerImage} 
-                                            coverImage={rel.coverImage} 
-                                            onClick={() => ""} 
+                                        {(rel) => <RelationCard
+                                            id={rel.id}
+                                            relationType={rel.relationType}
+                                            title={rel.title}
+                                            bannerImage={rel.bannerImage}
+                                            coverImage={rel.coverImage}
+                                            onClick={() => ""}
                                         />}
                                     </For>
                                 </div>
