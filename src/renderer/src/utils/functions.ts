@@ -705,8 +705,6 @@ export function convertHistoryToAnimuList() {
             lastUpdate: dateToUnix(new Date().toString())
         }
 
-        console.log(element.AnimeData.episodes)
-
         if (element.AnimeData.episodes && parseInt(element.saveData.episode) < element.AnimeData.episodes) 
             status = { ...status, status: "CURRENT", startWatch: dateToUnix(new Date().toString()) }
 
