@@ -284,6 +284,9 @@ export interface SettingsConfig {
     firstStart: boolean
     deepLinkURL: string
     yt_dlp: string
+    animulist: {
+        historyConvert: boolean
+    }
     plugins: {
         hiddenPlugins: string[]
         // information: string

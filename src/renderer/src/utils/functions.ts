@@ -684,3 +684,32 @@ export function unixToDateTime(unixTimestamp: number | undefined): string {
 
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
+
+export function convertHistoryToAnimuList() {
+    const history = unwrap(getHistory()).history.reverse()
+    if (history.length <= 0) return
+    const animulist = unwrap(animulistData())
+
+    for (let index = 0; index < history.length; index++) {
+        const element = history[index];
+        const finded = animulist.find((v) => v.AnimeData.id == element.AnimeData.id)
+        if (finded) continue
+        if (!element.saveData.episode) continue
+        let status: animulistProps = {
+            status: "COMPLETED",
+            score: 0,
+            reapeat: 0,
+            startWatch: 0,
+            endWatch: 0,
+            added: dateToUnix(new Date().toString()),
+            lastUpdate: dateToUnix(new Date().toString())
+        }
+
+        console.log(element.AnimeData.episodes)
+
+        if (element.AnimeData.episodes && parseInt(element.saveData.episode) < element.AnimeData.episodes) 
+            status = { ...status, status: "CURRENT", startWatch: dateToUnix(new Date().toString()) }
+
+        addToAnimuList(status, element.AnimeData)
+    }
+}

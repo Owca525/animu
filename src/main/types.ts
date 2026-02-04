@@ -7,6 +7,9 @@ export interface SettingsConfig {
     firstStart: boolean
     deepLinkURL: string
     yt_dlp: string
+    animulist: {
+        historyConvert: boolean
+    }
     plugins: {
         // information: string
         hiddenPlugins: string[]
@@ -299,7 +302,10 @@ export const defaultConfig: SettingsConfig = {
         check: "Every Day",
         maxBackups: 3
     },
-    yt_dlp: ""
+    yt_dlp: "",
+    animulist: {
+        historyConvert: true
+    }
 };
 
 export type pluginRepoExpanded = {

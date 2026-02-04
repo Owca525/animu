@@ -8,6 +8,7 @@ import {
   calculateZoomLevel,
   changeTheme,
   checkDate,
+  convertHistoryToAnimuList,
   detectPluginVersion,
   fetchPluginRepos,
   updateObjectConfig
@@ -167,7 +168,13 @@ function App() {
 
   function LoadConfig() {
     if (!window.api) return
-    const loadedConnfig = getConfig()
+    let loadedConnfig = getConfig()
+
+    if (loadedConnfig.animulist.historyConvert) {
+      convertHistoryToAnimuList()
+      loadedConnfig = updateObjectConfig("animulist.historyConvert", false, loadedConnfig)
+      saveConfig(loadedConnfig)
+    }
 
     // Loading theme
     const loadedTheme = getGlobalCache().loadedTheme
