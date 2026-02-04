@@ -1,4 +1,5 @@
-import { genYearsList, request } from "@renderer/utils/functions";
+import { genYearsList, request, unixToDateTime } from "@renderer/utils/functions";
+import { t } from "@renderer/utils/i18n";
 import { AnimeData, cardData, containerData, genresSearchFormat, informationPluginFormat } from "@renderer/utils/types";
 
 const pageSize = 20
@@ -196,21 +197,22 @@ query(
 }
 `;
 
-// const graphicAiringAnime = `
-// query AiringAnimes($page: Int, $perPage: Int, $sort: [AiringSort], $airingAtGreater: Int, $airingAtLesser: Int) {
-//     Page(page: $page, perPage: $perPage) {
-//         airingSchedules(sort: $sort, airingAt_greater: $airingAtGreater, airingAt_lesser: $airingAtLesser) {
-//         id
-//         airingAt
-//         episode
+const graphicAiringAnime = `
+query AiringAnimes($page: Int, $perPage: Int, $sort: [AiringSort], $airingAtGreater: Int, $airingAtLesser: Int) {
+    Page(page: $page, perPage: $perPage) {
+        airingSchedules(sort: $sort, airingAt_greater: $airingAtGreater, airingAt_lesser: $airingAtLesser) {
+        id
+        airingAt
+        timeUntilAiring
+        episode
 
-//         media {
-//           ${animeData}
-//         }
-//       }
-//     }
-// }
-// `
+        media {
+          ${animeData}
+        }
+      }
+    }
+}
+`
 
 const graphicHomeApi = `
   query (
@@ -468,19 +470,49 @@ export default class AnilistApi implements informationPluginFormat {
     "Adult Mode": false,
     "Max Page Size": 20,
   };
-  // async schedule(context: { airingStart: number; airingEnd: number; }, callbacks: { onSuccess: (data: containerData) => void; onError: (error: string) => void; }) {
-  //   let week = getWeek()
-  //   console.log(week)
-  //   let variables = {
-  //     page: 1,
-  //     perPage: 50,
-  //     sort: ["TIME"],
-  //     airingAtGreater: week.startWeekUnix,
-  //     airingAtLesser: week.endWeekUnix
-  //   }
+  async schedule(airingStart: number, airingEnd: number): Promise<containerData> {
+    // let week = getWeek()
+    // console.log(week)
 
-  //   console.log(await sendPost(variables, graphicAiringAnime))
-  // }
+    const days = [t("week.sunday"), t("week.monday"), t("week.tuesday"), t("week.wednesday"), t("week.thursday"), t("week.friday"), t("week.saturday")];
+    console.log(airingStart, airingEnd)
+    let variables = {
+      page: 1,
+      perPage: 50,
+      sort: ["TIME"],
+      airingAtGreater: airingStart,
+      airingAtLesser: airingEnd
+    }
+
+    const date = new Date(unixToDateTime(airingStart))
+
+    let response = await sendPost(variables, graphicAiringAnime)
+    console.log(response)
+    if (!response.success || !response.json) return {
+      title: days[date.getDay()],
+      data: []
+    }
+
+    let data = response.json["data"]["Page"]["airingSchedules"].map((v) => {
+      const converted = Convert(v["media"])
+      return {
+        ...converted,
+        animeData: {
+          ...converted.AnimeData,
+          nextAiringEpisode: {
+            airingAt: v["airingAt"],
+            episode: v["episode"],
+            timeUntilAiring: v["timeUntilAiring"]
+          }
+        }
+      }
+    })
+
+    return {
+      title: days[date.getDay()],
+      data: data
+    }
+  }
 
   search = async (name: string, page: number, params?: genresSearchFormat) => {
     try {

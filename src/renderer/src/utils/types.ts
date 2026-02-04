@@ -253,10 +253,7 @@ export interface informationPluginFormat {
     search(name: string, page: number, params?: genresSearchFormat): Promise<containerData | undefined>
     home(): Promise<{ topCards?: containerData, sections: containerData[] } | undefined>
     anime(context: { id: string }): Promise<AnimeData | undefined>
-    // schedule(
-    //     context: { airingStart?: number, airingEnd?: number },
-    //     callbacks: { onSuccess: (data: containerData) => void, onError: (error: string) => void }
-    // )
+    schedule: (airingStart: number, airingEnd: number) => Promise<containerData>
 }
 
 export interface playerPluginManagerFormat {
@@ -272,7 +269,7 @@ export interface informationPluginManagerFormat {
     home(): void
     anime(id: string): Promise<AnimeData | undefined>
     initial(): Promise<void>
-    // schedule(airingStart?: number, airingEnd?: number): void
+    schedule(airingStart: number, airingEnd: number): Promise<containerData>
 }
 
 export type genres = { genres: string[], seasons: string[], years: string[], format: string[], statuses: string[] }

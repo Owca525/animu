@@ -19,7 +19,9 @@
         "incognitomode": "Incognito Mode: {{switch}}",
         "off": "Off",
         "on": "On",
-        "action": "Action"
+        "action": "Action",
+        "schedule": "Schedule",
+        "animulist": "AnimuList"
     },
     "animulist": {
         "status": {

@@ -659,7 +659,7 @@ export async function updateDataInAnimulist(id: string, anime: { AnimeData: Anim
 export async function refreashAnimulist() {
     setAnimulistData(await window.api.animulist.getDatabase())
     const global = getHomeCache()
-    if (global.activePage != "AnimuList") return
+    if (global.activePage != "global.animulist") return
 
     setHomeData(undefined, {
         sections: [

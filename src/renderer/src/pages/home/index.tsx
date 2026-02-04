@@ -4,7 +4,7 @@ import Container from './components/container';
 import Filter from './components/filter';
 import Input from '@renderer/components/input';
 import Sidebar from '@renderer/components/sidebar';
-import { changeTitleAnimu, CreateContextMenuOptions, getHistory, setHomeData } from '@renderer/utils/functions';
+import { changeTitleAnimu, CreateContextMenuOptions, dateToUnix, getHistory, setHomeData, unixToDateTime } from '@renderer/utils/functions';
 import {
   createSignal,
   For,
@@ -40,7 +40,7 @@ import {
 import { useI18n } from '@renderer/utils/i18n';
 import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
 import { animulistData, getGlobalCache, setDeeplinkRunned } from '@renderer/utils/stores/global';
-// import { createShortcut } from "@solid-primitives/keyboard";
+
 // import WelcomeScreen from "./components/welcomeScreen"
 const Home = () => {
   const { t } = useI18n()
@@ -71,6 +71,11 @@ const Home = () => {
         text: "AnimuList",
         onClick: setAnimuList,
       },
+      {
+        icon: "calendar_month",
+        text: "global.schedule",
+        onClick: setCalendary,
+      }
     ],
     bottom: [
       {
@@ -98,9 +103,13 @@ const Home = () => {
         changeTitleAnimu(`Animu - ${t("global.home")}`)
         setSearchText(t("home.search"))
         break
-      case "AnimuList":
-        changeTitleAnimu(`Animu - AnimuList`)
+      case "global.animulist":
+        changeTitleAnimu(`Animu - ${t("global.animulist")}`)
         setSearchText("Search in AnimuList...")
+        break
+      case "global.schedule":
+        changeTitleAnimu(`Animu - ${t("global.schedule")}`)
+        setSearchText("Search in Schedule...")
         break
     }
   }
@@ -184,11 +193,29 @@ const Home = () => {
     navigate("/player");
   }
 
+  function setCalendary(date?: string) {
+    setHomeSearchTags(undefined)
+    setHomeActivePage("global.schedule");
+    detectActivePage()
+
+    let tmp = new Date()
+    if (date) tmp = new Date(date)
+
+    const startOfDay = new Date(tmp);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(tmp);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    console.log(startOfDay, endOfDay)
+
+    setHomeData(async () => getInformationPlugin().schedule(dateToUnix(startOfDay.toString()), dateToUnix(endOfDay.toString())))
+  }
+
   function setAnimuList() {
     setHomeSearchTags(undefined)
-    setHomeActivePage("AnimuList");
+    setHomeActivePage("global.animulist");
     detectActivePage()
-    console.log(animulistData())
 
     setHomeData(undefined, {
       sections: [
@@ -368,6 +395,9 @@ const Home = () => {
               custonClass={`${homeCache().data && homeCache().data.topCards ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
             />
           </div>
+          <Show when={getHomeCache().activePage == "global.schedule"}>
+            <Input type="date" defaultValue={unixToDateTime(dateToUnix(new Date().toString())).split(" ")[0]} onKeyDown={setCalendary}/>
+          </Show>
         </div>
       </div>
 
