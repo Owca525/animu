@@ -1,6 +1,6 @@
 import { genYearsList, request, unixToDateTime } from "@renderer/utils/functions";
 import { t } from "@renderer/utils/i18n";
-import { AnimeData, cardData, containerData, genresSearchFormat, informationPluginFormat } from "@renderer/utils/types";
+import { AnimeData, cardData, containerData, genres, genresSearchFormat, informationPluginFormat } from "@renderer/utils/types";
 
 const pageSize = 20
 
@@ -394,12 +394,10 @@ export async function searchInAnilist(name: string, page: number, params?: genre
     if (name.replaceAll(" ", "") != "") variables = { ...variables, search: name }
 
     if (params) {
-      if (params) variables = { ...variables, genres: params.genres }
-      if (params.genres) variables = { ...variables, genres: params.genres }
       if (params.genres) variables = { ...variables, genres: params.genres }
       if (params.years) variables = { ...variables, seasonYear: parseInt(params.years) }
       if (params.seasons) variables = { ...variables, season: params.seasons.toUpperCase() }
-      if (params.format) variables = { ...variables, format: params.format.map((tmp) => tmp.toUpperCase().replaceAll(" ", "_")) }
+      if (params.format) variables = { ...variables, format: params.format.toUpperCase().replaceAll(" ", "_") }
       if (params.airing) variables = { ...variables, status: params.airing.toUpperCase().replaceAll(" ", "_") }
     }
 
@@ -434,7 +432,14 @@ export default class AnilistApi implements informationPluginFormat {
     version: "2.0",
     name: "AnilistApi",
     pageSize: pageSize,
-    searchOption: {
+    searchOption: [],
+    author: "Owca525",
+    urlWebsite: "https://anilist.co",
+    icon: "https://anilist.co/img/icons/icon.svg"
+  };
+
+  constructor() {
+    const options = {
       genres: [
         "Action",
         "Adventure",
@@ -460,11 +465,51 @@ export default class AnilistApi implements informationPluginFormat {
       years: genYearsList(1940),
       format: ["TV", "Movie", "TV Short", "special", "OVA", "ONA"],
       statuses: ["Releasing", "Finished", "Not Yet Released", "Cancelled"]
-    },
-    author: "Owca525",
-    urlWebsite: "https://anilist.co",
-    icon: "https://anilist.co/img/icons/icon.svg"
-  };
+    }
+
+    let newOptions: genres[] = [
+      {
+        type: "genres",
+        placeholder: "filter.placeholderGenres",
+        title: "filter.genres",
+        langPath: "anime_genres.",
+        options: options.genres
+      },
+      {
+        type: "years",
+        title: "filter.year",
+        placeholder: "filter.placeholderYears",
+        langPath: "",
+        options: options.years
+      },
+      {
+        type: "season",
+        placeholder: "filter.placeholderSeason",
+        title: "filter.season",
+        langPath: "anime_seasons.",
+        options: options.seasons
+      },
+      {
+        type: "format",
+        placeholder: "filter.placeholderFormat",
+        title: "filter.format",
+        langPath: "anime_formats.",
+        options: options.format
+      },
+      {
+        type: "airing",
+        placeholder: "filter.placeholderAiring",
+        title: "filter.airing",
+        langPath: "anime_statuses.",
+        options: options.statuses
+      },
+    ]
+
+    this.metadata = {
+      ...this.metadata,
+      searchOption: newOptions
+    }
+  }
 
   config: { [key: string]: any; } = {
     "Adult Mode": false,

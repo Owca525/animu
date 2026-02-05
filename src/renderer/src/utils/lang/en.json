@@ -23,6 +23,12 @@
         "schedule": "Schedule",
         "animulist": "AnimuList"
     },
+    "search": {
+        "home": "Search Anime...",
+        "history": "Search History...",
+        "animulist": "Search in AnimuList...",
+        "schedule": "Search in Schedule..."
+    },
     "animulist": {
         "status": {
             "CURRENT": "Watching",
@@ -78,8 +84,6 @@
         "info": "Info"
     },
     "home": {
-        "search": "Search Anime...",
-        "historySearch": "Search History...",
         "nothingfound": "Nothing Found Here",
         "error": "Error Occured",
         "trending_now": "Trending Now",
@@ -135,14 +139,14 @@
         "fantasy": "Fantasy",
         "hentai": "Hentai",
         "horror": "Horror",
-        "mahoushoujo": "Mahou Shoujo",
+        "mahou_shoujo": "Mahou Shoujo",
         "mecha": "Mecha",
         "music": "Music",
         "mystery": "Mystery",
         "psychological": "Psychological",
         "romance": "romance",
         "sci-fi": "Sci-Fi",
-        "sliceoflife": "Slice of Life",
+        "slice_of_life": "Slice of Life",
         "sports": "Sports",
         "supernatural": "Supernatural",
         "thriller": "Thriller"

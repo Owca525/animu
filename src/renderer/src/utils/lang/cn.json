@@ -21,6 +21,12 @@
     "on": "開啟",
     "action": "操作"
   },
+  "search": {
+    "home": "搜尋",
+    "history": "搜尋紀錄…",
+    "animulist": "Search in AnimuList...",
+    "schedule": "Search in Schedule..."
+  },
   "imageviewer": {
     "failedfetch": "圖片取得失敗",
     "failedsave": "圖片儲存失敗",
@@ -66,8 +72,6 @@
     "info": "資訊"
   },
   "home": {
-    "search": "搜尋",
-    "historySearch": "搜尋紀錄…",
     "nothingfound": "這裡甚麼都沒有",
     "error": "發生錯誤",
     "trending_now": "現在流行",
@@ -123,14 +127,14 @@
     "fantasy": "奇幻",
     "hentai": "H動漫",
     "horror": "恐怖",
-    "mahoushoujo": "魔法少女",
+    "mahou_shoujo": "魔法少女",
     "mecha": "機甲",
     "music": "音樂",
     "mystery": "懸疑",
     "psychological": "心理",
     "romance": "浪漫",
     "sci-fi": "科幻",
-    "sliceoflife": "日常",
+    "slice_of_life": "日常",
     "sports": "運動",
     "supernatural": "超自然",
     "thriller": "驚悚"

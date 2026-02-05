@@ -247,7 +247,7 @@ export interface informationPluginFormat {
         author: string
         icon?: string
         urlWebsite?: string
-        searchOption: genres
+        searchOption: genres[]
     }
     config?: { [key: string]: any }
     search(name: string, page: number, params?: genresSearchFormat): Promise<containerData | undefined>
@@ -272,8 +272,15 @@ export interface informationPluginManagerFormat {
     schedule(airingStart: number, airingEnd: number): Promise<containerData>
 }
 
-export type genres = { genres: string[], seasons: string[], years: string[], format: string[], statuses: string[] }
-export interface genresSearchFormat { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }
+export type genres = {
+    type: string,
+    placeholder: string,
+    title: string,
+    langPath: string
+    options: string[]
+}
+
+export interface genresSearchFormat { [key: string]: string }
 
 export interface episodeList { player_id: string, episodesData: { episodes: { ep: string, img?: string, title?: string }[], type: string, name?: string }[] }
 
@@ -416,13 +423,7 @@ export interface Thumbnail {
     }[]
 };
 
-export interface FilterParams {
-    genres?: string[];
-    years?: string;
-    seasons?: string;
-    format?: string[];
-    airing?: string;
-};
+export interface FilterParams { [key: string]: string };
 
 export interface pluginRepo {
     name: string,

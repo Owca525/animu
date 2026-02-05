@@ -21,6 +21,12 @@
     "on": "On",
     "action": "Action"
   },
+  "search": {
+    "home": "Szukaj Anime...",
+    "history": "Szukaj w histori...",
+    "animulist": "Search in AnimuList...",
+    "schedule": "Search in Schedule..."
+  },
   "imageviewer": {
     "failedfetch": "Failed Fetch Image",
     "failedsave": "Failed Save Image",
@@ -66,8 +72,6 @@
     "info": "Info"
   },
   "home": {
-    "search": "Szukaj Anime...",
-    "historySearch": "Szukaj w histori...",
     "nothingfound": "Nic nie znaleziono",
     "error": "Wystąpił błąd",
     "trending_now": "Popularne teraz",
@@ -123,14 +127,14 @@
     "fantasy": "Fantasy",
     "hentai": "Hentai",
     "horror": "Horror",
-    "mahoushoujo": "Mahou Shoujo",
+    "mahou_shoujo": "Mahou Shoujo",
     "mecha": "Mechy",
     "music": "Muzyczny",
     "mystery": "Tajemnice",
     "psychological": "Psychologiczny",
     "romance": "Romans",
     "sci-fi": "sci-fi",
-    "sliceoflife": "Okruchy Życia",
+    "slice_of_life": "Okruchy Życia",
     "sports": "Sportowe",
     "supernatural": "Nadprzyrodzone",
     "thriller": "Thriller"

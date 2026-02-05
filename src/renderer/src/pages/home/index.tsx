@@ -4,7 +4,7 @@ import Container from './components/container';
 import Filter from './components/filter';
 import Input from '@renderer/components/input';
 import Sidebar from '@renderer/components/sidebar';
-import { changeTitleAnimu, CreateContextMenuOptions, dateToUnix, getHistory, setHomeData, unixToDateTime } from '@renderer/utils/functions';
+import { changeTitleAnimu, CreateContextMenuOptions, dateToUnix, getHistory, unixToDateTime } from '@renderer/utils/functions';
 import {
   createSignal,
   For,
@@ -39,7 +39,8 @@ import {
 } from "@renderer/utils/types";
 import { useI18n } from '@renderer/utils/i18n';
 import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
-import { animulistData, getGlobalCache, setDeeplinkRunned } from '@renderer/utils/stores/global';
+import { getGlobalCache, setDeeplinkRunned } from '@renderer/utils/stores/global';
+import { setAnimuList, setCalendary, setHistory } from './homeUtils';
 
 // import WelcomeScreen from "./components/welcomeScreen"
 const Home = () => {
@@ -59,7 +60,7 @@ const Home = () => {
       {
         icon: "home",
         text: "global.home",
-        onClick: () => { setHomeActivePage("global.home"); setHomeSearchTags(undefined); plugin.home(); changeTitleAnimu(`Animu - ${t("global.home")}`) },
+        onClick: plugin.home,
       },
       {
         icon: "history",
@@ -68,7 +69,7 @@ const Home = () => {
       },
       {
         icon: "view_list",
-        text: "AnimuList",
+        text: "global.animulist",
         onClick: setAnimuList,
       },
       {
@@ -86,37 +87,20 @@ const Home = () => {
     ],
   };
 
-  // if (pluginPlayer && pluginPlayer.sidebarAddon) {
-  //   sidebarData = {
-  //     bottom: [...sidebarData.bottom],
-  //     top: [...sidebarData.top, ...pluginPlayer.sidebarAddon] as any,
-  //   };
-  // }
-
-  function detectActivePage() {
-    switch (getHomeCache().activePage) {
-      case "global.history":
-        changeTitleAnimu(`Animu - ${t("global.history")}`)
-        setSearchText(t("home.historySearch"))
-        break
-      case "global.home":
-        changeTitleAnimu(`Animu - ${t("global.home")}`)
-        setSearchText(t("home.search"))
-        break
-      case "global.animulist":
-        changeTitleAnimu(`Animu - ${t("global.animulist")}`)
-        setSearchText("Search in AnimuList...")
-        break
-      case "global.schedule":
-        changeTitleAnimu(`Animu - ${t("global.schedule")}`)
-        setSearchText("Search in Schedule...")
-        break
-    }
+  function setNewActivePage(text: string) {
+    setHomeSearch(undefined)
+    setHomeSearchTags(undefined)
+    setHomeActivePage(text)
+    changeTitleAnimu(`Animu - ${t(text)}`)
+    setSearchText(t(`search.${text.split(".")[1]}`))
   }
 
   onMount(() => {
-    detectActivePage()
-
+    for (let index = 0; index < sidebarData.top.length; index++) {
+      const element = sidebarData.top[index];
+      if (getHomeCache().activePage == element.text) setNewActivePage(element.text)
+    }
+    
     if (!getGlobalCache().deeplinkRunned) {
       window.api.onProtocolRequest(fetchDeeplinks)
       setDeeplinkRunned(true)
@@ -193,71 +177,7 @@ const Home = () => {
     navigate("/player");
   }
 
-  function setCalendary(date?: string) {
-    setHomeSearchTags(undefined)
-    setHomeActivePage("global.schedule");
-    detectActivePage()
 
-    let tmp = new Date()
-    if (date) tmp = new Date(date)
-
-    const startOfDay = new Date(tmp);
-    startOfDay.setHours(0, 0, 0, 0);
-
-    const endOfDay = new Date(tmp);
-    endOfDay.setHours(23, 59, 59, 999);
-
-    console.log(startOfDay, endOfDay)
-
-    setHomeData(async () => getInformationPlugin().schedule(dateToUnix(startOfDay.toString()), dateToUnix(endOfDay.toString())))
-  }
-
-  function setAnimuList() {
-    setHomeSearchTags(undefined)
-    setHomeActivePage("global.animulist");
-    detectActivePage()
-
-    setHomeData(undefined, {
-      sections: [
-        {
-          data: unwrap(animulistData())
-        }
-      ]
-    })
-  }
-
-  function setHistory() {
-    setHomeSearchTags(undefined)
-    setHomeActivePage("global.history");
-    detectActivePage()
-    let history = getHistory()
-
-    let data: homeData["data"] = {
-      sections: [
-        {
-          title: t("global.continuewatch"),
-          data: history.continue.slice(0, 20),
-          horizontal: true,
-          onTitleClick: async () => ({
-            title: t("global.continuewatch"),
-            data: history.continue,
-            horizontal: false,
-          }),
-        },
-        {
-          title: t("global.history"),
-          data: history.history.slice(0, 20) as any,
-          horizontal: true,
-          onTitleClick: async () => ({
-            title: t("global.history"),
-            data: history.history as any,
-            horizontal: false,
-          })
-        },
-      ],
-    };
-    setHomeData(undefined, data)
-  }
   const handleScroll = () => {
     let home = homeCache()
     if (!home.data) return;
@@ -271,7 +191,7 @@ const Home = () => {
   };
 
   // TODO: napraw wyszukiwanie itp
-  async function OnSearch(text: string) {
+  async function OnSearch(text: string = "") {
     let home = homeCache()
     if (home.activePage == "global.home") {
       setHomeSearch(text)
@@ -373,6 +293,7 @@ const Home = () => {
         onChange={() => setOpenSidebar(false)}
         activeElement
         setAciveElement={getSidebarNumber()}
+        onClickTopButtons={setNewActivePage}
       />
 
       <div class={`home-header-container ${homeCache().data && !homeCache().data.topCards ? "active" : ""} ${headerActive() ? "color" : ""}`}>
