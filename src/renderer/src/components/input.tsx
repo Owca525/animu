@@ -48,7 +48,7 @@ export default function Input(props: InputProps) {
       placeholder={props.placeholder}
       value={props.defaultValue ? props.defaultValue : ""}
       onKeyDown={handleData}
-      onInput={(v) => props.onKeyDown ? props.onKeyDown(v.currentTarget.value) : ""}
+      onInput={(v) => props.onKeyDown && props.type == "date" ? props.onKeyDown(v.currentTarget.value) : ""}
     />
   );
 }

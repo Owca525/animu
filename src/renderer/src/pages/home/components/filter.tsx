@@ -5,15 +5,33 @@ import { FilterParams, genres } from "@renderer/utils/types"
 import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js"
 import { useI18n } from "@renderer/utils/i18n"
 import { getHomeCache, setHomeSearchTags } from "@renderer/utils/stores/home"
+import { unwrap } from "solid-js/store"
 
 interface filterProps {
     custonClass?: string,
-    onChange: (params: FilterParams) => void,
+    onChange: (params: FilterParams | undefined) => void,
     filter: genres[]
 }
 
+export function updateGenres(key: string, value: string | undefined) {
+    console.log(key)
+    let params = unwrap(getHomeCache().filterTags)
+    console.log(params)
+    if (!params && !value) return
+    if (!params && value != undefined) return setHomeSearchTags({ [key]: value })
+    if (!params) return
+
+    if (value == undefined) {
+        delete params[key]
+        setHomeSearchTags(params)
+        return
+    }
+
+    setHomeSearchTags({ ...params, [key]: value })
+}
+
 export default function Filter(props: filterProps) {
-    const { t } = useI18n()
+    const { t, pathExist } = useI18n()
 
     const [showFilter, setShowFilter] = createSignal<boolean>(false)
     const [currentFilter, setCurrentFilter] = createSignal<FilterParams>()
@@ -35,28 +53,13 @@ export default function Filter(props: filterProps) {
     })
 
     createEffect(() => {
-        setCurrentFilter(getHomeCache().filterTags)
+        const tmp = getHomeCache()
+        setCurrentFilter(tmp.filterTags)
     })
 
-    function updateGenres(key: string, value: string | undefined) {
-        let params = getHomeCache().filterTags
-        if (!params && !value) return
-        if (!params && value != undefined) {
-            setCurrentFilter({ [key]: value })
-            setHomeSearchTags({ [key]: value })
-            return
-        }
-        if (!params) return
-
-        if (value == undefined) {
-            delete params[key]
-            setCurrentFilter(params)
-            setHomeSearchTags(params)
-            return
-        }
-
-        setCurrentFilter({ ...params, [key]: value })
-        setHomeSearchTags({ ...params, [key]: value })
+    function checkWrapper(str: string, val: string) {
+        if (pathExist(str)) return t(str)
+        return val
     }
 
     return (
@@ -67,12 +70,21 @@ export default function Filter(props: filterProps) {
                     <For each={props.filter}>
                         {(item) => (
                             <div class="home-filter-space">
-                                <div class="home-filter-title">{t(item.title)}</div>
-                                <Dropdown onClickX={() => updateGenres(item.type, undefined)}   
-                                    buttonText={currentFilter() && currentFilter()![item.type] ? currentFilter()![item.type] : ""}
+                                <div class="home-filter-title">{pathExist(item.title) ? t(item.title) : item.title}</div>
+                                <Dropdown onClickX={() => {
+                                    updateGenres(item.type, undefined);
+                                    setCurrentFilter(unwrap(getHomeCache().filterTags))
+                                    props.onChange(unwrap(currentFilter()))
+                                }}
+                                    buttonText={currentFilter() && currentFilter()![item.type] ?
+                                        checkWrapper(`${item.langPath}${currentFilter()![item.type].toLowerCase().replaceAll(" ", "_")}`, currentFilter()![item.type]) : ""}
                                     options={item.options.map((val) => ({
-                                        label: t(`${item.langPath}${val.toLowerCase().replaceAll(" ", "_")}`),
-                                        onClick: () => updateGenres(item.type, val)
+                                        label: checkWrapper(`${item.langPath}${val.toLowerCase().replaceAll(" ", "_")}`, val),
+                                        onClick: () => {
+                                            updateGenres(item.type, val)
+                                            setCurrentFilter(unwrap(getHomeCache().filterTags))
+                                            props.onChange(unwrap(currentFilter()))
+                                        }
                                     }))}
                                     placeholder={t(item.placeholder)}
                                 />

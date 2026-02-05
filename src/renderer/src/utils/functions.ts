@@ -4,6 +4,7 @@ import {
     cardData,
     containerData,
     ContextMenuProps,
+    FilterParams,
     homeData,
     informationPluginFormat,
     playerChapterList,
@@ -185,35 +186,35 @@ export async function refetchHistory() {
     let data: homeData = getHomeCache()
     if (data.activePage != "global.history") return
     let history = getHistory()
-    if (data.data.sections[0].title == t("global.continuewatch") && data.data.sections.length != 2) {
-        setHomeNewData({ sections: [{ title: t("global.continuewatch"), data: history.continue, horizontal: false }] })
+    if (data.data.sections[0].title == "global.continuewatch" && data.data.sections.length != 2) {
+        setHomeNewData({ sections: [{ title: "global.continuewatch", data: history.continue, horizontal: false }] })
         return
     }
 
-    if (data.data.sections[0].title == t("global.history") && data.data.sections.length != 2) {
-        setHomeNewData({ sections: [{ title: t("global.history"), data: history.history as cardData[], horizontal: false }] })
+    if (data.data.sections[0].title == "global.history" && data.data.sections.length != 2) {
+        setHomeNewData({ sections: [{ title: "global.history", data: history.history as cardData[], horizontal: false }] })
         return
     }
 
-    if (data.data.sections[0].title == t("global.continuewatch") && data.data.sections[1].title == t("global.history")) {
+    if (data.data.sections[0].title == "global.continuewatch" && data.data.sections[1].title == "global.history") {
         setHomeNewData({
             sections: [
                 {
-                    title: t("global.continuewatch"),
+                    title: "global.continuewatch",
                     data: history.continue.slice(0, 20),
                     horizontal: true,
                     onTitleClick: async () => ({
-                        title: t("global.continuewatch"),
+                        title: "global.continuewatch",
                         data: history.continue,
                         horizontal: false,
                     })
                 },
                 {
-                    title: t("global.history"),
+                    title: "global.history",
                     data: history.history.slice(0, 20) as cardData[],
                     horizontal: true,
                     onTitleClick: async () => ({
-                        title: t("global.history"),
+                        title: "global.history",
                         data: history.history as any,
                         horizontal: false,
                     })
@@ -639,7 +640,7 @@ export function dateToUnix(dateStr: string): number {
 }
 
 export async function addToAnimuList(animulist: animulistProps, anime: AnimeData, notification: boolean = false) {
-    await window.api.animulist.add({ AnimeData: {...unwrap(anime), nextAiringEpisode: undefined}, animulist: unwrap(animulist) })
+    await window.api.animulist.add({ AnimeData: { ...unwrap(anime), nextAiringEpisode: undefined }, animulist: unwrap(animulist) })
     refreashAnimulist()
     if (notification) toast(`Succesfully Added ${anime.title.romaji} to animulist`)
 }
@@ -705,9 +706,47 @@ export function convertHistoryToAnimuList() {
             lastUpdate: dateToUnix(new Date().toString())
         }
 
-        if (element.AnimeData.episodes && parseInt(element.saveData.episode) < element.AnimeData.episodes) 
+        if (element.AnimeData.episodes && parseInt(element.saveData.episode) < element.AnimeData.episodes)
             status = { ...status, status: "CURRENT", startWatch: dateToUnix(new Date().toString()) }
 
         addToAnimuList(status, element.AnimeData)
     }
+}
+
+export function searchDataInCards(cards: cardData[], search: string, params: FilterParams | undefined) {
+    let results: cardData[] = []
+
+    results = cards.filter((item) =>
+        item.AnimeData.title["romaji"] ?
+            item.AnimeData.title["romaji"].toLowerCase().includes(search.toLowerCase()) :
+            false
+    )
+    results = [...results, ...cards.filter((item) =>
+        item.AnimeData.title["native"] ?
+            item.AnimeData.title["native"].toLowerCase().includes(search.toLowerCase()) :
+            false
+    )]
+    results = [...results, ...cards.filter((item) =>
+        item.AnimeData.title["english"] ?
+            item.AnimeData.title["english"].toLowerCase().includes(search.toLowerCase()) :
+            false
+    )]
+
+    console.log(params, results)
+
+    if (!params) return results.filter(
+        (item, index, self) =>
+            index === self.findIndex(t => t.AnimeData.id === item.AnimeData.id)
+    )
+
+    if (params["years"]) results = results.filter((val) => new String(val.AnimeData.seasonYear) == params["years"])
+    if (params["season"]) results = results.filter((val) => new String(val.AnimeData.season) == params["season"])
+    if (params["format"]) results = results.filter((val) => new String(val.AnimeData.format) == params["format"])
+    if (params["airing"]) results = results.filter((val) => new String(val.AnimeData.status) == params["airing"])
+    if (params["genres"]) results = results.filter((val) => [...new Set(val.AnimeData.genres)].includes(params["genres"]))
+    
+    return results.filter(
+        (item, index, self) =>
+            index === self.findIndex(t => t.AnimeData.id === item.AnimeData.id)
+    )
 }
