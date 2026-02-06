@@ -1,8 +1,6 @@
 import Hls from "hls.js"
 
-import { AnimeData, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
-import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObjectConfig } from "@renderer/utils/functions"
-import { AnimeData, animulistProps, ContextMenuProps, deepLinkData, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
+import { AnimeData, animulistProps, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
 import { convertKeybinds, CreateContextMenuOptions, dateToUnix, detectTitle, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateDataInAnimulist, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
