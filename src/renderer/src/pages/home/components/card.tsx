@@ -1,4 +1,4 @@
-import { cardData, ContextMenuProps } from "@renderer/utils/types";
+import { animulistProps, cardData, ContextMenuProps } from "@renderer/utils/types";
 import "./css/card.css";
 import { useNavigate } from "@solidjs/router";
 import { JSX, Match, Show, Switch, createSignal, onMount, onCleanup } from "solid-js";
@@ -32,9 +32,12 @@ function Card(props: CardProps) {
   const [isError, setIsError] = createSignal(false);
   const [isOut, setIsOut] = createSignal(false);
   const [isCardVisible, setCardVisible] = createSignal(false);
+  const [animulistCard, setAnimulistCard] = createSignal<animulistProps | undefined>(props.card.animulist)
   let cardRef: HTMLDivElement | undefined;
 
   onMount(() => {
+    const tmp = unwrap(animulistData()).find((v=>v.AnimeData.id == props.card.AnimeData.id))
+    if (tmp) setAnimulistCard(tmp.animulist)
     if (!cardRef) return
     const observer = new IntersectionObserver(
       (entries) => {
@@ -89,7 +92,7 @@ function Card(props: CardProps) {
     }
 
     const animulist = unwrap(animulistData())
-    let tmp = props.card.animulist
+    let tmp = animulistCard()
     if (!tmp && animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id)) tmp = animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id)?.animulist
     localStorage.setItem("informationCache", JSON.stringify({ 
       anime: props.card.AnimeData, 
@@ -223,8 +226,8 @@ function Card(props: CardProps) {
       info.push(<div class="card-information-text card-information-top">TBA</div>);
     }
 
-    if (props.card.animulist) {
-      info.push(<div class="card-information-animulist-status">Status: {t(`animulist.status.${props.card.animulist.status}`)}</div>)
+    if (animulistCard()) {
+      info.push(<div class="card-information-animulist-status">Status: {t(`animulist.status.${animulistCard()!.status}`)}</div>)
     }
 
     if (props.card.AnimeData.studios && props.card.AnimeData.studios.length > 0) {
