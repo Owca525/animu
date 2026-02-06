@@ -81,6 +81,9 @@ input[type="number"]::-webkit-outer-spin-button {
 .animu-initial-content {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
   gap: 8px;
 }
 
@@ -105,6 +108,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .loading-animation {
   animation: spin 1s linear infinite;
+  user-select: none;
 }
 
 /* animation */
