@@ -1,6 +1,6 @@
 import Hls from "hls.js"
 
-import { AnimeData, ContextMenuProps, deepLinkData, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
+import { AnimeData, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
 import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
@@ -995,19 +995,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     };
 
     function generateShareURL() {
-        const anime: deepLinkData = {
-            animeID: anime_data.AnimeData.id,
-            player: {
-                plugin: anime_data.saveData.pluginName,
-                type: temp.type,
-                id: anime_data.AnimeData.player_ID as string,
-                episode: temp.episode,
-                time: currentTime()
-            }
-        }
+        const deepStr = `${anime_data.AnimeData.id},${anime_data.saveData.pluginName},${temp.type},${anime_data.AnimeData.player_ID},${temp.episode},${currentTime()}`
 
         const config = unwrap(getConfig())
-        SaveToClipboard("text", `${config.deepLinkURL}/?anime=${btoa(JSON.stringify(anime))}`)
+        SaveToClipboard("text", `${config.deepLinkURL}/?anime=${btoa(deepStr)}`)
     }
 
     const centerContextMenu: ContextMenuProps = [
