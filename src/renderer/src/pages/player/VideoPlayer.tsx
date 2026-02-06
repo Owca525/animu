@@ -347,7 +347,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             return
         }
         if (hls()) hls()!.destroy()
-        
+
         setListResolution(() => currentplayer.resolution)
         setPlayer(() => currentplayer)
         setCurrentResoltion(currentRes)
@@ -826,7 +826,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     //         case 0:
     //             togglePlay()
     //             break
-            
+
     //     }
     // }
 
@@ -1316,17 +1316,17 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     </div>
                 </div>
             </div>
-            <button onClick={() => {
-                if (currentSkipButton().type == "ending") {
-                    setHideUpNextEpisode(true)
-                    setIsDisableButtonSkipTimerEnding(true)
-                };
-                if (currentSkipButton().type == "opening") setIsDisableButtonSkipTimerOpening(true)
-                setTimeVideo(currentSkipButton().time)
-                clearChapterSkipTime()
-            }} class={`player-skip-chapters-button ${IsRunningButtonSkipTime() ? "show" : "hidden"}`}>
-                {currentSkipButton().text}, {`${buttonSkipTime()}s`}
-            </button>
+            <Button content={`${currentSkipButton().text} ${buttonSkipTime()}s`} ButtonClass={`player-skip-chapters-button ${IsRunningButtonSkipTime() ? "show" : "hidden"}`}
+                onClick={() => {
+                    if (currentSkipButton().type == "ending") {
+                        setHideUpNextEpisode(true)
+                        setIsDisableButtonSkipTimerEnding(true)
+                    };
+                    if (currentSkipButton().type == "opening") setIsDisableButtonSkipTimerOpening(true)
+                    setTimeVideo(currentSkipButton().time)
+                    clearChapterSkipTime()
+                }}
+            />
             <div ref={screenShotContainer} class={`player-screenshot-container ${screenShot().active ? "show" : "hidden"}`}
                 classList={{ click: screenShot().click != "" }}
                 onclick={() => screenShot().click != "" ? openUrlFolder(screenShot().click) : ""}
