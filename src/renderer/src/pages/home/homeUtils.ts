@@ -7,7 +7,9 @@ import { unwrap } from "solid-js/store";
 
 export function setCalendary(date?: string) {
     let tmp = new Date()
+    console.log(tmp)
     if (date) tmp = new Date(date)
+    console.log(tmp, date)
 
     const startOfDay = new Date(tmp);
     startOfDay.setHours(0, 0, 0, 0);

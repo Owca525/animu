@@ -73,7 +73,7 @@ const Home = () => {
       {
         icon: "calendar_month",
         text: "global.schedule",
-        onClick: setCalendary,
+        onClick: () => setCalendary(),
       }
     ],
     bottom: [
