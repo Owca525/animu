@@ -27,7 +27,7 @@ import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import { getConfig, setConfig } from './utils/stores/config';
 import { getGlobalCache, setGlobalHistory, setGlobalTheme, setIncognitoMode } from './utils/stores/global';
 import { HashRouter, Route } from '@solidjs/router';
-import { getInformationPlugin, pluginManager } from './utils/stores/plugins';
+import { getInformationPlugin, pluginManager, setPluginRepo } from './utils/stores/plugins';
 import { setHomeActivePage } from './utils/stores/home';
 import { toast, updateToast } from './utils/context/ToastNotification';
 import { t, useI18n } from './utils/i18n';
@@ -35,7 +35,7 @@ import './App.css';
 import './themes/darkerAnimu/main.css';
 import './utils/i18n';
 import { unwrap } from 'solid-js/store';
-import { themeMetadata } from './utils/types';
+import { pluginRepoExpanded, themeMetadata } from './utils/types';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -95,7 +95,7 @@ function App() {
     setHomeActivePage("global.home")
 
     setinitialState({ text: "Loading Plugin", plugin: false })
-    await fetchPluginRepos()
+    await checkPluginUpdate()
     await getInformationPlugin().initial()
     await pluginManager().initialPlugins()
     setInitation(false)
@@ -219,6 +219,18 @@ function App() {
       </Match>
     </Switch>
   )
+}
+
+async function checkPluginUpdate() {
+  const config = getConfig()
+  let tmpDatabase: pluginRepoExpanded[] = []
+  try {
+    tmpDatabase = localStorage.getItem("pluginDatabase") ? JSON.parse(localStorage.getItem("pluginDatabase") as any) : []
+  } catch (error) { console.warn("Error failed parsed pluginRepo Database", error) }
+
+  if (config.plugins.pluginCheckType == "On Start" || tmpDatabase.length <= 0 || config.plugins.lastTimeCheck <= 0) return await fetchPluginRepos()
+  if (checkDate(config.plugins.lastTimeCheck, config.plugins.pluginCheckType as any)) await fetchPluginRepos()
+  else { setPluginRepo(tmpDatabase) }
 }
 
 async function runCheckUpdate() {

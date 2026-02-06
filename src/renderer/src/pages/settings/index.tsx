@@ -1205,6 +1205,16 @@ function settings() {
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
+                            {"Checking for plugin updates"}
+                            <ButtonGroup selectedValue={t(`settings.general.${config().new.plugins.pluginCheckType.toLowerCase().replaceAll(" ", "")}`)} listValues={[
+                                { value: t("settings.general.onstart"), onClick: () => handleChange("plugins.pluginCheckType", "On Start") },
+                                { value: t("settings.general.everyday"), onClick: () => handleChange("plugins.pluginCheckType", "Every Day") },
+                                { value: t("settings.general.everyweek"), onClick: () => handleChange("plugins.pluginCheckType", "Every Week") },
+                            ]}
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
                             {t("settings.extensions.updateplugin")}
                             <Button content={t("settings.general.checkupdate")} onClick={async () => {
                                 await fetchPluginRepos()

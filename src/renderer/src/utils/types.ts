@@ -277,6 +277,8 @@ export interface SettingsConfig {
         userPlugins: boolean
         player: string
         repoURL: string[]
+        pluginCheckType: "On Start" | "Every Day" | "Every Week"
+        lastTimeCheck: number
     }
     General: {
         // HoverSidebar: boolean
