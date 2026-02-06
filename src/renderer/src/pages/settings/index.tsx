@@ -251,6 +251,12 @@ function settings() {
             return { old: structuredClone(prev.old), new: structuredClone(prev.old) }
         })
         setpluginList((prev) => prev.map(pl => ({ ...pl, active: pl.plugin.metadata.name == config().old.plugins.player })))
+
+        const tmp = activeThemes().entries().filter((item) => !config().old.General.theme.includes(item[1].themeName))
+        tmp.forEach((v) => {
+            updateTheme(v[1], true, v[0])
+        })
+
         setThemes(loadedTheme().filter((val) => ![...activeThemes().entries()].map((v) => v[1].themeName).includes(val.themeName)))
         pluginManager().initialPlugins()
         setSaving(() => false)
