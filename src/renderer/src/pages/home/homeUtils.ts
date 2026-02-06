@@ -117,11 +117,13 @@ export function historySearch(search: string = "", params: FilterParams | undefi
 
 export function AnimuListSearch(search: string = "", params: FilterParams | undefined) {
     if (search.replaceAll(" ", "") == "" && params == undefined) return setAnimuList()
+    let tmp = searchDataInCards(unwrap(animulistData()), search, params)
+    if (params && params["watching"]) tmp = tmp.filter((v) => v.animulist?.status == params["watching"])
     setHomeData(undefined, {
         sections: [
             {
                 title: search != "" ? `Searching: ${search}` : undefined,
-                data: searchDataInCards(unwrap(animulistData()), search, params)
+                data: tmp
             }
         ]
     })

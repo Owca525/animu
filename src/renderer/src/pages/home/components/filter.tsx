@@ -77,9 +77,9 @@ export default function Filter(props: filterProps) {
                                     props.onChange(unwrap(currentFilter()))
                                 }}
                                     buttonText={currentFilter() && currentFilter()![item.type] ?
-                                        checkWrapper(`${item.langPath}${currentFilter()![item.type].toLowerCase().replaceAll(" ", "_")}`, currentFilter()![item.type]) : ""}
+                                        checkWrapper(`${item.langPath}${currentFilter()![item.type]}`, currentFilter()![item.type]) : ""}
                                     options={item.options.map((val) => ({
-                                        label: checkWrapper(`${item.langPath}${val.toLowerCase().replaceAll(" ", "_")}`, val),
+                                        label: checkWrapper(`${item.langPath}${val}`, val),
                                         onClick: () => {
                                             updateGenres(item.type, val)
                                             setCurrentFilter(unwrap(getHomeCache().filterTags))

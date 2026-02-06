@@ -473,7 +473,7 @@ export default class AnilistApi implements informationPluginFormat {
         placeholder: "filter.placeholderGenres",
         title: "filter.genres",
         langPath: "anime_genres.",
-        options: options.genres
+        options: options.genres.map(v => v.toLowerCase().replaceAll(" ", "_"))
       },
       {
         type: "years",
@@ -487,21 +487,21 @@ export default class AnilistApi implements informationPluginFormat {
         placeholder: "filter.placeholderSeason",
         title: "filter.season",
         langPath: "anime_seasons.",
-        options: options.seasons
+        options: options.seasons.map(v => v.toLowerCase().replaceAll(" ", "_"))
       },
       {
         type: "format",
         placeholder: "filter.placeholderFormat",
         title: "filter.format",
         langPath: "anime_formats.",
-        options: options.format
+        options: options.format.map(v => v.toLowerCase().replaceAll(" ", "_"))
       },
       {
         type: "airing",
         placeholder: "filter.placeholderAiring",
         title: "filter.airing",
         langPath: "anime_statuses.",
-        options: options.statuses
+        options: options.statuses.map(v => v.toLowerCase().replaceAll(" ", "_"))
       },
     ]
 

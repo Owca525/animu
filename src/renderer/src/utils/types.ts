@@ -82,7 +82,11 @@ export interface homeData {
     page: number
     stopScrolling: boolean
     activePage: "history" | "home" | string
-    filterTags?: FilterParams
+    filterTags?: FilterParams,
+    otherFilter: {
+        page: string,
+        filter: genres[]
+    }[]
     mainContainer: {
         scrollLeft: number,
         scrollTop: number,

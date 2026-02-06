@@ -29,6 +29,7 @@ import {
   containerData,
   deepLinkData,
   FilterParams,
+  genres,
   homeData,
   SettingsConfig,
 } from "@renderer/utils/types";
@@ -218,6 +219,16 @@ const Home = () => {
     }
   }
 
+  function checkOtherFilters() {
+    if (homeCache().otherFilter.length <= 0) return []
+    let tmp: genres[] = [] 
+    for (let index = 0; index < homeCache().otherFilter.length; index++) {
+      const element = homeCache().otherFilter[index];
+      if (element.page == homeCache().activePage) tmp = [...tmp, ...element.filter]
+    }
+    return tmp
+  }
+
   return (
     <main
       class={`home-main ${homeCache().data && !homeCache().data.topCards ? "active" : ""}`}
@@ -250,7 +261,7 @@ const Home = () => {
           <div class="home-filter-void">
             <Filter
               onChange={(params: FilterParams | undefined) => { StartSearch(unwrap(homeCache().search), params) }}
-              filter={plugin.currentPlugin.metadata.searchOption}
+              filter={[...plugin.currentPlugin.metadata.searchOption, ...checkOtherFilters()]}
               custonClass={`${homeCache().data && homeCache().data.topCards ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
             />
           </div>
