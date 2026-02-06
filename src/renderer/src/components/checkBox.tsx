@@ -4,6 +4,7 @@ import "./css/checkBox.css";
 interface CheckBoxProps {
   onChecked?: (check: boolean) => void;
   checked?: boolean;
+  disable?: boolean
 }
 
 const CheckBox: Component<CheckBoxProps> = (props) => {
@@ -13,6 +14,7 @@ const CheckBox: Component<CheckBoxProps> = (props) => {
       class="checkbox"
       type="checkbox"
       checked={props.checked}
+      disabled={props.disable}
       onChange={(event) => props.onChecked?.(event.currentTarget.checked)}
     />
   );
