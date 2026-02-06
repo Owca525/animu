@@ -20,13 +20,27 @@ export function setCalendary(date?: string) {
     setHomeData(async () => getInformationPlugin().schedule(dateToUnix(startOfDay.toString()), dateToUnix(endOfDay.toString())))
 }
 
-export function setAnimuList() {
+export function setAnimuList(): any {
+    const animulist = unwrap(animulistData())
+    if (animulist.length <= 0) return setHomeData(undefined, {sections: [ { data: [] } ]})
+    let finnalContainer: containerData[] = []
+
+    const currentAnime = animulist.filter((v) => v.animulist.status == "CURRENT")
+    if (currentAnime.length >= 1) finnalContainer.push({ title: "animulist.status.CURRENT", data: currentAnime, horizontal: true })
+
+    const watchedAnime = animulist.filter((v) => v.animulist.status == "COMPLETED")
+    if (watchedAnime.length >= 1) finnalContainer.push({ title: "animulist.status.COMPLETED", data: watchedAnime, horizontal: true })
+
+    const planningAnime = animulist.filter((v) => v.animulist.status == "PLANNING")
+    if (planningAnime.length >= 1) finnalContainer.push({ title: "animulist.status.PLANNING", data: planningAnime, horizontal: true })
+
+    const pausedAnime = animulist.filter((v) => v.animulist.status == "PAUSED")
+    if (pausedAnime.length >= 1) finnalContainer.push({ title: "animulist.status.PAUSED", data: pausedAnime, horizontal: true })
+
+    if (finnalContainer.length <= 1) return setHomeData(undefined, {sections: [ { data: unwrap(animulistData()) } ]})
+
     setHomeData(undefined, {
-        sections: [
-            {
-                data: unwrap(animulistData())
-            }
-        ]
+        sections: finnalContainer
     })
 }
 
@@ -70,8 +84,8 @@ export function anilistSearch(search: string, params: FilterParams | undefined) 
 
 export function historySearch(search: string = "", params: FilterParams | undefined) {
     if (search.replaceAll(" ", "") == "" && params == undefined) {
-      setHistory()
-      return
+        setHistory()
+        return
     }
     const history = getHistory()
     const homeCache = getHomeCache().data["sections"]
@@ -82,7 +96,7 @@ export function historySearch(search: string = "", params: FilterParams | undefi
     if (homeCache.length == 1) {
         finnalContainer.push({
             title: homeCache[0].title == "global.history" ? "global.history" : "global.continuewatch",
-            data: homeCache[0].title == "global.history" ? searchDataInCards(history.history as cardData[], search, params) : 
+            data: homeCache[0].title == "global.history" ? searchDataInCards(history.history as cardData[], search, params) :
                 searchDataInCards(history.continue as cardData[], search, params)
         })
     } else {
@@ -105,7 +119,7 @@ export function AnimuListSearch(search: string = "", params: FilterParams | unde
     if (search.replaceAll(" ", "") == "" && params == undefined) return setAnimuList()
     setHomeData(undefined, {
         sections: [
-            {   
+            {
                 title: search != "" ? `Searching: ${search}` : undefined,
                 data: searchDataInCards(unwrap(animulistData()), search, params)
             }
