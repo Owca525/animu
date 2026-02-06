@@ -391,7 +391,8 @@
             "website": "Website",
             "hideplugin": "Hide Plugin",
             "unhideplugin": "UnHide Plugin",
-            "conf": "Config: {{title}}"
+            "conf": "Config: {{title}}",
+            "updatecheck": "Checking for plugin updates"
         },
         "upNext": {
             "var1": "Variant 1",

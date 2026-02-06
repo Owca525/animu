@@ -392,7 +392,8 @@
       "website": "官方網站",
       "hideplugin": "隱藏外掛",
       "unhideplugin": "顯示外掛",
-      "conf": "設定：{{title}}"
+      "conf": "設定：{{title}}",
+      "updatecheck": "正在檢查外掛更新"
     },
     "upNext": {
       "var1": "樣式 1",
