@@ -83,7 +83,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [IsRunningButtonSkipTime, setIsRunningButtonSkipTime] = createSignal<boolean>(false)
     const [IsDisableButtonSkipTimerOpening, setIsDisableButtonSkipTimerOpening] = createSignal<boolean>(false)
     const [IsDisableButtonSkipTimerEnding, setIsDisableButtonSkipTimerEnding] = createSignal<boolean>(false)
-    const [currentSkipButton, setcurrentSkipButton] = createSignal<{ text: string, type: "opening" | "ending" | "", time: number }>({ text: "", type: "", time: 0 })
+    const [currentSkipButton, setcurrentSkipButton] = createSignal<{ type: "opening" | "ending" | "", time: number }>({ type: "", time: 0 })
 
     const [isShowButtonSkipLeft, setShowButtonSkipLeft] = createSignal<boolean>(false)
     const [isShowButtonSkipRight, setShowButtonSkipRight] = createSignal<boolean>(false)
@@ -639,12 +639,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             if (config.Player.general.autoSkipOpenings || config.Player.general.autoSkipEndings) return setTimeVideo(element.end)
 
             if (element.type == "opening" && !IsDisableButtonSkipTimerOpening()) {
-                setcurrentSkipButton(() => { return { text: "Skip Opening", time: element.end, type: "opening" } })
+                setcurrentSkipButton(() => { return { time: element.end, type: "opening" } })
                 setIsDisableButtonSkipTimerOpening(() => true)
                 startChapterSkipTime()
             }
             if (element.type == "ending" && !IsDisableButtonSkipTimerEnding()) {
-                setcurrentSkipButton(() => { return { text: "Skip Ending", time: element.end, type: "ending" } })
+                setcurrentSkipButton(() => { return { time: element.end, type: "ending" } })
                 setIsDisableButtonSkipTimerEnding(() => true)
                 startChapterSkipTime()
             }
@@ -1307,7 +1307,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     </div>
                 </div>
             </div>
-            <Button content={`${currentSkipButton().text} ${buttonSkipTime()}s`} ButtonClass={`player-skip-chapters-button ${IsRunningButtonSkipTime() ? "show" : "hidden"}`}
+            <Button content={t(`player.skiptimebutton.${currentSkipButton().type}`, { time: buttonSkipTime() })} ButtonClass={`player-skip-chapters-button ${IsRunningButtonSkipTime() ? "show" : "hidden"}`}
                 onClick={() => {
                     if (currentSkipButton().type == "ending") {
                         setHideUpNextEpisode(true)

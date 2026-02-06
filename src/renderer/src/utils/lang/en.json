@@ -21,6 +21,12 @@
         "on": "On",
         "action": "Action"
     },
+    "initial": {
+        "animu": "Animu is initializing",
+        "theme": "Loading Theme",
+        "config": "Loading Config",
+        "plugin": "Loading Plugin"
+    },
     "imageviewer": {
         "failedfetch": "Failed Fetch Image",
         "failedsave": "Failed Save Image",
@@ -406,6 +412,10 @@
             "currentime": "CurrentTime: ",
             "durration": "Duration: "
         },
+        "skiptimebutton": {
+            "opening": "Skip Opening {{time}}s",
+            "ending": "Skip Ending {{time}}s"
+        },
         "shareanime": "Share Anime Episode",
         "selectepisode": "Select Episode",
         "TitleEpisode": "Episode {{ep}} of {{name}}",
@@ -503,7 +513,8 @@
     "errorboundary": {
         "gotohome": "Go Back Home",
         "leaveanimu": "Leave Animu",
-        "errormessage": "Error Message: {{error}}"
+        "errormessage": "Error Message: {{error}}",
+        "github": "Send Issue to github"
     },
     "credits": {
         "owca525": "Animu Creator",

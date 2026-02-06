@@ -21,6 +21,12 @@
     "on": "開啟",
     "action": "操作"
   },
+  "initial": {
+    "animu": "Animu is initializing",
+    "theme": "正在載入主題",
+    "config": "正在載入設定",
+    "plugin": "正在載入外掛"
+  },
   "imageviewer": {
     "failedfetch": "圖片取得失敗",
     "failedsave": "圖片儲存失敗",
@@ -407,6 +413,10 @@
       "currentime": "目前時間: ",
       "durration": "總長度: "
     },
+    "skiptimebutton": {
+      "opening": "略過片頭 {{time}} 秒",
+      "ending": "略過片尾 {{time}} 秒"
+    },
     "shareanime": "分享動畫集數",
     "selectepisode": "選擇集數",
     "TitleEpisode": "第 {{ep}} 集：{{name}}",
@@ -504,7 +514,8 @@
   "errorboundary": {
     "gotohome": "回到首頁",
     "leaveanimu": "離開動畫",
-    "errormessage": "錯誤訊息：{{error}}"
+    "errormessage": "錯誤訊息：{{error}}",
+    "github": "回報問題至 GitHub"
   },
   "credits": {
     "owca525": "Animu 創作者",

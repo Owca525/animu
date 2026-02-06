@@ -87,14 +87,14 @@ function App() {
       setConfig(JSON.parse(localStorage.getItem("config") as any))
       setGlobalHistory(JSON.parse(localStorage.getItem("history") as any))
     }
-    setinitialState({ text: "Loading Theme", plugin: false })
-    if (window.api) setGlobalTheme(await window.api.themes.list())
-
-    setinitialState({ text: "Loading Config", plugin: false })
+    setinitialState({ text: t("initial.config"), plugin: false })
     LoadConfig()
     setHomeActivePage("global.home")
 
-    setinitialState({ text: "Loading Plugin", plugin: false })
+    setinitialState({ text: t("initial.theme"), plugin: false })
+    if (window.api) setGlobalTheme(await window.api.themes.list())
+
+    setinitialState({ text: t("initial.plugin"), plugin: false })
     await checkPluginUpdate()
     await getInformationPlugin().initial()
     await pluginManager().initialPlugins()
@@ -197,7 +197,7 @@ function App() {
         <main class='animu-initial-container'>
           <img src={icon} alt="Animu Icon" class='animu-initial-icon' />
           <div class="animu-initial-content">
-            <span class='animu-initial-text'>Animu is initializing</span>
+            <span class='animu-initial-text'>{t("initial.animu")}</span>
             <div class="animu-initial-state">
               <span class='material-symbols-outlined loading-animation'>progress_activity</span>
               <span class='animu-initial-text'>{initialState().text}</span>

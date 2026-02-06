@@ -21,6 +21,12 @@
     "on": "On",
     "action": "Action"
   },
+  "initial": {
+    "animu": "Animu is initializing",
+    "theme": "Loading Theme",
+    "config": "Loading Config",
+    "plugin": "Loading Plugin"
+  },
   "imageviewer": {
     "failedfetch": "Failed Fetch Image",
     "failedsave": "Failed Save Image",
@@ -399,6 +405,10 @@
       "notfound": "Odtwarzacz nie znalazł żadnych URL-i",
       "player": "Player found a problem"
     },
+    "skiptimebutton": {
+      "opening": "Skip Opening {{time}}s",
+      "ending": "Skip Ending {{time}}s"
+    },
     "shareanime": "Share Anime Episode",
     "selectepisode": "Select Episode",
     "TitleEpisode": "Odcinek {{ep}} z {{name}}",
@@ -496,7 +506,8 @@
   "errorboundary": {
     "gotohome": "Wróć na stronę główną",
     "leaveanimu": "Opuść Animu",
-    "errormessage": "Komunikat błędu: {{error}}"
+    "errormessage": "Komunikat błędu: {{error}}",
+    "github": "Send Issue to github"
   },
   "credits": {
     "owca525": "Animu Creator",

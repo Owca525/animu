@@ -21,6 +21,12 @@
     "on": "Вкл.",
     "action": "Действие"
   },
+  "initial": {
+    "animu": "Инициализация Аниму",
+    "theme": "Загрузка Темы",
+    "config": "Загрузка Конфигурации",
+    "plugin": "Загрузка Плагина"
+  },
   "imageviewer": {
     "failedfetch": "Не удалось загрузить изображение",
     "failedsave": "Не удалось сохранить изображение",
@@ -400,6 +406,10 @@
       "notfound": "Плеер не нашёл URL-адресов",
       "player": "Плеер столкнулся с проблемой"
     },
+    "skiptimebutton": {
+      "opening": "Пропустить опенинг {{time}}с",
+      "ending": "Пропустить эндинг {{time}}с"
+    },
     "shareanime": "Поделиться эпизодом аниме",
     "selectepisode": "Выбрать эпизод",
     "TitleEpisode": "Эпизод {{ep}} из «{{name}}»",
@@ -497,7 +507,8 @@
   "errorboundary": {
     "gotohome": "Вернуться на главную",
     "leaveanimu": "Покинуть Animu",
-    "errormessage": "Сообщение об ошибке: {{error}}"
+    "errormessage": "Сообщение об ошибке: {{error}}",
+    "github": "Сообщить об ошибке на GitHub"
   },
   "credits": {
     "owca525": "Создатель Animu",
