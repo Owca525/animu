@@ -494,8 +494,8 @@ function information() {
                                             value: 'Episodes',
                                             onClick: () => SetactivePage("Episodes")
                                         }, {
-                                            value: 'Media',
-                                            onClick: () => {SetactivePage("Media");searchAnimeOpenings()}
+                                            value: 'Opening/Ending',
+                                            onClick: () => {SetactivePage("Opening/Ending");searchAnimeOpenings()}
                                         }]} />
                                         {/* {
                                             value: 'Trailer',
@@ -511,7 +511,7 @@ function information() {
                                     <Match when={showLoadingInEpisodes()}>
                                         <div class="information-loading-container"><span class="material-symbols-outlined information-loading">progress_activity</span></div>
                                     </Match>
-                                    <Match when={activePage() == "Media"}>
+                                    <Match when={activePage() == "Opening/Ending"}>
                                         <For each={animeMedia()}>
                                             {(item) => <Button content={item.title} onClick={() => {setCurrentAnimeMedia(undefined);setCurrentAnimeMedia(item)}} />}
                                         </For>
