@@ -76,7 +76,7 @@ function extractPlugin(folderPlugins: string, type: "official" | "user") {
 
 export function detectZoom(zoom: number) {
     try {
-        if (!isNaN(Number(zoom.toString()))) return 1
+        if (isNaN(parseInt(zoom.toString()))) return 1
         return zoom / 100
     } catch (error) {
         console.error("Failed Fetch Zoom", zoom)
