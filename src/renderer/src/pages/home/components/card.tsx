@@ -4,9 +4,11 @@ import { useNavigate } from "@solidjs/router";
 import { JSX, Match, Show, Switch, createSignal, onMount, onCleanup } from "solid-js";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import {
+  addToAnimuList,
   convertSeconds,
   CreateContextMenuOptions,
   getGradientColor,
+  removeFromAnimulist,
   SaveToClipboard,
 } from "@renderer/utils/functions";
 import { DeleteFromHistory, SaveHistory } from "@renderer/utils/FilesManager/history";
@@ -14,6 +16,8 @@ import { unwrap } from "solid-js/store";
 import { removeToast, toast, updateToast } from "@renderer/utils/context/ToastNotification";
 import { pluginManager } from "@renderer/utils/stores/plugins";
 import { useI18n } from "@renderer/utils/i18n";
+import { showCustomMenu } from "@renderer/utils/context/menuContext";
+import { animulistData } from "@renderer/utils/stores/global";
 
 interface CardProps {
   card: cardData;
@@ -22,7 +26,7 @@ interface CardProps {
 
 function Card(props: CardProps) {
   const { t, pathExist } = useI18n()
-  
+
   const navigate = useNavigate();
   const [isLoading, setLoading] = createSignal(true);
   const [isError, setIsError] = createSignal(false);
@@ -73,7 +77,7 @@ function Card(props: CardProps) {
         episodelist: episodeList,
         continewatch: true,
       }))
-      
+
       removeToast(idToast)
       navigate("/player");
       return;
@@ -84,7 +88,14 @@ function Card(props: CardProps) {
       return;
     }
 
-    localStorage.setItem("informationCache", JSON.stringify({ anime: props.card.AnimeData, saveData: props.card.saveData }))
+    const animulist = unwrap(animulistData())
+    let tmp = props.card.animulist
+    if (!tmp && animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id)) tmp = animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id)?.animulist
+    localStorage.setItem("informationCache", JSON.stringify({ 
+      anime: props.card.AnimeData, 
+      saveData: props.card.saveData, 
+      animulist: tmp
+    }))
     navigate("/info");
   }
 
@@ -128,6 +139,25 @@ function Card(props: CardProps) {
           ? SaveToClipboard("image", props.card.AnimeData.coverImage)
           : "",
     })
+  }
+
+  if (animulistData().find((v) => v.AnimeData.id == props.card.AnimeData.id) && !props.disableinformation) {
+    CenterContextMenu.push({
+      option: "Remove From Anilist",
+      onClick: () => removeFromAnimulist(props.card.AnimeData.id, true),
+      deletion: true
+    });
+  } else if (!props.disableinformation) {
+    CenterContextMenu.push({
+      option: "Add To AnimuList",
+      onClick: () =>
+        showCustomMenu({
+          title: `Add ${props.card.AnimeData.title.romaji}`, animuList: {
+            anime: unwrap(props.card.AnimeData),
+            save: (animulist, anime) => addToAnimuList(animulist, anime, true)
+          }
+        }),
+    });
   }
 
   if (props.card.saveData) {
@@ -191,6 +221,10 @@ function Card(props: CardProps) {
       );
     } else if (!(props.card.AnimeData.season && props.card.AnimeData.seasonYear) && !props.card.AnimeData.nextAiringEpisode) {
       info.push(<div class="card-information-text card-information-top">TBA</div>);
+    }
+
+    if (props.card.animulist) {
+      info.push(<div class="card-information-animulist-status">Status: {t(`animulist.status.${props.card.animulist.status}`)}</div>)
     }
 
     if (props.card.AnimeData.studios && props.card.AnimeData.studios.length > 0) {

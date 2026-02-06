@@ -201,8 +201,11 @@ export async function extractEpisodes(anime_id: string, episode: { start: number
 export async function extractInformation(id: string): Promise<{ episodes: { ep: string; img?: string; title?: string }[]; type: string; name?: string }[]> {
     let variables = `{"_id":"${id}"}`;
     const resp = await requestToApi(variables, HASH_INFO, header);
-    if (!resp.success || !resp.json || !resp.json.data.show) return []
-    let anime_data = resp.json.data.show
+    if (!resp.success || !resp.json || !resp.json["data"]["show"]) {
+        console.warn(resp)
+        return []
+    }
+    let anime_data = resp.json["data"]["show"]
     let episodes = await extractEpisodes(id, { start: parseInt(anime_data.availableEpisodesDetail.sub.at(-1)), end: parseInt(anime_data.availableEpisodesDetail.sub[0]) })
     if (episodes.length <= 0) episodes = anime_data["availableEpisodesDetail"]["sub"].map((v: string) => ({ ep: v }))
 

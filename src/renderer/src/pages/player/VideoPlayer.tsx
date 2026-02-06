@@ -2,6 +2,8 @@ import Hls from "hls.js"
 
 import { AnimeData, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
 import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObjectConfig } from "@renderer/utils/functions"
+import { AnimeData, animulistProps, ContextMenuProps, deepLinkData, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
+import { convertKeybinds, CreateContextMenuOptions, dateToUnix, detectTitle, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateDataInAnimulist, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
@@ -34,7 +36,8 @@ interface VideoPlayerProps {
     player_data: playerData[]
     anime_data: {
         AnimeData: AnimeData,
-        saveData: indentityPlayer
+        saveData: indentityPlayer,
+        animulist?: animulistProps
     }
     temp: { episode: string, type: string, episodes: { ep: string, img?: string, title?: string }[] }
     setNextEpisode: (value: string) => void
@@ -544,6 +547,21 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         // Checking to save history
         if (isCleanup()) return
         if (!config) return
+
+        if (durrationTime() > 10 && currentTime() > durrationTime() - parseInt(config.History.continue.MaximizeTimeSave.toString()) && anime_data.animulist && anime_data.animulist.status == "CURRENT" && anime_data.AnimeData.episodes) {
+            if (temp.episode == anime_data.AnimeData.episodes.toString()) {
+                updateDataInAnimulist(anime_data.AnimeData.id,  {
+                    AnimeData: anime_data.AnimeData,
+                    animulist: {
+                        ...anime_data.animulist,
+                        status: "COMPLETED",
+                        endWatch: anime_data.animulist.endWatch == 0 ? dateToUnix(new Date().toString()) : anime_data.animulist.endWatch,
+                        lastUpdate: dateToUnix(new Date().toString())
+                    }
+                })
+            }
+        }
+
         if (currentTime() <= parseInt(config.History.continue.MinimalTimeSave.toString())) return
         let futureHistory = {
             AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },

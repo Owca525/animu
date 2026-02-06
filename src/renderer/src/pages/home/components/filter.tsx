@@ -1,19 +1,40 @@
 import Dropdown from "@renderer/components/dropDown"
 import "./css/Filter.css"
 import Button from "@renderer/components/buttons"
-import { FilterParams, homeData } from "@renderer/utils/types"
-import { createSignal, onCleanup, onMount, Show } from "solid-js"
-import { getHomeCache } from "@renderer/utils/stores/home"
+import { FilterParams, genres } from "@renderer/utils/types"
+import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js"
 import { useI18n } from "@renderer/utils/i18n"
+import { getHomeCache, setHomeSearchTags } from "@renderer/utils/stores/home"
+import { unwrap } from "solid-js/store"
 
-interface filterProps { custonClass?: string, onChange: (params?: FilterParams, removeParam?: string) => void, filter: { genres: string[], seasons: string[], years: string[], format: string[], statuses: string[] } }
+interface filterProps {
+    custonClass?: string,
+    onChange: (params: FilterParams | undefined) => void,
+    filter: genres[]
+}
 
-// { onChange, filter, custonClass }
+export function updateGenres(key: string, value: string | undefined) {
+    console.log(key)
+    let params = unwrap(getHomeCache().filterTags)
+    console.log(params)
+    if (!params && !value) return
+    if (!params && value != undefined) return setHomeSearchTags({ [key]: value })
+    if (!params) return
+
+    if (value == undefined) {
+        delete params[key]
+        setHomeSearchTags(params)
+        return
+    }
+
+    setHomeSearchTags({ ...params, [key]: value })
+}
+
 export default function Filter(props: filterProps) {
-    const { t } = useI18n()
-    
+    const { t, pathExist } = useI18n()
+
     const [showFilter, setShowFilter] = createSignal<boolean>(false)
-    const homeCache: homeData = getHomeCache();
+    const [currentFilter, setCurrentFilter] = createSignal<FilterParams>()
     let containerRef: HTMLDivElement | undefined;
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -31,31 +52,45 @@ export default function Filter(props: filterProps) {
         document.removeEventListener('mousedown', handleClickOutside);
     })
 
+    createEffect(() => {
+        const tmp = getHomeCache()
+        setCurrentFilter(tmp.filterTags)
+    })
+
+    function checkWrapper(str: string, val: string) {
+        if (pathExist(str)) return t(str)
+        return val
+    }
+
     return (
         <>
             <Button ButtonClass={`home-filter-button ${props.custonClass}`} iconClassName="home-filter-button" icon="tune" onClick={() => setShowFilter((prev) => !prev)} />
             <Show when={showFilter()}>
                 <div tabIndex={-1} class="home-filter-container home-filter-container-horizontal-new" ref={containerRef}>
-                    <div class="home-filter-space">
-                        <div class="home-filter-title">{t("filter.genres")}</div>
-                        <Dropdown onClickX={() => props.onChange(undefined, "genres")} buttonText={homeCache.filterTags?.genres ? t(`anime_genres.${homeCache.filterTags.genres[0].toLowerCase().replaceAll(" ", "")}`) : ""} options={props.filter.genres.map((element) => { return { label: t(`anime_genres.${element.toLowerCase().replaceAll(" ", "")}`), onClick: () => props.onChange({ genres: [element] }) } })} placeholder={t("filter.placeholderGenres")} />
-                    </div>
-                    <div class="home-filter-space">
-                        <div class="home-filter-title">{t("filter.year")}</div>
-                        <Dropdown onClickX={() => props.onChange(undefined, "years")} buttonText={homeCache.filterTags?.years ? homeCache.filterTags.years : ""} options={props.filter.years.map((element) => { return { label: element, onClick: () => props.onChange({ years: element }) } })} placeholder={t("filter.placeholderYears")} />
-                    </div>
-                    <div class="home-filter-space">
-                        <div class="home-filter-title">{t("filter.season")}</div>
-                        <Dropdown onClickX={() => props.onChange(undefined, "seasons")} buttonText={homeCache.filterTags?.seasons ? t(`anime_seasons.${homeCache.filterTags.seasons.toLowerCase().replaceAll(" ", "")}`) : ""} options={props.filter.seasons.map((element) => { return { label: t(`anime_seasons.${element.toLowerCase().replaceAll(" ", "")}`), onClick: () => props.onChange({ seasons: element }) } })} placeholder={t("filter.placeholderSeason")} />
-                    </div>
-                    <div class="home-filter-space">
-                        <div class="home-filter-title">{t("filter.format")}</div>
-                        <Dropdown onClickX={() => props.onChange(undefined, "format")} buttonText={homeCache.filterTags?.format ? t(`anime_formats.${homeCache.filterTags.format[0].toLowerCase().replaceAll(" ", "_")}`) : ""} options={props.filter.format.map((element) => { return { label: t(`anime_formats.${element.toLowerCase().replaceAll(" ", "_")}`), onClick: () => props.onChange({ format: [element] }) } })} placeholder={t("filter.placeholderFormat")} />
-                    </div>
-                    <div class="home-filter-space">
-                        <div class="home-filter-title">{t("filter.airing")}</div>
-                        <Dropdown onClickX={() => props.onChange(undefined, "airing")} buttonText={homeCache.filterTags?.airing ? t(`anime_statuses.${homeCache.filterTags.airing.toLowerCase().replaceAll(" ", "_")}`) : ""} options={props.filter.statuses.map((element) => { return { label: t(`anime_statuses.${element.toLowerCase().replaceAll(" ", "_")}`), onClick: () => props.onChange({ airing: element }) } })} placeholder={t("filter.placeholderAiring")} />
-                    </div>
+                    <For each={props.filter}>
+                        {(item) => (
+                            <div class="home-filter-space">
+                                <div class="home-filter-title">{pathExist(item.title) ? t(item.title) : item.title}</div>
+                                <Dropdown onClickX={() => {
+                                    updateGenres(item.type, undefined);
+                                    setCurrentFilter(unwrap(getHomeCache().filterTags))
+                                    props.onChange(unwrap(currentFilter()))
+                                }}
+                                    buttonText={currentFilter() && currentFilter()![item.type] ?
+                                        checkWrapper(`${item.langPath}${currentFilter()![item.type].toLowerCase().replaceAll(" ", "_")}`, currentFilter()![item.type]) : ""}
+                                    options={item.options.map((val) => ({
+                                        label: checkWrapper(`${item.langPath}${val.toLowerCase().replaceAll(" ", "_")}`, val),
+                                        onClick: () => {
+                                            updateGenres(item.type, val)
+                                            setCurrentFilter(unwrap(getHomeCache().filterTags))
+                                            props.onChange(unwrap(currentFilter()))
+                                        }
+                                    }))}
+                                    placeholder={t(item.placeholder)}
+                                />
+                            </div>
+                        )}
+                    </For>
                 </div>
             </Show>
         </>
