@@ -166,6 +166,10 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
                                         <Input type={"number"} defaultValue={animulistTMPData()?.score.toString()} onKeyDown={(v) => setAnimulistData(p => ({ ...p, score: parseInt(v) } as any))}/>
                                     </div>
                                     <div class="custom-menu-space">
+                                        Rewatch Number
+                                        <Input type={"number"} defaultValue={animulistTMPData()?.reapeat.toString()} onKeyDown={(v) => setAnimulistData(p => ({ ...p, reapeat: parseInt(v) } as any))}/>
+                                    </div>
+                                    <div class="custom-menu-space">
                                         Start Date
                                         <Input type={"date"}
                                             defaultValue={animulistTMPData().startWatch > 0 ? unixToDateTime(animulistTMPData().startWatch).split(" ")[0] : undefined} 
