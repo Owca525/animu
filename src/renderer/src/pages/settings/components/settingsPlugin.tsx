@@ -40,7 +40,7 @@ export default function SettingsPlugin(props: SettingsPluginProps) {
                     </div>
                 </div>
                 <div class="settings-extension-top-right">
-                    <CheckBox checked={props.active} onChecked={(v) => "home" in props.plugin ? "" : props.setActivePlugin(v, props.plugin as any)} />
+                    <CheckBox checked={props.active} disable={"home" in props.plugin} onChecked={(v) => "home" in props.plugin ? "" : props.setActivePlugin(v, props.plugin as any)} />
                     <span class='settings-extension-version'>v{props.plugin.metadata.version}</span>
                 </div>
             </div>

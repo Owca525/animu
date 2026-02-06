@@ -16,6 +16,8 @@ export interface SettingsConfig {
         userPlugins: boolean
         player: string
         repoURL: string[]
+        pluginCheckType: "On Start" | "Every Day" | "Every Week"
+        lastTimeCheck: number
     }
     General: {
         // HoverSidebar: boolean
@@ -294,7 +296,9 @@ export const defaultConfig: SettingsConfig = {
         player: "Allmanga",
         userPlugins: false,
         hiddenPlugins: [],
-        repoURL: ["https://raw.githubusercontent.com/Owca525/animu-plugins/refs/heads/main"]
+        repoURL: ["https://raw.githubusercontent.com/Owca525/animu-plugins/refs/heads/main"],
+        pluginCheckType: "Every Day",
+        lastTimeCheck: 0
     },
     backup: {
         enable: false,

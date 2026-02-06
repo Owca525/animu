@@ -1,5 +1,7 @@
 import Hls from "hls.js"
 
+import { AnimeData, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
+import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObjectConfig } from "@renderer/utils/functions"
 import { AnimeData, animulistProps, ContextMenuProps, deepLinkData, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
 import { convertKeybinds, CreateContextMenuOptions, dateToUnix, detectTitle, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateDataInAnimulist, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
@@ -84,7 +86,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [IsRunningButtonSkipTime, setIsRunningButtonSkipTime] = createSignal<boolean>(false)
     const [IsDisableButtonSkipTimerOpening, setIsDisableButtonSkipTimerOpening] = createSignal<boolean>(false)
     const [IsDisableButtonSkipTimerEnding, setIsDisableButtonSkipTimerEnding] = createSignal<boolean>(false)
-    const [currentSkipButton, setcurrentSkipButton] = createSignal<{ text: string, type: "opening" | "ending" | "", time: number }>({ text: "", type: "", time: 0 })
+    const [currentSkipButton, setcurrentSkipButton] = createSignal<{ type: "opening" | "ending" | "", time: number }>({ type: "", time: 0 })
 
     const [isShowButtonSkipLeft, setShowButtonSkipLeft] = createSignal<boolean>(false)
     const [isShowButtonSkipRight, setShowButtonSkipRight] = createSignal<boolean>(false)
@@ -348,7 +350,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             return
         }
         if (hls()) hls()!.destroy()
-        
+
         setListResolution(() => currentplayer.resolution)
         setPlayer(() => currentplayer)
         setCurrentResoltion(currentRes)
@@ -655,12 +657,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             if (config.Player.general.autoSkipOpenings || config.Player.general.autoSkipEndings) return setTimeVideo(element.end)
 
             if (element.type == "opening" && !IsDisableButtonSkipTimerOpening()) {
-                setcurrentSkipButton(() => { return { text: "Skip Opening", time: element.end, type: "opening" } })
+                setcurrentSkipButton(() => { return { time: element.end, type: "opening" } })
                 setIsDisableButtonSkipTimerOpening(() => true)
                 startChapterSkipTime()
             }
             if (element.type == "ending" && !IsDisableButtonSkipTimerEnding()) {
-                setcurrentSkipButton(() => { return { text: "Skip Ending", time: element.end, type: "ending" } })
+                setcurrentSkipButton(() => { return { time: element.end, type: "ending" } })
                 setIsDisableButtonSkipTimerEnding(() => true)
                 startChapterSkipTime()
             }
@@ -842,7 +844,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     //         case 0:
     //             togglePlay()
     //             break
-            
+
     //     }
     // }
 
@@ -1011,19 +1013,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     };
 
     function generateShareURL() {
-        const anime: deepLinkData = {
-            animeID: anime_data.AnimeData.id,
-            player: {
-                plugin: anime_data.saveData.pluginName,
-                type: temp.type,
-                id: anime_data.AnimeData.player_ID as string,
-                episode: temp.episode,
-                time: currentTime()
-            }
-        }
+        const deepStr = `${anime_data.AnimeData.id},${anime_data.saveData.pluginName},${temp.type},${anime_data.AnimeData.player_ID},${temp.episode},${currentTime()}`
 
         const config = unwrap(getConfig())
-        SaveToClipboard("text", `${config.deepLinkURL}/?anime=${btoa(JSON.stringify(anime))}`)
+        SaveToClipboard("text", `${config.deepLinkURL}/?anime=${btoa(deepStr)}`)
     }
 
     const centerContextMenu: ContextMenuProps = [
@@ -1332,17 +1325,17 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     </div>
                 </div>
             </div>
-            <button onClick={() => {
-                if (currentSkipButton().type == "ending") {
-                    setHideUpNextEpisode(true)
-                    setIsDisableButtonSkipTimerEnding(true)
-                };
-                if (currentSkipButton().type == "opening") setIsDisableButtonSkipTimerOpening(true)
-                setTimeVideo(currentSkipButton().time)
-                clearChapterSkipTime()
-            }} class={`player-skip-chapters-button ${IsRunningButtonSkipTime() ? "show" : "hidden"}`}>
-                {currentSkipButton().text}, {`${buttonSkipTime()}s`}
-            </button>
+            <Button content={t(`player.skiptimebutton.${currentSkipButton().type}`, { time: buttonSkipTime() })} ButtonClass={`player-skip-chapters-button ${IsRunningButtonSkipTime() ? "show" : "hidden"}`}
+                onClick={() => {
+                    if (currentSkipButton().type == "ending") {
+                        setHideUpNextEpisode(true)
+                        setIsDisableButtonSkipTimerEnding(true)
+                    };
+                    if (currentSkipButton().type == "opening") setIsDisableButtonSkipTimerOpening(true)
+                    setTimeVideo(currentSkipButton().time)
+                    clearChapterSkipTime()
+                }}
+            />
             <div ref={screenShotContainer} class={`player-screenshot-container ${screenShot().active ? "show" : "hidden"}`}
                 classList={{ click: screenShot().click != "" }}
                 onclick={() => screenShot().click != "" ? openUrlFolder(screenShot().click) : ""}

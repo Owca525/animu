@@ -118,7 +118,9 @@ export const defaultConfigWeb: SettingsConfig = {
         player: "Allmanga",
         userPlugins: false,
         hiddenPlugins: [],
-        repoURL: ["https://raw.githubusercontent.com/Owca525/animu-plugins/refs/heads/main"]
+        repoURL: ["https://raw.githubusercontent.com/Owca525/animu-plugins/refs/heads/main"],
+        pluginCheckType: "Every Day",
+        lastTimeCheck: 0
     },
     backup: {
         enable: false,

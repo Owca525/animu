@@ -12,7 +12,7 @@
 }
 
 .custom-menu-box {
-    width: clamp(250px, 20vw, 400px);
+    width: clamp(250px, 35vw, 600px);
     height: max-content;
     background-color: var(--second-layer);
     padding: 12px;

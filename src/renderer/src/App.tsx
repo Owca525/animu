@@ -28,7 +28,7 @@ import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import { getConfig, setConfig } from './utils/stores/config';
 import { getGlobalCache, setAnimulistData, setGlobalHistory, setGlobalTheme, setIncognitoMode } from './utils/stores/global';
 import { HashRouter, Route } from '@solidjs/router';
-import { getInformationPlugin, pluginManager } from './utils/stores/plugins';
+import { getInformationPlugin, pluginManager, setPluginRepo } from './utils/stores/plugins';
 import { setHomeActivePage } from './utils/stores/home';
 import { toast, updateToast } from './utils/context/ToastNotification';
 import { t, useI18n } from './utils/i18n';
@@ -36,7 +36,7 @@ import './App.css';
 import './themes/darkerAnimu/main.css';
 import './utils/i18n';
 import { unwrap } from 'solid-js/store';
-import { themeMetadata } from './utils/types';
+import { pluginRepoExpanded, themeMetadata } from './utils/types';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -88,20 +88,21 @@ function App() {
       setConfig(JSON.parse(localStorage.getItem("config") as any))
       setGlobalHistory(JSON.parse(localStorage.getItem("history") as any))
     }
-    setinitialState({ text: "Loading Theme", plugin: false })
-    if (window.api) setGlobalTheme(await window.api.themes.list())
-
-    setinitialState({ text: "Loading Config", plugin: false })
+    setinitialState({ text: t("initial.config"), plugin: false })
     LoadConfig()
     setHomeActivePage("global.home")
 
+    setinitialState({ text: t("initial.theme"), plugin: false })
+    if (window.api) setGlobalTheme(await window.api.themes.list())
+
+    setinitialState({ text: t("initial.plugin"), plugin: false })
+    await checkPluginUpdate()
+    await getInformationPlugin().initial()
+    await pluginManager().initialPlugins()
+    
     setinitialState({ text: "Loading AnimuList", plugin: false })
     setAnimulistData(await window.api.animulist.getDatabase())
 
-    setinitialState({ text: "Loading Plugin", plugin: false })
-    await fetchPluginRepos()
-    await getInformationPlugin().initial()
-    await pluginManager().initialPlugins()
     setInitation(false)
 
     detectPluginVersion()
@@ -207,7 +208,7 @@ function App() {
         <main class='animu-initial-container'>
           <img src={icon} alt="Animu Icon" class='animu-initial-icon' />
           <div class="animu-initial-content">
-            <span class='animu-initial-text'>Animu is initializing</span>
+            <span class='animu-initial-text'>{t("initial.animu")}</span>
             <div class="animu-initial-state">
               <span class='material-symbols-outlined loading-animation'>progress_activity</span>
               <span class='animu-initial-text'>{initialState().text}</span>
@@ -229,6 +230,18 @@ function App() {
       </Match>
     </Switch>
   )
+}
+
+async function checkPluginUpdate() {
+  const config = getConfig()
+  let tmpDatabase: pluginRepoExpanded[] = []
+  try {
+    tmpDatabase = localStorage.getItem("pluginDatabase") ? JSON.parse(localStorage.getItem("pluginDatabase") as any) : []
+  } catch (error) { console.warn("Error failed parsed pluginRepo Database", error) }
+
+  if (config.plugins.pluginCheckType == "On Start" || tmpDatabase.length <= 0 || config.plugins.lastTimeCheck <= 0) return await fetchPluginRepos()
+  if (checkDate(config.plugins.lastTimeCheck, config.plugins.pluginCheckType as any)) await fetchPluginRepos()
+  else { setPluginRepo(tmpDatabase) }
 }
 
 async function runCheckUpdate() {

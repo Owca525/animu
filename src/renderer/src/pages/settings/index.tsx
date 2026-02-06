@@ -251,6 +251,12 @@ function settings() {
             return { old: structuredClone(prev.old), new: structuredClone(prev.old) }
         })
         setpluginList((prev) => prev.map(pl => ({ ...pl, active: pl.plugin.metadata.name == config().old.plugins.player })))
+
+        const tmp = activeThemes().entries().filter((item) => !config().old.General.theme.includes(item[1].themeName))
+        tmp.forEach((v) => {
+            updateTheme(v[1], true, v[0])
+        })
+
         setThemes(loadedTheme().filter((val) => ![...activeThemes().entries()].map((v) => v[1].themeName).includes(val.themeName)))
         pluginManager().initialPlugins()
         setSaving(() => false)
@@ -495,7 +501,7 @@ function settings() {
                                                     <Show when={value.options}>
                                                         <Button icon='settings' ButtonClass="settings-settings-theme-button" onClick={(event) => { event.stopPropagation(); openThemeOption(value) }} />
                                                     </Show>
-                                                    <CheckBox checked onChecked={() => value.themeName != "DarkerAnimu" ? updateTheme(value, true, id) : ""} />
+                                                    <CheckBox checked onChecked={() => value.themeName != "DarkerAnimu" ? updateTheme(value, true, id) : ""} disable={value.themeName == "DarkerAnimu"} />
                                                 </span>
                                             </div>
                                             )}
@@ -1195,6 +1201,16 @@ function settings() {
                                 onChecked={(checked) =>
                                     handleChange('plugins.userPlugins', checked)
                                 }
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("settings.extensions.updatecheck")}
+                            <ButtonGroup selectedValue={t(`settings.general.${config().new.plugins.pluginCheckType.toLowerCase().replaceAll(" ", "")}`)} listValues={[
+                                { value: t("settings.general.onstart"), onClick: () => handleChange("plugins.pluginCheckType", "On Start") },
+                                { value: t("settings.general.everyday"), onClick: () => handleChange("plugins.pluginCheckType", "Every Day") },
+                                { value: t("settings.general.everyweek"), onClick: () => handleChange("plugins.pluginCheckType", "Every Week") },
+                            ]}
                             />
                         </div>
                         <div class="settings-line"></div>

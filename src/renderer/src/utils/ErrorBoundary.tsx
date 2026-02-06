@@ -18,8 +18,8 @@ function LocalErrorBoundary(error: any) {
         <div class='main-error-container'>
             <div class="main-error-text">{t("globalError")}</div>
             <div class="main-error-button-container">
-                <Button content={t("errorboundary.gotohome")} ButtonClass='error-button' onClick={() => window.location.href = `${window.location.origin}${window.location.pathname}`} />
-                <Button content={"Send Issue to github"} ButtonClass='error-button' onClick={() => createIssue()} />
+                <Button content={t("errorboundary.gotohome")} ButtonClass='error-button' onClick={() => {window.location.href = `${window.location.origin}${window.location.pathname}`; window.BrowserWindow.reload()}} />
+                <Button content={t("errorboundary.github")} ButtonClass='error-button' onClick={() => createIssue()} />
                 <Button content={t("errorboundary.leaveanimu")} ButtonClass='error-button' onClick={() => window.api ? window.BrowserWindow.exit() : ""} />
             </div>
             <div class="main-error-show">

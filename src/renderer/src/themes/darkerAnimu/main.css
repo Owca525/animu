@@ -1277,6 +1277,7 @@ th {
 .button-group-button {
   background-color: var(--second-layer);
   border: 2px solid var(--fourth-layer);
+  transition: all 80ms ease-in-out;
 }
 
 .button-group-button:hover,

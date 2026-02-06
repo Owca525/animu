@@ -24,6 +24,7 @@ import { getInformationPlugin, getPluginList, getPluginRepo, pluginManager, setP
 import semver from "semver";
 import { v4 as uuidv4 } from 'uuid';
 import { toast, updateToast } from './context/ToastNotification';
+import { saveConfig } from './FilesManager/config';
 
 export function decodeHtmlEntities(str: string) {
     const parser = new DOMParser();
@@ -595,7 +596,9 @@ export async function fetchPluginRepos() {
         const resp = await request(`${element}/database.json`)
         if (resp.success && resp.json && resp.json != {} as any) resp.json.map((v) => ({ ...v, repoURL: element })).forEach(element => { tmp.push(element) });
     }
+    localStorage.setItem("pluginDatabase", JSON.stringify(tmp))
     setPluginRepo(tmp)
+    saveConfig(updateObjectConfig("plugins.lastTimeCheck", Math.floor(new Date().getTime() / 1000), config))
 }
 
 export async function setHomeData(wrapper?: () => Promise<homeData["data"] | containerData | undefined>, data?: homeData["data"]) {

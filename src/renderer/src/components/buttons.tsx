@@ -16,6 +16,7 @@ export default function Button(props: ButtonProps) {
       tabIndex={-1}
       class={"button " + (props.ButtonClass ?? "")}
       onClick={props.onClick}
+      onKeyDown={(event) => event.code == "Space" || event.code == "Enter" ? event.preventDefault() : ""}
     >
       <Show when={props.titleButton}>
         <span class="button-tooltip">
