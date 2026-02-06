@@ -549,7 +549,6 @@ function information() {
                                 </Switch>
                             </div>
 
-                            {/* FIXME: FIX THIS FOR 0.8 Update */}
                             <Show when={tempData().anime.relations && tempData().anime.relations!.length > 0}>
                                 <div class="information-relation-container">
                                     <For each={tempData().anime.relations}>
@@ -557,9 +556,13 @@ function information() {
                                             id={rel.id}
                                             relationType={rel.relationType}
                                             title={rel.title}
-                                            bannerImage={rel.bannerImage}
                                             coverImage={rel.coverImage}
-                                            onClick={() => ""}
+                                            onClick={() => ChangeAnimeInInformation({
+                                                title: rel.title,
+                                                id: rel.id.toString()
+                                            })}
+                                            status={rel.status}
+                                            source={rel.format}
                                         />}
                                     </For>
                                 </div>

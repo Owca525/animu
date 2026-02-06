@@ -324,8 +324,7 @@
     padding: 8px;
     display: flex;
     gap: 12px;
-    /* overflow-x: auto; */
-    z-index: 5;
+    overflow-x: auto;
 }
 
 .information-recomendation-loading {

@@ -86,6 +86,8 @@ const animeData = `
           relationType
           node {
             id
+            format
+            status(version: 2)
             title {
               romaji
               english
@@ -95,7 +97,6 @@ const animeData = `
               extraLarge
               large
             }
-            bannerImage
           }
         }
       }
@@ -296,7 +297,9 @@ function Convert(convert: any): cardData {
           id: element.node.id,
           title: element.node.title,
           coverImage: element.node.coverImage.extraLarge ? element.node.coverImage.extraLarge : element.node.coverImage.large,
-          relationType: element.relationType
+          relationType: element.relationType,
+          status: element["node"]["status"],
+          format: element["node"]["format"]
         })
       });
     }

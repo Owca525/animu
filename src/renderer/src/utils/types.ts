@@ -64,7 +64,9 @@ export interface AnimeData {
         title: { english?: string, native: string, romaji: string }
         bannerImage?: string
         coverImage: string
-        relationType: string
+        relationType: string,
+        status: string,
+        format: string
     }[]
     recommendations?: {
         id: number,

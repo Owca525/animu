@@ -201,8 +201,7 @@ export async function extractEpisodes(anime_id: string, episode: { start: number
 export async function extractInformation(id: string): Promise<{ episodes: { ep: string; img?: string; title?: string }[]; type: string; name?: string }[]> {
     let variables = `{"_id":"${id}"}`;
     const resp = await requestToApi(variables, HASH_INFO, header);
-    console.log(resp)
-    if (!resp.success || !resp.json || !resp.json["data"]["show"]) {
+    if (!resp.success || !resp.json || resp.json["errors"]) {
         console.warn(resp)
         return []
     }
