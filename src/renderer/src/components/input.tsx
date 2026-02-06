@@ -2,7 +2,7 @@ import { createSignal } from "solid-js";
 import "./css/input.css";
 
 interface InputProps {
-  type?: "text" | "password" | "number";
+  type?: "text" | "password" | "number" | "date";
   InputClass?: string;
   placeholder?: string;
   onKeyDown?: (text: string) => void;
@@ -13,6 +13,8 @@ export default function Input(props: InputProps) {
   const [cacheText, setCacheText] = createSignal("");
   const [debounceTimeout, setDebounceTimeout] = createSignal<number | null>(null);
   let inputRef: HTMLInputElement | undefined;
+
+  console.log(props)
 
   const handleData = (event: KeyboardEvent & { currentTarget: HTMLInputElement }) => {
     if (!props.onKeyDown) return;
@@ -46,6 +48,7 @@ export default function Input(props: InputProps) {
       placeholder={props.placeholder}
       value={props.defaultValue ? props.defaultValue : ""}
       onKeyDown={handleData}
+      onInput={(v) => props.onKeyDown && props.type == "date" ? props.onKeyDown(v.currentTarget.value) : ""}
     />
   );
 }
