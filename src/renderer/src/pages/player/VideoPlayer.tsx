@@ -152,6 +152,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             if (element.defaultHost) defaulthost = element
         }
 
+        shaka.polyfill.installAll()
+
         shaka.net.NetworkingEngine.registerScheme("https", (type, requests) => {
             const controller = new AbortController();
 

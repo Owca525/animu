@@ -39,7 +39,7 @@
     "jassub": "1.8.8",
     "material-symbols": "^0.40.2",
     "semver": "^7.7.4",
-    "shaka-player": "4.16.13",
+    "shaka-player": "5.0.0",
     "subtitle-converter": "^3.0.12",
     "uuid": "^13.0.0",
     "zod": "^4.3.6"
