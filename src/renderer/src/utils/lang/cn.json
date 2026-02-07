@@ -72,6 +72,7 @@
     "info": "資訊"
   },
   "home": {
+    "searching": "正在搜尋：{{title}}",
     "search": "搜尋",
     "historySearch": "搜尋紀錄…",
     "nothingfound": "這裡甚麼都沒有",
