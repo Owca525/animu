@@ -12,11 +12,13 @@ import "./update"
 import "./request"
 import "./streaming"
 import "./backup"
+import "./animulist"
 import { convertToNewFormat, detectOldVersion, write } from './os'
 import { existsSync, mkdirSync, readFileSync } from 'fs'
 import { cardData, defaultConfig, SettingsConfig } from './types';
 import { deepMerge, detectZoom, runCheckYT_DLP, setupDiscordRPC } from './utils';
 import { electronAppUniversalProtocolClient } from 'electron-app-universal-protocol-client';
+import { checkDatabase } from './animulist';
 
 export let mainWindow: BrowserWindow | undefined
 export const newConfigPath = path.join(app.getPath("userData"), "animuConfig")
@@ -220,6 +222,7 @@ export async function initialBackend() {
       historyData = JSON.parse(data)
     }
     runCheckYT_DLP()
+    checkDatabase()
 
     // if (existsSync(path.join(newConfigPath, "continueWatch.json"))) {
     //   let data = readFileSync(path.join(newConfigPath, "continueWatch.json"), "utf-8")
@@ -246,3 +249,4 @@ ipcMain.handle('refreshBackend', () => initialBackend());
 
 ipcMain.handle('getConfig', () => config);
 ipcMain.handle('getHistory', () => historyData);
+
