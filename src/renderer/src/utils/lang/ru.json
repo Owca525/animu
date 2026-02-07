@@ -26,6 +26,7 @@
     "theme": "Загрузка Темы",
     "config": "Загрузка Конфигурации",
     "plugin": "Загрузка Плагина"
+  },
   "search": {
     "home": "Поиск...",
     "history": "Поиск в истории...",
@@ -106,7 +107,8 @@
     "releasing": "Выходит",
     "finished": "Завершено",
     "not_yet_released": "Ещё не вышло",
-    "cancelled": "Отменено"
+    "cancelled": "Отменено",
+    "hiatus": "Hiatus"
   },
   "anime_relationtype": {
     "adaptation": "Адаптация",
@@ -150,7 +152,11 @@
     "tv_short": "Короткий ТВ-сериал",
     "special": "Спешл",
     "ova": "OVA",
-    "ona": "ONA"
+    "ona": "ONA",
+    "one_shot": "One Shot",
+    "music": "Music",
+    "novel": "Novel",
+    "manga": "Manga"
   },
   "anime_source": {
     "lightnovel": "Ранобэ",

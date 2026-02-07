@@ -247,8 +247,9 @@ const graphicHomeApi = `
 const graphicApIDAnime = `
 query(
   $id: Int!
+  $type: MediaType
 ) {
-  Media(id: $id, type: ANIME) {
+  Media(id: $id, type: $type) {
     ${animeData}
   }
 }
@@ -620,11 +621,22 @@ export default class AnilistApi implements informationPluginFormat {
   }
   anime = async (context: { id: string; }) => {
     try {
-      let req = await sendPost({ id: context.id }, graphicApIDAnime)
+      let req = await sendPost({ id: context.id, type: "ANIME" }, graphicApIDAnime)
       if (!req.success || !req.json) return
       return Convert(req.json.data.Media).AnimeData
     } catch (error) {
       console.error("Uknown error in anime/anilistapi", error)
+      return
+    }
+  }
+
+  getManga = async (id: string) => {
+    try {
+      let req = await sendPost({ id: id, type: "MANGA" }, graphicApIDAnime)
+      if (!req.success || !req.json) return
+      return Convert(req.json.data.Media).AnimeData
+    } catch (error) {
+      console.error("Uknown error in getManga/anilistapi", error)
       return
     }
   }

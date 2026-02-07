@@ -119,7 +119,8 @@
         "releasing": "Releasing",
         "finished": "Finished",
         "not_yet_released": "Not Yet Released",
-        "cancelled": "Cancelled"
+        "cancelled": "Cancelled",
+        "hiatus": "Hiatus"
     },
     "anime_relationtype": {
         "adaptation": "Adaptation",
@@ -163,7 +164,11 @@
         "tv_short": "TV Short",
         "special": "Special",
         "ova": "OVA",
-        "ona": "ONA"
+        "ona": "ONA",
+        "one_shot": "One Shot",
+        "music": "Music",
+        "novel": "Novel",
+        "manga": "Manga"
     },
     "anime_source": {
         "lightnovel": "Light novel",

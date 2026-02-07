@@ -84,7 +84,8 @@ function information() {
         queryFn: async (queryKey) => {
             const [animeData, player_id, pluginName] = queryKey;
             if (typeof animeData != "object") return
-            if (animeData.anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED" || animeData.anime.format != "ANIME") return
+            if (animeData.anime.format == "MANGA" || animeData.anime.format == "NOVEL" || animeData.anime.format == "ONE_SHOT") return
+            if (animeData.anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED" || animeData.anime.type != "ANIME") return
             // if (animeData.anime.id == "" && !player_id) return setEpisodeResponse(await plugin.extractEpisodeList(animeData.anime, undefined)) deprecated
 
             let plugin: playerPluginFormat = pluginManager().changePlugin(pluginName as string)
@@ -195,7 +196,15 @@ function information() {
 
     async function ChangeAnimeInInformation(data: AnimeData): Promise<any> {
         const idToast = toast(t("notification.fetchinganime"), { removeTimer: true, type: "loading" })
-        const resp = await getInformationPlugin().anime(data.id)
+        let resp 
+        if (!data.type && data.format == "MANGA" || data.format == "NOVEL" || data.format == "ONE_SHOT") {
+            resp = await getInformationPlugin().getManga(data.id)
+        } else if (data.type == "MANGA") {
+            resp = await getInformationPlugin().getManga(data.id)
+        } else {
+            resp = await getInformationPlugin().anime(data.id)
+        }
+        
         if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", removeTimer: false })
         updateToast(idToast, t("notification.successanime"), { type: "success", removeTimer: false })
 
@@ -486,10 +495,6 @@ function information() {
                                 <div class="information-episodes-top-content">
                                     <div class="information-eopsodes-top-left">
                                         <Button ButtonClass="information-episodes-button" icon="search" onClick={() => setshowWrong(() => true)} />
-                                        {/* <span class='information-eopsodes-top-line'></span>
-                                        <Button content='Episodes' />
-                                        <Button content='Opening' />
-                                        <Button content='Ending' /> */}
                                         <ButtonGroup selectedValue={activePage()} listValues={[{
                                             value: 'Episodes',
                                             onClick: () => SetactivePage("Episodes")
@@ -498,7 +503,7 @@ function information() {
                                             onClick: () => {SetactivePage("Opening/Ending");searchAnimeOpenings()}
                                         }]} />
                                         {/* {
-                                            value: 'Trailer',
+                                            value: 'Anime Trailer',
                                             onClick: () => SetactivePage("Trailer")
                                         } */}
                                     </div>
@@ -559,7 +564,9 @@ function information() {
                                             coverImage={rel.coverImage}
                                             onClick={() => ChangeAnimeInInformation({
                                                 title: rel.title,
-                                                id: rel.id.toString()
+                                                id: rel.id.toString(),
+                                                format: rel.format,
+                                                type: rel.type
                                             })}
                                             status={rel.status}
                                             source={rel.format}

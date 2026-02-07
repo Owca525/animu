@@ -165,4 +165,7 @@ export class informationPluginManager implements informationPluginManagerFormat 
     anime = async (id: string) => {
         return await this.currentPlugin.anime({ id: id })
     }
+    getManga = async (id: string) => {
+        return await this.currentPlugin.getManga(id)
+    }
 }

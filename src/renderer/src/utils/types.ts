@@ -261,6 +261,7 @@ export interface informationPluginFormat {
     home(): Promise<{ topCards?: containerData, sections: containerData[] } | undefined>
     anime(context: { id: string }): Promise<AnimeData | undefined>
     schedule: (airingStart: number, airingEnd: number) => Promise<containerData>
+    getManga: (id: string) => Promise<AnimeData | undefined>
 }
 
 export interface playerPluginManagerFormat {
@@ -277,6 +278,7 @@ export interface informationPluginManagerFormat {
     anime(id: string): Promise<AnimeData | undefined>
     initial(): Promise<void>
     schedule(airingStart: number, airingEnd: number): Promise<containerData>
+    getManga: (id: string) => Promise<AnimeData | undefined>
 }
 
 export type genres = {

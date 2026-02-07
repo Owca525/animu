@@ -26,6 +26,7 @@
     "theme": "正在載入主題",
     "config": "正在載入設定",
     "plugin": "正在載入外掛"
+  },
   "search": {
     "home": "搜尋",
     "history": "搜尋紀錄…",
@@ -106,7 +107,8 @@
     "releasing": "正在連載中",
     "finished": "完成",
     "not_yet_released": "還沒釋出",
-    "cancelled": "取消"
+    "cancelled": "取消",
+    "hiatus": "Hiatus"
   },
   "anime_relationtype": {
     "adaptation": "改編作品",
@@ -150,7 +152,11 @@
     "tv_short": "短篇動畫",
     "special": "特別篇",
     "ova": "OVA(原創錄影動畫)",
-    "ona": "ONA(網路動畫)"
+    "ona": "ONA(網路動畫)",
+    "one_shot": "One Shot",
+    "music": "Music",
+    "novel": "Novel",
+    "manga": "Manga"
   },
   "anime_source": {
     "lightnovel": "輕小說",

@@ -26,6 +26,7 @@
     "theme": "Loading Theme",
     "config": "Loading Config",
     "plugin": "Loading Plugin"
+  },
   "search": {
     "home": "Szukaj Anime...",
     "history": "Szukaj w histori...",
@@ -106,7 +107,8 @@
     "releasing": "Emitowane",
     "finished": "Zakończone",
     "not_yet_released": "Jeszcze nie wyemitowane",
-    "cancelled": "Anulowane"
+    "cancelled": "Anulowane",
+    "hiatus": "Hiatus"
   },
   "anime_relationtype": {
     "adaptation": "Adaptation",
@@ -150,7 +152,11 @@
     "tv_short": "Krótkometrażowy TV",
     "special": "Specjalny",
     "ova": "OVA",
-    "ona": "ONA"
+    "ona": "ONA",
+    "one_shot": "One Shot",
+    "music": "Music",
+    "novel": "Novel",
+    "manga": "Manga"
   },
   "anime_source": {
     "lightnovel": "Light Novel",
