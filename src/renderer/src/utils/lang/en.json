@@ -72,6 +72,7 @@
         "info": "Info"
     },
     "home": {
+        "searching": "Searching: {{title}}",
         "search": "Search Anime...",
         "historySearch": "Search History...",
         "nothingfound": "Nothing Found Here",

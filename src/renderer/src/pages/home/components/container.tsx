@@ -90,11 +90,17 @@ function Container(props: containerData) {
     setHomeData(props.onTitleClick)
   }
 
+  function checkTitle(str: string) {
+    let tmp = str.split("/")
+    if (tmp.length <= 1) return pathExist(str) ? t(str) : str
+    return t(tmp[0], { title: tmp[1] })
+  }
+
   return (
     <div tabIndex={-1} class="main-container">
       <div tabIndex={-1} class="container-title-container">
         <Show when={props.title}>
-          <div class={props.onTitleClick ? "container-title-click" : "container-title"} onclick={handleTitleClick}>{props.title && pathExist(props.title) ? t(props.title) : props.title}</div>
+          <div class={props.onTitleClick ? "container-title-click" : "container-title"} onclick={handleTitleClick}>{props.title && checkTitle(props.title)}</div>
         </Show>
         <Show when={props.tags}>
           <For each={props.tags}>

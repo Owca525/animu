@@ -485,7 +485,7 @@ export default class AnilistApi implements informationPluginFormat {
   search = async (name: string, page: number, params?: genresSearchFormat) => {
     try {
       let title: string | undefined = undefined
-      if (!(name.replaceAll(" ", "") == "")) title = `Searching: ${name}`
+      if (!(name.replaceAll(" ", "") == "")) title = `home.searching/${name}`
 
       const resp = await searchInAnilist(name, page, params, this.config["Adult Mode"], this.config["Max Page Size"])
 
