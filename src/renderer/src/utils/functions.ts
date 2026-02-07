@@ -696,7 +696,8 @@ export function convertHistoryToAnimuList() {
 
     for (let index = 0; index < history.length; index++) {
         const element = history[index];
-        const finded = animulist.find((v) => v.AnimeData.id == element.AnimeData.id)
+        if (element.AnimeData.id.replaceAll(" ", "") == "") return
+        const finded = animulist.find((v) => v.AnimeData.id.toString() == element.AnimeData.id.toString())
         if (finded) continue
         if (!element.saveData.episode) continue
         let status: animulistProps = {

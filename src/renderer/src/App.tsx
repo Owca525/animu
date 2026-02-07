@@ -91,6 +91,9 @@ function App() {
     setinitialState({ text: t("initial.theme"), plugin: false })
     if (window.api) setGlobalTheme(await window.api.themes.list())
 
+    setinitialState({ text: "Loading AnimuList", plugin: false })
+    setAnimulistData(await window.api.animulist.getDatabase())
+
     setinitialState({ text: t("initial.config"), plugin: false })
     LoadConfig()
     setHomeActivePage("global.home")
@@ -99,9 +102,6 @@ function App() {
     await checkPluginUpdate()
     await getInformationPlugin().initial()
     await pluginManager().initialPlugins()
-    
-    setinitialState({ text: "Loading AnimuList", plugin: false })
-    setAnimulistData(await window.api.animulist.getDatabase())
 
     setInitation(false)
 
