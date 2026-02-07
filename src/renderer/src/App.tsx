@@ -88,12 +88,12 @@ function App() {
       setConfig(JSON.parse(localStorage.getItem("config") as any))
       setGlobalHistory(JSON.parse(localStorage.getItem("history") as any))
     }
+    setinitialState({ text: t("initial.theme"), plugin: false })
+    if (window.api) setGlobalTheme(await window.api.themes.list())
+
     setinitialState({ text: t("initial.config"), plugin: false })
     LoadConfig()
     setHomeActivePage("global.home")
-
-    setinitialState({ text: t("initial.theme"), plugin: false })
-    if (window.api) setGlobalTheme(await window.api.themes.list())
 
     setinitialState({ text: t("initial.plugin"), plugin: false })
     await checkPluginUpdate()

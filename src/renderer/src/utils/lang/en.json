@@ -90,6 +90,7 @@
         "info": "Info"
     },
     "home": {
+        "searching": "Searching: {{title}}",
         "nothingfound": "Nothing Found Here",
         "error": "Error Occured",
         "trending_now": "Trending Now",

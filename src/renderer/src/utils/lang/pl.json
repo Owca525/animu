@@ -78,6 +78,7 @@
     "info": "Info"
   },
   "home": {
+    "searching": "Searching: {{title}}",
     "nothingfound": "Nic nie znaleziono",
     "error": "Wystąpił błąd",
     "trending_now": "Popularne teraz",
