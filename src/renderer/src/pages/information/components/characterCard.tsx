@@ -20,6 +20,11 @@ export default function CharacterCards(props: characterCardsProps) {
         return { animation: "fadeIn 0.3s forwards" };
     }
 
+    if (!props.image) {
+        setLoadingImage(false)
+        setImageError(true)
+    }
+
     return (
         <div class="information-characters-card" onClick={props.onClick} ref={props.ref}>
             <Switch>

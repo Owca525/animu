@@ -31,12 +31,13 @@
 }
 
 .information-character-image-placeholder {
-    width: max-content;
-    height: 150px;
+    width: 100%;
+    height: max-content !important;
+    max-height: 500px !important;
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1;
+    z-index: -1;
 }
 
 .information-characters-card-description {
