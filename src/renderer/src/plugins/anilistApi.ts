@@ -87,6 +87,7 @@ const animeData = `
           node {
             id
             format
+            type
             status(version: 2)
             title {
               romaji
@@ -299,7 +300,8 @@ function Convert(convert: any): cardData {
           coverImage: element.node.coverImage.extraLarge ? element.node.coverImage.extraLarge : element.node.coverImage.large,
           relationType: element.relationType,
           status: element["node"]["status"],
-          format: element["node"]["format"]
+          format: element["node"]["format"],
+          type: element["node"]["type"]
         })
       });
     }

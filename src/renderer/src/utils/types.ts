@@ -67,6 +67,7 @@ export interface AnimeData {
         relationType: string,
         status: string,
         format: string
+        type: string
     }[]
     recommendations?: {
         id: number,

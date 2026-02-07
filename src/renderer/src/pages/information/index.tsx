@@ -84,7 +84,7 @@ function information() {
         queryFn: async (queryKey) => {
             const [animeData, player_id, pluginName] = queryKey;
             if (typeof animeData != "object") return
-            if (animeData.anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED" || animeData.anime.format == "MANGA") return
+            if (animeData.anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED" || animeData.anime.format != "ANIME") return
             // if (animeData.anime.id == "" && !player_id) return setEpisodeResponse(await plugin.extractEpisodeList(animeData.anime, undefined)) deprecated
 
             let plugin: playerPluginFormat = pluginManager().changePlugin(pluginName as string)
