@@ -1,4 +1,4 @@
-import { createContext, JSX, For, Show, createSignal } from "solid-js";
+import { createContext, JSX, For, Show, createSignal, createEffect } from "solid-js";
 import { Portal } from "solid-js/web";
 import "./css/menuContext.css";
 import { AnimeData, animulistProps, themeMetadata } from "../types";
@@ -42,7 +42,7 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
     const { t, pathExist } = useI18n()
     const [content, setContent] = createSignal<menuProps | undefined>();
 
-    const [animulistTMPData, setAnimulistData] = createSignal<animulistProps>({
+    const [animulistTMPData, setTMPAnimulist] = createSignal<animulistProps>({
         status: "CURRENT",
         score: 0,
         reapeat: 0,
@@ -53,11 +53,20 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
     });
 
     function showCustomMenu(data: menuProps) {
-        if (data.animuList && data.animuList.animulist) setAnimulistData(data.animuList.animulist)
+        if (data.animuList && data.animuList.animulist) setTMPAnimulist(data.animuList.animulist)
         setContent(data);
     }
 
-    function hideCustomMenu() { setContent(undefined); setAnimulistData({
+    createEffect(() => {
+        console.log(animulistTMPData())
+    })
+
+    function setAnimulistNewData(data: { [key: string]: number | string }) {
+        console.log(data)
+        setTMPAnimulist((v) => ({...v, ...data}))
+    }
+
+    function hideCustomMenu() { setContent(undefined); setTMPAnimulist({
         status: "CURRENT",
         score: 0,
         reapeat: 0,
@@ -159,28 +168,28 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
                                 <Show when={content()?.animuList}>
                                     <div class="custom-menu-space">
                                         Status
-                                        <Dropdown disableX buttonText={t(`animulist.status.${animulistTMPData()?.status}`)} options={["CURRENT", "PLANNING", "COMPLETED", "REPEATING", "DROPPED", "PAUSED"].map((v) => ({ label: t(`animulist.status.${v}`), onClick: () => setAnimulistData((p) => ({...p, status: v} as any)) }))} />
+                                        <Dropdown disableX buttonText={t(`animulist.status.${animulistTMPData()?.status}`)} options={["CURRENT", "PLANNING", "COMPLETED", "REPEATING", "DROPPED", "PAUSED"].map((v) => ({ label: t(`animulist.status.${v}`), onClick: () => setAnimulistNewData({ status: v}) }))} />
                                     </div>
                                     <div class="custom-menu-space">
                                         Score
-                                        <Input type={"number"} defaultValue={animulistTMPData()?.score.toString()} onKeyDown={(v) => setAnimulistData(p => ({ ...p, score: parseInt(v) } as any))}/>
+                                        <Input type={"number"} defaultValue={animulistTMPData()?.score as any} useInput onKeyDown={(v) => {setAnimulistNewData({ score: parseInt(v) })}}/>
                                     </div>
                                     <div class="custom-menu-space">
                                         Rewatch Number
-                                        <Input type={"number"} defaultValue={animulistTMPData()?.reapeat.toString()} onKeyDown={(v) => setAnimulistData(p => ({ ...p, reapeat: parseInt(v) } as any))}/>
+                                        <Input type={"number"} defaultValue={animulistTMPData()?.reapeat as any} useInput onKeyDown={(v) => setAnimulistNewData({ reapeat: parseInt(v) })}/>
                                     </div>
                                     <div class="custom-menu-space">
                                         Start Date
                                         <Input type={"date"}
                                             defaultValue={animulistTMPData().startWatch > 0 ? unixToDateTime(animulistTMPData().startWatch).split(" ")[0] : undefined} 
-                                            onKeyDown={(v) => setAnimulistData(p => ({ ...p, startWatch: dateToUnix(v) }) as any)}
+                                            onKeyDown={(v) => setAnimulistNewData({ startWatch: dateToUnix(v) })}
                                         />
                                     </div>
                                     <div class="custom-menu-space">
                                         Finish Date
                                         <Input type={"date"} 
                                             defaultValue={animulistTMPData().endWatch > 0 ? unixToDateTime(animulistTMPData().endWatch).split(" ")[0] : undefined} 
-                                            onKeyDown={(v) => setAnimulistData(p => ({ ...p, endWatch: dateToUnix(v) }) as any)}
+                                            onKeyDown={(v) => setAnimulistNewData({ endWatch: dateToUnix(v) })}
                                         />
                                     </div>
                                     <div class="custom-menu-space">
