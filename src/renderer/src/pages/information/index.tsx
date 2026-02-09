@@ -196,7 +196,7 @@ function information() {
 
     async function ChangeAnimeInInformation(data: AnimeData): Promise<any> {
         const idToast = toast(t("notification.fetchinganime"), { removeTimer: true, type: "loading" })
-        let resp 
+        let resp
         if (!data.type && data.format == "MANGA" || data.format == "NOVEL" || data.format == "ONE_SHOT") {
             resp = await getInformationPlugin().getManga(data.id)
         } else if (data.type == "MANGA") {
@@ -204,7 +204,7 @@ function information() {
         } else {
             resp = await getInformationPlugin().anime(data.id)
         }
-        
+
         if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", removeTimer: false })
         updateToast(idToast, t("notification.successanime"), { type: "success", removeTimer: false })
 
@@ -350,29 +350,31 @@ function information() {
                             <Show when={tempData().anime.trailer}>
                                 <Button titleButton={t("information.bar.trailer")} icon="theaters" ButtonClass="information-bar-icon" onClick={() => openUrlFolder(`https://www.youtube.com/watch?v=${tempData().anime.trailer?.id}`)} />
                             </Show>
-                            <Switch>
-                                <Match when={tempData().animulist == undefined}>
-                                    <Button titleButton={"Add To Animulist"} icon="add" ButtonClass="information-bar-icon" onClick={() => showCustomMenu({
-                                        title: `Add ${tempData().anime.title.romaji}`, animuList: {
-                                            anime: unwrap(tempData().anime),
-                                            save: (animulist, anime) => { addToAnimuList(animulist, anime, true); setTmpData((p) => ({ ...p, animulist: animulist })) }
-                                        }
-                                    })} />
-                                </Match>
-                                <Match when={tempData().animulist}>
-                                    <Button titleButton={"Edit Anime"} icon="edit" ButtonClass="information-bar-icon" onClick={() => showCustomMenu({
-                                        title: `Edit ${tempData().anime.title.romaji}`, animuList: {
-                                            anime: unwrap(tempData().anime),
-                                            animulist: tempData().animulist,
-                                            save: (animulist, anime) => { updateDataInAnimulist(anime.id, { AnimeData: anime, animulist }, true); setTmpData((p) => ({ ...p, animulist: animulist })) }
-                                        }
-                                    })} />
-                                    <Button titleButton={"Remove From Animulist"} icon="delete" ButtonClass="information-bar-icon" onClick={() => {
-                                        removeFromAnimulist(tempData().anime.id, true);
-                                        setTmpData((p) => ({ ...p, animulist: undefined }))
-                                    }} />
-                                </Match>
-                            </Switch>
+                            <Show when={tempData().anime.type == "ANIME"}>
+                                <Switch>
+                                    <Match when={tempData().animulist == undefined}>
+                                        <Button titleButton={"Add To Animulist"} icon="add" ButtonClass="information-bar-icon" onClick={() => showCustomMenu({
+                                            title: `Add ${tempData().anime.title.romaji}`, animuList: {
+                                                anime: unwrap(tempData().anime),
+                                                save: (animulist, anime) => { addToAnimuList(animulist, anime, true); setTmpData((p) => ({ ...p, animulist: animulist })) }
+                                            }
+                                        })} />
+                                    </Match>
+                                    <Match when={tempData().animulist}>
+                                        <Button titleButton={"Edit Anime"} icon="edit" ButtonClass="information-bar-icon" onClick={() => showCustomMenu({
+                                            title: `Edit ${tempData().anime.title.romaji}`, animuList: {
+                                                anime: unwrap(tempData().anime),
+                                                animulist: tempData().animulist,
+                                                save: (animulist, anime) => { updateDataInAnimulist(anime.id, { AnimeData: anime, animulist }, true); setTmpData((p) => ({ ...p, animulist: animulist })) }
+                                            }
+                                        })} />
+                                        <Button titleButton={"Remove From Animulist"} icon="delete" ButtonClass="information-bar-icon" onClick={() => {
+                                            removeFromAnimulist(tempData().anime.id, true);
+                                            setTmpData((p) => ({ ...p, animulist: undefined }))
+                                        }} />
+                                    </Match>
+                                </Switch>
+                            </Show>
                         </div>
                     </div>
 
@@ -491,68 +493,70 @@ function information() {
                                 }]
                             }}/> */}
 
-                            <div class="information-episodes">
-                                <div class="information-episodes-top-content">
-                                    <div class="information-eopsodes-top-left">
-                                        <Button ButtonClass="information-episodes-button" icon="search" onClick={() => setshowWrong(() => true)} />
-                                        <ButtonGroup selectedValue={activePage()} listValues={[{
-                                            value: 'Episodes',
-                                            onClick: () => SetactivePage("Episodes")
-                                        }, {
-                                            value: 'Opening/Ending',
-                                            onClick: () => {SetactivePage("Opening/Ending");searchAnimeOpenings()}
-                                        }]} />
-                                        {/* {
+                            <Show when={tempData().anime.type == "ANIME"}>
+                                <div class="information-episodes">
+                                    <div class="information-episodes-top-content">
+                                        <div class="information-eopsodes-top-left">
+                                            <Button ButtonClass="information-episodes-button" icon="search" onClick={() => setshowWrong(() => true)} />
+                                            <ButtonGroup selectedValue={activePage()} listValues={[{
+                                                value: 'Episodes',
+                                                onClick: () => SetactivePage("Episodes")
+                                            }, {
+                                                value: 'Opening/Ending',
+                                                onClick: () => { SetactivePage("Opening/Ending"); searchAnimeOpenings() }
+                                            }]} />
+                                            {/* {
                                             value: 'Anime Trailer',
                                             onClick: () => SetactivePage("Trailer")
                                         } */}
+                                        </div>
+                                        <div class="information-episodes-space">
+                                            <Dropdown options={segregatePlugins(refreashInformation)} disableX buttonText={currentPlugin()} />
+                                            <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(getPlayerPLugin()?.metadata.name as string, true)} />
+                                        </div>
                                     </div>
-                                    <div class="information-episodes-space">
-                                        <Dropdown options={segregatePlugins(refreashInformation)} disableX buttonText={currentPlugin()} />
-                                        <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(getPlayerPLugin()?.metadata.name as string, true)} />
-                                    </div>
+                                    <Switch>
+                                        <Match when={showLoadingInEpisodes()}>
+                                            <div class="information-loading-container"><span class="material-symbols-outlined information-loading">progress_activity</span></div>
+                                        </Match>
+                                        <Match when={activePage() == "Opening/Ending"}>
+                                            <For each={animeMedia()}>
+                                                {(item) => <Button content={item.title} onClick={() => { setCurrentAnimeMedia(undefined); setCurrentAnimeMedia(item) }} />}
+                                            </For>
+                                            <Show when={currentMedia()}>
+                                                <MiniPlayer player_data={{
+                                                    title: currentMedia()?.title!,
+                                                    resolutions: [{
+                                                        res: currentMedia()?.resolution!.toString()!,
+                                                        url: currentMedia()?.url!
+                                                    }]
+                                                }} />
+                                            </Show>
+                                        </Match>
+                                        <Match when={showWrong() == false && activePage() == "Episodes"}>
+                                            <Switch>
+                                                <Match when={episodeResponse.loading()}>
+                                                    <div class="information-loading-container"><span class="material-symbols-outlined information-loading">progress_activity</span></div>
+                                                </Match>
+                                                <Match when={episodeResponse.error()}>
+                                                    <div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>
+                                                </Match>
+                                                <Match when={episodeResponse.data() == undefined}>
+                                                    <div class="information-loading-container"><span class="information-error material-symbols-outlined">search_off</span>Nothing Found</div>
+                                                </Match>
+                                                <Match when={episodeResponse.data()}>
+                                                    <For each={episodeResponse.data()?.episodesData} fallback={<div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}>
+                                                        {(episode) => {
+                                                            if (episode.episodes.length <= 0) return <></>
+                                                            return <Drop LeftHeader={episode.name ? episode.name : t(`information.types.${episode.type}`)} RightHeader={t("information.listEpisodes", { number: episode.episodes.length })} content={makeButtons(episode.episodes, episode.type)} />
+                                                        }}
+                                                    </For>
+                                                </Match>
+                                            </Switch>
+                                        </Match>
+                                    </Switch>
                                 </div>
-                                <Switch>
-                                    <Match when={showLoadingInEpisodes()}>
-                                        <div class="information-loading-container"><span class="material-symbols-outlined information-loading">progress_activity</span></div>
-                                    </Match>
-                                    <Match when={activePage() == "Opening/Ending"}>
-                                        <For each={animeMedia()}>
-                                            {(item) => <Button content={item.title} onClick={() => {setCurrentAnimeMedia(undefined);setCurrentAnimeMedia(item)}} />}
-                                        </For>
-                                        <Show when={currentMedia()}>
-                                            <MiniPlayer player_data={{
-                                                title: currentMedia()?.title!,
-                                                resolutions: [{
-                                                    res: currentMedia()?.resolution!.toString()!,
-                                                    url: currentMedia()?.url!
-                                                }]
-                                            }} />
-                                        </Show>
-                                    </Match>
-                                    <Match when={showWrong() == false && activePage() == "Episodes"}>
-                                        <Switch>
-                                            <Match when={episodeResponse.loading()}>
-                                                <div class="information-loading-container"><span class="material-symbols-outlined information-loading">progress_activity</span></div>
-                                            </Match>
-                                            <Match when={episodeResponse.error()}>
-                                                <div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>
-                                            </Match>
-                                            <Match when={episodeResponse.data() == undefined}>
-                                                <div class="information-loading-container"><span class="information-error material-symbols-outlined">search_off</span>Nothing Found</div>
-                                            </Match>
-                                            <Match when={episodeResponse.data()}>
-                                                <For each={episodeResponse.data()?.episodesData} fallback={<div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}>
-                                                    {(episode) => {
-                                                        if (episode.episodes.length <= 0) return <></>
-                                                        return <Drop LeftHeader={episode.name ? episode.name : t(`information.types.${episode.type}`)} RightHeader={t("information.listEpisodes", { number: episode.episodes.length })} content={makeButtons(episode.episodes, episode.type)} />
-                                                    }}
-                                                </For>
-                                            </Match>
-                                        </Switch>
-                                    </Match>
-                                </Switch>
-                            </div>
+                            </Show>
 
                             <Show when={tempData().anime.relations && tempData().anime.relations!.length > 0}>
                                 <div class="information-relation-container">
