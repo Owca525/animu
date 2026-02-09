@@ -644,18 +644,21 @@ export function dateToUnix(dateStr: string): number {
 }
 
 export async function addToAnimuList(animulist: animulistProps, anime: AnimeData, notification: boolean = false) {
+    if (getGlobalCache().incognito) return
     await window.api.animulist.add({ AnimeData: { ...unwrap(anime), nextAiringEpisode: undefined }, animulist: unwrap(animulist) })
     refreashAnimulist()
     if (notification) toast(`Succesfully Added ${anime.title.romaji} to animulist`)
 }
 
 export async function removeFromAnimulist(id: string, notification: boolean = false) {
+    if (getGlobalCache().incognito) return
     await window.api.animulist.delete(unwrap(id))
     refreashAnimulist()
     if (notification) toast(`Succesfully Removed From animulist`)
 }
 
 export async function updateDataInAnimulist(id: string, anime: { AnimeData: AnimeData; animulist: animulistProps }, notification: boolean = false) {
+    if (getGlobalCache().incognito) return
     await window.api.animulist.update(unwrap(id), unwrap(anime))
     refreashAnimulist()
     if (notification) toast(`Succesfully Updated in animulist`)
