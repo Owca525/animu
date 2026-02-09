@@ -72,6 +72,7 @@
     "info": "Информация"
   },
   "home": {
+    "searching": "Поиск: {{title}}",
     "search": "Поиск...",
     "historySearch": "Поиск в истории...",
     "nothingfound": "Здесь ничего не найдено",
