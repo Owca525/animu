@@ -24,18 +24,41 @@ export function setAnimuList(): any {
     const animulist = unwrap(animulistData())
     if (animulist.length <= 0) return setHomeData(undefined, {sections: [ { data: [] } ]})
     let finnalContainer: containerData[] = []
+    const global = unwrap(getHomeCache())
 
     const currentAnime = animulist.filter((v) => v.animulist.status == "CURRENT")
-    if (currentAnime.length >= 1) finnalContainer.push({ title: "animulist.status.CURRENT", data: currentAnime, horizontal: true })
+    if (currentAnime.length >= 1) 
+        finnalContainer.push({ 
+            title: "animulist.status.CURRENT", 
+            data: currentAnime, 
+            horizontal: true, 
+            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watched: "CURRENT" }) 
+        })
 
     const watchedAnime = animulist.filter((v) => v.animulist.status == "COMPLETED")
-    if (watchedAnime.length >= 1) finnalContainer.push({ title: "animulist.status.COMPLETED", data: watchedAnime, horizontal: true })
+    if (watchedAnime.length >= 1) 
+        finnalContainer.push({ 
+            title: "animulist.status.COMPLETED", 
+            data: watchedAnime, 
+            horizontal: true,
+            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watched: "COMPLETED" }) 
+        })
 
     const planningAnime = animulist.filter((v) => v.animulist.status == "PLANNING")
-    if (planningAnime.length >= 1) finnalContainer.push({ title: "animulist.status.PLANNING", data: planningAnime, horizontal: true })
+    if (planningAnime.length >= 1) finnalContainer.push({ 
+            title: "animulist.status.PLANNING", 
+            data: planningAnime, 
+            horizontal: true,
+            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watched: "PLANNING" }) 
+        })
 
     const pausedAnime = animulist.filter((v) => v.animulist.status == "PAUSED")
-    if (pausedAnime.length >= 1) finnalContainer.push({ title: "animulist.status.PAUSED", data: pausedAnime, horizontal: true })
+    if (pausedAnime.length >= 1) finnalContainer.push({ 
+            title: "animulist.status.PAUSED",
+            data: pausedAnime, 
+            horizontal: true,
+            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watched: "PAUSED" }) 
+        })
 
     if (finnalContainer.length <= 1) return setHomeData(undefined, {sections: [ { data: unwrap(animulistData()) } ]})
 

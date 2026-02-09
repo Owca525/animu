@@ -25,6 +25,7 @@ import semver from "semver";
 import { v4 as uuidv4 } from 'uuid';
 import { toast, updateToast } from './context/ToastNotification';
 import { saveConfig } from './FilesManager/config';
+import { AnimuListSearch } from '@renderer/pages/home/homeUtils';
 
 export function decodeHtmlEntities(str: string) {
     const parser = new DOMParser();
@@ -662,16 +663,10 @@ export async function updateDataInAnimulist(id: string, anime: { AnimeData: Anim
 
 export async function refreashAnimulist() {
     setAnimulistData(await window.api.animulist.getDatabase())
-    const global = getHomeCache()
+    const global = unwrap(getHomeCache())
     if (global.activePage != "global.animulist") return
 
-    setHomeData(undefined, {
-        sections: [
-            {
-                data: animulistData()
-            }
-        ]
-    })
+    AnimuListSearch(global.search, global.filterTags)
 }
 
 export function unixToDateTime(unixTimestamp: number | undefined): string {
