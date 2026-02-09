@@ -469,12 +469,14 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
             hls.on(Hls.Events.ERROR, (_event, data) => {
                 console.error("HLS", _event, data)
+                const curTime = unwrap(currentTime())
                 hls.currentLevel = hls.levels.length - 1;
+                if (data.details == "bufferStalledError") hls.startLoad(curTime)
                 if (data.fatal) {
                     let message: string | undefined
                     switch (data.type) {
                         case Hls.ErrorTypes.NETWORK_ERROR:
-                            hls.startLoad();
+                            hls.startLoad(curTime);
                             message = t('player.errors.MEDIA_ERR_NETWORK')
                             break;
                         case Hls.ErrorTypes.MEDIA_ERROR:
