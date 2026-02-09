@@ -550,8 +550,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (isCleanup()) return
         if (!config) return
 
-        if (durrationTime() > 10 && currentTime() > durrationTime() - parseInt(config.History.continue.MaximizeTimeSave.toString()) && anime_data.animulist && anime_data.animulist.status == "CURRENT" && anime_data.AnimeData.episodes) {
-            if (anime_data.AnimeData.episodes != undefined && temp.episode == anime_data.AnimeData.episodes.toString()) {
+        if (durrationTime() > 10 && currentTime() > durrationTime() - parseInt(config.History.continue.MaximizeTimeSave.toString()) && anime_data.animulist) {
+            if (anime_data.AnimeData.episodes != undefined && anime_data.animulist.status == "CURRENT" && temp.episode.toString() == anime_data.AnimeData.episodes.toString()) {
                 updateDataInAnimulist(anime_data.AnimeData.id,  {
                     AnimeData: anime_data.AnimeData,
                     animulist: {

@@ -178,6 +178,7 @@ function information() {
                 episode: episode
             },
             episodelist: episodes,
+            animulist: tmp.animulist
         })))
         navigate("/player")
     }
