@@ -62,7 +62,6 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
     })
 
     function setAnimulistNewData(data: { [key: string]: number | string }) {
-        console.log(data)
         setTMPAnimulist((v) => ({...v, ...data}))
     }
 
@@ -172,11 +171,11 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
                                     </div>
                                     <div class="custom-menu-space">
                                         Score
-                                        <Input type={"number"} defaultValue={animulistTMPData()?.score as any} useInput onKeyDown={(v) => {setAnimulistNewData({ score: parseInt(v) })}}/>
+                                        <Input type={"number"} defaultValue={Number(animulistTMPData()?.score).toString()} onInput={(v) => {setAnimulistNewData({ score: parseInt(v) })}}/>
                                     </div>
                                     <div class="custom-menu-space">
                                         Rewatch Number
-                                        <Input type={"number"} defaultValue={animulistTMPData()?.reapeat as any} useInput onKeyDown={(v) => setAnimulistNewData({ reapeat: parseInt(v) })}/>
+                                        <Input type={"number"} defaultValue={Number(animulistTMPData()?.reapeat).toString()} onInput={(v) => setAnimulistNewData({ reapeat: parseInt(v) })}/>
                                     </div>
                                     <div class="custom-menu-space">
                                         Start Date

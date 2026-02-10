@@ -266,7 +266,7 @@ const Home = () => {
             />
           </div>
           <Show when={getHomeCache().activePage == "global.schedule"}>
-            <Input type="date" defaultValue={unixToDateTime(dateToUnix(new Date().toString())).split(" ")[0]} onKeyDown={setCalendary} />
+            <Input type="date" defaultValue={unixToDateTime(dateToUnix(new Date().toString())).split(" ")[0]} onInput={setCalendary} />
           </Show>
         </div>
       </div>

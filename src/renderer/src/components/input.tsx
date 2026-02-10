@@ -6,8 +6,8 @@ interface InputProps {
   InputClass?: string;
   placeholder?: string;
   onKeyDown?: (text: string) => void;
+  onInput?: (text: string) => void;
   defaultValue?: string;
-  useInput?: boolean,
 }
 
 export default function Input(props: InputProps) {
@@ -16,7 +16,6 @@ export default function Input(props: InputProps) {
   let inputRef: HTMLInputElement | undefined;
 
   const handleData = (event: KeyboardEvent & { currentTarget: HTMLInputElement }) => {
-    if (props.useInput) return
     if (!props.onKeyDown) return;
 
     const value = event.currentTarget.value;
@@ -39,12 +38,6 @@ export default function Input(props: InputProps) {
     setDebounceTimeout(newTimeout as unknown as number);
   };
 
-  function handleInput(event: InputEvent & { currentTarget: HTMLInputElement; target: HTMLInputElement; }) {
-    if (!props.useInput) return
-    if (!props.onKeyDown) return
-    props.onKeyDown(event.currentTarget.value)
-  }
-
   return (
     <input
       tabIndex={-1}
@@ -54,7 +47,7 @@ export default function Input(props: InputProps) {
       placeholder={props.placeholder}
       value={props.defaultValue ? props.defaultValue : ""}
       onKeyDown={handleData}
-      onInput={handleInput}
+      onInput={(event) => props.onInput ? props.onInput(event.currentTarget.value) : ""}
     />
   );
 }
