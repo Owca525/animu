@@ -25,7 +25,7 @@ const player = () => {
     if (!anime_data || !anime_data.save || !anime_data.episodelist || !anime_data.data) {
         showDialog({
             type: "error",
-            title: t("player.errors.player"),
+            title: t("player.errors.error"),
             description: t("player.errors.missing"),
             buttons: [{
                 title: t("dialog.return"),
@@ -112,7 +112,7 @@ const player = () => {
     function showErrorDialog() {
         showDialog({
             type: "error",
-            title: t("player.errors.player"),
+            title: t("player.errors.error"),
             description: t("player.error.notfound"),
             buttons: [
                 {
