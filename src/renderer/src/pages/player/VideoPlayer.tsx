@@ -184,7 +184,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             return new shaka.util.AbortableOperation(promise, async () => controller.abort());
         });
 
-        shakaPlayer = new shaka.Player(videoRef);
+        shakaPlayer = new shaka.Player();
         shakaPlayer.configure({
             streaming: {
                 bufferingGoal: 3 * 60,
@@ -192,6 +192,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 bufferBehind: 3 * 60,
             }
         })
+        if (videoRef) shakaPlayer.attach(videoRef)
 
         runNewPlayer(defaulthost)
         handleVolume(PlayerVolume, true)
