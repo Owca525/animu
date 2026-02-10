@@ -29,7 +29,7 @@ import {
     Switch
 } from 'solid-js';
 import { createShortcut } from '@solid-primitives/keyboard';
-import { getGlobalCache } from '@renderer/utils/stores/global';
+import { animulistData, getGlobalCache } from '@renderer/utils/stores/global';
 import { getInformationPlugin, getPlayerPLugin, pluginManager } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { unwrap } from 'solid-js/store';
@@ -197,6 +197,8 @@ function information() {
 
     async function ChangeAnimeInInformation(data: AnimeData): Promise<any> {
         const idToast = toast(t("notification.fetchinganime"), { removeTimer: true, type: "loading" })
+        const animulist = unwrap(animulistData())
+        let tmpAnimulist
         let resp
         if (!data.type && data.format == "MANGA" || data.format == "NOVEL" || data.format == "ONE_SHOT") {
             resp = await getInformationPlugin().getManga(data.id)
@@ -204,6 +206,7 @@ function information() {
             resp = await getInformationPlugin().getManga(data.id)
         } else {
             resp = await getInformationPlugin().anime(data.id)
+            tmpAnimulist = animulist.find((v) => v.AnimeData.id == tempData().anime.id)?.animulist
         }
 
         if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", removeTimer: false })
@@ -216,8 +219,8 @@ function information() {
             ele.scrollTop = 0
         })
 
-        localStorage.setItem("informationCache", JSON.stringify({ anime: resp, saveData: undefined }))
-        setTmpData({ anime: resp, saveData: undefined })
+        localStorage.setItem("informationCache", JSON.stringify({ anime: resp, saveData: undefined, animulist: tmpAnimulist }))
+        setTmpData({ anime: resp, saveData: undefined, animulist: tmpAnimulist })
         initialInformation()
     }
 
