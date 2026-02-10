@@ -455,7 +455,7 @@
         "mute": "Mute",
         "unmute": "Unmute",
         "errors": {
-            "error": "Error in Player",
+            "error": "Player Found Issue",
             "missing": "Missing data to extract urls",
             "extractionError": "Failed Extracting Player Urls: {{error}}",
             "MEDIA_ERR_ABORTED": "The playback was aborted.",

@@ -3,7 +3,7 @@ import { genresSearchFormat, informationPluginManagerFormat, informationPluginFo
 import { getPluginRepo, setPlayerPlugin, setPluginPlayerList } from "./stores/plugins";
 import Allmanga from "@renderer/plugins/allmanga";
 import Anizone from "@renderer/plugins/anizone";
-import GojoLive from "@renderer/plugins/gojoLive";
+import Animetsu from "@renderer/plugins/animetsu";
 import LycorisCafe from "@renderer/plugins/lycoriscafe";
 import { getConfig } from "./stores/config";
 import { detectIndex, getPluginInitialConfig, getPluginsList, getRenderPath, setHomeData } from "./functions";
@@ -16,7 +16,7 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
     pluginList: playerPluginFormat[] = [
         // new Allmanga,
         // new Anizone,
-        // new GojoLive,
+        // new Animetsu,
         // new LycorisCafe,
     ];
     changePlugin = (plugin_id: string): playerPluginFormat => {
@@ -64,7 +64,7 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
 
     initialPlugins = async (): Promise<void> => {
         this.pluginList = []
-        const localPlugins = [Allmanga, Anizone, GojoLive, LycorisCafe]
+        const localPlugins = [Allmanga, Anizone, Animetsu, LycorisCafe]
 
         const plugins = await getPluginsList()
         const externalPlugins = await this.loadPlugin(plugins)
