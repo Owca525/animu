@@ -14,7 +14,7 @@
   transform: scale(1.02);
 }
 
-.relation-card-cover, .information-character-image-placeholder {
+.relation-card-cover, .relation-card-image-placeholder {
     max-height: 120px;
     width: max-content;
     height: max-content;
@@ -25,7 +25,7 @@
     user-select: none;
 }
 
-.information-character-image-placeholder {
+.relation-card-image-placeholder {
     width: max-content;
     height: 120px;
     display: flex;
