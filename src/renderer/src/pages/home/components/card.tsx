@@ -60,7 +60,10 @@ function Card(props: CardProps) {
     if (props.card.saveData && props.card.saveData.episode != "" && (props.card.saveData.last_Time != 0 || props.card.saveData.isStarted)) {
       let idToast = toast(t("notification.episodesfetching"), { type: "loading", removeTimer: true })
       const currentPLugin = pluginManager().changePlugin(props.card.saveData.pluginName)
-      const episodeList = await currentPLugin.extractOnlyEpisodesList(props.card.saveData.type, props.card.AnimeData.player_ID as string);
+      const episodeList = await currentPLugin.extractOnlyEpisodesList(props.card.saveData.type, props.card.AnimeData.player_ID as string).catch((error) => {
+        console.error("currentPLugin.extractOnlyEpisodesList", error)
+        return []
+      });
 
       if (episodeList.length <= 0) {
         updateToast(idToast, t("notification.episodesfailed"), { type: "error", removeTimer: false })
