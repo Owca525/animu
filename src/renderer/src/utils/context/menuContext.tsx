@@ -181,14 +181,14 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
                                         Start Date
                                         <Input type={"date"}
                                             defaultValue={animulistTMPData().startWatch > 0 ? unixToDateTime(animulistTMPData().startWatch).split(" ")[0] : undefined} 
-                                            onKeyDown={(v) => setAnimulistNewData({ startWatch: dateToUnix(v) })}
+                                            onInput={(v) => setAnimulistNewData({ startWatch: dateToUnix(v) })}
                                         />
                                     </div>
                                     <div class="custom-menu-space">
                                         Finish Date
                                         <Input type={"date"} 
                                             defaultValue={animulistTMPData().endWatch > 0 ? unixToDateTime(animulistTMPData().endWatch).split(" ")[0] : undefined} 
-                                            onKeyDown={(v) => setAnimulistNewData({ endWatch: dateToUnix(v) })}
+                                            onInput={(v) => setAnimulistNewData({ endWatch: dateToUnix(v) })}
                                         />
                                     </div>
                                     <div class="custom-menu-space">
