@@ -14,7 +14,7 @@ const header = {
 }
 
 const source_names = ["Yt-mp4", 'Sak', 'S-mp4', 'Luf-mp4', "Kir", "Default", "Uv-mp4", "Mp4", "Ok"]
-const normalUrls = ["Mp4", "Ok"]
+const normalUrls = ["Ok"]
 
 const mapping: Record<string, string> = {
     "79": "A", "7a": "B", "7b": "C", "7c": "D", "7d": "E", "7e": "F", "7f": "G",
@@ -105,7 +105,7 @@ async function SearchAnimeInAllmanga(name: string, page: number): Promise<AnimeD
         const resp = await requestToApi(variables, HASH_SEARCH, header)
         if (!resp.success || !resp.json) return []
         if ("errors" in resp.json) {
-            console.info("Allmanga Request show error", resp.json["errors"])
+            console.warn("Allmanga Request show error", resp.json["errors"], variables)
             return []
         }
         return resp.json.data.shows.edges.map((card) => converterData(card))
@@ -260,22 +260,15 @@ async function fetchMP4(hostname: string, url: string): Promise<playerData | und
         const extractedata = await runYT_DLP(url)
         for (let index = 0; index < extractedata.formats.length; index++) {
             const element = extractedata.formats[index];
-            if ("container" in element && element["container"] == "mp4_dash") resoltutions.push({
+            if ("format_id" in element && element["format_id"].includes("dash-video")) resoltutions.push({
                 res: `${element["height"]}`,
                 url: element["url"],
                 reqHeader: element["http_headers"],
             })
-            else {
-                resoltutions.push({
-                    res: element["height"] ? `${element["height"]}` : "1080",
-                    url: element["url"],
-                    reqHeader: element["http_headers"]
-                })
-            }
         }
         return {
             hostname: hostname,
-            resolution: resoltutions
+            resolution: resoltutions.reverse()
         }
     } catch (error) {
         return undefined
@@ -284,7 +277,7 @@ async function fetchMP4(hostname: string, url: string): Promise<playerData | und
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.9",
+        version: "1.10",
         name: "Allmanga",
         author: "Owca525",
         icon: "https://allmanga.to/android-icon-192x192.png",
@@ -320,18 +313,15 @@ export default class Allmanga implements playerPluginFormat {
                     let tmp = await requestForUrl(element.url)
                     if (tmp) data.push(tmp)
                 }
-                // TODO: FIX THIS
-                // if (!element.decode) {
-                //     const urlObject = new URL(element.url);
-                //     data.push({
-                //         hostname: urlObject.hostname,
-                //         resolution: [],
-                //         extractResolution: async () => await fetchMP4(urlObject.hostname, element.url)
-                //     })
-                // }
+                if (!element.decode) {
+                    const urlObject = new URL(element.url);
+                    data.push({
+                        hostname: urlObject.hostname,
+                        resolution: [],
+                        extractResolution: async () => await fetchMP4(urlObject.hostname, element.url)
+                    })
+                }
             }
-
-            console.log(data)
 
             if (type == "dub" && jsonObject.data.episode.episodeInfo.vidInforsdub) {
                 data.push({
