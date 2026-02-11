@@ -521,7 +521,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 video.pause()
                 return false
             }
-            video.play()
+            video.play().catch((reason) => {
+                console.warn("Video Play Error Catch", reason)
+            })
             return true
         })
 
