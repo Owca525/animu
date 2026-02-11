@@ -224,6 +224,7 @@ function information() {
         setCoverIsLoading(true)
         setCoverIsError(false)
 
+        SetactivePage("Episodes")
         setAnimeMedia([])
         setCurrentAnimeMedia(undefined)
 
