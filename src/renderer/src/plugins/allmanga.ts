@@ -93,9 +93,9 @@ function converterData(data: any): AnimeData | undefined {
 }
 
 async function requestToApi(variables: string, hash: string, header: any) {
-    let url = `${API_WEB}/api?variables=${variables}&extensions={"persistedQuery":{"version":1,"sha256Hash": "${hash}"}}`
+    let url = `${API_WEB}/api?variables=${variables}&extensions={"persistedQuery":{"version":1,"sha256Hash":"${hash}"}}`
     let data = await request(url, { headers: header })
-    if (!data.success) console.error("Allmanga request", data, url, header)
+    if (!data.success || data.json && data.json["errors"]) console.error("Allmanga request", data, url, header)
     return data
 }
 

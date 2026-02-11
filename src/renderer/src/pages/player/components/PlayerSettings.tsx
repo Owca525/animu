@@ -54,8 +54,8 @@ export default function PlayerSettings(props: playerSettingsProps) {
                         isGray={props.resolution.length <= 1}
                     />
                     <PlayerSettingsButton onClick={() => props.audioTrack.length > 1 ? setcurrentSettings("track") : ""}
-                        icon="music_note"
-                        leftText={t("player.settings.audio")}
+                        icon={props.resDubbing ? "mic" : "music_note"}
+                        leftText={props.resDubbing ? t("player.dubbing") : t("player.settings.audio")}
                         rightText={props.current.currentTrack}
                         isGray={props.audioTrack.length <= 1}
                         type={props.resDubbing ? "switch" : undefined}
