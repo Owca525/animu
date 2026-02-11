@@ -224,6 +224,9 @@ function information() {
         setCoverIsLoading(true)
         setCoverIsError(false)
 
+        setAnimeMedia([])
+        setCurrentAnimeMedia(undefined)
+
         localStorage.setItem("informationCache", JSON.stringify({ anime: resp, saveData: undefined, animulist: tmpAnimulist }))
         setTmpData({ anime: resp, saveData: undefined, animulist: tmpAnimulist })
         initialInformation()
