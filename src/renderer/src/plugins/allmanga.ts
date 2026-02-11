@@ -1,7 +1,7 @@
 import { convertMsToMinutes, makeSmallText, request, runYT_DLP } from "@renderer/utils/functions"
 import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerData, resolutionFormat } from "@renderer/utils/types"
 
-const HASH_SEARCH = '06327bc10dd682e1ee7e07b6db9c16e9ad2fd56c1b769e47513128cd5c9fc77a'
+const HASH_SEARCH = 'a24c500a1b765c68ae1d8dd85174931f661c71369c89b92b88b75a725afc471c'
 const HASH_INFO = '043448386c7a686bc2aabfbb6b80f6074e795d350df48015023b079527b0848a'
 const HASH_PLAYER = 'd405d0edd690624b66baba3068e0edc3ac90f1597d898a1ec8db4e5c43c00fec'
 const HASH_DATA = "c8f3ac51f598e630a1d09d7f7fb6924cff23277f354a23e473b962a367880f7d"
@@ -277,7 +277,7 @@ async function fetchMP4(hostname: string, url: string): Promise<playerData | und
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.10",
+        version: "1.11",
         name: "Allmanga",
         author: "Owca525",
         icon: "https://allmanga.to/android-icon-192x192.png",
