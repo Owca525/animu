@@ -1,7 +1,7 @@
 import { convertMsToMinutes, makeSmallText, request, runYT_DLP } from "@renderer/utils/functions"
 import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerData, resolutionFormat } from "@renderer/utils/types"
 
-const HASH_SEARCH = '06327bc10dd682e1ee7e07b6db9c16e9ad2fd56c1b769e47513128cd5c9fc77a'
+const HASH_SEARCH = 'a24c500a1b765c68ae1d8dd85174931f661c71369c89b92b88b75a725afc471c'
 const HASH_INFO = '043448386c7a686bc2aabfbb6b80f6074e795d350df48015023b079527b0848a'
 const HASH_PLAYER = 'd405d0edd690624b66baba3068e0edc3ac90f1597d898a1ec8db4e5c43c00fec'
 const HASH_DATA = "c8f3ac51f598e630a1d09d7f7fb6924cff23277f354a23e473b962a367880f7d"
@@ -14,7 +14,7 @@ const header = {
 }
 
 const source_names = ["Yt-mp4", 'Sak', 'S-mp4', 'Luf-mp4', "Kir", "Default", "Uv-mp4", "Mp4", "Ok"]
-const normalUrls = ["Mp4", "Ok"]
+const normalUrls = ["Ok"]
 
 const mapping: Record<string, string> = {
     "79": "A", "7a": "B", "7b": "C", "7c": "D", "7d": "E", "7e": "F", "7f": "G",
@@ -93,9 +93,9 @@ function converterData(data: any): AnimeData | undefined {
 }
 
 async function requestToApi(variables: string, hash: string, header: any) {
-    let url = `${API_WEB}/api?variables=${variables}&extensions={"persistedQuery":{"version":1,"sha256Hash": "${hash}"}}`
+    let url = `${API_WEB}/api?variables=${variables}&extensions={"persistedQuery":{"version":1,"sha256Hash":"${hash}"}}`
     let data = await request(url, { headers: header })
-    if (!data.success) console.error("Allmanga request", data, url, header)
+    if (!data.success || data.json && data.json["errors"]) console.error("Allmanga request", data, url, header)
     return data
 }
 
@@ -105,7 +105,7 @@ async function SearchAnimeInAllmanga(name: string, page: number): Promise<AnimeD
         const resp = await requestToApi(variables, HASH_SEARCH, header)
         if (!resp.success || !resp.json) return []
         if ("errors" in resp.json) {
-            console.info("Allmanga Request show error", resp.json["errors"])
+            console.warn("Allmanga Request show error", resp.json["errors"], variables)
             return []
         }
         return resp.json.data.shows.edges.map((card) => converterData(card))
@@ -263,22 +263,15 @@ async function fetchMP4(hostname: string, url: string): Promise<playerData | und
         const extractedata = await runYT_DLP(url)
         for (let index = 0; index < extractedata.formats.length; index++) {
             const element = extractedata.formats[index];
-            if ("container" in element && element["container"] == "mp4_dash") resoltutions.push({
+            if ("format_id" in element && element["format_id"].includes("dash-video")) resoltutions.push({
                 res: `${element["height"]}`,
                 url: element["url"],
                 reqHeader: element["http_headers"],
             })
-            else {
-                resoltutions.push({
-                    res: element["height"] ? `${element["height"]}` : "1080",
-                    url: element["url"],
-                    reqHeader: element["http_headers"]
-                })
-            }
         }
         return {
             hostname: hostname,
-            resolution: resoltutions
+            resolution: resoltutions.reverse()
         }
     } catch (error) {
         return undefined
@@ -287,7 +280,7 @@ async function fetchMP4(hostname: string, url: string): Promise<playerData | und
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.9",
+        version: "1.11",
         name: "Allmanga",
         author: "Owca525",
         icon: "https://allmanga.to/android-icon-192x192.png",
@@ -323,18 +316,15 @@ export default class Allmanga implements playerPluginFormat {
                     let tmp = await requestForUrl(element.url)
                     if (tmp) data.push(tmp)
                 }
-                // TODO: FIX THIS
-                // if (!element.decode) {
-                //     const urlObject = new URL(element.url);
-                //     data.push({
-                //         hostname: urlObject.hostname,
-                //         resolution: [],
-                //         extractResolution: async () => await fetchMP4(urlObject.hostname, element.url)
-                //     })
-                // }
+                if (!element.decode) {
+                    const urlObject = new URL(element.url);
+                    data.push({
+                        hostname: urlObject.hostname,
+                        resolution: [],
+                        extractResolution: async () => await fetchMP4(urlObject.hostname, element.url)
+                    })
+                }
             }
-
-            console.log(data)
 
             if (type == "dub" && jsonObject.data.episode.episodeInfo.vidInforsdub) {
                 data.push({

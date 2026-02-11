@@ -439,6 +439,7 @@
             "opening": "Skip Opening {{time}}s",
             "ending": "Skip Ending {{time}}s"
         },
+        "dubbing": "Dubbing",
         "shareanime": "Share Anime Episode",
         "selectepisode": "Select Episode",
         "TitleEpisode": "Episode {{ep}} of {{name}}",

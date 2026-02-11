@@ -421,6 +421,7 @@
       "opening": "Пропустить опенинг {{time}}с",
       "ending": "Пропустить эндинг {{time}}с"
     },
+    "dubbing": "Озвучка",
     "shareanime": "Поделиться эпизодом аниме",
     "selectepisode": "Выбрать эпизод",
     "TitleEpisode": "Эпизод {{ep}} из «{{name}}»",

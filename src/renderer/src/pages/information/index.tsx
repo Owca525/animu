@@ -219,6 +219,11 @@ function information() {
             ele.scrollTop = 0
         })
 
+        setBannerIsError(false)
+        setBannerLoadingData(true)
+        setCoverIsLoading(true)
+        setCoverIsError(false)
+
         localStorage.setItem("informationCache", JSON.stringify({ anime: resp, saveData: undefined, animulist: tmpAnimulist }))
         setTmpData({ anime: resp, saveData: undefined, animulist: tmpAnimulist })
         initialInformation()
