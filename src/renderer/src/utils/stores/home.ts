@@ -10,7 +10,17 @@ const initialState: homeData = {
     stopScrolling: false,
     filterTags: undefined,
     mainContainer: undefined,
-    activePage: ""
+    activePage: "",
+    otherFilter: [{
+        page: 'global.animulist',
+        filter: [{
+            type: 'watching',
+            placeholder: 'Status Watching',
+            title: 'Status Watching',
+            langPath: 'animulist.status.',
+            options: ["CURRENT", "PLANNING", "COMPLETED", "REPEATING", "PAUSED", "DROPPED"]
+        }]
+    }]
 };
 
 export const [globalState, setGlobalState] = createStore(initialState);

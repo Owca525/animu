@@ -27,6 +27,12 @@
     "config": "正在載入設定",
     "plugin": "正在載入外掛"
   },
+  "search": {
+    "home": "搜尋",
+    "history": "搜尋紀錄…",
+    "animulist": "Search in AnimuList...",
+    "schedule": "Search in Schedule..."
+  },
   "imageviewer": {
     "failedfetch": "圖片取得失敗",
     "failedsave": "圖片儲存失敗",
@@ -104,7 +110,8 @@
     "releasing": "正在連載中",
     "finished": "完成",
     "not_yet_released": "還沒釋出",
-    "cancelled": "取消"
+    "cancelled": "取消",
+    "hiatus": "Hiatus"
   },
   "anime_relationtype": {
     "adaptation": "改編作品",
@@ -130,14 +137,14 @@
     "fantasy": "奇幻",
     "hentai": "H動漫",
     "horror": "恐怖",
-    "mahoushoujo": "魔法少女",
+    "mahou_shoujo": "魔法少女",
     "mecha": "機甲",
     "music": "音樂",
     "mystery": "懸疑",
     "psychological": "心理",
     "romance": "浪漫",
     "sci-fi": "科幻",
-    "sliceoflife": "日常",
+    "slice_of_life": "日常",
     "sports": "運動",
     "supernatural": "超自然",
     "thriller": "驚悚"
@@ -148,7 +155,11 @@
     "tv_short": "短篇動畫",
     "special": "特別篇",
     "ova": "OVA(原創錄影動畫)",
-    "ona": "ONA(網路動畫)"
+    "ona": "ONA(網路動畫)",
+    "one_shot": "One Shot",
+    "music": "Music",
+    "novel": "Novel",
+    "manga": "Manga"
   },
   "anime_source": {
     "lightnovel": "輕小說",

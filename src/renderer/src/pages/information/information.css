@@ -324,8 +324,7 @@
     padding: 8px;
     display: flex;
     gap: 12px;
-    /* overflow-x: auto; */
-    z-index: 5;
+    overflow-x: auto;
 }
 
 .information-recomendation-loading {
@@ -333,6 +332,19 @@
     justify-content: center;
     align-items: center;
     height: 200px;
+}
+
+.information-animulist-container {
+    background-color: var(--second-layer);
+    padding: 12px;
+    border-radius: 12px;
+    display: flex;
+    gap: 12px;
+}
+
+.information-eopsodes-top-left {
+    display: flex;
+    gap: 8px;
 }
 
 /* For smaller devices / window sizes */
