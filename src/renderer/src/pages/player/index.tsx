@@ -66,6 +66,7 @@ const player = () => {
             time: 0,
             actual: ep
         }))
+        console.log([anime_data.data?.player_ID, extractionData().actual, extractionData().type], extractionData)
         response.Refetch([anime_data.data?.player_ID, extractionData().actual, extractionData().type])
         updateHistory()
     }

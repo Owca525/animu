@@ -473,7 +473,7 @@ async function checkExistyt_dlp() {
 async function downloadyt_dlp(data: Map<string, any>, name: string) {
     const resp = await advanceRequest(data["browser_download_url"])
     if (!resp.success) return
-    fs.writeFileSync(path.join(app.getPath("userData"), "yt-dlp.json"), JSON.stringify(data), "utf-8")
+    fs.writeFileSync(path.join(app.getPath("userData"), "yt-dlp.json"), JSON.stringify(yt_dlp_releases_cache), "utf-8")
     fs.writeFileSync(path.join(app.getPath("userData"), name), resp.buffer, "binary")
 }
 
@@ -499,8 +499,9 @@ export async function runCheckYT_DLP() {
     }
 
     if (await checkExistyt_dlp() && updated == false) return
-
+    
     if (config.yt_dlp.replaceAll(" ", "").length <= 0) {
+        yt_dlp_releases_cache = lastest.json
         await installyt_dlp(lastest.json)
         return
     }

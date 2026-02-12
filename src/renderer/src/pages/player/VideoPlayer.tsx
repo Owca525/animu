@@ -203,10 +203,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             toggleFullscreen(true)
             setIsFullscreen(true)
         }
-        if (videoRef) {
-            videoRef.currentTime = time
-            setcurrentTime(() => time)
-        }
+        setTimeVideo(time)
         if ("mediaSession" in navigator) {
             const findedepisode = temp.episodes.findIndex((value) => value.ep == temp.episode)
             const cover = temp.episodes[findedepisode] ? temp.episodes[findedepisode].img : anime_data.AnimeData.coverImage
@@ -356,7 +353,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         setPlayer(() => currentplayer)
         setCurrentResoltion(currentRes)
         try {
-            await shakaPlayer.load(currentRes.url, time)
+            await shakaPlayer.load(currentRes.url)
+            setTimeVideo(time)
         } catch (error) { shakaPlayerErrorParser(error) }
     }
 
@@ -440,8 +438,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             const time = videoRef.currentTime
             hls.loadSource(resolution.url);
             hls.attachMedia(videoRef);
-
-            videoRef.currentTime = time
+            setTimeVideo(time)
 
             hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
                 setFatalError(false)
@@ -645,7 +642,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         saveContinueProgress(event)
         checkUpNext(event)
         handleProgress(event)
-
+        
+        // 
         setVideoFrames({ totalVideoFrames: event.currentTarget.getVideoPlaybackQuality().totalVideoFrames, droppedVideoFrames: event.currentTarget.getVideoPlaybackQuality().droppedVideoFrames })
 
         // Update RPC
@@ -697,9 +695,14 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             timeDelete = ((parseInt(duration.toFixed(0)) - (parseInt(duration.toFixed(0)) - endingChupter.start)) - parseInt(currentTime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
         }
 
+        if (parseInt(timeDelete.toFixed(0)) < 0) {
+            setUpNextEpisode(false)
+            return
+        }
+
         if (isHideUpNextEpisode() == false && temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1] != null && showUpToNext) {
             setUpNextEpisode(true)
-            setTimeNextEpisode(timeDelete)
+            setTimeNextEpisode(parseInt(timeDelete.toFixed(0)))
         } else {
             setTimeNextEpisode(parseInt(config.Player.upToNextEpisode.interval.toString()))
             setUpNextEpisode(false)
