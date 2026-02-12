@@ -419,6 +419,7 @@
       "opening": "略過片頭 {{time}} 秒",
       "ending": "略過片尾 {{time}} 秒"
     },
+    "dubbing": "配音",
     "shareanime": "分享動畫集數",
     "selectepisode": "選擇集數",
     "TitleEpisode": "第 {{ep}} 集：{{name}}",
