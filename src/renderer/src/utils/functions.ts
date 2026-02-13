@@ -691,6 +691,8 @@ export function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): 
         console.error("Functions SheepFinderAnime2000 error", error)
         return animeList[0].player_ID
     }
+}
+
 export function dateToUnix(dateStr: string): number {
     const date = new Date(dateStr);
     return Math.floor(date.getTime() / 1000);
