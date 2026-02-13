@@ -1,22 +1,66 @@
-import { t } from "@renderer/utils/i18n"
+import { useI18n } from "@renderer/utils/i18n"
 import "./css/relationCard.css"
+import { createSignal, Match, Show, Switch } from "solid-js"
 
 export type characterCardsProps = {
     id: number,
     title: { english?: string, native: string, romaji: string }
-    bannerImage?: string
     coverImage: string
     relationType: string
-    onClick?: () => void,
+    onClick?: () => void
+    source?: string
+    status?: string
 }
 
+// Inspiration Anilist relation cards
 export default function RelationCard(props: characterCardsProps) {
+    const { t, pathExist } = useI18n()
+    const [isLoadingImage, setLoadingImage] = createSignal(true);
+    const [isImageError, setImageError] = createSignal(false);
+
+    function checkState() {
+        if (isLoadingImage()) return { display: "none" };
+        if (isImageError()) return { display: "none" };
+        return { animation: "fadeIn 0.3s forwards" };
+    }
+
     return (
-        <div class="relation-card-background" style={{ "background-image": `url(${props.bannerImage ?? props.coverImage})` }}>
-            <div class="relation-card-container" onClick={props.onClick} >
-                <span class="relation-card-title">{props.title.romaji}</span>
-                <span class="relation-card-type">{t(`anime_relationtype.${props.relationType.toLowerCase().replaceAll("_", "")}`)}</span>
+        <main class="relation-card-container" onClick={props.onClick}>
+            <Switch>
+                <Match when={isLoadingImage()}>
+                    <div class="relation-card-image-placeholder">
+                        <span class="material-symbols-outlined loading-animation icon">progress_activity</span>
+                    </div>
+                </Match>
+                <Match when={isImageError()}>
+                    <div class="relation-card-image-placeholder">
+                        <span class="material-symbols-outlined icon">error</span>
+                    </div>
+                </Match>
+            </Switch>
+            <img class="relation-card-cover" 
+                src={props.coverImage} 
+                style={checkState()}
+                onLoad={() => setLoadingImage(false)}
+                onError={() => setImageError(true)}
+            />
+            <div class="relation-card-content">
+                <div class="relation-card-content-top">
+                    <span class="relation-card-relation">{t(`anime_relationtype.${props.relationType.toLowerCase().replaceAll("_", "")}`)}</span>
+                    <span class="relation-card-title">{props.title.romaji}</span>
+                </div>
+                <div class="relation-card-content-bottom">
+                    <Show when={props.source}>
+                        <span class="relation-card-source">{pathExist(`anime_source.${props.source!.toLowerCase()}`) ? 
+                            t(`anime_source.${props.source!.toLowerCase()}`) :
+                            t(`anime_formats.${props.source!.toLowerCase()}`) }</span>
+                    </Show>
+                    <Show when={props.source && props.status}>-</Show>
+                    <Show when={props.status}>
+                        <span class="relation-card-status">{t(`anime_statuses.${props.status!.toLowerCase()}`)}</span>
+                    </Show>
+                </div>
             </div>
-        </div>
+        </main>
     );
 }
