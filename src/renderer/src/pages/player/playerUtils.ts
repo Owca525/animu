@@ -69,10 +69,15 @@ export function countImages(data: { ep: string, img?: string, title?: string }[]
 
 export async function fetchResolutions<F extends (data: playerDataExtended) => Promise<any>>(tmpData: playerDataExtended, func: F): Promise<{ success: boolean, data: Awaited<ReturnType<F>> | undefined }> {
     if (!func) return { success: false, data: undefined }
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 5000);
+
     try {
         return { success: true, data: await func(tmpData) }
     } catch (error) {
         console.error(error, "fetchResolutions player")
         return { success: false, data: undefined }
+    } finally {
+        clearInterval(id)
     }
 }
