@@ -239,6 +239,27 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (videoRef) videoRef.src = ""
         videoRef = undefined
         shakaPlayer?.destroy()
+
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: '',
+            artist: '',
+            album: '',
+            artwork: []
+        });
+        const actions = [
+            'play',
+            'pause',
+            'stop',
+            'previoustrack',
+            'nexttrack',
+            'seekbackward',
+            'seekforward',
+            'seekto'
+        ];
+
+        actions.forEach(action => {
+            navigator.mediaSession.setActionHandler(action as any, null);
+        });
     })
 
     // player Functions
@@ -313,7 +334,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (currentplayer.extractResolution) {
             console.warn(temp, anime_data)
             if (currentExtractionRes().toast != "") removeToast(currentExtractionRes().toast)
-            
+
             const tmpID = uuidv4()
             const idToast = toast(t("notification.fetchresolution"), { type: "loading", removeTimer: true })
             setCurrentExtractionRes({ id: tmpID, toast: idToast })
@@ -330,7 +351,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
             removeToast(idToast)
             if (currentExtractionRes().id != tmpID) return
-            setCurrentExtractionRes((prev) => ({...prev, toast: ""}))
+            setCurrentExtractionRes((prev) => ({ ...prev, toast: "" }))
             if (tmp.success && tmp.data) {
                 currentplayer = tmp.data
                 updatePlayerData((prev) => prev.map((player) => player.hostname == tmp.data?.hostname ? tmp.data : player))
@@ -637,7 +658,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         saveContinueProgress(event)
         checkUpNext(event)
         handleProgress(event)
-        
+
         // 
         setVideoFrames({ totalVideoFrames: event.currentTarget.getVideoPlaybackQuality().totalVideoFrames, droppedVideoFrames: event.currentTarget.getVideoPlaybackQuality().droppedVideoFrames })
 
