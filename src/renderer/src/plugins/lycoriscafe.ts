@@ -1,8 +1,63 @@
-import { request, timeToSeconds } from "@renderer/utils/functions";
+import { makeSmallText, request, timeToSeconds } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat } from "@renderer/utils/types";
 const WEB = "https://www.lycoris.cafe"
 const HEADER = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0'
+}
+
+function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string | undefined {
+    try {
+        if (anime.id != "") {
+            console.log("ID Check")
+            const findedID = animeList.find((item) => item.id == anime.id)
+            if (findedID) return findedID.player_ID
+        }
+
+        console.log("First Check", animeList)
+        // FIRST CHECK
+        if (animeList.length <= 0) return undefined
+        if (animeList.length == 1) return animeList[0].player_ID
+
+        // Second Check
+        let seasonYearFilter = animeList.filter((element) => element.seasonYear == anime.seasonYear)
+        console.log("Second Check", seasonYearFilter)
+        if (seasonYearFilter.length <= 0) return undefined
+        if (seasonYearFilter.length == 1) return seasonYearFilter[0].player_ID
+
+        // Third Check
+        let seasonFilter = seasonYearFilter.filter((element) => makeSmallText(element.season) == makeSmallText(anime.season))
+        console.log("Third Check", seasonYearFilter)
+        if (seasonFilter.length <= 0) return undefined
+        if (seasonFilter.length == 1) return seasonFilter[0].player_ID
+
+        // Four Check
+        let episodesFilter: AnimeData[] | undefined = undefined
+        if (anime.episodes) {
+            episodesFilter = seasonFilter.filter((element) => element.episodes == anime.episodes)
+            console.log("Four Check", episodesFilter)
+            if (episodesFilter.length <= 0) return undefined
+            if (episodesFilter.length == 1) return episodesFilter[0].player_ID
+        }
+
+        // Five Check
+        let durationFilter: AnimeData[] = []
+        if (episodesFilter) durationFilter = episodesFilter.filter((element) => element.duration == anime.duration)
+        else durationFilter = seasonFilter.filter((element) => element.duration == anime.duration)
+        console.log("Five Check", durationFilter)
+        if (durationFilter.length <= 0) return undefined
+        if (durationFilter.length == 1) return durationFilter[0].player_ID
+
+        // Six Check
+        let formatFilter = durationFilter.filter((element) => makeSmallText(element.format) == makeSmallText(anime.format))
+        console.log("Six Check", formatFilter)
+        if (formatFilter.length <= 0) return undefined
+        if (formatFilter.length == 1) return formatFilter[0].player_ID
+
+        return formatFilter[0].player_ID
+    } catch (error) {
+        console.error("LycorisCafe SheepFinderAnime2000 error", error)
+        return animeList[0].player_ID
+    }
 }
 
 function detectResoltion(text: string): string {
@@ -55,7 +110,7 @@ async function requestToApi(anime_id: string): Promise<{ data: any } | undefined
 
 export default class LycorisCafe implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.1",
+        version: "1.2",
         name: "Lycoris.cafe",
         author: "Owca525",
         icon: "https://www.lycoris.cafe/favicon.ico",
@@ -126,7 +181,7 @@ export default class LycorisCafe implements playerPluginFormat {
         if (!animeID && animeData) {
             let animeList = await this.searchAnime(animeData.title.romaji, 1)
             if (animeList.length <= 0) return
-            animeID = animeList[0].AnimeData.id
+            animeID = SheepFinderAnime2000(animeList.map(v=>v.AnimeData), animeData)
         }
         if (!animeID) return
 
@@ -161,7 +216,7 @@ export default class LycorisCafe implements playerPluginFormat {
         return episodes
     }
     searchAnime = async (name: string, page: number, _params?: genresSearchFormat): Promise<cardData[]> => {
-        let url = `https://www.lycoris.cafe/api/search?page=${page}&pageSize=12&search=${name}&genres=&status=&format=&year=&season=&source=&sortField=popularity&sortDirection=desc&preferRomaji=true`
+        let url = `${WEB}/api/search?page=${page}&pageSize=12&search=${name}&genres=&status=&format=&year=&season=&source=&sortField=popularity&sortDirection=desc&preferRomaji=true`
         const req = await request(url, { headers: HEADER });
         if (!req.success || !req.json) return []
 

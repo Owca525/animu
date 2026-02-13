@@ -1,5 +1,5 @@
 import { convertMsToMinutes, makeSmallText, request, runYT_DLP } from "@renderer/utils/functions"
-import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerData, resolutionFormat } from "@renderer/utils/types"
+import { AnimeData, episodeList, genresSearchFormat, playerPluginFormat, playerData, resolutionFormat } from "@renderer/utils/types"
 
 const HASH_SEARCH = 'a24c500a1b765c68ae1d8dd85174931f661c71369c89b92b88b75a725afc471c'
 const HASH_INFO = '043448386c7a686bc2aabfbb6b80f6074e795d350df48015023b079527b0848a'
@@ -115,52 +115,58 @@ async function SearchAnimeInAllmanga(name: string, page: number): Promise<AnimeD
     }
 }
 
-function findAnime(animeList: cardData[], anime: AnimeData): string | undefined {
+function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string | undefined {
     try {
+        if (anime.id != "") {
+            console.log("ID Check")
+            const findedID = animeList.find((item) => item.id == anime.id)
+            if (findedID) return findedID.player_ID
+        }
+
         console.log("First Check", animeList)
         // FIRST CHECK
         if (animeList.length <= 0) return undefined
-        if (animeList.length == 1) return animeList[0].AnimeData.player_ID
+        if (animeList.length == 1) return animeList[0].player_ID
 
         // Second Check
-        let seasonYearFilter = animeList.filter((element) => element.AnimeData.seasonYear == anime.seasonYear)
+        let seasonYearFilter = animeList.filter((element) => element.seasonYear == anime.seasonYear)
         console.log("Second Check", seasonYearFilter)
         if (seasonYearFilter.length <= 0) return undefined
-        if (seasonYearFilter.length == 1) return seasonYearFilter[0].AnimeData.player_ID
+        if (seasonYearFilter.length == 1) return seasonYearFilter[0].player_ID
 
         // Third Check
-        let seasonFilter = seasonYearFilter.filter((element) => makeSmallText(element.AnimeData.season) == makeSmallText(anime.season))
+        let seasonFilter = seasonYearFilter.filter((element) => makeSmallText(element.season) == makeSmallText(anime.season))
         console.log("Third Check", seasonYearFilter)
         if (seasonFilter.length <= 0) return undefined
-        if (seasonFilter.length == 1) return seasonFilter[0].AnimeData.player_ID
+        if (seasonFilter.length == 1) return seasonFilter[0].player_ID
 
         // Four Check
-        let episodesFilter: cardData[] | undefined = undefined
+        let episodesFilter: AnimeData[] | undefined = undefined
         if (anime.episodes) {
-            episodesFilter = seasonFilter.filter((element) => element.AnimeData.episodes == anime.episodes)
+            episodesFilter = seasonFilter.filter((element) => element.episodes == anime.episodes)
             console.log("Four Check", episodesFilter)
             if (episodesFilter.length <= 0) return undefined
-            if (episodesFilter.length == 1) return episodesFilter[0].AnimeData.player_ID
+            if (episodesFilter.length == 1) return episodesFilter[0].player_ID
         }
 
         // Five Check
-        let durationFilter: cardData[] = []
-        if (episodesFilter) durationFilter = episodesFilter.filter((element) => element.AnimeData.duration == anime.duration)
-        else durationFilter = seasonFilter.filter((element) => element.AnimeData.duration == anime.duration)
+        let durationFilter: AnimeData[] = []
+        if (episodesFilter) durationFilter = episodesFilter.filter((element) => element.duration == anime.duration)
+        else durationFilter = seasonFilter.filter((element) => element.duration == anime.duration)
         console.log("Five Check", durationFilter)
         if (durationFilter.length <= 0) return undefined
-        if (durationFilter.length == 1) return durationFilter[0].AnimeData.player_ID
+        if (durationFilter.length == 1) return durationFilter[0].player_ID
 
         // Six Check
-        let formatFilter = durationFilter.filter((element) => makeSmallText(element.AnimeData.format) == makeSmallText(anime.format))
+        let formatFilter = durationFilter.filter((element) => makeSmallText(element.format) == makeSmallText(anime.format))
         console.log("Six Check", formatFilter)
         if (formatFilter.length <= 0) return undefined
-        if (formatFilter.length == 1) return formatFilter[0].AnimeData.player_ID
+        if (formatFilter.length == 1) return formatFilter[0].player_ID
 
-        return formatFilter[0].AnimeData.player_ID
+        return formatFilter[0].player_ID
     } catch (error) {
-        console.error("Allmanga findAnime error", error)
-        return animeList[0].AnimeData.player_ID
+        console.error("Allmanga SheepFinderAnime2000 error", error)
+        return animeList[0].player_ID
     }
 }
 
@@ -280,7 +286,7 @@ async function fetchMP4(hostname: string, url: string): Promise<playerData | und
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.11",
+        version: "1.12",
         name: "Allmanga",
         author: "Owca525",
         icon: "https://allmanga.to/android-icon-192x192.png",
@@ -366,7 +372,7 @@ export default class Allmanga implements playerPluginFormat {
 
             if (animeData && !tmpAnimeID) {
                 let data = await SearchAnimeInAllmanga(animeData.title.romaji, 1);
-                tmpAnimeID = findAnime(data.map((card) => ({ AnimeData: card })), animeData)
+                tmpAnimeID = SheepFinderAnime2000(data, animeData)
             };
 
             console.log(tmpAnimeID)

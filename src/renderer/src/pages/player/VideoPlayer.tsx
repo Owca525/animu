@@ -27,6 +27,7 @@ import { removeToast, toast, updateToast } from "@renderer/utils/context/ToastNo
 import { useI18n } from "@renderer/utils/i18n"
 import { addTime, countImages, fetchResolutions, VTTstoryBoardParser } from "./playerUtils"
 import shaka from "shaka-player/dist/shaka-player.compiled.js";
+import { v4 as uuidv4 } from 'uuid';
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -74,6 +75,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [durrationTime, setdurrationTime] = createSignal<number>(0)
     const [currentBuffer, setBuffered] = createSignal<{ position: number, width: number }[]>([])
     const [playerData, updatePlayerData] = createSignal<playerData[]>(player_data)
+    const [currentExtractionRes, setCurrentExtractionRes] = createSignal<{ id: string, toast: string }>({ id: "", toast: "" })
 
     // UI
     const [isVolume, setShowVolume] = createSignal<boolean>(false)
@@ -232,11 +234,33 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     onCleanup(() => {
         setCleanup(true)
+        removeToast(currentExtractionRes().toast)
         if (hls()) hls()?.destroy()
         if (currentASSubtitles()) currentASSubtitles()?.destroy()
         if (videoRef) videoRef.src = ""
         videoRef = undefined
         shakaPlayer?.destroy()
+
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: '',
+            artist: '',
+            album: '',
+            artwork: []
+        });
+        const actions = [
+            'play',
+            'pause',
+            'stop',
+            'previoustrack',
+            'nexttrack',
+            'seekbackward',
+            'seekforward',
+            'seekto'
+        ];
+
+        actions.forEach(action => {
+            navigator.mediaSession.setActionHandler(action as any, null);
+        });
     })
 
     // player Functions
@@ -307,8 +331,14 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         setFatalError(false)
 
         let currentplayer = data
+        setPlayer(() => currentplayer)
         if (currentplayer.extractResolution) {
+            console.warn(temp, anime_data)
+            if (currentExtractionRes().toast != "") removeToast(currentExtractionRes().toast)
+
+            const tmpID = uuidv4()
             const idToast = toast(t("notification.fetchresolution"), { type: "loading", removeTimer: true })
+            setCurrentExtractionRes({ id: tmpID, toast: idToast })
             let tmp = await fetchResolutions({
                 ...currentplayer,
                 episode: {
@@ -319,7 +349,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     type: temp.type
                 }
             }, currentplayer.extractResolution)
+
             removeToast(idToast)
+            if (currentExtractionRes().id != tmpID) return
+            setCurrentExtractionRes((prev) => ({ ...prev, toast: "" }))
             if (tmp.success && tmp.data) {
                 currentplayer = tmp.data
                 updatePlayerData((prev) => prev.map((player) => player.hostname == tmp.data?.hostname ? tmp.data : player))
@@ -331,6 +364,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             setFatalError(() => true)
             return
         }
+        setPlayer(() => currentplayer)
 
         const time = videoRef.currentTime
         if (currentplayer.subtitles) setListSubtitles(() => [{ url: "", format: "", lang: "", label: "Off" }, ...currentplayer.subtitles as playerSubtitlesFormat[]])
@@ -343,14 +377,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             setCurrentResoltion(currentRes)
         }
         if (currentRes.hls) {
-            setPlayer(() => currentplayer)
             await runHLS(currentRes, currentplayer.splitHLS)
             return
         }
         if (hls()) hls()!.destroy()
 
         setListResolution(() => currentplayer.resolution)
-        setPlayer(() => currentplayer)
         setCurrentResoltion(currentRes)
         try {
             await shakaPlayer.load(currentRes.url)
@@ -642,7 +674,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         saveContinueProgress(event)
         checkUpNext(event)
         handleProgress(event)
-        
+
         // 
         setVideoFrames({ totalVideoFrames: event.currentTarget.getVideoPlaybackQuality().totalVideoFrames, droppedVideoFrames: event.currentTarget.getVideoPlaybackQuality().droppedVideoFrames })
 
@@ -683,9 +715,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (duration <= config.Player.upToNextEpisode.durationShow * 60 && !currentPlayer()!.listChapters) return
 
         let endingChupter: playerChapterList | undefined = undefined
-        if (currentPlayer()!.listChapters) endingChupter = currentPlayer()!.listChapters!.find((cha) => cha.type == "ending")
-
-        if (currentPlayer()!.listChapters && endingChupter && endingChupter.end == 0 && endingChupter.start == 0) return
+        if (currentPlayer()!.listChapters) {
+            endingChupter = currentPlayer()!.listChapters!.find((cha) => cha.type == "ending")
+            if (endingChupter && endingChupter.end == 0 && endingChupter.start == 0) return
+        }
 
         let showUpToNext: boolean = currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
         let timeDelete: number = ((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
