@@ -9,6 +9,7 @@ protocols:
     - animu
 directories:
   buildResources: build
+artifactName: "${productName}-${version}-${os}.${ext}"
 files:
   - '!**/.vscode/*'
   - '!src/*'
@@ -32,7 +33,6 @@ files:
   - '!**/{appveyor.yml,.travis.yml,circle.yml}'
   - '!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}'
   - "!node_modules/**"
-
 win:
   executableName: animu
   target:
