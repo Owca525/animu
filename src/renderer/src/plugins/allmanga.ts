@@ -117,12 +117,6 @@ async function SearchAnimeInAllmanga(name: string, page: number): Promise<AnimeD
 
 function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string | undefined {
     try {
-        if (anime.id != "") {
-            console.log("ID Check")
-            const findedID = animeList.find((item) => item.id == anime.id)
-            if (findedID) return findedID.player_ID
-        }
-
         console.log("First Check", animeList)
         // FIRST CHECK
         if (animeList.length <= 0) return undefined
@@ -283,7 +277,7 @@ async function fetchMP4(hostname: string, url: string): Promise<playerData | und
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.12",
+        version: "1.13",
         name: "Allmanga",
         author: "Owca525",
         icon: "https://allmanga.to/android-icon-192x192.png",
