@@ -2,8 +2,8 @@ import { makeSmallText, request } from "@renderer/utils/functions";
 import { t } from "@renderer/utils/i18n";
 import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerData, playerSubtitlesFormat, resolutionFormat, playerChapterList, playerDataExtended } from "@renderer/utils/types";
 
-const BACKEND = "https://ani.metsu.site"
-const WEBSITE = "https://animetsu.bz/"
+const BACKEND = "https://b.animetsu.live/"
+const WEBSITE = "https://animetsu.live/"
 
 const HEADER = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36',
@@ -110,13 +110,32 @@ async function extractResolutions(episode: string, type: string, playerData: pla
 
 export default class Animetsu implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.1",
+        version: "1.2",
         name: "Animetsu.Live",
         icon: "https://animetsu.live/apple-touch-icon.png",
         author: "Owca525",
         supportLang: ["en"],
         urlWebsite: WEBSITE,
     };
+    config: { [key: string]: any; } = {
+        Backend: BACKEND
+    };
+
+    // checkBackend = async () => {
+    //     const response = await request(`${WEBSITE}assets/index.js?ex`)
+    //     if (!response.success) return
+    //     const tmp = response.text.match(/https:\/\/([^.]+)\.\$\{window\?\.\location\?\.\hostname\}/)
+    //     if (!tmp) return
+    //     const url = `${tmp[0].replaceAll("${window?.location?.hostname}", new URL(WEBSITE).hostname)}/`
+    //     if (!url.startsWith("https://")) return
+    //     if (url != this.config.Backend) {
+
+    //     }
+    // }
+
+    // constructor() {
+    //     this.checkBackend()
+    // }
     
     extractPlayerData = async (_type: string, episode: string, id: string): Promise<playerData[]> => {
         try {
