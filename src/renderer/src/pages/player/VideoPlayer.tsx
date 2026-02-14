@@ -367,7 +367,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         setPlayer(() => currentplayer)
 
         const time = videoRef.currentTime
-        if (currentplayer.subtitles) setListSubtitles(() => [{ url: "", format: "", lang: "", label: "Off" }, ...currentplayer.subtitles as playerSubtitlesFormat[]])
+        if (currentplayer.subtitles) setListSubtitles(() => [{ url: "", format: "", lang: "", label: t("player.other.off") }, ...currentplayer.subtitles as playerSubtitlesFormat[]])
         if (currentplayer.storyboardVTT) setThumbnail(await VTTstoryBoardParser(currentplayer.storyboardVTT))
         const currentRes = currentplayer.resolution[0]
 
@@ -394,6 +394,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         console.error("Shaka Player Error:", error)
         if (!("category" in error)) return setFatalError(true)
         if (error.category == 4 && videoRef && currentResolution()) {
+            setFatalError(false)
             videoRef.src = currentResolution()!.url
             videoRef.currentTime = currentTime()
             return
