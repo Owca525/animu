@@ -393,6 +393,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         console.error("Shaka Player Error:", error)
         if (!("category" in error)) return setFatalError(true)
         if (error.category == 4 && videoRef && currentResolution()) {
+            setFatalError(false)
             videoRef.src = currentResolution()!.url
             videoRef.currentTime = currentTime()
             return
