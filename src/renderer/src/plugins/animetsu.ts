@@ -11,6 +11,12 @@ const HEADER = {
     'Referer': WEBSITE
 }
 
+function preaperURL(str: string) {
+    if (!str) return str
+    console.log(str.replaceAll("//", "/").replace("/", "https://"))
+    return str.replaceAll("//", "/").replace("https:/", "https://")
+}
+
 function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string | undefined {
     try {
         if (anime.id != "") {
@@ -70,7 +76,7 @@ async function extractResolutions(episode: string, type: string, playerData: pla
     try {
         // oppai?server=${server}&id=${id}&num=${episode}&subType=${type}
         if (!server) return undefined
-        let response = await request(`${BACKEND}/api/anime/oppai/${server}/${episode}?server=default&source_type=${type}`, { headers: HEADER });
+        let response = await request(preaperURL(`${BACKEND}/api/anime/oppai/${server}/${episode}?server=default&source_type=${type}`), { headers: HEADER });
         if (!response.success || !response.json) return undefined
         let subtitles: playerSubtitlesFormat[] = []
         if (response.json["subtitles"]) {
@@ -80,9 +86,10 @@ async function extractResolutions(episode: string, type: string, playerData: pla
                 return { url: element["url"], lang: "en", label: element["lang"], format: lastPart }
             })
         }
+
         let resolutions: resolutionFormat[] = response.json["sources"].map((element) => ({
             res: element["quality"],
-            url: `${BACKEND}/proxy${element["url"]}`,
+            url: `https://ani.metsu.site/proxy${element["url"]}`,
             defaultSubtitles: subtitles.length > 0,
             hls: true,
             reqHeader: {
@@ -110,7 +117,7 @@ async function extractResolutions(episode: string, type: string, playerData: pla
 
 export default class Animetsu implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.2",
+        version: "1.3",
         name: "Animetsu.Live",
         icon: "https://animetsu.live/apple-touch-icon.png",
         author: "Owca525",
@@ -139,7 +146,7 @@ export default class Animetsu implements playerPluginFormat {
     
     extractPlayerData = async (_type: string, episode: string, id: string): Promise<playerData[]> => {
         try {
-            let response = await request(`${BACKEND}/api/anime/servers/${id}/${episode}`, { headers: HEADER });
+            let response = await request(preaperURL(`${BACKEND}/api/anime/servers/${id}/${episode}`), { headers: HEADER });
             if (!response.success || !response.json) {
                 console.warn("extractPlayerData/Animetsu request failed", response)
                 return []
@@ -171,7 +178,7 @@ export default class Animetsu implements playerPluginFormat {
             }
             if (!animeID) return
 
-            let response = await request(`${BACKEND}/api/anime/eps/${animeID}`, { headers: HEADER });
+            let response = await request(preaperURL(`${BACKEND}/api/anime/eps/${animeID}`), { headers: HEADER });
             if (!response.success || !response.json) {
                 console.warn("extractEpisodeList/Animetsu request failed", response)
                 return
@@ -184,6 +191,8 @@ export default class Animetsu implements playerPluginFormat {
                     title: element["name"]
                 }
             })
+
+            console.log(episodes)
 
             return {
                 player_id: animeID,
@@ -204,7 +213,7 @@ export default class Animetsu implements playerPluginFormat {
         return data.episodesData[0].episodes
     }
     searchAnime = async (name: string, _page: number, _params?: genresSearchFormat): Promise<cardData[]> => {
-        let response = await request(`${BACKEND}/api/anime/search/?query=${name}`, { headers: HEADER });
+        let response = await request(preaperURL(`${BACKEND}/api/anime/search/?query=${name}`), { headers: HEADER });
         if (!response.success || !response.json) return []
         let data: cardData[] = []
         for (let index = 0; index < response.json.results.length; index++) {
