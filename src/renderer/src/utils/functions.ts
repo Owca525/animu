@@ -1,8 +1,10 @@
 import {
     AnimeData,
+    animulistProps,
     cardData,
     containerData,
     ContextMenuProps,
+    FilterParams,
     homeData,
     informationPluginFormat,
     playerChapterList,
@@ -13,7 +15,7 @@ import {
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { getGlobalCache, setActiveThemes, setGlobalToken } from './stores/global';
+import { animulistData, getGlobalCache, setActiveThemes, setAnimulistData, setGlobalToken } from './stores/global';
 import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
@@ -23,6 +25,7 @@ import semver from "semver";
 import { v4 as uuidv4 } from 'uuid';
 import { toast, updateToast } from './context/ToastNotification';
 import { saveConfig } from './FilesManager/config';
+import { AnimuListSearch } from '@renderer/pages/home/homeUtils';
 
 export function decodeHtmlEntities(str: string) {
     const parser = new DOMParser();
@@ -185,35 +188,35 @@ export async function refetchHistory() {
     let data: homeData = getHomeCache()
     if (data.activePage != "global.history") return
     let history = getHistory()
-    if (data.data.sections[0].title == t("global.continuewatch") && data.data.sections.length != 2) {
-        setHomeNewData({ sections: [{ title: t("global.continuewatch"), data: history.continue, horizontal: false }] })
+    if (data.data.sections[0].title == "global.continuewatch" && data.data.sections.length != 2) {
+        setHomeNewData({ sections: [{ title: "global.continuewatch", data: history.continue, horizontal: false }] })
         return
     }
 
-    if (data.data.sections[0].title == t("global.history") && data.data.sections.length != 2) {
-        setHomeNewData({ sections: [{ title: t("global.history"), data: history.history as cardData[], horizontal: false }] })
+    if (data.data.sections[0].title == "global.history" && data.data.sections.length != 2) {
+        setHomeNewData({ sections: [{ title: "global.history", data: history.history as cardData[], horizontal: false }] })
         return
     }
 
-    if (data.data.sections[0].title == t("global.continuewatch") && data.data.sections[1].title == t("global.history")) {
+    if (data.data.sections[0].title == "global.continuewatch" && data.data.sections[1].title == "global.history") {
         setHomeNewData({
             sections: [
                 {
-                    title: t("global.continuewatch"),
+                    title: "global.continuewatch",
                     data: history.continue.slice(0, 20),
                     horizontal: true,
                     onTitleClick: async () => ({
-                        title: t("global.continuewatch"),
+                        title: "global.continuewatch",
                         data: history.continue,
                         horizontal: false,
                     })
                 },
                 {
-                    title: t("global.history"),
+                    title: "global.history",
                     data: history.history.slice(0, 20) as cardData[],
                     horizontal: true,
                     onTitleClick: async () => ({
-                        title: t("global.history"),
+                        title: "global.history",
                         data: history.history as any,
                         horizontal: false,
                     })
@@ -629,7 +632,7 @@ export async function getPluginsList() {
     return await window.api.plugins.list()
 }
 
-export async function getPluginInitialConfig(name: string, config: { [key: string]: any;}): Promise<{[key: string]: any;}> {
+export async function getPluginInitialConfig(name: string, config: { [key: string]: any; }): Promise<{ [key: string]: any; }> {
     if (window.api) return await window.api.plugins.getConfig(name, config)
     localStorage.setItem(name, JSON.stringify(config))
     return config
@@ -688,4 +691,119 @@ export function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): 
         console.error("Functions SheepFinderAnime2000 error", error)
         return animeList[0].player_ID
     }
+}
+
+export function dateToUnix(dateStr: string): number {
+    const date = new Date(dateStr);
+    return Math.floor(date.getTime() / 1000);
+}
+
+export async function addToAnimuList(animulist: animulistProps, anime: AnimeData, notification: boolean = false) {
+    if (getGlobalCache().incognito) return
+    await window.api.animulist.add({ AnimeData: { ...unwrap(anime), nextAiringEpisode: undefined }, animulist: unwrap(animulist) })
+    refreashAnimulist()
+    if (notification) toast(`Succesfully Added ${anime.title.romaji} to animulist`)
+}
+
+export async function removeFromAnimulist(id: string, notification: boolean = false) {
+    if (getGlobalCache().incognito) return
+    await window.api.animulist.delete(unwrap(id))
+    refreashAnimulist()
+    if (notification) toast(`Succesfully Removed From animulist`)
+}
+
+export async function updateDataInAnimulist(id: string, anime: { AnimeData: AnimeData; animulist: animulistProps }, notification: boolean = false) {
+    if (getGlobalCache().incognito) return
+    await window.api.animulist.update(unwrap(id), unwrap(anime))
+    refreashAnimulist()
+    if (notification) toast(`Succesfully Updated in animulist`)
+}
+
+export async function refreashAnimulist() {
+    setAnimulistData(await window.api.animulist.getDatabase())
+    const global = unwrap(getHomeCache())
+    if (global.activePage != "global.animulist") return
+
+    AnimuListSearch(global.search, global.filterTags)
+}
+
+export function unixToDateTime(unixTimestamp: number | undefined): string {
+    if (!unixTimestamp || unixTimestamp == 0) return t("player.other.unknown")
+    const date = new Date(unixTimestamp * 1000);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+export function convertHistoryToAnimuList() {
+    const history = unwrap(getHistory()).history.reverse()
+    if (history.length <= 0) return
+    const animulist = unwrap(animulistData())
+
+    for (let index = 0; index < history.length; index++) {
+        const element = history[index];
+        if (element.AnimeData.id.replaceAll(" ", "") == "") return
+        const finded = animulist.find((v) => v.AnimeData.id.toString() == element.AnimeData.id.toString())
+        if (finded) continue
+        if (!element.saveData.episode) continue
+        let status: animulistProps = {
+            status: "COMPLETED",
+            score: 0,
+            reapeat: 0,
+            startWatch: 0,
+            endWatch: 0,
+            added: dateToUnix(new Date().toString()),
+            lastUpdate: dateToUnix(new Date().toString())
+        }
+
+        if (element.AnimeData.episodes && parseInt(element.saveData.episode) < element.AnimeData.episodes)
+            status = { ...status, status: "CURRENT", startWatch: dateToUnix(new Date().toString()) }
+
+        addToAnimuList(status, element.AnimeData)
+    }
+}
+
+export function searchDataInCards(cards: cardData[], search: string, params: FilterParams | undefined) {
+    let results: cardData[] = []
+
+    results = cards.filter((item) =>
+        item.AnimeData.title["romaji"] ?
+            item.AnimeData.title["romaji"].toLowerCase().includes(search.toLowerCase()) :
+            false
+    )
+    results = [...results, ...cards.filter((item) =>
+        item.AnimeData.title["native"] ?
+            item.AnimeData.title["native"].toLowerCase().includes(search.toLowerCase()) :
+            false
+    )]
+    results = [...results, ...cards.filter((item) =>
+        item.AnimeData.title["english"] ?
+            item.AnimeData.title["english"].toLowerCase().includes(search.toLowerCase()) :
+            false
+    )]
+
+    console.log(params, results)
+
+    if (!params) return results.filter(
+        (item, index, self) =>
+            index === self.findIndex(t => t.AnimeData.id === item.AnimeData.id)
+    )
+
+    if (params["years"]) results = results.filter((val) => new String(val.AnimeData.seasonYear) == params["years"])
+    if (params["season"]) results = results.filter((val) => new String(val.AnimeData.season) == params["season"])
+    if (params["format"]) results = results.filter((val) => new String(val.AnimeData.format) == params["format"])
+    if (params["airing"]) results = results.filter((val) => new String(val.AnimeData.status) == params["airing"])
+    if (params["genres"]) results = results.filter((val) => [...new Set(val.AnimeData.genres)].includes(params["genres"]))
+    
+    return results.filter(
+        (item, index, self) =>
+            index === self.findIndex(t => t.AnimeData.id === item.AnimeData.id)
+    )
 }

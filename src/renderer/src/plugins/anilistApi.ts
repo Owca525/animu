@@ -1,5 +1,6 @@
-import { genYearsList, request } from "@renderer/utils/functions";
-import { AnimeData, cardData, containerData, genresSearchFormat, informationPluginFormat } from "@renderer/utils/types";
+import { genYearsList, request, unixToDateTime } from "@renderer/utils/functions";
+import { t } from "@renderer/utils/i18n";
+import { AnimeData, cardData, containerData, genres, genresSearchFormat, informationPluginFormat } from "@renderer/utils/types";
 
 const pageSize = 20
 
@@ -85,6 +86,9 @@ const animeData = `
           relationType
           node {
             id
+            format
+            type
+            status(version: 2)
             title {
               romaji
               english
@@ -94,7 +98,6 @@ const animeData = `
               extraLarge
               large
             }
-            bannerImage
           }
         }
       }
@@ -196,21 +199,22 @@ query(
 }
 `;
 
-// const graphicAiringAnime = `
-// query AiringAnimes($page: Int, $perPage: Int, $sort: [AiringSort], $airingAtGreater: Int, $airingAtLesser: Int) {
-//     Page(page: $page, perPage: $perPage) {
-//         airingSchedules(sort: $sort, airingAt_greater: $airingAtGreater, airingAt_lesser: $airingAtLesser) {
-//         id
-//         airingAt
-//         episode
+const graphicAiringAnime = `
+query AiringAnimes($page: Int, $perPage: Int, $sort: [AiringSort], $airingAtGreater: Int, $airingAtLesser: Int) {
+    Page(page: $page, perPage: $perPage) {
+        airingSchedules(sort: $sort, airingAt_greater: $airingAtGreater, airingAt_lesser: $airingAtLesser) {
+        id
+        airingAt
+        timeUntilAiring
+        episode
 
-//         media {
-//           ${animeData}
-//         }
-//       }
-//     }
-// }
-// `
+        media {
+          ${animeData}
+        }
+      }
+    }
+}
+`
 
 const graphicHomeApi = `
   query (
@@ -243,8 +247,9 @@ const graphicHomeApi = `
 const graphicApIDAnime = `
 query(
   $id: Int!
+  $type: MediaType
 ) {
-  Media(id: $id, type: ANIME) {
+  Media(id: $id, type: $type) {
     ${animeData}
   }
 }
@@ -294,7 +299,10 @@ function Convert(convert: any): cardData {
           id: element.node.id,
           title: element.node.title,
           coverImage: element.node.coverImage.extraLarge ? element.node.coverImage.extraLarge : element.node.coverImage.large,
-          relationType: element.relationType
+          relationType: element.relationType,
+          status: element["node"]["status"],
+          format: element["node"]["format"],
+          type: element["node"]["type"]
         })
       });
     }
@@ -392,12 +400,10 @@ export async function searchInAnilist(name: string, page: number, params?: genre
     if (name.replaceAll(" ", "") != "") variables = { ...variables, search: name }
 
     if (params) {
-      if (params) variables = { ...variables, genres: params.genres }
-      if (params.genres) variables = { ...variables, genres: params.genres }
       if (params.genres) variables = { ...variables, genres: params.genres }
       if (params.years) variables = { ...variables, seasonYear: parseInt(params.years) }
       if (params.seasons) variables = { ...variables, season: params.seasons.toUpperCase() }
-      if (params.format) variables = { ...variables, format: params.format.map((tmp) => tmp.toUpperCase().replaceAll(" ", "_")) }
+      if (params.format) variables = { ...variables, format: params.format.toUpperCase().replaceAll(" ", "_") }
       if (params.airing) variables = { ...variables, status: params.airing.toUpperCase().replaceAll(" ", "_") }
     }
 
@@ -432,7 +438,14 @@ export default class AnilistApi implements informationPluginFormat {
     version: "2.0",
     name: "AnilistApi",
     pageSize: pageSize,
-    searchOption: {
+    searchOption: [],
+    author: "Owca525",
+    urlWebsite: "https://anilist.co",
+    icon: "https://anilist.co/img/icons/icon.svg"
+  };
+
+  constructor() {
+    const options = {
       genres: [
         "Action",
         "Adventure",
@@ -458,29 +471,99 @@ export default class AnilistApi implements informationPluginFormat {
       years: genYearsList(1940),
       format: ["TV", "Movie", "TV Short", "special", "OVA", "ONA"],
       statuses: ["Releasing", "Finished", "Not Yet Released", "Cancelled"]
-    },
-    author: "Owca525",
-    urlWebsite: "https://anilist.co",
-    icon: "https://anilist.co/img/icons/icon.svg"
-  };
+    }
+
+    let newOptions: genres[] = [
+      {
+        type: "genres",
+        placeholder: "filter.placeholderGenres",
+        title: "filter.genres",
+        langPath: "anime_genres.",
+        options: options.genres.map(v => v.toLowerCase().replaceAll(" ", "_"))
+      },
+      {
+        type: "years",
+        title: "filter.year",
+        placeholder: "filter.placeholderYears",
+        langPath: "",
+        options: options.years
+      },
+      {
+        type: "season",
+        placeholder: "filter.placeholderSeason",
+        title: "filter.season",
+        langPath: "anime_seasons.",
+        options: options.seasons.map(v => v.toLowerCase().replaceAll(" ", "_"))
+      },
+      {
+        type: "format",
+        placeholder: "filter.placeholderFormat",
+        title: "filter.format",
+        langPath: "anime_formats.",
+        options: options.format.map(v => v.toLowerCase().replaceAll(" ", "_"))
+      },
+      {
+        type: "airing",
+        placeholder: "filter.placeholderAiring",
+        title: "filter.airing",
+        langPath: "anime_statuses.",
+        options: options.statuses.map(v => v.toLowerCase().replaceAll(" ", "_"))
+      },
+    ]
+
+    this.metadata = {
+      ...this.metadata,
+      searchOption: newOptions
+    }
+  }
 
   config: { [key: string]: any; } = {
     "Adult Mode": false,
     "Max Page Size": 20,
   };
-  // async schedule(context: { airingStart: number; airingEnd: number; }, callbacks: { onSuccess: (data: containerData) => void; onError: (error: string) => void; }) {
-  //   let week = getWeek()
-  //   console.log(week)
-  //   let variables = {
-  //     page: 1,
-  //     perPage: 50,
-  //     sort: ["TIME"],
-  //     airingAtGreater: week.startWeekUnix,
-  //     airingAtLesser: week.endWeekUnix
-  //   }
+  async schedule(airingStart: number, airingEnd: number): Promise<containerData> {
+    // let week = getWeek()
+    // console.log(week)
 
-  //   console.log(await sendPost(variables, graphicAiringAnime))
-  // }
+    const days = [t("week.sunday"), t("week.monday"), t("week.tuesday"), t("week.wednesday"), t("week.thursday"), t("week.friday"), t("week.saturday")];
+    console.log(airingStart, airingEnd)
+    let variables = {
+      page: 1,
+      perPage: 50,
+      sort: ["TIME"],
+      airingAtGreater: airingStart,
+      airingAtLesser: airingEnd
+    }
+
+    const date = new Date(unixToDateTime(airingStart))
+
+    let response = await sendPost(variables, graphicAiringAnime)
+    console.log(response)
+    if (!response.success || !response.json) return {
+      title: days[date.getDay()],
+      data: []
+    }
+
+    let data = response.json["data"]["Page"]["airingSchedules"].map((v) => {
+      const converted = Convert(v["media"])
+      return {
+        ...converted,
+        animeData: {
+          ...converted.AnimeData,
+          nextAiringEpisode: {
+            airingAt: v["airingAt"],
+            episode: v["episode"],
+            timeUntilAiring: v["timeUntilAiring"]
+          }
+        }
+      }
+    })
+
+    return {
+      title: days[date.getDay()],
+      data: data
+    }
+  }
 
   search = async (name: string, page: number, params?: genresSearchFormat) => {
     try {
@@ -538,11 +621,22 @@ export default class AnilistApi implements informationPluginFormat {
   }
   anime = async (context: { id: string; }) => {
     try {
-      let req = await sendPost({ id: context.id }, graphicApIDAnime)
+      let req = await sendPost({ id: context.id, type: "ANIME" }, graphicApIDAnime)
       if (!req.success || !req.json) return
       return Convert(req.json.data.Media).AnimeData
     } catch (error) {
       console.error("Uknown error in anime/anilistapi", error)
+      return
+    }
+  }
+
+  getManga = async (id: string) => {
+    try {
+      let req = await sendPost({ id: id, type: "MANGA" }, graphicApIDAnime)
+      if (!req.success || !req.json) return
+      return Convert(req.json.data.Media).AnimeData
+    } catch (error) {
+      console.error("Uknown error in getManga/anilistapi", error)
       return
     }
   }

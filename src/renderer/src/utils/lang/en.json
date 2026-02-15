@@ -19,7 +19,25 @@
         "incognitomode": "Incognito Mode: {{switch}}",
         "off": "Off",
         "on": "On",
-        "action": "Action"
+        "action": "Action",
+        "schedule": "Schedule",
+        "animulist": "AnimuList"
+    },
+    "search": {
+        "home": "Search Anime...",
+        "history": "Search History...",
+        "animulist": "Search in AnimuList...",
+        "schedule": "Search in Schedule..."
+    },
+    "animulist": {
+        "status": {
+            "CURRENT": "Watching",
+            "PLANNING": "Planning",
+            "COMPLETED": "Completed",
+            "REPEATING": "Rewatching",
+            "PAUSED": "Paused",
+            "DROPPED": "Dropped"
+        }
     },
     "initial": {
         "animu": "Animu is initializing",
@@ -74,8 +92,6 @@
     },
     "home": {
         "searching": "Searching: {{title}}",
-        "search": "Search Anime...",
-        "historySearch": "Search History...",
         "nothingfound": "Nothing Found Here",
         "error": "Error Occured",
         "trending_now": "Trending Now",
@@ -105,7 +121,8 @@
         "releasing": "Releasing",
         "finished": "Finished",
         "not_yet_released": "Not Yet Released",
-        "cancelled": "Cancelled"
+        "cancelled": "Cancelled",
+        "hiatus": "Hiatus"
     },
     "anime_relationtype": {
         "adaptation": "Adaptation",
@@ -131,14 +148,14 @@
         "fantasy": "Fantasy",
         "hentai": "Hentai",
         "horror": "Horror",
-        "mahoushoujo": "Mahou Shoujo",
+        "mahou_shoujo": "Mahou Shoujo",
         "mecha": "Mecha",
         "music": "Music",
         "mystery": "Mystery",
         "psychological": "Psychological",
         "romance": "romance",
         "sci-fi": "Sci-Fi",
-        "sliceoflife": "Slice of Life",
+        "slice_of_life": "Slice of Life",
         "sports": "Sports",
         "supernatural": "Supernatural",
         "thriller": "Thriller"
@@ -149,7 +166,11 @@
         "tv_short": "TV Short",
         "special": "Special",
         "ova": "OVA",
-        "ona": "ONA"
+        "ona": "ONA",
+        "one_shot": "One Shot",
+        "music": "Music",
+        "novel": "Novel",
+        "manga": "Manga"
     },
     "anime_source": {
         "lightnovel": "Light novel",

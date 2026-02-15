@@ -8,6 +8,7 @@ import {
   calculateZoomLevel,
   changeTheme,
   checkDate,
+  convertHistoryToAnimuList,
   detectPluginVersion,
   fetchPluginRepos,
   updateObjectConfig
@@ -25,7 +26,7 @@ import {
 } from 'solid-js';
 import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import { getConfig, setConfig } from './utils/stores/config';
-import { getGlobalCache, setGlobalHistory, setGlobalTheme, setIncognitoMode } from './utils/stores/global';
+import { getGlobalCache, setAnimulistData, setGlobalHistory, setGlobalTheme, setIncognitoMode } from './utils/stores/global';
 import { HashRouter, Route } from '@solidjs/router';
 import { getInformationPlugin, pluginManager, setPluginRepo } from './utils/stores/plugins';
 import { setHomeActivePage } from './utils/stores/home';
@@ -98,6 +99,7 @@ function App() {
     await checkPluginUpdate()
     await getInformationPlugin().initial()
     await pluginManager().initialPlugins()
+
     setInitation(false)
 
     detectPluginVersion()
@@ -164,7 +166,13 @@ function App() {
 
   function LoadConfig() {
     if (!window.api) return
-    const loadedConnfig = getConfig()
+    let loadedConnfig = getConfig()
+
+    if (loadedConnfig.animulist.historyConvert) {
+      convertHistoryToAnimuList()
+      loadedConnfig = updateObjectConfig("animulist.historyConvert", false, loadedConnfig)
+      saveConfig(loadedConnfig)
+    }
 
     // Loading theme
     const loadedTheme = getGlobalCache().loadedTheme
