@@ -328,7 +328,7 @@ function settings() {
                 (item, index, self) =>
                     index === self.findIndex(t => t[1].themeName === item[1].themeName)
             ))
-
+        
         setThemes(loadedTheme().filter((val) => ![...active.entries()].map((v) => v[1].themeName).includes(val.themeName)))
         changeTheme(active)
         handleChange("General.theme", unwrap([...activeThemes().entries()].map((val) => val[1].themeName)) as unknown as string)
@@ -346,7 +346,9 @@ function settings() {
                         [change]: update
                     }
                     await window.api.themes.writeConfig(unwrap(theme), unwrap(record))
-                    if (![...activeThemes().entries()].map((v) => v[1].themeName).includes(theme.themeName)) updateTheme(theme)
+
+                    const finded = [...activeThemes().entries()].map((v) => v[1].themeName)
+                    if (finded.find((v) => v == theme.themeName)) updateTheme(theme)
                 },
             }
         })
