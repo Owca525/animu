@@ -25,7 +25,8 @@
         "animu": "Animu is initializing",
         "theme": "Loading Theme",
         "config": "Loading Config",
-        "plugin": "Loading Plugin"
+        "plugin": "Loading Plugin",
+        "history": "Loading History"
     },
     "imageviewer": {
         "failedfetch": "Failed Fetch Image",

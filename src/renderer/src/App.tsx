@@ -43,7 +43,7 @@ import { pluginRepoExpanded, themeMetadata } from './utils/types';
 function App() {
   const { changeLanguage } = useI18n()
   const [isInitation, setInitation] = createSignal<boolean>(true)
-  const [initialState, setinitialState] = createSignal<{ text: string, plugin: boolean }>({ text: "Loading History", plugin: false })
+  const [initialState, setinitialState] = createSignal<{ text: string, plugin: boolean }>({ text: "initial.history", plugin: false })
 
   if (window.api) {
     createShortcut(["F12"], () => {
@@ -87,14 +87,14 @@ function App() {
       setConfig(JSON.parse(localStorage.getItem("config") as any))
       setGlobalHistory(JSON.parse(localStorage.getItem("history") as any))
     }
-    setinitialState({ text: t("initial.theme"), plugin: false })
+    setinitialState({ text: "initial.theme", plugin: false })
     if (window.api) setGlobalTheme(await window.api.themes.list())
 
-    setinitialState({ text: t("initial.config"), plugin: false })
+    setinitialState({ text: "initial.config", plugin: false })
     LoadConfig()
     setHomeActivePage("global.home")
 
-    setinitialState({ text: t("initial.plugin"), plugin: false })
+    setinitialState({ text: "initial.plugin", plugin: false })
     await checkPluginUpdate()
     await getInformationPlugin().initial()
     await pluginManager().initialPlugins()
@@ -200,7 +200,7 @@ function App() {
             <span class='animu-initial-text'>{t("initial.animu")}</span>
             <div class="animu-initial-state">
               <span class='material-symbols-outlined loading-animation'>progress_activity</span>
-              <span class='animu-initial-text'>{initialState().text}</span>
+              <span class='animu-initial-text'>{t(initialState().text)}</span>
             </div>
           </div>
         </main>
