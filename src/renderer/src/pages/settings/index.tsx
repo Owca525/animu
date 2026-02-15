@@ -328,7 +328,7 @@ function settings() {
                 (item, index, self) =>
                     index === self.findIndex(t => t[1].themeName === item[1].themeName)
             ))
-
+        
         setThemes(loadedTheme().filter((val) => ![...active.entries()].map((v) => v[1].themeName).includes(val.themeName)))
         changeTheme(active)
         handleChange("General.theme", unwrap([...activeThemes().entries()].map((val) => val[1].themeName)) as unknown as string)
@@ -346,7 +346,9 @@ function settings() {
                         [change]: update
                     }
                     await window.api.themes.writeConfig(unwrap(theme), unwrap(record))
-                    if (![...activeThemes().entries()].map((v) => v[1].themeName).includes(theme.themeName)) updateTheme(theme)
+
+                    const finded = [...activeThemes().entries()].map((v) => v[1].themeName)
+                    if (finded.find((v) => v == theme.themeName)) updateTheme(theme)
                 },
             }
         })
@@ -491,7 +493,7 @@ function settings() {
                                     <span class='settings-theme-span'>{t("settings.theme.active")}</span>
                                     <div class="settings-theme-container">
                                         <For each={[...activeThemes().entries()].reverse()}>
-                                            {([id, value]) => (<div class={`settings-button-theme ${value.themeName != "DarkerAnimu" && [...activeThemes().entries()].length > 2 ? "button" : ""}`} onclick={() => value.themeName != "DarkerAnimu" ? updateTheme(value, true, id) : ""}>
+                                            {([id, value]) => (<div class={`settings-button-theme ${value.themeName != "DarkerAnimu" && [...activeThemes().entries()].length > 2 ? "settings" : ""}`} onclick={() => value.themeName != "DarkerAnimu" ? updateTheme(value, true, id) : ""}>
                                                 {value.themeName}
                                                 <span class='settings-theme-button-span'>
                                                     <Show when={value.themeName != "DarkerAnimu" && [...activeThemes().entries()].length > 2}>
@@ -511,7 +513,7 @@ function settings() {
                                     <div class="settings-theme-container">
                                         <For each={themes()}>
                                             {(value) => (
-                                                <div class={`settings-button-theme ${value.options ? "button" : ""}`} onclick={() => updateTheme(value)}>
+                                                <div class={`settings-button-theme ${value.options ? "settings" : ""}`} onclick={() => updateTheme(value)}>
                                                     {value.themeName}
                                                     <span class='settings-theme-button-span'>
                                                         <Show when={value.options}>

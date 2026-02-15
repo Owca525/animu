@@ -769,9 +769,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         setFatalError(true)
         toast(message, { type: "error" });
 
-        // if (!currentPlayer) return
-        // let index = playerData().findIndex((element) => element.hostname == currentPlayer.hostname)
-        // if (playerData()[index + 1]) runNewPlayer(playerData()[index + 1])
+        if (!currentPlayer()) return
+        let index = playerData().findIndex((element) => element.hostname == currentPlayer()!.hostname)
+        if (playerData()[index + 1]) runNewPlayer(playerData()[index + 1])
     }
 
     function setTimeVideo(value: number) {
