@@ -62,18 +62,17 @@ export function convertSeconds(totalSeconds: number | undefined) {
     return { days, hours, minutes, seconds };
 }
 
-export function checkDate(date: string | number, type: "Every Day" | "Every Week" | "Every Month") {
-    const givenDate = new Date(date);
-    const currentDate = new Date();
-    const milliseconds = currentDate.getTime() - givenDate.getTime();
+export function checkDate(date: number, type: string) {
+    const currentDate = new Date().toString();
     switch (type) {
         case "Every Week":
-            return milliseconds >= 7 * 24 * 60 * 60 * 1000;
+            return calculateDays(date, dateToUnix(currentDate)) >= 7;
         case "Every Day":
-            return milliseconds >= 24 * 60 * 60 * 1000;
+            return calculateDays(date, dateToUnix(currentDate)) >= 1;
         case "Every Month":
-            return milliseconds >= (24 * 60 * 60 * 1000) * 30;
+            return calculateDays(date, dateToUnix(currentDate)) >= 30;
     }
+    return false
 }
 
 export function calculateZoomLevel(percentage: number): number {
@@ -599,7 +598,7 @@ export async function fetchPluginRepos() {
     }
     localStorage.setItem("pluginDatabase", JSON.stringify(tmp))
     setPluginRepo(tmp)
-    saveConfig(updateObjectConfig("plugins.lastTimeCheck", Math.floor(new Date().getTime() / 1000), config))
+    saveConfig(updateObjectConfig("plugins.lastTimeCheck", dateToUnix(new Date().toString()), config))
 }
 
 export async function setHomeData(wrapper?: () => Promise<homeData["data"] | containerData | undefined>, data?: homeData["data"]) {
@@ -806,4 +805,14 @@ export function searchDataInCards(cards: cardData[], search: string, params: Fil
         (item, index, self) =>
             index === self.findIndex(t => t.AnimeData.id === item.AnimeData.id)
     )
+}
+
+export function calculateDays(unix1: number, unix2: number): number {
+  const date1 = new Date(unix1 * 1000);
+  const date2 = new Date(unix2 * 1000);
+
+  date1.setHours(0, 0, 0, 0);
+  date2.setHours(0, 0, 0, 0);
+
+  return -((date2.getTime() - date1.getTime()) / 86400000);
 }

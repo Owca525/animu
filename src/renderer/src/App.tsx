@@ -9,6 +9,7 @@ import {
   changeTheme,
   checkDate,
   convertHistoryToAnimuList,
+  dateToUnix,
   detectPluginVersion,
   fetchPluginRepos,
   updateObjectConfig
@@ -197,7 +198,7 @@ function App() {
     if (!loadedConnfig.backup.enable) return
     if (!checkDate(loadedConnfig.backup.lastCheck, loadedConnfig.backup.check)) return
     CreateBackup()
-    saveConfig(updateObjectConfig("backup.lastCheck", new Date().getTime(), loadedConnfig))
+    saveConfig(updateObjectConfig("backup.lastCheck", dateToUnix(new Date().toString()), loadedConnfig))
     window.backend.refresh()
   }
 
@@ -240,14 +241,14 @@ async function checkPluginUpdate() {
   } catch (error) { console.warn("Error failed parsed pluginRepo Database", error) }
 
   if (config.plugins.pluginCheckType == "On Start" || tmpDatabase.length <= 0 || config.plugins.lastTimeCheck <= 0) return await fetchPluginRepos()
-  if (checkDate(config.plugins.lastTimeCheck, config.plugins.pluginCheckType as any)) await fetchPluginRepos()
+  if (checkDate(config.plugins.lastTimeCheck, config.plugins.pluginCheckType)) await fetchPluginRepos()
   else { setPluginRepo(tmpDatabase) }
 }
 
 async function runCheckUpdate() {
   let config = getConfig()
   if (config.update.type == "On Start") await checkUpdate()
-  if (checkDate(config.update.lastTime, config.update.type as any)) await checkUpdate()
+  if (checkDate(config.update.lastTime, config.update.type)) await checkUpdate()
 }
 
 export default App

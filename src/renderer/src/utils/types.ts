@@ -408,7 +408,7 @@ export interface SettingsConfig {
         playerDebug: boolean
     }
     update: {
-        lastTime: string
+        lastTime: number
         type: "On Start" | "Every Day" | "Every Week"
         enable: boolean
     }

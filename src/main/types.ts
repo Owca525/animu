@@ -118,7 +118,7 @@ export interface SettingsConfig {
         playerDebug: boolean
     }
     update: {
-        lastTime: string
+        lastTime: number
         type: "On Start" | "Every Day" | "Every Week"
         enable: boolean
     }
@@ -288,7 +288,7 @@ export const defaultConfig: SettingsConfig = {
         playerDebug: false
     },
     update: {
-        lastTime: "0",
+        lastTime: 0,
         type: "On Start",
         enable: true
     },
