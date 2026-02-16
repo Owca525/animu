@@ -321,6 +321,48 @@
   align-items: center;
 }
 
+.setttings-plugin-store-container {
+  display: flex;
+  padding: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.setttings-plugin-store-image {
+  width: 50px;
+}
+
+.setttings-plugin-store-author, .setttings-plugin-store-version, .setttings-plugin-store-type, .setttings-plugin-store-name {
+  background-color: var(--five-layer);
+  border-radius: 12px;
+  padding: 6px 8px;
+}
+
+.setttings-plugin-store-button {
+  background-color: var(--green-one) !important;
+  outline: none !important;
+}
+
+.setttings-plugin-store-button.installed {
+  background-color: var(--five-layer) !important;
+  cursor:default !important;
+}
+
+.setttings-plugin-store-button.installed:hover {
+  background-color: var(--five-layer) !important;
+}
+
+.setttings-plugin-store-button:hover {
+  color: var(--text) !important;
+  background-color: var(--five-layer) !important;
+}
+
+.settings-plugin-store-image-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* for very small window sizes */
 @media (max-width: 600px) {
 

@@ -8,6 +8,7 @@ import SeekBar from '@renderer/components/seekBar';
 import SettingsDrop from './components/settingsDrop';
 import SettingsInput from './components/settingsInput';
 import Sidebar from '@renderer/components/sidebar';
+import icon from '@resources/icon.png';
 import {
     calculateZoomLevel,
     changeTheme,
@@ -41,7 +42,7 @@ import {
 import { createShortcut } from '@solid-primitives/keyboard';
 import { DetectOldVersionHistory } from '@renderer/utils/FilesManager/history';
 import { getConfig, setConfig } from '@renderer/utils/stores/config';
-import { getInformationPlugin, getPlayerPLugin, getPluginList, pluginManager, setPluginPlayerList } from '@renderer/utils/stores/plugins';
+import { getInformationPlugin, getPlayerPLugin, getPluginList, getPluginRepo, pluginManager, setPluginPlayerList } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { saveConfig } from '@renderer/utils/FilesManager/config';
 import { showDialog } from '@renderer/utils/context/DialogContext';
@@ -53,6 +54,19 @@ import { useI18n } from '@renderer/utils/i18n';
 import { activeThemes, loadedTheme } from '@renderer/utils/stores/global';
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 import SettingsPlugin from './components/settingsPlugin';
+import semver from "semver";
+
+export type pluginRepoExpandedSettings = {
+    name: string,
+    file: string,
+    ver: string,
+    author: string,
+    type: "information" | "player"
+    urlWebsite: string,
+    icon?: string,
+    sha256: string,
+    description?: string
+} & { repoURL: string, installed: boolean, update: boolean }
 
 function settings() {
     const navigate = useNavigate();
@@ -328,7 +342,7 @@ function settings() {
                 (item, index, self) =>
                     index === self.findIndex(t => t[1].themeName === item[1].themeName)
             ))
-        
+
         setThemes(loadedTheme().filter((val) => ![...active.entries()].map((v) => v[1].themeName).includes(val.themeName)))
         changeTheme(active)
         handleChange("General.theme", unwrap([...activeThemes().entries()].map((val) => val[1].themeName)) as unknown as string)
@@ -415,6 +429,33 @@ function settings() {
     function changeYT_DLP(v: string) {
         handleChange("yt_dlp", v)
         window.api.yt_dlp.install(v)
+    }
+
+    function getDatabaseOfRepo(): pluginRepoExpandedSettings[] {
+        const repo = getPluginRepo()
+        const plugins = getPluginList()
+        const infoPlugin = getInformationPlugin().currentPlugin
+        
+        return repo.map((item) => {
+            if (item.type == "information") {
+                return { ...item, update: semver.gt(semver.coerce(item.ver) as any, semver.coerce(infoPlugin.metadata.version) as any), installed: true }
+            }
+
+            const finded = plugins.find((value) => value.metadata.name == item.name)
+            if (!finded) return { ...item, installed: false, update: false }
+
+            return {
+                ...item,
+                installed: true, 
+                update: semver.gt(semver.coerce(item.ver) as any, semver.coerce(finded.metadata.version) as any)
+            }
+        })
+    }
+
+    function getStatusStore(tmp: pluginRepoExpandedSettings): string {
+        if (!tmp.installed) return "settings.pluginstore.install"
+        if (tmp.update) return "settings.pluginstore.update"
+        return "settings.pluginstore.installed"
     }
 
     return (
@@ -1232,6 +1273,45 @@ function settings() {
                             }} />
                         </div>
                         <div class="settings-line"></div>
+                        <div class='settings-setting-container'>
+                            <SettingsDrop LeftHeader={t("settings.pluginstore.store")} content={
+                                <div class='settings-plugin-store-splitter'>
+                                    <For each={getDatabaseOfRepo()}>
+                                        {(item) => (
+                                            <div class='setttings-plugin-store-container'>
+                                                <div class='settings-plugin-store-image-container'>
+                                                    <img src={item.icon ? item.icon : icon} class='setttings-plugin-store-image' />
+                                                    <span class='setttings-plugin-store-name'>{item.name}</span>
+                                                </div>
+                                                <span class='setttings-plugin-store-author'>{item.author}</span>
+                                                <span class='setttings-plugin-store-version'>{item.ver}</span>
+                                                <span class='setttings-plugin-store-type'>{t(`settings.extensions.${item.type}`)}</span>
+                                                <Button 
+                                                    content={t(getStatusStore(item))} 
+                                                    ButtonClass={`setttings-plugin-store-button ${item.installed ? "installed" : ""}`}
+                                                    onClick={async () => {
+                                                        if (!item.update && item.installed) return
+                                                        await window.api.plugins.installUpdate(item)
+
+                                                        await fetchPluginRepos()
+                                                        await detectPluginVersion(true)
+                                                        await getInformationPlugin().initial()
+                                                        await pluginManager().initialPlugins()
+                                                        const plugin = getPlayerPLugin()
+                                                        const playerPluginList = getPluginList().map((pl) => {
+                                                            if (!plugin) return { active: false, plugin: pl }
+                                                            return { active: plugin.metadata.name == pl.metadata.name, plugin: pl }
+                                                        })
+                                                        setpluginList([{ active: true, plugin: getInformationPlugin().currentPlugin }, ...playerPluginList])
+                                                    }}
+                                                />
+                                            </div>
+                                        )}
+                                    </For>
+                                </div>
+                            } />
+                        </div>
+                        <div class="settings-line"></div>
                         <div class="settings-container-extensions-menu">
                             <span class='settings-container-title'>{t("settings.extensions.installed")}</span>
                             <div class="settings-container-extensions">
@@ -1243,6 +1323,7 @@ function settings() {
                                     )}
                                 </For>
                             </div>
+
                             <Show when={hiddenPluginList().length > 0}>
                                 <span class='settings-container-title'>{t("settings.extensions.hidden")}</span>
                                 <div class="settings-container-extensions">

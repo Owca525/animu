@@ -25,7 +25,8 @@
     "animu": "Инициализация Аниму",
     "theme": "Загрузка Темы",
     "config": "Загрузка Конфигурации",
-    "plugin": "Загрузка Плагина"
+    "plugin": "Загрузка Плагина",
+    "history": "Загрузка Истории"
   },
   "imageviewer": {
     "failedfetch": "Не удалось загрузить изображение",
@@ -236,6 +237,12 @@
   "settings": {
     "turnDeveloper": "Включить режим разработчика",
     "yt-dlp": "yt-dlp Версия",
+    "pluginstore": {
+      "store": "Plugin Store",
+      "install": "Install",
+      "installed": "Installed",
+      "update": "Update"
+    },
     "theme": {
       "active": "Активная тема",
       "loaded": "Загруженная тема"
