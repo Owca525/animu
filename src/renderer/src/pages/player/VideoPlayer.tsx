@@ -586,7 +586,11 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (durrationTime() > 10 && currentTime() > durrationTime() - parseInt(config.History.continue.MaximizeTimeSave.toString()) && anime_data.animulist) {
             if (anime_data.AnimeData.episodes != undefined && anime_data.animulist.status == "CURRENT" && temp.episode.toString() == anime_data.AnimeData.episodes.toString()) {
                 updateDataInAnimulist(anime_data.AnimeData.id,  {
-                    AnimeData: anime_data.AnimeData,
+                    AnimeData: {
+                        ...anime_data.AnimeData,
+                        recommendations: undefined,
+                        nextAiringEpisode: undefined
+                    },
                     animulist: {
                         ...anime_data.animulist,
                         status: "COMPLETED",
@@ -599,8 +603,13 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         if (currentTime() <= parseInt(config.History.continue.MinimalTimeSave.toString())) return
         let futureHistory = {
-            AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
+            AnimeData: { 
+                ...anime_data.AnimeData, 
+                nextAiringEpisode: undefined,
+                recommendations: undefined
+            },
             saveData: {
+                ...anime_data.saveData,
                 pluginName: anime_data.saveData.pluginName,
                 last_Time: event.currentTarget.currentTime,
                 episode: temp.episode,

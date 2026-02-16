@@ -1,6 +1,6 @@
 import path from "path"
 import { newConfigPath } from "."
-import { animulistData } from "./types"
+import { AnimeData, animulistData } from "./types"
 import { ipcMain } from "electron"
 import fs from "fs"
 
@@ -24,7 +24,7 @@ function saveToDatabase(data: animulistData[]) {
 
 ipcMain.handle("animulist:saveToDatabase", async (_, data: animulistData) => {
     let database = checkDatabase()
-    database.unshift(data)
+    database.unshift({ ...data, AnimeData: { ...data.AnimeData, nextAiringEpisode: undefined, recommendations: undefined } })
     saveToDatabase(database.filter(
         (item, index, self) =>
             index === self.findIndex(i => i.AnimeData.id === item.AnimeData.id)
@@ -34,8 +34,21 @@ ipcMain.handle("animulist:deleteFromDatabase", async (_, id: string) => {
     let database = checkDatabase()
     saveToDatabase(database.filter((v) => v.AnimeData.id != id))
 });
-ipcMain.handle("animulist:updateDatabase", async (_, id, anime) => {
+ipcMain.handle("animulist:updateDatabase", async (_, id, anime: { AnimeData: AnimeData; animulist: any }) => {
     let database = checkDatabase()
-    saveToDatabase(database.map((v) => v.AnimeData.id == id ? anime : v))
+    saveToDatabase(database.map((v) => v.AnimeData.id == id ? { ...anime, 
+        AnimeData: { 
+            ...anime.AnimeData,
+            nextAiringEpisode: undefined,
+            recommendations: undefined
+        }
+    } : {
+        ...v,
+        AnimeData: {
+            ...v.AnimeData,
+            nextAiringEpisode: undefined,
+            recommendations: undefined
+        }
+    }))
 });
 ipcMain.handle("animulist:getAllInformation", async (_) => checkDatabase());

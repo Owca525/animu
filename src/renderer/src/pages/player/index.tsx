@@ -96,7 +96,7 @@ const player = () => {
         changeTitleAnimu(`Animu - ${anime_data.data.title.romaji}`)
         SaveHistory({
             saveData: {
-                pluginName: anime_data.save?.pluginName ? anime_data.save.pluginName : "",
+                ...anime_data.save,
                 last_Time: anime_data.save.last_Time,
                 isStarted: anime_data.save.last_Time == 0,
                 type: extractionData().type,
@@ -104,7 +104,8 @@ const player = () => {
             },
             AnimeData: {
                 ...anime_data.data,
-                nextAiringEpisode: undefined
+                nextAiringEpisode: undefined,
+                recommendations: undefined
             }
         })
 
@@ -117,7 +118,11 @@ const player = () => {
             endWatch: 0,
             added: dateToUnix(new Date().toString()),
             lastUpdate: dateToUnix(new Date().toString())
-        }, anime_data.data)
+        }, {
+            ...anime_data.data,
+            nextAiringEpisode: undefined,
+            recommendations: undefined
+        })
     })
 
     function showErrorDialog() {

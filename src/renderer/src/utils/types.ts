@@ -168,6 +168,7 @@ export interface indentityPlayer {
     episode: string
     type: string
     isStarted?: boolean
+    lastAnimeDataUpdate?: number
 }
 
 export interface animulistProps {

@@ -5,10 +5,12 @@ import Dropdown from '@renderer/components/dropDown';
 import { AnimeData, animeOpeningsFormat, animulistProps, cardData, ContextMenuProps, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
 import {
     addToAnimuList,
+    calculateDays,
     changeTitleAnimu,
     convertDateToFormattedString,
     convertSeconds,
     CreateContextMenuOptions,
+    dateToUnix,
     decodeHtmlEntities,
     getGradientColor,
     openUrlFolder,
@@ -47,6 +49,7 @@ import RelationCard from './components/relationCard';
 import ButtonGroup from '../settings/components/buttonGroup';
 import MiniPlayer from '@renderer/components/miniPlayer';
 import { requestAnimeMedia } from '@renderer/utils/animeThemes';
+import { updateHistoryData } from '@renderer/utils/FilesManager/history';
 
 function information() {
     const { t } = useI18n()
@@ -120,9 +123,41 @@ function information() {
         ])
     }
 
+    function checkAnimeFetching() {
+        const stopRequestEveryTime = false // TODO: ADD NEW SETTINGS
+        if (!tempData().saveData) return
+        const tmpsave = unwrap(tempData().saveData)
+        if (tempData().anime.status == "RELEASING") {
+            setTmpData({
+                ...unwrap(tempData()),
+                saveData: {
+                    ...tmpsave,
+                    lastAnimeDataUpdate: dateToUnix(new Date().toString())
+                }
+            } as any)
+            return FetchAnimeForinformation()
+        }
+        if (stopRequestEveryTime) return
+
+        const lastTime = tempData().saveData?.lastAnimeDataUpdate
+        setTmpData({
+            ...unwrap(tempData()),
+            saveData: {
+                ...tmpsave,
+                lastAnimeDataUpdate: dateToUnix(new Date().toString())
+            }
+        } as any)
+        if (stopRequestEveryTime && !lastTime || calculateDays(lastTime as number, dateToUnix(new Date().toString())) >= 1) {
+            return FetchAnimeForinformation()
+        }
+        return FetchAnimeForinformation()
+    }
+
     function initialInformation() {
         changeTitleAnimu(`Animu - ${tempData().anime.title.romaji}`)
         generateAnimeForContextMenu()
+
+        checkAnimeFetching()
 
         if (tempData().saveData && tempData().anime.status == "RELEASING") FetchAnimeForinformation()
 
@@ -188,7 +223,9 @@ function information() {
         const resp = await getInformationPlugin().anime(tempData().anime.id)
         if (!resp) return setFetchingAnime(false)
         setFetchingAnime(false)
+
         setTmpData((prev) => ({ ...prev, anime: resp }))
+        updateHistoryData(tempData().anime.id, { AnimeData: resp, saveData: unwrap(tempData().saveData) })
         if (tempData().anime.nextAiringEpisode?.timeUntilAiring) setSecondsLeft({
             left: tempData().anime.nextAiringEpisode!.timeUntilAiring,
             converted: convertSeconds(tempData().anime.nextAiringEpisode!.timeUntilAiring)
@@ -395,7 +432,7 @@ function information() {
 
                         <div class="information-info">
                             <Switch>
-                                <Match when={fetchingAnime()}>
+                                <Match when={fetchingAnime() && tempData().anime.status == "RELEASING"}>
                                     <div class="information-info-content loading">
                                         <span class='material-symbols-outlined loading-animation icon'>progress_activity</span>
                                     </div>

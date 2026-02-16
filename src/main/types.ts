@@ -174,6 +174,12 @@ export interface AnimeData {
     id: string
     malID?: string
     trailer?: { id: string, site: string } | undefined
+    recommendations?: {
+        id: number,
+        title: { english?: string, native: string, romaji: string }
+        bannerImage?: string
+        coverImage: string
+    }[]
 }
 
 export interface indentityPlayer {

@@ -764,8 +764,12 @@ export function convertHistoryToAnimuList() {
 
         if (element.AnimeData.episodes && parseInt(element.saveData.episode) < element.AnimeData.episodes)
             status = { ...status, status: "CURRENT", startWatch: dateToUnix(new Date().toString()) }
-
-        addToAnimuList(status, element.AnimeData)
+        
+        addToAnimuList(status, {
+            ...element.AnimeData,
+            nextAiringEpisode: undefined,
+            recommendations: undefined
+        })
     }
 }
 
