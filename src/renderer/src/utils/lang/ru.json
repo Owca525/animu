@@ -238,10 +238,10 @@
     "turnDeveloper": "Включить режим разработчика",
     "yt-dlp": "yt-dlp Версия",
     "pluginstore": {
-      "store": "Plugin Store",
-      "install": "Install",
-      "installed": "Installed",
-      "update": "Update"
+      "store": "Магазин плагинов",
+      "install": "Установить",
+      "installed": "Установлено",
+      "update": "Обновить"
     },
     "theme": {
       "active": "Активная тема",
