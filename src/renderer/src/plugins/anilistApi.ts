@@ -220,6 +220,8 @@ const graphicHomeApi = `
   query (
     $season: MediaSeason,
     $seasonYear: Int,
+    $nextSeason: MediaSeason,
+    $nextYear: Int
     $isAdult: Boolean
   ) {
     trending: Page(page: 1, perPage: ${pageSize}) {
@@ -229,6 +231,11 @@ const graphicHomeApi = `
     }
     season: Page(page: 1, perPage: ${pageSize}) {
       media(season: $season, seasonYear: $seasonYear, sort: POPULARITY_DESC, type: ANIME, isAdult: $isAdult) {
+        ...media
+      }
+    }
+    nextSeason: Page(page: 1, perPage: ${pageSize}) {
+      media(season: $nextSeason, seasonYear: $nextYear, sort: POPULARITY_DESC, type: ANIME, isAdult: $isAdult) {
         ...media
       }
     }
@@ -351,8 +358,10 @@ function getSeasonFromDate() {
   const now = new Date();
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
+  const list = ["WINTER", "SPRING", "SUMMER", "FALL"]
 
   let season: string;
+  let nextSeason: string = list[0];
 
   if (month >= 1 && month <= 3) {
     season = "WINTER";
@@ -364,7 +373,10 @@ function getSeasonFromDate() {
     season = "FALL";
   }
 
-  return { season, seasonYear: year };
+  const finded = list.findIndex((v) => season == v)
+  if (list.length-1 > list.findIndex((v) => season == v)) nextSeason = list[finded+1]
+
+  return { season, nextSeason, seasonYear: year, nextYear: finded == 3 ? year+1 : year };
 }
 
 // async function getGenres(): Promise<string[]> {
@@ -585,14 +597,20 @@ export default class AnilistApi implements informationPluginFormat {
   home = async () => {
     try {
       let season = getSeasonFromDate()
-      let data = await sendPost({ season: season.season, seasonYear: season.seasonYear, isAdult: this.config["Adult Mode"] }, graphicHomeApi.replaceAll("20", this.config["Max Page Size"]))
+      let data = await sendPost({
+        season: season.season,
+        seasonYear: season.seasonYear,
+        isAdult: this.config["Adult Mode"],
+        nextSeason: season.nextSeason,
+        nextYear: season.nextYear,
+      }, graphicHomeApi.replaceAll("20", this.config["Max Page Size"]))
       if (!data.success || !data.json) return
       let home: containerData[] = [
         {
           title: "home.trending_now",
           data: data.json.data.trending.media.map((anime) => Convert(anime)),
           horizontal: true,
-          onTitleClick: async () => await fetchCategory({...tendingAnime, isAdult: this.config["Adult Mode"]}, "home.trending_now"),
+          onTitleClick: async () => await fetchCategory({ ...tendingAnime, isAdult: this.config["Adult Mode"] }, "home.trending_now"),
         },
         {
           title: "home.popular_in_this_season",
@@ -607,10 +625,22 @@ export default class AnilistApi implements informationPluginFormat {
           }, "home.popular_in_this_season"),
         },
         {
+          title: "Upcoming Next Season",
+          data: data.json.data.nextSeason.media.map((anime) => Convert(anime)),
+          horizontal: true,
+          onTitleClick: async () => await fetchCategory({
+            page: 1,
+            season: season.nextSeason,
+            seasonYear: season.nextYear,
+            type: "ANIME",
+            isAdult: this.config["Adult Mode"]
+          }, "Upcoming Next Season"),
+        },
+        {
           title: "home.all_time_popular",
           data: data.json.data.popular.media.map((anime) => Convert(anime)),
           horizontal: true,
-          onTitleClick: async () => await fetchCategory({...allPopular, isAdult: this.config["Adult Mode"]}, "home.all_time_popular"),
+          onTitleClick: async () => await fetchCategory({ ...allPopular, isAdult: this.config["Adult Mode"] }, "home.all_time_popular"),
         }
       ]
       return { sections: home, topCards: home[0] }
