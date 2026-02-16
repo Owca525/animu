@@ -25,7 +25,8 @@
     "animu": "Animu is initializing",
     "theme": "Loading Theme",
     "config": "Loading Config",
-    "plugin": "Loading Plugin"
+    "plugin": "Loading Plugin",
+    "history": "Ładowanie Histori"
   },
   "search": {
     "home": "Szukaj Anime...",
@@ -244,6 +245,12 @@
   "settings": {
     "turnDeveloper": "Włącz tryb deweloperski",
     "yt-dlp": "yt-dlp Versions",
+    "pluginstore": {
+      "store": "Plugin Store",
+      "install": "Install",
+      "installed": "Installed",
+      "update": "Update"
+    },
     "theme": {
       "active": "Active Theme",
       "loaded": "Loaded Theme"
