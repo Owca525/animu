@@ -265,7 +265,7 @@
 }
 
 .information-loading {
-    font-size: 3em !important;
+    font-size: 3.2em !important;
     animation: spin 1s linear infinite;
 }
 
@@ -275,6 +275,13 @@
     justify-content: center;
     align-items: center;
     gap: 12px;
+    padding: 20px 0px;
+    user-select: none;
+    font-size: 1.2em;
+}
+
+.information-error {
+    font-size: 2em !important;
 }
 
 .information-select-episode {
