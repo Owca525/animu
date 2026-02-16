@@ -249,10 +249,10 @@
     "turnDeveloper": "開啟開發者工具",
     "yt-dlp": "yt-dlp 版本",
     "pluginstore": {
-      "store": "Plugin Store",
-      "install": "Install",
-      "installed": "Installed",
-      "update": "Update"
+      "store": "外掛商店",
+      "install": "安裝",
+      "installed": "已安裝",
+      "update": "更新"
     },
     "theme": {
       "active": "目前使用的主題",
