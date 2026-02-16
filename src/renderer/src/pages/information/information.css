@@ -86,7 +86,7 @@
 }
 
 .information-top {
-    width: 80%;
+    width: 88%;
     height: fit-content;
     display: flex;
     margin-top: clamp(202px, 43% - 22px, 35vh - 25px);
@@ -149,7 +149,7 @@
 
 .information-bottom {
     margin-top: 20px;
-    width: 80%;
+    width: 88%;
     display: flex;
     flex-direction: row;
     gap: 30px;
