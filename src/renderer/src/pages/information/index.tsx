@@ -425,7 +425,7 @@ function information() {
                                             <div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>
                                         </Match>
                                         <Match when={episodeResponse.data() == undefined}>
-                                            <div class="information-loading-container"><span class="information-error material-symbols-outlined">search_off</span>Nothing Found</div>
+                                            <div class="information-loading-container"><span class="information-error material-symbols-outlined">search_off</span>{t("global.notFound")}</div>
                                         </Match>
                                         <Match when={episodeResponse.data()}>
                                             <For each={episodeResponse.data()?.episodesData} fallback={<div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}>
