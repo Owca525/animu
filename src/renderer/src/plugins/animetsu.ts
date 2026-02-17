@@ -13,7 +13,6 @@ const HEADER = {
 
 function preaperURL(str: string) {
     if (!str) return str
-    console.log(str.replaceAll("//", "/").replace("/", "https://"))
     return str.replaceAll("//", "/").replace("https:/", "https://")
 }
 
@@ -117,7 +116,7 @@ async function extractResolutions(episode: string, type: string, playerData: pla
 
 export default class Animetsu implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.3",
+        version: "1.4",
         name: "Animetsu.Live",
         icon: "https://animetsu.live/apple-touch-icon.png",
         author: "Owca525",
@@ -158,8 +157,8 @@ export default class Animetsu implements playerPluginFormat {
                     hostname: element["id"],
                     defaultHost: element["default"],
                     resolution: [],
-                    extractResolution: async (playerData: playerDataExtended) => await extractResolutions(episode, "sub", playerData, id),
-                    isDubbing: async (playerData: playerDataExtended) => (await extractResolutions(episode, "dub", playerData, id))?.resolution
+                    extractResolution: async (playerData: playerDataExtended) => await extractResolutions(playerData.episode.currentEpisode, "sub", playerData, id),
+                    isDubbing: async (playerData: playerDataExtended) => (await extractResolutions(playerData.episode.currentEpisode, "dub", playerData, id))?.resolution
                 })
             }
 

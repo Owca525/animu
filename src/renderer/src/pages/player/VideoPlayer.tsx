@@ -332,7 +332,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         let currentplayer = data
         setPlayer(() => currentplayer)
         if (currentplayer.extractResolution) {
-            console.warn(temp, anime_data)
             if (currentExtractionRes().toast != "") removeToast(currentExtractionRes().toast)
 
             const tmpID = uuidv4()
