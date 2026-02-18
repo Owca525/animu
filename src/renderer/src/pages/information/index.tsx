@@ -592,7 +592,7 @@ function information() {
                                                     <div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>
                                                 </Match>
                                                 <Match when={episodeResponse.data() == undefined}>
-                                                    <div class="information-loading-container"><span class="information-error material-symbols-outlined">search_off</span>Nothing Found</div>
+                                                    <div class="information-loading-container"><span class="information-error material-symbols-outlined">search_off</span>{t("global.notFound")}</div>
                                                 </Match>
                                                 <Match when={episodeResponse.data()}>
                                                     <For each={episodeResponse.data()?.episodesData} fallback={<div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}>
@@ -673,11 +673,20 @@ function information() {
                 <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
             </main>
             <Show when={showWrong()}>
-                <ContainerWrong name={tempData().anime.title.romaji} refetchfunc={(id?: string) => { setshowWrong(() => false); setCurrentId(id); episodeResponse.Refetch([tempData(), id, currentPlugin()]) }} exitfunc={() => setshowWrong(() => false)} />
+                <ContainerWrong name={tempData().anime.title.romaji} refetchfunc={(id?: string) => { 
+                        setshowWrong(false); 
+                        setCurrentId(id); 
+                        episodeResponse.Refetch([tempData(), id, currentPlugin()]) 
+                    }} 
+                    exitfunc={() => setshowWrong(() => false)} 
+                />
             </Show>
 
             <Show when={showImages()}>
-                <ImageViewer files={[tempData().anime.coverImage as string, tempData().anime.bannerImage as string].filter((value) => value != null)} disable={() => setShowImages(false)} />
+                <ImageViewer 
+                    files={[tempData().anime.coverImage as string, tempData().anime.bannerImage as string].filter((value) => value != null)} 
+                    disable={() => setShowImages(false)} 
+                />
             </Show>
         </>
     )

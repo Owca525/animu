@@ -13,7 +13,6 @@ const HEADER = {
 
 function preaperURL(str: string) {
     if (!str) return str
-    console.log(str.replaceAll("//", "/").replace("/", "https://"))
     return str.replaceAll("//", "/").replace("https:/", "https://")
 }
 
@@ -77,7 +76,7 @@ async function extractResolutions(episode: string, type: string, playerData: pla
         // oppai?server=${server}&id=${id}&num=${episode}&subType=${type}
         if (!server) return undefined
         let response = await request(preaperURL(`${BACKEND}/api/anime/oppai/${server}/${episode}?server=default&source_type=${type}`), { headers: HEADER });
-        if (!response.success || !response.json) return undefined
+        if (!response.success || !response.json || response.text == "{}") return undefined
         let subtitles: playerSubtitlesFormat[] = []
         if (response.json["subtitles"]) {
             subtitles = response.json["subtitles"].map((element) => {
@@ -111,13 +110,13 @@ async function extractResolutions(episode: string, type: string, playerData: pla
         }
     } catch (error) {
         console.error("extractResolutions/Animetsu", error)
-        return
+        return undefined
     }
 }
 
 export default class Animetsu implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.3",
+        version: "1.5",
         name: "Animetsu.Live",
         icon: "https://animetsu.live/apple-touch-icon.png",
         author: "Owca525",
@@ -158,8 +157,8 @@ export default class Animetsu implements playerPluginFormat {
                     hostname: element["id"],
                     defaultHost: element["default"],
                     resolution: [],
-                    extractResolution: async (playerData: playerDataExtended) => await extractResolutions(episode, "sub", playerData, id),
-                    isDubbing: async (playerData: playerDataExtended) => (await extractResolutions(episode, "dub", playerData, id))?.resolution
+                    extractResolution: async (playerData: playerDataExtended) => await extractResolutions(playerData.episode.currentEpisode, "sub", playerData, id),
+                    isDubbing: async (playerData: playerDataExtended) => (await extractResolutions(playerData.episode.currentEpisode, "dub", playerData, id))?.resolution
                 })
             }
 
@@ -187,12 +186,10 @@ export default class Animetsu implements playerPluginFormat {
             let episodes = response.json.map((element) => {
                 return {
                     ep: element["ep_num"],
-                    img: `${BACKEND}/proxy${element["img"]}`,
+                    img: `https://ani.metsu.site/proxy${element["img"]}`,
                     title: element["name"]
                 }
             })
-
-            console.log(episodes)
 
             return {
                 player_id: animeID,

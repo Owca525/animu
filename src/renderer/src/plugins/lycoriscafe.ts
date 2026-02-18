@@ -86,6 +86,7 @@ function convertToAnimeData(data: any): AnimeData | undefined {
                 romaji: data["title"]
             },
             id: data["id"],
+            player_ID: data["id"], 
             format: data["format"],
             season: data["season"],
             seasonYear: data["seasonYear"],
@@ -110,7 +111,7 @@ async function requestToApi(anime_id: string): Promise<{ data: any } | undefined
 
 export default class LycorisCafe implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.2",
+        version: "1.3",
         name: "Lycoris.cafe",
         author: "Owca525",
         icon: "https://www.lycoris.cafe/favicon.ico",

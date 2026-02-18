@@ -21,6 +21,7 @@ interface playerSettingsProps {
     state: boolean
     resDubbing?: boolean
     turnDubbing?: (value: boolean) => void
+    isDubbingOn?: boolean
 }
 
 export default function PlayerSettings(props: playerSettingsProps) {
@@ -60,6 +61,7 @@ export default function PlayerSettings(props: playerSettingsProps) {
                         isGray={props.audioTrack.length <= 1}
                         type={props.resDubbing ? "switch" : undefined}
                         turnDubbing={props.resDubbing ? props.turnDubbing : undefined}
+                        isDubbingOn={props.resDubbing ? props.isDubbingOn : undefined}
                     />
                     <PlayerSettingsButton onClick={() => props.subtitles.length > 1 ? setcurrentSettings("subtitles") : ""}
                         icon="subtitles"
