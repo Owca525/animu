@@ -98,6 +98,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [isFullscreen, setIsFullscreen] = createSignal<boolean>(false)
     const [isCleanup, setCleanup] = createSignal<boolean>(false)
     const [playerHeadersTMP, setPLayerHeaderTMP] = createSignal<Map<string, string>>(new Map())
+    const [isDubbingOn, setIsDubbingOn] = createSignal<boolean>(false)
 
     // Resolution
     const [ListResolution, setListResolution] = createSignal<resoltionFormatExtended[]>([])
@@ -1131,14 +1132,16 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         return formatTime(newTime)
     }
 
-    async function changeToDubbing(value: boolean) {
+    async function changeToDubbing() {
         const player = currentPlayer()
         if (!player) return
+        console.log(isDubbingOn())
 
-        if (value && player?.dubResolution) {
+        if (isDubbingOn() == false && player?.dubResolution) {
             setListResolution(player.dubResolution)
             setNewResolution(player.dubResolution[0])
-        } else if (value && player.isDubbing) {
+            setIsDubbingOn(true)
+        } else if (isDubbingOn() == false && player.isDubbing) {
             const idToast = toast(t("notification.fetchingdub"), { type: "loading", removeTimer: true })
             const tmp = await fetchResolutions({
                 ...player,
@@ -1157,9 +1160,11 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 setListResolution(tmp.data)
                 setNewResolution(tmp.data[0])
             } else updateToast(idToast, t("notification.faileddub"), { type: "error", removeTimer: false })
+            setIsDubbingOn(true)
         } else {
             setListResolution(player.resolution)
             setNewResolution(player.resolution[0])
+            setIsDubbingOn(false)
         }
     }
 
@@ -1319,6 +1324,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                                 </Show>
                             </div>
                             <PlayerSettings
+                                isDubbingOn={isDubbingOn()}
                                 state={currentSettings()}
                                 turnDubbing={changeToDubbing}
                                 resDubbing={currentPlayer() && currentPlayer()?.isDubbing ? true : false}

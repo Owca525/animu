@@ -1,4 +1,3 @@
-import { Component } from "solid-js";
 import "./css/checkBox.css";
 
 interface CheckBoxProps {
@@ -7,7 +6,7 @@ interface CheckBoxProps {
   disable?: boolean
 }
 
-const CheckBox: Component<CheckBoxProps> = (props) => {
+export default function CheckBox(props: CheckBoxProps) {
   return (
     <input
       tabIndex={-1}
@@ -15,9 +14,10 @@ const CheckBox: Component<CheckBoxProps> = (props) => {
       type="checkbox"
       checked={props.checked}
       disabled={props.disable}
-      onChange={(event) => props.onChecked?.(event.currentTarget.checked)}
+      onclick={(event) => {
+        event.stopPropagation()
+        props.onChecked?.(event.currentTarget.checked)
+      }}
     />
   );
 };
-
-export default CheckBox;
