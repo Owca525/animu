@@ -156,8 +156,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             if (element.defaultHost) defaulthost = element
         }
 
-        shaka.polyfill.installAll()
-
         shaka.net.NetworkingEngine.registerScheme("https", (type, requests) => {
             const controller = new AbortController();
 
@@ -1472,7 +1470,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     currentHost={currentPlayer() ? currentPlayer()?.hostname as string : "Unknown"}
                     currentResolution={currentResolution() ? currentResolution()?.res as string : "Unknown"}
                     currentSettings={currentSettings()}
-                    time={time}
                     timeNextEpisode={timeNextEpisode()}
                     episode={{ ep: temp.episode, type: temp.type }}
                     episodes={temp.episodes}

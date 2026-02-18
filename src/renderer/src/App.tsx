@@ -38,6 +38,7 @@ import './themes/darkerAnimu/main.css';
 import './utils/i18n';
 import { unwrap } from 'solid-js/store';
 import { pluginRepoExpanded, themeMetadata } from './utils/types';
+import shaka from 'shaka-player';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -80,6 +81,8 @@ function App() {
   })
 
   onMount(async () => {
+    shaka.polyfill.installAll()
+    
     if (window.api) {
       setConfig(await window.api.getConfig())
       setGlobalHistory(await window.api.getHistory())
