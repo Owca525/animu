@@ -820,3 +820,8 @@ export function calculateDays(unix1: number, unix2: number): number {
 
   return -((date2.getTime() - date1.getTime()) / 86400000);
 }
+
+export function convertSecondsToHoursFormat(seconds: number): string {
+  if (seconds < 0) seconds = 0;
+  return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
+}

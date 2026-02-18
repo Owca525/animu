@@ -518,16 +518,16 @@ function information() {
                                 <div class='information-animulist-container'>
                                     <span class='information-animulist-data'>
                                         Status {t(`animulist.status.${tempData().animulist?.status}`)}
-                                    </span>·
+                                    </span>&#8226;
                                     <span class='information-animulist-data'>
                                         Added {unixToDateTime(tempData().animulist?.added).split(" ")[0]}
-                                    </span>·
+                                    </span>&#8226;
                                     <span class='information-animulist-data'>
                                         Started Watching {unixToDateTime(tempData().animulist?.startWatch).split(" ")[0]}
-                                    </span>·
+                                    </span>&#8226;
                                     <span class='information-animulist-data'>
                                         Ended Watch {unixToDateTime(tempData().animulist?.endWatch).split(" ")[0]}
-                                    </span>·
+                                    </span>&#8226;
                                     <span class='information-animulist-data'>
                                         Repeat Watch {tempData().animulist?.reapeat}
                                     </span>

@@ -201,7 +201,7 @@
   flex-direction: column;
   align-items: start;
   gap: 1em;
-  cursor:auto;
+  cursor: auto;
 }
 
 .player-up-Next-Anime.old,
@@ -516,6 +516,7 @@
   transform: translateX(-400px);
   transition: 250ms ease-out;
 }
+
 .player-skip-chapters-button.show {
   transform: translateX(0px);
 }
@@ -572,6 +573,71 @@
 .player-screenshot-image {
   height: 58px;
   border-radius: 8px 0px 0px 8px;
+}
+
+.player-more-information-container {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  text-align: end;
+  position: absolute;
+  gap: 16px;
+  padding: 2.2em 3em;
+}
+
+.player-more-information-background {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  text-align: end;
+  position: absolute;
+  justify-content: center;
+  background-color: color-mix(in srgb, var(--black) 88%, transparent);
+
+  height: 100vh;
+  width: 100vw;
+}
+
+.player-more-information-top-text {
+  color: var(--text-gray);
+}
+
+.player-more-information-title {
+  font-size: 1.4em;
+  font-weight: 800;
+}
+
+.player-more-information-format-container {
+  display: flex;
+  gap: 12px;
+  text-align: center;
+  color: var(--text-gray);
+}
+
+.player-more-information-format,
+.player-more-information-episode,
+.player-more-information-durration,
+.player-more-information-description {
+  color: var(--text-gray);
+}
+
+.player-more-information-description {
+  width: clamp(500px, 50vw, 800px);
+  display: -webkit-box;
+  line-clamp: 5;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+}
+
+.player-more-information-image {
+  width: 180px;
+  aspect-ratio: 2 / 3;
+  border-radius: 12px;
+}
+
+.player-more-information-durration {
+  display: flex;
+  margin-bottom: 10vh;
 }
 
 @media (max-width: 1000px) {
