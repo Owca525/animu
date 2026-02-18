@@ -7,6 +7,9 @@ export interface SettingsConfig {
     firstStart: boolean
     deepLinkURL: string
     yt_dlp: string
+    animulist: {
+        historyConvert: boolean
+    }
     plugins: {
         // information: string
         hiddenPlugins: string[]
@@ -115,7 +118,7 @@ export interface SettingsConfig {
         playerDebug: boolean
     }
     update: {
-        lastTime: string
+        lastTime: number
         type: "On Start" | "Every Day" | "Every Week"
         enable: boolean
     }
@@ -171,6 +174,12 @@ export interface AnimeData {
     id: string
     malID?: string
     trailer?: { id: string, site: string } | undefined
+    recommendations?: {
+        id: number,
+        title: { english?: string, native: string, romaji: string }
+        bannerImage?: string
+        coverImage: string
+    }[]
 }
 
 export interface indentityPlayer {
@@ -285,7 +294,7 @@ export const defaultConfig: SettingsConfig = {
         playerDebug: false
     },
     update: {
-        lastTime: "0",
+        lastTime: 0,
         type: "On Start",
         enable: true
     },
@@ -303,7 +312,10 @@ export const defaultConfig: SettingsConfig = {
         check: "Every Day",
         maxBackups: 3
     },
-    yt_dlp: ""
+    yt_dlp: "",
+    animulist: {
+        historyConvert: true
+    }
 };
 
 export type pluginRepoExpanded = {
@@ -352,3 +364,17 @@ export const ThemeSchema = z.object({
         })
     ).optional()
 });
+
+export interface animulistData {
+    AnimeData: AnimeData
+    animulist: {
+        status: "CURRENT" | "PLANNING" | "COMPLETED" | "REPEATING" | "DROPPED" | "PAUSED",
+        score: number,
+        reapeat: number,
+        startWatch: number,
+        endWatch: number,
+        added: number,
+        lastUpdate: number,
+        favorite?: boolean
+    }
+}

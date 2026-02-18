@@ -3,6 +3,7 @@ import { getConfig } from "./stores/config";
 import { unwrap } from "solid-js/store";
 import { toast, updateToast } from "./context/ToastNotification";
 import { t } from "./i18n";
+import { dateToUnix } from "./functions";
 
 export async function checkUpdate(alwaysShow: boolean = false) {
   try {
@@ -23,7 +24,7 @@ export async function checkUpdate(alwaysShow: boolean = false) {
     }
 
     const config = unwrap(getConfig());
-    config.update.lastTime = new Date().toString();
+    config.update.lastTime = dateToUnix(new Date().toString());
     saveConfig(config);
   } catch (error) {
     console.error("Error in checkUpdate", error);

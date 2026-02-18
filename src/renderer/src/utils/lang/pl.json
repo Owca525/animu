@@ -28,6 +28,12 @@
     "plugin": "Loading Plugin",
     "history": "Ładowanie Histori"
   },
+  "search": {
+    "home": "Szukaj Anime...",
+    "history": "Szukaj w histori...",
+    "animulist": "Search in AnimuList...",
+    "schedule": "Search in Schedule..."
+  },
   "imageviewer": {
     "failedfetch": "Failed Fetch Image",
     "failedsave": "Failed Save Image",
@@ -74,8 +80,6 @@
   },
   "home": {
     "searching": "Searching: {{title}}",
-    "search": "Szukaj Anime...",
-    "historySearch": "Szukaj w histori...",
     "nothingfound": "Nic nie znaleziono",
     "error": "Wystąpił błąd",
     "trending_now": "Popularne teraz",
@@ -105,7 +109,8 @@
     "releasing": "Emitowane",
     "finished": "Zakończone",
     "not_yet_released": "Jeszcze nie wyemitowane",
-    "cancelled": "Anulowane"
+    "cancelled": "Anulowane",
+    "hiatus": "Hiatus"
   },
   "anime_relationtype": {
     "adaptation": "Adaptation",
@@ -131,14 +136,14 @@
     "fantasy": "Fantasy",
     "hentai": "Hentai",
     "horror": "Horror",
-    "mahoushoujo": "Mahou Shoujo",
+    "mahou_shoujo": "Mahou Shoujo",
     "mecha": "Mechy",
     "music": "Muzyczny",
     "mystery": "Tajemnice",
     "psychological": "Psychologiczny",
     "romance": "Romans",
     "sci-fi": "sci-fi",
-    "sliceoflife": "Okruchy Życia",
+    "slice_of_life": "Okruchy Życia",
     "sports": "Sportowe",
     "supernatural": "Nadprzyrodzone",
     "thriller": "Thriller"
@@ -149,7 +154,11 @@
     "tv_short": "Krótkometrażowy TV",
     "special": "Specjalny",
     "ova": "OVA",
-    "ona": "ONA"
+    "ona": "ONA",
+    "one_shot": "One Shot",
+    "music": "Music",
+    "novel": "Novel",
+    "manga": "Manga"
   },
   "anime_source": {
     "lightnovel": "Light Novel",
