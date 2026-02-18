@@ -18,7 +18,6 @@ interface developerStatsProps {
         ep: string;
     }
     PlayerVolume: number
-    time: number
     episodesUrl: playerData[]
     currentHost: string
     currentSettings: boolean
@@ -42,10 +41,9 @@ export default function developerStats(props: developerStatsProps) {
             <div class="player-dev-text">isUpNextEpisode: <span class="player-dev-text">{props.isUpNextEpisode.toString()}</span></div>
             <div class="player-dev-text">isHideUpNextEpisode: <span class="player-dev-text">{props.isHideUpNextEpisode.toString()}</span></div>
             <div class="player-dev-header">Data</div>
-            <div class="player-dev-text">episodes: <span class="player-dev-text">{props.episodes.toString()}</span></div>
+            <div class="player-dev-text">episodes: <span class="player-dev-text">{props.episodes.length}</span></div>
             <div class="player-dev-text">episode: <span class="player-dev-text">{props.episode.ep}, {props.episode.type}</span></div>
             <div class="player-dev-text">PlayerVolume: <span class="player-dev-text">{props.PlayerVolume.toString()}</span></div>
-            <div class="player-dev-text">time: <span class="player-dev-text">{props.time.toString()}</span></div>
             <div class="player-dev-text">episodesUrl: <span class="player-dev-text">{props.episodesUrl.length}</span></div>
             <div class="player-dev-header">Other</div>
             <div class="player-dev-text">currentHost: <span class="player-dev-text">{props.currentHost.toString()}</span></div>
