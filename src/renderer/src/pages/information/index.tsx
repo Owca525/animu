@@ -499,11 +499,20 @@ function information() {
                 <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
             </main>
             <Show when={showWrong()}>
-                <ContainerWrong name={tempData().anime.title.romaji} refetchfunc={(id?: string) => { setshowWrong(() => false); setCurrentId(id); episodeResponse.Refetch([tempData(), id, currentPlugin()]) }} exitfunc={() => setshowWrong(() => false)} />
+                <ContainerWrong name={tempData().anime.title.romaji} refetchfunc={(id?: string) => { 
+                        setshowWrong(false); 
+                        setCurrentId(id); 
+                        episodeResponse.Refetch([tempData(), id, currentPlugin()]) 
+                    }} 
+                    exitfunc={() => setshowWrong(() => false)} 
+                />
             </Show>
 
             <Show when={showImages()}>
-                <ImageViewer files={[tempData().anime.coverImage as string, tempData().anime.bannerImage as string].filter((value) => value != null)} disable={() => setShowImages(false)} />
+                <ImageViewer 
+                    files={[tempData().anime.coverImage as string, tempData().anime.bannerImage as string].filter((value) => value != null)} 
+                    disable={() => setShowImages(false)} 
+                />
             </Show>
         </>
     )
