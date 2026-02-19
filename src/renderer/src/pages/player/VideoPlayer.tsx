@@ -1503,6 +1503,13 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                             <span class="player-more-information-episode">Episode {temp.episode}</span>
                         </div>
                         <span class="player-more-information-description">{decodeHtmlEntities(anime_data.AnimeData.description as any)}</span>
+                        <div class="player-more-information-genres-container">
+                            <For each={anime_data.AnimeData.genres}>
+                                {(item) => (
+                                    <div class="player-more-information-genres">{item as string}</div>
+                                )}
+                            </For>
+                        </div>
                         <span class="player-more-information-durration">{anime_data.AnimeData.averageScore}% &#8226; {convertSecondsToHoursFormat(durrationTime())}</span>
                     </div>
                 </div>

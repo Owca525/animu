@@ -630,6 +630,19 @@
   overflow: hidden;
 }
 
+.player-more-information-genres-container {
+  display: flex;
+  gap: 12px;
+}
+
+.player-more-information-genres {
+  color: var(--text-gray);
+  border: 1px solid var(--text-gray);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8em;
+}
+
 .player-more-information-image {
   width: 180px;
   aspect-ratio: 2 / 3;
