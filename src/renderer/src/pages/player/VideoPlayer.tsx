@@ -1494,13 +1494,15 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             <Show when={isShowingMoreInformation()}>
                 <div class="player-more-information-background">
                     <div class="player-more-information-container">
-                        <span class="player-more-information-top-text">Current Playing</span>
+                        <span class="player-more-information-top-text">Current Watching</span>
                         <img src={anime_data.AnimeData.coverImage} class="player-more-information-image" />
                         <span class="player-more-information-title">{anime_data.AnimeData.title.romaji}</span>
                         <div class="player-more-information-format-container">
+                            <span class="player-more-information-season">{t(`anime_seasons.${anime_data.AnimeData.season?.toLowerCase()}`)} {anime_data.AnimeData.seasonYear}</span>
+                            &#8226;
                             <span class="player-more-information-format">{t(`anime_formats.${anime_data.AnimeData.format?.toLowerCase()}`)}</span>
                             &#8226;
-                            <span class="player-more-information-episode">Episode {temp.episode}</span>
+                            <span class="player-more-information-episode">Episode {temp.episode} / {temp.episodes.length}</span>
                         </div>
                         <span class="player-more-information-description">{decodeHtmlEntities(anime_data.AnimeData.description as any)}</span>
                         <div class="player-more-information-genres-container">

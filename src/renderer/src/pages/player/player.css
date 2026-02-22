@@ -617,7 +617,8 @@
 .player-more-information-format,
 .player-more-information-episode,
 .player-more-information-durration,
-.player-more-information-description {
+.player-more-information-description,
+.player-more-information-season {
   color: var(--text-gray);
 }
 
