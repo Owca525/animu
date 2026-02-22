@@ -224,8 +224,13 @@ function information() {
         if (!resp) return setFetchingAnime(false)
         setFetchingAnime(false)
 
-        setTmpData((prev) => ({ ...prev, anime: resp }))
-        updateHistoryData(tempData().anime.id, { AnimeData: resp, saveData: unwrap(tempData().saveData) })
+        const tmpnewFetch: AnimeData = {
+            ...resp,
+            player_ID: currentIDplayer() ? unwrap(currentIDplayer()) : episodeResponse.data()?.player_id
+        }
+
+        setTmpData((prev) => ({ ...prev, anime: tmpnewFetch }))
+        updateHistoryData(tempData().anime.id, { AnimeData: tmpnewFetch, saveData: unwrap(tempData().saveData) })
         if (tempData().anime.nextAiringEpisode?.timeUntilAiring) setSecondsLeft({
             left: tempData().anime.nextAiringEpisode!.timeUntilAiring,
             converted: convertSeconds(tempData().anime.nextAiringEpisode!.timeUntilAiring)
