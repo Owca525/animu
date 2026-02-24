@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, Menu, session, ipcMain, dialog, crashReporter } from 'electron'
+import { app, shell, BrowserWindow, Menu, session, ipcMain, dialog, crashReporter, Tray } from 'electron'
 import { optimizer, is } from '@electron-toolkit/utils'
 import path, { join } from 'path'
 import ini from "ini";
@@ -116,6 +116,38 @@ function createWindow(): void {
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
+  })
+
+  let tray = new Tray(icon)
+
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Open Animu',
+      click: () => {
+        if (mainWindow) mainWindow.show()
+      }
+    },
+    { type: 'separator' },
+    {
+      label: 'Exit Animu',
+      click: () => {
+        app.quit()
+      }
+    }
+  ])
+
+  tray.setToolTip('Animu')
+  tray.setContextMenu(contextMenu)
+
+  tray.on('click', () => {
+    if (!mainWindow) return
+    mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show()
+  })
+
+  mainWindow.on('close', (e) => {
+    if (!mainWindow) return
+    e.preventDefault()
+    mainWindow.hide()
   })
 
   Menu.setApplicationMenu(null);
