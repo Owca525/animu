@@ -19,7 +19,8 @@
         "incognitomode": "Incognito Mode: {{switch}}",
         "off": "Off",
         "on": "On",
-        "action": "Action"
+        "action": "Action",
+        "adult": "Adult"
     },
     "initial": {
         "animu": "Animu is initializing",
