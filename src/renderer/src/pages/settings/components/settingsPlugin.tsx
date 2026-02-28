@@ -50,6 +50,9 @@ export default function SettingsPlugin(props: SettingsPluginProps) {
                         <span class='settings-extension-mini-button' onclick={() => openUrlFolder(props.plugin.metadata.urlWebsite!)}>{t("settings.extensions.website")}</span>
                     </Show>
                     <span class='settings-extension-mini-button' >{"home" in props.plugin ? t("settings.extensions.information") : t("settings.extensions.player")}</span>
+                    <Show when={props.plugin.metadata["adult"]}>
+                        <span class='settings-extension-mini-button red'>{t("global.adult")}</span>
+                    </Show>
                 </div>
                 <div class='settings-extension-bottom-right'>
                     <Show when={props.plugin.config}>

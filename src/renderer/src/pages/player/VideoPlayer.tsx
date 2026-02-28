@@ -669,6 +669,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     function startChapterSkipTime() {
         if (IsRunningButtonSkipTime()) return
+        if (currentTime() <= 0 || durrationTime() <= 0) return
 
         setIsRunningButtonSkipTime(() => true)
 
@@ -727,11 +728,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     function checkUpNext(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
         // checking to show Up next communicat
+        if (currentTime() <= 0 || durrationTime() <= 0) return
         if (!currentPlayer()) return
         if (!config) return
         if (!config.Player.upToNextEpisode.enable) return
         const duration = event.currentTarget.duration
-        const currentTime = event.currentTarget.currentTime
+        const currenttime = event.currentTarget.currentTime
 
         if (duration <= config.Player.upToNextEpisode.durationShow * 60 && !currentPlayer()!.listChapters) return
 
@@ -741,12 +743,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             if (endingChupter && endingChupter.end == 0 && endingChupter.start == 0) return
         }
 
-        let showUpToNext: boolean = currentTime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
-        let timeDelete: number = ((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currentTime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
+        let showUpToNext: boolean = currenttime > duration - parseInt(config.History.continue.MaximizeTimeSave.toString())
+        let timeDelete: number = ((parseInt(duration.toFixed(0)) - parseInt(config.History.continue.MaximizeTimeSave.toString())) - parseInt(currenttime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
 
         if (endingChupter) {
-            showUpToNext = currentTime >= endingChupter.start
-            timeDelete = ((parseInt(duration.toFixed(0)) - (parseInt(duration.toFixed(0)) - endingChupter.start)) - parseInt(currentTime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
+            showUpToNext = currenttime >= endingChupter.start
+            timeDelete = ((parseInt(duration.toFixed(0)) - (parseInt(duration.toFixed(0)) - endingChupter.start)) - parseInt(currenttime.toFixed(0))) + parseInt(config.Player.upToNextEpisode.interval.toString())
         }
 
         if (parseInt(timeDelete.toFixed(0)) < 0) {
@@ -822,6 +824,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     })
 
     function setEpisode(type: "next" | "prev") {
+        if (durrationTime() <= 0) return console.warn("Illegal Change Episode")
         let ep = temp.episodes.findIndex((item) => item.ep.toString() == temp.episode, toString())
         if (ep < 0) return
         if (type == 'prev') ep = ep - 1
@@ -1210,7 +1213,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 <video
                     ref={videoRef}
                     class="video-player"
-                    onTimeUpdate={updateProgress}
+                    onTimeUpdate={(event) => {
+                        updateProgress(event)
+                        setFatalError(false)
+                    }}
                     onProgress={updateProgress}
                     onSeeked={updateProgress}
                     onClick={() => { togglePlay(); setcurrentSettings(() => false); setShowSelectEpisode(() => false) }}

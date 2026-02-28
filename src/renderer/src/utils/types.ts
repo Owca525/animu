@@ -239,6 +239,7 @@ export interface playerPluginFormat {
         supportLang: string[]
         // sidebarAddon?: sidebarData[]
         searchOption?: genres
+        adult?: boolean
     }
     config?: { [key: string]: any }
     extractPlayerData(type: string, episode: string, id: string): Promise<playerData[]>

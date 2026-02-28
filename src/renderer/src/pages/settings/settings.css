@@ -289,6 +289,16 @@
   color: var(--text);
 }
 
+.settings-extension-mini-button.red {
+  border-color: var(--red-one);
+  color: var(--red-one);
+}
+
+.settings-extension-mini-button.red:hover {
+  background-color: var(--red-one);
+  color: var(--text);
+}
+
 .settings-extension-top-right {
   display: flex;
   flex-direction: column;

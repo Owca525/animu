@@ -539,11 +539,25 @@ ipcMain.handle("getyt-dlp_releases", async () => {
 
 ipcMain.handle("run_yt-dlp", async (_, url: string, commands?: string[]) => await getVideoInfo(url, commands))
 
+async function CheckPathToYT_DLP(commands: string[]): Promise<[string, string[]]> {
+    if (await pythonCheck() && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp"))) 
+        return ["/usr/bin/python3", [path.join(app.getPath("userData"), "yt-dlp"), ...commands]]
+
+    if (process.platform == "win32" && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp.exe"))) 
+        return [path.join(app.getPath("userData"), "yt-dlp.exe"), commands]
+    if (process.platform == "linux" && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp_linux"))) 
+        return [path.join(app.getPath("userData"), "yt-dlp_linux"), commands]
+
+    return ["/usr/bin/python3", [path.join(app.getPath("userData"), "yt-dlp"), ...commands]]
+}
+
 // "-j",
 // "--no-playlist",
 function getVideoInfo(url: string, commands: string[] = ["-j"]) {
-    return new Promise((resolve, reject) => {
-        const yt = spawn("yt-dlp", [...commands, url]);
+    return new Promise(async (resolve, reject) => {
+        const pathCommands = await CheckPathToYT_DLP([...commands, url])
+
+        const yt = spawn(pathCommands[0], pathCommands[1]);
 
         let data = "";
         let error = "";
