@@ -1177,7 +1177,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 <video
                     ref={videoRef}
                     class="video-player"
-                    onTimeUpdate={updateProgress}
+                    onTimeUpdate={(event) => {
+                        updateProgress(event)
+                        setFatalError(false)
+                    }}
                     onProgress={updateProgress}
                     onSeeked={updateProgress}
                     onClick={() => { togglePlay(); setcurrentSettings(() => false); setShowSelectEpisode(() => false) }}
