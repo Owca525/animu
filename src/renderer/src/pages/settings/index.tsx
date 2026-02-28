@@ -195,7 +195,7 @@ function settings() {
 
     onMount(async () => {
         const plugin = getPlayerPLugin()
-        setLastActiveTheme(activeThemes())
+        setLastActiveTheme(structuredClone(unwrap(activeThemes())))
         const playerPluginList = getPluginList().map((pl) => {
             if (!plugin) return { active: false, plugin: pl }
             return { active: plugin.metadata.name == pl.metadata.name, plugin: pl }
@@ -242,7 +242,7 @@ function settings() {
 
     function saveNewConfig() {
         try {
-            setLastActiveTheme(activeThemes())
+            setLastActiveTheme(structuredClone(unwrap(activeThemes())))
             setConfig(config().new)
             setNewConfig((prev) => {
                 return { old: structuredClone(prev.new), new: structuredClone(prev.new) }
