@@ -29,6 +29,12 @@
     "plugin": "Загрузка Плагина",
     "history": "Загрузка Истории"
   },
+  "search": {
+    "home": "Поиск...",
+    "history": "Поиск в истории...",
+    "animulist": "Search in AnimuList...",
+    "schedule": "Search in Schedule..."
+  },
   "imageviewer": {
     "failedfetch": "Не удалось загрузить изображение",
     "failedsave": "Не удалось сохранить изображение",
@@ -75,8 +81,6 @@
   },
   "home": {
     "searching": "Поиск: {{title}}",
-    "search": "Поиск...",
-    "historySearch": "Поиск в истории...",
     "nothingfound": "Здесь ничего не найдено",
     "error": "Произошла ошибка",
     "trending_now": "В тренде сейчас",
@@ -106,7 +110,8 @@
     "releasing": "Выходит",
     "finished": "Завершено",
     "not_yet_released": "Ещё не вышло",
-    "cancelled": "Отменено"
+    "cancelled": "Отменено",
+    "hiatus": "Hiatus"
   },
   "anime_relationtype": {
     "adaptation": "Адаптация",
@@ -132,14 +137,14 @@
     "fantasy": "Фэнтези",
     "hentai": "Хентай",
     "horror": "Ужасы",
-    "mahoushoujo": "Махо-сёдзё",
+    "mahou_shoujo": "Махо-сёдзё",
     "mecha": "Меха",
     "music": "Музыкальное",
     "mystery": "Мистика",
     "psychological": "Психологическое",
     "romance": "Романтика",
     "sci-fi": "Научная фантастика",
-    "sliceoflife": "Повседневность",
+    "slice_of_life": "Повседневность",
     "sports": "Спорт",
     "supernatural": "Сверхъестественное",
     "thriller": "Триллер"
@@ -150,7 +155,11 @@
     "tv_short": "Короткий ТВ-сериал",
     "special": "Спешл",
     "ova": "OVA",
-    "ona": "ONA"
+    "ona": "ONA",
+    "one_shot": "One Shot",
+    "music": "Music",
+    "novel": "Novel",
+    "manga": "Manga"
   },
   "anime_source": {
     "lightnovel": "Ранобэ",

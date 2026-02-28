@@ -127,5 +127,8 @@ export const defaultConfigWeb: SettingsConfig = {
         lastCheck: 0,
         check: "Every Day",
         maxBackups: 3
+    },
+    animulist: {
+        historyConvert: true
     }
 };

@@ -64,7 +64,10 @@ export interface AnimeData {
         title: { english?: string, native: string, romaji: string }
         bannerImage?: string
         coverImage: string
-        relationType: string
+        relationType: string,
+        status: string,
+        format: string
+        type: string
     }[]
     recommendations?: {
         id: number,
@@ -82,7 +85,11 @@ export interface homeData {
     page: number
     stopScrolling: boolean
     activePage: "history" | "home" | string
-    filterTags?: FilterParams
+    filterTags?: FilterParams,
+    otherFilter: {
+        page: string,
+        filter: genres[]
+    }[]
     mainContainer: {
         scrollLeft: number,
         scrollTop: number,
@@ -110,7 +117,8 @@ export interface globalDataFormat {
     deeplinkRunned: boolean,
     loadedTheme: themeMetadata[],
     activeThemes: Map<number, themeMetadata>
-    token: UUIDTypes | undefined
+    token: UUIDTypes | undefined,
+    animuList: { AnimeData: AnimeData, animulist: animulistProps, onClick?: (data: AnimeData) => void }[]
 }
 
 export type playerDataExtended = playerData & {
@@ -160,11 +168,24 @@ export interface indentityPlayer {
     episode: string
     type: string
     isStarted?: boolean
+    lastAnimeDataUpdate?: number
+}
+
+export interface animulistProps {
+    status: "CURRENT" | "PLANNING" | "COMPLETED" | "REPEATING" | "DROPPED" | "PAUSED",
+    score: number,
+    reapeat: number,
+    startWatch: number,
+    endWatch: number,
+    added: number,
+    lastUpdate: number,
+    favorite?: boolean
 }
 
 export interface cardData {
     AnimeData: AnimeData
     saveData?: indentityPlayer
+    animulist?: animulistProps
     onClick?: (data: AnimeData) => void
 }
 
@@ -235,16 +256,14 @@ export interface informationPluginFormat {
         author: string
         icon?: string
         urlWebsite?: string
-        searchOption: genres
+        searchOption: genres[]
     }
     config?: { [key: string]: any }
     search(name: string, page: number, params?: genresSearchFormat): Promise<containerData | undefined>
     home(): Promise<{ topCards?: containerData, sections: containerData[] } | undefined>
     anime(context: { id: string }): Promise<AnimeData | undefined>
-    // schedule(
-    //     context: { airingStart?: number, airingEnd?: number },
-    //     callbacks: { onSuccess: (data: containerData) => void, onError: (error: string) => void }
-    // )
+    schedule: (airingStart: number, airingEnd: number) => Promise<containerData>
+    getManga: (id: string) => Promise<AnimeData | undefined>
 }
 
 export interface playerPluginManagerFormat {
@@ -260,11 +279,19 @@ export interface informationPluginManagerFormat {
     home(): void
     anime(id: string): Promise<AnimeData | undefined>
     initial(): Promise<void>
-    // schedule(airingStart?: number, airingEnd?: number): void
+    schedule(airingStart: number, airingEnd: number): Promise<containerData>
+    getManga: (id: string) => Promise<AnimeData | undefined>
 }
 
-export type genres = { genres: string[], seasons: string[], years: string[], format: string[], statuses: string[] }
-export interface genresSearchFormat { genres?: string[], years?: string, seasons?: string, format?: string[], airing?: string }
+export type genres = {
+    type: string,
+    placeholder: string,
+    title: string,
+    langPath: string
+    options: string[]
+}
+
+export interface genresSearchFormat { [key: string]: string }
 
 export interface episodeList { player_id: string, episodesData: { episodes: { ep: string, img?: string, title?: string }[], type: string, name?: string }[] }
 
@@ -272,6 +299,9 @@ export interface SettingsConfig {
     firstStart: boolean
     deepLinkURL: string
     yt_dlp: string
+    animulist: {
+        historyConvert: boolean
+    }
     plugins: {
         hiddenPlugins: string[]
         // information: string
@@ -380,7 +410,7 @@ export interface SettingsConfig {
         playerDebug: boolean
     }
     update: {
-        lastTime: string
+        lastTime: number
         type: "On Start" | "Every Day" | "Every Week"
         enable: boolean
     }
@@ -406,13 +436,7 @@ export interface Thumbnail {
     }[]
 };
 
-export interface FilterParams {
-    genres?: string[];
-    years?: string;
-    seasons?: string;
-    format?: string[];
-    airing?: string;
-};
+export interface FilterParams { [key: string]: string };
 
 export interface pluginRepo {
     name: string,
@@ -436,3 +460,12 @@ export type pluginRepoExpanded = {
     sha256: string,
     description?: string
 } & { repoURL: string }
+
+export interface animeOpeningsFormat {
+    type: "OP" | "EN" | "IN"
+    title: string,
+    resolution: number,
+    size: number,
+    url: string,
+    filename: string
+}

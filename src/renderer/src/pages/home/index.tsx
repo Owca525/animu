@@ -1,46 +1,43 @@
 import BigCardsContainer from './components/bigCardsContainer';
 import Button from '@renderer/components/buttons';
 import Container from './components/container';
-import Filter from './components/filter';
+import Filter, { updateGenres } from './components/filter';
 import Input from '@renderer/components/input';
 import Sidebar from '@renderer/components/sidebar';
-import { changeTitleAnimu, CreateContextMenuOptions, getHistory, setHomeData } from '@renderer/utils/functions';
+import { changeTitleAnimu, CreateContextMenuOptions, dateToUnix, unixToDateTime } from '@renderer/utils/functions';
 import {
   createSignal,
   For,
   Match,
   onMount,
   Show,
-  Switch
+  Switch,
 } from 'solid-js';
 import { getConfig } from '@renderer/utils/stores/config';
 import {
   getHomeCache,
   setHomeActivePage,
-  setHomeNewData,
   setHomeSearch,
-  setHomeSearchPage,
   setHomeSearchTags,
-  setHomeStopScrolling
 } from '@renderer/utils/stores/home';
 import { getInformationPlugin, pluginManager } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './home.css';
-// Home css
 import {
-  cardData,
   containerData,
   deepLinkData,
   FilterParams,
+  genres,
   homeData,
   SettingsConfig,
 } from "@renderer/utils/types";
 import { useI18n } from '@renderer/utils/i18n';
 import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
 import { getGlobalCache, setDeeplinkRunned } from '@renderer/utils/stores/global';
-// import { createShortcut } from "@solid-primitives/keyboard";
+import { anilistSearch, AnimuListSearch, historySearch, setAnimuList, setCalendary, setHistory } from './homeUtils';
+
 // import WelcomeScreen from "./components/welcomeScreen"
 const Home = () => {
   const { t } = useI18n()
@@ -49,6 +46,7 @@ const Home = () => {
   const [homeCache] = createSignal<homeData>(getHomeCache());
   // const pluginPlayer = getPlayerPLugin();
   const [isOpenSidebar, setOpenSidebar] = createSignal<boolean>(false);
+  const [searchText, setSearchText] = createSignal<string>();
   const [headerActive, setHeaderActive] = createSignal<boolean>(false)
 
   let divRef: HTMLDivElement | undefined;
@@ -58,13 +56,26 @@ const Home = () => {
       {
         icon: "home",
         text: "global.home",
-        onClick: () => { setHomeActivePage("global.home"); setHomeSearchTags(undefined); plugin.home(); changeTitleAnimu(`Animu - ${t("global.home")}`) },
+        onClick: plugin.home,
+        onSearch: anilistSearch
       },
       {
         icon: "history",
         text: "global.history",
         onClick: setHistory,
+        onSearch: historySearch
       },
+      {
+        icon: "view_list",
+        text: "global.animulist",
+        onClick: setAnimuList,
+        onSearch: AnimuListSearch
+      },
+      {
+        icon: "calendar_month",
+        text: "global.schedule",
+        onClick: () => setCalendary(),
+      }
     ],
     bottom: [
       {
@@ -75,16 +86,19 @@ const Home = () => {
     ],
   };
 
-  // if (pluginPlayer && pluginPlayer.sidebarAddon) {
-  //   sidebarData = {
-  //     bottom: [...sidebarData.bottom],
-  //     top: [...sidebarData.top, ...pluginPlayer.sidebarAddon] as any,
-  //   };
-  // }
+  function setNewActivePage(text: string) {
+    setHomeSearch(undefined)
+    setHomeSearchTags(undefined)
+    setHomeActivePage(text)
+    changeTitleAnimu(`Animu - ${t(text)}`)
+    setSearchText(t(`search.${text.split(".")[1]}`))
+  }
 
   onMount(() => {
-    if (getHomeCache().activePage == "global.history") changeTitleAnimu(`Animu - ${t("global.history")}`)
-    else changeTitleAnimu(`Animu - ${t("global.home")}`)
+    for (let index = 0; index < sidebarData.top.length; index++) {
+      const element = sidebarData.top[index];
+      if (getHomeCache().activePage == element.text) setNewActivePage(element.text)
+    }
 
     if (!getGlobalCache().deeplinkRunned) {
       window.api.onProtocolRequest(fetchDeeplinks)
@@ -162,38 +176,7 @@ const Home = () => {
     navigate("/player");
   }
 
-  function setHistory() {
-    setHomeSearchTags(undefined)
-    setHomeActivePage("global.history");
-    changeTitleAnimu(`Animu - ${t("global.history")}`)
-    let history = getHistory()
 
-    let data: homeData["data"] = {
-      sections: [
-        {
-          title: t("global.continuewatch"),
-          data: history.continue.slice(0, 20),
-          horizontal: true,
-          onTitleClick: async () => ({
-            title: t("global.continuewatch"),
-            data: history.continue,
-            horizontal: false,
-          }),
-        },
-        {
-          title: t("global.history"),
-          data: history.history.slice(0, 20) as any,
-          horizontal: true,
-          onTitleClick: async () => ({
-            title: t("global.history"),
-            data: history.history as any,
-            horizontal: false,
-          })
-        },
-      ],
-    };
-    setHomeData(undefined, data)
-  }
   const handleScroll = () => {
     let home = homeCache()
     if (!home.data) return;
@@ -206,68 +189,6 @@ const Home = () => {
     else setHeaderActive(() => false)
   };
 
-  // TODO: napraw wyszukiwanie itp
-  async function OnSearch(text: string) {
-    let home = homeCache()
-    if (home.activePage == "global.home") {
-      setHomeSearch(text)
-      setHomeSearchPage(1)
-      setHomeStopScrolling(false);
-      plugin.searchAnime(text, 1, home.filterTags);
-      return;
-    }
-
-    if (home.activePage != "global.history") return
-    if (text.replaceAll(" ", "") == "") {
-      setHistory()
-      return
-    }
-    let history = getHistory()
-    let finnalContainer: containerData[] = []
-    let historySearch = history.history.filter((data) =>
-      data.AnimeData.title.romaji.toLowerCase().includes(text.toLowerCase())
-    );
-    let continueSearch = history.history.filter((data) =>
-      data.AnimeData.title.romaji.toLowerCase().includes(text.toLowerCase())
-    );
-
-    if (continueSearch.length > 0) finnalContainer.push({
-      title: t("global.continuewatch"),
-      data: continueSearch as cardData[],
-      horizontal: historySearch.length <= 0
-    })
-
-    if (historySearch.length > 0) finnalContainer.push({
-      title: t("global.history"),
-      data: historySearch as cardData[],
-      horizontal: historySearch.length <= 0
-    })
-
-    if (continueSearch.length <= 0 && historySearch.length <= 0) finnalContainer.push({
-      title: t("global.history"),
-      data: [],
-      horizontal: true
-    })
-
-    setHomeNewData({ sections: finnalContainer })
-  }
-
-  function onChange(params?: FilterParams, removeParam?: string) {
-    let home = homeCache()
-    if (removeParam) {
-      const newParams: FilterParams = { ...home.filterTags };
-      if (newParams[removeParam] !== undefined) {
-        delete newParams[removeParam];
-      }
-      setHomeSearchTags(newParams)
-      OnSearch(home.search);
-      return;
-    }
-
-    if (!home.filterTags) setHomeSearchTags(params)
-    else setHomeSearchTags({ ...home.filterTags, ...params })
-    OnSearch(home.search);
-  }
 
   function CreateTagList() {
     let home = homeCache()
@@ -275,7 +196,8 @@ const Home = () => {
     if (!home.filterTags) return;
     let data: any = [];
     for (const [key, type] of Object.entries(home.filterTags)) {
-      data.push({ remover: () => onChange(undefined, key), name: type });
+      console.log(key)
+      data.push({ remover: () => {updateGenres(key, undefined);StartSearch(unwrap(homeCache().search), unwrap(homeCache().filterTags))}, name: type });
     }
 
     return data;
@@ -290,11 +212,22 @@ const Home = () => {
     return 0
   }
 
-  // createShortcut(["h"], () => {
-  //   let plugin = getPlayerPLugin()
-  //   if (!plugin) return
-  //   plugin.searchAnime("Oshi no ko", 1)
-  // })
+  function StartSearch(search: string = "", params: FilterParams | undefined) {
+    for (let index = 0; index < sidebarData.top.length; index++) {
+      const element = sidebarData.top[index];
+      if (element.onSearch && element.text == homeCache().activePage) element.onSearch(search, params)
+    }
+  }
+
+  function checkOtherFilters() {
+    if (homeCache().otherFilter.length <= 0) return []
+    let tmp: genres[] = [] 
+    for (let index = 0; index < homeCache().otherFilter.length; index++) {
+      const element = homeCache().otherFilter[index];
+      if (element.page == homeCache().activePage) tmp = [...tmp, ...element.filter]
+    }
+    return tmp
+  }
 
   return (
     <main
@@ -309,6 +242,7 @@ const Home = () => {
         onChange={() => setOpenSidebar(false)}
         activeElement
         setAciveElement={getSidebarNumber()}
+        onClickTopButtons={setNewActivePage}
       />
 
       <div class={`home-header-container ${homeCache().data && !homeCache().data.topCards ? "active" : ""} ${headerActive() ? "color" : ""}`}>
@@ -319,18 +253,21 @@ const Home = () => {
         />
         <div class="home-header-search">
           <Input
-            placeholder={getHomeCache().activePage == "global.history" ? t("home.historySearch") : t("home.search")}
+            placeholder={searchText()}
             InputClass={`${homeCache().data && homeCache().data.topCards ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
             defaultValue={homeCache().search}
-            onKeyDown={OnSearch}
+            onKeyDown={(search: string) => { StartSearch(search, unwrap(homeCache().filterTags)) }}
           />
           <div class="home-filter-void">
             <Filter
-              onChange={onChange}
-              filter={plugin.currentPlugin.metadata.searchOption}
+              onChange={(params: FilterParams | undefined) => { StartSearch(unwrap(homeCache().search), params) }}
+              filter={[...plugin.currentPlugin.metadata.searchOption, ...checkOtherFilters()]}
               custonClass={`${homeCache().data && homeCache().data.topCards ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
             />
           </div>
+          <Show when={getHomeCache().activePage == "global.schedule"}>
+            <Input type="date" defaultValue={unixToDateTime(dateToUnix(new Date().toString())).split(" ")[0]} onInput={setCalendary} />
+          </Show>
         </div>
       </div>
 

@@ -8,6 +8,8 @@ import {
   calculateZoomLevel,
   changeTheme,
   checkDate,
+  convertHistoryToAnimuList,
+  dateToUnix,
   detectPluginVersion,
   fetchPluginRepos,
   updateObjectConfig
@@ -25,7 +27,7 @@ import {
 } from 'solid-js';
 import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import { getConfig, setConfig } from './utils/stores/config';
-import { getGlobalCache, setGlobalHistory, setGlobalTheme, setIncognitoMode } from './utils/stores/global';
+import { getGlobalCache, setAnimulistData, setGlobalHistory, setGlobalTheme, setIncognitoMode } from './utils/stores/global';
 import { HashRouter, Route } from '@solidjs/router';
 import { getInformationPlugin, pluginManager, setPluginRepo } from './utils/stores/plugins';
 import { setHomeActivePage } from './utils/stores/home';
@@ -36,6 +38,7 @@ import './themes/darkerAnimu/main.css';
 import './utils/i18n';
 import { unwrap } from 'solid-js/store';
 import { pluginRepoExpanded, themeMetadata } from './utils/types';
+import shaka from 'shaka-player';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -78,6 +81,8 @@ function App() {
   })
 
   onMount(async () => {
+    shaka.polyfill.installAll()
+    
     if (window.api) {
       setConfig(await window.api.getConfig())
       setGlobalHistory(await window.api.getHistory())
@@ -90,6 +95,9 @@ function App() {
     setinitialState({ text: "initial.theme", plugin: false })
     if (window.api) setGlobalTheme(await window.api.themes.list())
 
+    setinitialState({ text: "Loading Animulist", plugin: false })
+    setAnimulistData(await window.api.animulist.getDatabase())
+
     setinitialState({ text: "initial.config", plugin: false })
     LoadConfig()
     setHomeActivePage("global.home")
@@ -98,6 +106,7 @@ function App() {
     await checkPluginUpdate()
     await getInformationPlugin().initial()
     await pluginManager().initialPlugins()
+
     setInitation(false)
 
     detectPluginVersion()
@@ -164,7 +173,13 @@ function App() {
 
   function LoadConfig() {
     if (!window.api) return
-    const loadedConnfig = getConfig()
+    let loadedConnfig = getConfig()
+
+    if (loadedConnfig.animulist.historyConvert) {
+      convertHistoryToAnimuList()
+      loadedConnfig = updateObjectConfig("animulist.historyConvert", false, loadedConnfig)
+      saveConfig(loadedConnfig)
+    }
 
     // Loading theme
     const loadedTheme = getGlobalCache().loadedTheme
@@ -186,7 +201,7 @@ function App() {
     if (!loadedConnfig.backup.enable) return
     if (!checkDate(loadedConnfig.backup.lastCheck, loadedConnfig.backup.check)) return
     CreateBackup()
-    saveConfig(updateObjectConfig("backup.lastCheck", new Date().getTime(), loadedConnfig))
+    saveConfig(updateObjectConfig("backup.lastCheck", dateToUnix(new Date().toString()), loadedConnfig))
     window.backend.refresh()
   }
 
@@ -229,14 +244,14 @@ async function checkPluginUpdate() {
   } catch (error) { console.warn("Error failed parsed pluginRepo Database", error) }
 
   if (config.plugins.pluginCheckType == "On Start" || tmpDatabase.length <= 0 || config.plugins.lastTimeCheck <= 0) return await fetchPluginRepos()
-  if (checkDate(config.plugins.lastTimeCheck, config.plugins.pluginCheckType as any)) await fetchPluginRepos()
+  if (checkDate(config.plugins.lastTimeCheck, config.plugins.pluginCheckType)) await fetchPluginRepos()
   else { setPluginRepo(tmpDatabase) }
 }
 
 async function runCheckUpdate() {
   let config = getConfig()
   if (config.update.type == "On Start") await checkUpdate()
-  if (checkDate(config.update.lastTime, config.update.type as any)) await checkUpdate()
+  if (checkDate(config.update.lastTime, config.update.type)) await checkUpdate()
 }
 
 export default App

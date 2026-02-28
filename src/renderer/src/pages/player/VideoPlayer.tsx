@@ -1,7 +1,7 @@
 import Hls from "hls.js"
 
-import { AnimeData, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
-import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObjectConfig } from "@renderer/utils/functions"
+import { AnimeData, animulistProps, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
+import { convertKeybinds, convertSecondsToHoursFormat, CreateContextMenuOptions, dateToUnix, decodeHtmlEntities, detectTitle, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateDataInAnimulist, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
@@ -35,7 +35,8 @@ interface VideoPlayerProps {
     player_data: playerData[]
     anime_data: {
         AnimeData: AnimeData,
-        saveData: indentityPlayer
+        saveData: indentityPlayer,
+        animulist?: animulistProps
     }
     temp: { episode: string, type: string, episodes: { ep: string, img?: string, title?: string }[] }
     setNextEpisode: (value: string) => void
@@ -63,6 +64,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     let volumeTimeout: NodeJS.Timeout | undefined
     let playAnimationTimeout: NodeJS.Timeout | undefined
     let buttonSkipLeft: NodeJS.Timeout | undefined
+    let moreInformationTimer: NodeJS.Timeout | undefined
     let buttonSkipRight: NodeJS.Timeout | undefined
     let assSubContainer: HTMLDivElement | undefined
     let vttSubRef: HTMLTrackElement | undefined
@@ -86,6 +88,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [IsDisableButtonSkipTimerOpening, setIsDisableButtonSkipTimerOpening] = createSignal<boolean>(false)
     const [IsDisableButtonSkipTimerEnding, setIsDisableButtonSkipTimerEnding] = createSignal<boolean>(false)
     const [currentSkipButton, setcurrentSkipButton] = createSignal<{ type: "opening" | "ending" | "", time: number }>({ type: "", time: 0 })
+    const [isShowingMoreInformation, setShowingMoreInformation] = createSignal<boolean>(false)
 
     const [isShowButtonSkipLeft, setShowButtonSkipLeft] = createSignal<boolean>(false)
     const [isShowButtonSkipRight, setShowButtonSkipRight] = createSignal<boolean>(false)
@@ -140,11 +143,17 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     function handleMouseMove() {
         setIsVisible(true)
-        if (hideTimer) {
-            clearTimeout(hideTimer)
-        }
+        setShowingMoreInformation(false)
+        clearTimeout(moreInformationTimer)
+        if (hideTimer) clearTimeout(hideTimer)
+
         if (currentSettings() == false && isShowSelectEpisode() == false) {
-            hideTimer = setTimeout(() => setIsVisible(false), 2000)
+            hideTimer = setTimeout(() => {
+                setIsVisible(false)
+                if (!isPlaying()) moreInformationTimer = setTimeout(() => {
+                    setShowingMoreInformation(true)
+                }, 4000)
+            }, 2000)
         }
     }
 
@@ -154,8 +163,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             const element = playerData()[index];
             if (element.defaultHost) defaulthost = element
         }
-
-        shaka.polyfill.installAll()
 
         shaka.net.NetworkingEngine.registerScheme("https", (type, requests) => {
             const controller = new AbortController();
@@ -545,12 +552,17 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     function togglePlay() {
         const video = videoRef
         if (!video) return
-
+        
         setIsPlaying(prev => {
             if (prev) {
                 video.pause()
+                moreInformationTimer = setTimeout(() => {
+                    setShowingMoreInformation(true)
+                }, 4000)
                 return false
             }
+            clearInterval(moreInformationTimer)
+            setShowingMoreInformation(false)
             video.play().catch((reason) => {
                 console.warn("Video Play Error Catch", reason)
             })
@@ -581,10 +593,34 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         // Checking to save history
         if (isCleanup()) return
         if (!config) return
+
+        if (durrationTime() > 10 && currentTime() > durrationTime() - parseInt(config.History.continue.MaximizeTimeSave.toString()) && anime_data.animulist) {
+            if (anime_data.AnimeData.episodes != undefined && anime_data.animulist.status == "CURRENT" && temp.episode.toString() == anime_data.AnimeData.episodes.toString()) {
+                updateDataInAnimulist(anime_data.AnimeData.id, {
+                    AnimeData: {
+                        ...anime_data.AnimeData,
+                        recommendations: undefined,
+                        nextAiringEpisode: undefined
+                    },
+                    animulist: {
+                        ...anime_data.animulist,
+                        status: "COMPLETED",
+                        endWatch: anime_data.animulist.endWatch == 0 ? dateToUnix(new Date().toString()) : anime_data.animulist.endWatch,
+                        lastUpdate: dateToUnix(new Date().toString())
+                    }
+                })
+            }
+        }
+
         if (currentTime() <= parseInt(config.History.continue.MinimalTimeSave.toString())) return
         let futureHistory = {
-            AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
+            AnimeData: {
+                ...anime_data.AnimeData,
+                nextAiringEpisode: undefined,
+                recommendations: undefined
+            },
             saveData: {
+                ...anime_data.saveData,
                 pluginName: anime_data.saveData.pluginName,
                 last_Time: event.currentTarget.currentTime,
                 episode: temp.episode,
@@ -1460,6 +1496,31 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     showNerdStats={showNerdStats()}
                     PlayerVolume={PlayerVolume}
                 />
+            </Show>
+            <Show when={isShowingMoreInformation()}>
+                <div class="player-more-information-background">
+                    <div class="player-more-information-container">
+                        <span class="player-more-information-top-text">Current Watching</span>
+                        <img src={anime_data.AnimeData.coverImage} class="player-more-information-image" />
+                        <span class="player-more-information-title">{anime_data.AnimeData.title.romaji}</span>
+                        <div class="player-more-information-format-container">
+                            <span class="player-more-information-season">{t(`anime_seasons.${anime_data.AnimeData.season?.toLowerCase()}`)} {anime_data.AnimeData.seasonYear}</span>
+                            &#8226;
+                            <span class="player-more-information-format">{t(`anime_formats.${anime_data.AnimeData.format?.toLowerCase()}`)}</span>
+                            &#8226;
+                            <span class="player-more-information-episode">Episode {temp.episode} / {temp.episodes.length}</span>
+                        </div>
+                        <span class="player-more-information-description">{decodeHtmlEntities(anime_data.AnimeData.description as any)}</span>
+                        <div class="player-more-information-genres-container">
+                            <For each={anime_data.AnimeData.genres}>
+                                {(item) => (
+                                    <div class="player-more-information-genres">{item as string}</div>
+                                )}
+                            </For>
+                        </div>
+                        <span class="player-more-information-durration">{anime_data.AnimeData.averageScore}% &#8226; {convertSecondsToHoursFormat(durrationTime())}</span>
+                    </div>
+                </div>
             </Show>
         </div>
     )

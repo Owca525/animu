@@ -156,20 +156,16 @@ export class informationPluginManager implements informationPluginManagerFormat 
     searchAnime = (name: string, page: number, params?: genresSearchFormat) => {
         setHomeData(async () => await this.currentPlugin.search(name, page, params))
     };
-    // schedule = (airingStart?: number, airingEnd?: number): void => {
-    //     this.currentPlugin.schedule({ airingStart, airingEnd }, {
-    //         onSuccess: function (data: containerData): void {
-    //             throw new Error("Function not implemented.");
-    //         },
-    //         onError: function (error: string): void {
-    //             throw new Error("Function not implemented.");
-    //         }
-    //     })
-    // }
+    schedule = (airingStart: number, airingEnd: number) => {
+        return this.currentPlugin.schedule(airingStart, airingEnd)
+    }
     home = () => {
         setHomeData(this.currentPlugin.home)
     }
     anime = async (id: string) => {
         return await this.currentPlugin.anime({ id: id })
+    }
+    getManga = async (id: string) => {
+        return await this.currentPlugin.getManga(id)
     }
 }
