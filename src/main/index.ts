@@ -144,11 +144,11 @@ function createWindow(): void {
     mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show()
   })
 
-  mainWindow.on('close', (e) => {
-    if (!mainWindow) return
-    e.preventDefault()
-    mainWindow.hide()
-  })
+  // mainWindow.on('close', (e) => {
+  //   if (!mainWindow) return
+  //   e.preventDefault()
+  //   mainWindow.hide()
+  // })
 
   Menu.setApplicationMenu(null);
 

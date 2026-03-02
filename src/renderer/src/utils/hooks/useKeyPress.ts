@@ -26,18 +26,20 @@ export function useKeyPress(func: (keybinds: string) => void) {
   };
 
   onMount(() => {
-    const callback = window.BrowserWindow.onWindowFocus((focus) => {
-      if (focus) {
-        window.addEventListener("keydown", handleKeyDown, { passive: true });
-        window.addEventListener("keyup", handleKeyUp, { passive: true });
-      } else {
-        window.removeEventListener("keydown", handleKeyDown);
-        window.removeEventListener("keyup", handleKeyUp);
-      }
-    })
-    onCleanup(() => {
-      callback()
-    })
+    if (window.api) {
+      const callback = window.BrowserWindow.onWindowFocus((focus) => {
+        if (focus) {
+          window.addEventListener("keydown", handleKeyDown, { passive: true });
+          window.addEventListener("keyup", handleKeyUp, { passive: true });
+        } else {
+          window.removeEventListener("keydown", handleKeyDown);
+          window.removeEventListener("keyup", handleKeyUp);
+        }
+      })
+      onCleanup(() => {
+        callback()
+      })
+    }
 
     window.addEventListener("keydown", handleKeyDown, { passive: true });
     window.addEventListener("keyup", handleKeyUp, { passive: true });

@@ -110,7 +110,7 @@ export const defaultConfigWeb: SettingsConfig = {
         playerDebug: false
     },
     update: {
-        lastTime: "0",
+        lastTime: 0,
         type: "On Start",
         enable: true
     },

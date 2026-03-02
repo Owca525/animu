@@ -13,6 +13,7 @@ import { setHomeSearchPage } from '@renderer/utils/stores/home';
 import { sidebarData } from '@renderer/utils/types';
 import './css/sidebar.css';
 import { useI18n } from '@renderer/utils/i18n';
+import app from "@renderer/app.json"
 
 interface sidebarProps {
   showLogo?: boolean
@@ -32,7 +33,6 @@ export default function Sidebar(props: sidebarProps) {
   const { t, pathExist } = useI18n()
 
   const [sidebarHover, setHover] = createSignal<boolean>(false)
-  const [animuVersion, setVersion] = createSignal<string>("")
   const [currentButton, setCurrentButton] = createSignal<number>(
     props.activeElement ?
     props.setAciveElement ? props.setAciveElement : 0
@@ -54,7 +54,6 @@ export default function Sidebar(props: sidebarProps) {
   })
 
   onMount(async () => {
-    setVersion(await window.backend.version())
     document.addEventListener('mousedown', handleClickOutside);
   })
   onCleanup(() => {
@@ -109,9 +108,9 @@ export default function Sidebar(props: sidebarProps) {
     >
       <Show when={props.showLogo}>
         <div class="sidebar-logo-icon-container">
-          <img src={icon} alt={animuVersion()} class="sidebar-image" />
+          <img src={icon} alt={app.ver} class="sidebar-image" />
           <Show when={sidebarHover()}>
-            <div class="sidebar-version">v{animuVersion()}</div>
+            <div class="sidebar-version">v{app.ver}</div>
           </Show>
         </div>
       </Show>

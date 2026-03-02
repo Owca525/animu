@@ -407,6 +407,9 @@ export async function request(url: string, options?: { method?: "POST" | "GET", 
 
         const response = await fetch(noCors ? url : "/api/request", noCors ? options : {
             method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({
                 url: url,
                 requestOptions: options
@@ -429,7 +432,7 @@ export async function request(url: string, options?: { method?: "POST" | "GET", 
         return {
             text: text,
             json: jsontext,
-            buffer: Buffer.from(await bufferCloned.arrayBuffer()),
+            buffer: await bufferCloned.arrayBuffer() as any,
             status: response.status,
             statusText: response.statusText,
             url: response.url,
@@ -441,7 +444,7 @@ export async function request(url: string, options?: { method?: "POST" | "GET", 
         return {
             text: (error as Error).message,
             json: undefined,
-            buffer: Buffer.from(""),
+            buffer: [] as any,
             status: 500,
             statusText: "Error",
             url: url,
@@ -699,27 +702,56 @@ export function dateToUnix(dateStr: string): number {
 
 export async function addToAnimuList(animulist: animulistProps, anime: AnimeData, notification: boolean = false) {
     if (getGlobalCache().incognito) return
-    await window.api.animulist.add({ AnimeData: { ...unwrap(anime), nextAiringEpisode: undefined }, animulist: unwrap(animulist) })
+    if (window.api) await window.api.animulist.add({ AnimeData: { ...unwrap(anime), nextAiringEpisode: undefined }, animulist: unwrap(animulist) })
+    else {
+        let database = structuredClone(unwrap(animulistData()))
+        database.unshift({ AnimeData: { ...unwrap(anime), nextAiringEpisode: undefined }, animulist: unwrap(animulist) })
+        console.log(database)
+        localStorage.setItem("animulist", JSON.stringify(database))
+    }
     refreashAnimulist()
     if (notification) toast(`Succesfully Added ${anime.title.romaji} to animulist`)
 }
 
 export async function removeFromAnimulist(id: string, notification: boolean = false) {
     if (getGlobalCache().incognito) return
-    await window.api.animulist.delete(unwrap(id))
+    if (window.api) await window.api.animulist.delete(unwrap(id))
+    else {
+        let database = structuredClone(unwrap(animulistData()))
+        localStorage.setItem("animulist", JSON.stringify(database.filter((v) => v.AnimeData.id != id)))
+    }
     refreashAnimulist()
     if (notification) toast(`Succesfully Removed From animulist`)
 }
 
 export async function updateDataInAnimulist(id: string, anime: { AnimeData: AnimeData; animulist: animulistProps }, notification: boolean = false) {
     if (getGlobalCache().incognito) return
-    await window.api.animulist.update(unwrap(id), unwrap(anime))
+    if (window.api) await window.api.animulist.update(unwrap(id), unwrap(anime))
+    else {
+        let database = structuredClone(unwrap(animulistData()))
+        localStorage.setItem("animulist", JSON.stringify(database.map((v) => v.AnimeData.id == id ? { ...anime, 
+        AnimeData: { 
+            ...anime.AnimeData,
+            nextAiringEpisode: undefined,
+            recommendations: undefined
+        }
+    } : {
+        ...v,
+        AnimeData: {
+            ...v.AnimeData,
+            nextAiringEpisode: undefined,
+            recommendations: undefined
+        }
+    })))
+    }
     refreashAnimulist()
     if (notification) toast(`Succesfully Updated in animulist`)
 }
 
 export async function refreashAnimulist() {
-    setAnimulistData(await window.api.animulist.getDatabase())
+    if (window.api) setAnimulistData(await window.api.animulist.getDatabase())
+    else setAnimulistData(JSON.parse(localStorage.getItem("animulist") as any))
+    
     const global = unwrap(getHomeCache())
     if (global.activePage != "global.animulist") return
 

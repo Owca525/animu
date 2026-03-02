@@ -547,7 +547,7 @@ export default function MiniPlayer(props: MiniPlayerProps) {
             setASSubtitles(() => undefined)
         }
 
-        if (window.electronAPI.process.env.NODE_ENV == "development" && currentASSubtitles() && assSubContainer) {
+        if (window.api && window.electronAPI.process.env.NODE_ENV == "development" && currentASSubtitles() && assSubContainer) {
             assSubContainer.innerHTML = ""
         }
 

@@ -100,7 +100,7 @@ const Home = () => {
       if (getHomeCache().activePage == element.text) setNewActivePage(element.text)
     }
 
-    if (!getGlobalCache().deeplinkRunned) {
+    if (!getGlobalCache().deeplinkRunned && window.api) {
       window.api.onProtocolRequest(fetchDeeplinks)
       setDeeplinkRunned(true)
     }

@@ -96,7 +96,11 @@ function App() {
     if (window.api) setGlobalTheme(await window.api.themes.list())
 
     setinitialState({ text: "Loading Animulist", plugin: false })
-    setAnimulistData(await window.api.animulist.getDatabase())
+    if (window.api) setAnimulistData(await window.api.animulist.getDatabase())
+    else {
+      if (!localStorage.getItem("animulist")) localStorage.setItem("animulist", JSON.stringify([]))
+        setAnimulistData(JSON.parse(localStorage.getItem("animulist") as any))
+    }
 
     setinitialState({ text: "initial.config", plugin: false })
     LoadConfig()

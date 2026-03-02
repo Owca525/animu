@@ -3,6 +3,47 @@ import fs from 'fs';
 import solid from 'vite-plugin-solid';
 import { defineConfig } from 'electron-vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
+import pkg from './package.json'
+import { execSync } from 'child_process';
+
+function generateInfoFile() {
+  let filePath: string
+  let tempPath: string
+
+  return {
+    name: 'generateInfoFile',
+
+    buildStart() {
+      filePath = path.resolve(__dirname, 'src/renderer/src/app.placeholder.json')
+      tempPath = path.resolve(__dirname, 'src/renderer/src/app.json')
+
+      fs.renameSync(tempPath, filePath)
+      let branch = execSync('git rev-parse --abbrev-ref HEAD')
+        .toString()
+        .trim()
+
+      let commit = execSync('git rev-parse --short HEAD')
+        .toString()
+        .trim()
+
+      fs.writeFileSync(tempPath, `
+      {
+        "ver": "${pkg.version}",
+        "branch": "${branch}",
+        "commit": "${commit}",
+        "compiled": "${Math.floor(new Date().getTime() / 1000)}"
+      }`)
+    },
+
+    closeBundle() {
+      tempPath = path.resolve(__dirname, 'src/renderer/src/app.json')
+      filePath = path.resolve(__dirname, 'src/renderer/src/app.placeholder.json')
+      
+      fs.rmSync(tempPath)
+      fs.renameSync(filePath, tempPath)
+    }
+  }
+}
 
 export default defineConfig({
   main: {
@@ -51,6 +92,7 @@ export default defineConfig({
     },
     plugins: [
       solid(),
+      generateInfoFile(),
       viteStaticCopy({
         targets: [
           {

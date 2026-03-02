@@ -77,7 +77,7 @@ function settings() {
     const [config, setNewConfig] = createSignal<{ old: SettingsConfig, new: SettingsConfig }>({ old: structuredClone(cfg), new: structuredClone(cfg) })
     const [themes, setThemes] = createSignal<themeMetadata[]>([])
     const [lastActiveTheme, setLastActiveTheme] = createSignal<Map<number, themeMetadata>>(new Map())
-    const [versions] = createSignal(window.electronAPI.process.versions)
+    const [versions] = createSignal(window.api ? window.electronAPI.process.versions : undefined)
     const [isSaving, setSaving] = createSignal<boolean>(false)
     const [backupList, setBackupList] = createSignal<{ date: Date, file: string }[]>([])
     const [pluginList, setpluginList] = createSignal<{ active: boolean, plugin: playerPluginFormat | informationPluginFormat }[]>([])
@@ -1218,21 +1218,23 @@ function settings() {
                             </span>
                         </div>
                     </div>
-                    <div class="settings-page-container">
-                        <div class="settings-page-title">{t("settings.devmode.information")}</div>
-                        <div class="settings-setting-container">
-                            <span>{t("settings.devmode.electronver")}</span>
-                            <span>{versions().electron}</span>
+                    <Show when={versions()}>
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("settings.devmode.information")}</div>
+                            <div class="settings-setting-container">
+                                <span>{t("settings.devmode.electronver")}</span>
+                                <span>{versions()!.electron}</span>
+                            </div>
+                            <div class="settings-setting-container">
+                                <span>{t("settings.devmode.chromiumver")}</span>
+                                <span>{versions()!.chrome}</span>
+                            </div>
+                            <div class="settings-setting-container">
+                                <span>{t("settings.devmode.nodever")}</span>
+                                <span>{versions()!.node}</span>
+                            </div>
                         </div>
-                        <div class="settings-setting-container">
-                            <span>{t("settings.devmode.chromiumver")}</span>
-                            <span>{versions().chrome}</span>
-                        </div>
-                        <div class="settings-setting-container">
-                            <span>{t("settings.devmode.nodever")}</span>
-                            <span>{versions().node}</span>
-                        </div>
-                    </div>
+                    </Show>
                 </Show>
                 <Show when={category() == "extensions"}>
                     <div class="settings-page-container">
