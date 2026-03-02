@@ -98,13 +98,13 @@ export async function SaveHistory(data: cardData): Promise<boolean> {
     }
 }
 
-export async function HardResetHistory(): Promise<boolean> {
+export async function OverWriteHistory(data: cardData[]): Promise<boolean> {
     try {
-        if (window.api) await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate([])))
-        else localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate([])))
+        if (window.api) await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(data)))
+        else localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(data)))
         return true
     } catch (Error) {
-        console.error(`${Error} in HardResetHistory`)
+        console.error(`${Error} in OverWriteHistory`)
         return false
     }
 }

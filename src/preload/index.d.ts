@@ -1,5 +1,5 @@
 import { ElectronAPI } from "@electron-toolkit/preload";
-import { AnimeData, cardData, pluginRepoExpanded, SettingsConfig, themeMetadata } from "@renderer/utils/types";
+import { AnimeData, cardData, globalDataFormat, pluginRepoExpanded, SettingsConfig, themeMetadata } from "@renderer/utils/types";
 
 declare global {
   interface Window {
@@ -90,8 +90,8 @@ declare global {
         add: (anime: { AnimeData: AnimeData, animulist: animulistProps }) => Promise<void>
         delete: (id: string) => Promise<boolean>
         update: (id: string, anime: { AnimeData: AnimeData, animulist: animulistProps }) => Promise<void>
-        getDatabase: () => Promise<globalDataFormat["animuList"][]>
-        hardReset: () => Promise<void>
+        getDatabase: () => Promise<globalDataFormat["animuList"]>
+        overWrite: (data: globalDataFormat["animuList"]) => Promise<void>
       }
       runExternaPlayer: (videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc") => any
       getOSDetails: () => Promise<{ platform: NodeJS.Platform, release: string, arch: string }>

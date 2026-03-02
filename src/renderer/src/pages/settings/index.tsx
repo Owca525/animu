@@ -40,7 +40,7 @@ import {
     Show
 } from 'solid-js';
 import { createShortcut } from '@solid-primitives/keyboard';
-import { DetectOldVersionHistory, HardResetHistory } from '@renderer/utils/FilesManager/history';
+import { DetectOldVersionHistory, OverWriteHistory } from '@renderer/utils/FilesManager/history';
 import { getConfig, setConfig } from '@renderer/utils/stores/config';
 import { getInformationPlugin, getPlayerPLugin, getPluginList, getPluginRepo, pluginManager, setPluginPlayerList } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
@@ -55,7 +55,7 @@ import { activeThemes, animulistData, getGlobalCache, loadedTheme } from '@rende
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 import SettingsPlugin from './components/settingsPlugin';
 import semver from "semver";
-import { HardResetAnimulist } from '@renderer/utils/FilesManager/animulist';
+import { OvewriteAnimuList } from '@renderer/utils/FilesManager/animulist';
 
 export type pluginRepoExpandedSettings = {
     name: string,
@@ -475,10 +475,10 @@ function settings() {
                 const file = JSON.parse(reader.result as any)
                 
                 // animulist
-                HardResetAnimulist()
+                OvewriteAnimuList(file["animulist"])
 
                 // History
-                HardResetHistory()
+                OverWriteHistory(file["history"])
 
                 // Config
                 setConfig(file["config"])

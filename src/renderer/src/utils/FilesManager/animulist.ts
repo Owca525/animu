@@ -64,9 +64,9 @@ export async function refreashAnimulist() {
     AnimuListSearch(global.search, global.filterTags)
 }
 
-export async function HardResetAnimulist() {
-    if (window.api) setAnimulistData([])
-    else setAnimulistData(JSON.parse([] as any))
+export async function OvewriteAnimuList(data: { AnimeData: AnimeData; animulist: animulistProps }[]) {
+    if (window.api) setAnimulistData(data)
+    else setAnimulistData(JSON.parse(data as any))
     refreashAnimulist()
 }
 
