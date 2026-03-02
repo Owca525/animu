@@ -69,7 +69,8 @@ if (process.contextIsolated) {
         add: (anime) => ipcRenderer.invoke('animulist:saveToDatabase', anime),
         delete: (id) => ipcRenderer.invoke('animulist:deleteFromDatabase', id),
         update: (id, anime) => ipcRenderer.invoke('animulist:updateDatabase', id, anime),
-        getDatabase: () => ipcRenderer.invoke('animulist:getAllInformation')
+        getDatabase: () => ipcRenderer.invoke('animulist:getAllInformation'),
+        hardReset: () => ipcRenderer.invoke('animulist:hardReset')
       },
       runExternaPlayer: (videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", videoData, type),
       getOSDetails: () => ipcRenderer.invoke('get-os-info'),

@@ -4,11 +4,9 @@ import { useNavigate } from "@solidjs/router";
 import { JSX, Match, Show, Switch, createSignal, onMount, onCleanup } from "solid-js";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import {
-  addToAnimuList,
   convertSeconds,
   CreateContextMenuOptions,
   getGradientColor,
-  removeFromAnimulist,
   SaveToClipboard,
 } from "@renderer/utils/functions";
 import { DeleteFromHistory, SaveHistory } from "@renderer/utils/FilesManager/history";
@@ -18,6 +16,7 @@ import { pluginManager } from "@renderer/utils/stores/plugins";
 import { useI18n } from "@renderer/utils/i18n";
 import { showCustomMenu } from "@renderer/utils/context/menuContext";
 import { animulistData } from "@renderer/utils/stores/global";
+import { addToAnimuList, removeFromAnimulist } from "@renderer/utils/FilesManager/animulist";
 
 interface CardProps {
   card: cardData;

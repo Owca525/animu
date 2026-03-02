@@ -98,6 +98,17 @@ export async function SaveHistory(data: cardData): Promise<boolean> {
     }
 }
 
+export async function HardResetHistory(): Promise<boolean> {
+    try {
+        if (window.api) await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate([])))
+        else localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate([])))
+        return true
+    } catch (Error) {
+        console.error(`${Error} in HardResetHistory`)
+        return false
+    }
+}
+
 function checkAnimeDuplicate(listcard: cardData[]): cardData[] {
     const map = new Map<string, cardData>()
 

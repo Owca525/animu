@@ -4,7 +4,6 @@ import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
 import { AnimeData, animeOpeningsFormat, animulistProps, cardData, ContextMenuProps, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
 import {
-    addToAnimuList,
     calculateDays,
     changeTitleAnimu,
     convertDateToFormattedString,
@@ -14,11 +13,9 @@ import {
     decodeHtmlEntities,
     getGradientColor,
     openUrlFolder,
-    removeFromAnimulist,
     SaveToClipboard,
     segregatePlugins,
     unixToDateTime,
-    updateDataInAnimulist
 } from '@renderer/utils/functions';
 import {
     createEffect,
@@ -50,6 +47,7 @@ import ButtonGroup from '../settings/components/buttonGroup';
 import MiniPlayer from '@renderer/components/miniPlayer';
 import { requestAnimeMedia } from '@renderer/utils/animeThemes';
 import { updateHistoryData } from '@renderer/utils/FilesManager/history';
+import { addToAnimuList, removeFromAnimulist, updateDataInAnimulist } from '@renderer/utils/FilesManager/animulist';
 
 function information() {
     const { t } = useI18n()

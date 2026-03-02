@@ -1,6 +1,5 @@
 import {
     AnimeData,
-    animulistProps,
     cardData,
     containerData,
     ContextMenuProps,
@@ -15,7 +14,7 @@ import {
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { animulistData, getGlobalCache, setActiveThemes, setAnimulistData, setGlobalToken } from './stores/global';
+import { getGlobalCache, setActiveThemes, setGlobalToken } from './stores/global';
 import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
@@ -25,7 +24,6 @@ import semver from "semver";
 import { v4 as uuidv4 } from 'uuid';
 import { toast, updateToast } from './context/ToastNotification';
 import { saveConfig } from './FilesManager/config';
-import { AnimuListSearch } from '@renderer/pages/home/homeUtils';
 
 export function decodeHtmlEntities(str: string) {
     const parser = new DOMParser();
@@ -700,64 +698,6 @@ export function dateToUnix(dateStr: string): number {
     return Math.floor(date.getTime() / 1000);
 }
 
-export async function addToAnimuList(animulist: animulistProps, anime: AnimeData, notification: boolean = false) {
-    if (getGlobalCache().incognito) return
-    if (window.api) await window.api.animulist.add({ AnimeData: { ...unwrap(anime), nextAiringEpisode: undefined }, animulist: unwrap(animulist) })
-    else {
-        let database = structuredClone(unwrap(animulistData()))
-        database.unshift({ AnimeData: { ...unwrap(anime), nextAiringEpisode: undefined }, animulist: unwrap(animulist) })
-        console.log(database)
-        localStorage.setItem("animulist", JSON.stringify(database))
-    }
-    refreashAnimulist()
-    if (notification) toast(`Succesfully Added ${anime.title.romaji} to animulist`)
-}
-
-export async function removeFromAnimulist(id: string, notification: boolean = false) {
-    if (getGlobalCache().incognito) return
-    if (window.api) await window.api.animulist.delete(unwrap(id))
-    else {
-        let database = structuredClone(unwrap(animulistData()))
-        localStorage.setItem("animulist", JSON.stringify(database.filter((v) => v.AnimeData.id != id)))
-    }
-    refreashAnimulist()
-    if (notification) toast(`Succesfully Removed From animulist`)
-}
-
-export async function updateDataInAnimulist(id: string, anime: { AnimeData: AnimeData; animulist: animulistProps }, notification: boolean = false) {
-    if (getGlobalCache().incognito) return
-    if (window.api) await window.api.animulist.update(unwrap(id), unwrap(anime))
-    else {
-        let database = structuredClone(unwrap(animulistData()))
-        localStorage.setItem("animulist", JSON.stringify(database.map((v) => v.AnimeData.id == id ? { ...anime, 
-        AnimeData: { 
-            ...anime.AnimeData,
-            nextAiringEpisode: undefined,
-            recommendations: undefined
-        }
-    } : {
-        ...v,
-        AnimeData: {
-            ...v.AnimeData,
-            nextAiringEpisode: undefined,
-            recommendations: undefined
-        }
-    })))
-    }
-    refreashAnimulist()
-    if (notification) toast(`Succesfully Updated in animulist`)
-}
-
-export async function refreashAnimulist() {
-    if (window.api) setAnimulistData(await window.api.animulist.getDatabase())
-    else setAnimulistData(JSON.parse(localStorage.getItem("animulist") as any))
-    
-    const global = unwrap(getHomeCache())
-    if (global.activePage != "global.animulist") return
-
-    AnimuListSearch(global.search, global.filterTags)
-}
-
 export function unixToDateTime(unixTimestamp: number | undefined): string {
     if (!unixTimestamp || unixTimestamp == 0) return t("player.other.unknown")
     const date = new Date(unixTimestamp * 1000);
@@ -771,38 +711,6 @@ export function unixToDateTime(unixTimestamp: number | undefined): string {
     const seconds = String(date.getSeconds()).padStart(2, "0");
 
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-}
-
-export function convertHistoryToAnimuList() {
-    const history = unwrap(getHistory()).history.reverse()
-    if (history.length <= 0) return
-    const animulist = unwrap(animulistData())
-
-    for (let index = 0; index < history.length; index++) {
-        const element = history[index];
-        if (element.AnimeData.id.replaceAll(" ", "") == "") return
-        const finded = animulist.find((v) => v.AnimeData.id.toString() == element.AnimeData.id.toString())
-        if (finded) continue
-        if (!element.saveData.episode) continue
-        let status: animulistProps = {
-            status: "COMPLETED",
-            score: 0,
-            reapeat: 0,
-            startWatch: 0,
-            endWatch: 0,
-            added: dateToUnix(new Date().toString()),
-            lastUpdate: dateToUnix(new Date().toString())
-        }
-
-        if (element.AnimeData.episodes && parseInt(element.saveData.episode) < element.AnimeData.episodes)
-            status = { ...status, status: "CURRENT", startWatch: dateToUnix(new Date().toString()) }
-        
-        addToAnimuList(status, {
-            ...element.AnimeData,
-            nextAiringEpisode: undefined,
-            recommendations: undefined
-        })
-    }
 }
 
 export function searchDataInCards(cards: cardData[], search: string, params: FilterParams | undefined) {

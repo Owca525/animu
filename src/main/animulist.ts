@@ -52,3 +52,4 @@ ipcMain.handle("animulist:updateDatabase", async (_, id, anime: { AnimeData: Ani
     }))
 });
 ipcMain.handle("animulist:getAllInformation", async (_) => checkDatabase());
+ipcMain.handle("animulist:hardReset", async (_) => saveToDatabase([]));

@@ -1,7 +1,7 @@
 import Hls from "hls.js"
 
 import { AnimeData, animulistProps, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
-import { convertKeybinds, convertSecondsToHoursFormat, CreateContextMenuOptions, dateToUnix, decodeHtmlEntities, detectTitle, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateDataInAnimulist, updateObjectConfig } from "@renderer/utils/functions"
+import { convertKeybinds, convertSecondsToHoursFormat, CreateContextMenuOptions, dateToUnix, decodeHtmlEntities, detectTitle, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
@@ -28,6 +28,7 @@ import { useI18n } from "@renderer/utils/i18n"
 import { addTime, countImages, fetchResolutions, VTTstoryBoardParser } from "./playerUtils"
 import shaka from "shaka-player/dist/shaka-player.compiled.js";
 import { v4 as uuidv4 } from 'uuid';
+import { updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 

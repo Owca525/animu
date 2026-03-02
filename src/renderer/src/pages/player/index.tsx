@@ -2,7 +2,7 @@ import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
 import { AnimeData, animulistProps, indentityPlayer, SettingsConfig } from "@renderer/utils/types";
 
 import "./player.css"
-import { addToAnimuList, changeTitleAnimu, dateToUnix, detectTitle, refetchHistory } from "@renderer/utils/functions";
+import { changeTitleAnimu, dateToUnix, detectTitle, refetchHistory } from "@renderer/utils/functions";
 import Button from "@renderer/components/buttons";
 
 import VideoPlayer from "./VideoPlayer";
@@ -15,6 +15,7 @@ import ExternalPlayer from "./externalPlayer";
 import { pluginManager } from "@renderer/utils/stores/plugins";
 import { useResponse } from "@renderer/utils/hooks/useResponse";
 import { useI18n } from "@renderer/utils/i18n";
+import { addToAnimuList } from "@renderer/utils/FilesManager/animulist";
 
 const player = () => {
     const { t } = useI18n()

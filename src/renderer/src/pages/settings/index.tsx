@@ -40,7 +40,7 @@ import {
     Show
 } from 'solid-js';
 import { createShortcut } from '@solid-primitives/keyboard';
-import { DetectOldVersionHistory } from '@renderer/utils/FilesManager/history';
+import { DetectOldVersionHistory, HardResetHistory } from '@renderer/utils/FilesManager/history';
 import { getConfig, setConfig } from '@renderer/utils/stores/config';
 import { getInformationPlugin, getPlayerPLugin, getPluginList, getPluginRepo, pluginManager, setPluginPlayerList } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
@@ -51,10 +51,11 @@ import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './settings.css';
 import { useI18n } from '@renderer/utils/i18n';
-import { activeThemes, loadedTheme } from '@renderer/utils/stores/global';
+import { activeThemes, animulistData, getGlobalCache, loadedTheme } from '@renderer/utils/stores/global';
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 import SettingsPlugin from './components/settingsPlugin';
 import semver from "semver";
+import { HardResetAnimulist } from '@renderer/utils/FilesManager/animulist';
 
 export type pluginRepoExpandedSettings = {
     name: string,
@@ -72,6 +73,8 @@ function settings() {
     const navigate = useNavigate();
     const cfg: SettingsConfig = unwrap(getConfig());
     const { t, changeLanguage, listLang } = useI18n()
+
+    let filePickerImport: HTMLInputElement | undefined
 
     const [category, setCategory] = createSignal<string>("general");
     const [config, setNewConfig] = createSignal<{ old: SettingsConfig, new: SettingsConfig }>({ old: structuredClone(cfg), new: structuredClone(cfg) })
@@ -458,6 +461,69 @@ function settings() {
         return "settings.pluginstore.installed"
     }
 
+    function importConfig(event: Event) {
+        const input = event.currentTarget as HTMLInputElement;
+        if (!input.files || input.files.length === 0) return;
+
+        const file = input.files[0];
+
+        if (file.type !== "text/plain") return
+
+        const reader = new FileReader();
+        reader.onload = async () => {
+            try {
+                const file = JSON.parse(reader.result as any)
+                
+                // animulist
+                HardResetAnimulist()
+
+                // History
+                HardResetHistory()
+
+                // Config
+                setConfig(file["config"])
+                saveConfig(file["config"])
+
+                toast("Sucessfully Imported Data To Animu", { type: "success"} )
+                if (window.api) window.BrowserWindow.reload()
+                else location.reload()
+
+            } catch (error) {
+                console.error("Error in importConfig", error)
+                toast("Failed Import Data", { type: "error" })
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    async function exportConfig() {
+        try {
+            const handle = await (window as any).showSaveFilePicker({
+                suggestedName: "animuExport.txt",
+                types: [
+                {
+                    description: "Text Files",
+                    accept: { "text/plain": [".txt"] },
+                },
+                ],
+            });
+
+            const exported = JSON.stringify({
+                animulist: unwrap(animulistData()),
+                history: unwrap(getGlobalCache().history),
+                config: unwrap(getConfig())
+            })
+
+            const writable = await handle.createWritable();
+            await writable.write(exported);
+            await writable.close();
+            toast("Succesfully Exported Data", { type: "success" })
+        } catch (error) {
+            console.error("Error in exportConfig", error)
+            toast("Failed Exported Data", { type: "error" })
+        }
+    }
+
     return (
         <main class="settings-container" onContextMenu={(event) => OpenContextMenu(ContextMenu(), event)}>
             <Sidebar
@@ -578,6 +644,38 @@ function settings() {
                                     handleChange('General.discordRPC', checked)
                                 }
                             />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {/* TODO: ADD LANG */} Manage Data in animu
+                            <div class='settings-mini-container'>
+                                <Button content='Import Data' onClick={() => {
+                                    showDialog({
+                                        type: "info",
+                                        title: 'Double Check',
+                                        description: "Are you sure importing file, this action overwrite everything",
+                                        buttons: [
+                                            {
+                                                title: t("dialog.no"),
+                                                onClick: () => ""
+                                            },
+                                            {
+                                                title: t("dialog.yes"),
+                                                onClick: () => filePickerImport?.click()
+                                            }
+                                        ]
+                                    })
+                                    
+                                }}/>
+                                <Button content='Export Data' onClick={exportConfig}/>
+                                <input
+                                    type="file"
+                                    accept=".txt"
+                                    ref={filePickerImport}
+                                    style={{ display: "none" }}
+                                    onChange={importConfig}
+                                />
+                            </div>
                         </div>
                     </div>
                     <div class="settings-page-container">

@@ -8,7 +8,6 @@ import {
   calculateZoomLevel,
   changeTheme,
   checkDate,
-  convertHistoryToAnimuList,
   dateToUnix,
   detectPluginVersion,
   fetchPluginRepos,
@@ -39,6 +38,7 @@ import './utils/i18n';
 import { unwrap } from 'solid-js/store';
 import { pluginRepoExpanded, themeMetadata } from './utils/types';
 import shaka from 'shaka-player';
+import { convertHistoryToAnimuList } from './utils/FilesManager/animulist';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
