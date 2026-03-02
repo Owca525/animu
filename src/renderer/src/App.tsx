@@ -1,5 +1,5 @@
 import Home from './pages/home/index';
-import icon from '../../../build/icon.png';
+import icon from '@resources/icon.png';
 import Information from './pages/information/index';
 import LocalErrorBoundary from './utils/ErrorBoundary';
 import Player from './pages/player/index';

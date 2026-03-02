@@ -4,7 +4,7 @@ import path, { join } from 'path'
 import ini from "ini";
 
 // Files import
-import icon from '../../resources/icon.png?asset'
+import icon from '../../build/icon.png?asset'
 import "./utils"
 import "./window"
 import "./os"
