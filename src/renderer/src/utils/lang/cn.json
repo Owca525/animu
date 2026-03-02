@@ -19,7 +19,8 @@
     "incognitomode": "無痕模式: {{switch}}",
     "off": "關閉",
     "on": "開啟",
-    "action": "操作"
+    "action": "操作",
+    "adult": "成人"
   },
   "initial": {
     "animu": "Animu is initializing",
