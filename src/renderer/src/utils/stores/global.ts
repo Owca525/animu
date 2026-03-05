@@ -1,6 +1,7 @@
 import { UUIDTypes } from "uuid";
 import { cardData, globalDataFormat, themeMetadata } from "../types";
 import { createStore } from "solid-js/store";
+import { Socket } from "socket.io-client";
 
 export const [globalState, setGlobalState] = createStore({
     incognito: false,
@@ -9,13 +10,18 @@ export const [globalState, setGlobalState] = createStore({
     loadedTheme: [],
     activeThemes: new Map(),
     token: undefined,
-    animuList: []
+    animuList: [],
+    socket: undefined
 } as globalDataFormat);
 
 export const getGlobalCache = () => globalState;
 export const loadedTheme = () => globalState.loadedTheme;
 export const activeThemes = () => globalState.activeThemes;
 export const animulistData = () => globalState.animuList;
+export const getSocket = () => globalState.socket?.instance;
+export const getSocketRoom = () => globalState.socket?.currentRoom;
+export const setSocket = (tmp: Socket) => setGlobalState((prev) => ({...prev, socket: { ...prev.socket as any, instance: tmp }}));
+export const setSocketRoom = (tmp: string) => setGlobalState((prev) => ({...prev, socket: { ...prev.socket as any, currentRoom: tmp }}));
 export const setActiveThemes = (tmp: Map<number, themeMetadata>) => setGlobalState((prev) => ({...prev, activeThemes: tmp}));
 export const setGlobalTheme = (tmp: themeMetadata[]) => setGlobalState((prev) => ({...prev, loadedTheme: tmp}));
 export const setIncognitoMode = (tmp: boolean) => setGlobalState((prev) => ({...prev, incognito: tmp}));

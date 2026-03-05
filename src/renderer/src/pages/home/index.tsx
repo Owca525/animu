@@ -37,6 +37,8 @@ import { useI18n } from '@renderer/utils/i18n';
 import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
 import { getGlobalCache, setDeeplinkRunned } from '@renderer/utils/stores/global';
 import { anilistSearch, AnimuListSearch, historySearch, setAnimuList, setCalendary, setHistory } from './homeUtils';
+// import { io } from 'socket.io-client';
+// import { socketPlayerInit } from '../player/VideoPlayer';
 
 // import WelcomeScreen from "./components/welcomeScreen"
 const Home = () => {
@@ -99,6 +101,50 @@ const Home = () => {
       const element = sidebarData.top[index];
       if (getHomeCache().activePage == element.text) setNewActivePage(element.text)
     }
+
+    // function runSocket(server: string = "") {
+    //   const socket = io(server)
+    //   console.log(socket)
+
+    //   socket.on("rooms-list", (rooms) => {
+    //     console.log(rooms)
+    //   })
+
+    //   socket.on("player:init", (playerData: socketPlayerInit) => {
+    //     localStorage.setItem("playerCache", JSON.stringify(unwrap({
+    //       data: playerData.anime,
+    //       save: playerData.saveData,
+    //       episodelist: playerData.temp.episodes,
+    //     })))
+    //     navigate("/player")
+    //   })
+
+    //   socket.on("disconnect", () => {
+    //     toast("Disconected From Websocket")
+    //   });
+    //   setSocket(socket)
+    // }
+
+    // function createRoom(name: string) {
+    //   const socket = getSocket()
+    //   console.log(socket)
+    //   if (!socket) return
+    //   socket.emit("join-room", name, (resp) => {
+    //     if (!resp.success) return toast(`Failed Connect to Room ${name}`)
+    //     else {
+    //       toast(`Sucesfully Connected to ${name}`)
+    //       setSocketRoom(name)
+    //     }
+    //   });
+    //   setSocketRoom(name)
+    // }
+
+    // function getRooms() {
+    //   const socket = getSocket()
+    //   console.log(socket)
+    //   if (!socket) return
+    //   return socket.emit("gets-rooms");
+    // }
 
     if (!getGlobalCache().deeplinkRunned && window.api) {
       window.api.onProtocolRequest(fetchDeeplinks)
@@ -197,7 +243,7 @@ const Home = () => {
     let data: any = [];
     for (const [key, type] of Object.entries(home.filterTags)) {
       console.log(key)
-      data.push({ remover: () => {updateGenres(key, undefined);StartSearch(unwrap(homeCache().search), unwrap(homeCache().filterTags))}, name: type });
+      data.push({ remover: () => { updateGenres(key, undefined); StartSearch(unwrap(homeCache().search), unwrap(homeCache().filterTags)) }, name: type });
     }
 
     return data;
@@ -221,7 +267,7 @@ const Home = () => {
 
   function checkOtherFilters() {
     if (homeCache().otherFilter.length <= 0) return []
-    let tmp: genres[] = [] 
+    let tmp: genres[] = []
     for (let index = 0; index < homeCache().otherFilter.length; index++) {
       const element = homeCache().otherFilter[index];
       if (element.page == homeCache().activePage) tmp = [...tmp, ...element.filter]

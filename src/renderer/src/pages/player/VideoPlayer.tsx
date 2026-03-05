@@ -29,6 +29,7 @@ import { addTime, countImages, fetchResolutions, VTTstoryBoardParser } from "./p
 import shaka from "shaka-player/dist/shaka-player.compiled.js";
 import { v4 as uuidv4 } from 'uuid';
 import { updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist"
+import { getSocket, getSocketRoom } from "@renderer/utils/stores/global"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -45,6 +46,11 @@ interface VideoPlayerProps {
     PlayerVolume: number
     time: number
     exitFromPlayer: () => void
+}
+export interface socketPlayerInit {
+    anime: AnimeData,
+    saveData: indentityPlayer,
+    temp: { episode: string, type: string, episodes: { ep: string, img?: string, title?: string }[] }
 }
 
 export type resoltionFormatExtended = resolutionFormat & {
@@ -70,6 +76,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     let assSubContainer: HTMLDivElement | undefined
     let vttSubRef: HTMLTrackElement | undefined
     let screenShotContainer: HTMLDivElement | undefined
+    let refreashUpdateSocket: NodeJS.Timeout | undefined
 
     // Variable
     const [volume, setVolume] = createSignal<number>(PlayerVolume)
@@ -141,6 +148,18 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [screenShot, setScreenShot] = createSignal<{ active: boolean, image: string, click: string }>({ active: false, image: "", click: "" });
 
     // const gamepad = useGamepad(0, gamepadControler);
+    if (!window.api && getSocket()) {
+        const socket = getSocket()
+        socket?.on("player:update", (update: { time: number, pause: boolean }) => {
+            console.log(update)
+            if (update.pause != isPlaying()) togglePlay()
+            console.log(unwrap(currentTime()) - update.time > 3, unwrap(currentTime()), unwrap(currentTime()) - update.time)
+            if (unwrap(currentTime()) - update.time > 3 || unwrap(currentTime()) - update.time < -3) {
+                setTimeVideo(update.time)
+                clearInterval(refreashUpdateSocket)
+            }
+        })
+    }
 
     function handleMouseMove() {
         setIsVisible(true)
@@ -553,7 +572,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     function togglePlay() {
         const video = videoRef
         if (!video) return
-        
+
         setIsPlaying(prev => {
             if (prev) {
                 video.pause()
@@ -569,6 +588,16 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             })
             return true
         })
+
+        if (!window.api && getSocket()) {
+            const socket = getSocket()
+            socket?.emit("player:update", {
+                roomName: unwrap(getSocketRoom()), player: {
+                    time: unwrap(currentTime()),
+                    pause: unwrap(isPlaying())
+                }
+            })
+        }
 
         if (playAnimationTimeout) clearTimeout(playAnimationTimeout)
         setShowPlay(() => true)
@@ -698,6 +727,20 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         checkUpNext(event)
         handleProgress(event)
 
+        if (!window.api && getSocket()) {
+            if (!refreashUpdateSocket) {
+                refreashUpdateSocket = setInterval(() => {
+                    const socket = getSocket()
+                    socket?.emit("player:update", {
+                        roomName: unwrap(getSocketRoom()), player: {
+                            time: unwrap(currentTime()),
+                            pause: unwrap(isPlaying())
+                        }
+                    })
+                }, 3000);
+            }
+        }
+
         // 
         setVideoFrames({ totalVideoFrames: event.currentTarget.getVideoPlaybackQuality().totalVideoFrames, droppedVideoFrames: event.currentTarget.getVideoPlaybackQuality().droppedVideoFrames })
 
@@ -801,6 +844,17 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (!videoRef) return
         videoRef.currentTime = value
         setcurrentTime(() => value)
+
+        if (!window.api && getSocket()) {
+            const socket = getSocket()
+            socket?.emit("player:update", {
+                roomName: unwrap(getSocketRoom()), player: {
+                    time: unwrap(currentTime()),
+                    pause: unwrap(isPlaying())
+                }
+            })
+        }
+
         if (!isNaN(value) && config && value > videoRef.duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
             setHideUpNextEpisode(true)
         }

@@ -1,3 +1,4 @@
+import { Socket } from "socket.io-client"
 import { UUIDTypes } from "uuid"
 
 export const notificationProps = {
@@ -118,6 +119,10 @@ export interface globalDataFormat {
     loadedTheme: themeMetadata[],
     activeThemes: Map<number, themeMetadata>
     token: UUIDTypes | undefined,
+    socket?: {
+        instance: Socket,
+        currentRoom: string,
+    },
     animuList: { AnimeData: AnimeData, animulist: animulistProps, onClick?: (data: AnimeData) => void }[]
 }
 

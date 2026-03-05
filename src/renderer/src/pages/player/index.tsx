@@ -16,6 +16,7 @@ import { pluginManager } from "@renderer/utils/stores/plugins";
 import { useResponse } from "@renderer/utils/hooks/useResponse";
 import { useI18n } from "@renderer/utils/i18n";
 import { addToAnimuList } from "@renderer/utils/FilesManager/animulist";
+import { getSocket, getSocketRoom } from "@renderer/utils/stores/global";
 
 const player = () => {
     const { t } = useI18n()
@@ -94,6 +95,18 @@ const player = () => {
     });
 
     onMount(() => {
+        if (!window.api && getSocket()) {
+            const socket = getSocket()
+            socket?.emit("player:init", {
+                roomName: getSocketRoom(),
+                data: {
+                    anime: anime_data.data,
+                    saveData: anime_data.save,
+                    temp: { episode: extractionData().actual, type: extractionData().type, episodes: extractionData().episodelist }
+                }
+            })
+        }
+
         changeTitleAnimu(`Animu - ${anime_data.data.title.romaji}`)
         SaveHistory({
             saveData: {
