@@ -109,6 +109,7 @@
 .information-cover, .information-cover-placeholder {
     max-width: 240px;
     max-height: 240px;
+    width: 100%;
     cursor: pointer;
     user-select: none;
     aspect-ratio: 2 / 3;

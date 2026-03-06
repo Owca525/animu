@@ -6,3 +6,13 @@
     width: clamp(50px, 25vw, 400px);
     font-size: large;
 }
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
