@@ -3,8 +3,41 @@ import fs from 'fs';
 import solid from 'vite-plugin-solid';
 import { defineConfig } from 'electron-vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
+import type { PluginOption } from "vite";
 import pkg from './package.json'
 import { execSync } from 'child_process';
+
+function evalConditionOr(expr: string, flags: Record<string, boolean>) {
+  const parts = expr.split("|").map(s => s.trim());
+  return parts.some(flag => flags[flag] === true);
+}
+
+export function viteConditionPlugin(flags: Record<string, boolean>): PluginOption {
+  return {
+    name: "viteConditionPlugin",
+    enforce: "pre",
+
+    // How to Use
+    // /* IFDEF DEBUG */
+    // ...code...
+    // /* ENDIF */
+    transform(code: string, id: string) {
+      if (!/\.(ts|tsx|js|jsx)$/.test(id)) return null;
+
+      const regex =
+        /(\/\*\s*#?IFDEF\s+(.+?)\s*\*\/|\{\s*\/\*\s*IFDEF\s+(.+?)\s*\*\/\s*\}|\/\/\s*IFDEF\s+(.+))([\s\S]*?)(\/\*\s*#?ENDIF\s*\*\/|\{\s*\/\*\s*ENDIF\s*\*\/\s*\}|\/\/\s*ENDIF)/gi;
+
+      code = code.replace(regex, (_, __, c1, c2, c3, inner) => {
+        const condition = (c1 || c2 || c3 || "").trim();
+        const enabled = evalConditionOr(condition, flags);
+
+        return enabled ? inner : "";
+      });
+
+      return { code, map: null };
+    }
+  };
+}
 
 function generateInfoFile() {
   let filePath: string
@@ -92,6 +125,10 @@ export default defineConfig({
     },
     plugins: [
       solid(),
+      viteConditionPlugin({
+        DEBUG: process.env.NODE_ENV !== 'production',
+        PROD: process.env.NODE_ENV == 'production'
+      }),
       generateInfoFile(),
       viteStaticCopy({
         targets: [
@@ -119,4 +156,3 @@ export default defineConfig({
     ]
   }
 })
-

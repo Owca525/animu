@@ -619,7 +619,27 @@ export async function setHomeData(wrapper?: () => Promise<homeData["data"] | con
         if ("sections" in respons) return setAllHomeData({ data: respons, isLoading: false, isError: false } as any)
         setAllHomeData({ data: { sections: [respons] }, isLoading: false, isError: false } as any)
     } catch (error) {
+        console.error("Error in setHomeData", error)
         setAllHomeData({ data: { sections: [] }, isLoading: false, isError: true, } as any)
+    }
+}
+
+export async function updateHomeContainer(data: homeData["data"] | containerData[]) {
+    try {
+        const tmp = unwrap(getHomeCache())
+        if (data instanceof Array) {
+            setHomeData(undefined, {
+                ...tmp.data,
+                sections: data
+            })
+            return
+        }
+        if (data instanceof Object) {
+            setHomeData(undefined, data)
+            return
+        }
+    } catch (error) {
+        console.error("Error in updateHomeContainer", error)
     }
 }
 

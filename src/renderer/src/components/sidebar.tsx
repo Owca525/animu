@@ -9,7 +9,7 @@ import {
   Show
   } from 'solid-js';
 import { createShortcut } from '@solid-primitives/keyboard';
-import { setHomeSearchPage } from '@renderer/utils/stores/home';
+import { setHomeSearchPage, setHomeStopScrolling } from '@renderer/utils/stores/home';
 import { sidebarData } from '@renderer/utils/types';
 import './css/sidebar.css';
 import { useI18n } from '@renderer/utils/i18n';
@@ -130,7 +130,9 @@ export default function Sidebar(props: sidebarProps) {
               <Button icon={value.icon}
                 content={detectSidebarStateButton(value.text)}
                 onClick={(event) => { 
-                  hideSidebar(event, value.onClick, i()) 
+                  setHomeSearchPage(1); 
+                  setHomeStopScrolling(false); 
+                  hideSidebar(event, value.onClick, i());
                   if (props.onClickTopButtons) props.onClickTopButtons(value.text)
                 }}
                 ButtonClass={`${detectSidebarStateClass()} ${checkNumber(i())}`}

@@ -196,6 +196,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     body: requests.body,
                 });
 
+                if (!resp.success) console.warn("Shaka Player Failed Request", tmp. resp)
+
                 const headersObj: { [key: string]: string } = {};
                 resp.responseHeader.forEach((value, key) => {
                     headersObj[key] = value;
@@ -325,14 +327,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             else runHLS(data, currentPlayer()?.splitHLS)
             return
         }
-
-        // if (data.doNotUseBackend) {
-        //     videoRef.src = data.url
-        // } else {
-        //     videoRef.src = `http://localhost:3001/video?url=${btoa(JSON.stringify(
-        //         { url: data.url, header: data.reqHeader }
-        //     ))}`
-        // }
 
         try {
             await shakaPlayer.load(data.url, time)
@@ -546,6 +540,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                             hls.destroy();
                             break;
                     }
+                    setFatalError(true)
                     if (message && !isCleanup()) toast(message, { type: "error" });
                 }
             });
@@ -681,15 +676,13 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     async function handlePictureInPicture() {
         const video = videoRef;
+        if (!video) return
 
         try {
             if (document.pictureInPictureElement) {
                 await document.exitPictureInPicture();
-
             } else {
-                if (video) {
-                    await video.requestPictureInPicture();
-                }
+                await video.requestPictureInPicture();
             }
         } catch (error) {
             console.error('Error PiP:', error);
@@ -746,7 +739,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         // Update RPC
         if (config.General.discordRPC && window.api) window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`)
-        if (config.Player.general.AutoSkipEpisode && event.currentTarget.duration == event.currentTarget.currentTime) setEpisode("next")
+        
+        if (!fatalError() && config.Player.general.AutoSkipEpisode && event.currentTarget.duration == event.currentTarget.currentTime) setEpisode("next")
 
         let player = currentPlayer()
 
@@ -816,6 +810,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         var message: string
         if (!Error) return
         if (isCleanup()) return
+        console.warn("Error Video Element in Animu", Error)
         switch (Error.code) {
             case Error.MEDIA_ERR_ABORTED:
                 message = t('player.errors.MEDIA_ERR_ABORTED')
@@ -870,13 +865,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             })
         }
     }
-
-    useKeyPress((keys: string) => {
-        if (keys == "CTRL+SHIFT+D") {
-            setshowNerdStats((prev) => !prev)
-        }
-        keybinds(keys)
-    })
 
     function setEpisode(type: "next" | "prev") {
         if (durrationTime() <= 0) return console.warn("Illegal Change Episode")
@@ -967,6 +955,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     //     }
     // }
+
+    useKeyPress((keys: string) => {
+        if (keys == "CTRL+SHIFT+D") setshowNerdStats((prev) => !prev)
+        if (keys == "CTRL+SHIFT+R" && currentPlayer()) runNewPlayer(currentPlayer()!)
+        keybinds(keys)
+    })
 
     function keybinds(event: string) {
         if (!videoRef) return
@@ -1268,10 +1262,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 <video
                     ref={videoRef}
                     class="video-player"
-                    onTimeUpdate={(event) => {
-                        updateProgress(event)
-                        setFatalError(false)
-                    }}
+                    onTimeUpdate={updateProgress}
                     onProgress={updateProgress}
                     onSeeked={updateProgress}
                     onClick={() => { togglePlay(); setcurrentSettings(() => false); setShowSelectEpisode(() => false) }}
@@ -1388,8 +1379,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                                 <SeekBar currentValue={volume()} maxValue={100} onSeek={value => handleVolume(value)} classes={{ "container": "player-seekbar" }} type="procent" />
                             </div>
 
-                            {/* TODO: Improve picture in picture */}
-                            {/* <PlayerButton icon={"picture_in_picture"} onClick={handlePictureInPicture} title={detectDisableTooltips("Picture In Picture")} ButtonClass="player-buttons" /> */}
+                            <Show when={currentASSubtitles() == undefined}>
+                                <PlayerButton icon={"picture_in_picture"} onClick={handlePictureInPicture} title={detectDisableTooltips(t("settings.player.keybinds.pip"))} ButtonClass="player-buttons" />
+                            </Show>
 
                             <Show when={temp.episodes.length >= 2}>
                                 <PlayerButton icon={"video_library"} title={detectDisableTooltips(t("player.selectepisode"))} ButtonClass="player-buttons" onClick={() => { setShowSelectEpisode((prev) => !prev); setcurrentSettings(() => false) }} />

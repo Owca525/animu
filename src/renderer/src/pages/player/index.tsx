@@ -58,7 +58,7 @@ const player = () => {
                 let pluginPlayer = pluginManager().changePlugin(anime_data.save?.pluginName ? anime_data.save.pluginName : "")
                 return await pluginPlayer.extractPlayerData(animeType, episode, player_id)
             },
-            cacheTime: 60 * 60 * 1000,
+            cacheTime: 3600000,
         }
     )
 
