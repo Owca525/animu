@@ -617,15 +617,13 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     async function handlePictureInPicture() {
         const video = videoRef;
+        if (!video) return
 
         try {
             if (document.pictureInPictureElement) {
                 await document.exitPictureInPicture();
-
             } else {
-                if (video) {
-                    await video.requestPictureInPicture();
-                }
+                await video.requestPictureInPicture();
             }
         } catch (error) {
             console.error('Error PiP:', error);
@@ -1300,8 +1298,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                                 <SeekBar currentValue={volume()} maxValue={100} onSeek={value => handleVolume(value)} classes={{ "container": "player-seekbar" }} type="procent" />
                             </div>
 
-                            {/* TODO: Improve picture in picture */}
-                            {/* <PlayerButton icon={"picture_in_picture"} onClick={handlePictureInPicture} title={detectDisableTooltips("Picture In Picture")} ButtonClass="player-buttons" /> */}
+                            <Show when={currentASSubtitles() == undefined}>
+                                <PlayerButton icon={"picture_in_picture"} onClick={handlePictureInPicture} title={detectDisableTooltips(t("settings.player.keybinds.pip"))} ButtonClass="player-buttons" />
+                            </Show>
 
                             <Show when={temp.episodes.length >= 2}>
                                 <PlayerButton icon={"video_library"} title={detectDisableTooltips(t("player.selectepisode"))} ButtonClass="player-buttons" onClick={() => { setShowSelectEpisode((prev) => !prev); setcurrentSettings(() => false) }} />

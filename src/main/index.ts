@@ -36,7 +36,6 @@ crashReporter.start({
 
 function createWindow(): void {
   let title = 'Animu '
-  let pipWindow;
 
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -70,24 +69,6 @@ function createWindow(): void {
     if (!mainWindow) return
     mainWindow.webContents.send("browserWindow:focus", false);
   });
-
-  global.createPiPWindow = () => {
-    pipWindow = new BrowserWindow({
-      width: 300,
-      height: 200,
-      alwaysOnTop: true,
-      frame: false,
-      resizable: false,
-      transparent: true,
-      webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false,
-      },
-    });
-
-    pipWindow.loadURL('http://localhost:3000/pip');
-    pipWindow.setAlwaysOnTop(true, 'screen-saver');
-  };
 
   const args = process.argv.slice(1);
   const isDevTools = args.includes("--dev-tools") || args.includes("--devtools");
