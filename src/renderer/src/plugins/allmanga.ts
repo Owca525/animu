@@ -1,5 +1,5 @@
-import { convertMsToMinutes, makeSmallText, request, runYT_DLP } from "@renderer/utils/functions"
-import { AnimeData, episodeList, genresSearchFormat, playerPluginFormat, playerData, resolutionFormat } from "@renderer/utils/types"
+import { convertMsToMinutes, makeSmallText, request } from "@renderer/utils/functions"
+import { AnimeData, episodeList, genresSearchFormat, playerPluginFormat, playerData } from "@renderer/utils/types"
 
 const HASH_SEARCH = 'a24c500a1b765c68ae1d8dd85174931f661c71369c89b92b88b75a725afc471c'
 const HASH_INFO = '043448386c7a686bc2aabfbb6b80f6074e795d350df48015023b079527b0848a'
@@ -13,8 +13,9 @@ const header = {
     // "Host": "api.allanime.day"
 }
 
-const source_names = ["Yt-mp4", 'Sak', 'S-mp4', 'Luf-mp4', "Kir", "Default", "Uv-mp4", "Mp4", "Ok"]
-const normalUrls = ["Ok"]
+const source_names = ['Sak', 'S-mp4', 'Luf-mp4', "Kir", "Default", "Uv-mp4", "Mp4"]
+// "Yt-mp4"
+// const normalUrls: string[] = []
 
 const mapping: Record<string, string> = {
     "79": "A", "7a": "B", "7b": "C", "7c": "D", "7d": "E", "7e": "F", "7f": "G",
@@ -31,11 +32,15 @@ const mapping: Record<string, string> = {
     "11": ")", "12": "*", "13": "+", "14": ",", "03": ";", "05": "=", "1d": "%"
 };
 
-function findUrl(url: string, sourceName: string): { url: string, decode: boolean } | undefined {
+function findUrl(url: string, sourceName: string): { url: string, decode: boolean, source: string } | undefined {
     for (let index = 0; index < source_names.length; index++) {
         const element = source_names[index];
-        if (element.toLowerCase() == sourceName.toLowerCase() && normalUrls.includes(element)) return { url, decode: false }
-        if (element.toLowerCase() == sourceName.toLowerCase()) return { url: decodeText(url), decode: true }
+        console.log(sourceName, url)
+        // if (element.toLowerCase() == sourceName.toLowerCase() && normalUrls.includes(element)) return { url, decode: false, source: sourceName }
+        if (element.toLowerCase() == sourceName.toLowerCase()) {
+            let tmpUrl = decodeText(url)
+            return { url: tmpUrl, decode: !tmpUrl.startsWith("https://"), source: sourceName }
+        }
     }
     return
 }
@@ -254,30 +259,30 @@ async function requestForUrl(url: string): Promise<playerData | undefined> {
     return listUrls
 }
 
-async function fetchMP4(hostname: string, url: string): Promise<playerData | undefined> {
-    try {
-        let resoltutions: resolutionFormat[] = [] 
-        const extractedata = await runYT_DLP(url)
-        for (let index = 0; index < extractedata.formats.length; index++) {
-            const element = extractedata.formats[index];
-            if ("format_id" in element && element["format_id"].includes("dash-video")) resoltutions.push({
-                res: `${element["height"]}`,
-                url: element["url"],
-                reqHeader: element["http_headers"],
-            })
-        }
-        return {
-            hostname: hostname,
-            resolution: resoltutions.reverse()
-        }
-    } catch (error) {
-        return undefined
-    }
-}
+// async function fetchMP4(hostname: string, url: string): Promise<playerData | undefined> {
+//     try {
+//         let resoltutions: resolutionFormat[] = [] 
+//         const extractedata = await runYT_DLP(url)
+//         for (let index = 0; index < extractedata.formats.length; index++) {
+//             const element = extractedata.formats[index];
+//             if ("format_id" in element && element["format_id"].includes("dash-video")) resoltutions.push({
+//                 res: `${element["height"]}`,
+//                 url: element["url"],
+//                 reqHeader: element["http_headers"],
+//             })
+//         }
+//         return {
+//             hostname: hostname,
+//             resolution: resoltutions.reverse()
+//         }
+//     } catch (error) {
+//         return undefined
+//     }
+// }
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.13",
+        version: "1.14",
         name: "Allmanga",
         author: "Owca525",
         icon: "https://allmanga.to/android-icon-192x192.png",
@@ -299,26 +304,42 @@ export default class Allmanga implements playerPluginFormat {
             if (!resp.success || !resp.json) return []
 
             let jsonObject = resp.json
+
             const sources = jsonObject.data.episode.sourceUrls
-            const urls: { url: string, decode: boolean }[] = sources
+            const urls: { url: string, decode: boolean, source: string }[] = sources
                 .map((tmp: { sourceUrl: string; sourceName: string }) =>
                     findUrl(tmp.sourceUrl, tmp.sourceName)
                 )
                 .filter((item) => item !== undefined)
+
+            const maxPriority = Math.max(...sources.map(i => i.priority));
+
+            const updatedItems = sources.map(item => ({
+                ...item,
+                active: item.priority === maxPriority
+            }));
 
             let data: playerData[] = []
             for (let i = 0; i < urls.length; i++) {
                 const element = urls[i];
                 if (element.decode) {
                     let tmp = await requestForUrl(element.url)
-                    if (tmp) data.push(tmp)
+                    if (tmp) data.push({
+                        ...tmp,
+                        defaultHost: updatedItems.find((item) => item["sourceName"] == element.source ? item["active"] : false)
+                    })
                 }
                 if (!element.decode) {
                     const urlObject = new URL(element.url);
                     data.push({
                         hostname: urlObject.hostname,
-                        resolution: [],
-                        extractResolution: async () => await fetchMP4(urlObject.hostname, element.url)
+                        defaultHost: updatedItems.find((item) => item["sourceName"] == element.source ? item["active"] : false),
+                        resolution: [{
+                            res: "",
+                            url: element.url,
+                            reqHeader: header
+                        }],
+                        // extractResolution: async () => await fetchMP4(urlObject.hostname, element.url)
                     })
                 }
             }

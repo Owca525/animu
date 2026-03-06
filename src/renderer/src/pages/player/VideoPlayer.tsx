@@ -169,6 +169,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     body: requests.body,
                 });
 
+                if (!resp.success) console.warn("Shaka Player Failed Request", tmp. resp)
+
                 const headersObj: { [key: string]: string } = {};
                 resp.responseHeader.forEach((value, key) => {
                     headersObj[key] = value;
