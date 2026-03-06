@@ -1,7 +1,7 @@
 import Hls from "hls.js"
 
-import { AnimeData, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
-import { convertKeybinds, CreateContextMenuOptions, detectTitle, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObjectConfig } from "@renderer/utils/functions"
+import { AnimeData, animulistProps, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
+import { convertKeybinds, convertSecondsToHoursFormat, CreateContextMenuOptions, dateToUnix, decodeHtmlEntities, detectTitle, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
@@ -28,6 +28,8 @@ import { useI18n } from "@renderer/utils/i18n"
 import { addTime, countImages, fetchResolutions, VTTstoryBoardParser } from "./playerUtils"
 import shaka from "shaka-player/dist/shaka-player.compiled.js";
 import { v4 as uuidv4 } from 'uuid';
+import { updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist"
+import { getSocket, getSocketRoom } from "@renderer/utils/stores/global"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -35,7 +37,8 @@ interface VideoPlayerProps {
     player_data: playerData[]
     anime_data: {
         AnimeData: AnimeData,
-        saveData: indentityPlayer
+        saveData: indentityPlayer,
+        animulist?: animulistProps
     }
     temp: { episode: string, type: string, episodes: { ep: string, img?: string, title?: string }[] }
     setNextEpisode: (value: string) => void
@@ -43,6 +46,11 @@ interface VideoPlayerProps {
     PlayerVolume: number
     time: number
     exitFromPlayer: () => void
+}
+export interface socketPlayerInit {
+    anime: AnimeData,
+    saveData: indentityPlayer,
+    temp: { episode: string, type: string, episodes: { ep: string, img?: string, title?: string }[] }
 }
 
 export type resoltionFormatExtended = resolutionFormat & {
@@ -63,10 +71,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     let volumeTimeout: NodeJS.Timeout | undefined
     let playAnimationTimeout: NodeJS.Timeout | undefined
     let buttonSkipLeft: NodeJS.Timeout | undefined
+    let moreInformationTimer: NodeJS.Timeout | undefined
     let buttonSkipRight: NodeJS.Timeout | undefined
     let assSubContainer: HTMLDivElement | undefined
     let vttSubRef: HTMLTrackElement | undefined
     let screenShotContainer: HTMLDivElement | undefined
+    let refreashUpdateSocket: NodeJS.Timeout | undefined
 
     // Variable
     const [volume, setVolume] = createSignal<number>(PlayerVolume)
@@ -86,6 +96,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [IsDisableButtonSkipTimerOpening, setIsDisableButtonSkipTimerOpening] = createSignal<boolean>(false)
     const [IsDisableButtonSkipTimerEnding, setIsDisableButtonSkipTimerEnding] = createSignal<boolean>(false)
     const [currentSkipButton, setcurrentSkipButton] = createSignal<{ type: "opening" | "ending" | "", time: number }>({ type: "", time: 0 })
+    const [isShowingMoreInformation, setShowingMoreInformation] = createSignal<boolean>(false)
 
     const [isShowButtonSkipLeft, setShowButtonSkipLeft] = createSignal<boolean>(false)
     const [isShowButtonSkipRight, setShowButtonSkipRight] = createSignal<boolean>(false)
@@ -137,14 +148,32 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [screenShot, setScreenShot] = createSignal<{ active: boolean, image: string, click: string }>({ active: false, image: "", click: "" });
 
     // const gamepad = useGamepad(0, gamepadControler);
+    if (!window.api && getSocket()) {
+        const socket = getSocket()
+        socket?.on("player:update", (update: { time: number, pause: boolean }) => {
+            console.log(update)
+            if (update.pause != isPlaying()) togglePlay()
+            console.log(unwrap(currentTime()) - update.time > 3, unwrap(currentTime()), unwrap(currentTime()) - update.time)
+            if (unwrap(currentTime()) - update.time > 3 || unwrap(currentTime()) - update.time < -3) {
+                setTimeVideo(update.time)
+                clearInterval(refreashUpdateSocket)
+            }
+        })
+    }
 
     function handleMouseMove() {
         setIsVisible(true)
-        if (hideTimer) {
-            clearTimeout(hideTimer)
-        }
+        setShowingMoreInformation(false)
+        clearTimeout(moreInformationTimer)
+        if (hideTimer) clearTimeout(hideTimer)
+
         if (currentSettings() == false && isShowSelectEpisode() == false) {
-            hideTimer = setTimeout(() => setIsVisible(false), 2000)
+            hideTimer = setTimeout(() => {
+                setIsVisible(false)
+                if (!isPlaying()) moreInformationTimer = setTimeout(() => {
+                    setShowingMoreInformation(true)
+                }, 4000)
+            }, 2000)
         }
     }
 
@@ -154,8 +183,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             const element = playerData()[index];
             if (element.defaultHost) defaulthost = element
         }
-
-        shaka.polyfill.installAll()
 
         shaka.net.NetworkingEngine.registerScheme("https", (type, requests) => {
             const controller = new AbortController();
@@ -544,13 +571,28 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         setIsPlaying(prev => {
             if (prev) {
                 video.pause()
+                moreInformationTimer = setTimeout(() => {
+                    setShowingMoreInformation(true)
+                }, 4000)
                 return false
             }
+            clearInterval(moreInformationTimer)
+            setShowingMoreInformation(false)
             video.play().catch((reason) => {
                 console.warn("Video Play Error Catch", reason)
             })
             return true
         })
+
+        if (!window.api && getSocket()) {
+            const socket = getSocket()
+            socket?.emit("player:update", {
+                roomName: unwrap(getSocketRoom()), player: {
+                    time: unwrap(currentTime()),
+                    pause: unwrap(isPlaying())
+                }
+            })
+        }
 
         if (playAnimationTimeout) clearTimeout(playAnimationTimeout)
         setShowPlay(() => true)
@@ -576,10 +618,34 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         // Checking to save history
         if (isCleanup()) return
         if (!config) return
+
+        if (durrationTime() > 10 && currentTime() > durrationTime() - parseInt(config.History.continue.MaximizeTimeSave.toString()) && anime_data.animulist) {
+            if (anime_data.AnimeData.episodes != undefined && anime_data.animulist.status == "CURRENT" && temp.episode.toString() == anime_data.AnimeData.episodes.toString()) {
+                updateDataInAnimulist(anime_data.AnimeData.id, {
+                    AnimeData: {
+                        ...anime_data.AnimeData,
+                        recommendations: undefined,
+                        nextAiringEpisode: undefined
+                    },
+                    animulist: {
+                        ...anime_data.animulist,
+                        status: "COMPLETED",
+                        endWatch: anime_data.animulist.endWatch == 0 ? dateToUnix(new Date().toString()) : anime_data.animulist.endWatch,
+                        lastUpdate: dateToUnix(new Date().toString())
+                    }
+                })
+            }
+        }
+
         if (currentTime() <= parseInt(config.History.continue.MinimalTimeSave.toString())) return
         let futureHistory = {
-            AnimeData: { ...anime_data.AnimeData, nextAiringEpisode: undefined },
+            AnimeData: {
+                ...anime_data.AnimeData,
+                nextAiringEpisode: undefined,
+                recommendations: undefined
+            },
             saveData: {
+                ...anime_data.saveData,
                 pluginName: anime_data.saveData.pluginName,
                 last_Time: event.currentTarget.currentTime,
                 episode: temp.episode,
@@ -653,6 +719,20 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         saveContinueProgress(event)
         checkUpNext(event)
         handleProgress(event)
+
+        if (!window.api && getSocket()) {
+            if (!refreashUpdateSocket) {
+                refreashUpdateSocket = setInterval(() => {
+                    const socket = getSocket()
+                    socket?.emit("player:update", {
+                        roomName: unwrap(getSocketRoom()), player: {
+                            time: unwrap(currentTime()),
+                            pause: unwrap(isPlaying())
+                        }
+                    })
+                }, 3000);
+            }
+        }
 
         // 
         setVideoFrames({ totalVideoFrames: event.currentTarget.getVideoPlaybackQuality().totalVideoFrames, droppedVideoFrames: event.currentTarget.getVideoPlaybackQuality().droppedVideoFrames })
@@ -759,6 +839,17 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (!videoRef) return
         videoRef.currentTime = value
         setcurrentTime(() => value)
+
+        if (!window.api && getSocket()) {
+            const socket = getSocket()
+            socket?.emit("player:update", {
+                roomName: unwrap(getSocketRoom()), player: {
+                    time: unwrap(currentTime()),
+                    pause: unwrap(isPlaying())
+                }
+            })
+        }
+
         if (!isNaN(value) && config && value > videoRef.duration - parseInt(config.History.continue.MaximizeTimeSave.toString())) {
             setHideUpNextEpisode(true)
         }
@@ -813,7 +904,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             setASSubtitles(() => undefined)
         }
 
-        if (window.electronAPI.process.env.NODE_ENV == "development" && currentASSubtitles() && assSubContainer) {
+        if (window.api && window.electronAPI.process.env.NODE_ENV == "development" && currentASSubtitles() && assSubContainer) {
             assSubContainer.innerHTML = ""
         }
 
@@ -1452,6 +1543,31 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     showNerdStats={showNerdStats()}
                     PlayerVolume={PlayerVolume}
                 />
+            </Show>
+            <Show when={isShowingMoreInformation()}>
+                <div class="player-more-information-background">
+                    <div class="player-more-information-container">
+                        <span class="player-more-information-top-text">Current Watching</span>
+                        <img src={anime_data.AnimeData.coverImage} class="player-more-information-image" />
+                        <span class="player-more-information-title">{anime_data.AnimeData.title.romaji}</span>
+                        <div class="player-more-information-format-container">
+                            <span class="player-more-information-season">{t(`anime_seasons.${anime_data.AnimeData.season?.toLowerCase()}`)} {anime_data.AnimeData.seasonYear}</span>
+                            &#8226;
+                            <span class="player-more-information-format">{t(`anime_formats.${anime_data.AnimeData.format?.toLowerCase()}`)}</span>
+                            &#8226;
+                            <span class="player-more-information-episode">Episode {temp.episode} / {temp.episodes.length}</span>
+                        </div>
+                        <span class="player-more-information-description">{decodeHtmlEntities(anime_data.AnimeData.description as any)}</span>
+                        <div class="player-more-information-genres-container">
+                            <For each={anime_data.AnimeData.genres}>
+                                {(item) => (
+                                    <div class="player-more-information-genres">{item as string}</div>
+                                )}
+                            </For>
+                        </div>
+                        <span class="player-more-information-durration">{anime_data.AnimeData.averageScore}% &#8226; {convertSecondsToHoursFormat(durrationTime())}</span>
+                    </div>
+                </div>
             </Show>
         </div>
     )

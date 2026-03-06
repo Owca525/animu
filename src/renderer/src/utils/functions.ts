@@ -3,6 +3,7 @@ import {
     cardData,
     containerData,
     ContextMenuProps,
+    FilterParams,
     homeData,
     informationPluginFormat,
     playerChapterList,
@@ -59,18 +60,17 @@ export function convertSeconds(totalSeconds: number | undefined) {
     return { days, hours, minutes, seconds };
 }
 
-export function checkDate(date: string | number, type: "Every Day" | "Every Week" | "Every Month") {
-    const givenDate = new Date(date);
-    const currentDate = new Date();
-    const milliseconds = currentDate.getTime() - givenDate.getTime();
+export function checkDate(date: number, type: string) {
+    const currentDate = new Date().toString();
     switch (type) {
         case "Every Week":
-            return milliseconds >= 7 * 24 * 60 * 60 * 1000;
+            return calculateDays(date, dateToUnix(currentDate)) >= 7;
         case "Every Day":
-            return milliseconds >= 24 * 60 * 60 * 1000;
+            return calculateDays(date, dateToUnix(currentDate)) >= 1;
         case "Every Month":
-            return milliseconds >= (24 * 60 * 60 * 1000) * 30;
+            return calculateDays(date, dateToUnix(currentDate)) >= 30;
     }
+    return false
 }
 
 export function calculateZoomLevel(percentage: number): number {
@@ -185,35 +185,35 @@ export async function refetchHistory() {
     let data: homeData = getHomeCache()
     if (data.activePage != "global.history") return
     let history = getHistory()
-    if (data.data.sections[0].title == t("global.continuewatch") && data.data.sections.length != 2) {
-        setHomeNewData({ sections: [{ title: t("global.continuewatch"), data: history.continue, horizontal: false }] })
+    if (data.data.sections[0].title == "global.continuewatch" && data.data.sections.length != 2) {
+        setHomeNewData({ sections: [{ title: "global.continuewatch", data: history.continue, horizontal: false }] })
         return
     }
 
-    if (data.data.sections[0].title == t("global.history") && data.data.sections.length != 2) {
-        setHomeNewData({ sections: [{ title: t("global.history"), data: history.history as cardData[], horizontal: false }] })
+    if (data.data.sections[0].title == "global.history" && data.data.sections.length != 2) {
+        setHomeNewData({ sections: [{ title: "global.history", data: history.history as cardData[], horizontal: false }] })
         return
     }
 
-    if (data.data.sections[0].title == t("global.continuewatch") && data.data.sections[1].title == t("global.history")) {
+    if (data.data.sections[0].title == "global.continuewatch" && data.data.sections[1].title == "global.history") {
         setHomeNewData({
             sections: [
                 {
-                    title: t("global.continuewatch"),
+                    title: "global.continuewatch",
                     data: history.continue.slice(0, 20),
                     horizontal: true,
                     onTitleClick: async () => ({
-                        title: t("global.continuewatch"),
+                        title: "global.continuewatch",
                         data: history.continue,
                         horizontal: false,
                     })
                 },
                 {
-                    title: t("global.history"),
+                    title: "global.history",
                     data: history.history.slice(0, 20) as cardData[],
                     horizontal: true,
                     onTitleClick: async () => ({
-                        title: t("global.history"),
+                        title: "global.history",
                         data: history.history as any,
                         horizontal: false,
                     })
@@ -405,6 +405,9 @@ export async function request(url: string, options?: { method?: "POST" | "GET", 
 
         const response = await fetch(noCors ? url : "/api/request", noCors ? options : {
             method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({
                 url: url,
                 requestOptions: options
@@ -427,7 +430,7 @@ export async function request(url: string, options?: { method?: "POST" | "GET", 
         return {
             text: text,
             json: jsontext,
-            buffer: Buffer.from(await bufferCloned.arrayBuffer()),
+            buffer: await bufferCloned.arrayBuffer() as any,
             status: response.status,
             statusText: response.statusText,
             url: response.url,
@@ -439,7 +442,7 @@ export async function request(url: string, options?: { method?: "POST" | "GET", 
         return {
             text: (error as Error).message,
             json: undefined,
-            buffer: Buffer.from(""),
+            buffer: [] as any,
             status: 500,
             statusText: "Error",
             url: url,
@@ -596,7 +599,7 @@ export async function fetchPluginRepos() {
     }
     localStorage.setItem("pluginDatabase", JSON.stringify(tmp))
     setPluginRepo(tmp)
-    saveConfig(updateObjectConfig("plugins.lastTimeCheck", Math.floor(new Date().getTime() / 1000), config))
+    saveConfig(updateObjectConfig("plugins.lastTimeCheck", dateToUnix(new Date().toString()), config))
 }
 
 export async function setHomeData(wrapper?: () => Promise<homeData["data"] | containerData | undefined>, data?: homeData["data"]) {
@@ -708,4 +711,77 @@ export function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): 
         console.error("Functions SheepFinderAnime2000 error", error)
         return animeList[0].player_ID
     }
+}
+
+export function dateToUnix(dateStr: string): number {
+    const date = new Date(dateStr);
+    return Math.floor(date.getTime() / 1000);
+}
+
+export function unixToDateTime(unixTimestamp: number | undefined): string {
+    if (!unixTimestamp || unixTimestamp == 0) return t("player.other.unknown")
+    const date = new Date(unixTimestamp * 1000);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+export function searchDataInCards(cards: cardData[], search: string, params: FilterParams | undefined) {
+    let results: cardData[] = []
+
+    results = cards.filter((item) =>
+        item.AnimeData.title["romaji"] ?
+            item.AnimeData.title["romaji"].toLowerCase().includes(search.toLowerCase()) :
+            false
+    )
+    results = [...results, ...cards.filter((item) =>
+        item.AnimeData.title["native"] ?
+            item.AnimeData.title["native"].toLowerCase().includes(search.toLowerCase()) :
+            false
+    )]
+    results = [...results, ...cards.filter((item) =>
+        item.AnimeData.title["english"] ?
+            item.AnimeData.title["english"].toLowerCase().includes(search.toLowerCase()) :
+            false
+    )]
+
+    console.log(params, results)
+
+    if (!params) return results.filter(
+        (item, index, self) =>
+            index === self.findIndex(t => t.AnimeData.id === item.AnimeData.id)
+    )
+
+    if (params["years"]) results = results.filter((val) => new String(val.AnimeData.seasonYear) == params["years"])
+    if (params["season"]) results = results.filter((val) => new String(val.AnimeData.season) == params["season"])
+    if (params["format"]) results = results.filter((val) => new String(val.AnimeData.format) == params["format"])
+    if (params["airing"]) results = results.filter((val) => new String(val.AnimeData.status) == params["airing"])
+    if (params["genres"]) results = results.filter((val) => [...new Set(val.AnimeData.genres)].includes(params["genres"]))
+    
+    return results.filter(
+        (item, index, self) =>
+            index === self.findIndex(t => t.AnimeData.id === item.AnimeData.id)
+    )
+}
+
+export function calculateDays(unix1: number, unix2: number): number {
+  const date1 = new Date(unix1 * 1000);
+  const date2 = new Date(unix2 * 1000);
+
+  date1.setHours(0, 0, 0, 0);
+  date2.setHours(0, 0, 0, 0);
+
+  return -((date2.getTime() - date1.getTime()) / 86400000);
+}
+
+export function convertSecondsToHoursFormat(seconds: number): string {
+  if (seconds < 0) seconds = 0;
+  return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
 }

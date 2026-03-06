@@ -34,6 +34,11 @@
 .big-card-information-image-container {
     position: relative;
     display: inline-block;
+    width: max-content;
+}
+.big-card-information-image {
+    max-width: none !important;
+    width: 100% !important;
 }
 
 .big-card-information-score {

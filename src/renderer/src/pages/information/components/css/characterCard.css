@@ -21,13 +21,22 @@
     user-select: none;
  }
 
-.information-characters-card-cover {
+.information-characters-card-cover, .information-character-image-placeholder {
     max-height: 165px;
     width: max-content;
     height: max-content;
     aspect-ratio: 2 / 3;
     object-fit: cover;
     user-select: none;
+}
+
+.information-character-image-placeholder {
+    width: 100%;
+    height: max-content !important;
+    max-height: 500px !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .information-characters-card-description {

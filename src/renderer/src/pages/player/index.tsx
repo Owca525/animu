@@ -1,8 +1,8 @@
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
-import { AnimeData, indentityPlayer, SettingsConfig } from "@renderer/utils/types";
+import { AnimeData, animulistProps, indentityPlayer, SettingsConfig } from "@renderer/utils/types";
 
 import "./player.css"
-import { changeTitleAnimu, detectTitle, refetchHistory } from "@renderer/utils/functions";
+import { changeTitleAnimu, dateToUnix, detectTitle, refetchHistory } from "@renderer/utils/functions";
 import Button from "@renderer/components/buttons";
 
 import VideoPlayer from "./VideoPlayer";
@@ -15,10 +15,12 @@ import ExternalPlayer from "./externalPlayer";
 import { pluginManager } from "@renderer/utils/stores/plugins";
 import { useResponse } from "@renderer/utils/hooks/useResponse";
 import { useI18n } from "@renderer/utils/i18n";
+import { addToAnimuList } from "@renderer/utils/FilesManager/animulist";
+import { getSocket, getSocketRoom } from "@renderer/utils/stores/global";
 
 const player = () => {
     const { t } = useI18n()
-    const anime_data: { data: AnimeData, save: indentityPlayer, episodelist: { ep: string, img?: string, title?: string }[], continewatch: boolean } = JSON.parse(localStorage.getItem("playerCache") as any)
+    const anime_data: { data: AnimeData, save: indentityPlayer, episodelist: { ep: string, img?: string, title?: string }[], animulist?: animulistProps, continewatch: boolean } = JSON.parse(localStorage.getItem("playerCache") as any)
     const navigate = useNavigate()
     const config: SettingsConfig = getConfig();
 
@@ -93,10 +95,22 @@ const player = () => {
     });
 
     onMount(() => {
+        if (!window.api && getSocket()) {
+            const socket = getSocket()
+            socket?.emit("player:init", {
+                roomName: getSocketRoom(),
+                data: {
+                    anime: anime_data.data,
+                    saveData: anime_data.save,
+                    temp: { episode: extractionData().actual, type: extractionData().type, episodes: extractionData().episodelist }
+                }
+            })
+        }
+
         changeTitleAnimu(`Animu - ${anime_data.data.title.romaji}`)
         SaveHistory({
             saveData: {
-                pluginName: anime_data.save?.pluginName ? anime_data.save.pluginName : "",
+                ...anime_data.save,
                 last_Time: anime_data.save.last_Time,
                 isStarted: anime_data.save.last_Time == 0,
                 type: extractionData().type,
@@ -104,8 +118,24 @@ const player = () => {
             },
             AnimeData: {
                 ...anime_data.data,
-                nextAiringEpisode: undefined
+                nextAiringEpisode: undefined,
+                recommendations: undefined
             }
+        })
+
+        if (anime_data.animulist) return
+        addToAnimuList({
+            status: "CURRENT",
+            score: 0,
+            reapeat: 0,
+            startWatch: dateToUnix(new Date().toString()),
+            endWatch: 0,
+            added: dateToUnix(new Date().toString()),
+            lastUpdate: dateToUnix(new Date().toString())
+        }, {
+            ...anime_data.data,
+            nextAiringEpisode: undefined,
+            recommendations: undefined
         })
     })
 
@@ -139,7 +169,7 @@ const player = () => {
         }
         if (config.Player.general.PlayerBehavior === "home") navigate("/")
         else {
-            localStorage.setItem("informationCache", JSON.stringify({ anime: anime_data.data, saveData: anime_data.save }))
+            localStorage.setItem("informationCache", JSON.stringify({ anime: anime_data.data, saveData: anime_data.save, animulist: anime_data.animulist }))
             navigate("/info")
         }
     }
@@ -170,7 +200,8 @@ const player = () => {
                     player_data={response.data()!}
                     anime_data={{
                         AnimeData: anime_data.data,
-                        saveData: anime_data.save
+                        saveData: anime_data.save,
+                        animulist: anime_data.animulist
                     }}
                     temp={{ episode: extractionData().actual, type: extractionData().type, episodes: extractionData().episodelist }}
                     setNextEpisode={setNewEpisode}

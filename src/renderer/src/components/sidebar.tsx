@@ -13,11 +13,14 @@ import { setHomeSearchPage, setHomeStopScrolling } from '@renderer/utils/stores/
 import { sidebarData } from '@renderer/utils/types';
 import './css/sidebar.css';
 import { useI18n } from '@renderer/utils/i18n';
+import app from "@renderer/app.json"
 
 interface sidebarProps {
   showLogo?: boolean
   openSidebar?: boolean
   onChange?: (isOpen: boolean) => void
+  onClickTopButtons?: (text: string) => void
+  onClickBottomButtons?: (text: string) => void
   data: {
     top: sidebarData[]
     bottom: sidebarData[]
@@ -30,7 +33,6 @@ export default function Sidebar(props: sidebarProps) {
   const { t, pathExist } = useI18n()
 
   const [sidebarHover, setHover] = createSignal<boolean>(false)
-  const [animuVersion, setVersion] = createSignal<string>("")
   const [currentButton, setCurrentButton] = createSignal<number>(
     props.activeElement ?
     props.setAciveElement ? props.setAciveElement : 0
@@ -52,7 +54,6 @@ export default function Sidebar(props: sidebarProps) {
   })
 
   onMount(async () => {
-    setVersion(await window.backend.version())
     document.addEventListener('mousedown', handleClickOutside);
   })
   onCleanup(() => {
@@ -63,11 +64,12 @@ export default function Sidebar(props: sidebarProps) {
     setHover((prev) => !prev)
   })
 
-  function hideSidebar(event, func, num?: number) {
+  function hideSidebar(event: MouseEvent, func, num?: number) {
+    setHomeSearchPage(1)
+
     if (props.activeElement && num != undefined) setCurrentButton(num)
     setHover((prev) => !prev)
-    if (!func) return
-    func(event)
+    if (func) func(event)
   }
 
   function detectSidebarStateButton(text: string): string | undefined {
@@ -106,9 +108,9 @@ export default function Sidebar(props: sidebarProps) {
     >
       <Show when={props.showLogo}>
         <div class="sidebar-logo-icon-container">
-          <img src={icon} alt={animuVersion()} class="sidebar-image" />
+          <img src={icon} alt={app.ver} class="sidebar-image" />
           <Show when={sidebarHover()}>
-            <div class="sidebar-version">v{animuVersion()}</div>
+            <div class="sidebar-version">v{app.ver}</div>
           </Show>
         </div>
       </Show>
@@ -117,7 +119,7 @@ export default function Sidebar(props: sidebarProps) {
           <Show when={!props.showLogo}>
             <Button icon={"arrow_back"}
               content={detectSidebarStateButton(t("sidebar.hide"))}
-              onClick={(event) => { hideSidebar(event, undefined) }}
+              onClick={(event) => hideSidebar(event, undefined) }
               ButtonClass={detectSidebarStateClass()}
               iconClassName="sidebar-button"
             />
@@ -131,6 +133,7 @@ export default function Sidebar(props: sidebarProps) {
                   setHomeSearchPage(1); 
                   setHomeStopScrolling(false); 
                   hideSidebar(event, value.onClick, i());
+                  if (props.onClickTopButtons) props.onClickTopButtons(value.text)
                 }}
                 ButtonClass={`${detectSidebarStateClass()} ${checkNumber(i())}`}
                 iconClassName={`sidebar-button ${checkNumber(i())}`} />
@@ -143,7 +146,10 @@ export default function Sidebar(props: sidebarProps) {
             {(value) => (
               <Button icon={value.icon} 
                 content={detectSidebarStateButton(value.text)} 
-                onClick={(event) => { hideSidebar(event, value.onClick) }} 
+                onClick={(event) => {
+                  hideSidebar(event, value.onClick)
+                  if (props.onClickBottomButtons) props.onClickBottomButtons(value.text)
+                }} 
                 ButtonClass={detectSidebarStateClass()} 
                 iconClassName="sidebar-button" />
             )}

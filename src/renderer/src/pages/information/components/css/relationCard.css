@@ -1,52 +1,76 @@
-/* .relation-card-background {
-    outline: 2px solid var(--green-one);
-} */
-
-.relation-card-background, .relation-card-container {
-    border-radius: 12px;
-    cursor: pointer;
-    user-select: none;
-    width: 200px;
-    height: 70px;
-}
-
-.relation-card-background {
-    /* position: absolute;
-    height: 100%;
-    width: 100%;
-    z-index: -1; */
-    background-size: cover;
-    background-repeat: no-repeat;
-}
-
 .relation-card-container {
-    backdrop-filter: blur(2px);
-    /* padding: 24px 32px; */
-    z-index: 1;
-    border: 3px solid var(--five-layer);
+    background-color: var(--third-layer);
+    border-radius: 12px;
+    display: flex;
+    transition: all 150ms ease;
+    cursor: pointer;
+    min-width: 300px;
+    max-height: 120px;
+    overflow: hidden;
+}
+
+.relation-card-container:hover {
+  background-color: var( --five-layer);
+  transform: scale(1.02);
+}
+
+.relation-card-cover, .relation-card-image-placeholder {
+    max-height: 120px;
+    width: max-content;
+    height: max-content;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    user-select: none;
+    border-radius: 12px 0px 0px 12px;
+    user-select: none;
+}
+
+.relation-card-image-placeholder {
+    width: max-content;
+    height: 120px;
     display: flex;
     justify-content: center;
     align-items: center;
-    text-align: center;
-
-    text-shadow: 2px 2px 2px var(--black);
+    z-index: 1;
 }
-.relation-card-type {
-    font-size: 1.2em;
-    width: 100%;
+
+.relation-card-relation {
+    font-size: 0.9em;
+    color: var(--green-one);
+    text-shadow: 1px 0px 14px var(--black);
+}
+
+.relation-card-content {
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
 }
 
 .relation-card-title {
-    position: absolute;
-    top: -40px;
-    z-index: 1000;
-    background-color: var(--five-layer);
-    border-radius: 12px;
-    width: max-content;
-    padding: 4px;
-    display: none;
+  display: -webkit-box;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.relation-card-container:hover .relation-card-title {
-    display: block;
+.relation-card-content-top {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.relation-card-status, .relation-card-source {
+    color: var(--text-gray);
+}
+
+.relation-card-content-bottom {
+    font-size: 0.9em;
+    color: var(--text-gray);
+    display: flex;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
 }

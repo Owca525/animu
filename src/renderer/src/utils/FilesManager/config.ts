@@ -110,7 +110,7 @@ export const defaultConfigWeb: SettingsConfig = {
         playerDebug: false
     },
     update: {
-        lastTime: "0",
+        lastTime: 0,
         type: "On Start",
         enable: true
     },
@@ -127,5 +127,8 @@ export const defaultConfigWeb: SettingsConfig = {
         lastCheck: 0,
         check: "Every Day",
         maxBackups: 3
+    },
+    animulist: {
+        historyConvert: true
     }
 };

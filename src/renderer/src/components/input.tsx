@@ -2,10 +2,11 @@ import { createSignal } from "solid-js";
 import "./css/input.css";
 
 interface InputProps {
-  type?: "text" | "password" | "number";
+  type?: "text" | "password" | "number" | "date";
   InputClass?: string;
   placeholder?: string;
   onKeyDown?: (text: string) => void;
+  onInput?: (text: string) => void;
   defaultValue?: string;
 }
 
@@ -46,6 +47,7 @@ export default function Input(props: InputProps) {
       placeholder={props.placeholder}
       value={props.defaultValue ? props.defaultValue : ""}
       onKeyDown={handleData}
+      onInput={(event) => props.onInput ? props.onInput(event.currentTarget.value) : ""}
     />
   );
 }

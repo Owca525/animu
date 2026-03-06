@@ -16,13 +16,15 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
     const [cardWidth, setCardWidth] = createSignal(0);
 
     onMount(() => {
-        const callback = window.BrowserWindow.onWindowFocus((focus) => {
-            if (focus) restartAutoSlide()
-            else stopAutoSlide()
-        })
-        onCleanup(() => {
-            callback()
-        })
+        if (window.api) {
+            const callback = window.BrowserWindow.onWindowFocus((focus) => {
+                if (focus) restartAutoSlide()
+                else stopAutoSlide()
+            })
+            onCleanup(() => {
+                callback()
+            })
+        }
 
         handleUpdate()
         window.addEventListener("resize", handleUpdate)

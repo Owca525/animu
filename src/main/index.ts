@@ -1,10 +1,10 @@
-import { app, shell, BrowserWindow, Menu, session, ipcMain, dialog, crashReporter } from 'electron'
+import { app, shell, BrowserWindow, Menu, session, ipcMain, dialog, crashReporter, Tray } from 'electron'
 import { optimizer, is } from '@electron-toolkit/utils'
 import path, { join } from 'path'
 import ini from "ini";
 
 // Files import
-import icon from '../../resources/icon.png?asset'
+import icon from '../../build/icon.png?asset'
 import "./utils"
 import "./window"
 import "./os"
@@ -12,11 +12,13 @@ import "./update"
 import "./request"
 import "./streaming"
 import "./backup"
+import "./animulist"
 import { convertToNewFormat, detectOldVersion, write } from './os'
 import { existsSync, mkdirSync, readFileSync } from 'fs'
 import { cardData, defaultConfig, SettingsConfig } from './types';
 import { deepMerge, detectZoom, runCheckYT_DLP, setupDiscordRPC } from './utils';
 import { electronAppUniversalProtocolClient } from 'electron-app-universal-protocol-client';
+import { checkDatabase } from './animulist';
 
 export let mainWindow: BrowserWindow | undefined
 export const newConfigPath = path.join(app.getPath("userData"), "animuConfig")
@@ -96,6 +98,38 @@ function createWindow(): void {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
+
+  let tray = new Tray(icon)
+
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Open Animu',
+      click: () => {
+        if (mainWindow) mainWindow.show()
+      }
+    },
+    { type: 'separator' },
+    {
+      label: 'Exit Animu',
+      click: () => {
+        app.quit()
+      }
+    }
+  ])
+
+  tray.setToolTip('Animu')
+  tray.setContextMenu(contextMenu)
+
+  tray.on('click', () => {
+    if (!mainWindow) return
+    mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show()
+  })
+
+  // mainWindow.on('close', (e) => {
+  //   if (!mainWindow) return
+  //   e.preventDefault()
+  //   mainWindow.hide()
+  // })
 
   Menu.setApplicationMenu(null);
 
@@ -201,6 +235,7 @@ export async function initialBackend() {
       historyData = JSON.parse(data)
     }
     runCheckYT_DLP()
+    checkDatabase()
 
     // if (existsSync(path.join(newConfigPath, "continueWatch.json"))) {
     //   let data = readFileSync(path.join(newConfigPath, "continueWatch.json"), "utf-8")
@@ -227,3 +262,4 @@ ipcMain.handle('refreshBackend', () => initialBackend());
 
 ipcMain.handle('getConfig', () => config);
 ipcMain.handle('getHistory', () => historyData);
+
