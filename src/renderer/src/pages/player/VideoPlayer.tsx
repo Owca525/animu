@@ -301,14 +301,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             return
         }
 
-        // if (data.doNotUseBackend) {
-        //     videoRef.src = data.url
-        // } else {
-        //     videoRef.src = `http://localhost:3001/video?url=${btoa(JSON.stringify(
-        //         { url: data.url, header: data.reqHeader }
-        //     ))}`
-        // }
-
         try {
             await shakaPlayer.load(data.url, time)
         } catch (error) { shakaPlayerErrorParser(error) }
@@ -521,6 +513,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                             hls.destroy();
                             break;
                     }
+                    setFatalError(true)
                     if (message && !isCleanup()) toast(message, { type: "error" });
                 }
             });
@@ -666,7 +659,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         // Update RPC
         if (config.General.discordRPC && window.api) window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`)
-        if (config.Player.general.AutoSkipEpisode && event.currentTarget.duration == event.currentTarget.currentTime) setEpisode("next")
+        
+        if (!fatalError() && config.Player.general.AutoSkipEpisode && event.currentTarget.duration == event.currentTarget.currentTime) setEpisode("next")
 
         let player = currentPlayer()
 
@@ -736,6 +730,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         var message: string
         if (!Error) return
         if (isCleanup()) return
+        console.warn("Error Video Element in Animu", Error)
         switch (Error.code) {
             case Error.MEDIA_ERR_ABORTED:
                 message = t('player.errors.MEDIA_ERR_ABORTED')
@@ -780,15 +775,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }
     }
 
-    useKeyPress((keys: string) => {
-        if (keys == "CTRL+SHIFT+D") {
-            setshowNerdStats((prev) => !prev)
-        }
-        keybinds(keys)
-    })
-
     function setEpisode(type: "next" | "prev") {
-        console.log(durrationTime())
         if (durrationTime() <= 0) return console.warn("Illegal Change Episode")
         let ep = temp.episodes.findIndex((item) => item.ep.toString() == temp.episode, toString())
         if (ep < 0) return
@@ -877,6 +864,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     //     }
     // }
+
+    useKeyPress((keys: string) => {
+        if (keys == "CTRL+SHIFT+D") setshowNerdStats((prev) => !prev)
+        if (keys == "CTRL+SHIFT+R" && currentPlayer()) runNewPlayer(currentPlayer()!)
+        keybinds(keys)
+    })
 
     function keybinds(event: string) {
         if (!videoRef) return
@@ -1178,10 +1171,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 <video
                     ref={videoRef}
                     class="video-player"
-                    onTimeUpdate={(event) => {
-                        updateProgress(event)
-                        setFatalError(false)
-                    }}
+                    onTimeUpdate={updateProgress}
                     onProgress={updateProgress}
                     onSeeked={updateProgress}
                     onClick={() => { togglePlay(); setcurrentSettings(() => false); setShowSelectEpisode(() => false) }}
