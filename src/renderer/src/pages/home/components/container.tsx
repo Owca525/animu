@@ -8,7 +8,7 @@ import { unwrap } from "solid-js/store"
 import { useI18n } from "@renderer/utils/i18n"
 import { getInformationPlugin } from "@renderer/utils/stores/plugins"
 import { useResponse } from "@renderer/utils/hooks/useResponse"
-import { setHomeData } from "@renderer/utils/functions"
+import { setHomeData, updateHomeContainer } from "@renderer/utils/functions"
 
 function Container(props: containerData) {
   const { t, pathExist } = useI18n()
@@ -35,13 +35,12 @@ function Container(props: containerData) {
     queryFn: async () => {
       const homeCache = unwrap(getHomeCache())
       if (homeCache.stopScrolling) return
-      if (!props.onScrollDownFunction) return ""
-      let tmp = await props.onScrollDownFunction(homeCache.search, unwrap(currentPage()), homeCache.filterTags)
-      if (tmp.data.length < tmp.maxPage) setHomeStopScrolling(true);
-      setAnimeCards((prev) => [...prev, ...tmp.data])
-      return ""
+      if (!props.onScrollDownFunction) return
+      const resp = await props.onScrollDownFunction(homeCache.search, unwrap(currentPage()), homeCache.filterTags)
+      if (resp.data.length < resp.maxPage) setHomeStopScrolling(true);
+      return resp.data
     },
-    cacheTime: 2 * 60 * 60 * 1000,
+    cacheTime: 900000,
     disable: true,
   })
 
@@ -52,7 +51,13 @@ function Container(props: containerData) {
   })
 
   createEffect(() => {
-    animeCards()
+    const tmpData = cardResponse.data()
+    if (!tmpData) return
+    setAnimeCards((prev) => [...prev, ...tmpData])
+    updateHomeContainer([{
+      ...props,
+      data: unwrap(animeCards())
+    }])
     handleUpdate()
   })
 

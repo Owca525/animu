@@ -76,7 +76,7 @@ function information() {
             let response = await plugin.extractEpisodeList(animeData.anime, player_id as string)
             return response
         },
-        cacheTime: 2 * 60 * 60 * 1000,
+        cacheTime: 7200000,
         disable: true,
     })
 

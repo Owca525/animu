@@ -9,7 +9,7 @@ import {
   Show
   } from 'solid-js';
 import { createShortcut } from '@solid-primitives/keyboard';
-import { setHomeSearchPage } from '@renderer/utils/stores/home';
+import { setHomeSearchPage, setHomeStopScrolling } from '@renderer/utils/stores/home';
 import { sidebarData } from '@renderer/utils/types';
 import './css/sidebar.css';
 import { useI18n } from '@renderer/utils/i18n';
@@ -117,7 +117,7 @@ export default function Sidebar(props: sidebarProps) {
           <Show when={!props.showLogo}>
             <Button icon={"arrow_back"}
               content={detectSidebarStateButton(t("sidebar.hide"))}
-              onClick={(event) => { setHomeSearchPage(1); hideSidebar(event, undefined) }}
+              onClick={(event) => { hideSidebar(event, undefined) }}
               ButtonClass={detectSidebarStateClass()}
               iconClassName="sidebar-button"
             />
@@ -127,7 +127,11 @@ export default function Sidebar(props: sidebarProps) {
             {(value, i) => (
               <Button icon={value.icon}
                 content={detectSidebarStateButton(value.text)}
-                onClick={(event) => { setHomeSearchPage(1); hideSidebar(event, value.onClick, i()) }}
+                onClick={(event) => { 
+                  setHomeSearchPage(1); 
+                  setHomeStopScrolling(false); 
+                  hideSidebar(event, value.onClick, i());
+                }}
                 ButtonClass={`${detectSidebarStateClass()} ${checkNumber(i())}`}
                 iconClassName={`sidebar-button ${checkNumber(i())}`} />
             )}
@@ -139,7 +143,7 @@ export default function Sidebar(props: sidebarProps) {
             {(value) => (
               <Button icon={value.icon} 
                 content={detectSidebarStateButton(value.text)} 
-                onClick={(event) => { setHomeSearchPage(1); hideSidebar(event, value.onClick) }} 
+                onClick={(event) => { hideSidebar(event, value.onClick) }} 
                 ButtonClass={detectSidebarStateClass()} 
                 iconClassName="sidebar-button" />
             )}
