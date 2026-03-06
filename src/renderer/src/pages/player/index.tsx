@@ -159,8 +159,13 @@ const player = () => {
     }
 
     async function leave() {
-        if (window.api) window.BrowserWindow.setFullscreen(false)
-        else document.exitFullscreen()
+        /* IFDEF DEBUG|PROD */
+        window.BrowserWindow.setFullscreen(false)
+        /* ENDIF */
+
+        /* IFDEF WEB */
+        document.exitFullscreen()
+        /* ENDIF */
         closeDialog()
         if (!anime_data) return
         if (anime_data.continewatch) {

@@ -8,35 +8,49 @@ import { dateToUnix, getHistory } from "../functions"
 
 export async function addToAnimuList(animulist: animulistProps, anime: AnimeData, notification: boolean = false) {
     if (getGlobalCache().incognito) return
-    if (window.api) await window.api.animulist.add({ AnimeData: { ...unwrap(anime), nextAiringEpisode: undefined }, animulist: unwrap(animulist) })
-    else {
-        let database = structuredClone(unwrap(animulistData()))
-        database.unshift({ AnimeData: { ...unwrap(anime), nextAiringEpisode: undefined }, animulist: unwrap(animulist) })
-        console.log(database)
-        localStorage.setItem("animulist", JSON.stringify(database))
-    }
+
+    /* IFDEF DEBUG|PROD */
+    await window.api.animulist.add({ AnimeData: { ...unwrap(anime), nextAiringEpisode: undefined }, animulist: unwrap(animulist) })
+    /* ENDIF */
+
+    /* IFDEF WEB */
+    let database = structuredClone(unwrap(animulistData()))
+    database.unshift({ AnimeData: { ...unwrap(anime), nextAiringEpisode: undefined }, animulist: unwrap(animulist) })
+    console.log(database)
+    localStorage.setItem("animulist", JSON.stringify(database))
+    /* ENDIF */
+
     refreashAnimulist()
     if (notification) toast(`Succesfully Added ${anime.title.romaji} to animulist`)
 }
 
 export async function removeFromAnimulist(id: string, notification: boolean = false) {
     if (getGlobalCache().incognito) return
-    if (window.api) await window.api.animulist.delete(unwrap(id))
-    else {
-        let database = structuredClone(unwrap(animulistData()))
-        localStorage.setItem("animulist", JSON.stringify(database.filter((v) => v.AnimeData.id != id)))
-    }
+    /* IFDEF DEBUG|PROD */
+    await window.api.animulist.delete(unwrap(id))
+    /* ENDIF */
+
+    /* IFDEF WEB */
+    let database = structuredClone(unwrap(animulistData()))
+    localStorage.setItem("animulist", JSON.stringify(database.filter((v) => v.AnimeData.id != id)))
+    /* ENDIF */
+
     refreashAnimulist()
     if (notification) toast(`Succesfully Removed From animulist`)
 }
 
 export async function updateDataInAnimulist(id: string, anime: { AnimeData: AnimeData; animulist: animulistProps }, notification: boolean = false) {
     if (getGlobalCache().incognito) return
-    if (window.api) await window.api.animulist.update(unwrap(id), unwrap(anime))
-    else {
-        let database = structuredClone(unwrap(animulistData()))
-        localStorage.setItem("animulist", JSON.stringify(database.map((v) => v.AnimeData.id == id ? { ...anime, 
-        AnimeData: { 
+
+    /* IFDEF DEBUG|PROD */
+    await window.api.animulist.update(unwrap(id), unwrap(anime))
+    /* ENDIF */
+
+    /* IFDEF WEB */
+    let database = structuredClone(unwrap(animulistData()))
+    localStorage.setItem("animulist", JSON.stringify(database.map((v) => v.AnimeData.id == id ? {
+        ...anime,
+        AnimeData: {
             ...anime.AnimeData,
             nextAiringEpisode: undefined,
             recommendations: undefined
@@ -49,15 +63,21 @@ export async function updateDataInAnimulist(id: string, anime: { AnimeData: Anim
             recommendations: undefined
         }
     })))
-    }
+    /* ENDIF */
+
     refreashAnimulist()
     if (notification) toast(`Succesfully Updated in animulist`)
 }
 
 export async function refreashAnimulist() {
-    if (window.api) setAnimulistData(await window.api.animulist.getDatabase())
-    else setAnimulistData(JSON.parse(localStorage.getItem("animulist") as any))
-    
+    /* IFDEF DEBUG|PROD */
+    setAnimulistData(await window.api.animulist.getDatabase())
+    /* ENDIF */
+
+    /* IFDEF WEB */
+    setAnimulistData(JSON.parse(localStorage.getItem("animulist") as any))
+    /* ENDIF */
+
     const global = unwrap(getHomeCache())
     if (global.activePage != "global.animulist") return
 
@@ -65,8 +85,13 @@ export async function refreashAnimulist() {
 }
 
 export async function OvewriteAnimuList(data: { AnimeData: AnimeData; animulist: animulistProps }[]) {
-    if (window.api) setAnimulistData(data)
-    else setAnimulistData(JSON.parse(data as any))
+    /* IFDEF DEBUG|PROD */
+    setAnimulistData(data)
+    /* ENDIF */
+
+    /* IFDEF WEB */
+    setAnimulistData(JSON.parse(data as any))
+    /* ENDIF */
     refreashAnimulist()
 }
 
@@ -93,7 +118,7 @@ export function convertHistoryToAnimuList() {
 
         if (element.AnimeData.episodes && parseInt(element.saveData.episode) < element.AnimeData.episodes)
             status = { ...status, status: "CURRENT", startWatch: dateToUnix(new Date().toString()) }
-        
+
         addToAnimuList(status, {
             ...element.AnimeData,
             nextAiringEpisode: undefined,

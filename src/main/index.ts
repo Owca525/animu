@@ -169,6 +169,11 @@ if (!gotTheLock) {
     app.on('browser-window-created', (_, window) => {
       optimizer.watchWindowShortcuts(window)
     })
+
+    /* IFDEF WEB */
+    if (process.env.ANIMU_WEB_DEV) return
+    /* ENDIF */
+
     await initialBackend()
     createWindow()
     electronAppUniversalProtocolClient.on('request', async (requestUrl) => {

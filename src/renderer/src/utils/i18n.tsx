@@ -2,7 +2,10 @@ import { createContext, useContext, createSignal, onMount } from "solid-js";
 import en from "./lang/en.json"
 
 async function getAllLangFiles() {
-  if (!window.api) return { en: en }
+  /* IFDEF WEB */
+  if (window["animuAppInfo"]["langs"]) return { en: en, ...window["animuAppInfo"]["langs"] }
+  /* ENDIF */
+  /* IFDEF DEBUG|PROD */
   let langFiles = await window.api.getListLang()
   let res = {}
   for (let index = 0; index < langFiles.length; index++) {
@@ -14,6 +17,7 @@ async function getAllLangFiles() {
     }
   }
   return res
+  /* ENDIF */
 }
 
 type Messages = Record<string, string | object>;

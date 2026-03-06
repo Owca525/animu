@@ -12,6 +12,27 @@ function evalConditionOr(expr: string, flags: Record<string, boolean>) {
   return parts.some(flag => flags[flag] === true);
 }
 
+function readAllLangFiles() {
+  const folderPath = path.join(path.resolve(__dirname), "src/renderer/src/utils/lang/")
+  const files = fs.readdirSync(path.join(path.resolve(__dirname), "src/renderer/src/utils/lang/"));
+
+  const jsonFiles = files.filter(file => path.extname(file).toLowerCase() === '.json');
+
+  const jsonData = jsonFiles.map(file => {
+    if (!file.endsWith(".json")) return undefined
+    const filePath = path.join(folderPath, file);
+    const fileContent = fs.readFileSync(filePath, 'utf-8');
+    try {
+      return { [file.replaceAll(".json", "")]: JSON.parse(fileContent) };
+    } catch (err) {
+      console.error(`Error ${file}:`, err);
+      return undefined;
+    }
+  });
+
+  return jsonData.filter(item => item !== undefined);
+}
+
 export function viteConditionPlugin(flags: Record<string, boolean>): PluginOption {
   return {
     name: "viteConditionPlugin",
@@ -39,18 +60,22 @@ export function viteConditionPlugin(flags: Record<string, boolean>): PluginOptio
   };
 }
 
-function generateInfoFile() {
-  let filePath: string
-  let tempPath: string
-
+function generateInfoFile(): PluginOption {
   return {
     name: 'generateInfoFile',
+    enforce: "pre",
+    transform(code: string, id: string) {
+      if (!/\.(ts|tsx|js|jsx)$/.test(id)) return null;
+      if (process.env.NODE_ENV !== 'production') {
+        code = code.replace('"PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION"', JSON.stringify({
+            ver: pkg.version,
+            branch: "Dev",
+            commit: "Uknown",
+            compiled: Math.floor(new Date().getTime() / 1000)
+        }));
+        return { code, map: null };
+      }
 
-    buildStart() {
-      filePath = path.resolve(__dirname, 'src/renderer/src/app.placeholder.json')
-      tempPath = path.resolve(__dirname, 'src/renderer/src/app.json')
-
-      fs.renameSync(tempPath, filePath)
       let branch = execSync('git rev-parse --abbrev-ref HEAD')
         .toString()
         .trim()
@@ -59,22 +84,19 @@ function generateInfoFile() {
         .toString()
         .trim()
 
-      fs.writeFileSync(tempPath, `
-      {
-        "ver": "${pkg.version}",
-        "branch": "${branch}",
-        "commit": "${commit}",
-        "compiled": "${Math.floor(new Date().getTime() / 1000)}"
-      }`)
-    },
+      let generatedJson = {
+          ver: pkg.version,
+          branch: branch,
+          commit: commit,
+          compiled: Math.floor(new Date().getTime() / 1000)
+      }
 
-    closeBundle() {
-      tempPath = path.resolve(__dirname, 'src/renderer/src/app.json')
-      filePath = path.resolve(__dirname, 'src/renderer/src/app.placeholder.json')
-      
-      fs.rmSync(tempPath)
-      fs.renameSync(filePath, tempPath)
-    }
+      if (process.env.ANIMU_WEB) generatedJson["langs"] = readAllLangFiles()
+
+      code = code.replace('"PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION"', JSON.stringify(generatedJson));
+
+      return { code, map: null };
+    },
   }
 }
 
@@ -94,6 +116,11 @@ export default defineConfig({
             dest: "",
           }
         ],
+      }),
+      viteConditionPlugin({
+        DEBUG: process.env.NODE_ENV !== 'production' && process.env.ANIMU_WEB_DEV == undefined,
+        PROD: process.env.NODE_ENV == 'production' && process.env.ANIMU_WEB_DEV == undefined,
+        WEB: process.env.ANIMU_WEB_DEV ? true : false
       }),
     ]
   },
@@ -121,13 +148,14 @@ export default defineConfig({
           minifyInternalExports: false
         }
       },
-      minify: false,
+      minify: process.env.ANIMU_WEB ? true : false,
     },
     plugins: [
       solid(),
       viteConditionPlugin({
-        DEBUG: process.env.NODE_ENV !== 'production',
-        PROD: process.env.NODE_ENV == 'production'
+        DEBUG: process.env.NODE_ENV !== 'production' && process.env.ANIMU_WEB_DEV == undefined,
+        PROD: process.env.NODE_ENV == 'production' && process.env.ANIMU_WEB_DEV == undefined,
+        WEB: process.env.ANIMU_WEB_DEV ? true : false
       }),
       generateInfoFile(),
       viteStaticCopy({

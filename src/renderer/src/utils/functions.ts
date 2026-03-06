@@ -95,7 +95,8 @@ function createHTMLLinkElement(css: string) {
 }
 
 export async function changeTheme(activeTheme: Map<number, themeMetadata>) {
-    if (!window.api) return
+    // TODO: ADD SUPPORT FOR WEB
+    /* IFDEF DEBUG|PROD */
     let old = document.querySelectorAll<HTMLLinkElement>("link")
     for (let index = 0; index < old.length; index++) {
         const element = old[index];
@@ -119,11 +120,11 @@ export async function changeTheme(activeTheme: Map<number, themeMetadata>) {
             if (content.dropDown) content.dropDown.map((value) => value.option == conf[key] ? createHTMLLinkElement(value.css) : "")
         }
     })
+    /* ENDIF */
 }
 
 export function changeTitleAnimu(title: string) {
-    let dev = false
-    if (window.api) dev = window.electronAPI.process.env.NODE_ENV == "development"
+    let dev = import.meta.env.DEV
     document.title = dev ? title + " - Development" : title
 }
 
@@ -401,8 +402,7 @@ export function updateObjectConfig(path: string, value: string | number | boolea
 
 export async function request(url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string }, body?: any }, noCors: boolean = false): Promise<{ text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: Map<string, string> }> {
     try {
-        if (window.api) return await window.api.request.advanceRequest(url, options)
-
+        /* IFDEF WEB */
         const response = await fetch(noCors ? url : "/api/request", noCors ? options : {
             method: "POST",
             headers: {
@@ -437,6 +437,11 @@ export async function request(url: string, options?: { method?: "POST" | "GET", 
             success: response.ok,
             responseHeader: response.headers as any
         };
+        /* ENDIF */
+
+        /* IFDEF DEBUG|PROD */
+        return await window.api.request.advanceRequest(url, options)
+        /* ENDIF */
     } catch (error) {
         console.error("error in requestGET", error)
         return {
@@ -452,30 +457,43 @@ export async function request(url: string, options?: { method?: "POST" | "GET", 
     }
 }
 
-export async function SaveToClipboard(type: "text" | "image", content: string) {
-    if (window.api) return window.api.saveToClipboard(type, content)
+export async function SaveToClipboard(type: "text" | "image", content: string) {    
+    /* IFDEF WEB */
     if (type == "image") {
         const blob = await (await fetch(content)).blob()
         const item = new ClipboardItem({ [blob.type]: blob });
-        await navigator.clipboard.write([item]);
-        return
+        return await navigator.clipboard.write([item]);
     }
 
     const blob = new Blob([content], { type: "text/plain" });
     const item = new ClipboardItem({ "text/plain": blob });
-    await navigator.clipboard.write([item]);
-    return
+    return await navigator.clipboard.write([item]);
+    /* ENDIF */
+
+    /* IFDEF DEBUG|PROD */
+    return window.api.saveToClipboard(type, content)
+    /* ENDIF */
 }
 
 export function openUrlFolder(content: string) {
-    if (window.api) return window.api.open(content)
+    /* IFDEF DEBUG|PROD */
+    return window.api.open(content)
+    /* ENDIF */
+
+    /* IFDEF WEB */
     return window.open(content, "_blank");
+    /* ENDIF */
 }
 
 export function toggleFullscreen(toggle: boolean = false) {
-    if (window.api) return window.BrowserWindow.setFullscreen(toggle)
+    /* IFDEF DEBUG|PROD */
+    return window.BrowserWindow.setFullscreen(toggle)
+    /* ENDIF */
+
+    /* IFDEF WEB */
     if (toggle) document.documentElement.requestFullscreen();
     else document.exitFullscreen();
+    /* ENDIF */
 }
 
 export function getWeek(): { startWeekUnix: number, endWeekUnix: number, startWeekDay: number, endWeekDay: number, month: number } {
@@ -648,14 +666,21 @@ export async function runYT_DLP(url: string, commands?: string[]) {
 }
 
 export async function getPluginsList() {
-    if (!window.api) return []
+    /* IFDEF DEBUG|PROD */
     return await window.api.plugins.list()
+    /* ENDIF */
+    return []
 }
 
 export async function getPluginInitialConfig(name: string, config: { [key: string]: any; }): Promise<{ [key: string]: any; }> {
-    if (window.api) return await window.api.plugins.getConfig(name, config)
+    /* IFDEF WEB */
     localStorage.setItem(name, JSON.stringify(config))
     return config
+    /* ENDIF */
+
+    /* IFDEF DEBUG|PROD */
+    return await window.api.plugins.getConfig(name, config)
+    /* ENDIF */
 }
 
 export function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string | undefined {

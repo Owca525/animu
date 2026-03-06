@@ -13,7 +13,6 @@ import { setHomeSearchPage, setHomeStopScrolling } from '@renderer/utils/stores/
 import { sidebarData } from '@renderer/utils/types';
 import './css/sidebar.css';
 import { useI18n } from '@renderer/utils/i18n';
-import app from "@renderer/app.json"
 
 interface sidebarProps {
   showLogo?: boolean
@@ -108,9 +107,9 @@ export default function Sidebar(props: sidebarProps) {
     >
       <Show when={props.showLogo}>
         <div class="sidebar-logo-icon-container">
-          <img src={icon} alt={app.ver} class="sidebar-image" />
+          <img src={icon} alt={window["animuAppInfo"].ver} class="sidebar-image" />
           <Show when={sidebarHover()}>
-            <div class="sidebar-version">v{app.ver}</div>
+            <div class="sidebar-version">v{window["animuAppInfo"].ver}</div>
           </Show>
         </div>
       </Show>

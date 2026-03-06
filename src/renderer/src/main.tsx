@@ -9,6 +9,8 @@ import { MenuContextProvider } from './utils/context/menuContext';
 import "material-symbols/material-symbols-outlined.woff2"
 import "material-symbols/outlined.css"
 
+(window as any).animuAppInfo = "PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION";
+
 render(
   () => (
     <I18nProvider config={{ defaultLang: "en", fallbackLang: "en" }}>

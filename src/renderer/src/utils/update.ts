@@ -6,8 +6,8 @@ import { t } from "./i18n";
 import { dateToUnix } from "./functions";
 
 export async function checkUpdate(alwaysShow: boolean = false) {
+  /* IFDEF DEBUG|PROD */
   try {
-    if (!window.api) return
     const update = await window.api.update.checkUpdate();
 
     if (update.available) {
@@ -30,9 +30,11 @@ export async function checkUpdate(alwaysShow: boolean = false) {
     console.error("Error in checkUpdate", error);
     toast(t("update.failed"), { type: "error" });
   }
+  /* ENDIF */
 }
 
 export function downloadUpdate(updateNotification: string) {
+  /* IFDEF DEBUG|PROD */
   window.api.update.updateProgress((_event, percent) => {
     updateToast(updateNotification, t("update.progress", { procent: percent.toFixed(1) }), {
       type: "loading",
@@ -45,4 +47,5 @@ export function downloadUpdate(updateNotification: string) {
       updateToast(updateNotification, t("update.done"), { type: "success", removeTimer: false, removeClick: false });
     }
   });
+  /* ENDIF */
 }

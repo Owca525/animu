@@ -16,15 +16,16 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
     const [cardWidth, setCardWidth] = createSignal(0);
 
     onMount(() => {
-        if (window.api) {
-            const callback = window.BrowserWindow.onWindowFocus((focus) => {
-                if (focus) restartAutoSlide()
-                else stopAutoSlide()
-            })
-            onCleanup(() => {
-                callback()
-            })
-        }
+
+        /* IFDEF DEBUG|PROD */
+        const callback = window.BrowserWindow.onWindowFocus((focus) => {
+            if (focus) restartAutoSlide()
+            else stopAutoSlide()
+        })
+        onCleanup(() => {
+            callback()
+        })
+        /* ENDIF */
 
         handleUpdate()
         window.addEventListener("resize", handleUpdate)
@@ -125,13 +126,13 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
                 </For>
             </div>
             <div class="big-card-container-buttons">
-                <span class='material-symbols-outlined big-card-container-navigaton-button' onclick={() => handleDotClick(data.data[currentIndex()-1] != undefined ? currentIndex() - 1 : data.data.length)}>keyboard_arrow_left</span>
+                <span class='material-symbols-outlined big-card-container-navigaton-button' onclick={() => handleDotClick(data.data[currentIndex() - 1] != undefined ? currentIndex() - 1 : data.data.length)}>keyboard_arrow_left</span>
                 <For each={data.data}>
                     {(_el, i) => (
                         <div class={`big-card-container-button ${currentIndex() === i() ? "active" : ""}`} onClick={() => handleDotClick(i())}></div>
                     )}
                 </For>
-                <span class='material-symbols-outlined big-card-container-navigaton-button' onclick={() => handleDotClick(data.data[currentIndex()+1] != undefined ? currentIndex() + 1 : 0)}>keyboard_arrow_right</span>
+                <span class='material-symbols-outlined big-card-container-navigaton-button' onclick={() => handleDotClick(data.data[currentIndex() + 1] != undefined ? currentIndex() + 1 : 0)}>keyboard_arrow_right</span>
             </div>
         </main>
     );

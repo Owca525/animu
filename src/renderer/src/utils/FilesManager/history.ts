@@ -26,8 +26,14 @@ export async function DeleteFromHistory(data: cardData) {
 
         if (index != -1) historyCache.splice(index, 1);
 
-        if (window.api) await window.api.os.write(`history.json`, JSON.stringify(historyCache))
-        else localStorage.setItem("history", JSON.stringify(historyCache))
+        /* IFDEF DEBUG|PROD */
+        await window.api.os.write(`history.json`, JSON.stringify(historyCache))
+        /* ENDIF */
+
+        /* IFDEF WEB */
+        localStorage.setItem("history", JSON.stringify(historyCache))
+        /* ENDIF */
+
         setGlobalHistory(historyCache)
         refetchHistory()
         return true
@@ -58,8 +64,13 @@ export async function updateHistoryData(id: string, data: cardData): Promise<boo
             }
         });
 
-        if (window.api) await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(historyCache as any)))
-        else localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(historyCache as any)))
+        /* IFDEF DEBUG|PROD */
+        await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(historyCache as any)))
+        /* ENDIF */
+        
+        /* IFDEF WEB */
+        localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(historyCache as any)))
+        /* ENDIF */
         setGlobalHistory(historyCache as any)
         refetchHistory()
         return true
@@ -87,8 +98,14 @@ export async function SaveHistory(data: cardData): Promise<boolean> {
 
         if (index != -1) historyCache.splice(index, 1);
         historyCache.unshift(data);
-        if (window.api) await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(historyCache)))
-        else localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(historyCache)))
+
+        /* IFDEF DEBUG|PROD */
+        await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(historyCache)))
+        /* ENDIF */
+
+        /* IFDEF WEB */
+        localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(historyCache)))
+        /* ENDIF */
         setGlobalHistory(historyCache)
         refetchHistory()
         return true
@@ -100,8 +117,13 @@ export async function SaveHistory(data: cardData): Promise<boolean> {
 
 export async function OverWriteHistory(data: cardData[]): Promise<boolean> {
     try {
-        if (window.api) await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(data)))
-        else localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(data)))
+        /* IFDEF DEBUG|PROD */
+        await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(data)))
+        /* ENDIF */
+
+        /* IFDEF WEB */
+        localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(data)))
+        /* ENDIF */
         return true
     } catch (Error) {
         console.error(`${Error} in OverWriteHistory`)

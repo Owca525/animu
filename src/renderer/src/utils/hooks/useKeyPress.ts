@@ -8,7 +8,7 @@ export function useKeyPress(func: (keybinds: string) => void) {
   const setFunc = (newFunc: typeof func) => {
     funcRef = newFunc;
   };
-  
+
   const handleKeyDown = (event: KeyboardEvent) => {
     const key = convertKeybinds(event.key);
     if (!keysRef.includes(key)) {
@@ -26,20 +26,20 @@ export function useKeyPress(func: (keybinds: string) => void) {
   };
 
   onMount(() => {
-    if (window.api) {
-      const callback = window.BrowserWindow.onWindowFocus((focus) => {
-        if (focus) {
-          window.addEventListener("keydown", handleKeyDown, { passive: true });
-          window.addEventListener("keyup", handleKeyUp, { passive: true });
-        } else {
-          window.removeEventListener("keydown", handleKeyDown);
-          window.removeEventListener("keyup", handleKeyUp);
-        }
-      })
-      onCleanup(() => {
-        callback()
-      })
-    }
+    /* IFDEF DEBUG|PROD */
+    const callback = window.BrowserWindow.onWindowFocus((focus) => {
+      if (focus) {
+        window.addEventListener("keydown", handleKeyDown, { passive: true });
+        window.addEventListener("keyup", handleKeyUp, { passive: true });
+      } else {
+        window.removeEventListener("keydown", handleKeyDown);
+        window.removeEventListener("keyup", handleKeyUp);
+      }
+    })
+    onCleanup(() => {
+      callback()
+    })
+    /* ENDIF */
 
     window.addEventListener("keydown", handleKeyDown, { passive: true });
     window.addEventListener("keyup", handleKeyUp, { passive: true });

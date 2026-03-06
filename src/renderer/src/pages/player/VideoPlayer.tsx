@@ -196,7 +196,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     body: requests.body,
                 });
 
-                if (!resp.success) console.warn("Shaka Player Failed Request", tmp. resp)
+                if (!resp.success) console.warn("Shaka Player Failed Request", tmp.resp)
 
                 const headersObj: { [key: string]: string } = {};
                 resp.responseHeader.forEach((value, key) => {
@@ -739,7 +739,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         // Update RPC
         if (config.General.discordRPC && window.api) window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`)
-        
+
         if (!fatalError() && config.Player.general.AutoSkipEpisode && event.currentTarget.duration == event.currentTarget.currentTime) setEpisode("next")
 
         let player = currentPlayer()
@@ -1107,23 +1107,23 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             if (config.Player.screenShot.saveType == "Clipboard") return showScreenShotSuccess(url, "")
         }
 
-        if (window.api) {
-            let resp: boolean = false
+        /* IFDEF DEBUG|PROD */
+        let resp: boolean = false
 
-            if (config.Player.screenShot.alwaysAsk) resp = await window.api.os.saveDialog(
-                `${config.Player.screenShot.path}/screenshot${formatedDate}.png`,
-                screenshot.replace(/^data:image\/png;base64,/, ''),
-                `screenshot${formatedDate}.png`, "png", ["PNG"], "base64"
-            )
-            else resp = await window.api.os.write(
-                `${config.Player.screenShot.path}/screenshot${formatedDate}.png`,
-                screenshot.replace(/^data:image\/png;base64,/, ''),
-                "base64"
-            )
+        if (config.Player.screenShot.alwaysAsk) resp = await window.api.os.saveDialog(
+            `${config.Player.screenShot.path}/screenshot${formatedDate}.png`,
+            screenshot.replace(/^data:image\/png;base64,/, ''),
+            `screenshot${formatedDate}.png`, "png", ["PNG"], "base64"
+        )
+        else resp = await window.api.os.write(
+            `${config.Player.screenShot.path}/screenshot${formatedDate}.png`,
+            screenshot.replace(/^data:image\/png;base64,/, ''),
+            "base64"
+        )
 
-            if (resp) showScreenShotSuccess(url, `${config.Player.screenShot.path}/screenshot${formatedDate}.png`)
-            else toast(t("player.toastscreenshot.failed"), { type: "error" });
-        }
+        if (resp) showScreenShotSuccess(url, `${config.Player.screenShot.path}/screenshot${formatedDate}.png`)
+        else toast(t("player.toastscreenshot.failed"), { type: "error" });
+        /* ENDIF */
     };
 
     function generateShareURL() {

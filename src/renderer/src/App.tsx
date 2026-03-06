@@ -48,32 +48,32 @@ function App() {
   const [isInitation, setInitation] = createSignal<boolean>(true)
   const [initialState, setinitialState] = createSignal<{ text: string, plugin: boolean }>({ text: "initial.history", plugin: false })
 
-  if (window.api) {
-    createShortcut(["F12"], () => {
-      if (getConfig().Developer.DevTools) window.BrowserWindow.openDevTools()
-    })
-    createShortcut(["Control", "Shift", "R"], async () => {
-      if (getConfig().Developer.DeveloperMode) {
-        const idToast = toast(t("global.themereload"), { type: "loading", removeTimer: true })
-        setGlobalTheme(await window.api.themes.list())
+  /* IFDEF DEBUG|PROD */
+  createShortcut(["F12"], () => {
+    if (getConfig().Developer.DevTools) window.BrowserWindow.openDevTools()
+  })
+  createShortcut(["Control", "Shift", "R"], async () => {
+    if (getConfig().Developer.DeveloperMode) {
+      const idToast = toast(t("global.themereload"), { type: "loading", removeTimer: true })
+      setGlobalTheme(await window.api.themes.list())
 
-        const loadedTheme = getGlobalCache().loadedTheme
-        let confTheme = [...new Set(unwrap(getConfig().General.theme))]
-        let loadingTheme: Map<number, themeMetadata> = new Map()
-        for (let index = 0; index < confTheme.length; index++) {
-          const element = confTheme[index];
-          const theme = loadedTheme.find((ele) => ele.themeName == element)
-          if (!theme) continue
-          loadingTheme.set(index, unwrap(theme))
-        }
-        changeTheme(loadingTheme)
-
-        updateToast(idToast, t("global.themereload"), { type: "success", removeTimer: false })
-        await window.backend.refresh()
+      const loadedTheme = getGlobalCache().loadedTheme
+      let confTheme = [...new Set(unwrap(getConfig().General.theme))]
+      let loadingTheme: Map<number, themeMetadata> = new Map()
+      for (let index = 0; index < confTheme.length; index++) {
+        const element = confTheme[index];
+        const theme = loadedTheme.find((ele) => ele.themeName == element)
+        if (!theme) continue
+        loadingTheme.set(index, unwrap(theme))
       }
-      await import("./utils/exports")
-    })
-  }
+      changeTheme(loadingTheme)
+
+      updateToast(idToast, t("global.themereload"), { type: "success", removeTimer: false })
+      await window.backend.refresh()
+    }
+    await import("./utils/exports")
+  })
+  /* ENDIF */
 
   createShortcut(["Control", "I"], () => {
     setIncognitoMode(!getGlobalCache().incognito)
@@ -82,28 +82,41 @@ function App() {
 
   onMount(async () => {
     shaka.polyfill.installAll()
-    
-    if (window.api) {
-      setConfig(await window.api.getConfig())
-      setGlobalHistory(await window.api.getHistory())
-    } else {
-      if (!localStorage.getItem("config")) localStorage.setItem("config", JSON.stringify(defaultConfigWeb))
-      if (!localStorage.getItem("history")) localStorage.setItem("history", JSON.stringify([]))
-      setConfig(JSON.parse(localStorage.getItem("config") as any))
-      setGlobalHistory(JSON.parse(localStorage.getItem("history") as any))
-    }
+
+    /* IFDEF WEB */
+    /* ENDIF */
+
+    /* IFDEF WEB */
+    if (!localStorage.getItem("config")) localStorage.setItem("config", JSON.stringify(defaultConfigWeb))
+    if (!localStorage.getItem("history")) localStorage.setItem("history", JSON.stringify([]))
+    setConfig(JSON.parse(localStorage.getItem("config") as any))
+    setGlobalHistory(JSON.parse(localStorage.getItem("history") as any))
+    /* ENDIF */
+
+    /* IFDEF DEBUG|PROD */
+    setConfig(await window.api.getConfig())
+    setGlobalHistory(await window.api.getHistory())
+    /* ENDIF */
+
     setinitialState({ text: "initial.theme", plugin: false })
-    if (window.api) setGlobalTheme(await window.api.themes.list())
+    /* IFDEF DEBUG|PROD */
+    setGlobalTheme(await window.api.themes.list())
+    /* ENDIF */
 
     setinitialState({ text: "Loading Animulist", plugin: false })
-    if (window.api) setAnimulistData(await window.api.animulist.getDatabase())
-    else {
-      if (!localStorage.getItem("animulist")) localStorage.setItem("animulist", JSON.stringify([]))
-        setAnimulistData(JSON.parse(localStorage.getItem("animulist") as any))
-    }
+    /* IFDEF DEBUG|PROD */
+    setAnimulistData(await window.api.animulist.getDatabase())
+    /* ENDIF */
+
+    /* IFDEF WEB */
+    if (!localStorage.getItem("animulist")) localStorage.setItem("animulist", JSON.stringify([]))
+    setAnimulistData(JSON.parse(localStorage.getItem("animulist") as any))
+    /* ENDIF */
 
     setinitialState({ text: "initial.config", plugin: false })
+    /* IFDEF DEBUG|PROD */
     LoadConfig()
+    /* ENDIF */
     setHomeActivePage("global.home")
 
     setinitialState({ text: "initial.plugin", plugin: false })
@@ -171,12 +184,14 @@ function App() {
 
     // setTimeout(() => worker.terminate(), 1000);
 
-
-    if (window.api) runCheckUpdate()
+    /* IFDEF DEBUG|PROD */
+    runCheckUpdate()
+    /* ENDIF */
   })
 
+  // TODO: ADD SUPPORT FOR BROWSER
+  /* IFDEF DEBUG|PROD */
   function LoadConfig() {
-    if (!window.api) return
     let loadedConnfig = getConfig()
 
     if (loadedConnfig.animulist.historyConvert) {
@@ -208,7 +223,7 @@ function App() {
     saveConfig(updateObjectConfig("backup.lastCheck", dateToUnix(new Date().toString()), loadedConnfig))
     window.backend.refresh()
   }
-
+  /* ENDIF */
 
   return (
     <Switch>
