@@ -102,27 +102,31 @@ export function convertHistoryToAnimuList() {
 
     for (let index = 0; index < history.length; index++) {
         const element = history[index];
-        if (element.AnimeData.id.replaceAll(" ", "") == "") return
-        const finded = animulist.find((v) => v.AnimeData.id.toString() == element.AnimeData.id.toString())
-        if (finded) continue
-        if (!element.saveData.episode) continue
-        let status: animulistProps = {
-            status: "COMPLETED",
-            score: 0,
-            reapeat: 0,
-            startWatch: 0,
-            endWatch: 0,
-            added: dateToUnix(new Date().toString()),
-            lastUpdate: dateToUnix(new Date().toString())
+        try {
+            if (element.AnimeData.id.replaceAll(" ", "") == "") return
+            const finded = animulist.find((v) => v.AnimeData.id.toString() == element.AnimeData.id.toString())
+            if (finded) continue
+            if (!element.saveData.episode) continue
+            let status: animulistProps = {
+                status: "COMPLETED",
+                score: 0,
+                reapeat: 0,
+                startWatch: 0,
+                endWatch: 0,
+                added: dateToUnix(new Date().toString()),
+                lastUpdate: dateToUnix(new Date().toString())
+            }
+
+            if (element.AnimeData.episodes && parseInt(element.saveData.episode) < element.AnimeData.episodes)
+                status = { ...status, status: "CURRENT", startWatch: dateToUnix(new Date().toString()) }
+
+            addToAnimuList(status, {
+                ...element.AnimeData,
+                nextAiringEpisode: undefined,
+                recommendations: undefined
+            })
+        } catch (error) {
+            console.error("convertHistoryToAnimuList have error", error, element)
         }
-
-        if (element.AnimeData.episodes && parseInt(element.saveData.episode) < element.AnimeData.episodes)
-            status = { ...status, status: "CURRENT", startWatch: dateToUnix(new Date().toString()) }
-
-        addToAnimuList(status, {
-            ...element.AnimeData,
-            nextAiringEpisode: undefined,
-            recommendations: undefined
-        })
     }
 }
