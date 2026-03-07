@@ -152,7 +152,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         const socket = getSocket()
         socket?.on("player:update", (update: { time: number, pause: boolean }) => {
             console.log(update)
-            if (update.pause != isPlaying()) togglePlay()
+            if (update.pause != isPlaying()) togglePlay(true)
             console.log(unwrap(currentTime()) - update.time > 3, unwrap(currentTime()), unwrap(currentTime()) - update.time)
             if (unwrap(currentTime()) - update.time > 3 || unwrap(currentTime()) - update.time < -3) {
                 setTimeVideo(update.time)
