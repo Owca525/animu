@@ -12,7 +12,7 @@
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
-    "dev:web": "ANIMU_WEB_DEV=true electron-vite dev",
+    "dev:web": "ANIMU_WEB_DEV=true ANIMU_WEB=true electron-vite dev",
     "build": "npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "npm run build && electron-builder --dir",

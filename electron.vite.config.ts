@@ -67,12 +67,14 @@ function generateInfoFile(): PluginOption {
     transform(code: string, id: string) {
       if (!/\.(ts|tsx|js|jsx)$/.test(id)) return null;
       if (process.env.NODE_ENV !== 'production') {
-        code = code.replace('"PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION"', JSON.stringify({
+        let tmp = {
             ver: pkg.version,
             branch: "Dev",
             commit: "Uknown",
             compiled: Math.floor(new Date().getTime() / 1000)
-        }));
+        }
+        if (process.env.ANIMU_WEB_DEV) tmp["langs"] = readAllLangFiles()
+        code = code.replace('"PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION"', JSON.stringify(tmp));
         return { code, map: null };
       }
 
@@ -153,9 +155,9 @@ export default defineConfig({
     plugins: [
       solid(),
       viteConditionPlugin({
-        DEBUG: process.env.NODE_ENV !== 'production' && process.env.ANIMU_WEB_DEV == undefined,
-        PROD: process.env.NODE_ENV == 'production' && process.env.ANIMU_WEB_DEV == undefined,
-        WEB: process.env.ANIMU_WEB_DEV ? true : false
+        DEBUG: process.env.NODE_ENV !== 'production' && process.env.ANIMU_WEB == undefined,
+        PROD: process.env.NODE_ENV == 'production' && process.env.ANIMU_WEB == undefined,
+        WEB: process.env.ANIMU_WEB ? true : false
       }),
       generateInfoFile(),
       viteStaticCopy({
