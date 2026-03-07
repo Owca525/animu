@@ -102,50 +102,6 @@ const Home = () => {
       if (getHomeCache().activePage == element.text) setNewActivePage(element.text)
     }
 
-    // function runSocket(server: string = "") {
-    //   const socket = io(server)
-    //   console.log(socket)
-
-    //   socket.on("rooms-list", (rooms) => {
-    //     console.log(rooms)
-    //   })
-
-    //   socket.on("player:init", (playerData: socketPlayerInit) => {
-    //     localStorage.setItem("playerCache", JSON.stringify(unwrap({
-    //       data: playerData.anime,
-    //       save: playerData.saveData,
-    //       episodelist: playerData.temp.episodes,
-    //     })))
-    //     navigate("/player")
-    //   })
-
-    //   socket.on("disconnect", () => {
-    //     toast("Disconected From Websocket")
-    //   });
-    //   setSocket(socket)
-    // }
-
-    // function createRoom(name: string) {
-    //   const socket = getSocket()
-    //   console.log(socket)
-    //   if (!socket) return
-    //   socket.emit("join-room", name, (resp) => {
-    //     if (!resp.success) return toast(`Failed Connect to Room ${name}`)
-    //     else {
-    //       toast(`Sucesfully Connected to ${name}`)
-    //       setSocketRoom(name)
-    //     }
-    //   });
-    //   setSocketRoom(name)
-    // }
-
-    // function getRooms() {
-    //   const socket = getSocket()
-    //   console.log(socket)
-    //   if (!socket) return
-    //   return socket.emit("gets-rooms");
-    // }
-
     if (!getGlobalCache().deeplinkRunned && window.api) {
       window.api.onProtocolRequest(fetchDeeplinks)
       setDeeplinkRunned(true)

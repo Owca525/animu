@@ -9,7 +9,7 @@ import VideoPlayer from "./VideoPlayer";
 import { SaveHistory } from "@renderer/utils/FilesManager/history";
 import { useNavigate } from "@solidjs/router";
 import { getConfig } from "@renderer/utils/stores/config";
-import { createSignal, Match, onMount, Switch } from "solid-js";
+import { createSignal, Match, onCleanup, onMount, Switch } from "solid-js";
 import { createShortcut } from "@solid-primitives/keyboard";
 import ExternalPlayer from "./externalPlayer";
 import { pluginManager } from "@renderer/utils/stores/plugins";
@@ -17,6 +17,7 @@ import { useResponse } from "@renderer/utils/hooks/useResponse";
 import { useI18n } from "@renderer/utils/i18n";
 import { addToAnimuList } from "@renderer/utils/FilesManager/animulist";
 import { getSocket, getSocketRoom } from "@renderer/utils/stores/global";
+import { unwrap } from "solid-js/store";
 
 const player = () => {
     const { t } = useI18n()
@@ -70,6 +71,11 @@ const player = () => {
         }))
         response.Refetch([anime_data.data?.player_ID, extractionData().actual, extractionData().type])
         updateHistory()
+
+        if (getSocket()) {
+            const socket = getSocket()
+            socket?.emit("player:nextepisode", unwrap(extractionData()))
+        }
     }
 
     function updateHistory() {
@@ -95,7 +101,7 @@ const player = () => {
     });
 
     onMount(() => {
-        if (!window.api && getSocket()) {
+        if (getSocket()) {
             const socket = getSocket()
             socket?.emit("player:init", {
                 roomName: getSocketRoom(),
@@ -104,6 +110,10 @@ const player = () => {
                     saveData: anime_data.save,
                     temp: { episode: extractionData().actual, type: extractionData().type, episodes: extractionData().episodelist }
                 }
+            })
+            socket?.on("player:nextepisode", (data) => {
+                setExtractionData(data)
+                response.Refetch([anime_data.data?.player_ID, data.actual, data.type])
             })
         }
 
@@ -137,6 +147,13 @@ const player = () => {
             nextAiringEpisode: undefined,
             recommendations: undefined
         })
+    })
+
+    onCleanup(() => {
+        if (getSocket()) {
+            const socket = getSocket()
+            socket?.off("player:nextepisode")
+        }
     })
 
     function showErrorDialog() {

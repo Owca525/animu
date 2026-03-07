@@ -148,7 +148,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [screenShot, setScreenShot] = createSignal<{ active: boolean, image: string, click: string }>({ active: false, image: "", click: "" });
 
     // const gamepad = useGamepad(0, gamepadControler);
-    if (!window.api && getSocket()) {
+    if (getSocket()) {
         const socket = getSocket()
         socket?.on("player:update", (update: { time: number, pause: boolean }) => {
             console.log(update)
@@ -269,6 +269,11 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (videoRef) videoRef.src = ""
         videoRef = undefined
         shakaPlayer?.destroy()
+
+        if (getSocket()) {
+            const socket = getSocket()
+            socket?.off("player:update")
+        }
 
         navigator.mediaSession.metadata = new MediaMetadata({
             title: '',
@@ -564,7 +569,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }, 500);
     }
 
-    function togglePlay() {
+    function togglePlay(noScoket: boolean = false) {
         const video = videoRef
         if (!video) return
 
@@ -584,7 +589,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             return true
         })
 
-        if (!window.api && getSocket()) {
+        if (!noScoket && getSocket()) {
+            clearInterval(refreashUpdateSocket)
             const socket = getSocket()
             socket?.emit("player:update", {
                 roomName: unwrap(getSocketRoom()), player: {
@@ -720,7 +726,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         checkUpNext(event)
         handleProgress(event)
 
-        if (!window.api && getSocket()) {
+        if (getSocket()) {
             if (!refreashUpdateSocket) {
                 refreashUpdateSocket = setInterval(() => {
                     const socket = getSocket()
@@ -840,7 +846,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         videoRef.currentTime = value
         setcurrentTime(() => value)
 
-        if (!window.api && getSocket()) {
+        if (getSocket()) {
+            clearInterval(refreashUpdateSocket)
             const socket = getSocket()
             socket?.emit("player:update", {
                 roomName: unwrap(getSocketRoom()), player: {

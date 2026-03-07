@@ -26,7 +26,7 @@ import {
 } from 'solid-js';
 import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import { getConfig, setConfig } from './utils/stores/config';
-import { getGlobalCache, setAnimulistData, setGlobalHistory, setGlobalTheme, setIncognitoMode } from './utils/stores/global';
+import { getGlobalCache, getSocket, setAnimulistData, setGlobalHistory, setGlobalTheme, setIncognitoMode, setSocket, setSocketRoom } from './utils/stores/global';
 import { HashRouter, Route } from '@solidjs/router';
 import { getInformationPlugin, pluginManager, setPluginRepo } from './utils/stores/plugins';
 import { setHomeActivePage } from './utils/stores/home';
@@ -39,6 +39,8 @@ import { unwrap } from 'solid-js/store';
 import { pluginRepoExpanded, themeMetadata } from './utils/types';
 import shaka from 'shaka-player';
 import { convertHistoryToAnimuList } from './utils/FilesManager/animulist';
+import { socketPlayerInit } from './pages/player/VideoPlayer';
+import { io } from 'socket.io-client';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -126,7 +128,7 @@ function App() {
 
     setInitation(false)
 
-    detectPluginVersion()
+    detectPluginVersion();
 
     // Code: https://github.com/cynthia2006/hanime-plugin/blob/master/yt_dlp_plugins/extractor/htv.py
     // const payload = `
@@ -184,6 +186,65 @@ function App() {
 
     // setTimeout(() => worker.terminate(), 1000);
 
+    (window as any).runSocket = runSocket;
+    (window as any).createRoom = createRoom;
+    (window as any).getRooms = getRooms;
+    (window as any).closeSocket = closeSocket;
+
+    function closeSocket() {
+      const socket = getSocket()
+      if (!socket) return
+      socket.close()
+    }
+
+    function runSocket(server: string = "") {
+      const socket = io(server)
+      console.log(socket)
+
+      socket.on("rooms-list", (rooms) => {
+        console.log(rooms)
+      })
+
+      socket.on("player:init", (playerData: socketPlayerInit) => {
+        localStorage.setItem("playerCache", JSON.stringify(unwrap({
+          data: playerData.anime,
+          save: playerData.saveData,
+          episodelist: playerData.temp.episodes,
+        })))
+        if (location.href.includes("/player")) return
+        const tmp = location.href.replaceAll("info", "")
+        location.href = `${tmp}player`
+      })
+
+      socket.on("disconnect", () => {
+        socket.off("player:init")
+        socket.off("rooms-list")
+        toast("Disconected From Websocket")
+      });
+      setSocket(socket)
+    }
+
+    function createRoom(name: string) {
+      const socket = getSocket()
+      console.log(socket)
+      if (!socket) return
+      socket.emit("join-room", name, (resp) => {
+        if (!resp.success) return toast(`Failed Connect to Room ${name}`)
+        else {
+          toast(`Sucesfully Connected to ${name}`)
+          setSocketRoom(name)
+        }
+      });
+      setSocketRoom(name)
+    }
+
+    function getRooms() {
+      const socket = getSocket()
+      console.log(socket)
+      if (!socket) return
+      return socket.emit("gets-rooms");
+    }
+
     /* IFDEF DEBUG|PROD */
     runCheckUpdate()
     /* ENDIF */
@@ -233,7 +294,6 @@ function App() {
           <div class="animu-initial-content">
             <span class='animu-initial-text'>{t("initial.animu")}</span>
             <div class="animu-initial-state">
-              <span class='material-symbols-outlined loading-animation'>progress_activity</span>
               <span class='animu-initial-text'>{t(initialState().text)}</span>
             </div>
           </div>
