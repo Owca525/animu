@@ -24,6 +24,13 @@
         "schedule": "Schedule",
         "animulist": "AnimuList"
     },
+    "anilist": {
+        "titles": {
+            "ROMAJI": "Romaji",
+            "ENGLISH": "English",
+            "NATIVE": "Native"
+        }
+    },
     "search": {
         "home": "Search Anime...",
         "history": "Search History...",

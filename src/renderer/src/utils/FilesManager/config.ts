@@ -136,6 +136,12 @@ export const defaultConfigWeb: SettingsConfig = {
     },
     animulist: {
         historyConvert: true
+    },
+    anilist: {
+        scoreFormat: "POINT_100",
+        titleFormat: "ROMAJI",
+        adultdefault: false,
+        maxpagesize: 20
     }
 };
 /* ENDIF */

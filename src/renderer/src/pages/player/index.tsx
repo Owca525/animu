@@ -2,7 +2,7 @@ import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
 import { AnimeData, animulistProps, indentityPlayer, SettingsConfig } from "@renderer/utils/types";
 
 import "./player.css"
-import { changeTitleAnimu, dateToUnix, detectTitle, refetchHistory } from "@renderer/utils/functions";
+import { changeTitleAnimu, dateToUnix, detectTitle, detectTitleConfig, refetchHistory } from "@renderer/utils/functions";
 import Button from "@renderer/components/buttons";
 
 import VideoPlayer from "./VideoPlayer";
@@ -117,7 +117,7 @@ const player = () => {
             })
         }
 
-        changeTitleAnimu(`Animu - ${anime_data.data.title.romaji}`)
+        changeTitleAnimu(`Animu - ${detectTitleConfig(anime_data.data.title)}`)
         SaveHistory({
             saveData: {
                 ...anime_data.save,

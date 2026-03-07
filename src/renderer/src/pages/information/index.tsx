@@ -11,6 +11,7 @@ import {
     CreateContextMenuOptions,
     dateToUnix,
     decodeHtmlEntities,
+    detectTitleConfig,
     getGradientColor,
     openUrlFolder,
     SaveToClipboard,
@@ -152,7 +153,7 @@ function information() {
     }
 
     function initialInformation() {
-        changeTitleAnimu(`Animu - ${tempData().anime.title.romaji}`)
+        changeTitleAnimu(`Animu - ${detectTitleConfig(tempData().anime.title)}`)
         generateAnimeForContextMenu()
 
         checkAnimeFetching()
@@ -387,7 +388,7 @@ function information() {
                             </div> */}
                         </div>
                         <div class="information-text-container">
-                            <div class="information-title">{tempData().anime.title.romaji}</div>
+                            <div class="information-title">{detectTitleConfig(tempData().anime.title)}</div>
                             <div class={`information-mini-title ${moreMiniTitle() == false ? "click" : ""}`} onclick={() => setmoreMiniTitle(true)}>{createMiniTitle()}</div>
                             <div class="information-description" ref={descriptionRef}>
                                 {decodeHtmlEntities(tempData().anime.description ?? t("information.descriptionnotfound"))}
@@ -407,7 +408,7 @@ function information() {
                                 <Switch>
                                     <Match when={tempData().animulist == undefined}>
                                         <Button titleButton={"Add To Animulist"} icon="add" ButtonClass="information-bar-icon" onClick={() => showCustomMenu({
-                                            title: `Add ${tempData().anime.title.romaji}`, animuList: {
+                                            title: `Add ${detectTitleConfig(tempData().anime.title)}`, animuList: {
                                                 anime: unwrap(tempData().anime),
                                                 save: (animulist, anime) => { addToAnimuList(animulist, anime, true); setTmpData((p) => ({ ...p, animulist: animulist })) }
                                             }
@@ -415,7 +416,7 @@ function information() {
                                     </Match>
                                     <Match when={tempData().animulist}>
                                         <Button titleButton={"Edit Anime"} icon="edit" ButtonClass="information-bar-icon" onClick={() => showCustomMenu({
-                                            title: `Edit ${tempData().anime.title.romaji}`, animuList: {
+                                            title: `Edit ${detectTitleConfig(tempData().anime.title)}`, animuList: {
                                                 anime: unwrap(tempData().anime),
                                                 animulist: tempData().animulist,
                                                 save: (animulist, anime) => { updateDataInAnimulist(anime.id, { AnimeData: anime, animulist }, true); setTmpData((p) => ({ ...p, animulist: animulist })) }
@@ -676,7 +677,7 @@ function information() {
                 <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
             </main>
             <Show when={showWrong()}>
-                <ContainerWrong name={tempData().anime.title.romaji} refetchfunc={(id?: string) => { 
+                <ContainerWrong name={detectTitleConfig(tempData().anime.title)} refetchfunc={(id?: string) => { 
                         setshowWrong(false); 
                         setCurrentId(id); 
                         episodeResponse.Refetch([tempData(), id, currentPlugin()]) 

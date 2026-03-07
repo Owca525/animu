@@ -1,6 +1,7 @@
 import { useI18n } from "@renderer/utils/i18n"
 import "./css/relationCard.css"
 import { createSignal, Match, Show, Switch } from "solid-js"
+import { detectTitleConfig } from "@renderer/utils/functions"
 
 export type characterCardsProps = {
     id: number,
@@ -47,7 +48,7 @@ export default function RelationCard(props: characterCardsProps) {
             <div class="relation-card-content">
                 <div class="relation-card-content-top">
                     <span class="relation-card-relation">{t(`anime_relationtype.${props.relationType.toLowerCase().replaceAll("_", "")}`)}</span>
-                    <span class="relation-card-title">{props.title.romaji}</span>
+                    <span class="relation-card-title">{detectTitleConfig(props.title)}</span>
                 </div>
                 <div class="relation-card-content-bottom">
                     <Show when={props.source}>

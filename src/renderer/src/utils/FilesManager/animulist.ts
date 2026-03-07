@@ -4,7 +4,7 @@ import { animulistData, getGlobalCache, setAnimulistData } from "../stores/globa
 import { AnimeData, animulistProps } from "../types"
 import { getHomeCache } from "../stores/home"
 import { AnimuListSearch } from "@renderer/pages/home/homeUtils"
-import { dateToUnix, getHistory } from "../functions"
+import { dateToUnix, detectTitleConfig, getHistory } from "../functions"
 
 export async function addToAnimuList(animulist: animulistProps, anime: AnimeData, notification: boolean = false) {
     if (getGlobalCache().incognito) return
@@ -21,7 +21,7 @@ export async function addToAnimuList(animulist: animulistProps, anime: AnimeData
     /* ENDIF */
 
     refreashAnimulist()
-    if (notification) toast(`Succesfully Added ${anime.title.romaji} to animulist`)
+    if (notification) toast(`Succesfully Added ${detectTitleConfig(anime.title)} to animulist`)
 }
 
 export async function removeFromAnimulist(id: string, notification: boolean = false) {

@@ -304,6 +304,12 @@ export interface SettingsConfig {
     firstStart: boolean
     deepLinkURL: string
     yt_dlp: string
+    anilist: {
+        scoreFormat: "POINT_100" | "POINT_10_DECIMAL" | "POINT_10" | "POINT_5" | "POINT_3"
+        titleFormat: "ROMAJI" | "ENGLISH" | "NATIVE"
+        adultdefault: boolean
+        maxpagesize: number
+    }
     animulist: {
         historyConvert: boolean
     }

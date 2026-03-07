@@ -1,7 +1,7 @@
 import Hls from "hls.js"
 
 import { AnimeData, animulistProps, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
-import { convertKeybinds, convertSecondsToHoursFormat, CreateContextMenuOptions, dateToUnix, decodeHtmlEntities, detectTitle, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObjectConfig } from "@renderer/utils/functions"
+import { convertKeybinds, convertSecondsToHoursFormat, CreateContextMenuOptions, dateToUnix, decodeHtmlEntities, detectTitle, detectTitleConfig, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObjectConfig } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
@@ -240,7 +240,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             const cover = temp.episodes[findedepisode] ? temp.episodes[findedepisode].img : anime_data.AnimeData.coverImage
             navigator.mediaSession.metadata = new MediaMetadata({
                 artist: anime_data.AnimeData.studios && anime_data.AnimeData.studios.length > 0 ? anime_data.AnimeData.studios.length[0] : "",
-                title: anime_data.AnimeData.title.romaji,
+                title: detectTitleConfig(anime_data.AnimeData.title),
                 artwork: [
                     { sizes: "512x512", src: cover ? cover : "" }
                 ]
@@ -744,7 +744,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         setVideoFrames({ totalVideoFrames: event.currentTarget.getVideoPlaybackQuality().totalVideoFrames, droppedVideoFrames: event.currentTarget.getVideoPlaybackQuality().droppedVideoFrames })
 
         // Update RPC
-        if (config.General.discordRPC && window.api) window.api.rpc.setActivity(t("discordrpc.player", { title: anime_data.AnimeData.title.romaji, ep: temp.episode }), `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`)
+        if (config.General.discordRPC && window.api) window.api.rpc.setActivity(t("discordrpc.player", { title: detectTitleConfig(anime_data.AnimeData.title), ep: temp.episode }), `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`)
 
         if (!fatalError() && config.Player.general.AutoSkipEpisode && event.currentTarget.duration == event.currentTarget.currentTime) setEpisode("next")
 
@@ -1400,7 +1400,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                                         <div class="player-select-episode-content-list">
                                             <For each={temp.episodes}>
                                                 {(element) => (
-                                                    <PlayerEpisodeElement nextEpisode={setNextEpisode} animeTitle={anime_data.AnimeData.title.romaji} episodes={element} currentEpisode={temp.episode} />
+                                                    <PlayerEpisodeElement nextEpisode={setNextEpisode} animeTitle={detectTitleConfig(anime_data.AnimeData.title)} episodes={element} currentEpisode={temp.episode} />
                                                 )}
                                             </For>
                                         </div>
@@ -1475,7 +1475,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             <Show when={config.Player.upToNextEpisode.variants == "old"}>
                 <div class={`player-up-Next-container old  ${isUpNextEpisode() ? "show" : "hidden"}`}>
                     <div class="player-up-Next-Title old">{t("player.upNext.title", { sec: parseInt(timeNextEpisode().toString()) })}</div>
-                    <div class="player-up-Next-Anime old">{t("player.upNext.titleAnime", { ep: getEpisode("next")?.ep, title: anime_data.AnimeData.title.romaji })}</div>
+                    <div class="player-up-Next-Anime old">{t("player.upNext.titleAnime", { ep: getEpisode("next")?.ep, title: detectTitleConfig(anime_data.AnimeData.title) })}</div>
                     <div class="player-up-Next-Buttons old">
                         <Button content={t("player.upNext.nextEp")} ButtonClass='player-up-Next-Button old' onClick={() => setEpisode("next")} />
                         <Button content={t("player.upNext.hide")} ButtonClass='player-up-Next-Button old' onClick={() => { setHideUpNextEpisode(true); setUpNextEpisode(false) }} />
@@ -1488,7 +1488,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     <div class="player-up-Next-container-var2 ">
                         <span class="material-symbols-outlined player-up-Next-icon">skip_next</span>
                         <div class="player-up-Next-content var2">
-                            <div class="player-up-Next-title">{anime_data.AnimeData.title.romaji}</div>
+                            <div class="player-up-Next-title">{detectTitleConfig(anime_data.AnimeData.title)}</div>
                             <div class="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: getEpisode("next")?.ep })}</div>
                             <div class="player-up-Next-text">{t("player.upNext.nextPlaying", { time: parseInt(timeNextEpisode().toString()) })}</div>
                         </div>
@@ -1506,7 +1506,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     <img src={getCurrentImage()} class="player-up-Next-image" />
                     <span class="material-symbols-outlined player-up-Next-icon">skip_next</span>
                     <div class="player-up-Next-content">
-                        <div class="player-up-Next-title">{anime_data.AnimeData.title.romaji}</div>
+                        <div class="player-up-Next-title">{detectTitleConfig(anime_data.AnimeData.title)}</div>
                         <div class="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: getEpisode("next")?.ep })}</div>
                         <div class="player-up-Next-text">{t("player.upNext.nextPlaying", { time: parseInt(timeNextEpisode().toString()) })}</div>
                     </div>
@@ -1556,7 +1556,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     <div class="player-more-information-container">
                         <span class="player-more-information-top-text">Current Watching</span>
                         <img src={anime_data.AnimeData.coverImage} class="player-more-information-image" />
-                        <span class="player-more-information-title">{anime_data.AnimeData.title.romaji}</span>
+                        <span class="player-more-information-title">{detectTitleConfig(anime_data.AnimeData.title)}</span>
                         <div class="player-more-information-format-container">
                             <span class="player-more-information-season">{t(`anime_seasons.${anime_data.AnimeData.season?.toLowerCase()}`)} {anime_data.AnimeData.seasonYear}</span>
                             &#8226;

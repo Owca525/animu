@@ -687,6 +687,38 @@ function settings() {
                             </div>
                         </div>
                     </div>
+                    <div class="settings-page-container">
+                        <div class="settings-page-title">{"Anilist"}</div>
+                        <div class="settings-setting-container">
+                            {"Default Adult Mode"}
+                            <CheckBox
+                                checked={config().new.anilist.adultdefault}
+                                onChecked={(checked) =>
+                                    handleChange('anilist.adultdefault', checked)
+                                }
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {"Max Anime Cards"}
+                            <SettingsInput
+                                iconChar=""
+                                type="number"
+                                onKeyDown={(text) => handleChange("anilist.maxpagesize", parseInt(text))}
+                                startValue={config().new.anilist.maxpagesize.toString()}
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {"Title Format In Animu"}
+                            <ButtonGroup selectedValue={t(`anilist.titles.${config().new.anilist.titleFormat}`)} listValues={[
+                                { value: t("anilist.titles.ROMAJI"), onClick: () => handleChange("anilist.titleFormat", "ROMAJI") },
+                                { value: t("anilist.titles.NATIVE"), onClick: () => handleChange("anilist.titleFormat", "NATIVE") },
+                                { value: t("anilist.titles.ENGLISH"), onClick: () => handleChange("anilist.titleFormat", "ENGLISH") },
+                            ]}
+                            />
+                        </div>
+                    </div>
                     <Show when={window.api}>
                         <div class="settings-page-container">
                             <div class="settings-page-title">{t("settings.general.updates")}</div>

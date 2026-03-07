@@ -10,6 +10,12 @@ export interface SettingsConfig {
     animulist: {
         historyConvert: boolean
     }
+    anilist: {
+        scoreFormat: "POINT_100" | "POINT_10_DECIMAL" | "POINT_10" | "POINT_5" | "POINT_3"
+        titleFormat: "ROMAJI" | "ENGLISH" | "NATIVE"
+        adultdefault: boolean
+        maxpagesize: number
+    }
     plugins: {
         // information: string
         hiddenPlugins: string[]
@@ -315,6 +321,12 @@ export const defaultConfig: SettingsConfig = {
     yt_dlp: "",
     animulist: {
         historyConvert: true
+    },
+    anilist: {
+        scoreFormat: "POINT_100",
+        titleFormat: "ROMAJI",
+        adultdefault: false,
+        maxpagesize: 20
     }
 };
 

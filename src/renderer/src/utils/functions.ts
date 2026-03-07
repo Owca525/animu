@@ -295,11 +295,11 @@ export function sleep(ms: number): Promise<void> {
 
 export function detectTitle(data: { title: { english?: string | undefined; native: string; romaji: string; }, ep: string, format?: string }): string {
     try {
-        if (data.format?.toLowerCase().includes("movie")) return t('player.TitleMovie', { name: data.title.romaji })
-        return t('player.TitleEpisode', { ep: data.ep, name: data.title.romaji })
+        if (data.format?.toLowerCase().includes("movie")) return t('player.TitleMovie', { name: detectTitleConfig(data.title) })
+        return t('player.TitleEpisode', { ep: data.ep, name: detectTitleConfig(data.title) })
     } catch (error) {
         console.error(error)
-        return t('player.TitleEpisode', { ep: data.ep, name: data.title.romaji })
+        return t('player.TitleEpisode', { ep: data.ep, name: detectTitleConfig(data.title) })
     }
 }
 
@@ -809,4 +809,17 @@ export function calculateDays(unix1: number, unix2: number): number {
 export function convertSecondsToHoursFormat(seconds: number): string {
   if (seconds < 0) seconds = 0;
   return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
+}
+
+export function detectTitleConfig(titles: AnimeData["title"]): string {
+    try {
+        const config = unwrap(getConfig())
+        const title = titles[config.anilist.titleFormat.toLocaleLowerCase()]
+        if (title) return title
+        if (titles["romaji"]) return titles["romaji"]
+        return Object.values(titles)[0]
+    } catch (error) {
+        console.error("detectTitleConfig Error", error)
+        return Object.values(titles)[0]
+    }
 }

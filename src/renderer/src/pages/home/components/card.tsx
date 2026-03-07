@@ -6,6 +6,7 @@ import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import {
   convertSeconds,
   CreateContextMenuOptions,
+  detectTitleConfig,
   getGradientColor,
   SaveToClipboard,
 } from "@renderer/utils/functions";
@@ -132,7 +133,7 @@ function Card(props: CardProps) {
     {
       option: t("contextMenu.copytitle"),
       onClick: () =>
-        SaveToClipboard("text", props.card.AnimeData.title.romaji),
+        SaveToClipboard("text", detectTitleConfig(props.card.AnimeData.title)),
     }
   ];
 
@@ -157,7 +158,7 @@ function Card(props: CardProps) {
       option: "Add To AnimuList",
       onClick: () =>
         showCustomMenu({
-          title: `Add ${props.card.AnimeData.title.romaji}`, animuList: {
+          title: `Add ${detectTitleConfig(props.card.AnimeData.title)}`, animuList: {
             anime: unwrap(props.card.AnimeData),
             save: (animulist, anime) => addToAnimuList(animulist, anime, true)
           }
@@ -279,7 +280,7 @@ function Card(props: CardProps) {
       class="card-container"
       onClick={sendToInformation}
       onMouseOver={checkOutOfBound}
-      title={props.card.AnimeData.title.romaji}
+      title={detectTitleConfig(props.card.AnimeData.title)}
       onContextMenu={(event) =>
         OpenContextMenu(
           CreateContextMenuOptions(
@@ -316,7 +317,7 @@ function Card(props: CardProps) {
           </div>
         </Match>
       </Switch>
-      <div class="card-title">{props.card.AnimeData.title.romaji}</div>
+      <div class="card-title">{detectTitleConfig(props.card.AnimeData.title)}</div>
       <Show when={props.card.saveData && props.card.saveData.episode}>
         <Show when={props.card.saveData?.last_Time != 0 && props.card.saveData?.type != ""} fallback={<div class="card-continue-watch-text">{t("history.history", { ep: props.card.saveData?.episode })}</div>}>
           <div class="card-continue-watch-text">{t("history.continue", { ep: props.card.saveData?.episode })}</div>

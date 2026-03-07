@@ -1,4 +1,4 @@
-import { getEpisodeDay, getGradientColor, getHistory } from '@renderer/utils/functions';
+import { detectTitleConfig, getEpisodeDay, getGradientColor, getHistory } from '@renderer/utils/functions';
 import { cardData, indentityPlayer } from '@renderer/utils/types';
 import "./css/bigcard.css"
 import Button from '@renderer/components/buttons';
@@ -117,7 +117,7 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
                         </Show>
                     </div>
                     <div class="big-card-information-content">
-                        <div class="big-card-information-title">{data.AnimeData.title.romaji}</div>
+                        <div class="big-card-information-title">{detectTitleConfig(data.AnimeData.title)}</div>
                         <div class="big-card-information-genres-content">
                             <Show when={data.AnimeData.genres}>
                                 <For each={data.AnimeData.genres}>

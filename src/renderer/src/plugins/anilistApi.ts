@@ -1,8 +1,9 @@
 import { genYearsList, request, unixToDateTime } from "@renderer/utils/functions";
 import { t } from "@renderer/utils/i18n";
+import { getConfig } from "@renderer/utils/stores/config";
 import { AnimeData, cardData, containerData, genres, genresSearchFormat, informationPluginFormat } from "@renderer/utils/types";
 
-const pageSize = 20
+const defaultPageSize = 20
 
 const animeData = `
       id
@@ -153,7 +154,7 @@ query(
   $minimumTagRank: Int,
   $sort: [MediaSort] = [POPULARITY_DESC, SCORE_DESC]
 ) {
-  Page(page: $page, perPage: ${pageSize}) {
+  Page(page: $page, perPage: CHANGE_ME_PAGE_SIZE) {
     pageInfo {
       total
       perPage
@@ -224,22 +225,22 @@ const graphicHomeApi = `
     $nextYear: Int
     $isAdult: Boolean
   ) {
-    trending: Page(page: 1, perPage: ${pageSize}) {
+    trending: Page(page: 1, perPage: CHANGE_ME_PAGE_SIZE) {
       media(sort: TRENDING_DESC, type: ANIME, isAdult: $isAdult) {
         ...media
       }
     }
-    season: Page(page: 1, perPage: ${pageSize}) {
+    season: Page(page: 1, perPage: CHANGE_ME_PAGE_SIZE) {
       media(season: $season, seasonYear: $seasonYear, sort: POPULARITY_DESC, type: ANIME, isAdult: $isAdult) {
         ...media
       }
     }
-    nextSeason: Page(page: 1, perPage: ${pageSize}) {
+    nextSeason: Page(page: 1, perPage: CHANGE_ME_PAGE_SIZE) {
       media(season: $nextSeason, seasonYear: $nextYear, sort: POPULARITY_DESC, type: ANIME, isAdult: $isAdult) {
         ...media
       }
     }
-    popular: Page(page: 1, perPage: ${pageSize}) {
+    popular: Page(page: 1, perPage: CHANGE_ME_PAGE_SIZE) {
       media(sort: POPULARITY_DESC, type: ANIME, isAdult: $isAdult) {
         ...media
       }
@@ -394,6 +395,7 @@ function getSeasonFromDate() {
 // }
 
 async function fetchCategory(params: any, title: string): Promise<containerData> {
+  const config = getConfig()
   const globalParams = params
   let container: containerData = {
     title: title,
@@ -401,7 +403,7 @@ async function fetchCategory(params: any, title: string): Promise<containerData>
     onScrollDownFunction: async (_search, page, _params) => {
       let resp = await sendToApi({ ...globalParams, page: page }, graphicApi)
       return {
-        maxPage: pageSize,
+        maxPage: config.anilist.maxpagesize,
         data: resp
       }
     }
@@ -410,6 +412,7 @@ async function fetchCategory(params: any, title: string): Promise<containerData>
 }
 
 export async function searchInAnilist(name: string, page: number, params?: genresSearchFormat, isAdult: boolean = false, MaxPage: number = 20): Promise<{ data: cardData[]; maxPage: number; }> {
+  const config = getConfig()
   try {
     let variables: any = {
       page: page,
@@ -430,25 +433,26 @@ export async function searchInAnilist(name: string, page: number, params?: genre
     const resp = await sendToApi(variables, graphicApi.replaceAll("20", MaxPage.toString()))
     return {
       data: resp,
-      maxPage: pageSize
+      maxPage: config.anilist.maxpagesize
     }
   } catch (error) {
     console.error("Error in searchInAnilist/anilist", error)
     return {
       data: [],
-      maxPage: pageSize
+      maxPage: config.anilist.maxpagesize
     }
   }
 }
 
 async function searchWrapper(name: string, page: number, params?: genresSearchFormat, isAdult: boolean = false, MaxPage: number = 20): Promise<{ data: cardData[]; maxPage: number; }> {
+  const config = getConfig()
   try {
     return await searchInAnilist(name, page, params, isAdult, MaxPage)
   } catch (error) {
     console.error("Error in searchWrapper/anilist", error)
     return {
       data: [],
-      maxPage: pageSize
+      maxPage: config.anilist.maxpagesize
     }
   }
 }
@@ -457,7 +461,7 @@ export default class AnilistApi implements informationPluginFormat {
   metadata: informationPluginFormat["metadata"] = {
     version: "2.0",
     name: "AnilistApi",
-    pageSize: pageSize,
+    pageSize: defaultPageSize,
     searchOption: [],
     author: "Owca525",
     urlWebsite: "https://anilist.co",
@@ -537,10 +541,6 @@ export default class AnilistApi implements informationPluginFormat {
     }
   }
 
-  config: { [key: string]: any; } = {
-    "Adult Mode": false,
-    "Max Page Size": 20,
-  };
   async schedule(airingStart: number, airingEnd: number): Promise<containerData> {
     // let week = getWeek()
     // console.log(week)
@@ -587,15 +587,16 @@ export default class AnilistApi implements informationPluginFormat {
 
   search = async (name: string, page: number, params?: genresSearchFormat) => {
     try {
+      const config = getConfig()
       let title: string | undefined = undefined
       if (!(name.replaceAll(" ", "") == "")) title = `home.searching/${name}`
 
-      const resp = await searchInAnilist(name, page, params, this.config["Adult Mode"], this.config["Max Page Size"])
+      const resp = await searchInAnilist(name, page, params, config.anilist.adultdefault, config.anilist.maxpagesize)
 
       return {
         title: title,
         data: resp.data,
-        onScrollDownFunction: async (search, page, params) => await searchWrapper(search ? search : "", page, params, this.config["Adult Mode"], this.config["Max Page Size"])
+        onScrollDownFunction: async (search, page, params) => await searchWrapper(search ? search : "", page, params, config.anilist.adultdefault, config.anilist.maxpagesize)
       }
     } catch (error) {
       console.error("Error in search/Anilistapi", error)
@@ -604,21 +605,23 @@ export default class AnilistApi implements informationPluginFormat {
   }
   home = async () => {
     try {
+      const config = getConfig()
       let season = getSeasonFromDate()
       let data = await sendPost({
         season: season.season,
         seasonYear: season.seasonYear,
-        isAdult: this.config["Adult Mode"],
+        isAdult: config.anilist.adultdefault,
         nextSeason: season.nextSeason,
         nextYear: season.nextYear,
-      }, graphicHomeApi.replaceAll("20", this.config["Max Page Size"]))
+      }, graphicHomeApi.replaceAll("CHANGE_ME_PAGE_SIZE", config.anilist.maxpagesize.toString()))
+
       if (!data.success || !data.json) return
       let home: containerData[] = [
         {
           title: "home.trending_now",
           data: data.json.data.trending.media.map((anime) => Convert(anime)),
           horizontal: true,
-          onTitleClick: async () => await fetchCategory({ ...tendingAnime, isAdult: this.config["Adult Mode"] }, "home.trending_now"),
+          onTitleClick: async () => await fetchCategory({ ...tendingAnime, isAdult: config.anilist.adultdefault }, "home.trending_now"),
         },
         {
           title: "home.popular_in_this_season",
@@ -629,7 +632,7 @@ export default class AnilistApi implements informationPluginFormat {
             season: season.season,
             seasonYear: season.seasonYear,
             type: "ANIME",
-            isAdult: this.config["Adult Mode"]
+            isAdult: config.anilist.adultdefault
           }, "home.popular_in_this_season"),
         },
         {
@@ -641,14 +644,14 @@ export default class AnilistApi implements informationPluginFormat {
             season: season.nextSeason,
             seasonYear: season.nextYear,
             type: "ANIME",
-            isAdult: this.config["Adult Mode"]
+            isAdult: config.anilist.adultdefault
           }, "Upcoming Next Season"),
         },
         {
           title: "home.all_time_popular",
           data: data.json.data.popular.media.map((anime) => Convert(anime)),
           horizontal: true,
-          onTitleClick: async () => await fetchCategory({ ...allPopular, isAdult: this.config["Adult Mode"] }, "home.all_time_popular"),
+          onTitleClick: async () => await fetchCategory({ ...allPopular, isAdult: config.anilist.adultdefault }, "home.all_time_popular"),
         }
       ]
       return { sections: home, topCards: home[0] }
