@@ -74,7 +74,7 @@ const player = () => {
 
         if (getSocket()) {
             const socket = getSocket()
-            socket?.emit("player:nextepisode", unwrap(extractionData()))
+            socket?.emit("player:nextepisode", { roomName: unwrap(getSocketRoom()), data: unwrap(extractionData()) })
         }
     }
 
@@ -104,14 +104,14 @@ const player = () => {
         if (getSocket()) {
             const socket = getSocket()
             socket?.emit("player:init", {
-                roomName: getSocketRoom(),
+                roomName: unwrap(getSocketRoom()),
                 data: {
                     anime: anime_data.data,
                     saveData: anime_data.save,
                     temp: { episode: extractionData().actual, type: extractionData().type, episodes: extractionData().episodelist }
                 }
             })
-            socket?.on("player:nextepisode", (data) => {
+            socket?.on("player:changepisode", (data) => {
                 setExtractionData(data)
                 response.Refetch([anime_data.data?.player_ID, data.actual, data.type])
             })
