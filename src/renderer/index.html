@@ -12,7 +12,9 @@
         style-src 'self' 'unsafe-inline' *;
         img-src * blob:;
         media-src * blob:;
+        connect-src 'self' https: http: ws: wss: data: blob:; 
       "/>
+      <!-- TODO: CHECK SCURITY CHECK -->
   </head>
 
   <body>
