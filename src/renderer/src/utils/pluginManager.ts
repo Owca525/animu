@@ -130,7 +130,7 @@ export class informationPluginManager implements informationPluginManagerFormat 
 
         if (infoPlugins.length <= 0) {
             const tmp = new AnilistApi()
-            if (tmp.config) tmp.config = await getPluginInitialConfig(tmp.metadata.name, tmp.config)
+            // if (tmp.config) tmp.config = await getPluginInitialConfig(tmp.metadata.name, tmp.config)
             this.currentPlugin = tmp
             return
         }

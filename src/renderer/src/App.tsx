@@ -42,6 +42,10 @@ import { convertHistoryToAnimuList } from './utils/FilesManager/animulist';
 import { socketPlayerInit } from './pages/player/VideoPlayer';
 import { io } from 'socket.io-client';
 
+/* IFDEF DEBUG */
+import "./utils/debug"
+/* ENDIF */
+
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
 

@@ -1316,7 +1316,7 @@ function settings() {
                                 }
                             />
                         </div>
-                        <div class="settings-line"></div>
+                        {/* <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("settings.devmode.playerdebug")}
                             <CheckBox
@@ -1325,7 +1325,7 @@ function settings() {
                                     handleChange('Developer.playerDebug', checked)
                                 }
                             />
-                        </div>
+                        </div> */}
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("settings.devmode.notificationtest")}
