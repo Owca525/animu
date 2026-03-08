@@ -14,6 +14,7 @@ import JASSUB from "jassub";
 
 import workerUrl from "jassub/dist/jassub-worker.js?url";
 import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
+import fallbackFontJASSUB from "jassub/dist/default.woff2?url";
 // import modernWasmUrl from 'jassub/dist/jassub-worker-modern.wasm?url'
 import { saveConfig } from "@renderer/utils/FilesManager/config"
 import { SaveHistory } from "@renderer/utils/FilesManager/history"
@@ -501,6 +502,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     switch (data.type) {
                         case Hls.ErrorTypes.NETWORK_ERROR:
                             hls.startLoad(curTime);
+                            setFatalError(false)
                             message = t('player.errors.MEDIA_ERR_NETWORK')
                             break;
                         case Hls.ErrorTypes.MEDIA_ERROR:
@@ -833,8 +835,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 subUrl: sub.url,
                 workerUrl,
                 wasmUrl,
+                availableFonts: {
+                    "default": fallbackFontJASSUB
+                },
+                defaultFont: "default"
                 // modernWasmUrl
-            });
+            } as any);
             setASSubtitles(renderer)
             setSubtitles(() => sub)
             return
