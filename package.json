@@ -1,6 +1,6 @@
 {
   "name": "animu",
-  "version": "0.7.10",
+  "version": "0.7.11",
   "description": "Simple Application To Watch Anime",
   "main": "./out/main/index.js",
   "author": "Owca525",
@@ -59,7 +59,7 @@
     "electron": "^40.8.0",
     "electron-builder": "^26.8.1",
     "electron-vite": "^5.0.0",
-    "eslint": "^10.0.0",
+    "eslint": "^10.0.3",
     "eslint-plugin-solid": "^0.14.5",
     "node-addon-api": "^8.6.0",
     "solid-js": "^1.9.11",
