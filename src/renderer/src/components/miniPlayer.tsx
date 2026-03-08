@@ -51,7 +51,7 @@ import fallbackFontJASSUB from "jassub/dist/default.woff2?url";
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
-interface VideoPlayerProps {
+interface MiniPlayerProps {
     title?: string
     hostname: string
     resolution: resolutionFormat[]
@@ -72,7 +72,7 @@ export type resoltionFormatExtended = resolutionFormat & {
     track?: shaka.extern.Track
 }
 
-function VideoPlayer(props: { props: VideoPlayerProps[] }) {
+function MiniPlayer(props: { props: MiniPlayerProps[] }) {
     const config: SettingsConfig = getConfig();
     const { t, currentLang } = useI18n()
 
@@ -97,7 +97,7 @@ function VideoPlayer(props: { props: VideoPlayerProps[] }) {
     const [currentTime, setcurrentTime] = createSignal<number>(0)
     const [durrationTime, setdurrationTime] = createSignal<number>(0)
     const [currentBuffer, setBuffered] = createSignal<{ position: number, width: number }[]>([])
-    const [playerData] = createSignal<VideoPlayerProps[]>(props.props)
+    const [playerData] = createSignal<MiniPlayerProps[]>(props.props)
     const [currentExtractionRes] = createSignal<{ id: string, toast: string }>({ id: "", toast: "" })
 
     // UI
@@ -122,7 +122,7 @@ function VideoPlayer(props: { props: VideoPlayerProps[] }) {
     const [ListResolution, setListResolution] = createSignal<resoltionFormatExtended[]>([])
     const [currentResolution, setCurrentResoltion] = createSignal<resoltionFormatExtended | undefined>(undefined)
 
-    const [currentPlayer, setPlayer] = createSignal<VideoPlayerProps | undefined>(undefined)
+    const [currentPlayer, setPlayer] = createSignal<MiniPlayerProps | undefined>(undefined)
 
     // other
     const [currentSettings, setcurrentSettings] = createSignal<boolean>(false)
@@ -1065,4 +1065,4 @@ function VideoPlayer(props: { props: VideoPlayerProps[] }) {
     )
 }
 
-export default VideoPlayer;
+export default MiniPlayer;
