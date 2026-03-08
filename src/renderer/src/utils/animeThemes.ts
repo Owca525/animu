@@ -25,7 +25,6 @@ query ($id: [Int!]) {
           nodes {
             filename
             resolution
-            size
             link
           }
         }
@@ -44,18 +43,21 @@ export async function requestAnimeMedia(anilistID: number): Promise<animeOpening
         let list: animeOpeningsFormat[] = []
         for (let index = 0; index < themes.length; index++) {
             const element = themes[index];
-            const videos = element["animethemeentries"][0]
-            console.log(element, videos)
-            list.push({
+            const videos = element["animethemeentries"]
+            videos.forEach((item) => {
+              const match = item["videos"]["nodes"][0]["filename"].match(/v\d+$/)
+              const variant = match ? match[0] : undefined
+              list.push({
                 type: element["type"],
-                title: element["song"]["title"],
-                resolution: videos["videos"]["nodes"][0]["resolution"],
-                size: videos["videos"]["nodes"][0]["size"],
-                url: videos["videos"]["nodes"][0]["link"],
-                filename: videos["videos"]["nodes"][0]["filename"]
+                variant: variant,
+                musicTitle: element["song"]["title"],
+                videos: item["videos"]["nodes"].map((vid) => {
+                  return { filename: vid["filename"], url: vid["link"], resolution: vid["resolution"] }
+                })
+              })
             })
         }
-
+        console.log(list)
         return list
     } catch (error) {
         console.error("animeThemes/requestAnimeMedia", error)

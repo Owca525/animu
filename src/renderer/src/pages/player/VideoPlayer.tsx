@@ -300,16 +300,25 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     // player Functions
     async function enterFullscreen() {
-        if (window.api && await window.BrowserWindow.isFullscreen()) {
-            toggleFullscreen(false)
-            setIsFullscreen(false)
-        } else if (document.fullscreenElement) {
+        /* IFDEF DEBUG|PROD */
+        if (await window.BrowserWindow.isFullscreen()) {
             toggleFullscreen(false)
             setIsFullscreen(false)
         } else {
             toggleFullscreen(true)
             setIsFullscreen(true)
         }
+        /* ENDIF */
+
+        /* IFDEF WEB */
+        if (document.fullscreenElement) {
+            toggleFullscreen(false)
+            setIsFullscreen(false)
+        } else {
+            toggleFullscreen(true)
+            setIsFullscreen(true)
+        }
+        /* ENDIF */
     }
 
     function setSpeed(speed: string) {
@@ -742,11 +751,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             }
         }
 
-        // 
         setVideoFrames({ totalVideoFrames: event.currentTarget.getVideoPlaybackQuality().totalVideoFrames, droppedVideoFrames: event.currentTarget.getVideoPlaybackQuality().droppedVideoFrames })
-
+        
         // Update RPC
-        if (config.General.discordRPC && window.api) window.api.rpc.setActivity(t("discordrpc.player", { title: detectTitleConfig(anime_data.AnimeData.title), ep: temp.episode }), `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`)
+        /* IFDEF DEBUG|PROD */
+        if (config.General.discordRPC) window.api.rpc.setActivity(t("discordrpc.player", { title: detectTitleConfig(anime_data.AnimeData.title), ep: temp.episode }), `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`)
+        /* ENDIF */
 
         if (!fatalError() && config.Player.general.AutoSkipEpisode && event.currentTarget.duration == event.currentTarget.currentTime) setEpisode("next")
 

@@ -651,6 +651,10 @@
   margin-bottom: 10vh;
 }
 
+.miniplayer {
+  border-radius: 12px;
+}
+
 @media (max-width: 1000px) {
   .player-end-time-display {
     max-width: 250px;

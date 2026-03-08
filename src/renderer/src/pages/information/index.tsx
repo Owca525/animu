@@ -45,7 +45,7 @@ import { toast, updateToast } from '@renderer/utils/context/ToastNotification';
 import { showCustomMenu } from '@renderer/utils/context/menuContext';
 import RelationCard from './components/relationCard';
 import ButtonGroup from '../settings/components/buttonGroup';
-import MiniPlayer from '@renderer/components/miniPlayer';
+import MiniPlayer, { MiniPlayerProps } from '@renderer/components/miniPlayer';
 import { requestAnimeMedia } from '@renderer/utils/animeThemes';
 import { updateHistoryData } from '@renderer/utils/FilesManager/history';
 import { addToAnimuList, removeFromAnimulist, updateDataInAnimulist } from '@renderer/utils/FilesManager/animulist';
@@ -69,7 +69,7 @@ function information() {
 
     // Openings / Endings
     const [animeMedia, setAnimeMedia] = createSignal<animeOpeningsFormat[]>([])
-    const [currentMedia, setCurrentAnimeMedia] = createSignal<animeOpeningsFormat | undefined>(undefined)
+    const [currentMedia, setCurrentAnimeMedia] = createSignal<MiniPlayerProps[] | undefined>(undefined)
 
     // Banner
     const [isBannerLoading, setBannerLoadingData] = createSignal<boolean>(true)
@@ -278,7 +278,19 @@ function information() {
         if (animeMedia().length > 0) return
         SetShowLoadingInEpisodes(true)
         setAnimeMedia(await requestAnimeMedia(parseInt(tempData().anime.id)))
-        setCurrentAnimeMedia(animeMedia()[0])
+
+        setCurrentAnimeMedia(unwrap(animeMedia()).map((item) => {
+            const firstPartTitle = item.type == "OP" ? "Opening" : "Ending"
+            return {
+                title: `${firstPartTitle} ${item.musicTitle} ${item.variant ? item.variant : ""}`,
+                hostname: `${firstPartTitle} ${item.musicTitle} ${item.variant ? item.variant : ""}`,
+                resolution: item.videos.map((item) => ({
+                    res: item.resolution.toString(),
+                    url: item.url
+                }))
+            } as MiniPlayerProps
+        }))
+
         console.log(animeMedia())
         SetShowLoadingInEpisodes(false)
     }
@@ -574,19 +586,8 @@ function information() {
                                             <div class="information-loading-container"><span class="material-symbols-outlined information-loading">progress_activity</span></div>
                                         </Match>
                                         <Match when={activePage() == "Opening/Ending"}>
-                                            <For each={animeMedia()}>
-                                                {(item) => <Button content={item.title} onClick={() => { setCurrentAnimeMedia(undefined); setCurrentAnimeMedia(item) }} />}
-                                            </For>
                                             <Show when={currentMedia()}>
-                                                <MiniPlayer props={[
-                                                    {
-                                                        hostname: currentMedia()?.title!,
-                                                        resolution: [{
-                                                            res: currentMedia()?.resolution!.toString()!,
-                                                            url: currentMedia()?.url!
-                                                        }]
-                                                    }
-                                                ]} />
+                                                <MiniPlayer props={unwrap(currentMedia()!)} />
                                             </Show>
                                         </Match>
                                         <Match when={showWrong() == false && activePage() == "Episodes"}>

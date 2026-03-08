@@ -51,7 +51,7 @@ import fallbackFontJASSUB from "jassub/dist/default.woff2?url";
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
-interface MiniPlayerProps {
+export interface MiniPlayerProps {
     title?: string
     hostname: string
     resolution: resolutionFormat[]
@@ -273,16 +273,29 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
 
     // player Functions
     async function enterFullscreen() {
-        if (window.api && await window.BrowserWindow.isFullscreen()) {
+        if (!containerRef) return
+
+        /* IFDEF DEBUG|PROD */
+        if (await window.BrowserWindow.isFullscreen()) {
             toggleFullscreen(false)
             setIsFullscreen(false)
-        } else if (document.fullscreenElement) {
+            document.exitFullscreen();
+        } else {
+            toggleFullscreen(true)
+            setIsFullscreen(true)
+            containerRef?.requestFullscreen()
+        }
+        /* ENDIF */
+
+        /* IFDEF WEB */
+        if (document.fullscreenElement) {
             toggleFullscreen(false)
             setIsFullscreen(false)
         } else {
             toggleFullscreen(true)
             setIsFullscreen(true)
         }
+        /* ENDIF */
     }
 
     function setSpeed(speed: string) {
@@ -607,10 +620,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
         }
         setFatalError(true)
         toast(message, { type: "error" });
-
-        if (!currentPlayer()) return
-        let index = playerData().findIndex((element) => element.hostname == currentPlayer()!.hostname)
-        if (playerData()[index + 1]) runNewPlayer(playerData()[index + 1])
     }
 
     function setTimeVideo(value: number) {
@@ -897,7 +906,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
     }
 
     return (
-        <div class={isVisible() ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
+        <div class={isVisible() ? "player-video-container miniplayer" : "player-video-container miniplayer player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
             <div ref={screenshotWrapper} class={isVisible() ? "player-video-container" : "player-video-container player-hide-cursor"} >
                 <video
                     ref={videoRef}

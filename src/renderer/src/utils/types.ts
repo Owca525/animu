@@ -474,9 +474,11 @@ export type pluginRepoExpanded = {
 
 export interface animeOpeningsFormat {
     type: "OP" | "EN" | "IN"
-    title: string,
-    resolution: number,
-    size: number,
-    url: string,
-    filename: string
+    musicTitle: string,
+    variant?: string
+    videos: {
+        filename: string,
+        url: string,
+        resolution: number
+    }[]
 }
