@@ -578,13 +578,15 @@ function information() {
                                                 {(item) => <Button content={item.title} onClick={() => { setCurrentAnimeMedia(undefined); setCurrentAnimeMedia(item) }} />}
                                             </For>
                                             <Show when={currentMedia()}>
-                                                <MiniPlayer player_data={{
-                                                    title: currentMedia()?.title!,
-                                                    resolutions: [{
-                                                        res: currentMedia()?.resolution!.toString()!,
-                                                        url: currentMedia()?.url!
-                                                    }]
-                                                }} />
+                                                <MiniPlayer props={[
+                                                    {
+                                                        hostname: currentMedia()?.title!,
+                                                        resolution: [{
+                                                            res: currentMedia()?.resolution!.toString()!,
+                                                            url: currentMedia()?.url!
+                                                        }]
+                                                    }
+                                                ]} />
                                             </Show>
                                         </Match>
                                         <Match when={showWrong() == false && activePage() == "Episodes"}>
@@ -677,19 +679,19 @@ function information() {
                 <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
             </main>
             <Show when={showWrong()}>
-                <ContainerWrong name={detectTitleConfig(tempData().anime.title)} refetchfunc={(id?: string) => { 
-                        setshowWrong(false); 
-                        setCurrentId(id); 
-                        episodeResponse.Refetch([tempData(), id, currentPlugin()]) 
-                    }} 
-                    exitfunc={() => setshowWrong(() => false)} 
+                <ContainerWrong name={detectTitleConfig(tempData().anime.title)} refetchfunc={(id?: string) => {
+                    setshowWrong(false);
+                    setCurrentId(id);
+                    episodeResponse.Refetch([tempData(), id, currentPlugin()])
+                }}
+                    exitfunc={() => setshowWrong(() => false)}
                 />
             </Show>
 
             <Show when={showImages()}>
-                <ImageViewer 
-                    files={[tempData().anime.coverImage as string, tempData().anime.bannerImage as string].filter((value) => value != null)} 
-                    disable={() => setShowImages(false)} 
+                <ImageViewer
+                    files={[tempData().anime.coverImage as string, tempData().anime.bannerImage as string].filter((value) => value != null)}
+                    disable={() => setShowImages(false)}
                 />
             </Show>
         </>

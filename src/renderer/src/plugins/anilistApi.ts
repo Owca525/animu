@@ -401,7 +401,7 @@ async function fetchCategory(params: any, title: string): Promise<containerData>
     title: title,
     data: await sendToApi(params, graphicApi),
     onScrollDownFunction: async (_search, page, _params) => {
-      let resp = await sendToApi({ ...globalParams, page: page }, graphicApi)
+      let resp = await sendToApi({ ...globalParams, page: page }, graphicApi.replaceAll("CHANGE_ME_PAGE_SIZE", config.anilist.maxpagesize.toString()));
       return {
         maxPage: config.anilist.maxpagesize,
         data: resp
@@ -412,7 +412,6 @@ async function fetchCategory(params: any, title: string): Promise<containerData>
 }
 
 export async function searchInAnilist(name: string, page: number, params?: genresSearchFormat, isAdult: boolean = false, MaxPage: number = 20): Promise<{ data: cardData[]; maxPage: number; }> {
-  const config = getConfig()
   try {
     let variables: any = {
       page: page,
@@ -430,16 +429,16 @@ export async function searchInAnilist(name: string, page: number, params?: genre
       if (params.airing) variables = { ...variables, status: params.airing.toUpperCase().replaceAll(" ", "_") }
     }
 
-    const resp = await sendToApi(variables, graphicApi.replaceAll("20", MaxPage.toString()))
+    const resp = await sendToApi(variables, graphicApi.replaceAll("CHANGE_ME_PAGE_SIZE", MaxPage.toString()))
     return {
       data: resp,
-      maxPage: config.anilist.maxpagesize
+      maxPage: MaxPage
     }
   } catch (error) {
     console.error("Error in searchInAnilist/anilist", error)
     return {
       data: [],
-      maxPage: config.anilist.maxpagesize
+      maxPage: MaxPage
     }
   }
 }
