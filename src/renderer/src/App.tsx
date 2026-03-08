@@ -199,7 +199,6 @@ function App() {
           <div class="animu-initial-content">
             <span class='animu-initial-text'>{t("initial.animu")}</span>
             <div class="animu-initial-state">
-              <span class='material-symbols-outlined loading-animation'>progress_activity</span>
               <span class='animu-initial-text'>{t(initialState().text)}</span>
             </div>
           </div>
