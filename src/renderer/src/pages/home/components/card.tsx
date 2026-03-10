@@ -77,9 +77,14 @@ function Card(props: CardProps) {
         return
       }
 
+      const animulist = unwrap(animulistData())
+      let tmp = animulistCard()
+      if (!tmp && animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id)) tmp = animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id)?.animulist
+
       localStorage.setItem("playerCache", JSON.stringify({
         data: (props.card.AnimeData),
         save: (props.card.saveData),
+        animulist: tmp,
         episodelist: episodeList,
         continewatch: true,
       }))
