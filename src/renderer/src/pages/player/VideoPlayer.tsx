@@ -567,10 +567,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     }
 
     async function exitPlayer() {
-        if (document.pictureInPictureElement) {
-            await document.exitPictureInPicture();
-        }
-        toggleFullscreen(false)
+        if (document.pictureInPictureElement) await document.exitPictureInPicture();
         exitFromPlayer()
     }
 
@@ -777,13 +774,15 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }
     }
 
-    function setEpisode(type: "next" | "prev") {
+    async function setEpisode(type: "next" | "prev") {
         if (durrationTime() <= 0) return console.warn("Illegal Change Episode")
         let ep = temp.episodes.findIndex((item) => item.ep.toString() == temp.episode, toString())
         if (ep < 0) return
         if (type == 'prev') ep = ep - 1
         if (type == 'next') ep = ep + 1
         if (temp.episodes[ep].ep === undefined) return
+
+        if (document.pictureInPictureElement) await document.exitPictureInPicture();
         return setNextEpisode(temp.episodes[ep].ep)
     }
 
