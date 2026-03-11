@@ -2,7 +2,10 @@ import { createContext, useContext, createSignal, onMount } from "solid-js";
 import en from "./lang/en.json"
 
 async function getAllLangFiles() {
-  if (!window.api) return { en: { translation: en } }
+  /* IFDEF WEB */
+  if (window["animuAppInfo"]["langs"]) return { en: en, ...window["animuAppInfo"]["langs"] }
+  /* ENDIF */
+  /* IFDEF DEBUG|PROD */
   let langFiles = await window.api.getListLang()
   let res = {}
   for (let index = 0; index < langFiles.length; index++) {
@@ -14,6 +17,7 @@ async function getAllLangFiles() {
     }
   }
   return res
+  /* ENDIF */
 }
 
 type Messages = Record<string, string | object>;
@@ -53,7 +57,7 @@ function getValueByPath<T>(obj: T, path: string): string {
     return path
   }
 }
-// FIXME: Napraw odświerzanie języka w danych mniejscach
+
 export function I18nProvider(props: { config: i18nConfig; children: any }) {
   const [currentLang, changeLanguage] = createSignal(props.config.defaultLang ? props.config.defaultLang :"en");
   const [dictionaries, setDictionaries] = createSignal<Dictionaries>({})

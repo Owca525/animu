@@ -6,8 +6,13 @@ export async function saveConfig(content: SettingsConfig): Promise<boolean> {
     try {
         const data = ini.stringify(content);
         setConfig(content)
-        if (window.api) return await window.api.os.write("config.ini", data)
+        /* IFDEF DEBUG|PROD */
+        return await window.api.os.write("config.ini", data)
+        /* ENDIF */
+
+        /* IFDEF WEB */
         localStorage.setItem("config", JSON.stringify(content))
+        /* ENDIF */
         return true
     } catch (Error) {
         console.error(`${Error} in saveConfig`);
@@ -15,6 +20,7 @@ export async function saveConfig(content: SettingsConfig): Promise<boolean> {
     }
 }
 
+/* IFDEF WEB */
 export const defaultConfigWeb: SettingsConfig = {
     firstStart: true,
     deepLinkURL: "https://owca525.github.io/",
@@ -110,7 +116,7 @@ export const defaultConfigWeb: SettingsConfig = {
         playerDebug: false
     },
     update: {
-        lastTime: "0",
+        lastTime: 0,
         type: "On Start",
         enable: true
     },
@@ -127,5 +133,15 @@ export const defaultConfigWeb: SettingsConfig = {
         lastCheck: 0,
         check: "Every Day",
         maxBackups: 3
+    },
+    animulist: {
+        historyConvert: true
+    },
+    anilist: {
+        scoreFormat: "POINT_100",
+        titleFormat: "ROMAJI",
+        adultdefault: false,
+        maxpagesize: 20
     }
 };
+/* ENDIF */

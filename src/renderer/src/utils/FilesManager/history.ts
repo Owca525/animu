@@ -26,13 +26,56 @@ export async function DeleteFromHistory(data: cardData) {
 
         if (index != -1) historyCache.splice(index, 1);
 
-        if (window.api) await window.api.os.write(`history.json`, JSON.stringify(historyCache))
-        else localStorage.setItem("history", JSON.stringify(historyCache))
+        /* IFDEF DEBUG|PROD */
+        await window.api.os.write(`history.json`, JSON.stringify(historyCache))
+        /* ENDIF */
+
+        /* IFDEF WEB */
+        localStorage.setItem("history", JSON.stringify(historyCache))
+        /* ENDIF */
+
         setGlobalHistory(historyCache)
         refetchHistory()
         return true
     } catch (Error) {
         console.error(`${Error} in DeleteFromFile`)
+        return false
+    }
+}
+
+export async function updateHistoryData(id: string, data: cardData): Promise<boolean> {
+    try {
+        if (getGlobalCache().incognito) return true
+        let historyCache = unwrap(getGlobalCache().history).map((item) => {
+            if (id == item.AnimeData.id) return {
+                ...data,
+                saveData: {
+                    ...item.saveData,
+                    ...data.saveData
+                }
+            }
+            return {
+                ...item,
+                AnimeData: {
+                    ...item.AnimeData,
+                    nextAiringEpisode: undefined,
+                    recommendations: undefined
+                },
+            }
+        });
+
+        /* IFDEF DEBUG|PROD */
+        await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(historyCache as any)))
+        /* ENDIF */
+        
+        /* IFDEF WEB */
+        localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(historyCache as any)))
+        /* ENDIF */
+        setGlobalHistory(historyCache as any)
+        refetchHistory()
+        return true
+    } catch (Error) {
+        console.error(`${Error} in SaveToFile`)
         return false
     }
 }
@@ -55,13 +98,35 @@ export async function SaveHistory(data: cardData): Promise<boolean> {
 
         if (index != -1) historyCache.splice(index, 1);
         historyCache.unshift(data);
-        if (window.api) await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(historyCache)))
-        else localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(historyCache)))
+
+        /* IFDEF DEBUG|PROD */
+        await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(historyCache)))
+        /* ENDIF */
+
+        /* IFDEF WEB */
+        localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(historyCache)))
+        /* ENDIF */
         setGlobalHistory(historyCache)
         refetchHistory()
         return true
     } catch (Error) {
         console.error(`${Error} in SaveToFile`)
+        return false
+    }
+}
+
+export async function OverWriteHistory(data: cardData[]): Promise<boolean> {
+    try {
+        /* IFDEF DEBUG|PROD */
+        await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(data)))
+        /* ENDIF */
+
+        /* IFDEF WEB */
+        localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(data)))
+        /* ENDIF */
+        return true
+    } catch (Error) {
+        console.error(`${Error} in OverWriteHistory`)
         return false
     }
 }

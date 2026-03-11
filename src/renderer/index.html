@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="icon" type="image/png" href="/icon.png">
     <meta charset="UTF-8" />
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta
@@ -11,7 +12,9 @@
         style-src 'self' 'unsafe-inline' *;
         img-src * blob:;
         media-src * blob:;
+        connect-src 'self' https: http: ws: wss: data: blob:; 
       "/>
+      <!-- TODO: CHECK SCURITY CHECK -->
   </head>
 
   <body>

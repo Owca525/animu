@@ -40,7 +40,7 @@ import {
     Show
 } from 'solid-js';
 import { createShortcut } from '@solid-primitives/keyboard';
-import { DetectOldVersionHistory } from '@renderer/utils/FilesManager/history';
+import { DetectOldVersionHistory, OverWriteHistory } from '@renderer/utils/FilesManager/history';
 import { getConfig, setConfig } from '@renderer/utils/stores/config';
 import { getInformationPlugin, getPlayerPLugin, getPluginList, getPluginRepo, pluginManager, setPluginPlayerList } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
@@ -51,10 +51,11 @@ import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './settings.css';
 import { useI18n } from '@renderer/utils/i18n';
-import { activeThemes, loadedTheme } from '@renderer/utils/stores/global';
+import { activeThemes, animulistData, getGlobalCache, loadedTheme } from '@renderer/utils/stores/global';
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 import SettingsPlugin from './components/settingsPlugin';
 import semver from "semver";
+import { OvewriteAnimuList } from '@renderer/utils/FilesManager/animulist';
 
 export type pluginRepoExpandedSettings = {
     name: string,
@@ -73,11 +74,13 @@ function settings() {
     const cfg: SettingsConfig = unwrap(getConfig());
     const { t, changeLanguage, listLang } = useI18n()
 
+    let filePickerImport: HTMLInputElement | undefined
+
     const [category, setCategory] = createSignal<string>("general");
     const [config, setNewConfig] = createSignal<{ old: SettingsConfig, new: SettingsConfig }>({ old: structuredClone(cfg), new: structuredClone(cfg) })
     const [themes, setThemes] = createSignal<themeMetadata[]>([])
     const [lastActiveTheme, setLastActiveTheme] = createSignal<Map<number, themeMetadata>>(new Map())
-    const [versions] = createSignal(window.electronAPI.process.versions)
+    const [versions] = createSignal(window.api ? window.electronAPI.process.versions : undefined)
     const [isSaving, setSaving] = createSignal<boolean>(false)
     const [backupList, setBackupList] = createSignal<{ date: Date, file: string }[]>([])
     const [pluginList, setpluginList] = createSignal<{ active: boolean, plugin: playerPluginFormat | informationPluginFormat }[]>([])
@@ -142,22 +145,22 @@ function settings() {
         ],
     });
 
-    if (window.api) {
-        setSidebarData((prev) => {
-            return {
-                ...prev,
-                bottom: [
-                    ...prev.bottom,
-                    {
-                        icon: "folder",
-                        text: "global.cfglocation",
-                        onClick: async () =>
-                            await window.api.open(await window.api.os.getConfigPath()),
-                    }
-                ].reverse()
-            }
-        })
-    }
+    /* IFDEF DEBUG|PROD */
+    setSidebarData((prev) => {
+        return {
+            ...prev,
+            bottom: [
+                ...prev.bottom,
+                {
+                    icon: "folder",
+                    text: "global.cfglocation",
+                    onClick: async () =>
+                        await window.api.open(await window.api.os.getConfigPath()),
+                }
+            ].reverse()
+        }
+    })
+    /* ENDIF */
 
     createShortcut(["Control", "d"], () => {
         if (config().new.Developer.DeveloperMode) return
@@ -204,13 +207,14 @@ function settings() {
         setpluginList([{ active: true, plugin: getInformationPlugin().currentPlugin }, ...playerPluginList])
         setThemes(loadedTheme().filter((val) => ![...activeThemes().entries()].map(([_, val]) => val.themeName).includes(val.themeName)))
         changeTitleAnimu(`Animu - ${t("global.settings")}`)
-        if (!window.api) return
-        setBackupList(await window.api.backup.list())
-
-        if (config().new.General.discordRPC) window.api.rpc.setActivity(undefined, t("discordrpc.settings"))
         turnOnDeveloperMode()
 
+        /* IFDEF DEBUG|PROD */
+        setBackupList(await window.api.backup.list())
+        if (config().new.General.discordRPC) window.api.rpc.setActivity(undefined, t("discordrpc.settings"))
+
         setReleases_yt_dlp(await window.api.yt_dlp.versionList())
+        /* ENDIF */
     });
 
     onCleanup(() => {
@@ -282,8 +286,9 @@ function settings() {
     }
 
     function setDynamicZoom(value: number) {
-        if (!window.api) return
+        /* IFDEF DEBUG|PROD */
         window.BrowserWindow.setZoom(calculateZoomLevel(value))
+        /* ENDIF */
     }
 
     async function buttonCheck() {
@@ -435,7 +440,7 @@ function settings() {
         const repo = getPluginRepo()
         const plugins = getPluginList()
         const infoPlugin = getInformationPlugin().currentPlugin
-        
+
         return repo.map((item) => {
             if (item.type == "information") {
                 return { ...item, update: semver.gt(semver.coerce(item.ver) as any, semver.coerce(infoPlugin.metadata.version) as any), installed: true }
@@ -446,7 +451,7 @@ function settings() {
 
             return {
                 ...item,
-                installed: true, 
+                installed: true,
                 update: semver.gt(semver.coerce(item.ver) as any, semver.coerce(finded.metadata.version) as any)
             }
         })
@@ -456,6 +461,74 @@ function settings() {
         if (!tmp.installed) return "settings.pluginstore.install"
         if (tmp.update) return "settings.pluginstore.update"
         return "settings.pluginstore.installed"
+    }
+
+    function importConfig(event: Event) {
+        const input = event.currentTarget as HTMLInputElement;
+        if (!input.files || input.files.length === 0) return;
+
+        const file = input.files[0];
+
+        if (file.type !== "text/plain") return
+
+        const reader = new FileReader();
+        reader.onload = async () => {
+            try {
+                const file = JSON.parse(reader.result as any)
+
+                // animulist
+                OvewriteAnimuList(file["animulist"])
+
+                // History
+                OverWriteHistory(file["history"])
+
+                // Config
+                setConfig(file["config"])
+                saveConfig(file["config"])
+
+                toast("Sucessfully Imported Data To Animu", { type: "success" })
+                /* IFDEF DEBUG|PROD */
+                window.BrowserWindow.reload()
+                /* ENDIF */
+
+                /* IFDEF WEB */
+                location.reload()
+                /* ENDIF */
+
+            } catch (error) {
+                console.error("Error in importConfig", error)
+                toast("Failed Import Data", { type: "error" })
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    async function exportConfig() {
+        try {
+            const handle = await (window as any).showSaveFilePicker({
+                suggestedName: "animuExport.txt",
+                types: [
+                    {
+                        description: "Text Files",
+                        accept: { "text/plain": [".txt"] },
+                    },
+                ],
+            });
+
+            const exported = JSON.stringify({
+                animulist: unwrap(animulistData()),
+                history: unwrap(getGlobalCache().history),
+                config: unwrap(getConfig())
+            })
+
+            const writable = await handle.createWritable();
+            await writable.write(exported);
+            await writable.close();
+            toast("Succesfully Exported Data", { type: "success" })
+        } catch (error) {
+            console.error("Error in exportConfig", error)
+            toast("Failed Exported Data", { type: "error" })
+        }
     }
 
     return (
@@ -569,66 +642,136 @@ function settings() {
                                 </div>
                             } />
                         </div>
+                        <Show when={window.api}>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                {t("settings.general.discordrpc")}
+                                <CheckBox
+                                    checked={config().new.General.discordRPC}
+                                    onChecked={(checked) =>
+                                        handleChange('General.discordRPC', checked)
+                                    }
+                                />
+                            </div>
+                        </Show>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("settings.general.discordrpc")}
-                            <CheckBox
-                                checked={config().new.General.discordRPC}
-                                onChecked={(checked) =>
-                                    handleChange('General.discordRPC', checked)
-                                }
-                            />
+                            {/* TODO: ADD LANG */} Manage Data in animu
+                            <div class='settings-mini-container'>
+                                <Button content='Import Data' onClick={() => {
+                                    showDialog({
+                                        type: "info",
+                                        title: 'Double Check',
+                                        description: "Are you sure importing file, this action overwrite everything",
+                                        buttons: [
+                                            {
+                                                title: t("dialog.no"),
+                                                onClick: () => ""
+                                            },
+                                            {
+                                                title: t("dialog.yes"),
+                                                onClick: () => filePickerImport?.click()
+                                            }
+                                        ]
+                                    })
+
+                                }} />
+                                <Button content='Export Data' onClick={exportConfig} />
+                                <input
+                                    type="file"
+                                    accept=".txt"
+                                    ref={filePickerImport}
+                                    style={{ display: "none" }}
+                                    onChange={importConfig}
+                                />
+                            </div>
                         </div>
                     </div>
                     <div class="settings-page-container">
-                        <div class="settings-page-title">{t("settings.general.updates")}</div>
+                        <div class="settings-page-title">{"Anilist"}</div>
                         <div class="settings-setting-container">
-                            {t("settings.general.checkupdate")}
-                            <Button content={t("settings.general.checkupdates")} icon="update" onClick={() => checkUpdate(true)} />
-                        </div>
-                        <div class="settings-line"></div>
-                        <div class="settings-setting-container">
-                            {t("settings.general.updates")}
+                            {"Default Adult Mode"}
                             <CheckBox
-                                checked={config().new.update.enable}
+                                checked={config().new.anilist.adultdefault}
                                 onChecked={(checked) =>
-                                    handleChange('update.enable', checked)
+                                    handleChange('anilist.adultdefault', checked)
                                 }
                             />
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("settings.general.checkupdates")}
-                            <ButtonGroup selectedValue={t(`settings.general.${config().new.update.type.toLowerCase().replaceAll(" ", "")}`)} listValues={[
-                                { value: t("settings.general.onstart"), onClick: () => handleChange("update.type", "On Start") },
-                                { value: t("settings.general.everyday"), onClick: () => handleChange("update.type", "Every Day") },
-                                { value: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
+                            {"Max Anime Cards"}
+                            <SettingsInput
+                                iconChar=""
+                                type="number"
+                                onKeyDown={(text) => handleChange("anilist.maxpagesize", parseInt(text))}
+                                startValue={config().new.anilist.maxpagesize.toString()}
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {"Title Format In Animu"}
+                            <ButtonGroup selectedValue={t(`anilist.titles.${config().new.anilist.titleFormat}`)} listValues={[
+                                { value: t("anilist.titles.ROMAJI"), onClick: () => handleChange("anilist.titleFormat", "ROMAJI") },
+                                { value: t("anilist.titles.NATIVE"), onClick: () => handleChange("anilist.titleFormat", "NATIVE") },
+                                { value: t("anilist.titles.ENGLISH"), onClick: () => handleChange("anilist.titleFormat", "ENGLISH") },
                             ]}
                             />
                         </div>
                     </div>
+                    <Show when={window.api}>
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("settings.general.updates")}</div>
+                            <div class="settings-setting-container">
+                                {t("settings.general.checkupdate")}
+                                <Button content={t("settings.general.checkupdates")} icon="update" onClick={() => checkUpdate(true)} />
+                            </div>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                {t("settings.general.updates")}
+                                <CheckBox
+                                    checked={config().new.update.enable}
+                                    onChecked={(checked) =>
+                                        handleChange('update.enable', checked)
+                                    }
+                                />
+                            </div>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                {t("settings.general.checkupdates")}
+                                <ButtonGroup selectedValue={t(`settings.general.${config().new.update.type.toLowerCase().replaceAll(" ", "")}`)} listValues={[
+                                    { value: t("settings.general.onstart"), onClick: () => handleChange("update.type", "On Start") },
+                                    { value: t("settings.general.everyday"), onClick: () => handleChange("update.type", "Every Day") },
+                                    { value: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
+                                ]}
+                                />
+                            </div>
+                        </div>
+                    </Show>
                     <div class="settings-page-container">
                         <div class="settings-page-title">{t("settings.general.window")}</div>
-                        <div class="settings-setting-container">
-                            <span class="settings-helpicon-space">{t("settings.general.maximize")}<HelpIcon description={t("settings.tips.automaximize")} /></span>
-                            <CheckBox
-                                checked={config().new.General.Window.AutoMaximize}
-                                onChecked={(checked) =>
-                                    handleChange('General.Window.AutoMaximize', checked)
-                                }
-                            />
-                        </div>
-                        <div class="settings-line"></div>
-                        <div class="settings-setting-container">
-                            <span class="settings-helpicon-space">{t("settings.general.fullscreen")}<HelpIcon description={t("settings.tips.autofullscreen")} /></span>
-                            <CheckBox
-                                checked={config().new.General.Window.AutoFullscreen}
-                                onChecked={(checked) =>
-                                    handleChange('General.Window.AutoFullscreen', checked)
-                                }
-                            />
-                        </div>
-                        <div class="settings-line"></div>
+                        <Show when={window.api}>
+                            <div class="settings-setting-container">
+                                <span class="settings-helpicon-space">{t("settings.general.maximize")}<HelpIcon description={t("settings.tips.automaximize")} /></span>
+                                <CheckBox
+                                    checked={config().new.General.Window.AutoMaximize}
+                                    onChecked={(checked) =>
+                                        handleChange('General.Window.AutoMaximize', checked)
+                                    }
+                                />
+                            </div>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                <span class="settings-helpicon-space">{t("settings.general.fullscreen")}<HelpIcon description={t("settings.tips.autofullscreen")} /></span>
+                                <CheckBox
+                                    checked={config().new.General.Window.AutoFullscreen}
+                                    onChecked={(checked) =>
+                                        handleChange('General.Window.AutoFullscreen', checked)
+                                    }
+                                />
+                            </div>
+                            <div class="settings-line"></div>
+                        </Show>
                         <div class="settings-setting-container">
                             {t("settings.general.zoom")}
                             <div class="settings-setting-seekbar-container">
@@ -865,66 +1008,68 @@ function settings() {
                             />
                         </div>
                     </div>
-                    <div class="settings-page-container">
-                        <div class="settings-page-title">{t("settings.player.external")}</div>
-                        <div class="settings-setting-container">
-                            {t("settings.player.enable_external")}
-                            <CheckBox
-                                checked={config().new.Player.external.enable}
-                                onChecked={(checked) =>
-                                    handleChange('Player.external.enable', checked)
-                                }
-                            />
-                        </div>
-                        <div class="settings-line"></div>
-                        <div class="settings-setting-container">
-                            {t("settings.player.select_player")}
-                            <Dropdown
-                                options={[
-                                    { label: "Movian", onClick: () => handleChange("Player.external.type", "Movian") },
-                                    { label: "Mpv", onClick: () => handleChange("Player.external.type", "Mpv") },
-                                    { label: "VLC", onClick: () => handleChange("Player.external.type", "VLC") },
-                                    // { label: "ChromeCast", onClick: () => handleChange("Player.external.type", "ChromeCast") }
-                                ]}
-                                buttonText={config().new.Player.external.type}
-                                disableX
-                            />
-                        </div>
-                        <Show when={config().new.Player.external.type != "ChromeCast"}>
+                    <Show when={window.api}>
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("settings.player.external")}</div>
+                            <div class="settings-setting-container">
+                                {t("settings.player.enable_external")}
+                                <CheckBox
+                                    checked={config().new.Player.external.enable}
+                                    onChecked={(checked) =>
+                                        handleChange('Player.external.enable', checked)
+                                    }
+                                />
+                            </div>
                             <div class="settings-line"></div>
-                        </Show>
-                        <Show when={config().new.Player.external.type === "Movian"}>
                             <div class="settings-setting-container">
-                                {t("settings.player.movianip")}
-                                <SettingsInput
-                                    iconChar=" "
-                                    type="text"
-                                    onKeyDown={(text) => handleChange("Player.external.movianIP", text)}
-                                    startValue={config().new.Player.external.movianIP}
+                                {t("settings.player.select_player")}
+                                <Dropdown
+                                    options={[
+                                        { label: "Movian", onClick: () => handleChange("Player.external.type", "Movian") },
+                                        { label: "Mpv", onClick: () => handleChange("Player.external.type", "Mpv") },
+                                        { label: "VLC", onClick: () => handleChange("Player.external.type", "VLC") },
+                                        // { label: "ChromeCast", onClick: () => handleChange("Player.external.type", "ChromeCast") }
+                                    ]}
+                                    buttonText={config().new.Player.external.type}
+                                    disableX
                                 />
                             </div>
-                        </Show>
-                        <Show when={config().new.Player.external.type === "Mpv"}>
-                            <div class="settings-setting-container">
-                                {t("settings.player.mpvpath")}
-                                <SettingsInput
-                                    type="text"
-                                    onKeyDown={(text) => handleChange("Player.external.mpvPath", text)}
-                                    startValue={config().new.Player.external.mpvPath}
-                                />
-                            </div>
-                        </Show>
-                        <Show when={config().new.Player.external.type === "VLC"}>
-                            <div class="settings-setting-container">
-                                {t("settings.player.vlcpath")}
-                                <SettingsInput
-                                    type="text"
-                                    onKeyDown={(text) => handleChange("Player.external.vlcPath", text)}
-                                    startValue={config().new.Player.external.vlcPath}
-                                />
-                            </div>
-                        </Show>
-                    </div>
+                            <Show when={config().new.Player.external.type != "ChromeCast"}>
+                                <div class="settings-line"></div>
+                            </Show>
+                            <Show when={config().new.Player.external.type === "Movian"}>
+                                <div class="settings-setting-container">
+                                    {t("settings.player.movianip")}
+                                    <SettingsInput
+                                        iconChar=" "
+                                        type="text"
+                                        onKeyDown={(text) => handleChange("Player.external.movianIP", text)}
+                                        startValue={config().new.Player.external.movianIP}
+                                    />
+                                </div>
+                            </Show>
+                            <Show when={config().new.Player.external.type === "Mpv"}>
+                                <div class="settings-setting-container">
+                                    {t("settings.player.mpvpath")}
+                                    <SettingsInput
+                                        type="text"
+                                        onKeyDown={(text) => handleChange("Player.external.mpvPath", text)}
+                                        startValue={config().new.Player.external.mpvPath}
+                                    />
+                                </div>
+                            </Show>
+                            <Show when={config().new.Player.external.type === "VLC"}>
+                                <div class="settings-setting-container">
+                                    {t("settings.player.vlcpath")}
+                                    <SettingsInput
+                                        type="text"
+                                        onKeyDown={(text) => handleChange("Player.external.vlcPath", text)}
+                                        startValue={config().new.Player.external.vlcPath}
+                                    />
+                                </div>
+                            </Show>
+                        </div>
+                    </Show>
                     <div class="settings-page-container">
                         <div class="settings-page-title">{t("settings.player.screenshot")}</div>
                         <div class="settings-setting-container">
@@ -1085,57 +1230,59 @@ function settings() {
                             />
                         </div>
                     </div>
-                    <div class="settings-page-container">
-                        <div class="settings-page-title">{t("settings.backup.title")}</div>
-                        <div class="settings-setting-container">
-                            {t("settings.backup.make")}
-                            <Button content={t("settings.backup.newbackup")} onClick={CreateBackup} />
-                        </div>
-                        <div class="settings-line"></div>
-                        <div class="settings-setting-container">
-                            {t("settings.backup.enable")}
-                            <CheckBox
-                                checked={config().new.backup.enable}
-                                onChecked={(checked) =>
-                                    handleChange('backup.enable', checked)
-                                }
-                            />
-                        </div>
-                        <div class="settings-line"></div>
-                        <div class="settings-setting-container">
-                            {t("settings.backup.when")}
-                            <ButtonGroup selectedValue={t(`settings.general.${config().new.backup.check.toLowerCase().replaceAll(" ", "")}`)} listValues={[
-                                { value: t("settings.general.everyday"), onClick: () => handleChange("update.type", "Every Day") },
-                                { value: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
-                                { value: t("settings.general.everymonth"), onClick: () => handleChange("update.type", "Every Month") },
-                            ]}
-                            />
-                        </div>
-                        <div class="settings-line"></div>
-                        <div class="settings-setting-container">
-                            {t("settings.backup.max")}
-                            <SettingsInput
-                                iconChar=""
-                                type="number"
-                                onKeyDown={(text) => handleChange("backup.maxBackups", parseInt(text))}
-                                startValue={config().new.backup.maxBackups.toString()}
-                            />
-                        </div>
-                        <SettingsDrop LeftHeader={t("settings.backup.backups")} leftbutton={{ icon: "folder", onClick: async () => window.api.open(await convertPath(`${await window.api.os.getBrowserConfigPath()}/animuBackup`)) }} content={
-                            <div class="settings-backup-container">
-                                <For each={backupList().reverse()}>
-                                    {(value) => {
-                                        const [year, month, day, hour, min] = [value.date.getFullYear(), value.date.getMonth(), value.date.getDate(), value.date.getHours(), value.date.getMinutes()]
-                                        return (
-                                            <span class="settings-button-backup" onclick={() => backupWarning(value.file, `${year}/${month}/${day} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`)}>
-                                                {t("settings.backup.from")} <span class="settings-button-date">{`${year}/${month.toString().padStart(2, "0")}/${day.toString().padStart(2, "0")} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`}</span>
-                                            </span>
-                                        )
-                                    }}
-                                </For>
+                    <Show when={window.api}>
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("settings.backup.title")}</div>
+                            <div class="settings-setting-container">
+                                {t("settings.backup.make")}
+                                <Button content={t("settings.backup.newbackup")} onClick={CreateBackup} />
                             </div>
-                        } />
-                    </div>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                {t("settings.backup.enable")}
+                                <CheckBox
+                                    checked={config().new.backup.enable}
+                                    onChecked={(checked) =>
+                                        handleChange('backup.enable', checked)
+                                    }
+                                />
+                            </div>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                {t("settings.backup.when")}
+                                <ButtonGroup selectedValue={t(`settings.general.${config().new.backup.check.toLowerCase().replaceAll(" ", "")}`)} listValues={[
+                                    { value: t("settings.general.everyday"), onClick: () => handleChange("update.type", "Every Day") },
+                                    { value: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
+                                    { value: t("settings.general.everymonth"), onClick: () => handleChange("update.type", "Every Month") },
+                                ]}
+                                />
+                            </div>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                {t("settings.backup.max")}
+                                <SettingsInput
+                                    iconChar=""
+                                    type="number"
+                                    onKeyDown={(text) => handleChange("backup.maxBackups", parseInt(text))}
+                                    startValue={config().new.backup.maxBackups.toString()}
+                                />
+                            </div>
+                            <SettingsDrop LeftHeader={t("settings.backup.backups")} leftbutton={{ icon: "folder", onClick: async () => window.api.open(await convertPath(`${await window.api.os.getBrowserConfigPath()}/animuBackup`)) }} content={
+                                <div class="settings-backup-container">
+                                    <For each={backupList().reverse()}>
+                                        {(value) => {
+                                            const [year, month, day, hour, min] = [value.date.getFullYear(), value.date.getMonth(), value.date.getDate(), value.date.getHours(), value.date.getMinutes()]
+                                            return (
+                                                <span class="settings-button-backup" onclick={() => backupWarning(value.file, `${year}/${month}/${day} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`)}>
+                                                    {t("settings.backup.from")} <span class="settings-button-date">{`${year}/${month.toString().padStart(2, "0")}/${day.toString().padStart(2, "0")} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`}</span>
+                                                </span>
+                                            )
+                                        }}
+                                    </For>
+                                </div>
+                            } />
+                        </div>
+                    </Show>
                 </Show>
                 <Show when={category() == "developer"}>
                     <div class="settings-page-container">
@@ -1169,7 +1316,7 @@ function settings() {
                                 }
                             />
                         </div>
-                        <div class="settings-line"></div>
+                        {/* <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("settings.devmode.playerdebug")}
                             <CheckBox
@@ -1178,7 +1325,7 @@ function settings() {
                                     handleChange('Developer.playerDebug', checked)
                                 }
                             />
-                        </div>
+                        </div> */}
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("settings.devmode.notificationtest")}
@@ -1218,21 +1365,23 @@ function settings() {
                             </span>
                         </div>
                     </div>
-                    <div class="settings-page-container">
-                        <div class="settings-page-title">{t("settings.devmode.information")}</div>
-                        <div class="settings-setting-container">
-                            <span>{t("settings.devmode.electronver")}</span>
-                            <span>{versions().electron}</span>
+                    <Show when={versions()}>
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("settings.devmode.information")}</div>
+                            <div class="settings-setting-container">
+                                <span>{t("settings.devmode.electronver")}</span>
+                                <span>{versions()!.electron}</span>
+                            </div>
+                            <div class="settings-setting-container">
+                                <span>{t("settings.devmode.chromiumver")}</span>
+                                <span>{versions()!.chrome}</span>
+                            </div>
+                            <div class="settings-setting-container">
+                                <span>{t("settings.devmode.nodever")}</span>
+                                <span>{versions()!.node}</span>
+                            </div>
                         </div>
-                        <div class="settings-setting-container">
-                            <span>{t("settings.devmode.chromiumver")}</span>
-                            <span>{versions().chrome}</span>
-                        </div>
-                        <div class="settings-setting-container">
-                            <span>{t("settings.devmode.nodever")}</span>
-                            <span>{versions().node}</span>
-                        </div>
-                    </div>
+                    </Show>
                 </Show>
                 <Show when={category() == "extensions"}>
                     <div class="settings-page-container">
@@ -1286,8 +1435,8 @@ function settings() {
                                                 <span class='setttings-plugin-store-author'>{item.author}</span>
                                                 <span class='setttings-plugin-store-version'>{item.ver}</span>
                                                 <span class='setttings-plugin-store-type'>{t(`settings.extensions.${item.type}`)}</span>
-                                                <Button 
-                                                    content={t(getStatusStore(item))} 
+                                                <Button
+                                                    content={t(getStatusStore(item))}
                                                     ButtonClass={`setttings-plugin-store-button ${item.installed ? "installed" : ""}`}
                                                     onClick={async () => {
                                                         if (!item.update && item.installed) return

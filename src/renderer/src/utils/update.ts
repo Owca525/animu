@@ -3,10 +3,11 @@ import { getConfig } from "./stores/config";
 import { unwrap } from "solid-js/store";
 import { toast, updateToast } from "./context/ToastNotification";
 import { t } from "./i18n";
+import { dateToUnix } from "./functions";
 
 export async function checkUpdate(alwaysShow: boolean = false) {
+  /* IFDEF DEBUG|PROD */
   try {
-    if (!window.api) return
     const update = await window.api.update.checkUpdate();
 
     if (update.available) {
@@ -23,15 +24,17 @@ export async function checkUpdate(alwaysShow: boolean = false) {
     }
 
     const config = unwrap(getConfig());
-    config.update.lastTime = new Date().toString();
+    config.update.lastTime = dateToUnix(new Date().toString());
     saveConfig(config);
   } catch (error) {
     console.error("Error in checkUpdate", error);
     toast(t("update.failed"), { type: "error" });
   }
+  /* ENDIF */
 }
 
 export function downloadUpdate(updateNotification: string) {
+  /* IFDEF DEBUG|PROD */
   window.api.update.updateProgress((_event, percent) => {
     updateToast(updateNotification, t("update.progress", { procent: percent.toFixed(1) }), {
       type: "loading",
@@ -44,4 +47,5 @@ export function downloadUpdate(updateNotification: string) {
       updateToast(updateNotification, t("update.done"), { type: "success", removeTimer: false, removeClick: false });
     }
   });
+  /* ENDIF */
 }

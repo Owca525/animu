@@ -65,6 +65,13 @@ if (process.contextIsolated) {
         install: (tag: string) => ipcRenderer.invoke('installyt-dlp', tag),
         run: (url: string, commands?: string[]) => ipcRenderer.invoke('run_yt-dlp', url, commands)
       },
+      animulist: {
+        add: (anime) => ipcRenderer.invoke('animulist:saveToDatabase', anime),
+        delete: (id) => ipcRenderer.invoke('animulist:deleteFromDatabase', id),
+        update: (id, anime) => ipcRenderer.invoke('animulist:updateDatabase', id, anime),
+        getDatabase: () => ipcRenderer.invoke('animulist:getAllInformation'),
+        overWrite: () => ipcRenderer.invoke('animulist:overwrite')
+      },
       runExternaPlayer: (videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", videoData, type),
       getOSDetails: () => ipcRenderer.invoke('get-os-info'),
       getListLang: () => ipcRenderer.invoke("get-lang-files"),

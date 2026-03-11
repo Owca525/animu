@@ -1,7 +1,9 @@
-import { genYearsList, request } from "@renderer/utils/functions";
-import { AnimeData, cardData, containerData, genresSearchFormat, informationPluginFormat } from "@renderer/utils/types";
+import { genYearsList, request, unixToDateTime } from "@renderer/utils/functions";
+import { t } from "@renderer/utils/i18n";
+import { getConfig } from "@renderer/utils/stores/config";
+import { AnimeData, cardData, containerData, genres, genresSearchFormat, informationPluginFormat } from "@renderer/utils/types";
 
-const pageSize = 20
+const defaultPageSize = 20
 
 const animeData = `
       id
@@ -85,6 +87,9 @@ const animeData = `
           relationType
           node {
             id
+            format
+            type
+            status(version: 2)
             title {
               romaji
               english
@@ -94,7 +99,6 @@ const animeData = `
               extraLarge
               large
             }
-            bannerImage
           }
         }
       }
@@ -150,7 +154,7 @@ query(
   $minimumTagRank: Int,
   $sort: [MediaSort] = [POPULARITY_DESC, SCORE_DESC]
 ) {
-  Page(page: $page, perPage: ${pageSize}) {
+  Page(page: $page, perPage: CHANGE_ME_PAGE_SIZE) {
     pageInfo {
       total
       perPage
@@ -196,39 +200,47 @@ query(
 }
 `;
 
-// const graphicAiringAnime = `
-// query AiringAnimes($page: Int, $perPage: Int, $sort: [AiringSort], $airingAtGreater: Int, $airingAtLesser: Int) {
-//     Page(page: $page, perPage: $perPage) {
-//         airingSchedules(sort: $sort, airingAt_greater: $airingAtGreater, airingAt_lesser: $airingAtLesser) {
-//         id
-//         airingAt
-//         episode
+const graphicAiringAnime = `
+query AiringAnimes($page: Int, $perPage: Int, $sort: [AiringSort], $airingAtGreater: Int, $airingAtLesser: Int) {
+    Page(page: $page, perPage: $perPage) {
+        airingSchedules(sort: $sort, airingAt_greater: $airingAtGreater, airingAt_lesser: $airingAtLesser) {
+        id
+        airingAt
+        timeUntilAiring
+        episode
 
-//         media {
-//           ${animeData}
-//         }
-//       }
-//     }
-// }
-// `
+        media {
+          ${animeData}
+        }
+      }
+    }
+}
+`
 
 const graphicHomeApi = `
   query (
     $season: MediaSeason,
     $seasonYear: Int,
+    $nextSeason: MediaSeason,
+    $nextYear: Int
     $isAdult: Boolean
   ) {
-    trending: Page(page: 1, perPage: ${pageSize}) {
+    trending: Page(page: 1, perPage: CHANGE_ME_PAGE_SIZE) {
       media(sort: TRENDING_DESC, type: ANIME, isAdult: $isAdult) {
         ...media
       }
     }
-    season: Page(page: 1, perPage: ${pageSize}) {
+    season: Page(page: 1, perPage: CHANGE_ME_PAGE_SIZE) {
       media(season: $season, seasonYear: $seasonYear, sort: POPULARITY_DESC, type: ANIME, isAdult: $isAdult) {
         ...media
       }
     }
-    popular: Page(page: 1, perPage: ${pageSize}) {
+    nextSeason: Page(page: 1, perPage: CHANGE_ME_PAGE_SIZE) {
+      media(season: $nextSeason, seasonYear: $nextYear, sort: POPULARITY_DESC, type: ANIME, isAdult: $isAdult) {
+        ...media
+      }
+    }
+    popular: Page(page: 1, perPage: CHANGE_ME_PAGE_SIZE) {
       media(sort: POPULARITY_DESC, type: ANIME, isAdult: $isAdult) {
         ...media
       }
@@ -243,8 +255,9 @@ const graphicHomeApi = `
 const graphicApIDAnime = `
 query(
   $id: Int!
+  $type: MediaType
 ) {
-  Media(id: $id, type: ANIME) {
+  Media(id: $id, type: $type) {
     ${animeData}
   }
 }
@@ -294,7 +307,10 @@ function Convert(convert: any): cardData {
           id: element.node.id,
           title: element.node.title,
           coverImage: element.node.coverImage.extraLarge ? element.node.coverImage.extraLarge : element.node.coverImage.large,
-          relationType: element.relationType
+          relationType: element.relationType,
+          status: element["node"]["status"],
+          format: element["node"]["format"],
+          type: element["node"]["type"]
         })
       });
     }
@@ -328,11 +344,19 @@ function Convert(convert: any): cardData {
 // WHY THE FUCK THIS DOESN'T WORK IF I CALL window.api.request.post IN CreateHomePage
 // Jeśli api anilist jest offline to daje "Forbidden" w statusText i error 403 request 
 async function sendPost(variable: any, query: any) {
-  return await request("https://graphql.anilist.co", { method: "POST", headers: header, body: JSON.stringify({ query: query, variables: variable }) } as any)
+  return await request(
+    "https://graphql.anilist.co", 
+    { method: "POST", headers: header, body: JSON.stringify({ query: query, variables: variable }) } as any,
+    window.api ? false : true
+  )
 }
 
 async function sendToApi(variable: any, query: any): Promise<cardData[]> {
-  let data = await request("https://graphql.anilist.co", { method: "POST", headers: header, body: JSON.stringify({ query: query, variables: variable }) } as any)
+  let data = await request(
+    "https://graphql.anilist.co", 
+    { method: "POST", headers: header, body: JSON.stringify({ query: query, variables: variable }) } as any,
+    window.api ? false : true
+  )
   if (data.success && data.json) {
     return data.json.data.Page.media.map((data) => Convert(data))
   }
@@ -343,8 +367,10 @@ function getSeasonFromDate() {
   const now = new Date();
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
+  const list = ["WINTER", "SPRING", "SUMMER", "FALL"]
 
   let season: string;
+  let nextSeason: string = list[0];
 
   if (month >= 1 && month <= 3) {
     season = "WINTER";
@@ -356,7 +382,10 @@ function getSeasonFromDate() {
     season = "FALL";
   }
 
-  return { season, seasonYear: year };
+  const finded = list.findIndex((v) => season == v)
+  if (list.length-1 > list.findIndex((v) => season == v)) nextSeason = list[finded+1]
+
+  return { season, nextSeason, seasonYear: year, nextYear: finded == 3 ? year+1 : year };
 }
 
 // async function getGenres(): Promise<string[]> {
@@ -366,14 +395,15 @@ function getSeasonFromDate() {
 // }
 
 async function fetchCategory(params: any, title: string): Promise<containerData> {
+  const config = getConfig()
   const globalParams = params
   let container: containerData = {
     title: title,
     data: await sendToApi(params, graphicApi),
     onScrollDownFunction: async (_search, page, _params) => {
-      let resp = await sendToApi({ ...globalParams, page: page }, graphicApi)
+      let resp = await sendToApi({ ...globalParams, page: page }, graphicApi.replaceAll("CHANGE_ME_PAGE_SIZE", config.anilist.maxpagesize.toString()));
       return {
-        maxPage: pageSize,
+        maxPage: config.anilist.maxpagesize,
         data: resp
       }
     }
@@ -392,37 +422,36 @@ export async function searchInAnilist(name: string, page: number, params?: genre
     if (name.replaceAll(" ", "") != "") variables = { ...variables, search: name }
 
     if (params) {
-      if (params) variables = { ...variables, genres: params.genres }
-      if (params.genres) variables = { ...variables, genres: params.genres }
       if (params.genres) variables = { ...variables, genres: params.genres }
       if (params.years) variables = { ...variables, seasonYear: parseInt(params.years) }
       if (params.seasons) variables = { ...variables, season: params.seasons.toUpperCase() }
-      if (params.format) variables = { ...variables, format: params.format.map((tmp) => tmp.toUpperCase().replaceAll(" ", "_")) }
+      if (params.format) variables = { ...variables, format: params.format.toUpperCase().replaceAll(" ", "_") }
       if (params.airing) variables = { ...variables, status: params.airing.toUpperCase().replaceAll(" ", "_") }
     }
 
-    const resp = await sendToApi(variables, graphicApi.replaceAll("20", MaxPage.toString()))
+    const resp = await sendToApi(variables, graphicApi.replaceAll("CHANGE_ME_PAGE_SIZE", MaxPage.toString()))
     return {
       data: resp,
-      maxPage: pageSize
+      maxPage: MaxPage
     }
   } catch (error) {
     console.error("Error in searchInAnilist/anilist", error)
     return {
       data: [],
-      maxPage: pageSize
+      maxPage: MaxPage
     }
   }
 }
 
 async function searchWrapper(name: string, page: number, params?: genresSearchFormat, isAdult: boolean = false, MaxPage: number = 20): Promise<{ data: cardData[]; maxPage: number; }> {
+  const config = getConfig()
   try {
     return await searchInAnilist(name, page, params, isAdult, MaxPage)
   } catch (error) {
     console.error("Error in searchWrapper/anilist", error)
     return {
       data: [],
-      maxPage: pageSize
+      maxPage: config.anilist.maxpagesize
     }
   }
 }
@@ -431,8 +460,15 @@ export default class AnilistApi implements informationPluginFormat {
   metadata: informationPluginFormat["metadata"] = {
     version: "2.0",
     name: "AnilistApi",
-    pageSize: pageSize,
-    searchOption: {
+    pageSize: defaultPageSize,
+    searchOption: [],
+    author: "Owca525",
+    urlWebsite: "https://anilist.co",
+    icon: "https://anilist.co/img/icons/icon.svg"
+  };
+
+  constructor() {
+    const options = {
       genres: [
         "Action",
         "Adventure",
@@ -458,41 +494,108 @@ export default class AnilistApi implements informationPluginFormat {
       years: genYearsList(1940),
       format: ["TV", "Movie", "TV Short", "special", "OVA", "ONA"],
       statuses: ["Releasing", "Finished", "Not Yet Released", "Cancelled"]
-    },
-    author: "Owca525",
-    urlWebsite: "https://anilist.co",
-    icon: "https://anilist.co/img/icons/icon.svg"
-  };
+    }
 
-  config: { [key: string]: any; } = {
-    "Adult Mode": false,
-    "Max Page Size": 20,
-  };
-  // async schedule(context: { airingStart: number; airingEnd: number; }, callbacks: { onSuccess: (data: containerData) => void; onError: (error: string) => void; }) {
-  //   let week = getWeek()
-  //   console.log(week)
-  //   let variables = {
-  //     page: 1,
-  //     perPage: 50,
-  //     sort: ["TIME"],
-  //     airingAtGreater: week.startWeekUnix,
-  //     airingAtLesser: week.endWeekUnix
-  //   }
+    let newOptions: genres[] = [
+      {
+        type: "genres",
+        placeholder: "filter.placeholderGenres",
+        title: "filter.genres",
+        langPath: "anime_genres.",
+        options: options.genres.map(v => v.toLowerCase().replaceAll(" ", "_"))
+      },
+      {
+        type: "years",
+        title: "filter.year",
+        placeholder: "filter.placeholderYears",
+        langPath: "",
+        options: options.years
+      },
+      {
+        type: "season",
+        placeholder: "filter.placeholderSeason",
+        title: "filter.season",
+        langPath: "anime_seasons.",
+        options: options.seasons.map(v => v.toLowerCase().replaceAll(" ", "_"))
+      },
+      {
+        type: "format",
+        placeholder: "filter.placeholderFormat",
+        title: "filter.format",
+        langPath: "anime_formats.",
+        options: options.format.map(v => v.toLowerCase().replaceAll(" ", "_"))
+      },
+      {
+        type: "airing",
+        placeholder: "filter.placeholderAiring",
+        title: "filter.airing",
+        langPath: "anime_statuses.",
+        options: options.statuses.map(v => v.toLowerCase().replaceAll(" ", "_"))
+      },
+    ]
 
-  //   console.log(await sendPost(variables, graphicAiringAnime))
-  // }
+    this.metadata = {
+      ...this.metadata,
+      searchOption: newOptions
+    }
+  }
+
+  async schedule(airingStart: number, airingEnd: number): Promise<containerData> {
+    // let week = getWeek()
+    // console.log(week)
+
+    const days = [t("week.sunday"), t("week.monday"), t("week.tuesday"), t("week.wednesday"), t("week.thursday"), t("week.friday"), t("week.saturday")];
+    console.log(airingStart, airingEnd)
+    let variables = {
+      page: 1,
+      perPage: 50,
+      sort: ["TIME"],
+      airingAtGreater: airingStart,
+      airingAtLesser: airingEnd
+    }
+
+    const date = new Date(unixToDateTime(airingStart))
+
+    let response = await sendPost(variables, graphicAiringAnime)
+    console.log(response)
+    if (!response.success || !response.json) return {
+      title: days[date.getDay()],
+      data: []
+    }
+
+    let data = response.json["data"]["Page"]["airingSchedules"].map((v) => {
+      const converted = Convert(v["media"])
+      return {
+        ...converted,
+        animeData: {
+          ...converted.AnimeData,
+          nextAiringEpisode: {
+            airingAt: v["airingAt"],
+            episode: v["episode"],
+            timeUntilAiring: v["timeUntilAiring"]
+          }
+        }
+      }
+    })
+
+    return {
+      title: days[date.getDay()],
+      data: data
+    }
+  }
 
   search = async (name: string, page: number, params?: genresSearchFormat) => {
     try {
+      const config = getConfig()
       let title: string | undefined = undefined
       if (!(name.replaceAll(" ", "") == "")) title = `home.searching/${name}`
 
-      const resp = await searchInAnilist(name, page, params, this.config["Adult Mode"], this.config["Max Page Size"])
+      const resp = await searchInAnilist(name, page, params, config.anilist.adultdefault, config.anilist.maxpagesize)
 
       return {
         title: title,
         data: resp.data,
-        onScrollDownFunction: async (search, page, params) => await searchWrapper(search ? search : "", page, params, this.config["Adult Mode"], this.config["Max Page Size"])
+        onScrollDownFunction: async (search, page, params) => await searchWrapper(search ? search : "", page, params, config.anilist.adultdefault, config.anilist.maxpagesize)
       }
     } catch (error) {
       console.error("Error in search/Anilistapi", error)
@@ -501,15 +604,23 @@ export default class AnilistApi implements informationPluginFormat {
   }
   home = async () => {
     try {
+      const config = getConfig()
       let season = getSeasonFromDate()
-      let data = await sendPost({ season: season.season, seasonYear: season.seasonYear, isAdult: this.config["Adult Mode"] }, graphicHomeApi.replaceAll("20", this.config["Max Page Size"]))
+      let data = await sendPost({
+        season: season.season,
+        seasonYear: season.seasonYear,
+        isAdult: config.anilist.adultdefault,
+        nextSeason: season.nextSeason,
+        nextYear: season.nextYear,
+      }, graphicHomeApi.replaceAll("CHANGE_ME_PAGE_SIZE", config.anilist.maxpagesize.toString()))
+
       if (!data.success || !data.json) return
       let home: containerData[] = [
         {
           title: "home.trending_now",
           data: data.json.data.trending.media.map((anime) => Convert(anime)),
           horizontal: true,
-          onTitleClick: async () => await fetchCategory({...tendingAnime, isAdult: this.config["Adult Mode"]}, "home.trending_now"),
+          onTitleClick: async () => await fetchCategory({ ...tendingAnime, isAdult: config.anilist.adultdefault }, "home.trending_now"),
         },
         {
           title: "home.popular_in_this_season",
@@ -520,14 +631,26 @@ export default class AnilistApi implements informationPluginFormat {
             season: season.season,
             seasonYear: season.seasonYear,
             type: "ANIME",
-            isAdult: this.config["Adult Mode"]
+            isAdult: config.anilist.adultdefault
           }, "home.popular_in_this_season"),
+        },
+        {
+          title: "Upcoming Next Season",
+          data: data.json.data.nextSeason.media.map((anime) => Convert(anime)),
+          horizontal: true,
+          onTitleClick: async () => await fetchCategory({
+            page: 1,
+            season: season.nextSeason,
+            seasonYear: season.nextYear,
+            type: "ANIME",
+            isAdult: config.anilist.adultdefault
+          }, "Upcoming Next Season"),
         },
         {
           title: "home.all_time_popular",
           data: data.json.data.popular.media.map((anime) => Convert(anime)),
           horizontal: true,
-          onTitleClick: async () => await fetchCategory({...allPopular, isAdult: this.config["Adult Mode"]}, "home.all_time_popular"),
+          onTitleClick: async () => await fetchCategory({ ...allPopular, isAdult: config.anilist.adultdefault }, "home.all_time_popular"),
         }
       ]
       return { sections: home, topCards: home[0] }
@@ -538,11 +661,22 @@ export default class AnilistApi implements informationPluginFormat {
   }
   anime = async (context: { id: string; }) => {
     try {
-      let req = await sendPost({ id: context.id }, graphicApIDAnime)
+      let req = await sendPost({ id: context.id, type: "ANIME" }, graphicApIDAnime)
       if (!req.success || !req.json) return
       return Convert(req.json.data.Media).AnimeData
     } catch (error) {
       console.error("Uknown error in anime/anilistapi", error)
+      return
+    }
+  }
+
+  getManga = async (id: string) => {
+    try {
+      let req = await sendPost({ id: id, type: "MANGA" }, graphicApIDAnime)
+      if (!req.success || !req.json) return
+      return Convert(req.json.data.Media).AnimeData
+    } catch (error) {
+      console.error("Uknown error in getManga/anilistapi", error)
       return
     }
   }

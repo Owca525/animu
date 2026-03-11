@@ -3,6 +3,7 @@ import {
     cardData,
     containerData,
     ContextMenuProps,
+    FilterParams,
     homeData,
     informationPluginFormat,
     playerChapterList,
@@ -59,18 +60,17 @@ export function convertSeconds(totalSeconds: number | undefined) {
     return { days, hours, minutes, seconds };
 }
 
-export function checkDate(date: string | number, type: "Every Day" | "Every Week" | "Every Month") {
-    const givenDate = new Date(date);
-    const currentDate = new Date();
-    const milliseconds = currentDate.getTime() - givenDate.getTime();
+export function checkDate(date: number, type: string) {
+    const currentDate = new Date().toString();
     switch (type) {
         case "Every Week":
-            return milliseconds >= 7 * 24 * 60 * 60 * 1000;
+            return calculateDays(date, dateToUnix(currentDate)) >= 7;
         case "Every Day":
-            return milliseconds >= 24 * 60 * 60 * 1000;
+            return calculateDays(date, dateToUnix(currentDate)) >= 1;
         case "Every Month":
-            return milliseconds >= (24 * 60 * 60 * 1000) * 30;
+            return calculateDays(date, dateToUnix(currentDate)) >= 30;
     }
+    return false
 }
 
 export function calculateZoomLevel(percentage: number): number {
@@ -95,7 +95,8 @@ function createHTMLLinkElement(css: string) {
 }
 
 export async function changeTheme(activeTheme: Map<number, themeMetadata>) {
-    if (!window.api) return
+    // TODO: ADD SUPPORT FOR WEB
+    /* IFDEF DEBUG|PROD */
     let old = document.querySelectorAll<HTMLLinkElement>("link")
     for (let index = 0; index < old.length; index++) {
         const element = old[index];
@@ -119,11 +120,11 @@ export async function changeTheme(activeTheme: Map<number, themeMetadata>) {
             if (content.dropDown) content.dropDown.map((value) => value.option == conf[key] ? createHTMLLinkElement(value.css) : "")
         }
     })
+    /* ENDIF */
 }
 
 export function changeTitleAnimu(title: string) {
-    let dev = false
-    if (window.api) dev = window.electronAPI.process.env.NODE_ENV == "development"
+    let dev = import.meta.env.DEV
     document.title = dev ? title + " - Development" : title
 }
 
@@ -185,35 +186,35 @@ export async function refetchHistory() {
     let data: homeData = getHomeCache()
     if (data.activePage != "global.history") return
     let history = getHistory()
-    if (data.data.sections[0].title == t("global.continuewatch") && data.data.sections.length != 2) {
-        setHomeNewData({ sections: [{ title: t("global.continuewatch"), data: history.continue, horizontal: false }] })
+    if (data.data.sections[0].title == "global.continuewatch" && data.data.sections.length != 2) {
+        setHomeNewData({ sections: [{ title: "global.continuewatch", data: history.continue, horizontal: false }] })
         return
     }
 
-    if (data.data.sections[0].title == t("global.history") && data.data.sections.length != 2) {
-        setHomeNewData({ sections: [{ title: t("global.history"), data: history.history as cardData[], horizontal: false }] })
+    if (data.data.sections[0].title == "global.history" && data.data.sections.length != 2) {
+        setHomeNewData({ sections: [{ title: "global.history", data: history.history as cardData[], horizontal: false }] })
         return
     }
 
-    if (data.data.sections[0].title == t("global.continuewatch") && data.data.sections[1].title == t("global.history")) {
+    if (data.data.sections[0].title == "global.continuewatch" && data.data.sections[1].title == "global.history") {
         setHomeNewData({
             sections: [
                 {
-                    title: t("global.continuewatch"),
+                    title: "global.continuewatch",
                     data: history.continue.slice(0, 20),
                     horizontal: true,
                     onTitleClick: async () => ({
-                        title: t("global.continuewatch"),
+                        title: "global.continuewatch",
                         data: history.continue,
                         horizontal: false,
                     })
                 },
                 {
-                    title: t("global.history"),
+                    title: "global.history",
                     data: history.history.slice(0, 20) as cardData[],
                     horizontal: true,
                     onTitleClick: async () => ({
-                        title: t("global.history"),
+                        title: "global.history",
                         data: history.history as any,
                         horizontal: false,
                     })
@@ -294,11 +295,11 @@ export function sleep(ms: number): Promise<void> {
 
 export function detectTitle(data: { title: { english?: string | undefined; native: string; romaji: string; }, ep: string, format?: string }): string {
     try {
-        if (data.format?.toLowerCase().includes("movie")) return t('player.TitleMovie', { name: data.title.romaji })
-        return t('player.TitleEpisode', { ep: data.ep, name: data.title.romaji })
+        if (data.format?.toLowerCase().includes("movie")) return t('player.TitleMovie', { name: detectTitleConfig(data.title) })
+        return t('player.TitleEpisode', { ep: data.ep, name: detectTitleConfig(data.title) })
     } catch (error) {
         console.error(error)
-        return t('player.TitleEpisode', { ep: data.ep, name: data.title.romaji })
+        return t('player.TitleEpisode', { ep: data.ep, name: detectTitleConfig(data.title) })
     }
 }
 
@@ -401,10 +402,12 @@ export function updateObjectConfig(path: string, value: string | number | boolea
 
 export async function request(url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string }, body?: any }, noCors: boolean = false): Promise<{ text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: Map<string, string> }> {
     try {
-        if (window.api) return await window.api.request.advanceRequest(url, options)
-
+        /* IFDEF WEB */
         const response = await fetch(noCors ? url : "/api/request", noCors ? options : {
             method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({
                 url: url,
                 requestOptions: options
@@ -427,19 +430,24 @@ export async function request(url: string, options?: { method?: "POST" | "GET", 
         return {
             text: text,
             json: jsontext,
-            buffer: Buffer.from(await bufferCloned.arrayBuffer()),
+            buffer: await bufferCloned.arrayBuffer() as any,
             status: response.status,
             statusText: response.statusText,
             url: response.url,
             success: response.ok,
             responseHeader: response.headers as any
         };
+        /* ENDIF */
+
+        /* IFDEF DEBUG|PROD */
+        return await window.api.request.advanceRequest(url, options)
+        /* ENDIF */
     } catch (error) {
         console.error("error in requestGET", error)
         return {
             text: (error as Error).message,
             json: undefined,
-            buffer: Buffer.from(""),
+            buffer: [] as any,
             status: 500,
             statusText: "Error",
             url: url,
@@ -449,30 +457,43 @@ export async function request(url: string, options?: { method?: "POST" | "GET", 
     }
 }
 
-export async function SaveToClipboard(type: "text" | "image", content: string) {
-    if (window.api) return window.api.saveToClipboard(type, content)
+export async function SaveToClipboard(type: "text" | "image", content: string) {    
+    /* IFDEF WEB */
     if (type == "image") {
         const blob = await (await fetch(content)).blob()
         const item = new ClipboardItem({ [blob.type]: blob });
-        await navigator.clipboard.write([item]);
-        return
+        return await navigator.clipboard.write([item]);
     }
 
     const blob = new Blob([content], { type: "text/plain" });
     const item = new ClipboardItem({ "text/plain": blob });
-    await navigator.clipboard.write([item]);
-    return
+    return await navigator.clipboard.write([item]);
+    /* ENDIF */
+
+    /* IFDEF DEBUG|PROD */
+    return window.api.saveToClipboard(type, content)
+    /* ENDIF */
 }
 
 export function openUrlFolder(content: string) {
-    if (window.api) return window.api.open(content)
+    /* IFDEF DEBUG|PROD */
+    return window.api.open(content)
+    /* ENDIF */
+
+    /* IFDEF WEB */
     return window.open(content, "_blank");
+    /* ENDIF */
 }
 
 export function toggleFullscreen(toggle: boolean = false) {
-    if (window.api) return window.BrowserWindow.setFullscreen(toggle)
+    /* IFDEF DEBUG|PROD */
+    return window.BrowserWindow.setFullscreen(toggle)
+    /* ENDIF */
+
+    /* IFDEF WEB */
     if (toggle) document.documentElement.requestFullscreen();
     else document.exitFullscreen();
+    /* ENDIF */
 }
 
 export function getWeek(): { startWeekUnix: number, endWeekUnix: number, startWeekDay: number, endWeekDay: number, month: number } {
@@ -596,7 +617,7 @@ export async function fetchPluginRepos() {
     }
     localStorage.setItem("pluginDatabase", JSON.stringify(tmp))
     setPluginRepo(tmp)
-    saveConfig(updateObjectConfig("plugins.lastTimeCheck", Math.floor(new Date().getTime() / 1000), config))
+    saveConfig(updateObjectConfig("plugins.lastTimeCheck", dateToUnix(new Date().toString()), config))
 }
 
 export async function setHomeData(wrapper?: () => Promise<homeData["data"] | containerData | undefined>, data?: homeData["data"]) {
@@ -645,14 +666,21 @@ export async function runYT_DLP(url: string, commands?: string[]) {
 }
 
 export async function getPluginsList() {
-    if (!window.api) return []
+    /* IFDEF DEBUG|PROD */
     return await window.api.plugins.list()
+    /* ENDIF */
+    return []
 }
 
 export async function getPluginInitialConfig(name: string, config: { [key: string]: any; }): Promise<{ [key: string]: any; }> {
-    if (window.api) return await window.api.plugins.getConfig(name, config)
+    /* IFDEF WEB */
     localStorage.setItem(name, JSON.stringify(config))
     return config
+    /* ENDIF */
+
+    /* IFDEF DEBUG|PROD */
+    return await window.api.plugins.getConfig(name, config)
+    /* ENDIF */
 }
 
 export function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string | undefined {
@@ -707,5 +735,91 @@ export function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): 
     } catch (error) {
         console.error("Functions SheepFinderAnime2000 error", error)
         return animeList[0].player_ID
+    }
+}
+
+export function dateToUnix(dateStr: string): number {
+    const date = new Date(dateStr);
+    return Math.floor(date.getTime() / 1000);
+}
+
+export function unixToDateTime(unixTimestamp: number | undefined): string {
+    if (!unixTimestamp || unixTimestamp == 0) return t("player.other.unknown")
+    const date = new Date(unixTimestamp * 1000);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+export function searchDataInCards(cards: cardData[], search: string, params: FilterParams | undefined) {
+    let results: cardData[] = []
+
+    results = cards.filter((item) =>
+        item.AnimeData.title["romaji"] ?
+            item.AnimeData.title["romaji"].toLowerCase().includes(search.toLowerCase()) :
+            false
+    )
+    results = [...results, ...cards.filter((item) =>
+        item.AnimeData.title["native"] ?
+            item.AnimeData.title["native"].toLowerCase().includes(search.toLowerCase()) :
+            false
+    )]
+    results = [...results, ...cards.filter((item) =>
+        item.AnimeData.title["english"] ?
+            item.AnimeData.title["english"].toLowerCase().includes(search.toLowerCase()) :
+            false
+    )]
+
+    console.log(params, results)
+
+    if (!params) return results.filter(
+        (item, index, self) =>
+            index === self.findIndex(t => t.AnimeData.id === item.AnimeData.id)
+    )
+
+    if (params["years"]) results = results.filter((val) => new String(val.AnimeData.seasonYear) == params["years"])
+    if (params["season"]) results = results.filter((val) => new String(val.AnimeData.season) == params["season"])
+    if (params["format"]) results = results.filter((val) => new String(val.AnimeData.format) == params["format"])
+    if (params["airing"]) results = results.filter((val) => new String(val.AnimeData.status) == params["airing"])
+    if (params["genres"]) results = results.filter((val) => [...new Set(val.AnimeData.genres)].includes(params["genres"]))
+    
+    return results.filter(
+        (item, index, self) =>
+            index === self.findIndex(t => t.AnimeData.id === item.AnimeData.id)
+    )
+}
+
+export function calculateDays(unix1: number, unix2: number): number {
+  const date1 = new Date(unix1 * 1000);
+  const date2 = new Date(unix2 * 1000);
+
+  date1.setHours(0, 0, 0, 0);
+  date2.setHours(0, 0, 0, 0);
+
+  return -((date2.getTime() - date1.getTime()) / 86400000);
+}
+
+export function convertSecondsToHoursFormat(seconds: number): string {
+  if (seconds < 0) seconds = 0;
+  return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
+}
+
+export function detectTitleConfig(titles: AnimeData["title"]): string {
+    try {
+        const config = unwrap(getConfig())
+        const title = titles[config.anilist.titleFormat.toLocaleLowerCase()]
+        if (title) return title
+        if (titles["romaji"]) return titles["romaji"]
+        return Object.values(titles)[0]
+    } catch (error) {
+        console.error("detectTitleConfig Error", error)
+        return Object.values(titles)[0]
     }
 }

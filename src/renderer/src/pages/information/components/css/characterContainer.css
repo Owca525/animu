@@ -18,6 +18,7 @@
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     overflow-x: scroll;
+    scrollbar-width: none;
 }
 
 .information-characters-container::-webkit-scrollbar {

@@ -130,7 +130,7 @@ export class informationPluginManager implements informationPluginManagerFormat 
 
         if (infoPlugins.length <= 0) {
             const tmp = new AnilistApi()
-            if (tmp.config) tmp.config = await getPluginInitialConfig(tmp.metadata.name, tmp.config)
+            // if (tmp.config) tmp.config = await getPluginInitialConfig(tmp.metadata.name, tmp.config)
             this.currentPlugin = tmp
             return
         }
@@ -156,20 +156,16 @@ export class informationPluginManager implements informationPluginManagerFormat 
     searchAnime = (name: string, page: number, params?: genresSearchFormat) => {
         setHomeData(async () => await this.currentPlugin.search(name, page, params))
     };
-    // schedule = (airingStart?: number, airingEnd?: number): void => {
-    //     this.currentPlugin.schedule({ airingStart, airingEnd }, {
-    //         onSuccess: function (data: containerData): void {
-    //             throw new Error("Function not implemented.");
-    //         },
-    //         onError: function (error: string): void {
-    //             throw new Error("Function not implemented.");
-    //         }
-    //     })
-    // }
+    schedule = (airingStart: number, airingEnd: number) => {
+        return this.currentPlugin.schedule(airingStart, airingEnd)
+    }
     home = () => {
         setHomeData(this.currentPlugin.home)
     }
     anime = async (id: string) => {
         return await this.currentPlugin.anime({ id: id })
+    }
+    getManga = async (id: string) => {
+        return await this.currentPlugin.getManga(id)
     }
 }

@@ -86,7 +86,7 @@
 }
 
 .information-top {
-    width: 80%;
+    width: 88%;
     height: fit-content;
     display: flex;
     margin-top: clamp(202px, 43% - 22px, 35vh - 25px);
@@ -109,6 +109,7 @@
 .information-cover, .information-cover-placeholder {
     max-width: 240px;
     max-height: 240px;
+    width: 100%;
     cursor: pointer;
     user-select: none;
     aspect-ratio: 2 / 3;
@@ -149,7 +150,7 @@
 
 .information-bottom {
     margin-top: 20px;
-    width: 80%;
+    width: 88%;
     display: flex;
     flex-direction: row;
     gap: 30px;
@@ -265,7 +266,7 @@
 }
 
 .information-loading {
-    font-size: 3em !important;
+    font-size: 3.2em !important;
     animation: spin 1s linear infinite;
 }
 
@@ -275,6 +276,13 @@
     justify-content: center;
     align-items: center;
     gap: 12px;
+    padding: 20px 0px;
+    user-select: none;
+    font-size: 1.2em;
+}
+
+.information-error {
+    font-size: 2em !important;
 }
 
 .information-select-episode {
@@ -324,8 +332,7 @@
     padding: 8px;
     display: flex;
     gap: 12px;
-    /* overflow-x: auto; */
-    z-index: 5;
+    overflow-x: auto;
 }
 
 .information-recomendation-loading {
@@ -333,6 +340,19 @@
     justify-content: center;
     align-items: center;
     height: 200px;
+}
+
+.information-animulist-container {
+    background-color: var(--second-layer);
+    padding: 12px;
+    border-radius: 12px;
+    display: flex;
+    gap: 12px;
+}
+
+.information-eopsodes-top-left {
+    display: flex;
+    gap: 8px;
 }
 
 /* For smaller devices / window sizes */

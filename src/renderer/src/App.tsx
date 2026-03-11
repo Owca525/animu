@@ -1,5 +1,5 @@
 import Home from './pages/home/index';
-import icon from '../../../build/icon.png';
+import icon from '@resources/icon.png';
 import Information from './pages/information/index';
 import LocalErrorBoundary from './utils/ErrorBoundary';
 import Player from './pages/player/index';
@@ -8,6 +8,7 @@ import {
   calculateZoomLevel,
   changeTheme,
   checkDate,
+  dateToUnix,
   detectPluginVersion,
   fetchPluginRepos,
   updateObjectConfig
@@ -25,7 +26,7 @@ import {
 } from 'solid-js';
 import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import { getConfig, setConfig } from './utils/stores/config';
-import { getGlobalCache, setGlobalHistory, setGlobalTheme, setIncognitoMode } from './utils/stores/global';
+import { getGlobalCache, getSocket, setAnimulistData, setGlobalHistory, setGlobalTheme, setIncognitoMode, setSocket, setSocketRoom } from './utils/stores/global';
 import { HashRouter, Route } from '@solidjs/router';
 import { getInformationPlugin, pluginManager, setPluginRepo } from './utils/stores/plugins';
 import { setHomeActivePage } from './utils/stores/home';
@@ -36,6 +37,14 @@ import './themes/darkerAnimu/main.css';
 import './utils/i18n';
 import { unwrap } from 'solid-js/store';
 import { pluginRepoExpanded, themeMetadata } from './utils/types';
+import shaka from 'shaka-player';
+import { convertHistoryToAnimuList } from './utils/FilesManager/animulist';
+import { socketPlayerInit } from './pages/player/VideoPlayer';
+import { io } from 'socket.io-client';
+
+/* IFDEF DEBUG */
+import "./utils/debug"
+/* ENDIF */
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -45,32 +54,32 @@ function App() {
   const [isInitation, setInitation] = createSignal<boolean>(true)
   const [initialState, setinitialState] = createSignal<{ text: string, plugin: boolean }>({ text: "initial.history", plugin: false })
 
-  if (window.api) {
-    createShortcut(["F12"], () => {
-      if (getConfig().Developer.DevTools) window.BrowserWindow.openDevTools()
-    })
-    createShortcut(["Control", "Shift", "R"], async () => {
-      if (getConfig().Developer.DeveloperMode) {
-        const idToast = toast(t("global.themereload"), { type: "loading", removeTimer: true })
-        setGlobalTheme(await window.api.themes.list())
+  /* IFDEF DEBUG|PROD */
+  createShortcut(["F12"], () => {
+    if (getConfig().Developer.DevTools) window.BrowserWindow.openDevTools()
+  })
+  createShortcut(["Control", "Shift", "R"], async () => {
+    if (getConfig().Developer.DeveloperMode) {
+      const idToast = toast(t("global.themereload"), { type: "loading", removeTimer: true })
+      setGlobalTheme(await window.api.themes.list())
 
-        const loadedTheme = getGlobalCache().loadedTheme
-        let confTheme = [...new Set(unwrap(getConfig().General.theme))]
-        let loadingTheme: Map<number, themeMetadata> = new Map()
-        for (let index = 0; index < confTheme.length; index++) {
-          const element = confTheme[index];
-          const theme = loadedTheme.find((ele) => ele.themeName == element)
-          if (!theme) continue
-          loadingTheme.set(index, unwrap(theme))
-        }
-        changeTheme(loadingTheme)
-
-        updateToast(idToast, t("global.themereload"), { type: "success", removeTimer: false })
-        await window.backend.refresh()
+      const loadedTheme = getGlobalCache().loadedTheme
+      let confTheme = [...new Set(unwrap(getConfig().General.theme))]
+      let loadingTheme: Map<number, themeMetadata> = new Map()
+      for (let index = 0; index < confTheme.length; index++) {
+        const element = confTheme[index];
+        const theme = loadedTheme.find((ele) => ele.themeName == element)
+        if (!theme) continue
+        loadingTheme.set(index, unwrap(theme))
       }
-      await import("./utils/exports")
-    })
-  }
+      changeTheme(loadingTheme)
+
+      updateToast(idToast, t("global.themereload"), { type: "success", removeTimer: false })
+      await window.backend.refresh()
+    }
+    await import("./utils/exports")
+  })
+  /* ENDIF */
 
   createShortcut(["Control", "I"], () => {
     setIncognitoMode(!getGlobalCache().incognito)
@@ -78,29 +87,52 @@ function App() {
   })
 
   onMount(async () => {
-    if (window.api) {
-      setConfig(await window.api.getConfig())
-      setGlobalHistory(await window.api.getHistory())
-    } else {
-      if (!localStorage.getItem("config")) localStorage.setItem("config", JSON.stringify(defaultConfigWeb))
-      if (!localStorage.getItem("history")) localStorage.setItem("history", JSON.stringify([]))
-      setConfig(JSON.parse(localStorage.getItem("config") as any))
-      setGlobalHistory(JSON.parse(localStorage.getItem("history") as any))
-    }
+    shaka.polyfill.installAll()
+
+    /* IFDEF WEB */
+    /* ENDIF */
+
+    /* IFDEF WEB */
+    if (!localStorage.getItem("config")) localStorage.setItem("config", JSON.stringify(defaultConfigWeb))
+    if (!localStorage.getItem("history")) localStorage.setItem("history", JSON.stringify([]))
+    setConfig(JSON.parse(localStorage.getItem("config") as any))
+    setGlobalHistory(JSON.parse(localStorage.getItem("history") as any))
+    /* ENDIF */
+
+    /* IFDEF DEBUG|PROD */
+    setConfig(await window.api.getConfig())
+    setGlobalHistory(await window.api.getHistory())
+    /* ENDIF */
+
     setinitialState({ text: "initial.theme", plugin: false })
-    if (window.api) setGlobalTheme(await window.api.themes.list())
+    /* IFDEF DEBUG|PROD */
+    setGlobalTheme(await window.api.themes.list())
+    /* ENDIF */
+
+    setinitialState({ text: "Loading Animulist", plugin: false })
+    /* IFDEF DEBUG|PROD */
+    setAnimulistData(await window.api.animulist.getDatabase())
+    /* ENDIF */
+
+    /* IFDEF WEB */
+    if (!localStorage.getItem("animulist")) localStorage.setItem("animulist", JSON.stringify([]))
+    setAnimulistData(JSON.parse(localStorage.getItem("animulist") as any))
+    /* ENDIF */
 
     setinitialState({ text: "initial.config", plugin: false })
+    /* IFDEF DEBUG|PROD */
     LoadConfig()
+    /* ENDIF */
     setHomeActivePage("global.home")
 
     setinitialState({ text: "initial.plugin", plugin: false })
     await checkPluginUpdate()
     await getInformationPlugin().initial()
     await pluginManager().initialPlugins()
+
     setInitation(false)
 
-    detectPluginVersion()
+    detectPluginVersion();
 
     // Code: https://github.com/cynthia2006/hanime-plugin/blob/master/yt_dlp_plugins/extractor/htv.py
     // const payload = `
@@ -158,13 +190,80 @@ function App() {
 
     // setTimeout(() => worker.terminate(), 1000);
 
+    (window as any).runSocket = runSocket;
+    (window as any).createRoom = createRoom;
+    (window as any).getRooms = getRooms;
+    (window as any).closeSocket = closeSocket;
 
-    if (window.api) runCheckUpdate()
+    function closeSocket() {
+      const socket = getSocket()
+      if (!socket) return
+      socket.close()
+    }
+
+    function runSocket(server: string = "") {
+      const socket = io(server)
+      console.log(socket)
+
+      socket.on("rooms-list", (rooms) => {
+        console.log(rooms)
+      })
+
+      socket.on("player:init", (playerData: socketPlayerInit) => {
+        localStorage.setItem("playerCache", JSON.stringify(unwrap({
+          data: playerData.anime,
+          save: playerData.saveData,
+          episodelist: playerData.temp.episodes,
+        })))
+        if (location.href.includes("/player")) return
+        const tmp = location.href.replaceAll("info", "")
+        location.href = `${tmp}player`
+      })
+
+      socket.on("disconnect", () => {
+        socket.off("player:init")
+        socket.off("rooms-list")
+        toast("Disconected From Websocket")
+      });
+      setSocket(socket)
+    }
+
+    function createRoom(name: string) {
+      const socket = getSocket()
+      console.log(socket)
+      if (!socket) return
+      socket.emit("join-room", name, (resp) => {
+        if (!resp.success) return toast(`Failed Connect to Room ${name}`)
+        else {
+          toast(`Sucesfully Connected to ${name}`)
+          setSocketRoom(name)
+        }
+      });
+      setSocketRoom(name)
+    }
+
+    function getRooms() {
+      const socket = getSocket()
+      console.log(socket)
+      if (!socket) return
+      return socket.emit("gets-rooms");
+    }
+
+    /* IFDEF DEBUG|PROD */
+    runCheckUpdate()
+    /* ENDIF */
   })
 
+  // TODO: ADD SUPPORT FOR BROWSER
+  /* IFDEF DEBUG|PROD */
   function LoadConfig() {
-    if (!window.api) return
-    const loadedConnfig = getConfig()
+    let loadedConnfig = getConfig()
+
+    if (loadedConnfig.animulist.historyConvert) {
+      convertHistoryToAnimuList()
+      loadedConnfig = updateObjectConfig("animulist.historyConvert", false, loadedConnfig)
+      saveConfig(loadedConnfig)
+    }
 
     // Loading theme
     const loadedTheme = getGlobalCache().loadedTheme
@@ -186,10 +285,10 @@ function App() {
     if (!loadedConnfig.backup.enable) return
     if (!checkDate(loadedConnfig.backup.lastCheck, loadedConnfig.backup.check)) return
     CreateBackup()
-    saveConfig(updateObjectConfig("backup.lastCheck", new Date().getTime(), loadedConnfig))
+    saveConfig(updateObjectConfig("backup.lastCheck", dateToUnix(new Date().toString()), loadedConnfig))
     window.backend.refresh()
   }
-
+  /* ENDIF */
 
   return (
     <Switch>
@@ -228,14 +327,14 @@ async function checkPluginUpdate() {
   } catch (error) { console.warn("Error failed parsed pluginRepo Database", error) }
 
   if (config.plugins.pluginCheckType == "On Start" || tmpDatabase.length <= 0 || config.plugins.lastTimeCheck <= 0) return await fetchPluginRepos()
-  if (checkDate(config.plugins.lastTimeCheck, config.plugins.pluginCheckType as any)) await fetchPluginRepos()
+  if (checkDate(config.plugins.lastTimeCheck, config.plugins.pluginCheckType)) await fetchPluginRepos()
   else { setPluginRepo(tmpDatabase) }
 }
 
 async function runCheckUpdate() {
   let config = getConfig()
   if (config.update.type == "On Start") await checkUpdate()
-  if (checkDate(config.update.lastTime, config.update.type as any)) await checkUpdate()
+  if (checkDate(config.update.lastTime, config.update.type)) await checkUpdate()
 }
 
 export default App

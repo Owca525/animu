@@ -1,7 +1,7 @@
 .player-video-container {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
   display: flex;
   justify-content: center;
@@ -94,10 +94,7 @@
 .video-center {
   display: flex;
   justify-content: center;
-  position: fixed;
   width: 100%;
-  top: 50%;
-  translate: 0px -50%;
   height: fit-content;
   min-height: 100px;
 }
@@ -201,7 +198,7 @@
   flex-direction: column;
   align-items: start;
   gap: 1em;
-  cursor:auto;
+  cursor: auto;
 }
 
 .player-up-Next-Anime.old,
@@ -402,9 +399,7 @@
 }
 
 .player-buffering-animation {
-  position: absolute !important;
-  top: 0px;
-
+  z-index: 1;
 }
 
 .player-select-episode-void {
@@ -516,6 +511,7 @@
   transform: translateX(-400px);
   transition: 250ms ease-out;
 }
+
 .player-skip-chapters-button.show {
   transform: translateX(0px);
 }
@@ -572,6 +568,91 @@
 .player-screenshot-image {
   height: 58px;
   border-radius: 8px 0px 0px 8px;
+}
+
+.player-more-information-container {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  text-align: end;
+  position: absolute;
+  gap: 16px;
+  padding: 2.2em 3em;
+}
+
+.player-more-information-background {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  text-align: end;
+  position: absolute;
+  justify-content: center;
+  background-color: color-mix(in srgb, var(--black) 88%, transparent);
+
+  height: 100vh;
+  width: 100vw;
+  z-index: 2;
+}
+
+.player-more-information-top-text {
+  color: var(--text-gray);
+}
+
+.player-more-information-title {
+  font-size: 1.4em;
+  font-weight: 800;
+}
+
+.player-more-information-format-container {
+  display: flex;
+  gap: 12px;
+  text-align: center;
+  color: var(--text-gray);
+}
+
+.player-more-information-format,
+.player-more-information-episode,
+.player-more-information-durration,
+.player-more-information-description,
+.player-more-information-season {
+  color: var(--text-gray);
+}
+
+.player-more-information-description {
+  width: clamp(500px, 50vw, 800px);
+  display: -webkit-box;
+  line-clamp: 5;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.player-more-information-genres-container {
+  display: flex;
+  gap: 12px;
+}
+
+.player-more-information-genres {
+  color: var(--text-gray);
+  border: 1px solid var(--text-gray);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8em;
+}
+
+.player-more-information-image {
+  width: 180px;
+  aspect-ratio: 2 / 3;
+  border-radius: 12px;
+}
+
+.player-more-information-durration {
+  display: flex;
+  margin-bottom: 10vh;
+}
+
+.miniplayer {
+  border-radius: 12px;
 }
 
 @media (max-width: 1000px) {

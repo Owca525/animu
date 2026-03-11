@@ -1,4 +1,4 @@
-import { getEpisodeDay, getGradientColor, getHistory } from '@renderer/utils/functions';
+import { detectTitleConfig, getEpisodeDay, getGradientColor, getHistory } from '@renderer/utils/functions';
 import { cardData, indentityPlayer } from '@renderer/utils/types';
 import "./css/bigcard.css"
 import Button from '@renderer/components/buttons';
@@ -7,6 +7,8 @@ import { Component, createSignal, For, Show } from 'solid-js';
 import { useI18n } from '@renderer/utils/i18n';
 import { pluginManager } from '@renderer/utils/stores/plugins';
 import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
+import { animulistData } from '@renderer/utils/stores/global';
+import { unwrap } from 'solid-js/store';
 
 type bigCardProps = { data: cardData, ref?: any }
 
@@ -24,7 +26,9 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
     }
 
     function openInformation() {
-        localStorage.setItem("informationCache", JSON.stringify({ anime: data.AnimeData }))
+        const animulist = unwrap(animulistData())
+        const tmp = animulist.find((v) => v.AnimeData.id == data.AnimeData.id)
+        localStorage.setItem("informationCache", JSON.stringify({ anime: data.AnimeData, animulist: tmp ? tmp.animulist : undefined }))
         navigate("/info");
     }
 
@@ -113,11 +117,11 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
                         </Show>
                     </div>
                     <div class="big-card-information-content">
-                        <div class="big-card-information-title">{data.AnimeData.title.romaji}</div>
+                        <div class="big-card-information-title">{detectTitleConfig(data.AnimeData.title)}</div>
                         <div class="big-card-information-genres-content">
                             <Show when={data.AnimeData.genres}>
                                 <For each={data.AnimeData.genres}>
-                                    {(value) => (<div class="big-card-information-genres">{t(`anime_genres.${value.toLowerCase().replaceAll(" ", "")}`)}</div>)}
+                                    {(value) => (<div class="big-card-information-genres">{t(`anime_genres.${value.toLowerCase().replaceAll(" ", "_")}`)}</div>)}
                                 </For>
                             </Show>
                         </div>

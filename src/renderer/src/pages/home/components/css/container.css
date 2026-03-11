@@ -46,6 +46,7 @@
     -webkit-overflow-scrolling: touch;
     padding: 4px 0px 3px 0px;
     width: 100%;
+    scrollbar-width: none;
 }
 
 .container-data-horizontal::-webkit-scrollbar {
