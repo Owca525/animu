@@ -559,7 +559,7 @@ function information() {
                                 }]
                             }}/> */}
 
-                            <Show when={tempData().anime.type == "ANIME"}>
+                            <Show when={tempData().anime.type == "ANIME" && tempData().anime.status != "NOT_YET_RELEASED"}>
                                 <div class="information-episodes">
                                     <div class="information-episodes-top-content">
                                         <div class="information-eopsodes-top-left">
