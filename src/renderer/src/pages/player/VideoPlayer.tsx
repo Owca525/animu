@@ -262,7 +262,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         });
     })
 
-    onCleanup(() => {
+    onCleanup(async () => {
+        if (document.pictureInPictureElement) await document.exitPictureInPicture();
+
         setCleanup(true)
         removeToast(currentExtractionRes().toast)
         if (hls()) hls()?.destroy()
@@ -276,12 +278,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             socket?.off("player:update")
         }
 
-        navigator.mediaSession.metadata = new MediaMetadata({
-            title: '',
-            artist: '',
-            album: '',
-            artwork: []
-        });
+        navigator.mediaSession.metadata = null
         const actions = [
             'play',
             'pause',
@@ -623,11 +620,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         handleVolume(volume())
     }
 
-    async function exitPlayer() {
-        if (document.pictureInPictureElement) await document.exitPictureInPicture();
-        exitFromPlayer()
-    }
-
     function saveContinueProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
         // Checking to save history
         if (isCleanup()) return
@@ -889,8 +881,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (type == 'prev') ep = ep - 1
         if (type == 'next') ep = ep + 1
         if (temp.episodes[ep].ep === undefined) return
-
-        if (document.pictureInPictureElement) await document.exitPictureInPicture();
         return setNextEpisode(temp.episodes[ep].ep)
     }
 
@@ -1011,7 +1001,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 enterFullscreen()
                 break
             case convertKeybinds(config.Player.keybinds.ExitPlayer.toLowerCase()).toLowerCase():
-                exitPlayer()
+                exitFromPlayer()
                 break
             case convertKeybinds(config.Player.keybinds.FrameSkipForward.toLowerCase()).toLowerCase():
                 setTimeVideo((time_now += 0.0416))
@@ -1328,7 +1318,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
             <div class="video-overlay">
                 <div class={checkUptoNext() ? isVisible() ? 'video-top' : 'video-top player-hidden' : 'video-top'}>
-                    <Button icon='arrow_back' ButtonClass='player-buttons' iconClassName="player-button-icons" onClick={async () => await exitPlayer()} />
+                    <Button icon='arrow_back' ButtonClass='player-buttons' iconClassName="player-button-icons" onClick={exitFromPlayer} />
                     <div class="player-title ">{detectTitle({ title: anime_data.AnimeData.title, ep: temp.episode, format: anime_data.AnimeData.format })}</div>
                 </div>
                 <div class="video-center"> {/* video-center-container */}

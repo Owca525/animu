@@ -230,7 +230,9 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
         });
     })
 
-    onCleanup(() => {
+    onCleanup(async () => {
+        if (document.pictureInPictureElement) await document.exitPictureInPicture();
+
         setCleanup(true)
         removeToast(currentExtractionRes().toast)
         if (hls()) hls()?.destroy()
@@ -243,27 +245,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
             const socket = getSocket()
             socket?.off("player:update")
         }
-
-        navigator.mediaSession.metadata = new MediaMetadata({
-            title: '',
-            artist: '',
-            album: '',
-            artwork: []
-        });
-        const actions = [
-            'play',
-            'pause',
-            'stop',
-            'previoustrack',
-            'nexttrack',
-            'seekbackward',
-            'seekforward',
-            'seekto'
-        ];
-
-        actions.forEach(action => {
-            navigator.mediaSession.setActionHandler(action as any, null);
-        });
     })
 
     // player Functions
