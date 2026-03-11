@@ -346,9 +346,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
             setFatalError(() => true)
             return
         }
-        setPlayer(() => currentplayer)
 
-        const time = videoRef.currentTime
         if (currentplayer.subtitles) setListSubtitles(() => [{ url: "", format: "", lang: "", label: t("player.other.off") }, ...currentplayer.subtitles as playerSubtitlesFormat[]])
         if (currentplayer.storyboardVTT) setThumbnail(await VTTstoryBoardParser(currentplayer.storyboardVTT))
         const currentRes = currentplayer.resolution[0]
@@ -367,8 +365,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
         setListResolution(() => currentplayer.resolution)
         setCurrentResoltion(currentRes)
         try {
-            await shakaPlayer.load(currentRes.url)
-            setTimeVideo(time)
+            await shakaPlayer.load(currentRes.url, 0)
         } catch (error) { shakaPlayerErrorParser(error) }
     }
 
