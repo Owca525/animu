@@ -29,7 +29,7 @@ const player = () => {
             description: t("player.errors.missing"),
             buttons: [{
                 title: t("dialog.return"),
-                onClick: () => navigate("/")
+                onClick: () => leave()
             }]
         })
         return
@@ -117,7 +117,7 @@ const player = () => {
             buttons: [
                 {
                     title: t("dialog.return"),
-                    onClick: () => navigate("/")
+                    onClick: () => leave()
                 },
                 {
                     title: t("dialog.retry"),
@@ -131,12 +131,11 @@ const player = () => {
     async function leave() {
         if (window.api) window.BrowserWindow.setFullscreen(false)
         else document.exitFullscreen()
+    
         closeDialog()
+
         if (!anime_data) return
-        if (anime_data.continewatch) {
-            navigate("/")
-            return
-        }
+        if (anime_data.continewatch) return navigate("/")
         if (config.Player.general.PlayerBehavior === "home") navigate("/")
         else {
             localStorage.setItem("informationCache", JSON.stringify({ anime: anime_data.data, saveData: anime_data.save }))
