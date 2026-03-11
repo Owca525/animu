@@ -225,11 +225,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
         handleVolume(config.Player.general.Volume, true)
         handleMouseMove()
 
-        if (config.Player.general.AutoFullscreen) {
-            toggleFullscreen(true)
-            setIsFullscreen(true)
-        }
-
         document.querySelectorAll('*').forEach((element: any) => {
             element.tabIndex = -1
         });
