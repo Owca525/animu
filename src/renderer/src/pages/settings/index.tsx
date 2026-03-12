@@ -903,6 +903,16 @@ function settings() {
                                 }
                             />
                         </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {"Play Opening In Information"}
+                            <CheckBox
+                                checked={config().new.information.openingininformation}
+                                onChecked={(checked) =>
+                                    handleChange('information.openingininformation', checked)
+                                }
+                            />
+                        </div>
                         {/* <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             <span class="settings-helpicon-space">
