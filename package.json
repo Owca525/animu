@@ -1,6 +1,6 @@
 {
   "name": "animu",
-  "version": "0.7.12",
+  "version": "0.8.0",
   "description": "Simple Application To Watch Anime",
   "main": "./out/main/index.js",
   "author": "Owca525",
@@ -57,10 +57,10 @@
     "@types/cheerio": "^1.0.0",
     "@types/crypto-js": "^4.2.2",
     "@types/ini": "^4.1.1",
-    "@types/node": "^25.4.0",
+    "@types/node": "^25.5.0",
     "@types/semver": "^7.7.1",
     "bufferutil": "^4.1.0",
-    "electron": "^41.0.0",
+    "electron": "^41.0.1",
     "electron-builder": "^26.8.1",
     "electron-vite": "^5.0.0",
     "eslint": "^10.0.3",
@@ -69,7 +69,7 @@
     "solid-js": "^1.9.11",
     "typescript": "^5.8.3",
     "utf-8-validate": "^6.0.6",
-    "vite": "^7.3.1",
+    "vite": "^8.0.0",
     "vite-plugin-solid": "^2.11.6",
     "vite-plugin-static-copy": "^3.2.0"
   }
