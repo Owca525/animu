@@ -928,7 +928,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
 
             <div class="video-overlay">
                 <div class={isVisible() ? 'video-top' : 'video-top player-hidden'}>
-                    <div class="player-title ">{currentPlayer()?.hostname}</div>
+                    <div class="player-title ">{currentPlayer()?.title}</div>
                 </div>
                 <div class="video-center"> {/* video-center-container */}
                     <Show when={!config.Player.ui.DisableSkipAnimation}>
