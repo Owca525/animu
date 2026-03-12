@@ -38,6 +38,7 @@ export default function OpeningPlayer(props: { music: animeOpeningsFormat }) {
         }
     })
 
+    // TODO: improve this
     return (
         <main class="main-opening-player-container">
             <div class="opening-player-text">
