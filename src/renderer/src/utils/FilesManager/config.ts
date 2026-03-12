@@ -142,6 +142,9 @@ export const defaultConfigWeb: SettingsConfig = {
         titleFormat: "ROMAJI",
         adultdefault: false,
         maxpagesize: 20
+    },
+    information: {
+        openingininformation: false
     }
 };
 /* ENDIF */

@@ -16,6 +16,9 @@ export interface SettingsConfig {
         adultdefault: boolean
         maxpagesize: number
     }
+    information: {
+        openingininformation: boolean
+    },
     plugins: {
         // information: string
         hiddenPlugins: string[]
@@ -327,6 +330,9 @@ export const defaultConfig: SettingsConfig = {
         titleFormat: "ROMAJI",
         adultdefault: false,
         maxpagesize: 20
+    },
+    information: {
+        openingininformation: false
     }
 };
 

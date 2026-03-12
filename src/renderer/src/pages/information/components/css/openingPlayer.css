@@ -1,0 +1,41 @@
+.main-opening-player-container {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 250px;
+  height: 40px;
+  background-color: var(--five-layer);
+  margin: 12px;
+
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-radius: 12px;
+  justify-content: space-between;
+}
+
+.opening-player-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.opening-player-name {
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.opening-player-artist {
+    font-size: .9em;
+    color: var(--text-gray);
+}
+
+.opening-player-button-play {
+    user-select: none;
+    cursor: pointer;
+    font-size: 2.5em !important;
+}
+
+.opening-player-controls {
+    display: flex;
+    align-items: center;
+}

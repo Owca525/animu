@@ -49,11 +49,14 @@ import MiniPlayer, { MiniPlayerProps } from '@renderer/components/miniPlayer';
 import { requestAnimeMedia } from '@renderer/utils/animeThemes';
 import { updateHistoryData } from '@renderer/utils/FilesManager/history';
 import { addToAnimuList, removeFromAnimulist, updateDataInAnimulist } from '@renderer/utils/FilesManager/animulist';
+import OpeningPlayer from './components/openingPlayer';
 
 function information() {
     const { t } = useI18n()
     const navigate = useNavigate();
     let descriptionRef: HTMLDivElement | undefined
+
+    const config = unwrap(getConfig())
 
     const [tempData, setTmpData] = createSignal<{ anime: AnimeData, saveData?: indentityPlayer, animulist?: animulistProps }>(JSON.parse(localStorage.getItem("informationCache") as string) as any)
     const [currentIDplayer, setCurrentId] = createSignal<string | undefined>(tempData().anime.player_ID)
@@ -70,6 +73,7 @@ function information() {
     // Openings / Endings
     const [animeMedia, setAnimeMedia] = createSignal<animeOpeningsFormat[]>([])
     const [currentMedia, setCurrentAnimeMedia] = createSignal<MiniPlayerProps[] | undefined>(undefined)
+    const [currentAudio, setCurrentAudio] = createSignal<animeOpeningsFormat | undefined>(undefined)
 
     // Banner
     const [isBannerLoading, setBannerLoadingData] = createSignal<boolean>(true)
@@ -155,6 +159,8 @@ function information() {
     function initialInformation() {
         changeTitleAnimu(`Animu - ${detectTitleConfig(tempData().anime.title)}`)
         generateAnimeForContextMenu()
+        
+        if (config.information.openingininformation) searchAnimeOpenings()
 
         checkAnimeFetching()
 
@@ -278,6 +284,8 @@ function information() {
         if (animeMedia().length > 0) return
         SetShowLoadingInEpisodes(true)
         setAnimeMedia(await requestAnimeMedia(parseInt(tempData().anime.id)))
+
+        setCurrentAudio(unwrap(animeMedia())[0])
 
         setCurrentAnimeMedia(unwrap(animeMedia()).map((item) => {
             const firstPartTitle = item.type == "OP" ? "Opening" : "Ending"
@@ -694,6 +702,10 @@ function information() {
                     files={[tempData().anime.coverImage as string, tempData().anime.bannerImage as string].filter((value) => value != null)}
                     disable={() => setShowImages(false)}
                 />
+            </Show>
+
+            <Show when={currentAudio() && config.information.openingininformation}>
+                <OpeningPlayer music={currentAudio()!}/>
             </Show>
         </>
     )

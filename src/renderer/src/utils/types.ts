@@ -334,6 +334,9 @@ export interface SettingsConfig {
             Zoom: number
         }
     }
+    information: {
+        openingininformation: boolean
+    },
     Player: {
         general: {
             Autoplay: boolean
@@ -476,9 +479,11 @@ export interface animeOpeningsFormat {
     type: "OP" | "EN" | "IN"
     musicTitle: string,
     variant?: string
+    artist: string
     videos: {
         filename: string,
         url: string,
         resolution: number
+        audio?: string
     }[]
 }
