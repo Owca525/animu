@@ -457,7 +457,7 @@ export async function request(url: string, options?: { method?: "POST" | "GET", 
     }
 }
 
-export async function SaveToClipboard(type: "text" | "image", content: string) {    
+export async function SaveToClipboard(type: "text" | "image", content: string) {
     /* IFDEF WEB */
     if (type == "image") {
         const blob = await (await fetch(content)).blob()
@@ -789,26 +789,27 @@ export function searchDataInCards(cards: cardData[], search: string, params: Fil
     if (params["format"]) results = results.filter((val) => new String(val.AnimeData.format) == params["format"])
     if (params["airing"]) results = results.filter((val) => new String(val.AnimeData.status) == params["airing"])
     if (params["genres"]) results = results.filter((val) => [...new Set(val.AnimeData.genres)].includes(params["genres"]))
-    
+
     return results.filter(
         (item, index, self) =>
             index === self.findIndex(t => t.AnimeData.id === item.AnimeData.id)
     )
 }
 
-export function calculateDays(unix1: number, unix2: number): number {
-  const date1 = new Date(unix1 * 1000);
-  const date2 = new Date(unix2 * 1000);
+export function calculateDays(unix1?: number, unix2?: number): number {
+    if (!unix1 || !unix2) return 0
+    const date1 = new Date(unix1 * 1000);
+    const date2 = new Date(unix2 * 1000);
 
-  date1.setHours(0, 0, 0, 0);
-  date2.setHours(0, 0, 0, 0);
+    date1.setHours(0, 0, 0, 0);
+    date2.setHours(0, 0, 0, 0);
 
-  return -((date2.getTime() - date1.getTime()) / 86400000);
+    return -((date2.getTime() - date1.getTime()) / 86400000);
 }
 
 export function convertSecondsToHoursFormat(seconds: number): string {
-  if (seconds < 0) seconds = 0;
-  return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
+    if (seconds < 0) seconds = 0;
+    return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
 }
 
 export function detectTitleConfig(titles: AnimeData["title"]): string {

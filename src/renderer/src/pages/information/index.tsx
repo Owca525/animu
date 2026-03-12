@@ -14,6 +14,7 @@ import {
     detectTitleConfig,
     getGradientColor,
     openUrlFolder,
+    refetchHistory,
     SaveToClipboard,
     segregatePlugins,
     unixToDateTime,
@@ -51,6 +52,12 @@ import { updateHistoryData } from '@renderer/utils/FilesManager/history';
 import { addToAnimuList, removeFromAnimulist, updateDataInAnimulist } from '@renderer/utils/FilesManager/animulist';
 import OpeningPlayer from './components/openingPlayer';
 
+interface informationTmpProps { 
+    anime: AnimeData, 
+    saveData?: indentityPlayer, 
+    animulist?: animulistProps 
+}
+
 function information() {
     const { t } = useI18n()
     const navigate = useNavigate();
@@ -58,7 +65,7 @@ function information() {
 
     const config = unwrap(getConfig())
 
-    const [tempData, setTmpData] = createSignal<{ anime: AnimeData, saveData?: indentityPlayer, animulist?: animulistProps }>(JSON.parse(localStorage.getItem("informationCache") as string) as any)
+    const [tempData, setTmpData] = createSignal<informationTmpProps>(JSON.parse(localStorage.getItem("informationCache") as string) as any)
     const [currentIDplayer, setCurrentId] = createSignal<string | undefined>(tempData().anime.player_ID)
 
     const [showWrong, setshowWrong] = createSignal<boolean>(false)
@@ -126,34 +133,43 @@ function information() {
         ])
     }
 
-    function checkAnimeFetching() {
-        const stopRequestEveryTime = false // TODO: ADD NEW SETTINGS
+    async function checkAnimeFetching() {
+        const alwaysRequest = false // TODO: ADD NEW SETTINGS
+
         if (!tempData().saveData) return
-        const tmpsave = unwrap(tempData().saveData)
-        if (tempData().anime.status == "RELEASING") {
-            setTmpData({
-                ...unwrap(tempData()),
-                saveData: {
-                    ...tmpsave,
-                    lastAnimeDataUpdate: dateToUnix(new Date().toString())
-                }
-            } as any)
-            return FetchAnimeForinformation()
-        }
-        if (stopRequestEveryTime) return
 
         const lastTime = tempData().saveData?.lastAnimeDataUpdate
-        setTmpData({
-            ...unwrap(tempData()),
-            saveData: {
-                ...tmpsave,
-                lastAnimeDataUpdate: dateToUnix(new Date().toString())
+
+        if (tempData().anime.status == "RELEASING" || !lastTime || calculateDays(lastTime, dateToUnix(new Date().toString())) >= 1 || alwaysRequest) {
+            await FetchAnimeForinformation()
+            const tmpData = unwrap(tempData())
+            const tmpUpdate = {
+                ...unwrap(tempData()),
+                saveData: {
+                    ...unwrap(tempData().saveData),
+                    lastAnimeDataUpdate: dateToUnix(new Date().toString())
+                } as indentityPlayer
             }
-        } as any)
-        if (stopRequestEveryTime && !lastTime || calculateDays(lastTime as number, dateToUnix(new Date().toString())) >= 1) {
-            return FetchAnimeForinformation()
+
+            updateHistoryData(tmpData.anime.id, {
+                AnimeData: {
+                    ...tmpData.anime,
+                    recommendations: undefined
+                },
+                saveData: tmpUpdate.saveData
+            })
+
+            localStorage.setItem("informationCache", JSON.stringify({
+                ...unwrap(tempData()),
+                anime: {
+                    ...tmpData.anime,
+                    recommendations: undefined
+                },
+                saveData: tmpUpdate.saveData
+            }))
+
+            await refetchHistory()
         }
-        return FetchAnimeForinformation()
     }
 
     function initialInformation() {
