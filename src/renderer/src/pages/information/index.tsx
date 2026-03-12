@@ -350,24 +350,22 @@ function information() {
             console.log(response)
             if (!response["url"]) {
                 setContentLoading(false)
-                setContentNoData("Video Not Found")
                 return
             }
 
             let chapters: playerChapterList[] = []
             if (response["chapters"]) chapters = response["chapters"].map((item) => (
-                { 
+                {
                     start: item["start_time"],
                     end: item["end_time"],
                     type: "other",
                     name: item["title"]
                 }))
-            
+
             let subtitles: playerSubtitlesFormat[] = []
             if (response["automatic_captions"]) {
                 for (const key in response["automatic_captions"]) {
                     const value = response["automatic_captions"][key as keyof typeof response["automatic_captions"]];
-                    console.log(key, value);
                     const subFinded = value.find((item) => item["ext"] == "vtt")
                     if (!subFinded) continue
                     subtitles.push({
@@ -387,7 +385,7 @@ function information() {
                 resolution: [{
                     res: response["height"].toString(),
                     url: response["url"],
-                    reqHeader: response["http_headers"] 
+                    reqHeader: response["http_headers"]
                 }]
             }])
             setContentLoading(false)
@@ -473,15 +471,15 @@ function information() {
             onClick: () => { SetactivePage("Opening/Ending"); searchAnimeOpenings() }
         }]
 
-        /* IFDEF DEBUG|PROD */
         if (tempData().anime.trailer) tmp.push({
             value: 'Trailer',
             onClick: () => {
+                /* IFDEF DEBUG|PROD */
                 getAnimeTrailer(`https://www.youtube.com/watch?v=${tempData().anime.trailer?.id}`)
+                /* ENDIF */
                 SetactivePage("Trailer")
             }
         })
-        /* ENDIF */
 
         return tmp
     }
@@ -537,9 +535,9 @@ function information() {
                         </div>
                         <div class="information-bar">
                             <Button titleButton={t("information.bar.anilist")} icon="open_in_new" ButtonClass="information-bar-icon" onClick={() => openUrlFolder(`https://anilist.co/anime/${tempData().anime.id}`)} />
-                            <Show when={tempData().anime.trailer && !window.api}>
+                            {/* <Show when={tempData().anime.trailer && !window.api}>
                                 <Button titleButton={t("information.bar.trailer")} icon="theaters" ButtonClass="information-bar-icon" onClick={() => openUrlFolder(`https://www.youtube.com/watch?v=${tempData().anime.trailer?.id}`)} />
-                            </Show>
+                            </Show> */}
                             <Show when={tempData().anime.type == "ANIME"}>
                                 <Switch>
                                     <Match when={tempData().animulist == undefined}>
@@ -697,8 +695,21 @@ function information() {
                                             <Match when={isContentNoData()}>
                                                 <div class="information-loading-container"><span class="information-error material-symbols-outlined">search_off</span>{t(isContentNoData()!)}</div>
                                             </Match>
-                                            <Match when={contentyt_dlp() && activePage() == "Trailer"}>
-                                                <MiniPlayer props={unwrap(contentyt_dlp()!)} />
+                                            <Match when={activePage() == "Trailer"}>
+                                                <Switch>
+                                                    <Match when={contentyt_dlp().length > 0}>
+                                                        <MiniPlayer props={unwrap(contentyt_dlp()!)} />
+                                                    </Match>
+                                                    <Match when={contentyt_dlp()}>
+                                                        <iframe
+                                                            height="610px"
+                                                            class='information-iframe'
+                                                            src={`https://www.youtube.com/embed/${unwrap(tempData()).anime.trailer?.id}`}
+                                                            frameborder="0"
+                                                            allowfullscreen
+                                                        ></iframe>
+                                                    </Match>
+                                                </Switch>
                                             </Match>
                                             <Match when={activePage() == "Opening/Ending"}>
                                                 <Show when={currentMedia()}>

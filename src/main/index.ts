@@ -19,6 +19,7 @@ import { cardData, defaultConfig, SettingsConfig } from './types';
 import { deepMerge, detectZoom, runCheckYT_DLP, setupDiscordRPC } from './utils';
 import { electronAppUniversalProtocolClient } from 'electron-app-universal-protocol-client';
 import { checkDatabase } from './animulist';
+import { ElectronBlocker } from "@ghostery/adblocker-electron";
 
 export let mainWindow: BrowserWindow | undefined
 export const newConfigPath = path.join(app.getPath("userData"), "animuConfig")
@@ -38,6 +39,7 @@ crashReporter.start({
 
 function createWindow(): void {
   let title = 'Animu '
+  runAdblocker()
 
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -252,6 +254,11 @@ export async function initialBackend() {
   }
 }
 
+async function runAdblocker() {
+  const blocker = await ElectronBlocker.fromPrebuiltAdsAndTracking(fetch);
+  blocker.enableBlockingInSession(session.defaultSession);
+}
+
 app.on('render-process-gone', (_event, _webContents, details) => {
   console.error('RENDERER CRASH', details)
 })
@@ -267,4 +274,3 @@ ipcMain.handle('refreshBackend', () => initialBackend());
 
 ipcMain.handle('getConfig', () => config);
 ipcMain.handle('getHistory', () => historyData);
-

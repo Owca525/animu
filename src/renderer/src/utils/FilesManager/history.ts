@@ -63,7 +63,6 @@ export async function updateHistoryData(id: string, data: cardData): Promise<boo
                 },
             }
         });
-        console.log(historyCache, data)
 
         /* IFDEF DEBUG|PROD */
         await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(historyCache as any)))
