@@ -14,7 +14,7 @@ import {
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { getGlobalCache, setActiveThemes, setGlobalToken } from './stores/global';
+import { ActiveService, getGlobalCache, getServices, setActiveThemes, setGlobalToken } from './stores/global';
 import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
@@ -823,4 +823,23 @@ export function detectTitleConfig(titles: AnimeData["title"]): string {
         console.error("detectTitleConfig Error", error)
         return Object.values(titles)[0]
     }
+}
+
+export function timeCovertToMs(time: { day?: number, month?: number, min?: number, hour?: number }) {
+    if (time["day"]) return time["day"] * 86400000
+    if (time["month"]) return time["month"] * 2678400000
+    if (time["min"]) return time["min"] * 60000
+    if (time["hour"]) return time["hour"] * 3600000
+    return 0
+}
+
+export function runService(func: () => Promise<any>, time: number, name: string) {
+    const interval = setInterval(func, time)
+    const tmp = {
+        name: name, 
+        interval: interval,
+        uuid: uuidv4()
+    }
+    let services = unwrap(getServices()).filter((v) => v.name != name)
+    ActiveService([...services, tmp])
 }

@@ -119,6 +119,7 @@ export interface globalDataFormat {
     loadedTheme: themeMetadata[],
     activeThemes: Map<number, themeMetadata>
     token: UUIDTypes | undefined,
+    service: serviceFormat[]
     socket?: {
         instance: Socket,
         currentRoom: string,
@@ -487,4 +488,10 @@ export interface animeOpeningsFormat {
         resolution: number
         audio?: string
     }[]
+}
+
+export interface serviceFormat {
+    name: string
+    interval?: NodeJS.Timeout,
+    uuid: string
 }

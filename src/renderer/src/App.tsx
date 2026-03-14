@@ -11,6 +11,8 @@ import {
   dateToUnix,
   detectPluginVersion,
   fetchPluginRepos,
+  runService,
+  timeCovertToMs,
   updateObjectConfig
 } from './utils/functions';
 import { checkUpdate } from './utils/update';
@@ -131,6 +133,7 @@ function App() {
     await pluginManager().initialPlugins()
 
     setInitation(false)
+    initialServices()
 
     detectPluginVersion();
 
@@ -335,6 +338,17 @@ async function runCheckUpdate() {
   let config = getConfig()
   if (config.update.type == "On Start") await checkUpdate()
   if (checkDate(config.update.lastTime, config.update.type)) await checkUpdate()
+}
+
+function initialServices() {
+  const config = getConfig()
+
+  /* IFDEF DEBUG|PROD */
+  if (config.update.type == "On Start") runService(checkUpdate, timeCovertToMs({ min: 30 }), "Animu Update")
+  /* ENDIF */
+
+  // TODO: Improve plugins update
+  runService(checkPluginUpdate, timeCovertToMs({ min: 30 }), "Plugin CheckUpdate")
 }
 
 export default App

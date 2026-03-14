@@ -1,5 +1,5 @@
 import { UUIDTypes } from "uuid";
-import { cardData, globalDataFormat, themeMetadata } from "../types";
+import { cardData, globalDataFormat, serviceFormat, themeMetadata } from "../types";
 import { createStore } from "solid-js/store";
 import { Socket } from "socket.io-client";
 
@@ -11,7 +11,8 @@ export const [globalState, setGlobalState] = createStore({
     activeThemes: new Map(),
     token: undefined,
     animuList: [],
-    socket: undefined
+    socket: undefined,
+    service: []
 } as globalDataFormat);
 
 export const getGlobalCache = () => globalState;
@@ -20,6 +21,7 @@ export const activeThemes = () => globalState.activeThemes;
 export const animulistData = () => globalState.animuList;
 export const getSocket = () => globalState.socket?.instance;
 export const getSocketRoom = () => globalState.socket?.currentRoom;
+export const getServices = () => globalState.service;
 export const setSocket = (tmp: Socket) => setGlobalState((prev) => ({...prev, socket: { ...prev.socket as any, instance: tmp }}));
 export const setSocketRoom = (tmp: string) => setGlobalState((prev) => ({...prev, socket: { ...prev.socket as any, currentRoom: tmp }}));
 export const setActiveThemes = (tmp: Map<number, themeMetadata>) => setGlobalState((prev) => ({...prev, activeThemes: tmp}));
@@ -29,4 +31,15 @@ export const setDeeplinkRunned = (tmp: boolean) => setGlobalState((prev) => ({..
 export const setGlobalHistory = (tmp: cardData[]) => setGlobalState((prev) => ({...prev, history: [...tmp]}));
 export const setGlobalToken = (tmp: UUIDTypes | undefined) => setGlobalState((prev) => ({...prev, token: tmp}));
 export const setAnimulistData = (tmp: globalDataFormat["animuList"]) => setGlobalState((prev) => ({...prev, animuList: tmp}));
+export const ActiveService = (tmp: serviceFormat[]) => setGlobalState((prev) => ({...prev, service: tmp}));
+export const DisableService = (tmp: serviceFormat) => setGlobalState((prev) => ({
+    ...prev, 
+    service: prev.service.map((v) => {
+        if (v.uuid == tmp.uuid) {
+            clearInterval(v.interval)
+            return { ...v, interval: undefined }
+        }
+        return v
+    }).filter((val) => val.uuid != tmp.uuid)
+}));
 
