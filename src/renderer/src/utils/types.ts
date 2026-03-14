@@ -332,6 +332,7 @@ export interface SettingsConfig {
             AutoMaximize: boolean
             AutoFullscreen: boolean
             Zoom: number
+            trayIconClose: boolean
         }
     }
     information: {

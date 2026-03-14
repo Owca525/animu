@@ -34,7 +34,13 @@ crashReporter.start({
   productName: "animu",
   compress: true,
   uploadToServer: false
-})
+}) 
+
+function changeURL(path: string) {
+  if (!mainWindow) return
+  const tmp = mainWindow.webContents.getURL().split("#")
+  mainWindow.loadURL(`${tmp[0]}#${path}`)
+}
 
 function createWindow(): void {
   let title = 'Animu '
@@ -110,10 +116,17 @@ function createWindow(): void {
     },
     { type: 'separator' },
     {
+      label: 'Watch Last Anime',
+      click: () => changeURL("/player")
+    },
+    {
+      label: 'Settings',
+      click: () => changeURL("/settings")
+    },
+    { type: 'separator' },
+    {
       label: 'Exit Animu',
-      click: () => {
-        app.quit()
-      }
+      click: app.quit
     }
   ])
 
@@ -125,11 +138,12 @@ function createWindow(): void {
     mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show()
   })
 
-  // mainWindow.on('close', (e) => {
-  //   if (!mainWindow) return
-  //   e.preventDefault()
-  //   mainWindow.hide()
-  // })
+  mainWindow.on('close', (e) => {
+    if (config.General.Window.trayIconClose) return
+    if (!mainWindow) return
+    e.preventDefault()
+    mainWindow.hide()
+  })
 
   Menu.setApplicationMenu(null);
 

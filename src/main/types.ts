@@ -38,6 +38,7 @@ export interface SettingsConfig {
             AutoMaximize: boolean
             AutoFullscreen: boolean
             Zoom: number
+            trayIconClose: boolean
         }
     }
     Player: {
@@ -219,6 +220,7 @@ export const defaultConfig: SettingsConfig = {
             AutoMaximize: false,
             AutoFullscreen: false,
             Zoom: 100,
+            trayIconClose: false
         },
         discordRPC: true
     },

@@ -32,6 +32,7 @@ export const defaultConfigWeb: SettingsConfig = {
             AutoMaximize: false,
             AutoFullscreen: false,
             Zoom: 100,
+            trayIconClose: false
         },
         discordRPC: true
     },

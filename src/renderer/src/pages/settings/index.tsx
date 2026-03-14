@@ -752,6 +752,16 @@ function settings() {
                         <div class="settings-page-title">{t("settings.general.window")}</div>
                         <Show when={window.api}>
                             <div class="settings-setting-container">
+                                {t("Close Animu On Exit Button")} 
+                                <CheckBox
+                                    checked={config().new.General.Window.trayIconClose}
+                                    onChecked={(checked) =>
+                                        handleChange('General.Window.trayIconClose', checked)
+                                    }
+                                />
+                            </div>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
                                 <span class="settings-helpicon-space">{t("settings.general.maximize")}<HelpIcon description={t("settings.tips.automaximize")} /></span>
                                 <CheckBox
                                     checked={config().new.General.Window.AutoMaximize}
