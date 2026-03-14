@@ -62,6 +62,7 @@ function information() {
     const { t } = useI18n()
     const navigate = useNavigate();
     let descriptionRef: HTMLDivElement | undefined
+    let animeEpisodeReleasingTime: NodeJS.Timeout | undefined
 
     const config = unwrap(getConfig())
 
@@ -117,17 +118,24 @@ function information() {
         disable: true,
     })
 
-    const intervalId = setInterval(() => {
-        setSecondsLeft(prev => {
-            if (!prev) return undefined
-            if (prev.left <= 1) {
-                clearInterval(intervalId);
-                if (tempData().anime.status == "RELEASING") FetchAnimeForinformation()
-                return { left: 0, converted: convertSeconds(0) };
-            }
-            return { left: prev.left - 1, converted: convertSeconds(prev.left - 1) };
-        });
-    }, 1000);
+    function checkIsAnimeReleasing() {
+        if (tempData().anime.status != "RELEASING") return
+        if (animeEpisodeReleasingTime) clearInterval(animeEpisodeReleasingTime)
+        
+        animeEpisodeReleasingTime = setInterval(() => {
+            setSecondsLeft(prev => {
+                if (!prev) return undefined
+                if (prev.left <= 1) {
+                    clearInterval(animeEpisodeReleasingTime);
+                    if (tempData().anime.status == "RELEASING") FetchAnimeForinformation()
+                    return { left: 0, converted: convertSeconds(0) };
+                }
+                return { left: prev.left - 1, converted: convertSeconds(prev.left - 1) };
+            });
+        }, 1000);
+    }
+
+    checkIsAnimeReleasing()
 
     function generateAnimeForContextMenu() {
         const config = unwrap(getConfig())
@@ -221,7 +229,7 @@ function information() {
     onMount(() => { initialInformation() })
 
     onCleanup(() => {
-        clearInterval(intervalId)
+        clearInterval(animeEpisodeReleasingTime)
         setTmpData(undefined as any)
     })
 
@@ -259,10 +267,7 @@ function information() {
 
         setTmpData((prev) => ({ ...prev, anime: tmpnewFetch }))
         updateHistoryData(tempData().anime.id, { AnimeData: tmpnewFetch, saveData: unwrap(tempData().saveData) })
-        if (tempData().anime.nextAiringEpisode?.timeUntilAiring) setSecondsLeft({
-            left: tempData().anime.nextAiringEpisode!.timeUntilAiring,
-            converted: convertSeconds(tempData().anime.nextAiringEpisode!.timeUntilAiring)
-        })
+        checkIsAnimeReleasing()
     }
 
     async function ChangeAnimeInInformation(data: AnimeData): Promise<any> {
@@ -575,7 +580,7 @@ function information() {
                                         <span class='material-symbols-outlined loading-animation icon'>progress_activity</span>
                                     </div>
                                 </Match>
-                                <Match when={tempData().anime.nextAiringEpisode && tempData().anime.player_ID === undefined && secondsLeft() != undefined && secondsLeft()!.left > 0 && !fetchingAnime()}>
+                                <Match when={tempData().anime.nextAiringEpisode && secondsLeft() != undefined && secondsLeft()!.left > 0 && !fetchingAnime()}>
                                     <div class="information-info-content">
                                         <div class="information-content-title">
                                             {t("information.airing")}: {tempData().anime.nextAiringEpisode?.episode}
