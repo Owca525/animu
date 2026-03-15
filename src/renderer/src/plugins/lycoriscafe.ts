@@ -1,8 +1,16 @@
-import { makeSmallText, request, timeToSeconds } from "@renderer/utils/functions";
+import { makeSmallText, request } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat } from "@renderer/utils/types";
 const WEB = "https://www.lycoris.cafe"
 const HEADER = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0'
+}
+
+function timeToSeconds(time: string): number {
+    const [hms] = time.split(".");
+    const parts = hms.split(":").map(Number);
+    const [hours, minutes, seconds] = parts;
+
+    return hours * 3600 + minutes * 60 + seconds;
 }
 
 function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string | undefined {
@@ -111,7 +119,7 @@ async function requestToApi(anime_id: string): Promise<{ data: any } | undefined
 
 export default class LycorisCafe implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.3",
+        version: "1.4",
         name: "Lycoris.cafe",
         author: "Owca525",
         icon: "https://www.lycoris.cafe/favicon.ico",
