@@ -126,7 +126,7 @@ function createWindow(): void {
     { type: 'separator' },
     {
       label: 'Exit Animu',
-      click: app.quit
+      click: () => app.quit()
     }
   ])
 
