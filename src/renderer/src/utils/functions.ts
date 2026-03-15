@@ -15,7 +15,7 @@ import {
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { ActiveService, getGlobalCache, getServices, setActiveThemes, setGlobalToken } from './stores/global';
+import { ActiveService, FindService, getGlobalCache, getServices, removeDeepLink, setActiveThemes, setAnilistUserData, setDeepLink, setGlobalToken } from './stores/global';
 import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
@@ -853,10 +853,10 @@ export function globalNavigate(path: string) {
 /* IFDEF DEBUG|PROD */
 export function fetchDeepLink(fetchedeeplink: string) {
     const deeplink = new URL(fetchedeeplink)
-    if (deeplink.host.replaceAll(" ", "").length <= 0) return
+    if (deeplink.search.replaceAll(" ", "").length <= 0) return
     getGlobalCache().deepLinks.forEach((item) => {
-        if (item.code == "") return item.func(deeplink.host)
-        if (deeplink.host.startsWith(item.code)) return item.func(deeplink.host)
+        if (item.code == "" && deeplink.search.startsWith("?") == undefined) return item.func(deeplink.search, item.code)
+        if (deeplink.search.startsWith(item.code)) return item.func(deeplink.search.replaceAll(`${item.code}=`, ""), item.code)
     })
 }
 
@@ -926,3 +926,135 @@ export async function fetchAnimeDeepLink(deeplink: string) {
     globalNavigate("/player");
 }
 /* ENDIF */
+
+export function LoginToAnilist() {
+    setDeepLink({
+        name: 'Fetch Anilist Token',
+        code: '?code',
+        func: fetchAnilistCodeToken
+    })
+
+    setDeepLink({
+        name: 'Fetch Anilist Token Error',
+        code: '?error',
+        func: fetchAnilistCodeToken
+    })
+
+    openUrlFolder("https://anilist.co/api/v2/oauth/authorize?client_id=30450&redirect_uri=animu://&response_type=code")
+}
+
+export async function fetchAnilistCodeToken(deeplink: string, code: string): Promise<any> {
+    console.log(deeplink, code)
+    removeDeepLink('Fetch Anilist Token')
+    removeDeepLink('Fetch Anilist Token Error')
+    if (code == "?error") return toast(t("Failed Login To Anilist"), { type: "error" })
+    await RefetchAnilistToken(deeplink)
+    await FetchAnilistUserData()
+}
+
+export async function RefetchAnilistToken(tmp?: string): Promise<any> {
+    let deeplink: string | undefined
+    try {
+        if (tmp) deeplink = tmp
+        else deeplink = JSON.stringify(localStorage.getItem("Animu_Anilist_login_token_information"))["refresh_token"]
+    } catch (error) {
+        console.error("RefetchAnilistToken error", error)
+        return
+    }
+
+    if (!deeplink) {
+        console.warn("REFETCH CODE IS MISSING WTF ARE YOU DOING")
+        return
+    }
+
+    const response = await request("https://anilist.co/api/v2/oauth/token", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify({
+            "grant_type": "authorization_code",
+            "client_id": "30450",
+            "client_secret": "DyAHkynxiqCjGVqD6Lp6oeCboQOf5HYK3s0yblws",
+            "redirect_uri": "animu://",
+            "code": deeplink,
+        })
+    })
+
+    if (!response.success) {
+        console.warn("fetchAnilistCodeToken failed Reqest", response)
+        return toast(t("Failed Login To Anilist"), { type: "error" })
+    }
+
+    localStorage.setItem("Animu_Anilist_login_token_information", JSON.stringify(response.json))
+}
+
+export const Anilist_USER_QUERY = `query {
+  Viewer {
+    id
+    name
+    about
+    avatar {
+      large
+    }
+    bannerImage
+    unreadNotificationCount
+    donatorTier
+    donatorBadge
+    moderatorRoles
+    options {
+      titleLanguage
+      staffNameLanguage
+      restrictMessagesToFollowing
+      airingNotifications
+      displayAdultContent
+      profileColor
+      notificationOptions {
+        type
+        enabled
+      }
+      disabledListActivity {
+        type
+        disabled
+      }
+    }
+    mediaListOptions {
+      scoreFormat
+      rowOrder
+      animeList {
+        customLists
+        sectionOrder
+        splitCompletedSectionByFormat
+        advancedScoring
+        advancedScoringEnabled
+      }
+    }
+  }
+}`
+
+export async function FetchAnilistUserData() {
+    try {
+        const token = JSON.parse(localStorage.getItem("Animu_Anilist_login_token_information") as any)
+        const response = await request("https://graphql.anilist.co", {
+            method: "POST",
+            headers: {
+                'Authorization': 'Bearer ' + token["access_token"],
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                query: Anilist_USER_QUERY
+            })
+        })
+        console.log(token, response)
+        if (!response.success || !response.json) return console.warn("Failed Fetch User Data")
+        
+        localStorage.setItem("Animu_Anilist_user_data", JSON.stringify(response.json["data"]["Viewer"]))
+        setAnilistUserData(response.json["data"]["Viewer"])
+
+        if (!FindService(t("Anilist Sync UserData"))) runService(FetchAnilistUserData, timeCovertToMs({ hour: 2 }), t("Anilist Sync UserData"))
+    } catch (error) {
+        console.error("FetchAnilistUserData error", error)
+    }
+}

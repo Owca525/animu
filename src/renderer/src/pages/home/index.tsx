@@ -34,6 +34,7 @@ import {
 } from "@renderer/utils/types";
 import { useI18n } from '@renderer/utils/i18n';
 import { anilistSearch, AnimuListSearch, historySearch, setAnimuList, setCalendary, setHistory } from './homeUtils';
+import Avatar from './components/avatar';
 // import { io } from 'socket.io-client';
 // import { socketPlayerInit } from '../player/VideoPlayer';
 
@@ -200,6 +201,7 @@ const Home = () => {
             <Input type="date" defaultValue={unixToDateTime(dateToUnix(new Date().toString())).split(" ")[0]} onInput={setCalendary} />
           </Show>
         </div>
+        <Avatar />
       </div>
 
       <div class="home-main-content" onScroll={handleScroll} ref={divRef}>

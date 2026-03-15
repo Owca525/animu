@@ -126,6 +126,7 @@ export interface globalDataFormat {
         currentRoom: string,
     },
     animuList: { AnimeData: AnimeData, animulist: animulistProps, onClick?: (data: AnimeData) => void }[]
+    anilist_user_data?: { [key: string]: any; }
 }
 
 export type playerDataExtended = playerData & {
@@ -501,5 +502,5 @@ export interface serviceFormat {
 export interface deeplinkFormat {
     name: string,
     code: string,
-    func: (deeplink: string) => any | Promise<any>
+    func: (deeplink: string, code: string) => any | Promise<any>
 }

@@ -16,7 +16,9 @@ import {
     convertKeybinds,
     convertPath,
     detectPluginVersion,
+    FetchAnilistUserData,
     fetchPluginRepos,
+    LoginToAnilist,
     openUrlFolder,
     request,
     savePluginConfig,
@@ -35,9 +37,11 @@ import {
     createEffect,
     createSignal,
     For,
+    Match,
     onCleanup,
     onMount,
-    Show
+    Show,
+    Switch
 } from 'solid-js';
 import { createShortcut } from '@solid-primitives/keyboard';
 import { DetectOldVersionHistory, OverWriteHistory } from '@renderer/utils/FilesManager/history';
@@ -51,7 +55,7 @@ import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './settings.css';
 import { useI18n } from '@renderer/utils/i18n';
-import { activeThemes, animulistData, getGlobalCache, loadedTheme } from '@renderer/utils/stores/global';
+import { activeThemes, animulistData, getAnilistUserData, getGlobalCache, loadedTheme } from '@renderer/utils/stores/global';
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 import SettingsPlugin from './components/settingsPlugin';
 import semver from "semver";
@@ -688,7 +692,22 @@ function settings() {
                         </div>
                     </div>
                     <div class="settings-page-container">
-                        <div class="settings-page-title">{"Anilist"}</div>
+                        <div class="settings-page-title">{t("Anilist")}</div>
+                        <Switch>
+                            <Match when={getAnilistUserData() == undefined}>
+                                <div class="settings-setting-container">
+                                    {t("Link Anilist Account to Animu")}
+                                    <Button content={t('Login')} onClick={LoginToAnilist}/>
+                                </div>
+                            </Match>
+                            <Match when={getAnilistUserData()}>
+                                <div class="settings-setting-container">
+                                    {t("Synchronize User Data To Animu")}
+                                    <Button content={t('Sync')} onClick={FetchAnilistUserData}/>
+                                </div>
+                            </Match>
+                        </Switch>
+                        <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("Default Adult Mode")}
                             <CheckBox

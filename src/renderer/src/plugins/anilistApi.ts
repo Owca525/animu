@@ -341,12 +341,25 @@ function Convert(convert: any): cardData {
   }
 }
 
+function getHeader() {
+  if (localStorage.getItem("Animu_Anilist_login_token_information")) {
+    try {
+      const token = JSON.parse(localStorage.getItem("Animu_Anilist_login_token_information") as any)
+      return {...header, 'Authorization': 'Bearer ' + token["access_token"],}
+    } catch (error) {
+      console.error("getHeader/anilistapi", error)
+      return header
+    }
+  }
+  return header
+}
+
 // WHY THE FUCK THIS DOESN'T WORK IF I CALL window.api.request.post IN CreateHomePage
 // Jeśli api anilist jest offline to daje "Forbidden" w statusText i error 403 request 
 async function sendPost(variable: any, query: any) {
   return await request(
     "https://graphql.anilist.co", 
-    { method: "POST", headers: header, body: JSON.stringify({ query: query, variables: variable }) } as any,
+    { method: "POST", headers: getHeader(), body: JSON.stringify({ query: query, variables: variable }) } as any,
     window.api ? false : true
   )
 }
@@ -354,7 +367,7 @@ async function sendPost(variable: any, query: any) {
 async function sendToApi(variable: any, query: any): Promise<cardData[]> {
   let data = await request(
     "https://graphql.anilist.co", 
-    { method: "POST", headers: header, body: JSON.stringify({ query: query, variables: variable }) } as any,
+    { method: "POST", headers: getHeader(), body: JSON.stringify({ query: query, variables: variable }) } as any,
     window.api ? false : true
   )
   if (data.success && data.json) {

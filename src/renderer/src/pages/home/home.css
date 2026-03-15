@@ -45,6 +45,7 @@
     display: flex;
     gap: 24px;
     position: fixed;
+    align-items: center;
     width: 100%;
     z-index: 2;
     grid-area: header;

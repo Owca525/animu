@@ -1,14 +1,14 @@
 .button {
-    cursor: pointer;
-    display: flex;
-    justify-content: start;
-    align-items: center;
-    gap: clamp(4px, 1vw, 12px);
-    padding: clamp(4px, 1vw, 12px);
-    transition: all 0.1s ease;
-    user-select: none;
-    anchor-name: ---button;
-    position: relative;
+  cursor: pointer;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: clamp(4px, 1vw, 12px);
+  padding: clamp(4px, 1vw, 12px);
+  transition: all 0.1s ease;
+  user-select: none;
+  anchor-name: ---button;
+  position: relative;
 }
 
 .button-tooltip {
@@ -36,7 +36,7 @@
 }
 
 .button-tooltip-container {
-    position: relative;
+  position: relative;
 }
 
 .button:hover .button-tooltip {

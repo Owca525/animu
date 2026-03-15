@@ -9,6 +9,7 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld("api", {
       open: (url: string) => ipcRenderer.invoke("open", url),
       saveToClipboard: (type: "text" | "image", content: string) => ipcRenderer.invoke("saveToClipboard", type, content),
+      getConfigAvatar: () => ipcRenderer.invoke("config:fetchAvatar"),
       chromecast: {
         startSearch: () => ipcRenderer.invoke("searchChromeCast"),
         deviceList: () => ipcRenderer.invoke("getListChromcasts"),

@@ -6,6 +6,7 @@ declare global {
     api: {
       open: (url: string) => Promise<void>;
       saveToClipboard: (type: "text" | "image", content: string) => Promise<boolean>;
+      getConfigAvatar: () => Promise<string | undefined>
       chromecast: {
         startSearch: () => void,
         deviceList: () => Promise<{ host: string, port: number, name: string }[]>;

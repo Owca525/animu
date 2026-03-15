@@ -10,6 +10,7 @@ import {
   checkDate,
   dateToUnix,
   detectPluginVersion,
+  FetchAnilistUserData,
   fetchPluginRepos,
   runService,
   timeCovertToMs,
@@ -28,7 +29,7 @@ import {
 } from 'solid-js';
 import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import { getConfig, setConfig } from './utils/stores/config';
-import { getGlobalCache, getSocket, setAnimulistData, setDeepLink, setDeeplinkRunned, setGlobalHistory, setGlobalTheme, setIncognitoMode, setSocket, setSocketRoom } from './utils/stores/global';
+import { getAnilistUserData, getGlobalCache, getSocket, setAnilistUserData, setAnimulistData, setDeepLink, setDeeplinkRunned, setGlobalHistory, setGlobalTheme, setIncognitoMode, setSocket, setSocketRoom } from './utils/stores/global';
 import { HashRouter, Route } from '@solidjs/router';
 import { getInformationPlugin, pluginManager, setPluginRepo } from './utils/stores/plugins';
 import { setHomeActivePage } from './utils/stores/home';
@@ -101,6 +102,17 @@ function App() {
     /* IFDEF WEB */
     /* ENDIF */
 
+    if (localStorage.getItem("Animu_Anilist_user_data") != undefined) {
+      try {
+        setAnilistUserData(JSON.parse(localStorage.getItem("Animu_Anilist_user_data") as any))
+      } catch (error) {
+        console.error("Failed Fetch Animu_Anilist_user_data from localstorage", error)
+      }
+    }
+
+    if (localStorage.getItem("Animu_Anilist_login_token_information") != undefined && localStorage.getItem("Animu_Anilist_user_data") == undefined) 
+      FetchAnilistUserData()
+
     /* IFDEF DEBUG|PROD */
     if (!getGlobalCache().deeplinkRunned) {
       window.api.onProtocolRequest(fetchDeepLink)
@@ -112,7 +124,6 @@ function App() {
       code: '',
       func: fetchAnimeDeepLink
     })
-
     /* ENDIF */
 
     /* IFDEF WEB */
@@ -365,13 +376,17 @@ function initialServices() {
   const config = getConfig()
 
   /* IFDEF DEBUG|PROD */
-  if (config.update.type == "On Start") runService(checkUpdate, timeCovertToMs({ min: 60 }), "Animu Update")
+  if (config.update.type == "On Start") runService(checkUpdate, timeCovertToMs({ min: 60 }), t("Animu Update"))
   /* ENDIF */
 
   runService(async () => {
     await checkPluginUpdate()
     await detectPluginVersion(true)
-  }, timeCovertToMs({ min: 30 }), "Plugin CheckUpdate")
+  }, timeCovertToMs({ min: 30 }), t("Plugin CheckUpdate"))
+
+  if (unwrap(getAnilistUserData())) {
+    runService(FetchAnilistUserData, timeCovertToMs({ hour: 2 }), t("Anilist Sync UserData"))
+  }
 }
 
 export default App
