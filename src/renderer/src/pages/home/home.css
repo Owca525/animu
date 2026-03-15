@@ -7,10 +7,13 @@
 }
 
 .home-main-content {
+    display: flex;
+    flex-direction: column;
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
     padding: 0px 8px;
+    gap: 4px;
 }
 
 .home-notification-container {

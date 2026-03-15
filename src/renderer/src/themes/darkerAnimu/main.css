@@ -301,10 +301,13 @@ body {
 .container-title,
 .container-title-click {
   border-radius: 12px;
+  transition: all 150ms ease-in-out;
+  outline: 2px solid var(--invisible)
 }
 
 .container-title-click:hover {
-  background-color: var(--third-layer);
+  outline: 2px solid var(--green-one);
+  color: var(--green-one);
 }
 
 .container-title,
