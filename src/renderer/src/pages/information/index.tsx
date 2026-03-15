@@ -709,8 +709,9 @@ function information() {
                                                         <iframe
                                                             height="610px"
                                                             class='information-iframe'
-                                                            src={`https://www.youtube.com/embed/${unwrap(tempData()).anime.trailer?.id}`}
+                                                            src={`https://www.youtube-nocookie.com/embed/${unwrap(tempData()).anime.trailer?.id}`}
                                                             frameborder="0"
+                                                            referrerpolicy='strict-origin-when-cross-origin'
                                                             allowfullscreen
                                                         ></iframe>
                                                     </Match>
