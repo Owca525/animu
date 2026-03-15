@@ -55,7 +55,7 @@ import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './settings.css';
 import { useI18n } from '@renderer/utils/i18n';
-import { activeThemes, animulistData, getAnilistUserData, getGlobalCache, loadedTheme } from '@renderer/utils/stores/global';
+import { activeThemes, animulistData, getAnilistUserData, getDeeplinks, getGlobalCache, loadedTheme, removeDeepLink, setDeepLink } from '@renderer/utils/stores/global';
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 import SettingsPlugin from './components/settingsPlugin';
 import semver from "semver";
@@ -697,13 +697,13 @@ function settings() {
                             <Match when={getAnilistUserData() == undefined}>
                                 <div class="settings-setting-container">
                                     {t("Link Anilist Account to Animu")}
-                                    <Button content={t('Login')} onClick={LoginToAnilist}/>
+                                    <Button content={t('Login')} onClick={LoginToAnilist} />
                                 </div>
                             </Match>
                             <Match when={getAnilistUserData()}>
                                 <div class="settings-setting-container">
                                     {t("Synchronize User Data To Animu")}
-                                    <Button content={t('Sync')} onClick={FetchAnilistUserData}/>
+                                    <Button content={t('Sync')} onClick={FetchAnilistUserData} />
                                 </div>
                             </Match>
                         </Switch>
@@ -771,7 +771,7 @@ function settings() {
                         <div class="settings-page-title">{t("settings.general.window")}</div>
                         <Show when={window.api}>
                             <div class="settings-setting-container">
-                                {t("Close Animu On Exit Button")} 
+                                {t("Close Animu On Exit Button")}
                                 <CheckBox
                                     checked={config().new.General.Window.trayIconClose}
                                     onChecked={(checked) =>
@@ -1402,6 +1402,26 @@ function settings() {
                                     })
                                 } />
                             </span>
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("Run Test DeepLink")}
+                            <CheckBox
+                                checked={getDeeplinks().find((val) => val.name == "Animu Deeplink Test") ? true : false}
+                                onChecked={(checked) => {
+                                    if (checked) {
+                                        setDeepLink({
+                                            name: 'Animu Deeplink Test',
+                                            code: 'animutest',
+                                            func: function (deeplink: string) {
+                                                toast(t("Ping Pong, Animu Received Deepling " + deeplink))
+                                            }
+                                        })
+                                    } else {
+                                        removeDeepLink("Animu Deeplink Test")
+                                    }
+                                }}
+                            />
                         </div>
                     </div>
                     <Show when={versions()}>
