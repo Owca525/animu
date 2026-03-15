@@ -656,12 +656,12 @@ function settings() {
                         </Show>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {/* TODO: ADD LANG */} Manage Data in animu
+                            {t("Manage Data in animu")}
                             <div class='settings-mini-container'>
                                 <Button content='Import Data' onClick={() => {
                                     showDialog({
                                         type: "info",
-                                        title: 'Double Check',
+                                        title: t("Double Check"),
                                         description: "Are you sure importing file, this action overwrite everything",
                                         buttons: [
                                             {
@@ -690,7 +690,7 @@ function settings() {
                     <div class="settings-page-container">
                         <div class="settings-page-title">{"Anilist"}</div>
                         <div class="settings-setting-container">
-                            {"Default Adult Mode"}
+                            {t("Default Adult Mode")}
                             <CheckBox
                                 checked={config().new.anilist.adultdefault}
                                 onChecked={(checked) =>
@@ -700,7 +700,7 @@ function settings() {
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {"Max Anime Cards"}
+                            {t("Max Anime Cards")}
                             <SettingsInput
                                 iconChar=""
                                 type="number"
@@ -710,7 +710,7 @@ function settings() {
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {"Title Format In Animu"}
+                            {t("Title Format In Animu")}
                             <ButtonGroup selectedValue={t(`anilist.titles.${config().new.anilist.titleFormat}`)} listValues={[
                                 { value: t("anilist.titles.ROMAJI"), onClick: () => handleChange("anilist.titleFormat", "ROMAJI") },
                                 { value: t("anilist.titles.NATIVE"), onClick: () => handleChange("anilist.titleFormat", "NATIVE") },

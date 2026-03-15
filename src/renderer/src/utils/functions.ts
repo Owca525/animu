@@ -833,12 +833,13 @@ export function timeCovertToMs(time: { day?: number, month?: number, min?: numbe
     return 0
 }
 
-export function runService(func: () => Promise<any>, time: number, name: string) {
-    const interval = setInterval(func, time)
+export function runService(func: () => Promise<any> | any, time: number, name: string, disable: boolean = false) {
+    const interval = disable ? undefined : setInterval(func, time)
     const tmp = {
         name: name, 
         interval: interval,
-        uuid: uuidv4()
+        uuid: uuidv4(),
+        func: func
     }
     let services = unwrap(getServices()).filter((v) => v.name != name)
     ActiveService([...services, tmp])

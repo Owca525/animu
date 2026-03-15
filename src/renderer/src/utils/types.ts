@@ -494,4 +494,5 @@ export interface serviceFormat {
     name: string
     interval?: NodeJS.Timeout,
     uuid: string
+    func: () => Promise<any> | any
 }

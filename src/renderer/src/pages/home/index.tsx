@@ -102,15 +102,20 @@ const Home = () => {
       if (getHomeCache().activePage == element.text) setNewActivePage(element.text)
     }
 
-    if (!getGlobalCache().deeplinkRunned && window.api) {
+    /* IFDEF DEBUG|PROD */
+    if (!getGlobalCache().deeplinkRunned) {
       window.api.onProtocolRequest(fetchDeeplinks)
       setDeeplinkRunned(true)
     }
+    /* ENDIF */
 
     if (homeCache().data.sections.length <= 0) plugin.home()
     const config: SettingsConfig = unwrap(getConfig());
-    if (config.General.discordRPC && window.api)
+    
+    /* IFDEF DEBUG|PROD */
+    if (config.General.discordRPC)
       window.api.rpc.setActivity(undefined, t("discordrpc.home"));
+    /* ENDIF */
   })
 
   async function fetchDeeplinks(deeplink: string) {

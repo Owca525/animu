@@ -344,11 +344,13 @@ function initialServices() {
   const config = getConfig()
 
   /* IFDEF DEBUG|PROD */
-  if (config.update.type == "On Start") runService(checkUpdate, timeCovertToMs({ min: 30 }), "Animu Update")
+  if (config.update.type == "On Start") runService(checkUpdate, timeCovertToMs({ min: 60 }), "Animu Update")
   /* ENDIF */
 
-  // TODO: Improve plugins update
-  runService(checkPluginUpdate, timeCovertToMs({ min: 30 }), "Plugin CheckUpdate")
+  runService(async () => {
+    await checkPluginUpdate()
+    await detectPluginVersion(true)
+  }, timeCovertToMs({ min: 30 }), "Plugin CheckUpdate")
 }
 
 export default App
