@@ -583,7 +583,7 @@ function getVideoInfo(url: string, commands: string[] = ["-j"]) {
 const extensions = ["png", "jpg", "jpeg", "svg", "webp"];
 
 ipcMain.handle("config:fetchAvatar", async () => {
-  const configDir = path.join(app.getPath("userData"), "config");
+  const configDir = path.join(newConfigPath, "config");
   for (const ext of extensions) {
     const file = path.join(configDir, `avatar.${ext}`);
     if (fs.existsSync(file)) {
