@@ -120,6 +120,7 @@ export interface globalDataFormat {
     activeThemes: Map<number, themeMetadata>
     token: UUIDTypes | undefined,
     service: serviceFormat[]
+    deepLinks: deeplinkFormat[]
     socket?: {
         instance: Socket,
         currentRoom: string,
@@ -495,4 +496,10 @@ export interface serviceFormat {
     interval?: NodeJS.Timeout,
     uuid: string
     func: () => Promise<any> | any
+}
+
+export interface deeplinkFormat {
+    name: string,
+    code: string,
+    func: (deeplink: string) => any | Promise<any>
 }

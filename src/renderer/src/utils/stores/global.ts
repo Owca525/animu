@@ -1,5 +1,5 @@
 import { UUIDTypes } from "uuid";
-import { cardData, globalDataFormat, serviceFormat, themeMetadata } from "../types";
+import { cardData, deeplinkFormat, globalDataFormat, serviceFormat, themeMetadata } from "../types";
 import { createStore } from "solid-js/store";
 import { Socket } from "socket.io-client";
 
@@ -12,7 +12,8 @@ export const [globalState, setGlobalState] = createStore({
     token: undefined,
     animuList: [],
     socket: undefined,
-    service: []
+    service: [],
+    deepLinks: []
 } as globalDataFormat);
 
 export const getGlobalCache = () => globalState;
@@ -22,6 +23,7 @@ export const animulistData = () => globalState.animuList;
 export const getSocket = () => globalState.socket?.instance;
 export const getSocketRoom = () => globalState.socket?.currentRoom;
 export const getServices = () => globalState.service;
+export const getDeeplinks = () => globalState.service;
 export const setSocket = (tmp: Socket) => setGlobalState((prev) => ({...prev, socket: { ...prev.socket as any, instance: tmp }}));
 export const setSocketRoom = (tmp: string) => setGlobalState((prev) => ({...prev, socket: { ...prev.socket as any, currentRoom: tmp }}));
 export const setActiveThemes = (tmp: Map<number, themeMetadata>) => setGlobalState((prev) => ({...prev, activeThemes: tmp}));
@@ -31,6 +33,8 @@ export const setDeeplinkRunned = (tmp: boolean) => setGlobalState((prev) => ({..
 export const setGlobalHistory = (tmp: cardData[]) => setGlobalState((prev) => ({...prev, history: [...tmp]}));
 export const setGlobalToken = (tmp: UUIDTypes | undefined) => setGlobalState((prev) => ({...prev, token: tmp}));
 export const setAnimulistData = (tmp: globalDataFormat["animuList"]) => setGlobalState((prev) => ({...prev, animuList: tmp}));
+export const setDeepLink = (tmp: deeplinkFormat) => setGlobalState((prev) => ({...prev, deepLinks: [...prev.deepLinks, tmp]}));
+export const removeDeepLink = (tmp: deeplinkFormat) => setGlobalState((prev) => ({...prev, deepLinks: prev.deepLinks.filter((item) => item.name != tmp.name)}));
 export const ActiveService = (tmp: serviceFormat[]) => setGlobalState((prev) => ({...prev, service: tmp}));
 export const DisableService = (tmp: serviceFormat) => setGlobalState((prev) => ({
     ...prev, 

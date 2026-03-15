@@ -20,22 +20,19 @@ import {
   setHomeSearch,
   setHomeSearchTags,
 } from '@renderer/utils/stores/home';
-import { getInformationPlugin, pluginManager } from '@renderer/utils/stores/plugins';
+import { getInformationPlugin } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './home.css';
 import {
   containerData,
-  deepLinkData,
   FilterParams,
   genres,
   homeData,
   SettingsConfig,
 } from "@renderer/utils/types";
 import { useI18n } from '@renderer/utils/i18n';
-import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
-import { getGlobalCache, setDeeplinkRunned } from '@renderer/utils/stores/global';
 import { anilistSearch, AnimuListSearch, historySearch, setAnimuList, setCalendary, setHistory } from './homeUtils';
 // import { io } from 'socket.io-client';
 // import { socketPlayerInit } from '../player/VideoPlayer';
@@ -102,13 +99,6 @@ const Home = () => {
       if (getHomeCache().activePage == element.text) setNewActivePage(element.text)
     }
 
-    /* IFDEF DEBUG|PROD */
-    if (!getGlobalCache().deeplinkRunned) {
-      window.api.onProtocolRequest(fetchDeeplinks)
-      setDeeplinkRunned(true)
-    }
-    /* ENDIF */
-
     if (homeCache().data.sections.length <= 0) plugin.home()
     const config: SettingsConfig = unwrap(getConfig());
     
@@ -117,72 +107,6 @@ const Home = () => {
       window.api.rpc.setActivity(undefined, t("discordrpc.home"));
     /* ENDIF */
   })
-
-  async function fetchDeeplinks(deeplink: string) {
-    if (deeplink.replaceAll(" ", "").length <= 0) return
-    let anime: deepLinkData | undefined;
-    try {
-      const str = atob(deeplink.replaceAll("animu://", ""))
-      if (str.startsWith("{")) anime = JSON.parse(str)
-      else {
-        const tmp = str.split(",")
-        if (tmp.length <= 0) throw "Failed Parse"
-        if (tmp.length == 1) anime = { animeID: tmp[0] }
-        if (tmp.length != 6) throw "Failed Parse"
-        anime = {
-          animeID: tmp[0],
-          player: {
-            plugin: tmp[1],
-            type: tmp[2],
-            id: tmp[3],
-            episode: tmp[4],
-            time: parseInt(tmp[5])
-          }
-        }
-      }
-    } catch (error) { console.error(t("deeplink.failed"), error) }
-    if (!anime) return
-
-    const infoPlugin = getInformationPlugin()
-    const idToast = toast(t("notification.fetchinganime"), { type: "loading", removeTimer: true })
-    const response = await infoPlugin.anime(anime.animeID)
-    if (!response) return updateToast(idToast, t("notification.failedanime"), { type: "error", removeTimer: false })
-    updateToast(idToast, t("notification.successanime"), { type: "success", removeTimer: false })
-
-    if (!anime.player) {
-      localStorage.setItem("informationCache", JSON.stringify({ anime: response }))
-      navigate!("/info")
-      return
-    }
-
-    const toastID = toast(t("notification.episodesfetching"), { type: "loading", removeTimer: true })
-    const currentPLugin = pluginManager().changePlugin(anime.player.plugin)
-    const episodeList = await currentPLugin.extractOnlyEpisodesList(anime.player.type, anime.player.id);
-
-    if (episodeList.length <= 0) {
-      updateToast(toastID, t("notification.episodesfailed"), { type: "error", removeTimer: false })
-      return
-    }
-
-    removeToast(toastID)
-
-    localStorage.setItem("playerCache", JSON.stringify({
-      data: {
-        ...response,
-        player_ID: anime.player.id
-      },
-      save: {
-        pluginName: currentPLugin.metadata.name,
-        last_Time: anime.player.time,
-        episode: anime.player.episode,
-        type: anime.player.type,
-      },
-      episodelist: episodeList,
-    }))
-
-    navigate("/player");
-  }
-
 
   const handleScroll = () => {
     let home = homeCache()

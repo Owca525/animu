@@ -28,7 +28,7 @@ import {
 } from 'solid-js';
 import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import { getConfig, setConfig } from './utils/stores/config';
-import { getGlobalCache, getSocket, setAnimulistData, setGlobalHistory, setGlobalTheme, setIncognitoMode, setSocket, setSocketRoom } from './utils/stores/global';
+import { getGlobalCache, getSocket, setAnimulistData, setDeepLink, setDeeplinkRunned, setGlobalHistory, setGlobalTheme, setIncognitoMode, setSocket, setSocketRoom } from './utils/stores/global';
 import { HashRouter, Route } from '@solidjs/router';
 import { getInformationPlugin, pluginManager, setPluginRepo } from './utils/stores/plugins';
 import { setHomeActivePage } from './utils/stores/home';
@@ -43,6 +43,13 @@ import shaka from 'shaka-player';
 import { convertHistoryToAnimuList } from './utils/FilesManager/animulist';
 import { socketPlayerInit } from './pages/player/VideoPlayer';
 import { io } from 'socket.io-client';
+
+/* IFDEF DEBUG|PROD */
+import {
+  fetchAnimeDeepLink,
+  fetchDeepLink,
+} from './utils/functions';
+/* ENDIF */
 
 /* IFDEF DEBUG */
 import "./utils/debug"
@@ -92,6 +99,20 @@ function App() {
     shaka.polyfill.installAll()
 
     /* IFDEF WEB */
+    /* ENDIF */
+
+    /* IFDEF DEBUG|PROD */
+    if (!getGlobalCache().deeplinkRunned) {
+      window.api.onProtocolRequest(fetchDeepLink)
+      setDeeplinkRunned(true)
+    }
+
+    setDeepLink({
+      name: 'Fetch Anime',
+      code: '',
+      func: fetchAnimeDeepLink
+    })
+
     /* ENDIF */
 
     /* IFDEF WEB */

@@ -3,6 +3,7 @@ import {
     cardData,
     containerData,
     ContextMenuProps,
+    deepLinkData,
     FilterParams,
     homeData,
     informationPluginFormat,
@@ -22,7 +23,7 @@ import { unwrap } from 'solid-js/store';
 import { getInformationPlugin, getPluginList, getPluginRepo, pluginManager, setPluginRepo } from './stores/plugins';
 import semver from "semver";
 import { v4 as uuidv4 } from 'uuid';
-import { toast, updateToast } from './context/ToastNotification';
+import { removeToast, toast, updateToast } from './context/ToastNotification';
 import { saveConfig } from './FilesManager/config';
 
 export function decodeHtmlEntities(str: string) {
@@ -836,7 +837,7 @@ export function timeCovertToMs(time: { day?: number, month?: number, min?: numbe
 export function runService(func: () => Promise<any> | any, time: number, name: string, disable: boolean = false) {
     const interval = disable ? undefined : setInterval(func, time)
     const tmp = {
-        name: name, 
+        name: name,
         interval: interval,
         uuid: uuidv4(),
         func: func
@@ -844,3 +845,84 @@ export function runService(func: () => Promise<any> | any, time: number, name: s
     let services = unwrap(getServices()).filter((v) => v.name != name)
     ActiveService([...services, tmp])
 }
+
+export function globalNavigate(path: string) {
+    location.href = `${location.origin}/#${path}`
+}
+
+/* IFDEF DEBUG|PROD */
+export function fetchDeepLink(fetchedeeplink: string) {
+    const deeplink = new URL(fetchedeeplink)
+    if (deeplink.host.replaceAll(" ", "").length <= 0) return
+    getGlobalCache().deepLinks.forEach((item) => {
+        if (item.code == "") return item.func(deeplink.host)
+        if (deeplink.host.startsWith(item.code)) return item.func(deeplink.host)
+    })
+}
+
+export async function fetchAnimeDeepLink(deeplink: string) {
+    console.log(deeplink)
+    if (deeplink.replaceAll(" ", "").length <= 0) return
+    let anime: deepLinkData | undefined;
+    try {
+        const str = atob(deeplink.replaceAll("animu://", ""))
+        if (str.startsWith("{")) anime = JSON.parse(str)
+        else {
+            const tmp = str.split(",")
+            if (tmp.length <= 0) throw "Failed Parse"
+            if (tmp.length == 1) anime = { animeID: tmp[0] }
+            if (tmp.length != 6) throw "Failed Parse"
+            anime = {
+                animeID: tmp[0],
+                player: {
+                    plugin: tmp[1],
+                    type: tmp[2],
+                    id: tmp[3],
+                    episode: tmp[4],
+                    time: parseInt(tmp[5])
+                }
+            }
+        }
+    } catch (error) { console.error(t("deeplink.failed"), error) }
+    if (!anime) return
+
+    const infoPlugin = getInformationPlugin()
+    const idToast = toast(t("notification.fetchinganime"), { type: "loading", removeTimer: true })
+    const response = await infoPlugin.anime(anime.animeID)
+    if (!response) return updateToast(idToast, t("notification.failedanime"), { type: "error", removeTimer: false })
+    updateToast(idToast, t("notification.successanime"), { type: "success", removeTimer: false })
+
+    if (!anime.player) {
+        localStorage.setItem("informationCache", JSON.stringify({ anime: response }))
+        globalNavigate("/info")
+        return
+    }
+
+    const toastID = toast(t("notification.episodesfetching"), { type: "loading", removeTimer: true })
+    const currentPLugin = pluginManager().changePlugin(anime.player.plugin)
+    const episodeList = await currentPLugin.extractOnlyEpisodesList(anime.player.type, anime.player.id);
+
+    if (episodeList.length <= 0) {
+        updateToast(toastID, t("notification.episodesfailed"), { type: "error", removeTimer: false })
+        return
+    }
+
+    removeToast(toastID)
+
+    localStorage.setItem("playerCache", JSON.stringify({
+        data: {
+            ...response,
+            player_ID: anime.player.id
+        },
+        save: {
+            pluginName: currentPLugin.metadata.name,
+            last_Time: anime.player.time,
+            episode: anime.player.episode,
+            type: anime.player.type,
+        },
+        episodelist: episodeList,
+    }))
+
+    globalNavigate("/player");
+}
+/* ENDIF */

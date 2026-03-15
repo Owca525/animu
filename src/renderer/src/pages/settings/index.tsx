@@ -662,7 +662,7 @@ function settings() {
                                     showDialog({
                                         type: "info",
                                         title: t("Double Check"),
-                                        description: "Are you sure importing file, this action overwrite everything",
+                                        description: t("Are you sure importing file, this action overwrite everything"),
                                         buttons: [
                                             {
                                                 title: t("dialog.no"),
