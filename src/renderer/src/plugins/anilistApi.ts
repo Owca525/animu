@@ -412,7 +412,7 @@ async function fetchCategory(params: any, title: string): Promise<containerData>
   const globalParams = params
   let container: containerData = {
     title: title,
-    data: await sendToApi(params, graphicApi),
+    data: await sendToApi(params, graphicApi.replaceAll("CHANGE_ME_PAGE_SIZE", config.anilist.maxpagesize.toString())),
     onScrollDownFunction: async (_search, page, _params) => {
       let resp = await sendToApi({ ...globalParams, page: page }, graphicApi.replaceAll("CHANGE_ME_PAGE_SIZE", config.anilist.maxpagesize.toString()));
       return {
