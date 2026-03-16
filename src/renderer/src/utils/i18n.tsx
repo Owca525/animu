@@ -1,5 +1,6 @@
 import { createContext, useContext, createSignal, onMount } from "solid-js";
 import en from "./lang/en.json"
+import { getConfig } from "./stores/config";
 
 async function getAllLangFiles() {
   /* IFDEF WEB */
@@ -70,7 +71,9 @@ export function I18nProvider(props: { config: i18nConfig; children: any }) {
     const dict = dictionaries()[currentLang()];
     let value = getValueByPath(dict, key)
     if (value != key) return replaceTemplate(value, replace)
-    console.error(`Missing key in ${currentLang()} lang: ${key}`)
+    
+    if (import.meta.env.DEV || getConfig().Developer.DeveloperMode) console.error(`Missing key in ${currentLang()} lang: ${key}`)
+    
     if (props.config.fallbackLang) {
       const fallback = dictionaries()[props.config.fallbackLang]
       value = replaceTemplate(getValueByPath(fallback, key), replace)
