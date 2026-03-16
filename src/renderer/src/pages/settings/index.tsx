@@ -23,7 +23,8 @@ import {
     request,
     savePluginConfig,
     unLinkAnilistAccount,
-    updateObjectConfig
+    updateAnilistUserData,
+    updateObject
 } from '@renderer/utils/functions';
 import { checkUpdate } from '@renderer/utils/update';
 import {
@@ -193,7 +194,7 @@ function settings() {
 
     function handleChange(path: string, value: string | number | boolean | any) {
         setNewConfig((prevConfig) => {
-            return { old: prevConfig.old, new: updateObjectConfig(path, value, unwrap(prevConfig.new)) }
+            return { old: prevConfig.old, new: updateObject(path, value, unwrap(prevConfig.new)) }
         })
     }
 
@@ -711,17 +712,20 @@ function settings() {
                                                 title: t('logout'),
                                                 description: t("Do you realy want logout account in animu?"),
                                                 buttons: [
-                                                {
-                                                    title: t("dialog.no"),
-                                                    onClick: () => ""
-                                                },
-                                                {
-                                                    title: t("dialog.yes"),
-                                                    onClick: unLinkAnilistAccount
-                                                }]
+                                                    {
+                                                        title: t("dialog.no"),
+                                                        onClick: () => ""
+                                                    },
+                                                    {
+                                                        title: t("dialog.yes"),
+                                                        onClick: unLinkAnilistAccount
+                                                    }]
                                             })
                                         }} />
-                                        <Button content={t('Sync')} onClick={FetchAnilistUserData} />
+                                        <Button content={t('Sync User Data')} onClick={async () => {
+                                            if (await FetchAnilistUserData()) toast(t("Succesfully Update User Data"), { type: "success" })
+                                            else toast(t("Failed Update User Data"), { type: "error" })
+                                        }} />
                                     </span>
                                 </div>
                             </Match>
@@ -731,9 +735,28 @@ function settings() {
                             {t("Default Adult Mode")}
                             <CheckBox
                                 checked={config().new.anilist.adultdefault}
-                                onChecked={(checked) =>
-                                    handleChange('anilist.adultdefault', checked)
-                                }
+                                onChecked={(checked) => {
+                                    if (getAnilistUserData() && getAnilistUserData()!["options"]["displayAdultContent"] == false) {
+                                        showDialog({
+                                            type: "info",
+                                            title: 'Warning',
+                                            description: 'Do you want Update display content in anilist / animu?',
+                                            buttons: [
+                                                {
+                                                    title: t("dialog.no"),
+                                                    onClick: () => handleChange('anilist.adultdefault', false)
+                                                },
+                                                {
+                                                    title: t("dialog.yes"),
+                                                    onClick: async () => {
+                                                        await updateAnilistUserData({ displayAdultContent: true }, true)
+                                                        handleChange('anilist.adultdefault', true)
+                                                    }
+                                                }
+                                            ]
+                                        })
+                                    } else handleChange('anilist.adultdefault', checked)
+                                }}
                             />
                         </div>
                         <div class="settings-line"></div>
@@ -785,10 +808,8 @@ function settings() {
                                 />
                             </div>
                         </div>
-                    </Show>
-                    <div class="settings-page-container">
-                        <div class="settings-page-title">{t("settings.general.window")}</div>
-                        <Show when={window.api}>
+                        <div class="settings-page-container">
+                            <div class="settings-page-title">{t("settings.general.window")}</div>
                             <div class="settings-setting-container">
                                 {t("Close Animu On Exit Button")}
                                 <CheckBox
@@ -819,16 +840,16 @@ function settings() {
                                 />
                             </div>
                             <div class="settings-line"></div>
-                        </Show>
-                        <div class="settings-setting-container">
-                            {t("settings.general.zoom")}
-                            <div class="settings-setting-seekbar-container">
-                                <span>50%</span>
-                                <SeekBar maxValue={200} minValue={50} type="procent" currentValue={config().new.General.Window.Zoom} onSeek={(value) => { handleChange("General.Window.Zoom", parseInt(value.toFixed(0))) }} />
-                                <span>200%</span>
+                            <div class="settings-setting-container">
+                                {t("settings.general.zoom")}
+                                <div class="settings-setting-seekbar-container">
+                                    <span>50%</span>
+                                    <SeekBar maxValue={200} minValue={50} type="procent" currentValue={config().new.General.Window.Zoom} onSeek={(value) => { handleChange("General.Window.Zoom", parseInt(value.toFixed(0))) }} />
+                                    <span>200%</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </Show>
                 </Show>
                 <Show when={category() == "player"}>
                     <div class="settings-page-container">

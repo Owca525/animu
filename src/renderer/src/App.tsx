@@ -14,7 +14,7 @@ import {
   fetchPluginRepos,
   runService,
   timeCovertToMs,
-  updateObjectConfig
+  updateObject
 } from './utils/functions';
 import { checkUpdate } from './utils/update';
 import { CreateBackup } from './utils/backup';
@@ -110,7 +110,7 @@ function App() {
       }
     }
 
-    if (localStorage.getItem("Animu_Anilist_login_token_information") != undefined && localStorage.getItem("Animu_Anilist_user_data") == undefined) 
+    if (localStorage.getItem("Animu_Anilist_login_token_information") != undefined) 
       FetchAnilistUserData()
 
     /* IFDEF DEBUG|PROD */
@@ -296,7 +296,7 @@ function App() {
 
     if (loadedConnfig.animulist.historyConvert) {
       convertHistoryToAnimuList()
-      loadedConnfig = updateObjectConfig("animulist.historyConvert", false, loadedConnfig)
+      loadedConnfig = updateObject("animulist.historyConvert", false, loadedConnfig)
       saveConfig(loadedConnfig)
     }
 
@@ -320,7 +320,7 @@ function App() {
     if (!loadedConnfig.backup.enable) return
     if (!checkDate(loadedConnfig.backup.lastCheck, loadedConnfig.backup.check)) return
     CreateBackup()
-    saveConfig(updateObjectConfig("backup.lastCheck", dateToUnix(new Date().toString()), loadedConnfig))
+    saveConfig(updateObject("backup.lastCheck", dateToUnix(new Date().toString()), loadedConnfig))
     window.backend.refresh()
   }
   /* ENDIF */

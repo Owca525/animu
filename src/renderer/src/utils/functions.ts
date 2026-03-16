@@ -10,7 +10,6 @@ import {
     playerChapterList,
     playerPluginFormat,
     pluginRepoExpanded,
-    SettingsConfig,
     themeMetadata
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
@@ -385,11 +384,11 @@ export function makeSmallText(text: string | undefined) {
     return text.toLowerCase()
 }
 
-export function updateObjectConfig(path: string, value: string | number | boolean, config: SettingsConfig): SettingsConfig {
+export function updateObject<T, U>(path: string, value: U, object: T): T {
     const keys = path.split('.')
-    const newConfig = unwrap(config)
+    const newObject = unwrap(object)
 
-    let current: any = newConfig
+    let current: any = newObject
     for (let i = 0; i < keys.length - 1; i++) {
         const key = keys[i]
 
@@ -398,7 +397,7 @@ export function updateObjectConfig(path: string, value: string | number | boolea
     }
 
     current[keys[keys.length - 1]] = value
-    return newConfig
+    return newObject
 }
 
 export async function request(url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string }, body?: any }, noCors: boolean = false): Promise<{ text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: Map<string, string> }> {
@@ -618,7 +617,7 @@ export async function fetchPluginRepos() {
     }
     localStorage.setItem("pluginDatabase", JSON.stringify(tmp))
     setPluginRepo(tmp)
-    saveConfig(updateObjectConfig("plugins.lastTimeCheck", dateToUnix(new Date().toString()), config))
+    saveConfig(updateObject("plugins.lastTimeCheck", dateToUnix(new Date().toString()), config))
 }
 
 export async function setHomeData(wrapper?: () => Promise<homeData["data"] | containerData | undefined>, data?: homeData["data"]) {
@@ -1047,14 +1046,19 @@ export async function FetchAnilistUserData() {
             })
         })
         console.log(token, response)
-        if (!response.success || !response.json) return console.warn("Failed Fetch User Data")
-        
+        if (!response.success || !response.json) {
+            console.warn("Failed Fetch User Data")
+            return false
+        }
+
         localStorage.setItem("Animu_Anilist_user_data", JSON.stringify(response.json["data"]["Viewer"]))
         setAnilistUserData(response.json["data"]["Viewer"])
 
         if (!FindService(t("Anilist Sync UserData"))) runService(FetchAnilistUserData, timeCovertToMs({ hour: 2 }), t("Anilist Sync UserData"))
+        return true
     } catch (error) {
         console.error("FetchAnilistUserData error", error)
+        return false
     }
 }
 
@@ -1068,5 +1072,121 @@ export function unLinkAnilistAccount() {
     } catch (error) {
         console.error("unLinkAnilistAccount/function Error", error)
         toast(t("Failed Unlike Account"), { type: "error" })
+    }
+}
+
+const anilist_USER_MUTATION = `
+mutation(
+  $about: String
+  $titleLanguage: UserTitleLanguage
+  $staffNameLanguage: UserStaffNameLanguage
+  $airingNotifications: Boolean
+  $displayAdultContent: Boolean
+  $scoreFormat: ScoreFormat
+  $rowOrder: String
+  $profileColor: String
+  $donatorBadge: String
+  $notificationOptions: [NotificationOptionInput]
+  $animeListOptions: MediaListOptionsInput
+  $mangaListOptions: MediaListOptionsInput
+  $timezone: String
+  $activityMergeTime: Int
+  $restrictMessagesToFollowing: Boolean
+  $disabledListActivity: [ListActivityOptionInput]
+) {
+  UpdateUser(
+    about: $about
+    titleLanguage: $titleLanguage
+    staffNameLanguage: $staffNameLanguage
+    airingNotifications: $airingNotifications
+    displayAdultContent: $displayAdultContent
+    scoreFormat: $scoreFormat
+    rowOrder: $rowOrder
+    profileColor: $profileColor
+    donatorBadge: $donatorBadge
+    notificationOptions: $notificationOptions
+    animeListOptions: $animeListOptions
+    mangaListOptions: $mangaListOptions
+    timezone: $timezone
+    activityMergeTime: $activityMergeTime
+    restrictMessagesToFollowing: $restrictMessagesToFollowing
+    disabledListActivity: $disabledListActivity
+  ) {
+    id
+    name
+    about
+    avatar { large }
+    bannerImage
+    unreadNotificationCount
+    donatorTier
+    donatorBadge
+    moderatorRoles
+    options {
+      titleLanguage
+      staffNameLanguage
+      restrictMessagesToFollowing
+      airingNotifications
+      displayAdultContent
+      profileColor
+      timezone
+      activityMergeTime
+      notificationOptions {
+        type
+        enabled
+      }
+      disabledListActivity {
+        type
+        disabled
+      }
+    }
+    mediaListOptions {
+      scoreFormat
+      rowOrder
+      animeList {
+        customLists
+        sectionOrder
+        splitCompletedSectionByFormat
+        advancedScoring
+        advancedScoringEnabled
+      }
+      mangaList {
+        customLists
+        sectionOrder
+        splitCompletedSectionByFormat
+        advancedScoring
+        advancedScoringEnabled
+      }
+    }
+  }
+}
+`;
+
+export async function updateAnilistUserData(variables: { [key: string]: any }, notification: boolean = false): Promise<any> {
+    try {
+        const token = JSON.parse(localStorage.getItem("Animu_Anilist_login_token_information") as any)
+        const response = await request("https://graphql.anilist.co", {
+            method: "POST",
+            headers: {
+                'Authorization': 'Bearer ' + token["access_token"],
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                query: anilist_USER_MUTATION,
+                variables: variables
+            })
+        })
+        console.log(response)
+        if (!response.success || !response.json) {
+            console.warn("Failed Update User Data", response)
+            return notification ? toast(t("Failed Update Anilist Settings"), { type: "error" }) : ""
+        }
+        localStorage.setItem("Animu_Anilist_user_data", JSON.stringify(response.json["data"]["UpdateUser"]))
+        setAnilistUserData(response.json["data"]["UpdateUser"])
+
+        return notification ? toast(t("Succesfully Updated Anilist Settings"), { type: "success" }) : ""
+    } catch (error) {
+        console.error("Error in updateAnilistUserData/functions", error)
+        return notification ? toast(t("Failed Update Anilist Settings"), { type: "error" }) : ""
     }
 }

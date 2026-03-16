@@ -631,7 +631,6 @@ export default class AnilistApi implements informationPluginFormat {
         console.warn("home/anilistapi Failed Request", data)
         return
       }
-      console.log(data)
 
       let home: containerData[] = [
         {

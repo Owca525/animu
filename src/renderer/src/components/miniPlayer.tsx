@@ -32,7 +32,7 @@ import {
     openUrlFolder,
     request,
     toggleFullscreen,
-    updateObjectConfig
+    updateObject
 } from '@renderer/utils/functions';
 import { VTTstoryBoardParser } from '@renderer/pages/player/playerUtils';
 import { getConfig } from '@renderer/utils/stores/config';
@@ -962,7 +962,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
                             <PlayerButton icon={isPlaying() ? "pause" : "play_arrow"} title={isPlaying() ? t('player.Pause') : t('player.play')} ButtonClass="player-buttons" onClick={togglePlay} />
 
                             <div class="player-time-display"
-                                onClick={() => { saveConfig(updateObjectConfig("Player.general.minusTime", !minusTimeState(), unwrap(config))); setminusTimeState((prev) => !prev) }}
+                                onClick={() => { saveConfig(updateObject("Player.general.minusTime", !minusTimeState(), unwrap(config))); setminusTimeState((prev) => !prev) }}
                             >
                                 <div class="player-time-display-current">
                                     <Show when={minusTimeState()} fallback={formatTime(currentTime())}>
