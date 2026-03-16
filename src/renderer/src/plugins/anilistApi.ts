@@ -627,7 +627,12 @@ export default class AnilistApi implements informationPluginFormat {
         nextYear: season.nextYear,
       }, graphicHomeApi.replaceAll("CHANGE_ME_PAGE_SIZE", config.anilist.maxpagesize.toString()))
 
-      if (!data.success || !data.json) return
+      if (!data.success || !data.json) {
+        console.warn("home/anilistapi Failed Request", data)
+        return
+      }
+      console.log(data)
+
       let home: containerData[] = [
         {
           title: "home.trending_now",
