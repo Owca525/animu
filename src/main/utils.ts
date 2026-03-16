@@ -581,14 +581,24 @@ function getVideoInfo(url: string, commands: string[] = ["-j"]) {
 }
 
 const extensions = ["png", "jpg", "jpeg", "svg", "webp"];
+const mimeMap: Record<string, string> = {
+  png: "image/png",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  svg: "image/svg+xml",
+  webp: "image/webp"
+};
 
 ipcMain.handle("config:fetchAvatar", async () => {
-  const configDir = path.join(newConfigPath, "config");
   for (const ext of extensions) {
-    const file = path.join(configDir, `avatar.${ext}`);
+    const file = path.join(newConfigPath, `avatar.${ext}`);
     if (fs.existsSync(file)) {
-        const tmp = fs.readFileSync(file);
-        return tmp.toString("base64");
+        console.log(file)
+        const buffer = fs.readFileSync(file);
+        return {
+            mime: mimeMap[ext],
+            data: buffer.toString("base64")
+        };
     }
   }
 

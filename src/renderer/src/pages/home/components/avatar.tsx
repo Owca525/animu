@@ -42,7 +42,8 @@ export default function Avatar() {
     } else {
       /* IFDEF DEBUG|PROD */
       const configAvatar = await window.api.getConfigAvatar()
-      if (configAvatar) setAvatar(configAvatar)
+      console.log(configAvatar)
+      if (configAvatar) setAvatar(`data:${configAvatar.mime};base64,${configAvatar.data}`)
       /* ENDIF */
       setGenerated((prev) => ([
         {
@@ -53,10 +54,17 @@ export default function Avatar() {
     }
   })
 
-  createEffect(() => {
+  createEffect(async () => {
     try {
       const tmp = getAnilistUserData()
-      if (!tmp) return
+      if (!tmp) {
+        /* IFDEF DEBUG|PROD */
+        const configAvatar = await window.api.getConfigAvatar()
+        console.log(configAvatar)
+        if (configAvatar) setAvatar(`data:${configAvatar.mime};base64,${configAvatar.data}`)
+        /* ENDIF */
+        return
+      }
       setAvatar(tmp["avatar"]["large"])
       if (isDropDownUpdate()) return
       setGenerated((prev) => ([
@@ -72,7 +80,7 @@ export default function Avatar() {
 
   return (
     <main class="avatar-container">
-      <img src={avatar()} class="avatar-main-icon" />
+      <img src={avatar()} class="avatar-main-icon" onerror={() => setAvatar(icon)}/>
       <div class="avatar-options-container">
         <For each={genereted()}>
           {(item) => <Switch>

@@ -1,5 +1,6 @@
 .avatar-main-icon, .avatar-icon {
     width: 48px;
+    border-radius: 50%;
 }
 
 .avatar-container-info {
