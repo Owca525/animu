@@ -593,7 +593,6 @@ ipcMain.handle("config:fetchAvatar", async () => {
   for (const ext of extensions) {
     const file = path.join(newConfigPath, `avatar.${ext}`);
     if (fs.existsSync(file)) {
-        console.log(file)
         const buffer = fs.readFileSync(file);
         return {
             mime: mimeMap[ext],

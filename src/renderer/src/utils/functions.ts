@@ -853,15 +853,14 @@ export function globalNavigate(path: string) {
 /* IFDEF DEBUG|PROD */
 export function fetchDeepLink(fetchedeeplink: string) {
     const deeplink = new URL(fetchedeeplink)
-    if (deeplink.search.replaceAll(" ", "").length <= 0) return
+    if (deeplink.host.length <= 0 && deeplink["search"].length == 0) return
     getGlobalCache().deepLinks.forEach((item) => {
-        if (item.code == "" && deeplink.search.startsWith("?") == undefined) return item.func(deeplink.search, item.code)
-        if (deeplink.search.startsWith(item.code)) return item.func(deeplink.search.replaceAll(`${item.code}=`, ""), item.code)
+        if (item.code == "" && deeplink["host"].length > 0) return item.func(deeplink.host, item.code)
+        if (deeplink.search.startsWith(`?${item.code}`)) return item.func(deeplink.search.replaceAll(`?${item.code}=`, ""), item.code)
     })
 }
 
 export async function fetchAnimeDeepLink(deeplink: string) {
-    console.log(deeplink)
     if (deeplink.replaceAll(" ", "").length <= 0) return
     let anime: deepLinkData | undefined;
     try {
@@ -930,13 +929,13 @@ export async function fetchAnimeDeepLink(deeplink: string) {
 export function LoginToAnilist() {
     setDeepLink({
         name: 'Fetch Anilist Token',
-        code: '?code',
+        code: 'code',
         func: fetchAnilistCodeToken
     })
 
     setDeepLink({
         name: 'Fetch Anilist Token Error',
-        code: '?error',
+        code: 'error',
         func: fetchAnilistCodeToken
     })
 

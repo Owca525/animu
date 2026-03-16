@@ -42,7 +42,6 @@ export default function Avatar() {
     } else {
       /* IFDEF DEBUG|PROD */
       const configAvatar = await window.api.getConfigAvatar()
-      console.log(configAvatar)
       if (configAvatar) setAvatar(`data:${configAvatar.mime};base64,${configAvatar.data}`)
       /* ENDIF */
       setGenerated((prev) => ([
@@ -60,7 +59,6 @@ export default function Avatar() {
       if (!tmp) {
         /* IFDEF DEBUG|PROD */
         const configAvatar = await window.api.getConfigAvatar()
-        console.log(configAvatar)
         if (configAvatar) setAvatar(`data:${configAvatar.mime};base64,${configAvatar.data}`)
         /* ENDIF */
         return
