@@ -196,7 +196,7 @@ if (!gotTheLock) {
     );
     await electronAppUniversalProtocolClient.initialize({
       protocol: PROTOCOL,
-      mode: 'development',
+      mode: process.env.NODE_ENV == 'development' ? 'development' : "production",
     });
     if (config.General.discordRPC && process.env.NODE_ENV != 'development') setupDiscordRPC()
 
