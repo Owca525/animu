@@ -50,4 +50,4 @@ export const DisableService = (tmp: serviceFormat) => setGlobalState((prev) => (
     }).filter((val) => val.uuid != tmp.uuid)
 }));
 
-export const setAnilistUserData = (tmp: { [key: string]: any; }) => setGlobalState((prev) => ({...prev, anilist_user_data: tmp}));
+export const setAnilistUserData = (tmp: { [key: string]: any; } | undefined) => setGlobalState((prev) => ({...prev, anilist_user_data: tmp}));

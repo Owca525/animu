@@ -1058,3 +1058,16 @@ export async function FetchAnilistUserData() {
         console.error("FetchAnilistUserData error", error)
     }
 }
+
+export function unLinkAnilistAccount() {
+    try {
+        setAnilistUserData(undefined)
+        localStorage.removeItem("Animu_Anilist_user_data")
+        localStorage.removeItem("Animu_Anilist_login_token_information")
+        toast(t("Succesfull Delete User In Animu"), { type: "success" })
+        openUrlFolder("https://anilist.co/settings/apps")
+    } catch (error) {
+        console.error("unLinkAnilistAccount/function Error", error)
+        toast(t("Failed Unlike Account"), { type: "error" })
+    }
+}

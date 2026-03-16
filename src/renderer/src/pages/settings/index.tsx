@@ -22,6 +22,7 @@ import {
     openUrlFolder,
     request,
     savePluginConfig,
+    unLinkAnilistAccount,
     updateObjectConfig
 } from '@renderer/utils/functions';
 import { checkUpdate } from '@renderer/utils/update';
@@ -703,7 +704,25 @@ function settings() {
                             <Match when={getAnilistUserData()}>
                                 <div class="settings-setting-container">
                                     {t("Synchronize User Data To Animu")}
-                                    <Button content={t('Sync')} onClick={FetchAnilistUserData} />
+                                    <span class="settings-custom-space">
+                                        <Button content={t('Logout')} onClick={() => {
+                                            showDialog({
+                                                type: 'info',
+                                                title: t('logout'),
+                                                description: t("Do you realy want logout account in animu?"),
+                                                buttons: [
+                                                {
+                                                    title: t("dialog.no"),
+                                                    onClick: () => ""
+                                                },
+                                                {
+                                                    title: t("dialog.yes"),
+                                                    onClick: unLinkAnilistAccount
+                                                }]
+                                            })
+                                        }} />
+                                        <Button content={t('Sync')} onClick={FetchAnilistUserData} />
+                                    </span>
                                 </div>
                             </Match>
                         </Switch>
