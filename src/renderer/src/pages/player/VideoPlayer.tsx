@@ -1322,6 +1322,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     ref={videoRef}
                     class="video-player"
                     preload="auto"
+                    autoplay={isPlaying()}
                     muted={isMuted()}
                     style={config.Player.general.VideoStreching ? { "object-fit": "cover" } : {}}
                 >

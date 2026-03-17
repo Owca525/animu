@@ -925,6 +925,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
                     ref={videoRef}
                     class="video-player"
                     preload="auto"
+                    autoplay={isPlaying()}
                     muted={isMuted()}
                     style={config.Player.general.VideoStreching ? { "object-fit": "cover" } : {}}
                 >
