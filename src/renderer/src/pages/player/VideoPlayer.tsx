@@ -236,6 +236,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             setEventInPlayer("progress", updateProgress)
             setEventInPlayer("seeked", updateProgress)
             setEventInPlayer("loadedmetadata", (event) => {
+                console.warn("PLAYER ON LOAD METADATA CURRENT TIME", event.currentTarget.currentTime)
                 updateProgress(event)
                 setdurrationTime(event.currentTarget.duration)
                 if (currentPlayer() && currentPlayer()!.listChapters) {
@@ -765,6 +766,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     }
 
     function updateProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
+        console.warn("updateProgress Current Time", event.currentTarget.currentTime)
+
         setcurrentTime(event.currentTarget.currentTime)
         saveContinueProgress(event)
         checkUpNext(event)
