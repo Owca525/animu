@@ -479,9 +479,9 @@ function information() {
         if (tempData().anime.trailer) tmp.push({
             value: 'Trailer',
             onClick: () => {
-                /* IFDEF DEBUG|PROD */
-                getAnimeTrailer(`https://www.youtube.com/watch?v=${tempData().anime.trailer?.id}`)
-                /* ENDIF */
+                // /* IFDEF DEBUG|PROD */
+                // getAnimeTrailer(`https://www.youtube.com/watch?v=${tempData().anime.trailer?.id}`)
+                // /* ENDIF */
                 SetactivePage("Trailer")
             }
         })
@@ -709,7 +709,7 @@ function information() {
                                                         <iframe
                                                             height="610px"
                                                             class='information-iframe'
-                                                            src={`https://www.youtube-nocookie.com/embed/${unwrap(tempData()).anime.trailer?.id}`}
+                                                            src={`https://www.youtube.com/embed/${unwrap(tempData()).anime.trailer?.id}`}
                                                             frameborder="0"
                                                             referrerpolicy='strict-origin-when-cross-origin'
                                                             allowfullscreen

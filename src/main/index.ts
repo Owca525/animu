@@ -88,6 +88,7 @@ function createWindow(): void {
 
   session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
     details.requestHeaders['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/143.0';
+    details.requestHeaders['Referer'] = 'http://localhost:5173/';
     callback({ requestHeaders: details.requestHeaders });
   });
 

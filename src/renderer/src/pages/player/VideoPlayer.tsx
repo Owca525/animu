@@ -78,6 +78,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     let vttSubRef: HTMLTrackElement | undefined
     let screenShotContainer: HTMLDivElement | undefined
     let refreashUpdateSocket: NodeJS.Timeout | undefined
+    let hls: Hls | undefined
+    let currentASSubtitles: JASSUB | undefined
 
     // Variable
     const [volume, setVolume] = createSignal<number>(PlayerVolume)
@@ -126,7 +128,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [currentSettings, setcurrentSettings] = createSignal<boolean>(false)
     const [showNerdStats, setshowNerdStats] = createSignal<boolean>(false)
     const [fatalError, setFatalError] = createSignal<boolean>(false)
-    const [hls, setHls] = createSignal<Hls | undefined>(undefined);
     const [chapterList, setChapterList] = createSignal<{ left: number, width: number, name?: string, type: "opening" | "ending" | "other" }[]>([])
     const [videoFrames, setVideoFrames] = createSignal<{ totalVideoFrames: number, droppedVideoFrames: number }>({ totalVideoFrames: 0, droppedVideoFrames: 0 })
 
@@ -134,7 +135,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [vttUrl, setVttUrl] = createSignal<string | undefined>(undefined);
     const [ListSubtitles, setListSubtitles] = createSignal<playerSubtitlesFormat[]>([])
     const [lastSubtitles, setlastSubtitles] = createSignal<playerSubtitlesFormat | undefined>(undefined)
-    const [currentASSubtitles, setASSubtitles] = createSignal<JASSUB | undefined>(undefined)
     const [currentSubtitles, setSubtitles] = createSignal<playerSubtitlesFormat | undefined>(undefined)
     const [currentCue, setCue] = createSignal<string | undefined>(undefined);
 
@@ -231,6 +231,24 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         handleVolume(PlayerVolume, true)
         handleMouseMove()
 
+        if (videoRef) {
+            setEventInPlayer("timeupdate", updateProgress)
+            setEventInPlayer("progress", updateProgress)
+            setEventInPlayer("seeked", updateProgress)
+            setEventInPlayer("loadedmetadata", (event) => {
+                updateProgress(event)
+                setdurrationTime(event.currentTarget.duration)
+                if (currentPlayer() && currentPlayer()!.listChapters) {
+                    generateOpeningEnding(currentPlayer()!.listChapters!)
+                }
+            })
+
+            setEventInPlayer("error", videoErrorHandler)
+            setEventInPlayer("canplay", () => { setWaitingPlayer(() => false) })
+            setEventInPlayer("waiting", () => { setWaitingPlayer(() => true) })
+            setEventInPlayer("click", () => { togglePlay(); setcurrentSettings(() => false); setShowSelectEpisode(() => false) })
+        }
+
         if (config.Player.general.AutoFullscreen) {
             toggleFullscreen(true)
             setIsFullscreen(true)
@@ -262,13 +280,39 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         });
     })
 
+    function setEventInPlayer(type: any, handler: (event: Event & { currentTarget: HTMLVideoElement; target: Element; }) => void) {
+        if (!videoRef) return
+        videoRef.addEventListener(type, handler);
+
+        onCleanup(() => {
+            if (videoRef) videoRef.removeEventListener(type, handler);
+        });
+    }
+
     onCleanup(async () => {
         if (document.pictureInPictureElement) await document.exitPictureInPicture();
 
+        if (containerRef) {
+            containerRef.innerHTML = ""
+            containerRef.remove()
+        }
+        if (hideTimer) clearInterval(hideTimer)
+        if (hideChapterButtonTimer) clearInterval(hideChapterButtonTimer)
+        if (screenshotWrapper) screenshotWrapper.remove()
+        if (volumeTimeout) clearInterval(volumeTimeout)
+        if (playAnimationTimeout) clearInterval(playAnimationTimeout)
+        if (buttonSkipLeft) clearInterval(buttonSkipLeft)
+        if (moreInformationTimer) clearInterval(moreInformationTimer)
+        if (buttonSkipRight) clearInterval(buttonSkipRight)
+        if (assSubContainer) assSubContainer.remove()
+        if (vttSubRef) vttSubRef.remove()
+        if (screenShotContainer) screenShotContainer.remove()
+        if (refreashUpdateSocket) clearInterval(refreashUpdateSocket)
+
         setCleanup(true)
         removeToast(currentExtractionRes().toast)
-        if (hls()) hls()?.destroy()
-        if (currentASSubtitles()) currentASSubtitles()?.destroy()
+        if (hls) hls.destroy()
+        if (currentASSubtitles) currentASSubtitles.destroy()
         if (videoRef) videoRef.src = ""
         videoRef = undefined
         shakaPlayer?.destroy()
@@ -334,8 +378,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         else setNewSubtitles(ListSubtitles[0])
         setCurrentResoltion(data)
 
-        if (hls() && data.hls) {
-            if (data.url == "") hls()!.currentLevel = hls()!.levels.findIndex(level => level.height === parseInt(data.res));
+        if (hls && data.hls) {
+            if (data.url == "") hls.currentLevel = hls.levels.findIndex(level => level.height === parseInt(data.res));
             else runHLS(data, currentPlayer()?.splitHLS)
             return
         }
@@ -412,7 +456,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             await runHLS(currentRes, currentplayer.splitHLS)
             return
         }
-        if (hls()) hls()!.destroy()
+        if (hls) hls.destroy()
 
         setListResolution(() => currentplayer.resolution)
         setCurrentResoltion(currentRes)
@@ -454,9 +498,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     }
 
     function changeAudioTrack(data: { id: number, lang?: string, label: string }) {
-        if (!hls()) return
+        if (!hls) return
         try {
-            hls()!.audioTrack = data.id
+            hls.audioTrack = data.id
             setCurrentAudioTrack(() => data)
         } catch (error) {
             toast(t("notification.failedchangeaudio"), { type: "error" })
@@ -464,7 +508,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     }
 
     async function runHLS(resolution: resolutionFormat, splitHls: boolean = false) {
-        const hls = new Hls({
+        const tmpHls = new Hls({
             maxBufferLength: 140,
             autoStartLoad: true,
             enableWorker: true,
@@ -497,22 +541,22 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             },
         });
 
-        setHls(() => hls)
+        hls = tmpHls
 
         if (Hls.isSupported() && videoRef) {
             const time = videoRef.currentTime
-            hls.loadSource(resolution.url);
-            hls.attachMedia(videoRef);
+            tmpHls.loadSource(resolution.url);
+            tmpHls.attachMedia(videoRef);
             setTimeVideo(time)
 
-            hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
+            tmpHls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
                 setFatalError(false)
                 if (!splitHls) {
                     const resolutions = data.levels.map((level) => level.height);
                     resolutions.reverse()
                     setListResolution(resolutions.map((val) => { return { res: val.toString(), url: "" } }))
                     setCurrentResoltion({ res: resolutions[0].toString(), url: "" })
-                    hls.currentLevel = hls.levels.length - 1;
+                    tmpHls.currentLevel = tmpHls.levels.length - 1;
                 }
                 data.levels.forEach(level => {
                     // I added Ignore because this give me a error "Cannot assign to 'audioCodec' because it is a read-only property." but i can assign then is good
@@ -530,27 +574,27 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 }
             });
 
-            hls.on(Hls.Events.ERROR, (_event, data) => {
+            tmpHls.on(Hls.Events.ERROR, (_event, data) => {
                 console.error("HLS", _event, data)
                 const curTime = unwrap(currentTime())
-                hls.currentLevel = hls.levels.length - 1;
-                if (data.details == "bufferStalledError") hls.startLoad(curTime)
+                tmpHls.currentLevel = tmpHls.levels.length - 1;
+                if (data.details == "bufferStalledError") tmpHls.startLoad(curTime)
                 if (data.fatal) {
                     let message: string | undefined
                     switch (data.type) {
                         case Hls.ErrorTypes.NETWORK_ERROR:
-                            hls.startLoad(curTime);
+                            tmpHls.startLoad(curTime);
                             setFatalError(false)
                             message = t('player.errors.MEDIA_ERR_NETWORK')
                             break;
                         case Hls.ErrorTypes.MEDIA_ERROR:
                             message = t('player.errors.MEDIA_ERR_DECODE')
-                            // hls.recoverMediaError()
-                            hls.destroy();
+                            // tmpHls.recoverMediaError()
+                            tmpHls.destroy();
                             return
                         default:
                             message = t('player.errors.default')
-                            hls.destroy();
+                            tmpHls.destroy();
                             break;
                     }
                     setFatalError(true)
@@ -741,7 +785,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }
 
         setVideoFrames({ totalVideoFrames: event.currentTarget.getVideoPlaybackQuality().totalVideoFrames, droppedVideoFrames: event.currentTarget.getVideoPlaybackQuality().droppedVideoFrames })
-        
+
         // Update RPC
         /* IFDEF DEBUG|PROD */
         if (config.General.discordRPC) window.api.rpc.setActivity(t("discordrpc.player", { title: detectTitleConfig(anime_data.AnimeData.title), ep: temp.episode }), `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`)
@@ -905,14 +949,14 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (!videoRef) return
 
         // This clear subtitles but this dosen't work on dev Because react second render
-        if (currentASSubtitles()) {
+        if (currentASSubtitles) {
             // currentASSubtitles.hide()
-            currentASSubtitles()!.destroy()
-            currentASSubtitles()!._canvas.remove()
-            setASSubtitles(() => undefined)
+            currentASSubtitles.destroy()
+            currentASSubtitles._canvas.remove()
+            currentASSubtitles = undefined
         }
 
-        if (window.api && window.electronAPI.process.env.NODE_ENV == "development" && currentASSubtitles() && assSubContainer) {
+        if (window.api && window.electronAPI.process.env.NODE_ENV == "development" && currentASSubtitles && assSubContainer) {
             assSubContainer.innerHTML = ""
         }
 
@@ -938,7 +982,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 defaultFont: "default"
                 // modernWasmUrl
             } as any);
-            setASSubtitles(renderer)
+            currentASSubtitles = renderer
             setSubtitles(() => sub)
             return
         }
@@ -1086,7 +1130,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         let screenshot: string = "data:,"
 
-        if (currentASSubtitles() && !noSubbtitles) {
+        if (currentASSubtitles && !noSubbtitles) {
             const outputCanvas = document.createElement("canvas");
             const ctx = outputCanvas.getContext("2d");
             if (!ctx) {
@@ -1096,7 +1140,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             outputCanvas.width = videoRef.videoWidth;
             outputCanvas.height = videoRef.videoHeight;
             ctx.drawImage(videoRef, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
-            ctx.drawImage(currentASSubtitles()!._canvas, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
+            ctx.drawImage(currentASSubtitles._canvas, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
             screenshot = outputCanvas.toDataURL("image/png");
         } else {
             const canvas = await html2canvas(screenshotWrapper);
@@ -1274,21 +1318,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 <video
                     ref={videoRef}
                     class="video-player"
-                    onTimeUpdate={updateProgress}
-                    onProgress={updateProgress}
-                    onSeeked={updateProgress}
-                    onClick={() => { togglePlay(); setcurrentSettings(() => false); setShowSelectEpisode(() => false) }}
-                    autoplay={isPlaying()}
-                    onWaiting={() => { setWaitingPlayer(() => true) }}
-                    onCanPlay={() => { setWaitingPlayer(() => false) }}
-                    onError={(error) => videoErrorHandler(error)}
-                    onLoadedMetadata={(event) => {
-                        updateProgress(event)
-                        setdurrationTime(event.currentTarget.duration)
-                        if (currentPlayer() && currentPlayer()!.listChapters) {
-                            generateOpeningEnding(currentPlayer()!.listChapters!)
-                        }
-                    }}
                     preload="auto"
                     muted={isMuted()}
                     style={config.Player.general.VideoStreching ? { "object-fit": "cover" } : {}}
@@ -1391,7 +1420,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                                 <SeekBar currentValue={volume()} maxValue={100} onSeek={value => handleVolume(value)} classes={{ "container": "player-seekbar" }} type="procent" />
                             </div>
 
-                            <Show when={currentASSubtitles() == undefined}>
+                            <Show when={currentASSubtitles == undefined}>
                                 <PlayerButton icon={"picture_in_picture"} onClick={handlePictureInPicture} title={detectDisableTooltips(t("settings.player.keybinds.pip"))} ButtonClass="player-buttons" />
                             </Show>
 
