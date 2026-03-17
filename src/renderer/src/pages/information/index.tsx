@@ -2,7 +2,7 @@ import Button from '@renderer/components/buttons';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
-import { AnimeData, animeOpeningsFormat, animulistProps, cardData, ContextMenuProps, indentityPlayer, playerChapterList, playerPluginFormat, playerSubtitlesFormat } from '@renderer/utils/types';
+import { AnimeData, animeOpeningsFormat, animulistProps, cardData, ContextMenuProps, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
 import {
     calculateDays,
     changeTitleAnimu,
@@ -78,6 +78,8 @@ function information() {
     const [secondsLeft, setSecondsLeft] = createSignal<undefined | { left: number, converted: { days: number; hours: number; minutes: number; seconds: number; } | undefined }>(undefined);
     const [contextMenu, setcontextMenu] = createSignal<ContextMenuProps>([])
 
+    const [buttonGroups, setButtonGroups] = createSignal<{value: string; onClick: () => void; }[]>([])
+
     // Openings / Endings
     const [animeMedia, setAnimeMedia] = createSignal<animeOpeningsFormat[]>([])
     const [currentMedia, setCurrentAnimeMedia] = createSignal<MiniPlayerProps[] | undefined>(undefined)
@@ -96,7 +98,7 @@ function information() {
     const [isContentNoData, setContentNoData] = createSignal<string | undefined>(undefined)
 
     // Content yt-dlp
-    const [contentyt_dlp, setContentYT_DLP] = createSignal<MiniPlayerProps[]>([])
+    // const [contentyt_dlp, setContentYT_DLP] = createSignal<MiniPlayerProps[]>([])
 
     const [activePage, SetactivePage] = createSignal<string>("Episodes")
 
@@ -121,7 +123,7 @@ function information() {
     function checkIsAnimeReleasing() {
         if (tempData().anime.status != "RELEASING") return
         if (animeEpisodeReleasingTime) clearInterval(animeEpisodeReleasingTime)
-        
+
         animeEpisodeReleasingTime = setInterval(() => {
             setSecondsLeft(prev => {
                 if (!prev) return undefined
@@ -223,7 +225,30 @@ function information() {
             setTmpData({ ...tempData(), saveData: { ...history[0].saveData, pluginName: unwrap(currentPlugin()) as string } as indentityPlayer })
             localStorage.setItem("informationCache", JSON.stringify({ ...tempData(), saveData: { ...history[0].saveData, pluginName: unwrap(currentPlugin()) as string } as indentityPlayer }))
         }
+
+        if (detectTrailerMusic()) return
+
         episodeResponse.Refetch([tempData(), currentIDplayer(), currentPlugin()])
+    }
+
+    function detectTrailerMusic() {
+        if (tempData().anime.format == "MUSIC") {
+            genereteButtonsGroup()
+            setContentLoading(false)
+            SetactivePage("Music")
+            if (tempData().anime.trailer == undefined) setContentNoData("No Music Found")
+            return true
+        }
+
+        if (tempData().anime.type != "ANIME" || tempData().anime.status == "NOT_YET_RELEASED") {
+            genereteButtonsGroup()
+            setContentLoading(false)
+            SetactivePage("Trailer")
+            if (tempData().anime.trailer == undefined) setContentNoData("No Trailer Found")
+            return true
+        }
+        genereteButtonsGroup()
+        return false
     }
 
     onMount(() => { initialInformation() })
@@ -276,9 +301,9 @@ function information() {
         const animulist = unwrap(animulistData())
         let tmpAnimulist
         let resp
-        if (!data.type && data.format == "MANGA" || data.format == "NOVEL" || data.format == "ONE_SHOT") {
-            resp = await getInformationPlugin().getManga(data.id)
-        } else if (data.type == "MANGA") {
+
+        if (data.format == "MANGA" || data.format == "NOVEL" || data.format == "ONE_SHOT") {
+            console.log("AKSNDL:NAJSD")
             resp = await getInformationPlugin().getManga(data.id)
         } else {
             resp = await getInformationPlugin().anime(data.id)
@@ -303,6 +328,8 @@ function information() {
         SetactivePage("Episodes")
         setAnimeMedia([])
         setCurrentAnimeMedia(undefined)
+
+        detectTrailerMusic()
 
         localStorage.setItem("informationCache", JSON.stringify({ anime: resp, saveData: undefined, animulist: tmpAnimulist }))
         setTmpData({ anime: resp, saveData: undefined, animulist: tmpAnimulist })
@@ -347,59 +374,59 @@ function information() {
     }
 
     /* IFDEF DEBUG|PROD */
-    async function getAnimeTrailer(url: string) {
-        try {
-            resetContentVariable()
-            setContentLoading(true)
-            const response = await window.api.yt_dlp.run(url)
-            console.log(response)
-            if (!response["url"]) {
-                setContentLoading(false)
-                return
-            }
+    // async function getAnimeTrailer(url: string) {
+    //     try {
+    //         resetContentVariable()
+    //         setContentLoading(true)
+    //         const response = await window.api.yt_dlp.run(url)
+    //         console.log(response)
+    //         if (!response["url"]) {
+    //             setContentLoading(false)
+    //             return
+    //         }
 
-            let chapters: playerChapterList[] = []
-            if (response["chapters"]) chapters = response["chapters"].map((item) => (
-                {
-                    start: item["start_time"],
-                    end: item["end_time"],
-                    type: "other",
-                    name: item["title"]
-                }))
+    //         let chapters: playerChapterList[] = []
+    //         if (response["chapters"]) chapters = response["chapters"].map((item) => (
+    //             {
+    //                 start: item["start_time"],
+    //                 end: item["end_time"],
+    //                 type: "other",
+    //                 name: item["title"]
+    //             }))
 
-            let subtitles: playerSubtitlesFormat[] = []
-            if (response["automatic_captions"]) {
-                for (const key in response["automatic_captions"]) {
-                    const value = response["automatic_captions"][key as keyof typeof response["automatic_captions"]];
-                    const subFinded = value.find((item) => item["ext"] == "vtt")
-                    if (!subFinded) continue
-                    subtitles.push({
-                        url: subFinded["url"],
-                        lang: key,
-                        label: subFinded["name"],
-                        format: subFinded["ext"]
-                    })
-                }
-            }
+    //         let subtitles: playerSubtitlesFormat[] = []
+    //         if (response["automatic_captions"]) {
+    //             for (const key in response["automatic_captions"]) {
+    //                 const value = response["automatic_captions"][key as keyof typeof response["automatic_captions"]];
+    //                 const subFinded = value.find((item) => item["ext"] == "vtt")
+    //                 if (!subFinded) continue
+    //                 subtitles.push({
+    //                     url: subFinded["url"],
+    //                     lang: key,
+    //                     label: subFinded["name"],
+    //                     format: subFinded["ext"]
+    //                 })
+    //             }
+    //         }
 
-            setContentYT_DLP([{
-                title: response["fulltitle"],
-                hostname: "Youtube",
-                listChapters: chapters,
-                subtitles: subtitles,
-                resolution: [{
-                    res: response["height"].toString(),
-                    url: response["url"],
-                    reqHeader: response["http_headers"]
-                }]
-            }])
-            setContentLoading(false)
-        } catch (error) {
-            console.error("Error in getAnimeTrailer", error)
-            setContentLoading(false)
-            setContentError(true)
-        }
-    }
+    //         setContentYT_DLP([{
+    //             title: response["fulltitle"],
+    //             hostname: "Youtube",
+    //             listChapters: chapters,
+    //             subtitles: subtitles,
+    //             resolution: [{
+    //                 res: response["height"].toString(),
+    //                 url: response["url"],
+    //                 reqHeader: response["http_headers"]
+    //             }]
+    //         }])
+    //         setContentLoading(false)
+    //     } catch (error) {
+    //         console.error("Error in getAnimeTrailer", error)
+    //         setContentLoading(false)
+    //         setContentError(true)
+    //     }
+    // }
     /* ENDIF */
 
     function makeButtons(episode: { ep: string, img?: string, title?: string }[], type: string) {
@@ -467,7 +494,29 @@ function information() {
         return titles.join(" \u25CF ")
     }
 
-    function genereteButtonsGroup() {
+    function genereteButtonsGroup(): any {
+        debugger
+        if (tempData().anime.format == "MUSIC") {
+            return setButtonGroups([{
+                value: 'Music',
+                onClick: () => {
+                    SetactivePage("Music")
+                    if (tempData().anime.trailer == undefined) setContentNoData("No Music Found")
+                }
+            }])
+        }
+
+        if (tempData().anime.type != "ANIME" || tempData().anime.status == "NOT_YET_RELEASED") {
+            return setButtonGroups([{
+                value: 'Trailer',
+                onClick: () => {
+                    SetactivePage("Trailer")
+                    if (tempData().anime.trailer == undefined) setContentNoData("No Trailer Found")
+                }
+            }])
+        }
+
+
         let tmp = [{
             value: 'Episodes',
             onClick: () => SetactivePage("Episodes")
@@ -485,8 +534,9 @@ function information() {
                 SetactivePage("Trailer")
             }
         })
+        console.log(tmp)
 
-        return tmp
+        setButtonGroups(tmp)
     }
 
     return (
@@ -677,31 +727,34 @@ function information() {
                                 </div>
                             </Show>
 
-                            <Show when={tempData().anime.type == "ANIME" && tempData().anime.status != "NOT_YET_RELEASED"}>
-                                <div class="information-episodes">
-                                    <div class="information-episodes-top-content">
-                                        <div class="information-eopsodes-top-left">
+                            <div class="information-episodes">
+                                <div class="information-episodes-top-content">
+                                    <div class="information-eopsodes-top-left">
+                                        <Show when={tempData().anime.type == "ANIME" && tempData().anime.status != "NOT_YET_RELEASED" && tempData().anime.format != "MUSIC"}>
                                             <Button ButtonClass="information-episodes-button" icon="search" onClick={() => setshowWrong(() => true)} />
-                                            <ButtonGroup selectedValue={activePage()} listValues={genereteButtonsGroup()} />
-                                        </div>
-                                        <div class="information-episodes-space">
+                                        </Show>
+                                        <ButtonGroup selectedValue={activePage()} listValues={buttonGroups()} />
+                                    </div>
+                                    <div class="information-episodes-space">
+                                        <Show when={tempData().anime.type == "ANIME" && tempData().anime.status != "NOT_YET_RELEASED" && tempData().anime.format != "MUSIC"}>
                                             <Dropdown options={segregatePlugins(refreashInformation)} disableX buttonText={currentPlugin()} />
                                             <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(getPlayerPLugin()?.metadata.name as string, true)} />
-                                        </div>
+                                        </Show>
                                     </div>
-                                    <Show when={!showWrong()}>
-                                        <Switch>
-                                            <Match when={isContentLoading()}>
-                                                <div class="information-loading-container"><span class="material-symbols-outlined information-loading">progress_activity</span></div>
-                                            </Match>
-                                            <Match when={isContentError()}>
-                                                <div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>
-                                            </Match>
-                                            <Match when={isContentNoData()}>
-                                                <div class="information-loading-container"><span class="information-error material-symbols-outlined">search_off</span>{t(isContentNoData()!)}</div>
-                                            </Match>
-                                            <Match when={activePage() == "Trailer"}>
-                                                <Switch>
+                                </div>
+                                <Show when={!showWrong()}>
+                                    <Switch>
+                                        <Match when={isContentLoading()}>
+                                            <div class="information-loading-container"><span class="material-symbols-outlined information-loading">progress_activity</span></div>
+                                        </Match>
+                                        <Match when={isContentError()}>
+                                            <div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>
+                                        </Match>
+                                        <Match when={isContentNoData()}>
+                                            <div class="information-loading-container"><span class="information-error material-symbols-outlined">search_off</span>{t(isContentNoData()!)}</div>
+                                        </Match>
+                                        <Match when={activePage() == "Trailer" || activePage() == "Music"}>
+                                            {/* <Switch>
                                                     <Match when={contentyt_dlp().length > 0}>
                                                         <MiniPlayer props={unwrap(contentyt_dlp()!)} />
                                                     </Match>
@@ -715,25 +768,32 @@ function information() {
                                                             allowfullscreen
                                                         ></iframe>
                                                     </Match>
-                                                </Switch>
-                                            </Match>
-                                            <Match when={activePage() == "Opening/Ending"}>
-                                                <Show when={currentMedia()}>
-                                                    <MiniPlayer props={unwrap(currentMedia()!)} />
-                                                </Show>
-                                            </Match>
-                                            <Match when={episodeResponse.data() && activePage() == "Episodes"}>
-                                                <For each={episodeResponse.data()?.episodesData} fallback={<div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}>
-                                                    {(episode) => {
-                                                        if (episode.episodes.length <= 0) return <></>
-                                                        return <Drop LeftHeader={episode.name ? episode.name : t(`information.types.${episode.type}`)} RightHeader={t("information.listEpisodes", { number: episode.episodes.length })} content={makeButtons(episode.episodes, episode.type)} />
-                                                    }}
-                                                </For>
-                                            </Match>
-                                        </Switch>
-                                    </Show>
-                                </div>
-                            </Show>
+                                                </Switch> */}
+                                            <iframe
+                                                height="610px"
+                                                class='information-iframe'
+                                                src={`https://www.youtube.com/embed/${unwrap(tempData()).anime.trailer?.id}`}
+                                                frameborder="0"
+                                                referrerpolicy='strict-origin-when-cross-origin'
+                                                allowfullscreen
+                                            ></iframe>
+                                        </Match>
+                                        <Match when={activePage() == "Opening/Ending"}>
+                                            <Show when={currentMedia()}>
+                                                <MiniPlayer props={unwrap(currentMedia()!)} />
+                                            </Show>
+                                        </Match>
+                                        <Match when={episodeResponse.data() && activePage() == "Episodes"}>
+                                            <For each={episodeResponse.data()?.episodesData} fallback={<div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}>
+                                                {(episode) => {
+                                                    if (episode.episodes.length <= 0) return <></>
+                                                    return <Drop LeftHeader={episode.name ? episode.name : t(`information.types.${episode.type}`)} RightHeader={t("information.listEpisodes", { number: episode.episodes.length })} content={makeButtons(episode.episodes, episode.type)} />
+                                                }}
+                                            </For>
+                                        </Match>
+                                    </Switch>
+                                </Show>
+                            </div>
 
                             <Show when={tempData().anime.relations && tempData().anime.relations!.length > 0}>
                                 <div class="information-relation-container">
