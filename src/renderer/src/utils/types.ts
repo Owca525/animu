@@ -75,6 +75,8 @@ export interface AnimeData {
         title: { english?: string, native: string, romaji: string }
         bannerImage?: string
         coverImage: string
+        type: string,
+        format?: string
     }[]
 }
 

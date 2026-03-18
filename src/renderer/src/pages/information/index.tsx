@@ -195,8 +195,6 @@ function information() {
 
         if (config.information.openingininformation) searchAnimeOpenings()
 
-        checkAnimeFetching()
-
         if (tempData().saveData && tempData().anime.status == "RELEASING") FetchAnimeForinformation()
 
         let plugin = pluginManager().currentPlugin
@@ -227,6 +225,8 @@ function information() {
         }
 
         if (detectTrailerMusic()) return
+
+        checkAnimeFetching()
 
         episodeResponse.Refetch([tempData(), currentIDplayer(), currentPlugin()])
     }
@@ -303,7 +303,6 @@ function information() {
         let resp
 
         if (data.format == "MANGA" || data.format == "NOVEL" || data.format == "ONE_SHOT") {
-            console.log("AKSNDL:NAJSD")
             resp = await getInformationPlugin().getManga(data.id)
         } else {
             resp = await getInformationPlugin().anime(data.id)
@@ -328,8 +327,6 @@ function information() {
         SetactivePage("Episodes")
         setAnimeMedia([])
         setCurrentAnimeMedia(undefined)
-
-        detectTrailerMusic()
 
         localStorage.setItem("informationCache", JSON.stringify({ anime: resp, saveData: undefined, animulist: tmpAnimulist }))
         setTmpData({ anime: resp, saveData: undefined, animulist: tmpAnimulist })
@@ -495,7 +492,6 @@ function information() {
     }
 
     function genereteButtonsGroup(): any {
-        debugger
         if (tempData().anime.format == "MUSIC") {
             return setButtonGroups([{
                 value: 'Music',
@@ -841,12 +837,14 @@ function information() {
                                         <span class='material-symbols-outlined loading-animation icon'>progress_activity</span>
                                     </div>
                                 </Match>
-                                <Match when={tempData().anime.recommendations && tempData().anime.recommendations!.length > 0 && !fetchingAnime()}>
+                                <Match when={tempData().anime.recommendations && tempData().anime.recommendations!.length > 0 && !fetchingAnime() && tempData().anime.type == "ANIME"}>
                                     <Container title="information.recomendation" horizontal data={tempData().anime.recommendations!.map((item) => ({
                                         AnimeData: {
                                             title: item.title,
                                             bannerImage: item.bannerImage,
                                             coverImage: item.coverImage,
+                                            type: item.type,
+                                            format: item.format,
                                             id: item.id.toString(),
                                         },
                                         onClick: ChangeAnimeInInformation

@@ -106,6 +106,8 @@ const animeData = `
         nodes {
           mediaRecommendation {
             id
+            type
+            format
             title {
               romaji
               english
@@ -324,6 +326,8 @@ function Convert(convert: any): cardData {
           id: element.mediaRecommendation.id,
           title: element.mediaRecommendation.title,
           coverImage: element.mediaRecommendation.coverImage.extraLarge ? element.mediaRecommendation.coverImage.extraLarge : element.mediaRecommendation.coverImage.large,
+          type: element["mediaRecommendation"]["type"],
+          format: element["mediaRecommendation"]["format"]
         })
       });
     }
@@ -690,7 +694,9 @@ export default class AnilistApi implements informationPluginFormat {
   getManga = async (id: string) => {
     try {
       let req = await sendPost({ id: id, type: "MANGA" }, graphicApIDAnime)
+      console.log(req)
       if (!req.success || !req.json) return
+      console.log(Convert(req.json.data.Media).AnimeData)
       return Convert(req.json.data.Media).AnimeData
     } catch (error) {
       console.error("Uknown error in getManga/anilistapi", error)
