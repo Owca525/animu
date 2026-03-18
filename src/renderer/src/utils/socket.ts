@@ -3,25 +3,22 @@ import { getSocket, setSocket, setSocketRoom } from "./stores/global";
 import { io } from "socket.io-client";
 import { unwrap } from "solid-js/store";
 import { toast } from "./context/ToastNotification";
+import { globalNavigate, reloadWebsite } from "./functions";
 
 (window as any).runSocket = runSocket;
 (window as any).createRoom = createRoom;
 (window as any).getRooms = getRooms;
 (window as any).closeSocket = closeSocket;
 
-function closeSocket() {
+export function closeSocket() {
     const socket = getSocket()
     if (!socket) return
     socket.close()
 }
 
-function runSocket(server: string = "") {
+export function runSocket(server: string = "") {
     const socket = io(server)
     console.log(socket)
-
-    socket.on("rooms-list", (rooms) => {
-        console.log(rooms)
-    })
 
     socket.on("player:init", (playerData: socketPlayerInit) => {
         localStorage.setItem("playerCache", JSON.stringify(unwrap({
@@ -29,22 +26,22 @@ function runSocket(server: string = "") {
             save: playerData.saveData,
             episodelist: playerData.temp.episodes,
         })))
-        if (location.href.includes("/player")) return
-        const tmp = location.href.replaceAll("info", "")
-        location.href = `${tmp}player`
+        if (location.href.includes("/player")) return reloadWebsite()
+        globalNavigate("/player")
     })
 
     socket.on("disconnect", () => {
         socket.off("player:init")
         socket.off("rooms-list")
+        setSocket(undefined as any)
         toast("Disconected From Websocket")
     });
     setSocket(socket)
+    return socket
 }
 
-function createRoom(name: string) {
+export function createRoom(name: string) {
     const socket = getSocket()
-    console.log(socket)
     if (!socket) return
     socket.emit("join-room", name, (resp) => {
         if (!resp.success) return toast(`Failed Connect to Room ${name}`)
@@ -56,9 +53,8 @@ function createRoom(name: string) {
     setSocketRoom(name)
 }
 
-function getRooms() {
+export function getRooms() {
     const socket = getSocket()
-    console.log(socket)
     if (!socket) return
     return socket.emit("gets-rooms");
 }

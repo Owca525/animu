@@ -1,0 +1,44 @@
+.socket-main-container {
+    background-color: var(--second-layer);
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translateY(-90%);
+
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 100%;
+    height: 200px;
+    gap: 8px;
+}
+
+.socket-topbar {
+    display: flex;
+    justify-content: space-between;
+}
+
+.socket-userid {
+    display: flex;
+    align-items: center;
+}
+
+.socket-buttons-contaienr {
+    display: flex;
+    gap: 4px;
+}
+
+.socket-button-connect {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 0px;
+    cursor: pointer;
+    user-select: none;
+}
+.socket-button-connect:hover {
+    background-color: var(--third-layer);
+    border-radius: 12px;
+}

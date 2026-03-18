@@ -434,6 +434,10 @@ export interface SettingsConfig {
         type: "On Start" | "Every Day" | "Every Week"
         enable: boolean
     }
+    socket: {
+        useSocket: boolean,
+        backend: string
+    }
 }
 
 export interface dialogProps {

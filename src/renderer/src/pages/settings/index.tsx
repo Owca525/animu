@@ -1443,26 +1443,48 @@ function settings() {
                                 } />
                             </span>
                         </div>
+                        <Show when={window.api}>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                {t("Run Test DeepLink")}
+                                <CheckBox
+                                    checked={getDeeplinks().find((val) => val.name == "Animu Deeplink Test") ? true : false}
+                                    onChecked={(checked) => {
+                                        if (checked) {
+                                            setDeepLink({
+                                                name: 'Animu Deeplink Test',
+                                                code: 'animutest',
+                                                func: function (deeplink: string) {
+                                                    toast(t("Ping Pong, Animu Received Deepling " + deeplink))
+                                                }
+                                            })
+                                        } else {
+                                            removeDeepLink("Animu Deeplink Test")
+                                        }
+                                    }}
+                                />
+                            </div>
+                        </Show>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("Run Test DeepLink")}
+                            {t("Use Websocket")}
                             <CheckBox
-                                checked={getDeeplinks().find((val) => val.name == "Animu Deeplink Test") ? true : false}
-                                onChecked={(checked) => {
-                                    if (checked) {
-                                        setDeepLink({
-                                            name: 'Animu Deeplink Test',
-                                            code: 'animutest',
-                                            func: function (deeplink: string) {
-                                                toast(t("Ping Pong, Animu Received Deepling " + deeplink))
-                                            }
-                                        })
-                                    } else {
-                                        removeDeepLink("Animu Deeplink Test")
-                                    }
-                                }}
+                                checked={config().new.socket.useSocket}
+                                onChecked={(checked) => handleChange('socket.useSocket', checked)}
                             />
                         </div>
+                        <Show when={config().new.socket.useSocket}>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                {t("Web Socket Backend")}
+                                <SettingsInput
+                                    iconChar=""
+                                    type='text'
+                                    onKeyDown={(text) => handleChange("socket.backend", text)}
+                                    startValue={config().new.socket.backend.toString()}
+                                />
+                            </div>
+                        </Show>
                     </div>
                     <Show when={versions()}>
                         <div class="settings-page-container">

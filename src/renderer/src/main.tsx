@@ -8,6 +8,7 @@ import { MenuContextProvider } from './utils/context/menuContext';
 
 import "material-symbols/material-symbols-outlined.woff2"
 import "material-symbols/outlined.css"
+import { SocketProvider } from './utils/context/SocketContext';
 
 (window as any).animuAppInfo = "PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION";
 
@@ -15,13 +16,15 @@ render(
   () => (
     <I18nProvider config={{ defaultLang: "en", fallbackLang: "en" }}>
       <MenuContextProvider>
-        <DialogProvider>
-          <ContextMenu>
-            <ToastProvider>
-              <App />
-            </ToastProvider>
-          </ContextMenu>
-        </DialogProvider>
+        <SocketProvider>
+          <DialogProvider>
+            <ContextMenu>
+              <ToastProvider>
+                <App />
+              </ToastProvider>
+            </ContextMenu>
+          </DialogProvider>
+        </SocketProvider>
       </MenuContextProvider>
     </I18nProvider>
   ),

@@ -233,7 +233,7 @@ export function CreateContextMenuOptions(start?: ContextMenuProps, center?: Cont
             ContextMenu.push(element)
         }
     }
-    ContextMenu.push({ option: t("dialog.reload"), onClick: () => window.BrowserWindow.reload() })
+    ContextMenu.push({ option: t("dialog.reload"), onClick: () => reloadWebsite() })
     if (center) {
         ContextMenu.push({ option: "", line: true })
         for (let index = 0; index < center.length; index++) {
@@ -1189,4 +1189,14 @@ export async function updateAnilistUserData(variables: { [key: string]: any }, n
         console.error("Error in updateAnilistUserData/functions", error)
         return notification ? toast(t("Failed Update Anilist Settings"), { type: "error" }) : ""
     }
+}
+
+export function reloadWebsite() {
+    /* IFDEF WEB */
+    location.reload()
+    /* ENDIF */
+
+    /* IFDEF DEBUG|PROD */
+    window.BrowserWindow.reload()
+    /* ENDIF */
 }

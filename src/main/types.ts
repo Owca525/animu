@@ -132,6 +132,10 @@ export interface SettingsConfig {
         type: "On Start" | "Every Day" | "Every Week"
         enable: boolean
     }
+    socket: {
+        useSocket: boolean,
+        backend: string
+    }
 }
 
 export interface AnimeData {
@@ -335,6 +339,10 @@ export const defaultConfig: SettingsConfig = {
     },
     information: {
         openingininformation: false
+    },
+    socket: {
+        useSocket: false,
+        backend: ""
     }
 };
 

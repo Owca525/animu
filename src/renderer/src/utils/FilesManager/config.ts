@@ -146,6 +146,10 @@ export const defaultConfigWeb: SettingsConfig = {
     },
     information: {
         openingininformation: false
+    },
+    socket: {
+        useSocket: false,
+        backend: ""
     }
 };
 /* ENDIF */
