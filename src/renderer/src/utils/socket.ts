@@ -3,7 +3,7 @@ import { getSocket, setSocket, setSocketRoom } from "./stores/global";
 import { io } from "socket.io-client";
 import { unwrap } from "solid-js/store";
 import { toast } from "./context/ToastNotification";
-import { globalNavigate, reloadWebsite } from "./functions";
+import { reloadWebsite } from "./functions";
 
 (window as any).runSocket = runSocket;
 (window as any).createRoom = createRoom;
@@ -27,7 +27,8 @@ export function runSocket(server: string = "") {
             episodelist: playerData.temp.episodes,
         })))
         if (location.href.includes("/player")) return reloadWebsite()
-        globalNavigate("/player")
+        const tmp = location.href.replaceAll("info", "")
+        location.href = `${tmp}player`
     })
 
     socket.on("disconnect", () => {
