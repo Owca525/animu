@@ -4,6 +4,7 @@ import Information from './pages/information/index';
 import LocalErrorBoundary from './utils/ErrorBoundary';
 import Player from './pages/player/index';
 import Settings from './pages/settings/index';
+import shaka from 'shaka-player';
 import {
   calculateZoomLevel,
   changeTheme,
@@ -15,8 +16,9 @@ import {
   runService,
   timeCovertToMs,
   updateObject
-} from './utils/functions';
+  } from './utils/functions';
 import { checkUpdate } from './utils/update';
+import { convertHistoryToAnimuList } from './utils/FilesManager/animulist';
 import { CreateBackup } from './utils/backup';
 import { createShortcut } from '@solid-primitives/keyboard';
 import {
@@ -26,24 +28,32 @@ import {
   onMount,
   Suspense,
   Switch
-} from 'solid-js';
+  } from 'solid-js';
 import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
+import {
+  getAnilistUserData,
+  getGlobalCache,
+  setAnilistUserData,
+  setAnimulistData,
+  setDeepLink,
+  setDeeplinkRunned,
+  setGlobalHistory,
+  setGlobalTheme,
+  setIncognitoMode
+  } from './utils/stores/global';
 import { getConfig, setConfig } from './utils/stores/config';
-import { getAnilistUserData, getGlobalCache, getSocket, setAnilistUserData, setAnimulistData, setDeepLink, setDeeplinkRunned, setGlobalHistory, setGlobalTheme, setIncognitoMode, setSocket, setSocketRoom } from './utils/stores/global';
-import { HashRouter, Route } from '@solidjs/router';
 import { getInformationPlugin, pluginManager, setPluginRepo } from './utils/stores/plugins';
+import { HashRouter, Route } from '@solidjs/router';
+import { pluginRepoExpanded, themeMetadata } from './utils/types';
 import { setHomeActivePage } from './utils/stores/home';
-import { toast, updateToast } from './utils/context/ToastNotification';
 import { t, useI18n } from './utils/i18n';
+import { toast, updateToast } from './utils/context/ToastNotification';
+import { unwrap } from 'solid-js/store';
 import './App.css';
 import './themes/darkerAnimu/main.css';
 import './utils/i18n';
-import { unwrap } from 'solid-js/store';
-import { pluginRepoExpanded, themeMetadata } from './utils/types';
-import shaka from 'shaka-player';
-import { convertHistoryToAnimuList } from './utils/FilesManager/animulist';
-import { socketPlayerInit } from './pages/player/VideoPlayer';
-import { io } from 'socket.io-client';
+import './utils/debug';
+import "./utils/socket"
 
 /* IFDEF DEBUG|PROD */
 import {
@@ -53,7 +63,6 @@ import {
 /* ENDIF */
 
 /* IFDEF DEBUG */
-import "./utils/debug"
 /* ENDIF */
 
 // import ErrorBoundary from './utils/ErrorBoundary';
@@ -224,65 +233,6 @@ function App() {
     // };
 
     // setTimeout(() => worker.terminate(), 1000);
-
-    (window as any).runSocket = runSocket;
-    (window as any).createRoom = createRoom;
-    (window as any).getRooms = getRooms;
-    (window as any).closeSocket = closeSocket;
-
-    function closeSocket() {
-      const socket = getSocket()
-      if (!socket) return
-      socket.close()
-    }
-
-    function runSocket(server: string = "") {
-      const socket = io(server)
-      console.log(socket)
-
-      socket.on("rooms-list", (rooms) => {
-        console.log(rooms)
-      })
-
-      socket.on("player:init", (playerData: socketPlayerInit) => {
-        localStorage.setItem("playerCache", JSON.stringify(unwrap({
-          data: playerData.anime,
-          save: playerData.saveData,
-          episodelist: playerData.temp.episodes,
-        })))
-        if (location.href.includes("/player")) return
-        const tmp = location.href.replaceAll("info", "")
-        location.href = `${tmp}player`
-      })
-
-      socket.on("disconnect", () => {
-        socket.off("player:init")
-        socket.off("rooms-list")
-        toast("Disconected From Websocket")
-      });
-      setSocket(socket)
-    }
-
-    function createRoom(name: string) {
-      const socket = getSocket()
-      console.log(socket)
-      if (!socket) return
-      socket.emit("join-room", name, (resp) => {
-        if (!resp.success) return toast(`Failed Connect to Room ${name}`)
-        else {
-          toast(`Sucesfully Connected to ${name}`)
-          setSocketRoom(name)
-        }
-      });
-      setSocketRoom(name)
-    }
-
-    function getRooms() {
-      const socket = getSocket()
-      console.log(socket)
-      if (!socket) return
-      return socket.emit("gets-rooms");
-    }
 
     /* IFDEF DEBUG|PROD */
     runCheckUpdate()
