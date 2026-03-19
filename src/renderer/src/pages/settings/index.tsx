@@ -314,11 +314,11 @@ function settings() {
             title: t("global.action"),
             description: t("settings.backup.askrestore", { date }),
             buttons: [{
-                title: "No",
+                title: t("dialog.no"),
                 onClick: () => ""
             },
             {
-                title: "Yes",
+                title: t("dialog.yes"),
                 onClick: async () => { RestoreBackup(file); setBackupList(await window.api.backup.list()) },
             }
             ]

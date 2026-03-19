@@ -1,4 +1,4 @@
-import { createContext, JSX, For, Show, createSignal, createEffect } from "solid-js";
+import { createContext, JSX, For, Show, createSignal } from "solid-js";
 import { Portal } from "solid-js/web";
 import "./css/menuContext.css";
 import { AnimeData, animulistProps, themeMetadata } from "../types";
@@ -56,10 +56,6 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
         if (data.animuList && data.animuList.animulist) setTMPAnimulist(data.animuList.animulist)
         setContent(data);
     }
-
-    createEffect(() => {
-        console.log(animulistTMPData())
-    })
 
     function setAnimulistNewData(data: { [key: string]: number | string }) {
         setTMPAnimulist((v) => ({...v, ...data}))

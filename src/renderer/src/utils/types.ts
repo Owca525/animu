@@ -8,17 +8,91 @@ export const notificationProps = {
     theme: "dark"
 }
 
+export const Anilist_ScoreFormatKeys = {
+    POINT_100: "POINT_100",
+    POINT_10_DECIMAL: "POINT_10_DECIMAL",
+    POINT_10: "POINT_10",
+    POINT_5: "POINT_5",
+    POINT_3: "POINT_3",
+} as const
+export type Anilist_ScoreFormat = keyof typeof Anilist_ScoreFormatKeys
+
+export const Anilist_UserTitleLanguageKeys = {
+    ROMAJI: "ROMAJI",
+    ENGLISH: "ENGLISH",
+    NATIVE: "NATIVE",
+    ROMAJI_STYLISED: "ROMAJI_STYLISED",
+    ENGLISH_STYLISED: "ENGLISH_STYLISED",
+    NATIVE_STYLISED: "NATIVE_STYLISED",
+} as const
+export type Anilist_UserTitleLanguage = keyof typeof Anilist_UserTitleLanguageKeys
+
+export const Anilist_UserStaffNameLanguageKeys = {
+    ROMAJI_WESTERN: "ROMAJI_WESTERN",
+    ROMAJI: "ROMAJI",
+    NATIVE: "NATIVE",
+} as const
+export type Anilist_UserStaffNameLanguage = keyof typeof Anilist_UserStaffNameLanguageKeys
+
+export const Anilist_MediaListStatusKeys = {
+    CURRENT: "CURRENT",
+    PLANNING: "PLANNING",
+    COMPLETED: "COMPLETED",
+    REPEATING: "REPEATING",
+    DROPPED: "DROPPED",
+    PAUSED: "PAUSED"
+}
+export type Anilist_MediaListStatus = keyof typeof Anilist_MediaListStatusKeys
+
+export interface anilistUSEMutation {
+    about?: String
+    titleLanguage?: Anilist_UserTitleLanguage
+    staffNameLanguage?: Anilist_UserStaffNameLanguage
+    airingNotifications?: Boolean
+    displayAdultContent?: Boolean
+    scoreFormat?: Anilist_ScoreFormat
+    rowOrder?: String
+    profileColor?: String
+    donatorBadge?: String
+    notificationOptions?: any // [NotificationOptionInput]
+    animeListOptions?: any // MediaListOptionsInput
+    mangaListOptions?: any // MediaListOptionsInput
+    timezone?: String
+    activityMergeTime?: number
+    restrictMessagesToFollowing?: Boolean
+    disabledListActivity?: any // [ListActivityOptionInput]
+}
+
+export interface DateObject {
+    day: number | undefined
+    month: number | undefined
+    year: number | undefined
+}
+
+export interface Anilist_ListMutation {
+    completedAt?: DateObject
+    startedAt?: DateObject
+    mediaId?: number // ID ANIME
+    progress?: number // EPISODES
+    repeat?: number
+    score?: number
+
+    status?: Anilist_MediaListStatus
+    progressVolumes?: number
+    private?: Boolean
+    notes?: String
+    // customLists: [String]
+    hiddenFromStatusLists?: Boolean
+    // advancedScores: [Float]
+}
+
 export interface AnimeData {
     averageScore?: number | undefined
     bannerImage?: string | undefined
     coverImage?: string | undefined
     description?: string | undefined
     duration?: number | undefined
-    endDate?: {
-        day: number
-        month: number
-        year: number
-    } | undefined
+    endDate?: DateObject | undefined
     episodes?: number | undefined
     format?: string | undefined
     genres?: Array<String>
@@ -30,11 +104,7 @@ export interface AnimeData {
     popularity?: number | undefined
     season?: string | undefined
     seasonYear?: number | undefined
-    startDate?: {
-        day: number
-        month: number
-        year: number
-    } | undefined
+    startDate?: DateObject | undefined
     characters?: {
         role: string,
         character: {
@@ -182,7 +252,7 @@ export interface indentityPlayer {
 }
 
 export interface animulistProps {
-    status: "CURRENT" | "PLANNING" | "COMPLETED" | "REPEATING" | "DROPPED" | "PAUSED",
+    status: Anilist_MediaListStatus,
     score: number,
     reapeat: number,
     startWatch: number,
@@ -190,6 +260,7 @@ export interface animulistProps {
     added: number,
     lastUpdate: number,
     favorite?: boolean
+    progress?: number
 }
 
 export interface cardData {
@@ -274,6 +345,8 @@ export interface informationPluginFormat {
     anime(context: { id: string }): Promise<AnimeData | undefined>
     schedule: (airingStart: number, airingEnd: number) => Promise<containerData>
     getManga: (id: string) => Promise<AnimeData | undefined>
+    getAnimeList: () => Promise<cardData[]>
+    setAnimeInList: (variable: Anilist_ListMutation) => Promise<boolean>
 }
 
 export interface playerPluginManagerFormat {
@@ -291,6 +364,8 @@ export interface informationPluginManagerFormat {
     initial(): Promise<void>
     schedule(airingStart: number, airingEnd: number): Promise<containerData>
     getManga: (id: string) => Promise<AnimeData | undefined>
+    getAnimeList: () => Promise<cardData[]>
+    setAnimeInList: (variable: Anilist_ListMutation) => Promise<boolean>
 }
 
 export type genres = {
@@ -310,8 +385,8 @@ export interface SettingsConfig {
     deepLinkURL: string
     yt_dlp: string
     anilist: {
-        scoreFormat: "POINT_100" | "POINT_10_DECIMAL" | "POINT_10" | "POINT_5" | "POINT_3"
-        titleFormat: "ROMAJI" | "ENGLISH" | "NATIVE"
+        scoreFormat: Anilist_ScoreFormat
+        titleFormat: Anilist_UserTitleLanguage
         adultdefault: boolean
         maxpagesize: number
     }

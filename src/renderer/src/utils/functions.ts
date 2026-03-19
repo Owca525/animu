@@ -3,6 +3,7 @@ import {
     cardData,
     containerData,
     ContextMenuProps,
+    DateObject,
     deepLinkData,
     FilterParams,
     homeData,
@@ -14,7 +15,7 @@ import {
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { ActiveService, FindService, getGlobalCache, getServices, removeDeepLink, setActiveThemes, setAnilistUserData, setDeepLink, setGlobalToken } from './stores/global';
+import { ActiveService, animulistData, FindService, getGlobalCache, getServices, removeDeepLink, setActiveThemes, setAnilistUserData, setDeepLink, setGlobalToken } from './stores/global';
 import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
@@ -24,6 +25,7 @@ import semver from "semver";
 import { v4 as uuidv4 } from 'uuid';
 import { removeToast, toast, updateToast } from './context/ToastNotification';
 import { saveConfig } from './FilesManager/config';
+import { OvewriteAnimuList } from './FilesManager/animulist';
 
 export function decodeHtmlEntities(str: string) {
     const parser = new DOMParser();
@@ -945,9 +947,38 @@ export async function fetchAnilistCodeToken(deeplink: string, code: string): Pro
     console.log(deeplink, code)
     removeDeepLink('Fetch Anilist Token')
     removeDeepLink('Fetch Anilist Token Error')
-    if (code == "?error") return toast(t("Failed Login To Anilist"), { type: "error" })
+    if (code == "error") return toast(t("Failed Login To Anilist"), { type: "error" })
     await RefetchAnilistToken(deeplink)
     await FetchAnilistUserData()
+
+    return
+    showDialog({
+        type: "info",
+        title: 'Action',
+        description: t("What Action You want to synchronize Anime List in Anilist"),
+        buttons: [{
+            title: 'Overwrite',
+            onClick: function () {
+                showDialog({
+                    type: 'info',
+                    title: 'Double Check',
+                    description: "Are you Sure to overwrite everything in anilist from animulist?",
+                    buttons: [{
+                        title: t("dialog.no"),
+                        onClick: AnilistMergeDataAnimeList
+                    }, {
+                        title: t("dialog.yes"),
+                        onClick: function () {
+
+                        }
+                    }]
+                })
+            }
+        }, {
+            title: 'Merge',
+            onClick: AnilistMergeDataAnimeList
+        }]
+    })
 }
 
 export async function RefetchAnilistToken(tmp?: string): Promise<any> {
@@ -1045,7 +1076,7 @@ export async function FetchAnilistUserData() {
                 query: Anilist_USER_QUERY
             })
         })
-        console.log(token, response)
+
         if (!response.success || !response.json) {
             console.warn("Failed Fetch User Data")
             return false
@@ -1199,4 +1230,44 @@ export function reloadWebsite() {
     /* IFDEF DEBUG|PROD */
     window.BrowserWindow.reload()
     /* ENDIF */
+}
+
+export function convertDateToDateObject(date: number): DateObject {
+    try {
+        const tmp = new Date(unixToDateTime(date))
+        return { day: tmp.getDay(), month: tmp.getMonth(), year: tmp.getFullYear() }
+    } catch (error) {
+        console.error("convertDateToDateObject/functions ", error)
+        return { day: undefined, month: undefined, year: undefined }
+    }
+}
+
+async function AnilistMergeDataAnimeList() {
+    const plugin = getInformationPlugin()
+    const animulist = unwrap(animulistData())
+    const anilistAnimeList = await plugin.getAnimeList()
+
+    if (animulist.length <= 0) return OvewriteAnimuList(anilistAnimeList.map((item) => ({ animulist: item.animulist as any, AnimeData: item.AnimeData })))
+    if (anilistAnimeList.length <= 0) { }
+    const animuIDlist = animulist.map((v) => v.AnimeData.id)
+
+    let animelist: cardData[] = []
+
+    anilistAnimeList.forEach((item): any => {
+        const tmp = animulist.find((v) => v.AnimeData.id == item.AnimeData.id)
+        if (!tmp) return animelist.push(item)
+
+        if (JSON.stringify(item.animulist) != JSON.stringify(tmp.animulist)) return animelist.push(item)
+    })
+
+    // TODO: END THIS
+}
+
+export function convertEpisode(ep: string): number {
+    try {
+        return parseInt(parseInt(ep).toFixed(0))
+    } catch (error) {
+        console.error("convertEpisode/functions ", error)
+        return 1
+    }
 }

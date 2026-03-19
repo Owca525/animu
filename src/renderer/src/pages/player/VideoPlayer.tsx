@@ -682,7 +682,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                         ...anime_data.animulist,
                         status: "COMPLETED",
                         endWatch: anime_data.animulist.endWatch == 0 ? dateToUnix(new Date().toString()) : anime_data.animulist.endWatch,
-                        lastUpdate: dateToUnix(new Date().toString())
+                        lastUpdate: dateToUnix(new Date().toString()),
+                        progress: anime_data.AnimeData.episodes ? anime_data.AnimeData.episodes : temp.episodes.length
                     }
                 })
             }

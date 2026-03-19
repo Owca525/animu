@@ -2,10 +2,11 @@ import Button from '@renderer/components/buttons';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
-import { AnimeData, animeOpeningsFormat, animulistProps, cardData, ContextMenuProps, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
+import { Anilist_ListMutation, AnimeData, animeOpeningsFormat, animulistProps, cardData, ContextMenuProps, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
 import {
     calculateDays,
     changeTitleAnimu,
+    convertDateToDateObject,
     convertDateToFormattedString,
     convertSeconds,
     CreateContextMenuOptions,
@@ -535,6 +536,28 @@ function information() {
         setButtonGroups(tmp)
     }
 
+    async function modifySaveAnimuList(animulist: animulistProps, anime: AnimeData, edit: boolean = false) {
+        if (edit) updateDataInAnimulist(anime.id, { AnimeData: anime, animulist }, true)
+        else addToAnimuList(animulist, anime, true); 
+
+        setTmpData((p) => ({ ...p, animulist: animulist }))
+
+        if (!getGlobalCache().anilist_user_data) return
+
+        let tmp = {
+            completedAt: convertDateToDateObject(animulist.endWatch),
+            startedAt: convertDateToDateObject(animulist.startWatch),
+            mediaId: parseInt(anime.id),
+            progress: animulist.progress ?? 0,
+            repeat: animulist.reapeat,
+            score: animulist.score,
+            status: animulist.status
+        } satisfies Anilist_ListMutation
+
+        if (await getInformationPlugin().setAnimeInList(tmp)) toast(t(`Succesfully Updated ${detectTitleConfig(anime.title)}`), { type: "success" })
+        else toast(t(`Failed Updated ${detectTitleConfig(anime.title)}`), { type: "error" })
+    }
+
     return (
         <>
             <main class="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(contextMenu()), event)}>
@@ -595,7 +618,7 @@ function information() {
                                         <Button titleButton={"Add To Animulist"} icon="add" ButtonClass="information-bar-icon" onClick={() => showCustomMenu({
                                             title: `Add ${detectTitleConfig(tempData().anime.title)}`, animuList: {
                                                 anime: unwrap(tempData().anime),
-                                                save: (animulist, anime) => { addToAnimuList(animulist, anime, true); setTmpData((p) => ({ ...p, animulist: animulist })) }
+                                                save: (animulist, anime) => { modifySaveAnimuList(animulist, anime) }
                                             }
                                         })} />
                                     </Match>
@@ -604,7 +627,7 @@ function information() {
                                             title: `Edit ${detectTitleConfig(tempData().anime.title)}`, animuList: {
                                                 anime: unwrap(tempData().anime),
                                                 animulist: tempData().animulist,
-                                                save: (animulist, anime) => { updateDataInAnimulist(anime.id, { AnimeData: anime, animulist }, true); setTmpData((p) => ({ ...p, animulist: animulist })) }
+                                                save: (animulist, anime) => { modifySaveAnimuList(animulist, anime, true) }
                                             }
                                         })} />
                                         <Button titleButton={"Remove From Animulist"} icon="delete" ButtonClass="information-bar-icon" onClick={() => {

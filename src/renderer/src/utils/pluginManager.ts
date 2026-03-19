@@ -1,5 +1,5 @@
 import AnilistApi from "@renderer/plugins/anilistApi";
-import { genresSearchFormat, informationPluginManagerFormat, informationPluginFormat, playerPluginManagerFormat, playerPluginFormat } from "./types";
+import { genresSearchFormat, informationPluginManagerFormat, informationPluginFormat, playerPluginManagerFormat, playerPluginFormat, Anilist_ListMutation } from "./types";
 import { getPluginRepo, setPlayerPlugin, setPluginPlayerList } from "./stores/plugins";
 import Allmanga from "@renderer/plugins/allmanga";
 import Anizone from "@renderer/plugins/anizone";
@@ -168,4 +168,11 @@ export class informationPluginManager implements informationPluginManagerFormat 
     getManga = async (id: string) => {
         return await this.currentPlugin.getManga(id)
     }
+
+    getAnimeList = async () => {
+        return await this.currentPlugin.getAnimeList()
+    };
+    setAnimeInList = async (variable: Anilist_ListMutation) => {
+        return await this.currentPlugin.setAnimeInList(variable)
+    };
 }

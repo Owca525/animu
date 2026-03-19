@@ -2,7 +2,7 @@ import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
 import { AnimeData, animulistProps, indentityPlayer, SettingsConfig } from "@renderer/utils/types";
 
 import "./player.css"
-import { changeTitleAnimu, dateToUnix, detectTitle, detectTitleConfig, refetchHistory } from "@renderer/utils/functions";
+import { changeTitleAnimu, convertEpisode, dateToUnix, detectTitle, detectTitleConfig, refetchHistory } from "@renderer/utils/functions";
 import Button from "@renderer/components/buttons";
 
 import VideoPlayer from "./VideoPlayer";
@@ -15,7 +15,7 @@ import ExternalPlayer from "./externalPlayer";
 import { pluginManager } from "@renderer/utils/stores/plugins";
 import { useResponse } from "@renderer/utils/hooks/useResponse";
 import { useI18n } from "@renderer/utils/i18n";
-import { addToAnimuList } from "@renderer/utils/FilesManager/animulist";
+import { addToAnimuList, updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist";
 import { getSocket, getSocketRoom } from "@renderer/utils/stores/global";
 import { unwrap } from "solid-js/store";
 
@@ -94,6 +94,18 @@ const player = () => {
             }
         })
         refetchHistory()
+
+        if (anime_data.animulist && anime_data.animulist.status == "CURRENT") {
+            updateDataInAnimulist(anime_data.data.id, {
+                AnimeData: anime_data.data,
+                animulist: {
+                    ...anime_data.animulist,
+                    status: "CURRENT",
+                    progress: convertEpisode(unwrap(extractionData().actual)),
+                    lastUpdate: dateToUnix(new Date().toString())
+                }
+            })
+        }
     }
 
     createShortcut(["Escape"], async () => {
@@ -133,20 +145,36 @@ const player = () => {
             }
         })
 
-        if (anime_data.animulist) return
-        addToAnimuList({
-            status: "CURRENT",
-            score: 0,
-            reapeat: 0,
-            startWatch: dateToUnix(new Date().toString()),
-            endWatch: 0,
-            added: dateToUnix(new Date().toString()),
-            lastUpdate: dateToUnix(new Date().toString())
-        }, {
-            ...anime_data.data,
-            nextAiringEpisode: undefined,
-            recommendations: undefined
-        })
+        if (anime_data.animulist) {
+            // TODO: NAPRAW TE IFY KURWA
+            if (anime_data.animulist.status == "PLANNING" || anime_data.animulist.status == "CURRENT") {
+                updateDataInAnimulist(anime_data.data.id, {
+                    AnimeData: anime_data.data,
+                    animulist: {
+                        ...anime_data.animulist,
+                        status: "CURRENT",
+                        progress: convertEpisode(unwrap(extractionData().actual)),
+                        lastUpdate: dateToUnix(new Date().toString())
+                    }
+                })
+            }
+        }
+        else {
+            addToAnimuList({
+                status: "CURRENT",
+                score: 0,
+                reapeat: 0,
+                startWatch: dateToUnix(new Date().toString()),
+                endWatch: 0,
+                added: dateToUnix(new Date().toString()),
+                lastUpdate: dateToUnix(new Date().toString()),
+                progress: convertEpisode(unwrap(extractionData().actual))
+            }, {
+                ...anime_data.data,
+                nextAiringEpisode: undefined,
+                recommendations: undefined
+            })
+        }
     })
 
     onCleanup(() => {

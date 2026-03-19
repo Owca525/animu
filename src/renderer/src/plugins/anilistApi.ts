@@ -1,7 +1,16 @@
-import { genYearsList, request, unixToDateTime } from "@renderer/utils/functions";
-import { t } from "@renderer/utils/i18n";
-import { getConfig } from "@renderer/utils/stores/config";
-import { AnimeData, cardData, containerData, genres, genresSearchFormat, informationPluginFormat } from "@renderer/utils/types";
+import {
+  Anilist_ListMutation,
+  AnimeData,
+  cardData,
+  containerData,
+  genres,
+  genresSearchFormat,
+  informationPluginFormat,
+} from '@renderer/utils/types';
+import { dateToUnix, genYearsList, request, unixToDateTime } from '@renderer/utils/functions';
+import { getConfig } from '@renderer/utils/stores/config';
+import { t } from '@renderer/utils/i18n';
+import { getGlobalCache } from '@renderer/utils/stores/global';
 
 const defaultPageSize = 20
 
@@ -219,6 +228,131 @@ query AiringAnimes($page: Int, $perPage: Int, $sort: [AiringSort], $airingAtGrea
 }
 `
 
+const graphicAnimeListAll = `query (
+  $userId: Int
+  $userName: String
+  $type: MediaType
+) {
+  MediaListCollection(
+    userId: $userId
+    userName: $userName
+    type: $type
+  ) {
+    lists {
+      name
+      isCustomList
+      isCompletedList: isSplitCompletedList
+
+      entries {
+        ...mediaListEntry
+      }
+    }
+  }
+}
+
+fragment mediaListEntry on MediaList {
+  id
+  mediaId
+  status
+  score
+  progress
+  progressVolumes
+  repeat
+  priority
+  private
+  hiddenFromStatusLists
+  customLists
+  advancedScores
+  notes
+  updatedAt
+
+  startedAt {
+    year
+    month
+    day
+  }
+
+  completedAt {
+    year
+    month
+    day
+  }
+
+  media {
+    ${animeData}
+  }
+}`
+
+const graphicAnimeListModified = `mutation (
+  $id: Int
+  $mediaId: Int
+  $status: MediaListStatus
+  $score: Float
+  $progress: Int
+  $progressVolumes: Int
+  $repeat: Int
+  $private: Boolean
+  $notes: String
+  $customLists: [String]
+  $hiddenFromStatusLists: Boolean
+  $advancedScores: [Float]
+  $startedAt: FuzzyDateInput
+  $completedAt: FuzzyDateInput
+) {
+  SaveMediaListEntry(
+    id: $id
+    mediaId: $mediaId
+    status: $status
+    score: $score
+    progress: $progress
+    progressVolumes: $progressVolumes
+    repeat: $repeat
+    private: $private
+    notes: $notes
+    customLists: $customLists
+    hiddenFromStatusLists: $hiddenFromStatusLists
+    advancedScores: $advancedScores
+    startedAt: $startedAt
+    completedAt: $completedAt
+  ) {
+    id
+    mediaId
+    status
+    score
+    advancedScores
+    progress
+    progressVolumes
+    repeat
+    priority
+    private
+    hiddenFromStatusLists
+    customLists
+    notes
+    updatedAt
+
+    startedAt {
+      year
+      month
+      day
+    }
+
+    completedAt {
+      year
+      month
+      day
+    }
+
+    user {
+      id
+      name
+    }
+
+    media {
+     ${animeData}
+    }
+  }
+}`
+
 const graphicHomeApi = `
   query (
     $season: MediaSeason,
@@ -349,7 +483,7 @@ function getHeader() {
   if (localStorage.getItem("Animu_Anilist_login_token_information")) {
     try {
       const token = JSON.parse(localStorage.getItem("Animu_Anilist_login_token_information") as any)
-      return {...header, 'Authorization': 'Bearer ' + token["access_token"],}
+      return { ...header, 'Authorization': 'Bearer ' + token["access_token"], }
     } catch (error) {
       console.error("getHeader/anilistapi", error)
       return header
@@ -362,7 +496,7 @@ function getHeader() {
 // Jeśli api anilist jest offline to daje "Forbidden" w statusText i error 403 request 
 async function sendPost(variable: any, query: any) {
   return await request(
-    "https://graphql.anilist.co", 
+    "https://graphql.anilist.co",
     { method: "POST", headers: getHeader(), body: JSON.stringify({ query: query, variables: variable }) } as any,
     window.api ? false : true
   )
@@ -370,7 +504,7 @@ async function sendPost(variable: any, query: any) {
 
 async function sendToApi(variable: any, query: any): Promise<cardData[]> {
   let data = await request(
-    "https://graphql.anilist.co", 
+    "https://graphql.anilist.co",
     { method: "POST", headers: getHeader(), body: JSON.stringify({ query: query, variables: variable }) } as any,
     window.api ? false : true
   )
@@ -400,9 +534,9 @@ function getSeasonFromDate() {
   }
 
   const finded = list.findIndex((v) => season == v)
-  if (list.length-1 > list.findIndex((v) => season == v)) nextSeason = list[finded+1]
+  if (list.length - 1 > list.findIndex((v) => season == v)) nextSeason = list[finded + 1]
 
-  return { season, nextSeason, seasonYear: year, nextYear: finded == 3 ? year+1 : year };
+  return { season, nextSeason, seasonYear: year, nextYear: finded == 3 ? year + 1 : year };
 }
 
 // async function getGenres(): Promise<string[]> {
@@ -560,6 +694,63 @@ export default class AnilistApi implements informationPluginFormat {
       searchOption: newOptions
     }
   }
+  
+  config?: { [key: string]: any; } | undefined;
+
+  async getAnimeList(): Promise<cardData[]> {
+    const tmpHeader = getHeader()
+    const global = getGlobalCache()
+    if (!tmpHeader["Authorization"]) return []
+    if (!global.anilist_user_data) return []
+
+    const response = await sendPost({ type: "ANIME", userId: global.anilist_user_data["id"] }, graphicAnimeListAll)
+    if (!response.success || !response.json) return []
+
+    let tmpList: any[] = []
+    for (let index = 0; index < response.json["data"]["MediaListCollection"]["lists"].length; index++) {
+      const element = response.json["data"]["MediaListCollection"]["lists"][index];
+
+      tmpList = [...tmpList, ...element["entries"]]
+    }
+
+    const readyList = tmpList.map((item) => {
+      try {
+        const startWatch = item["startedAt"]["day"] != undefined && item["startedAt"]["month"] != undefined && item["startedAt"]["year"] != undefined ?
+          dateToUnix(new Date(item["startedAt"]["year"], item["startedAt"]["month"]-1, item["startedAt"]["day"]).toString()) : undefined
+        
+        const endWatch = item["completedAt"]["day"] != undefined && item["completedAt"]["month"] != undefined && item["completedAt"]["year"] != undefined ?
+          dateToUnix(new Date(item["completedAt"]["year"], item["completedAt"]["month"]-1, item["completedAt"]["day"]).toString()) : undefined
+
+        return {
+          ...Convert(item["media"]),
+          animulist: {
+            status: item["status"],
+            score: item["score"],
+            reapeat: item["repeat"],
+            startWatch: startWatch,
+            endWatch: endWatch,
+            added: dateToUnix(new Date().toString()),
+            lastUpdate: item["updatedAt"],
+            favorite: false,
+            progress: item["progress"]
+          }
+        } as cardData
+      } catch (error) {
+        console.error("Failed Convert map/anilistapi", error, item)
+        return undefined
+      }
+    }).filter((v) => v != undefined)
+
+    return readyList
+  };
+
+  async setAnimeInList(variable: Anilist_ListMutation): Promise<boolean> {
+    const tmpHeader = getHeader()
+    if (!tmpHeader["Authorization"]) return false
+    const response = await sendPost(variable, graphicAnimeListModified)
+    if (!response.success) return false
+    return true
+  };
 
   async schedule(airingStart: number, airingEnd: number): Promise<containerData> {
     // let week = getWeek()
