@@ -1017,7 +1017,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     useKeyPress((keys: string) => {
         if (keys == "CTRL+SHIFT+D") setshowNerdStats((prev) => !prev)
-        if (keys == "CTRL+SHIFT+R" && currentPlayer()) runNewPlayer(currentPlayer()!)
+        if (keys == "SHIFT+R" && currentPlayer()) runNewPlayer(currentPlayer()!)
         keybinds(keys)
     })
 
