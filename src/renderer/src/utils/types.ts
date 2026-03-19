@@ -45,19 +45,19 @@ export const Anilist_MediaListStatusKeys = {
 export type Anilist_MediaListStatus = keyof typeof Anilist_MediaListStatusKeys
 
 export interface anilistUSEMutation {
-    about?: String
+    about?: string
     titleLanguage?: Anilist_UserTitleLanguage
     staffNameLanguage?: Anilist_UserStaffNameLanguage
     airingNotifications?: Boolean
     displayAdultContent?: Boolean
     scoreFormat?: Anilist_ScoreFormat
-    rowOrder?: String
-    profileColor?: String
-    donatorBadge?: String
+    rowOrder?: string
+    profileColor?: string
+    donatorBadge?: string
     notificationOptions?: any // [NotificationOptionInput]
     animeListOptions?: any // MediaListOptionsInput
     mangaListOptions?: any // MediaListOptionsInput
-    timezone?: String
+    timezone?: string
     activityMergeTime?: number
     restrictMessagesToFollowing?: Boolean
     disabledListActivity?: any // [ListActivityOptionInput]
@@ -80,8 +80,8 @@ export interface Anilist_ListMutation {
     status?: Anilist_MediaListStatus
     progressVolumes?: number
     private?: Boolean
-    notes?: String
-    // customLists: [String]
+    notes?: string
+    // customLists: [string]
     hiddenFromStatusLists?: Boolean
     // advancedScores: [Float]
 }
@@ -95,7 +95,7 @@ export interface AnimeData {
     endDate?: DateObject | undefined
     episodes?: number | undefined
     format?: string | undefined
-    genres?: Array<String>
+    genres?: Array<string>
     nextAiringEpisode?: {
         airingAt: number
         episode: number

@@ -79,7 +79,7 @@ function information() {
     const [secondsLeft, setSecondsLeft] = createSignal<undefined | { left: number, converted: { days: number; hours: number; minutes: number; seconds: number; } | undefined }>(undefined);
     const [contextMenu, setcontextMenu] = createSignal<ContextMenuProps>([])
 
-    const [buttonGroups, setButtonGroups] = createSignal<{value: string; onClick: () => void; }[]>([])
+    const [buttonGroups, setButtonGroups] = createSignal<{ value: string; onClick: () => void; }[]>([])
 
     // Openings / Endings
     const [animeMedia, setAnimeMedia] = createSignal<animeOpeningsFormat[]>([])
@@ -538,7 +538,7 @@ function information() {
 
     async function modifySaveAnimuList(animulist: animulistProps, anime: AnimeData, edit: boolean = false) {
         if (edit) updateDataInAnimulist(anime.id, { AnimeData: anime, animulist }, true)
-        else addToAnimuList(animulist, anime, true); 
+        else addToAnimuList(animulist, anime, true);
 
         setTmpData((p) => ({ ...p, animulist: animulist }))
 
@@ -642,85 +642,99 @@ function information() {
 
                     <div class="information-bottom">
 
-                        <div class="information-info">
-                            <Switch>
-                                <Match when={fetchingAnime() && tempData().anime.status == "RELEASING"}>
-                                    <div class="information-info-content loading">
-                                        <span class='material-symbols-outlined loading-animation icon'>progress_activity</span>
-                                    </div>
-                                </Match>
-                                <Match when={tempData().anime.nextAiringEpisode && secondsLeft() != undefined && secondsLeft()!.left > 0 && !fetchingAnime()}>
-                                    <div class="information-info-content">
-                                        <div class="information-content-title">
-                                            {t("information.airing")}: {tempData().anime.nextAiringEpisode?.episode}
+                        <div class="information-right-bar">
+
+                            <div class="information-info">
+                                <Switch>
+                                    <Match when={fetchingAnime() && tempData().anime.status == "RELEASING"}>
+                                        <div class="information-info-content loading">
+                                            <span class='material-symbols-outlined loading-animation icon'>progress_activity</span>
                                         </div>
-                                        {`${secondsLeft()?.converted?.days}d ${secondsLeft()?.converted?.hours}h ${secondsLeft()?.converted?.minutes}m ${secondsLeft()?.converted?.seconds}s`}
+                                    </Match>
+                                    <Match when={tempData().anime.nextAiringEpisode && secondsLeft() != undefined && secondsLeft()!.left > 0 && !fetchingAnime()}>
+                                        <div class="information-info-content">
+                                            <div class="information-content-title">
+                                                {t("information.airing")}: {tempData().anime.nextAiringEpisode?.episode}
+                                            </div>
+                                            {`${secondsLeft()?.converted?.days}d ${secondsLeft()?.converted?.hours}h ${secondsLeft()?.converted?.minutes}m ${secondsLeft()?.converted?.seconds}s`}
+                                        </div>
+                                    </Match>
+                                </Switch>
+
+                                <Show when={tempData().anime.format}>
+                                    <div class="information-info-content">
+                                        <div class="information-content-title">{t("information.format")}</div>
+                                        {t(`anime_formats.${tempData().anime.format?.toLowerCase()}`)}
                                     </div>
-                                </Match>
-                            </Switch>
+                                </Show>
 
-                            <Show when={tempData().anime.format}>
-                                <div class="information-info-content">
-                                    <div class="information-content-title">{t("information.format")}</div>
-                                    {t(`anime_formats.${tempData().anime.format?.toLowerCase()}`)}
+                                <Show when={tempData().anime.episodes}>
+                                    <div class="information-info-content">
+                                        <div class="information-content-title">{t("information.episodes")}</div>
+                                        {tempData().anime.episodes}
+                                    </div>
+                                </Show>
+
+                                <Show when={tempData().anime.duration}>
+                                    <div class="information-info-content">
+                                        <div class="information-content-title">{t("information.duration")}</div>
+                                        {tempData().anime.duration} {t("global.minutes")}
+                                    </div>
+                                </Show>
+
+                                <Show when={tempData().anime.status}>
+                                    <div class="information-info-content">
+                                        <div class="information-content-title">{t("information.status")}</div>
+                                        {t(`anime_statuses.${tempData().anime.status?.toLowerCase()}`)}
+                                    </div>
+                                </Show>
+
+                                <Show when={tempData().anime.startDate &&
+                                    tempData().anime.startDate?.year != undefined &&
+                                    tempData().anime.startDate?.day != undefined &&
+                                    tempData().anime.startDate?.month != undefined}>
+                                    <div class="information-info-content">
+                                        <div class="information-content-title">{t("information.startdate")}</div>
+                                        {convertDateToFormattedString(tempData().anime.startDate?.year, tempData().anime.startDate?.month, tempData().anime.startDate?.day, undefined, undefined)}
+                                    </div>
+                                </Show>
+
+                                <Show when={tempData().anime.endDate &&
+                                    tempData().anime.endDate?.year != undefined &&
+                                    tempData().anime.endDate?.day != undefined &&
+                                    tempData().anime.endDate?.month != undefined}>
+                                    <div class="information-info-content">
+                                        <div class="information-content-title">{t("information.endate")}</div>
+                                        {convertDateToFormattedString(tempData().anime.endDate?.year, tempData().anime.endDate?.month, tempData().anime.endDate?.day, undefined, undefined)}
+                                    </div>
+                                </Show>
+
+                                <Show when={tempData().anime.season && tempData().anime.seasonYear}>
+                                    <div class="information-info-content">
+                                        <div class="information-content-title">{t("information.season")}</div>
+                                        {t(`anime_seasons.${tempData().anime.season?.toLowerCase()}`)} {tempData().anime.seasonYear}
+                                    </div>
+                                </Show>
+
+                                <Show when={tempData().anime.source}>
+                                    <div class="information-info-content">
+                                        <div class="information-content-title">{t("information.source")}</div>
+                                        {t(`anime_source.${tempData().anime.source?.toLowerCase().replaceAll("_", "")}`)}
+                                    </div>
+                                </Show>
+
+                            </div>
+
+                            <Show when={tempData().anime.genres}>
+                                <div class="information-genres-container">
+                                    <span class='information-genre-title'>Genres</span>
+                                    <For each={tempData().anime.genres}>
+                                        {(item) => (
+                                            <span class='information-genre-button'>{t(`anime_genres.${item.replaceAll(" ", "_").toLowerCase()}`)}</span>
+                                        )}
+                                    </For>
                                 </div>
                             </Show>
-
-                            <Show when={tempData().anime.episodes}>
-                                <div class="information-info-content">
-                                    <div class="information-content-title">{t("information.episodes")}</div>
-                                    {tempData().anime.episodes}
-                                </div>
-                            </Show>
-
-                            <Show when={tempData().anime.duration}>
-                                <div class="information-info-content">
-                                    <div class="information-content-title">{t("information.duration")}</div>
-                                    {tempData().anime.duration} {t("global.minutes")}
-                                </div>
-                            </Show>
-
-                            <Show when={tempData().anime.status}>
-                                <div class="information-info-content">
-                                    <div class="information-content-title">{t("information.status")}</div>
-                                    {t(`anime_statuses.${tempData().anime.status?.toLowerCase()}`)}
-                                </div>
-                            </Show>
-
-                            <Show when={tempData().anime.startDate &&
-                                tempData().anime.startDate?.year != undefined &&
-                                tempData().anime.startDate?.day != undefined &&
-                                tempData().anime.startDate?.month != undefined}>
-                                <div class="information-info-content">
-                                    <div class="information-content-title">{t("information.startdate")}</div>
-                                    {convertDateToFormattedString(tempData().anime.startDate?.year, tempData().anime.startDate?.month, tempData().anime.startDate?.day, undefined, undefined)}
-                                </div>
-                            </Show>
-
-                            <Show when={tempData().anime.endDate &&
-                                tempData().anime.endDate?.year != undefined &&
-                                tempData().anime.endDate?.day != undefined &&
-                                tempData().anime.endDate?.month != undefined}>
-                                <div class="information-info-content">
-                                    <div class="information-content-title">{t("information.endate")}</div>
-                                    {convertDateToFormattedString(tempData().anime.endDate?.year, tempData().anime.endDate?.month, tempData().anime.endDate?.day, undefined, undefined)}
-                                </div>
-                            </Show>
-
-                            <Show when={tempData().anime.season && tempData().anime.seasonYear}>
-                                <div class="information-info-content">
-                                    <div class="information-content-title">{t("information.season")}</div>
-                                    {t(`anime_seasons.${tempData().anime.season?.toLowerCase()}`)} {tempData().anime.seasonYear}
-                                </div>
-                            </Show>
-
-                            <Show when={tempData().anime.source}>
-                                <div class="information-info-content">
-                                    <div class="information-content-title">{t("information.source")}</div>
-                                    {t(`anime_source.${tempData().anime.source?.toLowerCase().replaceAll("_", "")}`)}
-                                </div>
-                            </Show>
-
                         </div>
 
 

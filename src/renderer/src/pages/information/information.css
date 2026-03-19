@@ -355,6 +355,37 @@
     gap: 8px;
 }
 
+.information-right-bar, .information-genres-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.information-genres-container {
+    padding: 12px 0px;
+    gap: 4px;
+    overflow: hidden;
+}
+
+.information-genre-button {
+    width: 88%;
+    background-color: var(--second-layer);
+    padding: 8px;
+    border-radius: 12px;
+    border: 2px solid var(--invisible);
+    transition: 150ms all ease-in-out;
+}
+
+.information-genre-button:hover {
+    border-color: var(--green-one);
+}
+
+.information-genre-title {
+    font-size: 1.2em;
+    margin-left: 4px;
+    padding-bottom: 6px;
+    font-weight: 800;
+}
+
 /* For smaller devices / window sizes */
 @media (max-width: 1000px) {
     .information-top {
