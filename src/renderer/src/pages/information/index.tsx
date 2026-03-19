@@ -154,7 +154,7 @@ function information() {
     async function checkAnimeFetching() {
         const alwaysRequest = false // TODO: ADD NEW SETTINGS
 
-        if (!tempData().saveData) return
+        if (tempData().anime["nextAiringEpisode"]) return
 
         const lastTime = tempData().saveData?.lastAnimeDataUpdate
 
