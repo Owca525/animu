@@ -416,9 +416,9 @@ async function fetchCategory(params: any, title: string): Promise<containerData>
   const globalParams = params
   let container: containerData = {
     title: title,
-    data: await sendToApi(params, graphicApi.replaceAll("CHANGE_ME_PAGE_SIZE", config.anilist.maxpagesize.toString())),
+    data: await sendToApi(params, replacePageInGraphicApi(graphicApi, config.anilist.maxpagesize.toString())),
     onScrollDownFunction: async (_search, page, _params) => {
-      let resp = await sendToApi({ ...globalParams, page: page }, graphicApi.replaceAll("CHANGE_ME_PAGE_SIZE", config.anilist.maxpagesize.toString()));
+      let resp = await sendToApi({ ...globalParams, page: page }, replacePageInGraphicApi(graphicApi, config.anilist.maxpagesize.toString()));
       return {
         maxPage: config.anilist.maxpagesize,
         data: resp
@@ -446,7 +446,7 @@ export async function searchInAnilist(name: string, page: number, params?: genre
       if (params.airing) variables = { ...variables, status: params.airing.toUpperCase().replaceAll(" ", "_") }
     }
 
-    const resp = await sendToApi(variables, graphicApi.replaceAll("CHANGE_ME_PAGE_SIZE", MaxPage.toString()))
+    const resp = await sendToApi(variables, replacePageInGraphicApi(graphicApi, MaxPage.toString()))
     return {
       data: resp,
       maxPage: MaxPage
@@ -471,6 +471,10 @@ async function searchWrapper(name: string, page: number, params?: genresSearchFo
       maxPage: config.anilist.maxpagesize
     }
   }
+}
+
+function replacePageInGraphicApi(graphicTMP: string, variable: string) {
+  return graphicTMP.replaceAll("CHANGE_ME_PAGE_SIZE", variable)
 }
 
 export default class AnilistApi implements informationPluginFormat {
@@ -629,7 +633,7 @@ export default class AnilistApi implements informationPluginFormat {
         isAdult: config.anilist.adultdefault,
         nextSeason: season.nextSeason,
         nextYear: season.nextYear,
-      }, graphicHomeApi.replaceAll("CHANGE_ME_PAGE_SIZE", config.anilist.maxpagesize.toString()))
+      }, replacePageInGraphicApi(graphicHomeApi, config.anilist.maxpagesize.toString()))
 
       if (!data.success || !data.json) {
         console.warn("home/anilistapi Failed Request", data)
