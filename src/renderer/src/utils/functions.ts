@@ -1271,3 +1271,11 @@ export function convertEpisode(ep: string): number {
         return 1
     }
 }
+
+export function sendNotification(notificiation: { title: string, description?: string, icon?: string }) {
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+        new Notification(notificiation.title, { body: notificiation.description, icon: notificiation.icon });
+      }
+    });
+}

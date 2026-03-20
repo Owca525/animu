@@ -16,7 +16,7 @@ import {
   runService,
   timeCovertToMs,
   updateObject
-  } from './utils/functions';
+} from './utils/functions';
 import { checkUpdate } from './utils/update';
 import { convertHistoryToAnimuList } from './utils/FilesManager/animulist';
 import { CreateBackup } from './utils/backup';
@@ -28,7 +28,7 @@ import {
   onMount,
   Suspense,
   Switch
-  } from 'solid-js';
+} from 'solid-js';
 import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import {
   getAnilistUserData,
@@ -40,7 +40,7 @@ import {
   setGlobalHistory,
   setGlobalTheme,
   setIncognitoMode
-  } from './utils/stores/global';
+} from './utils/stores/global';
 import { getConfig, setConfig } from './utils/stores/config';
 import { getInformationPlugin, pluginManager, setPluginRepo } from './utils/stores/plugins';
 import { HashRouter, Route } from '@solidjs/router';
@@ -119,7 +119,7 @@ function App() {
       }
     }
 
-    if (localStorage.getItem("Animu_Anilist_login_token_information") != undefined) 
+    if (localStorage.getItem("Animu_Anilist_login_token_information") != undefined)
       FetchAnilistUserData()
 
     /* IFDEF DEBUG|PROD */

@@ -154,8 +154,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         socket?.on("player:update", (update: { time: number, pause: boolean }) => {
             console.log(update)
             if (update.pause != isPlaying()) togglePlay(true)
-            console.log(unwrap(currentTime()) - update.time > 3, unwrap(currentTime()), unwrap(currentTime()) - update.time)
-            if (unwrap(currentTime()) - update.time > 3 || unwrap(currentTime()) - update.time < -3) {
+            console.log(unwrap(currentTime()) - update.time > 2, unwrap(currentTime()), unwrap(currentTime()) - update.time)
+            if (unwrap(currentTime()) - update.time > 2 || unwrap(currentTime()) - update.time < -2 ) {
                 setTimeVideo(update.time)
                 clearInterval(refreashUpdateSocket)
             }
@@ -579,6 +579,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 console.error("HLS", _event, data)
                 const curTime = unwrap(currentTime())
                 tmpHls.currentLevel = tmpHls.levels.length - 1;
+                setFatalError(data.fatal)
                 if (data.details == "bufferStalledError") tmpHls.startLoad(curTime)
                 if (data.fatal) {
                     let message: string | undefined
@@ -598,7 +599,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                             tmpHls.destroy();
                             break;
                     }
-                    setFatalError(true)
                     if (message && !isCleanup()) toast(message, { type: "error" });
                 }
             });
