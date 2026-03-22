@@ -607,11 +607,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     function handleVolume(value: number, dontShow: boolean = false) {
         if (!videoRef) return
-        videoRef.volume = value / 100
+        if (!dontShow) setTimeoutForElement(volumeTimeout, setShowVolume)
+        if (value > 100 || value < 0) return
+        videoRef.volume = parseFloat((value / 100).toFixed(2))
         setVolume(() => value)
-        volumeCacheFunc(value)
-        if (dontShow) return
-        setTimeoutForElement(volumeTimeout, setShowVolume)
     }
 
     function setTimeoutForElement(element: NodeJS.Timeout | undefined, func: (initialState: boolean) => void) {
