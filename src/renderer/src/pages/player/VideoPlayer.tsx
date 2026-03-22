@@ -613,6 +613,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (!dontShow) setTimeoutForElement(volumeTimeout, setShowVolume)
         if (value > 100 || value < 0) return
         videoRef.volume = parseFloat((value / 100).toFixed(2))
+        volumeCacheFunc(value)
         setVolume(() => value)
     }
 
