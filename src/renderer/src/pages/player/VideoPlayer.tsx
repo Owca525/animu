@@ -434,6 +434,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 currentplayer = tmp.data
                 updatePlayerData((prev) => prev.map((player) => player.hostname == tmp.data?.hostname ? tmp.data : player))
             }
+        } else if (currentExtractionRes().toast != "") {
+            setCurrentExtractionRes((prev) => ({ ...prev, toast: "" }))
+            removeToast(currentExtractionRes().id)
         }
 
         if (currentplayer.resolution.length <= 0) {
