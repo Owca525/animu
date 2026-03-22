@@ -14,7 +14,9 @@ export const [globalState, setGlobalState] = createStore({
     socket: undefined,
     service: [],
     deepLinks: [],
-    anilist_user_data: undefined
+    anilist_user_data: undefined,
+    isAnimuHidden: false,
+    isAnimuFocus: true,
 } as globalDataFormat);
 
 export const getGlobalCache = () => globalState;
@@ -26,6 +28,8 @@ export const getSocketRoom = () => globalState.socket?.currentRoom;
 export const getServices = () => globalState.service;
 export const getDeeplinks = () => globalState.deepLinks;
 export const getAnilistUserData = () => globalState.anilist_user_data;
+export const isAnimuHidden = () => globalState.isAnimuHidden;
+export const isAnimuFocus = () => globalState.isAnimuFocus;
 export const setSocket = (tmp: Socket) => setGlobalState((prev) => ({...prev, socket: { ...prev.socket as any, instance: tmp }}));
 export const setSocketRoom = (tmp: string) => setGlobalState((prev) => ({...prev, socket: { ...prev.socket as any, currentRoom: tmp }}));
 export const setActiveThemes = (tmp: Map<number, themeMetadata>) => setGlobalState((prev) => ({...prev, activeThemes: tmp}));
@@ -51,3 +55,12 @@ export const DisableService = (tmp: serviceFormat) => setGlobalState((prev) => (
 }));
 
 export const setAnilistUserData = (tmp: { [key: string]: any; } | undefined) => setGlobalState((prev) => ({...prev, anilist_user_data: tmp}));
+
+/* IFDEF DEBUG|PROD */
+window.BrowserWindow.onWindowHidden((hidden: boolean) => {
+    setGlobalState((prev) => ({...prev, isAnimuHidden: hidden}))
+})
+window.BrowserWindow.onWindowFocus((focus: boolean) => {
+    setGlobalState((prev) => ({...prev, isAnimuFocus: focus}))
+})
+/* ENDIF */

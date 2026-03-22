@@ -198,7 +198,9 @@ export interface globalDataFormat {
         currentRoom: string,
     },
     animuList: { AnimeData: AnimeData, animulist: animulistProps, onClick?: (data: AnimeData) => void }[]
-    anilist_user_data?: { [key: string]: any; }
+    anilist_user_data?: { [key: string]: any; },
+    isAnimuHidden: boolean
+    isAnimuFocus: boolean
 }
 
 export type playerDataExtended = playerData & {

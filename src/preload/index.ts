@@ -107,6 +107,13 @@ if (process.contextIsolated) {
         return () => {
           ipcRenderer.removeListener("browserWindow:focus", handler);
         };
+      },
+      onWindowHidden: (callback) => {
+        const handler = (_, value) => callback(value);
+        ipcRenderer.on("browserWindow:hidden", handler);
+        return () => {
+          ipcRenderer.removeListener("browserWindow:hidden", handler);
+        };
       }
     });
   } catch (error) {

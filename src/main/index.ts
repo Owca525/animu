@@ -34,7 +34,7 @@ crashReporter.start({
   productName: "animu",
   compress: true,
   uploadToServer: false
-}) 
+})
 
 function changeURL(path: string) {
   if (!mainWindow) return
@@ -76,6 +76,15 @@ function createWindow(): void {
   mainWindow.on("blur", () => {
     if (!mainWindow) return
     mainWindow.webContents.send("browserWindow:focus", false);
+  });
+
+
+  mainWindow.on('hide', () => {
+    if (mainWindow) mainWindow.webContents.send("browserWindow:hidden", true);
+  });
+
+  mainWindow.on('show', () => {
+    if (mainWindow) mainWindow.webContents.send("browserWindow:hidden", false);
   });
 
   const args = process.argv.slice(1);
