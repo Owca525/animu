@@ -27,10 +27,13 @@ import { unwrap } from "solid-js/store"
 import { removeToast, toast, updateToast } from "@renderer/utils/context/ToastNotification"
 import { useI18n } from "@renderer/utils/i18n"
 import { addTime, countImages, fetchResolutions, VTTstoryBoardParser } from "./playerUtils"
-import shaka from "shaka-player/dist/shaka-player.compiled.js";
 import { v4 as uuidv4 } from 'uuid';
 import { updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist"
 import { getSocket, getSocketRoom } from "@renderer/utils/stores/global"
+
+import videojs from "video.js";
+// import "@videojs/http-streaming" 
+import Player from "video.js/dist/types/player"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -54,17 +57,13 @@ export interface socketPlayerInit {
     temp: { episode: string, type: string, episodes: { ep: string, img?: string, title?: string }[] }
 }
 
-export type resoltionFormatExtended = resolutionFormat & {
-    track?: shaka.extern.Track
-}
-
 const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, temp, setNextEpisode, volumeCacheFunc, PlayerVolume = 0, time, exitFromPlayer }) => {
     const config: SettingsConfig = getConfig();
     const { t, currentLang } = useI18n()
 
     // ref for html object
     let videoRef: HTMLVideoElement | undefined
-    let shakaPlayer: shaka.Player | undefined
+    let videoJS: Player | undefined
     let containerRef: HTMLDivElement | undefined
     let hideTimer: NodeJS.Timeout | undefined
     let hideChapterButtonTimer: NodeJS.Timeout | undefined
@@ -111,12 +110,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [isPlaying, setIsPlaying] = createSignal<boolean>(config.Player.general.Autoplay)
     const [isFullscreen, setIsFullscreen] = createSignal<boolean>(false)
     const [isCleanup, setCleanup] = createSignal<boolean>(false)
-    const [playerHeadersTMP, setPLayerHeaderTMP] = createSignal<Map<string, string>>(new Map())
+    // const [playerHeadersTMP, setPLayerHeaderTMP] = createSignal<Map<string, string>>(new Map())
     const [isDubbingOn, setIsDubbingOn] = createSignal<boolean>(false)
 
     // Resolution
-    const [ListResolution, setListResolution] = createSignal<resoltionFormatExtended[]>([])
-    const [currentResolution, setCurrentResoltion] = createSignal<resoltionFormatExtended | undefined>(undefined)
+    const [ListResolution, setListResolution] = createSignal<resolutionFormat[]>([])
+    const [currentResolution, setCurrentResoltion] = createSignal<resolutionFormat | undefined>(undefined)
 
     // Up Next
     const [timeNextEpisode, setTimeNextEpisode] = createSignal<number>(config.Player.upToNextEpisode.durationShow)
@@ -155,7 +154,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             console.log(update)
             if (update.pause != isPlaying()) togglePlay(true)
             console.log(unwrap(currentTime()) - update.time > 2, unwrap(currentTime()), unwrap(currentTime()) - update.time)
-            if (unwrap(currentTime()) - update.time > 2 || unwrap(currentTime()) - update.time < -2 ) {
+            if (unwrap(currentTime()) - update.time > 2 || unwrap(currentTime()) - update.time < -2) {
                 setTimeVideo(update.time)
                 clearInterval(refreashUpdateSocket)
             }
@@ -184,48 +183,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             const element = playerData()[index];
             if (element.defaultHost) defaulthost = element
         }
-
-        shaka.net.NetworkingEngine.registerScheme("https", (type, requests) => {
-            const controller = new AbortController();
-
-            const promise = (async () => {
-                let tmp: any = {}
-                if (currentResolution() && currentResolution()?.reqHeader) tmp = currentResolution()?.reqHeader
-                const resp = await request(type, {
-                    method: requests.method as any,
-                    headers: { ...requests.headers, ...tmp, ...playerHeadersTMP() },
-                    body: requests.body,
-                });
-
-                if (!resp.success) console.warn("Shaka Player Failed Request", tmp.resp)
-
-                const headersObj: { [key: string]: string } = {};
-                resp.responseHeader.forEach((value, key) => {
-                    headersObj[key] = value;
-                });
-                setPLayerHeaderTMP(resp.responseHeader)
-
-                return {
-                    data: resp.buffer,
-                    headers: headersObj,
-                    uri: type,
-                    originalUri: type,
-                    originalRequest: requests,
-                };
-            })();
-
-            return new shaka.util.AbortableOperation(promise, async () => controller.abort());
-        });
-
-        shakaPlayer = new shaka.Player();
-        shakaPlayer.configure({
-            streaming: {
-                bufferingGoal: 3 * 60,
-                rebufferingGoal: 15,
-                bufferBehind: 3 * 60,
-            }
-        })
-        if (videoRef) shakaPlayer.attach(videoRef)
 
         runNewPlayer(defaulthost)
         handleVolume(PlayerVolume, true)
@@ -316,7 +273,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (currentASSubtitles) currentASSubtitles.destroy()
         if (videoRef) videoRef.src = ""
         videoRef = undefined
-        shakaPlayer?.destroy()
+        if(videoJS) videoJS.dispose()
 
         if (getSocket()) {
             const socket = getSocket()
@@ -371,8 +328,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     async function setNewResolution(data: resolutionFormat | undefined) {
         if (!data) return
         if (!videoRef) return
-        if (!shakaPlayer) return
-        setPLayerHeaderTMP(new Map())
+
         setFatalError(false)
         const time = videoRef.currentTime
         if (data.defaultSubtitles) setDefaultSubtitles(ListSubtitles())
@@ -385,9 +341,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             return
         }
 
-        try {
-            await shakaPlayer.load(data.url, time)
-        } catch (error) { shakaPlayerErrorParser(error) }
+        if (videoJS) {
+            videoJS.src(data.url)
+            setTimeVideo(time)
+        }
     }
 
     async function setDefaultSubtitles(data: playerSubtitlesFormat[]) {
@@ -404,8 +361,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     async function runNewPlayer(data: playerData) {
         if (!videoRef) return
-        if (!shakaPlayer) return
-        setPLayerHeaderTMP(new Map())
         setFatalError(false)
 
         let currentplayer = data
@@ -456,7 +411,54 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             setListResolution(currentplayer.resolution)
             setCurrentResoltion(currentRes)
         }
+
+        // TODO: If you have time check why videojs first put m3u8 to video element after that put to HLS plugin
+        // const ajsdbfgkljsadfbjkln = Object.assign(
+        //     function (options: any, callback: any) {
+        //         const controller = new AbortController();
+
+        //         request(options.uri, {
+        //             method: options.method || "GET",
+        //             headers: {
+        //                 ...options.headers,
+        //                 ...currentRes.reqHeader
+        //             },
+        //         })
+        //             .then(async (res) => {
+        //                 console.log(res)
+        //                 if (!res.success) throw new Error("Fetch failed: " + res.status);
+        //                 callback(null, { response: res.buffer });
+        //             })
+        //             .catch((err) => callback(err, null));
+
+        //         return { abort: () => controller.abort() };
+        //     },
+        // )
+        // videojs.xhr = ajsdbfgkljsadfbjkln
+        // if (videojs["Vhs"]) (videojs as any).Vhs.xhr = ajsdbfgkljsadfbjkln;
+
         if (currentRes.hls) {
+            //     videoJS = videojs(videoRef, {
+            //         controls: false,
+            //         autoplay: true,
+            //         preload: "auto",
+            //         bigPlayButton: false,
+            //         loadingSpinner: false,
+            //         posterImage: false,
+            //         errorDisplay: false,
+            //         html5: {
+            //             vhs: {
+            //                 withCredentials: false,
+            //                 overrideNative: true,
+            //             },
+            //         },
+            //         sources: [
+            //             {
+            //                 src: currentRes.url,
+            //                 type: "application/x-mpegURL",
+            //             },
+            //         ],
+            //     });
             await runHLS(currentRes, currentplayer.splitHLS)
             return
         }
@@ -464,41 +466,43 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         setListResolution(() => currentplayer.resolution)
         setCurrentResoltion(currentRes)
-        try {
-            await shakaPlayer.load(currentRes.url)
-            setTimeVideo(time)
-        } catch (error) { shakaPlayerErrorParser(error) }
-    }
 
-    function shakaPlayerErrorParser(error: any): any {
-        console.error("Shaka Player Error:", error)
-        if (!("category" in error)) return setFatalError(true)
-        if (error.category == 4 && videoRef && currentResolution()) {
-            setFatalError(false)
-            videoRef.src = currentResolution()!.url
-            videoRef.currentTime = currentTime()
-            return
+        videoJS = videojs(videoRef, {
+            controls: false,
+            autoplay: true,
+            preload: "auto",
+            bigPlayButton: false,
+            loadingSpinner: false,
+            posterImage: false,
+            errorDisplay: false,
+            html5: {
+                vhs: {
+                    withCredentials: false,
+                    overrideNative: true,
+                },
+            },
+            sources: [
+                {
+                    src: currentRes.url,
+                    type: "video/mp4",
+                },
+            ],
+        });
+        videoJS.children_.forEach((v) => {
+            if (v["nodeName"] == "VIDEO") (v as HTMLVideoElement).classList.add("video-player")
+        })
+
+        const div = document.getElementById(videoJS.id_);
+        if (div) {
+            for (let i = div.children.length - 1; i >= 0; i--) {
+                const child = div.children[i];
+                if (child.tagName.toLowerCase() !== 'video') {
+                    div.removeChild(child);
+                }
+            }
         }
 
-        setFatalError(true)
-        // TODO: Add notification Erros
-        // switch (error.category) {
-        //     case 1:
-        //         break
-        //     case 2:
-        //         break
-        //     case 3:
-        //         break
-        //     case 5:
-        //         break
-        //     case 7:
-        //         break
-        //     case 8:
-        //         break
-        //     case 9:
-        //         break
-        // }
-
+        setTimeVideo(time)
     }
 
     function changeAudioTrack(data: { id: number, lang?: string, label: string }) {
@@ -612,6 +616,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (!videoRef) return
         if (!dontShow) setTimeoutForElement(volumeTimeout, setShowVolume)
         if (value > 100 || value < 0) return
+        if (videoJS) videoJS.volume(parseFloat((value / 100).toFixed(2)))
         videoRef.volume = parseFloat((value / 100).toFixed(2))
         volumeCacheFunc(value)
         setVolume(() => value)
@@ -896,6 +901,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     function setTimeVideo(value: number) {
         if (!videoRef) return
         videoRef.currentTime = value
+        if (videoJS) videoJS.currentTime(value)
         setcurrentTime(() => value)
 
         if (getSocket()) {
@@ -1329,6 +1335,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     autoplay={isPlaying()}
                     muted={isMuted()}
                     style={config.Player.general.VideoStreching ? { "object-fit": "cover" } : {}}
+                    onSuspend={(event) => {
+                        console.warn("Player Suspend", event);
+                    }}
                 >
                     <track
                         src={vttUrl()}

@@ -5,7 +5,6 @@ import NerdStats from '@renderer/pages/player/components/nerdStats';
 import PlayerButton from '@renderer/pages/player/components/PlayerButton';
 import PlayerSettings from '@renderer/pages/player/components/PlayerSettings';
 import SeekBar from '@renderer/components/seekBar';
-import shaka from 'shaka-player/dist/shaka-player.compiled.js';
 import {
     AnimeData,
     ContextMenuProps,
@@ -47,6 +46,8 @@ import { useKeyPress } from '@renderer/utils/hooks/useKeyPress';
 import workerUrl from "jassub/dist/jassub-worker.js?url";
 import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
 import fallbackFontJASSUB from "jassub/dist/default.woff2?url";
+import videojs from 'video.js';
+import Player from 'video.js/dist/types/player';
 // import modernWasmUrl from 'jassub/dist/jassub-worker-modern.wasm?url'
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
@@ -68,17 +69,13 @@ export interface socketPlayerInit {
     temp: { episode: string, type: string, episodes: { ep: string, img?: string, title?: string }[] }
 }
 
-export type resoltionFormatExtended = resolutionFormat & {
-    track?: shaka.extern.Track
-}
-
 function MiniPlayer(props: { props: MiniPlayerProps[] }) {
     const config: SettingsConfig = getConfig();
     const { t, currentLang } = useI18n()
 
     // ref for html object
     let videoRef: HTMLVideoElement | undefined
-    let shakaPlayer: shaka.Player | undefined
+    let videoJS: Player | undefined
     let containerRef: HTMLDivElement | undefined
     let hideTimer: NodeJS.Timeout | undefined
     let screenshotWrapper: HTMLDivElement | undefined
@@ -117,11 +114,11 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
     const [isPlaying, setIsPlaying] = createSignal<boolean>(config.Player.general.Autoplay)
     const [isFullscreen, setIsFullscreen] = createSignal<boolean>(false)
     const [isCleanup, setCleanup] = createSignal<boolean>(false)
-    const [playerHeadersTMP, setPLayerHeaderTMP] = createSignal<Map<string, string>>(new Map())
+    // const [playerHeadersTMP, setPLayerHeaderTMP] = createSignal<Map<string, string>>(new Map())
 
     // Resolution
-    const [ListResolution, setListResolution] = createSignal<resoltionFormatExtended[]>([])
-    const [currentResolution, setCurrentResoltion] = createSignal<resoltionFormatExtended | undefined>(undefined)
+    const [ListResolution, setListResolution] = createSignal<resolutionFormat[]>([])
+    const [currentResolution, setCurrentResoltion] = createSignal<resolutionFormat | undefined>(undefined)
 
     const [currentPlayer, setPlayer] = createSignal<MiniPlayerProps | undefined>(undefined)
 
@@ -177,46 +174,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
     onMount(() => {
         let defaulthost = playerData()[0]
 
-        shaka.net.NetworkingEngine.registerScheme("https", (type, requests) => {
-            const controller = new AbortController();
-
-            const promise = (async () => {
-                let tmp: any = {}
-                if (currentResolution() && currentResolution()?.reqHeader) tmp = currentResolution()?.reqHeader
-                const resp = await request(type, {
-                    method: requests.method as any,
-                    headers: { ...requests.headers, ...tmp, ...playerHeadersTMP() },
-                    body: requests.body,
-                });
-
-                if (!resp.success) console.warn("Shaka Player Failed Request", tmp.resp)
-
-                const headersObj: { [key: string]: string } = {};
-                resp.responseHeader.forEach((value, key) => {
-                    headersObj[key] = value;
-                });
-                setPLayerHeaderTMP(resp.responseHeader)
-
-                return {
-                    data: resp.buffer,
-                    headers: headersObj,
-                    uri: type,
-                    originalUri: type,
-                    originalRequest: requests,
-                };
-            })();
-
-            return new shaka.util.AbortableOperation(promise, async () => controller.abort());
-        });
-
-        shakaPlayer = new shaka.Player();
-        shakaPlayer.configure({
-            streaming: {
-                bufferingGoal: 3 * 60,
-                rebufferingGoal: 15,
-                bufferBehind: 3 * 60,
-            }
-        })
         if (videoRef) {
             setEventInPlayer("timeupdate", updateProgress)
             setEventInPlayer("progress", updateProgress)
@@ -228,7 +185,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
             setEventInPlayer("waiting", () => { setWaitingPlayer(() => true) })
             setEventInPlayer("click", () => { togglePlay(); setcurrentSettings(() => false); setShowSelectEpisode(() => false) })
         }
-        if (videoRef) shakaPlayer.attach(videoRef)
 
         runNewPlayer(defaulthost)
         handleVolume(config.Player.general.Volume, true)
@@ -276,7 +232,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
             videoRef.remove()
         }
         videoRef = undefined
-        if (shakaPlayer) shakaPlayer.destroy()
 
         if (getSocket()) {
             const socket = getSocket()
@@ -319,8 +274,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
     async function setNewResolution(data: resolutionFormat | undefined) {
         if (!data) return
         if (!videoRef) return
-        if (!shakaPlayer) return
-        setPLayerHeaderTMP(new Map())
         setFatalError(false)
         const time = videoRef.currentTime
         if (data.defaultSubtitles) setDefaultSubtitles(ListSubtitles())
@@ -333,9 +286,10 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
             return
         }
 
-        try {
-            await shakaPlayer.load(data.url, time)
-        } catch (error) { shakaPlayerErrorParser(error) }
+        if (videoJS) {
+            videoJS.src(data.url)
+            setTimeVideo(time)
+        }
     }
 
     async function setDefaultSubtitles(data: playerSubtitlesFormat[]) {
@@ -352,8 +306,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
 
     async function runNewPlayer(data: playerData) {
         if (!videoRef) return
-        if (!shakaPlayer) return
-        setPLayerHeaderTMP(new Map())
         setFatalError(false)
 
         let currentplayer = data
@@ -382,22 +334,43 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
 
         setListResolution(() => currentplayer.resolution)
         setCurrentResoltion(currentRes)
-        try {
-            await shakaPlayer.load(currentRes.url, 0)
-        } catch (error) { shakaPlayerErrorParser(error) }
-    }
 
-    function shakaPlayerErrorParser(error: any): any {
-        console.error("Shaka Player Error:", error)
-        if (!("category" in error)) return setFatalError(true)
-        if (error.category == 4 && videoRef && currentResolution()) {
-            setFatalError(false)
-            videoRef.src = currentResolution()!.url
-            videoRef.currentTime = currentTime()
-            return
+        videoJS = videojs(videoRef, {
+            controls: false,
+            autoplay: true,
+            preload: "auto",
+            bigPlayButton: false,
+            loadingSpinner: false,
+            posterImage: false,
+            errorDisplay: false,
+            html5: {
+                vhs: {
+                    withCredentials: false,
+                    overrideNative: true,
+                },
+            },
+            sources: [
+                {
+                    src: currentRes.url,
+                    type: "video/mp4",
+                },
+            ],
+        });
+        videoJS.children_.forEach((v) => {
+            if (v["nodeName"] == "VIDEO") (v as HTMLVideoElement).classList.add("video-player")
+        })
+
+        const div = document.getElementById(videoJS.id_);
+        if (div) {
+            for (let i = div.children.length - 1; i >= 0; i--) {
+                const child = div.children[i];
+                if (child.tagName.toLowerCase() !== 'video') {
+                    div.removeChild(child);
+                }
+            }
         }
 
-        setFatalError(true)
+        setTimeVideo(0)
     }
 
     function changeAudioTrack(data: { id: number, lang?: string, label: string }) {
@@ -638,6 +611,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
     function setTimeVideo(value: number) {
         if (!videoRef) return
         videoRef.currentTime = value
+        if (videoJS) videoJS.currentTime(value)
         setcurrentTime(() => value)
     }
 

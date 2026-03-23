@@ -4,7 +4,6 @@ import Information from './pages/information/index';
 import LocalErrorBoundary from './utils/ErrorBoundary';
 import Player from './pages/player/index';
 import Settings from './pages/settings/index';
-import shaka from 'shaka-player';
 import {
   calculateZoomLevel,
   changeTheme,
@@ -106,8 +105,6 @@ function App() {
   })
 
   onMount(async () => {
-    shaka.polyfill.installAll()
-
     /* IFDEF WEB */
     /* ENDIF */
 
