@@ -11,7 +11,7 @@
 .toast {
   padding: 18px;
   border-radius: 12px;
-  width: clamp(270px, 20vw, 330px);
+  width: clamp(270px, 23vw, 450px);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -19,6 +19,8 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   background-color: var(--fourth-layer);
   user-select: none;
+
+  cursor: pointer;
 }
 .toast.disable {
   animation: ToastSlideOut 0.2s ease;
@@ -46,8 +48,37 @@
 }
 
 .toast.click {
-  cursor: pointer;
-  user-select: none;
+  cursor: default;
+}
+
+.toast.notification {
+  padding: 0px;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  overflow: hidden;
+}
+
+.toast-notification-top-bar {
+  background-color: var(--five-layer);
+  width: 100%;
+  padding: 2px 8px;
+  font-size: .9em;
+}
+
+.toast-notification-content {
+  padding: 4px 8px;
+  padding-bottom: 12px;
+  width: 94%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: .8em;
+}
+
+.toast-notification-icon {
+  width: 44px;
+  border-radius: 4px;
 }
 
 /* ANIMATION */

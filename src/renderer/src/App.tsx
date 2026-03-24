@@ -78,7 +78,7 @@ function App() {
   })
   createShortcut(["Control", "Shift", "R"], async () => {
     if (getConfig().Developer.DeveloperMode) {
-      const idToast = toast(t("global.themereload"), { type: "loading", removeTimer: true })
+      const idToast = toast(t("global.themereload"), { type: "loading", timer: true })
       setGlobalTheme(await window.api.themes.list())
 
       const loadedTheme = getGlobalCache().loadedTheme
@@ -92,12 +92,15 @@ function App() {
       }
       changeTheme(loadingTheme)
 
-      updateToast(idToast, t("global.themereload"), { type: "success", removeTimer: false })
+      updateToast(idToast, t("global.themereload"), { type: "success", timer: false })
       await window.backend.refresh()
     }
-    await import("./utils/exports")
   })
   /* ENDIF */
+
+  {
+    import("./utils/exports").then((v) => v)
+  }
 
   createShortcut(["Control", "I"], () => {
     setIncognitoMode(!getGlobalCache().incognito)

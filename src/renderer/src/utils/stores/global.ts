@@ -1,5 +1,5 @@
 import { UUIDTypes } from "uuid";
-import { cardData, deeplinkFormat, globalDataFormat, serviceFormat, themeMetadata } from "../types";
+import { cardData, deeplinkFormat, globalDataFormat, NotificationProps, serviceFormat, themeMetadata } from "../types";
 import { createStore } from "solid-js/store";
 import { Socket } from "socket.io-client";
 
@@ -17,6 +17,7 @@ export const [globalState, setGlobalState] = createStore({
     anilist_user_data: undefined,
     isAnimuHidden: false,
     isAnimuFocus: true,
+    notifications: []
 } as globalDataFormat);
 
 export const getGlobalCache = () => globalState;
@@ -30,6 +31,7 @@ export const getDeeplinks = () => globalState.deepLinks;
 export const getAnilistUserData = () => globalState.anilist_user_data;
 export const isAnimuHidden = () => globalState.isAnimuHidden;
 export const isAnimuFocus = () => globalState.isAnimuFocus;
+export const getNotificationList = () => globalState.notifications;
 export const setSocket = (tmp: Socket) => setGlobalState((prev) => ({...prev, socket: { ...prev.socket as any, instance: tmp }}));
 export const setSocketRoom = (tmp: string) => setGlobalState((prev) => ({...prev, socket: { ...prev.socket as any, currentRoom: tmp }}));
 export const setActiveThemes = (tmp: Map<number, themeMetadata>) => setGlobalState((prev) => ({...prev, activeThemes: tmp}));
@@ -40,6 +42,7 @@ export const setGlobalHistory = (tmp: cardData[]) => setGlobalState((prev) => ({
 export const setGlobalToken = (tmp: UUIDTypes | undefined) => setGlobalState((prev) => ({...prev, token: tmp}));
 export const setAnimulistData = (tmp: globalDataFormat["animuList"]) => setGlobalState((prev) => ({...prev, animuList: tmp}));
 export const setDeepLink = (tmp: deeplinkFormat) => setGlobalState((prev) => ({...prev, deepLinks: [...prev.deepLinks, tmp]}));
+export const addNotification = (tmp: NotificationProps) => setGlobalState((prev) => ({...prev, notifications: [...prev.notifications, tmp]}));
 export const removeDeepLink = (name: string) => setGlobalState((prev) => ({...prev, deepLinks: prev.deepLinks.filter((item) => item.name != name)}));
 export const ActiveService = (tmp: serviceFormat[]) => setGlobalState((prev) => ({...prev, service: tmp}));
 export const FindService = (tmp: string) => globalState.service.find((item) => item.name == tmp);
@@ -63,4 +66,14 @@ window.BrowserWindow.onWindowHidden((hidden: boolean) => {
 window.BrowserWindow.onWindowFocus((focus: boolean) => {
     setGlobalState((prev) => ({...prev, isAnimuFocus: focus}))
 })
+/* ENDIF */
+
+/* IFDEF WEB */
+window.addEventListener("focus", () => {
+    setGlobalState((prev) => ({...prev, isAnimuFocus: true}))
+});
+
+window.addEventListener("blur", () => {
+    setGlobalState((prev) => ({...prev, isAnimuFocus: false}))
+});
 /* ENDIF */

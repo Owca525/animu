@@ -1,4 +1,4 @@
-import { createContext, createSignal, JSX, For, Show } from "solid-js";
+import { createContext, createSignal, JSX, For, Show, Switch, Match } from "solid-js";
 import { Portal } from "solid-js/web";
 import { v4 as uuidv4 } from 'uuid';
 import "./css/ToastNotification.css"
@@ -6,28 +6,29 @@ import "./css/ToastNotification.css"
 type ToastProps = {
     id: string;
     message: string;
+    added?: { description: string, icon?: string }
     options?: ToastOptions;
 };
 
 type expandedToastProps = ToastProps & { animation: boolean, updated: boolean, timer: NodeJS.Timeout | undefined }
 
 interface ToastOptions {
-    type?: "success" | "error" | "info" | "warning" | "loading",
+    type?: "success" | "error" | "info" | "warning" | "loading" | "notification",
     duration?: number,
     onClick?: () => void;
-    removeTimer?: boolean
-    removeClick?: boolean
+    timer?: boolean
+    click?: boolean
 }
 
 const defaultOptions: ToastOptions = {
     type: "info",
     duration: 3000,
-    removeTimer: false,
+    timer: false,
 }
 
 interface ToastContextType {
-    addToast: (msg: string, options: ToastOptions) => string;
-    updateToast: (id: string, msg: string, options?: ToastOptions) => void;
+    addToast: (msg: string | { title: string, description: string, icon?: string }, options: ToastOptions) => string;
+    updateToast: (id: string, msg: string | { title: string, description: string, icon?: string }, options?: ToastOptions) => void;
     removeToast: (id: string) => void;
 };
 
@@ -37,31 +38,33 @@ let toastAPI: ToastContextType | undefined;
 export function ToastProvider(props: { children: JSX.Element }) {
     const [toasts, setToasts] = createSignal<expandedToastProps[]>([]);
 
-    function addToast(message: string, options: ToastOptions) {
+    function addToast(message: string | { title: string, description: string, icon?: string }, options: ToastOptions) {
         const id = uuidv4();
         let duration = options.duration;
         let timer: NodeJS.Timeout | undefined
-        if (!options.removeTimer) {
+        if (!options.timer) {
             timer = setTimeout(() => {
                 removeToast(id)
             }, duration);
         }
-        setToasts(prev => [...prev, { id, message, options, animation: false, updated: false, timer }]);
+        if (typeof message == "string") setToasts(prev => [...prev, { id, message: message as string, options, animation: false, updated: false, timer }]);
+        else setToasts(prev => [...prev, { id, message: message.title, added: message, options, animation: false, updated: false, timer }])
         return id
     };
 
-    function updateToast(id: string, msg: string, options?: ToastOptions) {
+    function updateToast(id: string, msg: string | { title: string, description: string, icon?: string }, options?: ToastOptions) {
         setToasts((prevToast) => prevToast.map((tost) => {
             if (tost.id != id) return tost
             clearInterval(tost.timer)
             let timer: NodeJS.Timeout | undefined
 
-            if (!options?.removeTimer) {
+            if (!options?.timer) {
                 timer = setTimeout(() => {
                     removeToast(id)
                 }, options?.duration ? options.duration : defaultOptions.duration);
             }
-            return { ...tost, message: msg, options: { ...tost.options, ...options }, updated: true, timer }
+            if (typeof msg == "string") return { ...tost, message: msg as string, options: { ...tost.options, ...options }, updated: true, timer }
+            return { ...tost, message: msg.title, added: msg, options: { ...tost.options, ...options }, updated: true, timer }
         }))
     };
 
@@ -78,10 +81,11 @@ export function ToastProvider(props: { children: JSX.Element }) {
                 <div class="toast-container">
                     <For each={toasts()}>
                         {toast => (
-                            <div class={`toast ${!toast.updated && !toast.animation ? "show" : ""} ${toast.options?.type} ${toast.animation && !toast.updated ? "disable" : ""} ${!toast.options?.removeClick || !toast.options?.onClick ? "" : "click"}`}
+                            <div class={`toast ${!toast.updated && !toast.animation ? "show" : ""} ${toast.options?.type} ${toast.animation && !toast.updated ? "disable" : ""} ${!toast.options?.click == false || !toast.options?.onClick ? "" : "click"}`}
                                 onclick={() => {
                                     if (toast.options?.onClick) toast.options.onClick()
-                                    if (!toast.options?.removeClick) removeToast(toast.id)
+                                    if (toast.options?.click) return
+                                    removeToast(toast.id)
                                 }}
                                 onanimationend={(event) => {
                                     if (event.target.classList.contains("disable")) setToasts(prev => prev.filter(t => t.id !== toast.id))
@@ -99,7 +103,22 @@ export function ToastProvider(props: { children: JSX.Element }) {
                                 <Show when={toast.options?.type == "info"}>
                                     <span class="material-symbols-outlined">info</span>
                                 </Show>
-                                {toast.message}
+                                <Switch>
+                                    <Match when={!toast.options || toast.options.type != "notification"}>
+                                        {toast.message}
+                                    </Match>
+                                    <Match when={toast["options"]?.type == "notification"}>
+                                        <span class="toast-notification-top-bar">
+                                            {toast.message}
+                                        </span>
+                                        <span class="toast-notification-content">
+                                            {toast.added?.description}
+                                            <Show when={toast.added?.icon}>
+                                                <img src={toast.added?.icon} class="toast-notification-icon" />
+                                            </Show>
+                                        </span>
+                                    </Match>
+                                </Switch>
                             </div>
                         )}
                     </For>
@@ -109,12 +128,12 @@ export function ToastProvider(props: { children: JSX.Element }) {
     );
 }
 
-export function toast(msg: string, options?: ToastOptions) {
+export function toast(msg: string | { title: string, description: string, icon?: string }, options?: ToastOptions) {
     if (!toastAPI) return "";
     return toastAPI.addToast(msg, { ...defaultOptions, ...options })
 }
 
-export function updateToast(id: string, msg: string, options?: ToastOptions) {
+export function updateToast(id: string, msg: string | { title: string, description: string, icon?: string }, options?: ToastOptions) {
     if (!toastAPI) return "";
     return toastAPI.updateToast(id, msg, options)
 }

@@ -8,6 +8,7 @@ import {
     FilterParams,
     homeData,
     informationPluginFormat,
+    NotificationProps,
     playerChapterList,
     playerPluginFormat,
     pluginRepoExpanded,
@@ -15,7 +16,7 @@ import {
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { ActiveService, animulistData, FindService, getGlobalCache, getServices, isAnimuFocus, isAnimuHidden, removeDeepLink, setActiveThemes, setAnilistUserData, setDeepLink, setGlobalToken } from './stores/global';
+import { ActiveService, addNotification, animulistData, FindService, getGlobalCache, getServices, isAnimuFocus, isAnimuHidden, removeDeepLink, setActiveThemes, setAnilistUserData, setDeepLink, setGlobalToken } from './stores/global';
 import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
@@ -534,31 +535,6 @@ export function convertText(text: string) {
         .replaceAll("%20", "+")
 }
 
-export function decryptAES(ciphertext: string, key: string): string | undefined {
-    try {
-        const raw = CryptoJS.enc.Base64.parse(ciphertext);
-        const iv = CryptoJS.lib.WordArray.create(raw.words.slice(0, 4), 16);
-        const encrypted = CryptoJS.lib.WordArray.create(
-            raw.words.slice(4),
-            raw.sigBytes - 16
-        );
-        const decrypted = CryptoJS.AES.decrypt(
-            { ciphertext: encrypted } as any,
-            CryptoJS.enc.Utf8.parse(key),
-            {
-                iv,
-                mode: CryptoJS.mode.CBC,
-                padding: CryptoJS.pad.Pkcs7
-            }
-        );
-        const text = decrypted.toString(CryptoJS.enc.Utf8);
-        return text || undefined;
-    } catch (error) {
-        console.error("Error in decryptAES", error)
-        return undefined;
-    }
-}
-
 export function getRenderPath(): string {
     return `${location.origin}${location.pathname.replace("index.html", "")}`
 }
@@ -597,9 +573,9 @@ export async function detectPluginVersion(notification: boolean = false) {
         if (semver.gt(semver.coerce(tmp.ver) as any, semver.coerce(element.metadata.version) as any)) {
             reInitial = true
             if (notification) {
-                const id = toast(`Update ${tmp.name} from ${element.metadata.version} to ${tmp.ver}`, { type: "loading", removeTimer: true })
+                const id = toast(`Update ${tmp.name} from ${element.metadata.version} to ${tmp.ver}`, { type: "loading", timer: true })
                 await window.api.plugins.installUpdate(tmp)
-                updateToast(id, "Update Succesfully Installed", { type: "success", removeTimer: false })
+                updateToast(id, "Update Succesfully Installed", { type: "success", timer: false })
             } else await window.api.plugins.installUpdate(tmp)
         }
     }
@@ -887,10 +863,10 @@ export async function fetchAnimeDeepLink(deeplink: string) {
     if (!anime) return
 
     const infoPlugin = getInformationPlugin()
-    const idToast = toast(t("notification.fetchinganime"), { type: "loading", removeTimer: true })
+    const idToast = toast(t("notification.fetchinganime"), { type: "loading", timer: true })
     const response = await infoPlugin.anime(anime.animeID)
-    if (!response) return updateToast(idToast, t("notification.failedanime"), { type: "error", removeTimer: false })
-    updateToast(idToast, t("notification.successanime"), { type: "success", removeTimer: false })
+    if (!response) return updateToast(idToast, t("notification.failedanime"), { type: "error", timer: false })
+    updateToast(idToast, t("notification.successanime"), { type: "success", timer: false })
 
     if (!anime.player) {
         localStorage.setItem("informationCache", JSON.stringify({ anime: response }))
@@ -898,12 +874,12 @@ export async function fetchAnimeDeepLink(deeplink: string) {
         return
     }
 
-    const toastID = toast(t("notification.episodesfetching"), { type: "loading", removeTimer: true })
+    const toastID = toast(t("notification.episodesfetching"), { type: "loading", timer: true })
     const currentPLugin = pluginManager().changePlugin(anime.player.plugin)
     const episodeList = await currentPLugin.extractOnlyEpisodesList(anime.player.type, anime.player.id);
 
     if (episodeList.length <= 0) {
-        updateToast(toastID, t("notification.episodesfailed"), { type: "error", removeTimer: false })
+        updateToast(toastID, t("notification.episodesfailed"), { type: "error", timer: false })
         return
     }
 
@@ -1272,14 +1248,19 @@ export function convertEpisode(ep: string): number {
     }
 }
 
-export function sendNotification(notificiation: { title: string, description: string, icon?: string, onClick?: () => void }) {
+export function sendNotification(notificiation: NotificationProps) {
     if (isAnimuHidden() || !isAnimuFocus()) {
         Notification.requestPermission().then(permission => {
-            if (permission === 'granted') {
-                new Notification(notificiation.title, { body: notificiation.description, icon: notificiation.icon });
-            }
+            if (permission != 'granted') return
+            let tmp = new Notification(t(notificiation.title), { body: t(notificiation.description), icon: notificiation.icon });
+            if (notificiation.onClick) tmp.addEventListener("click", notificiation.onClick)
         });
     } else {
-        toast(notificiation.description)
+        toast({
+            title: t(notificiation.title),
+            description: t(notificiation.description),
+            icon: notificiation.icon
+        },  { type: "notification", onClick: notificiation.onClick })
     }
+    addNotification(notificiation)
 }

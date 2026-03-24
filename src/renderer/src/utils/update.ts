@@ -13,7 +13,6 @@ export async function checkUpdate(alwaysShow: boolean = false) {
     if (update.available) {
       const id = toast(t("update.available", { ver: update.version }), {
         duration: 5000,
-        removeClick: true,
         onClick: () => {
           window.api.update.downloadUpdate();
           downloadUpdate(id);
@@ -38,13 +37,13 @@ export function downloadUpdate(updateNotification: string) {
   window.api.update.updateProgress((_event, percent) => {
     updateToast(updateNotification, t("update.progress", { procent: percent.toFixed(1) }), {
       type: "loading",
-      removeTimer: true,
-      removeClick: true,
+      timer: true,
+      click: true,
       onClick: undefined
     });
 
     if (percent.toFixed(0) === "100") {
-      updateToast(updateNotification, t("update.done"), { type: "success", removeTimer: false, removeClick: false });
+      updateToast(updateNotification, t("update.done"), { type: "success", timer: false, click: false });
     }
   });
   /* ENDIF */

@@ -4,6 +4,31 @@ import { AnimeData, cardData, episodeList, genresSearchFormat, playerData, playe
 const WEBSITE = "https://www.aowu.tv/"
 const SearchPath = "/search/-------------.html?wd="
 
+export function decryptAES(ciphertext: string, key: string): string | undefined {
+    try {
+        const raw = CryptoJS.enc.Base64.parse(ciphertext);
+        const iv = CryptoJS.lib.WordArray.create(raw.words.slice(0, 4), 16);
+        const encrypted = CryptoJS.lib.WordArray.create(
+            raw.words.slice(4),
+            raw.sigBytes - 16
+        );
+        const decrypted = CryptoJS.AES.decrypt(
+            { ciphertext: encrypted } as any,
+            CryptoJS.enc.Utf8.parse(key),
+            {
+                iv,
+                mode: CryptoJS.mode.CBC,
+                padding: CryptoJS.pad.Pkcs7
+            }
+        );
+        const text = decrypted.toString(CryptoJS.enc.Utf8);
+        return text || undefined;
+    } catch (error) {
+        console.error("Error in decryptAES", error)
+        return undefined;
+    }
+}
+
 export default class Aowu implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
         version: "1.0",

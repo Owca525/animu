@@ -37,10 +37,10 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
         if (saveData) plugin = pluginManager().changePlugin(saveData.pluginName)
         if (!plugin) return toast(t("notification.failedplugin"), { type: "error" })
         
-        const idToast = toast(t("notification.fetchinganime"), { type: "loading", removeTimer: true })
+        const idToast = toast(t("notification.fetchinganime"), { type: "loading", timer: true })
         if (!saveData && !id) {
             const response = await plugin.extractEpisodeList(data.AnimeData)
-            if (!response || response.episodesData.length <= 0) return updateToast(idToast, t("notification.failedanime"), { type: "error", removeTimer: false })
+            if (!response || response.episodesData.length <= 0) return updateToast(idToast, t("notification.failedanime"), { type: "error", timer: false })
             localStorage.setItem("playerCache", JSON.stringify({
                 data: {
                     ...data.AnimeData,
@@ -59,7 +59,7 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
         if (saveData && id) {
             const episodeList = await plugin.extractOnlyEpisodesList(saveData.type, id);
             if (episodeList.length <= 0) {
-                updateToast(idToast, t("notification.failedepisodes"), { type: "error", removeTimer: false })
+                updateToast(idToast, t("notification.failedepisodes"), { type: "error", timer: false })
                 return
             }
 

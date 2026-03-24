@@ -403,7 +403,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             if (currentExtractionRes().toast != "") removeToast(currentExtractionRes().toast)
 
             const tmpID = uuidv4()
-            const idToast = toast(t("notification.fetchresolution"), { type: "loading", removeTimer: true })
+            const idToast = toast(t("notification.fetchresolution"), { type: "loading", timer: true })
             setCurrentExtractionRes({ id: tmpID, toast: idToast })
             let tmp = await fetchResolutions({
                 ...currentplayer,
@@ -1301,7 +1301,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             setNewResolution(player.dubResolution[0])
             setIsDubbingOn(true)
         } else if (isDubbingOn() == false && player.isDubbing) {
-            const idToast = toast(t("notification.fetchingdub"), { type: "loading", removeTimer: true })
+            const idToast = toast(t("notification.fetchingdub"), { type: "loading", timer: true })
             const tmp = await fetchResolutions({
                 ...player,
                 episode: {
@@ -1318,7 +1318,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 setPlayer({ ...player, dubResolution: tmp.data })
                 setListResolution(tmp.data)
                 setNewResolution(tmp.data[0])
-            } else updateToast(idToast, t("notification.faileddub"), { type: "error", removeTimer: false })
+            } else updateToast(idToast, t("notification.faileddub"), { type: "error", timer: false })
             setIsDubbingOn(true)
         } else {
             setListResolution(player.resolution)

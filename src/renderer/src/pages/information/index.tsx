@@ -297,7 +297,7 @@ function information() {
 
     async function ChangeAnimeInInformation(data: AnimeData): Promise<any> {
         resetContentVariable()
-        const idToast = toast(t("notification.fetchinganime"), { removeTimer: true, type: "loading" })
+        const idToast = toast(t("notification.fetchinganime"), { timer: true, type: "loading" })
         const animulist = unwrap(animulistData())
         let tmpAnimulist
         let resp
@@ -309,8 +309,8 @@ function information() {
             tmpAnimulist = animulist.find((v) => v.AnimeData.id == tempData().anime.id)?.animulist
         }
 
-        if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", removeTimer: false })
-        updateToast(idToast, t("notification.successanime"), { type: "success", removeTimer: false })
+        if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", timer: false })
+        updateToast(idToast, t("notification.successanime"), { type: "success", timer: false })
 
         // Reseting Recomendation
         setTmpData((prev) => ({ ...prev, anime: { ...prev.anime, recommendations: undefined } }))

@@ -1,12 +1,12 @@
 import { Socket } from "socket.io-client"
 import { UUIDTypes } from "uuid"
 
-export const notificationProps = {
-    closeOnClick: true,
-    autoClose: 3000,
-    pauseOnHover: true,
-    theme: "dark"
-}
+// export const notificationProps = {
+//     closeOnClick: true,
+//     autoClose: 3000,
+//     pauseOnHover: true,
+//     theme: "dark"
+// }
 
 export const Anilist_ScoreFormatKeys = {
     POINT_100: "POINT_100",
@@ -201,6 +201,15 @@ export interface globalDataFormat {
     anilist_user_data?: { [key: string]: any; },
     isAnimuHidden: boolean
     isAnimuFocus: boolean
+    notifications: NotificationProps[]
+}
+
+export interface NotificationProps {
+    title: string,
+    description: string,
+    icon?: string,
+    onClick?: () => void | Promise<void>
+    readed?: boolean
 }
 
 export type playerDataExtended = playerData & {
