@@ -184,6 +184,35 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
             setEventInPlayer("canplay", () => { setWaitingPlayer(() => false) })
             setEventInPlayer("waiting", () => { setWaitingPlayer(() => true) })
             setEventInPlayer("click", () => { togglePlay(); setcurrentSettings(() => false); setShowSelectEpisode(() => false) })
+
+            videoJS = videojs(videoRef, {
+                controls: false,
+                autoplay: true,
+                preload: "auto",
+                bigPlayButton: false,
+                loadingSpinner: false,
+                posterImage: false,
+                errorDisplay: false,
+                html5: {
+                    vhs: {
+                        withCredentials: false,
+                        overrideNative: true,
+                    },
+                },
+            });
+            videoJS.children_.forEach((v) => {
+                if (v["nodeName"] == "VIDEO") (v as HTMLVideoElement).classList.add("video-player")
+            })
+
+            const div = document.getElementById(videoJS.id_);
+            if (div) {
+                for (let i = div.children.length - 1; i >= 0; i--) {
+                    const child = div.children[i];
+                    if (child.tagName.toLowerCase() !== 'video') {
+                        div.removeChild(child);
+                    }
+                }
+            }
         }
 
         runNewPlayer(defaulthost)
@@ -287,7 +316,10 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
         }
 
         if (videoJS) {
-            videoJS.src(data.url)
+            videoJS.src({
+                src: data.url,
+                type: "video/mp4",
+            })
             setTimeVideo(time)
         }
     }
@@ -327,48 +359,17 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
             setCurrentResoltion(currentRes)
         }
         if (currentRes.hls) {
-            await runHLS(currentRes, currentplayer.splitHLS)
-            return
+            return await runHLS(currentRes, currentplayer.splitHLS)
         }
         if (hls) hls.destroy()
 
         setListResolution(() => currentplayer.resolution)
         setCurrentResoltion(currentRes)
 
-        videoJS = videojs(videoRef, {
-            controls: false,
-            autoplay: true,
-            preload: "auto",
-            bigPlayButton: false,
-            loadingSpinner: false,
-            posterImage: false,
-            errorDisplay: false,
-            html5: {
-                vhs: {
-                    withCredentials: false,
-                    overrideNative: true,
-                },
-            },
-            sources: [
-                {
-                    src: currentRes.url,
-                    type: "video/mp4",
-                },
-            ],
-        });
-        videoJS.children_.forEach((v) => {
-            if (v["nodeName"] == "VIDEO") (v as HTMLVideoElement).classList.add("video-player")
+        videoJS?.src({
+            src: currentRes.url,
+            type: "video/mp4",
         })
-
-        const div = document.getElementById(videoJS.id_);
-        if (div) {
-            for (let i = div.children.length - 1; i >= 0; i--) {
-                const child = div.children[i];
-                if (child.tagName.toLowerCase() !== 'video') {
-                    div.removeChild(child);
-                }
-            }
-        }
 
         setTimeVideo(0)
     }

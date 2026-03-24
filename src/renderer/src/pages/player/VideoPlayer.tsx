@@ -184,7 +184,39 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             if (element.defaultHost) defaulthost = element
         }
 
-        runNewPlayer(defaulthost)
+        if (videoRef) {
+            console.log("AJKL:NSDFL:NADF")
+            videoJS = videojs(videoRef, {
+                controls: false,
+                autoplay: true,
+                preload: "auto",
+                bigPlayButton: false,
+                loadingSpinner: false,
+                posterImage: false,
+                errorDisplay: false,
+                html5: {
+                    vhs: {
+                        withCredentials: false,
+                        overrideNative: true,
+                    },
+                },
+            });
+            videoJS.children_.forEach((v) => {
+                if (v["nodeName"] == "VIDEO") (v as HTMLVideoElement).classList.add("video-player")
+            })
+
+            const div = document.getElementById(videoJS.id_);
+            if (div) {
+                for (let i = div.children.length - 1; i >= 0; i--) {
+                    const child = div.children[i];
+                    if (child.tagName.toLowerCase() !== 'video') {
+                        div.removeChild(child);
+                    }
+                }
+            }
+        }
+
+        runNewPlayer(defaulthost, time)
         handleVolume(PlayerVolume, true)
         handleMouseMove()
 
@@ -193,7 +225,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             setEventInPlayer("progress", updateProgress)
             setEventInPlayer("seeked", updateProgress)
             setEventInPlayer("loadedmetadata", (event) => {
-                console.warn("PLAYER ON LOAD METADATA CURRENT TIME", event.currentTarget.currentTime)
                 updateProgress(event)
                 setdurrationTime(event.currentTarget.duration)
                 if (currentPlayer() && currentPlayer()!.listChapters) {
@@ -211,7 +242,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             toggleFullscreen(true)
             setIsFullscreen(true)
         }
-        setTimeVideo(time)
+
         if ("mediaSession" in navigator) {
             const findedepisode = temp.episodes.findIndex((value) => value.ep == temp.episode)
             const cover = temp.episodes[findedepisode] ? temp.episodes[findedepisode].img : anime_data.AnimeData.coverImage
@@ -273,7 +304,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (currentASSubtitles) currentASSubtitles.destroy()
         if (videoRef) videoRef.src = ""
         videoRef = undefined
-        if(videoJS) videoJS.dispose()
+        if (videoJS) videoJS.dispose()
 
         if (getSocket()) {
             const socket = getSocket()
@@ -342,7 +373,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }
 
         if (videoJS) {
-            videoJS.src(data.url)
+            videoJS.src({
+                src: data.url,
+                type: "video/mp4",
+            })
             setTimeVideo(time)
         }
     }
@@ -359,7 +393,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         setNewSubtitles(data[0])
     }
 
-    async function runNewPlayer(data: playerData) {
+    async function runNewPlayer(data: playerData, tmpTime?: number) {
         if (!videoRef) return
         setFatalError(false)
 
@@ -401,7 +435,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }
         setPlayer(() => currentplayer)
 
-        const time = videoRef.currentTime
+        const time = tmpTime ? tmpTime : videoRef.currentTime
         if (currentplayer.subtitles) setListSubtitles(() => [{ url: "", format: "", lang: "", label: t("player.other.off") }, ...currentplayer.subtitles as playerSubtitlesFormat[]])
         if (currentplayer.storyboardVTT) setThumbnail(await VTTstoryBoardParser(currentplayer.storyboardVTT))
         const currentRes = currentplayer.resolution[0]
@@ -467,41 +501,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         setListResolution(() => currentplayer.resolution)
         setCurrentResoltion(currentRes)
 
-        videoJS = videojs(videoRef, {
-            controls: false,
-            autoplay: true,
-            preload: "auto",
-            bigPlayButton: false,
-            loadingSpinner: false,
-            posterImage: false,
-            errorDisplay: false,
-            html5: {
-                vhs: {
-                    withCredentials: false,
-                    overrideNative: true,
-                },
-            },
-            sources: [
-                {
-                    src: currentRes.url,
-                    type: "video/mp4",
-                },
-            ],
-        });
-        videoJS.children_.forEach((v) => {
-            if (v["nodeName"] == "VIDEO") (v as HTMLVideoElement).classList.add("video-player")
+        videoJS?.src({
+            src: currentRes.url,
+            type: "video/mp4",
         })
-
-        const div = document.getElementById(videoJS.id_);
-        if (div) {
-            for (let i = div.children.length - 1; i >= 0; i--) {
-                const child = div.children[i];
-                if (child.tagName.toLowerCase() !== 'video') {
-                    div.removeChild(child);
-                }
-            }
-        }
-
         setTimeVideo(time)
     }
 
@@ -775,7 +778,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     }
 
     function updateProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
-        console.warn("updateProgress Current Time", event.currentTarget.currentTime)
 
         setcurrentTime(event.currentTarget.currentTime)
         saveContinueProgress(event)
@@ -1335,9 +1337,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     autoplay={isPlaying()}
                     muted={isMuted()}
                     style={config.Player.general.VideoStreching ? { "object-fit": "cover" } : {}}
-                    onSuspend={(event) => {
-                        console.warn("Player Suspend", event);
-                    }}
                 >
                     <track
                         src={vttUrl()}
