@@ -24,6 +24,7 @@ export let mainWindow: BrowserWindow | undefined
 export const newConfigPath = path.join(app.getPath("userData"), "animuConfig")
 export const themeConfigPath = path.join(newConfigPath, "themeConfig")
 export const pluginsConfigPath = path.join(newConfigPath, "pluginsConfig")
+export const animuPlaylistPath = path.join(newConfigPath, "playlist")
 export const userPlugins = path.join(newConfigPath, "plugins")
 export const animuPlugins = path.join(app.getPath("userData"), "animuPlugins")
 export let config: SettingsConfig = defaultConfig
@@ -89,9 +90,7 @@ function createWindow(): void {
 
   const args = process.argv.slice(1);
   const isDevTools = args.includes("--dev-tools") || args.includes("--devtools");
-  if (isDevTools) {
-    mainWindow.webContents.openDevTools({ mode: "detach" });
-  } else if (config.Developer.DevToolsOnStart) {
+  if (isDevTools || config.Developer.DevToolsOnStart) {
     mainWindow.webContents.openDevTools({ mode: "detach" });
   }
 
@@ -248,6 +247,7 @@ export async function initialBackend() {
     if (!existsSync(pluginsConfigPath)) mkdirSync(pluginsConfigPath)
     if (!existsSync(userPlugins)) mkdirSync(userPlugins)
     if (!existsSync(animuPlugins)) mkdirSync(animuPlugins)
+    if (!existsSync(animuPlaylistPath)) mkdirSync(animuPlaylistPath)
 
     if (existsSync(path.join(newConfigPath, "config.ini"))) {
       let data = readFileSync(path.join(newConfigPath, "config.ini"), "utf-8")

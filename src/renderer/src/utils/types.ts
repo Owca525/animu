@@ -202,6 +202,7 @@ export interface globalDataFormat {
     isAnimuHidden: boolean
     isAnimuFocus: boolean
     notifications: NotificationProps[]
+    todayAnimeAnilist: cardData[]
 }
 
 export interface NotificationProps {
@@ -354,7 +355,7 @@ export interface informationPluginFormat {
     search(name: string, page: number, params?: genresSearchFormat): Promise<containerData | undefined>
     home(): Promise<{ topCards?: containerData, sections: containerData[] } | undefined>
     anime(context: { id: string }): Promise<AnimeData | undefined>
-    schedule: (airingStart: number, airingEnd: number) => Promise<containerData>
+    schedule: (airingStart: number, airingEnd: number) => Promise<cardData[]>
     getManga: (id: string) => Promise<AnimeData | undefined>
     getAnimeList: () => Promise<cardData[]>
     setAnimeInList: (variable: Anilist_ListMutation) => Promise<boolean>
@@ -373,7 +374,7 @@ export interface informationPluginManagerFormat {
     home(): void
     anime(id: string): Promise<AnimeData | undefined>
     initial(): Promise<void>
-    schedule(airingStart: number, airingEnd: number): Promise<containerData>
+    schedule(airingStart: number, airingEnd: number): Promise<cardData[]>
     getManga: (id: string) => Promise<AnimeData | undefined>
     getAnimeList: () => Promise<cardData[]>
     setAnimeInList: (variable: Anilist_ListMutation) => Promise<boolean>
@@ -595,4 +596,10 @@ export interface deeplinkFormat {
     name: string,
     code: string,
     func: (deeplink: string, code: string) => any | Promise<any>
+}
+
+export interface playlistFormatData {
+    anime: cardData,
+    added: number,
+    lastupdate: number
 }

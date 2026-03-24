@@ -1,4 +1,5 @@
 import { dateToUnix, getHistory, searchDataInCards, setHomeData } from "@renderer/utils/functions";
+import { t } from "@renderer/utils/i18n";
 import { animulistData } from "@renderer/utils/stores/global";
 import { getHomeCache, setHomeNewData, setHomeSearch, setHomeSearchPage, setHomeStopScrolling } from "@renderer/utils/stores/home";
 import { getInformationPlugin } from "@renderer/utils/stores/plugins";
@@ -6,6 +7,7 @@ import { cardData, containerData, FilterParams, homeData } from "@renderer/utils
 import { unwrap } from "solid-js/store";
 
 export function setCalendary(date?: string) {
+    
     let tmp = new Date()
     if (date) tmp = new Date(date)
 
@@ -16,8 +18,14 @@ export function setCalendary(date?: string) {
     endOfDay.setHours(23, 59, 59, 999);
 
     console.log(startOfDay, endOfDay)
+    const days = [t("week.sunday"), t("week.monday"), t("week.tuesday"), t("week.wednesday"), t("week.thursday"), t("week.friday"), t("week.saturday")];
 
-    setHomeData(async () => getInformationPlugin().schedule(dateToUnix(startOfDay.toString()), dateToUnix(endOfDay.toString())))
+    setHomeData(async () => ({
+        sections: [{
+            title: days[startOfDay.getDay()],
+            data: await getInformationPlugin().schedule(dateToUnix(startOfDay.toString()), dateToUnix(endOfDay.toString()))
+        }]
+    }))
 }
 
 export function setAnimuList(): any {

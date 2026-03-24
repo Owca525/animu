@@ -406,3 +406,9 @@ export interface animulistData {
         favorite?: boolean
     }
 }
+
+export interface playlistFormatData {
+    anime: cardData,
+    added: number,
+    lastupdate: number
+}

@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { electronAPI } from "@electron-toolkit/preload";
-import { pluginRepoExpanded } from "../main/types";
+import { playlistFormatData, pluginRepoExpanded } from "../main/types";
 
 const api = {};
 
@@ -10,6 +10,13 @@ if (process.contextIsolated) {
       open: (url: string) => ipcRenderer.invoke("open", url),
       saveToClipboard: (type: "text" | "image", content: string) => ipcRenderer.invoke("saveToClipboard", type, content),
       getConfigAvatar: () => ipcRenderer.invoke("config:fetchAvatar"),
+      animePlaylist: {
+        read: (playlist: string) => ipcRenderer.invoke("playlist:read", playlist),
+        save: (playlist: string, data: playlistFormatData) => ipcRenderer.invoke("playlist:save", playlist, data),
+        update: (playlist: string, data: playlistFormatData) => ipcRenderer.invoke("playlist:update", playlist, data),
+        delete: (playlist: string, animeID: string) => ipcRenderer.invoke("playlist:delete", playlist, animeID),
+        deleteAll: (playlist: string) => ipcRenderer.invoke("playlist:deleteAll", playlist),
+      },
       chromecast: {
         startSearch: () => ipcRenderer.invoke("searchChromeCast"),
         deviceList: () => ipcRenderer.invoke("getListChromcasts"),

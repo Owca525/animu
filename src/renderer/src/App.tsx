@@ -7,11 +7,13 @@ import Settings from './pages/settings/index';
 import {
   calculateZoomLevel,
   changeTheme,
+  checkAnimeTodayReleaseEpisode,
   checkDate,
   dateToUnix,
   detectPluginVersion,
   FetchAnilistUserData,
   fetchPluginRepos,
+  getTodayAnilistAnime,
   runService,
   timeCovertToMs,
   updateObject
@@ -38,7 +40,8 @@ import {
   setDeeplinkRunned,
   setGlobalHistory,
   setGlobalTheme,
-  setIncognitoMode
+  setIncognitoMode,
+  setTodayAnimeInAnilist
 } from './utils/stores/global';
 import { getConfig, setConfig } from './utils/stores/config';
 import { getInformationPlugin, pluginManager, setPluginRepo } from './utils/stores/plugins';
@@ -121,6 +124,10 @@ function App() {
 
     if (localStorage.getItem("Animu_Anilist_login_token_information") != undefined)
       FetchAnilistUserData()
+
+    getTodayAnilistAnime().then((v) => {
+      setTodayAnimeInAnilist(v)
+    })
 
     /* IFDEF DEBUG|PROD */
     if (!getGlobalCache().deeplinkRunned) {
@@ -333,6 +340,12 @@ function initialServices() {
     await checkPluginUpdate()
     await detectPluginVersion(true)
   }, timeCovertToMs({ min: 30 }), t("Plugin CheckUpdate"))
+
+  runService(async () => {
+    setTodayAnimeInAnilist(await getTodayAnilistAnime())
+  }, timeCovertToMs({ hour: 3 }), t("Check Daily Anilist"))
+
+  runService(checkAnimeTodayReleaseEpisode, timeCovertToMs({ min: 40 }), t("Check Is Anime episode avaible"))
 
   if (unwrap(getAnilistUserData())) {
     runService(FetchAnilistUserData, timeCovertToMs({ hour: 2 }), t("Anilist Sync UserData"))

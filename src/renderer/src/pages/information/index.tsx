@@ -52,6 +52,7 @@ import { requestAnimeMedia } from '@renderer/utils/animeThemes';
 import { updateHistoryData } from '@renderer/utils/FilesManager/history';
 import { addToAnimuList, removeFromAnimulist, updateDataInAnimulist } from '@renderer/utils/FilesManager/animulist';
 import OpeningPlayer from './components/openingPlayer';
+import { readPlaylist, removeInPlaylist, saveToPlaylist } from '@renderer/utils/FilesManager/playlist';
 
 interface informationTmpProps {
     anime: AnimeData,
@@ -78,6 +79,8 @@ function information() {
     const [currentPlugin, setCurrentPlugin] = createSignal<string | undefined>(undefined)
     const [secondsLeft, setSecondsLeft] = createSignal<undefined | { left: number, converted: { days: number; hours: number; minutes: number; seconds: number; } | undefined }>(undefined);
     const [contextMenu, setcontextMenu] = createSignal<ContextMenuProps>([])
+
+    const [isInWaitingPlaylist, setiswaitingplaylist] = createSignal<boolean>(false)
 
     const [buttonGroups, setButtonGroups] = createSignal<{ value: string; onClick: () => void; }[]>([])
 
@@ -199,6 +202,11 @@ function information() {
         if (config.information.openingininformation) searchAnimeOpenings()
 
         if (tempData().saveData && tempData().anime.status == "RELEASING") FetchAnimeForinformation()
+
+        readPlaylist("global.waitingplaylist").then((v) => {
+            if (v.find((v) => v.anime.AnimeData.id == tempData().anime.id)) setiswaitingplaylist(true)
+            else setiswaitingplaylist(false)
+        })
 
         let plugin = pluginManager().currentPlugin
         if (plugin) setCurrentPlugin(plugin.metadata.name)
@@ -635,6 +643,50 @@ function information() {
                                         }} />
                                     </Match>
                                 </Switch>
+                                <Show when={tempData().anime.status == "RELEASING" && tempData().anime.type == "ANIME"}>
+                                    <Switch>
+                                        <Match when={!isInWaitingPlaylist()}>
+                                            <Button titleButton={"Add To Waiting Playlist"} icon="playlist_add" ButtonClass="information-bar-icon" onClick={async (): Promise<any> => {
+                                                const tmp = unwrap(tempData())
+                                                console.log(tempData())
+                                                const resp = await saveToPlaylist("global.waitingplaylist", {
+                                                    anime: {
+                                                        AnimeData: {
+                                                            ...tmp.anime,
+                                                            player_ID: episodeResponse.data() ? episodeResponse.data()?.player_id : unwrap(currentIDplayer())
+                                                        },
+                                                        saveData: tmp.saveData == undefined ? {
+                                                            pluginName: unwrap(getPlayerPLugin())?.metadata.name!,
+                                                            last_Time: 0,
+                                                            episode: "1",
+                                                            type: "sub",
+                                                            isStarted: true,
+                                                            lastAnimeDataUpdate: dateToUnix(new Date().toString()),
+                                                        } : tmp.saveData
+                                                    },
+                                                    added: dateToUnix(new Date().toString()),
+                                                    lastupdate: dateToUnix(new Date().toString())
+                                                })
+                                                if (!resp) return toast("Failed Add Anime to Waiting Playlist",  { type: "error" })
+                                                else {
+                                                    setiswaitingplaylist(true)
+                                                    toast("Succesfully added to waiting playlist", { type: "success" })
+                                                }
+                                            }} />
+                                        </Match>
+                                        <Match when={isInWaitingPlaylist()}>
+                                            <Button titleButton={"Remove From Waiting Playlist"} icon="playlist_remove" ButtonClass="information-bar-icon" onClick={async (): Promise<any> => {
+                                                const tmp = unwrap(tempData())
+                                                const resp = await removeInPlaylist("global.waitingplaylist", tmp.anime.id)
+                                                if (!resp) return toast("Failed Remove Anime to Waiting Playlist",  { type: "error" })
+                                                else {
+                                                    setiswaitingplaylist(false)
+                                                    toast("Succesfully Removed Anime from waiting playlist", { type: "success" })
+                                                }
+                                            }} />
+                                        </Match>
+                                    </Switch>
+                                </Show>
                             </Show>
                         </div>
                     </div>

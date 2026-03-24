@@ -7,6 +7,13 @@ declare global {
       open: (url: string) => Promise<void>;
       saveToClipboard: (type: "text" | "image", content: string) => Promise<boolean>;
       getConfigAvatar: () => Promise<{ mime: string, data: string } | undefined>
+      animePlaylist: {
+        read: (playlist: string) => Promise<playlistFormatData[]>
+        save: (playlist: string, data: playlistFormatData) => Promise<boolean>
+        update: (playlist: string, data: playlistFormatData) => Promise<boolean>
+        delete: (playlist: string, animeID: string) => Promise<boolean>
+        deleteAll: (playlist: string) => Promise<boolean>
+      }
       chromecast: {
         startSearch: () => void,
         deviceList: () => Promise<{ host: string, port: number, name: string }[]>;

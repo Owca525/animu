@@ -17,7 +17,8 @@ export const [globalState, setGlobalState] = createStore({
     anilist_user_data: undefined,
     isAnimuHidden: false,
     isAnimuFocus: true,
-    notifications: []
+    notifications: [],
+    todayAnimeAnilist: []
 } as globalDataFormat);
 
 export const getGlobalCache = () => globalState;
@@ -32,6 +33,8 @@ export const getAnilistUserData = () => globalState.anilist_user_data;
 export const isAnimuHidden = () => globalState.isAnimuHidden;
 export const isAnimuFocus = () => globalState.isAnimuFocus;
 export const getNotificationList = () => globalState.notifications;
+export const todayAnimeInAnilist = () => globalState.todayAnimeAnilist;
+export const setTodayAnimeInAnilist = (tmp: cardData[]) => setGlobalState((prev) => ({...prev, todayAnimeAnilist: tmp}));
 export const setSocket = (tmp: Socket) => setGlobalState((prev) => ({...prev, socket: { ...prev.socket as any, instance: tmp }}));
 export const setSocketRoom = (tmp: string) => setGlobalState((prev) => ({...prev, socket: { ...prev.socket as any, currentRoom: tmp }}));
 export const setActiveThemes = (tmp: Map<number, themeMetadata>) => setGlobalState((prev) => ({...prev, activeThemes: tmp}));

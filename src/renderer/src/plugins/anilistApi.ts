@@ -7,9 +7,8 @@ import {
   genresSearchFormat,
   informationPluginFormat,
 } from '@renderer/utils/types';
-import { dateToUnix, genYearsList, request, unixToDateTime } from '@renderer/utils/functions';
+import { dateToUnix, genYearsList, request } from '@renderer/utils/functions';
 import { getConfig } from '@renderer/utils/stores/config';
-import { t } from '@renderer/utils/i18n';
 import { getGlobalCache } from '@renderer/utils/stores/global';
 
 const defaultPageSize = 20
@@ -752,11 +751,10 @@ export default class AnilistApi implements informationPluginFormat {
     return true
   };
 
-  async schedule(airingStart: number, airingEnd: number): Promise<containerData> {
+  async schedule(airingStart: number, airingEnd: number): Promise<cardData[]> {
     // let week = getWeek()
     // console.log(week)
 
-    const days = [t("week.sunday"), t("week.monday"), t("week.tuesday"), t("week.wednesday"), t("week.thursday"), t("week.friday"), t("week.saturday")];
     console.log(airingStart, airingEnd)
     let variables = {
       page: 1,
@@ -766,20 +764,14 @@ export default class AnilistApi implements informationPluginFormat {
       airingAtLesser: airingEnd
     }
 
-    const date = new Date(unixToDateTime(airingStart))
-
     let response = await sendPost(variables, graphicAiringAnime)
-    console.log(response)
-    if (!response.success || !response.json) return {
-      title: days[date.getDay()],
-      data: []
-    }
+    if (!response.success || !response.json) return []
 
     let data = response.json["data"]["Page"]["airingSchedules"].map((v) => {
       const converted = Convert(v["media"])
       return {
         ...converted,
-        animeData: {
+        AnimeData: {
           ...converted.AnimeData,
           nextAiringEpisode: {
             airingAt: v["airingAt"],
@@ -790,10 +782,7 @@ export default class AnilistApi implements informationPluginFormat {
       }
     })
 
-    return {
-      title: days[date.getDay()],
-      data: data
-    }
+    return data
   }
 
   search = async (name: string, page: number, params?: genresSearchFormat) => {

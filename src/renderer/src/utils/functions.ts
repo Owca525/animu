@@ -16,7 +16,7 @@ import {
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { ActiveService, addNotification, animulistData, FindService, getGlobalCache, getServices, isAnimuFocus, isAnimuHidden, removeDeepLink, setActiveThemes, setAnilistUserData, setDeepLink, setGlobalToken } from './stores/global';
+import { ActiveService, addNotification, animulistData, FindService, getGlobalCache, getServices, isAnimuFocus, isAnimuHidden, removeDeepLink, setActiveThemes, setAnilistUserData, setDeepLink, setGlobalToken, todayAnimeInAnilist } from './stores/global';
 import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
@@ -27,6 +27,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { removeToast, toast, updateToast } from './context/ToastNotification';
 import { saveConfig } from './FilesManager/config';
 import { OvewriteAnimuList } from './FilesManager/animulist';
+import { readPlaylist } from './FilesManager/playlist';
 
 export function decodeHtmlEntities(str: string) {
     const parser = new DOMParser();
@@ -1264,3 +1265,45 @@ export function sendNotification(notificiation: NotificationProps) {
     }
     addNotification(notificiation)
 }
+
+export async function getTodayAnilistAnime() {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    return await getInformationPlugin().schedule(dateToUnix(startOfDay.toString()), dateToUnix(endOfDay.toString()))
+}
+
+export async function checkAnimeTodayReleaseEpisode() {
+    const todayANimeId = unwrap(todayAnimeInAnilist()).map((v) => v.AnimeData.id)
+    const todayAnime = unwrap(todayAnimeInAnilist())
+
+    const waitingPlaylist = await readPlaylist("global.waitingplaylist")
+
+    const plugins = getPluginList()
+
+    const sortedList = waitingPlaylist.filter((v) => todayANimeId.includes(v.anime.AnimeData.id))
+
+    for (let index = 0; index < sortedList.length; index++) {
+        const element = sortedList[index];
+        const tmpplugin = plugins.find((v) => v.metadata.name == element.anime.saveData?.pluginName)
+        if (!tmpplugin) continue
+
+        let episodes = await tmpplugin.extractOnlyEpisodesList(element.anime.saveData?.type!, element.anime.AnimeData.player_ID!)
+        if (episodes.length <= 0) continue
+        let asdasdads = episodes.map((v) => v.ep.toString())
+        
+        const tmpEpisode = todayAnime.find((v) => v.AnimeData.id == element.anime.AnimeData.id)!.AnimeData.nextAiringEpisode!.episode.toString()
+        if (asdasdads.includes(tmpEpisode)) {
+            sendNotification({
+                title: `New Episode Avaible in ${tmpplugin.metadata.name} plugin`,
+                description: `You Can Watch Episode ${tmpEpisode} Of ${detectTitleConfig(element.anime.AnimeData.title)}`,
+                icon: element.anime.AnimeData.coverImage
+            })
+        }
+    }
+}
+
+(window as any).checkAnimeTodayReleaseEpisode = checkAnimeTodayReleaseEpisode;

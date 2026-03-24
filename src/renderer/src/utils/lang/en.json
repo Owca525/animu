@@ -22,7 +22,8 @@
         "action": "Action",
         "adult": "Adult",
         "schedule": "Schedule",
-        "animulist": "AnimuList"
+        "animulist": "AnimuList",
+        "waitingplaylist": "Waiting Playlist"
     },
     "anilist": {
         "titles": {
