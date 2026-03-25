@@ -493,7 +493,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             //             },
             //         ],
             //     });
-            await runHLS(currentRes, currentplayer.splitHLS)
+            await runHLS(currentRes, currentplayer.splitHLS, tmpTime ? tmpTime : undefined)
             return
         }
         if (hls) hls.destroy()
@@ -518,7 +518,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }
     }
 
-    async function runHLS(resolution: resolutionFormat, splitHls: boolean = false) {
+    async function runHLS(resolution: resolutionFormat, splitHls: boolean = false, initialTime?: number) {
         const tmpHls = new Hls({
             maxBufferLength: 140,
             autoStartLoad: true,
@@ -555,7 +555,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         hls = tmpHls
 
         if (Hls.isSupported() && videoRef) {
-            const time = videoRef.currentTime
+            const time = initialTime ? initialTime : videoRef.currentTime
             tmpHls.loadSource(resolution.url);
             tmpHls.attachMedia(videoRef);
             setTimeVideo(time)
