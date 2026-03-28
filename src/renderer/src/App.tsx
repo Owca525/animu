@@ -54,7 +54,6 @@ import { unwrap } from 'solid-js/store';
 import './App.css';
 import './themes/darkerAnimu/main.css';
 import './utils/i18n';
-import './utils/debug';
 import "./utils/socket"
 
 /* IFDEF DEBUG|PROD */
@@ -65,6 +64,7 @@ import {
 /* ENDIF */
 
 /* IFDEF DEBUG */
+import './utils/debug';
 /* ENDIF */
 
 // import ErrorBoundary from './utils/ErrorBoundary';
