@@ -36,8 +36,10 @@ function Card(props: CardProps) {
   let cardRef: HTMLDivElement | undefined;
 
   onMount(() => {
-    const tmp = unwrap(animulistData()).find((v=>v.AnimeData.id == props.card.AnimeData.id))
-    if (tmp) setAnimulistCard(tmp.animulist)
+    if (!animulistCard()) {
+      const tmp = unwrap(animulistData()).find((v => v.AnimeData.id == props.card.AnimeData.id))
+      if (tmp) setAnimulistCard(tmp.animulist)
+    }
     if (!cardRef) return
     const observer = new IntersectionObserver(
       (entries) => {
@@ -102,9 +104,9 @@ function Card(props: CardProps) {
     const animulist = unwrap(animulistData())
     let tmp = animulistCard()
     if (!tmp && animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id)) tmp = animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id)?.animulist
-    localStorage.setItem("informationCache", JSON.stringify({ 
-      anime: props.card.AnimeData, 
-      saveData: props.card.saveData, 
+    localStorage.setItem("informationCache", JSON.stringify({
+      anime: props.card.AnimeData,
+      saveData: props.card.saveData,
       animulist: tmp
     }))
     navigate("/info");
