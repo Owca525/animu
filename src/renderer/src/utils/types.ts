@@ -601,5 +601,6 @@ export interface deeplinkFormat {
 export interface playlistFormatData {
     anime: cardData,
     added: number,
-    lastupdate: number
+    lastupdate: number,
+    customData?: any
 }

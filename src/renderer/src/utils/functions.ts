@@ -27,7 +27,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { removeToast, toast, updateToast } from './context/ToastNotification';
 import { saveConfig } from './FilesManager/config';
 import { OvewriteAnimuList } from './FilesManager/animulist';
-import { readPlaylist } from './FilesManager/playlist';
+import { readPlaylist, updatePlaylist } from './FilesManager/playlist';
 
 export function decodeHtmlEntities(str: string) {
     const parser = new DOMParser();
@@ -1288,22 +1288,32 @@ export async function checkAnimeTodayReleaseEpisode() {
 
     for (let index = 0; index < sortedList.length; index++) {
         const element = sortedList[index];
-        const tmpplugin = plugins.find((v) => v.metadata.name == element.anime.saveData?.pluginName)
-        if (!tmpplugin) continue
+        if (element.customData) continue
 
-        let episodes = await tmpplugin.extractOnlyEpisodesList(element.anime.saveData?.type!, element.anime.AnimeData.player_ID!)
-        if (episodes.length <= 0) continue
-        let asdasdads = episodes.map((v) => v.ep.toString())
-        
-        const tmpEpisode = todayAnime.find((v) => v.AnimeData.id == element.anime.AnimeData.id)!.AnimeData.nextAiringEpisode!.episode.toString()
-        if (asdasdads.includes(tmpEpisode)) {
-            sendNotification({
-                title: `New Episode Avaible in ${tmpplugin.metadata.name} plugin`,
-                description: `You Can Watch Episode ${tmpEpisode} Of ${detectTitleConfig(element.anime.AnimeData.title)}`,
-                icon: element.anime.AnimeData.coverImage
-            })
+        try {
+            const tmpplugin = plugins.find((v) => v.metadata.name == element.anime.saveData?.pluginName)
+            if (!tmpplugin) continue
+
+            let episodes = await tmpplugin.extractOnlyEpisodesList(element.anime.saveData?.type!, element.anime.AnimeData.player_ID!)
+            if (episodes.length <= 0) continue
+            let asdasdads = episodes.map((v) => v.ep.toString())
+            
+            const tmpEpisode = todayAnime.find((v) => v.AnimeData.id == element.anime.AnimeData.id)!.AnimeData.nextAiringEpisode!.episode.toString()
+            if (asdasdads.includes(tmpEpisode)) {
+                sendNotification({
+                    title: `New Episode Avaible in ${tmpplugin.metadata.name} plugin`,
+                    description: `You Can Watch Episode ${tmpEpisode} Of ${detectTitleConfig(element.anime.AnimeData.title)}`,
+                    icon: element.anime.AnimeData.coverImage
+                })
+            }
+            await updatePlaylist(element.anime.AnimeData.id, {...element, customData: true})
+        } catch (error) {
+            console.error("Error function/checkAnimeTodayReleaseEpisode", error)
         }
     }
-}
 
-(window as any).checkAnimeTodayReleaseEpisode = checkAnimeTodayReleaseEpisode;
+    const notTodayANime = waitingPlaylist.filter((v) => !todayANimeId.includes(v.anime.AnimeData.id))
+    notTodayANime.forEach(async (anime) => {
+        if (anime.customData) await updatePlaylist(anime.anime.AnimeData.id, {...anime, customData: false})
+    })
+}
