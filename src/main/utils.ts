@@ -673,3 +673,14 @@ ipcMain.handle("playlist:read", async (_, playlist: string) => {
         return []
     }
 });
+
+const toMB = (bytes) => bytes / 1024 / 1024;
+
+ipcMain.handle("debug:memory", async (_) => {
+  const mem = process.memoryUsage();
+  return {
+    rss: toMB(mem.rss),
+    heapUsed: toMB(mem.heapUsed),
+    heapTotal: toMB(mem.heapTotal)
+  }
+});

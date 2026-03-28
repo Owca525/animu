@@ -96,7 +96,8 @@ if (process.contextIsolated) {
           ipcRenderer.invoke(channel, ...args),
       },
       version: () => ipcRenderer.invoke("animuVersion"),
-      refresh: () => ipcRenderer.invoke("refreshBackend")
+      refresh: () => ipcRenderer.invoke("refreshBackend"),
+      debug: () => ipcRenderer.invoke("debug:memory")
     });
     contextBridge.exposeInMainWorld("electronAPI", electronAPI)
     contextBridge.exposeInMainWorld("BrowserWindow", {

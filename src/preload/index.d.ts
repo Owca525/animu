@@ -114,6 +114,7 @@ declare global {
       };
       version: () => Promise<string>;
       refresh: () => Promise<void>
+      debug: () => Promise<{ rss: number, heapUsed: number, heapTotal: number }>
     };
     electronAPI: ElectronAPI
     BrowserWindow: {

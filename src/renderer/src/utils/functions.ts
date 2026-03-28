@@ -1317,3 +1317,11 @@ export async function checkAnimeTodayReleaseEpisode() {
         if (anime.customData) await updatePlaylist(anime.anime.AnimeData.id, {...anime, customData: false})
     })
 }
+
+/* IFDEF DEBUG|PROD */
+(window as any).showProcessMemory = async (number = 5000) => {
+    setInterval(async () => {
+        console.log(await window.backend.debug())
+    }, number)
+};
+/* ENDIF */
