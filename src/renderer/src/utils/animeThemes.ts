@@ -1,4 +1,6 @@
+import { unwrap } from "solid-js/store"
 import { request } from "./functions"
+import { addOpeningCache, animeOpeningsCache } from "./stores/global"
 import { animeOpeningsFormat } from "./types"
 
 const QUERY_API = "https://graphql.animethemes.moe/"
@@ -48,6 +50,9 @@ query ($id: [Int!]) {
 `
 
 export async function requestAnimeMedia(anilistID: number): Promise<animeOpeningsFormat[]> {
+  const cache = unwrap(animeOpeningsCache())
+  if (cache[anilistID]) return cache[anilistID]
+
   const response = await request(QUERY_API, { method: "POST", headers: header, body: JSON.stringify({ query: videosQuery, variables: { id: [anilistID] } }) })
   console.log(response)
   if (!response.success || !response.json) return []
@@ -74,6 +79,7 @@ export async function requestAnimeMedia(anilistID: number): Promise<animeOpening
       console.error("animeThemes/requestAnimeMedia", error)
     }
   }
-  console.log(list)
+
+  addOpeningCache(anilistID, list)
   return list
 }

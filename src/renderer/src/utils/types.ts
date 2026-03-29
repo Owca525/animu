@@ -203,6 +203,7 @@ export interface globalDataFormat {
     isAnimuFocus: boolean
     notifications: NotificationProps[]
     todayAnimeAnilist: cardData[]
+    animeOpeningsCache: { [key: number]: animeOpeningsFormat[] }
 }
 
 export interface NotificationProps {

@@ -1,5 +1,5 @@
 import { UUIDTypes } from "uuid";
-import { cardData, deeplinkFormat, globalDataFormat, NotificationProps, serviceFormat, themeMetadata } from "../types";
+import { animeOpeningsFormat, cardData, deeplinkFormat, globalDataFormat, NotificationProps, serviceFormat, themeMetadata } from "../types";
 import { createStore } from "solid-js/store";
 import { Socket } from "socket.io-client";
 
@@ -18,7 +18,8 @@ export const [globalState, setGlobalState] = createStore({
     isAnimuHidden: false,
     isAnimuFocus: true,
     notifications: [],
-    todayAnimeAnilist: []
+    todayAnimeAnilist: [],
+    animeOpeningsCache: {}
 } as globalDataFormat);
 
 export const getGlobalCache = () => globalState;
@@ -34,6 +35,9 @@ export const isAnimuHidden = () => globalState.isAnimuHidden;
 export const isAnimuFocus = () => globalState.isAnimuFocus;
 export const getNotificationList = () => globalState.notifications;
 export const todayAnimeInAnilist = () => globalState.todayAnimeAnilist;
+export const animeOpeningsCache = () => globalState.animeOpeningsCache;
+
+export const addOpeningCache = (id: number, op: animeOpeningsFormat[]) => setGlobalState((prev) => ({...prev, animeOpeningsCache: { ...prev.animeOpeningsCache, [id]: op }}));
 export const setTodayAnimeInAnilist = (tmp: cardData[]) => setGlobalState((prev) => ({...prev, todayAnimeAnilist: tmp}));
 export const setSocket = (tmp: Socket) => setGlobalState((prev) => ({...prev, socket: { ...prev.socket as any, instance: tmp }}));
 export const setSocketRoom = (tmp: string) => setGlobalState((prev) => ({...prev, socket: { ...prev.socket as any, currentRoom: tmp }}));
