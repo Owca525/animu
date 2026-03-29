@@ -98,6 +98,8 @@ function Container(props: containerData) {
   }
 
   function updateAfterChangePage() {
+    const cache = getHomeCache()
+    if (cache.data["sections"].length > 0) return
     updateHomeContainer([{
       ...props,
       data: unwrap(animeCards())
