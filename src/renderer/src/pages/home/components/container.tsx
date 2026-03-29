@@ -54,10 +54,6 @@ function Container(props: containerData) {
     const tmpData = cardResponse.data()
     if (!tmpData) return
     setAnimeCards((prev) => [...prev, ...tmpData])
-    updateHomeContainer([{
-      ...props,
-      data: unwrap(animeCards())
-    }])
     handleUpdate()
   })
 
@@ -101,6 +97,13 @@ function Container(props: containerData) {
     return t(tmp[0], { title: tmp[1] })
   }
 
+  function updateAfterChangePage() {
+    updateHomeContainer([{
+      ...props,
+      data: unwrap(animeCards())
+    }])
+  }
+
   return (
     <div tabIndex={-1} class="main-container">
       <div tabIndex={-1} class="container-title-container">
@@ -119,7 +122,7 @@ function Container(props: containerData) {
         <Show when={animeCards().length > 0}>
           <div tabIndex={-1} class={props.horizontal ? "container-data-horizontal" : "container-data"} ref={container}>
             <For each={animeCards()}>
-              {(card) => (<Card card={card} />)}
+              {(card) => (<Card card={card} containerClick={updateAfterChangePage} />)}
             </For>
           </div>
         </Show>

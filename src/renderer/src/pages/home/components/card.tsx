@@ -22,6 +22,7 @@ import { addToAnimuList, removeFromAnimulist } from "@renderer/utils/FilesManage
 interface CardProps {
   card: cardData;
   disableinformation?: boolean;
+  containerClick?: () => void
 }
 
 function Card(props: CardProps) {
@@ -61,6 +62,8 @@ function Card(props: CardProps) {
   })
 
   async function sendToInformation() {
+    if (props.containerClick) props.containerClick()
+
     if (props.card.onClick) {
       props.card.onClick(props.card.AnimeData);
       return;
