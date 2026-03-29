@@ -1306,7 +1306,7 @@ export async function checkAnimeTodayReleaseEpisode() {
                     icon: element.anime.AnimeData.coverImage
                 })
             }
-            await updatePlaylist(element.anime.AnimeData.id, {...element, customData: true})
+            await updatePlaylist("global.waitingplaylist", {...element, customData: true})
         } catch (error) {
             console.error("Error function/checkAnimeTodayReleaseEpisode", error)
         }
@@ -1314,7 +1314,7 @@ export async function checkAnimeTodayReleaseEpisode() {
 
     const notTodayANime = waitingPlaylist.filter((v) => !todayANimeId.includes(v.anime.AnimeData.id))
     notTodayANime.forEach(async (anime) => {
-        if (anime.customData) await updatePlaylist(anime.anime.AnimeData.id, {...anime, customData: false})
+        if (anime.customData) await updatePlaylist("global.waitingplaylist", {...anime, customData: false})
     })
 }
 
