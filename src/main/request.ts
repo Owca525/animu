@@ -68,7 +68,7 @@ export async function advanceRequest(url: string, options?: { method?: "POST" | 
         try {
             text = await respTextClone.text()
         } catch (error) {}
-        if (!response.ok) return { text: text, buffer: [], status: response.status, statusText: response.statusText, url: response.url, success: response.ok, json: undefined, responseHeader: response.headers }
+
         const bufferCloned = response.clone()
         let jsontext;
 

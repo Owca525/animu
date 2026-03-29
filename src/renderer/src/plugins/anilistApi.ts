@@ -815,9 +815,11 @@ export default class AnilistApi implements informationPluginFormat {
         nextYear: season.nextYear,
       }, replacePageInGraphicApi(graphicHomeApi, config.anilist.maxpagesize.toString()))
 
+      console.log(data)
+
       if (!data.success || !data.json) {
         console.warn("home/anilistapi Failed Request", data)
-        return
+        return data.json && data.json["errors"] ? { error: data.json["errors"][0]["message"] } : undefined
       }
 
       let home: containerData[] = [

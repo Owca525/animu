@@ -153,7 +153,7 @@ export interface AnimeData {
 export interface homeData {
     data: { topCards?: containerData, sections: containerData[] }
     isLoading: boolean
-    isError: boolean
+    isError: undefined | string | boolean
     search: string
     page: number
     stopScrolling: boolean
@@ -352,8 +352,8 @@ export interface informationPluginFormat {
         searchOption: genres[]
     }
     config?: { [key: string]: any }
-    search(name: string, page: number, params?: genresSearchFormat): Promise<containerData | undefined>
-    home(): Promise<{ topCards?: containerData, sections: containerData[] } | undefined>
+    search(name: string, page: number, params?: genresSearchFormat): Promise<containerData | { error: string } | undefined>
+    home(): Promise<{ topCards?: containerData, sections: containerData[] } | { error: string } | undefined>
     anime(context: { id: string }): Promise<AnimeData | undefined>
     schedule: (airingStart: number, airingEnd: number) => Promise<cardData[]>
     getManga: (id: string) => Promise<AnimeData | undefined>

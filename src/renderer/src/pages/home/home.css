@@ -28,6 +28,11 @@
     gap: 8px;
 }
 
+.home-error-notification {
+    width: 60%;
+    font-size: 0.9em;
+}
+
 .icon {
     font-size: 2em !important;
     user-select: none;

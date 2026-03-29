@@ -206,7 +206,7 @@ const Home = () => {
 
       <div class="home-main-content" onScroll={handleScroll} ref={divRef}>
         <Switch>
-          <Match when={homeCache().isLoading && homeCache().isError == false}>
+          <Match when={homeCache().isLoading && !homeCache().isError}>
             <div class="home-notification-container">
               <div class="material-symbols-outlined loading-animation icon">
                 progress_activity
@@ -218,10 +218,17 @@ const Home = () => {
               <span class="material-symbols-outlined icon">
                 error
               </span>
-              {t("home.error")}
+              <Show when={typeof homeCache().isError == "boolean"}>
+                {t("home.error")}
+              </Show>
+              <Show when={typeof homeCache().isError == "string"}>
+                <span class='home-error-notification'>
+                  {t(homeCache().isError as string)}
+                </span>
+              </Show>
             </div>
           </Match>
-          <Match when={homeCache().isError == false && homeCache().isLoading == false && homeCache().data && homeCache().data.sections && homeCache().data.sections.length <= 0}>
+          <Match when={!homeCache().isError && homeCache().isLoading == false && homeCache().data && homeCache().data.sections && homeCache().data.sections.length <= 0}>
             <div class="home-notification-container">
               <span class="material-symbols-outlined icon">
                 search_off
@@ -229,7 +236,7 @@ const Home = () => {
               {t("home.nothingfound")}
             </div>
           </Match>
-          <Match when={homeCache().isLoading == false && homeCache().isError == false && homeCache().data && homeCache().data.sections && homeCache().data.sections.length > 0}>
+          <Match when={homeCache().isLoading == false && !homeCache().isError && homeCache().data && homeCache().data.sections && homeCache().data.sections.length > 0}>
             <Show when={homeCache().data && homeCache().data.topCards}>
               <BigCardsContainer data={homeCache().data.topCards as containerData} />
             </Show>

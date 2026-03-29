@@ -423,7 +423,6 @@ export async function request(url: string, options?: { method?: "POST" | "GET", 
             text = await respTextClone.text()
         } catch (error) { }
 
-        if (!response.ok) return { text: text, buffer: [] as any, status: response.status, statusText: response.statusText, url: response.url, success: response.ok, json: undefined, responseHeader: response.headers as any }
         let bufferCloned = response.clone()
         let jsontext;
 
@@ -599,7 +598,7 @@ export async function fetchPluginRepos() {
     saveConfig(updateObject("plugins.lastTimeCheck", dateToUnix(new Date().toString()), config))
 }
 
-export async function setHomeData(wrapper?: () => Promise<homeData["data"] | containerData | undefined>, data?: homeData["data"]) {
+export async function setHomeData(wrapper?: () => Promise<homeData["data"] | containerData | undefined | { error: string }>, data?: homeData["data"]) {
     const uuid = uuidv4()
     try {
         setGlobalToken(uuid)
@@ -612,7 +611,8 @@ export async function setHomeData(wrapper?: () => Promise<homeData["data"] | con
 
         const respons = await wrapper()
         if (getGlobalCache().token && getGlobalCache().token != uuid) return
-        if (!respons) return setAllHomeData({ data: { sections: [] }, isLoading: false, isError: true } as any)
+        console.log(respons)
+        if (!respons || respons["error"]) return setAllHomeData({ data: { sections: [] }, isLoading: false, isError: respons ? respons["error"] : true } as any)
         if ("sections" in respons) return setAllHomeData({ data: respons, isLoading: false, isError: false } as any)
         setAllHomeData({ data: { sections: [respons] }, isLoading: false, isError: false } as any)
     } catch (error) {
