@@ -24,7 +24,7 @@ import { unwrap } from 'solid-js/store';
 import { getInformationPlugin, getPluginList, getPluginRepo, pluginManager, setPluginRepo } from './stores/plugins';
 import semver from "semver";
 import { v4 as uuidv4 } from 'uuid';
-import { removeToast, toast, updateToast } from './context/ToastNotification';
+import { removeToast, toast, ToastOptions, updateToast } from './context/ToastNotification';
 import { saveConfig } from './FilesManager/config';
 import { OvewriteAnimuList } from './FilesManager/animulist';
 import { readPlaylist, updatePlaylist } from './FilesManager/playlist';
@@ -1249,7 +1249,7 @@ export function convertEpisode(ep: string): number {
     }
 }
 
-export function sendNotification(notificiation: NotificationProps) {
+export function sendNotification(notificiation: NotificationProps, toastprop?: ToastOptions) {
     if (isAnimuHidden() || !isAnimuFocus()) {
         Notification.requestPermission().then(permission => {
             if (permission != 'granted') return
@@ -1261,7 +1261,7 @@ export function sendNotification(notificiation: NotificationProps) {
             title: t(notificiation.title),
             description: t(notificiation.description),
             icon: notificiation.icon
-        },  { type: "notification", onClick: notificiation.onClick })
+        },  { ...toastprop, type: "notification", onClick: notificiation.onClick })
     }
     addNotification(notificiation)
 }

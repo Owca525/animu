@@ -12,7 +12,7 @@ type ToastProps = {
 
 type expandedToastProps = ToastProps & { animation: boolean, updated: boolean, timer: NodeJS.Timeout | undefined }
 
-interface ToastOptions {
+export interface ToastOptions {
     type?: "success" | "error" | "info" | "warning" | "loading" | "notification",
     duration?: number,
     onClick?: () => void;
@@ -22,7 +22,7 @@ interface ToastOptions {
 
 const defaultOptions: ToastOptions = {
     type: "info",
-    duration: 3000,
+    duration: 5000,
     timer: false,
 }
 
