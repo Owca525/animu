@@ -115,16 +115,16 @@ async function extractResolutions(episode: string, type: string, playerData: pla
 
 export default class Animetsu implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.6",
+        version: "1.7",
         name: "Animetsu.Live",
         icon: "https://animetsu.live/apple-touch-icon.png",
         author: "Owca525",
         supportLang: ["en"],
         urlWebsite: WEBSITE,
     };
-    config: { [key: string]: any; } = {
-        Backend: BACKEND
-    };
+    // config: { [key: string]: any; } = {
+    //     Backend: BACKEND
+    // };
 
     // checkBackend = async () => {
     //     const response = await request(`${WEBSITE}assets/index.js?ex`)
@@ -145,6 +145,11 @@ export default class Animetsu implements playerPluginFormat {
     extractPlayerData = async (_type: string, episode: string, id: string): Promise<playerData[]> => {
         try {
             let response = await request(preaperURL(`${BACKEND}/api/anime/servers/${id}/${episode}`), { headers: HEADER });
+
+            /* IFDEF DEBUG */
+            console.warn("animetsu/extractPlayerData", response)
+            /* ENDIF */
+
             if (!response.success || !response.json) {
                 console.warn("extractPlayerData/Animetsu request failed", response)
                 return []
@@ -177,6 +182,11 @@ export default class Animetsu implements playerPluginFormat {
             if (!animeID) return
 
             let response = await request(preaperURL(`${BACKEND}/api/anime/eps/${animeID}`), { headers: HEADER });
+
+            /* IFDEF DEBUG */
+            console.warn("animetsu/extractEpisodeList", response)
+            /* ENDIF */
+
             if (!response.success || !response.json) {
                 console.warn("extractEpisodeList/Animetsu request failed", response)
                 return
@@ -210,15 +220,24 @@ export default class Animetsu implements playerPluginFormat {
     }
     searchAnime = async (name: string, _page: number, _params?: genresSearchFormat): Promise<cardData[]> => {
         let response = await request(preaperURL(`${BACKEND}/api/anime/search/?query=${name}`), { headers: HEADER });
+
+        /* IFDEF DEBUG */
+        console.warn("animetsu/searchAnime", response)
+        /* ENDIF */
+
         if (!response.success || !response.json) return []
+
         let data: cardData[] = []
         for (let index = 0; index < response.json.results.length; index++) {
             const element = response.json.results[index];
             data.push({
                 AnimeData: {
-                    genres: undefined,
-                    characters: [],
-                    studios: [],
+                    genres: element["genres"],
+                    isAdult: element["is_adult"],
+                    seasonYear: element["year"],
+                    type: element["type"],
+                    season: element["season"],
+                    status: element["status"],
                     title: element["title"],
                     id: element["anilist_id"],
                     player_ID: element["id"],
