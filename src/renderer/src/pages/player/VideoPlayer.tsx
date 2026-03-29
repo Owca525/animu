@@ -1268,10 +1268,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         return true
     }
 
-    function getEpisode(type: "next" | "prev"): { ep: string; img?: string; title?: string; } | undefined {
+    function getEpisode(type?: "next" | "prev"): { ep: string; img?: string; title?: string; } | undefined {
         if (type == "next") return temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) + 1]
         if (type == "prev") return temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep) - 1]
-        return undefined
+        return temp.episodes[temp.episodes.findIndex((item) => temp.episode == item.ep)]
     }
 
     function calculateChaptersTime(): string | undefined {
@@ -1363,8 +1363,13 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
             <div class="video-overlay">
                 <div class={checkUptoNext() ? isVisible() ? 'video-top' : 'video-top player-hidden' : 'video-top'}>
-                    <Button icon='arrow_back' ButtonClass='player-buttons' iconClassName="player-button-icons" onClick={exitFromPlayer} />
-                    <div class="player-title ">{detectTitle({ title: anime_data.AnimeData.title, ep: temp.episode, format: anime_data.AnimeData.format })}</div>
+                    <div class="video-top-top">
+                        <Button icon='arrow_back' ButtonClass='player-buttons' iconClassName="player-button-icons" onClick={exitFromPlayer} />
+                        <div class="player-title ">{detectTitle({ title: anime_data.AnimeData.title, ep: temp.episode, format: anime_data.AnimeData.format })}</div>
+                    </div>
+                    <Show when={getEpisode()?.title}>
+                        <span class="video-episode-title">{getEpisode()?.title}</span>
+                    </Show>
                 </div>
                 <div class="video-center"> {/* video-center-container */}
                     <Show when={!config.Player.ui.DisableSkipAnimation}>

@@ -75,6 +75,24 @@
   transition: opacity 200ms ease;
 }
 
+.video-top {
+  flex-direction: column;
+  align-items: start;
+}
+
+.video-top-top {
+  display: flex;
+  align-items: center;
+}
+
+.video-episode-title {
+  padding: 0px 8px;
+  font-size: .9em;
+  margin-top: -8px;
+  color: var(--text-gray);
+  text-shadow: 0px 2px 4px var(--black);
+}
+
 .player-loading-top {
   position: absolute;
   top: 0;
