@@ -643,7 +643,7 @@ function information() {
                                         }} />
                                     </Match>
                                 </Switch>
-                                <Show when={tempData().anime.status == "RELEASING" && tempData().anime.type == "ANIME"}>
+                                <Show when={tempData().anime.nextAiringEpisode && tempData().anime.type == "ANIME"}>
                                     <Switch>
                                         <Match when={!isInWaitingPlaylist()}>
                                             <Button titleButton={"Add To Waiting Playlist"} icon="playlist_add" ButtonClass="information-bar-icon" onClick={async (): Promise<any> => {
