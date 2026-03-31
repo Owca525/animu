@@ -125,7 +125,7 @@ function information() {
     })
 
     function checkIsAnimeReleasing() {
-        if (tempData().anime.status != "RELEASING") return
+        if (!tempData().anime.nextAiringEpisode) return
         if (animeEpisodeReleasingTime) clearInterval(animeEpisodeReleasingTime)
         setSecondsLeft({
             left: tempData().anime.nextAiringEpisode!.timeUntilAiring,
@@ -211,7 +211,7 @@ function information() {
         let plugin = pluginManager().currentPlugin
         if (plugin) setCurrentPlugin(plugin.metadata.name)
 
-        if (tempData().anime.nextAiringEpisode?.timeUntilAiring) checkIsAnimeReleasing()
+        if (tempData().anime.nextAiringEpisode) checkIsAnimeReleasing()
 
         document.querySelectorAll('*').forEach((element: any) => {
             element.tabIndex = -1
