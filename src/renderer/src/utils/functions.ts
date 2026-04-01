@@ -1325,3 +1325,14 @@ export async function checkAnimeTodayReleaseEpisode() {
     }, number)
 };
 /* ENDIF */
+
+export function convertStringToDateObject(date: string | undefined): DateObject | undefined {
+    try {
+        if (!date) return undefined
+        const data = new Date(date)
+        return { month: data.getMonth(), day: data.getDay(), year: data.getFullYear() }
+    } catch (error) {
+        console.error("convertStringToDateObject/functions", error)
+        return undefined
+    }
+}
