@@ -14,9 +14,7 @@ interface filterProps {
 }
 
 export function updateGenres(key: string, value: string | undefined) {
-    console.log(key)
     let params = unwrap(getHomeCache().filterTags)
-    console.log(params)
     if (!params && !value) return
     if (!params && value != undefined) return setHomeSearchTags({ [key]: value })
     if (!params) return

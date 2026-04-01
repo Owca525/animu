@@ -17,7 +17,7 @@ async function generateSha256(text: any) {
 }
 
 export function useResponse<T, TData>(options: UseResponseOptions<T, TData>) {
-    const [loading, setLoading] = createSignal<boolean>(true);
+    const [loading, setLoading] = createSignal<boolean>(false);
     const [error, setError] = createSignal<boolean>(false);
     const [data, setData] = createSignal<TData>()
     const [forceRefetch, setForceRefetch] = createSignal<boolean>(false);

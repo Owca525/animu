@@ -9,6 +9,8 @@ import { useI18n } from "@renderer/utils/i18n"
 import { getInformationPlugin } from "@renderer/utils/stores/plugins"
 import { useResponse } from "@renderer/utils/hooks/useResponse"
 import { setHomeData, updateHomeContainer } from "@renderer/utils/functions"
+import { getGlobalCache, setGlobalToken } from "@renderer/utils/stores/global"
+import { v4 as uuidv4 } from 'uuid';
 
 function Container(props: containerData) {
   const { t, pathExist } = useI18n()
@@ -16,33 +18,40 @@ function Container(props: containerData) {
   const [currentPage, setcurrentPage] = createSignal(unwrap(getHomeCache().page))
   const [animeCards, setAnimeCards] = createSignal<cardData[]>(props.data)
   const [disableScrollButtons, setDisableScrollButtons] = createSignal<boolean>(false)
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        const homeCache = unwrap(getHomeCache())
-        if (entry.isIntersecting && !homeCache.stopScrolling) {
-          setHomeSearchPage(currentPage() + 1)
-          setcurrentPage(currentPage() + 1)
-          cardResponse.Refetch([currentPage() + 1, props.title])
-          observer.unobserve(entry.target)
-        }
-      });
-    }
-  );
 
   const cardResponse = useResponse({
-    queryKey: [currentPage(), props.title],
+    queryKey: [currentPage(), props.title, props.tags ? props.tags.map((v) => v.name) : []],
     queryFn: async () => {
+      const token = uuidv4()
+      setGlobalToken(token)
+
       const homeCache = unwrap(getHomeCache())
       if (homeCache.stopScrolling) return
       if (!props.onScrollDownFunction) return
       const resp = await props.onScrollDownFunction(homeCache.search, unwrap(currentPage()), homeCache.filterTags)
+
+      if (getGlobalCache().token != token) return
+
       if (resp.data.length < resp.maxPage) setHomeStopScrolling(true);
       return resp.data
     },
     cacheTime: 900000,
     disable: true,
   })
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const homeCache = unwrap(getHomeCache())
+        if (entry.isIntersecting && !homeCache.stopScrolling && !cardResponse.loading() && !cardResponse.error()) {
+          setHomeSearchPage(currentPage() + 1)
+          setcurrentPage(currentPage() + 1)
+          cardResponse.Refetch([currentPage() + 1, props.title, props.tags ? props.tags.map((v) => v.name) : []])
+          observer.unobserve(entry.target)
+        }
+      });
+    }
+  );
 
   onMount(() => {
     handleUpdate()
@@ -69,10 +78,11 @@ function Container(props: containerData) {
 
   function handleUpdate() {
     if (props.horizontal) return
+    if (getHomeCache().stopScrolling) return
     const lastCard = document.querySelector(".card-container:last-child")
     if (!lastCard) return
     let plugin = getInformationPlugin()
-    if (animeCards().length < plugin.currentPlugin.metadata.pageSize) setHomeStopScrolling(true)
+    if (animeCards().length < plugin.currentPlugin.metadata.pageSize) return setHomeStopScrolling(true)
     observer.observe(lastCard)
   }
 
@@ -136,6 +146,11 @@ function Container(props: containerData) {
           <Button icon="chevron_right" ButtonClass="container-right-skip-button" onClick={() => handleButtonScroll(120)} />
         </Show>
       </div>
+      <Show when={cardResponse.loading()}>
+        <div class="container-loading-bottom">
+            <span class="material-symbols-outlined loading-animation icon">progress_activity</span>
+        </div>
+      </Show>
     </div>
   )
 }

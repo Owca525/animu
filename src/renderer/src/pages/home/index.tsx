@@ -18,7 +18,9 @@ import {
   getHomeCache,
   setHomeActivePage,
   setHomeSearch,
+  setHomeSearchPage,
   setHomeSearchTags,
+  setHomeStopScrolling,
 } from '@renderer/utils/stores/home';
 import { getInformationPlugin } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
@@ -86,19 +88,21 @@ const Home = () => {
     ],
   };
 
-  function setNewActivePage(text: string) {
-    setHomeSearch(undefined)
-    setHomeSearchTags(undefined)
+  function setNewActivePage(text: string, overwrite: boolean = true) {
+    if (overwrite) {
+      setHomeSearch(undefined)
+      setHomeSearchTags(undefined)
+    }
     setHomeActivePage(text)
     changeTitleAnimu(`Animu - ${t(text)}`)
     setSearchText(t(`search.${text.split(".")[1]}`))
   }
 
   onMount(() => {
-    for (let index = 0; index < sidebarData.top.length; index++) {
-      const element = sidebarData.top[index];
-      if (getHomeCache().activePage == element.text) setNewActivePage(element.text)
-    }
+    sidebarData.top.forEach((element) => {
+      if (getHomeCache().activePage == element.text) 
+        setNewActivePage(element.text, false)
+    })
 
     if (homeCache().data.sections.length <= 0) plugin.home()
     const config: SettingsConfig = unwrap(getConfig());
@@ -128,7 +132,6 @@ const Home = () => {
     if (!home.filterTags) return;
     let data: any = [];
     for (const [key, type] of Object.entries(home.filterTags)) {
-      console.log(key)
       data.push({ remover: () => { updateGenres(key, undefined); StartSearch(unwrap(homeCache().search), unwrap(homeCache().filterTags)) }, name: type });
     }
 
@@ -145,10 +148,13 @@ const Home = () => {
   }
 
   function StartSearch(search: string = "", params: FilterParams | undefined) {
-    for (let index = 0; index < sidebarData.top.length; index++) {
-      const element = sidebarData.top[index];
-      if (element.onSearch && element.text == homeCache().activePage) element.onSearch(search, params)
-    }
+    setHomeSearchPage(1)
+    setHomeStopScrolling(false)
+
+    sidebarData.top.forEach((element) => {
+      if (element.onSearch && element.text == homeCache().activePage) 
+        element.onSearch(search, params)
+    })
   }
 
   function checkOtherFilters() {

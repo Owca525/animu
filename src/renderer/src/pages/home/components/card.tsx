@@ -36,25 +36,26 @@ function Card(props: CardProps) {
   const [animulistCard, setAnimulistCard] = createSignal<animulistProps | undefined>(props.card.animulist)
   let cardRef: HTMLDivElement | undefined;
 
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        entry.target.classList.toggle("show", entry.isIntersecting)
+        setCardVisible(entry.isIntersecting)
+        if (entry.isIntersecting) observer.unobserve(entry.target)
+      });
+    },
+    {
+      rootMargin: "200px",
+      threshold: 0,
+    }
+  );
+
   onMount(() => {
     if (!animulistCard()) {
       const tmp = unwrap(animulistData()).find((v => v.AnimeData.id == props.card.AnimeData.id))
       if (tmp) setAnimulistCard(tmp.animulist)
     }
     if (!cardRef) return
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          entry.target.classList.toggle("show", entry.isIntersecting)
-          setCardVisible(entry.isIntersecting)
-          if (entry.isIntersecting) observer.unobserve(entry.target)
-        });
-      },
-      {
-        rootMargin: "200px",
-        threshold: 0,
-      }
-    );
 
     observer.observe(cardRef);
 
