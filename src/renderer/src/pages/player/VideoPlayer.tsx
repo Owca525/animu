@@ -779,6 +779,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     function updateProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
 
+        setShowingMoreInformation(false)
+
         setcurrentTime(event.currentTarget.currentTime)
         saveContinueProgress(event)
         checkUpNext(event)
@@ -1606,7 +1608,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     PlayerVolume={PlayerVolume}
                 />
             </Show>
-            <Show when={isShowingMoreInformation()}>
+            <Show when={isShowingMoreInformation() && !config.Player.general.disablemoreinformation}>
                 <div class="player-more-information-background">
                     <div class="player-more-information-container">
                         <span class="player-more-information-top-text">Current Watching</span>

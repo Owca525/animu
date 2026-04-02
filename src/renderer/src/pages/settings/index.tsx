@@ -659,6 +659,13 @@ function settings() {
                                     }
                                 />
                             </div>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                <span class="settings-helpicon-space">
+                                    {t("settings.yt-dlp")}
+                                </span>
+                                <Dropdown disableX placeholder={yt_dlprelases().length <= 0 ? t("global.notFound") : yt_dlprelases()[0]} options={yt_dlprelases().map((v) => ({ label: v, onClick: () => changeYT_DLP(v) }))} />
+                            </div>
                         </Show>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
@@ -974,6 +981,16 @@ function settings() {
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
+                            {t("Disable More Information in player")}
+                            <CheckBox
+                                checked={config().new.Player.general.disablemoreinformation}
+                                onChecked={(checked) =>
+                                    handleChange('Player.general.disablemoreinformation', checked)
+                                }
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
                             {"Play Opening In Information"}
                             <CheckBox
                                 checked={config().new.information.openingininformation}
@@ -995,13 +1012,6 @@ function settings() {
                                 }
                             />
                         </div> */}
-                        <div class="settings-line"></div>
-                        <div class="settings-setting-container">
-                            <span class="settings-helpicon-space">
-                                {t("settings.yt-dlp")}
-                            </span>
-                            <Dropdown disableX placeholder={yt_dlprelases().length <= 0 ? t("global.notFound") : yt_dlprelases()[0]} options={yt_dlprelases().map((v) => ({ label: v, onClick: () => changeYT_DLP(v) }))} />
-                        </div>
                     </div>
                     <div class="settings-page-container">
                         <div class="settings-page-title">{t("settings.player.uptonextep")}</div>

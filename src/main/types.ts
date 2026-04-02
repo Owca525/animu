@@ -57,6 +57,7 @@ export interface SettingsConfig {
             autoSkipEndings: boolean
             showBrokenBuffer: boolean
             minusTime: boolean
+            disablemoreinformation: boolean
         }
         screenShot: {
             alwaysAsk: boolean
@@ -243,7 +244,8 @@ export const defaultConfig: SettingsConfig = {
             autoSkipOpenings: false,
             autoSkipEndings: false,
             showBrokenBuffer: false,
-            minusTime: false
+            minusTime: false,
+            disablemoreinformation: false
         },
         screenShot: {
             alwaysAsk: true,

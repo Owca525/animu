@@ -44,7 +44,7 @@ import {
   setTodayAnimeInAnilist
 } from './utils/stores/global';
 import { getConfig, setConfig } from './utils/stores/config';
-import { getInformationPlugin, pluginManager, setPluginRepo } from './utils/stores/plugins';
+import { setPluginRepo } from './utils/stores/plugins';
 import { HashRouter, Route } from '@solidjs/router';
 import { pluginRepoExpanded, themeMetadata } from './utils/types';
 import { setHomeActivePage } from './utils/stores/home';
@@ -177,13 +177,10 @@ function App() {
 
     setinitialState({ text: "initial.plugin", plugin: false })
     await checkPluginUpdate()
-    await getInformationPlugin().initial()
-    await pluginManager().initialPlugins()
+    await detectPluginVersion();
 
     setInitation(false)
     initialServices()
-
-    detectPluginVersion();
 
     // Code: https://github.com/cynthia2006/hanime-plugin/blob/master/yt_dlp_plugins/extractor/htv.py
     // const payload = `

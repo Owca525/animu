@@ -51,7 +51,8 @@ export const defaultConfigWeb: SettingsConfig = {
             autoSkipOpenings: false,
             autoSkipEndings: false,
             showBrokenBuffer: false,
-            minusTime: false
+            minusTime: false,
+            disablemoreinformation: false
         },
         screenShot: {
             alwaysAsk: true,

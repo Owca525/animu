@@ -447,6 +447,7 @@ export interface SettingsConfig {
             autoSkipEndings: boolean
             showBrokenBuffer: boolean
             minusTime: boolean
+            disablemoreinformation: boolean
         }
         screenShot: {
             alwaysAsk: boolean
