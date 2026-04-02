@@ -45,7 +45,7 @@ import {
   setTodayAnimeInAnilist
 } from './utils/stores/global';
 import { getConfig, setConfig } from './utils/stores/config';
-import { setPluginRepo } from './utils/stores/plugins';
+import { getInformationPlugin, pluginManager, setPluginRepo } from './utils/stores/plugins';
 import { HashRouter, Route } from '@solidjs/router';
 import { pluginRepoExpanded, themeMetadata } from './utils/types';
 import { setHomeActivePage } from './utils/stores/home';
@@ -178,6 +178,8 @@ function App() {
 
     setinitialState({ text: "initial.plugin", plugin: false })
     await checkPluginUpdate()
+    await pluginManager().initialPlugins()
+    await getInformationPlugin().initial()
     await detectPluginVersion();
 
     setInitation(false)

@@ -1,6 +1,7 @@
 import Button from '@renderer/components/buttons';
-import { openUrlFolder } from './functions';
+import { globalNavigate, openUrlFolder, reloadWebsite } from './functions';
 import { useI18n } from './i18n';
+import { Show } from 'solid-js';
 
 function LocalErrorBoundary(error: any) {
     console.error(error)
@@ -18,9 +19,11 @@ function LocalErrorBoundary(error: any) {
         <div class='main-error-container'>
             <div class="main-error-text">{t("globalError")}</div>
             <div class="main-error-button-container">
-                <Button content={t("errorboundary.gotohome")} ButtonClass='error-button' onClick={() => {window.location.href = `${window.location.origin}${window.location.pathname}`; window.BrowserWindow.reload()}} />
+                <Button content={t("errorboundary.gotohome")} ButtonClass='error-button' onClick={() => {globalNavigate(""); window.BrowserWindow.reload()}} />
                 <Button content={t("errorboundary.github")} ButtonClass='error-button' onClick={() => createIssue()} />
-                <Button content={t("errorboundary.leaveanimu")} ButtonClass='error-button' onClick={() => window.api ? window.BrowserWindow.exit() : ""} />
+                <Show when={window.api}>
+                    <Button content={t("errorboundary.leaveanimu")} ButtonClass='error-button' onClick={() => window.api ? reloadWebsite() : ""} />
+                </Show>
             </div>
             <div class="main-error-show">
                 {t("errorboundary.errormessage", { error: error.toString() })}
