@@ -465,6 +465,8 @@ function information() {
     }
 
     createShortcut(["Escape"], () => {
+        if (!location.href.includes("/#/info")) return
+        
         if (showWrong()) setshowWrong(() => false)
         else if (showImages()) setShowImages(false)
         else navigate("/")
