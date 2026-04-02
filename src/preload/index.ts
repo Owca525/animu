@@ -37,8 +37,8 @@ if (process.contextIsolated) {
         advanceRequest: (url: string, options?: { method?: "POST" | "GET", header?: Record<string, string> }) => ipcRenderer.invoke('advanceRequest', url, options),
       },
       rpc: {
-        setActivity: (details: string | undefined, state: string | undefined) =>
-          ipcRenderer.invoke("setActivity", details, state),
+        setActivity: (details: string | undefined, state: string | undefined, time?: Date, urlDetails?: string) =>
+          ipcRenderer.invoke("setActivity", details, state, time, urlDetails),
         runDiscordRPC: () => ipcRenderer.invoke("runDiscordRPC"),
       },
       os: {

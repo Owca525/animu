@@ -32,13 +32,13 @@ ipcMain.on("openDevTools", () => {
 })
 
 // Change activity in Discord Rich presence
-ipcMain.handle('setActivity', (_event, details?: string, state?: string, time?: Date) => {
+ipcMain.handle('setActivity', (_event, details?: string, state?: string, time?: Date, urlDetails?: string) => {
     if (!rpc) return
 
     rpc.user?.setActivity({
         largeImageUrl: "https://github.com/Owca525/animu?tab=readme-ov-file#animu",
         // smallImageKey: "animu",
-        smallImageUrl: "https://github.com/Owca525/animu?tab=readme-ov-file#animu",
+        detailsUrl: urlDetails,
         url: "https://github.com/Owca525/animu?tab=readme-ov-file#animu",
         details: details,
         state: state,
@@ -274,8 +274,7 @@ export function setupDiscordRPC(): void {
     rpc.on('ready', () => {
         rpc.user?.setActivity({
             startTimestamp: runTime,
-            largeImageKey: 'https://github.com/Owca525/animu/blob/electron/resources/icon.png?raw=true',
-            instance: false,
+            largeImageKey: "animu",
             type: ActivityType.Watching
         });
     });

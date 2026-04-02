@@ -65,7 +65,9 @@ declare global {
       rpc: {
         setActivity: (
           details: string | undefined,
-          state: string | undefined
+          state: string | undefined,
+          time?: Date, 
+          urlDetails?: string
         ) => Promise<void>;
         runDiscordRPC: () => void;
       }
