@@ -29,7 +29,7 @@ import { useI18n } from "@renderer/utils/i18n"
 import { addTime, countImages, fetchResolutions, VTTstoryBoardParser } from "./playerUtils"
 import { v4 as uuidv4 } from 'uuid';
 import { updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist"
-import { getSocket, getSocketRoom } from "@renderer/utils/stores/global"
+import { getAudioOutput, getSocket, getSocketRoom } from "@renderer/utils/stores/global"
 
 import videojs from "video.js";
 // import "@videojs/http-streaming" 
@@ -185,7 +185,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }
 
         if (videoRef) {
-            console.log("AJKL:NSDFL:NADF")
             videoJS = videojs(videoRef, {
                 controls: false,
                 autoplay: true,
@@ -201,6 +200,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     },
                 },
             });
+            if (getAudioOutput()) videoRef.setSinkId(getAudioOutput()!.deviceId)
+                
             videoJS.children_.forEach((v) => {
                 if (v["nodeName"] == "VIDEO") (v as HTMLVideoElement).classList.add("video-player")
             })

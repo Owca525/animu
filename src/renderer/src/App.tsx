@@ -36,6 +36,7 @@ import {
   getGlobalCache,
   setAnilistUserData,
   setAnimulistData,
+  setAudioOutput,
   setDeepLink,
   setDeeplinkRunned,
   setGlobalHistory,
@@ -247,6 +248,15 @@ function App() {
   /* IFDEF DEBUG|PROD */
   function LoadConfig() {
     let loadedConnfig = getConfig()
+    // await navigator.mediaDevices.enumerateDevices()
+
+    navigator.mediaDevices.enumerateDevices().then((element) => {
+      const audioOutputs = element.filter(device => device.kind === "audiooutput")
+
+      audioOutputs.forEach((el) => {
+        if (el.label.toLowerCase() == loadedConnfig.General.audioOutput.toLowerCase()) setAudioOutput(el)
+      })
+    })
 
     if (loadedConnfig.animulist.historyConvert) {
       convertHistoryToAnimuList()

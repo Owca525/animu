@@ -34,6 +34,7 @@ export interface SettingsConfig {
         language: string
         theme: string[]
         discordRPC: boolean
+        audioOutput: string
         Window: {
             AutoMaximize: boolean
             AutoFullscreen: boolean
@@ -227,7 +228,8 @@ export const defaultConfig: SettingsConfig = {
             Zoom: 100,
             trayIconClose: false
         },
-        discordRPC: true
+        discordRPC: true,
+        audioOutput: "Default"
     },
     Player: {
         general: {

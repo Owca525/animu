@@ -19,7 +19,8 @@ export const [globalState, setGlobalState] = createStore({
     isAnimuFocus: true,
     notifications: [],
     todayAnimeAnilist: [],
-    animeOpeningsCache: {}
+    animeOpeningsCache: {},
+    audioOutput: undefined
 } as globalDataFormat);
 
 export const getGlobalCache = () => globalState;
@@ -36,9 +37,11 @@ export const isAnimuFocus = () => globalState.isAnimuFocus;
 export const getNotificationList = () => globalState.notifications;
 export const todayAnimeInAnilist = () => globalState.todayAnimeAnilist;
 export const animeOpeningsCache = () => globalState.animeOpeningsCache;
+export const getAudioOutput = () => globalState.audioOutput;
 
 export const addOpeningCache = (id: number, op: animeOpeningsFormat[]) => setGlobalState((prev) => ({...prev, animeOpeningsCache: { ...prev.animeOpeningsCache, [id]: op }}));
 export const setTodayAnimeInAnilist = (tmp: cardData[]) => setGlobalState((prev) => ({...prev, todayAnimeAnilist: tmp}));
+export const setAudioOutput = (tmp: MediaDeviceInfo) => setGlobalState((prev) => ({...prev, audioOutput: tmp}));
 export const setSocket = (tmp: Socket) => setGlobalState((prev) => ({...prev, socket: { ...prev.socket as any, instance: tmp }}));
 export const setSocketRoom = (tmp: string) => setGlobalState((prev) => ({...prev, socket: { ...prev.socket as any, currentRoom: tmp }}));
 export const setActiveThemes = (tmp: Map<number, themeMetadata>) => setGlobalState((prev) => ({...prev, activeThemes: tmp}));

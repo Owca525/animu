@@ -57,7 +57,7 @@ import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './settings.css';
 import { useI18n } from '@renderer/utils/i18n';
-import { activeThemes, animulistData, getAnilistUserData, getDeeplinks, getGlobalCache, loadedTheme, removeDeepLink, setDeepLink } from '@renderer/utils/stores/global';
+import { activeThemes, animulistData, getAnilistUserData, getDeeplinks, getGlobalCache, loadedTheme, removeDeepLink, setAudioOutput, setDeepLink } from '@renderer/utils/stores/global';
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 import SettingsPlugin from './components/settingsPlugin';
 import semver from "semver";
@@ -88,6 +88,9 @@ function settings() {
     const [lastActiveTheme, setLastActiveTheme] = createSignal<Map<number, themeMetadata>>(new Map())
     const [versions] = createSignal(window.api ? window.electronAPI.process.versions : undefined)
     const [isSaving, setSaving] = createSignal<boolean>(false)
+
+    const [audioOutput, setaudioOutput] = createSignal<MediaDeviceInfo[]>([])
+
     const [backupList, setBackupList] = createSignal<{ date: Date, file: string }[]>([])
     const [pluginList, setpluginList] = createSignal<{ active: boolean, plugin: playerPluginFormat | informationPluginFormat }[]>([])
     const [hiddenPluginList, setHiddenPluginList] = createSignal<string[]>([])
@@ -203,6 +206,11 @@ function settings() {
     })
 
     onMount(async () => {
+        navigator.mediaDevices.enumerateDevices().then((element) => {
+            const audioOutputs = element.filter(device => device.kind === "audiooutput")
+            setaudioOutput(audioOutputs)
+        })
+
         const plugin = getPlayerPLugin()
         setLastActiveTheme(structuredClone(unwrap(activeThemes())))
         const playerPluginList = getPluginList().map((pl) => {
@@ -667,6 +675,23 @@ function settings() {
                                 <Dropdown disableX placeholder={yt_dlprelases().length <= 0 ? t("global.notFound") : yt_dlprelases()[0]} options={yt_dlprelases().map((v) => ({ label: v, onClick: () => changeYT_DLP(v) }))} />
                             </div>
                         </Show>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("Audio Output")}
+                            <div class="settings-helpicon-space">
+                                <Dropdown
+                                    options={audioOutput().map(element => {
+                                        return { label: element.label, onClick: () => {
+                                            handleChange('General.audioOutput', element.label)
+                                            setAudioOutput(element)
+                                        } }
+                                    })}
+                                    buttonText={config().new.General.audioOutput}
+                                    placeholderChange={() => config().new.General.audioOutput}
+                                    disableX
+                                />
+                            </div>
+                        </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("Manage Data in animu")}

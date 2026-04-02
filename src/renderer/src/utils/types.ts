@@ -204,6 +204,7 @@ export interface globalDataFormat {
     notifications: NotificationProps[]
     todayAnimeAnilist: cardData[]
     animeOpeningsCache: { [key: number]: animeOpeningsFormat[] }
+    audioOutput: MediaDeviceInfo | undefined
 }
 
 export interface NotificationProps {
@@ -421,6 +422,7 @@ export interface SettingsConfig {
         language: string
         theme: string[]
         discordRPC: boolean
+        audioOutput: string
         Window: {
             AutoMaximize: boolean
             AutoFullscreen: boolean

@@ -34,7 +34,8 @@ export const defaultConfigWeb: SettingsConfig = {
             Zoom: 100,
             trayIconClose: false
         },
-        discordRPC: true
+        discordRPC: true,
+        audioOutput: "Default"
     },
     Player: {
         general: {

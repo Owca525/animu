@@ -35,7 +35,7 @@ import {
 } from '@renderer/utils/functions';
 import { VTTstoryBoardParser } from '@renderer/pages/player/playerUtils';
 import { getConfig } from '@renderer/utils/stores/config';
-import { getSocket, getSocketRoom } from '@renderer/utils/stores/global';
+import { getAudioOutput, getSocket, getSocketRoom } from '@renderer/utils/stores/global';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { removeToast, toast } from '@renderer/utils/context/ToastNotification';
 import { saveConfig } from '@renderer/utils/FilesManager/config';
@@ -200,6 +200,8 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
                     },
                 },
             });
+            if (getAudioOutput()) videoRef.setSinkId(getAudioOutput()!.deviceId)
+                
             videoJS.children_.forEach((v) => {
                 if (v["nodeName"] == "VIDEO") (v as HTMLVideoElement).classList.add("video-player")
             })
