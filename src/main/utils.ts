@@ -36,11 +36,14 @@ ipcMain.handle('setActivity', (_event, details?: string, state?: string, time?: 
     if (!rpc) return
 
     rpc.user?.setActivity({
+        largeImageUrl: "https://github.com/Owca525/animu?tab=readme-ov-file#animu",
+        // smallImageKey: "animu",
+        smallImageUrl: "https://github.com/Owca525/animu?tab=readme-ov-file#animu",
+        url: "https://github.com/Owca525/animu?tab=readme-ov-file#animu",
         details: details,
         state: state,
         startTimestamp: time ? time : runTime,
-        largeImageKey: 'https://github.com/Owca525/animu/blob/electron/resources/icon.png?raw=true',
-        instance: false,
+        largeImageKey: 'animu',
         type: ActivityType.Watching
     });
 })
