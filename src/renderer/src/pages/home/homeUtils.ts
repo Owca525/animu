@@ -1,7 +1,7 @@
 import { dateToUnix, getHistory, searchDataInCards, setHomeData } from "@renderer/utils/functions";
 import { t } from "@renderer/utils/i18n";
 import { animulistData } from "@renderer/utils/stores/global";
-import { getHomeCache, setHomeNewData, setHomeSearch, setHomeSearchPage, setHomeStopScrolling } from "@renderer/utils/stores/home";
+import { getHomeCache, setHomeNewData, setHomeSearch, setHomeSearchPage, setHomeSearchTags, setHomeStopScrolling } from "@renderer/utils/stores/home";
 import { getInformationPlugin } from "@renderer/utils/stores/plugins";
 import { cardData, containerData, FilterParams, homeData } from "@renderer/utils/types";
 import { unwrap } from "solid-js/store";
@@ -40,7 +40,7 @@ export function setAnimuList(): any {
             title: "animulist.status.CURRENT", 
             data: currentAnime, 
             horizontal: true, 
-            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watched: "CURRENT" }) 
+            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watching: "CURRENT" }) 
         })
 
     const watchedAnime = animulist.filter((v) => v.animulist.status == "COMPLETED")
@@ -49,7 +49,7 @@ export function setAnimuList(): any {
             title: "animulist.status.COMPLETED", 
             data: watchedAnime, 
             horizontal: true,
-            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watched: "COMPLETED" }) 
+            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watching: "COMPLETED" }) 
         })
 
     const planningAnime = animulist.filter((v) => v.animulist.status == "PLANNING")
@@ -57,7 +57,7 @@ export function setAnimuList(): any {
             title: "animulist.status.PLANNING", 
             data: planningAnime, 
             horizontal: true,
-            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watched: "PLANNING" }) 
+            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watching: "PLANNING" }) 
         })
 
     const pausedAnime = animulist.filter((v) => v.animulist.status == "PAUSED")
@@ -65,7 +65,7 @@ export function setAnimuList(): any {
             title: "animulist.status.PAUSED",
             data: pausedAnime, 
             horizontal: true,
-            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watched: "PAUSED" }) 
+            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watching: "PAUSED" }) 
         })
 
     if (finnalContainer.length <= 1) return setHomeData(undefined, {sections: [ { data: unwrap(animulistData()) } ]})
@@ -150,6 +150,7 @@ export function AnimuListSearch(search: string = "", params: FilterParams | unde
     if (search.replaceAll(" ", "") == "" && params == undefined) return setAnimuList()
     let tmp = searchDataInCards(unwrap(animulistData()), search, params)
     if (params && params["watching"]) tmp = tmp.filter((v) => v.animulist?.status == params["watching"])
+    setHomeSearchTags(params)
     setHomeData(undefined, {
         sections: [
             {
