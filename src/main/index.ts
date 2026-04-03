@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, Menu, session, ipcMain, dialog, crashReporter, Tray } from 'electron'
+import { app, shell, BrowserWindow, Menu, session, ipcMain, crashReporter, Tray, dialog, Notification } from 'electron'
 import { optimizer, is } from '@electron-toolkit/utils'
 import path, { join } from 'path'
 import ini from "ini";
@@ -13,8 +13,12 @@ import "./request"
 import "./streaming"
 import "./backup"
 import "./animulist"
+import "./playlist"
+import "./theme"
+import "./plugins"
+
 import { convertToNewFormat, detectOldVersion, write } from './os'
-import { existsSync, mkdirSync, readFileSync } from 'fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import { cardData, defaultConfig, SettingsConfig } from './types';
 import { deepMerge, detectZoom, runCheckYT_DLP, setupDiscordRPC } from './utils';
 import { electronAppUniversalProtocolClient } from 'electron-app-universal-protocol-client';
@@ -27,6 +31,9 @@ export const pluginsConfigPath = path.join(newConfigPath, "pluginsConfig")
 export const animuPlaylistPath = path.join(newConfigPath, "playlist")
 export const userPlugins = path.join(newConfigPath, "plugins")
 export const animuPlugins = path.join(app.getPath("userData"), "animuPlugins")
+
+export let DEBUG: boolean = false
+
 export let config: SettingsConfig = defaultConfig
 let historyData: cardData[] = []
 const PROTOCOL = "animu"
@@ -152,6 +159,15 @@ function createWindow(): void {
     if (!mainWindow) return
     e.preventDefault()
     mainWindow.hide()
+    if (!existsSync(path.join(app.getPath("userData"), "traynotification"))) {
+      const notification = new Notification({
+        title: 'Animu',
+        icon: icon,
+        body: "Animu is Now In tray mode if you want disable this you can in settings",
+      });
+      notification.show()
+      writeFileSync(path.join(app.getPath("userData"), "traynotification"), "")
+    }
   })
 
   Menu.setApplicationMenu(null);
@@ -175,56 +191,77 @@ function createWindow(): void {
   })
 }
 
-const gotTheLock = app.requestSingleInstanceLock()
+const isSecondInstance = app.requestSingleInstanceLock()
+app.on('second-instance', () => {
+  if (!mainWindow) return
+  if (mainWindow.isMinimized()) mainWindow.restore()
+  mainWindow.focus()
+})
 
-if (!gotTheLock) {
-  app.quit()
-} else {
-  app.on('second-instance', () => {
-    if (!mainWindow) return
-    if (mainWindow.isMinimized()) mainWindow.restore()
-    mainWindow.focus()
-    // dialog.showErrorBox("MESSAGE", `${deepLink}`)
-  })
-
-  app.whenReady().then(async () => {
-
-    app.on('browser-window-created', (_, window) => {
-      optimizer.watchWindowShortcuts(window)
-    })
-
-    /* IFDEF WEB */
-    if (process.env.ANIMU_WEB_DEV) return
-    /* ENDIF */
-
-    await initialBackend()
-    createWindow()
-    electronAppUniversalProtocolClient.on('request', async (requestUrl) => {
-      if (mainWindow) mainWindow.webContents.send('protocol-request', requestUrl)
-    },
-    );
-    await electronAppUniversalProtocolClient.initialize({
-      protocol: PROTOCOL,
-      mode: process.env.NODE_ENV == 'development' ? 'development' : "production",
+app.whenReady().then(async () => {
+  if (!isSecondInstance) {
+    await dialog.showMessageBox({
+      type: 'info',
+      buttons: ['OK'],
+      defaultId: 0,
+      title: "Animu",
+      message: 'Animu has already running',
     });
-    if (config.General.discordRPC && process.env.NODE_ENV != 'development') setupDiscordRPC()
+    app.quit()
+    return
+  }
 
-    app.on('activate', function () {
-      if (BrowserWindow.getAllWindows().length === 0) createWindow()
-    })
+  const isInspectEnabled = process.argv.some(arg =>
+    arg.startsWith('--inspect')
+  );
+
+  DEBUG = isInspectEnabled
+
+  /* IFDEF PROD */
+  if (DEBUG) {
+    const notification = new Notification({
+      title: 'Animu',
+      icon: icon,
+      body: "Animu is running in debug mode, which causes it to display sensitive data. Since you didn't enable debug mode, please Turn Off Animu by clicking this notification.",
+    });
+    notification.on("click", () => app.quit())
+    notification.show()
+  }
+  /* ENDIF */
+
+  /* IFDEF DEBUG */
+  DEBUG = true
+  /* ENDIF */
+
+  app.on('browser-window-created', (_, window) => {
+    optimizer.watchWindowShortcuts(window)
   })
 
-  app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-      app.quit()
-    }
-  })
-}
+  /* IFDEF WEB */
+  if (process.env.ANIMU_WEB_DEV) return
+  /* ENDIF */
 
-app.on('open-url', (event, url) => {
-  event.preventDefault()
-  console.log('DEEPLINK:', url)
-  if (window) dialog.showErrorBox("MESSAGE", url)
+  await initialBackend()
+  createWindow()
+  electronAppUniversalProtocolClient.on('request', async (requestUrl) => {
+    if (mainWindow) mainWindow.webContents.send('protocol-request', requestUrl)
+  },
+  );
+  await electronAppUniversalProtocolClient.initialize({
+    protocol: PROTOCOL,
+    mode: process.env.NODE_ENV == 'development' ? 'development' : "production",
+  });
+  if (config.General.discordRPC && process.env.NODE_ENV != 'development') setupDiscordRPC()
+
+  app.on('activate', function () {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
+})
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit()
+  }
 })
 
 function detectKeybinds(config: SettingsConfig) {
@@ -287,7 +324,7 @@ app.on('child-process-gone', (_event, details) => {
 process.on('uncaughtException', console.error)
 process.on('unhandledRejection', console.error)
 
-ipcMain.handle('refreshBackend', () => initialBackend());
+ipcMain.handle('backend:refresh', () => initialBackend());
 
-ipcMain.handle('getConfig', () => config);
-ipcMain.handle('getHistory', () => historyData);
+ipcMain.handle('backend:config', () => config);
+ipcMain.handle('backend:history', () => historyData);

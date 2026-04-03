@@ -52,9 +52,9 @@ export async function RestoreBackup(file: string): Promise<{ success: boolean, e
     }
 }
 
-ipcMain.handle("restoreBackup", async (_event, file: string) => RestoreBackup(file));
-ipcMain.handle("makeBackup", async (_event) => createBackup());
-ipcMain.handle("backupList", async (_event) => (await getBackupList()).sort((a, b) => a.date.getTime() - b.date.getTime()));
+ipcMain.handle("backup:restore", async (_event, file: string) => RestoreBackup(file));
+ipcMain.handle("backup:make", async (_event) => createBackup());
+ipcMain.handle("backup:list", async (_event) => (await getBackupList()).sort((a, b) => a.date.getTime() - b.date.getTime()));
 
 async function checkBackupFolder() {
     if (!fs.existsSync(backupFolder)) {

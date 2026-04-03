@@ -1,7 +1,6 @@
 import { app, dialog, ipcMain } from "electron";
 import { mainWindow, newConfigPath } from ".";
 
-import { execSync } from "child_process";
 import { WriteFileOptions, writeFileSync, mkdirSync, existsSync, readFileSync, promises, rmSync } from "fs";
 import path from "path"
 import os from "os"
@@ -22,43 +21,18 @@ export function write(path: string, data: string, format?: WriteFileOptions): bo
   }
 }
 
-ipcMain.handle("exist", (_event, pathStr: string): boolean => {
+ipcMain.handle("fs:exist", (_event, pathStr: string): boolean => {
   return existsSync(path.join(newConfigPath, pathStr))
 });
 
-ipcMain.handle("getConfigPath", (_event): string => {
-  return newConfigPath
-});
-
-ipcMain.handle("getBrowserConfigPath", (_event): string => {
-  return app.getPath("userData")
-});
-
-ipcMain.handle("getPathProgram", async (_event, program: string): Promise<string> => {
-  try {
-    if (os.platform() === "win32") return ""
-    let paths = execSync(`whereis ${program}`).toString().trim().split(" ")
-    if (!(paths.length <= 1)) return paths[1]
-    let flatpakPaths = execSync(`flatpak list --columns=application`).toString().trim().split(" ")
-    for (let index = 0; index < flatpakPaths.length; index++) {
-      const element = flatpakPaths[index];
-      if (element.toLowerCase().includes(program.toLocaleLowerCase())) return element.replace("\n", "")
-    }
-    return ""
-  } catch (error) {
-    console.error(error)
-    return ""
-  }
-});
-
-ipcMain.handle("write", (_event, pathStr: string, data: string, format?: WriteFileOptions): boolean => {
+ipcMain.handle("fs:write", (_event, pathStr: string, data: string, format?: WriteFileOptions): boolean => {
   if (pathStr.includes(".png")) {
     return write(pathStr, data, format)
   }
   return write(path.join(newConfigPath, pathStr), data, format)
 });
 
-ipcMain.handle("read",  (_event, pathStr: string, format: WriteFileOptions): string | NonSharedBuffer | undefined => {
+ipcMain.handle("fs:read",  (_event, pathStr: string, format: WriteFileOptions): string | NonSharedBuffer | undefined => {
     try {
       let tmpPath = path.join(newConfigPath, pathStr)
       if (format) return readFileSync(tmpPath, format);
@@ -69,7 +43,16 @@ ipcMain.handle("read",  (_event, pathStr: string, format: WriteFileOptions): str
   }
 );
 
-ipcMain.handle("saveDialog", async (_event, fileName: string, data: any, title: string, name: string, extensions: string[], format?: string): Promise<boolean> => {
+ipcMain.handle("backend:configPath", (_event): string => {
+  return newConfigPath
+});
+
+ipcMain.handle("backend:BrowserConfigPath", (_event): string => {
+  return app.getPath("userData")
+});
+
+
+ipcMain.handle("os:saveDialog", async (_event, fileName: string, data: any, title: string, name: string, extensions: string[], format?: string): Promise<boolean> => {
     const { filePath } = await dialog.showSaveDialog({
       title: title,
       defaultPath: fileName,
@@ -80,7 +63,7 @@ ipcMain.handle("saveDialog", async (_event, fileName: string, data: any, title: 
   }
 );
 
-ipcMain.handle("openDialog", async (_event, path?: string, name?: string, extensions?: string[]): Promise<string> => {
+ipcMain.handle("os:openDialog", async (_event, path?: string, name?: string, extensions?: string[]): Promise<string> => {
     if (!mainWindow) return "";
     let dialogProps: Electron.OpenDialogOptions = {
       defaultPath: path,
@@ -99,7 +82,7 @@ ipcMain.handle("openDialog", async (_event, path?: string, name?: string, extens
   }
 );
 
-ipcMain.handle('get-os-info', () => {
+ipcMain.handle('os:information', () => {
   return {
     platform: os.platform(),
     release: os.release(),

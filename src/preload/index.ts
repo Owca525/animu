@@ -25,53 +25,45 @@ if (process.contextIsolated) {
       },
       update: {
         updateProgress: (callback) =>
-          ipcRenderer.on("update-download-progress", callback),
-        downloadUpdate: () => ipcRenderer.send("downloadUpdate"),
-        checkUpdate: () => ipcRenderer.invoke("checkUpdates"),
+          ipcRenderer.on("update:progress", callback),
+        downloadUpdate: () => ipcRenderer.send("update:startdownload"),
+        checkUpdate: () => ipcRenderer.invoke("update:checkUpdates"),
       },
-      request: {
-        get: (url: string, header: Record<string, string>, type?: "json" | "text") =>
-          ipcRenderer.invoke("fetch-data", url, header, type),
-        post: (url: string, header: Record<string, string>, body?: { query: any, variables: Object }, type?: "json" | "text") =>
-          ipcRenderer.invoke("send-post", url, header, body, type),
-        advanceRequest: (url: string, options?: { method?: "POST" | "GET", header?: Record<string, string> }) => ipcRenderer.invoke('advanceRequest', url, options),
-      },
+      request: (url: string, options?: { method?: "POST" | "GET", header?: Record<string, string> }) => ipcRenderer.invoke('advanceRequest', url, options),
       rpc: {
         setActivity: (details: string | undefined, state: string | undefined, time?: Date, urlDetails?: string) =>
-          ipcRenderer.invoke("setActivity", details, state, time, urlDetails),
-        runDiscordRPC: () => ipcRenderer.invoke("runDiscordRPC"),
+          ipcRenderer.invoke("discordrpc:activity", details, state, time, urlDetails),
+        runDiscordRPC: () => ipcRenderer.invoke("discordrpc:run"),
       },
       os: {
-        exists: (path: string) => ipcRenderer.invoke("exist", path),
-        write: (path: string, data: string, format?: string) => ipcRenderer.invoke("write", path, data, format),
-        read: (path: string, format?: string) => ipcRenderer.invoke("read", path, format),
-        saveDialog: (fileName: string, data: any, title: string, name: string, extensions: string[], format?: string) => ipcRenderer.invoke("saveDialog", fileName, data, title, name, extensions, format),
-        openDialog: (path?: string, name?: string, extensions?: string[]) => ipcRenderer.invoke("openDialog", path, name, extensions),
-        getPathProgram: (program: string) => ipcRenderer.invoke("getPathProgram", program),
-        checkPictureFolder: () => ipcRenderer.invoke("createPictureFolder"),
-        getConfigPath: () => ipcRenderer.invoke("getConfigPath"),
-        getBrowserConfigPath: () => ipcRenderer.invoke("getBrowserConfigPath")
+        exists: (path: string) => ipcRenderer.invoke("fs:exist", path),
+        write: (path: string, data: string, format?: string) => ipcRenderer.invoke("fs:write", path, data, format),
+        read: (path: string, format?: string) => ipcRenderer.invoke("fs:read", path, format),
+        saveDialog: (fileName: string, data: any, title: string, name: string, extensions: string[], format?: string) => ipcRenderer.invoke("os:saveDialog", fileName, data, title, name, extensions, format),
+        openDialog: (path?: string, name?: string, extensions?: string[]) => ipcRenderer.invoke("os:openDialog", path, name, extensions),
+        getConfigPath: () => ipcRenderer.invoke("backend:configPath"),
+        getBrowserConfigPath: () => ipcRenderer.invoke("backend:BrowserConfigPath")
       },
       backup: {
-        make: () => ipcRenderer.invoke("makeBackup"),
-        list: () => ipcRenderer.invoke("backupList"),
-        restore: (file: string) => ipcRenderer.invoke("restoreBackup", file)
+        make: () => ipcRenderer.invoke("backup:make"),
+        list: () => ipcRenderer.invoke("backup:list"),
+        restore: (file: string) => ipcRenderer.invoke("backup:restore", file)
       },
       themes: {
-        list: () => ipcRenderer.invoke("get-css-files"),
-        config: (theme) => ipcRenderer.invoke("getThemeConfig", theme),
-        writeConfig: (theme, data: Record<string, boolean | string>) => ipcRenderer.invoke("saveConfigTheme", theme, data)
+        list: () => ipcRenderer.invoke("theme:listTheme"),
+        config: (theme) => ipcRenderer.invoke("theme:ConfigTheme", theme),
+        writeConfig: (theme, data: Record<string, boolean | string>) => ipcRenderer.invoke("theme:SaveConfig", theme, data)
       },
       plugins: {
-        list: () => ipcRenderer.invoke("externalPlugins"),
-        saveConfig: (name: string, config: { [key: string]: any }) => ipcRenderer.invoke("savePluginConfig", name, config),
-        getConfig: (name: string, config: { [key: string]: any }) => ipcRenderer.invoke("getPluginConfig", name, config),
-        installUpdate: (plugin: pluginRepoExpanded) => ipcRenderer.invoke("installPluginUpdate", plugin)
+        list: () => ipcRenderer.invoke("plugins:list"),
+        saveConfig: (name: string, config: { [key: string]: any }) => ipcRenderer.invoke("plugins:saveConfig", name, config),
+        getConfig: (name: string, config: { [key: string]: any }) => ipcRenderer.invoke("plugins:getConfig", name, config),
+        installUpdate: (plugin: pluginRepoExpanded) => ipcRenderer.invoke("plugins:install", plugin)
       },
       yt_dlp: {
-        versionList: () => ipcRenderer.invoke('getyt-dlp_releases'),
-        install: (tag: string) => ipcRenderer.invoke('installyt-dlp', tag),
-        run: (url: string, commands?: string[]) => ipcRenderer.invoke('run_yt-dlp', url, commands)
+        versionList: () => ipcRenderer.invoke('yt-dlp:releases'),
+        install: (tag: string) => ipcRenderer.invoke('yt-dlp:install', tag),
+        run: (url: string, commands?: string[]) => ipcRenderer.invoke('yt-dlp:run', url, commands)
       },
       animulist: {
         add: (anime) => ipcRenderer.invoke('animulist:saveToDatabase', anime),
@@ -81,34 +73,33 @@ if (process.contextIsolated) {
         overWrite: () => ipcRenderer.invoke('animulist:overwrite')
       },
       runExternaPlayer: (videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", videoData, type),
-      getOSDetails: () => ipcRenderer.invoke('get-os-info'),
-      getListLang: () => ipcRenderer.invoke("get-lang-files"),
-      getConfig: () => ipcRenderer.invoke("getConfig"),
-      getHistory: () => ipcRenderer.invoke("getHistory"),
+      getOSDetails: () => ipcRenderer.invoke('os:information'),
+      getListLang: () => ipcRenderer.invoke("lang:files"),
+      getConfig: () => ipcRenderer.invoke("backend:config"),
+      getHistory: () => ipcRenderer.invoke("backend:history"),
       onProtocolRequest: (callback: (url: string) => void) => {
         ipcRenderer.on('protocol-request', (_, url) => callback(url));
       },
     });
     contextBridge.exposeInMainWorld("backend", {
-      Buffer: require("buffer").Buffer,
-      ipcRenderer: {
-        invoke: (channel: string, ...args: any[]): Promise<any> =>
-          ipcRenderer.invoke(channel, ...args),
-      },
-      version: () => ipcRenderer.invoke("animuVersion"),
-      refresh: () => ipcRenderer.invoke("refreshBackend"),
+      // ipcRenderer: {
+      //   invoke: (channel: string, ...args: any[]): Promise<any> =>
+      //     ipcRenderer.invoke(channel, ...args),
+      // },
+      version: () => ipcRenderer.invoke("backend:version"),
+      refresh: () => ipcRenderer.invoke("backend:refresh"),
       debug: () => ipcRenderer.invoke("debug:memory")
     });
     contextBridge.exposeInMainWorld("electronAPI", electronAPI)
     contextBridge.exposeInMainWorld("BrowserWindow", {
-      setMaximize: () => ipcRenderer.send("setMaximize"),
+      setMaximize: () => ipcRenderer.send("window:maximize"),
       setFullscreen: (option: boolean) =>
-        ipcRenderer.send("setFullscreen", option),
-      isFullscreen: () => ipcRenderer.invoke("isFullscreen"),
-      setZoom: (zoom: number) => ipcRenderer.send("setZoom", zoom),
-      exit: () => ipcRenderer.send("exit"),
-      openDevTools: () => ipcRenderer.send("openDevTools"),
-      reload: () => ipcRenderer.send("reload-window"),
+        ipcRenderer.send("window:fullscreen", option),
+      isFullscreen: () => ipcRenderer.invoke("window:isfullscreen"),
+      setZoom: (zoom: number) => ipcRenderer.send("window:zoom", zoom),
+      exit: () => ipcRenderer.send("window:exit"),
+      openDevTools: () => ipcRenderer.send("window:devtools"),
+      reload: () => ipcRenderer.send("window:reload"),
       onWindowFocus: (callback) => {
         const handler = (_, value) => callback(value);
         ipcRenderer.on("browserWindow:focus", handler);

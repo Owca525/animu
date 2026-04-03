@@ -225,7 +225,7 @@ function settings() {
 
         /* IFDEF DEBUG|PROD */
         setBackupList(await window.api.backup.list())
-        if (config().new.General.discordRPC) window.api.rpc.setActivity(undefined, t("discordrpc.settings"))
+        if (config().new.General.discordRPC) window.api.rpc.setActivity({ state: t("discordrpc.settings") })
 
         setReleases_yt_dlp(await window.api.yt_dlp.versionList())
         /* ENDIF */

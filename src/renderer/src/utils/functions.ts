@@ -297,13 +297,14 @@ export function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function detectTitle(data: { title: { english?: string | undefined; native: string; romaji: string; }, ep: string, format?: string }): string {
+export function detectTitle(data: { title: AnimeData["title"], ep: string, format?: string } | undefined): string {
     try {
+        if (!data) return ""
         if (data.format?.toLowerCase().includes("movie")) return t('player.TitleMovie', { name: detectTitleConfig(data.title) })
         return t('player.TitleEpisode', { ep: data.ep, name: detectTitleConfig(data.title) })
     } catch (error) {
         console.error(error)
-        return t('player.TitleEpisode', { ep: data.ep, name: detectTitleConfig(data.title) })
+        return data ? t('player.TitleEpisode', { ep: data.ep, name: detectTitleConfig(data.title) }) : ""
     }
 }
 
@@ -443,7 +444,7 @@ export async function request(url: string, options?: { method?: "POST" | "GET", 
         /* ENDIF */
 
         /* IFDEF DEBUG|PROD */
-        return await window.api.request.advanceRequest(url, options)
+        return await window.api.request(url, options)
         /* ENDIF */
     } catch (error) {
         console.error("error in requestGET", error)

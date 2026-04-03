@@ -32,43 +32,18 @@ declare global {
         install: (tag: string) => Promise<void>
         run: (url: string, commands?: string[]) => Promise<{ [key: string]: any }>
       },
-      request: {
-        get: (
-          url: string,
-          header: Record<string, string>,
-          type?: "json" | "text"
-        ) => Promise<{
-          success: boolean;
-          data: any;
-          status: number;
-          statusText: string;
-          error?: unknown;
-        }>;
-        post: (url: string, header: Record<string, string>, body?: { query: any, variables: Object }, type?: "json" | "text") => Promise<{
-          success: boolean;
-          data: any;
-          status: number;
-          statusText: string;
-          error?: unknown;
-        }>;
-        advanceRequest: (url: string, options?: { method?: "POST" | "GET", header?: Record<string, string>, body?: any }) => Promise<{
-          text: string,
-          json: { [key: string]: any } | undefined,
-          buffer: Buffer,
-          status: number,
-          statusText: string,
-          url: string,
-          success: boolean,
-          responseHeader: Map<string, string>
-        }>
-      };
+      request: (url: string, options?: { method?: "POST" | "GET", header?: Record<string, string>, body?: any }) => Promise<{
+        text: string,
+        json: { [key: string]: any } | undefined,
+        buffer: Buffer,
+        status: number,
+        statusText: string,
+        url: string,
+        success: boolean,
+        responseHeader: Map<string, string>
+      }>;
       rpc: {
-        setActivity: (
-          details: string | undefined,
-          state: string | undefined,
-          time?: Date, 
-          urlDetails?: string
-        ) => Promise<void>;
+        setActivity: ({ details, state, time, urlDetails }: { details?: string, state?: string, time?: Date, urlDetails?: string }) => Promise<void>;
         runDiscordRPC: () => void;
       }
       os: {
@@ -111,9 +86,9 @@ declare global {
       onProtocolRequest: (callback: (url: string) => void) => void
     };
     backend: {
-      ipcRenderer: {
-        invoke(channel: string, ...args: any[]): Promise<any>;
-      };
+      // ipcRenderer: {
+      //   invoke(channel: string, ...args: any[]): Promise<any>;
+      // };
       version: () => Promise<string>;
       refresh: () => Promise<void>
       debug: () => Promise<{ rss: number, heapUsed: number, heapTotal: number }>

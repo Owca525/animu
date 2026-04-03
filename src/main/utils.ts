@@ -1,18 +1,25 @@
-import { app, BrowserWindow, clipboard, ipcMain, nativeImage, shell } from "electron"
-import { Client } from "@xhayper/discord-rpc";
-import { ActivityType } from "discord-api-types/v10"
-import ini from "ini";
 import crypto from 'crypto';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import { ActivityType } from 'discord-api-types/v10';
+import { advanceRequest } from './request';
+import {
+    config,
+    newConfigPath,
+    } from '.';
+import {
+    app,
+    clipboard,
+    ipcMain,
+    nativeImage,
+    shell
+    } from 'electron';
+import { Client } from '@xhayper/discord-rpc';
+import { exec, execSync, spawn } from 'child_process';
 
-import path from "path"
-import fs from "fs"
-import { animuPlaylistPath, animuPlugins, config, mainWindow, newConfigPath, pluginsConfigPath, themeConfigPath } from ".";
-import { exec, execSync, spawn } from "child_process";
 // import express from "express";
 // import { Readable } from "stream";
-import os from "os"
-import { playlistFormatData, pluginRepoExpanded, themeFormatType, ThemeSchema } from "./types";
-import { advanceRequest } from "./request";
 // import { requestResponseVideo } from "./types";
 
 let yt_dlp_releases_cache: Map<string, any>[] = []
@@ -26,13 +33,8 @@ if (process.env.NODE_ENV != 'development') {
     rpc = new Client({ clientId: CLIENT_ID, transport: { type: 'ipc' } });
 }
 
-ipcMain.on("openDevTools", () => {
-    if (!mainWindow) return
-    mainWindow.webContents.openDevTools()
-})
-
 // Change activity in Discord Rich presence
-ipcMain.handle('setActivity', (_event, details?: string, state?: string, time?: Date, urlDetails?: string) => {
+ipcMain.handle('discordrpc:activity', (_event, { details, state, time, urlDetails }: { details?: string, state?: string, time?: Date, urlDetails?: string }) => {
     if (!rpc) return
 
     rpc.user?.setActivity({
@@ -48,33 +50,15 @@ ipcMain.handle('setActivity', (_event, details?: string, state?: string, time?: 
     });
 })
 
-ipcMain.handle('runDiscordRPC', (_event) => {
+ipcMain.handle('discordrpc:run', (_event) => {
     setupDiscordRPC()
 })
 
-function sha256FromString(text) {
+export function sha256FromString(text) {
     return crypto
         .createHash('sha256')
         .update(text, 'utf8')
         .digest('hex');
-}
-
-function extractPlugin(folderPlugins: string, type: "official" | "user") {
-    if (!fs.existsSync(folderPlugins)) return []
-    const folder = fs.readdirSync(folderPlugins)
-
-    let files = folder.filter((item) => {
-        return fs.statSync(path.join(folderPlugins, item)).isFile()
-    })
-
-    files = files.filter((ele) => ele.endsWith(".js"))
-    if (files.length <= 0) return []
-
-    return files.map((item) => {
-        const content = fs.readFileSync(path.join(folderPlugins, item), "utf-8")
-        const isPlayer = content.includes("extractPlayerData")
-        return { file: item, content: content, type, sha256: sha256FromString(content), pluginType: isPlayer ? "player" : "information" }
-    })
 }
 
 export function detectZoom(zoom: number) {
@@ -86,12 +70,6 @@ export function detectZoom(zoom: number) {
         return 1
     }
 }
-
-ipcMain.handle('externalPlugins', (_event) => {
-    const user = extractPlugin(path.join(newConfigPath, "plugins"), "user")
-    const official = extractPlugin(path.join(app.getPath("userData"), "animuPlugins"), "official")
-    return [...user, ...official]
-})
 
 ipcMain.handle('runExternalPlayer', (_event, videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc"): any => {
     if (videoData.path.replace(" ", "") == "") return
@@ -150,27 +128,7 @@ ipcMain.handle('saveToClipboard', async (_event, type: "text" | "image", content
     }
 })
 
-ipcMain.handle('get-css-files', async (): Promise<themeFormatType[]> => {
-    // Directory for local css
-    let stylesDir: string = "";
-    if (process.env.NODE_ENV === 'development') {
-        stylesDir = path.join(__dirname, '../../src/renderer/src/themes')
-    } else {
-        stylesDir = path.join(__dirname, '../../out/renderer/assets/themes')
-    }
-
-    const localList = await getThemeList(stylesDir)
-
-    const configcss = checkConfigFolder("themes")
-    if (configcss == undefined) return localList
-
-    // Direcotry for config/theme css
-    const customList = await getThemeList(configcss)
-
-    return [...localList, ...customList]
-});
-
-function getFolderPath(folderPath: string) {
+export function getFolderPath(folderPath: string) {
     try {
         if (fs.statSync(folderPath).isDirectory()) return folderPath
         return path.dirname(folderPath)
@@ -179,45 +137,7 @@ function getFolderPath(folderPath: string) {
     }
 }
 
-async function getThemeList(themePath: string): Promise<themeFormatType[]> {
-    let listFolder = await fs.promises.readdir(themePath)
-    let finallist: themeFormatType[] = []
-    for (let index = 0; index < listFolder.length; index++) {
-        const element = listFolder[index];
-        const folderTheme = path.join(themePath, element)
-        if (fs.statSync(folderTheme).isDirectory()) {
-            let theme = await getMetadataTheme(folderTheme)
-            if (theme) finallist.push(theme)
-        }
-    }
-    return finallist.map((theme) => {
-        if (!theme.options) return theme
-        const mainCSSPath = getFolderPath(theme.mainCSS)
-        return {
-            ...theme, options: theme.options.map((value) => {
-                if (value.css && value.css.replaceAll(" ", "") != "") return { ...value, css: path.join(mainCSSPath, value.css) }
-                if (value.dropDown) return { ...value, dropDown: value.dropDown.map((val) => ({ ...val, css: val.css != "" ? path.join(mainCSSPath, val.css) : "" })) }
-                return value
-            })
-        }
-    })
-}
-
-async function getMetadataTheme(path_theme: string): Promise<themeFormatType | undefined> {
-    try {
-        const pathTheme = path.join(path_theme, "/theme.json")
-
-        if (!fs.existsSync(pathTheme)) return undefined
-        let themeJSON = JSON.parse(fs.readFileSync(pathTheme, "utf-8"))
-        const theme = ThemeSchema.parse(themeJSON)
-        return { ...theme, mainCSS: path.join(path_theme, theme.mainCSS) }
-    } catch (error) {
-        console.log("Error parsing theme", error)
-        return undefined
-    }
-}
-
-ipcMain.handle('get-lang-files', async (): Promise<{ data: any, lang: string }[]> => {
+ipcMain.handle('lang:files', async (): Promise<{ data: any, lang: string }[]> => {
     let langDir: string = "";
     if (process.env.NODE_ENV === 'development') {
         langDir = path.join(__dirname, '../../src/renderer/src/utils/lang')
@@ -255,13 +175,13 @@ ipcMain.handle('get-lang-files', async (): Promise<{ data: any, lang: string }[]
     return [...langList.filter((data) => data.lang != ""), ...userLangList.filter((data) => data.lang != "")]
 });
 
-function checkConfigFolder(folder: string): string | undefined {
+export function checkConfigFolder(folder: string): string | undefined {
     if (fs.existsSync(`${newConfigPath}/${folder}`)) return `${newConfigPath}/${folder}`
     fs.mkdirSync(`${newConfigPath}/${folder}`)
     return `${newConfigPath}/${folder}`
 }
 
-async function takeFileExtensionAndPath(dir: string, format: string): Promise<string[]> {
+export async function takeFileExtensionAndPath(dir: string, format: string): Promise<string[]> {
     return await fs.promises.readdir(dir).then(files => {
         files = files.filter(file => file.endsWith(format));
         return files.map((file) => `${dir}/${file}`)
@@ -389,73 +309,9 @@ export function deepMerge(target: any, source: any): any {
     return target;
 }
 
-ipcMain.handle("animuVersion", () => app.getVersion())
+ipcMain.handle("backend:version", () => app.getVersion())
 
-ipcMain.handle('getThemeConfig', async (_event, theme: themeFormatType): Promise<Record<string, string | boolean> | {}> => getThemeConfig(theme))
-
-function getThemeConfig(theme: themeFormatType) {
-    if (!fs.existsSync(path.join(themeConfigPath, `${theme.themeName}.ini`))) return generateConfigTheme(theme)
-    return ini.parse(fs.readFileSync(path.join(themeConfigPath, `${theme.themeName}.ini`), "utf-8"))
-}
-
-function generateConfigTheme(theme: themeFormatType) {
-    if (!theme.options) return {}
-
-    let generetatedConfig: Record<string, boolean | string> = {}
-
-    for (let index = 0; index < theme.options.length; index++) {
-        const element = theme.options[index];
-
-        if (element.css != undefined) {
-            generetatedConfig[element.name] = element.default ? element.default : false
-        } else if (element.dropDown) {
-            generetatedConfig[element.name] = element.dropDown[0].option
-        }
-    }
-
-    fs.writeFileSync(path.join(themeConfigPath, `${theme.themeName}.ini`), ini.stringify(generetatedConfig), "utf-8")
-    return generetatedConfig
-}
-
-ipcMain.handle('saveConfigTheme', async (_event, theme: themeFormatType, data: Record<string, boolean | string>): Promise<void> => saveThemeConfig(theme, data))
-
-function saveThemeConfig(theme: themeFormatType, data: Record<string, boolean | string> | {}): any {
-    let content = data
-    if (!fs.existsSync(path.join(themeConfigPath, `${theme.themeName}.ini`))) {
-        content = { ...generateConfigTheme(theme), ...content }
-    } else {
-        content = { ...getThemeConfig(theme), ...content }
-    }
-    fs.writeFileSync(path.join(themeConfigPath, `${theme.themeName}.ini`), ini.stringify(content), "utf-8")
-}
-
-ipcMain.handle("getPluginConfig", (_, name: string, config: { [key: string]: any }) => getPluginConfig(name, config))
-ipcMain.handle("savePluginConfig", (_, name: string, config: { [key: string]: any }) => savePluginConfig(name, config))
-
-function getPluginConfig(name: string, config: { [key: string]: any }) {
-    if (!fs.existsSync(path.join(pluginsConfigPath, `${name}.ini`))) return generetaPluginConfig(name, config)
-    return ini.parse(fs.readFileSync(path.join(pluginsConfigPath, `${name}.ini`), "utf-8"))
-}
-
-function generetaPluginConfig(name: string, config: { [key: string]: any }) {
-    fs.writeFileSync(path.join(pluginsConfigPath, `${name}.ini`), ini.stringify(config), "utf-8")
-    return config
-}
-
-function savePluginConfig(name: string, config: { [key: string]: any }) {
-    fs.writeFileSync(path.join(pluginsConfigPath, `${name}.ini`), ini.stringify(config), "utf-8")
-}
-
-ipcMain.handle("installPluginUpdate", async (_, plugin: pluginRepoExpanded) => {
-    const resp = await advanceRequest(`${plugin.repoURL}${plugin.file}`)
-    if (!resp.success || !resp.text) return
-    fs.writeFileSync(path.join(animuPlugins, path.basename(plugin.file)), resp.text, "utf-8")
-})
-
-ipcMain.on("reload-window", () => {
-    BrowserWindow.getAllWindows()[0].reload();
-});
-
+// YT_DLP
 function pythonCheck() {
     return new Promise(resolve => {
         exec(`python3 --version`, error => {
@@ -476,7 +332,7 @@ async function downloadyt_dlp(data: Map<string, any>, name: string) {
     const resp = await advanceRequest(data["browser_download_url"])
     if (!resp.success) return
     fs.writeFileSync(path.join(app.getPath("userData"), "yt-dlp.json"), JSON.stringify(yt_dlp_releases_cache), "utf-8")
-    fs.writeFileSync(path.join(app.getPath("userData"), name), resp.buffer, "binary")
+    fs.writeFileSync(path.join(app.getPath("userData"), name), resp.buffer as any, "binary")
 }
 
 async function installyt_dlp(data: Map<string, any>) {
@@ -518,13 +374,13 @@ export async function runCheckYT_DLP() {
     }
 }
 
-ipcMain.handle("installyt-dlp", async (_, tag: string) => {
+ipcMain.handle("yt-dlp:install", async (_, tag: string) => {
     for (let index = 0; index < yt_dlp_releases_cache.length; index++) {
         const element = yt_dlp_releases_cache[index];
         if (element["tag_name"] == tag) await installyt_dlp(element)
     }
 })
-ipcMain.handle("getyt-dlp_releases", async () => {
+ipcMain.handle("yt-dlp:releases", async () => {
     if (yt_dlp_releases_cache.length <= 0) {
         const resp = await advanceRequest("https://api.github.com/repos/yt-dlp/yt-dlp/releases")
         if (!resp.success || !resp.json) {
@@ -539,7 +395,7 @@ ipcMain.handle("getyt-dlp_releases", async () => {
     return yt_dlp_releases_cache
 })
 
-ipcMain.handle("run_yt-dlp", async (_, url: string, commands?: string[]) => await getVideoInfo(url, commands))
+ipcMain.handle("yt-dlp:run", async (_, url: string, commands?: string[]) => await getVideoInfo(url, commands))
 
 async function CheckPathToYT_DLP(commands: string[]): Promise<[string, string[]]> {
     if (await pythonCheck() && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp"))) 
@@ -581,6 +437,7 @@ function getVideoInfo(url: string, commands: string[] = ["-j"]) {
         });
     });
 }
+/////////////////////
 
 const extensions = ["png", "jpg", "jpeg", "svg", "webp"];
 const mimeMap: Record<string, string> = {
@@ -604,76 +461,6 @@ ipcMain.handle("config:fetchAvatar", async () => {
   }
 
   return undefined
-});
-
-
-ipcMain.handle("playlist:save", async (_, playlist: string, data: playlistFormatData) => {
-    try {
-        const playlistPath = path.join(animuPlaylistPath, `${btoa(playlist)}.json`)
-        if (!fs.existsSync(playlistPath)) {
-            fs.writeFileSync(playlistPath, JSON.stringify([data]), "utf-8")
-            return true
-        }
-        const tmpPlaylist = JSON.parse(fs.readFileSync(playlistPath, "utf-8"))
-
-        fs.writeFileSync(playlistPath, JSON.stringify([...tmpPlaylist, data]), "utf-8")
-        return true
-    } catch (error) {
-        console.error("Failed Save Playlist", error)
-        return false
-    }
-});
-
-ipcMain.handle("playlist:update", async (_, playlist: string, data: playlistFormatData) => {
-    try {
-        const playlistPath = path.join(animuPlaylistPath, `${btoa(playlist)}.json`)
-        
-        if (!fs.existsSync(playlistPath)) return false
-        const tmpPlaylist: playlistFormatData[] = JSON.parse(fs.readFileSync(playlistPath, "utf-8"))
-
-        fs.writeFileSync(playlistPath, JSON.stringify([...tmpPlaylist.map((v) => v.anime.AnimeData.id == data.anime.AnimeData.id ? data : v)]), "utf-8")
-        return true
-    } catch (error) {
-        console.error("Failed Update Playlist", error)
-        return false
-    }
-});
-
-ipcMain.handle("playlist:delete", async (_, playlist: string, animeID: string) => {
-    try {
-        const playlistPath = path.join(animuPlaylistPath, `${btoa(playlist)}.json`)
-        if (!fs.existsSync(playlistPath)) return false
-        const tmpPlaylist: playlistFormatData[] = JSON.parse(fs.readFileSync(playlistPath, "utf-8"))
-
-        fs.writeFileSync(playlistPath, JSON.stringify([...tmpPlaylist.filter((v) => v.anime.AnimeData.id != animeID)]), "utf-8")
-        return true
-    } catch (error) {
-        console.error("Failed Delete Playlist", error)
-        return false
-    }
-});
-
-ipcMain.handle("playlist:deleteAll", async (_, playlist: string) => {
-    try {
-        const playlistPath = path.join(animuPlaylistPath, `${btoa(playlist)}.json`)
-        if (!fs.existsSync(playlistPath)) return true
-        fs.rmSync(playlistPath)
-        return true
-    } catch (error) {
-        console.error("Failed Everything From Playlist", error)
-        return false
-    }
-});
-
-ipcMain.handle("playlist:read", async (_, playlist: string) => {
-    try {
-        const playlistPath = path.join(animuPlaylistPath, `${btoa(playlist)}.json`)
-        if (!fs.existsSync(playlistPath)) return []
-        return JSON.parse(fs.readFileSync(playlistPath, "utf-8"))
-    } catch (error) {
-        console.error("Failed read Playlist", error)
-        return []
-    }
 });
 
 const toMB = (bytes) => bytes / 1024 / 1024;

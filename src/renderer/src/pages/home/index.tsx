@@ -109,7 +109,7 @@ const Home = () => {
     
     /* IFDEF DEBUG|PROD */
     if (config.General.discordRPC)
-      window.api.rpc.setActivity(undefined, t("discordrpc.home"));
+      window.api.rpc.setActivity({ state: t("discordrpc.home") });
     /* ENDIF */
   })
 

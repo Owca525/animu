@@ -805,11 +805,11 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         // Update RPC
         /* IFDEF DEBUG|PROD */
-        if (config.General.discordRPC) window.api.rpc.setActivity(t("discordrpc.player", { title: detectTitleConfig(anime_data.AnimeData.title), ep: temp.episode }), 
-            `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`, 
-            undefined,
-            `https://anilist.co/anime/${anime_data.AnimeData.id}`
-        )
+        if (config.General.discordRPC) window.api.rpc.setActivity({ 
+            details: t("discordrpc.player", { title: detectTitleConfig(anime_data.AnimeData.title), ep: temp.episode }),
+            state: `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`,
+            urlDetails: `https://anilist.co/anime/${anime_data.AnimeData.id}`
+        })
         /* ENDIF */
 
         if (!fatalError() && config.Player.general.AutoSkipEpisode && event.currentTarget.duration == event.currentTarget.currentTime) setEpisode("next")
