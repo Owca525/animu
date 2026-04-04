@@ -756,7 +756,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     function startChapterSkipTime() {
         if (IsRunningButtonSkipTime()) return
-        if (currentTime() <= 0 || durrationTime() <= 0) return
 
         setIsRunningButtonSkipTime(() => true)
 
@@ -817,6 +816,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         let player = currentPlayer()
 
         if (!player || !player!.listChapters) return
+        if (currentTime() <= 0 || durrationTime() <= 0) return
         player.listChapters.forEach(element => {
             let currentTime = event.currentTarget.currentTime
             if (element.start == 0 && element.end == 0) return
