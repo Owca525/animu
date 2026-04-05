@@ -246,6 +246,7 @@ export interface resolutionFormat {
     reqHeader?: { [key: string]: string },
     doNotUseBackend?: boolean
     defaultSubtitles?: boolean;
+    canBeDownloaded?: boolean
 }
 
 export interface externalPlayerFormat {

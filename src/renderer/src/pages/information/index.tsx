@@ -364,7 +364,8 @@ function information() {
                 hostname: `${firstPartTitle} ${item.musicTitle} ${item.variant ? item.variant : ""}`,
                 resolution: item.videos.map((item) => ({
                     res: item.resolution.toString(),
-                    url: item.url
+                    url: item.url,
+                    canBeDownloaded: true
                 }))
             } as MiniPlayerProps
         }))

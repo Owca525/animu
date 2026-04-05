@@ -124,6 +124,9 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
 
     // other
     const [currentSettings, setcurrentSettings] = createSignal<boolean>(false)
+    const [currentContextMenu, setCurrentContextMenu] = createSignal<ContextMenuProps>([
+        { option: t("contextMenu.nerdstats"), onClick: () => setshowNerdStats((prev) => !prev) },
+    ])
     const [showNerdStats, setshowNerdStats] = createSignal<boolean>(false)
     const [fatalError, setFatalError] = createSignal<boolean>(false)
     const [chapterList, setChapterList] = createSignal<{ left: number, width: number, name?: string, type: "opening" | "ending" | "other" }[]>([])
@@ -201,7 +204,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
                 },
             });
             if (getAudioOutput()) videoRef.setSinkId(getAudioOutput()!.deviceId)
-                
+
             videoJS.children_.forEach((v) => {
                 if (v["nodeName"] == "VIDEO") (v as HTMLVideoElement).classList.add("video-player")
             })
@@ -317,6 +320,16 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
             return
         }
 
+        if (data.canBeDownloaded) {
+            setCurrentContextMenu([
+                {
+                    option: "Download Video",
+                    onClick: () => downloadVideo(data.url)
+                },
+                ...unwrap(currentContextMenu())
+            ])
+        }
+
         if (videoJS) {
             videoJS.src({
                 src: data.url,
@@ -336,6 +349,13 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
             }
         }
         setNewSubtitles(data[0])
+    }
+
+    function downloadVideo(url: string) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = url;
+        link.click();
     }
 
     async function runNewPlayer(data: playerData) {
@@ -364,6 +384,16 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
             return await runHLS(currentRes, currentplayer.splitHLS)
         }
         if (hls) hls.destroy()
+
+        if (currentRes.canBeDownloaded) {
+            setCurrentContextMenu([
+                {
+                    option: "Download Video",
+                    onClick: () => downloadVideo(currentRes.url)
+                },
+                ...unwrap(currentContextMenu())
+            ])
+        }
 
         setListResolution(() => currentplayer.resolution)
         setCurrentResoltion(currentRes)
@@ -843,10 +873,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
         /* ENDIF */
     };
 
-    const centerContextMenu: ContextMenuProps = [
-        { option: t("contextMenu.nerdstats"), onClick: () => setshowNerdStats((prev) => !prev) },
-    ]
-
     function handleProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
         // if (!config.Player.general.showBrokenBuffer && !hls()) return
         const video = event.currentTarget;
@@ -896,7 +922,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
     }
 
     return (
-        <div class={isVisible() ? "player-video-container miniplayer" : "player-video-container miniplayer player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
+        <div class={isVisible() ? "player-video-container miniplayer" : "player-video-container miniplayer player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, currentContextMenu()), event)}>
             <div ref={screenshotWrapper} class={isVisible() ? "player-video-container" : "player-video-container player-hide-cursor"} >
                 <video
                     ref={videoRef}

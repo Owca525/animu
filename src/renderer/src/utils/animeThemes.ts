@@ -26,9 +26,6 @@ query ($id: [Int!]) {
             ... on Artist {
               name
             }
-            ... on Membership {
-              alias
-            }
           }
         }
       }
