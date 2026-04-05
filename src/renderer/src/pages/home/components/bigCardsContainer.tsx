@@ -28,7 +28,7 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
         /* ENDIF */
 
         handleUpdate()
-        window.addEventListener("resize", handleUpdate)
+        window.addEventListener("resize", restartAutoSlide)
         startAutoSlide();
         if (!divRef) return;
         divRef.addEventListener("scroll", handleScroll);
@@ -37,7 +37,7 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
     onCleanup(() => {
         divRef?.removeEventListener("scroll", handleScroll);
         stopAutoSlide()
-        window.removeEventListener("resize", handleUpdate)
+        window.removeEventListener("resize", restartAutoSlide)
     })
 
     function handleUpdate() {
@@ -104,6 +104,8 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
     };
 
     function restartAutoSlide() {
+        handleDotClick(currentIndex())
+        handleUpdate()
         stopAutoSlide();
         startAutoSlide();
     };
