@@ -102,5 +102,5 @@ ipcMain.handle('theme:listTheme', async (): Promise<themeFormatType[]> => {
     return [...localList, ...customList]
 });
 
-ipcMain.handle('theme:ConfigTheme', async (_event, theme: themeFormatType, data: Record<string, boolean | string>): Promise<void> => saveThemeConfig(theme, data))
-ipcMain.handle('theme:SaveConfig', async (_event, theme: themeFormatType): Promise<Record<string, string | boolean> | {}> => getThemeConfig(theme))
+ipcMain.handle('theme:SaveConfig', async (_event, theme: themeFormatType, data: Record<string, boolean | string>): Promise<void> => saveThemeConfig(theme, data))
+ipcMain.handle('theme:ConfigTheme', async (_event, theme: themeFormatType): Promise<Record<string, string | boolean> | {}> => getThemeConfig(theme))

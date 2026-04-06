@@ -18,6 +18,7 @@ import { useI18n } from "@renderer/utils/i18n";
 import { showCustomMenu } from "@renderer/utils/context/menuContext";
 import { animulistData } from "@renderer/utils/stores/global";
 import { addToAnimuList, removeFromAnimulist } from "@renderer/utils/FilesManager/animulist";
+import AnimulistMenu from "@renderer/components/animulistMenu";
 
 interface CardProps {
   card: cardData;
@@ -168,12 +169,10 @@ function Card(props: CardProps) {
     CenterContextMenu.push({
       option: "Add To AnimuList",
       onClick: () =>
-        showCustomMenu({
-          title: `Add ${detectTitleConfig(props.card.AnimeData.title)}`, animuList: {
+        showCustomMenu(AnimulistMenu({
             anime: unwrap(props.card.AnimeData),
             save: (animulist, anime) => addToAnimuList(animulist, anime, true)
-          }
-        }),
+          })),
     });
   }
 

@@ -53,6 +53,7 @@ import { updateHistoryData } from '@renderer/utils/FilesManager/history';
 import { addToAnimuList, removeFromAnimulist, updateDataInAnimulist } from '@renderer/utils/FilesManager/animulist';
 import OpeningPlayer from './components/openingPlayer';
 import { readPlaylist, removeInPlaylist, saveToPlaylist } from '@renderer/utils/FilesManager/playlist';
+import AnimulistMenu from '@renderer/components/animulistMenu';
 
 interface informationTmpProps {
     anime: AnimeData,
@@ -467,7 +468,7 @@ function information() {
 
     createShortcut(["Escape"], () => {
         if (!location.href.includes("#/info")) return
-        
+
         if (showWrong()) setshowWrong(() => false)
         else if (showImages()) setShowImages(false)
         else navigate("/")
@@ -625,21 +626,19 @@ function information() {
                             <Show when={tempData().anime.type == "ANIME"}>
                                 <Switch>
                                     <Match when={tempData().animulist == undefined}>
-                                        <Button titleButton={"Add To Animulist"} icon="add" ButtonClass="information-bar-icon" onClick={() => showCustomMenu({
-                                            title: `Add ${detectTitleConfig(tempData().anime.title)}`, animuList: {
-                                                anime: unwrap(tempData().anime),
-                                                save: (animulist, anime) => { modifySaveAnimuList(animulist, anime) }
-                                            }
-                                        })} />
+                                        <Button titleButton={"Add To Animulist"} icon="add" ButtonClass="information-bar-icon" onClick={() => showCustomMenu(AnimulistMenu({
+                                            anime: unwrap(tempData().anime),
+                                            animulist: tempData().animulist,
+                                            save: (animulist, anime) => { modifySaveAnimuList(animulist, anime, true) }
+                                        }))} />
                                     </Match>
                                     <Match when={tempData().animulist}>
-                                        <Button titleButton={"Edit Anime"} icon="edit" ButtonClass="information-bar-icon" onClick={() => showCustomMenu({
-                                            title: `Edit ${detectTitleConfig(tempData().anime.title)}`, animuList: {
-                                                anime: unwrap(tempData().anime),
-                                                animulist: tempData().animulist,
-                                                save: (animulist, anime) => { modifySaveAnimuList(animulist, anime, true) }
-                                            }
-                                        })} />
+                                        <Button titleButton={"Edit Anime"} icon="edit" ButtonClass="information-bar-icon" onClick={() => showCustomMenu(AnimulistMenu({
+                                            anime: unwrap(tempData().anime),
+                                            animulist: tempData().animulist,
+                                            save: (animulist, anime) => { modifySaveAnimuList(animulist, anime, true) }
+                                        }
+                                        ))} />
                                         <Button titleButton={"Remove From Animulist"} icon="delete" ButtonClass="information-bar-icon" onClick={() => {
                                             removeFromAnimulist(tempData().anime.id, true);
                                             setTmpData((p) => ({ ...p, animulist: undefined }))
@@ -670,7 +669,7 @@ function information() {
                                                     added: dateToUnix(new Date().toString()),
                                                     lastupdate: dateToUnix(new Date().toString())
                                                 })
-                                                if (!resp) return toast("Failed Add Anime to Waiting Playlist",  { type: "error" })
+                                                if (!resp) return toast("Failed Add Anime to Waiting Playlist", { type: "error" })
                                                 else {
                                                     setiswaitingplaylist(true)
                                                     toast("Succesfully added to waiting playlist", { type: "success" })
@@ -681,7 +680,7 @@ function information() {
                                             <Button titleButton={"Remove From Waiting Playlist"} icon="playlist_remove" ButtonClass="information-bar-icon" onClick={async (): Promise<any> => {
                                                 const tmp = unwrap(tempData())
                                                 const resp = await removeInPlaylist("global.waitingplaylist", tmp.anime.id)
-                                                if (!resp) return toast("Failed Remove Anime to Waiting Playlist",  { type: "error" })
+                                                if (!resp) return toast("Failed Remove Anime to Waiting Playlist", { type: "error" })
                                                 else {
                                                     setiswaitingplaylist(false)
                                                     toast("Succesfully Removed Anime from waiting playlist", { type: "success" })

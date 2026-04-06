@@ -62,6 +62,7 @@ import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/ut
 import SettingsPlugin from './components/settingsPlugin';
 import semver from "semver";
 import { OvewriteAnimuList } from '@renderer/utils/FilesManager/animulist';
+import OtherSettings from './components/otherSettings';
 
 export type pluginRepoExpandedSettings = {
     name: string,
@@ -369,7 +370,8 @@ function settings() {
 
     async function openThemeOption(theme: themeMetadata) {
         const themeConfig = await window.api.themes.config(unwrap(theme))
-        showCustomMenu({
+
+        showCustomMenu(OtherSettings({
             title: t("settings.extensions.conf", { title: theme.themeName }),
             themeConfig: {
                 theme: theme,
@@ -384,7 +386,7 @@ function settings() {
                     if (finded.find((v) => v == theme.themeName)) updateTheme(theme)
                 },
             }
-        })
+        }))
     }
 
     function setActivePlugin(active: boolean, plugin: playerPluginFormat) {
@@ -407,13 +409,13 @@ function settings() {
 
     function openPluginSettings(plugin: playerPluginFormat | informationPluginFormat) {
         if (!plugin.config) return
-        showCustomMenu({
+        showCustomMenu(OtherSettings({
             title: t("settings.extensions.conf", { title: plugin.metadata.name }),
             pluginConfig: {
                 config: plugin.config,
                 onChange: (v, a) => savePluginSettings(plugin.config as any, v, a, plugin)
             }
-        })
+        }))
     }
 
     function savePluginSettings(config: { [key: string]: any }, variable: string, change: any, plugin: playerPluginFormat | informationPluginFormat) {
@@ -681,10 +683,12 @@ function settings() {
                             <div class="settings-helpicon-space">
                                 <Dropdown
                                     options={audioOutput().map(element => {
-                                        return { label: element.label, onClick: () => {
-                                            handleChange('General.audioOutput', element.label)
-                                            setAudioOutput(element)
-                                        } }
+                                        return {
+                                            label: element.label, onClick: () => {
+                                                handleChange('General.audioOutput', element.label)
+                                                setAudioOutput(element)
+                                            }
+                                        }
                                     })}
                                     buttonText={config().new.General.audioOutput}
                                     placeholderChange={() => config().new.General.audioOutput}
