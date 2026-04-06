@@ -1298,6 +1298,14 @@ function settings() {
                             {t("settings.player.keybinds.screenshot2")}
                             <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.noSubbtitlesreenshot)} keyBind={(keys) => handleChange("Player.keybinds.noSubbtitlesreenshot", keys)} />
                         </div>
+                        <div class="settings-setting-container">
+                            {t("Start Record Clip")}
+                            <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.startRecordClip)} keyBind={(keys) => handleChange("Player.keybinds.startRecordClip", keys)} />
+                        </div>
+                        <div class="settings-setting-container">
+                            {t("Stop Record Clip")}
+                            <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.stopRecordClip)} keyBind={(keys) => handleChange("Player.keybinds.stopRecordClip", keys)} />
+                        </div>
                     </div>
                 </Show>
                 <Show when={category() == "files"}>

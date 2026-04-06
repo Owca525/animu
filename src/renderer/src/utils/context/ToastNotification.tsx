@@ -42,7 +42,7 @@ export function ToastProvider(props: { children: JSX.Element }) {
         const id = uuidv4();
         let duration = options.duration;
         let timer: NodeJS.Timeout | undefined
-        if (!options.timer) {
+        if (options.timer == false) {
             timer = setTimeout(() => {
                 removeToast(id)
             }, duration);
@@ -58,7 +58,7 @@ export function ToastProvider(props: { children: JSX.Element }) {
             clearInterval(tost.timer)
             let timer: NodeJS.Timeout | undefined
 
-            if (!options?.timer) {
+            if (options?.timer == false) {
                 timer = setTimeout(() => {
                     removeToast(id)
                 }, options?.duration ? options.duration : defaultOptions.duration);

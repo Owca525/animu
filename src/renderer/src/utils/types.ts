@@ -496,6 +496,8 @@ export interface SettingsConfig {
             toggleSubtitles: string
             skipOpeningEnding: string
             noSubbtitlesreenshot: string
+            startRecordClip: string,
+            stopRecordClip: string
         }
     }
     History: {

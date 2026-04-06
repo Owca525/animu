@@ -147,6 +147,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     // ScreenShot
     const [screenShot, setScreenShot] = createSignal<{ active: boolean, image: string, click: string }>({ active: false, image: "", click: "" });
 
+    // Clip Notitication
+    const [clipToastID, setClipToastID] = createSignal<string | undefined>(undefined);
+
     // const gamepad = useGamepad(0, gamepadControler);
     if (getSocket()) {
         const socket = getSocket()
@@ -159,6 +162,68 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 clearInterval(refreashUpdateSocket)
             }
         })
+    }
+
+    let mediaRecorderInstance: MediaRecorder | undefined;
+    let videoChunks: Blob[] = [];
+
+    function startRecordClip() {
+        if (!videoRef) return
+        if (!videoRef["captureStream"]) return
+        if (mediaRecorderInstance) return
+
+        const stream = (videoRef as any).captureStream();
+        setClipToastID(toast("Clip Is Recording", { type: "loading", click: true, timer: true }))
+
+        mediaRecorderInstance = new MediaRecorder(stream);
+
+        mediaRecorderInstance.ondataavailable = (event) => videoChunks.push(event.data);
+
+        mediaRecorderInstance.onstop = () => {
+            const blob = new Blob(videoChunks, { type: "video/webm" });
+            const url = URL.createObjectURL(blob);
+
+            removeToast(clipToastID()!)
+
+            if (isPlaying()) togglePlay(true)
+
+            const currentDate = new Date()
+
+            const [year, month, day, hour, minute, second] = [
+                currentDate.getFullYear(),
+                currentDate.getMonth() + 1,
+                currentDate.getDate(),
+                currentDate.getHours(),
+                currentDate.getMinutes(),
+                currentDate.getSeconds(),
+            ].map(v => String(v).padStart(2, "0"));
+
+            const formatedDate = `-${year}-${month}-${day}-${hour}-${minute}-${second}`;
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `clip${formatedDate}.webm`;
+            a.click();
+        };
+
+        if (isPlaying() == false) togglePlay(true)
+        mediaRecorderInstance.start();
+    }
+
+    function stopRecordClip() {
+        if (!mediaRecorderInstance) return
+        mediaRecorderInstance.stop();
+    }
+
+    function pauseClip() {
+        if (!mediaRecorderInstance) return
+        if (mediaRecorderInstance.state == "recording") {
+            mediaRecorderInstance.pause();
+            updateToast(clipToastID()!, "Clip is Paused", { type: "warning", timer: true, click: true })
+        } else if (mediaRecorderInstance.state == "paused") {
+            mediaRecorderInstance.resume();
+            updateToast(clipToastID()!, "Clip Is Recording", { type: "loading", click: true, timer: true })
+        }
     }
 
     function handleMouseMove() {
@@ -201,7 +266,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 },
             });
             if (getAudioOutput()) videoRef.setSinkId(getAudioOutput()!.deviceId)
-                
+
             videoJS.children_.forEach((v) => {
                 if (v["nodeName"] == "VIDEO") (v as HTMLVideoElement).classList.add("video-player")
             })
@@ -644,6 +709,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 moreInformationTimer = setTimeout(() => {
                     setShowingMoreInformation(true)
                 }, 4000)
+                pauseClip()
                 return false
             }
             clearInterval(moreInformationTimer)
@@ -651,6 +717,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             video.play().catch((reason) => {
                 console.warn("Video Play Error Catch", reason)
             })
+            pauseClip()
             return true
         })
 
@@ -804,7 +871,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         // Update RPC
         /* IFDEF DEBUG|PROD */
-        if (config.General.discordRPC) window.api.rpc.setActivity({ 
+        if (config.General.discordRPC) window.api.rpc.setActivity({
             details: t("discordrpc.player", { title: detectTitleConfig(anime_data.AnimeData.title), ep: temp.episode }),
             state: `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`,
             urlDetails: `https://anilist.co/anime/${anime_data.AnimeData.id}`
@@ -1111,6 +1178,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 if (currentSkipButton().type == "opening") setIsDisableButtonSkipTimerOpening(true)
                 setTimeVideo(currentSkipButton().time)
                 clearChapterSkipTime()
+                break
+            case convertKeybinds(config.Player.keybinds.startRecordClip.toLowerCase()).toLowerCase():
+                startRecordClip()
+                break
+            case convertKeybinds(config.Player.keybinds.stopRecordClip.toLowerCase()).toLowerCase():
+                stopRecordClip()
                 break
         }
     }

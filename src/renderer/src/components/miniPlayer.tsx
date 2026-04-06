@@ -37,7 +37,7 @@ import { VTTstoryBoardParser } from '@renderer/pages/player/playerUtils';
 import { getConfig } from '@renderer/utils/stores/config';
 import { getAudioOutput, getSocket, getSocketRoom } from '@renderer/utils/stores/global';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
-import { removeToast, toast } from '@renderer/utils/context/ToastNotification';
+import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
 import { saveConfig } from '@renderer/utils/FilesManager/config';
 import { unwrap } from 'solid-js/store';
 import { useI18n } from '@renderer/utils/i18n';
@@ -69,7 +69,7 @@ export interface socketPlayerInit {
     temp: { episode: string, type: string, episodes: { ep: string, img?: string, title?: string }[] }
 }
 
-function MiniPlayer(props: { props: MiniPlayerProps[] }) {
+function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean }) {
     const config: SettingsConfig = getConfig();
     const { t, currentLang } = useI18n()
 
@@ -149,6 +149,9 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
     // ScreenShot
     const [screenShot, setScreenShot] = createSignal<{ active: boolean, image: string, click: string }>({ active: false, image: "", click: "" });
 
+    // Clip Notitication
+    const [clipToastID, setClipToastID] = createSignal<string | undefined>(undefined);
+
     // const gamepad = useGamepad(0, gamepadControler);
     if (getSocket()) {
         const socket = getSocket()
@@ -173,6 +176,69 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
             }, 2000)
         }
     }
+
+    let mediaRecorderInstance: MediaRecorder | undefined;
+    let videoChunks: Blob[] = [];
+
+    function startRecordClip() {
+        if (!videoRef) return
+        if (!videoRef["captureStream"]) return
+        if (mediaRecorderInstance) return
+
+        const stream = (videoRef as any).captureStream();
+        setClipToastID(toast("Clip Is Recording", { type: "loading", click: true, timer: true }))
+
+        mediaRecorderInstance = new MediaRecorder(stream);
+
+        mediaRecorderInstance.ondataavailable = (event) => videoChunks.push(event.data);
+
+        mediaRecorderInstance.onstop = () => {
+            const blob = new Blob(videoChunks, { type: "video/webm" });
+            const url = URL.createObjectURL(blob);
+
+            removeToast(clipToastID()!)
+
+            if (isPlaying()) togglePlay(true)
+
+            const currentDate = new Date()
+
+            const [year, month, day, hour, minute, second] = [
+                currentDate.getFullYear(),
+                currentDate.getMonth() + 1,
+                currentDate.getDate(),
+                currentDate.getHours(),
+                currentDate.getMinutes(),
+                currentDate.getSeconds(),
+            ].map(v => String(v).padStart(2, "0"));
+
+            const formatedDate = `-${year}-${month}-${day}-${hour}-${minute}-${second}`;
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `clip${formatedDate}.webm`;
+            a.click();
+        };
+
+        if (isPlaying() == false) togglePlay(true)
+        mediaRecorderInstance.start();
+    }
+
+    function stopRecordClip() {
+        if (!mediaRecorderInstance) return
+        mediaRecorderInstance.stop();
+    }
+
+    function pauseClip() {
+        if (!mediaRecorderInstance) return
+        if (mediaRecorderInstance.state == "recording") {
+            mediaRecorderInstance.pause();
+            updateToast(clipToastID()!, "Clip is Paused", { type: "warning", timer: true, click: true })
+        } else if (mediaRecorderInstance.state == "paused") {
+            mediaRecorderInstance.resume();
+            updateToast(clipToastID()!, "Clip Is Recording", { type: "loading", click: true, timer: true })
+        }
+    }
+
 
     onMount(() => {
         let defaulthost = playerData()[0]
@@ -536,11 +602,13 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
         setIsPlaying(prev => {
             if (prev) {
                 video.pause()
+                pauseClip()
                 return false
             }
             video.play().catch((reason) => {
                 console.warn("Video Play Error Catch", reason)
             })
+            pauseClip()
             return true
         })
 
@@ -781,6 +849,12 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
             case convertKeybinds(config.Player.keybinds.toggleSubtitles.toLowerCase()).toLowerCase():
                 toggleSubtitles()
                 break
+            case convertKeybinds(config.Player.keybinds.startRecordClip.toLowerCase()).toLowerCase():
+                startRecordClip()
+                break
+            case convertKeybinds(config.Player.keybinds.stopRecordClip.toLowerCase()).toLowerCase():
+                stopRecordClip()
+                break
         }
     }
 
@@ -1014,38 +1088,40 @@ function MiniPlayer(props: { props: MiniPlayerProps[] }) {
                                 <SeekBar currentValue={volume()} maxValue={100} onSeek={value => handleVolume(value)} classes={{ "container": "player-seekbar" }} type="procent" />
                             </div>
 
-                            <Show when={currentASSubtitles == undefined}>
-                                <PlayerButton icon={"picture_in_picture"} onClick={handlePictureInPicture} title={detectDisableTooltips(t("settings.player.keybinds.pip"))} ButtonClass="player-buttons" />
-                            </Show>
+                            <Show when={!props.disableSettings}>
+                                <Show when={currentASSubtitles == undefined}>
+                                    <PlayerButton icon={"picture_in_picture"} onClick={handlePictureInPicture} title={detectDisableTooltips(t("settings.player.keybinds.pip"))} ButtonClass="player-buttons" />
+                                </Show>
 
-                            <PlayerSettings
-                                isDubbingOn={false}
-                                state={currentSettings()}
-                                turnDubbing={() => ""}
-                                resDubbing={false}
-                                sources={
-                                    playerData().map((val) => { return { name: val.hostname, change: () => runNewPlayer(playerData()[playerData().findIndex((item) => item.hostname === val.hostname)]) } })
-                                }
-                                resolution={
-                                    ListResolution().map((val) => { return { res: val.res, change: () => setNewResolution(val) } })
-                                }
-                                speed={speed.map((val) => { return { speed: parseFloat(val), change: () => setSpeed(val) } })}
-                                subtitles={
-                                    ListSubtitles().map((val) => { return { sub: val.label, change: () => setNewSubtitles(val) } })
-                                }
-                                audioTrack={
-                                    audioTrackList().map((val) => { return { track: val.label, change: () => changeAudioTrack(val) } })
-                                }
-                                disableSettings={() => setcurrentSettings(() => false)}
-                                current={{
-                                    currentHost: currentPlayer() ? currentPlayer()!.hostname : t("player.other.unknown"),
-                                    currentResolution: currentResolution() ? currentResolution()!.res : t("player.other.unknown"),
-                                    currentSpeed: videoRef?.playbackRate ? videoRef?.playbackRate : 1,
-                                    currentSub: currentSubtitles() ? currentSubtitles()!.label : t("player.other.off"),
-                                    currentTrack: currentAudioTrack() ? currentAudioTrack()!.label : t("player.other.default")
-                                }}
-                            />
-                            <PlayerButton icon="settings" ButtonClass="player-buttons" title={detectDisableTooltips(t('global.settings'))} onClick={() => { setcurrentSettings((prev) => !prev); setShowSelectEpisode(() => false) }} />
+                                <PlayerSettings
+                                    isDubbingOn={false}
+                                    state={currentSettings()}
+                                    turnDubbing={() => ""}
+                                    resDubbing={false}
+                                    sources={
+                                        playerData().map((val) => { return { name: val.hostname, change: () => runNewPlayer(playerData()[playerData().findIndex((item) => item.hostname === val.hostname)]) } })
+                                    }
+                                    resolution={
+                                        ListResolution().map((val) => { return { res: val.res, change: () => setNewResolution(val) } })
+                                    }
+                                    speed={speed.map((val) => { return { speed: parseFloat(val), change: () => setSpeed(val) } })}
+                                    subtitles={
+                                        ListSubtitles().map((val) => { return { sub: val.label, change: () => setNewSubtitles(val) } })
+                                    }
+                                    audioTrack={
+                                        audioTrackList().map((val) => { return { track: val.label, change: () => changeAudioTrack(val) } })
+                                    }
+                                    disableSettings={() => setcurrentSettings(() => false)}
+                                    current={{
+                                        currentHost: currentPlayer() ? currentPlayer()!.hostname : t("player.other.unknown"),
+                                        currentResolution: currentResolution() ? currentResolution()!.res : t("player.other.unknown"),
+                                        currentSpeed: videoRef?.playbackRate ? videoRef?.playbackRate : 1,
+                                        currentSub: currentSubtitles() ? currentSubtitles()!.label : t("player.other.off"),
+                                        currentTrack: currentAudioTrack() ? currentAudioTrack()!.label : t("player.other.default")
+                                    }}
+                                />
+                                <PlayerButton icon="settings" ButtonClass="player-buttons" title={detectDisableTooltips(t('global.settings'))} onClick={() => { setcurrentSettings((prev) => !prev); setShowSelectEpisode(() => false) }} />
+                            </Show>
                             <PlayerButton icon={isFullscreen() ? 'fullscreen_exit' : 'fullscreen'} ButtonClass="player-buttons" title={detectDisableTooltips(t('player.fullscreen'))} onClick={async () => await enterFullscreen()} />
                         </div>
                     </div>

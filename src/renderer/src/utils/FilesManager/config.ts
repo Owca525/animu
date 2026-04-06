@@ -92,7 +92,9 @@ export const defaultConfigWeb: SettingsConfig = {
             PictureInPicture: "P",
             toggleSubtitles: "C",
             skipOpeningEnding: "S",
-            noSubbtitlesreenshot: "CTRL+f10"
+            noSubbtitlesreenshot: "CTRL+f10",
+            startRecordClip: "F7",
+            stopRecordClip: "F8"
         },
         ui: {
             DisableVolumeAnimation: false,
