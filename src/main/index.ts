@@ -38,6 +38,9 @@ export let config: SettingsConfig = defaultConfig
 let historyData: cardData[] = []
 const PROTOCOL = "animu"
 
+let customheader: Record<string, string | string[]> | undefined
+let isUserInPlayer: boolean = false
+
 crashReporter.start({
   productName: "animu",
   compress: true,
@@ -72,8 +75,13 @@ function createWindow(): void {
     title: title
   })
 
-  mainWindow.webContents.on('will-navigate', (event) => {
+  mainWindow.webContents.on("did-navigate-in-page", (event, url) => {
     event.preventDefault();
+    if (url.includes("#/player")) {
+      isUserInPlayer = true
+    } else {
+      isUserInPlayer = false
+    }
   });
 
   mainWindow.on("focus", () => {
@@ -102,9 +110,19 @@ function createWindow(): void {
   }
 
   session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
-    details.requestHeaders['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/143.0';
-    details.requestHeaders['Referer'] = 'http://localhost:5173/';
-    callback({ requestHeaders: details.requestHeaders });
+    let newHeader = {
+      ...details.requestHeaders,
+      "Referer": "http://localhost:5173/",
+      "User-Agent": config.backend.useragent
+    }
+    if (isUserInPlayer) {
+      newHeader = {
+        ...newHeader,
+        ...customheader
+      }
+    }
+    
+    callback({ requestHeaders: newHeader });
   });
 
   if (process.env.NODE_ENV === 'development') {
@@ -328,3 +346,5 @@ ipcMain.handle('backend:refresh', () => initialBackend());
 
 ipcMain.handle('backend:config', () => config);
 ipcMain.handle('backend:history', () => historyData);
+
+ipcMain.handle('backend:customheader', (_, header: Record<string, string | string[]> | undefined) => customheader = header);

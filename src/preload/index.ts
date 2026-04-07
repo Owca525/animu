@@ -86,6 +86,7 @@ if (process.contextIsolated) {
       //   invoke: (channel: string, ...args: any[]): Promise<any> =>
       //     ipcRenderer.invoke(channel, ...args),
       // },
+      changeHeader: (v) => ipcRenderer.invoke("backend:customheader", v),
       version: () => ipcRenderer.invoke("backend:version"),
       refresh: () => ipcRenderer.invoke("backend:refresh"),
       debug: () => ipcRenderer.invoke("debug:memory")

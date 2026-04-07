@@ -140,6 +140,10 @@ export interface SettingsConfig {
         useSocket: boolean,
         backend: string
     }
+    backend: {
+        useragent: string
+        discordrpcTime: number
+    }
 }
 
 export interface AnimeData {
@@ -351,6 +355,10 @@ export const defaultConfig: SettingsConfig = {
     socket: {
         useSocket: false,
         backend: ""
+    },
+    backend: {
+        useragent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/143.0",
+        discordrpcTime: -1
     }
 };
 

@@ -89,6 +89,7 @@ declare global {
       // ipcRenderer: {
       //   invoke(channel: string, ...args: any[]): Promise<any>;
       // };
+      changeHeader: (header: Record<string, string | string[]> | undefined) => Promise<void>
       version: () => Promise<string>;
       refresh: () => Promise<void>
       debug: () => Promise<{ rss: number, heapUsed: number, heapTotal: number }>

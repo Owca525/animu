@@ -7,14 +7,14 @@ import { advanceRequest } from './request';
 import {
     config,
     newConfigPath,
-    } from '.';
+} from '.';
 import {
     app,
     clipboard,
     ipcMain,
     nativeImage,
     shell
-    } from 'electron';
+} from 'electron';
 import { Client } from '@xhayper/discord-rpc';
 import { exec, execSync, spawn } from 'child_process';
 
@@ -36,6 +36,10 @@ if (process.env.NODE_ENV != 'development') {
 // Change activity in Discord Rich presence
 ipcMain.handle('discordrpc:activity', (_event, { details, state, time, urlDetails }: { details?: string, state?: string, time?: Date, urlDetails?: string }) => {
     if (!rpc) return
+
+    if (config.backend.discordrpcTime >= 0) {
+        time = new Date(unixToDateTime(config.backend.discordrpcTime));
+    }
 
     rpc.user?.setActivity({
         largeImageUrl: "https://github.com/Owca525/animu?tab=readme-ov-file#animu",
@@ -191,9 +195,16 @@ export async function takeFileExtensionAndPath(dir: string, format: string): Pro
 // Setup Discord Rich presence
 export function setupDiscordRPC(): void {
     if (!rpc) return
+
+    let time: Date | undefined;
+
+    if (config.backend.discordrpcTime >= 0) {
+        time = new Date(unixToDateTime(config.backend.discordrpcTime));
+    }
+
     rpc.on('ready', () => {
         rpc.user?.setActivity({
-            startTimestamp: runTime,
+            startTimestamp: time ? time : runTime,
             largeImageKey: "animu",
             type: ActivityType.Watching
         });
@@ -357,7 +368,7 @@ export async function runCheckYT_DLP() {
     }
 
     if (await checkExistyt_dlp() && updated == false) return
-    
+
     if (config.yt_dlp.replaceAll(" ", "").length <= 0) {
         yt_dlp_releases_cache = lastest.json
         await installyt_dlp(lastest.json)
@@ -398,12 +409,12 @@ ipcMain.handle("yt-dlp:releases", async () => {
 ipcMain.handle("yt-dlp:run", async (_, url: string, commands?: string[]) => await getVideoInfo(url, commands))
 
 async function CheckPathToYT_DLP(commands: string[]): Promise<[string, string[]]> {
-    if (await pythonCheck() && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp"))) 
+    if (await pythonCheck() && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp")))
         return ["/usr/bin/python3", [path.join(app.getPath("userData"), "yt-dlp"), ...commands]]
 
-    if (process.platform == "win32" && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp.exe"))) 
+    if (process.platform == "win32" && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp.exe")))
         return [path.join(app.getPath("userData"), "yt-dlp.exe"), commands]
-    if (process.platform == "linux" && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp_linux"))) 
+    if (process.platform == "linux" && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp_linux")))
         return [path.join(app.getPath("userData"), "yt-dlp_linux"), commands]
 
     return ["/usr/bin/python3", [path.join(app.getPath("userData"), "yt-dlp"), ...commands]]
@@ -441,35 +452,50 @@ function getVideoInfo(url: string, commands: string[] = ["-j"]) {
 
 const extensions = ["png", "jpg", "jpeg", "svg", "webp"];
 const mimeMap: Record<string, string> = {
-  png: "image/png",
-  jpg: "image/jpeg",
-  jpeg: "image/jpeg",
-  svg: "image/svg+xml",
-  webp: "image/webp"
+    png: "image/png",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    svg: "image/svg+xml",
+    webp: "image/webp"
 };
 
 ipcMain.handle("config:fetchAvatar", async () => {
-  for (const ext of extensions) {
-    const file = path.join(newConfigPath, `avatar.${ext}`);
-    if (fs.existsSync(file)) {
-        const buffer = fs.readFileSync(file);
-        return {
-            mime: mimeMap[ext],
-            data: buffer.toString("base64")
-        };
+    for (const ext of extensions) {
+        const file = path.join(newConfigPath, `avatar.${ext}`);
+        if (fs.existsSync(file)) {
+            const buffer = fs.readFileSync(file);
+            return {
+                mime: mimeMap[ext],
+                data: buffer.toString("base64")
+            };
+        }
     }
-  }
 
-  return undefined
+    return undefined
 });
 
 const toMB = (bytes) => bytes / 1024 / 1024;
 
 ipcMain.handle("debug:memory", async (_) => {
-  const mem = process.memoryUsage();
-  return {
-    rss: toMB(mem.rss),
-    heapUsed: toMB(mem.heapUsed),
-    heapTotal: toMB(mem.heapTotal)
-  }
+    const mem = process.memoryUsage();
+    return {
+        rss: toMB(mem.rss),
+        heapUsed: toMB(mem.heapUsed),
+        heapTotal: toMB(mem.heapTotal)
+    }
 });
+
+export function unixToDateTime(unixTimestamp: number | undefined): string {
+    if (!unixTimestamp || unixTimestamp == 0) return new Date().toString()
+    const date = new Date(unixTimestamp * 1000);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}

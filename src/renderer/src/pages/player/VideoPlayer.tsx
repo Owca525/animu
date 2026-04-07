@@ -1,4 +1,4 @@
-import Hls from "hls.js"
+import Hls, { HlsConfig } from "hls.js"
 
 import { AnimeData, animulistProps, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
 import { convertKeybinds, convertSecondsToHoursFormat, CreateContextMenuOptions, dateToUnix, decodeHtmlEntities, detectTitle, detectTitleConfig, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObject } from "@renderer/utils/functions"
@@ -250,6 +250,48 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }
 
         if (videoRef) {
+            // TODO: If you have time check why videojs first put m3u8 to video element after that put to HLS plugin
+            // const ajsdbfgkljsadfbjkln = Object.assign(
+            //     function (options: any, callback: any) {
+            //         const controller = new AbortController();
+
+            //         request(options.uri, {
+            //             method: options.method || "GET",
+            //             headers: {
+            //                 ...options.headers,
+            //                 ...currentResolution() && currentResolution()!["reqHeader"] ? currentResolution()!["reqHeader"] : {}
+            //             },
+            //         })
+            //             .then(async (res) => {
+            //                 console.log(res)
+            //                 if (!res.success) throw new Error("Fetch failed: " + res.status);
+            //                 callback(null, { 
+            //                     body: res.json ? res.json : res.text,
+            //                     statusCode: res.status,
+            //                     method: options.method,
+            //                     headers: res.responseHeader,
+            //                     url: options.uri,
+            //                     rawRequest: {
+            //                         readyState: 1,
+            //                         response: res.buffer,
+            //                         responseText: res.text,
+            //                         responseType: res.json ? "json" : res.text ? "text" : "arraybuffer", //"" | "text" | "arraybuffer" | "blob" | "document" | "json"
+            //                         responseURL: options.uri,
+            //                         status: res.status,
+            //                         statusText: res.statusText,
+            //                         timeout: 100,
+            //                         withCredentials: false,
+            //                     }
+            //                  });
+            //             })
+            //             .catch((err) => callback(err, null));
+
+            //         return { abort: () => controller.abort() };
+            //     },
+            // )
+            // videojs.xhr = ajsdbfgkljsadfbjkln
+            // if (videojs["Vhs"]) (videojs as any).Vhs.xhr = ajsdbfgkljsadfbjkln;
+
             videoJS = videojs(videoRef, {
                 controls: false,
                 autoplay: true,
@@ -363,6 +405,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (vttSubRef) vttSubRef.remove()
         if (screenShotContainer) screenShotContainer.remove()
         if (refreashUpdateSocket) clearInterval(refreashUpdateSocket)
+        
+        /* IFDEF DEBUG|PROD */
+        await window.backend.changeHeader(undefined)
+        /* ENDIF */
 
         setCleanup(true)
         removeToast(currentExtractionRes().toast)
@@ -431,6 +477,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (data.defaultSubtitles) setDefaultSubtitles(ListSubtitles())
         else setNewSubtitles(ListSubtitles[0])
         setCurrentResoltion(data)
+
+        /* IFDEF DEBUG|PROD */
+        await window.backend.changeHeader(data["reqHeader"])
+        /* ENDIF */
 
         if (hls && data.hls) {
             if (data.url == "") hls.currentLevel = hls.levels.findIndex(level => level.height === parseInt(data.res));
@@ -512,53 +562,15 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             setCurrentResoltion(currentRes)
         }
 
-        // TODO: If you have time check why videojs first put m3u8 to video element after that put to HLS plugin
-        // const ajsdbfgkljsadfbjkln = Object.assign(
-        //     function (options: any, callback: any) {
-        //         const controller = new AbortController();
-
-        //         request(options.uri, {
-        //             method: options.method || "GET",
-        //             headers: {
-        //                 ...options.headers,
-        //                 ...currentRes.reqHeader
-        //             },
-        //         })
-        //             .then(async (res) => {
-        //                 console.log(res)
-        //                 if (!res.success) throw new Error("Fetch failed: " + res.status);
-        //                 callback(null, { response: res.buffer });
-        //             })
-        //             .catch((err) => callback(err, null));
-
-        //         return { abort: () => controller.abort() };
-        //     },
-        // )
-        // videojs.xhr = ajsdbfgkljsadfbjkln
-        // if (videojs["Vhs"]) (videojs as any).Vhs.xhr = ajsdbfgkljsadfbjkln;
+        /* IFDEF DEBUG|PROD */
+        await window.backend.changeHeader(currentRes.reqHeader);
+        /* ENDIF */
 
         if (currentRes.hls) {
-            //     videoJS = videojs(videoRef, {
-            //         controls: false,
-            //         autoplay: true,
-            //         preload: "auto",
-            //         bigPlayButton: false,
-            //         loadingSpinner: false,
-            //         posterImage: false,
-            //         errorDisplay: false,
-            //         html5: {
-            //             vhs: {
-            //                 withCredentials: false,
-            //                 overrideNative: true,
-            //             },
-            //         },
-            //         sources: [
-            //             {
-            //                 src: currentRes.url,
-            //                 type: "application/x-mpegURL",
-            //             },
-            //         ],
-            //     });
+            // videoJS?.src({
+            //     src: currentRes.url,
+            //     type: "application/x-mpegURL",
+            // })
             await runHLS(currentRes, currentplayer.splitHLS, tmpTime ? tmpTime : undefined)
             return
         }
@@ -585,38 +597,48 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     }
 
     async function runHLS(resolution: resolutionFormat, splitHls: boolean = false, initialTime?: number) {
-        const tmpHls = new Hls({
+        let configHLS: Partial<HlsConfig> = {
             maxBufferLength: 140,
             autoStartLoad: true,
             enableWorker: true,
             lowLatencyMode: false,
             backBufferLength: 90,
-            loader: class extends Hls.DefaultConfig.loader {
-                load(context: any, config: any, callbacks: any) {
-                    request(context.url, { method: "GET", headers: resolution.reqHeader }).then((data) => {
-                        let currentData: any = data.text
-                        if (!data.success) {
-                            console.warn("Context:", context, "Data:", data)
-                            callbacks.onError({ type: 'network', details: "Failed Request", fatal: true }, context)
-                            return
-                        }
-                        const now = performance.now()
-                        if (context.responseType == "arraybuffer") currentData = data.buffer
-                        callbacks.onSuccess({ data: currentData, url: context.url }, {
-                            loaded: data.buffer.byteLength,
-                            total: data.buffer.byteLength,
-                            abort: false,
-                            retry: config.maxRetry,
-                            chunkCount: 0,
-                            bwEstimate: 0,
-                            loading: { start: now - 10, first: now - 5, end: now },
-                            parsing: { start: now, end: now },
-                            buffering: { start: now, first: now, end: now }
-                        }, context);
-                    });
-                }
-            },
-        });
+        }
+
+        /* IFDEF WEB */
+        class sheepLoader extends Hls.DefaultConfig.loader {
+            load(context: any, config: any, callbacks: any) {
+                request(context.url, { method: "GET" }).then((data) => {
+                    let currentData: any = data.text
+                    if (!data.success) {
+                        console.warn("Context:", context, "Data:", data)
+                        callbacks.onError({ type: 'network', details: "Failed Request", fatal: true }, context)
+                        return
+                    }
+                    const now = performance.now()
+                    if (context.responseType == "arraybuffer") currentData = data.buffer
+                    callbacks.onSuccess({ data: currentData, url: context.url }, {
+                        loaded: data.buffer.byteLength,
+                        total: data.buffer.byteLength,
+                        abort: false,
+                        retry: config.maxRetry,
+                        chunkCount: 0,
+                        bwEstimate: 0,
+                        loading: { start: now - 10, first: now - 5, end: now },
+                        parsing: { start: now, end: now },
+                        buffering: { start: now, first: now, end: now }
+                    }, context);
+                });
+            }
+        }
+
+        configHLS = {
+            ...configHLS,
+            loader: sheepLoader,
+        }
+        /* ENDIF */
+
+        const tmpHls = new Hls(configHLS);
 
         hls = tmpHls
 

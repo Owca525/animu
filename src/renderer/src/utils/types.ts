@@ -532,6 +532,10 @@ export interface SettingsConfig {
         useSocket: boolean,
         backend: string
     }
+    backend: {
+        useragent: string
+        discordrpcTime: number
+    }
 }
 
 export interface dialogProps {
