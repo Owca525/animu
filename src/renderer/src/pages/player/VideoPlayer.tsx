@@ -18,9 +18,8 @@ import fallbackFontJASSUB from "jassub/dist/default.woff2?url";
 // import modernWasmUrl from 'jassub/dist/jassub-worker-modern.wasm?url'
 import { saveConfig } from "@renderer/utils/FilesManager/config"
 import { SaveHistory } from "@renderer/utils/FilesManager/history"
-import { Component, createSignal, For, onCleanup, onMount, Show } from "solid-js"
+import { Component, createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js"
 import { getConfig } from "@renderer/utils/stores/config"
-import { useKeyPress } from "@renderer/utils/hooks/useKeyPress"
 import DeveloperStats from "./components/developerStats"
 import NerdStats from "./components/nerdStats"
 import { unwrap } from "solid-js/store"
@@ -34,6 +33,7 @@ import { getAudioOutput, getSocket, getSocketRoom } from "@renderer/utils/stores
 import videojs from "video.js";
 // import "@videojs/http-streaming" 
 import Player from "video.js/dist/types/player"
+import { useKeyDownList } from "@solid-primitives/keyboard"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -1123,10 +1123,15 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     //     }
     // }
 
-    useKeyPress((keys: string) => {
-        if (keys == "CTRL+SHIFT+D") setshowNerdStats((prev) => !prev)
-        if (keys == "SHIFT+R" && currentPlayer()) runNewPlayer(currentPlayer()!)
-        keybinds(keys)
+    const keys = useKeyDownList();
+    createEffect(() => {
+        const tmp = keys()
+        if (tmp.length <= 0) return
+        const converted = tmp.map((v) => convertKeybinds(v)).join("+")
+
+        if (converted == "CTRL+SHIFT+D") setshowNerdStats((prev) => !prev)
+        if (converted == "SHIFT+R" && currentPlayer()) runNewPlayer(currentPlayer()!)
+        keybinds(converted)
     })
 
     function keybinds(event: string) {
