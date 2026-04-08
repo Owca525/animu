@@ -724,7 +724,7 @@ export function dateToUnix(dateStr: string): number {
 }
 
 export function unixToDateTime(unixTimestamp: number | undefined): string {
-    if (!unixTimestamp || unixTimestamp == 0) return t("player.other.unknown")
+    if (unixTimestamp == undefined) return t("player.other.unknown")
     const date = new Date(unixTimestamp * 1000);
 
     const year = date.getFullYear();

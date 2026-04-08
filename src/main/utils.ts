@@ -486,7 +486,7 @@ ipcMain.handle("debug:memory", async (_) => {
 });
 
 export function unixToDateTime(unixTimestamp: number | undefined): string {
-    if (!unixTimestamp || unixTimestamp == 0) return new Date().toString()
+    if (unixTimestamp == undefined) return new Date().toString()
     const date = new Date(unixTimestamp * 1000);
 
     const year = date.getFullYear();
