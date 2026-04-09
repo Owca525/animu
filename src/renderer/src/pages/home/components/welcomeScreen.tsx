@@ -1,65 +1,57 @@
 import "./css/welcomeScreen.css"
-import { t } from "i18next"
 import icon from "@resources/icon.png"
 import Button from "@renderer/components/buttons"
 import Dropdown from "@renderer/components/dropDown"
-import i18n from "@renderer/utils/i18n"
-import { SettingsConfig } from "@renderer/utils/types"
-import { useSelector } from "react-redux"
-import { useState } from "react"
+import { createSignal, Show } from "solid-js"
+import { useI18n } from "@renderer/utils/i18n"
+import { getConfig } from "@renderer/utils/stores/config"
 
-const WelcomeScreen: React.FC<{}> = () => {
-    // TODO: ADD WELCOME SCREEN
-    const config: SettingsConfig = useSelector((data: any) => data.config);
-    const [currentPage, setPage] = useState<"lang" | "plugins">("lang")
+export default function WelcomeScreen() {
+    const config = getConfig()
+    const [currentPage, setCurrentPage] = createSignal<number>(0)
+    const { t, changeLanguage, listLang } = useI18n()
 
     return (
-        <main tabIndex={-1} className="welcome-screen-void">
-            <div className="welcome-screen-content">
-                <div className="welcome-screen-header-container">
-                    <div className="welcome-screen-title">Welcome To Animu</div>
-                    <img src={icon} alt="animu icon" className="welcome-screen-main-icon" />
+        <main tabIndex={-1} class="welcome-screen-void">
+            <div class="welcome-screen-content">
+                <div class="welcome-screen-header-container">
+                    <div class="welcome-screen-title">Welcome To Animu</div>
+                    <img src={icon} alt="animu icon" class="welcome-screen-main-icon" />
                 </div>
-                <div className="welcome-screen-option-container">
-                    {currentPage == "lang" &&
-                        <>
-                            <div className="welcome-screen-option-description">Select language</div>
-                            <Dropdown
-                                options={Object.keys(i18n.store.data).map(element => {
-                                    return { label: t(`lang.${element}`), onClick: () => "" }
-                                })}
-                                buttonText={t(`lang.${config.General.language}`)}
-                                placeholderChange={() => t(`lang.${config.General.language}`)}
-                                disableX
-                            />
-                        </>
-                    }
-                    {currentPage == "plugins" &&
-                        <>
-                            <div className="welcome-screen-option-description">Select Plugin</div>
-                            <Dropdown
-                                options={Object.keys(i18n.store.data).map(element => {
-                                    return { label: t(`lang.${element}`), onClick: () => "" }
-                                })}
-                                buttonText={t(`lang.${config.General.language}`)}
-                                placeholderChange={() => t(`lang.${config.General.language}`)}
-                                disableX
-                            />
-                        </>
-                    }
+                <div class="welcome-screen-option-container">
+                    <Show when={currentPage() == 0}>
+                        <div class="welcome-screen-option-description">Select language</div>
+                        <Dropdown
+                            options={listLang().map(element => {
+                                return { label: t(`lang.${element}`) }
+                            })}
+                            buttonText={t(`lang.${config.General.language}`)}
+                            placeholderChange={() => t(`lang.${config.General.language}`)}
+                            disableX
+                        />
+                    </Show>
+                    <Show when={currentPage() == 1}>
+                        <div class="welcome-screen-option-description">Select Default Plugin</div>
+                        {/* <Dropdown
+                            options={Object.keys(i18n.store.data).map(element => {
+                                return { label: t(`lang.${element}`), onClick: () => "" }
+                            })}
+                            buttonText={t(`lang.${config.General.language}`)}
+                            placeholderChange={() => t(`lang.${config.General.language}`)}
+                            disableX
+                        /> */}
+                    </Show>
                 </div>
-                <div className="welcome-screen-button-container">
-                    {currentPage == "lang" &&
-                        <Button content="Skip" onClick={() => setPage(() => "plugins")} />
-                    }
-                    {currentPage == "plugins" &&
+                <div class="welcome-screen-button-container">
+                    {/* <Show when={}>
+                        <Button content="Skip" onClick={() => setCurrentPage(() => "plugins")} />
+                    </Show> */}
+                    <Show when={currentPage() == 1}>
                         <Button content="Exit" />
-                    }
-                    <Button content="Next" />
+                    </Show>
+                    <Button content="Next" onClick={() => setCurrentPage((v) => v + 1)} />
                 </div>
             </div>
         </main>
     )
 }
-
-export default WelcomeScreen
