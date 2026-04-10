@@ -33,7 +33,7 @@ import { getAudioOutput, getSocket, getSocketRoom } from "@renderer/utils/stores
 import videojs from "video.js";
 // import "@videojs/http-streaming" 
 import Player from "video.js/dist/types/player"
-import { useKeyDownList } from "@solid-primitives/keyboard"
+import { createShortcut, useKeyDownList } from "@solid-primitives/keyboard"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -1130,8 +1130,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         const converted = tmp.map((v) => convertKeybinds(v)).join("+")
 
         if (converted == "CTRL+SHIFT+D") setshowNerdStats((prev) => !prev)
-        if (converted == "SHIFT+R" && currentPlayer()) runNewPlayer(currentPlayer()!)
         keybinds(converted)
+    })
+
+    createShortcut(["Shift", "R"],() => {
+        if (currentPlayer())
+            runNewPlayer(currentPlayer()!)
     })
 
     function keybinds(event: string) {
