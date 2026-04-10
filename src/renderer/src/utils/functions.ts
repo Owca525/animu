@@ -330,10 +330,10 @@ export function timeToSeconds(time: string): number {
     return hours * 3600 + minutes * 60 + seconds;
 }
 
-export async function convertChaptersVTT(url: string): Promise<playerChapterList[]> {
-    let req = await fetch(url)
-    if (!req.ok) return []
-    let lines = (await req.text()).split("\n")
+export async function convertChaptersVTT(url: string, options?: { method?: "POST" | "GET"; headers?: { [key: string]: any }; body?: any }): Promise<playerChapterList[]> {
+    let req = await request(url, options)
+    if (!req.success) return []
+    let lines = req.text.split("\n")
 
     let finnalListChapters: playerChapterList[] = []
     for (let i = 0; i < lines.length; i++) {
