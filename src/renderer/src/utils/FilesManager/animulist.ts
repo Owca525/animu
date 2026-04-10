@@ -8,6 +8,7 @@ import { dateToUnix, detectTitleConfig, getHistory } from "../functions"
 
 export async function addToAnimuList(animulist: animulistProps, anime: AnimeData, notification: boolean = false) {
     if (getGlobalCache().incognito) return
+    if (anime.id == "") return
 
     /* IFDEF DEBUG|PROD */
     await window.api.animulist.add({ AnimeData: { ...unwrap(anime), nextAiringEpisode: undefined }, animulist: unwrap(animulist) })
@@ -26,6 +27,8 @@ export async function addToAnimuList(animulist: animulistProps, anime: AnimeData
 
 export async function removeFromAnimulist(id: string, notification: boolean = false) {
     if (getGlobalCache().incognito) return
+    if (id == "") return
+
     /* IFDEF DEBUG|PROD */
     await window.api.animulist.delete(unwrap(id))
     /* ENDIF */
@@ -41,6 +44,7 @@ export async function removeFromAnimulist(id: string, notification: boolean = fa
 
 export async function updateDataInAnimulist(id: string, anime: { AnimeData: AnimeData; animulist: animulistProps }, notification: boolean = false) {
     if (getGlobalCache().incognito) return
+    if (anime.AnimeData.id == "") return
 
     /* IFDEF DEBUG|PROD */
     await window.api.animulist.update(unwrap(id), unwrap(anime))

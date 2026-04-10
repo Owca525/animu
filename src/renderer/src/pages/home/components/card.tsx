@@ -102,8 +102,7 @@ function Card(props: CardProps) {
     }
 
     if (props.card.AnimeData.id === "") {
-      // np. extractInformation(props.card.AnimeData.player_ID)
-      return;
+      toast("This Anime Dosen't Have Anilist ID this may have make weird bugs", { type: "warning" })
     }
 
     const animulist = unwrap(animulistData())

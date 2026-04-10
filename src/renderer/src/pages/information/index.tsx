@@ -158,6 +158,8 @@ function information() {
     }
 
     async function checkAnimeFetching() {
+        if (tempData().anime.id == "") return
+
         const alwaysRequest = false // TODO: ADD NEW SETTINGS
 
         if (tempData().anime["nextAiringEpisode"]) return
@@ -220,10 +222,15 @@ function information() {
 
         if (descriptionRef && descriptionRef.scrollHeight > descriptionRef.clientHeight) setNeedMore(true)
 
-        if (tempData().anime.id == "") return
         let tempHistory = unwrap(getGlobalCache().history)
 
-        let history = tempHistory.filter((anime) => anime.AnimeData.id == tempData().anime.id)
+        let history: cardData[] = []
+        if (tempData().anime.id == "") {
+            history = tempHistory.filter((anime) => detectTitleConfig(anime.AnimeData.title) == detectTitleConfig(tempData().anime.title))
+        } else {
+            history = tempHistory.filter((anime) => anime.AnimeData.id == tempData().anime.id)
+        }
+
         if (history.length > 0) {
             let plugin: playerPluginFormat = pluginManager().changePlugin(history[0].saveData?.pluginName as string)
             if (plugin) if (plugin.metadata.name != history[0].saveData?.pluginName) setCurrentId(undefined)

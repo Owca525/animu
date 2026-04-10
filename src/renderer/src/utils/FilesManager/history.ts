@@ -1,7 +1,7 @@
 import { cardData } from '../types';
 import { CreateBackup } from '../backup';
 import { getGlobalCache, setGlobalHistory } from '../stores/global';
-import { refetchHistory } from '../functions';
+import { detectTitleConfig, refetchHistory } from '../functions';
 import { toast, updateToast } from '../context/ToastNotification';
 import { unwrap } from 'solid-js/store';
 import { searchInAnilist } from '@renderer/plugins/anilistApi';
@@ -16,7 +16,7 @@ export async function DeleteFromHistory(data: cardData) {
         let index = -1
         if (data.AnimeData.id == "") {
             index = historyCache.findIndex(
-                (item) => item.AnimeData.title.romaji === data.AnimeData.title.romaji
+                (item) => detectTitleConfig(item.AnimeData.title) === detectTitleConfig(data.AnimeData.title)
             );
         } else {
             index = historyCache.findIndex(
@@ -46,28 +46,50 @@ export async function DeleteFromHistory(data: cardData) {
 export async function updateHistoryData(id: string, data: cardData): Promise<boolean> {
     try {
         if (getGlobalCache().incognito) return true
-        let historyCache = unwrap(getGlobalCache().history).map((item) => {
-            if (id == item.AnimeData.id) return {
-                ...data,
-                saveData: {
-                    ...item.saveData,
-                    ...data.saveData
+        let historyCache: any[] = [];
+
+        if (id == "" || data.AnimeData.id == "") {
+            historyCache = unwrap(getGlobalCache().history).map((item) => {
+                if (detectTitleConfig(data.AnimeData.title) == detectTitleConfig(item.AnimeData.title)) return {
+                    ...data,
+                    saveData: {
+                        ...item.saveData,
+                        ...data.saveData
+                    }
                 }
-            }
-            return {
-                ...item,
-                AnimeData: {
-                    ...item.AnimeData,
-                    nextAiringEpisode: undefined,
-                    recommendations: undefined
-                },
-            }
-        });
+                return {
+                    ...item,
+                    AnimeData: {
+                        ...item.AnimeData,
+                        nextAiringEpisode: undefined,
+                        recommendations: undefined
+                    },
+                }
+            });
+        } else {
+            historyCache = unwrap(getGlobalCache().history).map((item) => {
+                if (id == item.AnimeData.id) return {
+                    ...data,
+                    saveData: {
+                        ...item.saveData,
+                        ...data.saveData
+                    }
+                }
+                return {
+                    ...item,
+                    AnimeData: {
+                        ...item.AnimeData,
+                        nextAiringEpisode: undefined,
+                        recommendations: undefined
+                    },
+                }
+            });
+        }
 
         /* IFDEF DEBUG|PROD */
         await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(historyCache as any)))
         /* ENDIF */
-        
+
         /* IFDEF WEB */
         localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(historyCache as any)))
         /* ENDIF */
@@ -88,7 +110,7 @@ export async function SaveHistory(data: cardData): Promise<boolean> {
         let index = -1
         if (data.AnimeData.id == "") {
             index = historyCache.findIndex(
-                (item) => item.AnimeData.player_ID === data.AnimeData.player_ID
+                (item) => detectTitleConfig(item.AnimeData.title) === detectTitleConfig(data.AnimeData.title)
             );
         } else {
             index = historyCache.findIndex(
