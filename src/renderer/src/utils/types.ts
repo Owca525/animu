@@ -205,6 +205,7 @@ export interface globalDataFormat {
     todayAnimeAnilist: cardData[]
     animeOpeningsCache: { [key: number]: animeOpeningsFormat[] }
     audioOutput: MediaDeviceInfo | undefined
+    pluginSearchMode: boolean
 }
 
 export interface NotificationProps {

@@ -48,7 +48,7 @@ import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
 import fallbackFontJASSUB from "jassub/dist/default.woff2?url";
 import videojs from 'video.js';
 import Player from 'video.js/dist/types/player';
-import { useKeyDownList } from '@solid-primitives/keyboard';
+import { createShortcut, useKeyDownList } from '@solid-primitives/keyboard';
 // import modernWasmUrl from 'jassub/dist/jassub-worker-modern.wasm?url'
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
@@ -795,8 +795,12 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         const converted = tmp.map((v) => convertKeybinds(v)).join("+")
 
         if (converted == "CTRL+SHIFT+D") setshowNerdStats((prev) => !prev)
-        if (converted == "SHIFT+R" && currentPlayer()) runNewPlayer(currentPlayer()!)
         keybinds(converted)
+    })
+
+    createShortcut(["Shift", "R"],() => {
+        if (currentPlayer())
+            runNewPlayer(currentPlayer()!)
     })
 
     function keybinds(event: string) {

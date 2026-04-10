@@ -1,8 +1,8 @@
 import { dateToUnix, getHistory, searchDataInCards, setHomeData } from "@renderer/utils/functions";
 import { t } from "@renderer/utils/i18n";
-import { animulistData } from "@renderer/utils/stores/global";
+import { animulistData, isPluginSearchMode } from "@renderer/utils/stores/global";
 import { getHomeCache, setHomeNewData, setHomeSearch, setHomeSearchPage, setHomeSearchTags, setHomeStopScrolling } from "@renderer/utils/stores/home";
-import { getInformationPlugin } from "@renderer/utils/stores/plugins";
+import { getInformationPlugin, getPlayerPLugin } from "@renderer/utils/stores/plugins";
 import { cardData, containerData, FilterParams, homeData } from "@renderer/utils/types";
 import { unwrap } from "solid-js/store";
 
@@ -105,12 +105,26 @@ export function setHistory() {
     setHomeData(undefined, data)
 }
 
-export function anilistSearch(search: string, params: FilterParams | undefined) {
-    const plugin = getInformationPlugin()
+export async function anilistSearch(search: string, params: FilterParams | undefined) {
     setHomeSearch(search)
     setHomeSearchPage(1)
     setHomeStopScrolling(false);
-    plugin.searchAnime(search, 1, params);
+    if (isPluginSearchMode()) {
+        const plugin = getPlayerPLugin()
+        const tmp = await plugin?.searchAnime(search, 1, params)
+
+        setHomeData(undefined, {
+            sections: [
+                {
+                    title: `home.searching/${search}`,
+                    data: tmp ? tmp : []
+                }
+            ]
+        })
+    } else {
+        const plugin = getInformationPlugin()
+        plugin.searchAnime(search, 1, params);
+    }
 }
 
 export function historySearch(search: string = "", params: FilterParams | undefined) {

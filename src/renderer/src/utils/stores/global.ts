@@ -20,7 +20,8 @@ export const [globalState, setGlobalState] = createStore({
     notifications: [],
     todayAnimeAnilist: [],
     animeOpeningsCache: {},
-    audioOutput: undefined
+    audioOutput: undefined,
+    pluginSearchMode: false
 } as globalDataFormat);
 
 export const getGlobalCache = () => globalState;
@@ -38,7 +39,9 @@ export const getNotificationList = () => globalState.notifications;
 export const todayAnimeInAnilist = () => globalState.todayAnimeAnilist;
 export const animeOpeningsCache = () => globalState.animeOpeningsCache;
 export const getAudioOutput = () => globalState.audioOutput;
+export const isPluginSearchMode = () => globalState.pluginSearchMode;
 
+export const setPluginSearchMode = (tmp: boolean) => setGlobalState((prev) => ({...prev, pluginSearchMode: tmp}));
 export const addOpeningCache = (id: number, op: animeOpeningsFormat[]) => setGlobalState((prev) => ({...prev, animeOpeningsCache: { ...prev.animeOpeningsCache, [id]: op }}));
 export const setTodayAnimeInAnilist = (tmp: cardData[]) => setGlobalState((prev) => ({...prev, todayAnimeAnilist: tmp}));
 export const setAudioOutput = (tmp: MediaDeviceInfo) => setGlobalState((prev) => ({...prev, audioOutput: tmp}));

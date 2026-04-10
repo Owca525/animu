@@ -34,6 +34,7 @@ import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import {
   getAnilistUserData,
   getGlobalCache,
+  isPluginSearchMode,
   setAnilistUserData,
   setAnimulistData,
   setAudioOutput,
@@ -42,6 +43,7 @@ import {
   setGlobalHistory,
   setGlobalTheme,
   setIncognitoMode,
+  setPluginSearchMode,
   setTodayAnimeInAnilist
 } from './utils/stores/global';
 import { getConfig, setConfig } from './utils/stores/config';
@@ -101,6 +103,12 @@ function App() {
     }
   })
   /* ENDIF */
+
+  createShortcut(["Control", "Shift", "|"], () => {
+    setPluginSearchMode(!isPluginSearchMode())
+    toast(`Plugin Search Mode ${isPluginSearchMode()}`, { type: "info" })
+    if (isPluginSearchMode()) toast("This Mode can broke some things in animu")
+  })
 
   {
     import("./utils/exports").then((v) => v)

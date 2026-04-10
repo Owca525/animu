@@ -2,7 +2,6 @@ import { containerData } from '@renderer/utils/types';
 import "./css/bigcardscontainer.css"
 import BigCard from './bigCard';
 import { Component, createSignal, For, onCleanup, onMount } from 'solid-js';
-
 type BigCardsContainerProps = { data: containerData }
 
 const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
@@ -16,17 +15,6 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
     const [cardWidth, setCardWidth] = createSignal(0);
 
     onMount(() => {
-
-        /* IFDEF DEBUG|PROD */
-        const callback = window.BrowserWindow.onWindowFocus((focus) => {
-            if (focus) restartAutoSlide()
-            else stopAutoSlide()
-        })
-        onCleanup(() => {
-            callback()
-        })
-        /* ENDIF */
-
         handleUpdate()
         window.addEventListener("resize", restartAutoSlide)
         startAutoSlide();
