@@ -20,8 +20,6 @@ const AnimulistMenu: Component<AnimulistProps> = (props) => {
         status: "CURRENT",
         score: 0,
         reapeat: 0,
-        startWatch: 0,
-        endWatch: 0,
         added: 0,
         lastUpdate: 0
     });
@@ -54,14 +52,14 @@ const AnimulistMenu: Component<AnimulistProps> = (props) => {
                     <div class="custom-menu-space">
                         Start Date
                         <Input type={"date"}
-                            defaultValue={animulistTMPData().startWatch > 0 ? unixToDateTime(animulistTMPData().startWatch).split(" ")[0] : undefined}
+                            defaultValue={parseInt(animulistTMPData()["startWatch"] as any) > 0 ? unixToDateTime(animulistTMPData().startWatch).split(" ")[0] : undefined}
                             onInput={(v) => setAnimulistNewData({ startWatch: dateToUnix(v) })}
                         />
                     </div>
                     <div class="custom-menu-space">
                         Finish Date
                         <Input type={"date"}
-                            defaultValue={animulistTMPData().endWatch > 0 ? unixToDateTime(animulistTMPData().endWatch).split(" ")[0] : undefined}
+                            defaultValue={parseInt(animulistTMPData()["endWatch"] as any) > 0 ? unixToDateTime(animulistTMPData().endWatch).split(" ")[0] : undefined}
                             onInput={(v) => setAnimulistNewData({ endWatch: dateToUnix(v) })}
                         />
                     </div>

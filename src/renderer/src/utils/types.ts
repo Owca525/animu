@@ -271,8 +271,8 @@ export interface animulistProps {
     status: Anilist_MediaListStatus,
     score: number,
     reapeat: number,
-    startWatch: number,
-    endWatch: number,
+    startWatch?: number,
+    endWatch?: number,
     added: number,
     lastUpdate: number,
     favorite?: boolean

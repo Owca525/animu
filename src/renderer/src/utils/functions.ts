@@ -1210,8 +1210,9 @@ export function reloadWebsite() {
     /* ENDIF */
 }
 
-export function convertDateToDateObject(date: number): DateObject {
+export function convertDateToDateObject(date: number | undefined): DateObject {
     try {
+        if (!date) return { day: undefined, month: undefined, year: undefined }
         const tmp = new Date(unixToDateTime(date))
         return { day: tmp.getDay(), month: tmp.getMonth(), year: tmp.getFullYear() }
     } catch (error) {
