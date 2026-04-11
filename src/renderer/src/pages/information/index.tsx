@@ -44,7 +44,7 @@ import CharacterContainer from './components/characterContainer';
 import { getConfig } from '@renderer/utils/stores/config';
 import Container from '../home/components/container';
 import { toast, updateToast } from '@renderer/utils/context/ToastNotification';
-import { showCustomMenu } from '@renderer/utils/context/menuContext';
+import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 import RelationCard from './components/relationCard';
 import ButtonGroup from '../settings/components/buttonGroup';
 import MiniPlayer, { MiniPlayerProps } from '@renderer/components/miniPlayer';
@@ -476,6 +476,7 @@ function information() {
     createShortcut(["Escape"], () => {
         if (!location.href.includes("#/info")) return
 
+        if (isCustomMenuActive()) return hideCustomMenu()
         if (showWrong()) setshowWrong(() => false)
         else if (showImages()) setShowImages(false)
         else navigate("/")
