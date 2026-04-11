@@ -9,7 +9,7 @@ export interface DropdownOption {
 interface DropdownProps {
   options?: DropdownOption[];
   placeholder?: string;
-  placeholderChange?: () => string;
+  placeholderChange?: () => string | undefined;
   buttonText?: string;
   disableX?: boolean;
   onClickX?: (text: string) => void;
@@ -31,7 +31,7 @@ export default function Dropdown(props: DropdownProps) {
     if (option.onClick) option.onClick(option.label);
     if (props.placeholderChange) {
       const placeholderText = props.placeholderChange();
-      setText(placeholderText);
+      if (placeholderText) setText(placeholderText);
     } else setText(option.label);
   };
 

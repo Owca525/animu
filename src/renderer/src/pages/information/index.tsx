@@ -212,6 +212,7 @@ function information() {
         })
 
         let plugin = pluginManager().currentPlugin
+        console.log(plugin)
         if (plugin) setCurrentPlugin(plugin.metadata.name)
 
         if (tempData().anime.nextAiringEpisode) checkIsAnimeReleasing()
@@ -312,7 +313,6 @@ function information() {
     }
 
     async function ChangeAnimeInInformation(data: AnimeData): Promise<any> {
-        resetContentVariable()
         const idToast = toast(t("notification.fetchinganime"), { timer: true, type: "loading" })
         const animulist = unwrap(animulistData())
         let tmpAnimulist
@@ -327,13 +327,12 @@ function information() {
 
         if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", timer: false })
         updateToast(idToast, t("notification.successanime"), { type: "success", timer: false })
+        resetContentVariable()
+        setmoreMiniTitle(false)
+        if (currentPlugin()) pluginManager().changePlugin(currentPlugin()!)
 
         // Reseting Recomendation
         setTmpData((prev) => ({ ...prev, anime: { ...prev.anime, recommendations: undefined } }))
-
-        document.querySelectorAll("*").forEach((ele) => {
-            ele.scrollTop = 0
-        })
 
         setBannerIsError(false)
         setBannerLoadingData(true)

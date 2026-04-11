@@ -26,13 +26,16 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
                 const element = loadedPlugins[index]
                 if (element.metadata.name == plugin_id) {
                     setPlayerPlugin(element)
+                    this.currentPlugin = element
                     return element
-                }
+                } 
                 if (plugin_id == "" && element.metadata.name == "Allmanga") {
                     setPlayerPlugin(element)
+                    this.currentPlugin = element
                     return element
                 }
             }
+            this.currentPlugin = loadedPlugins[0]
             return loadedPlugins[0]
         } catch (error) {
             console.error(error)
