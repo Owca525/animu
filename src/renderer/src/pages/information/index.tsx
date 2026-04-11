@@ -636,7 +636,7 @@ function information() {
                                         <Button titleButton={"Add To Animulist"} icon="add" ButtonClass="information-bar-icon" onClick={() => showCustomMenu(AnimulistMenu({
                                             anime: unwrap(tempData().anime),
                                             animulist: tempData().animulist,
-                                            save: (animulist, anime) => { modifySaveAnimuList(animulist, anime, true) }
+                                            save: (animulist, anime) => { modifySaveAnimuList(animulist, anime) }
                                         }))} />
                                     </Match>
                                     <Match when={tempData().animulist}>
