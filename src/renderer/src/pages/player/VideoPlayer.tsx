@@ -18,7 +18,7 @@ import fallbackFontJASSUB from "jassub/dist/default.woff2?url";
 // import modernWasmUrl from 'jassub/dist/jassub-worker-modern.wasm?url'
 import { saveConfig } from "@renderer/utils/FilesManager/config"
 import { SaveHistory } from "@renderer/utils/FilesManager/history"
-import { Component, createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js"
+import { Component, createSignal, For, onCleanup, onMount, Show } from "solid-js"
 import { getConfig } from "@renderer/utils/stores/config"
 import DeveloperStats from "./components/developerStats"
 import NerdStats from "./components/nerdStats"
@@ -33,7 +33,7 @@ import { getAudioOutput, getSocket, getSocketRoom } from "@renderer/utils/stores
 import videojs from "video.js";
 // import "@videojs/http-streaming" 
 import Player from "video.js/dist/types/player"
-import { createShortcut, useKeyDownList } from "@solid-primitives/keyboard"
+import { useKeyPress } from "@renderer/utils/hooks/useKeyPress"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -405,7 +405,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (vttSubRef) vttSubRef.remove()
         if (screenShotContainer) screenShotContainer.remove()
         if (refreashUpdateSocket) clearInterval(refreashUpdateSocket)
-        
+
         /* IFDEF DEBUG|PROD */
         await window.backend.changeHeader(undefined)
         /* ENDIF */
@@ -1123,19 +1123,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     //     }
     // }
 
-    const keys = useKeyDownList();
-    createEffect(() => {
-        const tmp = keys()
-        if (tmp.length <= 0) return
-        const converted = tmp.map((v) => convertKeybinds(v)).join("+")
-
-        if (converted == "CTRL+SHIFT+D") setshowNerdStats((prev) => !prev)
-        keybinds(converted)
-    })
-
-    createShortcut(["Shift", "R"],() => {
-        if (currentPlayer())
-            runNewPlayer(currentPlayer()!)
+    useKeyPress((keys: string) => {
+        if (keys == "CTRL+SHIFT+D") setshowNerdStats((prev) => !prev)
+        if (keys == "SHIFT+R" && currentPlayer()) runNewPlayer(currentPlayer()!)
+        keybinds(keys)
     })
 
     function keybinds(event: string) {
