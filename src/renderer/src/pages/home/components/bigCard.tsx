@@ -121,16 +121,16 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
                         <div class="big-card-information-genres-content">
                             <Show when={data.AnimeData.genres}>
                                 <For each={data.AnimeData.genres}>
-                                    {(value) => (<div class="big-card-information-genres">{t(`anime_genres.${value.toLowerCase().replaceAll(" ", "_")}`)}</div>)}
+                                    {(value) => (<div class="big-card-information-genres">{t(`anime_genres.${value}`)}</div>)}
                                 </For>
                             </Show>
                         </div>
                         <div class="big-card-information-others">
                             <Show when={data.AnimeData.format}>
-                                <div class="big-card-information-format">{t(`anime_formats.${data.AnimeData.format?.toLowerCase()}`)}</div>
+                                <div class="big-card-information-format">{t(`anime_formats.${data.AnimeData.format}`)}</div>
                             </Show>
                             <Show when={data.AnimeData.status}>
-                                <div class="big-card-information-status">{t(`anime_statuses.${data.AnimeData.status?.toLowerCase()}`)}</div>
+                                <div class="big-card-information-status">{t(`anime_statuses.${data.AnimeData.status}`)}</div>
                             </Show>
                             <Show when={data.AnimeData.episodes}>
                                 <div class="big-card-information-episode">{formatEpisode() != "" ? `${formatEpisode()} /` : ""} {data.AnimeData.episodes} {t("home.bigcard.episodes")}</div>

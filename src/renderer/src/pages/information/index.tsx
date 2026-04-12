@@ -724,7 +724,7 @@ function information() {
                                 <Show when={tempData().anime.format}>
                                     <div class="information-info-content">
                                         <div class="information-content-title">{t("information.format")}</div>
-                                        {t(`anime_formats.${tempData().anime.format?.toLowerCase()}`)}
+                                        {t(`anime_formats.${tempData().anime.format}`)}
                                     </div>
                                 </Show>
 
@@ -745,7 +745,7 @@ function information() {
                                 <Show when={tempData().anime.status}>
                                     <div class="information-info-content">
                                         <div class="information-content-title">{t("information.status")}</div>
-                                        {t(`anime_statuses.${tempData().anime.status?.toLowerCase()}`)}
+                                        {t(`anime_statuses.${tempData().anime.status}`)}
                                     </div>
                                 </Show>
 
@@ -772,14 +772,14 @@ function information() {
                                 <Show when={tempData().anime.season && tempData().anime.seasonYear}>
                                     <div class="information-info-content">
                                         <div class="information-content-title">{t("information.season")}</div>
-                                        {t(`anime_seasons.${tempData().anime.season?.toLowerCase()}`)} {tempData().anime.seasonYear}
+                                        {t(`anime_seasons.${tempData().anime.season}`)} {tempData().anime.seasonYear}
                                     </div>
                                 </Show>
 
                                 <Show when={tempData().anime.source}>
                                     <div class="information-info-content">
                                         <div class="information-content-title">{t("information.source")}</div>
-                                        {t(`anime_source.${tempData().anime.source?.toLowerCase().replaceAll("_", "")}`)}
+                                        {t(`anime_source.${tempData().anime.source}`)}
                                     </div>
                                 </Show>
 
@@ -790,7 +790,7 @@ function information() {
                                     <span class='information-genre-title'>Genres</span>
                                     <For each={tempData().anime.genres}>
                                         {(item) => (
-                                            <span class='information-genre-button'>{t(`anime_genres.${item.replaceAll(" ", "_").toLowerCase()}`)}</span>
+                                            <span class='information-genre-button'>{t(`anime_genres.${item.toUpperCase()}`)}</span>
                                         )}
                                     </For>
                                 </div>
@@ -913,7 +913,7 @@ function information() {
                                     id: char.character.id,
                                     image: char.character.image,
                                     name: char.character.name,
-                                    role: t(`information.role.${char.role.toLowerCase()}`),
+                                    role: t(`information.role.${char.role}`),
                                     onClick: () => openUrlFolder(`https://anilist.co/character/${char.character.id}`)
                                 }))} />
                             </Show>

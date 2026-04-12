@@ -47,18 +47,18 @@ export default function RelationCard(props: characterCardsProps) {
             />
             <div class="relation-card-content">
                 <div class="relation-card-content-top">
-                    <span class="relation-card-relation">{t(`anime_relationtype.${props.relationType.toLowerCase().replaceAll("_", "")}`)}</span>
+                    <span class="relation-card-relation">{t(`anime_relationtype.${props.relationType}`)}</span>
                     <span class="relation-card-title">{detectTitleConfig(props.title)}</span>
                 </div>
                 <div class="relation-card-content-bottom">
                     <Show when={props.source}>
-                        <span class="relation-card-source">{pathExist(`anime_source.${props.source!.toLowerCase()}`) ? 
-                            t(`anime_source.${props.source!.toLowerCase()}`) :
-                            t(`anime_formats.${props.source!.toLowerCase()}`) }</span>
+                        <span class="relation-card-source">{pathExist(`anime_source.${props.source}`) ? 
+                            t(`anime_source.${props.source}`) :
+                            t(`anime_formats.${props.source}`) }</span>
                     </Show>
                     <Show when={props.source && props.status}>-</Show>
                     <Show when={props.status}>
-                        <span class="relation-card-status">{t(`anime_statuses.${props.status!.toLowerCase()}`)}</span>
+                        <span class="relation-card-status">{t(`anime_statuses.${props.status}`)}</span>
                     </Show>
                 </div>
             </div>

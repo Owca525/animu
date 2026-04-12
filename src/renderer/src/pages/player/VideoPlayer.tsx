@@ -1715,9 +1715,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                         <img src={anime_data.AnimeData.coverImage} class="player-more-information-image" />
                         <span class="player-more-information-title">{detectTitleConfig(anime_data.AnimeData.title)}</span>
                         <div class="player-more-information-format-container">
-                            <span class="player-more-information-season">{t(`anime_seasons.${anime_data.AnimeData.season?.toLowerCase()}`)} {anime_data.AnimeData.seasonYear}</span>
+                            <span class="player-more-information-season">{t(`anime_seasons.${anime_data.AnimeData.season}`)} {anime_data.AnimeData.seasonYear}</span>
                             &#8226;
-                            <span class="player-more-information-format">{t(`anime_formats.${anime_data.AnimeData.format?.toLowerCase()}`)}</span>
+                            <span class="player-more-information-format">{t(`anime_formats.${anime_data.AnimeData.format}`)}</span>
                             &#8226;
                             <span class="player-more-information-episode">Episode {temp.episode} / {temp.episodes.length}</span>
                         </div>

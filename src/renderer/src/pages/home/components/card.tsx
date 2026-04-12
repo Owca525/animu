@@ -231,7 +231,7 @@ function Card(props: CardProps) {
     if ((!props.card.AnimeData.nextAiringEpisode || props.card.saveData) && props.card.AnimeData.season && props.card.AnimeData.seasonYear) {
       info.push(
         <div class="card-information-text card-information-top">
-          {t(`anime_seasons.${props.card.AnimeData.season.toLowerCase()}`)} {props.card.AnimeData.seasonYear}
+          {t(`anime_seasons.${props.card.AnimeData.season}`)} {props.card.AnimeData.seasonYear}
         </div>
       );
     } else if (!(props.card.AnimeData.season && props.card.AnimeData.seasonYear) && !props.card.AnimeData.nextAiringEpisode) {
@@ -247,19 +247,19 @@ function Card(props: CardProps) {
     } else if (props.card.AnimeData.status) {
       info.push(
         <div class="card-information-text">
-          {t(`anime_statuses.${props.card.AnimeData.status.toLowerCase()}`)}
+          {t(`anime_statuses.${props.card.AnimeData.status}`)}
         </div>
       );
     }
 
     const bottom: JSX.Element[] = [];
 
-    if (props.card.AnimeData.format && pathExist(`anime_formats.${props.card.AnimeData.format.toLowerCase()}`)) {
-      bottom.push(t(`anime_formats.${props.card.AnimeData.format.toLowerCase()}`));
-    } else if (props.card.AnimeData.format && pathExist(`anime_genres.${props.card.AnimeData.format.toLowerCase()}`)) {
-      bottom.push(t(`anime_genres.${props.card.AnimeData.format.toLowerCase()}`))
+    if (props.card.AnimeData.format && pathExist(`anime_formats.${props.card.AnimeData.format}`)) {
+      bottom.push(t(`anime_formats.${props.card.AnimeData.format}`));
+    } else if (props.card.AnimeData.format && pathExist(`anime_genres.${props.card.AnimeData.format}`)) {
+      bottom.push(t(`anime_genres.${props.card.AnimeData.format}`))
     } else if (props.card.AnimeData.type) {
-      bottom.push(t(`anime_source.${props.card.AnimeData.type.toLowerCase().replaceAll("_", "")}`));
+      bottom.push(t(`anime_source.${props.card.AnimeData.type}`));
     }
 
     if (props.card.AnimeData.episodes && props.card.AnimeData.format?.toUpperCase() != "MOVIE") {
