@@ -132,7 +132,7 @@ const Home = () => {
     if (!home.filterTags) return;
     let data: any = [];
     for (const [key, type] of Object.entries(home.filterTags)) {
-      data.push({ remover: () => { updateGenres(key, undefined); StartSearch(unwrap(homeCache().search), unwrap(homeCache().filterTags)) }, name: type });
+      data.push({ remover: () => { updateGenres(key, undefined, type.name); StartSearch(unwrap(homeCache().search), unwrap(homeCache().filterTags)) }, name: type.name });
     }
 
     return data;

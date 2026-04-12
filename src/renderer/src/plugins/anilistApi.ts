@@ -3,8 +3,8 @@ import {
   AnimeData,
   cardData,
   containerData,
+  FilterPluginsParams,
   genres,
-  genresSearchFormat,
   informationPluginFormat,
 } from '@renderer/utils/types';
 import { dateToUnix, genYearsList, request, timeCovertToMs } from '@renderer/utils/functions';
@@ -605,7 +605,7 @@ async function fetchCategory(params: any, title: string): Promise<containerData>
   return container
 }
 
-export async function searchInAnilist(name: string, page: number, params?: genresSearchFormat, isAdult: boolean = false, MaxPage: number = 20): Promise<{ data: cardData[]; maxPage: number; }> {
+export async function searchInAnilist(name: string, page: number, params?: FilterPluginsParams, isAdult: boolean = false, MaxPage: number = 20): Promise<{ data: cardData[]; maxPage: number; }> {
   try {
     let variables: any = {
       page: page,
@@ -637,7 +637,7 @@ export async function searchInAnilist(name: string, page: number, params?: genre
   }
 }
 
-async function searchWrapper(name: string, page: number, params?: genresSearchFormat, isAdult: boolean = false, MaxPage: number = 20): Promise<{ data: cardData[]; maxPage: number; }> {
+async function searchWrapper(name: string, page: number, params?: FilterPluginsParams, isAdult: boolean = false, MaxPage: number = 20): Promise<{ data: cardData[]; maxPage: number; }> {
   const config = getConfig()
   try {
     return await searchInAnilist(name, page, params, isAdult, MaxPage)
@@ -829,7 +829,7 @@ export default class AnilistApi implements informationPluginFormat {
     return data
   }
 
-  search = async (name: string, page: number, params?: genresSearchFormat) => {
+  search = async (name: string, page: number, params?: FilterPluginsParams) => {
     try {
       const config = getConfig()
       let title: string | undefined = undefined

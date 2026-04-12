@@ -1,4 +1,4 @@
-import { cardData, containerData } from "@renderer/utils/types"
+import { cardData, containerData, FilterPluginsParams } from "@renderer/utils/types"
 import "./css/container.css"
 import Card from "./card"
 import Button from "@renderer/components/buttons"
@@ -28,7 +28,18 @@ function Container(props: containerData) {
       const homeCache = unwrap(getHomeCache())
       if (homeCache.stopScrolling) return
       if (!props.onScrollDownFunction) return
-      const resp = await props.onScrollDownFunction(homeCache.search, unwrap(currentPage()), homeCache.filterTags)
+      let outputFilter: FilterPluginsParams | undefined = undefined;
+      if (homeCache.filterTags) {
+        outputFilter = Object.entries(homeCache.filterTags).reduce<FilterPluginsParams>(
+          (acc, [key, value]) => {
+            acc[key] = value.val;
+            return acc;
+          },
+          {}
+        );
+      }
+
+      const resp = await props.onScrollDownFunction(homeCache.search, unwrap(currentPage()), outputFilter)
 
       if (getGlobalCache().token != token) return
 
@@ -125,7 +136,7 @@ function Container(props: containerData) {
         <Show when={props.tags}>
           <For each={props.tags}>
             {(element) => (
-              <div onClick={element.remover} class="container-tag">{element.name} <span class="material-symbols-outlined container-tag-icon">close</span></div>
+              <div onClick={element.remover} class="container-tag">{t(element.name)} <span class="material-symbols-outlined container-tag-icon">close</span></div>
             )}
           </For>
         </Show>
@@ -148,7 +159,7 @@ function Container(props: containerData) {
       </div>
       <Show when={cardResponse.loading()}>
         <div class="container-loading-bottom">
-            <span class="material-symbols-outlined loading-animation icon">progress_activity</span>
+          <span class="material-symbols-outlined loading-animation icon">progress_activity</span>
         </div>
       </Show>
     </div>

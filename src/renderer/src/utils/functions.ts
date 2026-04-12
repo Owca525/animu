@@ -6,6 +6,7 @@ import {
     DateObject,
     deepLinkData,
     FilterParams,
+    FilterPluginsParams,
     homeData,
     informationPluginFormat,
     NotificationProps,
@@ -738,7 +739,7 @@ export function unixToDateTime(unixTimestamp: number | undefined): string {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
-export function searchDataInCards(cards: cardData[], search: string, params: FilterParams | undefined) {
+export function searchDataInCards(cards: cardData[], search: string, params: FilterPluginsParams | undefined) {
     let results: cardData[] = []
 
     results = cards.filter((item) =>
@@ -1263,7 +1264,7 @@ export function sendNotification(notificiation: NotificationProps, toastprop?: T
             title: t(notificiation.title),
             description: t(notificiation.description),
             icon: notificiation.icon
-        },  { ...toastprop, type: "notification", onClick: notificiation.onClick })
+        }, { ...toastprop, type: "notification", onClick: notificiation.onClick })
     }
     addNotification(notificiation)
 }
@@ -1299,7 +1300,7 @@ export async function checkAnimeTodayReleaseEpisode() {
             let episodes = await tmpplugin.extractOnlyEpisodesList(element.anime.saveData?.type!, element.anime.AnimeData.player_ID!)
             if (episodes.length <= 0) continue
             let asdasdads = episodes.map((v) => v.ep.toString())
-            
+
             const tmpEpisode = todayAnime.find((v) => v.AnimeData.id == element.anime.AnimeData.id)!.AnimeData.nextAiringEpisode!.episode.toString()
             if (asdasdads.includes(tmpEpisode)) {
                 sendNotification({
@@ -1308,7 +1309,7 @@ export async function checkAnimeTodayReleaseEpisode() {
                     icon: element.anime.AnimeData.coverImage
                 })
             }
-            await updatePlaylist("global.waitingplaylist", {...element, customData: true})
+            await updatePlaylist("global.waitingplaylist", { ...element, customData: true })
         } catch (error) {
             console.error("Error function/checkAnimeTodayReleaseEpisode", error)
         }
@@ -1316,7 +1317,7 @@ export async function checkAnimeTodayReleaseEpisode() {
 
     const notTodayANime = waitingPlaylist.filter((v) => !todayANimeId.includes(v.anime.AnimeData.id))
     notTodayANime.forEach(async (anime) => {
-        if (anime.customData) await updatePlaylist("global.waitingplaylist", {...anime, customData: false})
+        if (anime.customData) await updatePlaylist("global.waitingplaylist", { ...anime, customData: false })
     })
 }
 
@@ -1337,4 +1338,16 @@ export function convertStringToDateObject(date: string | undefined): DateObject 
         console.error("convertStringToDateObject/functions", error)
         return undefined
     }
+}
+
+export function convertParams(data: FilterParams | undefined): FilterPluginsParams | undefined {
+    if (!data) return undefined
+
+    return Object.entries(data).reduce<FilterPluginsParams>(
+        (acc, [key, value]) => {
+            acc[key] = value.val;
+            return acc;
+        },
+        {}
+    );
 }

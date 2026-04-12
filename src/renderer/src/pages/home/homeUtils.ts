@@ -1,4 +1,4 @@
-import { dateToUnix, getHistory, searchDataInCards, setHomeData } from "@renderer/utils/functions";
+import { convertParams, dateToUnix, getHistory, searchDataInCards, setHomeData } from "@renderer/utils/functions";
 import { t } from "@renderer/utils/i18n";
 import { animulistData, isPluginSearchMode } from "@renderer/utils/stores/global";
 import { getHomeCache, setHomeNewData, setHomeSearch, setHomeSearchPage, setHomeSearchTags, setHomeStopScrolling } from "@renderer/utils/stores/home";
@@ -40,7 +40,10 @@ export function setAnimuList(): any {
             title: "animulist.status.CURRENT", 
             data: currentAnime, 
             horizontal: true, 
-            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watching: "CURRENT" }) 
+            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watching: {
+                val: "CURRENT",
+                name: "animulist.status.CURRENT"
+            } }) 
         })
 
     const watchedAnime = animulist.filter((v) => v.animulist.status == "COMPLETED")
@@ -49,7 +52,10 @@ export function setAnimuList(): any {
             title: "animulist.status.COMPLETED", 
             data: watchedAnime, 
             horizontal: true,
-            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watching: "COMPLETED" }) 
+            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watching: {
+                val: "COMPLETED",
+                name: "animulist.status.COMPLETED"
+            } }) 
         })
 
     const planningAnime = animulist.filter((v) => v.animulist.status == "PLANNING")
@@ -57,7 +63,10 @@ export function setAnimuList(): any {
             title: "animulist.status.PLANNING", 
             data: planningAnime, 
             horizontal: true,
-            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watching: "PLANNING" }) 
+            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watching: {
+                val: "PLANNING",
+                name: "animulist.status.PLANNING"
+            } }) 
         })
 
     const pausedAnime = animulist.filter((v) => v.animulist.status == "PAUSED")
@@ -65,7 +74,10 @@ export function setAnimuList(): any {
             title: "animulist.status.PAUSED",
             data: pausedAnime, 
             horizontal: true,
-            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watching: "PAUSED" }) 
+            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watching: {
+                val: "PAUSED",
+                name: "animulist.status.PAUSED"
+            } }) 
         })
 
     if (finnalContainer.length <= 1) return setHomeData(undefined, {sections: [ { data: unwrap(animulistData()) } ]})
@@ -111,7 +123,7 @@ export async function anilistSearch(search: string, params: FilterParams | undef
     setHomeStopScrolling(false);
     if (isPluginSearchMode()) {
         const plugin = getPlayerPLugin()
-        const tmp = await plugin?.searchAnime(search, 1, params)
+        const tmp = await plugin?.searchAnime(search, 1, convertParams(params))
 
         setHomeData(undefined, {
             sections: [
@@ -141,18 +153,18 @@ export function historySearch(search: string = "", params: FilterParams | undefi
     if (homeCache.length == 1) {
         finnalContainer.push({
             title: homeCache[0].title == "global.history" ? "global.history" : "global.continuewatch",
-            data: homeCache[0].title == "global.history" ? searchDataInCards(history.history as cardData[], search, params) :
-                searchDataInCards(history.continue as cardData[], search, params)
+            data: homeCache[0].title == "global.history" ? searchDataInCards(history.history as cardData[], search, convertParams(params)) :
+                searchDataInCards(history.continue as cardData[], search, convertParams(params))
         })
     } else {
         finnalContainer.push({
             title: "global.continuewatch",
-            data: searchDataInCards(history.continue as cardData[], search, params),
+            data: searchDataInCards(history.continue as cardData[], search, convertParams(params)),
             horizontal: true
         })
         finnalContainer.push({
             title: "global.history",
-            data: searchDataInCards(history.history as cardData[], search, params),
+            data: searchDataInCards(history.history as cardData[], search, convertParams(params)),
             horizontal: true
         })
     }
@@ -162,8 +174,8 @@ export function historySearch(search: string = "", params: FilterParams | undefi
 
 export function AnimuListSearch(search: string = "", params: FilterParams | undefined) {
     if (search.replaceAll(" ", "") == "" && params == undefined) return setAnimuList()
-    let tmp = searchDataInCards(unwrap(animulistData()), search, params)
-    if (params && params["watching"]) tmp = tmp.filter((v) => v.animulist?.status == params["watching"])
+    let tmp = searchDataInCards(unwrap(animulistData()), search, convertParams(params))
+    if (params && params["watching"]) tmp = tmp.filter((v) => v.animulist?.status == params["watching"].val)
     setHomeSearchTags(params)
     setHomeData(undefined, {
         sections: [

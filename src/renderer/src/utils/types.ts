@@ -290,7 +290,7 @@ export interface containerData {
     title?: string
     data: cardData[]
     horizontal?: boolean
-    onScrollDownFunction?: (search: string | undefined, page: number, params?: genresSearchFormat) => Promise<{ data: cardData[], maxPage: number }>
+    onScrollDownFunction?: (search: string | undefined, page: number, params?: FilterPluginsParams) => Promise<{ data: cardData[], maxPage: number }>
     onTitleClick?: () => Promise<containerData>
     tags?: {
         remover: () => void
@@ -342,7 +342,7 @@ export interface playerPluginFormat {
     extractPlayerData(type: string, episode: string, id: string): Promise<playerData[]>
     extractEpisodeList(animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined>
     extractOnlyEpisodesList(type: string, anime_id: string): Promise<{ ep: string, img?: string, title?: string }[]>
-    searchAnime(name: string, page: number, params?: genresSearchFormat): Promise<cardData[]>
+    searchAnime(name: string, page: number, params?: FilterPluginsParams): Promise<cardData[]>
 }
 
 export interface informationPluginFormat {
@@ -356,7 +356,7 @@ export interface informationPluginFormat {
         searchOption: genres[]
     }
     config?: { [key: string]: any }
-    search(name: string, page: number, params?: genresSearchFormat): Promise<containerData | { error: string } | undefined>
+    search(name: string, page: number, params?: FilterPluginsParams): Promise<containerData | { error: string } | undefined>
     home(): Promise<{ topCards?: containerData, sections: containerData[] } | { error: string } | undefined>
     anime(context: { id: string }): Promise<AnimeData | undefined>
     schedule: (airingStart: number, airingEnd: number) => Promise<cardData[]>
@@ -374,7 +374,7 @@ export interface playerPluginManagerFormat {
 
 export interface informationPluginManagerFormat {
     currentPlugin: informationPluginFormat
-    searchAnime(name: string, page: number, params?: genresSearchFormat): void
+    searchAnime(name: string, page: number, params?: FilterPluginsParams): void
     home(): void
     anime(id: string): Promise<AnimeData | undefined>
     initial(): Promise<void>
@@ -391,8 +391,6 @@ export type genres = {
     langPath: string
     options: string[]
 }
-
-export interface genresSearchFormat { [key: string]: string }
 
 export interface episodeList { player_id: string, episodesData: { episodes: { ep: string, img?: string, title?: string }[], type: string, name?: string }[] }
 
@@ -559,7 +557,12 @@ export interface Thumbnail {
     }[]
 };
 
-export interface FilterParams { [key: string]: string };
+export interface FilterParams { [key: string]: {
+    val: string,
+    name: string
+} };
+
+export interface FilterPluginsParams { [key: string]: string }
 
 export interface pluginRepo {
     name: string,
