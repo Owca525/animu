@@ -15,7 +15,9 @@ import {
 } from 'solid-js';
 import { getConfig } from '@renderer/utils/stores/config';
 import {
+  activeHomePage,
   getHomeCache,
+  getHomeSidebarData,
   setHomeActivePage,
   setHomeSearch,
   setHomeSearchPage,
@@ -25,7 +27,6 @@ import {
 import { getInformationPlugin } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { unwrap } from 'solid-js/store';
-import { useNavigate } from '@solidjs/router';
 import './home.css';
 import {
   containerData,
@@ -34,79 +35,52 @@ import {
   homeData,
   SettingsConfig,
 } from "@renderer/utils/types";
-import { useI18n } from '@renderer/utils/i18n';
-import { anilistSearch, AnimuListSearch, historySearch, setAnimuList, setCalendary, setHistory } from './homeUtils';
+import { t } from '@renderer/utils/i18n';
+import { setCalendary } from './homeUtils';
 import Avatar from './components/avatar';
 // import { io } from 'socket.io-client';
 // import { socketPlayerInit } from '../player/VideoPlayer';
 
 // import WelcomeScreen from "./components/welcomeScreen"
+
+export function StartHomeSearch(search: string = "", params: FilterParams | undefined) {
+  console.log(params)
+  setHomeSearchPage(1)
+  setHomeStopScrolling(false)
+
+  getHomeSidebarData().top.forEach((element) => {
+    if (element.onSearch && element.text == getHomeCache().activePage)
+      element.onSearch(search, params)
+  })
+}
+
+export function setNewActivePage(text: string, overwrite: boolean = true) {
+  if (overwrite) {
+    setHomeSearch(undefined)
+    setHomeSearchTags(undefined)
+  }
+  setHomeActivePage(text)
+  changeTitleAnimu(`Animu - ${t(text)}`)
+}
+
 const Home = () => {
-  const { t } = useI18n()
-  const navigate = useNavigate();
   const plugin = getInformationPlugin()
   const [homeCache] = createSignal<homeData>(getHomeCache());
   // const pluginPlayer = getPlayerPLugin();
   const [isOpenSidebar, setOpenSidebar] = createSignal<boolean>(false);
-  const [searchText, setSearchText] = createSignal<string>();
   const [headerActive, setHeaderActive] = createSignal<boolean>(false)
 
   let divRef: HTMLDivElement | undefined;
 
-  let sidebarData = {
-    top: [
-      {
-        icon: "home",
-        text: "global.home",
-        onClick: plugin.home,
-        onSearch: anilistSearch
-      },
-      {
-        icon: "history",
-        text: "global.history",
-        onClick: setHistory,
-        onSearch: historySearch
-      },
-      {
-        icon: "view_list",
-        text: "global.animulist",
-        onClick: setAnimuList,
-        onSearch: AnimuListSearch
-      },
-      {
-        icon: "calendar_month",
-        text: "global.schedule",
-        onClick: () => setCalendary(),
-      }
-    ],
-    bottom: [
-      {
-        icon: "settings",
-        text: "global.settings",
-        onClick: () => navigate("/settings"),
-      },
-    ],
-  };
-
-  function setNewActivePage(text: string, overwrite: boolean = true) {
-    if (overwrite) {
-      setHomeSearch(undefined)
-      setHomeSearchTags(undefined)
-    }
-    setHomeActivePage(text)
-    changeTitleAnimu(`Animu - ${t(text)}`)
-    setSearchText(t(`search.${text.split(".")[1]}`))
-  }
-
   onMount(() => {
-    sidebarData.top.forEach((element) => {
-      if (getHomeCache().activePage == element.text) 
+    getHomeSidebarData().top.forEach((element) => {
+      if (getHomeCache().activePage == element.text)
         setNewActivePage(element.text, false)
     })
 
-    if (homeCache().data.sections.length <= 0) plugin.home()
+    // if (homeCache().data.sections.length <= 0) plugin.home()
     const config: SettingsConfig = unwrap(getConfig());
-    
+
     /* IFDEF DEBUG|PROD */
     if (config.General.discordRPC)
       window.api.rpc.setActivity({ state: t("discordrpc.home") });
@@ -132,7 +106,7 @@ const Home = () => {
     if (!home.filterTags) return;
     let data: any = [];
     for (const [key, type] of Object.entries(home.filterTags)) {
-      data.push({ remover: () => { updateGenres(key, undefined, type.name); StartSearch(unwrap(homeCache().search), unwrap(homeCache().filterTags)) }, name: type.name });
+      data.push({ remover: () => { updateGenres(key, undefined, type.name); StartHomeSearch(unwrap(homeCache().search), unwrap(homeCache().filterTags)) }, name: type.name });
     }
 
     return data;
@@ -140,21 +114,11 @@ const Home = () => {
 
   function getSidebarNumber() {
     let home = homeCache()
-    for (let index = 0; index < sidebarData.top.length; index++) {
-      const element = sidebarData.top[index];
+    for (let index = 0; index < getHomeSidebarData().top.length; index++) {
+      const element = getHomeSidebarData().top[index];
       if (element.text == home.activePage) return index
     }
     return 0
-  }
-
-  function StartSearch(search: string = "", params: FilterParams | undefined) {
-    setHomeSearchPage(1)
-    setHomeStopScrolling(false)
-
-    sidebarData.top.forEach((element) => {
-      if (element.onSearch && element.text == homeCache().activePage) 
-        element.onSearch(search, params)
-    })
   }
 
   function checkOtherFilters() {
@@ -175,7 +139,7 @@ const Home = () => {
       }
     >
       <Sidebar
-        data={sidebarData}
+        data={getHomeSidebarData()}
         openSidebar={isOpenSidebar()}
         onChange={() => setOpenSidebar(false)}
         activeElement
@@ -191,14 +155,14 @@ const Home = () => {
         />
         <div class="home-header-search">
           <Input
-            placeholder={searchText()}
+            placeholder={t(`search.${activeHomePage().split(".")[1]}`)}
             InputClass={`${homeCache().data && homeCache().data.topCards ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
             defaultValue={homeCache().search}
-            onKeyDown={(search: string) => { StartSearch(search, unwrap(homeCache().filterTags)) }}
+            onKeyDown={(search: string) => { StartHomeSearch(search, unwrap(homeCache().filterTags)) }}
           />
           <div class="home-filter-void">
             <Filter
-              onChange={(params: FilterParams | undefined) => { StartSearch(unwrap(homeCache().search), params) }}
+              onChange={(params: FilterParams | undefined) => { StartHomeSearch(unwrap(homeCache().search), params) }}
               filter={[...plugin.currentPlugin.metadata.searchOption, ...checkOtherFilters()]}
               custonClass={`${homeCache().data && homeCache().data.topCards ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
             />

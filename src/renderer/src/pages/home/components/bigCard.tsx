@@ -9,6 +9,9 @@ import { pluginManager } from '@renderer/utils/stores/plugins';
 import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
 import { animulistData } from '@renderer/utils/stores/global';
 import { unwrap } from 'solid-js/store';
+import { updateGenres } from './filter';
+import { StartHomeSearch } from '..';
+import { getHomeCache } from '@renderer/utils/stores/home';
 
 type bigCardProps = { data: cardData, ref?: any }
 
@@ -94,6 +97,12 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
         return <></>
     }
 
+    function changeGenres(val: string) {
+        updateGenres("genres", val, `anime_genres.${val}`);
+        const cache = getHomeCache()
+        StartHomeSearch(cache.search, cache.filterTags)
+    }
+
     return (
         <div class="big-card-content" ref={ref} style={{ "background-image": `url(${data.AnimeData.bannerImage ?? data.AnimeData.coverImage})` }}>
             <div class={`big-card-background ${!data.AnimeData.bannerImage ? "big-card-blur" : ""}`}>
@@ -121,7 +130,7 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
                         <div class="big-card-information-genres-content">
                             <Show when={data.AnimeData.genres}>
                                 <For each={data.AnimeData.genres}>
-                                    {(value) => (<div class="big-card-information-genres">{t(`anime_genres.${value}`)}</div>)}
+                                    {(value) => (<div onclick={() => changeGenres(value)} class="big-card-information-genres">{t(`anime_genres.${value}`)}</div>)}
                                 </For>
                             </Show>
                         </div>

@@ -110,6 +110,15 @@
     font-size: .8em;
 }
 
+.big-card-information-genres {
+    outline: 2px solid var(--invisible);
+    cursor: pointer;
+}
+
+.big-card-information-genres:hover {
+    outline-color: var(--green-one);
+}
+
 .big-card-information-format,
 .big-card-information-status,
 .big-card-information-episode {

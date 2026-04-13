@@ -618,9 +618,9 @@ export async function searchInAnilist(name: string, page: number, params?: Filte
     if (params) {
       if (params.genres) variables = { ...variables, genres: params.genres }
       if (params.years) variables = { ...variables, seasonYear: parseInt(params.years) }
-      if (params.season) variables = { ...variables, season: params.season.toUpperCase() }
-      if (params.format) variables = { ...variables, format: params.format.toUpperCase().replaceAll(" ", "_") }
-      if (params.airing) variables = { ...variables, status: params.airing.toUpperCase().replaceAll(" ", "_") }
+      if (params.season) variables = { ...variables, season: params.season }
+      if (params.format) variables = { ...variables, format: params.format }
+      if (params.airing) variables = { ...variables, status: params.airing }
     }
 
     const resp = await sendToApi(variables, replacePageInGraphicApi(graphicApi, MaxPage.toString()), timeCovertToMs({ min: 5 }))
@@ -700,7 +700,7 @@ export default class AnilistApi implements informationPluginFormat {
         placeholder: "filter.placeholderGenres",
         title: "filter.genres",
         langPath: "anime_genres.",
-        options: options.genres.map(v => v.toLowerCase().replaceAll(" ", "_"))
+        options: options.genres
       },
       {
         type: "years",
@@ -714,21 +714,21 @@ export default class AnilistApi implements informationPluginFormat {
         placeholder: "filter.placeholderSeason",
         title: "filter.season",
         langPath: "anime_seasons.",
-        options: options.seasons.map(v => v.toLowerCase().replaceAll(" ", "_"))
+        options: options.seasons
       },
       {
         type: "format",
         placeholder: "filter.placeholderFormat",
         title: "filter.format",
         langPath: "anime_formats.",
-        options: options.format.map(v => v.toLowerCase().replaceAll(" ", "_"))
+        options: options.format
       },
       {
         type: "airing",
         placeholder: "filter.placeholderAiring",
         title: "filter.airing",
         langPath: "anime_statuses.",
-        options: options.statuses.map(v => v.toLowerCase().replaceAll(" ", "_"))
+        options: options.statuses
       },
     ]
 

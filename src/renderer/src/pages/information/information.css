@@ -373,6 +373,7 @@
     border-radius: 12px;
     border: 2px solid var(--invisible);
     transition: 150ms all ease-in-out;
+    cursor: pointer;
 }
 
 .information-genre-button:hover {

@@ -76,16 +76,16 @@ export default function Filter(props: filterProps) {
                             <div class="home-filter-space">
                                 <div class="home-filter-title">{pathExist(item.title) ? t(item.title) : item.title}</div>
                                 <Dropdown onClickX={() => {
-                                    updateGenres(item.type, undefined, checkWrapper(`${item.langPath}${item.type}`, item.type));
+                                    updateGenres(item.type, undefined, `${item.langPath}${item.type}`);
                                     setCurrentFilter(unwrap(getHomeCache().filterTags))
                                     props.onChange(unwrap(currentFilter()))
                                 }}
                                     buttonText={currentFilter() && currentFilter()![item.type] ?
-                                        checkWrapper(`${item.langPath}${currentFilter()![item.type]}`, currentFilter()![item.type].name) : ""}
+                                        t(`${currentFilter()![item.type].name}`) : ""}
                                     options={item.options.map((val) => ({
                                         label: checkWrapper(`${item.langPath}${val}`, val),
                                         onClick: () => {
-                                            updateGenres(item.type, val, checkWrapper(`${item.langPath}${val}`, val))
+                                            updateGenres(item.type, val, `${item.langPath}${val}`)
                                             setCurrentFilter(unwrap(getHomeCache().filterTags))
                                             props.onChange(unwrap(currentFilter()))
                                         }

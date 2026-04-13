@@ -171,6 +171,10 @@ export interface homeData {
         clientHeight: number
     } | undefined
     onScrollContainer?: () => void
+    sidebarData: {
+        top: sidebarData[],
+        bottom: sidebarData[]
+    }
 }
 
 export interface deepLinkData {
@@ -301,7 +305,8 @@ export interface containerData {
 export interface sidebarData {
     icon: string
     text: string
-    onClick?: () => void
+    onClick?: () => any | Promise<any>
+    onSearch?: (search: string, params: FilterParams | undefined) => any | Promise<any>
 }
 
 export type ContextMenuProps = {

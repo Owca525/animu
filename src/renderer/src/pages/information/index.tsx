@@ -54,6 +54,9 @@ import { addToAnimuList, removeFromAnimulist, updateDataInAnimulist } from '@ren
 import OpeningPlayer from './components/openingPlayer';
 import { readPlaylist, removeInPlaylist, saveToPlaylist } from '@renderer/utils/FilesManager/playlist';
 import AnimulistMenu from '@renderer/components/animulistMenu';
+import { updateGenres } from '../home/components/filter';
+import { getHomeCache, getHomeSidebarData } from '@renderer/utils/stores/home';
+import { setNewActivePage, StartHomeSearch } from '../home';
 
 interface informationTmpProps {
     anime: AnimeData,
@@ -790,7 +793,18 @@ function information() {
                                     <span class='information-genre-title'>Genres</span>
                                     <For each={tempData().anime.genres}>
                                         {(item) => (
-                                            <span class='information-genre-button'>{t(`anime_genres.${item}`)}</span>
+                                            <span onclick={() => {
+                                            if (isCustomMenuActive()) hideCustomMenu()
+                                            if (showWrong()) setshowWrong(() => false)
+                                            if (showImages()) setShowImages(false)
+
+                                            updateGenres("genres", item, `anime_genres.${item}`);
+                                            const cache = getHomeCache()
+                                            StartHomeSearch(cache.search, cache.filterTags)
+                                            setNewActivePage(getHomeSidebarData().top[0].text, false)
+
+                                            navigate("/")
+                                            }} class='information-genre-button'>{t(`anime_genres.${item}`)}</span>
                                         )}
                                     </For>
                                 </div>

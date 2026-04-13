@@ -135,7 +135,7 @@ export async function anilistSearch(search: string, params: FilterParams | undef
         })
     } else {
         const plugin = getInformationPlugin()
-        plugin.searchAnime(search, 1, params);
+        plugin.searchAnime(search, 1, convertParams(params));
     }
 }
 
