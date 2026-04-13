@@ -790,7 +790,7 @@ function information() {
                                     <span class='information-genre-title'>Genres</span>
                                     <For each={tempData().anime.genres}>
                                         {(item) => (
-                                            <span class='information-genre-button'>{t(`anime_genres.${item.toUpperCase()}`)}</span>
+                                            <span class='information-genre-button'>{t(`anime_genres.${item}`)}</span>
                                         )}
                                     </For>
                                 </div>
