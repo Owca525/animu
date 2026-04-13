@@ -190,6 +190,8 @@ function App() {
     await getInformationPlugin().initial()
     await detectPluginVersion();
 
+    getInformationPlugin().home()
+
     setInitation(false)
     initialServices()
 
