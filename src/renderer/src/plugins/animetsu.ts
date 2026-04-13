@@ -1,6 +1,6 @@
 import { makeSmallText, request } from "@renderer/utils/functions";
 import { t } from "@renderer/utils/i18n";
-import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerData, playerSubtitlesFormat, resolutionFormat, playerChapterList, playerDataExtended } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, FilterPluginsParams, playerPluginFormat, playerData, playerSubtitlesFormat, resolutionFormat, playerChapterList, playerDataExtended } from "@renderer/utils/types";
 
 const BACKEND = "https://animetsu.live/v2"
 const WEBSITE = "https://animetsu.live/"
@@ -230,7 +230,7 @@ export default class Animetsu implements playerPluginFormat {
         if (!data) return []
         return data.episodesData[0].episodes
     }
-    searchAnime = async (name: string, _page: number, _params?: genresSearchFormat): Promise<cardData[]> => {
+    searchAnime = async (name: string, _page: number, _params?: FilterPluginsParams): Promise<cardData[]> => {
         let response = await request(preaperURL(`${BACKEND}/api/anime/search/?query=${name}`), { headers: HEADER });
 
         /* IFDEF DEBUG */

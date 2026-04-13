@@ -1,5 +1,5 @@
 import { makeSmallText, request } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, genresSearchFormat, playerData, playerPluginFormat, resolutionFormat } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, FilterPluginsParams, playerData, playerPluginFormat, resolutionFormat } from "@renderer/utils/types";
 
 const WEBSITE = "https://site.yummyani.me/"
 const API = "https://site.yummyani.me/api"
@@ -144,7 +144,7 @@ export default class yummyani implements playerPluginFormat {
         if (!response) return []
         return response.episodesData[0].episodes
     }
-    searchAnime = async (name: string, _page: number, _params?: genresSearchFormat): Promise<cardData[]> => {
+    searchAnime = async (name: string, _page: number, _params?: FilterPluginsParams): Promise<cardData[]> => {
         const response = await request(`${API}/search?q=${encodeURIComponent(name)}&limit=20&offset=0`)
         if (!response.success || !response.json) return []
         let cards: AnimeData[] | undefined[] = response.json["response"].map((v) => converterToAnimeData(v))

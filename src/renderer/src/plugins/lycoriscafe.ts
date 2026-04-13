@@ -1,5 +1,5 @@
 import { makeSmallText, request } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, FilterPluginsParams, playerPluginFormat, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat } from "@renderer/utils/types";
 const WEB = "https://www.lycoris.cafe"
 const HEADER = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0'
@@ -224,7 +224,7 @@ export default class LycorisCafe implements playerPluginFormat {
 
         return episodes
     }
-    searchAnime = async (name: string, page: number, _params?: genresSearchFormat): Promise<cardData[]> => {
+    searchAnime = async (name: string, page: number, _params?: FilterPluginsParams): Promise<cardData[]> => {
         let url = `${WEB}/api/search?page=${page}&pageSize=12&search=${name}&genres=&status=&format=&year=&season=&source=&sortField=popularity&sortDirection=desc&preferRomaji=true`
         const req = await request(url, { headers: HEADER });
         if (!req.success || !req.json) return []

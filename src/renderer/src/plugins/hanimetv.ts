@@ -1,5 +1,5 @@
 import { request } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, genresSearchFormat, playerData, playerPluginFormat } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, FilterPluginsParams, playerData, playerPluginFormat } from "@renderer/utils/types";
 
 const WEBSITE = "https://hanime.tv/"
 const API = "https://cached.freeanimehentai.net/"
@@ -225,7 +225,7 @@ export default class HanimeTv implements playerPluginFormat {
 
         return response.episodesData[0].episodes
     }
-    searchAnime = async (name: string, _page: number, _params?: genresSearchFormat): Promise<cardData[]> => {
+    searchAnime = async (name: string, _page: number, _params?: FilterPluginsParams): Promise<cardData[]> => {
         const tokens = await this.getVendorTokens()
         if (!tokens) return []
         if (this.cache.hentaiListCache.length <= 0) {

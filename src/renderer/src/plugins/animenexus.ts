@@ -2,7 +2,7 @@
 // player make token and session id token to m3u8 file
 
 import { convertChaptersVTT, request } from "@renderer/utils/functions";
-import { AnimeData, cardData, DateObject, episodeList, genresSearchFormat, playerData, playerPluginFormat } from "@renderer/utils/types";
+import { AnimeData, cardData, DateObject, episodeList, FilterPluginsParams, playerData, playerPluginFormat } from "@renderer/utils/types";
 
 const WEBSITE = "https://anime.nexus/"
 const API = "https://api.anime.nexus/api/"
@@ -128,7 +128,7 @@ export default class animenexus implements playerPluginFormat {
         
         return response["episodesData"][0]["episodes"]
     }
-    searchAnime = async (name: string, _page: number, _params?: genresSearchFormat): Promise<cardData[]> => {
+    searchAnime = async (name: string, _page: number, _params?: FilterPluginsParams): Promise<cardData[]> => {
         const response = await request(`${API}anime/shows?search=${name}&sortBy=name asc&page=1&includes[]=poster&includes[]=genres&hasVideos=1`, {
             headers: header
         })

@@ -1,5 +1,5 @@
 import { convertChaptersVTT, convertText, request } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerChapterList } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, FilterPluginsParams, playerPluginFormat, playerChapterList } from "@renderer/utils/types";
 
 const WEB = "https://anizone.to"
 const CARDS_REGEX = /<div[^>]*class=["']grid grid-cols-1 2xl:grid-cols-2 gap-4["'][^>]*>(.*?)<\/div>/gs
@@ -159,7 +159,7 @@ export default class Anizone implements playerPluginFormat {
         if (!data) return []
         return data.episodesData[0].episodes
     }
-    searchAnime = async (name: string, _page: number, _params?: genresSearchFormat): Promise<cardData[]> => {
+    searchAnime = async (name: string, _page: number, _params?: FilterPluginsParams): Promise<cardData[]> => {
         return await searchAnime(name)
     }
 }

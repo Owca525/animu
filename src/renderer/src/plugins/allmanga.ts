@@ -1,5 +1,5 @@
 import { convertMsToMinutes, makeSmallText, request } from "@renderer/utils/functions"
-import { AnimeData, episodeList, genresSearchFormat, playerPluginFormat, playerData } from "@renderer/utils/types"
+import { AnimeData, episodeList, FilterPluginsParams, playerPluginFormat, playerData } from "@renderer/utils/types"
 
 const HASH_SEARCH = 'a24c500a1b765c68ae1d8dd85174931f661c71369c89b92b88b75a725afc471c'
 const HASH_INFO = '043448386c7a686bc2aabfbb6b80f6074e795d350df48015023b079527b0848a'
@@ -409,7 +409,7 @@ export default class Allmanga implements playerPluginFormat {
         }
         return []
     }
-    async searchAnime(name: string, page: number, _params?: genresSearchFormat) {
+    async searchAnime(name: string, page: number, _params?: FilterPluginsParams) {
         let resp = await SearchAnimeInAllmanga(name.replaceAll('"', "").replaceAll('&', ""), page)
         return resp.map((card) => ({ AnimeData: card }))
     }
