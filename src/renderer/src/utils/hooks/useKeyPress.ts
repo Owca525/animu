@@ -26,13 +26,13 @@ export function useKeyPress(func: (keybinds: string) => void) {
   };
 
   onMount(() => {
-    window.addEventListener("keydown", handleKeyDown, { passive: true });
-    window.addEventListener("keyup", handleKeyUp, { passive: true });
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keyup", handleKeyUp);
   });
 
   onCleanup(() => {
-    window.removeEventListener("keydown", handleKeyDown);
-    window.removeEventListener("keyup", handleKeyUp);
+    document.removeEventListener("keydown", handleKeyDown);
+    document.removeEventListener("keyup", handleKeyUp);
   });
 
   return { setFunc };
