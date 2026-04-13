@@ -827,7 +827,12 @@ export function runService(func: () => Promise<any> | any, time: number, name: s
 }
 
 export function globalNavigate(path: string) {
+    /* IFDEF PROD */
+    location.href = `${location.pathname}#${path}`
+    /* ENDIF */
+    /* IFDEF DEBUG */
     location.href = `${location.origin}/#${path}`
+    /* ENDIF */
 }
 
 /* IFDEF DEBUG|PROD */
