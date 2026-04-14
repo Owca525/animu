@@ -1,5 +1,5 @@
 import AnilistApi from "@renderer/plugins/anilistApi";
-import { genresSearchFormat, informationPluginManagerFormat, informationPluginFormat, playerPluginManagerFormat, playerPluginFormat, Anilist_ListMutation } from "./types";
+import { FilterPluginsParams, informationPluginManagerFormat, informationPluginFormat, playerPluginManagerFormat, playerPluginFormat, Anilist_ListMutation } from "./types";
 import { getPluginRepo, setPlayerPlugin, setPluginPlayerList } from "./stores/plugins";
 import Allmanga from "@renderer/plugins/allmanga";
 import Anizone from "@renderer/plugins/anizone";
@@ -156,7 +156,7 @@ export class informationPluginManager implements informationPluginManagerFormat 
     //   private plugins: informationPluginFormat[] = [];
     currentPlugin: informationPluginFormat = new AnilistApi()
 
-    searchAnime = (name: string, page: number, params?: genresSearchFormat) => {
+    searchAnime = (name: string, page: number, params?: FilterPluginsParams) => {
         setHomeData(async () => await this.currentPlugin.search(name, page, params))
     };
     schedule = (airingStart: number, airingEnd: number) => {
