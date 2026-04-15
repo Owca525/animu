@@ -1,4 +1,4 @@
-import { createSignal, createEffect, For } from "solid-js";
+import { createSignal, createEffect, For, Show } from "solid-js";
 import { formatTime } from '@renderer/utils/functions';
 import type { Thumbnail } from '@renderer/utils/types';
 import "./css/seekBar.css";
@@ -182,32 +182,32 @@ export default function SeekBar(props: SeekBarProps) {
         </div>
       )}
 
-      <div ref={(el) => (seekBarProgress = el!)} class={`seekbar-progress ${props.classes?.progress ?? ""}`} />
-      <div ref={(el) => (seekbarThumb = el!)} class={`seekbar-thumb ${props.classes?.thumb ?? ""}`} />
+      <div ref={seekBarProgress} class={`seekbar-progress ${props.classes?.progress ?? ""}`} />
+      <div ref={seekbarThumb} class={`seekbar-thumb ${props.classes?.thumb ?? ""}`} />
       <div
         ref={(el) => (seekbarBox = el!)}
         class={`seekbar-box ${props.classes?.box ?? ""}`}
         style={{ "display": show() ? "block" : "none" }}
       />
       <div class="seekbar-content-wrapper" style={{ "display": show() ? "block" : "none" }}>
-        {props.thumbnail && (
+        <Show when={props.thumbnail}>
           <div
             ref={(el) => (seekbarThumbnail = el!)}
             class="seekbar-thumbnail"
             style={{
               "display": show() ? "block" : "none",
-              "background-image": `url(${props.thumbnail.src})`,
+              "background-image": `url(${props.thumbnail!.src})`,
             }}
           />
-        )}
-        {props.chapterList && props.chapterList.length > 0 && (
+        </Show>
+        <Show when={props.chapterList && props.chapterList.length > 0}>
           <div
             ref={(el) => (seekbarChapterText = el!)}
             class={`seekbar-box ${
               props.thumbnail ? "seekbar-chapter-box-thumbnails" : "seekbar-chapter-box"
             } ${props.classes?.box ?? ""}`}
           />
-        )}
+        </Show>
       </div>
     </div>
   );
