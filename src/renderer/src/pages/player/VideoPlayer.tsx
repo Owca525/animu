@@ -810,6 +810,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 last_Time: event.currentTarget.currentTime,
                 episode: temp.episode,
                 type: temp.type,
+                duration: unwrap(durrationTime()),
                 isStarted: false,
             }
         }

@@ -267,6 +267,7 @@ export interface indentityPlayer {
     last_Time: number
     episode: string
     type: string
+    duration?: number
     isStarted?: boolean
     lastAnimeDataUpdate?: number
 }

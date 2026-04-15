@@ -132,6 +132,38 @@
     font-size: 0.9em;
 }
 
+.card-episode-mark {
+    background-color: var(--third-layer);
+    padding: 2px 8px;
+    border-radius: 6px;
+    z-index: 12;
+    top: 0;
+    right: 0;
+    position: absolute;
+    margin: 8px;
+
+    font-size: .9em;
+}
+
+.card-episode-seekbar-container {
+    background-color: var(--fourth-layer);
+    width: 100%;
+    height: 8px;
+    overflow: hidden;
+    z-index: 1;
+    position: relative;
+    margin-top: -12px;
+    border-radius: 2px;
+}
+
+.card-episode-progress {
+    display: flex;
+    height: 8px;
+    z-index: 2;
+    position: relative;
+    background-color: var(--green-one);
+}
+
 /* For smaller devices / window sizes */
 @media (max-width: 600px) {
     .card-information, .card-information-left, .card-information-right {

@@ -169,9 +169,9 @@ function Card(props: CardProps) {
       option: "Add To AnimuList",
       onClick: () =>
         showCustomMenu(AnimulistMenu({
-            anime: unwrap(props.card.AnimeData),
-            save: (animulist, anime) => addToAnimuList(animulist, anime, true)
-          })),
+          anime: unwrap(props.card.AnimeData),
+          save: (animulist, anime) => addToAnimuList(animulist, anime, true)
+        })),
     });
   }
 
@@ -305,6 +305,11 @@ function Card(props: CardProps) {
           {GenerateInformation()}
         </div>
       </Show>
+      <Show when={props.card.saveData}>
+        <span class="card-episode-mark">
+        Ep {props.card.saveData!["episode"]}
+        </span>
+      </Show>
       <Show when={props.card.AnimeData.coverImage && isCardVisible()}>
         <img
           src={props.card.AnimeData.coverImage}
@@ -326,6 +331,14 @@ function Card(props: CardProps) {
           </div>
         </Match>
       </Switch>
+      <Show when={props.card.saveData && props.card.saveData["last_Time"] > 0 && (props.card.saveData["duration"] || props.card.AnimeData.duration)}>
+        <div class="card-episode-seekbar-container">
+          <span style={{
+            width: props.card.AnimeData.duration ? `${(props.card.saveData!["last_Time"] / (props.card.AnimeData.duration * 60)) * 100}%` :
+              `${(props.card.saveData!["last_Time"] / props.card.saveData!["duration"]!) * 100}%`
+          }} class="card-episode-progress"></span>
+        </div>
+      </Show>
       <div class="card-title">{detectTitleConfig(props.card.AnimeData.title)}</div>
       <Show when={props.card.saveData && props.card.saveData.episode}>
         <Show when={props.card.saveData?.last_Time != 0 && props.card.saveData?.type != ""} fallback={<div class="card-continue-watch-text">{t("history.history", { ep: props.card.saveData?.episode })}</div>}>
