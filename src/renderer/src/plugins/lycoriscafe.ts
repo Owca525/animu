@@ -76,8 +76,8 @@ function detectResoltion(text: string): string {
             return "720"
         case "FHD":
             return "1080"
-        case "SourceMKV":
-            return "Source"
+        // case "SourceMKV":
+        //     return "Source"
     }
     return "Unknown"
 }
@@ -113,13 +113,16 @@ function convertToAnimeData(data: any): AnimeData | undefined {
 async function requestToApi(anime_id: string): Promise<{ data: any } | undefined> {
     let url = `${WEB}/api/anime/${anime_id}`
     let req = await request(url, { headers: HEADER });
-    if (!req.success) return undefined
+    if (!req.success) {
+        console.error("Failed Request requestToApi/lycorisCafe", anime_id, req)
+        return undefined
+    }
     return { data: req.json }
 }
 
 export default class LycorisCafe implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.4",
+        version: "1.5",
         name: "Lycoris.cafe",
         author: "Owca525",
         icon: "https://www.lycoris.cafe/favicon.ico",
@@ -227,7 +230,10 @@ export default class LycorisCafe implements playerPluginFormat {
     searchAnime = async (name: string, page: number, _params?: FilterPluginsParams): Promise<cardData[]> => {
         let url = `${WEB}/api/search?page=${page}&pageSize=12&search=${name}&genres=&status=&format=&year=&season=&source=&sortField=popularity&sortDirection=desc&preferRomaji=true`
         const req = await request(url, { headers: HEADER });
-        if (!req.success || !req.json) return []
+        if (!req.success || !req.json) {
+            console.warn("Failed Request searchAnime/LycorisCafe", req)
+            return []
+        }
 
         let data: cardData[] = req.json.data.map((element) => { return { AnimeData: convertToAnimeData(element) } })
         if (!data) return []
