@@ -611,6 +611,17 @@
   height: 100vh;
   width: 100vw;
   z-index: 2;
+  transition: opacity 100ms ease-in-out, z-index 0ms, linear 100ms;
+}
+
+.player-more-information-background.hidden {
+  opacity: 0;
+  z-index: -1;
+}
+
+.player-more-information-background.show {
+  opacity: 1;
+  z-index: 1;
 }
 
 .player-more-information-background::after {

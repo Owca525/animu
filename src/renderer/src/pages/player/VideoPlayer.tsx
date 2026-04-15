@@ -739,6 +739,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             video.play().catch((reason) => {
                 console.warn("Video Play Error Catch", reason)
             })
+            moreInformationTimer = setTimeout(() => {
+                setShowingMoreInformation(true)
+            }, 4000)
             pauseClip()
             return true
         })
@@ -868,7 +871,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     function updateProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
 
-        setShowingMoreInformation(false)
+        if (moreInformationTimer) clearInterval(moreInformationTimer)
 
         setcurrentTime(event.currentTarget.currentTime)
         saveContinueProgress(event)
@@ -1708,28 +1711,46 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     PlayerVolume={PlayerVolume}
                 />
             </Show>
-            <Show when={isShowingMoreInformation() && !config.Player.general.disablemoreinformation}>
-                <div class="player-more-information-background">
+            <Show when={!config.Player.general.disablemoreinformation}>
+                <div class={`player-more-information-background ${isShowingMoreInformation() ? "show" : "hidden"}`}>
                     <div class="player-more-information-container">
-                        <span class="player-more-information-top-text">Current Watching</span>
+                        <span class="player-more-information-top-text">{t("Current Watching")}</span>
                         <img src={anime_data.AnimeData.coverImage} class="player-more-information-image" />
                         <span class="player-more-information-title">{detectTitleConfig(anime_data.AnimeData.title)}</span>
                         <div class="player-more-information-format-container">
-                            <span class="player-more-information-season">{t(`anime_seasons.${anime_data.AnimeData.season}`)} {anime_data.AnimeData.seasonYear}</span>
-                            &#8226;
-                            <span class="player-more-information-format">{t(`anime_formats.${anime_data.AnimeData.format}`)}</span>
-                            &#8226;
+                            <Show when={anime_data.AnimeData.season || anime_data.AnimeData.seasonYear}>
+                                <span class="player-more-information-season">
+                                    <Show when={anime_data.AnimeData.season}>
+                                        {t(`anime_seasons.${anime_data.AnimeData.season}`)}
+                                        &nbsp;
+                                    </Show>
+                                    <Show when={anime_data.AnimeData.seasonYear}>
+                                        {anime_data.AnimeData.seasonYear}
+                                    </Show>
+                                </span>
+                                &#8226;
+                            </Show>
+                            <Show when={anime_data.AnimeData.format}>
+                                <span class="player-more-information-format">{t(`anime_formats.${anime_data.AnimeData.format}`)}</span>
+                                &#8226;
+                            </Show>
                             <span class="player-more-information-episode">Episode {temp.episode} / {temp.episodes.length}</span>
                         </div>
-                        <span class="player-more-information-description">{decodeHtmlEntities(anime_data.AnimeData.description as any)}</span>
+                        <span class="player-more-information-description">{decodeHtmlEntities(anime_data.AnimeData.description)}</span>
                         <div class="player-more-information-genres-container">
                             <For each={anime_data.AnimeData.genres}>
                                 {(item) => (
-                                    <div class="player-more-information-genres">{item as string}</div>
+                                    <div class="player-more-information-genres">{item}</div>
                                 )}
                             </For>
                         </div>
-                        <span class="player-more-information-durration">{anime_data.AnimeData.averageScore}% &#8226; {convertSecondsToHoursFormat(durrationTime())}</span>
+                        <span class="player-more-information-durration">
+                            <Show when={anime_data.AnimeData.averageScore}>
+                                {anime_data.AnimeData.averageScore}%
+                                &#8226;
+                            </Show>
+                            {convertSecondsToHoursFormat(durrationTime())}
+                        </span>
                     </div>
                 </div>
             </Show>

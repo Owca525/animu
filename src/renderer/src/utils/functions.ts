@@ -30,7 +30,8 @@ import { saveConfig } from './FilesManager/config';
 import { OvewriteAnimuList } from './FilesManager/animulist';
 import { readPlaylist, updatePlaylist } from './FilesManager/playlist';
 
-export function decodeHtmlEntities(str: string) {
+export function decodeHtmlEntities(str: string | undefined) {
+    if (!str) return ""
     const parser = new DOMParser();
     const doc = parser.parseFromString(str, 'text/html');
     return doc.documentElement.textContent;
