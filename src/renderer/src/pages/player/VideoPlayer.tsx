@@ -683,8 +683,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     let message: string | undefined
                     switch (data.type) {
                         case Hls.ErrorTypes.NETWORK_ERROR:
-                            tmpHls.startLoad(curTime);
-                            setFatalError(false)
+                            if (data.response && (data.response["code"] == 429 || data.response["code"] == 403)) {
+                                setFatalError(true)
+                            } else {
+                                tmpHls.startLoad(curTime);
+                                setFatalError(false)
+                            }
                             message = t('player.errors.MEDIA_ERR_NETWORK')
                             break;
                         case Hls.ErrorTypes.MEDIA_ERROR:
