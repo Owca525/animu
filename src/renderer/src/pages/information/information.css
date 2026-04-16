@@ -15,7 +15,7 @@
     width: clamp(20px, 1vw, 30px);
     height: clamp(20px, 1vw, 30px);
     padding: clamp(4px, 1vw, 12px);
-    
+
     font-size: clamp(0.8rem, 1.5vw, 1.2rem);
 
     display: flex;
@@ -27,14 +27,18 @@
 }
 
 .information-bar {
-    margin-right: -90px;
+    /* margin-right: -90px; */
     margin-top: -20px;
+    margin-left: 12px;
     padding: 8px;
     gap: 6px;
     align-items: center;
     display: flex;
     flex-direction: column;
     height: max-content;
+    position: absolute;
+    position-anchor: --information-top;
+    left: anchor(right);
 }
 
 /* banner related classes */
@@ -93,6 +97,7 @@
     gap: 20px;
     padding: 20px;
     box-sizing: border-box;
+    anchor-name: --information-top;
 }
 
 .information-image-container {
@@ -106,7 +111,8 @@
     align-items: center;
 }
 
-.information-cover, .information-cover-placeholder {
+.information-cover,
+.information-cover-placeholder {
     max-width: 240px;
     max-height: 240px;
     width: 100%;
@@ -176,7 +182,7 @@
 }
 
 .information-info-content {
-       overflow: hidden; 
+    overflow: hidden;
     padding: 14px 10px;
 }
 
@@ -224,13 +230,14 @@
     line-clamp: 3;
     -webkit-box-orient: vertical;
 }
+
 .information-description.moretext {
     height: 100%;
     max-height: none;
 }
 
 .information-description-toggle {
-    display: none !important; 
+    display: none !important;
     user-select: none;
     cursor: pointer;
     position: relative;
@@ -321,7 +328,9 @@
     font-size: 2em;
 }
 
-.information-episodes, .information-characters, .information-info {
+.information-episodes,
+.information-characters,
+.information-info {
     animation: firstShow 0.2s ease forwards;
 }
 
@@ -355,7 +364,8 @@
     gap: 8px;
 }
 
-.information-right-bar, .information-genres-container {
+.information-right-bar,
+.information-genres-container {
     display: flex;
     flex-direction: column;
 }
@@ -401,7 +411,8 @@
         width: 100%;
     }
 
-    .information-banner, .information-banner-image {
+    .information-banner,
+    .information-banner-image {
         position: relative;
         height: fit-content;
         max-height: 250px;
@@ -415,7 +426,7 @@
     .information-bottom {
         flex-direction: column;
     }
-    
+
     .information-bottom-content {
         padding: 0px max(1dvw, 10px);
     }
@@ -459,18 +470,18 @@
     .information-description {
         font-size: 0.9em;
     }
-    
+
     .information-bar {
         margin-right: 0px;
         margin-top: 0px;
         padding: 0px;
         gap: 4px;
     }
-    
+
     .information-score {
         font-size: clamp(0.85rem, 1.8vw, 1rem);
     }
-    
+
 }
 
 /* for very small window sizes */
@@ -487,7 +498,8 @@
         margin-top: 0px;
     }
 
-    .information-banner, .information-fade {
+    .information-banner,
+    .information-fade {
         width: 100%;
         height: max(10vh, 100px);
     }
@@ -526,8 +538,9 @@
     .information-description {
         font-size: 0.8em;
     }
-    
-    .information-title, .information-title2 {
+
+    .information-title,
+    .information-title2 {
         display: none;
     }
 
@@ -547,7 +560,7 @@
         padding-left: 6dvw;
         padding-top: 15px;
     }
-    
+
     .information * .button {
         padding: clamp(4px, 2vw, 20px);
     }
