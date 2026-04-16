@@ -7,9 +7,8 @@ import { cardData, containerData, FilterParams, homeData } from "@renderer/utils
 import { unwrap } from "solid-js/store";
 
 export function setCalendary(date?: string) {
-    
     let tmp = new Date()
-    if (date) tmp = new Date(date)
+    if (typeof date == "string") tmp = new Date(date)
 
     const startOfDay = new Date(tmp);
     startOfDay.setHours(0, 0, 0, 0);
@@ -17,7 +16,6 @@ export function setCalendary(date?: string) {
     const endOfDay = new Date(tmp);
     endOfDay.setHours(23, 59, 59, 999);
 
-    console.log(startOfDay, endOfDay)
     const days = [t("week.sunday"), t("week.monday"), t("week.tuesday"), t("week.wednesday"), t("week.thursday"), t("week.friday"), t("week.saturday")];
 
     setHomeData(async () => ({
