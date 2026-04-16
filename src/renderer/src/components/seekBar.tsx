@@ -148,7 +148,7 @@ export default function SeekBar(props: SeekBarProps) {
     <div tabIndex={-1} class={`seekBar-container ${props.classes?.container ?? ""}`}>
       <div
         class="seekbar-shadow"
-        ref={(el) => (seekBarRef = el!)}
+        ref={seekBarRef}
         onClick={(e) => setPosition(e as MouseEvent)}
         onMouseDown={() => setDrag(true)}
         onMouseUp={() => setDrag(false)}
@@ -156,7 +156,7 @@ export default function SeekBar(props: SeekBarProps) {
         onMouseEnter={() => setShow(true)}
         onMouseMove={(e) => handleMouseMove(e as MouseEvent)}
       />
-      {props.secondBarValues && (
+      <Show when={props.secondBarValues}>
         <div class="seekbar-buffer-wrapper">
           <For each={props.secondBarValues}>
             {(buffer) => (
@@ -164,8 +164,8 @@ export default function SeekBar(props: SeekBarProps) {
             )}
           </For>
         </div>
-      )}
-      {props.chapterList && props.chapterList.length > 0 && (
+      </Show>
+      <Show when={props.chapterList && props.chapterList.length > 0}>
         <div class="seekbar-chapters-wrapper">
           <For each={props.chapterList}>
             {(chapter) => (
@@ -180,19 +180,19 @@ export default function SeekBar(props: SeekBarProps) {
             )}
           </For>
         </div>
-      )}
+      </Show>
 
       <div ref={seekBarProgress} class={`seekbar-progress ${props.classes?.progress ?? ""}`} />
       <div ref={seekbarThumb} class={`seekbar-thumb ${props.classes?.thumb ?? ""}`} />
       <div
-        ref={(el) => (seekbarBox = el!)}
+        ref={seekbarBox}
         class={`seekbar-box ${props.classes?.box ?? ""}`}
         style={{ "display": show() ? "block" : "none" }}
       />
       <div class="seekbar-content-wrapper" style={{ "display": show() ? "block" : "none" }}>
         <Show when={props.thumbnail}>
           <div
-            ref={(el) => (seekbarThumbnail = el!)}
+            ref={seekbarThumbnail}
             class="seekbar-thumbnail"
             style={{
               "display": show() ? "block" : "none",
@@ -202,7 +202,7 @@ export default function SeekBar(props: SeekBarProps) {
         </Show>
         <Show when={props.chapterList && props.chapterList.length > 0}>
           <div
-            ref={(el) => (seekbarChapterText = el!)}
+            ref={seekbarChapterText}
             class={`seekbar-box ${
               props.thumbnail ? "seekbar-chapter-box-thumbnails" : "seekbar-chapter-box"
             } ${props.classes?.box ?? ""}`}
