@@ -2,7 +2,7 @@
   position: fixed;
   bottom: 0;
   right: 0;
-  width: 250px;
+  width: max-content;
   height: 40px;
   background-color: var(--five-layer);
   margin: 12px;
@@ -12,6 +12,11 @@
   padding: 12px;
   border-radius: 12px;
   justify-content: space-between;
+  gap: 12px;
+}
+
+.opening-seekbar {
+    width: 150px;
 }
 
 .opening-player-text {
@@ -38,4 +43,5 @@
 .opening-player-controls {
     display: flex;
     align-items: center;
+    gap: 12px;
 }

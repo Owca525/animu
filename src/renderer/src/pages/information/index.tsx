@@ -91,7 +91,7 @@ function information() {
     // Openings / Endings
     const [animeMedia, setAnimeMedia] = createSignal<animeOpeningsFormat[]>([])
     const [currentMedia, setCurrentAnimeMedia] = createSignal<MiniPlayerProps[] | undefined>(undefined)
-    const [currentAudio, setCurrentAudio] = createSignal<animeOpeningsFormat | undefined>(undefined)
+    const [currentAudio, setCurrentAudio] = createSignal<animeOpeningsFormat[] | undefined>(undefined)
 
     // Banner
     const [isBannerLoading, setBannerLoadingData] = createSignal<boolean>(true)
@@ -365,7 +365,7 @@ function information() {
             return setContentNoData("Openings Not Found")
         }
 
-        setCurrentAudio(response[0])
+        setCurrentAudio(response)
 
         setCurrentAnimeMedia(response.map((item) => {
             const firstPartTitle = item.type == "OP" ? "Opening" : "Ending"
