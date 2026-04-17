@@ -877,6 +877,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     function updateProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
 
         if (moreInformationTimer) clearInterval(moreInformationTimer)
+        setShowingMoreInformation(false)
 
         setcurrentTime(event.currentTarget.currentTime)
         saveContinueProgress(event)
