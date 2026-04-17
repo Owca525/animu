@@ -8,6 +8,7 @@ import LycorisCafe from "@renderer/plugins/lycoriscafe";
 import { getConfig } from "./stores/config";
 import { detectIndex, getPluginInitialConfig, getPluginsList, getRenderPath, setHomeData } from "./functions";
 import semver from "semver";
+import AniDap from "@renderer/plugins/anidap";
 // import yummyani from "@renderer/plugins/yummyani";
 // import Aowu from "@renderer/plugins/aowu";
 
@@ -67,7 +68,7 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
 
     initialPlugins = async (): Promise<void> => {
         this.pluginList = []
-        const localPlugins = [Allmanga, Anizone, Animetsu, LycorisCafe]
+        const localPlugins = [Allmanga, Anizone, Animetsu, LycorisCafe, AniDap]
 
         const plugins = await getPluginsList()
         const externalPlugins = await this.loadPlugin(plugins)
