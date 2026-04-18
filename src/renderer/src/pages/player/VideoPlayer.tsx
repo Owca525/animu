@@ -604,16 +604,19 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     async function runHLS(resolution: resolutionFormat, splitHls: boolean = false, initialTime?: number) {
         let configHLS: Partial<HlsConfig> = {
-            autoStartLoad: true,
             enableWorker: true,
             lowLatencyMode: true,
-            backBufferLength: 40,
+            backBufferLength: 90,
+            maxBufferLength: 300,
+            maxBufferSize: 120000000,
+            maxMaxBufferLength: 600,
+            nudgeMaxRetry: 9
         }
 
         /* IFDEF WEB */
         class sheepLoader extends Hls.DefaultConfig.loader {
             load(context: any, config: any, callbacks: any) {
-                request(context.url, { method: "GET" }).then((data) => {
+                request(context.url, { method: "GET", headers: resolution["reqHeader"] }).then((data) => {
                     let currentData: any = data.text
                     if (!data.success) {
                         console.warn("Context:", context, "Data:", data)

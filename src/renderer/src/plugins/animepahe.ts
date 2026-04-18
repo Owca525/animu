@@ -203,6 +203,7 @@ export default class AnimePahe implements playerPluginFormat {
             data.push({
                 res: element["resolution"]!,
                 url: urlResp["url"] as string,
+                hls: true,
                 reqHeader: {
                     ...urlResp["header"],
                     ...playerHeader
