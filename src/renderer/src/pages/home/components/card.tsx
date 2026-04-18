@@ -315,7 +315,10 @@ function Card(props: CardProps) {
           src={props.card.AnimeData.coverImage}
           class="card-image"
           onLoad={() => setLoading(false)}
-          onError={() => setIsError(true)}
+          onError={() => {
+            setIsError(true);
+            setLoading(false)
+          }}
           style={checkState()}
         />
       </Show>
@@ -327,7 +330,7 @@ function Card(props: CardProps) {
         </Match>
         <Match when={isError()}>
           <div class="card-image-placeholder">
-            <span class="material-symbols-outlined icon">error</span>
+            <span class="material-symbols-outlined icon">broken_image</span>
           </div>
         </Match>
       </Switch>
