@@ -148,7 +148,8 @@ export default class AnimePahe implements playerPluginFormat {
         name: "AnimePahe",
         author: "Owca525",
         supportLang: ["en"],
-        urlWebsite: WEBSITE
+        urlWebsite: WEBSITE,
+        icon: `${WEBSITE}/favicon-96x96.png`
     };
     cache: { [key: string]: string | number[] }[] = []
 
