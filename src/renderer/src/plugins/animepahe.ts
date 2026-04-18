@@ -10,9 +10,18 @@ const header = {
 }
 
 const playerHeader = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0',
-    'Referer': "https://kwik.cx",
-    "Origin": "https://kwik.cx"
+    "User-Agent":
+        "Mozilla/5.0 (X11; Linux x86_64; rv:149.0) Gecko/20100101 Firefox/149.0",
+    Accept: "*/*",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    Origin: "https://kwik.cx",
+    "Sec-GPC": "1",
+    Connection: "keep-alive",
+    Referer: "https://kwik.cx/",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "cross-site"
 }
 
 function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string | undefined {
@@ -104,7 +113,9 @@ class Hls {
 
 async function extractResolution(url: string) {
     const htmlResponse = await request(url, { headers: header })
-    console.log(htmlResponse)
+    /* IFDEF DEBUG */
+    console.log("extractPlayerData/AnimePahe", htmlResponse)
+    /* ENDIF */
     if (!htmlResponse["success"]) return
 
     const scripts = Array.from(
@@ -112,8 +123,6 @@ async function extractResolution(url: string) {
     )
         .map(m => m[1])
         .filter(code => code.includes("eval"));
-
-    console.log(scripts)
 
     const blob = new Blob([payload + scripts], { type: "text/javascript" });
     const payloadURL = URL.createObjectURL(blob);
@@ -147,14 +156,16 @@ export default class AnimePahe implements playerPluginFormat {
         if (this.cache[id] == undefined) await this.extractEpisodeList(undefined, id)
         if (this.cache[id] == undefined) return []
 
-        const find = this.cache[id].find((v) => v["episode"].toString() == episode.toString())
+        const find = this.cache[id][parseInt(episode)-1]
         if (!find) return []
         const episodeID = find["session"]
         const htmlResponse = await request(`${WEBSITE}/play/${id}/${episodeID}`, { headers: header })
+        /* IFDEF DEBUG */
+        console.log("extractPlayerData/AnimePahe", htmlResponse)
+        /* ENDIF */
+
         if (!htmlResponse["success"]) return []
 
-        console.log(htmlResponse)
-        console.log(htmlResponse.text.match(/<[^>]*data-src=["'][^"']+["'][^>]*>/g))
         const tagRegex = /<[^>]*data-src=["'][^"']+["'][^>]*>/g;
 
         let match;
@@ -182,12 +193,12 @@ export default class AnimePahe implements playerPluginFormat {
             });
         }
 
+        let dubbingRes = results.filter((v) => v["audio"] == "eng")
         results = results.filter((v) => v["audio"] == "jpn")
         let data: resolutionFormat[] = []
         for (let index = 0; index < results.length; index++) {
             const element = results[index];
             const urlResp = await extractResolution(element["src"]!)
-            console.log(urlResp)
             if (!urlResp) continue
             data.push({
                 res: element["resolution"]!,
@@ -199,19 +210,43 @@ export default class AnimePahe implements playerPluginFormat {
             })
         }
 
-        return [{
-            hostname: "animepahe",
-            resolution: data,
+        let finnalContent: playerData = {
+            hostname: "AnimePahe",
+            resolution: data.reverse(),
             splitHLS: true
-        }]
+        }
+        if (dubbingRes.length > 0) {
+            finnalContent = {
+                ...finnalContent,
+                isDubbing: async () => {
+                    let dubData: resolutionFormat[] = []
+                    for (let index = 0; index < dubbingRes.length; index++) {
+                        const element = dubbingRes[index];
+                        const urlResp = await extractResolution(element["src"]!)
+                        if (!urlResp) continue
+                        dubData.push({
+                            res: element["resolution"]!,
+                            url: urlResp["url"] as string,
+                            reqHeader: {
+                                ...urlResp["header"],
+                                ...playerHeader
+                            }
+                        })
+                    }
+                    return dubData.reverse()
+                }
+            }
+        }
+
+        return [finnalContent]
     }
     extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {
         if (anime_id && this.cache[anime_id]) {
             return {
                 player_id: anime_id,
                 episodesData: [{
-                    episodes: this.cache[anime_id].map((v) => ({
-                        ep: v["episode"],
+                    episodes: this.cache[anime_id].map((v, i) => ({
+                        ep: i+1,
                         img: v["snapshot"],
                         title: v["title"]
                     })),
@@ -228,19 +263,21 @@ export default class AnimePahe implements playerPluginFormat {
         }
         if (!anime_id) return
         const episodeResponse = await request(`${WEBSITE}/api?m=release&id=${anime_id}&sort=episode_asc&page=1`, { headers: header })
-        console.log(episodeResponse)
+        /* IFDEF DEBUG */
+        console.log("extractEpisodeList/AnimePahe", episodeResponse)
+        /* ENDIF */
 
         if (!episodeResponse["success"] || !episodeResponse["json"]) return
         this.cache = {
             ...this.cache,
             [anime_id]: episodeResponse["json"]["data"]
-        }
+        };
 
         return {
             player_id: anime_id,
             episodesData: [{
-                episodes: episodeResponse["json"]["data"].map((v) => ({
-                    ep: v["episode"],
+                episodes: episodeResponse["json"]["data"].map((v, i) => ({
+                    ep: i+1,
                     img: v["snapshot"],
                     title: v["title"]
                 })),
@@ -256,6 +293,9 @@ export default class AnimePahe implements playerPluginFormat {
     searchAnime = async (name: string, _page: number, _params?: FilterPluginsParams): Promise<cardData[]> => {
         try {
             const searchResponse = await request(`${WEBSITE}/api?m=search&q=${name}`, { headers: header })
+            /* IFDEF DEBUG */
+            console.log("searchAnime/AnimePahe", searchResponse)
+            /* ENDIF */
             if (!searchResponse["success"] || !searchResponse["json"]) return []
 
             return searchResponse["json"]["data"].map((v) => convertToAnimeData(v))

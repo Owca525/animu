@@ -326,7 +326,13 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         runNewPlayer(defaulthost, time)
         handleVolume(PlayerVolume, true)
-        handleMouseMove()
+        handleMouseMove();
+
+        /* IFDEF DEBUG */
+        (window as any).playerVideoRef = videoRef;
+        (window as any).playerVideoJS = videoJS;
+        (window as any).playerHLS = hls;
+        /* ENDIF */
 
         if (videoRef) {
             setEventInPlayer("timeupdate", updateProgress)
@@ -598,11 +604,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     async function runHLS(resolution: resolutionFormat, splitHls: boolean = false, initialTime?: number) {
         let configHLS: Partial<HlsConfig> = {
-            maxBufferLength: 140,
             autoStartLoad: true,
             enableWorker: true,
-            lowLatencyMode: false,
-            backBufferLength: 90,
+            lowLatencyMode: true,
+            backBufferLength: 40,
         }
 
         /* IFDEF WEB */
