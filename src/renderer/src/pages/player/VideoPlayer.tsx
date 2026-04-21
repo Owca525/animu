@@ -1762,6 +1762,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                             <Show when={anime_data.AnimeData.averageScore}>
                                 {anime_data.AnimeData.averageScore}%
                                 &#8226;
+                                &nbsp;
                             </Show>
                             {convertSecondsToHoursFormat(durrationTime())}
                         </span>
