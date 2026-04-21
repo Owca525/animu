@@ -1046,8 +1046,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }
     }
 
-    async function setEpisode(type: "next" | "prev") {
-        if (durrationTime() <= 0) return console.warn("Illegal Change Episode")
+    async function setEpisode(type: "next" | "prev", passIllegal = false) {
+        if (durrationTime() <= 0 && !passIllegal) return console.warn("Illegal Change Episode")
         let ep = temp.episodes.findIndex((item) => item.ep.toString() == temp.episode, toString())
         if (ep < 0) return
         if (type == 'prev') ep = ep - 1
@@ -1197,10 +1197,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 setMutedToPlayer()
                 break
             case convertKeybinds(config.Player.keybinds.NextEpisode.toLowerCase()).toLowerCase():
-                setEpisode("next")
+                setEpisode("next", true)
                 break
             case convertKeybinds(config.Player.keybinds.PrevEpisode.toLowerCase()).toLowerCase():
-                setEpisode("prev")
+                setEpisode("prev", true)
                 break
             case convertKeybinds(config.Player.keybinds.PictureInPicture.toLowerCase()).toLowerCase():
                 handlePictureInPicture()
@@ -1521,13 +1521,13 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                         <div class="player-left">
                             <Show when={getEpisode("prev") !== undefined}>
                                 <PlayerButton title={t('player.previous', { ep: getEpisode("prev")?.ep })} icon='skip_previous'
-                                    onClick={() => setEpisode("prev")}
+                                    onClick={() => setEpisode("prev", true)}
                                     ButtonClass="player-buttons" />
                             </Show>
                             <PlayerButton icon={isPlaying() ? "pause" : "play_arrow"} title={isPlaying() ? t('player.Pause') : t('player.play')} ButtonClass="player-buttons" onClick={togglePlay} />
 
                             <Show when={getEpisode("next") !== undefined}>
-                                <PlayerButton icon='skip_next' ButtonClass='player-buttons' title={t('player.next', { ep: getEpisode("next")?.ep })} onClick={() => setEpisode("next")} />
+                                <PlayerButton icon='skip_next' ButtonClass='player-buttons' title={t('player.next', { ep: getEpisode("next")?.ep })} onClick={() => setEpisode("next", true)} />
                             </Show>
                             <div class="player-time-display"
                                 onClick={() => { saveConfig(updateObject("Player.general.minusTime", !minusTimeState(), unwrap(config))); setminusTimeState((prev) => !prev) }}

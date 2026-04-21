@@ -49,7 +49,7 @@ const player = () => {
 
     const response = useResponse(
         {
-            queryKey: [anime_data.data?.player_ID, extractionData().actual, extractionData().type],
+            queryKey: [anime_data.data?.player_ID, extractionData().actual, extractionData().type, JSON.stringify(anime_data.save["pluginName"])],
             queryFn: async (queryKey) => {
                 const [player_id, episode, animeType] = queryKey;
                 if (!player_id || !episode || !animeType) {
@@ -69,7 +69,8 @@ const player = () => {
             time: 0,
             actual: ep
         }))
-        response.Refetch([anime_data.data?.player_ID, extractionData().actual, extractionData().type])
+        console.log(ep, extractionData())
+        response.Refetch([anime_data.data?.player_ID, extractionData().actual, extractionData().type, JSON.stringify(anime_data.save["pluginName"])])
         updateHistory()
 
         if (getSocket()) {
