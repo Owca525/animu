@@ -111,17 +111,17 @@ function information() {
     const [activePage, SetactivePage] = createSignal<string>("Episodes")
 
     const episodeResponse = useResponse({
-        queryKey: [tempData(), currentIDplayer(), currentPlugin()],
+        queryKey: [tempData()["anime"], currentIDplayer(), currentPlugin()],
         queryFn: async (queryKey) => {
             const [animeData, player_id, pluginName] = queryKey;
             if (typeof animeData != "object") return
-            if (animeData.anime.format == "MANGA" || animeData.anime.format == "NOVEL" || animeData.anime.format == "ONE_SHOT") return
-            if (animeData.anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED" || animeData.anime.type != "ANIME") return
-            // if (animeData.anime.id == "" && !player_id) return setEpisodeResponse(await plugin.extractEpisodeList(animeData.anime, undefined)) deprecated
+            if (animeData.format == "MANGA" || animeData.format == "NOVEL" || animeData.format == "ONE_SHOT") return
+            if (animeData.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED" || animeData.type != "ANIME") return
+            // if (animeData.id == "" && !player_id) return setEpisodeResponse(await plugin.extractEpisodeList(animeData, undefined)) deprecated
 
             let plugin: playerPluginFormat = pluginManager().changePlugin(pluginName as string)
             if (!plugin) return
-            let response = await plugin.extractEpisodeList(animeData.anime, player_id as string)
+            let response = await plugin.extractEpisodeList(animeData, player_id as string)
             return response
         },
         cacheTime: 7200000,
@@ -248,7 +248,7 @@ function information() {
 
         checkAnimeFetching()
 
-        episodeResponse.Refetch([tempData(), currentIDplayer(), currentPlugin()])
+        episodeResponse.Refetch([tempData()["anime"], currentIDplayer(), currentPlugin()])
     }
 
     function detectTrailerMusic() {
@@ -488,7 +488,7 @@ function information() {
         setCurrentId(undefined)
         pluginManager().changePlugin(name)
         setCurrentPlugin(name)
-        episodeResponse.Refetch([tempData(), currentIDplayer(), currentPlugin()], force)
+        episodeResponse.Refetch([tempData()["anime"], currentIDplayer(), currentPlugin()], force)
     }
 
     createEffect(() => {
@@ -972,7 +972,7 @@ function information() {
                 <ContainerWrong name={detectTitleConfig(tempData().anime.title)} refetchfunc={(id?: string) => {
                     setshowWrong(false);
                     setCurrentId(id);
-                    episodeResponse.Refetch([tempData(), id, currentPlugin()])
+                    episodeResponse.Refetch([tempData()["anime"], id, currentPlugin()])
                 }}
                     exitfunc={() => setshowWrong(() => false)}
                 />
