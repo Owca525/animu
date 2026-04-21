@@ -10,6 +10,7 @@ import { detectIndex, getPluginInitialConfig, getPluginsList, getRenderPath, set
 import semver from "semver";
 import AniDap from "@renderer/plugins/anidap";
 import AnimePahe from "@renderer/plugins/animepahe";
+import Senshi from "@renderer/plugins/senshi";
 // import yummyani from "@renderer/plugins/yummyani";
 // import Aowu from "@renderer/plugins/aowu";
 
@@ -69,7 +70,7 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
 
     initialPlugins = async (): Promise<void> => {
         this.pluginList = []
-        const localPlugins = [Allmanga, Anizone, Animetsu, LycorisCafe, AniDap, AnimePahe]
+        const localPlugins = [Allmanga, Anizone, Animetsu, LycorisCafe, AniDap, AnimePahe, Senshi]
 
         const plugins = await getPluginsList()
         const externalPlugins = await this.loadPlugin(plugins)
