@@ -124,7 +124,7 @@ export interface AnimeData {
     studios?: string[]
     title: { english?: string, native: string, romaji: string }
     type?: string | undefined
-    episodesList?: { episodes: { ep: string, img?: string, title?: string }[], type: string, name?: string }[]
+    episodesList?: { episodes: episodeMetadata[], type: string, name?: string }[]
     player_ID?: string
     id: string
     isAdult?: boolean
@@ -223,7 +223,7 @@ export interface NotificationProps {
 export type playerDataExtended = playerData & {
     episode: {
         currentEpisode: string
-        episodeList: string[]
+        episodeList: episodeMetadata[]
         anime: AnimeData
         animeID: string
         type: string
@@ -347,7 +347,7 @@ export interface playerPluginFormat {
     config?: { [key: string]: any }
     extractPlayerData(type: string, episode: string, id: string): Promise<playerData[]>
     extractEpisodeList(animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined>
-    extractOnlyEpisodesList(type: string, anime_id: string): Promise<{ ep: string, img?: string, title?: string }[]>
+    extractOnlyEpisodesList(type: string, anime_id: string): Promise<episodeMetadata[]>
     searchAnime(name: string, page: number, params?: FilterPluginsParams): Promise<cardData[]>
 }
 
@@ -398,7 +398,21 @@ export type genres = {
     options: string[]
 }
 
-export interface episodeList { player_id: string, episodesData: { episodes: { ep: string, img?: string, title?: string }[], type: string, name?: string }[] }
+export interface episodeMetadata { 
+    ep: string, 
+    img?: string, 
+    title?: string,
+    blueRayVer?: boolean,
+    durration?: number,
+    plugindID?: string,
+    uploadedUnix?: number
+}
+
+export interface episodeList { 
+    player_id: string, 
+    langugeAvaible?: string[]
+    episodesData: { episodes: episodeMetadata[], type: "dub" | "sub" | "both", name?: string }[] 
+}
 
 export interface SettingsConfig {
     firstStart: boolean

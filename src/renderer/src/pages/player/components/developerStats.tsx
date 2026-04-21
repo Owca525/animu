@@ -1,4 +1,4 @@
-import { playerData } from "@renderer/utils/types"
+import { episodeMetadata, playerData } from "@renderer/utils/types"
 import "./css/developerStats.css"
 
 interface developerStatsProps {
@@ -12,7 +12,7 @@ interface developerStatsProps {
     timeNextEpisode: number
     isUpNextEpisode: boolean
     isHideUpNextEpisode: boolean
-    episodes: { ep: string, img?: string, title?: string }[]
+    episodes: episodeMetadata[]
     episode: {
         type: string;
         ep: string;

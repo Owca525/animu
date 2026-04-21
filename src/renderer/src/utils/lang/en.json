@@ -234,7 +234,8 @@
         "types": {
             "sub": "Subtitles",
             "dub": "Dubbing",
-            "raw": "Raw"
+            "raw": "Raw",
+            "both": "Subtitles/Dubbing"
         },
         "notification": {
             "coverdone": "Cover succesfully copied to clipboard",

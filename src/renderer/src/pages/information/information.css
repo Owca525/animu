@@ -397,6 +397,18 @@
     font-weight: 800;
 }
 
+.information-avaible-langs-container {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.information-avaible-lang {
+    padding: 2px 6px;
+    background-color: var(--five-layer);
+    border-radius: 12px;
+}
+
 /* For smaller devices / window sizes */
 @media (max-width: 1000px) {
     .information-top {

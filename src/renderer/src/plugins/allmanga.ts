@@ -1,5 +1,5 @@
 import { convertMsToMinutes, makeSmallText, request } from "@renderer/utils/functions"
-import { AnimeData, episodeList, FilterPluginsParams, playerPluginFormat, playerData } from "@renderer/utils/types"
+import { AnimeData, episodeList, FilterPluginsParams, playerPluginFormat, playerData, episodeMetadata } from "@renderer/utils/types"
 
 const HASH_SEARCH = 'a24c500a1b765c68ae1d8dd85174931f661c71369c89b92b88b75a725afc471c'
 const HASH_INFO = '043448386c7a686bc2aabfbb6b80f6074e795d350df48015023b079527b0848a'
@@ -218,10 +218,10 @@ function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string 
     }
 }
 
-async function formatEpisodeData(data: any): Promise<{ ep: string, img?: string, title?: string }[]> {
+async function formatEpisodeData(data: any): Promise<episodeMetadata[]> {
     try {
         if (!data) return []
-        let finnallData: { ep: string, img?: string, title?: string }[] = []
+        let finnallData: episodeMetadata[] = []
         for (let index = 0; index < data.length; index++) {
             const element = data[index];
             const thumbnail = element.thumbnails.filter(url => url.startsWith("https"))
@@ -238,7 +238,7 @@ async function formatEpisodeData(data: any): Promise<{ ep: string, img?: string,
     }
 }
 
-export async function extractEpisodes(anime_id: string, episode: { start: number, end: number }): Promise<{ ep: string, img?: string, title?: string }[]> {
+export async function extractEpisodes(anime_id: string, episode: { start: number, end: number }): Promise<episodeMetadata[]> {
     try {
         let variables = `{"showId":"${anime_id}","episodeNumStart":${parseInt(episode.start.toString())},"episodeNumEnd":${parseInt(episode.end.toString())}}`
         const resp = await requestToApi(variables, HASH_DATA, header)
@@ -432,7 +432,7 @@ export default class Allmanga implements playerPluginFormat {
             return
         }
     }
-    async extractOnlyEpisodesList(type: string, anime_id: string): Promise<{ ep: string, img?: string, title?: string }[]> {
+    async extractOnlyEpisodesList(type: string, anime_id: string): Promise<episodeMetadata[]> {
         let episodes = await extractInformation(anime_id)
         for (let index = 0; index < episodes.length; index++) {
             const element = episodes[index];

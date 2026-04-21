@@ -1,0 +1,46 @@
+.information-episode-box, .information-episode-box-image {
+    width: 300px;
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.information-episode-box-title, .information-episode-box-episod, .information-episode-box-durration, .information-episode-box-upload, .information-episode-box-episode {
+    padding: 2px 6px;
+    background-color: color-mix(in srgb, var(--second-layer) 90%, transparent);
+    border-radius: 6px;
+    z-index: 12;
+    position: absolute;
+}
+
+.information-episode-box-blueRay {
+    position: absolute;
+    z-index: 12px;
+    right: 0;
+    background-color: var(--blue-one);
+    padding: 4px;
+}
+
+.information-episode-box-title {
+    left: 0;
+    margin: 6px;
+    margin-top: 32px;
+}
+
+.information-episode-box-episode {
+    left: 0;
+    margin: 6px;
+}
+
+.information-episode-box-durration {
+    right: 0;
+    bottom: 0;
+    margin: 12px;
+}
+
+.information-episode-box-upload {
+    bottom: 0;
+    left: 0;
+    margin: 12px;
+}

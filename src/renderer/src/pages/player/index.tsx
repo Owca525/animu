@@ -1,5 +1,5 @@
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
-import { AnimeData, animulistProps, indentityPlayer, SettingsConfig } from "@renderer/utils/types";
+import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, SettingsConfig } from "@renderer/utils/types";
 
 import "./player.css"
 import { changeTitleAnimu, convertEpisode, dateToUnix, detectTitle, detectTitleConfig, refetchHistory } from "@renderer/utils/functions";
@@ -21,7 +21,7 @@ import { unwrap } from "solid-js/store";
 
 const player = () => {
     const { t } = useI18n()
-    const anime_data: { data: AnimeData, save: indentityPlayer, episodelist: { ep: string, img?: string, title?: string }[], animulist?: animulistProps, continewatch: boolean } = JSON.parse(localStorage.getItem("playerCache") as any)
+    const anime_data: { data: AnimeData, save: indentityPlayer, episodelist: episodeMetadata[], animulist?: animulistProps, continewatch: boolean } = JSON.parse(localStorage.getItem("playerCache") as any)
     const navigate = useNavigate()
     const config: SettingsConfig = getConfig();
 
@@ -39,7 +39,7 @@ const player = () => {
     }
 
     const [playerVolume, setPlayerVolume] = createSignal<number>(config.Player.general.Volume)
-    const [extractionData, setExtractionData] = createSignal<{ actual: string, type: string, episodelist: { ep: string, img?: string, title?: string }[], time: number }>({
+    const [extractionData, setExtractionData] = createSignal<{ actual: string, type: string, episodelist: episodeMetadata[], time: number }>({
         actual: anime_data.save.episode,
         type: anime_data.save.type,
         episodelist: anime_data.episodelist,
@@ -266,7 +266,7 @@ const player = () => {
     // return loadingAnimation(leave, { title: anime_data.data.title, ep: extractionData().actual, format: anime_data.data.format }, extractionData())
 }
 
-function getCurrentImage(currentdata: { actual: string, type: string, episodelist: { ep: string, img?: string, title?: string }[], time: number }): string | undefined {
+function getCurrentImage(currentdata: { actual: string, type: string, episodelist: episodeMetadata[], time: number }): string | undefined {
     for (let index = 0; index < currentdata.episodelist.length; index++) {
         const element = currentdata.episodelist[index];
         if (element.ep == currentdata.actual && element.img) return element.img
@@ -274,7 +274,7 @@ function getCurrentImage(currentdata: { actual: string, type: string, episodelis
     return undefined
 }
 
-function loadingAnimation(leave: () => void, anime_data: { data: AnimeData, ep: string }, currentdata: { actual: string, type: string, episodelist: { ep: string, img?: string, title?: string }[], time: number }) {
+function loadingAnimation(leave: () => void, anime_data: { data: AnimeData, ep: string }, currentdata: { actual: string, type: string, episodelist: episodeMetadata[], time: number }) {
     return (
         <div class="player-loading-container" style={{ "background-image": `url(${getCurrentImage(currentdata)})` }}>
             <div class="player-loading-container-black"></div>

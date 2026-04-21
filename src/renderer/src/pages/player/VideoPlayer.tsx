@@ -1,6 +1,6 @@
 import Hls, { HlsConfig } from "hls.js"
 
-import { AnimeData, animulistProps, ContextMenuProps, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
+import { AnimeData, animulistProps, ContextMenuProps, episodeMetadata, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
 import { convertKeybinds, convertSecondsToHoursFormat, CreateContextMenuOptions, dateToUnix, decodeHtmlEntities, detectTitle, detectTitleConfig, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObject } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
@@ -44,7 +44,7 @@ interface VideoPlayerProps {
         saveData: indentityPlayer,
         animulist?: animulistProps
     }
-    temp: { episode: string, type: string, episodes: { ep: string, img?: string, title?: string }[] }
+    temp: { episode: string, type: string, episodes: episodeMetadata[] }
     setNextEpisode: (value: string) => void
     volumeCacheFunc: (value: number) => void
     PlayerVolume: number
@@ -54,7 +54,7 @@ interface VideoPlayerProps {
 export interface socketPlayerInit {
     anime: AnimeData,
     saveData: indentityPlayer,
-    temp: { episode: string, type: string, episodes: { ep: string, img?: string, title?: string }[] }
+    temp: { episode: string, type: string, episodes: episodeMetadata[] }
 }
 
 const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, temp, setNextEpisode, volumeCacheFunc, PlayerVolume = 0, time, exitFromPlayer }) => {
@@ -531,7 +531,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 ...currentplayer,
                 episode: {
                     currentEpisode: temp.episode,
-                    episodeList: temp.episodes.map((ep) => ep.ep),
+                    episodeList: temp.episodes,
                     anime: anime_data.AnimeData,
                     animeID: anime_data.AnimeData.player_ID as string,
                     type: temp.type
@@ -1425,7 +1425,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 ...player,
                 episode: {
                     currentEpisode: temp.episode,
-                    episodeList: temp.episodes.map((ep) => ep.ep),
+                    episodeList: temp.episodes,
                     anime: anime_data.AnimeData,
                     animeID: anime_data.AnimeData.player_ID as string,
                     type: temp.type

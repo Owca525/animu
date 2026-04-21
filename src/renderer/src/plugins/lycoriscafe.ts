@@ -1,5 +1,5 @@
 import { makeSmallText, request } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, FilterPluginsParams, playerPluginFormat, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, FilterPluginsParams, playerPluginFormat, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, episodeMetadata } from "@renderer/utils/types";
 const WEB = "https://www.lycoris.cafe"
 const HEADER = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0'
@@ -200,7 +200,7 @@ export default class LycorisCafe implements playerPluginFormat {
         let req = await requestToApi(animeID)
         if (!req) return
         let tmpEpisodes = req.data.anime["episodes"]
-        let episodes: { ep: string, img?: string, title?: string }[] = tmpEpisodes.map((ep) => {
+        let episodes: episodeMetadata[] = tmpEpisodes.map((ep) => {
             return {
                 ep: ep["number"],
                 img: ep["thumbnail"],
@@ -217,7 +217,7 @@ export default class LycorisCafe implements playerPluginFormat {
         let req = await requestToApi(anime_id)
         if (!req) return []
         let tmpEpisodes = req.data.anime["episodes"]
-        let episodes: { ep: string, img?: string, title?: string }[] = tmpEpisodes.map((ep) => {
+        let episodes: episodeMetadata[] = tmpEpisodes.map((ep) => {
             return {
                 ep: ep["number"],
                 img: ep["thumbnail"],

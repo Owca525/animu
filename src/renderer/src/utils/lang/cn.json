@@ -217,7 +217,8 @@
     "types": {
       "sub": "字幕版",
       "dub": "配音版",
-      "raw": "無字幕版"
+      "raw": "無字幕版",
+      "both": "Subtitles/Dubbing"
     },
     "notification": {
       "coverdone": "複製成功",

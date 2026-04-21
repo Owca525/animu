@@ -127,8 +127,6 @@ export default class Senshi implements playerPluginFormat {
             ]
         }
 
-        console.log(dub, sub)
-
         let player: playerData = {
             hostname: "Senshi",
             resolution: [{
@@ -169,7 +167,7 @@ export default class Senshi implements playerPluginFormat {
                     ep: v["ep_id"],
                     title: v["ep_title"]
                 })),
-                type: "sub"
+                type: window["animuAppInfo"] ? "both" : "sub"
             }]
         }
     }

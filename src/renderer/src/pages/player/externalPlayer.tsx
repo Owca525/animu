@@ -2,7 +2,7 @@
 
 import Button from "@renderer/components/buttons"
 import "./components/css/externalPlayer.css"
-import { AnimeData, indentityPlayer, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig } from "@renderer/utils/types"
+import { AnimeData, episodeMetadata, indentityPlayer, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig } from "@renderer/utils/types"
 import { detectTitle, isNumberString } from "@renderer/utils/functions"
 import Dropdown from "@renderer/components/dropDown"
 import { Component, createSignal, For, onMount, Show } from "solid-js"
@@ -21,7 +21,7 @@ interface ExternalplayerProps {
     playerData: playerData[]
     time: number
     setNextEpisode: (value: string) => void
-    now_episodes: { episode: string, type: string, episodes: { ep: string, img?: string, title?: string }[] }
+    now_episodes: { episode: string, type: string, episodes: episodeMetadata[] }
     externalPlayerData: { onChage: (data: "Movian" | "VLC" | "Mpv" | "ChromeCast") => void, current: "Movian" | "VLC" | "Mpv" | "ChromeCast" }
 }
 

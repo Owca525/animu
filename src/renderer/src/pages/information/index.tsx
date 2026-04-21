@@ -2,7 +2,7 @@ import Button from '@renderer/components/buttons';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
-import { Anilist_ListMutation, AnimeData, animeOpeningsFormat, animulistProps, cardData, ContextMenuProps, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
+import { Anilist_ListMutation, AnimeData, animeOpeningsFormat, animulistProps, cardData, ContextMenuProps, episodeMetadata, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
 import {
     calculateDays,
     changeTitleAnimu,
@@ -57,6 +57,7 @@ import AnimulistMenu from '@renderer/components/animulistMenu';
 import { updateGenres } from '../home/components/filter';
 import { getHomeCache, getHomeSidebarData } from '@renderer/utils/stores/home';
 import { setNewActivePage, StartHomeSearch } from '../home';
+import EpisodeBox from './components/episodeBox';
 
 interface informationTmpProps {
     anime: AnimeData,
@@ -278,7 +279,7 @@ function information() {
         setTmpData(undefined as any)
     })
 
-    function enterPlayer(episodes: { ep: string, img?: string, title?: string }[], type: string, episode: string) {
+    function enterPlayer(episodes: episodeMetadata[], type: string, episode: string) {
         let tmp = unwrap(tempData())
         let lastTime = 0
         if (tmp.saveData && tmp.saveData.episode.toString() === episode.toString()) lastTime = tmp.saveData.last_Time
@@ -445,31 +446,12 @@ function information() {
     // }
     /* ENDIF */
 
-    function makeButtons(episode: { ep: string, img?: string, title?: string }[], type: string) {
+    function makeButtons(episode: episodeMetadata[], type: string) {
         let tmpSaveData = tempData()
         return (
             <div class="information-buttons-episode-container">
                 <For each={episode}>
-                    {(data) => {
-                        const saveData = tmpSaveData.saveData;
-                        const epNum = parseInt(data.ep);
-                        const savedEp = parseInt(saveData?.episode ?? "0");
-                        const isWatched = saveData && epNum < savedEp;
-                        const isWatching = saveData && epNum === savedEp && (saveData.last_Time !== 0 || saveData.isStarted);
-                        const isWatchedEqual = saveData && epNum === savedEp && saveData.last_Time === 0 && !saveData.isStarted;
-
-                        return (
-                            <div
-                                class={`information-episode-button 
-                                    ${isWatched ? "watched" : ""} 
-                                    ${isWatching ? "watching" : ""} 
-                                    ${isWatchedEqual ? "watched" : ""}`
-                                }
-                                onClick={() => enterPlayer(episode, type, data.ep)}>
-                                {data.ep}
-                            </div>
-                        );
-                    }}
+                    {(data) => <EpisodeBox variant='v1' enterPlayer={() => enterPlayer(episode, type, data.ep)} saveData={tmpSaveData.saveData} episode={data}/>}
                 </For>
             </div>
         )
@@ -794,16 +776,16 @@ function information() {
                                     <For each={tempData().anime.genres}>
                                         {(item) => (
                                             <span onclick={() => {
-                                            if (isCustomMenuActive()) hideCustomMenu()
-                                            if (showWrong()) setshowWrong(() => false)
-                                            if (showImages()) setShowImages(false)
+                                                if (isCustomMenuActive()) hideCustomMenu()
+                                                if (showWrong()) setshowWrong(() => false)
+                                                if (showImages()) setShowImages(false)
 
-                                            updateGenres("genres", item, `anime_genres.${item}`);
-                                            const cache = getHomeCache()
-                                            StartHomeSearch(cache.search, cache.filterTags)
-                                            setNewActivePage(getHomeSidebarData().top[0].text, false)
+                                                updateGenres("genres", item, `anime_genres.${item}`);
+                                                const cache = getHomeCache()
+                                                StartHomeSearch(cache.search, cache.filterTags)
+                                                setNewActivePage(getHomeSidebarData().top[0].text, false)
 
-                                            navigate("/")
+                                                navigate("/")
                                             }} class='information-genre-button'>{t(`anime_genres.${item}`)}</span>
                                         )}
                                     </For>
@@ -894,7 +876,22 @@ function information() {
                                             <For each={episodeResponse.data()?.episodesData} fallback={<div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}>
                                                 {(episode) => {
                                                     if (episode.episodes.length <= 0) return <></>
-                                                    return <Drop LeftHeader={episode.name ? episode.name : t(`information.types.${episode.type}`)} RightHeader={t("information.listEpisodes", { number: episode.episodes.length })} content={makeButtons(episode.episodes, episode.type)} />
+                                                    return <Drop
+                                                        LeftHeader={<>
+                                                            {episode.name ? episode.name : t(`information.types.${episode.type}`)}
+                                                            <Show when={episodeResponse.data()!["langugeAvaible"]}>
+                                                                <span class='information-avaible-langs-container'>
+                                                                    <For each={episodeResponse.data()!["langugeAvaible"]}>
+                                                                        {(v) => (
+                                                                            <span class='information-avaible-lang'>{v}</span>
+                                                                        )}
+                                                                    </For>
+                                                                </span>
+                                                            </Show>
+                                                        </>}
+                                                        RightHeader={t("information.listEpisodes", { number: episode.episodes.length })}
+                                                        content={makeButtons(episode.episodes, episode.type)}
+                                                    />
                                                 }}
                                             </For>
                                         </Match>

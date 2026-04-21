@@ -1,5 +1,5 @@
 import { formatTime, request, toSeconds } from "@renderer/utils/functions";
-import { playerDataExtended, Thumbnail } from "@renderer/utils/types";
+import { episodeMetadata, playerDataExtended, Thumbnail } from "@renderer/utils/types";
 
 export async function VTTstoryBoardParser(url: string) {
     let data = await request(url)
@@ -57,7 +57,7 @@ export function addTime(durration: number): string {
     return `${hours}:${minutes}`;
 }
 
-export function countImages(data: { ep: string, img?: string, title?: string }[]): boolean {
+export function countImages(data: episodeMetadata[]): boolean {
     let counter: number = 0
     for (let index = 0; index < data.length; index++) {
         const element = data[index];

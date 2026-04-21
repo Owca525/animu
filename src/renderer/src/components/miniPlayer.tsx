@@ -6,9 +6,7 @@ import PlayerButton from '@renderer/pages/player/components/PlayerButton';
 import PlayerSettings from '@renderer/pages/player/components/PlayerSettings';
 import SeekBar from '@renderer/components/seekBar';
 import {
-    AnimeData,
     ContextMenuProps,
-    indentityPlayer,
     playerChapterList,
     playerData,
     playerSubtitlesFormat,
@@ -61,12 +59,6 @@ export interface MiniPlayerProps {
     storyboardVTT?: string
     listChapters?: playerChapterList[]
     subtitles?: playerSubtitlesFormat[]
-}
-
-export interface socketPlayerInit {
-    anime: AnimeData,
-    saveData: indentityPlayer,
-    temp: { episode: string, type: string, episodes: { ep: string, img?: string, title?: string }[] }
 }
 
 function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean }) {

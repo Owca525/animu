@@ -214,7 +214,8 @@
     "types": {
       "sub": "Napisy",
       "dub": "Dubbing",
-      "raw": "Raw"
+      "raw": "Raw",
+      "both": "Subtitles/Dubbing"
     },
     "notification": {
       "coverdone": "Okładka została skopiowana do schowka",

@@ -215,7 +215,8 @@
     "types": {
       "sub": "Субтитры",
       "dub": "Озвучка",
-      "raw": "Оригинал"
+      "raw": "Оригинал",
+      "both": "Subtitles/Dubbing"
     },
     "notification": {
       "coverdone": "Обложка успешно скопирована в буфер обмена",
