@@ -39,7 +39,9 @@ export default function EpisodeBox(props: episodeBoxProps) {
                         ${isWatched ? "watched" : ""} 
                         ${isWatching ? "watching" : ""} 
                         ${isWatchedEqual ? "watched" : ""}
-                    `}>
+                    `}
+                    onclick={props.enterPlayer}
+                    >
                     <img src={props["episode"]["img"] ? props["episode"]["img"] : ""} class={`information-episode-box-image ${isLoadingImage() == false && isErrorImage() == false ? "show" : ""}`}
                         onload={() => setIsLoadingImage(false)}
                         onerror={() => {

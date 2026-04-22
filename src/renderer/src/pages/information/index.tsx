@@ -114,15 +114,14 @@ function information() {
     const episodeResponse = useResponse({
         queryKey: [tempData()["anime"], currentIDplayer(), currentPlugin()],
         queryFn: async (queryKey) => {
-            const [animeData, player_id, pluginName] = queryKey;
-            if (typeof animeData != "object") return
-            if (animeData.format == "MANGA" || animeData.format == "NOVEL" || animeData.format == "ONE_SHOT") return
-            if (animeData.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED" || animeData.type != "ANIME") return
-            // if (animeData.id == "" && !player_id) return setEpisodeResponse(await plugin.extractEpisodeList(animeData, undefined)) deprecated
+            const [_, player_id, pluginName] = queryKey;
+            if (tempData().anime.format == "MANGA" || tempData().anime.format == "NOVEL" || tempData().anime.format == "ONE_SHOT") return
+            if (tempData().anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED" || tempData().anime.type != "ANIME") return
+            // if (tempData().anime.id == "" && !player_id) return setEpisodeResponse(await plugin.extractEpisodeList(tempData().anime, undefined)) deprecated
 
             let plugin: playerPluginFormat = pluginManager().changePlugin(pluginName as string)
             if (!plugin) return
-            let response = await plugin.extractEpisodeList(animeData, player_id as string)
+            let response = await plugin.extractEpisodeList(tempData().anime, player_id as string)
             return response
         },
         cacheTime: 7200000,
@@ -164,13 +163,11 @@ function information() {
     async function checkAnimeFetching() {
         if (tempData().anime.id == "") return
 
-        const alwaysRequest = false // TODO: ADD NEW SETTINGS
-
         if (tempData().anime["nextAiringEpisode"]) return
 
         const lastTime = tempData().saveData?.lastAnimeDataUpdate
 
-        if (tempData().anime.status == "RELEASING" || !lastTime || calculateDays(lastTime, dateToUnix(new Date().toString())) >= 1 || alwaysRequest) {
+        if (tempData().anime.status == "RELEASING" || !lastTime || calculateDays(lastTime, dateToUnix(new Date().toString())) >= 1 || config.information.alwaysUpdateAnime) {
             await FetchAnimeForinformation()
             const tmpData = unwrap(tempData())
             const tmpUpdate = {
@@ -216,7 +213,6 @@ function information() {
         })
 
         let plugin = pluginManager().currentPlugin
-        console.log(plugin)
         if (plugin) setCurrentPlugin(plugin.metadata.name)
 
         if (tempData().anime.nextAiringEpisode) checkIsAnimeReleasing()
@@ -249,7 +245,7 @@ function information() {
 
         checkAnimeFetching()
 
-        episodeResponse.Refetch([tempData()["anime"], currentIDplayer(), currentPlugin()])
+        episodeResponse.Refetch([tempData()["anime"]["title"]["romaji"], currentIDplayer(), currentPlugin()])
     }
 
     function detectTrailerMusic() {
@@ -451,7 +447,10 @@ function information() {
         return (
             <div class="information-buttons-episode-container">
                 <For each={episode}>
-                    {(data) => <EpisodeBox variant='v1' enterPlayer={() => enterPlayer(episode, type, data.ep)} saveData={tmpSaveData.saveData} episode={data}/>}
+                    {(data) => <EpisodeBox variant={config.information.episodeVariants} 
+                        enterPlayer={() => enterPlayer(episode, type, data.ep)} 
+                        saveData={tmpSaveData.saveData} episode={data}/>
+                    }
                 </For>
             </div>
         )
@@ -470,7 +469,7 @@ function information() {
         setCurrentId(undefined)
         pluginManager().changePlugin(name)
         setCurrentPlugin(name)
-        episodeResponse.Refetch([tempData()["anime"], currentIDplayer(), currentPlugin()], force)
+        episodeResponse.Refetch([tempData()["anime"]["title"]["romaji"], currentIDplayer(), currentPlugin()], force)
     }
 
     createEffect(() => {
@@ -534,7 +533,6 @@ function information() {
                 SetactivePage("Trailer")
             }
         })
-        console.log(tmp)
 
         setButtonGroups(tmp)
     }
@@ -642,7 +640,6 @@ function information() {
                                         <Match when={!isInWaitingPlaylist()}>
                                             <Button titleButton={"Add To Waiting Playlist"} icon="playlist_add" ButtonClass="information-bar-icon" onClick={async (): Promise<any> => {
                                                 const tmp = unwrap(tempData())
-                                                console.log(tempData())
                                                 const resp = await saveToPlaylist("global.waitingplaylist", {
                                                     anime: {
                                                         AnimeData: {
@@ -969,7 +966,7 @@ function information() {
                 <ContainerWrong name={detectTitleConfig(tempData().anime.title)} refetchfunc={(id?: string) => {
                     setshowWrong(false);
                     setCurrentId(id);
-                    episodeResponse.Refetch([tempData()["anime"], id, currentPlugin()])
+                    episodeResponse.Refetch([tempData()["anime"]["title"]["romaji"], id, currentPlugin()])
                 }}
                     exitfunc={() => setshowWrong(() => false)}
                 />

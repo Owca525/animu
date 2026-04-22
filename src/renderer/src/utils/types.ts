@@ -404,7 +404,7 @@ export interface episodeMetadata {
     title?: string,
     blueRayVer?: boolean,
     durration?: number,
-    plugindID?: string,
+    episodeID?: string,
     uploadedUnix?: number
 }
 
@@ -451,7 +451,9 @@ export interface SettingsConfig {
         }
     }
     information: {
-        openingininformation: boolean
+        openingininformation: boolean,
+        alwaysUpdateAnime: boolean,
+        episodeVariants: "v1" | "v2"
     },
     Player: {
         general: {

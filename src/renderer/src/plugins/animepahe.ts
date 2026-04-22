@@ -261,7 +261,11 @@ export default class AnimePahe implements playerPluginFormat {
                     episodes: this.cache[anime_id].map((v, i) => ({
                         ep: i + 1,
                         img: v["snapshot"],
-                        title: v["title"]
+                        title: v["title"],
+                        durration: convertTimeStringToSeconds(v["duration"]),
+                        blueRayVer: v["disc"] == "BD",
+                        episodeID: v["session"],
+                        uploadedUnix: dateToUnix(v["created_at"])
                     })),
                     type: "sub"
                 }]
@@ -295,7 +299,7 @@ export default class AnimePahe implements playerPluginFormat {
                     title: v["title"],
                     durration: convertTimeStringToSeconds(v["duration"]),
                     blueRayVer: v["disc"] == "BD",
-                    plugindID: v["session"],
+                    episodeID: v["session"],
                     uploadedUnix: dateToUnix(v["created_at"])
                 } as episodeMetadata)),
                 type: "sub"

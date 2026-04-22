@@ -246,6 +246,10 @@
     }
   },
   "settings": {
+    "variants": {
+      "v1": "Variant 1",
+      "v2": "Variant 2"
+    },
     "turnDeveloper": "Включить режим разработчика",
     "yt-dlp": "yt-dlp Версия",
     "pluginstore": {

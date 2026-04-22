@@ -816,6 +816,37 @@ function settings() {
                             />
                         </div>
                     </div>
+                    <div class="settings-page-container">
+                        <div class="settings-page-title">{t("Information Page")}</div>
+                        <div class="settings-setting-container">
+                            {t("Always Update Anime In Information")}
+                            <CheckBox
+                                checked={config().new.information.alwaysUpdateAnime}
+                                onChecked={(checked) =>
+                                    handleChange('information.alwaysUpdateAnime', checked)
+                                }
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("Default Episode Variants")}
+                            <ButtonGroup selectedValue={t(`settings.variants.${config().new.information.episodeVariants}`)} listValues={[
+                                { value: t("Variant 1"), onClick: () => handleChange("information.episodeVariants", "v1") },
+                                { value: t("Variant 2"), onClick: () => handleChange("information.episodeVariants", "v2") },
+                            ]}
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("Play Opening In Information")}
+                            <CheckBox
+                                checked={config().new.information.openingininformation}
+                                onChecked={(checked) =>
+                                    handleChange('information.openingininformation', checked)
+                                }
+                            />
+                        </div>
+                    </div>
                     <Show when={window.api}>
                         <div class="settings-page-container">
                             <div class="settings-page-title">{t("settings.general.updates")}</div>
@@ -1015,16 +1046,6 @@ function settings() {
                                 checked={config().new.Player.general.disablemoreinformation}
                                 onChecked={(checked) =>
                                     handleChange('Player.general.disablemoreinformation', checked)
-                                }
-                            />
-                        </div>
-                        <div class="settings-line"></div>
-                        <div class="settings-setting-container">
-                            {"Play Opening In Information"}
-                            <CheckBox
-                                checked={config().new.information.openingininformation}
-                                onChecked={(checked) =>
-                                    handleChange('information.openingininformation', checked)
                                 }
                             />
                         </div>

@@ -17,7 +17,9 @@ export interface SettingsConfig {
         maxpagesize: number
     }
     information: {
-        openingininformation: boolean
+        openingininformation: boolean,
+        alwaysUpdateAnime: boolean,
+        episodeVariants: "v1" | "v2"
     },
     plugins: {
         // information: string
@@ -353,7 +355,9 @@ export const defaultConfig: SettingsConfig = {
         maxpagesize: 20
     },
     information: {
-        openingininformation: false
+        openingininformation: false,
+        alwaysUpdateAnime: false,
+        episodeVariants: "v1"
     },
     socket: {
         useSocket: false,

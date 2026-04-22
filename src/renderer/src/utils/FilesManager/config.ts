@@ -149,7 +149,9 @@ export const defaultConfigWeb: SettingsConfig = {
         maxpagesize: 20
     },
     information: {
-        openingininformation: false
+        openingininformation: false,
+        alwaysUpdateAnime: false,
+        episodeVariants: "v1"
     },
     socket: {
         useSocket: false,

@@ -40,7 +40,7 @@ export function useResponse<T, TData>(options: UseResponseOptions<T, TData>) {
             if (dissable()) return undefined
             const queryKey = getQueryKey()
             const sha256 = await generateSha256(queryKey)
-            if (cacheTime && !forceRefetch() && cache.has(sha256)) {
+            if (!forceRefetch() && cache.has(sha256)) {
                 setLoading(false)
                 setError(false)
                 return setData(cache.get(sha256))

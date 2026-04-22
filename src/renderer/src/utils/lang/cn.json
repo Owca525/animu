@@ -248,6 +248,10 @@
     }
   },
   "settings": {
+    "variants": {
+      "v1": "Variant 1",
+      "v2": "Variant 2"
+    },
     "turnDeveloper": "開啟開發者工具",
     "yt-dlp": "yt-dlp 版本",
     "pluginstore": {

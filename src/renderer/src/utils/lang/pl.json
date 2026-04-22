@@ -245,6 +245,10 @@
     }
   },
   "settings": {
+    "variants": {
+      "v1": "Variant 1",
+      "v2": "Variant 2"
+    },
     "turnDeveloper": "Włącz tryb deweloperski",
     "yt-dlp": "yt-dlp Versions",
     "pluginstore": {
