@@ -67,6 +67,12 @@ function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string 
     }
 }
 
+export function dateToUnix(dateStr: string | undefined): number | undefined {
+    if (!dateStr) return undefined
+    const date = new Date(dateStr);
+    return Math.floor(date.getTime() / 1000);
+}
+
 function converterToCardData(data: { [key: string]: string | number }): cardData {
     return {
         AnimeData: {
@@ -154,6 +160,9 @@ export default class Senshi implements playerPluginFormat {
         }
         if (!anime_id) return
         const episodeResp = await request(`${WEBSITE}/episodes/${anime_id}`, { headers: header })
+        /* IFDEF DEBUG */
+        console.warn("extractEpisodeList/Senshi", episodeResp)
+        /* ENDIF */
         if (!episodeResp["success"] || !episodeResp["json"]) return
         this.cache = [
             ...this.cache,
@@ -165,7 +174,8 @@ export default class Senshi implements playerPluginFormat {
             episodesData: [{
                 episodes: episodeResp["json"].map((v) => ({
                     ep: v["ep_id"],
-                    title: v["ep_title"]
+                    title: v["ep_title"],
+                    uploadedUnix: dateToUnix(v["created_at"])
                 })),
                 type: window["animuAppInfo"] ? "both" : "sub"
             }]
@@ -187,12 +197,14 @@ export default class Senshi implements playerPluginFormat {
                     searchTerm: name,
                 })
             })
-
+            /* IFDEF DEBUG */
+            console.warn("searchAnime/Senshi", searchResponse)
+            /* ENDIF */
             if (!searchResponse["success"] || !searchResponse["json"]) return []
 
             return searchResponse["json"]["data"].map((v) => converterToCardData(v))
         } catch (error) {
-            console.log("Error in searchAnime/aowu", error)
+            console.error("Error in searchAnime/aowu", error)
             return []
         }
     }

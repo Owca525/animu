@@ -94,7 +94,7 @@ function convertToAnimeData(data: any): AnimeData | undefined {
                 romaji: data["title"]
             },
             id: data["id"],
-            player_ID: data["id"], 
+            player_ID: data["id"],
             format: data["format"],
             season: data["season"],
             seasonYear: data["seasonYear"],
@@ -110,9 +110,18 @@ function convertToAnimeData(data: any): AnimeData | undefined {
     }
 }
 
+export function dateToUnix(dateStr: string | undefined): number | undefined {
+    if (!dateStr) return undefined
+    const date = new Date(dateStr);
+    return Math.floor(date.getTime() / 1000);
+}
+
 async function requestToApi(anime_id: string): Promise<{ data: any } | undefined> {
     let url = `${WEB}/api/anime/${anime_id}`
     let req = await request(url, { headers: HEADER });
+    /* IFDEF DEBUG */
+    console.warn("requestToApi/lycorisCafe", req)
+    /* ENDIF */
     if (!req.success) {
         console.error("Failed Request requestToApi/lycorisCafe", anime_id, req)
         return undefined
@@ -152,7 +161,7 @@ export default class LycorisCafe implements playerPluginFormat {
             let animeEpisodes = JSON.parse(atob(decodeData))
             for (const key in animeEpisodes) {
                 let res = detectResoltion(key)
-                if (animeEpisodes[key].length <= 0) continue 
+                if (animeEpisodes[key].length <= 0) continue
                 if (res == "Unknown") continue
                 currentEpisode.push({
                     res: res,
@@ -189,11 +198,11 @@ export default class LycorisCafe implements playerPluginFormat {
     }
     extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {
         let animeID = anime_id;
-        
+
         if (!animeID && animeData) {
             let animeList = await this.searchAnime(animeData.title.romaji, 1)
             if (animeList.length <= 0) return
-            animeID = SheepFinderAnime2000(animeList.map(v=>v.AnimeData), animeData)
+            animeID = SheepFinderAnime2000(animeList.map(v => v.AnimeData), animeData)
         }
         if (!animeID) return
 
@@ -204,7 +213,8 @@ export default class LycorisCafe implements playerPluginFormat {
             return {
                 ep: ep["number"],
                 img: ep["thumbnail"],
-                title: ep["title"]
+                title: ep["title"],
+                uploadedUnix: dateToUnix(ep["airDate"])
             }
         })
 
@@ -221,7 +231,8 @@ export default class LycorisCafe implements playerPluginFormat {
             return {
                 ep: ep["number"],
                 img: ep["thumbnail"],
-                title: ep["title"]
+                title: ep["title"],
+                uploadedUnix: dateToUnix(ep["airDate"])
             }
         })
 

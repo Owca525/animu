@@ -153,6 +153,12 @@ async function fuckThisEncryptionMethod(encryptedMotherFucker: string) {
     return JSON.parse(new TextDecoder().decode(FINNALCUM));
 }
 
+export function dateToUnix(dateStr: string | undefined): number | undefined {
+    if (!dateStr) return undefined
+    const date = new Date(dateStr);
+    return Math.floor(date.getTime() / 1000);
+}
+
 async function SearchAnimeInAllmanga(name: string, page: number): Promise<AnimeData[]> {
     try {
         let variables = `{"search":{"query":"${name.replaceAll('"', "").replaceAll('&', "")}"},"limit":26,"page":${page},"translationType":"sub","countryOrigin":"ALL"}`
@@ -227,8 +233,10 @@ async function formatEpisodeData(data: any): Promise<episodeMetadata[]> {
             const thumbnail = element.thumbnails.filter(url => url.startsWith("https"))
             finnallData.push({
                 ep: element.episodeIdNum,
-                img: thumbnail.length > 0 ? thumbnail[0] : undefined,
-                title: element.notes ? element.notes.replace("<note-split>", " ") : undefined
+                img: thumbnail.length > 0 ? thumbnail[0] : `https://wp.youtube-anime.com/aln.youtube-anime.com${element["thumbnails"][0]}?w=480`,
+                title: element.notes ? element.notes.replace("<note-split>", " ") : undefined,
+                uploadedUnix: dateToUnix(element["uploadDates"]["sub"]),
+                durration: element["vidInforssub"] ? element["vidInforssub"]["vidDuration"] : undefined
             })
         }
         return finnallData

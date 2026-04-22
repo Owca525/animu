@@ -173,7 +173,7 @@ export default class AnimePahe implements playerPluginFormat {
         const episodeID = find["session"]
         const htmlResponse = await request(`${WEBSITE}/play/${id}/${episodeID}`, { headers: header })
         /* IFDEF DEBUG */
-        console.log("extractPlayerData/AnimePahe", htmlResponse)
+        console.warn("extractPlayerData/AnimePahe", htmlResponse)
         /* ENDIF */
 
         if (!htmlResponse["success"]) return []
@@ -281,7 +281,7 @@ export default class AnimePahe implements playerPluginFormat {
         if (!anime_id) return
         const episodeResponse = await request(`${WEBSITE}/api?m=release&id=${anime_id}&sort=episode_asc&page=1`, { headers: header })
         /* IFDEF DEBUG */
-        console.log("extractEpisodeList/AnimePahe", episodeResponse)
+        console.warn("extractEpisodeList/AnimePahe", episodeResponse)
         /* ENDIF */
 
         if (!episodeResponse["success"] || !episodeResponse["json"]) return
@@ -315,13 +315,13 @@ export default class AnimePahe implements playerPluginFormat {
         try {
             const searchResponse = await request(`${WEBSITE}/api?m=search&q=${name}`, { headers: header })
             /* IFDEF DEBUG */
-            console.log("searchAnime/AnimePahe", searchResponse)
+            console.warn("searchAnime/AnimePahe", searchResponse)
             /* ENDIF */
             if (!searchResponse["success"] || !searchResponse["json"]) return []
 
             return searchResponse["json"]["data"].map((v) => convertToAnimeData(v))
         } catch (error) {
-            console.log("Error in searchAnime/aowu", error)
+            console.error("Error in searchAnime/aowu", error)
             return []
         }
     }

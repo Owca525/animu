@@ -73,8 +73,25 @@ export default function EpisodeBox(props: episodeBoxProps) {
                         <span class="information-episode-box-title">{props["episode"]["title"]}</span>
                     </Show>
                     <span class="information-episode-box-episode">Ep {props.episode.ep}</span>
-                    <Show when={props["episode"]["durration"]}>
-                        <span class="information-episode-box-durration">{formatTime(props["episode"]["durration"])}</span>
+                    <Show when={props["episode"]["durration"] || (props["saveData"] && props["saveData"]["last_Time"] > 0)}>
+                        <span class="information-episode-box-durration">
+                            <Show when={(props["saveData"] && props["saveData"]["last_Time"] > 0) && isWatching}>
+                                <Switch>
+                                    <Match when={props["episode"]["durration"] == undefined}>
+                                        Continue From {formatTime(props["saveData"]!["last_Time"])}
+                                    </Match>
+                                    <Match when={props["episode"]["durration"]}>
+                                        {formatTime(props["saveData"]!["last_Time"])}
+                                        &nbsp;
+                                        /
+                                        &nbsp;
+                                    </Match>
+                                </Switch>
+                            </Show>
+                            <Show when={props["episode"]["durration"]}>
+                                {formatTime(props["episode"]["durration"])}
+                            </Show>
+                        </span>
                     </Show>
                     <Show when={props["episode"]["uploadedUnix"]}>
                         <span class="information-episode-box-upload">{formatDate(unixToDateTime(props["episode"]["uploadedUnix"]))}</span>
