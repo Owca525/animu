@@ -1,5 +1,5 @@
 import { makeSmallText, request } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, FilterPluginsParams, playerData, playerPluginFormat, resolutionFormat } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerPluginFormat, resolutionFormat } from "@renderer/utils/types";
 
 const WEBSITE = "https://animepahe.pw"
 
@@ -22,6 +22,18 @@ const playerHeader = {
     "Sec-Fetch-Dest": "empty",
     "Sec-Fetch-Mode": "cors",
     "Sec-Fetch-Site": "cross-site"
+}
+
+export function convertTimeStringToSeconds(time: string | undefined) {
+    if (!time) return undefined
+    const [hours, minutes, seconds] = time.split(':').map(Number);
+    return hours * 3600 + minutes * 60 + seconds;
+}
+
+export function dateToUnix(dateStr: string | undefined): number | undefined {
+    if (!dateStr) return undefined
+    const date = new Date(dateStr);
+    return Math.floor(date.getTime() / 1000);
 }
 
 function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string | undefined {
@@ -156,7 +168,7 @@ export default class AnimePahe implements playerPluginFormat {
         if (this.cache[id] == undefined) await this.extractEpisodeList(undefined, id)
         if (this.cache[id] == undefined) return []
 
-        const find = this.cache[id][parseInt(episode)-1]
+        const find = this.cache[id][parseInt(episode) - 1]
         if (!find) return []
         const episodeID = find["session"]
         const htmlResponse = await request(`${WEBSITE}/play/${id}/${episodeID}`, { headers: header })
@@ -247,7 +259,7 @@ export default class AnimePahe implements playerPluginFormat {
                 player_id: anime_id,
                 episodesData: [{
                     episodes: this.cache[anime_id].map((v, i) => ({
-                        ep: i+1,
+                        ep: i + 1,
                         img: v["snapshot"],
                         title: v["title"]
                     })),
@@ -278,10 +290,14 @@ export default class AnimePahe implements playerPluginFormat {
             player_id: anime_id,
             episodesData: [{
                 episodes: episodeResponse["json"]["data"].map((v, i) => ({
-                    ep: i+1,
+                    ep: i + 1,
                     img: v["snapshot"],
-                    title: v["title"]
-                })),
+                    title: v["title"],
+                    durration: convertTimeStringToSeconds(v["duration"]),
+                    blueRayVer: v["disc"] == "BD",
+                    plugindID: v["session"],
+                    uploadedUnix: dateToUnix(v["created_at"])
+                } as episodeMetadata)),
                 type: "sub"
             }]
         }

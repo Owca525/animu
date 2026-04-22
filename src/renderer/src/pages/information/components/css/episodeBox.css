@@ -1,9 +1,27 @@
-.information-episode-box, .information-episode-box-image {
+.information-episode-box, .information-episode-box-image, .information-episode-box-image-placeholder {
     width: 300px;
     border-radius: 12px;
     position: relative;
     cursor: pointer;
     overflow: hidden;
+}
+
+.information-episode-box-image-placeholder {
+    height: 168.750px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.information-episode-box-image {
+    opacity: 0;
+    display: none;
+    transition: all 150ms ease-out;
+}
+
+.information-episode-box-image.show {
+    display: block;
+    opacity: 1;
 }
 
 .information-episode-box-title, .information-episode-box-episod, .information-episode-box-durration, .information-episode-box-upload, .information-episode-box-episode {
@@ -43,4 +61,29 @@
     bottom: 0;
     left: 0;
     margin: 12px;
+}
+
+.information-episode-box {
+    display: flex;
+    outline: 3px solid var(--invisible);
+    transition: all 150ms ease-in-out;
+}
+
+.information-episode-box.watched {
+  outline-color: var(--green-one);
+}
+
+.information-episode-box.watching {
+  outline-color: var(--orange-one);
+}
+
+.information-episode-box.current {
+  outline-color: var(--orange-one);
+}
+
+.information-episode-box:hover {
+  background-color: var(--five-layer);
+  outline-color: var(--green-one);
+  color: var(--green-one);
+  transform: scale(1.02);
 }

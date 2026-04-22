@@ -1,6 +1,7 @@
-import { Match, Show, Switch } from "solid-js";
+import { createSignal, Match, Show, Switch } from "solid-js";
 import "./css/episodeBox.css";
 import { episodeMetadata, indentityPlayer } from "@renderer/utils/types";
+import { formatDate, formatTime, unixToDateTime } from "@renderer/utils/functions";
 
 interface episodeBoxProps {
     variant: "v1" | "v2",
@@ -10,6 +11,9 @@ interface episodeBoxProps {
 }
 
 export default function EpisodeBox(props: episodeBoxProps) {
+    const [isErrorImage, setErrorImage] = createSignal<boolean>(false)
+    const [isLoadingImage, setIsLoadingImage] = createSignal<boolean>(true)
+
     const saveData = props.saveData;
     const epNum = parseInt(props.episode.ep);
     const savedEp = parseInt(saveData?.episode ?? "0");
@@ -31,20 +35,47 @@ export default function EpisodeBox(props: episodeBoxProps) {
                 </div>
             </Match>
             <Match when={props["variant"] == "v2"}>
-                <div class="information-episode-box">
-                    <Show when={props["episode"]["img"]}>
-                        <img src={props["episode"]["img"]} class="information-episode-box-image"/>
-                    </Show>
+                <div class={`information-episode-box 
+                        ${isWatched ? "watched" : ""} 
+                        ${isWatching ? "watching" : ""} 
+                        ${isWatchedEqual ? "watched" : ""}
+                    `}>
+                    <img src={props["episode"]["img"] ? props["episode"]["img"] : ""} class={`information-episode-box-image ${isLoadingImage() == false && isErrorImage() == false ? "show" : ""}`}
+                        onload={() => setIsLoadingImage(false)}
+                        onerror={() => {
+                            setErrorImage(true)
+                            setIsLoadingImage(false)
+                        }}
+                    />
+                    <Switch>
+                        <Match when={isErrorImage() == false && isLoadingImage()}>
+                            <></>
+                        </Match>
+                        <Match when={isErrorImage()}>
+                            <span class="information-episode-box-image-placeholder">
+                                <span class="material-symbols-outlined icon">
+                                    broken_image
+                                </span>
+                            </span>
+                        </Match>
+                        <Match when={isLoadingImage()}>
+                            <span class="information-episode-box-image-placeholder">
+                                <span class="material-symbols-outlined loading-animation icon">
+                                    progress_activity
+                                </span>
+                            </span>
+                        </Match>
+                    </Switch>
 
                     <Show when={props["episode"]["title"]}>
                         <span class="information-episode-box-title">{props["episode"]["title"]}</span>
                     </Show>
                     <span class="information-episode-box-episode">Ep {props.episode.ep}</span>
                     <Show when={props["episode"]["durration"]}>
-                        <span class="information-episode-box-durration">{props["episode"]["durration"]}</span>
+                        <span class="information-episode-box-durration">{formatTime(props["episode"]["durration"])}</span>
                     </Show>
                     <Show when={props["episode"]["uploadedUnix"]}>
-                        <span class="information-episode-box-upload">{props["episode"]["uploadedUnix"]}</span>
+                        <span class="information-episode-box-upload">{formatDate(unixToDateTime(props["episode"]["uploadedUnix"]))}</span>
                     </Show>
                     <Show when={props.episode["blueRayVer"]}>
                         <span class="information-episode-box-blueRay">BD</span>

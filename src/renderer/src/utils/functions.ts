@@ -1357,3 +1357,35 @@ export function convertParams(data: FilterParams | undefined): FilterPluginsPara
         {}
     );
 }
+
+export function convertTimeStringToSeconds(time: string | undefined) {
+    if (!time) return undefined
+    const [hours, minutes, seconds] = time.split(':').map(Number);
+    return hours * 3600 + minutes * 60 + seconds;
+}
+
+export function formatDate(dateInput: string) {
+  const date = new Date(dateInput);
+  const now = new Date();
+
+  const diffMs = now.getTime() - date.getTime();
+  const diffSeconds = Math.floor(diffMs / 1000);
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffHours < 24) {
+    if (diffHours <= 0) return "Just Now";
+    return `${diffHours} Hour${diffHours !== 1 ? "s" : ""} Ago`;
+  }
+
+  if (diffDays < 7) {
+    return `${diffDays} Day${diffDays !== 1 ? "s" : ""} Ago`;
+  }
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+
+  return `${day}.${month}.${year}`;
+}
