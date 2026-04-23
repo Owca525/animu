@@ -610,7 +610,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             maxBufferLength: 300,
             maxBufferSize: 120000000,
             maxMaxBufferLength: 600,
-            nudgeMaxRetry: 9
+            nudgeMaxRetry: 5
         }
 
         /* IFDEF WEB */

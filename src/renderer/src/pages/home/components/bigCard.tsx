@@ -37,7 +37,7 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
 
     async function goToPlayer(saveData?: indentityPlayer, id?: string): Promise<any> {
         let plugin = pluginManager().currentPlugin
-        if (saveData) plugin = pluginManager().changePlugin(saveData.pluginName)
+        if (saveData) plugin = await pluginManager().changePlugin(saveData.pluginName)
         if (!plugin) return toast(t("notification.failedplugin"), { type: "error" })
         
         const idToast = toast(t("notification.fetchinganime"), { type: "loading", timer: true })

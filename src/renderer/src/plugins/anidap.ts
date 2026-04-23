@@ -1,3 +1,4 @@
+// DISSABLE
 import { makeSmallText, request } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, FilterPluginsParams, playerData, playerDataExtended, playerPluginFormat } from "@renderer/utils/types";
 

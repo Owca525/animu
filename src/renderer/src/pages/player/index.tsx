@@ -56,7 +56,7 @@ const player = () => {
                     console.error("THIS CAN'T HAPPEN IF Happen then something is wrong with player_id, episode, queryFetch/player", queryKey)
                     return []
                 }
-                let pluginPlayer = pluginManager().changePlugin(anime_data.save?.pluginName ? anime_data.save.pluginName : "")
+                let pluginPlayer = await pluginManager().changePlugin(anime_data.save?.pluginName ? anime_data.save.pluginName : "")
                 return await pluginPlayer.extractPlayerData(animeType, episode, player_id)
             },
             cacheTime: 3600000,

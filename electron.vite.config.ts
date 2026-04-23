@@ -3,7 +3,7 @@ import fs from 'fs';
 import solid from 'vite-plugin-solid';
 import { defineConfig } from 'electron-vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
-import type { PluginOption } from "vite";
+import { transformWithEsbuild, type PluginOption } from "vite";
 import pkg from './package.json'
 import { execSync } from 'child_process';
 
@@ -68,10 +68,10 @@ function generateInfoFile(): PluginOption {
       if (!/\.(ts|tsx|js|jsx)$/.test(id)) return null;
       if (process.env.NODE_ENV !== 'production') {
         let tmp = {
-            ver: pkg.version,
-            branch: "Dev",
-            commit: "Uknown",
-            compiled: Math.floor(new Date().getTime() / 1000)
+          ver: pkg.version,
+          branch: "Dev",
+          commit: "Uknown",
+          compiled: Math.floor(new Date().getTime() / 1000)
         }
         if (process.env.ANIMU_WEB_DEV) tmp["langs"] = readAllLangFiles()
         code = code.replace('"PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION"', JSON.stringify(tmp));
@@ -87,10 +87,10 @@ function generateInfoFile(): PluginOption {
         .trim()
 
       let generatedJson = {
-          ver: pkg.version,
-          branch: branch,
-          commit: commit,
-          compiled: Math.floor(new Date().getTime() / 1000)
+        ver: pkg.version,
+        branch: branch,
+        commit: commit,
+        compiled: Math.floor(new Date().getTime() / 1000)
       }
 
       if (process.env.ANIMU_WEB) generatedJson["langs"] = readAllLangFiles()
@@ -100,6 +100,36 @@ function generateInfoFile(): PluginOption {
       return { code, map: null };
     },
   }
+}
+
+function compileRawModule() {
+  return {
+    name: "compilerawmodules",
+
+    async load(id: string) {
+      if (!id.endsWith("?compiledRaw")) {
+        return;
+      }
+
+      const file = id.replace("?compiledRaw", "");
+
+      const code = fs.readFileSync(file, "utf8");
+      let isDissabled = false
+      if (code.startsWith("// DISSABLE")) isDissabled = true
+
+      const result = await transformWithEsbuild(
+        code,
+        file,
+        {
+          loader: "ts",
+          format: "esm",
+          target: "esnext"
+        }
+      );
+
+      return `export default ${JSON.stringify(isDissabled ? `` : `${result.code}`)}`;
+    }
+  };
 }
 
 export default defineConfig({
@@ -135,6 +165,14 @@ export default defineConfig({
     }
   },
   renderer: {
+    server: {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      cors: {
+        origin: true
+      }
+    },
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src'),
@@ -159,6 +197,7 @@ export default defineConfig({
         PROD: process.env.NODE_ENV == 'production' && process.env.ANIMU_WEB == undefined,
         WEB: process.env.ANIMU_WEB ? true : false
       }),
+      compileRawModule(),
       generateInfoFile(),
       viteStaticCopy({
         targets: [

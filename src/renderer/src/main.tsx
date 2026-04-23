@@ -12,6 +12,7 @@ import { SocketProvider } from './utils/context/SocketContext';
 
 (window as any).animuAppInfo = "PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION";
 
+if (window.BrowserWindow) {
 render(
   () => (
     <I18nProvider config={{ defaultLang: "en", fallbackLang: "en" }}>
@@ -30,3 +31,4 @@ render(
   ),
   document.getElementById("root") as HTMLElement
 );
+}

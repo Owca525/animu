@@ -31,6 +31,7 @@ import {
     ContextMenuProps,
     informationPluginFormat,
     playerPluginFormat,
+    playerPluginFormatList,
     SettingsConfig,
     themeMetadata
 } from '@renderer/utils/types';
@@ -93,7 +94,7 @@ function settings() {
     const [audioOutput, setaudioOutput] = createSignal<MediaDeviceInfo[]>([])
 
     const [backupList, setBackupList] = createSignal<{ date: Date, file: string }[]>([])
-    const [pluginList, setpluginList] = createSignal<{ active: boolean, plugin: playerPluginFormat | informationPluginFormat }[]>([])
+    const [pluginList, setpluginList] = createSignal<{ active: boolean, plugin: playerPluginFormatList | informationPluginFormat }[]>([])
     const [hiddenPluginList, setHiddenPluginList] = createSignal<string[]>([])
     const [yt_dlprelases, setReleases_yt_dlp] = createSignal<string[]>([])
     const [ContextMenu, setContextMenu] = createSignal<ContextMenuProps>([
@@ -389,7 +390,7 @@ function settings() {
         }))
     }
 
-    function setActivePlugin(active: boolean, plugin: playerPluginFormat) {
+    async function setActivePlugin(active: boolean, plugin: playerPluginFormat) {
         let tmp: playerPluginFormat | undefined
         if (new Set(hiddenPluginList()).has(plugin.metadata.name)) {
             unHidePlugin(plugin)
@@ -398,11 +399,11 @@ function settings() {
 
         if (!active) {
             const plu = pluginList()[0]
-            tmp = pluginManager().changePlugin(plu.plugin.metadata.name)
-            setpluginList((prev) => prev.map((pl) => ({ ...pl, active: tmp!.metadata.name == pl.plugin.metadata.name })))
+            tmp = await pluginManager().changePlugin(plu.plugin["metadata"]!.name)
+            setpluginList((prev) => prev.map((pl) => ({ ...pl, active: tmp!.metadata.name == pl.plugin["metadata"].name })))
         } else {
-            tmp = pluginManager().changePlugin(plugin.metadata.name)
-            setpluginList((prev) => prev.map((pl) => ({ ...pl, active: tmp!.metadata.name == pl.plugin.metadata.name })))
+            tmp = await pluginManager().changePlugin(plugin.metadata.name)
+            setpluginList((prev) => prev.map((pl) => ({ ...pl, active: tmp!.metadata.name == pl.plugin["metadata"].name })))
         }
         handleChange("plugins.player", tmp.metadata.name)
     }
@@ -432,7 +433,8 @@ function settings() {
         }
 
         const listplugins = getPluginList()
-        setPluginPlayerList(listplugins.map((p) => p.metadata.name == plugin.metadata.name ? plugin : p))
+        // TODO: maybe fix this and maybe this make some erro fuck it i'm tired
+        setPluginPlayerList(listplugins.map((p) => p.metadata.name == plugin.metadata.name ? plugin : p) as any)
     }
 
     function hidePlayerPlugin(plugin: playerPluginFormat, active: boolean) {
@@ -1655,7 +1657,7 @@ function settings() {
                             <div class="settings-container-extensions">
                                 <For each={pluginList()}>
                                     {(tmp) => (
-                                        <Show when={!new Set(hiddenPluginList()).has(tmp.plugin.metadata.name)}>
+                                        <Show when={!new Set(hiddenPluginList()).has(tmp.plugin["metadata"].name)}>
                                             <SettingsPlugin active={"home" in tmp.plugin ? true : tmp.active} unHidePlugin={unHidePlugin} plugin={tmp.plugin} hidePlugin={hidePlayerPlugin} pluginSettings={openPluginSettings} setActivePlugin={setActivePlugin} />
                                         </Show>
                                     )}
@@ -1667,7 +1669,7 @@ function settings() {
                                 <div class="settings-container-extensions">
                                     <For each={pluginList()}>
                                         {(tmp) => (
-                                            <Show when={new Set(hiddenPluginList()).has(tmp.plugin.metadata.name)}>
+                                            <Show when={new Set(hiddenPluginList()).has(tmp.plugin["metadata"].name)}>
                                                 <SettingsPlugin isHidden unHidePlugin={unHidePlugin} active={tmp.active} plugin={tmp.plugin} hidePlugin={hidePlayerPlugin} pluginSettings={openPluginSettings} setActivePlugin={setActivePlugin} />
                                             </Show>
                                         )}

@@ -371,10 +371,21 @@ export interface informationPluginFormat {
     setAnimeInList: (variable: Anilist_ListMutation) => Promise<boolean>
 }
 
+export type playerPluginInstanceFormat = playerPluginFormat & {
+    instance?: HTMLIFrameElement
+    runInstance(pluginCode: string): Promise<void>
+    destroy(): void
+}
+
+export type playerPluginFormatList = {
+    metadata: playerPluginFormat["metadata"],
+    code: string
+}
+
 export interface playerPluginManagerFormat {
     currentPlugin: playerPluginFormat | undefined
-    pluginList: playerPluginFormat[]
-    changePlugin(plugin_id: string): playerPluginFormat
+    pluginList: playerPluginFormatList[]
+    changePlugin(plugin_id: string): Promise<playerPluginInstanceFormat>
     initialPlugins(): void
 }
 
@@ -398,9 +409,9 @@ export type genres = {
     options: string[]
 }
 
-export interface episodeMetadata { 
-    ep: string, 
-    img?: string, 
+export interface episodeMetadata {
+    ep: string,
+    img?: string,
     title?: string,
     blueRayVer?: boolean,
     durration?: number,
@@ -408,10 +419,10 @@ export interface episodeMetadata {
     uploadedUnix?: number
 }
 
-export interface episodeList { 
-    player_id: string, 
+export interface episodeList {
+    player_id: string,
     langugeAvaible?: string[]
-    episodesData: { episodes: episodeMetadata[], type: "dub" | "sub" | "both", name?: string }[] 
+    episodesData: { episodes: episodeMetadata[], type: "dub" | "sub" | "both", name?: string }[]
 }
 
 export interface SettingsConfig {
@@ -579,10 +590,12 @@ export interface Thumbnail {
     }[]
 };
 
-export interface FilterParams { [key: string]: {
-    val: string,
-    name: string
-} };
+export interface FilterParams {
+    [key: string]: {
+        val: string,
+        name: string
+    }
+};
 
 export interface FilterPluginsParams { [key: string]: string }
 

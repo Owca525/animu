@@ -2,14 +2,14 @@ import Button from "@renderer/components/buttons";
 import CheckBox from "@renderer/components/checkBox";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import { CreateContextMenuOptions, openUrlFolder } from "@renderer/utils/functions";
-import { informationPluginFormat, playerPluginFormat } from "@renderer/utils/types";
+import { informationPluginFormat, playerPluginFormat, playerPluginFormatList } from "@renderer/utils/types";
 import { Show } from "solid-js";
 import icon from '@resources/icon.png';
 import { t } from "@renderer/utils/i18n";
 
 interface SettingsPluginProps {
     active: boolean,
-    plugin: playerPluginFormat | informationPluginFormat,
+    plugin: playerPluginFormatList | informationPluginFormat,
     hidePlugin: (plugin: playerPluginFormat, active: boolean) => void,
     pluginSettings: (plugin: playerPluginFormat | informationPluginFormat) => void
     setActivePlugin: (active: boolean, plugin: playerPluginFormat) => void
@@ -25,8 +25,8 @@ export default function SettingsPlugin(props: SettingsPluginProps) {
                 "home" in props.plugin ? "" :
                     OpenContextMenu(
                         CreateContextMenuOptions(
-                            props.isHidden ?    [{ option: t("settings.extensions.unhideplugin"), onClick: () => props.unHidePlugin(props.plugin as playerPluginFormat) }] : 
-                                [{ option: t("settings.extensions.hideplugin"), onClick: () => props.hidePlugin(props.plugin as playerPluginFormat, props.active) }]
+                            props.isHidden ?    [{ option: t("settings.extensions.unhideplugin"), onClick: () => props.unHidePlugin(props["plugin"] as any) }] : 
+                                [{ option: t("settings.extensions.hideplugin"), onClick: () => props.hidePlugin(props.plugin as any, props.active) }]
                         ),
                         event
                     )
@@ -55,8 +55,8 @@ export default function SettingsPlugin(props: SettingsPluginProps) {
                     </Show>
                 </div>
                 <div class='settings-extension-bottom-right'>
-                    <Show when={props.plugin.config}>
-                        <Button icon='settings' ButtonClass='settings-extension-button' onClick={() => props.pluginSettings(props.plugin)} />
+                    <Show when={props.plugin["config"]}>
+                        <Button icon='settings' ButtonClass='settings-extension-button' onClick={() => props.pluginSettings(props.plugin as any)} />
                     </Show>
                 </div>
             </div>

@@ -559,10 +559,23 @@ export function loadedPluginsList() {
 }
 
 export function detectIndex(str: string) {
-    const index = `${getRenderPath()}index.js`
+    let index = ""
+    console.log(str)
+    console.trace()
 
-    if (str.includes("./index.js")) return str.replaceAll("./index.js", index)
-    else return str.replaceAll("index.js", index)
+    /* IFDEF PROD */
+    index = `${getRenderPath()}index.js`
+    if (str.includes("@renderer/utils/functions")) return str.replace("@renderer/utils/functions", index).replace("@renderer/utils/i18n", index)
+    /* ENDIF */
+
+    /* IFDEF DEBUG */
+    index = `${getRenderPath()}src/utils/functions`
+    if (str.includes("@renderer/utils/functions")) str = str.replaceAll("@renderer/utils/functions", index)
+    if (str.includes("@renderer/utils/types")) str = str.replaceAll("@renderer/utils/types", `${getRenderPath()}src/utils/types`)
+    /* ENDIF */
+
+    if (str.includes(`"./index.js"`)) return str.replaceAll(`"./index.js"`, `"${index}"`)
+    else return str.replaceAll(`"index.js"`, `"${index}"`)
 }
 
 export async function detectPluginVersion(notification: boolean = false) {
@@ -884,7 +897,7 @@ export async function fetchAnimeDeepLink(deeplink: string) {
     }
 
     const toastID = toast(t("notification.episodesfetching"), { type: "loading", timer: true })
-    const currentPLugin = pluginManager().changePlugin(anime.player.plugin)
+    const currentPLugin = await pluginManager().changePlugin(anime.player.plugin)
     const episodeList = await currentPLugin.extractOnlyEpisodesList(anime.player.type, anime.player.id);
 
     if (episodeList.length <= 0) {
@@ -1291,8 +1304,6 @@ export async function checkAnimeTodayReleaseEpisode() {
 
     const waitingPlaylist = await readPlaylist("global.waitingplaylist")
 
-    const plugins = getPluginList()
-
     const sortedList = waitingPlaylist.filter((v) => todayANimeId.includes(v.anime.AnimeData.id))
 
     for (let index = 0; index < sortedList.length; index++) {
@@ -1300,7 +1311,7 @@ export async function checkAnimeTodayReleaseEpisode() {
         if (element.customData) continue
 
         try {
-            const tmpplugin = plugins.find((v) => v.metadata.name == element.anime.saveData?.pluginName)
+            const tmpplugin = await pluginManager().changePlugin(element.anime.saveData?.pluginName as string)
             if (!tmpplugin) continue
 
             let episodes = await tmpplugin.extractOnlyEpisodesList(element.anime.saveData?.type!, element.anime.AnimeData.player_ID!)

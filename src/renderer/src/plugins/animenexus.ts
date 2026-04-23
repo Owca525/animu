@@ -1,4 +1,4 @@
-// NOT USE PLUGIN
+// DISSABLE
 // player make token and session id token to m3u8 file
 
 import { convertChaptersVTT, request } from "@renderer/utils/functions";

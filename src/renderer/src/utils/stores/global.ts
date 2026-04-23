@@ -73,12 +73,14 @@ export const DisableService = (tmp: serviceFormat) => setGlobalState((prev) => (
 export const setAnilistUserData = (tmp: { [key: string]: any; } | undefined) => setGlobalState((prev) => ({...prev, anilist_user_data: tmp}));
 
 /* IFDEF DEBUG|PROD */
-window.BrowserWindow.onWindowHidden((hidden: boolean) => {
-    setGlobalState((prev) => ({...prev, isAnimuHidden: hidden}))
-})
-window.BrowserWindow.onWindowFocus((focus: boolean) => {
-    setGlobalState((prev) => ({...prev, isAnimuFocus: focus}))
-})
+if (window.BrowserWindow) {
+    window.BrowserWindow.onWindowHidden((hidden: boolean) => {
+        setGlobalState((prev) => ({...prev, isAnimuHidden: hidden}))
+    })
+    window.BrowserWindow.onWindowFocus((focus: boolean) => {
+        setGlobalState((prev) => ({...prev, isAnimuFocus: focus}))
+    })
+}
 /* ENDIF */
 
 /* IFDEF WEB */

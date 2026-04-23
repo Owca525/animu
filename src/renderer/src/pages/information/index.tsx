@@ -2,7 +2,7 @@ import Button from '@renderer/components/buttons';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
-import { Anilist_ListMutation, AnimeData, animeOpeningsFormat, animulistProps, cardData, ContextMenuProps, episodeMetadata, indentityPlayer, playerPluginFormat } from '@renderer/utils/types';
+import { Anilist_ListMutation, AnimeData, animeOpeningsFormat, animulistProps, cardData, ContextMenuProps, episodeMetadata, indentityPlayer } from '@renderer/utils/types';
 import {
     calculateDays,
     changeTitleAnimu,
@@ -119,7 +119,7 @@ function information() {
             if (tempData().anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED" || tempData().anime.type != "ANIME") return
             // if (tempData().anime.id == "" && !player_id) return setEpisodeResponse(await plugin.extractEpisodeList(tempData().anime, undefined)) deprecated
 
-            let plugin: playerPluginFormat = pluginManager().changePlugin(pluginName as string)
+            let plugin = await pluginManager().changePlugin(pluginName as string)
             if (!plugin) return
             let response = await plugin.extractEpisodeList(tempData().anime, player_id as string)
             return response
@@ -199,7 +199,7 @@ function information() {
         }
     }
 
-    function initialInformation() {
+    async function initialInformation() {
         changeTitleAnimu(`Animu - ${detectTitleConfig(tempData().anime.title)}`)
         generateAnimeForContextMenu()
 
@@ -233,8 +233,9 @@ function information() {
         }
 
         if (history.length > 0) {
-            let plugin: playerPluginFormat = pluginManager().changePlugin(history[0].saveData?.pluginName as string)
+            let plugin = await pluginManager().changePlugin(history[0].saveData?.pluginName as string)
             if (plugin) if (plugin.metadata.name != history[0].saveData?.pluginName) setCurrentId(undefined)
+            console.log(plugin)
             setCurrentPlugin(plugin.metadata.name)
 
             setTmpData({ ...tempData(), saveData: { ...history[0].saveData, pluginName: unwrap(currentPlugin()) as string } as indentityPlayer })
@@ -329,7 +330,7 @@ function information() {
         updateToast(idToast, t("notification.successanime"), { type: "success", timer: false })
         resetContentVariable()
         setmoreMiniTitle(false)
-        if (currentPlugin()) pluginManager().changePlugin(currentPlugin()!)
+        if (currentPlugin()) await pluginManager().changePlugin(currentPlugin()!)
 
         // Reseting Recomendation
         setTmpData((prev) => ({ ...prev, anime: { ...prev.anime, recommendations: undefined } }))
@@ -467,7 +468,7 @@ function information() {
 
     async function refreashInformation(name: string, force: boolean = false) {
         setCurrentId(undefined)
-        pluginManager().changePlugin(name)
+        await pluginManager().changePlugin(name)
         setCurrentPlugin(name)
         episodeResponse.Refetch([tempData()["anime"]["title"]["romaji"], currentIDplayer(), currentPlugin()], force)
     }
@@ -823,7 +824,11 @@ function information() {
                                     </div>
                                     <div class="information-episodes-space">
                                         <Show when={tempData().anime.type == "ANIME" && tempData().anime.status != "NOT_YET_RELEASED" && tempData().anime.format != "MUSIC"}>
-                                            <Dropdown options={segregatePlugins(refreashInformation)} disableX buttonText={currentPlugin()} />
+                                            <Dropdown 
+                                                options={segregatePlugins(refreashInformation)} 
+                                                disableX 
+                                                buttonText={currentPlugin()} 
+                                            />
                                             <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(getPlayerPLugin()?.metadata.name as string, true)} />
                                         </Show>
                                     </div>

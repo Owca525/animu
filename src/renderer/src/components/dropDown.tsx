@@ -1,4 +1,4 @@
-import { createSignal, For, onMount, Show } from "solid-js";
+import { createEffect, createSignal, For, onMount, Show } from "solid-js";
 import "./css/dropDown.css";
 
 export interface DropdownOption {
@@ -21,6 +21,10 @@ export default function Dropdown(props: DropdownProps) {
   const [text, setText] = createSignal(props.buttonText);
 
   onMount(() => {
+    setText(props.buttonText)
+  })
+
+  createEffect(() => {
     setText(props.buttonText)
   })
 
