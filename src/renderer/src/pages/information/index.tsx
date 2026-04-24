@@ -106,6 +106,8 @@ function information() {
     const [isContentError, setContentError] = createSignal<boolean>(false)
     const [isContentNoData, setContentNoData] = createSignal<string | undefined>(undefined)
 
+    const [youCanleave, setYouCanLeave] = createSignal<boolean>(false)
+
     // Content yt-dlp
     // const [contentyt_dlp, setContentYT_DLP] = createSignal<MiniPlayerProps[]>([])
 
@@ -269,11 +271,15 @@ function information() {
         return false
     }
 
-    onMount(() => { initialInformation() })
+    onMount(() => {
+        setTimeout(() => { setYouCanLeave(true) }, 500)
+        initialInformation() 
+    })
 
     onCleanup(() => {
         clearInterval(animeEpisodeReleasingTime)
         setTmpData(undefined as any)
+        setYouCanLeave(false)
     })
 
     function enterPlayer(episodes: episodeMetadata[], type: string, episode: string) {
@@ -448,9 +454,9 @@ function information() {
         return (
             <div class="information-buttons-episode-container">
                 <For each={episode}>
-                    {(data) => <EpisodeBox variant={config.information.episodeVariants} 
-                        enterPlayer={() => enterPlayer(episode, type, data.ep)} 
-                        saveData={tmpSaveData.saveData} episode={data}/>
+                    {(data) => <EpisodeBox variant={config.information.episodeVariants}
+                        enterPlayer={() => enterPlayer(episode, type, data.ep)}
+                        saveData={tmpSaveData.saveData} episode={data} />
                     }
                 </For>
             </div>
@@ -458,7 +464,7 @@ function information() {
     }
 
     createShortcut(["Escape"], () => {
-        if (!location.href.includes("#/info")) return
+        if (!location.href.includes("#/info") || !youCanleave()) return
 
         if (isCustomMenuActive()) return hideCustomMenu()
         if (showWrong()) setshowWrong(() => false)
@@ -778,12 +784,12 @@ function information() {
                                                     if (isCustomMenuActive()) hideCustomMenu()
                                                     if (showWrong()) setshowWrong(() => false)
                                                     if (showImages()) setShowImages(false)
-    
+
                                                     updateGenres("genres", item, `anime_genres.${item}`);
                                                     const cache = getHomeCache()
                                                     StartHomeSearch(cache.search, cache.filterTags)
                                                     setNewActivePage(getHomeSidebarData().top[0].text, false)
-    
+
                                                     navigate("/")
                                                 }} class='information-genre-button'>{t(`anime_genres.${item}`)}</span>
                                             )}
@@ -826,10 +832,10 @@ function information() {
                                     </div>
                                     <div class="information-episodes-space">
                                         <Show when={tempData().anime.type == "ANIME" && tempData().anime.status != "NOT_YET_RELEASED" && tempData().anime.format != "MUSIC"}>
-                                            <Dropdown 
-                                                options={segregatePlugins(refreashInformation)} 
-                                                disableX 
-                                                buttonText={currentPlugin()} 
+                                            <Dropdown
+                                                options={segregatePlugins(refreashInformation)}
+                                                disableX
+                                                buttonText={currentPlugin()}
                                             />
                                             <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(getPlayerPLugin()?.metadata.name as string, true)} />
                                         </Show>
