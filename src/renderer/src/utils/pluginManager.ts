@@ -340,11 +340,21 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
     initialPlugins = async (): Promise<void> => {
         this.pluginList = []
 
+        /* IFDEF ONLYPLUGINS */
+        const d = import.meta.glob("../plugins/*.ts", {
+            eager: false,
+            import: "default",
+        })
+        console.log(d)
+        /* ENDIF */
+
+        /* IFDEF DEBUG|PROD|WEB */
         const importedModules = import.meta.glob("../plugins/*.ts", {
             eager: true,
             query: "?compiledRaw",
             import: "default"
         })
+        /* ENDIF */
         const moduleList = Object.entries(importedModules).map(([path, code]) => ({
             path,
             code: code as string

@@ -108,49 +108,45 @@ async function requestToApi(variables: string, hash: string, header: any) {
     return data
 }
 
-function textToArray(str: string): Uint8Array {
-    const binary = atob(str);
-    const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+function FuckBufferDosentWorkInElectron(base64: string): Uint8Array {
+  const binary = atob(base64);
 
-    return bytes;
-}
+  const bytes = new Uint8Array(binary.length);
 
-function decodeFuckingBase64Code(fuckingEncryptedCode: string) {
-    const cleaned = fuckingEncryptedCode
-        .trim()
-        .replace(/[^+/0-9A-Za-z-_]/g, "");
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
 
-    if (cleaned.length < 2) return textToArray("");
-
-    return textToArray(cleaned.padEnd(
-        cleaned.length + ((4 - (cleaned.length % 4)) % 4),
-        "="
-    ));
+  return bytes;
 }
 async function fuckThisEncryptionMethod(encryptedMotherFucker: string) {
-    const fuckingKey = new TextEncoder().encode("SimtVuagFbGR2K7P");
-    const randomShitHashIDKWhy = await crypto.subtle.digest("SHA-256", fuckingKey);
+    let bufferEncrypted = FuckBufferDosentWorkInElectron(encryptedMotherFucker)
+    let version = bufferEncrypted[0];
 
-    const FINALFUCKINGKEY = await crypto.subtle.importKey(
-        "raw",
-        randomShitHashIDKWhy,
-        { name: "AES-GCM" },
-        false,
-        ["decrypt"]
-    );
+    if (version !== 1) {
+        console.error("ALLMANGA CHANGED THEY FUCKING VERSION OF ENCRYPTION IMEDITLY SEND AS BUG REPORT NOW HAVE VERSION: ", version)
+        return
+    }
 
-    const StupidArrayGayNWord = decodeFuckingBase64Code(encryptedMotherFucker);
+    const encodedKey = (new TextEncoder).encode(`Xot36i3lK3:v${version}`)
+    const digestetCUM = await crypto.subtle.digest("SHA-256", encodedKey);
 
-    const ivFUCK = StupidArrayGayNWord.slice(0, 12);
-    const encryptedShit = StupidArrayGayNWord.slice(12);
+    const cumKey = await crypto.subtle.importKey("raw", digestetCUM, {
+        name: "AES-GCM"
+    }, !1, ["decrypt"])
 
-    const FINNALCUM = await crypto.subtle.decrypt(
-        { name: "AES-GCM", iv: ivFUCK },
-        FINALFUCKINGKEY,
-        encryptedShit
-    );
+    const randomSlicedBufferCum = bufferEncrypted.slice(1, 13)
+    let w = bufferEncrypted.slice(bufferEncrypted.length - 16)
+    let v = bufferEncrypted.slice(13, (bufferEncrypted.length - 16))
+    let O = new Uint8Array(v.length + w.length);
+    O.set(v);
+    O.set(w, v.length);
 
-    return JSON.parse(new TextDecoder().decode(FINNALCUM));
+    const decryptedCum = await crypto.subtle.decrypt({
+        name: "AES-GCM",
+        iv: randomSlicedBufferCum
+    }, cumKey, O);
+    return JSON.parse((new TextDecoder).decode(decryptedCum))
 }
 
 export function dateToUnix(dateStr: string | undefined): number | undefined {
@@ -342,7 +338,7 @@ async function requestForUrl(url: string): Promise<playerData | undefined> {
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.15",
+        version: "1.16",
         name: "Allmanga",
         author: "Owca525",
         icon: "https://allmanga.to/android-icon-192x192.png",
@@ -408,7 +404,7 @@ export default class Allmanga implements playerPluginFormat {
                 const main = jsonObject["episode"]["episodeInfo"][`vidInfors${type}`]
                 data.push({
                     hostname: "wp.youtube-anime.com", resolution: [{
-                        res: main["vidResolution"].toString(), 
+                        res: main["vidResolution"].toString(),
                         url: `https://aln.youtube-anime.com${main["vidPath"]}`,
                         hls: false,
                         doNotUseBackend: true

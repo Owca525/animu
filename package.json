@@ -20,7 +20,8 @@
     "build:mac": "electron-vite build && electron-builder --mac",
     "build:linux": "electron-vite build && electron-builder --linux",
     "build:web": "ANIMU_WEB=true electron-vite build",
-    "build:install": "npm run build:linux && python3 install.py"
+    "build:install": "npm run build:linux && python3 install.py",
+    "build:plugins": "ONLY_PLUGINS=true electron-vite build"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
