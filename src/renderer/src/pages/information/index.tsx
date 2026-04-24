@@ -771,22 +771,24 @@ function information() {
                             <Show when={tempData().anime.genres}>
                                 <div class="information-genres-container">
                                     <span class='information-genre-title'>Genres</span>
-                                    <For each={tempData().anime.genres}>
-                                        {(item) => (
-                                            <span onclick={() => {
-                                                if (isCustomMenuActive()) hideCustomMenu()
-                                                if (showWrong()) setshowWrong(() => false)
-                                                if (showImages()) setShowImages(false)
-
-                                                updateGenres("genres", item, `anime_genres.${item}`);
-                                                const cache = getHomeCache()
-                                                StartHomeSearch(cache.search, cache.filterTags)
-                                                setNewActivePage(getHomeSidebarData().top[0].text, false)
-
-                                                navigate("/")
-                                            }} class='information-genre-button'>{t(`anime_genres.${item}`)}</span>
-                                        )}
-                                    </For>
+                                    <div class="information-genres-container-container">
+                                        <For each={tempData().anime.genres}>
+                                            {(item) => (
+                                                <span onclick={() => {
+                                                    if (isCustomMenuActive()) hideCustomMenu()
+                                                    if (showWrong()) setshowWrong(() => false)
+                                                    if (showImages()) setShowImages(false)
+    
+                                                    updateGenres("genres", item, `anime_genres.${item}`);
+                                                    const cache = getHomeCache()
+                                                    StartHomeSearch(cache.search, cache.filterTags)
+                                                    setNewActivePage(getHomeSidebarData().top[0].text, false)
+    
+                                                    navigate("/")
+                                                }} class='information-genre-button'>{t(`anime_genres.${item}`)}</span>
+                                            )}
+                                        </For>
+                                    </div>
                                 </div>
                             </Show>
                         </div>
