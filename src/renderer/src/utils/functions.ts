@@ -560,8 +560,6 @@ export function loadedPluginsList() {
 
 export function detectIndex(str: string) {
     let index = ""
-    console.log(str)
-    console.trace()
 
     /* IFDEF PROD */
     index = `${getRenderPath()}index.js`
@@ -627,7 +625,6 @@ export async function setHomeData(wrapper?: () => Promise<homeData["data"] | con
 
         const respons = await wrapper()
         if (getGlobalCache().token && getGlobalCache().token != uuid) return
-        console.log(respons)
         if (!respons || respons["error"]) return setAllHomeData({ data: { sections: [] }, isLoading: false, isError: respons ? respons["error"] : true } as any)
         if ("sections" in respons) return setAllHomeData({ data: respons, isLoading: false, isError: false } as any)
         setAllHomeData({ data: { sections: [respons] }, isLoading: false, isError: false } as any)
@@ -771,8 +768,6 @@ export function searchDataInCards(cards: cardData[], search: string, params: Fil
             item.AnimeData.title["english"].toLowerCase().includes(search.toLowerCase()) :
             false
     )]
-
-    console.log(params, results)
 
     if (!params) return results.filter(
         (item, index, self) =>
