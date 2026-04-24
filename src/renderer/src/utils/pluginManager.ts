@@ -177,7 +177,7 @@ class playerPluginInstance implements playerPluginInstanceFormat {
             }
         } else {
             for (const [key, value] of Object.entries(object)) {
-                if (value!["callbackID"]) {
+                if (value && value["callbackID"]) {
                     finalObject = {
                         ...finalObject,
                         [key]: async (...args) => this.wrapperObjectFunction(args, value!["callbackID"])
