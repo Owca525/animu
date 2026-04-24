@@ -338,7 +338,7 @@ async function requestForUrl(url: string): Promise<playerData | undefined> {
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.16",
+        version: "1.17",
         name: "Allmanga",
         author: "Owca525",
         icon: "https://allmanga.to/android-icon-192x192.png",
@@ -353,8 +353,10 @@ export default class Allmanga implements playerPluginFormat {
         "HASH_DATA": HASH_DATA
     };
 
-    async extractPlayerData(type: string, episode: string, id: string) {
-        let variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${episode}"}`
+    async extractPlayerData(type: string, episode: episodeMetadata, id: string) {
+        let tmpEpisode = typeof episode == "object" ? episode["ep"] : episode
+
+        let variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${tmpEpisode}"}`
         try {
             const resp = await requestToApi(variables, HASH_PLAYER, header)
 

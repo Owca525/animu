@@ -49,7 +49,7 @@ const player = () => {
 
     const response = useResponse(
         {
-            queryKey: [anime_data.data?.player_ID, extractionData().actual, extractionData().type, JSON.stringify(anime_data.save["pluginName"])],
+            queryKey: [anime_data.data?.player_ID, extractionData().episodelist.find((v) => v.ep == extractionData().actual), extractionData().type, JSON.stringify(anime_data.save["pluginName"])],
             queryFn: async (queryKey) => {
                 const [player_id, episode, animeType] = queryKey;
                 if (!player_id || !episode || !animeType) {
@@ -57,7 +57,7 @@ const player = () => {
                     return []
                 }
                 let pluginPlayer = await pluginManager().changePlugin(anime_data.save?.pluginName ? anime_data.save.pluginName : "")
-                return await pluginPlayer.extractPlayerData(animeType, episode, player_id)
+                return await pluginPlayer.extractPlayerData(animeType as string, episode as episodeMetadata, player_id as string)
             },
             cacheTime: 3600000,
         }

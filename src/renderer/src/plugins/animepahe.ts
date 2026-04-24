@@ -156,7 +156,7 @@ async function extractResolution(url: string) {
 
 export default class AnimePahe implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.0",
+        version: "1.1",
         name: "AnimePahe",
         author: "Owca525",
         supportLang: ["en"],
@@ -164,11 +164,12 @@ export default class AnimePahe implements playerPluginFormat {
     };
     cache: { [key: string]: string | number[] }[] = []
 
-    extractPlayerData = async (_type: string, episode: string, id: string): Promise<playerData[]> => {
+    extractPlayerData = async (_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
         if (this.cache[id] == undefined) await this.extractEpisodeList(undefined, id)
         if (this.cache[id] == undefined) return []
+        let mainEpisode: string = typeof episode == "object" ? episode.ep : episode
 
-        const find = this.cache[id][parseInt(episode) - 1]
+        const find = this.cache[id][parseInt(mainEpisode) - 1]
         if (!find) return []
         const episodeID = find["session"]
         const htmlResponse = await request(`${WEBSITE}/play/${id}/${episodeID}`, { headers: header })

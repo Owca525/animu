@@ -12,6 +12,7 @@ const payload = `
 <div id="root"></div>
   <script type="module">
     const pending = new Map();
+    window.animuAppInfo = "PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION"
 
     async function functionWrapper(values, func, id) {
         try {
@@ -161,7 +162,7 @@ class playerPluginInstance implements playerPluginInstanceFormat {
             this.instance!.contentWindow!.postMessage({
                 type: "RESULT",
                 uuid: uuid,
-                value,
+                value: JSON.parse(JSON.stringify(value)),
             }, "*");
         });
     }
@@ -176,7 +177,7 @@ class playerPluginInstance implements playerPluginInstanceFormat {
             }
         } else {
             for (const [key, value] of Object.entries(object)) {
-                if (typeof value!["callbackID"] == "object") {
+                if (value!["callbackID"]) {
                     finalObject = {
                         ...finalObject,
                         [key]: async (...args) => this.wrapperObjectFunction(args, value!["callbackID"])
@@ -189,10 +190,11 @@ class playerPluginInstance implements playerPluginInstanceFormat {
                 }
             }
         }
+
         return finalObject
     }
 
-    extractPlayerData = async (type: string, episode: string, id: string): Promise<playerData[]> => {
+    extractPlayerData = async (type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
         if (!this.instance) return []
         return this.wrapperFunction("extractPlayerData", { type, episode, id }) as any
     }
@@ -218,7 +220,7 @@ class playerPluginInstance implements playerPluginInstanceFormat {
         let iframe = document.createElement("iframe")
         iframe.sandbox.add("allow-scripts")
         iframe.style.display = "none"
-        const blob = new Blob([payload.replace("CHANGETOPLUGIN", pluginCode)], { type: "text/html" });
+        const blob = new Blob([payload.replace("CHANGETOPLUGIN", pluginCode).replace(`"PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION"`, window["animuAppInfo"])], { type: "text/html" });
         const url = URL.createObjectURL(blob);
         iframe.src = url
         this.instance = iframe

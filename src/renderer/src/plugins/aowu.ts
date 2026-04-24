@@ -1,6 +1,6 @@
 // DISSABLE
 import { request } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, FilterPluginsParams, playerData, playerPluginFormat } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerPluginFormat } from "@renderer/utils/types";
 
 const WEBSITE = "https://www.aowu.tv/"
 const SearchPath = "/search/-------------.html?wd="
@@ -38,7 +38,7 @@ export default class Aowu implements playerPluginFormat {
         supportLang: ["cn"],
         urlWebsite: WEBSITE
     };
-    extractPlayerData = async(type: string, episode: string, id: string): Promise<playerData[]> => {
+    extractPlayerData = async(type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
         return []
     }
     extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {

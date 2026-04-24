@@ -345,7 +345,7 @@ export interface playerPluginFormat {
         adult?: boolean
     }
     config?: { [key: string]: any }
-    extractPlayerData(type: string, episode: string, id: string): Promise<playerData[]>
+    extractPlayerData(type: string, episode: episodeMetadata, id: string): Promise<playerData[]>
     extractEpisodeList(animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined>
     extractOnlyEpisodesList(type: string, anime_id: string): Promise<episodeMetadata[]>
     searchAnime(name: string, page: number, params?: FilterPluginsParams): Promise<cardData[]>

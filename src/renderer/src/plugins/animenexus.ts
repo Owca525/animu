@@ -2,7 +2,7 @@
 // player make token and session id token to m3u8 file
 
 import { convertChaptersVTT, request } from "@renderer/utils/functions";
-import { AnimeData, cardData, DateObject, episodeList, FilterPluginsParams, playerData, playerPluginFormat } from "@renderer/utils/types";
+import { AnimeData, cardData, DateObject, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerPluginFormat } from "@renderer/utils/types";
 
 const WEBSITE = "https://anime.nexus/"
 const API = "https://api.anime.nexus/api/"
@@ -57,10 +57,12 @@ export default class animenexus implements playerPluginFormat {
 
     cache: { [key: string]: any }[] = []
 
-    extractPlayerData = async(_type: string, episode: string, id: string): Promise<playerData[]> => {
+    extractPlayerData = async(_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
+        let mainEpisode: string = typeof episode == "object" ? episode.ep : episode
+
         if (!this.cache[id]) await this.extractEpisodeList(undefined, id)
         
-        const episodeID = this.cache[id].find((v) => v["number"] == parseInt(episode))["id"]
+        const episodeID = this.cache[id].find((v) => v["number"] == parseInt(mainEpisode))["id"]
         if (!episodeID) return []
 
         const response = await request(`${API}anime/details/episode/stream?id=${episodeID}&fillers=true&recaps=true`, {

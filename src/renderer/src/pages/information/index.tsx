@@ -882,7 +882,7 @@ function information() {
                                                     if (episode.episodes.length <= 0) return <></>
                                                     return <Drop
                                                         LeftHeader={<>
-                                                            {episode.name ? episode.name : t(`information.types.${episode.type}`)}
+                                                            {episode.name ? t(episode.name) : t(`information.types.${episode.type}`)}
                                                             <Show when={episodeResponse.data()!["langugeAvaible"]}>
                                                                 <span class='information-avaible-langs-container'>
                                                                     <For each={episodeResponse.data()!["langugeAvaible"]}>

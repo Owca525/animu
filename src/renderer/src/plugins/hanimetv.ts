@@ -1,6 +1,6 @@
 // DISSABLE
 import { request } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, FilterPluginsParams, playerData, playerPluginFormat } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerPluginFormat } from "@renderer/utils/types";
 
 const WEBSITE = "https://hanime.tv/"
 const API = "https://cached.freeanimehentai.net/"
@@ -26,6 +26,15 @@ const Header = {
     "Referer": "https://hanime.tv",
     "Origin": "https://hanime.tv",
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:147.0) Gecko/20100101 Firefox/147.0",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Content-Type": "application/json",
+    "Sec-GPC": "1",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-origin",
+    "DNT": "1",
+    "Priority": "u=4",
+    "sec-ch-ua": `"Chromium";v="147", "Not.A/Brand";v="8"`
 }
 
 function convertToCardData(data: { [key: string]: string | number | string[] }): cardData {
@@ -127,13 +136,14 @@ export default class HanimeTv implements playerPluginFormat {
         });
     }
 
-    extractPlayerData = async (_type: string, episode: string, id: string): Promise<playerData[]> => {
+    extractPlayerData = async (_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
+        let mainEpisode: string = typeof episode == "object" ? episode.ep : episode
+
         const splitedID = id.split("?/")
-        console.log(this.cache.fetchedAnimeInfoCache)
         if (!this.cache.fetchedAnimeInfoCache[splitedID[0]]) return []
         const data = this.cache.fetchedAnimeInfoCache[splitedID[0]]["hentai_franchise_hentai_videos"]
 
-        const tmp = data.find((v) => v["slug"].split("-").includes(episode));
+        const tmp = data.find((v) => v["slug"].split("-").includes(mainEpisode));
         console.log(tmp, data)
         if (!tmp) return []
 

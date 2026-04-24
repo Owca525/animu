@@ -131,7 +131,7 @@ async function requestToApi(anime_id: string): Promise<{ data: any } | undefined
 
 export default class LycorisCafe implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.5",
+        version: "1.6",
         name: "Lycoris.cafe",
         author: "Owca525",
         icon: "https://www.lycoris.cafe/favicon.ico",
@@ -139,7 +139,9 @@ export default class LycorisCafe implements playerPluginFormat {
         supportLang: ["pl"]
     };
 
-    extractPlayerData = async (_type: string, episode: string, id: string): Promise<playerData[]> => {
+    extractPlayerData = async (_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
+        let mainEpisode: string = typeof episode == "object" ? episode.ep : episode
+
         let req = await requestToApi(id)
         if (!req) return []
         let episodes = req.data.anime["episodes"]
@@ -147,7 +149,7 @@ export default class LycorisCafe implements playerPluginFormat {
         let subtitles: playerSubtitlesFormat[] = []
         let chapters: playerChapterList[] = []
 
-        let tmp = episodes.find((element) => parseInt(element.number) == parseInt(episode))
+        let tmp = episodes.find((element) => parseInt(element.number) == parseInt(mainEpisode))
         if (!tmp) return []
 
         let reqID = await request(`${WEB}/api/watch/getVideoLink?id=${tmp.id}`, { headers: HEADER });

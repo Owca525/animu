@@ -1,6 +1,6 @@
 // DISSABLE
 import { makeSmallText, request } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, FilterPluginsParams, playerData, playerPluginFormat, resolutionFormat } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerPluginFormat, resolutionFormat } from "@renderer/utils/types";
 
 const WEBSITE = "https://site.yummyani.me/"
 const API = "https://site.yummyani.me/api"
@@ -93,7 +93,7 @@ export default class yummyani implements playerPluginFormat {
 
     episodesCache: { [key: number]: any } = {}
 
-    extractPlayerData = async (_type: string, episode: string, id: string): Promise<playerData[]> => {
+    extractPlayerData = async (_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
         try {
             // TODO: End this
             await this.extractEpisodeList(undefined, id)

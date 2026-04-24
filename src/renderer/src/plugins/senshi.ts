@@ -1,5 +1,5 @@
 import { makeSmallText, request } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, FilterPluginsParams, playerChapterList, playerData, playerPluginFormat, resolutionFormat } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerChapterList, playerData, playerPluginFormat, resolutionFormat } from "@renderer/utils/types";
 
 const WEBSITE = "https://senshi.live"
 
@@ -109,8 +109,10 @@ export default class Senshi implements playerPluginFormat {
     };
     cache: { [key: string]: number | string }[] = []
 
-    extractPlayerData = async (_type: string, episode: string, id: string): Promise<playerData[]> => {
-        const urlsResp = await request(`${WEBSITE}/episode-embeds/${id}/${episode}`, { headers: header })
+    extractPlayerData = async (_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
+        let mainEpisode: string = typeof episode == "object" ? episode.ep : episode
+
+        const urlsResp = await request(`${WEBSITE}/episode-embeds/${id}/${mainEpisode}`, { headers: header })
         if (!urlsResp["success"] || !urlsResp["json"]) return []
         const sub = urlsResp["json"].find((v) => v["status"] == "HardSub")
         const dub = urlsResp["json"].find((v) => v["status"] == "Dub")
@@ -118,7 +120,7 @@ export default class Senshi implements playerPluginFormat {
         const cached = this.cache[id]
         let tmp: playerChapterList[] = []
         if (cached) {
-            const asd = cached.find((v) => v["ep_id"].toString() == episode)
+            const asd = cached.find((v) => v["ep_id"].toString() == mainEpisode)
             if (asd) tmp = [
                 {
                     start: asd["intro_start"] ? asd["intro_start"] : 0,

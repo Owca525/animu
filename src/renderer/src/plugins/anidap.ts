@@ -1,6 +1,6 @@
 // DISSABLE
 import { makeSmallText, request } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, FilterPluginsParams, playerData, playerDataExtended, playerPluginFormat } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerDataExtended, playerPluginFormat } from "@renderer/utils/types";
 
 const WEBSITE = "https://anidap.se"
 
@@ -413,8 +413,10 @@ export default class AniDap implements playerPluginFormat {
         urlWebsite: WEBSITE,
         icon: "https://anidap.se/logo.png"
     };
-    extractPlayerData = async (_type: string, episode: string, id: string): Promise<playerData[]> => {
-        const serverResponse = await request(`${WEBSITE}/api/anime/servers?id=${id}&ep=${episode}`, pluginRequest as any)
+    extractPlayerData = async (_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
+        let mainEpisode: string = typeof episode == "object" ? episode.ep : episode
+
+        const serverResponse = await request(`${WEBSITE}/api/anime/servers?id=${id}&ep=${mainEpisode}`, pluginRequest as any)
 
         /* IFDEF DEBUG */
         console.warn("extractPlayerData/AniDup", serverResponse)
