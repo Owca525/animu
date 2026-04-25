@@ -321,6 +321,7 @@ export function toSeconds(time: string) {
 };
 
 export function isNumberString(str: string): boolean {
+    if (!str) return false
     return str.trim() !== "" && !isNaN(Number(str));
 }
 

@@ -2,7 +2,7 @@ import Button from '@renderer/components/buttons';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
-import { Anilist_ListMutation, AnimeData, animeOpeningsFormat, animulistProps, cardData, ContextMenuProps, episodeMetadata, indentityPlayer } from '@renderer/utils/types';
+import { Anilist_ListMutation, AnimeData, animeOpeningsFormat, animulistProps, cardData, ContextMenuProps, episodeMetadata, indentityPlayer, playerChapterList, playerSubtitlesFormat, resolutionFormat } from '@renderer/utils/types';
 import {
     calculateDays,
     changeTitleAnimu,
@@ -109,7 +109,7 @@ function information() {
     const [youCanleave, setYouCanLeave] = createSignal<boolean>(false)
 
     // Content yt-dlp
-    // const [contentyt_dlp, setContentYT_DLP] = createSignal<MiniPlayerProps[]>([])
+    const [contentyt_dlp, setContentYT_DLP] = createSignal<MiniPlayerProps[]>([])
 
     const [activePage, SetactivePage] = createSignal<string>("Episodes")
 
@@ -273,7 +273,7 @@ function information() {
 
     onMount(() => {
         setTimeout(() => { setYouCanLeave(true) }, 500)
-        initialInformation() 
+        initialInformation()
     })
 
     onCleanup(() => {
@@ -394,59 +394,86 @@ function information() {
     }
 
     /* IFDEF DEBUG|PROD */
-    // async function getAnimeTrailer(url: string) {
-    //     try {
-    //         resetContentVariable()
-    //         setContentLoading(true)
-    //         const response = await window.api.yt_dlp.run(url)
-    //         console.log(response)
-    //         if (!response["url"]) {
-    //             setContentLoading(false)
-    //             return
-    //         }
+    async function getAnimeTrailer(url: string) {
+        try {
+            resetContentVariable()
+            setContentLoading(true)
+            let resolutions: resolutionFormat[] = []
+            let storyBoard: string | undefined
 
-    //         let chapters: playerChapterList[] = []
-    //         if (response["chapters"]) chapters = response["chapters"].map((item) => (
-    //             {
-    //                 start: item["start_time"],
-    //                 end: item["end_time"],
-    //                 type: "other",
-    //                 name: item["title"]
-    //             }))
+            const response = await window.api.yt_dlp.run(url)
+            console.log(response)
+            if (response["url"]) {
+                resolutions.push({
+                    res: `${response["height"]}`,
+                    url: response["url"],
+                    reqHeader: response["http_headers"]
+                })
+            }
 
-    //         let subtitles: playerSubtitlesFormat[] = []
-    //         if (response["automatic_captions"]) {
-    //             for (const key in response["automatic_captions"]) {
-    //                 const value = response["automatic_captions"][key as keyof typeof response["automatic_captions"]];
-    //                 const subFinded = value.find((item) => item["ext"] == "vtt")
-    //                 if (!subFinded) continue
-    //                 subtitles.push({
-    //                     url: subFinded["url"],
-    //                     lang: key,
-    //                     label: subFinded["name"],
-    //                     format: subFinded["ext"]
-    //                 })
-    //             }
-    //         }
+            if (response["formats"]) {
+                const filtered = response["formats"].filter((v) => !v["container"] && v["protocol"] == "m3u8_native" && v["format_note"] != "storyboard")
+                let tmpres = filtered.map((v) => ({
+                    url: v["url"],
+                    res: `${v["height"]}`,
+                    reqHeader: v["http_headers"],
+                    hls: true
+                }))
+                const audio = response["formats"].filter((v) => v["resolution"] == "audio only")
+                const mediumAudio = audio.find((v) => v["format_note"] == "medium")
+                // tmpres = tmpres.map((v) => ({
+                //     ...v,
+                //     audioUrl: {
+                //         url: mediumAudio ? mediumAudio["url"] : audio[0]["url"]
+                //     }
+                // }))
+                const storyBoardFinded: any[] = response["formats"].filter((v) => v["format_note"] != "storyboard")
+                storyBoard = storyBoardFinded.at(-1)["url"]
+                console.log(tmpres, audio, mediumAudio, storyBoard)
+                tmpres.reverse()
+                resolutions = tmpres
+            }
 
-    //         setContentYT_DLP([{
-    //             title: response["fulltitle"],
-    //             hostname: "Youtube",
-    //             listChapters: chapters,
-    //             subtitles: subtitles,
-    //             resolution: [{
-    //                 res: response["height"].toString(),
-    //                 url: response["url"],
-    //                 reqHeader: response["http_headers"]
-    //             }]
-    //         }])
-    //         setContentLoading(false)
-    //     } catch (error) {
-    //         console.error("Error in getAnimeTrailer", error)
-    //         setContentLoading(false)
-    //         setContentError(true)
-    //     }
-    // }
+            let chapters: playerChapterList[] = []
+            if (response["chapters"]) chapters = response["chapters"].map((item) => (
+                {
+                    start: item["start_time"],
+                    end: item["end_time"],
+                    type: "other",
+                    name: item["title"]
+                }))
+
+            let subtitles: playerSubtitlesFormat[] = []
+            if (response["automatic_captions"]) {
+                for (const key in response["automatic_captions"]) {
+                    const value = response["automatic_captions"][key as keyof typeof response["automatic_captions"]];
+                    const subFinded = value.find((item) => item["ext"] == "vtt")
+                    if (!subFinded) continue
+                    subtitles.push({
+                        url: subFinded["url"],
+                        lang: key,
+                        label: subFinded["name"],
+                        format: subFinded["ext"]
+                    })
+                }
+            }
+
+            setContentYT_DLP([{
+                title: response["fulltitle"],
+                hostname: "Youtube",
+                listChapters: chapters,
+                subtitles: subtitles,
+                resolution: resolutions,
+                splitHLS: resolutions.length != 1,
+                // storyboardVTT: storyBoard
+            }])
+            setContentLoading(false)
+        } catch (error) {
+            console.error("Error in getAnimeTrailer", error)
+            setContentLoading(false)
+            setContentError(true)
+        }
+    }
     /* ENDIF */
 
     function makeButtons(episode: episodeMetadata[], type: string) {
@@ -535,7 +562,7 @@ function information() {
             value: 'Trailer',
             onClick: () => {
                 // /* IFDEF DEBUG|PROD */
-                // getAnimeTrailer(`https://www.youtube.com/watch?v=${tempData().anime.trailer?.id}`)
+                getAnimeTrailer(`https://www.youtube.com/watch?v=${tempData().anime.trailer?.id}`)
                 // /* ENDIF */
                 SetactivePage("Trailer")
             }
@@ -853,29 +880,29 @@ function information() {
                                             <div class="information-loading-container"><span class="information-error material-symbols-outlined">search_off</span>{t(isContentNoData()!)}</div>
                                         </Match>
                                         <Match when={activePage() == "Trailer" || activePage() == "Music"}>
-                                            {/* <Switch>
-                                                    <Match when={contentyt_dlp().length > 0}>
-                                                        <MiniPlayer props={unwrap(contentyt_dlp()!)} />
-                                                    </Match>
-                                                    <Match when={contentyt_dlp()}>
-                                                        <iframe
-                                                            height="610px"
-                                                            class='information-iframe'
-                                                            src={`https://www.youtube.com/embed/${unwrap(tempData()).anime.trailer?.id}`}
-                                                            frameborder="0"
-                                                            referrerpolicy='strict-origin-when-cross-origin'
-                                                            allowfullscreen
-                                                        ></iframe>
-                                                    </Match>
-                                                </Switch> */}
-                                            <iframe
+                                            <Switch>
+                                                <Match when={contentyt_dlp().length > 0}>
+                                                    <MiniPlayer props={unwrap(contentyt_dlp()!)} />
+                                                </Match>
+                                                <Match when={contentyt_dlp()}>
+                                                    <iframe
+                                                        height="610px"
+                                                        class='information-iframe'
+                                                        src={`https://www.youtube.com/embed/${unwrap(tempData()).anime.trailer?.id}`}
+                                                        frameborder="0"
+                                                        referrerpolicy='strict-origin-when-cross-origin'
+                                                        allowfullscreen
+                                                    ></iframe>
+                                                </Match>
+                                            </Switch>
+                                            {/* <iframe
                                                 height="610px"
                                                 class='information-iframe'
                                                 src={`https://www.youtube.com/embed/${unwrap(tempData()).anime.trailer?.id}`}
                                                 frameborder="0"
                                                 referrerpolicy='strict-origin-when-cross-origin'
                                                 allowfullscreen
-                                            ></iframe>
+                                            ></iframe> */}
                                         </Match>
                                         <Match when={activePage() == "Opening/Ending"}>
                                             <Show when={currentMedia()}>

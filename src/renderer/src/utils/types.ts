@@ -247,9 +247,13 @@ export interface playerData {
 export interface resolutionFormat {
     res: string,
     url: string,
+    mimeType?: string
+    audioUrl?: {
+        url: string,
+        mimeType?: string
+    }
     hls?: boolean
     reqHeader?: { [key: string]: string },
-    doNotUseBackend?: boolean
     defaultSubtitles?: boolean;
     canBeDownloaded?: boolean
 }

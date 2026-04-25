@@ -65,6 +65,22 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
     const config: SettingsConfig = getConfig();
     const { t, currentLang } = useI18n()
 
+    let videoJSConfig = {
+        controls: false,
+        autoplay: true,
+        preload: "auto",
+        bigPlayButton: false,
+        loadingSpinner: false,
+        posterImage: false,
+        errorDisplay: false,
+        html5: {
+            vhs: {
+                withCredentials: false,
+                overrideNative: true,
+            },
+        },
+    };
+
     // ref for html object
     let videoRef: HTMLVideoElement | undefined
     let videoJS: Player | undefined
@@ -81,6 +97,8 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
     let refreashUpdateSocket: NodeJS.Timeout | undefined
     let hls: Hls | undefined
     let currentASSubtitles: JASSUB | undefined
+    let audioRef: HTMLAudioElement | undefined
+    let audioVideoJS: Player | undefined
 
     // Variable
     const [volume, setVolume] = createSignal<number>(config.Player.general.Volume)
@@ -246,21 +264,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
             setEventInPlayer("waiting", () => { setWaitingPlayer(() => true) })
             setEventInPlayer("click", () => { togglePlay(); setcurrentSettings(() => false); setShowSelectEpisode(() => false) })
 
-            videoJS = videojs(videoRef, {
-                controls: false,
-                autoplay: true,
-                preload: "auto",
-                bigPlayButton: false,
-                loadingSpinner: false,
-                posterImage: false,
-                errorDisplay: false,
-                html5: {
-                    vhs: {
-                        withCredentials: false,
-                        overrideNative: true,
-                    },
-                },
-            });
+            videoJS = videojs(videoRef, videoJSConfig);
             if (getAudioOutput()) videoRef.setSinkId(getAudioOutput()!.deviceId)
 
             videoJS.children_.forEach((v) => {
@@ -276,6 +280,14 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
                     }
                 }
             }
+        }
+
+        if (audioRef) {
+            audioVideoJS = videojs(audioRef, {...videoJSConfig, autplay: false});
+            if (getAudioOutput()) audioRef.setSinkId(getAudioOutput()!.deviceId)
+            
+            const div = document.getElementById(audioVideoJS.id_);
+            if (div) div.style.display = "none";
         }
 
         runNewPlayer(defaulthost)
@@ -294,7 +306,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
 
     onCleanup(async () => {
         if (document.pictureInPictureElement) await document.exitPictureInPicture();
-
 
         setCleanup(true)
         removeToast(currentExtractionRes().toast)
@@ -315,7 +326,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         if (refreashUpdateSocket) clearInterval(refreashUpdateSocket)
 
         if (hls) hls.destroy()
-        console.log(hls)
         if (currentASSubtitles) currentASSubtitles.destroy()
         if (videoRef) {
             videoRef.pause();
@@ -324,6 +334,14 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
             videoRef.remove()
         }
         videoRef = undefined
+
+        if (audioRef) {
+            audioRef.pause();
+            audioRef.removeAttribute("src");
+            audioRef.load();
+            audioRef.remove()
+        }
+        audioRef = undefined
 
         if (getSocket()) {
             const socket = getSocket()
@@ -391,7 +409,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         if (videoJS) {
             videoJS.src({
                 src: data.url,
-                type: "video/mp4",
+                type: data["mimeType"] ? data["mimeType"] : "video/mp4",
             })
             setTimeVideo(time)
         }
@@ -438,6 +456,16 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
             setListResolution(currentplayer.resolution)
             setCurrentResoltion(currentRes)
         }
+
+        if (currentRes["audioUrl"] && audioRef && audioVideoJS) {
+            audioVideoJS.src({
+                src: currentRes["audioUrl"]["url"],
+                type: currentRes["audioUrl"]["mimeType"] ? currentRes["audioUrl"]["mimeType"] : "audio/mp3"
+            })
+            audioVideoJS.volume(parseFloat((volume() / 100).toFixed(2)))
+            audioVideoJS.pause()
+        }
+
         if (currentRes.hls) {
             return await runHLS(currentRes, currentplayer.splitHLS)
         }
@@ -458,7 +486,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
 
         videoJS?.src({
             src: currentRes.url,
-            type: "video/mp4",
+            type: currentRes.mimeType ? currentRes.mimeType : "video/mp4",
         })
 
         setTimeVideo(0)
@@ -575,7 +603,9 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         if (!videoRef) return
         if (!dontShow) setTimeoutForElement(volumeTimeout, setShowVolume)
         if (value > 100 || value < 0) return
-        videoRef.volume = parseFloat((value / 100).toFixed(2))
+        const vol = parseFloat((value / 100).toFixed(2))
+        videoRef.volume = vol
+        if (audioRef) audioRef.volume = vol
         setVolume(() => value)
     }
 
@@ -594,12 +624,14 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         setIsPlaying(prev => {
             if (prev) {
                 video.pause()
+                if (audioRef) audioRef.pause()
                 pauseClip()
                 return false
             }
             video.play().catch((reason) => {
                 console.warn("Video Play Error Catch", reason)
             })
+            if (audioRef) audioRef.play().catch((err) => console.warn(err))
             pauseClip()
             return true
         })
@@ -705,6 +737,8 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         if (!videoRef) return
         videoRef.currentTime = value
         if (videoJS) videoJS.currentTime(value)
+        if (audioRef) audioRef.currentTime = value
+        if (audioVideoJS) audioVideoJS.currentTime(value)
         setcurrentTime(() => value)
     }
 
@@ -727,6 +761,8 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
     async function setNewSubtitles(sub: playerSubtitlesFormat | undefined) {
         if (!sub) return
         if (!videoRef) return
+
+        console.log(sub)
 
         // This clear subtitles but this dosen't work on dev Because react second render
         if (currentASSubtitles) {
@@ -767,8 +803,11 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
             return
         }
 
-        let data = await request(sub.url)
-        if (!data.success) return
+        let data = await request(sub.url, { headers: currentResolution()!["reqHeader"] })
+        if (!data["success"]) {
+            toast(t("Failed Fetch Subttitles"), { type: "error" })
+            return
+        }
 
         const vtt = await convert(data.text, ".vtt", { removeTextFormatting: true });
         const blob = new Blob([vtt.subtitle], { type: "text/vtt" });
@@ -1005,6 +1044,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
                         ref={vttSubRef}
                     />
                 </video>
+                <audio ref={audioRef} style={{ display: "none" }} />
                 <Show when={currentCue()}>
                     <div class={`player-subtitle-container ${isVisible() ? "up" : "down"}`}>
                         <For each={currentCue()!.split("\n")}>
