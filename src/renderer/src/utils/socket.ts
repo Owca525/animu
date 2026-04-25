@@ -1,8 +1,8 @@
-import { socketPlayerInit } from "@renderer/components/miniPlayer";
 import { getSocket, setSocket, setSocketRoom } from "./stores/global";
 import { io } from "socket.io-client";
 import { unwrap } from "solid-js/store";
 import { toast } from "./context/ToastNotification";
+import { socketPlayerInit } from "@renderer/pages/player/VideoPlayer";
 
 (window as any).runSocket = runSocket;
 (window as any).createRoom = createRoom;
