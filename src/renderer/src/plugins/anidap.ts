@@ -138,113 +138,6 @@ const pluginHeader = {
 
 const pluginRequest = { headers: pluginHeader, method: "GET" }
 
-const UintRandomValL = Uint8Array.from(Object.values({
-    "0": 153,
-    "1": 204,
-    "2": 58,
-    "3": 179,
-    "4": 132,
-    "5": 32,
-    "6": 132,
-    "7": 74,
-    "8": 237,
-    "9": 132,
-    "10": 66,
-    "11": 232,
-    "12": 165,
-    "13": 109,
-    "14": 4,
-    "15": 228
-}));
-
-const UintRandomValM = Uint8Array.from(Object.values({
-    "0": 125,
-    "1": 242,
-    "2": 111,
-    "3": 214,
-    "4": 41,
-    "5": 233,
-    "6": 157,
-    "7": 185,
-    "8": 129,
-    "9": 127,
-    "10": 193,
-    "11": 136,
-    "12": 240,
-    "13": 86,
-    "14": 178,
-    "15": 99,
-    "16": 233,
-    "17": 244,
-    "18": 192,
-    "19": 171,
-    "20": 215,
-    "21": 10,
-    "22": 97,
-    "23": 198,
-    "24": 230,
-    "25": 161,
-    "26": 74,
-    "27": 167,
-    "28": 8,
-    "29": 95,
-    "30": 230,
-    "31": 49
-}));
-
-const UintRandomVall = Uint8Array.from(Object.values({
-    "0": 254,
-    "1": 1,
-    "2": 21,
-    "3": 56,
-    "4": 237,
-    "5": 239,
-    "6": 4,
-    "7": 1,
-    "8": 115,
-    "9": 55,
-    "10": 110,
-    "11": 242,
-    "12": 235,
-    "13": 106,
-    "14": 242,
-    "15": 147,
-    "16": 85,
-    "17": 221,
-    "18": 167,
-    "19": 44,
-    "20": 72,
-    "21": 18,
-    "22": 102,
-    "23": 242,
-    "24": 195,
-    "25": 45,
-    "26": 48,
-    "27": 201,
-    "28": 206,
-    "29": 73,
-    "30": 175,
-    "31": 65
-}));
-
-const UintRandomValA = Uint8Array.from(Object.values({
-    "0": 206,
-    "1": 68,
-    "2": 122,
-    "3": 132,
-    "4": 230,
-    "5": 208,
-    "6": 85,
-    "7": 116,
-    "8": 75,
-    "9": 82,
-    "10": 30,
-    "11": 94,
-    "12": 139,
-    "13": 115,
-    "14": 2,
-    "15": 213
-}));
 function decodeRandomStr(input: string) {
     for (; input.length % 4;) {
         input += "=";
@@ -263,6 +156,97 @@ function converter(e: Uint8Array, t: Uint8Array): Uint8Array {
     });
 }
 async function decryptorPlayerData(str: string) {
+    const sn = 263 * 60_000;
+
+    const vt = Uint8Array.from({ length: 32 }, (_, i) =>
+        ((i * 17 + 53) ^ (i * 23 + 79) ^ (i * 31 + 124)) & 255
+    );
+
+    const Re = Uint8Array.from([
+        13, 27, 7, 19, 31, 11, 23, 37,
+        41, 43, 47, 53, 59, 61, 67, 71,
+        73, 79, 83, 89, 97, 101, 103, 107,
+        109, 113, 127, 131, 137, 139, 149, 151
+    ]);
+
+    const Ke = (a, b, c) =>
+        (((a ^ b) << 1) ^ ((b ^ c) >> 1) ^ (a + b + c)) & 255;
+
+    const wt = (arr, i) => {
+        const l = arr.length;
+        return (
+            arr[i % l] ^
+            arr[(i * 7 + 11) % l] ^
+            arr[(i * 13 + 17) % l]
+        );
+    };
+
+    const e = (Date.now() / sn) | 0;
+
+    const t = new Uint8Array(128);
+    for (let i = 0; i < 128; i++) {
+        const u = Re[i & 31];
+
+        t[i] = ( wt(vt, i) ^ ((e + i * u) & 255) ^ ((i ^ u) & 255) ) & 255;
+    }
+
+    const n = new Uint8Array(64);
+    for (let i = 0; i < 64; i++) {
+        const u = t[i];
+        const m = t[i + 64];
+
+        n[i] = u ^ Ke(u, m, (e >>> (i & 15)) & 255);
+    }
+
+    const r = new Uint8Array(32);
+    for (let i = 0; i < 32; i++) {
+        const u = n[i];
+        const m = n[i + 32];
+        const d = Re[(i * 3 + 7) & 31];
+
+        r[i] = (u ^ m ^ (u + m + d)) & 255;
+    }
+
+    const UintRandomValA = new Uint8Array(16);
+    for (let i = 0; i < 16; i++) {
+        const u = r[i];
+        const m = r[i + 16];
+
+        UintRandomValA[i] = ( (((u << 3) | (u >>> 5)) ^ ((m << 5) | (m >>> 3))) ^ ((e >>> (i * 2)) & 255) ) & 255;
+    }
+
+    const c = new Uint8Array(48);
+    for (let i = 0; i < 48; i++) {
+        const p = Ke(
+            r[(i * 7 + 11) & 31],
+            r[(i * 13 + 17) & 31],
+            r[(i * 19 + 23) & 31]
+        );
+
+        c[i] =( p ^ ((e >>> (i % 24)) & 255) ^ wt(vt, i * 3) ) & 255;
+    }
+
+    const UintRandomVall = new Uint8Array(32);
+
+    for (let round = 0; round < 3; round++) {
+        const offset = round << 4;
+
+        for (let i = 0; i < 32; i++) {
+            const a = round === 0 ? c[i] : UintRandomVall[i];
+
+            UintRandomVall[i] =
+                (
+                    Ke(
+                        a,
+                        c[(i * 5 + 7) % 48],
+                        c[(i * 11 + 13) % 48]
+                    ) ^
+                    c[(i + offset) % 48]
+                ) & 255;
+        }
+    }
+
+
     try {
         const key = await crypto.subtle.importKey("raw", UintRandomVall, {
             name: "AES-GCM"
@@ -280,7 +264,7 @@ async function decryptorPlayerData(str: string) {
         return JSON.parse(new TextDecoder().decode(FINALLCUM))
     } catch (error) {
         try {
-            const key = await crypto.subtle.importKey("raw", UintRandomValM, {
+            const key = await crypto.subtle.importKey("raw", UintRandomVall, {
                 name: "AES-GCM"
             }, !1, ["encrypt", "decrypt"]);
 
@@ -292,7 +276,7 @@ async function decryptorPlayerData(str: string) {
                 iv: uintSlice
             }, key, uintSecondSlice)
 
-            const result = converter(new Uint8Array(unRevealNumbers), UintRandomValL);
+            const result = converter(new Uint8Array(unRevealNumbers), UintRandomValA);
 
             return JSON.parse(new TextDecoder().decode(result));
         } catch (error) {
