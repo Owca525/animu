@@ -158,6 +158,7 @@ export default class Animetsu implements playerPluginFormat {
         author: "Owca525",
         supportLang: ["en"],
         urlWebsite: WEBSITE,
+        type: "player"
     };
     // config: { [key: string]: any; } = {
     //     Backend: BACKEND

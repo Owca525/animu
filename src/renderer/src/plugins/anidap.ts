@@ -395,7 +395,8 @@ export default class AniDap implements playerPluginFormat {
         author: "Owca525",
         supportLang: ["en"],
         urlWebsite: WEBSITE,
-        icon: "https://anidap.se/logo.png"
+        icon: "https://anidap.se/logo.png",
+        type: "player"
     };
     extractPlayerData = async (_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
         let mainEpisode: string = typeof episode == "object" ? episode.ep : episode

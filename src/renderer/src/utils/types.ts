@@ -346,7 +346,8 @@ export interface playerPluginFormat {
         supportLang: string[]
         // sidebarAddon?: sidebarData[]
         searchOption?: genres
-        adult?: boolean
+        adult?: boolean,
+        type: "player"
     }
     config?: { [key: string]: any }
     extractPlayerData(type: string, episode: episodeMetadata, id: string): Promise<playerData[]>
@@ -363,7 +364,8 @@ export interface informationPluginFormat {
         author: string
         icon?: string
         urlWebsite?: string
-        searchOption: genres[]
+        searchOption: genres[],
+        type: "information"
     }
     config?: { [key: string]: any }
     search(name: string, page: number, params?: FilterPluginsParams): Promise<containerData | { error: string } | undefined>

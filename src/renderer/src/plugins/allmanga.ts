@@ -344,6 +344,7 @@ export default class Allmanga implements playerPluginFormat {
         icon: "https://allmanga.to/android-icon-192x192.png",
         supportLang: ["en"],
         urlWebsite: "https://allmanga.to",
+        type: "player"
     }
     config: { [key: string]: any; } = {
         "settings.extensions.website": API_WEB,
@@ -409,7 +410,6 @@ export default class Allmanga implements playerPluginFormat {
                         res: main["vidResolution"].toString(),
                         url: `https://aln.youtube-anime.com${main["vidPath"]}`,
                         hls: false,
-                        doNotUseBackend: true
                     }]
                 })
             }

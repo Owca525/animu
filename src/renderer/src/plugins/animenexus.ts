@@ -52,7 +52,8 @@ export default class animenexus implements playerPluginFormat {
         name: "Anime.nexus",
         author: "Owca525",
         supportLang: ["en", "jpn", "rus"],
-        urlWebsite: WEBSITE
+        urlWebsite: WEBSITE,
+        type: "player"
     };
 
     cache: { [key: string]: any }[] = []

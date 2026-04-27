@@ -88,7 +88,8 @@ export default class yummyani implements playerPluginFormat {
         author: "Owca525",
         icon: "https://site.yummyani.me/img/icon/yummy-192.png",
         supportLang: ["ru"],
-        urlWebsite: WEBSITE
+        urlWebsite: WEBSITE,
+        type: "player"
     };
 
     episodesCache: { [key: number]: any } = {}

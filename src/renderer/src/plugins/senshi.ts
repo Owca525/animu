@@ -105,7 +105,8 @@ export default class Senshi implements playerPluginFormat {
         author: "Owca525",
         supportLang: ["en"],
         urlWebsite: WEBSITE,
-        icon: "https://senshi.live/assets/Senshi_Logo_3-Dm8yKkWF.png"
+        icon: "https://senshi.live/assets/Senshi_Logo_3-Dm8yKkWF.png",
+        type: "player"
     };
     cache: { [key: string]: number | string }[] = []
 

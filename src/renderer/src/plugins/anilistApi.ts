@@ -662,7 +662,8 @@ export default class AnilistApi implements informationPluginFormat {
     searchOption: [],
     author: "Owca525",
     urlWebsite: "https://anilist.co",
-    icon: "https://anilist.co/img/icons/icon.svg"
+    icon: "https://anilist.co/img/icons/icon.svg",
+    type: 'information'
   };
 
   constructor() {

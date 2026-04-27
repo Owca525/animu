@@ -61,7 +61,8 @@ export default class Aowu implements playerPluginFormat {
         name: "AnimeOnsen",
         author: "Owca525",
         supportLang: ["en"],
-        urlWebsite: WEBSITE
+        urlWebsite: WEBSITE,
+        type: "player"
     };
     extractPlayerData = async (_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
         const response = await request(`${WEBSITE.replace("www.", "api.")}/v4/content/${id}/video/${episode}`, { headers: {

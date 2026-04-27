@@ -36,7 +36,8 @@ export default class Aowu implements playerPluginFormat {
         name: "Aowu",
         author: "Owca525",
         supportLang: ["cn"],
-        urlWebsite: WEBSITE
+        urlWebsite: WEBSITE,
+        type: "player"
     };
     extractPlayerData = async(type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
         return []

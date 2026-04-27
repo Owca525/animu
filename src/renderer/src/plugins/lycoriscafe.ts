@@ -136,7 +136,8 @@ export default class LycorisCafe implements playerPluginFormat {
         author: "Owca525",
         icon: "https://www.lycoris.cafe/favicon.ico",
         urlWebsite: WEB,
-        supportLang: ["pl"]
+        supportLang: ["pl"],
+        type: "player"
     };
 
     extractPlayerData = async (_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {

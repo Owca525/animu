@@ -48,7 +48,8 @@ export default class Anizone implements playerPluginFormat {
         name: "AniZone",
         author: "Owca525",
         supportLang: ["en", "pl", "de"],
-        urlWebsite: WEB
+        urlWebsite: WEB,
+        type: "player"
     };
 
     extractPlayerData = async (_type: string, episode: episodeMetadata, id: string) => {

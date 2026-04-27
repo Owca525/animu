@@ -74,7 +74,8 @@ export default class HanimeTv implements playerPluginFormat {
         author: "Owca525",
         supportLang: ["en"],
         urlWebsite: WEBSITE,
-        icon: "https://hanime.tv/apple-touch-icon-precomposed.png"
+        icon: "https://hanime.tv/apple-touch-icon-precomposed.png",
+        type: "player"
     };
 
     cache: { vendor: string | undefined, hentaiListCache: { [key: string]: any }[], fetchedAnimeInfoCache: { [key: string]: any }[] } = {
