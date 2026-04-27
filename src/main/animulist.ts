@@ -11,7 +11,14 @@ export function checkDatabase(): animulistData[] {
             return []
         }
         const database = fs.readFileSync(path.join(newConfigPath, "animulistDatabase.json"), "utf-8")
-        return JSON.parse(database) as animulistData[]
+        // TODO: REMOVE THIS BEFORE RELEASE 0.8.0
+        return JSON.parse(database).map((v: animulistData) => ({
+            ...v,
+            animulist: {
+                ...v["animulist"],
+                endWatch: v["animulist"]["endWatch"] == 0 ? undefined : v["animulist"]["endWatch"]
+            }
+        } as animulistData)) as animulistData[]
     } catch (error) {
         console.error("animulist/checkDatabase", error)
         return []

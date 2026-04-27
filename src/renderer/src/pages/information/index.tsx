@@ -76,7 +76,11 @@ function information() {
     const config = unwrap(getConfig())
 
     const [tempData, setTmpData] = createSignal<informationTmpProps>(JSON.parse(localStorage.getItem("informationCache") as string) as any)
-    const [currentIDplayer, setCurrentId] = createSignal<string | undefined>(tempData().anime.player_ID)
+    const [currentIDplayer, setCurrentId] = createSignal<string | undefined>(tempData().anime.player_ID);
+
+    /* IFDEF DEBUG */
+    (window as any).getInformationData = () => unwrap(tempData())
+    /* ENDIF */
 
     const [showWrong, setshowWrong] = createSignal<boolean>(false)
     const [isNeedMore, setNeedMore] = createSignal<boolean>(false)
