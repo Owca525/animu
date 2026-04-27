@@ -1,0 +1,85 @@
+.notificationmenu-button {
+    anchor-name: --anchor-notificationmenu-button;
+    position: relative;
+}
+
+.notificationmenu-notification-container {
+    background-color: var(--third-layer);
+    position: absolute;
+    position-anchor: --anchor-notificationmenu-button;
+
+    top: anchor(bottom);
+    left: anchor(center);
+
+    margin-top: 8px;
+
+    translate: -80% 0;
+
+    width: 400px;
+    max-height: 500px;
+
+    padding: 12px;
+    border-radius: 12px;
+
+    transition: opacity 100ms ease-in-out, z-index 0ms, linear 100ms;
+    opacity: 0;
+    z-index: -1;
+}
+
+.notificationmenu-notification-container.active {
+    z-index: 20;
+    opacity: 1;
+}
+
+.notificationmenu-notification-img {
+    width: 50px;
+}
+
+.notificationmenu-notification {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 4px;
+    border-radius: 12px;
+    cursor: pointer;
+    outline: 2px solid var(--invisible);
+    transition: all 150ms ease-in-out;
+}
+
+.notificationmenu-notification:hover {
+    background-color: var(--five-layer);
+}
+
+.notificationmenu-notification-text-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.notificationmenu-notification-description {
+    font-size: .85em;
+}
+
+.notificationmenu-notification-title {
+    font-weight: 600;
+    font-size: .9em;
+}
+
+.notificationmenu-notification.notReaded {
+    outline-color: var(--red-one);
+}
+
+.notificationmenu-notitification-number {
+    position: absolute;
+    border-radius: 50%;
+    user-select: none;
+    padding: 4px 8px;
+    position: absolute;
+    position-anchor: --anchor-notificationmenu-button;
+
+    bottom: anchor(top);
+    left: anchor(right);
+
+    translate: -80% 18px;
+    background-color: var(--red-one);
+}

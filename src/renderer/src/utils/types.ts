@@ -221,7 +221,11 @@ export interface NotificationProps {
     description: string,
     icon?: string,
     onClick?: () => void | Promise<void>
-    readed?: boolean
+    readed?: boolean,
+    cache?: {
+        action: string,
+        args: any[]
+    } 
 }
 
 export type playerDataExtended = playerData & {

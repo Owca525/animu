@@ -1248,7 +1248,10 @@ export function sendNotification(notificiation: NotificationProps, toastprop?: T
             icon: notificiation.icon
         }, { ...toastprop, type: "notification", onClick: notificiation.onClick })
     }
-    addNotification(notificiation)
+    addNotification({
+        ...notificiation,
+        readed: false
+    })
 }
 
 export async function getTodayAnilistAnime() {

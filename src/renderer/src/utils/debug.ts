@@ -4,6 +4,8 @@ import { getGlobalCache } from "./stores/global";
 import { getHomeCache } from "./stores/home";
 import { getInformationPlugin, getPlayerPLugin, getPluginList, getPluginRepo, pluginManager } from "./stores/plugins";
 import { request, sendNotification } from "./functions";
+import { t } from "./i18n";
+import icon from '@resources/icon.png';
 
 (window as any).getConfig = () => unwrap(getConfig());
 (window as any).getGlobalCache = () => unwrap(getGlobalCache());
@@ -15,3 +17,10 @@ import { request, sendNotification } from "./functions";
 (window as any).pluginManager = () => unwrap(pluginManager());
 (window as any).sendNotification = sendNotification;
 (window as any).request = request;
+(window as any).testNotitication = () => {
+    sendNotification({
+        title: t("update.available", { ver: window["animuAppInfo"]["ver"] }),
+        description: "New Update is Avaible",
+        icon: icon
+    })
+}

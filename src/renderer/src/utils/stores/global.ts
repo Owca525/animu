@@ -63,6 +63,8 @@ export const setGlobalToken = (tmp: UUIDTypes | undefined) => setGlobalState((pr
 export const setAnimulistData = (tmp: globalDataFormat["animuList"]) => setGlobalState((prev) => ({...prev, animuList: tmp}));
 export const setDeepLink = (tmp: deeplinkFormat) => setGlobalState((prev) => ({...prev, deepLinks: [...prev.deepLinks, tmp]}));
 export const addNotification = (tmp: NotificationProps) => setGlobalState((prev) => ({...prev, notifications: [...prev.notifications, tmp]}));
+export const modifyNotification = (tmp: NotificationProps) => setGlobalState((prev) => ({...prev, notifications: prev.notifications.map((v) => v["title"] == tmp["title"] ? tmp : v)}));
+
 export const removeDeepLink = (name: string) => setGlobalState((prev) => ({...prev, deepLinks: prev.deepLinks.filter((item) => item.name != name)}));
 export const ActiveService = (tmp: serviceFormat[]) => setGlobalState((prev) => ({...prev, service: tmp}));
 export const FindService = (tmp: string) => globalState.service.find((item) => item.name == tmp);

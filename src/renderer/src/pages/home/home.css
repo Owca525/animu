@@ -79,3 +79,9 @@
     gap: 12px;
     align-items: center;
 }
+
+.home-header-right {
+    display: flex;
+    margin-left: auto;
+    gap: 16px;
+}
