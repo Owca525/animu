@@ -3,7 +3,7 @@ import { animeOpeningsFormat, cardData, deeplinkFormat, globalDataFormat, Notifi
 import { createStore } from "solid-js/store";
 import { Socket } from "socket.io-client";
 
-export const [globalState, setGlobalState] = createStore({
+export const [globalState, setGlobalState] = createStore<globalDataFormat>({
     incognito: false,
     history: [],
     deeplinkRunned: false,
@@ -21,7 +21,11 @@ export const [globalState, setGlobalState] = createStore({
     todayAnimeAnilist: [],
     animeOpeningsCache: {},
     audioOutput: undefined,
-    pluginSearchMode: false
+    pluginSearchMode: false,
+    yt_dlp: {
+        ver: "",
+        listVer: []
+    }
 } as globalDataFormat);
 
 export const getGlobalCache = () => globalState;
@@ -40,7 +44,10 @@ export const todayAnimeInAnilist = () => globalState.todayAnimeAnilist;
 export const animeOpeningsCache = () => globalState.animeOpeningsCache;
 export const getAudioOutput = () => globalState.audioOutput;
 export const isPluginSearchMode = () => globalState.pluginSearchMode;
+export const getCurrentYT_DLPVer = () => globalState.yt_dlp["ver"];
+export const getListOfVerYT_DLP = () => globalState.yt_dlp["listVer"];
 
+export const setYT_DLPVersion = (tmp: globalDataFormat["yt_dlp"]) => setGlobalState((prev) => ({...prev, yt_dlp: tmp}));
 export const setPluginSearchMode = (tmp: boolean) => setGlobalState((prev) => ({...prev, pluginSearchMode: tmp}));
 export const addOpeningCache = (id: number, op: animeOpeningsFormat[]) => setGlobalState((prev) => ({...prev, animeOpeningsCache: { ...prev.animeOpeningsCache, [id]: op }}));
 export const setTodayAnimeInAnilist = (tmp: cardData[]) => setGlobalState((prev) => ({...prev, todayAnimeAnilist: tmp}));

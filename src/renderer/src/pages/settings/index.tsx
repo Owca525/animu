@@ -57,7 +57,7 @@ import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './settings.css';
 import { useI18n } from '@renderer/utils/i18n';
-import { activeThemes, animulistData, getAnilistUserData, getDeeplinks, getGlobalCache, loadedTheme, removeDeepLink, setAudioOutput, setDeepLink } from '@renderer/utils/stores/global';
+import { activeThemes, animulistData, getAnilistUserData, getCurrentYT_DLPVer, getDeeplinks, getGlobalCache, getListOfVerYT_DLP, loadedTheme, removeDeepLink, setAudioOutput, setDeepLink } from '@renderer/utils/stores/global';
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 import SettingsPlugin from './components/settingsPlugin';
 import semver from "semver";
@@ -96,7 +96,6 @@ function settings() {
     const [backupList, setBackupList] = createSignal<{ date: Date, file: string }[]>([])
     const [pluginList, setpluginList] = createSignal<{ active: boolean, plugin: playerPluginFormatList | informationPluginFormatList }[]>([])
     const [hiddenPluginList, setHiddenPluginList] = createSignal<string[]>([])
-    const [yt_dlprelases, setReleases_yt_dlp] = createSignal<string[]>([])
     const [ContextMenu, setContextMenu] = createSignal<ContextMenuProps>([
         { option: "dialog.reload", onClick: () => location.reload() },
         { option: "", line: true },
@@ -232,8 +231,6 @@ function settings() {
         /* IFDEF DEBUG|PROD */
         setBackupList(await window.api.backup.list())
         if (config().new.General.discordRPC) window.api.rpc.setActivity({ state: t("discordrpc.settings") })
-
-        setReleases_yt_dlp(await window.api.yt_dlp.versionList())
         /* ENDIF */
     });
 
@@ -680,7 +677,10 @@ function settings() {
                                 <span class="settings-helpicon-space">
                                     {t("settings.yt-dlp")}
                                 </span>
-                                <Dropdown disableX placeholder={yt_dlprelases().length <= 0 ? t("global.notFound") : yt_dlprelases()[0]} options={yt_dlprelases().map((v) => ({ label: v, onClick: () => changeYT_DLP(v) }))} />
+                                <Dropdown disableX 
+                                        placeholder={getCurrentYT_DLPVer() != "" ? getCurrentYT_DLPVer() : getListOfVerYT_DLP()[0]} 
+                                        options={getListOfVerYT_DLP().map((v) => ({ label: v, onClick: () => changeYT_DLP(v) }))} 
+                                    />
                             </div>
                         </Show>
                         <div class="settings-line"></div>

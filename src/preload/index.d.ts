@@ -28,7 +28,7 @@ declare global {
         checkUpdate: () => Promise<{ available: boolean, version: string }>
       };
       yt_dlp: {
-        versionList: () => Promise<string[]>
+        versionList: () => Promise<{ ver: string, listVer: string[] }>
         install: (tag: string) => Promise<void>
         run: (url: string, commands?: string[]) => Promise<{ [key: string]: any }>
       },

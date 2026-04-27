@@ -42,7 +42,8 @@ import {
   setGlobalTheme,
   setIncognitoMode,
   setPluginSearchMode,
-  setTodayAnimeInAnilist
+  setTodayAnimeInAnilist,
+  setYT_DLPVersion
 } from './utils/stores/global';
 import { getConfig, setConfig } from './utils/stores/config';
 import { getInformationPlugin, pluginManager, setPluginRepo } from './utils/stores/plugins';
@@ -148,6 +149,10 @@ function App() {
       code: '',
       func: fetchAnimeDeepLink
     })
+
+    window.api.yt_dlp.versionList().then((v) => {
+      setYT_DLPVersion(v)
+    }).catch((v) => console.error("Failed Set YT_DLP Version", v))
     /* ENDIF */
 
     /* IFDEF WEB */

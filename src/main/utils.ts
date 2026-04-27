@@ -370,14 +370,14 @@ export async function runCheckYT_DLP() {
     if (await checkExistyt_dlp() && updated == false) return
 
     if (config.yt_dlp.replaceAll(" ", "").length <= 0) {
-        yt_dlp_releases_cache = lastest.json
+        yt_dlp_releases_cache = lastest.json.map((v) => v["tag_name"])
         await installyt_dlp(lastest.json)
         return
     }
 
     const resp = await advanceRequest(yt_dlp_releases)
     if (!resp.success || !resp.json) return
-    yt_dlp_releases_cache = resp.json
+    yt_dlp_releases_cache = resp.json.map((v) => v["tag_name"])
 
     for (let index = 0; index < resp.json.length; index++) {
         const element = resp.json[index];
@@ -392,18 +392,19 @@ ipcMain.handle("yt-dlp:install", async (_, tag: string) => {
     }
 })
 ipcMain.handle("yt-dlp:releases", async () => {
+    let currentVersionYT_DLP: string = ""
+    if (fs.existsSync(path.join(app.getPath("userData"), "yt-dlp.json"))) {
+        const tmp = JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), "yt-dlp.json"), "utf-8"))
+        currentVersionYT_DLP = tmp["tag_name"]
+    }
+
     if (yt_dlp_releases_cache.length <= 0) {
         const resp = await advanceRequest("https://api.github.com/repos/yt-dlp/yt-dlp/releases")
-        if (!resp.success || !resp.json) {
-            if (fs.existsSync(path.join(app.getPath("userData"), "yt-dlp.json"))) {
-                const tmp = JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), "yt-dlp.json"), "utf-8"))
-                return [tmp["tag_name"]]
-            }
-            return []
-        }
+        if (!resp.success || !resp.json) return [currentVersionYT_DLP["tag_name"]]
         yt_dlp_releases_cache = resp.json.map((v) => v["tag_name"])
-    } else return yt_dlp_releases_cache.map((v) => v["tag_name"])
-    return yt_dlp_releases_cache
+    }
+
+    return { ver: currentVersionYT_DLP, listVer: yt_dlp_releases_cache }
 })
 
 ipcMain.handle("yt-dlp:run", async (_, url: string, commands?: string[]) => await getVideoInfo(url, commands))

@@ -209,7 +209,11 @@ export interface globalDataFormat {
     todayAnimeAnilist: cardData[]
     animeOpeningsCache: { [key: number]: animeOpeningsFormat[] }
     audioOutput: MediaDeviceInfo | undefined
-    pluginSearchMode: boolean
+    pluginSearchMode: boolean,
+    yt_dlp: {
+        ver: string,
+        listVer: string[]
+    }
 }
 
 export interface NotificationProps {
