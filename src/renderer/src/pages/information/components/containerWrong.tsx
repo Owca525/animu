@@ -41,7 +41,7 @@ const ContainerWrong: Component<ContainerWrongProps> = ({ name, exitfunc, refetc
         <dialog class='information-containerwrong' ref={containerRef}>
             <div class="information-containerwrong-top">
                 <Input
-                    placeholder={t("home.search")}
+                    placeholder={t("search.home")}
                     defaultValue={name}
                     onKeyDown={(text) => {setSearchName(text);response.Refetch([searchName(), getPlayerPLugin()])}}
                 />

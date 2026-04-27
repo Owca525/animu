@@ -19,7 +19,10 @@ export interface SettingsConfig {
     information: {
         openingininformation: boolean,
         alwaysUpdateAnime: boolean,
-        episodeVariants: "v1" | "v2"
+        episodeVariants: "v1" | "v2",
+        trailerplayertype: "embed" | "player",
+        preloadTrailer: boolean,
+        preloadOpening: boolean
     },
     plugins: {
         // information: string
@@ -357,7 +360,10 @@ export const defaultConfig: SettingsConfig = {
     information: {
         openingininformation: false,
         alwaysUpdateAnime: false,
-        episodeVariants: "v1"
+        episodeVariants: "v1",
+        trailerplayertype: "player",
+        preloadTrailer: false,
+        preloadOpening: false
     },
     socket: {
         useSocket: false,

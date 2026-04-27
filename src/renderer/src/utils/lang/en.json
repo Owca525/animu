@@ -269,6 +269,12 @@
             "v1": "Variant 1",
             "v2": "Variant 2"
         },
+        "information": {
+            "trailertype": {
+                "embed": "Embed",
+                "player": "Animu Player"
+            }
+        },
         "turnDeveloper": "Turn On Developer Mode",
         "yt-dlp": "yt-dlp Versions",
         "pluginstore": {

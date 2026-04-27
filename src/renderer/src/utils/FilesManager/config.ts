@@ -151,7 +151,10 @@ export const defaultConfigWeb: SettingsConfig = {
     information: {
         openingininformation: false,
         alwaysUpdateAnime: false,
-        episodeVariants: "v1"
+        episodeVariants: "v1",
+        trailerplayertype: "player",
+        preloadTrailer: false,
+        preloadOpening: false
     },
     socket: {
         useSocket: false,

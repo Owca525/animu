@@ -219,11 +219,13 @@ function settings() {
             return { active: plugin.metadata.name == pl.metadata.name, plugin: pl }
         })
         setHiddenPluginList(getConfig().plugins.hiddenPlugins)
-        setpluginList([{ active: true, plugin: {
-            code: "",
-            sha256: "",
-            metadata: getInformationPlugin().currentPlugin["metadata"]
-        } }, ...playerPluginList])
+        setpluginList([{
+            active: true, plugin: {
+                code: "",
+                sha256: "",
+                metadata: getInformationPlugin().currentPlugin["metadata"]
+            }
+        }, ...playerPluginList])
         setThemes(loadedTheme().filter((val) => ![...activeThemes().entries()].map(([_, val]) => val.themeName).includes(val.themeName)))
         changeTitleAnimu(`Animu - ${t("global.settings")}`)
         turnOnDeveloperMode()
@@ -677,10 +679,10 @@ function settings() {
                                 <span class="settings-helpicon-space">
                                     {t("settings.yt-dlp")}
                                 </span>
-                                <Dropdown disableX 
-                                        placeholder={getCurrentYT_DLPVer() != "" ? getCurrentYT_DLPVer() : getListOfVerYT_DLP()[0]} 
-                                        options={getListOfVerYT_DLP().map((v) => ({ label: v, onClick: () => changeYT_DLP(v) }))} 
-                                    />
+                                <Dropdown disableX
+                                    placeholder={getCurrentYT_DLPVer() != "" ? getCurrentYT_DLPVer() : getListOfVerYT_DLP()[0]}
+                                    options={getListOfVerYT_DLP().map((v) => ({ label: v, onClick: () => changeYT_DLP(v) }))}
+                                />
                             </div>
                         </Show>
                         <div class="settings-line"></div>
@@ -849,6 +851,37 @@ function settings() {
                                 checked={config().new.information.openingininformation}
                                 onChecked={(checked) =>
                                     handleChange('information.openingininformation', checked)
+                                }
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("Trailer player Type")}
+                            <ButtonGroup selectedValue={t(`settings.information.trailertype.${config().new.information.trailerplayertype}`)} listValues={[
+                                { value: t("Animu Player"), onClick: () => handleChange("information.trailerplayertype", "player") },
+                                { value: t("Embed"), onClick: () => handleChange("information.trailerplayertype", "embed") },
+                            ]}
+                            />
+                        </div>
+                        <Show when={config().new.information.trailerplayertype == "player"}>
+                            <div class="settings-line"></div>
+                            <div class="settings-setting-container">
+                                {t("Preload Trailer")}
+                                <CheckBox
+                                    checked={config().new.information.preloadTrailer}
+                                    onChecked={(checked) =>
+                                        handleChange('information.preloadTrailer', checked)
+                                    }
+                                />
+                            </div>
+                        </Show>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("Preload Opening/Ending")}
+                            <CheckBox
+                                checked={config().new.information.preloadOpening}
+                                onChecked={(checked) =>
+                                    handleChange('information.preloadOpening', checked)
                                 }
                             />
                         </div>
@@ -1611,11 +1644,13 @@ function settings() {
                                     if (!plugin) return { active: false, plugin: pl }
                                     return { active: plugin.metadata.name == pl.metadata.name, plugin: pl }
                                 })
-                                setpluginList([{ active: true, plugin: {
-                                    metadata: getInformationPlugin().currentPlugin["metadata"],
-                                    sha256: "",
-                                    code: ""
-                                } }, ...playerPluginList])
+                                setpluginList([{
+                                    active: true, plugin: {
+                                        metadata: getInformationPlugin().currentPlugin["metadata"],
+                                        sha256: "",
+                                        code: ""
+                                    }
+                                }, ...playerPluginList])
                             }} />
                         </div>
                         <div class="settings-line"></div>
@@ -1646,11 +1681,13 @@ function settings() {
                                                             if (!plugin) return { active: false, plugin: pl }
                                                             return { active: plugin.metadata.name == pl.metadata.name, plugin: pl }
                                                         })
-                                                        setpluginList([{ active: true, plugin: {
-                                                            metadata: getInformationPlugin().currentPlugin["metadata"],
-                                                            sha256: "",
-                                                            code: ""
-                                                        } }, ...playerPluginList])
+                                                        setpluginList([{
+                                                            active: true, plugin: {
+                                                                metadata: getInformationPlugin().currentPlugin["metadata"],
+                                                                sha256: "",
+                                                                code: ""
+                                                            }
+                                                        }, ...playerPluginList])
                                                     }}
                                                 />
                                             </div>
@@ -1666,13 +1703,13 @@ function settings() {
                                 <For each={pluginList()}>
                                     {(tmp) => (
                                         <Show when={!new Set(hiddenPluginList()).has(tmp.plugin["metadata"].name)}>
-                                            <SettingsPlugin 
-                                                    active={"home" in tmp.plugin ? true : tmp.active} 
-                                                    unHidePlugin={unHidePlugin} plugin={tmp.plugin} 
-                                                    hidePlugin={hidePlayerPlugin} 
-                                                    pluginSettings={openPluginSettings} 
-                                                    setActivePlugin={setActivePlugin} 
-                                                />
+                                            <SettingsPlugin
+                                                active={"home" in tmp.plugin ? true : tmp.active}
+                                                unHidePlugin={unHidePlugin} plugin={tmp.plugin}
+                                                hidePlugin={hidePlayerPlugin}
+                                                pluginSettings={openPluginSettings}
+                                                setActivePlugin={setActivePlugin}
+                                            />
                                         </Show>
                                     )}
                                 </For>
@@ -1684,14 +1721,14 @@ function settings() {
                                     <For each={pluginList()}>
                                         {(tmp) => (
                                             <Show when={new Set(hiddenPluginList()).has(tmp.plugin["metadata"].name)}>
-                                                <SettingsPlugin isHidden 
-                                                        unHidePlugin={unHidePlugin} 
-                                                        active={tmp.active} 
-                                                        plugin={tmp.plugin} 
-                                                        hidePlugin={hidePlayerPlugin} 
-                                                        pluginSettings={openPluginSettings} 
-                                                        setActivePlugin={setActivePlugin} 
-                                                    />
+                                                <SettingsPlugin isHidden
+                                                    unHidePlugin={unHidePlugin}
+                                                    active={tmp.active}
+                                                    plugin={tmp.plugin}
+                                                    hidePlugin={hidePlayerPlugin}
+                                                    pluginSettings={openPluginSettings}
+                                                    setActivePlugin={setActivePlugin}
+                                                />
                                             </Show>
                                         )}
                                     </For>

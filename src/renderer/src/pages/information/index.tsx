@@ -70,6 +70,8 @@ function information() {
     const navigate = useNavigate();
     let descriptionRef: HTMLDivElement | undefined
     let animeEpisodeReleasingTime: NodeJS.Timeout | undefined
+    let isAOpeningFetching: boolean = false
+    let isATrailerFetching: boolean = false
 
     const config = unwrap(getConfig())
 
@@ -274,6 +276,9 @@ function information() {
     onMount(() => {
         setTimeout(() => { setYouCanLeave(true) }, 500)
         initialInformation()
+        if (config["information"]["preloadOpening"]) searchAnimeOpenings(true)
+        if (config["information"]["preloadTrailer"] && config["information"]["trailerplayertype"] == "player") 
+            getAnimeTrailer(`https://www.youtube.com/watch?v=${tempData()["anime"]["trailer"]?.id}`)
     })
 
     onCleanup(() => {
@@ -329,7 +334,7 @@ function information() {
             resp = await getInformationPlugin().getManga(data.id)
         } else {
             resp = await getInformationPlugin().anime(data.id)
-            tmpAnimulist = animulist.find((v) => v.AnimeData.id == tempData().anime.id)?.animulist
+            tmpAnimulist = animulist.find((v) => v.AnimeData.id == resp["anime"]["id"])?.animulist
         }
 
         if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", timer: false })
@@ -362,9 +367,16 @@ function information() {
             setContentLoading(true)
         }
 
+        if (isAOpeningFetching && activePage() == "Opening/Ending") {
+            resetContentVariable()
+            setContentLoading(true)
+            return
+        }
+
         const response = await requestAnimeMedia(parseInt(tempData().anime.id))
         setAnimeMedia(response)
         if (response.length <= 0 && !noContentLoading) {
+            isAOpeningFetching = false
             setContentLoading(false)
             return setContentNoData("Openings Not Found")
         }
@@ -384,6 +396,9 @@ function information() {
             } as MiniPlayerProps
         }))
 
+        if (isAOpeningFetching && activePage() == "Opening/Ending") setContentLoading(false)
+
+        isAOpeningFetching = false
         if (!noContentLoading) setContentLoading(false)
     }
 
@@ -394,10 +409,20 @@ function information() {
     }
 
     /* IFDEF DEBUG|PROD */
-    async function getAnimeTrailer(url: string) {
+    async function getAnimeTrailer(url: string, noContentLoading = false) {
         try {
-            resetContentVariable()
-            setContentLoading(true)
+            if (config["information"]["trailerplayertype"]) return
+            if (!noContentLoading) {
+                resetContentVariable()
+                setContentLoading(true)
+            }
+
+            if (isATrailerFetching && activePage() == "Trailer") {
+                resetContentVariable()
+                setContentLoading(true)
+                return
+            }
+
             let resolutions: resolutionFormat[] = []
             let storyBoard: string | undefined
 
@@ -467,11 +492,19 @@ function information() {
                 splitHLS: resolutions.length != 1,
                 // storyboardVTT: storyBoard
             }])
+            isATrailerFetching = false
             setContentLoading(false)
         } catch (error) {
             console.error("Error in getAnimeTrailer", error)
-            setContentLoading(false)
-            setContentError(true)
+            if (!noContentLoading) {
+                setContentLoading(false)
+                setContentError(true)
+            }
+
+            if (isATrailerFetching && activePage() == "Trailer") {
+                setContentLoading(false)
+                setContentError(true)
+            }
         }
     }
     /* ENDIF */
@@ -544,6 +577,9 @@ function information() {
                 value: 'Trailer',
                 onClick: () => {
                     SetactivePage("Trailer")
+                    // /* IFDEF DEBUG|PROD */
+                    getAnimeTrailer(`https://www.youtube.com/watch?v=${tempData().anime.trailer?.id}`)
+                    // /* ENDIF */
                     if (tempData().anime.trailer == undefined) setContentNoData("No Trailer Found")
                 }
             }])
@@ -561,13 +597,13 @@ function information() {
         if (tempData().anime.trailer) tmp.push({
             value: 'Trailer',
             onClick: () => {
+                SetactivePage("Trailer")
                 // /* IFDEF DEBUG|PROD */
                 getAnimeTrailer(`https://www.youtube.com/watch?v=${tempData().anime.trailer?.id}`)
                 // /* ENDIF */
-                SetactivePage("Trailer")
             }
         })
-
+ 
         setButtonGroups(tmp)
     }
 
@@ -895,14 +931,6 @@ function information() {
                                                     ></iframe>
                                                 </Match>
                                             </Switch>
-                                            {/* <iframe
-                                                height="610px"
-                                                class='information-iframe'
-                                                src={`https://www.youtube.com/embed/${unwrap(tempData()).anime.trailer?.id}`}
-                                                frameborder="0"
-                                                referrerpolicy='strict-origin-when-cross-origin'
-                                                allowfullscreen
-                                            ></iframe> */}
                                         </Match>
                                         <Match when={activePage() == "Opening/Ending"}>
                                             <Show when={currentMedia()}>

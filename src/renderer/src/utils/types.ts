@@ -481,7 +481,10 @@ export interface SettingsConfig {
     information: {
         openingininformation: boolean,
         alwaysUpdateAnime: boolean,
-        episodeVariants: "v1" | "v2"
+        episodeVariants: "v1" | "v2",
+        trailerplayertype: "embed" | "player",
+        preloadTrailer: boolean,
+        preloadOpening: boolean
     },
     Player: {
         general: {
