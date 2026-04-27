@@ -12,7 +12,6 @@ import {
     NotificationProps,
     playerChapterList,
     playerPluginFormat,
-    pluginRepoExpanded,
     themeMetadata
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
@@ -22,11 +21,9 @@ import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
 import { unwrap } from 'solid-js/store';
-import { getInformationPlugin, getPluginList, getPluginRepo, pluginManager, setPluginRepo } from './stores/plugins';
-import semver from "semver";
+import { getInformationPlugin, getPluginList, pluginManager } from './stores/plugins';
 import { v4 as uuidv4 } from 'uuid';
 import { removeToast, toast, ToastOptions, updateToast } from './context/ToastNotification';
-import { saveConfig } from './FilesManager/config';
 import { OvewriteAnimuList } from './FilesManager/animulist';
 import { readPlaylist, updatePlaylist } from './FilesManager/playlist';
 
@@ -577,42 +574,6 @@ export function detectIndex(str: string) {
     else return str.replaceAll(`"index.js"`, `"${index}"`)
 }
 
-export async function detectPluginVersion(notification: boolean = false) {
-    const plugins = unwrap(getPluginList())
-    const pluginsRepo = unwrap(getPluginRepo())
-    let reInitial = false
-    for (let index = 0; index < plugins.length; index++) {
-        const element = plugins[index];
-        const tmp = pluginsRepo.find((v) => v.name == element.metadata.name)
-        if (!tmp) continue
-        if (semver.gt(semver.coerce(tmp.ver) as any, semver.coerce(element.metadata.version) as any)) {
-            reInitial = true
-            if (notification) {
-                const id = toast(`Update ${tmp.name} from ${element.metadata.version} to ${tmp.ver}`, { type: "loading", timer: true })
-                await window.api.plugins.installUpdate(tmp)
-                updateToast(id, "Update Succesfully Installed", { type: "success", timer: false })
-            } else await window.api.plugins.installUpdate(tmp)
-        }
-    }
-    if (reInitial) {
-        await getInformationPlugin().initial()
-        await pluginManager().initialPlugins()
-    }
-}
-
-export async function fetchPluginRepos() {
-    const config = getConfig()
-    let tmp: pluginRepoExpanded[] = []
-    for (let index = 0; index < config.plugins.repoURL.length; index++) {
-        const element = config.plugins.repoURL[index];
-        const resp = await request(`${element}/database.json`)
-        if (resp.success && resp.json && resp.json != {} as any) resp.json.map((v) => ({ ...v, repoURL: element })).forEach(element => { tmp.push(element) });
-    }
-    localStorage.setItem("pluginDatabase", JSON.stringify(tmp))
-    setPluginRepo(tmp)
-    saveConfig(updateObject("plugins.lastTimeCheck", dateToUnix(new Date().toString()), config))
-}
-
 export async function setHomeData(wrapper?: () => Promise<homeData["data"] | containerData | undefined | { error: string }>, data?: homeData["data"]) {
     const uuid = uuidv4()
     try {
@@ -832,6 +793,12 @@ export function runService(func: () => Promise<any> | any, time: number, name: s
         uuid: uuidv4(),
         func: func
     }
+    if (!disable) {
+        try {
+            func()
+        } catch (error) { console.error("Failed Run Service", time, name) }
+    }
+
     let services = unwrap(getServices()).filter((v) => v.name != name)
     ActiveService([...services, tmp])
 }
@@ -1396,3 +1363,17 @@ export function formatDate(dateInput: string) {
 
   return `${day}.${month}.${year}`;
 }
+
+export async function CreateSHA256(text: string) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
+
+  return hashHex;
+};

@@ -2,14 +2,14 @@ import Button from "@renderer/components/buttons";
 import CheckBox from "@renderer/components/checkBox";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import { CreateContextMenuOptions, openUrlFolder } from "@renderer/utils/functions";
-import { informationPluginFormat, playerPluginFormat, playerPluginFormatList } from "@renderer/utils/types";
+import { informationPluginFormat, informationPluginFormatList, playerPluginFormat, playerPluginFormatList } from "@renderer/utils/types";
 import { Show } from "solid-js";
 import icon from '@resources/icon.png';
 import { t } from "@renderer/utils/i18n";
 
 interface SettingsPluginProps {
     active: boolean,
-    plugin: playerPluginFormatList | informationPluginFormat,
+    plugin: playerPluginFormatList | informationPluginFormatList,
     hidePlugin: (plugin: playerPluginFormat, active: boolean) => void,
     pluginSettings: (plugin: playerPluginFormat | informationPluginFormat) => void
     setActivePlugin: (active: boolean, plugin: playerPluginFormat) => void

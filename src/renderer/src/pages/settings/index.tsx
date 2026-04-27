@@ -15,9 +15,7 @@ import {
     changeTitleAnimu,
     convertKeybinds,
     convertPath,
-    detectPluginVersion,
     FetchAnilistUserData,
-    fetchPluginRepos,
     LoginToAnilist,
     openUrlFolder,
     request,
@@ -30,6 +28,7 @@ import { checkUpdate } from '@renderer/utils/update';
 import {
     ContextMenuProps,
     informationPluginFormat,
+    informationPluginFormatList,
     playerPluginFormat,
     playerPluginFormatList,
     SettingsConfig,
@@ -64,6 +63,7 @@ import SettingsPlugin from './components/settingsPlugin';
 import semver from "semver";
 import { OvewriteAnimuList } from '@renderer/utils/FilesManager/animulist';
 import OtherSettings from './components/otherSettings';
+import { checkUpdatePlugins } from '@renderer/utils/plugins';
 
 export type pluginRepoExpandedSettings = {
     name: string,
@@ -94,7 +94,7 @@ function settings() {
     const [audioOutput, setaudioOutput] = createSignal<MediaDeviceInfo[]>([])
 
     const [backupList, setBackupList] = createSignal<{ date: Date, file: string }[]>([])
-    const [pluginList, setpluginList] = createSignal<{ active: boolean, plugin: playerPluginFormatList | informationPluginFormat }[]>([])
+    const [pluginList, setpluginList] = createSignal<{ active: boolean, plugin: playerPluginFormatList | informationPluginFormatList }[]>([])
     const [hiddenPluginList, setHiddenPluginList] = createSignal<string[]>([])
     const [yt_dlprelases, setReleases_yt_dlp] = createSignal<string[]>([])
     const [ContextMenu, setContextMenu] = createSignal<ContextMenuProps>([
@@ -151,7 +151,7 @@ function settings() {
             {
                 icon: "home",
                 text: "global.home",
-                onClick: () => { navigate("/"); resetNewConfig() },
+                onClick: () => { navigate("/") },
             },
         ],
     });
@@ -220,7 +220,11 @@ function settings() {
             return { active: plugin.metadata.name == pl.metadata.name, plugin: pl }
         })
         setHiddenPluginList(getConfig().plugins.hiddenPlugins)
-        setpluginList([{ active: true, plugin: getInformationPlugin().currentPlugin }, ...playerPluginList])
+        setpluginList([{ active: true, plugin: {
+            code: "",
+            sha256: "",
+            metadata: getInformationPlugin().currentPlugin["metadata"]
+        } }, ...playerPluginList])
         setThemes(loadedTheme().filter((val) => ![...activeThemes().entries()].map(([_, val]) => val.themeName).includes(val.themeName)))
         changeTitleAnimu(`Animu - ${t("global.settings")}`)
         turnOnDeveloperMode()
@@ -1600,16 +1604,18 @@ function settings() {
                         <div class="settings-setting-container">
                             {t("settings.extensions.updateplugin")}
                             <Button content={t("settings.general.checkupdate")} onClick={async () => {
-                                await fetchPluginRepos()
-                                await detectPluginVersion(true)
-                                await getInformationPlugin().initial()
-                                await pluginManager().initialPlugins()
+                                await checkUpdatePlugins()
+
                                 const plugin = getPlayerPLugin()
                                 const playerPluginList = getPluginList().map((pl) => {
                                     if (!plugin) return { active: false, plugin: pl }
                                     return { active: plugin.metadata.name == pl.metadata.name, plugin: pl }
                                 })
-                                setpluginList([{ active: true, plugin: getInformationPlugin().currentPlugin }, ...playerPluginList])
+                                setpluginList([{ active: true, plugin: {
+                                    metadata: getInformationPlugin().currentPlugin["metadata"],
+                                    sha256: "",
+                                    code: ""
+                                } }, ...playerPluginList])
                             }} />
                         </div>
                         <div class="settings-line"></div>
@@ -1633,16 +1639,18 @@ function settings() {
                                                         if (!item.update && item.installed) return
                                                         await window.api.plugins.installUpdate(item)
 
-                                                        await fetchPluginRepos()
-                                                        await detectPluginVersion(true)
-                                                        await getInformationPlugin().initial()
-                                                        await pluginManager().initialPlugins()
+                                                        await checkUpdatePlugins()
+
                                                         const plugin = getPlayerPLugin()
                                                         const playerPluginList = getPluginList().map((pl) => {
                                                             if (!plugin) return { active: false, plugin: pl }
                                                             return { active: plugin.metadata.name == pl.metadata.name, plugin: pl }
                                                         })
-                                                        setpluginList([{ active: true, plugin: getInformationPlugin().currentPlugin }, ...playerPluginList])
+                                                        setpluginList([{ active: true, plugin: {
+                                                            metadata: getInformationPlugin().currentPlugin["metadata"],
+                                                            sha256: "",
+                                                            code: ""
+                                                        } }, ...playerPluginList])
                                                     }}
                                                 />
                                             </div>
@@ -1658,7 +1666,13 @@ function settings() {
                                 <For each={pluginList()}>
                                     {(tmp) => (
                                         <Show when={!new Set(hiddenPluginList()).has(tmp.plugin["metadata"].name)}>
-                                            <SettingsPlugin active={"home" in tmp.plugin ? true : tmp.active} unHidePlugin={unHidePlugin} plugin={tmp.plugin} hidePlugin={hidePlayerPlugin} pluginSettings={openPluginSettings} setActivePlugin={setActivePlugin} />
+                                            <SettingsPlugin 
+                                                    active={"home" in tmp.plugin ? true : tmp.active} 
+                                                    unHidePlugin={unHidePlugin} plugin={tmp.plugin} 
+                                                    hidePlugin={hidePlayerPlugin} 
+                                                    pluginSettings={openPluginSettings} 
+                                                    setActivePlugin={setActivePlugin} 
+                                                />
                                         </Show>
                                     )}
                                 </For>
@@ -1670,7 +1684,14 @@ function settings() {
                                     <For each={pluginList()}>
                                         {(tmp) => (
                                             <Show when={new Set(hiddenPluginList()).has(tmp.plugin["metadata"].name)}>
-                                                <SettingsPlugin isHidden unHidePlugin={unHidePlugin} active={tmp.active} plugin={tmp.plugin} hidePlugin={hidePlayerPlugin} pluginSettings={openPluginSettings} setActivePlugin={setActivePlugin} />
+                                                <SettingsPlugin isHidden 
+                                                        unHidePlugin={unHidePlugin} 
+                                                        active={tmp.active} 
+                                                        plugin={tmp.plugin} 
+                                                        hidePlugin={hidePlayerPlugin} 
+                                                        pluginSettings={openPluginSettings} 
+                                                        setActivePlugin={setActivePlugin} 
+                                                    />
                                             </Show>
                                         )}
                                     </For>

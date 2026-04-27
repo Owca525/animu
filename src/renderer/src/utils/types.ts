@@ -385,7 +385,14 @@ export type playerPluginInstanceFormat = playerPluginFormat & {
 
 export type playerPluginFormatList = {
     metadata: playerPluginFormat["metadata"],
-    code: string
+    code: string,
+    sha256: string
+}
+
+export type informationPluginFormatList = {
+    metadata: informationPluginFormat["metadata"],
+    code: string,
+    sha256: string
 }
 
 export interface playerPluginManagerFormat {

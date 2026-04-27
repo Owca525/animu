@@ -10,9 +10,7 @@ import {
   checkAnimeTodayReleaseEpisode,
   checkDate,
   dateToUnix,
-  detectPluginVersion,
   FetchAnilistUserData,
-  fetchPluginRepos,
   getTodayAnilistAnime,
   runService,
   timeCovertToMs,
@@ -68,6 +66,7 @@ import {
 
 /* IFDEF DEBUG */
 import './utils/debug';
+import { checkUpdatePlugins, checkUpdateRepoPlugins } from './utils/plugins';
 /* ENDIF */
 
 // import ErrorBoundary from './utils/ErrorBoundary';
@@ -185,10 +184,8 @@ function App() {
     setHomeActivePage("global.home")
 
     setinitialState({ text: "initial.plugin", plugin: false })
-    await checkPluginUpdate()
     await pluginManager().initialPlugins()
     await getInformationPlugin().initial()
-    await detectPluginVersion();
 
     getInformationPlugin().home()
 
@@ -278,11 +275,11 @@ async function checkPluginUpdate() {
   const config = getConfig()
   let tmpDatabase: pluginRepoExpanded[] = []
   try {
-    tmpDatabase = localStorage.getItem("pluginDatabase") ? JSON.parse(localStorage.getItem("pluginDatabase") as any) : []
+    tmpDatabase = localStorage.getItem("AnimuPluginDatabase") ? JSON.parse(localStorage.getItem("AnimuPluginDatabase") as any) : await checkUpdateRepoPlugins()
   } catch (error) { console.warn("Error failed parsed pluginRepo Database", error) }
 
-  if (config.plugins.pluginCheckType == "On Start" || tmpDatabase.length <= 0 || config.plugins.lastTimeCheck <= 0) return await fetchPluginRepos()
-  if (checkDate(config.plugins.lastTimeCheck, config.plugins.pluginCheckType)) await fetchPluginRepos()
+  if (config.plugins.pluginCheckType == "On Start" || tmpDatabase.length <= 0 || config.plugins.lastTimeCheck <= 0) return await checkUpdatePlugins()
+  if (checkDate(config.plugins.lastTimeCheck, config.plugins.pluginCheckType)) await checkUpdatePlugins()
   else { setPluginRepo(tmpDatabase) }
 }
 
@@ -299,10 +296,7 @@ function initialServices() {
   if (config.update.type == "On Start") runService(checkUpdate, timeCovertToMs({ min: 60 }), t("Animu Update"))
   /* ENDIF */
 
-  runService(async () => {
-    await checkPluginUpdate()
-    await detectPluginVersion(true)
-  }, timeCovertToMs({ min: 30 }), t("Plugin CheckUpdate"))
+  runService(checkPluginUpdate, timeCovertToMs({ min: 30 }), t("Plugin CheckUpdate"))
 
   runService(async () => {
     setTodayAnimeInAnilist(await getTodayAnilistAnime())

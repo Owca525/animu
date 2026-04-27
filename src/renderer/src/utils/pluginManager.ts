@@ -1,8 +1,8 @@
 import AnilistApi from "@renderer/plugins/anilistApi";
-import { FilterPluginsParams, informationPluginManagerFormat, informationPluginFormat, playerPluginManagerFormat, Anilist_ListMutation, playerPluginInstanceFormat, AnimeData, cardData, episodeList, episodeMetadata, playerData } from "./types";
+import { FilterPluginsParams, informationPluginManagerFormat, informationPluginFormat, playerPluginManagerFormat, Anilist_ListMutation, playerPluginInstanceFormat, AnimeData, cardData, episodeList, episodeMetadata, playerData, playerPluginFormatList } from "./types";
 import { getPluginRepo, setPlayerPlugin, setPluginPlayerList } from "./stores/plugins";
 import { getConfig } from "./stores/config";
-import { detectIndex, getPluginInitialConfig, getPluginsList, getRenderPath, request, setHomeData } from "./functions";
+import { CreateSHA256, detectIndex, getPluginInitialConfig, getPluginsList, getRenderPath, request, setHomeData } from "./functions";
 import semver from "semver";
 
 const payload = `
@@ -129,11 +129,12 @@ const payload = `
 `
 
 class playerPluginInstance implements playerPluginInstanceFormat {
-    metadata = {
+    metadata: playerPluginFormatList["metadata"] = {
         version: "1.0",
         name: "PluginLoader",
         author: "Owca525",
         supportLang: [],
+        type: "player"
     }
     instance: HTMLIFrameElement | undefined = undefined
     pendingRequest = new Map<string, (value: unknown) => void>()
@@ -328,7 +329,8 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
                     ...this.pluginList,
                     {
                         metadata: pluginLoader.metadata,
-                        code: content
+                        code: content,
+                        sha256: await CreateSHA256(content)
                     }
                 ]
                 pluginLoader.destroy()
@@ -362,6 +364,7 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
             code: code as string
         }))
 
+        this.pluginList = []
         for (let index = 0; index < moduleList.length; index++) {
             const element = moduleList[index];
             if (element["code"] == "") continue
@@ -384,7 +387,8 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
                     ...this.pluginList,
                     {
                         metadata: pluginLoader.metadata,
-                        code: code
+                        code: code,
+                        sha256: await CreateSHA256(code)
                     }
                 ]
                 pluginLoader.destroy()
@@ -394,19 +398,6 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
             }
         }
         await this.loadOtherPlugins()
-
-        // const localPlugins = [Allmanga, Anizone, Animetsu, LycorisCafe, AniDap, AnimePahe, ...(await this.loadPlugin(plugins))]
-
-        // for (let index = 0; index < localPlugins.length; index++) {
-        //     try {
-        //         const plugin = localPlugins[index] as any;
-        //         const tmp = new plugin
-        //         if (tmp.config) tmp.config = await getPluginInitialConfig(tmp.metadata.name, tmp.config)
-        //         this.pluginList.push(tmp)
-        //     } catch (error) {
-        //         console.warn("Failed Load Module", error, localPlugins[index])
-        //     }
-        // }
 
         this.pluginList = this.pluginList.filter((item, _, arr) => {
             return !arr.some(
