@@ -391,6 +391,12 @@ export type playerPluginInstanceFormat = playerPluginFormat & {
     destroy(): void
 }
 
+export type informationPluginInstanceFormat = informationPluginFormat & {
+    instance?: HTMLIFrameElement
+    runInstance(pluginCode: string): Promise<void>
+    destroy(): void
+}
+
 export type playerPluginFormatList = {
     metadata: playerPluginFormat["metadata"],
     code: string,
@@ -420,6 +426,27 @@ export interface informationPluginManagerFormat {
     getManga: (id: string) => Promise<AnimeData | undefined>
     getAnimeList: () => Promise<cardData[]>
     setAnimeInList: (variable: Anilist_ListMutation) => Promise<boolean>
+}
+
+export interface PluginManagerFormat {
+    activePlayerPlugin: playerPluginInstanceFormat
+    activeInformationPlugin: informationPluginInstanceFormat
+
+    playerPluginList: playerPluginFormatList[]
+    informationPluginList: informationPluginFormatList[]
+
+    isInitializingPlugins: boolean
+
+    dummyLoader(plugins: { path: string; code: string; }[]): Promise<(informationPluginFormatList | playerPluginFormatList)[]>
+
+    initialPlugins(): Promise<void>
+    changePlayerPlugin(name: string): Promise<playerPluginFormat>
+    changeInformationPlugin(name: string): Promise<informationPluginFormat>
+
+    checkUpdates(): Promise<void>
+    installPlugin(): Promise<void>
+
+    reloadPlugins(hard?: boolean): Promise<void>
 }
 
 export type genres = {

@@ -556,17 +556,17 @@ export function loadedPluginsList() {
     return plugins.filter((p) => !hiddenPlugins.has(p.metadata.name))
 }
 
-export function detectIndex(str: string) {
-    let index = ""
+export function detectIndex(str: string, customINDEX: string = "") {
+    let index = customINDEX
 
     /* IFDEF PROD */
-    index = `${getRenderPath()}index.js`
+    if (customINDEX == "") index = `${getRenderPath()}index.js`
     if (str.includes("@renderer/utils/functions")) return str.replace("@renderer/utils/functions", index).replace("@renderer/utils/i18n", index)
     /* ENDIF */
 
     /* IFDEF DEBUG */
-    index = `${getRenderPath()}src/utils/functions`
-    if (str.includes("@renderer/utils/functions")) str = str.replaceAll("@renderer/utils/functions", index)
+    if (customINDEX == "") index = `${getRenderPath()}src/utils/functions`
+    if (str.includes("@renderer/utils/functions")) str = str.replaceAll("@renderer/utils/functions", index).replace("@renderer/utils/i18n", index)
     if (str.includes("@renderer/utils/types")) str = str.replaceAll("@renderer/utils/types", `${getRenderPath()}src/utils/types`)
     /* ENDIF */
 
@@ -636,6 +636,7 @@ export async function getPluginInitialConfig(name: string, config: { [key: strin
     return await window.api.plugins.getConfig(name, config)
     /* ENDIF */
 }
+
 
 export function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string | undefined {
     try {

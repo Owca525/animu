@@ -1,5 +1,5 @@
 import AnilistApi from "@renderer/plugins/anilistApi";
-import { FilterPluginsParams, informationPluginManagerFormat, informationPluginFormat, playerPluginManagerFormat, Anilist_ListMutation, playerPluginInstanceFormat, AnimeData, cardData, episodeList, episodeMetadata, playerData, playerPluginFormatList } from "./types";
+import { FilterPluginsParams, informationPluginManagerFormat, informationPluginFormat, playerPluginManagerFormat, Anilist_ListMutation, playerPluginInstanceFormat, AnimeData, cardData, episodeList, episodeMetadata, playerData, playerPluginFormatList, PluginManagerFormat, informationPluginFormatList, informationPluginInstanceFormat, playerPluginFormat } from "./types";
 import { getPluginRepo, setPlayerPlugin, setPluginPlayerList } from "./stores/plugins";
 import { getConfig } from "./stores/config";
 import { CreateSHA256, detectIndex, getPluginInitialConfig, getPluginsList, getRenderPath, request, setHomeData } from "./functions";
@@ -126,6 +126,46 @@ const payload = `
   </script>
 </body>
 </html>
+`
+
+const workerDummyimport = `
+export const SheepFinderAnime2000 = () => {};
+export const capitalizeFirstLetter = () => {};
+export const checkDate = () => {};
+export const convertChaptersVTT = () => {};
+export const convertMsToMinutes = () => {};
+export const convertSeconds = () => {};
+export const convertText = () => {};
+export const dateToUnix = () => {};
+export const genYearsList = () => {};
+export const getWeek = () => {};
+export const request = () => {};
+export const runYT_DLP = () => {};
+export const t = () => {};
+export const timeToSeconds = () => {};
+export const updateObject = () => {};
+export const makeSmallText = () => {};
+`
+
+const workerPayloadMetadataExtractor = `
+var window = { location: ${JSON.stringify(location)}, ...this };
+globalThis.window = window;
+
+async function initial() {
+  try {
+    const mod = await import("SET_WORKER_URL");
+    self.postMessage({
+      ok: true,
+      result: (new mod.default).metadata,
+    });
+  } catch (err) {
+    self.postMessage({
+      ok: false,
+      error: err.message,
+    });
+  }
+}
+initial()
 `
 
 class playerPluginInstance implements playerPluginInstanceFormat {
@@ -281,6 +321,7 @@ class playerPluginInstance implements playerPluginInstanceFormat {
 export class PlayerPluginManager implements playerPluginManagerFormat {
     currentPlugin: playerPluginInstanceFormat | undefined;
     pluginList: playerPluginManagerFormat["pluginList"] = [];
+    isInitializingPlugins: boolean = false
 
     changePlugin = async (plugin_id: string): Promise<playerPluginInstanceFormat> => {
         if (this.currentPlugin && this.currentPlugin["metadata"]["name"] == plugin_id) return this.currentPlugin
@@ -342,97 +383,188 @@ export class PlayerPluginManager implements playerPluginManagerFormat {
     }
 
     initialPlugins = async (): Promise<void> => {
-        this.pluginList = []
-
-        /* IFDEF ONLYPLUGINS */
-        const d = import.meta.glob("../plugins/*.ts", {
-            eager: false,
-            import: "default",
-        })
-        console.log(d)
-        /* ENDIF */
-
-        /* IFDEF DEBUG|PROD|WEB */
-        const importedModules = import.meta.glob("../plugins/*.ts", {
-            eager: true,
-            query: "?compiledRaw",
-            import: "default"
-        })
-        /* ENDIF */
-        const moduleList = Object.entries(importedModules).map(([path, code]) => ({
-            path,
-            code: code as string
-        }))
+        if (this.isInitializingPlugins) return
+        this.isInitializingPlugins = true
 
         this.pluginList = []
-        for (let index = 0; index < moduleList.length; index++) {
-            const element = moduleList[index];
-            if (element["code"] == "") continue
-            if (element["path"].includes("anilistApi")) continue
-            const pluginLoader = new playerPluginInstance()
-            try {
-                let code = ""
 
-                /* IFDEF DEBUG */
-                await pluginLoader.runInstance(`${getRenderPath()}src${element["path"].replaceAll("..", "")}`)
-                code = `${getRenderPath()}src${element["path"].replaceAll("..", "")}`
-                /* ENDIF */
+        try {
 
-                /* IFDEF PROD */
-                await pluginLoader.runInstance(element["code"])
-                code = element["code"];
-                /* ENDIF */
+            /* IFDEF DEBUG|PROD|WEB */
+            const importedModules = import.meta.glob("../plugins/*.ts", {
+                eager: true,
+                query: "?compiledRaw",
+                import: "default"
+            })
+            /* ENDIF */
+            const moduleList = Object.entries(importedModules).map(([path, code]) => ({
+                path,
+                code: code as string
+            }))
 
-                this.pluginList = [
-                    ...this.pluginList,
-                    {
-                        metadata: pluginLoader.metadata,
-                        code: code,
-                        sha256: await CreateSHA256(code)
-                    }
-                ]
-                pluginLoader.destroy()
-            } catch (error) {
-                console.error("Failed Load Plugin", error)
-                pluginLoader.destroy()
+            this.pluginList = []
+
+            async function LoadFastPlugins(params: { path: string; code: string; }[]) {
+                let plugins: playerPluginManagerFormat["pluginList"] = []
+
+                const blobDummy = new Blob([workerDummyimport], { type: "text/javascript" });
+                let dummyImportURL = URL.createObjectURL(blobDummy);
+
+                let promiseResolve: (value: unknown) => void
+                const promise = new Promise((resolve) => {
+                    promiseResolve = resolve
+                })
+
+                console.log(params)
+
+                params.forEach((element) => {
+                    const blobCode = new Blob([detectIndex(element["code"], dummyImportURL)], { type: "text/javascript" });
+                    let codeURL = URL.createObjectURL(blobCode);
+
+                    console.log(detectIndex(element["code"]))
+
+                    const mainCode = new Blob([workerPayloadMetadataExtractor.replace("SET_WORKER_URL", codeURL)], { type: "text/javascript" });
+                    let mainCodeURL = URL.createObjectURL(mainCode);
+
+                    const worker = new Worker(mainCodeURL, { type: "module" });
+
+                    worker.onmessage = async (e) => {
+                        if (e.data["ok"]) {
+                            let code = element["code"];
+
+                            /* IFDEF DEBUG */
+                            code = `${getRenderPath()}src${element["path"].replaceAll("..", "")}`
+                            /* ENDIF */
+
+                            plugins = [
+                                ...plugins,
+                                {
+                                    metadata: e["data"]["result"],
+                                    code: code,
+                                    sha256: await CreateSHA256(code)
+                                }
+                            ]
+
+                            if (plugins.length == params.length) promiseResolve(plugins)
+                        } else {
+                            console.error("FAILED LOAD PLUGIN", e)
+                        }
+                        worker.terminate()
+                    };
+
+                    /* IFDEF DEBUG */
+                    // pluginLoader.runInstance(`${getRenderPath()}src${element["path"].replaceAll("..", "")}`).then(async () => {
+                    //     let code = `${getRenderPath()}src${element["path"].replaceAll("..", "")}`
+                    // plugins = [
+                    //     ...plugins,
+                    //     {
+                    //         metadata: pluginLoader.metadata,
+                    //         code: code,
+                    //         sha256: await CreateSHA256(code)
+                    //     }
+                    // ]
+
+                    //     if (plugins.length == params.length) promiseResolve(plugins)
+                    // })
+                    /* ENDIF */
+
+                    /* IFDEF PROD */
+                    // pluginLoader.runInstance(element["code"]).then(async () => {
+                    //     plugins = [
+                    //         ...plugins,
+                    //         {
+                    //             metadata: pluginLoader.metadata,
+                    //             code: element["code"],
+                    //             sha256: await CreateSHA256(element["code"])
+                    //         }
+                    //     ]
+
+                    //     if (plugins.length == params.length) promiseResolve(plugins)
+                    // })
+                    /* ENDIF */
+                })
+
+                return promise
             }
-        }
-        await this.loadOtherPlugins()
 
-        this.pluginList = this.pluginList.filter((item, _, arr) => {
-            return !arr.some(
-                other =>
-                    other.metadata.name === item.metadata.name &&
-                    semver.gt(semver.coerce(other.metadata.version) as any, semver.coerce(item.metadata.version) as any)
-            );
-        })
+            // console.time('newLoader');
+            // console.log(await LoadFastPlugins(moduleList.filter((v) => v["code"] != "" && !v["path"].includes("anilistApi"))))
+            // console.timeEnd('newLoader');
 
-        this.pluginList = this.pluginList.filter(
-            (item, index, self) =>
-                index === self.findIndex(i => i.metadata.name === item.metadata.name)
-        )
-
-        // this.currentPlugin = this.pluginList[0]
-        // setPlayerPlugin(this.pluginList[0])
-
-        setPluginPlayerList(this.pluginList)
-        const config = getConfig()
-        for (let index = 0; index < this.pluginList.length; index++) {
-            const element = this.pluginList[index];
-            if (element.metadata.name == config.plugins.player) {
+            console.time('oldLoader');
+            for (let index = 0; index < moduleList.length; index++) {
+                const element = moduleList[index];
+                if (element["code"] == "") continue
+                if (element["path"].includes("anilistApi")) continue
                 const pluginLoader = new playerPluginInstance()
-                await pluginLoader.runInstance(element.code)
+                try {
+                    let code = ""
 
-                setPlayerPlugin(pluginLoader)
-                this.currentPlugin = pluginLoader
-                return
+                    /* IFDEF DEBUG */
+                    await pluginLoader.runInstance(`${getRenderPath()}src${element["path"].replaceAll("..", "")}`)
+                    code = `${getRenderPath()}src${element["path"].replaceAll("..", "")}`
+                    /* ENDIF */
+
+                    /* IFDEF PROD */
+                    await pluginLoader.runInstance(element["code"])
+                    code = element["code"];
+                    /* ENDIF */
+
+                    this.pluginList = [
+                        ...this.pluginList,
+                        {
+                            metadata: pluginLoader.metadata,
+                            code: code,
+                            sha256: await CreateSHA256(code)
+                        }
+                    ]
+                    pluginLoader.destroy()
+                } catch (error) {
+                    console.error("Failed Load Plugin", error)
+                    pluginLoader.destroy()
+                }
             }
-        }
+            console.timeEnd('oldLoader');
+            await this.loadOtherPlugins()
 
-        const pluginLoader = new playerPluginInstance()
-        await pluginLoader.runInstance(this.pluginList[0].code)
-        setPlayerPlugin(pluginLoader)
-        this.currentPlugin = pluginLoader
+            this.pluginList = this.pluginList.filter((item, _, arr) => {
+                return !arr.some(
+                    other =>
+                        other.metadata.name === item.metadata.name &&
+                        semver.gt(semver.coerce(other.metadata.version) as any, semver.coerce(item.metadata.version) as any)
+                );
+            })
+
+            this.pluginList = this.pluginList.filter(
+                (item, index, self) =>
+                    index === self.findIndex(i => i.metadata.name === item.metadata.name)
+            )
+
+            // this.currentPlugin = this.pluginList[0]
+            // setPlayerPlugin(this.pluginList[0])
+
+            setPluginPlayerList(this.pluginList)
+            const config = getConfig()
+            for (let index = 0; index < this.pluginList.length; index++) {
+                const element = this.pluginList[index];
+                if (element.metadata.name == config.plugins.player) {
+                    const pluginLoader = new playerPluginInstance()
+                    await pluginLoader.runInstance(element.code)
+
+                    setPlayerPlugin(pluginLoader)
+                    this.currentPlugin = pluginLoader
+                    return
+                }
+            }
+
+            const pluginLoader = new playerPluginInstance()
+            await pluginLoader.runInstance(this.pluginList[0].code)
+            setPlayerPlugin(pluginLoader)
+            this.currentPlugin = pluginLoader
+        } catch (error) {
+            console.error("Failed Initialize Plugins", error)
+            this.isInitializingPlugins = false
+        }
     }
 }
 
@@ -492,3 +624,126 @@ export class informationPluginManager implements informationPluginManagerFormat 
         return await this.currentPlugin.setAnimeInList(variable)
     };
 }
+
+export class PluginManager implements PluginManagerFormat {
+    activePlayerPlugin: playerPluginInstanceFormat = undefined as any;
+    activeInformationPlugin: informationPluginInstanceFormat = undefined as any;
+
+    playerPluginList: playerPluginFormatList[] = [];
+    informationPluginList: informationPluginFormatList[] = [];
+
+    isInitializingPlugins: boolean = false;
+
+    dummyLoader = async (plugins: { path: string; code: string; }[]): Promise<(playerPluginFormatList | informationPluginFormatList)[]> => {
+        let loadedPlugins: (playerPluginFormatList | informationPluginFormatList)[] = []
+
+        const blobDummy = new Blob([workerDummyimport], { type: "text/javascript" });
+        let dummyImportURL = URL.createObjectURL(blobDummy);
+
+        let promiseResolve: (value: any) => void
+        const promise = new Promise((resolve: (v: (playerPluginFormatList | informationPluginFormatList)[]) => void, reject) => {
+            promiseResolve = resolve
+            setTimeout(() => {
+                reject("Failed Load All Plugins")
+            }, 1000 * plugins.length)
+        })
+
+        console.log(150 * plugins.length)
+
+        plugins.forEach((element, index) => {
+            const blobCode = new Blob([detectIndex(element["code"], dummyImportURL)], { type: "text/javascript" });
+            let codeURL = URL.createObjectURL(blobCode);
+
+            const mainCode = new Blob([workerPayloadMetadataExtractor.replace("SET_WORKER_URL", codeURL)], { type: "text/javascript" });
+            let mainCodeURL = URL.createObjectURL(mainCode);
+
+            console.log(index)
+
+            const worker = new Worker(mainCodeURL, { type: "module" });
+
+            worker.onmessage = async (e) => {
+                console.log(e)
+                if (e.data["ok"]) {
+                    let code = element["code"];
+
+                    /* IFDEF DEBUG */
+                    code = `${getRenderPath()}src${element["path"].replaceAll("..", "")}`
+                    /* ENDIF */
+
+                    loadedPlugins = [
+                        ...loadedPlugins,
+                        {
+                            metadata: e["data"]["result"],
+                            code: code,
+                            sha256: await CreateSHA256(code)
+                        }
+                    ]
+
+                    if (loadedPlugins.length == index) promiseResolve(loadedPlugins)
+                } else {
+                    console.error("FAILED LOAD PLUGIN", e)
+                }
+                worker.terminate()
+            };
+
+        })
+
+        return promise
+    }
+
+    initialPlugins = async (): Promise<void> => {
+        /* IFDEF DEBUG|PROD|WEB */
+        const importedModules = import.meta.glob("../plugins/*.ts", {
+            eager: true,
+            query: "?compiledRaw",
+            import: "default"
+        })
+        /* ENDIF */
+        let moduleList = Object.entries(importedModules).map(([path, code]) => ({
+            path,
+            code: code as string
+        }))
+
+        moduleList = [
+            ...moduleList,
+            ...(await getPluginsList()).map((v) => ({
+                path: v["file"],
+                code: v["content"]
+            }))
+        ].filter((v) => v["code"] != "")
+
+        console.time('dummyLoader');
+        console.log(await this.dummyLoader(moduleList))
+        console.timeEnd('dummyLoader');
+    }
+
+    changePlayerPlugin = async (name: string): Promise<playerPluginFormat> => {
+        return undefined as any
+    }
+
+    changeInformationPlugin = async (name: string): Promise<informationPluginFormat> => {
+        return undefined as any
+    }
+
+    checkUpdates = async (): Promise<void> => {
+
+    }
+
+    installPlugin = async (): Promise<void> => {
+
+    }
+
+    reloadPlugins = async (hard?: boolean): Promise<void> => {
+
+    }
+}
+
+/* IFDEF ONLYPLUGINS */
+const d = import.meta.glob("../plugins/*.ts", {
+    eager: false,
+    import: "default",
+})
+console.log(d);
+/* ENDIF */
+
+(window as any).PluginManager = PluginManager;
