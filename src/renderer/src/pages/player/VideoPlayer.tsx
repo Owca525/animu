@@ -606,11 +606,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         let configHLS: Partial<HlsConfig> = {
             enableWorker: true,
             lowLatencyMode: true,
-            backBufferLength: 90,
-            maxBufferLength: 300,
+            autoStartLoad: true,
+            backBufferLength: 40,
             maxBufferSize: 120000000,
-            maxMaxBufferLength: 600,
-            nudgeMaxRetry: 5
+            manifestLoadingMaxRetry: 3,
+            levelLoadingMaxRetry: 3,
+            fragLoadingMaxRetry: 3,
         }
 
         /* IFDEF WEB */
