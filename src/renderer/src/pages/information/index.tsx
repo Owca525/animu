@@ -338,11 +338,12 @@ function information() {
             resp = await getInformationPlugin().getManga(data.id)
         } else {
             resp = await getInformationPlugin().anime(data.id)
-            tmpAnimulist = animulist.find((v) => v.AnimeData.id == resp["anime"]["id"])?.animulist
         }
 
         if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", timer: false })
         updateToast(idToast, t("notification.successanime"), { type: "success", timer: false })
+        tmpAnimulist = animulist.find((v) => v.AnimeData.id == resp["anime"]["id"])?.animulist
+        
         resetContentVariable()
         setmoreMiniTitle(false)
         if (currentPlugin()) await pluginManager().changePlugin(currentPlugin()!)
