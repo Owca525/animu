@@ -629,7 +629,7 @@
   position: absolute;
   top: 0;
   right: 0;
-  width: 100%;
+  width: 130%;
   height: 100%;
   background: linear-gradient(to left, var(--black), transparent);
 }
