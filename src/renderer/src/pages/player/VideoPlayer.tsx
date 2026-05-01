@@ -741,6 +741,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         setIsPlaying(prev => {
             if (prev) {
                 video.pause()
+                clearInterval(moreInformationTimer)
                 moreInformationTimer = setTimeout(() => {
                     setShowingMoreInformation(true)
                 }, 4000)
@@ -752,9 +753,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             video.play().catch((reason) => {
                 console.warn("Video Play Error Catch", reason)
             })
-            moreInformationTimer = setTimeout(() => {
-                setShowingMoreInformation(true)
-            }, 4000)
             pauseClip()
             return true
         })
