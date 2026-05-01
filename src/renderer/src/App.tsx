@@ -288,7 +288,7 @@ async function checkPluginUpdate() {
     tmpDatabase = localStorage.getItem("AnimuPluginDatabase") ? JSON.parse(localStorage.getItem("AnimuPluginDatabase") as any) : await pluginManager().checkUpdates()
   } catch (error) { console.warn("Error failed parsed pluginRepo Database", error) }
 
-  if (config.plugins.pluginCheckType == "On Start" || tmpDatabase.length <= 0 || config.plugins.lastTimeCheck <= 0) return await pluginManager().checkUpdates()
+  if (config.plugins.pluginCheckType == "On Start" || config.plugins.lastTimeCheck <= 0) return await pluginManager().checkUpdates()
   if (checkDate(config.plugins.lastTimeCheck, config.plugins.pluginCheckType)) await pluginManager().checkUpdates()
   else { setPluginRepo(tmpDatabase) }
 }
