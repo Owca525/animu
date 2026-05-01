@@ -441,7 +441,7 @@ export class PluginManager implements PluginManagerFormat {
             promiseResolve = resolve
             setTimeout(() => {
                 reject("Failed Load All Plugins")
-            }, 30 * plugins.length)
+            }, 50 * plugins.length)
         })
 
         plugins.forEach((element, index) => {

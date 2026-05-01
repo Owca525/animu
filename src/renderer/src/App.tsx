@@ -67,10 +67,9 @@ import {
 
 /* IFDEF DEBUG */
 import './utils/debug';
-import { setHome } from './pages/home/homeUtils';
 /* ENDIF */
 
-
+import { setHome } from './pages/home/homeUtils';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
