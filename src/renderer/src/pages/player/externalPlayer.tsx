@@ -141,7 +141,7 @@ const ExternalPlayer: Component<ExternalplayerProps> = ({ animeData, now_episode
                 ...player,
                 episode: {
                     currentEpisode: now_episodes.episode,
-                    episodeList: now_episodes.episodes.map((ep) => ep.ep),
+                    episodeList: now_episodes.episodes,
                     anime: animeData.AnimeData,
                     animeID: animeData.AnimeData.player_ID as string,
                     type: now_episodes.type

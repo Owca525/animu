@@ -127,7 +127,8 @@ function information() {
             if (tempData().anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED" || tempData().anime.type != "ANIME") return
             // if (tempData().anime.id == "" && !player_id) return setEpisodeResponse(await plugin.extractEpisodeList(tempData().anime, undefined)) deprecated
 
-            let plugin = await pluginManager().changePlugin(pluginName as string)
+            let plugin = await pluginManager().changePlayerPlugin(pluginName as string)
+            console.log(plugin)
             if (!plugin) return
             let response = await plugin.extractEpisodeList(tempData().anime, player_id as string)
             return response
@@ -220,8 +221,8 @@ function information() {
             else setiswaitingplaylist(false)
         })
 
-        let plugin = pluginManager().currentPlugin
-        if (plugin) setCurrentPlugin(plugin.metadata.name)
+        let plugin = getPlayerPLugin()
+        setCurrentPlugin(plugin.metadata.name)
 
         if (tempData().anime.nextAiringEpisode) checkIsAnimeReleasing()
 
@@ -241,7 +242,7 @@ function information() {
         }
 
         if (history.length > 0) {
-            let plugin = await pluginManager().changePlugin(history[0].saveData?.pluginName as string)
+            let plugin = await pluginManager().changePlayerPlugin(history[0].saveData?.pluginName as string)
             if (plugin) if (plugin.metadata.name != history[0].saveData?.pluginName) setCurrentId(undefined)
             console.log(plugin)
             setCurrentPlugin(plugin.metadata.name)
@@ -346,7 +347,7 @@ function information() {
         
         resetContentVariable()
         setmoreMiniTitle(false)
-        if (currentPlugin()) await pluginManager().changePlugin(currentPlugin()!)
+        if (currentPlugin()) await pluginManager().changePlayerPlugin(currentPlugin()!)
 
         // Reseting Recomendation
         setTmpData((prev) => ({ ...prev, anime: { ...prev.anime, recommendations: undefined } }))
@@ -539,7 +540,7 @@ function information() {
 
     async function refreashInformation(name: string, force: boolean = false) {
         setCurrentId(undefined)
-        await pluginManager().changePlugin(name)
+        await pluginManager().changePlayerPlugin(name)
         setCurrentPlugin(name)
         episodeResponse.Refetch([tempData()["anime"]["title"]["romaji"], currentIDplayer(), currentPlugin()], force)
     }

@@ -1,19 +1,18 @@
-import Button from "@renderer/components/buttons";
 import CheckBox from "@renderer/components/checkBox";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import { CreateContextMenuOptions, openUrlFolder } from "@renderer/utils/functions";
-import { informationPluginFormat, informationPluginFormatList, playerPluginFormat, playerPluginFormatList } from "@renderer/utils/types";
+import { PluginLoadedFormat } from "@renderer/utils/types";
 import { Show } from "solid-js";
 import icon from '@resources/icon.png';
 import { t } from "@renderer/utils/i18n";
 
 interface SettingsPluginProps {
     active: boolean,
-    plugin: playerPluginFormatList | informationPluginFormatList,
-    hidePlugin: (plugin: playerPluginFormat, active: boolean) => void,
-    pluginSettings: (plugin: playerPluginFormat | informationPluginFormat) => void
-    setActivePlugin: (active: boolean, plugin: playerPluginFormat) => void
-    unHidePlugin: (plugin: playerPluginFormat) => void
+    plugin: PluginLoadedFormat,
+    hidePlugin: (plugin: PluginLoadedFormat, active: boolean) => void,
+    // pluginSettings: (plugin: PluginLoadedFormat) => void
+    setActivePlugin: (active: boolean, plugin: PluginLoadedFormat) => void
+    unHidePlugin: (plugin: PluginLoadedFormat) => void
     isHidden?: boolean
 }
 
@@ -55,9 +54,9 @@ export default function SettingsPlugin(props: SettingsPluginProps) {
                     </Show>
                 </div>
                 <div class='settings-extension-bottom-right'>
-                    <Show when={props.plugin["config"]}>
+                    {/* <Show when={props.plugin["config"]}>
                         <Button icon='settings' ButtonClass='settings-extension-button' onClick={() => props.pluginSettings(props.plugin as any)} />
-                    </Show>
+                    </Show> */}
                 </div>
             </div>
         </div>

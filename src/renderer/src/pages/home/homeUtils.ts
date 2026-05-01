@@ -26,59 +26,72 @@ export function setCalendary(date?: string) {
     }))
 }
 
+export function setHome() {
+    const plugin = getInformationPlugin()
+    setHomeData(async () => await plugin.home())
+}
+
 export function setAnimuList(): any {
     const animulist = unwrap(animulistData())
-    if (animulist.length <= 0) return setHomeData(undefined, {sections: [ { data: [] } ]})
+    if (animulist.length <= 0) return setHomeData(undefined, { sections: [{ data: [] }] })
     let finnalContainer: containerData[] = []
     const global = unwrap(getHomeCache())
 
     const currentAnime = animulist.filter((v) => v.animulist.status == "CURRENT")
-    if (currentAnime.length >= 1) 
-        finnalContainer.push({ 
-            title: "animulist.status.CURRENT", 
-            data: currentAnime, 
-            horizontal: true, 
-            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watching: {
-                val: "CURRENT",
-                name: "animulist.status.CURRENT"
-            } }) 
+    if (currentAnime.length >= 1)
+        finnalContainer.push({
+            title: "animulist.status.CURRENT",
+            data: currentAnime,
+            horizontal: true,
+            onTitleClick: () => AnimuListSearch("", {
+                ...global.filterTags, watching: {
+                    val: "CURRENT",
+                    name: "animulist.status.CURRENT"
+                }
+            })
         })
 
     const watchedAnime = animulist.filter((v) => v.animulist.status == "COMPLETED")
-    if (watchedAnime.length >= 1) 
-        finnalContainer.push({ 
-            title: "animulist.status.COMPLETED", 
-            data: watchedAnime, 
+    if (watchedAnime.length >= 1)
+        finnalContainer.push({
+            title: "animulist.status.COMPLETED",
+            data: watchedAnime,
             horizontal: true,
-            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watching: {
-                val: "COMPLETED",
-                name: "animulist.status.COMPLETED"
-            } }) 
+            onTitleClick: () => AnimuListSearch("", {
+                ...global.filterTags, watching: {
+                    val: "COMPLETED",
+                    name: "animulist.status.COMPLETED"
+                }
+            })
         })
 
     const planningAnime = animulist.filter((v) => v.animulist.status == "PLANNING")
-    if (planningAnime.length >= 1) finnalContainer.push({ 
-            title: "animulist.status.PLANNING", 
-            data: planningAnime, 
-            horizontal: true,
-            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watching: {
+    if (planningAnime.length >= 1) finnalContainer.push({
+        title: "animulist.status.PLANNING",
+        data: planningAnime,
+        horizontal: true,
+        onTitleClick: () => AnimuListSearch("", {
+            ...global.filterTags, watching: {
                 val: "PLANNING",
                 name: "animulist.status.PLANNING"
-            } }) 
+            }
         })
+    })
 
     const pausedAnime = animulist.filter((v) => v.animulist.status == "PAUSED")
-    if (pausedAnime.length >= 1) finnalContainer.push({ 
-            title: "animulist.status.PAUSED",
-            data: pausedAnime, 
-            horizontal: true,
-            onTitleClick: () => AnimuListSearch("", { ...global.filterTags, watching: {
+    if (pausedAnime.length >= 1) finnalContainer.push({
+        title: "animulist.status.PAUSED",
+        data: pausedAnime,
+        horizontal: true,
+        onTitleClick: () => AnimuListSearch("", {
+            ...global.filterTags, watching: {
                 val: "PAUSED",
                 name: "animulist.status.PAUSED"
-            } }) 
+            }
         })
+    })
 
-    if (finnalContainer.length <= 1) return setHomeData(undefined, {sections: [ { data: unwrap(animulistData()) } ]})
+    if (finnalContainer.length <= 1) return setHomeData(undefined, { sections: [{ data: unwrap(animulistData()) }] })
 
     setHomeData(undefined, {
         sections: finnalContainer
@@ -133,7 +146,7 @@ export async function anilistSearch(search: string, params: FilterParams | undef
         })
     } else {
         const plugin = getInformationPlugin()
-        plugin.searchAnime(search, 1, convertParams(params));
+        setHomeData(async () => await plugin.search(search, 1, convertParams(params)));
     }
 }
 

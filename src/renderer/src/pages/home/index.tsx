@@ -164,7 +164,7 @@ const Home = () => {
           <div class="home-filter-void">
             <Filter
               onChange={(params: FilterParams | undefined) => { StartHomeSearch(unwrap(homeCache().search), params) }}
-              filter={[...plugin.currentPlugin.metadata.searchOption, ...checkOtherFilters()]}
+              filter={[...plugin.metadata.searchOption!, ...checkOtherFilters()]}
               custonClass={`${homeCache().data && homeCache().data.topCards ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
             />
           </div>

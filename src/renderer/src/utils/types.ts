@@ -225,7 +225,7 @@ export interface NotificationProps {
     cache?: {
         action: string,
         args: any[]
-    } 
+    }
 }
 
 export type playerDataExtended = playerData & {
@@ -345,18 +345,7 @@ export interface themeMetadata {
 }
 
 export interface playerPluginFormat {
-    metadata: {
-        version: string
-        name: string
-        author: string
-        icon?: string
-        urlWebsite?: string
-        supportLang: string[]
-        // sidebarAddon?: sidebarData[]
-        searchOption?: genres
-        adult?: boolean,
-        type: "player"
-    }
+    metadata: PluginMetadataFormat
     config?: { [key: string]: any }
     extractPlayerData(type: string, episode: episodeMetadata, id: string): Promise<playerData[]>
     extractEpisodeList(animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined>
@@ -364,89 +353,89 @@ export interface playerPluginFormat {
     searchAnime(name: string, page: number, params?: FilterPluginsParams): Promise<cardData[]>
 }
 
+export interface PluginMetadataFormat {
+    version: string
+    name: string
+    pageSize?: number
+    author: string
+    icon?: string
+    urlWebsite?: string
+    type: "information" | "player"
+    adult?: boolean,
+    supportLang?: string[]
+    searchOption?: genres[]
+}
+
 export interface informationPluginFormat {
-    metadata: {
-        version: string
-        name: string
-        pageSize: number
-        author: string
-        icon?: string
-        urlWebsite?: string
-        searchOption: genres[],
-        type: "information"
-    }
+    metadata: PluginMetadataFormat
     config?: { [key: string]: any }
     search(name: string, page: number, params?: FilterPluginsParams): Promise<containerData | { error: string } | undefined>
     home(): Promise<{ topCards?: containerData, sections: containerData[] } | { error: string } | undefined>
-    anime(context: { id: string }): Promise<AnimeData | undefined>
+    anime(id: string): Promise<AnimeData | undefined>
     schedule: (airingStart: number, airingEnd: number) => Promise<cardData[]>
     getManga: (id: string) => Promise<AnimeData | undefined>
     getAnimeList: () => Promise<cardData[]>
     setAnimeInList: (variable: Anilist_ListMutation) => Promise<boolean>
 }
 
+export interface WorkerWrapperInstance {
+    instance: Worker
+    pendingRequest: Map<string, (value: unknown) => void>
+    otherDataPermision: boolean
+
+    runInstance: (pluginCode: string) => Promise<PluginMetadataFormat>
+    destroy: () => void
+    detectObjectHasAFunction: (object: { [key: string]: any }) => { [key: string]: any }
+    wrapperObjectFunction: (value: { [key: string]: any }, uuid: string) => Promise<void>
+    wrapperFunction: (func: string, value?: { [key: string]: any }) => Promise<void>
+}
+
 export type playerPluginInstanceFormat = playerPluginFormat & {
-    instance?: HTMLIFrameElement
-    runInstance(pluginCode: string): Promise<void>
-    destroy(): void
+    instance?: WorkerWrapperInstance
+    CreateInstance(pluginCode: string): Promise<void>
+    clear(): void
 }
 
 export type informationPluginInstanceFormat = informationPluginFormat & {
-    instance?: HTMLIFrameElement
-    runInstance(pluginCode: string): Promise<void>
-    destroy(): void
+    instance?: WorkerWrapperInstance
+    CreateInstance(pluginCode: string): Promise<void>
+    clear(): void
 }
 
-export type playerPluginFormatList = {
+export type PluginLoadedFormat = {
     metadata: playerPluginFormat["metadata"],
     code: string,
     sha256: string
 }
 
-export type informationPluginFormatList = {
-    metadata: informationPluginFormat["metadata"],
-    code: string,
-    sha256: string
-}
+export interface pluginsGlobalFormat {
+    informationPluginLoaded: PluginLoadedFormat[],
+    playerPluginLoaded: PluginLoadedFormat[],
 
-export interface playerPluginManagerFormat {
-    currentPlugin: playerPluginFormat | undefined
-    pluginList: playerPluginFormatList[]
-    changePlugin(plugin_id: string): Promise<playerPluginInstanceFormat>
-    initialPlugins(): void
-}
+    informationPlugin: informationPluginFormat,
+    playerPlugin: playerPluginFormat,
 
-export interface informationPluginManagerFormat {
-    currentPlugin: informationPluginFormat
-    searchAnime(name: string, page: number, params?: FilterPluginsParams): void
-    home(): void
-    anime(id: string): Promise<AnimeData | undefined>
-    initial(): Promise<void>
-    schedule(airingStart: number, airingEnd: number): Promise<cardData[]>
-    getManga: (id: string) => Promise<AnimeData | undefined>
-    getAnimeList: () => Promise<cardData[]>
-    setAnimeInList: (variable: Anilist_ListMutation) => Promise<boolean>
+    pluginManager: PluginManagerFormat,
+    pluginRepo: pluginRepoExpanded[]
 }
 
 export interface PluginManagerFormat {
     activePlayerPlugin: playerPluginInstanceFormat
     activeInformationPlugin: informationPluginInstanceFormat
 
-    playerPluginList: playerPluginFormatList[]
-    informationPluginList: informationPluginFormatList[]
+    playerPluginList: PluginLoadedFormat[]
+    informationPluginList: PluginLoadedFormat[]
 
     isInitializingPlugins: boolean
 
-    dummyLoader(plugins: { path: string; code: string; }[]): Promise<(informationPluginFormatList | playerPluginFormatList)[]>
+    dummyLoader(plugins: { path: string; code: string; }[]): Promise<PluginLoadedFormat[]>
 
     initialPlugins(): Promise<void>
     changePlayerPlugin(name: string): Promise<playerPluginFormat>
     changeInformationPlugin(name: string): Promise<informationPluginFormat>
 
     checkUpdates(): Promise<void>
-    installPlugin(): Promise<void>
-
-    reloadPlugins(hard?: boolean): Promise<void>
+    installPlugin(plugin: pluginRepoExpanded): Promise<void>
 }
 
 export type genres = {

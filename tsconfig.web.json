@@ -9,10 +9,9 @@
   "compilerOptions": {
     "composite": true,
     "jsxImportSource": "solid-js",
-    "baseUrl": ".",
     "paths": {
       "@renderer/*": [
-        "src/renderer/src/*"
+        "./src/renderer/src/*"
       ]
     }
   }

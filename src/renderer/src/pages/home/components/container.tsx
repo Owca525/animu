@@ -93,7 +93,7 @@ function Container(props: containerData) {
     const lastCard = document.querySelector(".card-container:last-child")
     if (!lastCard) return
     let plugin = getInformationPlugin()
-    if (animeCards().length < plugin.currentPlugin.metadata.pageSize) return setHomeStopScrolling(true)
+    if (animeCards().length < plugin.metadata.pageSize!) return setHomeStopScrolling(true)
     observer.observe(lastCard)
   }
 

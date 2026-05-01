@@ -46,7 +46,7 @@ const ContainerWrong: Component<ContainerWrongProps> = ({ name, exitfunc, refetc
                     onKeyDown={(text) => {setSearchName(text);response.Refetch([searchName(), getPlayerPLugin()])}}
                 />
                 <Dropdown
-                    options={segregatePlugins(async (name) => { await pluginManager().changePlugin(name); response.Refetch([searchName(), getPlayerPLugin()]); })}
+                    options={segregatePlugins(async (name) => { await pluginManager().changePlayerPlugin(name); response.Refetch([searchName(), getPlayerPLugin()]); })}
                     disableX
                     buttonText={getPlayerPLugin()?.metadata.name}
                 />

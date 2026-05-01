@@ -7,10 +7,8 @@ import {
   genres,
   informationPluginFormat,
 } from '@renderer/utils/types';
-import { dateToUnix, genYearsList, request, timeCovertToMs } from '@renderer/utils/functions';
+import { CreateSHA256, dateToUnix, genYearsList, request, timeCovertToMs } from '@renderer/utils/functions';
 import { getConfig } from '@renderer/utils/stores/config';
-import { getGlobalCache } from '@renderer/utils/stores/global';
-import { sha256 } from "js-sha256";
 
 const defaultPageSize = 20
 
@@ -480,15 +478,15 @@ function Convert(convert: any): cardData {
 }
 
 function getHeader() {
-  if (localStorage.getItem("Animu_Anilist_login_token_information")) {
-    try {
-      const token = JSON.parse(localStorage.getItem("Animu_Anilist_login_token_information") as any)
-      return { ...header, 'Authorization': 'Bearer ' + token["access_token"], }
-    } catch (error) {
-      console.error("getHeader/anilistapi", error)
-      return header
-    }
-  }
+  // if (localStorage.getItem("Animu_Anilist_login_token_information")) {
+  //   try {
+  //     const token = JSON.parse(localStorage.getItem("Animu_Anilist_login_token_information") as any)
+  //     return { ...header, 'Authorization': 'Bearer ' + token["access_token"], }
+  //   } catch (error) {
+  //     console.error("getHeader/anilistapi", error)
+  //     return header
+  //   }
+  // }
   return header
 }
 
@@ -501,8 +499,8 @@ let globalAnilistCache: {
 }[] = []
 
 
-function addToAnilistCache(timer: number, object: { query: string, variables: anilistVariable }, response: any) {
-  const hash = sha256(JSON.stringify(object))
+async function addToAnilistCache(timer: number, object: { query: string, variables: anilistVariable }, response: any) {
+  const hash = await CreateSHA256(JSON.stringify(object))
   globalAnilistCache = [...globalAnilistCache, {
     data: response,
     timer: setTimeout(() => {
@@ -512,8 +510,8 @@ function addToAnilistCache(timer: number, object: { query: string, variables: an
   }]
 }
 
-function findAnilistCache(object: { query: string, variables: anilistVariable }) {
-  const hash = sha256(JSON.stringify(object))
+async function findAnilistCache(object: { query: string, variables: anilistVariable }) {
+  const hash = await CreateSHA256(JSON.stringify(object))
   const finded = globalAnilistCache.find((el) => el["hash"] == hash)
   if (finded) return finded.data
   return undefined
@@ -522,7 +520,7 @@ function findAnilistCache(object: { query: string, variables: anilistVariable })
 // WHY THE FUCK THIS DOESN'T WORK IF I CALL window.api.request.post IN CreateHomePage
 // Jeśli api anilist jest offline to daje "Forbidden" w statusText i error 403 request 
 async function sendPost(variable: anilistVariable, query: string, timer = 0) {
-  const cache = findAnilistCache({ query: query, variables: variable })
+  const cache = await  findAnilistCache({ query: query, variables: variable })
   if (cache) return cache
   
   const response = await request(
@@ -531,7 +529,7 @@ async function sendPost(variable: anilistVariable, query: string, timer = 0) {
     window.api ? false : true
   )
   if (response.json && response.success && timer > 0) {
-    addToAnilistCache(timer, { query: query, variables: variable }, response)
+    await addToAnilistCache(timer, { query: query, variables: variable }, response)
   }
 
   return response
@@ -539,7 +537,7 @@ async function sendPost(variable: anilistVariable, query: string, timer = 0) {
 
 async function sendToApi(variable: anilistVariable, query: string, timer = 0): Promise<cardData[]> {
 
-  const cache = findAnilistCache({ query: query, variables: variable })
+  const cache = await findAnilistCache({ query: query, variables: variable })
   if (cache) return cache.json!.data.Page.media.map((data) => Convert(data))
 
   let data = await request(
@@ -743,7 +741,7 @@ export default class AnilistApi implements informationPluginFormat {
 
   async getAnimeList(): Promise<cardData[]> {
     const tmpHeader = getHeader()
-    const global = getGlobalCache()
+    const global = { anilist_user_data: undefined }
     if (!tmpHeader["Authorization"]) return []
     if (!global.anilist_user_data) return []
 
@@ -910,9 +908,9 @@ export default class AnilistApi implements informationPluginFormat {
       return
     }
   }
-  anime = async (context: { id: string; }) => {
+  anime = async (id: string) => {
     try {
-      let req = await sendPost({ id: context.id, type: "ANIME" }, graphicApIDAnime, timeCovertToMs({ min: 5 }))
+      let req = await sendPost({ id: id, type: "ANIME" }, graphicApIDAnime, timeCovertToMs({ min: 5 }))
       if (!req.success || !req.json) return
       return Convert(req.json.data.Media).AnimeData
     } catch (error) {

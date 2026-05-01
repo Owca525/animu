@@ -21,7 +21,7 @@ import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
 import { unwrap } from 'solid-js/store';
-import { getInformationPlugin, getPluginList, pluginManager } from './stores/plugins';
+import { getInformationPlugin, getPlayerPluginList, pluginManager } from './stores/plugins';
 import { v4 as uuidv4 } from 'uuid';
 import { removeToast, toast, ToastOptions, updateToast } from './context/ToastNotification';
 import { OvewriteAnimuList } from './FilesManager/animulist';
@@ -551,24 +551,23 @@ export async function getPluginConfig(instance: playerPluginFormat | information
 }
 
 export function loadedPluginsList() {
-    const plugins = getPluginList()
+    const plugins = getPlayerPluginList()
     const hiddenPlugins = new Set(getConfig().plugins.hiddenPlugins)
     return plugins.filter((p) => !hiddenPlugins.has(p.metadata.name))
 }
 
 export function detectIndex(str: string, customINDEX: string = "") {
     let index = customINDEX
+    const renderer = ["utils/functions", "utils/i18n", "utils/types", "utils/stores/config", "utils/stores/global"]
 
-    /* IFDEF PROD */
     if (customINDEX == "") index = `${getRenderPath()}index.js`
-    if (str.includes("@renderer/utils/functions")) return str.replace("@renderer/utils/functions", index).replace("@renderer/utils/i18n", index)
-    /* ENDIF */
-
-    /* IFDEF DEBUG */
-    if (customINDEX == "") index = `${getRenderPath()}src/utils/functions`
-    if (str.includes("@renderer/utils/functions")) str = str.replaceAll("@renderer/utils/functions", index).replace("@renderer/utils/i18n", index)
-    if (str.includes("@renderer/utils/types")) str = str.replaceAll("@renderer/utils/types", `${getRenderPath()}src/utils/types`)
-    /* ENDIF */
+    if (str.includes("@renderer/")) {
+        for (let i = 0; i < renderer.length; i++) {
+            const element = renderer[i];
+            str = str.replace(`@renderer/${element}`, index)
+        }
+        return str
+    }
 
     if (str.includes(`"./index.js"`)) return str.replaceAll(`"./index.js"`, `"${index}"`)
     else return str.replaceAll(`"index.js"`, `"${index}"`)
@@ -861,7 +860,7 @@ export async function fetchAnimeDeepLink(deeplink: string) {
     }
 
     const toastID = toast(t("notification.episodesfetching"), { type: "loading", timer: true })
-    const currentPLugin = await pluginManager().changePlugin(anime.player.plugin)
+    const currentPLugin = await pluginManager().changePlayerPlugin(anime.player.plugin)
     const episodeList = await currentPLugin.extractOnlyEpisodesList(anime.player.type, anime.player.id);
 
     if (episodeList.length <= 0) {
@@ -1278,7 +1277,7 @@ export async function checkAnimeTodayReleaseEpisode() {
         if (element.customData) continue
 
         try {
-            const tmpplugin = await pluginManager().changePlugin(element.anime.saveData?.pluginName as string)
+            const tmpplugin = await pluginManager().changePlayerPlugin(element.anime.saveData?.pluginName as string)
             if (!tmpplugin) continue
 
             let episodes = await tmpplugin.extractOnlyEpisodesList(element.anime.saveData?.type!, element.anime.AnimeData.player_ID!)

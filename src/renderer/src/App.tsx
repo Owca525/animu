@@ -46,7 +46,7 @@ import {
   setYT_DLPVersion
 } from './utils/stores/global';
 import { getConfig, setConfig } from './utils/stores/config';
-import { getInformationPlugin, pluginManager, setPluginRepo } from './utils/stores/plugins';
+import { pluginManager, setPluginRepo } from './utils/stores/plugins';
 import { HashRouter, Route } from '@solidjs/router';
 import { pluginRepoExpanded, themeMetadata } from './utils/types';
 import { setHomeActivePage } from './utils/stores/home';
@@ -67,8 +67,10 @@ import {
 
 /* IFDEF DEBUG */
 import './utils/debug';
-import { checkUpdatePlugins, checkUpdateRepoPlugins } from './utils/plugins';
+import { setHome } from './pages/home/homeUtils';
 /* ENDIF */
+
+
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -122,6 +124,9 @@ function App() {
   onMount(async () => {
     /* IFDEF WEB */
     /* ENDIF */
+
+    await pluginManager().initialPlugins()
+    await pluginManager().changeInformationPlugin("AnilistApi")
 
     if (localStorage.getItem("Animu_Anilist_user_data") != undefined) {
       try {
@@ -189,10 +194,8 @@ function App() {
     setHomeActivePage("global.home")
 
     setinitialState({ text: "initial.plugin", plugin: false })
-    await pluginManager().initialPlugins()
-    await getInformationPlugin().initial()
 
-    getInformationPlugin().home()
+    setHome()
 
     setInitation(false)
     initialServices()
@@ -207,6 +210,8 @@ function App() {
   function LoadConfig() {
     let loadedConnfig = getConfig()
     // await navigator.mediaDevices.enumerateDevices()
+
+    pluginManager().changePlayerPlugin(loadedConnfig["plugins"]["player"])
 
     navigator.mediaDevices.enumerateDevices().then((element) => {
       const audioOutputs = element.filter(device => device.kind === "audiooutput")
@@ -280,11 +285,11 @@ async function checkPluginUpdate() {
   const config = getConfig()
   let tmpDatabase: pluginRepoExpanded[] = []
   try {
-    tmpDatabase = localStorage.getItem("AnimuPluginDatabase") ? JSON.parse(localStorage.getItem("AnimuPluginDatabase") as any) : await checkUpdateRepoPlugins()
+    tmpDatabase = localStorage.getItem("AnimuPluginDatabase") ? JSON.parse(localStorage.getItem("AnimuPluginDatabase") as any) : await pluginManager().checkUpdates()
   } catch (error) { console.warn("Error failed parsed pluginRepo Database", error) }
 
-  if (config.plugins.pluginCheckType == "On Start" || tmpDatabase.length <= 0 || config.plugins.lastTimeCheck <= 0) return await checkUpdatePlugins()
-  if (checkDate(config.plugins.lastTimeCheck, config.plugins.pluginCheckType)) await checkUpdatePlugins()
+  if (config.plugins.pluginCheckType == "On Start" || tmpDatabase.length <= 0 || config.plugins.lastTimeCheck <= 0) return await pluginManager().checkUpdates()
+  if (checkDate(config.plugins.lastTimeCheck, config.plugins.pluginCheckType)) await pluginManager().checkUpdates()
   else { setPluginRepo(tmpDatabase) }
 }
 

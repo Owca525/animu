@@ -243,7 +243,7 @@ export function getWeek() {
  * @returns {Promise<{ text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: Map<string, string> }>} 
  */
 export async function request(url, options) {
-
+    return await window.request(url, options)
 }
 
 /**
@@ -320,3 +320,46 @@ export function makeSmallText(text) {
     if (!text) return text
     return text.toLowerCase()
 }
+
+/**
+ *
+ * @export
+ * @async
+ * @param {string} text 
+ * @returns {string} 
+ */
+export async function CreateSHA256(text) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
+
+  return hashHex;
+};
+
+/**
+ *
+ * @export
+ * @param {{ day?: number, month?: number, min?: number, hour?: number }} time 
+ * @returns {number} 
+ */
+export function timeCovertToMs(time) {
+    if (time["day"]) return time["day"] * 86400000
+    if (time["month"]) return time["month"] * 2678400000
+    if (time["min"]) return time["min"] * 60000
+    if (time["hour"]) return time["hour"] * 3600000
+    return 0
+}
+
+export const getConfig = () => {
+    if (typeof window["config"] == "string") return
+    return window["config"]
+};
+export const getGlobalCache = () => {
+
+};

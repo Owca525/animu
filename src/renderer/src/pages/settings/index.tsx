@@ -19,7 +19,7 @@ import {
     LoginToAnilist,
     openUrlFolder,
     request,
-    savePluginConfig,
+    // savePluginConfig,
     unLinkAnilistAccount,
     updateAnilistUserData,
     updateObject
@@ -28,9 +28,8 @@ import { checkUpdate } from '@renderer/utils/update';
 import {
     ContextMenuProps,
     informationPluginFormat,
-    informationPluginFormatList,
     playerPluginFormat,
-    playerPluginFormatList,
+    PluginLoadedFormat,
     SettingsConfig,
     themeMetadata
 } from '@renderer/utils/types';
@@ -48,7 +47,7 @@ import {
 import { createShortcut } from '@solid-primitives/keyboard';
 import { DetectOldVersionHistory, OverWriteHistory } from '@renderer/utils/FilesManager/history';
 import { getConfig, setConfig } from '@renderer/utils/stores/config';
-import { getInformationPlugin, getPlayerPLugin, getPluginList, getPluginRepo, pluginManager, setPluginPlayerList } from '@renderer/utils/stores/plugins';
+import { getAllPluginList, getInformationPlugin, getPlayerPLugin, getPluginRepo, pluginManager } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { saveConfig } from '@renderer/utils/FilesManager/config';
 import { showDialog } from '@renderer/utils/context/DialogContext';
@@ -63,7 +62,6 @@ import SettingsPlugin from './components/settingsPlugin';
 import semver from "semver";
 import { OvewriteAnimuList } from '@renderer/utils/FilesManager/animulist';
 import OtherSettings from './components/otherSettings';
-import { checkUpdatePlugins } from '@renderer/utils/plugins';
 
 export type pluginRepoExpandedSettings = {
     name: string,
@@ -94,7 +92,7 @@ function settings() {
     const [audioOutput, setaudioOutput] = createSignal<MediaDeviceInfo[]>([])
 
     const [backupList, setBackupList] = createSignal<{ date: Date, file: string }[]>([])
-    const [pluginList, setpluginList] = createSignal<{ active: boolean, plugin: playerPluginFormatList | informationPluginFormatList }[]>([])
+    const [pluginList, setpluginList] = createSignal<{ active: boolean, plugin: PluginLoadedFormat }[]>([])
     const [hiddenPluginList, setHiddenPluginList] = createSignal<string[]>([])
     const [ContextMenu, setContextMenu] = createSignal<ContextMenuProps>([
         { option: "dialog.reload", onClick: () => location.reload() },
@@ -214,18 +212,12 @@ function settings() {
 
         const plugin = getPlayerPLugin()
         setLastActiveTheme(structuredClone(unwrap(activeThemes())))
-        const playerPluginList = getPluginList().map((pl) => {
+        const playerPluginList = getAllPluginList().map((pl) => {
             if (!plugin) return { active: false, plugin: pl }
             return { active: plugin.metadata.name == pl.metadata.name, plugin: pl }
         })
         setHiddenPluginList(getConfig().plugins.hiddenPlugins)
-        setpluginList([{
-            active: true, plugin: {
-                code: "",
-                sha256: "",
-                metadata: getInformationPlugin().currentPlugin["metadata"]
-            }
-        }, ...playerPluginList])
+        setpluginList(playerPluginList)
         setThemes(loadedTheme().filter((val) => ![...activeThemes().entries()].map(([_, val]) => val.themeName).includes(val.themeName)))
         changeTitleAnimu(`Animu - ${t("global.settings")}`)
         turnOnDeveloperMode()
@@ -393,61 +385,66 @@ function settings() {
         }))
     }
 
-    async function setActivePlugin(active: boolean, plugin: playerPluginFormat) {
-        let tmp: playerPluginFormat | undefined
+    async function setActivePlugin(active: boolean, plugin: PluginLoadedFormat) {
+        let loadedPlugin: informationPluginFormat | playerPluginFormat = undefined as any
+
         if (new Set(hiddenPluginList()).has(plugin.metadata.name)) {
             unHidePlugin(plugin)
             saveNewConfig()
         }
 
-        if (!active) {
-            const plu = pluginList()[0]
-            tmp = await pluginManager().changePlugin(plu.plugin["metadata"]!.name)
-            setpluginList((prev) => prev.map((pl) => ({ ...pl, active: tmp!.metadata.name == pl.plugin["metadata"].name })))
-        } else {
-            tmp = await pluginManager().changePlugin(plugin.metadata.name)
-            setpluginList((prev) => prev.map((pl) => ({ ...pl, active: tmp!.metadata.name == pl.plugin["metadata"].name })))
-        }
-        handleChange("plugins.player", tmp.metadata.name)
-    }
+        let tmpPlugin = plugin
+        if (!active) tmpPlugin = pluginList()[0]["plugin"]
 
-    function openPluginSettings(plugin: playerPluginFormat | informationPluginFormat) {
-        if (!plugin.config) return
-        showCustomMenu(OtherSettings({
-            title: t("settings.extensions.conf", { title: plugin.metadata.name }),
-            pluginConfig: {
-                config: plugin.config,
-                onChange: (v, a) => savePluginSettings(plugin.config as any, v, a, plugin)
-            }
-        }))
-    }
+        if (tmpPlugin["metadata"]["type"] == "information") loadedPlugin = await pluginManager().changeInformationPlugin(tmpPlugin["metadata"]["name"])
+        if (tmpPlugin["metadata"]["type"] == "information") loadedPlugin = await pluginManager().changePlayerPlugin(tmpPlugin["metadata"]["name"])
 
-    function savePluginSettings(config: { [key: string]: any }, variable: string, change: any, plugin: playerPluginFormat | informationPluginFormat) {
-        let tmpConfig = config
-        for (const key in config) {
-            if (key == variable) tmpConfig = { ...tmpConfig, [key]: change }
-        }
-        savePluginConfig(plugin, tmpConfig)
-        plugin.config = tmpConfig
-
-        if ("home" in plugin) {
-            getInformationPlugin().currentPlugin = plugin
+        if (!loadedPlugin) {
+            toast(t("Failed Change Plugin", { type: "error" }))
             return
         }
 
-        const listplugins = getPluginList()
-        // TODO: maybe fix this and maybe this make some erro fuck it i'm tired
-        setPluginPlayerList(listplugins.map((p) => p.metadata.name == plugin.metadata.name ? plugin : p) as any)
+        setpluginList((prev) => prev.map((pl) => ({ ...pl, active: tmpPlugin.metadata.name == pl.plugin["metadata"].name })))
+        handleChange("plugins.player", tmpPlugin.metadata.name)
     }
 
-    function hidePlayerPlugin(plugin: playerPluginFormat, active: boolean) {
+    // function openPluginSettings(plugin: PluginLoadedFormat) {
+    //     if (!plugin.config) return
+    //     showCustomMenu(OtherSettings({
+    //         title: t("settings.extensions.conf", { title: plugin.metadata.name }),
+    //         pluginConfig: {
+    //             config: plugin.config,
+    //             onChange: (v, a) => savePluginSettings(plugin.config as any, v, a, plugin)
+    //         }
+    //     }))
+    // }
+
+    // function savePluginSettings(config: { [key: string]: any }, variable: string, change: any, plugin: PluginLoadedFormat) {
+    //     let tmpConfig = config
+    //     for (const key in config) {
+    //         if (key == variable) tmpConfig = { ...tmpConfig, [key]: change }
+    //     }
+    //     savePluginConfig(plugin, tmpConfig)
+    //     plugin.config = tmpConfig
+
+    //     if ("home" in plugin) {
+    //         getInformationPlugin().currentPlugin = plugin
+    //         return
+    //     }
+
+    //     const listplugins = getPluginList()
+    //     // TODO: maybe fix this and maybe this make some erro fuck it i'm tired
+    //     setPluginPlayerList(listplugins.map((p) => p.metadata.name == plugin.metadata.name ? plugin : p) as any)
+    // }
+
+    function hidePlayerPlugin(plugin: PluginLoadedFormat, active: boolean) {
         if (active) setActivePlugin(false, plugin)
 
         setHiddenPluginList((prev) => [...prev, plugin.metadata.name])
         handleChange("plugins.hiddenPlugins", [...hiddenPluginList()])
     }
 
-    function unHidePlugin(plugin: playerPluginFormat) {
+    function unHidePlugin(plugin: PluginLoadedFormat) {
         setHiddenPluginList((prev) => prev.filter(i => i !== plugin.metadata.name))
         handleChange("plugins.hiddenPlugins", [...hiddenPluginList()])
     }
@@ -459,8 +456,8 @@ function settings() {
 
     function getDatabaseOfRepo(): pluginRepoExpandedSettings[] {
         const repo = getPluginRepo()
-        const plugins = getPluginList()
-        const infoPlugin = getInformationPlugin().currentPlugin
+        const plugins = getAllPluginList()
+        const infoPlugin = getInformationPlugin()
 
         return repo.map((item) => {
             if (item.type == "information") {
@@ -1637,20 +1634,7 @@ function settings() {
                         <div class="settings-setting-container">
                             {t("settings.extensions.updateplugin")}
                             <Button content={t("settings.general.checkupdate")} onClick={async () => {
-                                await checkUpdatePlugins()
-
-                                const plugin = getPlayerPLugin()
-                                const playerPluginList = getPluginList().map((pl) => {
-                                    if (!plugin) return { active: false, plugin: pl }
-                                    return { active: plugin.metadata.name == pl.metadata.name, plugin: pl }
-                                })
-                                setpluginList([{
-                                    active: true, plugin: {
-                                        metadata: getInformationPlugin().currentPlugin["metadata"],
-                                        sha256: "",
-                                        code: ""
-                                    }
-                                }, ...playerPluginList])
+                                await pluginManager().checkUpdates()
                             }} />
                         </div>
                         <div class="settings-line"></div>
@@ -1674,20 +1658,7 @@ function settings() {
                                                         if (!item.update && item.installed) return
                                                         await window.api.plugins.installUpdate(item)
 
-                                                        await checkUpdatePlugins()
-
-                                                        const plugin = getPlayerPLugin()
-                                                        const playerPluginList = getPluginList().map((pl) => {
-                                                            if (!plugin) return { active: false, plugin: pl }
-                                                            return { active: plugin.metadata.name == pl.metadata.name, plugin: pl }
-                                                        })
-                                                        setpluginList([{
-                                                            active: true, plugin: {
-                                                                metadata: getInformationPlugin().currentPlugin["metadata"],
-                                                                sha256: "",
-                                                                code: ""
-                                                            }
-                                                        }, ...playerPluginList])
+                                                        await pluginManager().checkUpdates()
                                                     }}
                                                 />
                                             </div>
@@ -1707,7 +1678,7 @@ function settings() {
                                                 active={"home" in tmp.plugin ? true : tmp.active}
                                                 unHidePlugin={unHidePlugin} plugin={tmp.plugin}
                                                 hidePlugin={hidePlayerPlugin}
-                                                pluginSettings={openPluginSettings}
+                                                // pluginSettings={openPluginSettings}
                                                 setActivePlugin={setActivePlugin}
                                             />
                                         </Show>
@@ -1726,7 +1697,7 @@ function settings() {
                                                     active={tmp.active}
                                                     plugin={tmp.plugin}
                                                     hidePlugin={hidePlayerPlugin}
-                                                    pluginSettings={openPluginSettings}
+                                                    // pluginSettings={openPluginSettings}
                                                     setActivePlugin={setActivePlugin}
                                                 />
                                             </Show>

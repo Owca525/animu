@@ -5,7 +5,7 @@ import Button from '@renderer/components/buttons';
 import { useNavigate } from '@solidjs/router';
 import { Component, createSignal, For, Show } from 'solid-js';
 import { useI18n } from '@renderer/utils/i18n';
-import { pluginManager } from '@renderer/utils/stores/plugins';
+import { getPlayerPLugin, pluginManager } from '@renderer/utils/stores/plugins';
 import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
 import { animulistData } from '@renderer/utils/stores/global';
 import { unwrap } from 'solid-js/store';
@@ -36,8 +36,8 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
     }
 
     async function goToPlayer(saveData?: indentityPlayer, id?: string): Promise<any> {
-        let plugin = pluginManager().currentPlugin
-        if (saveData) plugin = await pluginManager().changePlugin(saveData.pluginName)
+        let plugin = getPlayerPLugin()
+        if (saveData) plugin = await pluginManager().changePlayerPlugin(saveData.pluginName)
         if (!plugin) return toast(t("notification.failedplugin"), { type: "error" })
         
         const idToast = toast(t("notification.fetchinganime"), { type: "loading", timer: true })

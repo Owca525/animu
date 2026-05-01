@@ -1,7 +1,6 @@
 import { createStore } from 'solid-js/store';
 import { FilterParams, homeData } from '../types';
-import { getInformationPlugin } from './plugins';
-import { anilistSearch, AnimuListSearch, historySearch, setAnimuList, setCalendary, setHistory } from '@renderer/pages/home/homeUtils';
+import { anilistSearch, AnimuListSearch, historySearch, setAnimuList, setCalendary, setHistory, setHome } from '@renderer/pages/home/homeUtils';
 import { globalNavigate } from '../functions';
 
 const initialState: homeData = {
@@ -13,7 +12,7 @@ const initialState: homeData = {
     stopScrolling: false,
     filterTags: undefined,
     mainContainer: undefined,
-    activePage: "",
+    activePage: "home",
     otherFilter: [{
         page: 'global.animulist',
         filter: [{
@@ -29,10 +28,7 @@ const initialState: homeData = {
             {
                 icon: "home",
                 text: "global.home",
-                onClick: () => {
-                    const plugin = getInformationPlugin()
-                    plugin.home()
-                },
+                onClick: setHome,
                 onSearch: anilistSearch
             },
             {
