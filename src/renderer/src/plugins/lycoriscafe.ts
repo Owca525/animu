@@ -1,8 +1,16 @@
-import { makeSmallText, request, timeToSeconds } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat } from "@renderer/utils/types";
+import { makeSmallText, request } from "@renderer/utils/functions";
+import { AnimeData, cardData, episodeList, FilterPluginsParams, playerPluginFormat, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, episodeMetadata } from "@renderer/utils/types";
 const WEB = "https://www.lycoris.cafe"
 const HEADER = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0'
+}
+
+function timeToSeconds(time: string): number {
+    const [hms] = time.split(".");
+    const parts = hms.split(":").map(Number);
+    const [hours, minutes, seconds] = parts;
+
+    return hours * 3600 + minutes * 60 + seconds;
 }
 
 function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string | undefined {
@@ -68,8 +76,8 @@ function detectResoltion(text: string): string {
             return "720"
         case "FHD":
             return "1080"
-        case "SourceMKV":
-            return "Source"
+        // case "SourceMKV":
+        //     return "Source"
     }
     return "Unknown"
 }
@@ -86,7 +94,7 @@ function convertToAnimeData(data: any): AnimeData | undefined {
                 romaji: data["title"]
             },
             id: data["id"],
-            player_ID: data["id"], 
+            player_ID: data["id"],
             format: data["format"],
             season: data["season"],
             seasonYear: data["seasonYear"],
@@ -102,24 +110,39 @@ function convertToAnimeData(data: any): AnimeData | undefined {
     }
 }
 
+export function dateToUnix(dateStr: string | undefined): number | undefined {
+    if (!dateStr) return undefined
+    const date = new Date(dateStr);
+    return Math.floor(date.getTime() / 1000);
+}
+
 async function requestToApi(anime_id: string): Promise<{ data: any } | undefined> {
     let url = `${WEB}/api/anime/${anime_id}`
     let req = await request(url, { headers: HEADER });
-    if (!req.success) return undefined
+    /* IFDEF DEBUG */
+    console.warn("requestToApi/lycorisCafe", req)
+    /* ENDIF */
+    if (!req.success) {
+        console.error("Failed Request requestToApi/lycorisCafe", anime_id, req)
+        return undefined
+    }
     return { data: req.json }
 }
 
 export default class LycorisCafe implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.3",
+        version: "1.6",
         name: "Lycoris.cafe",
         author: "Owca525",
         icon: "https://www.lycoris.cafe/favicon.ico",
         urlWebsite: WEB,
-        supportLang: ["pl"]
+        supportLang: ["pl"],
+        type: "player"
     };
 
-    extractPlayerData = async (_type: string, episode: string, id: string): Promise<playerData[]> => {
+    extractPlayerData = async (_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
+        let mainEpisode: string = typeof episode == "object" ? episode.ep : episode
+
         let req = await requestToApi(id)
         if (!req) return []
         let episodes = req.data.anime["episodes"]
@@ -127,7 +150,7 @@ export default class LycorisCafe implements playerPluginFormat {
         let subtitles: playerSubtitlesFormat[] = []
         let chapters: playerChapterList[] = []
 
-        let tmp = episodes.find((element) => parseInt(element.number) == parseInt(episode))
+        let tmp = episodes.find((element) => parseInt(element.number) == parseInt(mainEpisode))
         if (!tmp) return []
 
         let reqID = await request(`${WEB}/api/watch/getVideoLink?id=${tmp.id}`, { headers: HEADER });
@@ -141,7 +164,7 @@ export default class LycorisCafe implements playerPluginFormat {
             let animeEpisodes = JSON.parse(atob(decodeData))
             for (const key in animeEpisodes) {
                 let res = detectResoltion(key)
-                if (animeEpisodes[key].length <= 0) continue 
+                if (animeEpisodes[key].length <= 0) continue
                 if (res == "Unknown") continue
                 currentEpisode.push({
                     res: res,
@@ -178,22 +201,23 @@ export default class LycorisCafe implements playerPluginFormat {
     }
     extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {
         let animeID = anime_id;
-        
+
         if (!animeID && animeData) {
             let animeList = await this.searchAnime(animeData.title.romaji, 1)
             if (animeList.length <= 0) return
-            animeID = SheepFinderAnime2000(animeList.map(v=>v.AnimeData), animeData)
+            animeID = SheepFinderAnime2000(animeList.map(v => v.AnimeData), animeData)
         }
         if (!animeID) return
 
         let req = await requestToApi(animeID)
         if (!req) return
         let tmpEpisodes = req.data.anime["episodes"]
-        let episodes: { ep: string, img?: string, title?: string }[] = tmpEpisodes.map((ep) => {
+        let episodes: episodeMetadata[] = tmpEpisodes.map((ep) => {
             return {
                 ep: ep["number"],
                 img: ep["thumbnail"],
-                title: ep["title"]
+                title: ep["title"],
+                uploadedUnix: dateToUnix(ep["airDate"])
             }
         })
 
@@ -206,20 +230,24 @@ export default class LycorisCafe implements playerPluginFormat {
         let req = await requestToApi(anime_id)
         if (!req) return []
         let tmpEpisodes = req.data.anime["episodes"]
-        let episodes: { ep: string, img?: string, title?: string }[] = tmpEpisodes.map((ep) => {
+        let episodes: episodeMetadata[] = tmpEpisodes.map((ep) => {
             return {
                 ep: ep["number"],
                 img: ep["thumbnail"],
-                title: ep["title"]
+                title: ep["title"],
+                uploadedUnix: dateToUnix(ep["airDate"])
             }
         })
 
         return episodes
     }
-    searchAnime = async (name: string, page: number, _params?: genresSearchFormat): Promise<cardData[]> => {
+    searchAnime = async (name: string, page: number, _params?: FilterPluginsParams): Promise<cardData[]> => {
         let url = `${WEB}/api/search?page=${page}&pageSize=12&search=${name}&genres=&status=&format=&year=&season=&source=&sortField=popularity&sortDirection=desc&preferRomaji=true`
         const req = await request(url, { headers: HEADER });
-        if (!req.success || !req.json) return []
+        if (!req.success || !req.json) {
+            console.warn("Failed Request searchAnime/LycorisCafe", req)
+            return []
+        }
 
         let data: cardData[] = req.json.data.map((element) => { return { AnimeData: convertToAnimeData(element) } })
         if (!data) return []

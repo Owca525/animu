@@ -1,5 +1,5 @@
 import { convertChaptersVTT, convertText, request } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, genresSearchFormat, playerPluginFormat, playerChapterList } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, FilterPluginsParams, playerPluginFormat, playerChapterList, episodeMetadata } from "@renderer/utils/types";
 
 const WEB = "https://anizone.to"
 const CARDS_REGEX = /<div[^>]*class=["']grid grid-cols-1 2xl:grid-cols-2 gap-4["'][^>]*>(.*?)<\/div>/gs
@@ -44,15 +44,18 @@ async function searchAnime(name: string): Promise<cardData[]> {
 
 export default class Anizone implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.1",
+        version: "1.2",
         name: "AniZone",
         author: "Owca525",
         supportLang: ["en", "pl", "de"],
-        urlWebsite: WEB
+        urlWebsite: WEB,
+        type: "player"
     };
 
-    extractPlayerData = async (_type: string, episode: string, id: string) => {
-        let url = `${WEB}/anime/${id}/${episode}`
+    extractPlayerData = async (_type: string, episode: episodeMetadata, id: string) => {
+        let mainEpisode: string = typeof episode == "object" ? episode.ep : episode
+
+        let url = `${WEB}/anime/${id}/${mainEpisode}`
 
         const req = await request(url, { headers: HEADER });
         if (!req.success) return []
@@ -159,7 +162,7 @@ export default class Anizone implements playerPluginFormat {
         if (!data) return []
         return data.episodesData[0].episodes
     }
-    searchAnime = async (name: string, _page: number, _params?: genresSearchFormat): Promise<cardData[]> => {
+    searchAnime = async (name: string, _page: number, _params?: FilterPluginsParams): Promise<cardData[]> => {
         return await searchAnime(name)
     }
 }

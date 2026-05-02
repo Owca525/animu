@@ -1,5 +1,5 @@
 import { convertMsToMinutes, makeSmallText, request } from "@renderer/utils/functions"
-import { AnimeData, episodeList, genresSearchFormat, playerPluginFormat, playerData } from "@renderer/utils/types"
+import { AnimeData, episodeList, FilterPluginsParams, playerPluginFormat, playerData, episodeMetadata } from "@renderer/utils/types"
 
 const HASH_SEARCH = 'a24c500a1b765c68ae1d8dd85174931f661c71369c89b92b88b75a725afc471c'
 const HASH_INFO = '043448386c7a686bc2aabfbb6b80f6074e795d350df48015023b079527b0848a'
@@ -10,10 +10,10 @@ const API_WEB = 'https://api.allanime.day'
 const header = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0',
     'Referer': 'https://allmanga.to/',
-    // "Host": "api.allanime.day"
+    "Origin": "https://allmanga.to/"
 }
 
-const source_names = ['Sak', 'S-mp4', 'Luf-mp4', "Kir", "Default", "Uv-mp4", "Mp4"]
+const source_names = ['Sak', 'S-mp4', 'Luf-mp4', "Kir", "Default", "Uv-mp4", "Mp4", "Yt-mp4"]
 // "Yt-mp4"
 // const normalUrls: string[] = []
 
@@ -35,7 +35,6 @@ const mapping: Record<string, string> = {
 function findUrl(url: string, sourceName: string): { url: string, decode: boolean, source: string } | undefined {
     for (let index = 0; index < source_names.length; index++) {
         const element = source_names[index];
-        console.log(sourceName, url)
         // if (element.toLowerCase() == sourceName.toLowerCase() && normalUrls.includes(element)) return { url, decode: false, source: sourceName }
         if (element.toLowerCase() == sourceName.toLowerCase()) {
             let tmpUrl = decodeText(url)
@@ -100,8 +99,60 @@ function converterData(data: any): AnimeData | undefined {
 async function requestToApi(variables: string, hash: string, header: any) {
     let url = `${API_WEB}/api?variables=${variables}&extensions={"persistedQuery":{"version":1,"sha256Hash":"${hash}"}}`
     let data = await request(url, { headers: header })
-    if (!data.success || data.json && data.json["errors"]) console.error("Allmanga request", data, url, header)
+
+    /* IFDEF DEBUG */
+    console.warn("requestToApi/allmanga", data)
+    /* ENDIF */
+
+    if (!data.success || data.json && data.json["error"]) console.error("Allmanga request", data, url, header)
     return data
+}
+
+function FuckBufferDosentWorkInElectron(base64: string): Uint8Array {
+  const binary = atob(base64);
+
+  const bytes = new Uint8Array(binary.length);
+
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+
+  return bytes;
+}
+async function fuckThisEncryptionMethod(encryptedMotherFucker: string) {
+    let bufferEncrypted = FuckBufferDosentWorkInElectron(encryptedMotherFucker)
+    let version = bufferEncrypted[0];
+
+    if (version !== 1) {
+        console.error("ALLMANGA CHANGED THEY FUCKING VERSION OF ENCRYPTION IMEDITLY SEND AS BUG REPORT NOW HAVE VERSION: ", version)
+        return
+    }
+
+    const encodedKey = (new TextEncoder).encode(`Xot36i3lK3:v${version}`)
+    const digestetCUM = await crypto.subtle.digest("SHA-256", encodedKey);
+
+    const cumKey = await crypto.subtle.importKey("raw", digestetCUM, {
+        name: "AES-GCM"
+    }, !1, ["decrypt"])
+
+    const randomSlicedBufferCum = bufferEncrypted.slice(1, 13)
+    let w = bufferEncrypted.slice(bufferEncrypted.length - 16)
+    let v = bufferEncrypted.slice(13, (bufferEncrypted.length - 16))
+    let O = new Uint8Array(v.length + w.length);
+    O.set(v);
+    O.set(w, v.length);
+
+    const decryptedCum = await crypto.subtle.decrypt({
+        name: "AES-GCM",
+        iv: randomSlicedBufferCum
+    }, cumKey, O);
+    return JSON.parse((new TextDecoder).decode(decryptedCum))
+}
+
+export function dateToUnix(dateStr: string | undefined): number | undefined {
+    if (!dateStr) return undefined
+    const date = new Date(dateStr);
+    return Math.floor(date.getTime() / 1000);
 }
 
 async function SearchAnimeInAllmanga(name: string, page: number): Promise<AnimeData[]> {
@@ -169,17 +220,19 @@ function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string 
     }
 }
 
-async function formatEpisodeData(data: any): Promise<{ ep: string, img?: string, title?: string }[]> {
+async function formatEpisodeData(data: any): Promise<episodeMetadata[]> {
     try {
         if (!data) return []
-        let finnallData: { ep: string, img?: string, title?: string }[] = []
+        let finnallData: episodeMetadata[] = []
         for (let index = 0; index < data.length; index++) {
             const element = data[index];
             const thumbnail = element.thumbnails.filter(url => url.startsWith("https"))
             finnallData.push({
                 ep: element.episodeIdNum,
-                img: thumbnail.length > 0 ? thumbnail[0] : undefined,
-                title: element.notes ? element.notes.replace("<note-split>", " ") : undefined
+                img: thumbnail.length > 0 ? thumbnail[0] : `https://wp.youtube-anime.com/aln.youtube-anime.com${element["thumbnails"][0]}?w=480`,
+                title: element.notes ? element.notes.replace("<note-split>", " ") : undefined,
+                uploadedUnix: dateToUnix(element["uploadDates"]["sub"]),
+                durration: element["vidInforssub"] ? element["vidInforssub"]["vidDuration"] : undefined
             })
         }
         return finnallData
@@ -189,7 +242,7 @@ async function formatEpisodeData(data: any): Promise<{ ep: string, img?: string,
     }
 }
 
-export async function extractEpisodes(anime_id: string, episode: { start: number, end: number }): Promise<{ ep: string, img?: string, title?: string }[]> {
+export async function extractEpisodes(anime_id: string, episode: { start: number, end: number }): Promise<episodeMetadata[]> {
     try {
         let variables = `{"showId":"${anime_id}","episodeNumStart":${parseInt(episode.start.toString())},"episodeNumEnd":${parseInt(episode.end.toString())}}`
         const resp = await requestToApi(variables, HASH_DATA, header)
@@ -206,8 +259,11 @@ export async function extractEpisodes(anime_id: string, episode: { start: number
 export async function extractInformation(id: string): Promise<{ episodes: { ep: string; img?: string; title?: string }[]; type: string; name?: string }[]> {
     let variables = `{"_id":"${id}"}`;
     const resp = await requestToApi(variables, HASH_INFO, header);
-    if (!resp.success || !resp.json || !resp.json.data.show) return []
-    let anime_data = resp.json.data.show
+    if (!resp.success || !resp.json || resp.json["errors"]) {
+        console.warn(resp)
+        return []
+    }
+    let anime_data = resp.json["data"]["show"]
     let episodes = await extractEpisodes(id, { start: parseInt(anime_data.availableEpisodesDetail.sub.at(-1)), end: parseInt(anime_data.availableEpisodesDetail.sub[0]) })
     if (episodes.length <= 0) episodes = anime_data["availableEpisodesDetail"]["sub"].map((v: string) => ({ ep: v }))
 
@@ -282,12 +338,13 @@ async function requestForUrl(url: string): Promise<playerData | undefined> {
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.14",
+        version: "1.17",
         name: "Allmanga",
         author: "Owca525",
         icon: "https://allmanga.to/android-icon-192x192.png",
         supportLang: ["en"],
         urlWebsite: "https://allmanga.to",
+        type: "player"
     }
     config: { [key: string]: any; } = {
         "settings.extensions.website": API_WEB,
@@ -297,15 +354,19 @@ export default class Allmanga implements playerPluginFormat {
         "HASH_DATA": HASH_DATA
     };
 
-    async extractPlayerData(type: string, episode: string, id: string) {
-        let variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${episode}"}`
+    async extractPlayerData(type: string, episode: episodeMetadata, id: string) {
+        let tmpEpisode = typeof episode == "object" ? episode["ep"] : episode
+
+        let variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${tmpEpisode}"}`
         try {
             const resp = await requestToApi(variables, HASH_PLAYER, header)
+
             if (!resp.success || !resp.json) return []
 
-            let jsonObject = resp.json
+            let jsonObject = await fuckThisEncryptionMethod(resp.json["data"]["tobeparsed"])
+            console.log(jsonObject)
 
-            const sources = jsonObject.data.episode.sourceUrls
+            const sources = jsonObject["episode"]["sourceUrls"]
             const urls: { url: string, decode: boolean, source: string }[] = sources
                 .map((tmp: { sourceUrl: string; sourceName: string }) =>
                     findUrl(tmp.sourceUrl, tmp.sourceName)
@@ -335,7 +396,7 @@ export default class Allmanga implements playerPluginFormat {
                         hostname: urlObject.hostname,
                         defaultHost: updatedItems.find((item) => item["sourceName"] == element.source ? item["active"] : false),
                         resolution: [{
-                            res: "",
+                            res: "1080",
                             url: element.url,
                             reqHeader: header
                         }],
@@ -343,31 +404,13 @@ export default class Allmanga implements playerPluginFormat {
                     })
                 }
             }
-
-            if (type == "dub" && jsonObject.data.episode.episodeInfo.vidInforsdub) {
+            if (jsonObject["episode"]["episodeInfo"][`vidInfors${type}`]) {
+                const main = jsonObject["episode"]["episodeInfo"][`vidInfors${type}`]
                 data.push({
                     hostname: "wp.youtube-anime.com", resolution: [{
-                        res: jsonObject.data.episode.episodeInfo.vidInforsdub.vidResolution.toString(), url: `https://aln.youtube-anime.com${jsonObject.data.episode.episodeInfo.vidInforsdub.vidPath}`,
+                        res: main["vidResolution"].toString(),
+                        url: `https://aln.youtube-anime.com${main["vidPath"]}`,
                         hls: false,
-                        doNotUseBackend: true
-                    }]
-                })
-            }
-            if (type == "raw" && jsonObject.data.episode.episodeInfo.vidInforsraw) {
-                data.push({
-                    hostname: "wp.youtube-anime.com", resolution: [{
-                        res: jsonObject.data.episode.episodeInfo.vidInforsraw.vidResolution.toString(), url: `https://aln.youtube-anime.com${jsonObject.data.episode.episodeInfo.vidInforsraw.vidPath}`,
-                        hls: false,
-                        doNotUseBackend: true
-                    }]
-                })
-            }
-            if (type == "sub" && jsonObject.data.episode.episodeInfo.vidInforssub) {
-                data.push({
-                    hostname: "wp.youtube-anime.com", resolution: [{
-                        res: jsonObject.data.episode.episodeInfo.vidInforssub.vidResolution.toString(), url: `https://aln.youtube-anime.com${jsonObject.data.episode.episodeInfo.vidInforssub.vidPath}`,
-                        hls: false,
-                        doNotUseBackend: true
                     }]
                 })
             }
@@ -387,8 +430,6 @@ export default class Allmanga implements playerPluginFormat {
                 tmpAnimeID = SheepFinderAnime2000(data, animeData)
             };
 
-            console.log(tmpAnimeID)
-
             if (!tmpAnimeID || tmpAnimeID == "") return
 
             let episodeList = await extractInformation(tmpAnimeID)
@@ -398,7 +439,7 @@ export default class Allmanga implements playerPluginFormat {
             return
         }
     }
-    async extractOnlyEpisodesList(type: string, anime_id: string): Promise<{ ep: string, img?: string, title?: string }[]> {
+    async extractOnlyEpisodesList(type: string, anime_id: string): Promise<episodeMetadata[]> {
         let episodes = await extractInformation(anime_id)
         for (let index = 0; index < episodes.length; index++) {
             const element = episodes[index];
@@ -406,7 +447,7 @@ export default class Allmanga implements playerPluginFormat {
         }
         return []
     }
-    async searchAnime(name: string, page: number, _params?: genresSearchFormat) {
+    async searchAnime(name: string, page: number, _params?: FilterPluginsParams) {
         let resp = await SearchAnimeInAllmanga(name.replaceAll('"', "").replaceAll('&', ""), page)
         return resp.map((card) => ({ AnimeData: card }))
     }
