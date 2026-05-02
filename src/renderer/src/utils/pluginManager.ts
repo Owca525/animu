@@ -1,5 +1,5 @@
 import { FilterPluginsParams, informationPluginFormat, Anilist_ListMutation, playerPluginInstanceFormat, AnimeData, cardData, episodeList, episodeMetadata, playerData, PluginManagerFormat, informationPluginInstanceFormat, playerPluginFormat, PluginMetadataFormat, PluginLoadedFormat, WorkerWrapperInstance, containerData, pluginRepoExpanded } from "./types";
-import { getPluginRepo, setInformationPlugin, setInformationPluginList, setPlayerPlugin, setPluginPlayerList, setPluginRepo } from "./stores/plugins";
+import { setInformationPlugin, setInformationPluginList, setPlayerPlugin, setPluginPlayerList, setPluginRepo } from "./stores/plugins";
 import { getConfig } from "./stores/config";
 import { CreateSHA256, dateToUnix, detectIndex, getPluginInitialConfig, getPluginsList, getRenderPath, request, setHomeData, updateObject } from "./functions";
 import semver from "semver";
@@ -9,6 +9,14 @@ import { toast, updateToast } from "./context/ToastNotification";
 import { unwrap } from "solid-js/store";
 const blob = new Blob([pluginFunctions], { type: "text/javascript" });
 const pluginFunctionsURL = URL.createObjectURL(blob);
+
+const availbeFunctions: { name: string, func: (...args) => Promise<any> }[] = [{
+    name: "request",
+    func: request as any
+}, {
+    name: "yt-dlp",
+    func: window.api.yt_dlp.run
+}]
 
 const workerDummyimport = `
 export const SheepFinderAnime2000 = () => {};
@@ -41,9 +49,13 @@ globalThis.window = window;
 async function initial() {
   try {
     const mod = await import("SET_WORKER_URL");
+    const loaded = new mod.default
     self.postMessage({
       ok: true,
-      result: (new mod.default).metadata,
+      result: {
+        metadata: loaded["metadata"],
+        config: loaded["config"],
+      },
     });
   } catch (err) {
     self.postMessage({
@@ -59,7 +71,8 @@ const WorkerPayload = `
 var window = { 
     location: ${JSON.stringify(location)},
     global: this,
-    request: async (url, options, noCors) => await callMainProcess("REQUESTAPI", { url, options, noCors }),
+    request: async (...args) => await callMainProcess("request", args),
+    yt_dlp: async (...args) => await callMainProcess("yt-dlp", args),
     animuAppInfo: "PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION",
     config: "CHANGE_TO_CONFIG_WHEN_ARE_PERMISIONS"
 };
@@ -76,9 +89,10 @@ async function functionWrapper(values, func, id) {
         self.postMessage({
                 type: "RESULT",
                 uuid: id,
-                value: response,
+                value: detectFunctionInObject(response),
             });
         } catch (error) {
+            console.error("functionWrapper", error)
             self.postMessage({
                 type: "RESULT",
                 uuid: id,
@@ -104,6 +118,7 @@ function detectFunctionInObject(object) {
                         ...endobject,
                         [key]: value.map((v) => detectFunctionInObject(v))
                     }
+                    continue
                 }
 
                 if (typeof value == "function") {
@@ -146,10 +161,9 @@ self.onmessage = async (event) => {
 
     if (data.type === "RESULT" && data.uuid) {
         const resolve = AnimuPendingFunctions.get(data.uuid);
-        if (resolve) {
-            resolve(data.value);
-            AnimuPendingFunctions.delete(data.uuid);
-        }
+        if (!resolve) return
+        resolve(data.value);
+        if (!data["stay"]) AnimuPendingFunctions.delete(data.uuid);
     }
 
     if (data.type === "CONFIG") {
@@ -162,20 +176,30 @@ self.onmessage = async (event) => {
             type: "RESULT",
             value: values != undefined ? JSON.parse(JSON.stringify(values)) : values,
             uuid: data["uuid"],
-            func: data["func"]
+            func: data["func"],
+            stay: data["stay"]
         });
+    }
+    
+    if (data.type === "CLEAR_CACHCE") {
+        if (!data["value"]) return
+
+        data["value"].forEach((v) => {
+            if (AnimuPendingFunctions.get(v)) AnimuPendingFunctions.delete(v)
+        })
     }
 };
 
-function callMainProcess(type, value) {
+function callMainProcess(func, args) {
     return new Promise((resolve) => {
         const id = crypto.randomUUID();
 
         AnimuPendingFunctions.set(id, resolve);
         self.postMessage({
-            type: type,
+            type: "API_FUNCTION",
             uuid: id,
-            value,
+            value: func,
+            args: args
         });
     });
 }
@@ -194,11 +218,14 @@ class WorkerWrapper implements WorkerWrapperInstance {
     pendingRequest = new Map<string, (value: unknown) => void>()
     otherDataPermision: boolean = false
 
+    weakRefCachce: { ref: WeakRef<{}>, id: string }[] = []
+    intervalCache: NodeJS.Timeout | undefined
+
     constructor(otherDataPermision = false) {
         this.otherDataPermision = otherDataPermision
     }
 
-    wrapperFunction = async (func: string, value?: { [key: string]: any }): Promise<any> => {
+    wrapperFunction = async (func: string, value?: { [key: string]: any }, stay: boolean = false): Promise<any> => {
         return new Promise((resolve, reject) => {
             if (!this.instance) return reject(new Error("Instance Dosen't Exist"))
             const id = crypto.randomUUID();
@@ -214,7 +241,8 @@ class WorkerWrapper implements WorkerWrapperInstance {
                 type: "RUN_FUNCTION",
                 uuid: id,
                 value,
-                func
+                func,
+                stay
             });
         });
     }
@@ -228,6 +256,7 @@ class WorkerWrapper implements WorkerWrapperInstance {
                 type: "RESULT",
                 uuid: uuid,
                 value: JSON.parse(JSON.stringify(value)),
+                stay: true
             });
         });
     }
@@ -242,6 +271,14 @@ class WorkerWrapper implements WorkerWrapperInstance {
             }
         } else {
             for (const [key, value] of Object.entries(object)) {
+                if (Array.isArray(value)) {
+                    finalObject = {
+                        ...finalObject,
+                        [key]: this.detectObjectHasAFunction(value)
+                    }
+                    continue
+                }
+
                 if (value && value["callbackID"]) {
                     finalObject = {
                         ...finalObject,
@@ -292,7 +329,7 @@ class WorkerWrapper implements WorkerWrapperInstance {
         worker.onmessage = async (event: MessageEvent<any>) => {
             const data = event.data
 
-            if (data.type === "RESULT" && data.uuid) {
+            if (data.type === "RESULT" && data["uuid"]) {
                 const resolve = this.pendingRequest.get(data.uuid);
                 if (!resolve) return
 
@@ -301,18 +338,40 @@ class WorkerWrapper implements WorkerWrapperInstance {
                     finalObject = this.detectObjectHasAFunction(data["value"])
                 }
 
-                console.log(finalObject)
+                if (data["stay"] && Object.entries(finalObject).length > 0) {
+
+                    this.weakRefCachce = [
+                        ...this.weakRefCachce,
+                        {
+                            ref: new WeakRef(finalObject),
+                            id: data["uuid"]
+                        }
+                    ]
+                }
 
                 resolve(Object.entries(finalObject).length > 0 ? finalObject : data.value);
-                this.pendingRequest.delete(data.uuid);
+                if (!data["stay"]) this.pendingRequest.delete(data.uuid);
             }
 
-            if (data["type"] === "REQUESTAPI") {
-                worker.postMessage({
-                    type: "RESULT",
-                    value: await request(data["value"]["url"], data["value"]["options"], data["value"]["noCors"]),
-                    uuid: data["uuid"]
-                })
+            if (data["type"] === "API_FUNCTION" && data["uuid"]) {
+                if (!data["value"]) return
+                const tmp = availbeFunctions.find((v) => v["name"] == data["value"])
+                if (!tmp) return
+
+                try {
+                    worker.postMessage({
+                        type: "RESULT",
+                        value: await tmp["func"](...data["args"]),
+                        uuid: data["uuid"]
+                    })
+                } catch (error) {
+                    console.error("Error Run Func", error)
+                    worker.postMessage({
+                        type: "RESULT",
+                        value: undefined,
+                        uuid: data["uuid"]
+                    })
+                }
             }
 
             if (data["type"] === "PLUGIN_METADATA") {
@@ -320,11 +379,31 @@ class WorkerWrapper implements WorkerWrapperInstance {
             }
         }
 
+        this.intervalCache = setInterval(() => {
+            const cache = this.weakRefCachce.filter((v) => {
+                if (!v["ref"]) return true
+
+                if (v["ref"].deref() == undefined) {
+                    console.log(`${v["id"]} cleared`)
+                    return true
+                }
+                return false
+            })
+
+            if (this.instance) {
+                this.instance.postMessage({
+                    type: "CLEAR_CACHCE",
+                    value: cache.map((v) => v["id"])
+                })
+            }
+        }, 30000)
+
         this.instance = worker
 
         return promise as any
     }
     destroy = () => {
+        if (this.intervalCache) clearInterval(this.intervalCache)
         if (this.instance) this.instance.terminate()
     }
 }
@@ -341,7 +420,7 @@ export class playerPluginInstance implements playerPluginInstanceFormat {
 
     extractPlayerData = async (type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
         if (!this.instance) return []
-        return await this.instance.wrapperFunction("extractPlayerData", { type, episode, id }) as any
+        return await this.instance.wrapperFunction("extractPlayerData", { type, episode, id }, true) as any
     }
     extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {
         if (!this.instance) return undefined
@@ -378,12 +457,12 @@ export class InformationPluginInstance implements informationPluginInstanceForma
 
     search = async (name: string, page: number, params?: FilterPluginsParams): Promise<containerData | { error: string; } | undefined> => {
         if (!this.instance) return
-        return await this.instance.wrapperFunction("search", { name, page, params }) as any
+        return await this.instance.wrapperFunction("search", { name, page, params }, true) as any
     }
 
     home = async (): Promise<{ topCards?: containerData; sections: containerData[]; } | { error: string; } | undefined> => {
         if (!this.instance) return
-        return await this.instance.wrapperFunction("home") as any
+        return await this.instance.wrapperFunction("home", undefined, true) as any
     }
 
     anime = async (id: string): Promise<AnimeData | undefined> => {
@@ -459,7 +538,8 @@ export class PluginManager implements PluginManagerFormat {
                     loadedPlugins = [
                         ...loadedPlugins,
                         {
-                            metadata: e["data"]["result"],
+                            metadata: e["data"]["result"]["metadata"],
+                            config: e["data"]["result"]["config"],
                             code: element["code"],
                             sha256: await CreateSHA256(element["code"])
                         }

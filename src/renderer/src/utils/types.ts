@@ -387,7 +387,7 @@ export interface WorkerWrapperInstance {
     destroy: () => void
     detectObjectHasAFunction: (object: { [key: string]: any }) => { [key: string]: any }
     wrapperObjectFunction: (value: { [key: string]: any }, uuid: string) => Promise<void>
-    wrapperFunction: (func: string, value?: { [key: string]: any }) => Promise<void>
+    wrapperFunction: (func: string, value?: { [key: string]: any }, stay?: boolean) => Promise<void>
 }
 
 export type playerPluginInstanceFormat = playerPluginFormat & {
@@ -405,7 +405,8 @@ export type informationPluginInstanceFormat = informationPluginFormat & {
 export type PluginLoadedFormat = {
     metadata: playerPluginFormat["metadata"],
     code: string,
-    sha256: string
+    sha256: string,
+    config?: { [key: string]: any }
 }
 
 export interface pluginsGlobalFormat {
