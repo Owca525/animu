@@ -343,7 +343,7 @@ function information() {
 
         if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", timer: false })
         updateToast(idToast, t("notification.successanime"), { type: "success", timer: false })
-        tmpAnimulist = animulist.find((v) => v.AnimeData.id == resp["anime"]["id"])?.animulist
+        tmpAnimulist = animulist.find((v) => v.AnimeData.id == resp["id"])?.animulist
         
         resetContentVariable()
         setmoreMiniTitle(false)
