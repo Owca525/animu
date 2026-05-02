@@ -1,22 +1,24 @@
-import { createContext, JSX, Show, createSignal } from "solid-js";
+import { createContext, JSX, Show, createSignal, For } from "solid-js";
 import { Portal } from "solid-js/web";
 import "./css/menuContext.css";
 import Button from "@renderer/components/buttons";
+import { unwrap } from "solid-js/store";
 
 interface menuContextType {
     showCustomMenu: (data: JSX.Element) => void;
     hideCustomMenu: () => void;
     isCustomMenuActive: () => boolean;
+    hideAllCustomMenu: () => void
 }
 
 const menuContext = createContext<menuContextType>();
 let customMenuApi: menuContextType | undefined;
 
 export function MenuContextProvider(props: { children: JSX.Element }) {
-    const [content, setContent] = createSignal<JSX.Element | undefined>();
+    const [content, setContent] = createSignal<JSX.Element[]>([]);
 
     function showCustomMenu(data: JSX.Element) {
-        setContent(data);
+        setContent((v) => [...v, data]);
     }
 
     function isCustomMenuActive() {
@@ -24,30 +26,42 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
     }
 
     function hideCustomMenu() {
-        setContent(undefined)
+        let tmp = unwrap(content())
+        tmp.pop()
+
+        setContent([])
+        setContent(tmp)
+    }
+
+    function hideAllCustomMenu() {
+        setContent([])
     }
 
     return (
         <menuContext.Provider
-            value={{ showCustomMenu, hideCustomMenu, isCustomMenuActive }}
+            value={{ showCustomMenu, hideCustomMenu, isCustomMenuActive, hideAllCustomMenu }}
         >
             {(() => {
-                customMenuApi = { showCustomMenu, hideCustomMenu, isCustomMenuActive };
+                customMenuApi = { showCustomMenu, hideCustomMenu, isCustomMenuActive, hideAllCustomMenu };
                 return undefined;
             })()}
             {props.children}
 
             <Show when={content()}>
-                <Portal>
-                    <main class="custom-menu-background">
-                        {content()}
-                        <Button
-                            icon="arrow_back"
-                            ButtonClass="custom-menu-exit-button"
-                            onClick={hideCustomMenu}
-                        />
-                    </main>
-                </Portal>
+                <For each={content()}>
+                    {(element) => (
+                        <Portal>
+                            <main class="custom-menu-background">
+                                {element}
+                                <Button
+                                    icon="arrow_back"
+                                    ButtonClass="custom-menu-exit-button"
+                                    onClick={hideCustomMenu}
+                                />
+                            </main>
+                        </Portal>
+                    )}
+                </For>
             </Show>
         </menuContext.Provider>
     );
@@ -66,4 +80,9 @@ export function hideCustomMenu() {
 export function isCustomMenuActive() {
     if (!customMenuApi) return false;
     return customMenuApi.isCustomMenuActive();
+}
+
+export function hideAllCustomMenu() {
+    if (!customMenuApi) return false;
+    return customMenuApi.hideAllCustomMenu();
 }

@@ -176,7 +176,7 @@ function information() {
 
         const lastTime = tempData().saveData?.lastAnimeDataUpdate
 
-        if (tempData().anime.status == "RELEASING" || !lastTime || calculateDays(lastTime, dateToUnix(new Date().toString())) >= 1 || config.information.alwaysUpdateAnime) {
+        if (tempData().anime.status == "RELEASING" || !lastTime || calculateDays(lastTime, dateToUnix(new Date().toString())) <= -1 || config.information.alwaysUpdateAnime) {
             await FetchAnimeForinformation()
             const tmpData = unwrap(tempData())
             const tmpUpdate = {

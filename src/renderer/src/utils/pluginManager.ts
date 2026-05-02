@@ -1,7 +1,7 @@
 import { FilterPluginsParams, informationPluginFormat, Anilist_ListMutation, playerPluginInstanceFormat, AnimeData, cardData, episodeList, episodeMetadata, playerData, PluginManagerFormat, informationPluginInstanceFormat, playerPluginFormat, PluginMetadataFormat, PluginLoadedFormat, WorkerWrapperInstance, containerData, pluginRepoExpanded } from "./types";
 import { setInformationPlugin, setInformationPluginList, setPlayerPlugin, setPluginPlayerList, setPluginRepo } from "./stores/plugins";
 import { getConfig } from "./stores/config";
-import { CreateSHA256, dateToUnix, detectIndex, getPluginInitialConfig, getPluginsList, getRenderPath, request, setHomeData, updateObject } from "./functions";
+import { CreateSHA256, dateToUnix, detectIndex, getPluginInitialConfig, getPluginsList, request, updateObject } from "./functions";
 import semver from "semver";
 import pluginFunctions from "./pluginFunctions.js?raw"
 import { saveConfig } from "./FilesManager/config";
@@ -104,6 +104,8 @@ async function functionWrapper(values, func, id) {
 function detectFunctionInObject(object) {
     if (object == undefined) return undefined
 
+    if (typeof object == "string") return object
+
     try {
         let endobject = Array.isArray(object) ? [] : {}
         if (Array.isArray(object)) {
@@ -116,7 +118,7 @@ function detectFunctionInObject(object) {
                 if (Array.isArray(value)) {
                     endobject = {
                         ...endobject,
-                        [key]: value.map((v) => detectFunctionInObject(v))
+                        [key]: detectFunctionInObject(value)
                     }
                     continue
                 }
@@ -261,8 +263,9 @@ class WorkerWrapper implements WorkerWrapperInstance {
         });
     }
 
-    detectObjectHasAFunction = (object) => {
+    detectObjectHasAFunction = (object): any => {
         let finalObject: any[] | { [key: string]: any } = Array.isArray(object) ? [] : {}
+        if (typeof object == "string") return object
 
         if (Array.isArray(object)) {
             for (let index = 0; index < object.length; index++) {
