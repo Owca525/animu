@@ -709,5 +709,3 @@ const d = import.meta.glob("../plugins/*.ts", {
 })
 console.log(d);
 /* ENDIF */
-
-(window as any).PluginManager = PluginManager;
