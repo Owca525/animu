@@ -10,8 +10,7 @@ const header = {
 }
 
 const playerHeader = {
-    "User-Agent":
-        "Mozilla/5.0 (X11; Linux x86_64; rv:149.0) Gecko/20100101 Firefox/149.0",
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:149.0) Gecko/20100101 Firefox/149.0",
     Accept: "*/*",
     "Accept-Language": "en-US,en;q=0.9",
     "Accept-Encoding": "gzip, deflate, br, zstd",
@@ -156,7 +155,7 @@ async function extractResolution(url: string) {
 
 export default class AnimePahe implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.1",
+        version: "1.2",
         name: "AnimePahe",
         author: "Owca525",
         supportLang: ["en"],

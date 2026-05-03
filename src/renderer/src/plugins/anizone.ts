@@ -44,7 +44,7 @@ async function searchAnime(name: string): Promise<cardData[]> {
 
 export default class Anizone implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.2",
+        version: "1.3",
         name: "AniZone",
         author: "Owca525",
         supportLang: ["en", "pl", "de"],

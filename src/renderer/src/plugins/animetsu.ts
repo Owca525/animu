@@ -152,7 +152,7 @@ export function dateToUnix(dateStr: string | undefined): number | undefined {
 
 export default class Animetsu implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.9",
+        version: "2.0",
         name: "Animetsu.Live",
         icon: `${WEBSITE}/android-chrome-192x192.png`,
         author: "Owca525",

@@ -100,7 +100,7 @@ function converterToCardData(data: { [key: string]: string | number }): cardData
 
 export default class Senshi implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.0",
+        version: "1.1",
         name: "Senshi",
         author: "Owca525",
         supportLang: ["en"],

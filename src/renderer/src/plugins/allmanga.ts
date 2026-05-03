@@ -338,7 +338,7 @@ async function requestForUrl(url: string): Promise<playerData | undefined> {
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.17",
+        version: "1.18",
         name: "Allmanga",
         author: "Owca525",
         icon: "https://allmanga.to/android-icon-192x192.png",
