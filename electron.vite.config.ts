@@ -152,7 +152,7 @@ function compileRawModule() {
         }
       )
 
-      if (process.env.ONLY_PLUGINS) {
+      if (process.env.ONLY_PLUGINS && !isDissabled) {
         if (!fs.existsSync(pluginsDir)) {
           fs.rmdirSync(pluginsDir)
           fs.mkdirSync(pluginsDir)
