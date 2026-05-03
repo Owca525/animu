@@ -8,6 +8,8 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
     let divRef: HTMLDivElement | undefined;
     let cardRef: HTMLDivElement | undefined;
     let intervalRef: NodeJS.Timeout | undefined;
+    let resizeInterval: NodeJS.Timeout | undefined
+
     const [isDragging, setIsDragging] = createSignal(false);
     const [startX, setStartX] = createSignal(0);
     const [scrollLeft, setScrollLeft] = createSignal(0);
@@ -71,12 +73,16 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
             behavior: "smooth",
         });
         setCurrentIndex(index);
-        restartAutoSlide();
+
+        handleUpdate()
+        stopAutoSlide();
+        startAutoSlide();
     }
 
     function startAutoSlide() {
         if (!divRef || !cardWidth()) return;
         if (intervalRef) clearInterval(intervalRef);
+
         intervalRef = setInterval(() => {
             setCurrentIndex((prev) => {
                 if (!divRef) return prev
@@ -92,10 +98,14 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
     };
 
     function restartAutoSlide() {
-        handleDotClick(currentIndex())
         handleUpdate()
         stopAutoSlide();
         startAutoSlide();
+
+        if (resizeInterval) clearTimeout(resizeInterval)
+        resizeInterval = setTimeout(() => {
+            handleDotClick(currentIndex())
+        }, 300)
     };
 
     return (
