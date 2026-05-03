@@ -560,13 +560,13 @@ export class PluginManager implements PluginManagerFormat {
 
     initialPlugins = async (): Promise<void> => {
         console.time('Animu Plugin Initializer Timer');
-        /* IFDEF DEBUG|PROD|WEB */
+
         const importedModules = import.meta.glob("../plugins/*.ts", {
             eager: true,
             query: "?compiledRaw",
             import: "default"
         })
-        /* ENDIF */
+
         let moduleList = Object.entries(importedModules).map(([path, code]) => ({
             path,
             code: code as string,
@@ -701,11 +701,3 @@ export class PluginManager implements PluginManagerFormat {
         await this.initialPlugins()
     }
 }
-
-/* IFDEF ONLYPLUGINS */
-const d = import.meta.glob("../plugins/*.ts", {
-    eager: false,
-    import: "default",
-})
-console.log(d);
-/* ENDIF */

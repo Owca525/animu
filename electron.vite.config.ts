@@ -12,6 +12,16 @@ function evalConditionOr(expr: string, flags: Record<string, boolean>) {
   return parts.some(flag => flags[flag] === true);
 }
 
+const globalFlags = {
+  DEBUG: process.env.NODE_ENV !== 'production' && process.env.ANIMU_WEB_DEV == undefined,
+  PROD: process.env.NODE_ENV == 'production' && process.env.ANIMU_WEB_DEV == undefined,
+  WEB: process.env.ANIMU_WEB_DEV ? true : false
+}
+
+const cwd = process.cwd()
+
+const pluginsDir = path.join(cwd, "compiledPlugins")
+
 function readAllLangFiles() {
   const folderPath = path.join(path.resolve(__dirname), "src/renderer/src/utils/lang/")
   const files = fs.readdirSync(path.join(path.resolve(__dirname), "src/renderer/src/utils/lang/"));
@@ -33,6 +43,20 @@ function readAllLangFiles() {
   return jsonData.filter(item => item !== undefined);
 }
 
+function ConditionTransform(code: string, flags: Record<string, boolean>): string {
+  const regex =
+    /(\/\*\s*#?IFDEF\s+(.+?)\s*\*\/|\{\s*\/\*\s*IFDEF\s+(.+?)\s*\*\/\s*\}|\/\/\s*IFDEF\s+(.+))([\s\S]*?)(\/\*\s*#?ENDIF\s*\*\/|\{\s*\/\*\s*ENDIF\s*\*\/\s*\}|\/\/\s*ENDIF)/gi;
+
+  code = code.replace(regex, (_, __, c1, c2, c3, inner) => {
+    const condition = (c1 || c2 || c3 || "").trim();
+    const enabled = evalConditionOr(condition, flags);
+
+    return enabled ? inner : "";
+  });
+
+  return code
+}
+
 export function viteConditionPlugin(flags: Record<string, boolean>): PluginOption {
   return {
     name: "viteConditionPlugin",
@@ -45,17 +69,7 @@ export function viteConditionPlugin(flags: Record<string, boolean>): PluginOptio
     transform(code: string, id: string) {
       if (!/\.(ts|tsx|js|jsx)$/.test(id)) return null;
 
-      const regex =
-        /(\/\*\s*#?IFDEF\s+(.+?)\s*\*\/|\{\s*\/\*\s*IFDEF\s+(.+?)\s*\*\/\s*\}|\/\/\s*IFDEF\s+(.+))([\s\S]*?)(\/\*\s*#?ENDIF\s*\*\/|\{\s*\/\*\s*ENDIF\s*\*\/\s*\}|\/\/\s*ENDIF)/gi;
-
-      code = code.replace(regex, (_, __, c1, c2, c3, inner) => {
-        const condition = (c1 || c2 || c3 || "").trim();
-        const enabled = evalConditionOr(condition, flags);
-
-        return enabled ? inner : "";
-      });
-
-      return { code, map: null };
+      return { code: ConditionTransform(code, flags), map: null };
     }
   };
 }
@@ -118,16 +132,35 @@ function compileRawModule() {
       if (code.startsWith("// DISSABLE")) isDissabled = true
 
       const result = await transformWithEsbuild(
-        code,
+        ConditionTransform(code, globalFlags),
         file,
         {
           loader: "ts",
           format: "esm",
-          target: "esnext"
+          target: "esnext",
         }
       );
 
-      return `export default ${JSON.stringify(isDissabled ? `` : `${result.code}`)}`;
+      const fixed = result.code.replace(
+        /import\s+([\s\S]*?)\s+from\s+["']([^"']+)["']/g,
+        (full, imports, path) => {
+          if (path.startsWith(".") || path.startsWith("@renderer")) {
+            return `import ${imports} from "./index.js"`
+          }
+
+          return full
+        }
+      )
+
+      if (process.env.ONLY_PLUGINS) {
+        if (!fs.existsSync(pluginsDir)) {
+          fs.rmdirSync(pluginsDir)
+          fs.mkdirSync(pluginsDir)
+        }
+        fs.writeFileSync(path.join(pluginsDir, path.basename(file).replace(".ts", ".js")), fixed, "utf-8")
+      }
+
+      return `export default ${JSON.stringify(isDissabled ? `` : `${fixed}`)}`;
     }
   };
 }
@@ -149,11 +182,7 @@ export default defineConfig({
           }
         ],
       }),
-      viteConditionPlugin({
-        DEBUG: process.env.NODE_ENV !== 'production' && process.env.ANIMU_WEB_DEV == undefined,
-        PROD: process.env.NODE_ENV == 'production' && process.env.ANIMU_WEB_DEV == undefined,
-        WEB: process.env.ANIMU_WEB_DEV ? true : false
-      }),
+      viteConditionPlugin(globalFlags),
     ]
   },
   preload: {

@@ -31,3 +31,4 @@ src/plugins/allmanga.ts
 out
 yarn.lock
 electron.vite.config.1739910625943.mjs
+compiledPlugins
