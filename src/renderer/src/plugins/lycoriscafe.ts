@@ -2,7 +2,16 @@ import { makeSmallText, request } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, FilterPluginsParams, playerPluginFormat, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, episodeMetadata } from "@renderer/utils/types";
 const WEB = "https://www.lycoris.cafe"
 const HEADER = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0'
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:149.0) Gecko/20100101 Firefox/149.0",
+    Accept: "*/*",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "Sec-GPC": "1",
+    Connection: "keep-alive",
+    Referer: WEB,
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "cross-site"
 }
 
 function timeToSeconds(time: string): number {
@@ -129,12 +138,36 @@ async function requestToApi(anime_id: string): Promise<{ data: any } | undefined
     return { data: req.json }
 }
 
+async function otherExtractor(id: string): Promise<playerData[]> {
+    try {
+        let reqID = await request(`${WEB}/api/watch/getRumbleVideoLink?id=${id}`, { headers: HEADER });
+        /* IFDEF DEBUG */
+        console.warn("otherExtractor/lycorisCafe", reqID)
+        /* ENDIF */
+        if (!reqID["success"] || !reqID["json"]) return []
+
+        return [{
+            hostname: "lycoris.cafe",
+            splitHLS: true,
+            resolution: Object.entries(reqID["json"]["allQualities"]).map(([res, data]) => ({
+                res: res,
+                url: data!["url"],
+                reqHeader: HEADER,
+                hls: true
+            })).reverse()
+        }]
+    } catch (error) {
+        console.error("Error otherExtractor Lycoris Cafe", error)
+        return []
+    }
+}
+
 export default class LycorisCafe implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.6",
+        version: "1.7",
         name: "Lycoris.cafe",
         author: "Owca525",
-        icon: "https://www.lycoris.cafe/favicon.ico",
+        icon: `${WEB}/favicon.ico`,
         urlWebsite: WEB,
         supportLang: ["pl"],
         type: "player"
@@ -154,7 +187,10 @@ export default class LycorisCafe implements playerPluginFormat {
         if (!tmp) return []
 
         let reqID = await request(`${WEB}/api/watch/getVideoLink?id=${tmp.id}`, { headers: HEADER });
-        if (!reqID.success) return []
+        /* IFDEF DEBUG */
+        console.warn("extractPlayerData/lycorisCafe", reqID)
+        /* ENDIF */
+        if (!reqID.success) return await otherExtractor(tmp.id)
         // if (!reqID.data.endWith("LC")) return []
 
         let decodeData = reqID.text.slice(0, -2)
