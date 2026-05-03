@@ -302,7 +302,7 @@ function initialServices() {
   const config = getConfig()
 
   /* IFDEF DEBUG|PROD */
-  if (config.update.type == "On Start") runService(checkUpdate, timeCovertToMs({ min: 60 }), t("Animu Update"))
+  if (config.update.type == "On Start") runService(checkUpdate, timeCovertToMs({ min: 60 }), t("Animu Update"), false, true)
   /* ENDIF */
 
   runService(checkPluginUpdate, timeCovertToMs({ min: 30 }), t("Plugin CheckUpdate"))

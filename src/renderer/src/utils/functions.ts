@@ -785,7 +785,7 @@ export function timeCovertToMs(time: { day?: number, month?: number, min?: numbe
     return 0
 }
 
-export function runService(func: () => Promise<any> | any, time: number, name: string, disable: boolean = false) {
+export function runService(func: () => Promise<any> | any, time: number, name: string, disable: boolean = false, dontRun: boolean = false) {
     const interval = disable ? undefined : setInterval(func, time)
     const tmp = {
         name: name,
@@ -793,7 +793,7 @@ export function runService(func: () => Promise<any> | any, time: number, name: s
         uuid: uuidv4(),
         func: func
     }
-    if (!disable) {
+    if (!disable && !dontRun) {
         try {
             func()
         } catch (error) { console.error("Failed Run Service", time, name) }
