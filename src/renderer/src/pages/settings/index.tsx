@@ -459,6 +459,8 @@ function settings() {
         const plugins = getAllPluginList()
         const infoPlugin = getInformationPlugin()
 
+        console.log(repo)
+
         return repo.map((item) => {
             if (item.type == "information") {
                 return { ...item, update: semver.gt(semver.coerce(item.ver) as any, semver.coerce(infoPlugin.metadata.version) as any), installed: true }

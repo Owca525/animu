@@ -280,12 +280,16 @@ function App() {
   )
 }
 
-async function checkPluginUpdate() {
+async function checkPluginUpdate(): Promise<any> {
   const config = getConfig()
   let tmpDatabase: pluginRepoExpanded[] = []
   try {
-    tmpDatabase = localStorage.getItem("AnimuPluginDatabase") ? JSON.parse(localStorage.getItem("AnimuPluginDatabase") as any) : await pluginManager().checkUpdates()
+    if (localStorage.getItem("AnimuPluginDatabase")) {
+      tmpDatabase = JSON.parse(localStorage.getItem("AnimuPluginDatabase") as any)
+    } else tmpDatabase = await pluginManager().checkUpdates()
   } catch (error) { console.warn("Error failed parsed pluginRepo Database", error) }
+
+  console.log(tmpDatabase)
 
   if (config.plugins.pluginCheckType == "On Start" || config.plugins.lastTimeCheck <= 0) return await pluginManager().checkUpdates()
   if (checkDate(config.plugins.lastTimeCheck, config.plugins.pluginCheckType)) await pluginManager().checkUpdates()

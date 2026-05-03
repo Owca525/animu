@@ -637,7 +637,7 @@ export class PluginManager implements PluginManagerFormat {
         return this.activeInformationPlugin
     }
 
-    checkUpdates = async (): Promise<void> => {
+    checkUpdates = async (): Promise<pluginRepoExpanded[]> => {
         const config = getConfig()
         let tmp: pluginRepoExpanded[] = []
 
@@ -672,6 +672,8 @@ export class PluginManager implements PluginManagerFormat {
             const element = reloadPlugin[index];
             this.installPlugin(element)
         }
+
+        return tmp
     }
 
     installPlugin = async (plugin: pluginRepoExpanded): Promise<void> => {
