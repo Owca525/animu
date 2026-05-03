@@ -337,9 +337,7 @@ class WorkerWrapper implements WorkerWrapperInstance {
                 if (!resolve) return
 
                 let finalObject = {}
-                if (typeof data["value"] == "object") {
-                    finalObject = this.detectObjectHasAFunction(data["value"])
-                }
+                if (typeof data["value"] == "object") finalObject = this.detectObjectHasAFunction(data["value"])
 
                 if (data["stay"] && Object.entries(finalObject).length > 0) {
 
@@ -351,6 +349,8 @@ class WorkerWrapper implements WorkerWrapperInstance {
                         }
                     ]
                 }
+
+                console.warn(data["uuid"], finalObject)
 
                 resolve(Object.entries(finalObject).length > 0 ? finalObject : data.value);
                 if (!data["stay"]) this.pendingRequest.delete(data.uuid);
