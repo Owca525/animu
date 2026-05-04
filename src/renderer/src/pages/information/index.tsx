@@ -259,22 +259,25 @@ function information() {
     }
 
     function detectTrailerMusic() {
+        genereteButtonsGroup()
+
         if (tempData().anime.format == "MUSIC") {
-            genereteButtonsGroup()
-            setContentLoading(false)
-            SetactivePage("Music")
+            buttonGroups().forEach((v) => {
+                if (v["value"] == "Music") v["onClick"]()
+            })
             if (tempData().anime.trailer == undefined) setContentNoData("No Music Found")
             return true
         }
 
         if (tempData().anime.type != "ANIME" || tempData().anime.status == "NOT_YET_RELEASED") {
-            genereteButtonsGroup()
-            setContentLoading(false)
+            buttonGroups().forEach((v) => {
+                if (v["value"] == "Trailer") v["onClick"]()
+            })
             SetactivePage("Trailer")
             if (tempData().anime.trailer == undefined) setContentNoData("No Trailer Found")
             return true
         }
-        genereteButtonsGroup()
+
         return false
     }
 
@@ -282,7 +285,7 @@ function information() {
         setTimeout(() => { setYouCanLeave(true) }, 300)
         initialInformation()
         if (config["information"]["preloadOpening"]) searchAnimeOpenings(true)
-        if (config["information"]["preloadTrailer"] && config["information"]["trailerplayertype"] == "player") 
+        if (config["information"]["preloadTrailer"] && config["information"]["trailerplayertype"] == "player")
             getAnimeTrailer(`https://www.youtube.com/watch?v=${tempData()["anime"]["trailer"]?.id}`)
     })
 
@@ -344,7 +347,7 @@ function information() {
         if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", timer: false })
         updateToast(idToast, t("notification.successanime"), { type: "success", timer: false })
         tmpAnimulist = animulist.find((v) => v.AnimeData.id == resp["id"])?.animulist
-        
+
         resetContentVariable()
         setmoreMiniTitle(false)
         if (currentPlugin()) await pluginManager().changePlayerPlugin(currentPlugin()!)
@@ -417,15 +420,13 @@ function information() {
     /* IFDEF DEBUG|PROD */
     async function getAnimeTrailer(url: string, noContentLoading = false) {
         try {
-            if (config["information"]["trailerplayertype"]) return
+            if (config["information"]["trailerplayertype"] == "embed") return
             if (!noContentLoading) {
                 resetContentVariable()
-                setContentLoading(true)
             }
 
             if (isATrailerFetching && activePage() == "Trailer") {
                 resetContentVariable()
-                setContentLoading(true)
                 return
             }
 
@@ -610,7 +611,7 @@ function information() {
                 // /* ENDIF */
             }
         })
- 
+
         setButtonGroups(tmp)
     }
 
