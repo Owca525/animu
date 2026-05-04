@@ -14,13 +14,13 @@
   transition: border-color 150ms ease;
   align-items: center;
   gap: 2px;
-  justify-content: end;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
   min-width: 0;
   font-size: 1em;
   min-width: fit-content;
+  justify-content: space-between;
 }
 
 .dropdown-button-icon {
@@ -62,7 +62,6 @@
 
   display: flex;
   gap: 4px;
-  align-items: center;
 }
 
 .dropdown-item-image {

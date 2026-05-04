@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For, onMount, Show } from "solid-js";
+import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import "./css/dropDown.css";
 
 export interface DropdownOption {
@@ -17,13 +17,28 @@ interface DropdownProps {
 }
 
 export default function Dropdown(props: DropdownProps) {
+  const dropdownID = crypto.randomUUID()
+
   const [isOpen, setIsOpen] = createSignal(false);
   const [text, setText] = createSignal(props.buttonText);
 
+  function checkIDSystem(event: MouseEvent) {
+    const target = event["target"] as HTMLElement
+    if (!("parentElement" in target)) return
+
+    if (target["parentElement"]!["id"] != dropdownID) setIsOpen(false)
+  }
+
   onMount(() => {
     setText(props.buttonText)
+
+    document.addEventListener('mousedown', checkIDSystem);
   })
 
+  onCleanup(() => {
+    document.removeEventListener('mousedown', checkIDSystem);
+  })
+  
   createEffect(() => {
     setText(props.buttonText)
   })
@@ -52,13 +67,12 @@ export default function Dropdown(props: DropdownProps) {
   };
 
   return (
-    <div tabIndex={-1} class={`dropdown-container ${props.dropClassName ?? ""}`}>
+    <div tabIndex={-1} id={dropdownID} class={`dropdown-container ${props.dropClassName ?? ""}`}>
       <div tabIndex={-1} class="dropdown-button" onClick={toggleDropdown}>
         <div
           tabIndex={-1}
-          class={`dropdown-button-text ${
-            (text() === "" || (props.options?.length ?? 0) <= 1) ? "dropdown-button-shadow-text" : ""
-          }`}
+          class={`dropdown-button-text ${(text() === "" || (props.options?.length ?? 0) <= 1) ? "dropdown-button-shadow-text" : ""
+            }`}
         >
           {displayText()}
         </div>
@@ -75,7 +89,7 @@ export default function Dropdown(props: DropdownProps) {
       </div>
 
       <Show when={isOpen() && (props.options?.length ?? 0) > 1}>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu" id={dropdownID}>
           <For each={props.options}>
             {option => (
               <li

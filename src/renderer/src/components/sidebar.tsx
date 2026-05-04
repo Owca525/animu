@@ -52,7 +52,7 @@ export default function Sidebar(props: sidebarProps) {
     if (props.onChange) props.onChange(sidebarHover())
   })
 
-  onMount(async () => {
+  onMount(() => {
     document.addEventListener('mousedown', handleClickOutside);
   })
   onCleanup(() => {

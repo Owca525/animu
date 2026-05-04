@@ -24,6 +24,7 @@ import {
   createSignal,
   ErrorBoundary,
   Match,
+  onCleanup,
   onMount,
   Suspense,
   Switch
@@ -45,7 +46,7 @@ import {
   setTodayAnimeInAnilist,
   setYT_DLPVersion
 } from './utils/stores/global';
-import { getConfig, setConfig } from './utils/stores/config';
+import { getConfig, setConfig, setGlobalState } from './utils/stores/config';
 import { pluginManager, setPluginRepo } from './utils/stores/plugins';
 import { HashRouter, Route } from '@solidjs/router';
 import { pluginRepoExpanded, themeMetadata } from './utils/types';
@@ -122,6 +123,20 @@ function App() {
 
   onMount(async () => {
     /* IFDEF WEB */
+    /* ENDIF */
+
+    /* IFDEF DEBUG|PROD */
+    let hiddenCallback = window.BrowserWindow.onWindowHidden((hidden: boolean) => {
+        setGlobalState((prev) => ({...prev, isAnimuHidden: hidden}))
+    })
+    let focusCallback = window.BrowserWindow.onWindowFocus((focus: boolean) => {
+        setGlobalState((prev) => ({...prev, isAnimuFocus: focus}))
+    })
+
+    onCleanup(() => {
+      hiddenCallback()
+      focusCallback()
+    })
     /* ENDIF */
 
     await pluginManager().initialPlugins()

@@ -47,29 +47,29 @@ export const isPluginSearchMode = () => globalState.pluginSearchMode;
 export const getCurrentYT_DLPVer = () => globalState.yt_dlp["ver"];
 export const getListOfVerYT_DLP = () => globalState.yt_dlp["listVer"];
 
-export const setYT_DLPVersion = (tmp: globalDataFormat["yt_dlp"]) => setGlobalState((prev) => ({...prev, yt_dlp: tmp}));
-export const setPluginSearchMode = (tmp: boolean) => setGlobalState((prev) => ({...prev, pluginSearchMode: tmp}));
-export const addOpeningCache = (id: number, op: animeOpeningsFormat[]) => setGlobalState((prev) => ({...prev, animeOpeningsCache: { ...prev.animeOpeningsCache, [id]: op }}));
-export const setTodayAnimeInAnilist = (tmp: cardData[]) => setGlobalState((prev) => ({...prev, todayAnimeAnilist: tmp}));
-export const setAudioOutput = (tmp: MediaDeviceInfo) => setGlobalState((prev) => ({...prev, audioOutput: tmp}));
-export const setSocket = (tmp: Socket) => setGlobalState((prev) => ({...prev, socket: { ...prev.socket as any, instance: tmp }}));
-export const setSocketRoom = (tmp: string) => setGlobalState((prev) => ({...prev, socket: { ...prev.socket as any, currentRoom: tmp }}));
-export const setActiveThemes = (tmp: Map<number, themeMetadata>) => setGlobalState((prev) => ({...prev, activeThemes: tmp}));
-export const setGlobalTheme = (tmp: themeMetadata[]) => setGlobalState((prev) => ({...prev, loadedTheme: tmp}));
-export const setIncognitoMode = (tmp: boolean) => setGlobalState((prev) => ({...prev, incognito: tmp}));
-export const setDeeplinkRunned = (tmp: boolean) => setGlobalState((prev) => ({...prev, deeplinkRunned: tmp}));
-export const setGlobalHistory = (tmp: cardData[]) => setGlobalState((prev) => ({...prev, history: [...tmp]}));
-export const setGlobalToken = (tmp: UUIDTypes | undefined) => setGlobalState((prev) => ({...prev, token: tmp}));
-export const setAnimulistData = (tmp: globalDataFormat["animuList"]) => setGlobalState((prev) => ({...prev, animuList: tmp}));
-export const setDeepLink = (tmp: deeplinkFormat) => setGlobalState((prev) => ({...prev, deepLinks: [...prev.deepLinks, tmp]}));
-export const addNotification = (tmp: NotificationProps) => setGlobalState((prev) => ({...prev, notifications: [...prev.notifications, tmp]}));
-export const modifyNotification = (tmp: NotificationProps) => setGlobalState((prev) => ({...prev, notifications: prev.notifications.map((v) => v["title"] == tmp["title"] ? tmp : v)}));
+export const setYT_DLPVersion = (tmp: globalDataFormat["yt_dlp"]) => setGlobalState((prev) => ({ ...prev, yt_dlp: tmp }));
+export const setPluginSearchMode = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, pluginSearchMode: tmp }));
+export const addOpeningCache = (id: number, op: animeOpeningsFormat[]) => setGlobalState((prev) => ({ ...prev, animeOpeningsCache: { ...prev.animeOpeningsCache, [id]: op } }));
+export const setTodayAnimeInAnilist = (tmp: cardData[]) => setGlobalState((prev) => ({ ...prev, todayAnimeAnilist: tmp }));
+export const setAudioOutput = (tmp: MediaDeviceInfo) => setGlobalState((prev) => ({ ...prev, audioOutput: tmp }));
+export const setSocket = (tmp: Socket) => setGlobalState((prev) => ({ ...prev, socket: { ...prev.socket as any, instance: tmp } }));
+export const setSocketRoom = (tmp: string) => setGlobalState((prev) => ({ ...prev, socket: { ...prev.socket as any, currentRoom: tmp } }));
+export const setActiveThemes = (tmp: Map<number, themeMetadata>) => setGlobalState((prev) => ({ ...prev, activeThemes: tmp }));
+export const setGlobalTheme = (tmp: themeMetadata[]) => setGlobalState((prev) => ({ ...prev, loadedTheme: tmp }));
+export const setIncognitoMode = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, incognito: tmp }));
+export const setDeeplinkRunned = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, deeplinkRunned: tmp }));
+export const setGlobalHistory = (tmp: cardData[]) => setGlobalState((prev) => ({ ...prev, history: [...tmp] }));
+export const setGlobalToken = (tmp: UUIDTypes | undefined) => setGlobalState((prev) => ({ ...prev, token: tmp }));
+export const setAnimulistData = (tmp: globalDataFormat["animuList"]) => setGlobalState((prev) => ({ ...prev, animuList: tmp }));
+export const setDeepLink = (tmp: deeplinkFormat) => setGlobalState((prev) => ({ ...prev, deepLinks: [...prev.deepLinks, tmp] }));
+export const addNotification = (tmp: NotificationProps) => setGlobalState((prev) => ({ ...prev, notifications: [...prev.notifications, tmp] }));
+export const modifyNotification = (tmp: NotificationProps) => setGlobalState((prev) => ({ ...prev, notifications: prev.notifications.map((v) => v["title"] == tmp["title"] ? tmp : v) }));
 
-export const removeDeepLink = (name: string) => setGlobalState((prev) => ({...prev, deepLinks: prev.deepLinks.filter((item) => item.name != name)}));
-export const ActiveService = (tmp: serviceFormat[]) => setGlobalState((prev) => ({...prev, service: tmp}));
+export const removeDeepLink = (name: string) => setGlobalState((prev) => ({ ...prev, deepLinks: prev.deepLinks.filter((item) => item.name != name) }));
+export const ActiveService = (tmp: serviceFormat[]) => setGlobalState((prev) => ({ ...prev, service: tmp }));
 export const FindService = (tmp: string) => globalState.service.find((item) => item.name == tmp);
 export const DisableService = (tmp: serviceFormat) => setGlobalState((prev) => ({
-    ...prev, 
+    ...prev,
     service: prev.service.map((v) => {
         if (v.uuid == tmp.uuid) {
             clearInterval(v.interval)
@@ -79,25 +79,14 @@ export const DisableService = (tmp: serviceFormat) => setGlobalState((prev) => (
     }).filter((val) => val.uuid != tmp.uuid)
 }));
 
-export const setAnilistUserData = (tmp: { [key: string]: any; } | undefined) => setGlobalState((prev) => ({...prev, anilist_user_data: tmp}));
-
-/* IFDEF DEBUG|PROD */
-if (window.BrowserWindow) {
-    window.BrowserWindow.onWindowHidden((hidden: boolean) => {
-        setGlobalState((prev) => ({...prev, isAnimuHidden: hidden}))
-    })
-    window.BrowserWindow.onWindowFocus((focus: boolean) => {
-        setGlobalState((prev) => ({...prev, isAnimuFocus: focus}))
-    })
-}
-/* ENDIF */
+export const setAnilistUserData = (tmp: { [key: string]: any; } | undefined) => setGlobalState((prev) => ({ ...prev, anilist_user_data: tmp }));
 
 /* IFDEF WEB */
 window.addEventListener("focus", () => {
-    setGlobalState((prev) => ({...prev, isAnimuFocus: true}))
+    setGlobalState((prev) => ({ ...prev, isAnimuFocus: true }))
 });
 
 window.addEventListener("blur", () => {
-    setGlobalState((prev) => ({...prev, isAnimuFocus: false}))
+    setGlobalState((prev) => ({ ...prev, isAnimuFocus: false }))
 });
 /* ENDIF */
