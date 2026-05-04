@@ -351,6 +351,8 @@ export interface playerPluginFormat {
     extractEpisodeList(animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined>
     extractOnlyEpisodesList(type: string, anime_id: string): Promise<episodeMetadata[]>
     searchAnime(name: string, page: number, params?: FilterPluginsParams): Promise<cardData[]>
+
+    raportStatus?: () => Promise<{ search: serverStatusData, player: serverStatusData, episodes: serverStatusData }>
 }
 
 export interface PluginMetadataFormat {
@@ -402,11 +404,23 @@ export type informationPluginInstanceFormat = informationPluginFormat & {
     clear(): void
 }
 
+export interface serverStatusData {
+    time: number,
+    error?: string,
+    work: boolean
+}
+
 export type PluginLoadedFormat = {
     metadata: playerPluginFormat["metadata"],
     code: string,
     sha256: string,
     config?: { [key: string]: any }
+
+    serverStatus?: {
+        search: serverStatusData,
+        player: serverStatusData,
+        episodes: serverStatusData
+    } 
 }
 
 export interface pluginsGlobalFormat {
@@ -434,6 +448,7 @@ export interface PluginManagerFormat {
     initialPlugins(): Promise<void>
     changePlayerPlugin(name: string): Promise<playerPluginFormat>
     changeInformationPlugin(name: string): Promise<informationPluginFormat>
+    checkStatusServerInPlugins(): Promise<void>
 
     checkUpdates(): Promise<pluginRepoExpanded[]>
     installPlugin(plugin: pluginRepoExpanded): Promise<void>

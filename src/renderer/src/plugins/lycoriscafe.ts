@@ -1,5 +1,5 @@
 import { makeSmallText, request } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, FilterPluginsParams, playerPluginFormat, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, episodeMetadata } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, FilterPluginsParams, playerPluginFormat, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, episodeMetadata, serverStatusData } from "@renderer/utils/types";
 const WEB = "https://www.lycoris.cafe"
 const HEADER = {
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:149.0) Gecko/20100101 Firefox/149.0",
@@ -290,4 +290,47 @@ export default class LycorisCafe implements playerPluginFormat {
         return data
     }
 
+    raportStatus = async (): Promise<{ search: serverStatusData; player: serverStatusData; episodes: serverStatusData; }> => {
+        let results: serverStatusData[] = []
+
+        async function wrapper(func: (...args) => any): Promise<serverStatusData | undefined> {
+            try {
+                const start = performance.now();
+                const response = await func()
+                const end = performance.now();
+
+                return {
+                    time: end - start,
+                    work: response.length > 0
+                }
+            } catch (error) {
+                return undefined
+            }
+        }
+
+        const functions = [
+            async () => this.searchAnime("Tokidoki Bosotto Russiago de Dereru Tonari no Alya-san", 1), 
+            async () => this.extractPlayerData("sub", { ep: "4" }, "189046"),
+            async () => this.extractOnlyEpisodesList("sub", "189046"),
+        ]
+
+        for (let index = 0; index < functions.length; index++) {
+            const element = functions[index];
+            const tmp = await wrapper(element)
+            if (!tmp) {
+                results.push({
+                    time: 0,
+                    work: false
+                })
+            } else {
+                results.push(tmp)
+            }
+        }
+
+        return {
+            search: results[0],
+            player: results[1],
+            episodes: results[2]
+        }
+    }
 }

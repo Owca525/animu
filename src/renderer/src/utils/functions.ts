@@ -360,7 +360,35 @@ export function segregatePlugins(func: (name: string) => void): DropdownOption[]
     let list: DropdownOption[] = []
     for (let index = 0; index < data.length; index++) {
         const element = data[index];
-        list.push({ label: element.metadata.name, onClick: () => func(element.metadata.name) })
+        let icon = "check_circle"
+        let iconclass = "green"
+
+        if (element["serverStatus"]) {
+            const values = Object.values(element["serverStatus"])
+
+            const filtered = values.filter((v) => v["time"] > 1000)
+            if (filtered.length > 0) {
+                icon = "info"
+                iconclass = "yellow"
+            }
+
+            values.forEach((v) => {
+                if (!v["work"]) {
+                    icon = "block"
+                    iconclass = "red"
+                }
+            })
+        } else {
+            icon = "help"
+            iconclass = "gray"
+        }
+
+        list.push({ 
+            label: element.metadata.name, 
+            onClick: () => func(element.metadata.name),
+            icon: icon,
+            classIcon: iconclass
+        })
     }
 
     return list

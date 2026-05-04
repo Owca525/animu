@@ -1,5 +1,5 @@
 import { FilterPluginsParams, informationPluginFormat, Anilist_ListMutation, playerPluginInstanceFormat, AnimeData, cardData, episodeList, episodeMetadata, playerData, PluginManagerFormat, informationPluginInstanceFormat, playerPluginFormat, PluginMetadataFormat, PluginLoadedFormat, WorkerWrapperInstance, containerData, pluginRepoExpanded } from "./types";
-import { setInformationPlugin, setInformationPluginList, setPlayerPlugin, setPluginPlayerList, setPluginRepo } from "./stores/plugins";
+import { setInformationPlugin, setPlayerPlugin, setPluginRepo } from "./stores/plugins";
 import { getConfig } from "./stores/config";
 import { CreateSHA256, dateToUnix, detectIndex, getPluginInitialConfig, getPluginsList, request, updateObject } from "./functions";
 import semver from "semver";
@@ -151,6 +151,8 @@ function detectFunctionInObject(object) {
 async function wrapperFunction(func, value) {
     try {
         if (!value) value = {}
+        if (typeof window["loadedPlugin"][func] != "function") return undefined
+
         return await window["loadedPlugin"][func](...Object.values(value))
     } catch (error) {
         console.error("Sandbox/wrapperFunction", error);
@@ -548,17 +550,46 @@ export class PluginManager implements PluginManagerFormat {
                         }
                     ]
 
+                    console.warn("Loaded Config", loadedPlugins)
                     if (plugins.length == index + 1) promiseResolve(loadedPlugins)
                 } else console.error("FAILED LOAD PLUGIN", e, element)
                 worker.terminate()
             };
-
         })
 
         return promise
     }
 
+    checkStatusServerInPlugins = async (): Promise<void> => {
+        const plugins = structuredClone(this.playerPluginList)
+
+        for (let index = 0; index < plugins.length; index++) {
+            const element = plugins[index];
+
+            const tmp = new WorkerWrapper
+            await tmp.runInstance(element["code"])
+
+            const results = await tmp.wrapperFunction("raportStatus")
+            tmp.destroy()
+
+            if (!results || typeof results != "object") {
+                this.playerPluginList = this.playerPluginList.map((v) => {
+                    if (v["code"] == element["code"]) return { ...element, serverStatus: undefined }
+                    return v
+                })
+            } else {
+                this.playerPluginList = this.playerPluginList.map((v) => {
+                    if (v["code"] == element["code"]) return { ...element, serverStatus: results }
+                    return v
+                })
+            }
+        }
+    }
+
     initialPlugins = async (): Promise<void> => {
+        if (this.isInitializingPlugins) return
+        this.isInitializingPlugins = true
+
         console.time('Animu Plugin Initializer Timer');
 
         const importedModules = import.meta.glob("../plugins/*.ts", {
@@ -586,6 +617,8 @@ export class PluginManager implements PluginManagerFormat {
         let pluginsMetadata = await this.dummyLoader(moduleList)
         console.timeEnd('Plugins Taken Metadata');
 
+        console.warn("Plugin Metadata", pluginsMetadata)
+
         pluginsMetadata = pluginsMetadata.filter((item, _, arr) => {
             return !arr.some(
                 other =>
@@ -599,13 +632,13 @@ export class PluginManager implements PluginManagerFormat {
                 index === self.findIndex(i => i.metadata.name === item.metadata.name)
         )
 
+        console.warn("Checked Plugin Metadata", pluginsMetadata)
+
         this.informationPluginList = pluginsMetadata.filter((v) => v["metadata"]["type"] == "information")
         this.playerPluginList = pluginsMetadata.filter((v) => v["metadata"]["type"] == "player")
-        setInformationPluginList(this.informationPluginList)
-        setPluginPlayerList(this.playerPluginList)
-
         if (this.informationPluginList.length <= 0) throw Error("No Information Plugin Critial State")
         if (this.playerPluginList.length <= 0) throw Error("No Player Plugins Critial State")
+        this.isInitializingPlugins = false
         console.timeEnd('Animu Plugin Initializer Timer');
     }
 

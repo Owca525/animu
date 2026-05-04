@@ -1,5 +1,5 @@
 import { makeSmallText, request } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerChapterList, playerData, playerPluginFormat, resolutionFormat } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerChapterList, playerData, playerPluginFormat, resolutionFormat, serverStatusData } from "@renderer/utils/types";
 
 const WEBSITE = "https://senshi.live"
 
@@ -212,4 +212,47 @@ export default class Senshi implements playerPluginFormat {
         }
     }
 
+    raportStatus = async (): Promise<{ search: serverStatusData; player: serverStatusData; episodes: serverStatusData; }> => {
+        let results: serverStatusData[] = []
+
+        async function wrapper(func: (...args) => any): Promise<serverStatusData | undefined> {
+            try {
+                const start = performance.now();
+                const response = await func()
+                const end = performance.now();
+
+                return {
+                    time: end - start,
+                    work: response.length > 0
+                }
+            } catch (error) {
+                return undefined
+            }
+        }
+
+        const functions = [
+            async () => this.searchAnime("Oshi No Ko", 1), 
+            async () => this.extractPlayerData("sub", "1" as any, "52034"),
+            async () => this.extractOnlyEpisodesList("sub", "dq0rz"),
+        ]
+
+        for (let index = 0; index < functions.length; index++) {
+            const element = functions[index];
+            const tmp = await wrapper(element)
+            if (!tmp) {
+                results.push({
+                    time: 0,
+                    work: false
+                })
+            } else {
+                results.push(tmp)
+            }
+        }
+
+        return {
+            search: results[0],
+            player: results[1],
+            episodes: results[2]
+        }
+    }
 }

@@ -28,6 +28,19 @@
   user-select: none;
 }
 
+.dropdown-icon.red {
+  color: var(--red-one);
+}
+.dropdown-icon.gray {
+  color: var(--text-gray);
+}
+.dropdown-icon.yellow {
+  color: var(--blue-one);
+}
+.dropdown-icon.green {
+  color: var(--green-one);
+}
+
 .dropdown-button-icon {
   font-size: 1.2em;
 }

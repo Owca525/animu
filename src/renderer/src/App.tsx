@@ -320,6 +320,10 @@ async function runCheckUpdate() {
 function initialServices() {
   const config = getConfig()
 
+  runService(async () => {
+    await pluginManager().checkStatusServerInPlugins()
+  }, timeCovertToMs({ min: 45 }), t("Check Status Of Player Plugins"))
+
   /* IFDEF DEBUG|PROD */
   if (config.update.type == "On Start") runService(checkUpdate, timeCovertToMs({ min: 60 }), t("Animu Update"), false, true)
   /* ENDIF */
