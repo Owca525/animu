@@ -279,7 +279,7 @@ function information() {
     }
 
     onMount(() => {
-        setTimeout(() => { setYouCanLeave(true) }, 500)
+        setTimeout(() => { setYouCanLeave(true) }, 300)
         initialInformation()
         if (config["information"]["preloadOpening"]) searchAnimeOpenings(true)
         if (config["information"]["preloadTrailer"] && config["information"]["trailerplayertype"] == "player") 
@@ -530,6 +530,7 @@ function information() {
     }
 
     createShortcut(["Escape"], () => {
+        console.log(location.href, youCanleave())
         if (!location.href.includes("#/info") || !youCanleave()) return
 
         if (isCustomMenuActive()) return hideCustomMenu()

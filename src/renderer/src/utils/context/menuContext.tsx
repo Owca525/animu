@@ -22,7 +22,7 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
     }
 
     function isCustomMenuActive() {
-        return content() ? true : false;
+        return content().length > 0;
     }
 
     function hideCustomMenu() {
