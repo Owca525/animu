@@ -3,11 +3,13 @@ import "./css/dropDown.css";
 
 export interface DropdownOption {
   label: string;
+  icon?: string;
+  classIcon?: string
   onClick?: (text: string) => void;
 }
 
 interface DropdownProps {
-  options?: DropdownOption[];
+  options: DropdownOption[];
   placeholder?: string;
   placeholderChange?: () => string | undefined;
   buttonText?: string;
@@ -21,6 +23,7 @@ export default function Dropdown(props: DropdownProps) {
 
   const [isOpen, setIsOpen] = createSignal(false);
   const [text, setText] = createSignal(props.buttonText);
+  const [current, setCurrent] = createSignal<DropdownOption | undefined>();
 
   function checkIDSystem(event: MouseEvent) {
     const target = event["target"] as HTMLElement
@@ -31,6 +34,7 @@ export default function Dropdown(props: DropdownProps) {
 
   onMount(() => {
     setText(props.buttonText)
+    setCurrent(props.options.find((v) => v["label"] == props.buttonText))
 
     document.addEventListener('mousedown', checkIDSystem);
   })
@@ -41,6 +45,7 @@ export default function Dropdown(props: DropdownProps) {
   
   createEffect(() => {
     setText(props.buttonText)
+    setCurrent(props.options.find((v) => v["label"] == props.buttonText))
   })
 
   const toggleDropdown = () => setIsOpen(prev => !prev);
@@ -68,12 +73,15 @@ export default function Dropdown(props: DropdownProps) {
 
   return (
     <div tabIndex={-1} id={dropdownID} class={`dropdown-container ${props.dropClassName ?? ""}`}>
-      <div tabIndex={-1} class="dropdown-button" onClick={toggleDropdown}>
+      <div tabIndex={-1} id={dropdownID} class="dropdown-button" onClick={toggleDropdown}>
         <div
           tabIndex={-1}
           class={`dropdown-button-text ${(text() === "" || (props.options?.length ?? 0) <= 1) ? "dropdown-button-shadow-text" : ""
             }`}
         >
+          <Show when={current() && current()!["icon"]}>
+            <span class={`material-symbols-outlined dropdown-icon ${current()!["classIcon"]}`}>{current()!["icon"]}</span>
+          </Show>
           {displayText()}
         </div>
         <Show when={text() === "" && !props.disableX}>
@@ -97,6 +105,9 @@ export default function Dropdown(props: DropdownProps) {
                 onClick={() => handleOptionClick(option)}
                 title={option.label}
               >
+                <Show when={option.icon}>
+                  <span class={`material-symbols-outlined dropdown-icon ${option.classIcon}`}>{option.icon}</span>
+                </Show>
                 {option.label}
               </li>
             )}

@@ -23,6 +23,11 @@
   justify-content: space-between;
 }
 
+.dropdown-icon {
+  font-size: 22px !important;
+  user-select: none;
+}
+
 .dropdown-button-icon {
   font-size: 1.2em;
 }
@@ -62,6 +67,8 @@
 
   display: flex;
   gap: 4px;
+
+  align-items: center;
 }
 
 .dropdown-item-image {
