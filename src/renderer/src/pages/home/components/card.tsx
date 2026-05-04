@@ -23,7 +23,8 @@ import AnimulistMenu from "@renderer/components/animulistMenu";
 interface CardProps {
   card: cardData;
   disableinformation?: boolean;
-  containerClick?: () => void
+  containerClick?: () => void;
+  small: boolean
 }
 
 function Card(props: CardProps) {
@@ -286,7 +287,7 @@ function Card(props: CardProps) {
     <div
       tabIndex={-1}
       ref={cardRef}
-      class="card-container"
+      class={`card-container ${props.small ? "small" : ""}`}
       onClick={sendToInformation}
       onMouseOver={checkOutOfBound}
       title={detectTitleConfig(props.card.AnimeData.title)}

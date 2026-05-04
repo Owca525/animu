@@ -1,8 +1,6 @@
 .card-container {
     position: relative;
     height: min-content;
-    width: 155px;
-    min-width: 155px;
     cursor: pointer;
     display: flex;
     justify-content: center;
@@ -21,6 +19,10 @@
     transform: translateY(-20px);
 }
 
+.card-container.small {
+    width: clamp(120px, 20vw, 150px);
+}
+
 .card-container.show {
     z-index: 1;
     opacity: 1;
@@ -28,8 +30,8 @@
 }
 
 .card-image, .card-image-placeholder, .big-card-image-placehorder-container {
-    max-width: 260px;
-    max-height: 220px;
+    max-width: clamp(140px, 20vw, 260px);
+    max-height: clamp(120px, 20vw, 220px);
     width: max-content;
     height: max-content;
     aspect-ratio: 2 / 3;
@@ -38,7 +40,7 @@
 
 .card-image-placeholder, .big-card-image-placehorder-container {
     width: max-content;
-    height: 220px;
+    height: clamp(120px, 20vw, 220px) ;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -46,7 +48,7 @@
 }
 
 .card-title {
-    font-size: 1em;
+    font-size: clamp(.9em, 0.8vw, 1.1em);
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;

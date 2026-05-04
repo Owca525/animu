@@ -145,7 +145,7 @@ function Container(props: containerData) {
         <Show when={animeCards().length > 0}>
           <div tabIndex={-1} class={props.horizontal ? "container-data-horizontal" : "container-data"} ref={container}>
             <For each={animeCards()}>
-              {(card) => (<Card card={card} containerClick={updateAfterChangePage} />)}
+              {(card) => (<Card card={card} containerClick={updateAfterChangePage} small={animeCards().length <= 15} />)}
             </For>
           </div>
         </Show>

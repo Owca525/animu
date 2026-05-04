@@ -20,10 +20,12 @@
 .main-container {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: clamp(2px, 1vw, 8px);
     position: relative;
     opacity: 0;
     animation: firstShow 0.2s ease forwards;
+
+    padding-bottom: 6px;
 }
 
 .container-data {
