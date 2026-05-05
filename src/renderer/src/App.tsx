@@ -9,6 +9,7 @@ import {
   changeTheme,
   checkAnimeTodayReleaseEpisode,
   checkDate,
+  checkTimeDriffrentUnix,
   dateToUnix,
   FetchAnilistUserData,
   getTodayAnilistAnime,
@@ -127,10 +128,10 @@ function App() {
 
     /* IFDEF DEBUG|PROD */
     let hiddenCallback = window.BrowserWindow.onWindowHidden((hidden: boolean) => {
-        setGlobalState((prev) => ({...prev, isAnimuHidden: hidden}))
+      setGlobalState((prev) => ({ ...prev, isAnimuHidden: hidden }))
     })
     let focusCallback = window.BrowserWindow.onWindowFocus((focus: boolean) => {
-        setGlobalState((prev) => ({...prev, isAnimuFocus: focus}))
+      setGlobalState((prev) => ({ ...prev, isAnimuFocus: focus }))
     })
 
     onCleanup(() => {
@@ -321,6 +322,11 @@ function initialServices() {
   const config = getConfig()
 
   runService(async () => {
+    try {
+      const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
+      if (tmp && checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])["min"] < 44) return
+    } catch (error) {}
+
     await pluginManager().checkStatusServerInPlugins()
   }, timeCovertToMs({ min: 45 }), t("Check Status Of Player Plugins"))
 

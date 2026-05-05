@@ -232,8 +232,8 @@ export default class Senshi implements playerPluginFormat {
 
         const functions = [
             async () => this.searchAnime("Oshi No Ko", 1), 
-            async () => this.extractPlayerData("sub", "1" as any, "52034"),
-            async () => this.extractOnlyEpisodesList("sub", "dq0rz"),
+            async () => this.extractPlayerData("sub", "1" as any, "61316"),
+            async () => this.extractOnlyEpisodesList("sub", "52034"),
         ]
 
         for (let index = 0; index < functions.length; index++) {

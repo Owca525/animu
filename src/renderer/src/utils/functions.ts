@@ -1408,3 +1408,15 @@ export async function CreateSHA256(text: string) {
 
   return hashHex;
 };
+
+export function checkTimeDriffrentUnix(start: number, end: number): { hour: number; min: number; sec: number; } {
+  const diff = Math.abs(end - start);
+
+  const hour = Math.floor(diff / 3600);
+  const min = Math.floor((diff % 3600) / 60);
+  const sec = diff % 60;
+
+  console.warn("checkTimeDriffrentUnix", { hour, min, sec })
+
+  return { hour, min, sec };
+}

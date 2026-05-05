@@ -1,7 +1,7 @@
 import { FilterPluginsParams, informationPluginFormat, Anilist_ListMutation, playerPluginInstanceFormat, AnimeData, cardData, episodeList, episodeMetadata, playerData, PluginManagerFormat, informationPluginInstanceFormat, playerPluginFormat, PluginMetadataFormat, PluginLoadedFormat, WorkerWrapperInstance, containerData, pluginRepoExpanded } from "./types";
-import { setInformationPlugin, setPlayerPlugin, setPluginRepo } from "./stores/plugins";
+import { getPlayerPluginList, setInformationPlugin, setPlayerPlugin, setPluginRepo } from "./stores/plugins";
 import { getConfig } from "./stores/config";
-import { CreateSHA256, dateToUnix, detectIndex, getPluginInitialConfig, getPluginsList, request, updateObject } from "./functions";
+import { checkTimeDriffrentUnix, CreateSHA256, dateToUnix, detectIndex, getPluginsList, request, updateObject } from "./functions";
 import semver from "semver";
 import pluginFunctions from "./pluginFunctions.js?raw"
 import { saveConfig } from "./FilesManager/config";
@@ -517,6 +517,19 @@ export class PluginManager implements PluginManagerFormat {
     dummyLoader = async (plugins: { path: string; code: string; official: boolean }[]): Promise<PluginLoadedFormat[]> => {
         let loadedPlugins: PluginLoadedFormat[] = []
 
+        let cache: Map<string, PluginLoadedFormat["serverStatus"]> = new Map()
+
+        try {
+            const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
+            if (tmp && checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])["min"] < 44) {
+                tmp["plugins"].forEach((element: PluginLoadedFormat) => {
+                    cache.set(element["metadata"]["name"], element["serverStatus"])
+                })
+            }
+        } catch (error) {
+            console.error("PluginManager/dummyLoader Failed Take Server Status Cachce", error)
+        }
+
         const blobDummy = new Blob([workerDummyimport], { type: "text/javascript" });
         let dummyImportURL = URL.createObjectURL(blobDummy);
 
@@ -546,6 +559,7 @@ export class PluginManager implements PluginManagerFormat {
                             metadata: e["data"]["result"]["metadata"],
                             config: e["data"]["result"]["config"],
                             code: element["code"],
+                            serverStatus: cache.get(e["data"]["result"]["metadata"]["name"]),
                             sha256: await CreateSHA256(element["code"])
                         }
                     ]
@@ -561,29 +575,48 @@ export class PluginManager implements PluginManagerFormat {
     }
 
     checkStatusServerInPlugins = async (): Promise<void> => {
-        const plugins = structuredClone(this.playerPluginList)
+        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", getPlayerPluginList(), this.playerPluginList)
+        let ended: number = 1
 
-        for (let index = 0; index < plugins.length; index++) {
-            const element = plugins[index];
-
+        getPlayerPluginList().forEach(async (element, _, array) => {
             const tmp = new WorkerWrapper
             await tmp.runInstance(element["code"])
 
-            const results = await tmp.wrapperFunction("raportStatus")
-            tmp.destroy()
+            tmp.wrapperFunction("raportStatus").then((results) => {
+                console.error(element["metadata"]["name"], results, element)
+                if (!results || typeof results != "object") {
+                    this.playerPluginList = getPlayerPluginList().map((v) => {
+                        if (v["code"] == element["code"]) return { ...element, serverStatus: undefined }
+                        return v
+                    })
+                } else {
+                    this.playerPluginList = getPlayerPluginList().map((v) => {
+                        if (v["code"] == element["code"]) return { ...element, serverStatus: results }
+                        return v
+                    })
+                }
+                tmp.destroy()
 
-            if (!results || typeof results != "object") {
-                this.playerPluginList = this.playerPluginList.map((v) => {
-                    if (v["code"] == element["code"]) return { ...element, serverStatus: undefined }
-                    return v
-                })
-            } else {
-                this.playerPluginList = this.playerPluginList.map((v) => {
-                    if (v["code"] == element["code"]) return { ...element, serverStatus: results }
-                    return v
-                })
-            }
-        }
+                ended += 1
+                if (ended == array.length) {
+                    localStorage.setItem("pluginStatusCachce", JSON.stringify({
+                        plugins: getPlayerPluginList(),
+                        time: dateToUnix(new Date().toString())
+                    }))
+                }
+            }).catch((error) => {
+                console.error(`pluginManager/checkStatusServerInPlugins Failed Check Status of ${element["metadata"]["name"]}`, error);
+                tmp.destroy()
+
+                ended += 1
+                if (ended == array.length) {
+                    localStorage.setItem("pluginStatusCachce", JSON.stringify({
+                        plugins: getPlayerPluginList(),
+                        time: dateToUnix(new Date().toString())
+                    }))
+                }
+            })
+        })
     }
 
     initialPlugins = async (): Promise<void> => {
@@ -643,6 +676,8 @@ export class PluginManager implements PluginManagerFormat {
     }
 
     changePlayerPlugin = async (name: string): Promise<playerPluginFormat> => {
+        if (this.activePlayerPlugin.metadata.name == name) return this.activePlayerPlugin
+
         console.time('Player Plugin Change Timer');
         let findedPlugin = this.playerPluginList.find((p) => p["metadata"]["name"] == name);
 
@@ -657,6 +692,8 @@ export class PluginManager implements PluginManagerFormat {
     }
 
     changeInformationPlugin = async (name: string): Promise<informationPluginFormat> => {
+        if (this.activeInformationPlugin.metadata.name == name) return this.activeInformationPlugin
+
         console.time('Information Plugin Change Timer');
         let findedPlugin = this.informationPluginList.find((p) => p["metadata"]["name"] == name);
 
