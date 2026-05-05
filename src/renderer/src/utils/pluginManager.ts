@@ -576,7 +576,6 @@ export class PluginManager implements PluginManagerFormat {
 
     checkStatusServerInPlugins = async (): Promise<void> => {
         console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", getPlayerPluginList(), this.playerPluginList)
-        let ended: number = 1
 
         getPlayerPluginList().forEach(async (element, _, array) => {
             const tmp = new WorkerWrapper
@@ -597,24 +596,18 @@ export class PluginManager implements PluginManagerFormat {
                 }
                 tmp.destroy()
 
-                ended += 1
-                if (ended == array.length) {
-                    localStorage.setItem("pluginStatusCachce", JSON.stringify({
-                        plugins: getPlayerPluginList(),
-                        time: dateToUnix(new Date().toString())
-                    }))
-                }
+                localStorage.setItem("pluginStatusCachce", JSON.stringify({
+                    plugins: array,
+                    time: dateToUnix(new Date().toString())
+                }))
             }).catch((error) => {
                 console.error(`pluginManager/checkStatusServerInPlugins Failed Check Status of ${element["metadata"]["name"]}`, error);
                 tmp.destroy()
 
-                ended += 1
-                if (ended == array.length) {
-                    localStorage.setItem("pluginStatusCachce", JSON.stringify({
-                        plugins: getPlayerPluginList(),
-                        time: dateToUnix(new Date().toString())
-                    }))
-                }
+                localStorage.setItem("pluginStatusCachce", JSON.stringify({
+                    plugins: array,
+                    time: dateToUnix(new Date().toString())
+                }))
             })
         })
     }
