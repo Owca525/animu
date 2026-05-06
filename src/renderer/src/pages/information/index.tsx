@@ -18,6 +18,9 @@ import {
     refetchHistory,
     SaveToClipboard,
     segregatePlugins,
+    sortCharacterType,
+    sortEpisodes,
+    sortRelationType,
     unixToDateTime,
 } from '@renderer/utils/functions';
 import {
@@ -128,10 +131,10 @@ function information() {
             // if (tempData().anime.id == "" && !player_id) return setEpisodeResponse(await plugin.extractEpisodeList(tempData().anime, undefined)) deprecated
 
             let plugin = await pluginManager().changePlayerPlugin(pluginName as string)
-            console.log(plugin)
-            if (!plugin) return
+
             let response = await plugin.extractEpisodeList(tempData().anime, player_id as string)
-            return response
+
+            return sortEpisodes(response)
         },
         cacheTime: 7200000,
         disable: true,
@@ -170,6 +173,15 @@ function information() {
     }
 
     async function checkAnimeFetching() {
+        setTmpData((prev: informationTmpProps) => ({
+            ...prev,
+            anime: {
+                ...prev["anime"],
+                relations: sortRelationType(prev["anime"]["relations"]),
+                characters: sortCharacterType(prev["anime"]["characters"])
+            }
+        }))
+
         if (tempData().anime.id == "") return
 
         if (tempData().anime["nextAiringEpisode"]) return
@@ -328,6 +340,14 @@ function information() {
         }
 
         setTmpData((prev) => ({ ...prev, anime: tmpnewFetch }))
+        setTmpData((prev: informationTmpProps) => ({
+            ...prev,
+            anime: {
+                ...prev["anime"],
+                relations: sortRelationType(prev["anime"]["relations"]),
+                characters: sortCharacterType(prev["anime"]["characters"])
+            }
+        }))
         updateHistoryData(tempData().anime.id, { AnimeData: tmpnewFetch, saveData: unwrap(tempData().saveData) })
         checkIsAnimeReleasing()
     }

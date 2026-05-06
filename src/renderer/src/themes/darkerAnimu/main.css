@@ -64,7 +64,7 @@ body {
 }
 
 ::-webkit-scrollbar {
-  background-color: var(--first-layer);
+  background-color: var(--invisible);
 }
 
 ::-webkit-scrollbar-thumb {

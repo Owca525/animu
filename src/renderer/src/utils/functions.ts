@@ -5,6 +5,7 @@ import {
     ContextMenuProps,
     DateObject,
     deepLinkData,
+    episodeList,
     FilterParams,
     FilterPluginsParams,
     homeData,
@@ -383,8 +384,8 @@ export function segregatePlugins(func: (name: string) => void): DropdownOption[]
             iconclass = "gray"
         }
 
-        list.push({ 
-            label: element.metadata.name, 
+        list.push({
+            label: element.metadata.name,
             onClick: () => func(element.metadata.name),
             icon: icon,
             classIcon: iconclass
@@ -1370,53 +1371,106 @@ export function convertTimeStringToSeconds(time: string | undefined) {
 }
 
 export function formatDate(dateInput: string) {
-  const date = new Date(dateInput);
-  const now = new Date();
+    const date = new Date(dateInput);
+    const now = new Date();
 
-  const diffMs = now.getTime() - date.getTime();
-  const diffSeconds = Math.floor(diffMs / 1000);
-  const diffMinutes = Math.floor(diffSeconds / 60);
-  const diffHours = Math.floor(diffMinutes / 60);
-  const diffDays = Math.floor(diffHours / 24);
+    const diffMs = now.getTime() - date.getTime();
+    const diffSeconds = Math.floor(diffMs / 1000);
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
 
-  if (diffHours < 24) {
-    if (diffHours <= 0) return "Just Now";
-    return `${diffHours} Hour${diffHours !== 1 ? "s" : ""} Ago`;
-  }
+    if (diffHours < 24) {
+        if (diffHours <= 0) return "Just Now";
+        return `${diffHours} Hour${diffHours !== 1 ? "s" : ""} Ago`;
+    }
 
-  if (diffDays < 7) {
-    return `${diffDays} Day${diffDays !== 1 ? "s" : ""} Ago`;
-  }
+    if (diffDays < 7) {
+        return `${diffDays} Day${diffDays !== 1 ? "s" : ""} Ago`;
+    }
 
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
 
-  return `${day}.${month}.${year}`;
+    return `${day}.${month}.${year}`;
 }
 
 export async function CreateSHA256(text: string) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(text);
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
 
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
 
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray
-    .map(b => b.toString(16).padStart(2, "0"))
-    .join("");
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
 
-  return hashHex;
+    return hashHex;
 };
 
 export function checkTimeDriffrentUnix(start: number, end: number): { hour: number; min: number; sec: number; } {
-  const diff = Math.abs(end - start);
+    const diff = Math.abs(end - start);
 
-  const hour = Math.floor(diff / 3600);
-  const min = Math.floor((diff % 3600) / 60);
-  const sec = diff % 60;
+    const hour = Math.floor(diff / 3600);
+    const min = Math.floor((diff % 3600) / 60);
+    const sec = diff % 60;
 
-  console.warn("checkTimeDriffrentUnix", { hour, min, sec })
+    console.warn("checkTimeDriffrentUnix", { hour, min, sec })
 
-  return { hour, min, sec };
+    return { hour, min, sec };
+}
+
+export function parseEpisode(ep: string) {
+    const match = ep.match(/^(\d+)([a-zA-Z]*)$/);
+
+    return {
+        num: match ? parseInt(match[1], 10) : Infinity,
+        suffix: match ? match[2] : ""
+    };
+}
+
+export function sortEpisodes(data: episodeList | undefined): episodeList | undefined {
+    if (!data) return
+
+    return {
+        ...data,
+        episodesData: data["episodesData"].map((v) => ({
+            ...v,
+            episodes: v["episodes"].sort((a, b) => {
+                const epA = parseEpisode(a.ep.toString());
+                const epB = parseEpisode(b.ep.toString());
+
+                if (epA.num !== epB.num) return epA.num - epB.num;
+                return epA.suffix.localeCompare(epB.suffix);
+            })
+        }))
+    }
+}
+
+export function sortCharacterType(content: AnimeData["characters"]) {
+    if (!content) return []
+
+    const priority = {
+        "MAIN": 0,
+    };
+
+    return content.sort((a, b) => {
+        return (priority[a.role] ?? 999) - (priority[b.role] ?? 999);
+    });
+}
+
+export function sortRelationType(content: AnimeData["relations"]) {
+    if (!content) return []
+
+    const priority = {
+        "ADAPTATION": 0,
+        "SEQUEL": 1,
+        "PREQUEL": 2
+    };
+
+    return content.sort((a, b) => {
+        return (priority[a.relationType] ?? 999) - (priority[b.relationType] ?? 999);
+    });
 }
