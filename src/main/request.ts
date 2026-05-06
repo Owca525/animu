@@ -33,7 +33,7 @@ export async function advanceRequest(url: string, options?: { method?: "POST" | 
 
         return convertedResponse;
     } catch (error) {
-        console.error(`Error in advanceRequest: ${(error as Error).message} ${(error as Error).name} ${(error as Error).cause} \n ${(error as Error).stack}`)
+        console.error(`Error in advanceRequest: ${(error as Error).message} ${(error as Error).name} ${(error as Error).cause} \n ${(error as Error).stack}`, url)
         return {
             text: (error as Error).message,
             json: undefined,
