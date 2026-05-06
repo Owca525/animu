@@ -80,6 +80,7 @@ const ContainerWrong: Component<ContainerWrongProps> = ({ name, exitfunc, refetc
                                 <Card
                                     card={{ AnimeData: card.AnimeData, onClick: () => refetchfunc(card.AnimeData.player_ID) }}
                                     disableinformation
+                                    small={response.data()!.length < 15}
                                 />
                             )}
                         </For>

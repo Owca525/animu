@@ -24,7 +24,7 @@ interface CardProps {
   card: cardData;
   disableinformation?: boolean;
   containerClick?: () => void;
-  small: boolean
+  small?: boolean
 }
 
 function Card(props: CardProps) {
