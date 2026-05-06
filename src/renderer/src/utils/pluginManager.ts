@@ -662,8 +662,8 @@ export class PluginManager implements PluginManagerFormat {
 
         console.warn("Checked Plugin Metadata", pluginsMetadata)
 
-        this.informationPluginList = pluginsMetadata.filter((v) => v["metadata"]["type"] == "information")
-        this.playerPluginList = pluginsMetadata.filter((v) => v["metadata"]["type"] == "player")
+        this.informationPluginList = structuredClone(pluginsMetadata).filter((v) => v["metadata"]["type"] == "information")
+        this.playerPluginList = structuredClone(pluginsMetadata).filter((v) => v["metadata"]["type"] == "player")
         if (this.informationPluginList.length <= 0) throw Error("No Information Plugin Critial State")
         if (this.playerPluginList.length <= 0) throw Error("No Player Plugins Critial State")
         this.isInitializingPlugins = false
