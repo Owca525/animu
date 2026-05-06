@@ -31,6 +31,8 @@ interface sidebarProps {
 export default function Sidebar(props: sidebarProps) {
   const { t, pathExist } = useI18n()
 
+  let intervalLeft: NodeJS.Timeout | undefined
+
   const [sidebarHover, setHover] = createSignal<boolean>(false)
   const [currentButton, setCurrentButton] = createSignal<number>(
     props.activeElement ?
@@ -98,12 +100,24 @@ export default function Sidebar(props: sidebarProps) {
 
   return (
     <div class={detectSidebarState()} ref={sidebarRef}
-      // initial={showLogo ? "visible" : "hidden"}
-      // animate={showLogo ? "visible" : sidebarHover ? "visible" : "hidden"}
-      // variants={sidebarVariants}
-      // transition={{ duration: 0.2 }}
-      onMouseEnter={() => props.showLogo && setHover(() => true)}
-      onMouseLeave={() => props.showLogo && setHover(() => false)}
+      onMouseEnter={() => {
+        if (!props.showLogo) return
+        
+        clearTimeout(intervalLeft)
+
+        intervalLeft = setTimeout(() => {
+          setHover(() => true)
+        }, 100)
+      }}
+      onMouseLeave={() => {
+        if (!props.showLogo) return
+
+        clearTimeout(intervalLeft)
+
+        intervalLeft = setTimeout(() => {
+          setHover(() => false)
+        }, 100)
+      }}
     >
       <Show when={props.showLogo}>
         <div class="sidebar-logo-icon-container">
