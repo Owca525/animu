@@ -324,7 +324,8 @@ function initialServices() {
   runService(async () => {
     try {
       const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
-      if (tmp && checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])["min"] < 44) return
+      const time = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])
+      if (time["min"] < 44 || time["hour"] > 0) return
     } catch (error) {}
 
     await pluginManager().checkStatusServerInPlugins()

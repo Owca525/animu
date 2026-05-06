@@ -521,7 +521,8 @@ export class PluginManager implements PluginManagerFormat {
 
         try {
             const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
-            if (tmp && checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])["min"] < 44) {
+            const time = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])
+            if (time["min"] < 44 || time["hour"] > 0) {
                 tmp["plugins"].forEach((element: PluginLoadedFormat) => {
                     cache.set(element["metadata"]["name"], element["serverStatus"])
                 })
