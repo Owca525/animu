@@ -515,7 +515,7 @@ export class PluginManager implements PluginManagerFormat {
     isInitializingPlugins: boolean = false;
 
     dummyLoader = async (plugins: { path: string; code: string; official: boolean }[]): Promise<PluginLoadedFormat[]> => {
-        let loadedPlugins: PluginLoadedFormat[] = []
+        let LoadedMetadataPlugins: PluginLoadedFormat[] = []
 
         let cache: Map<string, PluginLoadedFormat["serverStatus"]> = new Map()
 
@@ -535,14 +535,14 @@ export class PluginManager implements PluginManagerFormat {
         let dummyImportURL = URL.createObjectURL(blobDummy);
 
         let promiseResolve: (value: any) => void
-        const promise = new Promise((resolve: (v: PluginLoadedFormat[]) => void, reject) => {
+        const promise = new Promise((resolve: (v: PluginLoadedFormat[]) => void) => {
             promiseResolve = resolve
             setTimeout(() => {
-                reject("Failed Load All Plugins")
-            }, 50 * plugins.length)
+                resolve(LoadedMetadataPlugins)
+            }, 100 * plugins.length)
         })
 
-        plugins.forEach((element, index) => {
+        plugins.forEach((element) => {
             const blobCode = new Blob([detectIndex(element["code"], dummyImportURL)], { type: "text/javascript" });
             let codeURL = URL.createObjectURL(blobCode);
 
@@ -554,19 +554,15 @@ export class PluginManager implements PluginManagerFormat {
             worker.onmessage = async (e) => {
                 if (e.data["ok"]) {
 
-                    loadedPlugins = [
-                        ...loadedPlugins,
-                        {
-                            metadata: e["data"]["result"]["metadata"],
-                            config: e["data"]["result"]["config"],
-                            code: element["code"],
-                            serverStatus: cache.get(e["data"]["result"]["metadata"]["name"]),
-                            sha256: await CreateSHA256(element["code"])
-                        }
-                    ]
+                    LoadedMetadataPlugins.push({
+                        metadata: e["data"]["result"]["metadata"],
+                        config: e["data"]["result"]["config"],
+                        code: element["code"],
+                        serverStatus: cache.get(e["data"]["result"]["metadata"]["name"]),
+                        sha256: await CreateSHA256(element["code"])
+                    })
 
-                    console.warn("Loaded Config", loadedPlugins)
-                    if (plugins.length == index + 1) promiseResolve(loadedPlugins)
+                    if (LoadedMetadataPlugins.length == plugins.length) promiseResolve(LoadedMetadataPlugins)
                 } else console.error("FAILED LOAD PLUGIN", e, element)
                 worker.terminate()
             };
@@ -576,7 +572,6 @@ export class PluginManager implements PluginManagerFormat {
     }
 
     checkStatusServerInPlugins = async (): Promise<void> => {
-        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", getPlayerPluginList(), this.playerPluginList)
         const initialTime = dateToUnix(new Date().toString())
 
         getPlayerPluginList().forEach(async (element, _, array) => {

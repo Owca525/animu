@@ -12,6 +12,23 @@ import { SocketProvider } from './utils/context/SocketContext';
 
 (window as any).animuAppInfo = "PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION";
 
+/* IFDEF DEBUG */
+const originalAddEventListener = document.addEventListener;
+const originalRemoveEventListener = document.removeEventListener;
+
+document.addEventListener = function(type, listener, options) {
+  console.log("Event Added", type);
+  console.trace()
+  return originalAddEventListener.call(this, type, listener, options);
+};
+
+document.removeEventListener = function(type, listener, options) {
+  console.log("Event Removed", type);
+  console.trace()
+  return originalRemoveEventListener.call(this, type, listener, options);
+};
+/* ENDIF */
+
 if (window.BrowserWindow) {
   render(
     () => (
