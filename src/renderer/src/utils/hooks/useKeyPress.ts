@@ -1,5 +1,6 @@
 import { onMount, onCleanup } from "solid-js";
 import { convertKeybinds } from "../functions";
+import { isAnimuFocus, isAnimuHidden } from "../stores/global";
 
 export function useKeyPress(func: (keybinds: string) => void) {
   let keysRef: string[] = [];
@@ -25,14 +26,30 @@ export function useKeyPress(func: (keybinds: string) => void) {
     funcRef(keysRef.join("+"));
   };
 
-  onMount(() => {
+  function clearEvents() {
+    keysRef = []
+    document.removeEventListener("keydown", handleKeyDown);
+    document.removeEventListener("keyup", handleKeyUp);
+  }
+
+  function runEvents() {
+    keysRef = []
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("keyup", handleKeyUp);
+  }
+
+  onMount(() => {
+    window.addEventListener("focus", runEvents);
+    window.addEventListener("blur", clearEvents);
+
+    if (!isAnimuHidden() && isAnimuFocus()) runEvents()
   });
 
   onCleanup(() => {
-    document.removeEventListener("keydown", handleKeyDown);
-    document.removeEventListener("keyup", handleKeyUp);
+    clearEvents()
+  
+    window.removeEventListener("focus", runEvents);
+    window.removeEventListener("blur", clearEvents);
   });
 
   return { setFunc };
