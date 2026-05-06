@@ -991,12 +991,17 @@ function settings() {
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("settings.player.volume")}
-                            <SettingsInput
-                                iconChar="%"
-                                type="number"
-                                onKeyDown={(text) => handleChange("Player.general.Volume", parseInt(text))}
-                                startValue={config().new.Player.general.Volume.toString()}
-                            />
+                            <div class='settings-setting-seekbar-container'>
+                                <span>0</span>
+                                <SeekBar 
+                                    maxValue={100} 
+                                    minValue={0} 
+                                    type="value"
+                                    currentValue={config().new.Player.general.Volume} 
+                                    onSeek={(value) => { handleChange("Player.general.Volume", parseInt(value.toFixed(0))) }} 
+                                />
+                                <span>100</span>
+                            </div>
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
