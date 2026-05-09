@@ -227,6 +227,7 @@ const Home = () => {
                   horizontal={element.horizontal}
                   onScrollDownFunction={element.onScrollDownFunction}
                   onTitleClick={element.onTitleClick}
+                  useResponse={element.useResponse}
                 // onTitle={element.onTitleClick}
                 />
               )}

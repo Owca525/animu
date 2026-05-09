@@ -307,8 +307,9 @@ export interface containerData {
     title?: string
     data: cardData[]
     horizontal?: boolean
-    onScrollDownFunction?: (search: string | undefined, page: number, params?: FilterPluginsParams) => Promise<{ data: cardData[], maxPage: number }>
+    onScrollDownFunction?: (search: string, page: number, params?: FilterPluginsParams) => Promise<SearchResponse>
     onTitleClick?: () => Promise<containerData>
+    useResponse?: boolean
     tags?: {
         remover: () => void
         name: string
@@ -368,10 +369,12 @@ export interface PluginMetadataFormat {
     searchOption?: genres[]
 }
 
+export interface SearchResponse { success?: boolean, content: cardData[], error?: string, maxPage: number, nextPage: boolean}
+
 export interface informationPluginFormat {
     metadata: PluginMetadataFormat
     config?: { [key: string]: any }
-    search(name: string, page: number, params?: FilterPluginsParams): Promise<containerData | { error: string } | undefined>
+    search(name: string, page: number, params?: FilterPluginsParams): Promise<SearchResponse>
     home(): Promise<{ topCards?: containerData, sections: containerData[] } | { error: string } | undefined>
     anime(id: string): Promise<AnimeData | undefined>
     schedule: (airingStart: number, airingEnd: number) => Promise<cardData[]>

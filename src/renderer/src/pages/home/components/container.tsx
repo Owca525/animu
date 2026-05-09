@@ -2,11 +2,10 @@ import { cardData, containerData, FilterPluginsParams } from "@renderer/utils/ty
 import "./css/container.css"
 import Card from "./card"
 import Button from "@renderer/components/buttons"
-import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js"
+import { createEffect, createSignal, For, Match, onCleanup, onMount, Show, Switch } from "solid-js"
 import { getHomeCache, setHomeSearchPage, setHomeStopScrolling } from "@renderer/utils/stores/home"
 import { unwrap } from "solid-js/store"
 import { useI18n } from "@renderer/utils/i18n"
-import { getInformationPlugin } from "@renderer/utils/stores/plugins"
 import { useResponse } from "@renderer/utils/hooks/useResponse"
 import { setHomeData, updateHomeContainer } from "@renderer/utils/functions"
 import { getGlobalCache, setGlobalToken } from "@renderer/utils/stores/global"
@@ -43,11 +42,11 @@ function Container(props: containerData) {
 
       if (getGlobalCache().token != token) return
 
-      if (resp.data.length < resp.maxPage) setHomeStopScrolling(true);
-      return resp.data
+      setHomeStopScrolling(!resp.nextPage)
+      return resp.content
     },
     cacheTime: 900000,
-    disable: true,
+    disable: props["useResponse"] && animeCards().length <= 0 ? false : true,
   })
 
   const observer = new IntersectionObserver(
@@ -90,11 +89,11 @@ function Container(props: containerData) {
   function handleUpdate() {
     if (props.horizontal) return
     if (getHomeCache().stopScrolling) return
-    const lastCard = document.querySelector(".card-container:last-child")
-    if (!lastCard) return
-    let plugin = getInformationPlugin()
-    if (animeCards().length < plugin.metadata.pageSize!) return setHomeStopScrolling(true)
-    observer.observe(lastCard)
+    setTimeout(() => {
+      const lastCard = document.querySelector(".card-container:last-child")
+      if (!lastCard) return
+      observer.observe(lastCard)
+    }, 300)
   }
 
 
@@ -128,7 +127,7 @@ function Container(props: containerData) {
   }
 
   return (
-    <div tabIndex={-1} class="main-container">
+    <div tabIndex={-1} class={`main-container ${cardResponse.error() || cardResponse.loading() ? "size" : ""}`}>
       <div tabIndex={-1} class="container-title-container">
         <Show when={props.title}>
           <div class={props.onTitleClick ? "container-title-click" : "container-title"} onclick={handleTitleClick}>{props.title && checkTitle(props.title)}</div>
@@ -141,27 +140,50 @@ function Container(props: containerData) {
           </For>
         </Show>
       </div>
-      <div tabIndex={-1} class={`container-button-container ${animeCards().length <= 0 && " container-error"}`}>
-        <Show when={animeCards().length > 0}>
-          <div tabIndex={-1} class={props.horizontal ? "container-data-horizontal" : "container-data"} ref={container}>
-            <For each={animeCards()}>
-              {(card) => (<Card card={card} containerClick={updateAfterChangePage} small={animeCards().length <= 15} />)}
-            </For>
-          </div>
-        </Show>
-        <Show when={animeCards().length <= 0}>
-          <div class="home-empty-container container-error-text"><span class="material-symbols-outlined home-empty-icon">search_off</span>{t("home.nothingfound")}</div>
-        </Show>
+
+      <div tabIndex={-1} class="container-button-container">
+        <Switch>
+          <Match when={!cardResponse.loading() && (cardResponse.error() || animeCards().length <= 0)}>
+            <div class="container-error-text">
+              <span class="material-symbols-outlined container-icon">search_off</span>{t("home.nothingfound")}
+            </div>
+          </Match>
+          <Match when={cardResponse.loading() && animeCards().length <= 0}>
+            <div class="container-error-text">
+              <span class="material-symbols-outlined loading-animation container-icon">progress_activity</span>
+            </div>
+          </Match>
+          <Match when={animeCards().length > 0}>
+            <div tabIndex={-1} class={props.horizontal ? "container-data-horizontal" : "container-data"} ref={container}>
+              <For each={animeCards()}>
+                {(card) => (
+                  <Card
+                    card={card}
+                    containerClick={updateAfterChangePage} small={animeCards().length <= 15}
+                  />
+                )}
+              </For>
+            </div>
+          </Match>
+        </Switch>
         <Show when={disableScrollButtons() == false && (props.horizontal && animeCards().length > 0)}>
           <Button icon="chevron_left" ButtonClass="container-left-skip-button" onClick={() => handleButtonScroll(-120)} />
           <Button icon="chevron_right" ButtonClass="container-right-skip-button" onClick={() => handleButtonScroll(120)} />
         </Show>
       </div>
-      <Show when={cardResponse.loading()}>
-        <div class="container-loading-bottom">
-          <span class="material-symbols-outlined loading-animation icon">progress_activity</span>
-        </div>
-      </Show>
+
+      <Switch>
+        <Match when={cardResponse.loading() && animeCards().length > 0}>
+          <div class="container-loading-bottom">
+            <span class="material-symbols-outlined loading-animation icon">progress_activity</span>
+          </div>
+        </Match>
+        <Match when={cardResponse.error() && animeCards().length > 0}>
+          <div class="container-loading-bottom">
+            <span class="material-symbols-outlined loading-animation icon">progress_activity</span>
+          </div>
+        </Match>
+      </Switch>
     </div>
   )
 }

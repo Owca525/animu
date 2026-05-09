@@ -4,8 +4,8 @@ import { getGlobalCache, setGlobalHistory } from '../stores/global';
 import { detectTitleConfig, refetchHistory } from '../functions';
 import { toast, updateToast } from '../context/ToastNotification';
 import { unwrap } from 'solid-js/store';
-import { searchInAnilist } from '@renderer/plugins/anilistApi';
 import { t } from '../i18n';
+import { getInformationPlugin } from '../stores/plugins';
 
 export async function DeleteFromHistory(data: cardData) {
     try {
@@ -176,14 +176,14 @@ async function convertToNewVersion(data: { id: string, title: string, img: strin
     for (let index = 0; index < data.length; index++) {
         const anime = data[index];
         try {
-            let reqAnime = await searchInAnilist(anime.title, 1)
-            if (reqAnime.data.length <= 0) {
+            let reqAnime = await getInformationPlugin().search(anime.title, 1)
+            if (reqAnime.content.length <= 0) {
                 failed += 1
                 continue
             }
-            let aniAnime = reqAnime.data[0]
-            for (let index = 0; index < reqAnime.data.length; index++) {
-                const element = reqAnime.data[index];
+            let aniAnime = reqAnime.content[0]
+            for (let index = 0; index < reqAnime.content.length; index++) {
+                const element = reqAnime.content[index];
                 if (element.AnimeData.coverImage == anime.img) aniAnime = element
             }
             animeList.push(

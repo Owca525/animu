@@ -602,16 +602,20 @@ export function detectIndex(str: string, customINDEX: string = "") {
     else return str.replaceAll(`"index.js"`, `"${index}"`)
 }
 
-export async function setHomeData(wrapper?: () => Promise<homeData["data"] | containerData | undefined | { error: string }>, data?: homeData["data"]) {
+export async function setHomeData(wrapper?: (() => Promise<homeData["data"] | containerData | undefined | { error: string }>) | homeData["data"] | containerData) {
     const uuid = uuidv4()
+    if (!wrapper) return
     try {
         setGlobalToken(uuid)
         setAllHomeData({ data: { sections: [] }, isLoading: true, isError: false } as any)
-        if (data) {
-            setAllHomeData({ data: data, isLoading: false, isError: false } as any)
+        if (typeof wrapper == "object" && "sections" in wrapper) {
+            setAllHomeData({ data: wrapper, isLoading: false, isError: false } as any)
             return
         }
-        if (!wrapper) return
+        if (typeof wrapper == "object") {
+            setAllHomeData({ data: { sections: [wrapper] }, isLoading: false, isError: false } as any)
+            return
+        }
 
         const respons = await wrapper()
         if (getGlobalCache().token && getGlobalCache().token != uuid) return
@@ -628,14 +632,14 @@ export async function updateHomeContainer(data: homeData["data"] | containerData
     try {
         const tmp = unwrap(getHomeCache())
         if (data instanceof Array) {
-            setHomeData(undefined, {
+            setHomeData({
                 ...tmp.data,
                 sections: data
             })
             return
         }
         if (data instanceof Object) {
-            setHomeData(undefined, data)
+            setHomeData(data)
             return
         }
     } catch (error) {

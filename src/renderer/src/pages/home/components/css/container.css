@@ -28,6 +28,10 @@
     padding-bottom: 6px;
 }
 
+.main-container.size {
+    height: 100%;
+}
+
 .container-data {
     gap: 12px;
     display: grid;
@@ -213,6 +217,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+
+    gap: 4px;
+    font-size: 1.4em;
+}
+
+.container-icon {
+    font-size: 3em !important;
+    user-select: none;
 }
 
 .container-title-container {

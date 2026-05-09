@@ -6,6 +6,7 @@ import {
   FilterPluginsParams,
   genres,
   informationPluginFormat,
+  SearchResponse,
 } from '@renderer/utils/types';
 import { CreateSHA256, dateToUnix, genYearsList, request, timeCovertToMs } from '@renderer/utils/functions';
 import { getConfig } from '@renderer/utils/stores/config';
@@ -520,9 +521,9 @@ async function findAnilistCache(object: { query: string, variables: anilistVaria
 // WHY THE FUCK THIS DOESN'T WORK IF I CALL window.api.request.post IN CreateHomePage
 // Jeśli api anilist jest offline to daje "Forbidden" w statusText i error 403 request 
 async function sendPost(variable: anilistVariable, query: string, timer = 0) {
-  const cache = await  findAnilistCache({ query: query, variables: variable })
+  const cache = await findAnilistCache({ query: query, variables: variable })
   if (cache) return cache
-  
+
   const response = await request(
     "https://graphql.anilist.co",
     { method: "POST", headers: getHeader(), body: JSON.stringify({ query: query, variables: variable }) },
@@ -596,56 +597,12 @@ async function fetchCategory(params: any, title: string): Promise<containerData>
       let resp = await sendToApi({ ...globalParams, page: page }, replacePageInGraphicApi(graphicApi, config.anilist.maxpagesize.toString()), timeCovertToMs({ min: 5 }));
       return {
         maxPage: config.anilist.maxpagesize,
-        data: resp
+        content: resp, 
+        nextPage: !(resp.length < config.anilist.maxpagesize)
       }
     }
   }
   return container
-}
-
-export async function searchInAnilist(name: string, page: number, params?: FilterPluginsParams, isAdult: boolean = false, MaxPage: number = 20): Promise<{ data: cardData[]; maxPage: number; }> {
-  try {
-    let variables: any = {
-      page: page,
-      sort: "SEARCH_MATCH",
-      type: "ANIME",
-      isAdult: isAdult
-    }
-    if (name.replaceAll(" ", "") != "") variables = { ...variables, search: name }
-
-    if (params) {
-      if (params.genres) variables = { ...variables, genres: params.genres }
-      if (params.years) variables = { ...variables, seasonYear: parseInt(params.years) }
-      if (params.season) variables = { ...variables, season: params.season }
-      if (params.format) variables = { ...variables, format: params.format }
-      if (params.airing) variables = { ...variables, status: params.airing }
-    }
-
-    const resp = await sendToApi(variables, replacePageInGraphicApi(graphicApi, MaxPage.toString()), timeCovertToMs({ min: 5 }))
-    return {
-      data: resp,
-      maxPage: MaxPage
-    }
-  } catch (error) {
-    console.error("Error in searchInAnilist/anilist", error)
-    return {
-      data: [],
-      maxPage: MaxPage
-    }
-  }
-}
-
-async function searchWrapper(name: string, page: number, params?: FilterPluginsParams, isAdult: boolean = false, MaxPage: number = 20): Promise<{ data: cardData[]; maxPage: number; }> {
-  const config = getConfig()
-  try {
-    return await searchInAnilist(name, page, params, isAdult, MaxPage)
-  } catch (error) {
-    console.error("Error in searchWrapper/anilist", error)
-    return {
-      data: [],
-      maxPage: config.anilist.maxpagesize
-    }
-  }
 }
 
 function replacePageInGraphicApi(graphicTMP: string, variable: string) {
@@ -687,10 +644,10 @@ export default class AnilistApi implements informationPluginFormat {
         "Supernatural",
         "Thriller"
       ],
-      seasons: ["Winter", "Spring", "Summer", "Fall"],
+      seasons: ["WINTER", "SPRING", "SUMMER", "FALL"],
       years: genYearsList(1940),
       format: ["TV", "Movie", "TV Short", "special", "OVA", "ONA"],
-      statuses: ["Releasing", "Finished", "Not Yet Released", "Cancelled"]
+      statuses: ["RELEASING", "FINISHED", "NOT_YET_RELEASED", "CANCELLED"]
     }
 
     let newOptions: genres[] = [
@@ -828,24 +785,42 @@ export default class AnilistApi implements informationPluginFormat {
     return data
   }
 
-  search = async (name: string, page: number, params?: FilterPluginsParams) => {
-    try {
+  search = async (name: string, page: number, params?: FilterPluginsParams): Promise<SearchResponse> => {
       const config = getConfig()
-      let title: string | undefined = undefined
-      if (!(name.replaceAll(" ", "") == "")) title = `home.searching/${name}`
-      console.log(params)
+      try {
+        let variables: any = {
+          page: page,
+          sort: "SEARCH_MATCH",
+          type: "ANIME",
+          isAdult: config.anilist.adultdefault
+        }
+        if (name.replaceAll(" ", "") != "") variables = { ...variables, search: name }
 
-      const resp = await searchInAnilist(name, page, params, config.anilist.adultdefault, config.anilist.maxpagesize)
+        if (params) {
+          if (params.genres) variables = { ...variables, genres: params.genres }
+          if (params.years) variables = { ...variables, seasonYear: parseInt(params.years) }
+          if (params.season) variables = { ...variables, season: params.season.toUpperCase() }
+          if (params.format) variables = { ...variables, format: params.format.toUpperCase() }
+          if (params.airing) variables = { ...variables, status: params.airing.toUpperCase() }
+        }
 
-      return {
-        title: title,
-        data: resp.data,
-        onScrollDownFunction: async (search, page, params) => await searchWrapper(search ? search : "", page, params, config.anilist.adultdefault, config.anilist.maxpagesize)
+        const resp = await sendPost(variables, replacePageInGraphicApi(graphicApi, config.anilist.maxpagesize.toString()), timeCovertToMs({ min: 5 }))
+        console.log(resp)
+        if (!resp["json"] || !resp["success"]) return { content: [], maxPage: config.anilist.maxpagesize, nextPage: false }
+
+        return {
+          content: resp["json"].data.Page.media.map((data) => Convert(data)),
+          maxPage: config.anilist.maxpagesize,
+          nextPage: resp["json"]["data"]["Page"]["pageInfo"]["hasNextPage"]
+        }
+      } catch (error) {
+        console.error("Error in searchInAnilist/anilist", error)
+        return {
+          content: [],
+          maxPage: config.anilist.maxpagesize,
+          nextPage: false,
+        }
       }
-    } catch (error) {
-      console.error("Error in search/Anilistapi", error)
-      return
-    }
   }
   home = async () => {
     try {

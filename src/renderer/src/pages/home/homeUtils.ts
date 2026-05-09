@@ -33,7 +33,7 @@ export function setHome() {
 
 export function setAnimuList(): any {
     const animulist = unwrap(animulistData())
-    if (animulist.length <= 0) return setHomeData(undefined, { sections: [{ data: [] }] })
+    if (animulist.length <= 0) return setHomeData({ sections: [{ data: [] }] })
     let finnalContainer: containerData[] = []
     const global = unwrap(getHomeCache())
 
@@ -91,9 +91,9 @@ export function setAnimuList(): any {
         })
     })
 
-    if (finnalContainer.length <= 1) return setHomeData(undefined, { sections: [{ data: unwrap(animulistData()) }] })
+    if (finnalContainer.length <= 1) return setHomeData({ sections: [{ data: unwrap(animulistData()) }] })
 
-    setHomeData(undefined, {
+    setHomeData({
         sections: finnalContainer
     })
 }
@@ -125,7 +125,7 @@ export function setHistory() {
             },
         ],
     };
-    setHomeData(undefined, data)
+    setHomeData(data)
 }
 
 export async function anilistSearch(search: string, params: FilterParams | undefined) {
@@ -136,7 +136,7 @@ export async function anilistSearch(search: string, params: FilterParams | undef
         const plugin = getPlayerPLugin()
         const tmp = await plugin?.searchAnime(search, 1, convertParams(params))
 
-        setHomeData(undefined, {
+        setHomeData({
             sections: [
                 {
                     title: `home.searching/${search}`,
@@ -144,10 +144,20 @@ export async function anilistSearch(search: string, params: FilterParams | undef
                 }
             ]
         })
-    } else {
-        const plugin = getInformationPlugin()
-        setHomeData(async () => await plugin.search(search, 1, convertParams(params)));
+        return
     }
+
+    let title: string | undefined = undefined
+    if (!(search.replaceAll(" ", "") == "")) title = `home.searching/${search}`
+    // async () => await plugin.search(search, 1, convertParams(params))
+    const plugin = getInformationPlugin()
+    setHomeData({
+        title: title,
+        data: [],
+        onScrollDownFunction: plugin.search,
+        useResponse: true
+    });
+
 }
 
 export function historySearch(search: string = "", params: FilterParams | undefined) {
@@ -188,7 +198,7 @@ export function AnimuListSearch(search: string = "", params: FilterParams | unde
     let tmp = searchDataInCards(unwrap(animulistData()), search, convertParams(params))
     if (params && params["watching"]) tmp = tmp.filter((v) => v.animulist?.status == params["watching"].val)
     setHomeSearchTags(params)
-    setHomeData(undefined, {
+    setHomeData({
         sections: [
             {
                 title: search != "" ? `Searching: ${search}` : undefined,
