@@ -1,4 +1,4 @@
-import { FilterPluginsParams, informationPluginFormat, Anilist_ListMutation, playerPluginInstanceFormat, AnimeData, cardData, episodeList, episodeMetadata, playerData, PluginManagerFormat, informationPluginInstanceFormat, playerPluginFormat, PluginMetadataFormat, PluginLoadedFormat, WorkerWrapperInstance, containerData, pluginRepoExpanded } from "./types";
+import { FilterPluginsParams, informationPluginFormat, Anilist_ListMutation, playerPluginInstanceFormat, AnimeData, cardData, episodeList, episodeMetadata, playerData, PluginManagerFormat, informationPluginInstanceFormat, playerPluginFormat, PluginMetadataFormat, PluginLoadedFormat, WorkerWrapperInstance, containerData, pluginRepoExpanded, SearchResponse } from "./types";
 import { getPlayerPluginList, setInformationPlugin, setPlayerPlugin, setPluginRepo } from "./stores/plugins";
 import { getConfig } from "./stores/config";
 import { checkTimeDriffrentUnix, CreateSHA256, dateToUnix, detectIndex, getPluginsList, request, updateObject } from "./functions";
@@ -460,8 +460,8 @@ export class InformationPluginInstance implements informationPluginInstanceForma
     }
     instance: WorkerWrapperInstance = undefined as any;
 
-    search = async (name: string, page: number, params?: FilterPluginsParams): Promise<containerData | { error: string; } | undefined> => {
-        if (!this.instance) return
+    search = async (name: string, page: number, params?: FilterPluginsParams): Promise<SearchResponse> => {
+        if (!this.instance) return { content: [], maxPage: 20, nextPage: false, }
         return await this.instance.wrapperFunction("search", { name, page, params }, true) as any
     }
 
@@ -579,7 +579,6 @@ export class PluginManager implements PluginManagerFormat {
             await tmp.runInstance(element["code"])
 
             tmp.wrapperFunction("raportStatus").then((results) => {
-                console.error(element["metadata"]["name"], results, element)
                 if (!results || typeof results != "object") {
                     this.playerPluginList = getPlayerPluginList().map((v) => {
                         if (v["code"] == element["code"]) return { ...element, serverStatus: undefined }

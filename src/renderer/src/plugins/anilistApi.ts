@@ -805,7 +805,6 @@ export default class AnilistApi implements informationPluginFormat {
         }
 
         const resp = await sendPost(variables, replacePageInGraphicApi(graphicApi, config.anilist.maxpagesize.toString()), timeCovertToMs({ min: 5 }))
-        console.log(resp)
         if (!resp["json"] || !resp["success"]) return { content: [], maxPage: config.anilist.maxpagesize, nextPage: false }
 
         return {
