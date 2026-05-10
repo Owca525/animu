@@ -118,6 +118,8 @@ function Container(props: containerData) {
   }
 
   function updateAfterChangePage() {
+    if (location.href.includes("#/info") || location.href.includes("#/player") || location.href.includes("#/settings") ) return
+    
     const cache = getHomeCache()
     if (cache.data["sections"].length > 1) return
     updateHomeContainer([{
