@@ -335,7 +335,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         /* ENDIF */
 
         if (videoRef) {
-            setEventInPlayer("timeupdate", updateProgress)
+            setEventInPlayer("timeupdate", (event) => {
+                setFatalError(false)
+                updateProgress(event)
+            })
             setEventInPlayer("progress", updateProgress)
             setEventInPlayer("seeked", updateProgress)
             setEventInPlayer("loadedmetadata", (event) => {
