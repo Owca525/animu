@@ -15,6 +15,7 @@ import {
     Thumbnail
 } from '@renderer/utils/types';
 import {
+    createEffect,
     createSignal,
     For,
     onCleanup,
@@ -113,6 +114,8 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
     const [isShowPlay, setShowPlay] = createSignal<boolean>(false)
     const [isShowSelectEpisode, setShowSelectEpisode] = createSignal<boolean>(false)
     const [minusTimeState, setminusTimeState] = createSignal<boolean>(config.Player.general.minusTime)
+
+    const [isInitilize, setInitialize] = createSignal<boolean>(true)
 
     const [isShowButtonSkipLeft, setShowButtonSkipLeft] = createSignal<boolean>(false)
     const [isShowButtonSkipRight, setShowButtonSkipRight] = createSignal<boolean>(false)
@@ -257,7 +260,10 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
             setEventInPlayer("timeupdate", updateProgress)
             setEventInPlayer("progress", updateProgress)
             setEventInPlayer("seeked", updateProgress)
-            setEventInPlayer("loadedmetadata", updateProgress)
+            setEventInPlayer("loadedmetadata", (event) => {
+                setInitialize(false)
+                updateProgress(event)
+            })
 
             setEventInPlayer("error", videoErrorHandler)
             setEventInPlayer("canplay", () => { setWaitingPlayer(() => false) })
@@ -381,9 +387,14 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         videoRef.playbackRate = parseFloat(speed)
     }
 
+    createEffect(() => {
+        console.log(isInitilize())
+    })
+
     async function setNewResolution(data: resolutionFormat | undefined) {
         if (!data) return
         if (!videoRef) return
+        setInitialize(true)
         setFatalError(false)
         const time = videoRef.currentTime
         if (data.defaultSubtitles) setDefaultSubtitles(ListSubtitles())
@@ -437,6 +448,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
     async function runNewPlayer(data: playerData) {
         if (!videoRef) return
         setFatalError(false)
+        setInitialize(true)
 
         let currentplayer = data
         setPlayer(() => currentplayer)
@@ -1027,7 +1039,12 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
     }
 
     return (
-        <div class={isVisible() ? "player-video-container miniplayer" : "player-video-container miniplayer player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, currentContextMenu()), event)}>
+        <div class={`player-video-container miniplayer ${isVisible() ? "player-hide-cursor" : "" }`} 
+                ref={containerRef}
+                onMouseMove={handleMouseMove} 
+                onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, currentContextMenu()), event)}
+                style={{ height: isInitilize() ? "600px" : "auto" }}
+            >
             <div ref={screenshotWrapper} class={isVisible() ? "player-video-container" : "player-video-container player-hide-cursor"} >
                 <video
                     ref={videoRef}
