@@ -1,5 +1,5 @@
 import { UUIDTypes } from "uuid";
-import { animeOpeningsFormat, cardData, deeplinkFormat, globalDataFormat, NotificationProps, serviceFormat, themeMetadata } from "../types";
+import { animeOpeningsFormat, cardData, deeplinkFormat, globalDataFormat, NotificationProps, NotificationPropsExpanded, serviceFormat, themeMetadata } from "../types";
 import { createStore } from "solid-js/store";
 import { Socket } from "socket.io-client";
 
@@ -62,8 +62,8 @@ export const setGlobalHistory = (tmp: cardData[]) => setGlobalState((prev) => ({
 export const setGlobalToken = (tmp: UUIDTypes | undefined) => setGlobalState((prev) => ({ ...prev, token: tmp }));
 export const setAnimulistData = (tmp: globalDataFormat["animuList"]) => setGlobalState((prev) => ({ ...prev, animuList: tmp }));
 export const setDeepLink = (tmp: deeplinkFormat) => setGlobalState((prev) => ({ ...prev, deepLinks: [...prev.deepLinks, tmp] }));
-export const addNotification = (tmp: NotificationProps) => setGlobalState((prev) => ({ ...prev, notifications: [...prev.notifications, tmp] }));
-export const modifyNotification = (tmp: NotificationProps) => setGlobalState((prev) => ({ ...prev, notifications: prev.notifications.map((v) => v["title"] == tmp["title"] ? tmp : v) }));
+export const addNotification = (tmp: NotificationProps) => setGlobalState((prev) => ({ ...prev, notifications: [...prev.notifications, { ...tmp, id: crypto.randomUUID() }] }));
+export const modifyNotification = (tmp: NotificationPropsExpanded) => setGlobalState((prev) => ({ ...prev, notifications: prev.notifications.map((v) => v["id"] == tmp["id"] ? tmp : v) }));
 
 export const removeDeepLink = (name: string) => setGlobalState((prev) => ({ ...prev, deepLinks: prev.deepLinks.filter((item) => item.name != name) }));
 export const ActiveService = (tmp: serviceFormat[]) => setGlobalState((prev) => ({ ...prev, service: tmp }));
@@ -81,7 +81,6 @@ export const DisableService = (tmp: serviceFormat) => setGlobalState((prev) => (
 
 export const setAnilistUserData = (tmp: { [key: string]: any; } | undefined) => setGlobalState((prev) => ({ ...prev, anilist_user_data: tmp }));
 
-/* IFDEF WEB */
 window.addEventListener("focus", () => {
     setGlobalState((prev) => ({ ...prev, isAnimuFocus: true }))
 });
@@ -89,4 +88,3 @@ window.addEventListener("focus", () => {
 window.addEventListener("blur", () => {
     setGlobalState((prev) => ({ ...prev, isAnimuFocus: false }))
 });
-/* ENDIF */

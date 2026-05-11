@@ -13,9 +13,9 @@
 
     margin-top: 8px;
 
-    translate: -80% 0;
+    translate: -85% 0;
 
-    width: 400px;
+    width: 500px;
     max-height: 500px;
 
     padding: 12px;
@@ -24,6 +24,26 @@
     transition: opacity 100ms ease-in-out, z-index 0ms, linear 100ms;
     opacity: 0;
     z-index: -1;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.notificationmenu-notification-notifications {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow: auto;
+
+    max-height: 400px;
+}
+
+.notificationmenu-notification-container-top, .notificationmenu-notification-container-left {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
 
 .notificationmenu-notification-container.active {

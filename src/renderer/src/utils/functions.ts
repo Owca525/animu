@@ -27,6 +27,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { removeToast, toast, ToastOptions, updateToast } from './context/ToastNotification';
 import { OvewriteAnimuList } from './FilesManager/animulist';
 import { readPlaylist, updatePlaylist } from './FilesManager/playlist';
+import { playerPluginInstance } from './pluginManager';
 
 export function decodeHtmlEntities(str: string | undefined) {
     if (!str) return ""
@@ -1268,6 +1269,7 @@ export function convertEpisode(ep: string): number {
 }
 
 export function sendNotification(notificiation: NotificationProps, toastprop?: ToastOptions) {
+    console.log(isAnimuHidden(), isAnimuFocus())
     if (isAnimuHidden() || !isAnimuFocus()) {
         Notification.requestPermission().then(permission => {
             if (permission != 'granted') return
@@ -1309,25 +1311,47 @@ export async function checkAnimeTodayReleaseEpisode() {
         const element = sortedList[index];
         if (element.customData) continue
 
+        const tmpplugin = new playerPluginInstance
+
         try {
-            const tmpplugin = await pluginManager().changePlayerPlugin(element.anime.saveData?.pluginName as string)
-            if (!tmpplugin) continue
+            const codePlugin = getPlayerPluginList().find((v) => v["metadata"]["name"] == element['anime']["saveData"]!["name"])
+            if (!codePlugin) {
+                tmpplugin.clear()
+                continue
+            }
+            await tmpplugin.CreateInstance(codePlugin["code"])
 
             let episodes = await tmpplugin.extractOnlyEpisodesList(element.anime.saveData?.type!, element.anime.AnimeData.player_ID!)
-            if (episodes.length <= 0) continue
+            if (episodes.length <= 0) {
+                tmpplugin.clear()
+                continue
+            }
+
             let asdasdads = episodes.map((v) => v.ep.toString())
 
             const tmpEpisode = todayAnime.find((v) => v.AnimeData.id == element.anime.AnimeData.id)!.AnimeData.nextAiringEpisode!.episode.toString()
             if (asdasdads.includes(tmpEpisode)) {
                 sendNotification({
                     title: `New Episode Avaible in ${tmpplugin.metadata.name} plugin`,
-                    description: `You Can Watch Episode ${tmpEpisode} Of ${detectTitleConfig(element.anime.AnimeData.title)}`,
+                    description: `Watch Episode ${tmpEpisode} Of ${detectTitleConfig(element.anime.AnimeData.title)}`,
                     icon: element.anime.AnimeData.coverImage
                 })
             }
-            await updatePlaylist("global.waitingplaylist", { ...element, customData: true })
+            await updatePlaylist("global.waitingplaylist", { ...{
+                ...element,
+                anime: {
+                    ...element["anime"],
+                    saveData: {
+                        ...element["anime"]["saveData"]!,
+                        episode: tmpEpisode
+                    }
+                }
+            }, customData: true })
+
+            tmpplugin.clear()
         } catch (error) {
             console.error("Error function/checkAnimeTodayReleaseEpisode", error)
+            tmpplugin.clear()
         }
     }
 

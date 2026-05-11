@@ -205,7 +205,7 @@ export interface globalDataFormat {
     anilist_user_data?: { [key: string]: any; },
     isAnimuHidden: boolean
     isAnimuFocus: boolean
-    notifications: NotificationProps[]
+    notifications: NotificationPropsExpanded[]
     todayAnimeAnilist: cardData[]
     animeOpeningsCache: { [key: number]: animeOpeningsFormat[] }
     audioOutput: MediaDeviceInfo | undefined
@@ -226,6 +226,10 @@ export interface NotificationProps {
         action: string,
         args: any[]
     }
+}
+
+export type NotificationPropsExpanded = NotificationProps & {
+    id: string
 }
 
 export type playerDataExtended = playerData & {
