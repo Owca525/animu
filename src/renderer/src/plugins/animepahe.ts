@@ -333,25 +333,35 @@ export default class AnimePahe implements playerPluginFormat {
     raportStatus = async (): Promise<{ search: serverStatusData; player: serverStatusData; episodes: serverStatusData; }> => {
         let results: serverStatusData[] = []
 
-        async function wrapper(func: (...args) => any): Promise<serverStatusData | undefined> {
+        async function wrapper(func: (...args) => any): Promise<{ content: any, server: serverStatusData } | undefined> {
             try {
                 const start = performance.now();
                 const response = await func()
                 const end = performance.now();
 
                 return {
-                    time: end - start,
-                    work: response.length > 0
+                    content: response,
+                    server: {
+                        time: end - start,
+                        work: response.length > 0
+                    }
                 }
             } catch (error) {
                 return undefined
             }
         }
 
+        const searchResponse = await wrapper(async () => this.searchAnime("Oshi No Ko", 1))
+        let id: string = ""
+        if (!searchResponse) results.push({ time: 0, work: false })
+        else {
+            results.push(searchResponse["server"])
+            id = searchResponse["server"]["work"] ? searchResponse["content"][0]["AnimeData"]["player_ID"] : ""
+        }
+
         const functions = [
-            async () => this.searchAnime("Oshi No Ko", 1), 
-            async () => this.extractPlayerData("sub", { ep: "1" }, "1b39a33c-ab14-c893-41a3-77923fd99c19"),
-            async () => this.extractOnlyEpisodesList("sub", "1b39a33c-ab14-c893-41a3-77923fd99c19"),
+            async () => this.extractPlayerData("sub", { ep: "1" }, id),
+            async () => this.extractOnlyEpisodesList("sub", id),
         ]
 
         for (let index = 0; index < functions.length; index++) {
@@ -363,7 +373,7 @@ export default class AnimePahe implements playerPluginFormat {
                     work: false
                 })
             } else {
-                results.push(tmp)
+                results.push(tmp["server"])
             }
         }
 
