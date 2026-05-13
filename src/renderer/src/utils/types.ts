@@ -455,7 +455,7 @@ export interface PluginManagerFormat {
     initialPlugins(): Promise<void>
     changePlayerPlugin(name: string): Promise<playerPluginFormat>
     changeInformationPlugin(name: string): Promise<informationPluginFormat>
-    checkStatusServerInPlugins(): Promise<void>
+    checkStatusServerInPlugins(hard?: boolean): Promise<void>
 
     checkUpdates(): Promise<pluginRepoExpanded[]>
     installPlugin(plugin: pluginRepoExpanded): Promise<void>

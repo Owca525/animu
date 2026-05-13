@@ -136,6 +136,12 @@ function App() {
     })
     /* ENDIF */
 
+    try {
+      const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
+      const time = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])
+      if (time["min"] < 44 && time["hour"] <= 0) localStorage.removeItem("pluginStatusCachce")
+    } catch (error) {}
+
     await pluginManager().initialPlugins()
     await pluginManager().changeInformationPlugin("AnilistApi")
 
@@ -316,13 +322,7 @@ function initialServices() {
   const config = getConfig()
 
   runService(async () => {
-    try {
-      const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
-      const time = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])
-      if (time["min"] < 44 && time["hour"] <= 0) return
-    } catch (error) {}
-
-    await pluginManager().checkStatusServerInPlugins()
+    await pluginManager().checkStatusServerInPlugins(!(localStorage.getItem("pluginStatusCachce") != undefined))
   }, timeCovertToMs({ min: 45 }), t("Check Status Of Player Plugins"))
 
   /* IFDEF DEBUG|PROD */

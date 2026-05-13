@@ -571,10 +571,12 @@ export class PluginManager implements PluginManagerFormat {
         return promise
     }
 
-    checkStatusServerInPlugins = async (): Promise<void> => {
+    checkStatusServerInPlugins = async (hard?: boolean): Promise<void> => {
         const initialTime = dateToUnix(new Date().toString())
 
         getPlayerPluginList().forEach(async (element, _, array) => {
+            if (element["serverStatus"] && !hard) return
+
             const tmp = new WorkerWrapper
             await tmp.runInstance(element["code"])
 
