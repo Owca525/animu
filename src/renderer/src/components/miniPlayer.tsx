@@ -1039,7 +1039,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
     }
 
     return (
-        <div class={`player-video-container miniplayer ${isVisible() ? "player-hide-cursor" : "" }`} 
+        <div class={`player-video-container miniplayer ${!isVisible() ? "player-hide-cursor" : "" }`} 
                 ref={containerRef}
                 onMouseMove={handleMouseMove} 
                 onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, currentContextMenu()), event)}
