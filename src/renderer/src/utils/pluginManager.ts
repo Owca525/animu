@@ -68,7 +68,8 @@ initial()
 `
 
 const WorkerPayload = `
-var window = { 
+
+var window = {
     location: ${JSON.stringify(location)},
     global: this,
     request: async (...args) => await callMainProcess("request", args),
@@ -527,9 +528,7 @@ export class PluginManager implements PluginManagerFormat {
                     cache.set(element["metadata"]["name"], element["serverStatus"])
                 })
             }
-        } catch (error) {
-            console.error("PluginManager/dummyLoader Failed Take Server Status Cachce", error)
-        }
+        } catch (error) {}
 
         const blobDummy = new Blob([workerDummyimport], { type: "text/javascript" });
         let dummyImportURL = URL.createObjectURL(blobDummy);
