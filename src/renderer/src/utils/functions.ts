@@ -1482,6 +1482,7 @@ export function sortCharacterType(content: AnimeData["characters"]) {
 
     const priority = {
         "MAIN": 0,
+        "SUPPORTING": 1,
     };
 
     return content.sort((a, b) => {
