@@ -1,6 +1,5 @@
 import { createContext, createSignal, JSX, For, Show, Switch, Match } from "solid-js";
 import { Portal } from "solid-js/web";
-import { v4 as uuidv4 } from 'uuid';
 import "./css/ToastNotification.css"
 
 type ToastProps = {
@@ -39,7 +38,7 @@ export function ToastProvider(props: { children: JSX.Element }) {
     const [toasts, setToasts] = createSignal<expandedToastProps[]>([]);
 
     function addToast(message: string | { title: string, description: string, icon?: string }, options: ToastOptions) {
-        const id = uuidv4();
+        const id = crypto.randomUUID();
         let duration = options.duration;
         let timer: NodeJS.Timeout | undefined
         if (options.timer == false) {

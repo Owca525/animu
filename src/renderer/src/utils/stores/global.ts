@@ -1,4 +1,3 @@
-import { UUIDTypes } from "uuid";
 import { animeOpeningsFormat, cardData, deeplinkFormat, globalDataFormat, NotificationProps, NotificationPropsExpanded, serviceFormat, themeMetadata } from "../types";
 import { createStore } from "solid-js/store";
 import { Socket } from "socket.io-client";
@@ -59,7 +58,7 @@ export const setGlobalTheme = (tmp: themeMetadata[]) => setGlobalState((prev) =>
 export const setIncognitoMode = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, incognito: tmp }));
 export const setDeeplinkRunned = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, deeplinkRunned: tmp }));
 export const setGlobalHistory = (tmp: cardData[]) => setGlobalState((prev) => ({ ...prev, history: [...tmp] }));
-export const setGlobalToken = (tmp: UUIDTypes | undefined) => setGlobalState((prev) => ({ ...prev, token: tmp }));
+export const setGlobalToken = (tmp: string | undefined) => setGlobalState((prev) => ({ ...prev, token: tmp }));
 export const setAnimulistData = (tmp: globalDataFormat["animuList"]) => setGlobalState((prev) => ({ ...prev, animuList: tmp }));
 export const setDeepLink = (tmp: deeplinkFormat) => setGlobalState((prev) => ({ ...prev, deepLinks: [...prev.deepLinks, tmp] }));
 export const addNotification = (tmp: NotificationProps) => setGlobalState((prev) => ({ ...prev, notifications: [...prev.notifications, { ...tmp, id: crypto.randomUUID() }] }));

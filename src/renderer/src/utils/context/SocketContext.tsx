@@ -12,7 +12,6 @@ import { createRoom, runSocket } from '../socket';
 import { getSocket, getSocketRoom } from '../stores/global';
 import Button from '@renderer/components/buttons';
 import { unwrap } from 'solid-js/store';
-import { v4 as uuidv4 } from 'uuid';
 import { Portal } from 'solid-js/web';
 
 export function SocketProvider(props: { children: JSX.Element }) {
@@ -81,7 +80,7 @@ export function SocketProvider(props: { children: JSX.Element }) {
     }
 
     function makeNewRoom() {
-        createRoom(uuidv4())
+        createRoom(crypto.randomUUID())
     }
 
     return (

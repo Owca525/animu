@@ -1,5 +1,4 @@
 import { Socket } from "socket.io-client"
-import { UUIDTypes } from "uuid"
 
 // export const notificationProps = {
 //     closeOnClick: true,
@@ -194,7 +193,7 @@ export interface globalDataFormat {
     deeplinkRunned: boolean,
     loadedTheme: themeMetadata[],
     activeThemes: Map<number, themeMetadata>
-    token: UUIDTypes | undefined,
+    token: string | undefined,
     service: serviceFormat[]
     deepLinks: deeplinkFormat[]
     socket?: {

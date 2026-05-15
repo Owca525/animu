@@ -23,7 +23,6 @@ import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
 import { unwrap } from 'solid-js/store';
 import { getInformationPlugin, getPlayerPluginList, pluginManager } from './stores/plugins';
-import { v4 as uuidv4 } from 'uuid';
 import { removeToast, toast, ToastOptions, updateToast } from './context/ToastNotification';
 import { OvewriteAnimuList } from './FilesManager/animulist';
 import { readPlaylist, updatePlaylist } from './FilesManager/playlist';
@@ -604,7 +603,7 @@ export function detectIndex(str: string, customINDEX: string = "") {
 }
 
 export async function setHomeData(wrapper?: (() => Promise<homeData["data"] | containerData | undefined | { error: string }>) | homeData["data"] | containerData) {
-    const uuid = uuidv4()
+    const uuid = crypto.randomUUID()
     if (!wrapper) return
     try {
         setGlobalToken(uuid)
@@ -824,7 +823,7 @@ export function runService(func: () => Promise<any> | any, time: number, name: s
     const tmp = {
         name: name,
         interval: interval,
-        uuid: uuidv4(),
+        uuid: crypto.randomUUID(),
         func: func
     }
     if (!disable && !dontRun) {
@@ -1502,4 +1501,19 @@ export function sortRelationType(content: AnimeData["relations"]) {
     return content.sort((a, b) => {
         return (priority[a.relationType] ?? 999) - (priority[b.relationType] ?? 999);
     });
+}
+
+export async function GenerateSha256(text: string) {
+  const data = new TextEncoder().encode(text);
+
+  const hashBuffer = await crypto.subtle.digest(
+    'SHA-256',
+    data
+  );
+
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+
+  return hashArray
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
 }

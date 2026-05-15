@@ -1,5 +1,5 @@
 import { createSignal, onCleanup, Accessor, onMount } from "solid-js";
-import { sha256 } from "js-sha256";
+import { GenerateSha256 } from "../functions";
 
 type UseResponseOptions<T, TData> = {
     queryKey: T[];
@@ -10,11 +10,6 @@ type UseResponseOptions<T, TData> = {
 };
 
 let cache: Map<string, any> = new Map();
-
-async function generateSha256(text: any) {
-    const str = JSON.stringify(text);
-    return sha256(str)
-}
 
 export function useResponse<T, TData>(options: UseResponseOptions<T, TData>) {
     const [loading, setLoading] = createSignal<boolean>(false);
@@ -39,7 +34,7 @@ export function useResponse<T, TData>(options: UseResponseOptions<T, TData>) {
         try {
             if (dissable()) return undefined
             const queryKey = getQueryKey()
-            const sha256 = await generateSha256(queryKey)
+            const sha256 = await GenerateSha256(JSON.stringify(queryKey))
             if (!forceRefetch() && cache.has(sha256)) {
                 setLoading(false)
                 setError(false)
@@ -87,3 +82,4 @@ export function useResponse<T, TData>(options: UseResponseOptions<T, TData>) {
 
     return { data, loading, error, Refetch };
 }
+

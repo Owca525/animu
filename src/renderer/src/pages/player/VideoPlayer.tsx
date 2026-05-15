@@ -26,7 +26,6 @@ import { unwrap } from "solid-js/store"
 import { removeToast, toast, updateToast } from "@renderer/utils/context/ToastNotification"
 import { useI18n } from "@renderer/utils/i18n"
 import { addTime, countImages, fetchResolutions, VTTstoryBoardParser } from "./playerUtils"
-import { v4 as uuidv4 } from 'uuid';
 import { updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist"
 import { getAudioOutput, getSocket, getSocketRoom } from "@renderer/utils/stores/global"
 
@@ -527,7 +526,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (currentplayer.extractResolution) {
             if (currentExtractionRes().toast != "") removeToast(currentExtractionRes().toast)
 
-            const tmpID = uuidv4()
+            const tmpID = crypto.randomUUID()
             const idToast = toast(t("notification.fetchresolution"), { type: "loading", timer: true })
             setCurrentExtractionRes({ id: tmpID, toast: idToast })
             let tmp = await fetchResolutions({

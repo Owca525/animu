@@ -9,7 +9,6 @@ import { useI18n } from "@renderer/utils/i18n"
 import { useResponse } from "@renderer/utils/hooks/useResponse"
 import { setHomeData, updateHomeContainer } from "@renderer/utils/functions"
 import { getGlobalCache, setGlobalToken } from "@renderer/utils/stores/global"
-import { v4 as uuidv4 } from 'uuid';
 
 function Container(props: containerData) {
   const { t, pathExist } = useI18n()
@@ -21,7 +20,7 @@ function Container(props: containerData) {
   const cardResponse = useResponse({
     queryKey: [currentPage(), props.title, props.tags ? props.tags.map((v) => v.name) : []],
     queryFn: async () => {
-      const token = uuidv4()
+      const token = crypto.randomUUID()
       setGlobalToken(token)
 
       const homeCache = unwrap(getHomeCache())
