@@ -1,6 +1,5 @@
 import { app, ipcMain } from "electron";
 import fs, { existsSync, readdirSync } from "fs"
-import archiver from "archiver";
 import path from "path";
 import { initialBackend, newConfigPath } from ".";
 import AdmZip from 'adm-zip'
@@ -62,16 +61,10 @@ async function checkBackupFolder() {
     }
 }
 
-async function zipFolder(sourceDir: string, outPath: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-        const output = fs.createWriteStream(outPath);
-        const archive = archiver("zip", { zlib: { level: 9 } });
-
-        output.on("close", resolve);
-        archive.on("error", reject);
-
-        archive.pipe(output);
-        archive.directory(sourceDir, false);
-        archive.finalize();
+async function zipFolder(sourceDir: string, outPath: string): Promise<boolean> {
+    return new Promise(async (resolve, reject) => {
+        const zip = new AdmZip();
+        zip.addLocalFolder(sourceDir)
+        zip.writeZipPromise(outPath).then((v) => resolve(v)).catch(reject)
     });
 }
