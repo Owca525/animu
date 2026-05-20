@@ -310,7 +310,7 @@ export async function initialBackend() {
       const content: SettingsConfig = deepMerge(defaultConfig, ParseINI(data))
 
       if (typeof content.General.theme === "string") config = { ...content, General: { ...content.General, theme: ["DarkerAnimu"] } }
-      else config = detectKeybinds(content)
+      config = detectKeybinds(content)
     } else {
       write(path.join(newConfigPath, "config.ini"), ConvertObjectToINI(defaultConfig))
       console.info("created new config")
