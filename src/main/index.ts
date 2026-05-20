@@ -284,10 +284,8 @@ app.on('window-all-closed', () => {
 
 function detectKeybinds(config: SettingsConfig) {
   let keybinds = config.Player.keybinds
-  console.log(config)
   const defaultKeybinds = defaultConfig.Player.keybinds
   for (const key in keybinds) {
-    console.log(key, keybinds[key])
     if (`${keybinds[key]}`.replaceAll(" ", "") == "") {
       keybinds = { ...keybinds, [key]: defaultKeybinds[key] }
     }

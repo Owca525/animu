@@ -1,7 +1,4 @@
-import {
-    themeFormatType,
-    ThemeSchema
-} from './types';
+import { themeFormatType } from './types';
 import { themeConfigPath } from '.';
 import fs from 'fs';
 import path from 'path';
@@ -68,17 +65,58 @@ async function getThemeList(themePath: string): Promise<themeFormatType[]> {
     })
 }
 
+function themeParser(theme: themeFormatType): themeFormatType | undefined {
+    try {
+        if (!("author" in theme) || !("themeName" in theme) || !("mainCSS" in theme)) return
+        let tmpTheme: themeFormatType = {
+            author: theme["author"],
+            themeName: theme["themeName"],
+            mainCSS: theme["mainCSS"],
+        } as any
+
+        if (theme["api"]) tmpTheme = { ...tmpTheme, api: theme["api"] }
+        if (theme["version"]) tmpTheme = { ...tmpTheme, version: theme["version"] }
+        if (theme["options"]) {
+            const tmpOptions = theme["options"].map((option) => {
+                let tmpDropdown: any = undefined
+                if (option["dropDown"]) {
+                    tmpDropdown = option["dropDown"].map((v) => ({
+                        option: v["option"],
+                        css: v["css"],
+                    }))
+                }
+
+                return {
+                    name: option["name"],
+                    dropDown: tmpDropdown,
+                    css: option["css"],
+                    default: option["default"],
+                }
+            })
+
+            tmpTheme = { ...tmpTheme, options: tmpOptions }
+        }
+
+        return tmpTheme
+    } catch (error) {
+        console.error("Failed Parse Theme", error)
+        return
+    }
+}
+
 async function getMetadataTheme(path_theme: string): Promise<themeFormatType | undefined> {
     try {
         const pathTheme = path.join(path_theme, "/theme.json")
 
-        if (!fs.existsSync(pathTheme)) return undefined
+        if (!fs.existsSync(pathTheme)) return
         let themeJSON = JSON.parse(fs.readFileSync(pathTheme, "utf-8"))
-        const theme = ThemeSchema.parse(themeJSON)
+        const theme = themeParser(themeJSON)
+        if (!theme) return
+
         return { ...theme, mainCSS: path.join(path_theme, theme.mainCSS) }
     } catch (error) {
         console.log("Error parsing theme", error)
-        return undefined
+        return
     }
 }
 

@@ -1,7 +1,6 @@
 import { app } from "electron"
 import path from "path"
 import { checkPath } from "./utils"
-import { z } from "zod";
 
 export interface SettingsConfig {
     firstStart: boolean
@@ -400,27 +399,6 @@ export interface themeFormatType {
         default?: boolean
     }[]
 }
-
-export const ThemeSchema = z.object({
-    api: z.string().optional(),
-    version: z.string().optional(),
-    author: z.string(),
-    themeName: z.string(),
-    mainCSS: z.string(),
-    options: z.array(
-        z.object({
-            name: z.string(),
-            css: z.string().optional(),
-            default: z.boolean().optional(),
-            dropDown: z.array(
-                z.object({
-                    option: z.string(),
-                    css: z.string()
-                })
-            ).optional()
-        })
-    ).optional()
-});
 
 export interface animulistData {
     AnimeData: AnimeData
