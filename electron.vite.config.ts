@@ -170,7 +170,7 @@ export default defineConfig({
     build: {
       emptyOutDir: true,
       sourcemap: false,
-      minify: true,
+      minify: globalFlags.DEBUG ? false : true,
       externalizeDeps: false
     },
     plugins: [
@@ -189,7 +189,7 @@ export default defineConfig({
     build: {
       emptyOutDir: true,
       sourcemap: false,
-      minify: true,
+      minify: globalFlags.DEBUG ? false : true,
       externalizeDeps: false
     }
   },

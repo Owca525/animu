@@ -1,7 +1,6 @@
 import { app, shell, BrowserWindow, Menu, session, ipcMain, crashReporter, Tray, dialog, Notification } from 'electron'
 import { optimizer, is } from '@electron-toolkit/utils'
 import path, { join } from 'path'
-import ini from "ini";
 
 // Files import
 import icon from '../../build/icon.png?asset'
@@ -23,6 +22,7 @@ import { cardData, defaultConfig, SettingsConfig } from './types';
 import { deepMerge, detectZoom, runCheckYT_DLP, setupDiscordRPC } from './utils';
 import { electronAppUniversalProtocolClient } from 'electron-app-universal-protocol-client';
 import { checkDatabase } from './animulist';
+import { ConvertObjectToINI, ParseINI } from './iniParser';
 
 export let mainWindow: BrowserWindow | undefined
 export const newConfigPath = path.join(app.getPath("userData"), "animuConfig")
@@ -160,7 +160,7 @@ function createWindow(): void {
     { type: 'separator' },
     {
       label: 'Exit Animu',
-      click: () => app.quit()
+      click: () => process.exit()
     }
   ])
 
@@ -284,9 +284,11 @@ app.on('window-all-closed', () => {
 
 function detectKeybinds(config: SettingsConfig) {
   let keybinds = config.Player.keybinds
+  console.log(config)
   const defaultKeybinds = defaultConfig.Player.keybinds
   for (const key in keybinds) {
-    if (keybinds[key].replaceAll(" ", "") == "") {
+    console.log(key, keybinds[key])
+    if (`${keybinds[key]}`.replaceAll(" ", "") == "") {
       keybinds = { ...keybinds, [key]: defaultKeybinds[key] }
     }
   }
@@ -306,11 +308,13 @@ export async function initialBackend() {
 
     if (existsSync(path.join(newConfigPath, "config.ini"))) {
       let data = readFileSync(path.join(newConfigPath, "config.ini"), "utf-8")
-      const content: SettingsConfig = deepMerge(defaultConfig, ini.parse(data))
+
+      const content: SettingsConfig = deepMerge(defaultConfig, ParseINI(data))
+
       if (typeof content.General.theme === "string") config = { ...content, General: { ...content.General, theme: ["DarkerAnimu"] } }
       else config = detectKeybinds(content)
     } else {
-      write(path.join(newConfigPath, "config.ini"), ini.stringify(defaultConfig))
+      write(path.join(newConfigPath, "config.ini"), ConvertObjectToINI(defaultConfig))
       console.info("created new config")
     }
 

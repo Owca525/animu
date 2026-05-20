@@ -4,8 +4,9 @@ import { mainWindow, newConfigPath } from ".";
 import { WriteFileOptions, writeFileSync, mkdirSync, existsSync, readFileSync, promises, rmSync } from "fs";
 import path from "path"
 import os from "os"
-import { cardData } from "./types";
+import { cardData, SettingsConfig } from "./types";
 import { createBackup } from "./backup";
+import { ConvertObjectToINI } from "./iniParser";
 
 export function write(path: string, data: string, format?: WriteFileOptions): boolean {
   try {
@@ -81,6 +82,10 @@ ipcMain.handle("os:openDialog", async (_event, path?: string, name?: string, ext
     return "";
   }
 );
+
+ipcMain.handle("os:saveConfig", async (_event, config: SettingsConfig): Promise<boolean> => {
+  return write(path.join(newConfigPath, "config.ini"), ConvertObjectToINI(config), "utf-8")
+});
 
 ipcMain.handle('os:information', () => {
   return {

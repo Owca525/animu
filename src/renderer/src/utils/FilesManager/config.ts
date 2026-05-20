@@ -1,13 +1,11 @@
-import ini from "ini";
 import { SettingsConfig } from "../types";
 import { setConfig } from "../stores/config";
 
 export async function saveConfig(content: SettingsConfig): Promise<boolean> {
     try {
-        const data = ini.stringify(content);
         setConfig(content)
         /* IFDEF DEBUG|PROD */
-        return await window.api.os.write("config.ini", data)
+        return await window.api.saveConfig(content)
         /* ENDIF */
 
         /* IFDEF WEB */

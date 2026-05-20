@@ -78,6 +78,7 @@ declare global {
         getDatabase: () => Promise<globalDataFormat["animuList"]>
         overWrite: (data: globalDataFormat["animuList"]) => Promise<void>
       }
+      saveConfig: (config: SettingsConfig) => Promise<boolean>
       runExternaPlayer: (videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc") => any
       getOSDetails: () => Promise<{ platform: NodeJS.Platform, release: string, arch: string }>
       getListLang: () => Promise<{ data: any, lang: string }[]>

@@ -2,16 +2,16 @@ import {
     themeFormatType,
     ThemeSchema
 } from './types';
-import ini from 'ini';
 import { themeConfigPath } from '.';
 import fs from 'fs';
 import path from 'path';
 import { ipcMain } from 'electron';
 import { checkConfigFolder, getFolderPath } from './utils';
+import { ConvertObjectToINI, ParseINI } from './iniParser';
 
 function getThemeConfig(theme: themeFormatType) {
     if (!fs.existsSync(path.join(themeConfigPath, `${theme.themeName}.ini`))) return generateConfigTheme(theme)
-    return ini.parse(fs.readFileSync(path.join(themeConfigPath, `${theme.themeName}.ini`), "utf-8"))
+    return ParseINI(fs.readFileSync(path.join(themeConfigPath, `${theme.themeName}.ini`), "utf-8"))
 }
 
 function generateConfigTheme(theme: themeFormatType) {
@@ -29,7 +29,7 @@ function generateConfigTheme(theme: themeFormatType) {
         }
     }
 
-    fs.writeFileSync(path.join(themeConfigPath, `${theme.themeName}.ini`), ini.stringify(generetatedConfig), "utf-8")
+    fs.writeFileSync(path.join(themeConfigPath, `${theme.themeName}.ini`), ConvertObjectToINI(generetatedConfig), "utf-8")
     return generetatedConfig
 }
 
@@ -40,7 +40,7 @@ function saveThemeConfig(theme: themeFormatType, data: Record<string, boolean | 
     } else {
         content = { ...getThemeConfig(theme), ...content }
     }
-    fs.writeFileSync(path.join(themeConfigPath, `${theme.themeName}.ini`), ini.stringify(content), "utf-8")
+    fs.writeFileSync(path.join(themeConfigPath, `${theme.themeName}.ini`), ConvertObjectToINI(content), "utf-8")
 }
 
 

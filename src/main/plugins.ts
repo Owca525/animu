@@ -1,24 +1,24 @@
 import { app, ipcMain } from "electron"
 import fs from 'fs';
-import ini from 'ini';
 import path from 'path';
 import { animuPlugins, newConfigPath, pluginsConfigPath } from ".";
 import { pluginRepoExpanded } from "./types";
 import { advanceRequest } from "./request";
 import { sha256FromString } from "./utils";
+import { ConvertObjectToINI, ParseINI } from "./iniParser";
 
 function getPluginConfig(name: string, config: { [key: string]: any }) {
     if (!fs.existsSync(path.join(pluginsConfigPath, `${name}.ini`))) return generetaPluginConfig(name, config)
-    return ini.parse(fs.readFileSync(path.join(pluginsConfigPath, `${name}.ini`), "utf-8"))
+    return ParseINI(fs.readFileSync(path.join(pluginsConfigPath, `${name}.ini`), "utf-8"))
 }
 
 function generetaPluginConfig(name: string, config: { [key: string]: any }) {
-    fs.writeFileSync(path.join(pluginsConfigPath, `${name}.ini`), ini.stringify(config), "utf-8")
+    fs.writeFileSync(path.join(pluginsConfigPath, `${name}.ini`), ConvertObjectToINI(config), "utf-8")
     return config
 }
 
 function savePluginConfig(name: string, config: { [key: string]: any }) {
-    fs.writeFileSync(path.join(pluginsConfigPath, `${name}.ini`), ini.stringify(config), "utf-8")
+    fs.writeFileSync(path.join(pluginsConfigPath, `${name}.ini`), ConvertObjectToINI(config), "utf-8")
 }
 
 function extractPlugin(folderPlugins: string, type: "official" | "user") {
