@@ -135,7 +135,7 @@ function ConvertObjectTreeToString(content: { [key: string]: any }, path: string
             return
         }
 
-        if (/\s/.test(val)) {
+        if (`${val}`.replaceAll(" ", "") == "") {
             convertedString += `${key}="${val}"\n`
             return
         }

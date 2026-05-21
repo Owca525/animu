@@ -17,12 +17,12 @@ import "./theme"
 import "./plugins"
 
 import { convertToNewFormat, detectOldVersion, write } from './os'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync} from 'fs'
 import { cardData, defaultConfig, SettingsConfig } from './types';
 import { deepMerge, detectZoom, runCheckYT_DLP, setupDiscordRPC } from './utils';
 import { electronAppUniversalProtocolClient } from 'electron-app-universal-protocol-client';
 import { checkDatabase } from './animulist';
-import { ConvertObjectToINI, ParseINI } from './iniParser';
+import { ParseINI } from './iniParser';
 
 export let mainWindow: BrowserWindow | undefined
 export const newConfigPath = path.join(app.getPath("userData"), "animuConfig")
@@ -121,7 +121,7 @@ function createWindow(): void {
         ...customheader
       }
     }
-    
+
     callback({ requestHeaders: newHeader });
   });
 
@@ -298,6 +298,7 @@ export async function initialBackend() {
   try {
     await detectOldVersion()
     await convertToNewFormat()
+    detectInIConfig()
 
     if (!existsSync(themeConfigPath)) mkdirSync(themeConfigPath)
     if (!existsSync(pluginsConfigPath)) mkdirSync(pluginsConfigPath)
@@ -305,15 +306,15 @@ export async function initialBackend() {
     if (!existsSync(animuPlugins)) mkdirSync(animuPlugins)
     if (!existsSync(animuPlaylistPath)) mkdirSync(animuPlaylistPath)
 
-    if (existsSync(path.join(newConfigPath, "config.ini"))) {
-      let data = readFileSync(path.join(newConfigPath, "config.ini"), "utf-8")
+    if (existsSync(path.join(newConfigPath, "config.json"))) {
+      let data = readFileSync(path.join(newConfigPath, "config.json"), "utf-8")
 
-      const content: SettingsConfig = deepMerge(defaultConfig, ParseINI(data))
+      const content: SettingsConfig = deepMerge(defaultConfig, JSON.parse(data))
 
       if (typeof content.General.theme === "string") config = { ...content, General: { ...content.General, theme: ["DarkerAnimu"] } }
       config = detectKeybinds(content)
     } else {
-      write(path.join(newConfigPath, "config.ini"), ConvertObjectToINI(defaultConfig))
+      write(path.join(newConfigPath, "config.json"), JSON.stringify(defaultConfig))
       console.info("created new config")
     }
 
@@ -332,6 +333,16 @@ export async function initialBackend() {
   } catch (error) {
     console.error("Failed Initial Backend", error)
   }
+}
+
+function detectInIConfig() {
+  if (!existsSync(path.join(newConfigPath, "config.ini"))) return
+
+  const data = readFileSync(path.join(newConfigPath, "config.ini"), "utf-8")
+  renameSync(path.join(newConfigPath, "config.ini"), path.join(newConfigPath, "config.ini.backup"))
+
+  const content: SettingsConfig = deepMerge(defaultConfig, ParseINI(data))
+  writeFileSync(path.join(newConfigPath, "config.json"), JSON.stringify(content), "utf-8")
 }
 
 app.on('render-process-gone', (_event, _webContents, details) => {
