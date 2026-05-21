@@ -287,8 +287,9 @@ function detectKeybinds(config: SettingsConfig) {
   const defaultKeybinds = defaultConfig.Player.keybinds
   for (const key in keybinds) {
     if (`${keybinds[key]}`.replaceAll(" ", "") == "") {
-      keybinds = { ...keybinds, [key]: defaultKeybinds[key] }
+      keybinds = { ...keybinds, [key]: `${defaultKeybinds[key]}` }
     }
+    else keybinds = { ...keybinds, [key]: `${keybinds[key]}` }
   }
   return { ...config, Player: { ...config.Player, keybinds: keybinds } }
 }

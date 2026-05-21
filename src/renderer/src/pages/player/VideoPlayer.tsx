@@ -1150,6 +1150,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     function keybinds(event: string) {
         if (!videoRef) return
         let time_now = videoRef.currentTime
+        console.log(config.Player.keybinds, event, convertKeybinds(config.Player.keybinds.Pause.toLowerCase()))
         switch (event.toLowerCase()) {
             case convertKeybinds(config.Player.keybinds.Pause.toLowerCase()).toLowerCase():
                 togglePlay()

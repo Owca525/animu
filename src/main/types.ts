@@ -281,7 +281,7 @@ export const defaultConfig: SettingsConfig = {
             variants: "var1"
         },
         keybinds: {
-            Pause: " ",
+            Pause: "SPACE",
             LongTimeSkipForward: "ArrowUp",
             LongTimeSkipBack: "ArrowDown",
             TimeSkipLeft: "ArrowLeft",

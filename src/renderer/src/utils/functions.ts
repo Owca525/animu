@@ -141,7 +141,8 @@ export function convertKeybinds(inputString: string) {
         "tab": "tab",
         "delete": "del",
         "end": "end",
-        " ": "space"
+        " ": "space",
+        "space": "Space"
     }
     for (const key in convert) {
         if (convert.hasOwnProperty(key)) {
