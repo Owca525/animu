@@ -88,7 +88,10 @@ function App() {
   createShortcut(["Control", "Shift", "R"], async () => {
     if (getConfig().Developer.DeveloperMode) {
       const idToast = toast(t("global.themereload"), { type: "loading", timer: true })
-      setGlobalTheme(await window.api.themes.list())
+      setGlobalTheme([
+        ...window["animuAppInfo"]["themes"],
+        ...await window.api.themes.list()
+      ])
 
       const loadedTheme = getGlobalCache().loadedTheme
       let confTheme = [...new Set(unwrap(getConfig().General.theme))]
@@ -191,7 +194,10 @@ function App() {
 
     setinitialState({ text: "initial.theme", plugin: false })
     /* IFDEF DEBUG|PROD */
-    setGlobalTheme(await window.api.themes.list())
+      setGlobalTheme([
+        ...window["animuAppInfo"]["themes"],
+        ...await window.api.themes.list()
+      ])
     /* ENDIF */
 
     setinitialState({ text: "Loading Animulist", plugin: false })

@@ -141,42 +141,20 @@ export function getFolderPath(folderPath: string) {
     }
 }
 
-ipcMain.handle('lang:files', async (): Promise<{ data: any, lang: string }[]> => {
-    let langDir: string = "";
-    if (process.env.NODE_ENV === 'development') {
-        langDir = path.join(__dirname, '../../src/renderer/src/utils/lang')
-    } else {
-        langDir = path.join(__dirname, '../../out/renderer/assets/lang')
-    }
-
-    let langPaths = await takeFileExtensionAndPath(langDir, ".json")
-    let langList = langPaths.map((element) => {
-        try {
-            return { data: fs.readFileSync(element, "utf-8"), lang: path.basename(element).replace(".json", "") }
-        } catch (error) {
-            return { data: {}, lang: "" }
-        }
-    })
-
+ipcMain.handle('lang:files', async (): Promise<{ content: string, lang: string }[]> => {
     const userLangPath = checkConfigFolder("lang")
-    if (!userLangPath) return langList.filter((data) => data.lang != "")
+    if (!userLangPath) return []
 
     let userlangListPath = await takeFileExtensionAndPath(userLangPath, ".json")
     let userLangList = userlangListPath.map((element) => {
         try {
-            return { data: fs.readFileSync(element, "utf-8"), lang: path.basename(element).replace(".json", "") }
+            return { content: fs.readFileSync(element, "utf-8"), lang: path.basename(element).replace(".json", "") }
         } catch (error) {
-            return { data: {}, lang: "" }
+            return { content: "", lang: "" }
         }
     })
 
-    for (let index = 0; index < userLangList.length; index++) {
-        const element = userLangList[index];
-        const indexList = langList.findIndex((item) => item.lang.toLowerCase() == element.lang.toLowerCase());
-        if (indexList != -1) langList.splice(indexList, 1);
-    }
-
-    return [...langList.filter((data) => data.lang != ""), ...userLangList.filter((data) => data.lang != "")]
+    return userLangList.filter((data) => data.lang != "")
 });
 
 export function checkConfigFolder(folder: string): string | undefined {

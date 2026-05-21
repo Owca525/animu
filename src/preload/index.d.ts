@@ -81,7 +81,7 @@ declare global {
       saveConfig: (config: SettingsConfig) => Promise<boolean>
       runExternaPlayer: (videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc") => any
       getOSDetails: () => Promise<{ platform: NodeJS.Platform, release: string, arch: string }>
-      getListLang: () => Promise<{ data: any, lang: string }[]>
+      getUserLang: () => Promise<{ content: string, lang: string }[]>
       getConfig: () => Promise<SettingsConfig>
       getHistory: () => Promise<cardData[]>
       onProtocolRequest: (callback: (url: string) => void) => void

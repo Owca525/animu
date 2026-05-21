@@ -92,9 +92,12 @@ export function formatTime(seconds: number | undefined): string {
 }
 
 function createHTMLLinkElement(css: string) {
+    const blob = new Blob([css], { type: "text/css" });
+    const url = URL.createObjectURL(blob);
+
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = css;
+    link.href = url;
     document.head.appendChild(link);
 }
 

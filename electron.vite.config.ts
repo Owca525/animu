@@ -2,7 +2,6 @@ import path, { resolve } from 'path';
 import fs from 'fs';
 import solid from 'vite-plugin-solid';
 import { defineConfig } from 'electron-vite';
-import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { transformWithEsbuild, type PluginOption } from "vite";
 import pkg from './package.json'
 import { execSync } from 'child_process';
@@ -38,9 +37,116 @@ function readAllLangFiles() {
       console.error(`Error ${file}:`, err);
       return undefined;
     }
-  });
+  }).filter(item => item !== undefined);
 
-  return jsonData.filter(item => item !== undefined);
+  let final = {}
+  jsonData.forEach((v) => {
+    final = {
+      ...final,
+      ...v
+    }
+  })
+
+  return final;
+}
+
+function getFolderPath(folderPath: string) {
+    try {
+        if (fs.statSync(folderPath).isDirectory()) return folderPath
+        return path.dirname(folderPath)
+    } catch (error) {
+        return folderPath
+    }
+}
+
+function getThemeList(themePath: string): { [key: string]: any }[] {
+    let listFolder = fs.readdirSync(themePath)
+    let finallist: { [key: string]: any }[] = []
+    for (let index = 0; index < listFolder.length; index++) {
+        const element = listFolder[index];
+        const folderTheme = path.join(themePath, element)
+        if (fs.statSync(folderTheme).isDirectory()) {
+            let theme = getMetadataTheme(folderTheme)
+            if (theme) finallist.push(theme)
+        }
+    }
+    return finallist.map((theme) => {
+        if (!theme.options) return theme
+        const mainCSSPath = getFolderPath(theme.mainCSS)
+        return {
+            ...theme,
+            mainCSS: fs.readFileSync(theme.mainCSS, "utf-8"),
+            options: theme.options.map((value) => {
+                if (value.css && value.css.replaceAll(" ", "") != "") return { 
+                    ...value, 
+                    css: fs.readFileSync(path.join(mainCSSPath, value.css), "utf-8") 
+                }
+
+                if (value.dropDown) return { ...value, dropDown: value.dropDown.map((val) => ({ 
+                    ...val, 
+                    css: val.css != "" ? fs.readFileSync(path.join(mainCSSPath, val.css), "utf-8") : "" 
+                })) 
+            }
+
+                return value
+            })
+        }
+    })
+}
+
+function themeParser(theme: { [key: string]: any }): { [key: string]: any } | undefined {
+    try {
+        if (!("author" in theme) || !("themeName" in theme) || !("mainCSS" in theme)) return
+        let tmpTheme: { [key: string]: any } = {
+            author: theme["author"],
+            themeName: theme["themeName"],
+            mainCSS: theme["mainCSS"],
+        } as any
+
+        if (theme["api"]) tmpTheme = { ...tmpTheme, api: theme["api"] }
+        if (theme["version"]) tmpTheme = { ...tmpTheme, version: theme["version"] }
+        if (theme["options"]) {
+            const tmpOptions = theme["options"].map((option) => {
+                let tmpDropdown: any = undefined
+                if (option["dropDown"]) {
+                    tmpDropdown = option["dropDown"].map((v) => ({
+                        option: v["option"],
+                        css: v["css"],
+                    }))
+                }
+
+                return {
+                    name: option["name"],
+                    dropDown: tmpDropdown,
+                    css: option["css"],
+                    default: option["default"],
+                }
+            })
+
+            tmpTheme = { ...tmpTheme, options: tmpOptions }
+        }
+
+        return tmpTheme
+    } catch (error) {
+        console.error("Failed Parse Theme", error)
+        return
+    }
+}
+
+function getMetadataTheme(path_theme: string): { [key: string]: any } | undefined {
+    try {
+        const pathTheme = path.join(path_theme, "/theme.json")
+
+        if (!fs.existsSync(pathTheme)) return
+        let themeJSON = JSON.parse(fs.readFileSync(pathTheme, "utf-8"))
+        const theme = themeParser(themeJSON)
+        if (!theme) return
+
+        return { ...theme, mainCSS: path.join(path_theme, theme.mainCSS) }
+    } catch (error) {
+        console.log("Error parsing theme", error)
+        return
+    }
 }
 
 function ConditionTransform(code: string, flags: Record<string, boolean>): string {
@@ -59,7 +165,6 @@ function ConditionTransform(code: string, flags: Record<string, boolean>): strin
 
 export function viteConditionPlugin(flags: Record<string, boolean>): PluginOption {
   return {
-    name: "viteConditionPlugin",
     enforce: "pre",
 
     // How to Use
@@ -71,12 +176,11 @@ export function viteConditionPlugin(flags: Record<string, boolean>): PluginOptio
 
       return { code: ConditionTransform(code, flags), map: null };
     }
-  };
+  } as any;
 }
 
 function generateInfoFile(): PluginOption {
   return {
-    name: 'generateInfoFile',
     enforce: "pre",
     transform(code: string, id: string) {
       if (!/\.(ts|tsx|js|jsx)$/.test(id)) return null;
@@ -85,9 +189,10 @@ function generateInfoFile(): PluginOption {
           ver: pkg.version,
           branch: "Dev",
           commit: "Uknown",
-          compiled: Math.floor(new Date().getTime() / 1000)
+          compiled: Math.floor(new Date().getTime() / 1000),
+          langs: readAllLangFiles(),
+          themes: getThemeList(path.join(path.resolve(__dirname), "src/renderer/src/themes"))
         }
-        if (process.env.ANIMU_WEB_DEV) tmp["langs"] = readAllLangFiles()
         code = code.replace('"PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION"', JSON.stringify(tmp));
         return { code, map: null };
       }
@@ -104,16 +209,16 @@ function generateInfoFile(): PluginOption {
         ver: pkg.version,
         branch: branch,
         commit: commit,
-        compiled: Math.floor(new Date().getTime() / 1000)
+        compiled: Math.floor(new Date().getTime() / 1000),
+        langs: readAllLangFiles(),
+        themes: getThemeList(path.join(path.resolve(__dirname), "src/renderer/src/themes"))
       }
-
-      if (process.env.ANIMU_WEB) generatedJson["langs"] = readAllLangFiles()
 
       code = code.replace('"PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION"', JSON.stringify(generatedJson));
 
       return { code, map: null };
     },
-  }
+  } as any
 }
 
 function compileRawModule() {
@@ -174,14 +279,6 @@ export default defineConfig({
       externalizeDeps: false
     },
     plugins: [
-      viteStaticCopy({
-        targets: [
-          {
-            src: "node_modules/castv2/lib/cast_channel.proto",
-            dest: "",
-          }
-        ],
-      }),
       viteConditionPlugin(globalFlags),
     ]
   },
@@ -215,7 +312,10 @@ export default defineConfig({
           chunkFileNames: "[name].js",
           assetFileNames: "[name][extname]",
           minifyInternalExports: false
-        }
+        },
+        input: {
+          main: resolve(__dirname, "src/renderer/index.html"),
+        },
       },
       minify: process.env.ANIMU_WEB ? true : false,
     },
@@ -229,25 +329,6 @@ export default defineConfig({
       }),
       compileRawModule(),
       generateInfoFile(),
-      viteStaticCopy({
-        targets: [
-          {
-            src: 'src/themes/*',
-            dest: 'assets/themes'
-          },
-          {
-            src: 'src/utils/lang/*',
-            dest: 'assets/lang'
-          },
-        ],
-      }),
-      {
-        name: 'delete',
-        closeBundle() {
-          const fileToDelete = path.resolve(__dirname, 'out/renderer/exports.js');
-          if (fs.existsSync(fileToDelete)) fs.unlinkSync(fileToDelete)
-        }
-      }
     ]
   }
 })

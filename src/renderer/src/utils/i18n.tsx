@@ -8,17 +8,20 @@ async function getAllLangFiles() {
   if (window["animuAppInfo"]["langs"]) return { en: en, ...window["animuAppInfo"]["langs"] }
   /* ENDIF */
   /* IFDEF DEBUG|PROD */
-  let langFiles = await window.api.getListLang()
+  let langFiles = await window.api.getUserLang()
   let res = {}
   for (let index = 0; index < langFiles.length; index++) {
     const element = langFiles[index];
     try {
-      res[element.lang] = JSON.parse(element.data)
+      res[element.lang] = JSON.parse(element.content)
     } catch (error) {
       console.error(error, "getAllLangFiles")
     }
   }
-  return res
+  return {
+    ...window["animuAppInfo"]["langs"],
+    ...res
+  }
   /* ENDIF */
 }
 

@@ -74,7 +74,7 @@ if (process.contextIsolated) {
       },
       runExternaPlayer: (videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", videoData, type),
       getOSDetails: () => ipcRenderer.invoke('os:information'),
-      getListLang: () => ipcRenderer.invoke("lang:files"),
+      getUserLang: () => ipcRenderer.invoke("lang:files"),
       saveConfig: (config) => ipcRenderer.invoke("os:saveConfig", config),
       getConfig: () => ipcRenderer.invoke("backend:config"),
       getHistory: () => ipcRenderer.invoke("backend:history"),

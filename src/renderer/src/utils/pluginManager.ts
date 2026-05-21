@@ -74,7 +74,7 @@ var window = {
     global: this,
     request: async (...args) => await callMainProcess("request", args),
     yt_dlp: async (...args) => await callMainProcess("yt-dlp", args),
-    animuAppInfo: "PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION",
+    animuAppInfo: "PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION_WORKER",
     config: "CHANGE_TO_CONFIG_WHEN_ARE_PERMISIONS"
 };
 
@@ -307,7 +307,11 @@ class WorkerWrapper implements WorkerWrapperInstance {
             const blobCode = new Blob([detectIndex(pluginCode, pluginFunctionsURL)], { type: "text/javascript" });
             pluginCode = URL.createObjectURL(blobCode);
         }
-        let payload = WorkerPayload.replace("CHANGETOPLUGIN", pluginCode).replace(`"PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION"`, JSON.stringify(window["animuAppInfo"]))
+
+        let payload = WorkerPayload.replace("CHANGETOPLUGIN", pluginCode).replace(`"PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION_WORKER"`, JSON.stringify({
+            ...window["animuAppInfo"],
+            themes: undefined
+        }))
         if (this.otherDataPermision) payload = payload.replace(`"CHANGE_TO_CONFIG_WHEN_ARE_PERMISIONS"`, JSON.stringify(getConfig()))
 
         const payloadBLob = new Blob([payload], { type: "text/javascript" });

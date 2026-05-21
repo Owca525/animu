@@ -41,14 +41,14 @@ function saveThemeConfig(theme: themeFormatType, data: Record<string, boolean | 
 }
 
 
-async function getThemeList(themePath: string): Promise<themeFormatType[]> {
-    let listFolder = await fs.promises.readdir(themePath)
+function getThemeList(themePath: string): themeFormatType[] {
+    let listFolder = fs.readdirSync(themePath)
     let finallist: themeFormatType[] = []
     for (let index = 0; index < listFolder.length; index++) {
         const element = listFolder[index];
         const folderTheme = path.join(themePath, element)
         if (fs.statSync(folderTheme).isDirectory()) {
-            let theme = await getMetadataTheme(folderTheme)
+            let theme = getMetadataTheme(folderTheme)
             if (theme) finallist.push(theme)
         }
     }
@@ -56,9 +56,20 @@ async function getThemeList(themePath: string): Promise<themeFormatType[]> {
         if (!theme.options) return theme
         const mainCSSPath = getFolderPath(theme.mainCSS)
         return {
-            ...theme, options: theme.options.map((value) => {
-                if (value.css && value.css.replaceAll(" ", "") != "") return { ...value, css: path.join(mainCSSPath, value.css) }
-                if (value.dropDown) return { ...value, dropDown: value.dropDown.map((val) => ({ ...val, css: val.css != "" ? path.join(mainCSSPath, val.css) : "" })) }
+            ...theme,
+            mainCSS: fs.readFileSync(theme.mainCSS, "utf-8"),
+            options: theme.options.map((value) => {
+                if (value.css && value.css.replaceAll(" ", "") != "") return { 
+                    ...value, 
+                    css: fs.readFileSync(path.join(mainCSSPath, value.css), "utf-8") 
+                }
+
+                if (value.dropDown) return { ...value, dropDown: value.dropDown.map((val) => ({ 
+                    ...val, 
+                    css: val.css != "" ? fs.readFileSync(path.join(mainCSSPath, val.css), "utf-8") : "" 
+                })) 
+            }
+
                 return value
             })
         }
@@ -104,7 +115,7 @@ function themeParser(theme: themeFormatType): themeFormatType | undefined {
     }
 }
 
-async function getMetadataTheme(path_theme: string): Promise<themeFormatType | undefined> {
+function getMetadataTheme(path_theme: string): themeFormatType | undefined {
     try {
         const pathTheme = path.join(path_theme, "/theme.json")
 
@@ -121,23 +132,13 @@ async function getMetadataTheme(path_theme: string): Promise<themeFormatType | u
 }
 
 ipcMain.handle('theme:listTheme', async (): Promise<themeFormatType[]> => {
-    // Directory for local css
-    let stylesDir: string = "";
-    if (process.env.NODE_ENV === 'development') {
-        stylesDir = path.join(__dirname, '../../src/renderer/src/themes')
-    } else {
-        stylesDir = path.join(__dirname, '../../out/renderer/assets/themes')
-    }
-
-    const localList = await getThemeList(stylesDir)
-
     const configcss = checkConfigFolder("themes")
-    if (configcss == undefined) return localList
+    if (configcss == undefined) return []
 
     // Direcotry for config/theme css
     const customList = await getThemeList(configcss)
 
-    return [...localList, ...customList]
+    return customList
 });
 
 ipcMain.handle('theme:SaveConfig', async (_event, theme: themeFormatType, data: Record<string, boolean | string>): Promise<void> => saveThemeConfig(theme, data))

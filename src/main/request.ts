@@ -29,7 +29,7 @@ export async function advanceRequest(url: string, options?: { method?: "POST" | 
             responseHeader: new Map<string, string>(response.headers.entries()),
         }
 
-        if (DEBUG) console.log("advanceRequest\n", convertedResponse, options)
+        if (DEBUG) console.log("advanceRequest\n", response) // options
 
         return convertedResponse;
     } catch (error) {
