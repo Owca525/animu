@@ -116,10 +116,6 @@ function App() {
     if (isPluginSearchMode()) toast("This Mode can broke some things in animu")
   })
 
-  {
-    import("./utils/exports").then((v) => v)
-  }
-
   createShortcut(["Control", "I"], () => {
     setIncognitoMode(!getGlobalCache().incognito)
     toast(t("global.incognitomode", { switch: getGlobalCache().incognito ? t("global.on") : t("global.off") }))
