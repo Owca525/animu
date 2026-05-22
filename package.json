@@ -26,7 +26,6 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^4.0.0",
-    "@solid-primitives/keyboard": "^1.3.5",
     "@solidjs/router": "^0.16.1",
     "@xhayper/discord-rpc": "^1.3.3",
     "adm-zip": "^0.5.17",

@@ -33,7 +33,6 @@ import {
     Show,
     Switch
 } from 'solid-js';
-import { createShortcut } from '@solid-primitives/keyboard';
 import { animulistData, getGlobalCache } from '@renderer/utils/stores/global';
 import { getInformationPlugin, getPlayerPLugin, pluginManager } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
@@ -61,6 +60,7 @@ import { updateGenres } from '../home/components/filter';
 import { getHomeCache, getHomeSidebarData } from '@renderer/utils/stores/home';
 import { setNewActivePage, StartHomeSearch } from '../home';
 import EpisodeBox from './components/episodeBox';
+import { SheepShortcut } from '@renderer/utils/hooks/useKeyPress';
 
 interface informationTmpProps {
     anime: AnimeData,
@@ -550,7 +550,7 @@ function information() {
         )
     }
 
-    createShortcut(["Escape"], () => {
+    SheepShortcut(["Escape"], () => {
         console.log(location.href, youCanleave())
         if (!location.href.includes("#/info") || !youCanleave()) return
 

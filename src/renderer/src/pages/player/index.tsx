@@ -10,7 +10,6 @@ import { SaveHistory } from "@renderer/utils/FilesManager/history";
 import { useNavigate } from "@solidjs/router";
 import { getConfig } from "@renderer/utils/stores/config";
 import { createSignal, Match, onCleanup, onMount, Switch } from "solid-js";
-import { createShortcut } from "@solid-primitives/keyboard";
 import ExternalPlayer from "./externalPlayer";
 import { pluginManager } from "@renderer/utils/stores/plugins";
 import { useResponse } from "@renderer/utils/hooks/useResponse";
@@ -18,6 +17,7 @@ import { useI18n } from "@renderer/utils/i18n";
 import { addToAnimuList, updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist";
 import { getSocket, getSocketRoom } from "@renderer/utils/stores/global";
 import { unwrap } from "solid-js/store";
+import { SheepShortcut } from "@renderer/utils/hooks/useKeyPress";
 
 const player = () => {
     const { t } = useI18n()
@@ -109,7 +109,7 @@ const player = () => {
         }
     }
 
-    createShortcut(["Escape"], async () => {
+    SheepShortcut(["Escape"], async () => {
         await leave()
     });
 

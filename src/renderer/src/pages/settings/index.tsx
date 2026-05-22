@@ -44,7 +44,6 @@ import {
     Show,
     Switch
 } from 'solid-js';
-import { createShortcut } from '@solid-primitives/keyboard';
 import { DetectOldVersionHistory, OverWriteHistory } from '@renderer/utils/FilesManager/history';
 import { getConfig, setConfig } from '@renderer/utils/stores/config';
 import { getAllPluginList, getInformationPlugin, getPlayerPLugin, getPluginRepo, pluginManager } from '@renderer/utils/stores/plugins';
@@ -62,6 +61,7 @@ import SettingsPlugin from './components/settingsPlugin';
 import semver from "semver";
 import { OvewriteAnimuList } from '@renderer/utils/FilesManager/animulist';
 import OtherSettings from './components/otherSettings';
+import { SheepShortcut } from '@renderer/utils/hooks/useKeyPress';
 
 export type pluginRepoExpandedSettings = {
     name: string,
@@ -170,7 +170,7 @@ function settings() {
     })
     /* ENDIF */
 
-    createShortcut(["Control", "d"], () => {
+    SheepShortcut(["Control", "d"], () => {
         if (config().new.Developer.DeveloperMode) return
         showDialog({
             type: "info",
@@ -189,7 +189,7 @@ function settings() {
         })
     })
 
-    createShortcut(["Escape"], () => {
+    SheepShortcut(["Escape"], () => {
         if (isCustomMenuActive()) return hideCustomMenu()
         navigate("/");
     })

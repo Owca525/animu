@@ -20,7 +20,6 @@ import {
 import { checkUpdate } from './utils/update';
 import { convertHistoryToAnimuList } from './utils/FilesManager/animulist';
 import { CreateBackup } from './utils/backup';
-import { createShortcut } from '@solid-primitives/keyboard';
 import {
   createSignal,
   ErrorBoundary,
@@ -72,6 +71,7 @@ import './utils/debug';
 /* ENDIF */
 
 import { setHome } from './pages/home/homeUtils';
+import { SheepShortcut } from './utils/hooks/useKeyPress';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -82,10 +82,10 @@ function App() {
   const [initialState, setinitialState] = createSignal<{ text: string, plugin: boolean }>({ text: "initial.history", plugin: false })
 
   /* IFDEF DEBUG|PROD */
-  createShortcut(["F12"], () => {
+  SheepShortcut(["F12"], () => {
     if (getConfig().Developer.DevTools) window.BrowserWindow.openDevTools()
   })
-  createShortcut(["Control", "Shift", "R"], async () => {
+  SheepShortcut(["Control", "Shift", "R"], async () => {
     if (getConfig().Developer.DeveloperMode) {
       const idToast = toast(t("global.themereload"), { type: "loading", timer: true })
       setGlobalTheme([
@@ -110,13 +110,13 @@ function App() {
   })
   /* ENDIF */
 
-  createShortcut(["Control", "Shift", "|"], () => {
+  SheepShortcut(["Control", "Shift", "|"], () => {
     setPluginSearchMode(!isPluginSearchMode())
     toast(`Plugin Search Mode ${isPluginSearchMode()}`, { type: "info" })
     if (isPluginSearchMode()) toast("This Mode can broke some things in animu")
   })
 
-  createShortcut(["Control", "I"], () => {
+  SheepShortcut(["Control", "I"], () => {
     setIncognitoMode(!getGlobalCache().incognito)
     toast(t("global.incognitomode", { switch: getGlobalCache().incognito ? t("global.on") : t("global.off") }))
   })

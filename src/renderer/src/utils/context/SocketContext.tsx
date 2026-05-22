@@ -1,4 +1,3 @@
-import { createShortcut } from '@solid-primitives/keyboard';
 import {
     createEffect,
     createSignal,
@@ -13,6 +12,7 @@ import { getSocket, getSocketRoom } from '../stores/global';
 import Button from '@renderer/components/buttons';
 import { unwrap } from 'solid-js/store';
 import { Portal } from 'solid-js/web';
+import { SheepShortcut } from '../hooks/useKeyPress';
 
 export function SocketProvider(props: { children: JSX.Element }) {
     const [show, setShow] = createSignal<boolean>(false);
@@ -20,11 +20,11 @@ export function SocketProvider(props: { children: JSX.Element }) {
     const [currentRoom, setRoom] = createSignal<string | undefined>(undefined);
     let refreshTime: NodeJS.Timeout | undefined
 
-    // createShortcut(["ctrl", "shift", "i"], () => {
+    // SheepShortcut(["ctrl", "shift", "i"], () => {
     //     if (!getConfig().socket.useSocket) return
     // })
 
-    createShortcut(["Control", "Shift", "S"], () => {
+    SheepShortcut(["Control", "Shift", "S"], () => {
         console.log("adsknfl;adjsnfl;adfsnjln;adf")
         if (!getConfig().socket.useSocket) return
         setShow((v) => !v)

@@ -54,3 +54,10 @@ export function useKeyPress(func: (keybinds: string) => void) {
 
   return { setFunc };
 }
+
+export function SheepShortcut(keys: string[], wrapper: (keybinds: string) => void ) {
+  const keybinds = convertKeybinds(keys.join("+"))
+  return useKeyPress((keys) => {
+    if (keybinds.toLowerCase() == keys.toLowerCase()) wrapper(keys)
+  })
+}
