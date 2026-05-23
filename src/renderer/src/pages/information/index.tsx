@@ -459,7 +459,11 @@ function information() {
                 resolutions.push({
                     res: `${response["height"]}`,
                     url: response["url"],
-                    reqHeader: response["http_headers"]
+                    reqHeader: {
+                        ...response["http_headers"],
+                        Referer: "https://youtube.com/",
+                        "Cookie": "VISITOR_INFO1_LIVE=C69AkZEGbAk; VISITOR_PRIVACY_METADATA=CgJQTBIiEh4SHAsMDg8QERITFBUWFxgZGhscHR4fICEiIyQlJicgWA%3D%3D; __Secure-YNID=18.YT=IJSDTRKHUE-OxQXY4HSCy3ZV3cGOD7GLUVvMtah_TK6vYrBou3yJOt91o-CynFQHgld0sDV2XatJ_jLKPI54_DUbkq_DwlcbM96rxY_izAXlPn1no3Q4_muen0B3y9uajIlDPgYapXNI4yuVtVf7V2F9c0e7tw21C16SCYO7MJSSL_RngU17RhI8nlXJzU97fnvY7lMD1LmDY8k8ur7Ch7FxdJ_ONtqEquRfTsX2gAXRGZg2Zm6uyLWcfkUKRaCXjAuOaUYmO_MZYteMB43-sRonYK8x7w23dCbRGFcKUZ2luhIYXjcAszRoV4itkUqJ8V2UU0MhJKhUrMj3BhopoA; YSC=SiecueoQXHA; __Secure-ROLLOUT_TOKEN=CL7apoqqjuHILBCGtPq4opuTAxidscenhs2UAw%3D%3D",
+                    }
                 })
             }
 

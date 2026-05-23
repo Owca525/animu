@@ -146,11 +146,10 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
     const [videoFrames, setVideoFrames] = createSignal<{ totalVideoFrames: number, droppedVideoFrames: number }>({ totalVideoFrames: 0, droppedVideoFrames: 0 })
 
     // Subtitles
-    const [vttUrl, setVttUrl] = createSignal<string | undefined>(undefined);
     const [ListSubtitles, setListSubtitles] = createSignal<playerSubtitlesFormat[]>([])
     const [lastSubtitles, setlastSubtitles] = createSignal<playerSubtitlesFormat | undefined>(undefined)
     const [currentSubtitles, setSubtitles] = createSignal<playerSubtitlesFormat | undefined>(undefined)
-    const [currentCue, setCue] = createSignal<string | undefined>(undefined);
+    const [currentCue, setCue] = createSignal<VTTCue | undefined>(undefined);
 
     // Audio Tracks
     const [audioTrackList, setAudioTrackList] = createSignal<{ id: number, lang?: string, label: string }[]>([]);
@@ -327,7 +326,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         if (buttonSkipLeft) clearInterval(buttonSkipLeft)
         if (buttonSkipRight) clearInterval(buttonSkipRight)
         if (assSubContainer) assSubContainer.remove()
-        if (vttSubRef) vttSubRef.remove()
+        if (vttSubRef) videoJS!.removeRemoteTextTrack(vttSubRef.track)
         if (screenShotContainer) screenShotContainer.remove()
         if (refreashUpdateSocket) clearInterval(refreashUpdateSocket)
 
@@ -697,6 +696,8 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         setcurrentTime(event.currentTarget.currentTime)
         handleProgress(event)
 
+        if (currentCue() && (event.currentTarget.currentTime >= currentCue()!["endTime"])) setCue(undefined)
+
         setdurrationTime(event.currentTarget.duration)
         if (currentPlayer() && currentPlayer()!.listChapters && chapterList().length <= 0) {
             generateOpeningEnding(currentPlayer()!.listChapters!)
@@ -754,16 +755,16 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         setcurrentTime(() => value)
     }
 
-    function onChangeTrackText(event: Event) {
-        if (!event.currentTarget) return
-        let track = event.currentTarget as unknown as TextTrack
+    function onChangeTrackText() {
+        if (!vttSubRef) return
+
+        if (!vttSubRef.track) return
+        let track = vttSubRef.track
         if (!track.activeCues) return
         let activeCue = track.activeCues[0] as VTTCue
 
         try {
-            if (activeCue.text) {
-                setCue(activeCue.text)
-            }
+            if (activeCue) setCue(activeCue)
             else setCue(undefined)
         } catch (error) {
             setCue(undefined)
@@ -772,7 +773,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
 
     async function setNewSubtitles(sub: playerSubtitlesFormat | undefined) {
         if (!sub) return
-        if (!videoRef) return
+        if (!videoJS) return
 
         console.log(sub)
 
@@ -788,9 +789,9 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
             assSubContainer.innerHTML = ""
         }
 
-        if (vttUrl()) {
-            setVttUrl(() => undefined)
+        if (vttSubRef){
             setCue(() => undefined)
+            videoJS.removeRemoteTextTrack(vttSubRef.track)
         }
 
         if (sub.label == "Off" && sub.format == "", sub.lang == "", sub.url == "") {
@@ -811,11 +812,12 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
                 // modernWasmUrl
             } as any);
             currentASSubtitles = renderer
-            setSubtitles(() => sub)
+            setSubtitles(sub)
             return
         }
 
-        let data = await request(sub.url, { headers: currentResolution()!["reqHeader"] })
+        const data = await request(sub.url, { headers: currentResolution()!["reqHeader"] })
+
         if (!data["success"]) {
             toast(t("Failed Fetch Subttitles"), { type: "error" })
             return
@@ -823,11 +825,15 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
 
         const vtt = await convert(data.text, ".vtt", { removeTextFormatting: true });
         const blob = new Blob([vtt.subtitle], { type: "text/vtt" });
-        setVttUrl(URL.createObjectURL(blob));
-        setSubtitles(() => sub)
-        let track = videoRef.textTracks[0]
-        track.mode = "hidden"
-        track.oncuechange = onChangeTrackText;
+        setSubtitles(sub)
+
+        vttSubRef = videoJS.addRemoteTextTrack({
+            src: URL.createObjectURL(blob),
+            kind: "subtitles"
+        }, true) as any
+        
+        vttSubRef!.track.mode = "hidden"
+        vttSubRef!.track.oncuechange = onChangeTrackText;
     }
 
     useKeyPress((keys: string) => {
@@ -1054,17 +1060,17 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
                     muted={isMuted()}
                     style={config.Player.general.VideoStreching ? { "object-fit": "cover" } : {}}
                 >
-                    <track
+                    {/* <track
                         src={vttUrl()}
                         kind="subtitles"
                         default
                         ref={vttSubRef}
-                    />
+                    /> */}
                 </video>
                 <audio ref={audioRef} style={{ display: "none" }} />
                 <Show when={currentCue()}>
                     <div class={`player-subtitle-container ${isVisible() ? "up" : "down"}`}>
-                        <For each={currentCue()!.split("\n")}>
+                        <For each={`${currentCue()?.text}`.replace("undefined", "").split("\n")}>
                             {(text) => (
                                 <span class="player-subtitle-content">{text}</span>
                             )}

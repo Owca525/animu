@@ -130,11 +130,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [videoFrames, setVideoFrames] = createSignal<{ totalVideoFrames: number, droppedVideoFrames: number }>({ totalVideoFrames: 0, droppedVideoFrames: 0 })
 
     // Subtitles
-    const [vttUrl, setVttUrl] = createSignal<string | undefined>(undefined);
     const [ListSubtitles, setListSubtitles] = createSignal<playerSubtitlesFormat[]>([])
     const [lastSubtitles, setlastSubtitles] = createSignal<playerSubtitlesFormat | undefined>(undefined)
     const [currentSubtitles, setSubtitles] = createSignal<playerSubtitlesFormat | undefined>(undefined)
-    const [currentCue, setCue] = createSignal<string | undefined>(undefined);
+    const [currentCue, setCue] = createSignal<VTTCue | undefined>(undefined);
 
     // Audio Tracks
     const [audioTrackList, setAudioTrackList] = createSignal<{ id: number, lang?: string, label: string }[]>([]);
@@ -1057,16 +1056,16 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         return setNextEpisode(temp.episodes[ep].ep)
     }
 
-    function onChangeTrackText(event: Event) {
-        if (!event.currentTarget) return
-        let track = event.currentTarget as unknown as TextTrack
+    function onChangeTrackText() {
+        if (!vttSubRef) return
+
+        if (!vttSubRef.track) return
+        let track = vttSubRef.track
         if (!track.activeCues) return
         let activeCue = track.activeCues[0] as VTTCue
 
         try {
-            if (activeCue.text) {
-                setCue(activeCue.text)
-            }
+            if (activeCue) setCue(activeCue)
             else setCue(undefined)
         } catch (error) {
             setCue(undefined)
@@ -1076,6 +1075,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     async function setNewSubtitles(sub: playerSubtitlesFormat | undefined) {
         if (!sub) return
         if (!videoRef) return
+        if (!videoJS) return
 
         // This clear subtitles but this dosen't work on dev Because react second render
         if (currentASSubtitles) {
@@ -1089,9 +1089,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             assSubContainer.innerHTML = ""
         }
 
-        if (vttUrl()) {
-            setVttUrl(() => undefined)
+        if (vttSubRef){
             setCue(() => undefined)
+            videoJS.removeRemoteTextTrack(vttSubRef.track)
         }
 
         if (sub.label == "Off" && sub.format == "", sub.lang == "", sub.url == "") {
@@ -1112,20 +1112,28 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 // modernWasmUrl
             } as any);
             currentASSubtitles = renderer
-            setSubtitles(() => sub)
+            setSubtitles(sub)
             return
         }
 
-        let data = await request(sub.url)
-        if (!data.success) return
+        const data = await request(sub.url, { headers: currentResolution()!["reqHeader"] })
+
+        if (!data["success"]) {
+            toast(t("Failed Fetch Subttitles"), { type: "error" })
+            return
+        }
 
         const vtt = await convert(data.text, ".vtt", { removeTextFormatting: true });
         const blob = new Blob([vtt.subtitle], { type: "text/vtt" });
-        setVttUrl(URL.createObjectURL(blob));
-        setSubtitles(() => sub)
-        let track = videoRef.textTracks[0]
-        track.mode = "hidden"
-        track.oncuechange = onChangeTrackText;
+        setSubtitles(sub)
+
+        vttSubRef = videoJS.addRemoteTextTrack({
+            src: URL.createObjectURL(blob),
+            kind: "subtitles"
+        }, true) as any
+        
+        vttSubRef!.track.mode = "hidden"
+        vttSubRef!.track.oncuechange = onChangeTrackText;
     }
 
     // function gamepadControler(num: number, pressed: boolean) {
@@ -1458,16 +1466,16 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     muted={isMuted()}
                     style={config.Player.general.VideoStreching ? { "object-fit": "cover" } : {}}
                 >
-                    <track
+                    {/* <track
                         src={vttUrl()}
                         kind="subtitles"
                         default
                         ref={vttSubRef}
-                    />
+                    /> */}
                 </video>
                 <Show when={currentCue()}>
                     <div class={`player-subtitle-container ${isVisible() ? "up" : "down"}`}>
-                        <For each={currentCue()!.split("\n")}>
+                        <For each={`${currentCue()?.text}`.replace("undefined", "").split("\n")}>
                             {(text) => (
                                 <span class="player-subtitle-content">{text}</span>
                             )}
