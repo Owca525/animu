@@ -258,10 +258,7 @@ function compileRawModule() {
       )
 
       if (process.env.ONLY_PLUGINS && !isDissabled) {
-        if (!fs.existsSync(pluginsDir)) {
-          fs.rmdirSync(pluginsDir)
-          fs.mkdirSync(pluginsDir)
-        }
+        if (!fs.existsSync(pluginsDir)) fs.mkdirSync(pluginsDir)
         fs.writeFileSync(path.join(pluginsDir, path.basename(file).replace(".ts", ".js")), fixed, "utf-8")
       }
 
