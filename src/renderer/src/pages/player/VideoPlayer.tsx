@@ -36,6 +36,16 @@ import { useKeyPress } from "@renderer/utils/hooks/useKeyPress"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
+const Defaultheader = {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:149.0) Gecko/20100101 Firefox/149.0",
+    Accept: "*/*",
+    "Sec-GPC": "1",
+    Connection: "keep-alive",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "cross-site",
+}
+
 interface VideoPlayerProps {
     player_data: playerData[]
     anime_data: {
@@ -563,11 +573,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (currentplayer.storyboardVTT) setThumbnail(await VTTstoryBoardParser(currentplayer.storyboardVTT))
         const currentRes = currentplayer.resolution[0]
 
+        setListResolution(currentplayer.resolution)
+        setCurrentResoltion(currentRes)
         if (currentRes.defaultSubtitles && currentplayer.subtitles) setDefaultSubtitles(currentplayer.subtitles)
-        if (currentRes.hls && currentplayer.splitHLS) {
-            setListResolution(currentplayer.resolution)
-            setCurrentResoltion(currentRes)
-        }
 
         /* IFDEF DEBUG|PROD */
         await window.backend.changeHeader(currentRes.reqHeader);
@@ -609,10 +617,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             lowLatencyMode: true,
             autoStartLoad: true,
             backBufferLength: 40,
-            maxBufferSize: 120000000,
             manifestLoadingMaxRetry: 3,
             levelLoadingMaxRetry: 3,
             fragLoadingMaxRetry: 3,
+            maxBufferLength: 140,
         }
 
         /* IFDEF WEB */
@@ -663,8 +671,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 if (!splitHls) {
                     const resolutions = data.levels.map((level) => level.height);
                     resolutions.reverse()
-                    setListResolution(resolutions.map((val) => { return { res: val.toString(), url: "" } }))
-                    setCurrentResoltion({ res: resolutions[0].toString(), url: "" })
+                    setListResolution(resolutions.map((val) => { return { ...resolution, res: val.toString(), url: "" } }))
+                    setCurrentResoltion({ ...resolution, res: resolutions[0].toString(), url: "" })
                     tmpHls.currentLevel = tmpHls.levels.length - 1;
                 }
                 data.levels.forEach(level => {
@@ -1089,7 +1097,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             assSubContainer.innerHTML = ""
         }
 
-        if (vttSubRef){
+        if (vttSubRef) {
             setCue(() => undefined)
             videoJS.removeRemoteTextTrack(vttSubRef.track)
         }
@@ -1116,9 +1124,11 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             return
         }
 
-        const data = await request(sub.url, { headers: currentResolution()!["reqHeader"] })
+        console.log(currentResolution())
+        const data = await request(sub.url, { headers: currentResolution() && currentResolution()!["reqHeader"] ? currentResolution()!["reqHeader"] : Defaultheader })
 
         if (!data["success"]) {
+            console.error("Failed Load Subtitles", data, currentResolution())
             toast(t("Failed Fetch Subttitles"), { type: "error" })
             return
         }
@@ -1131,7 +1141,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             src: URL.createObjectURL(blob),
             kind: "subtitles"
         }, true) as any
-        
+
         vttSubRef!.track.mode = "hidden"
         vttSubRef!.track.oncuechange = onChangeTrackText;
     }

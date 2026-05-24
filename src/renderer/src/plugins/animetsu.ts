@@ -22,6 +22,22 @@ const HEADER = {
     "sec-fetch-site": "same-origin",
 }
 
+const playerHeader = {
+  "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:150.0) Gecko/20100101 Firefox/150.0",
+  Accept: "*/*",
+  "Accept-Language": "en-US,en;q=0.9",
+  "Accept-Encoding": "gzip, deflate, br, zstd",
+  Origin: WEBSITE,
+  Referer: WEBSITE,
+  "Sec-GPC": "1",
+  "Sec-Fetch-Dest": "empty",
+  "Sec-Fetch-Mode": "cors",
+  "Sec-Fetch-Site": "cross-site",
+  DNT: "1",
+  Connection: "keep-alive",
+  TE: "trailers",
+};
+
 function preaperURL(str: string) {
     if (!str) return str
     return str.replaceAll("//", "/").replace("https:/", "https://")
@@ -113,9 +129,7 @@ async function extractResolutions(episode: string, type: string, playerData: pla
             url: element["need_proxy"] ? `${window["animetsuBackend"]["proxy"]}${element["url"]}` : element["url"],
             defaultSubtitles: subtitles.length > 0,
             hls: true,
-            reqHeader: {
-                ...HEADER,
-            }
+            reqHeader: playerHeader
         }))
 
         let chapters: playerChapterList[] = response.json["skips"] ? [
@@ -152,7 +166,7 @@ export function dateToUnix(dateStr: string | undefined): number | undefined {
 
 export default class Animetsu implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "2.0",
+        version: "2.1",
         name: "Animetsu.Live",
         icon: `${WEBSITE}/android-chrome-192x192.png`,
         author: "Owca525",
