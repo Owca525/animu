@@ -3,11 +3,40 @@ import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams,
 
 const WEBSITE = "https://animepahe.pw"
 
-const header = {
+let header = {
+    "Accept": "application/json, text/javascript, */*; q=0.01",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "X-Requested-With": "XMLHttpRequest",
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0',
     'Referer': WEBSITE,
-    'Cookie': "__ddgid_=rxaWYPF7aoOXKtn7; __ddg2_=IPvarMbSedUW2ZAe; __ddg1_=T4CBje2yYmFKRIzHOw7q; res=1080; aud=jpn; av1=0; ddg_last_challenge=1775827819966; latest=3; XSRF-TOKEN=eyJpdiI6IkJvT1g2VU0rdEk3ZmYxdkFZZ09qbUE9PSIsInZhbHVlIjoiRTk0eE9ZWnNCcEFIT1NDdXB1S3BPSWhGUHMvWHBSNmVFWjMrdTNQamJZeDBveEtUNTh0bmlRdWMzVUQ2aEJuelJuRkZ4WU13Q0daZ3lIbGkybk9WMkRvZUt6a2hBcnVYcGxTY2NWZWlzYzJ3VEFZNHkyVlBpcm42N3dGOFlIdmwiLCJtYWMiOiI4Y2EyYmIwOTk1MGI2ZmQ1MjA1NTkyMjM0YzY1NWRiZWFlOGNmOGU4MjZlNGMzYjQ1OTIxN2VlMjcyZjg3MjBkIiwidGFnIjoiIn0%3D; animepahe_session=eyJpdiI6InZOVkozRU9BS2dPeDBJbkdDM1gwU2c9PSIsInZhbHVlIjoiYWExOE5qTjZ5TXYrbW9sKzhQbnhOb20xYVNiTm9HQ0k0cmZ6cUg0amtBcVp3dVBtTzlNOVNEYytZL1BKcFE4d0dZaWpWMUxvU24zbmp0WUh6MjFhS1E4RFJ3QVEzY2NnQ1NjK3hHaEpIY0RTU2FSZlEyWmhRQ1AzK0ZBUE80WnAiLCJtYWMiOiI0ODEwZjY4N2Y4NjBlNTgxMjBjN2U4NWZhODE2NjJkNWI1ZmVjZmZiZWI5OTcxMTM0ZDQwZjAzZTE3YzJlNDI2IiwidGFnIjoiIn0%3D; __ddg8_=p2oEfIz1oBRPzKIq; __ddg10_=1776518926; __ddg9_=109.243.146.23"
+    "Sec-GPC": "1",
+    Connection: "keep-alive",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-origin",
+    "Cookie": "__ddgid_=rxaWYPF7aoOXKtn7; __ddg2_=IPvarMbSedUW2ZAe; __ddg1_=T4CBje2yYmFKRIzHOw7q; res=480; aud=jpn; animepahe_session=eyJpdiI6IkR1WXA5Z08wN1I3bTNPS3RJMSt1VUE9PSIsInZhbHVlIjoiTTVQa040dkpwLzVGczNXQVNrakZQd2lUajZ5cURGU0VMMlhqai8rcHBkMTRnTFora3pXZjkzUVpTTk82NVMvYlBDd3JMclU5MCtCMFNoSGdQbThQczduUVdtcVJrTGhmUlMrdU81VkU1LzRobWRZc0QzdG5LeWd5VXJDQkg0SkQiLCJtYWMiOiI3Yzg3MTQ4ODY1ODJhMWFkYTNjMmEzOWMxODhlYjkyNWI4YTAzMTNiYWI5NWVmOWZhMTY3MDliZTNkYzUxMGUyIiwidGFnIjoiIn0%3D"
 }
+
+const headers = {
+    "Upgrade-Insecure-Requests": "1",
+    "Sec-Fetch-Dest": "iframe",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "cross-site",
+    "Sec-Fetch-User": "?1",
+    "DNT": "1",
+    "Priority": "u=4",
+    "TE": "trailers",
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:150.0) Gecko/20100101 Firefox/150.0",
+    Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "Sec-Fetch-Storage-Access": "none",
+    "Sec-GPC": "1",
+    "Alt-Used": "kwik.cx",
+    Connection: "keep-alive",
+    Referer: "https://animepahe.pw/",
+};
 
 const playerHeader = {
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:149.0) Gecko/20100101 Firefox/149.0",
@@ -125,7 +154,7 @@ class Hls {
 `
 
 async function extractResolution(url: string) {
-    const htmlResponse = await request(url, { headers: header })
+    const htmlResponse = await request(url, { headers: headers })
     /* IFDEF DEBUG */
     console.log("extractPlayerData/AnimePahe", htmlResponse)
     /* ENDIF */
@@ -157,7 +186,7 @@ async function extractResolution(url: string) {
 
 export default class AnimePahe implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.2",
+        version: "1.3",
         name: "AnimePahe",
         author: "Owca525",
         supportLang: ["en"],
@@ -166,6 +195,29 @@ export default class AnimePahe implements playerPluginFormat {
         icon: `${WEBSITE}/favicon-96x96.png`
     };
     cache: { [key: string]: string | number[] }[] = []
+
+    setTokenGlobal = async () => {
+        const response = await request(WEBSITE, {
+            headers: {
+                ...header,
+                "Cookie": "__ddgid_=RlVqWYf2TR9vFVwf; __ddg2_=clm4M7RH9VxgNk0U; __ddg1_=3TwQqAi8FJB0Y7CTF6BU; res=1080; aud=jpn; av1=0"
+            }
+        })
+
+        Object.entries(response.responseHeader).forEach(([key, val]) => {
+            if (key != "set-cookie") return
+
+            header = {
+                ...header,
+                "Cookie": `__ddgid_=RlVqWYf2TR9vFVwf; __ddg2_=clm4M7RH9VxgNk0U; __ddg1_=3TwQqAi8FJB0Y7CTF6BU; res=1080; aud=jpn; av1=0 ${val}`
+            }
+        })
+
+    }
+
+    constructor() {
+        this.setTokenGlobal()
+    }
 
     extractPlayerData = async (_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
         if (this.cache[id] == undefined) await this.extractEpisodeList(undefined, id)
@@ -360,7 +412,12 @@ export default class AnimePahe implements playerPluginFormat {
         }
 
         const functions = [
-            async () => this.extractPlayerData("sub", { ep: "1" }, id),
+            async () => {
+                const data = await this.extractPlayerData("sub", { ep: "1" }, id)
+                if (data.length <= 0) return data
+                if (data[0]["resolution"].length) return []
+                return data
+            },
             async () => this.extractOnlyEpisodesList("sub", id),
         ]
 

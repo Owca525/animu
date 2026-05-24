@@ -29,7 +29,7 @@ export const convertText = () => {};
 export const dateToUnix = () => {};
 export const genYearsList = () => {};
 export const getWeek = () => {};
-export const request = () => {};
+export const request = async () => {};
 export const runYT_DLP = () => {};
 export const t = () => {};
 export const timeToSeconds = () => {};
@@ -523,7 +523,6 @@ export class PluginManager implements PluginManagerFormat {
         let LoadedMetadataPlugins: PluginLoadedFormat[] = []
 
         let cache: Map<string, PluginLoadedFormat["serverStatus"]> = new Map()
-
         try {
             const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
             const time = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])
@@ -577,7 +576,7 @@ export class PluginManager implements PluginManagerFormat {
     checkStatusServerInPlugins = async (hard?: boolean): Promise<void> => {
         const initialTime = dateToUnix(new Date().toString())
 
-        getPlayerPluginList().forEach(async (element, _, array) => {
+        getPlayerPluginList().forEach(async (element) => {
             if (element["serverStatus"] && !hard) return
 
             const tmp = new WorkerWrapper
@@ -598,7 +597,7 @@ export class PluginManager implements PluginManagerFormat {
                 tmp.destroy()
 
                 localStorage.setItem("pluginStatusCachce", JSON.stringify({
-                    plugins: array,
+                    plugins: this.playerPluginList,
                     time: initialTime
                 }))
             }).catch((error) => {
@@ -606,7 +605,7 @@ export class PluginManager implements PluginManagerFormat {
                 tmp.destroy()
 
                 localStorage.setItem("pluginStatusCachce", JSON.stringify({
-                    plugins: array,
+                    plugins: this.playerPluginList,
                     time: initialTime
                 }))
             })

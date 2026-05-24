@@ -138,7 +138,7 @@ function App() {
     try {
       const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
       const time = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])
-      if (time["min"] < 44 && time["hour"] <= 0) localStorage.removeItem("pluginStatusCachce")
+      if (time["min"] > 44 && time["hour"] >= 0) localStorage.removeItem("pluginStatusCachce")
     } catch (error) {}
 
     await pluginManager().initialPlugins()
@@ -327,10 +327,10 @@ function initialServices() {
     try {
       const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
       const time = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])
-      if (time["min"] < 44 && time["hour"] <= 0) localStorage.removeItem("pluginStatusCachce")
+      if (time["min"] > 44 && time["hour"] >= 0) localStorage.removeItem("pluginStatusCachce")
     } catch (error) {}
 
-    await pluginManager().checkStatusServerInPlugins(!(localStorage.getItem("pluginStatusCachce") != undefined))
+    await pluginManager().checkStatusServerInPlugins(localStorage.getItem("pluginStatusCachce") == undefined)
   }, timeCovertToMs({ min: 45 }), t("Check Status Of Player Plugins"))
 
   /* IFDEF DEBUG|PROD */
