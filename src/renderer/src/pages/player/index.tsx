@@ -96,7 +96,7 @@ const player = () => {
                     return []
                 }
 
-                if (anime_data.save.pluginName == "SHEEPCUSTOMOWEVERWIOTE") return (window as any).customPlayerData
+                if (anime_data.save.pluginName == "SHEEPCUSTOMOWEVERWIOTE" || (window as any).customPlayerData) return (window as any).customPlayerData
 
                 let pluginPlayer = await pluginManager().changePlayerPlugin(anime_data.save?.pluginName ? anime_data.save.pluginName : "")
                 return await pluginPlayer.extractPlayerData(animeType as string, episode as episodeMetadata, player_id as string)
