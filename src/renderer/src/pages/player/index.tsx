@@ -1,8 +1,8 @@
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
-import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, SettingsConfig } from "@renderer/utils/types";
+import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, playerData, SettingsConfig } from "@renderer/utils/types";
 
 import "./player.css"
-import { changeTitleAnimu, convertEpisode, dateToUnix, detectTitle, detectTitleConfig, refetchHistory } from "@renderer/utils/functions";
+import { changeTitleAnimu, convertEpisode, dateToUnix, detectTitle, detectTitleConfig, globalNavigate, refetchHistory } from "@renderer/utils/functions";
 import Button from "@renderer/components/buttons";
 
 import VideoPlayer from "./VideoPlayer";
@@ -15,9 +15,48 @@ import { pluginManager } from "@renderer/utils/stores/plugins";
 import { useResponse } from "@renderer/utils/hooks/useResponse";
 import { useI18n } from "@renderer/utils/i18n";
 import { addToAnimuList, updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist";
-import { getSocket, getSocketRoom } from "@renderer/utils/stores/global";
+import { getSocket, getSocketRoom, setIncognitoMode } from "@renderer/utils/stores/global";
 import { unwrap } from "solid-js/store";
 import { SheepShortcut } from "@renderer/utils/hooks/useKeyPress";
+
+function OverWritePlayer(url: string, hls: boolean) {
+    if (!url || !hls) throw new Error("Give 2 Aruments")
+
+    localStorage.setItem("playerCache", JSON.stringify({
+        data: {
+            title: {
+                native: "Player Overwrite",
+                romaji: "Player Overwrite"
+            },
+            id: crypto.randomUUID(),
+            player_ID: crypto.randomUUID()
+        },
+        save: {
+            last_Time: 0,
+            type: "sub",
+            pluginName: "SHEEPCUSTOMOWEVERWIOTE",
+            episode: 1
+        },
+        episodelist: ["1"],
+    }));
+
+    (window as any).customPlayerData = [
+        {
+            hostname: "OverWriter",
+            resolution: [{
+                res: "1080",
+                url: url,
+                hls: hls
+            }],
+        }
+    ] as playerData[]
+
+    globalNavigate("/player")
+
+    setIncognitoMode(true)
+}
+
+(window as any).OverWritePlayer = OverWritePlayer;
 
 const player = () => {
     const { t } = useI18n()
@@ -56,6 +95,9 @@ const player = () => {
                     console.error("THIS CAN'T HAPPEN IF Happen then something is wrong with player_id, episode, queryFetch/player", queryKey)
                     return []
                 }
+
+                if (anime_data.save.pluginName == "SHEEPCUSTOMOWEVERWIOTE") return (window as any).customPlayerData
+
                 let pluginPlayer = await pluginManager().changePlayerPlugin(anime_data.save?.pluginName ? anime_data.save.pluginName : "")
                 return await pluginPlayer.extractPlayerData(animeType as string, episode as episodeMetadata, player_id as string)
             },
@@ -114,6 +156,9 @@ const player = () => {
     });
 
     onMount(() => {
+
+        if (anime_data.save.pluginName == "SHEEPCUSTOMOWEVERWIOTE") setIncognitoMode(true)
+
         if (getSocket()) {
             const socket = getSocket()
             socket?.emit("player:init", {
