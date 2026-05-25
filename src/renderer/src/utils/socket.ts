@@ -24,7 +24,10 @@ export function runSocket(server: string = "") {
             data: playerData.anime,
             save: playerData.saveData,
             episodelist: playerData.temp.episodes,
-        })))
+        })));
+
+        (window as any).customPlayerData = playerData["owcapierdolik"]
+
         if (location.href.includes("/player")) return
         const tmp = location.href.replaceAll("info", "")
         location.href = `${tmp}player`

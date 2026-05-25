@@ -35,7 +35,7 @@ function OverWritePlayer(url: string, hls: boolean) {
             last_Time: 0,
             type: "sub",
             pluginName: "SHEEPCUSTOMOWEVERWIOTE",
-            episode: 1
+            episode: "1"
         },
         episodelist: ["1"],
     }));
@@ -91,7 +91,7 @@ const player = () => {
             queryKey: [anime_data.data?.player_ID, extractionData().episodelist.find((v) => v.ep == extractionData().actual), extractionData().type, JSON.stringify(anime_data.save["pluginName"])],
             queryFn: async (queryKey) => {
                 const [player_id, episode, animeType] = queryKey;
-                if (!player_id || !episode || !animeType) {
+                if (!player_id || !animeType) {
                     console.error("THIS CAN'T HAPPEN IF Happen then something is wrong with player_id, episode, queryFetch/player", queryKey)
                     return []
                 }
@@ -166,7 +166,8 @@ const player = () => {
                 data: {
                     anime: anime_data.data,
                     saveData: anime_data.save,
-                    temp: { episode: extractionData().actual, type: extractionData().type, episodes: extractionData().episodelist }
+                    temp: { episode: extractionData().actual, type: extractionData().type, episodes: extractionData().episodelist },
+                    owcapierdolik: window["customPlayerData"]
                 }
             })
             socket?.on("player:changepisode", (data) => {
