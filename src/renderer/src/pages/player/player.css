@@ -507,16 +507,16 @@
 
 .player-subtitle-content {
   text-align: center;
-  font-size: clamp(1.2em, 2vw, 2em);
+  font-size: 2.4em;
   pointer-events: none;
   width: max-content;
   max-width: 100vw;
   padding: 6px;
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-  filter: drop-shadow(2px 2px 3px black);
-  font-weight: bold;
-  -webkit-text-stroke-width: 1px;
+  filter: drop-shadow(2px 2px 1px black);
+  -webkit-text-stroke-width: 2px;
   -webkit-text-stroke-color: black;
+  font-weight: bold;
 }
 
 .player-skip-chapters-button {
