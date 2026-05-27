@@ -834,7 +834,7 @@ function settings() {
                                 }
                             />
                         </div>
-                        <div class="settings-line"></div>
+                        {/* <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("Default Episode Variants")}
                             <ButtonGroup selectedValue={t(`settings.variants.${config().new.information.episodeVariants}`)} listValues={[
@@ -842,7 +842,7 @@ function settings() {
                                 { value: t("Variant 2"), onClick: () => handleChange("information.episodeVariants", "v2") },
                             ]}
                             />
-                        </div>
+                        </div> */}
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("Play Opening In Information")}
