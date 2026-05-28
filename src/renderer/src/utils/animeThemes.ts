@@ -62,10 +62,13 @@ export async function requestAnimeMedia(anilistID: number): Promise<animeOpening
       videos.forEach((item) => {
         const match = item["videos"]["nodes"][0]["filename"].match(/v\d+$/)
         const variant = match ? match[0] : undefined
+        const artist = element["song"]["performances"].length > 0 ? element["song"]["performances"][0]["artist"]["name"] : ""
+
+
         list.push({
           type: element["type"],
           variant: variant,
-          artist: element["song"]["performances"][0]["artist"]["name"],
+          artist: artist,
           musicTitle: element["song"]["title"],
           videos: item["videos"]["nodes"].map((vid) => {
             return { filename: vid["filename"], url: vid["link"], resolution: vid["resolution"], audio: vid["audio"] ? `https://a.animethemes.moe/${vid["audio"]["path"].split("/").pop()}` : undefined }
