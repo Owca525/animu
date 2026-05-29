@@ -53,7 +53,7 @@ function getThemeList(themePath: string): themeFormatType[] {
         }
     }
     return finallist.map((theme) => {
-        if (!theme.options) return theme
+        if (!theme.options) return {...theme, mainCSS: fs.readFileSync(theme.mainCSS, "utf-8")}
         const mainCSSPath = getFolderPath(theme.mainCSS)
         return {
             ...theme,
