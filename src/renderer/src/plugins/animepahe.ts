@@ -415,7 +415,7 @@ export default class AnimePahe implements playerPluginFormat {
             async () => {
                 const data = await this.extractPlayerData("sub", { ep: "1" }, id)
                 if (data.length <= 0) return data
-                if (data[0]["resolution"].length) return []
+                if (data[0]["resolution"].length <= 0) return []
                 return data
             },
             async () => this.extractOnlyEpisodesList("sub", id),
