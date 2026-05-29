@@ -29,7 +29,18 @@ export const convertText = () => {};
 export const dateToUnix = () => {};
 export const genYearsList = () => {};
 export const getWeek = () => {};
-export const request = async () => {};
+export const request = async (url) => {
+    return {
+        text: "Initial",
+        json: undefined,
+        buffer: [],
+        status: 500,
+        statusText: "Error",
+        url: url,
+        success: false,
+        responseHeader: {}
+    }
+};
 export const runYT_DLP = () => {};
 export const t = () => {};
 export const timeToSeconds = () => {};
@@ -531,7 +542,7 @@ export class PluginManager implements PluginManagerFormat {
                     cache.set(element["metadata"]["name"], element["serverStatus"])
                 })
             }
-        } catch (error) {}
+        } catch (error) { }
 
         const blobDummy = new Blob([workerDummyimport], { type: "text/javascript" });
         let dummyImportURL = URL.createObjectURL(blobDummy);
