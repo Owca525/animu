@@ -17,7 +17,7 @@ import {
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { ActiveService, addNotification, animulistData, FindService, getGlobalCache, getServices, isAnimuFocus, removeDeepLink, setActiveThemes, setAnilistUserData, setDeepLink, setGlobalToken, todayAnimeInAnilist } from './stores/global';
+import { addNotification, animulistData, getGlobalCache, isAnimuFocus, removeDeepLink, setActiveThemes, setAnilistUserData, setDeepLink, setGlobalToken, todayAnimeInAnilist } from './stores/global';
 import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
@@ -822,23 +822,23 @@ export function timeCovertToMs(time: { day?: number, month?: number, min?: numbe
     return 0
 }
 
-export function runService(func: () => Promise<any> | any, time: number, name: string, disable: boolean = false, dontRun: boolean = false) {
-    const interval = disable ? undefined : setInterval(func, time)
-    const tmp = {
-        name: name,
-        interval: interval,
-        uuid: crypto.randomUUID(),
-        func: func
-    }
-    if (!disable && !dontRun) {
-        try {
-            func()
-        } catch (error) { console.error("Failed Run Service", time, name) }
-    }
+// export function runService(func: () => Promise<any> | any, time: number, name: string, disable: boolean = false, dontRun: boolean = false) {
+//     const interval = disable ? undefined : setInterval(func, time)
+//     const tmp = {
+//         name: name,
+//         interval: interval,
+//         uuid: crypto.randomUUID(),
+//         func: func
+//     }
+//     if (!disable && !dontRun) {
+//         try {
+//             func()
+//         } catch (error) { console.error("Failed Run Service", time, name) }
+//     }
 
-    let services = unwrap(getServices()).filter((v) => v.name != name)
-    ActiveService([...services, tmp])
-}
+//     let services = unwrap(getServices()).filter((v) => v.name != name)
+//     ActiveService([...services, tmp])
+// }
 
 export function globalNavigate(path: string) {
     /* IFDEF PROD */
@@ -1083,7 +1083,7 @@ export async function FetchAnilistUserData() {
         localStorage.setItem("Animu_Anilist_user_data", JSON.stringify(response.json["data"]["Viewer"]))
         setAnilistUserData(response.json["data"]["Viewer"])
 
-        if (!FindService(t("Anilist Sync UserData"))) runService(FetchAnilistUserData, timeCovertToMs({ hour: 2 }), t("Anilist Sync UserData"))
+        // if (!FindService(t("Anilist Sync UserData"))) runService(FetchAnilistUserData, timeCovertToMs({ hour: 2 }), t("Anilist Sync UserData"))
         return true
     } catch (error) {
         console.error("FetchAnilistUserData error", error)

@@ -13,7 +13,6 @@ import {
   dateToUnix,
   FetchAnilistUserData,
   getTodayAnilistAnime,
-  runService,
   timeCovertToMs,
   updateObject
 } from './utils/functions';
@@ -30,7 +29,6 @@ import {
 } from 'solid-js';
 import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import {
-  getAnilistUserData,
   getGlobalCache,
   isPluginSearchMode,
   setAnilistUserData,
@@ -71,6 +69,7 @@ import './utils/debug';
 
 import { setHome } from './pages/home/homeUtils';
 import { SheepShortcut } from './utils/hooks/useKeyPress';
+import { ServiceManager } from './utils/service';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -128,7 +127,7 @@ function App() {
       const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
       const time = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])
       if (time["min"] > 44 && time["hour"] >= 0) localStorage.removeItem("pluginStatusCachce")
-    } catch (error) {}
+    } catch (error) { }
 
     await pluginManager().initialPlugins()
     await pluginManager().changeInformationPlugin("AnilistApi")
@@ -179,11 +178,13 @@ function App() {
 
     setinitialState({ text: "initial.theme", plugin: false })
     /* IFDEF DEBUG|PROD */
-      setGlobalTheme([
-        ...window["animuAppInfo"]["themes"],
-        ...await window.api.themes.list()
-      ])
+    setGlobalTheme([
+      ...window["animuAppInfo"]["themes"],
+      ...await window.api.themes.list()
+    ]);
     /* ENDIF */
+
+    (window as any).ServiceManager = () => ServiceManager
 
     setinitialState({ text: "Loading Animulist", plugin: false })
     /* IFDEF DEBUG|PROD */
@@ -312,31 +313,58 @@ async function runCheckUpdate() {
 function initialServices() {
   const config = getConfig()
 
-  runService(async () => {
-    try {
-      const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
-      const time = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])
-      if (time["min"] > 44 && time["hour"] >= 0) localStorage.removeItem("pluginStatusCachce")
-    } catch (error) {}
+  ServiceManager.InitialServiceManager([
+    {
+      active: true,
+      execute: async () => {
+        try {
+          const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
+          const time = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])
+          if (time["min"] > 44 && time["hour"] >= 0) localStorage.removeItem("pluginStatusCachce")
+        } catch (error) { }
 
-    await pluginManager().checkStatusServerInPlugins(localStorage.getItem("pluginStatusCachce") == undefined)
-  }, timeCovertToMs({ min: 45 }), t("Check Status Of Player Plugins"))
+        await pluginManager().checkStatusServerInPlugins(localStorage.getItem("pluginStatusCachce") == undefined)
+      },
+      name: t("PluginStatus"),
+      description: t("Check Status Of Player Plugins"),
+      activeTime: timeCovertToMs({ min: 45 })
+    },
+    {
+      active: !window["animuAppInfo"]["flags"]["WEB"] && config.update.type == "On Start",
+      execute: checkUpdate,
+      name: 'AnimUpdate',
+      description: "Check Animu Update",
+      noFirstStart: true,
+      activeTime: timeCovertToMs({ min: 60 })
+    },
+    {
+      active: true,
+      execute: checkPluginUpdate,
+      name: t('PluginUpdates'),
+      activeTime: timeCovertToMs({ min: 30 }),
+      description: t("Check Plugins are Updated")
+    },
+    {
+      active: true,
+      execute: async () => {
+        setTodayAnimeInAnilist(await getTodayAnilistAnime())
+      },
+      name: t('DailyAnilist'),
+      description: t("Check Daily Anilist"),
+      activeTime: timeCovertToMs({ hour: 3 })
+    },
+    {
+      active: true,
+      execute: checkAnimeTodayReleaseEpisode,
+      name: t("EpisodesAvaible"),
+      description: t("Check Is Anime episode avaible"),
+      activeTime: timeCovertToMs({ min: 40 })
+    }
+  ])
 
-  /* IFDEF DEBUG|PROD */
-  if (config.update.type == "On Start") runService(checkUpdate, timeCovertToMs({ min: 60 }), t("Animu Update"), false, true)
-  /* ENDIF */
-
-  runService(checkPluginUpdate, timeCovertToMs({ min: 30 }), t("Plugin CheckUpdate"))
-
-  runService(async () => {
-    setTodayAnimeInAnilist(await getTodayAnilistAnime())
-  }, timeCovertToMs({ hour: 3 }), t("Check Daily Anilist"))
-
-  runService(checkAnimeTodayReleaseEpisode, timeCovertToMs({ min: 40 }), t("Check Is Anime episode avaible"))
-
-  if (unwrap(getAnilistUserData())) {
-    runService(FetchAnilistUserData, timeCovertToMs({ hour: 2 }), t("Anilist Sync UserData"))
-  }
+  // if (unwrap(getAnilistUserData())) {
+  //   runService(FetchAnilistUserData, timeCovertToMs({ hour: 2 }), t("Anilist Sync UserData"))
+  // }
 }
 
 export default App

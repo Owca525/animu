@@ -697,10 +697,22 @@ export interface animeOpeningsFormat {
 }
 
 export interface serviceFormat {
-    name: string
-    interval?: NodeJS.Timeout,
-    uuid: string
-    func: () => Promise<any> | any
+    active: boolean,
+    id: string,
+    execute: () => any | Promise<any>
+    timer: NodeJS.Timeout | undefined,
+    description?: string,
+    name: string,
+    activeTime: number
+}
+
+export interface DefaultService {
+    active: boolean,
+    execute: () => any | Promise<any>
+    description?: string,
+    name: string,
+    activeTime: number,
+    noFirstStart?: boolean
 }
 
 export interface deeplinkFormat {

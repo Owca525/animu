@@ -191,7 +191,8 @@ function generateInfoFile(): PluginOption {
           commit: "Uknown",
           compiled: Math.floor(new Date().getTime() / 1000),
           langs: readAllLangFiles(),
-          themes: getThemeList(path.join(path.resolve(__dirname), "src/renderer/src/themes"))
+          themes: getThemeList(path.join(path.resolve(__dirname), "src/renderer/src/themes")),
+          flags: globalFlags
         }
         code = code.replace('"PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION"', JSON.stringify(tmp));
         return { code, map: null };
@@ -211,7 +212,8 @@ function generateInfoFile(): PluginOption {
         commit: commit,
         compiled: Math.floor(new Date().getTime() / 1000),
         langs: readAllLangFiles(),
-        themes: getThemeList(path.join(path.resolve(__dirname), "src/renderer/src/themes"))
+        themes: getThemeList(path.join(path.resolve(__dirname), "src/renderer/src/themes")),
+        flags: globalFlags
       }
 
       code = code.replace('"PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION"', JSON.stringify(generatedJson));
