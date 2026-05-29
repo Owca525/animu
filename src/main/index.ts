@@ -84,25 +84,6 @@ function createWindow(): void {
     }
   });
 
-  mainWindow.on("focus", () => {
-    if (!mainWindow) return
-    mainWindow.webContents.send("browserWindow:focus", true);
-  });
-
-  mainWindow.on("blur", () => {
-    if (!mainWindow) return
-    mainWindow.webContents.send("browserWindow:focus", false);
-  });
-
-
-  mainWindow.on('hide', () => {
-    if (mainWindow) mainWindow.webContents.send("browserWindow:hidden", true);
-  });
-
-  mainWindow.on('show', () => {
-    if (mainWindow) mainWindow.webContents.send("browserWindow:hidden", false);
-  });
-
   const args = process.argv.slice(1);
   const isDevTools = args.includes("--dev-tools") || args.includes("--devtools");
   if (isDevTools || config.Developer.DevToolsOnStart) {

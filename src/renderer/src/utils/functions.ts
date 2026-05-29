@@ -17,7 +17,7 @@ import {
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { ActiveService, addNotification, animulistData, FindService, getGlobalCache, getServices, isAnimuFocus, isAnimuHidden, removeDeepLink, setActiveThemes, setAnilistUserData, setDeepLink, setGlobalToken, todayAnimeInAnilist } from './stores/global';
+import { ActiveService, addNotification, animulistData, FindService, getGlobalCache, getServices, isAnimuFocus, removeDeepLink, setActiveThemes, setAnilistUserData, setDeepLink, setGlobalToken, todayAnimeInAnilist } from './stores/global';
 import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
@@ -1272,8 +1272,7 @@ export function convertEpisode(ep: string): number {
 }
 
 export function sendNotification(notificiation: NotificationProps, toastprop?: ToastOptions) {
-    console.log(isAnimuHidden(), isAnimuFocus())
-    if (isAnimuHidden() || !isAnimuFocus()) {
+    if (!isAnimuFocus()) {
         Notification.requestPermission().then(permission => {
             if (permission != 'granted') return
             let tmp = new Notification(t(notificiation.title), { body: t(notificiation.description), icon: notificiation.icon });

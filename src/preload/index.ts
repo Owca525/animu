@@ -102,20 +102,6 @@ if (process.contextIsolated) {
       exit: () => ipcRenderer.send("window:exit"),
       openDevTools: () => ipcRenderer.send("window:devtools"),
       reload: () => ipcRenderer.send("window:reload"),
-      onWindowFocus: (callback) => {
-        const handler = (_, value) => callback(value);
-        ipcRenderer.on("browserWindow:focus", handler);
-        return () => {
-          ipcRenderer.removeListener("browserWindow:focus", handler);
-        };
-      },
-      onWindowHidden: (callback) => {
-        const handler = (_, value) => callback(value);
-        ipcRenderer.on("browserWindow:hidden", handler);
-        return () => {
-          ipcRenderer.removeListener("browserWindow:hidden", handler);
-        };
-      }
     });
   } catch (error) {
     console.error(error);

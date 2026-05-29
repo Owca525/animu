@@ -1,6 +1,6 @@
 import { onMount, onCleanup } from "solid-js";
 import { convertKeybinds } from "../functions";
-import { isAnimuFocus, isAnimuHidden } from "../stores/global";
+import { isAnimuFocus } from "../stores/global";
 
 export function useKeyPress(func: (keybinds: string) => void) {
   let keysRef: string[] = [];
@@ -42,7 +42,7 @@ export function useKeyPress(func: (keybinds: string) => void) {
     window.addEventListener("focus", runEvents);
     window.addEventListener("blur", clearEvents);
 
-    if (!isAnimuHidden() && isAnimuFocus()) runEvents()
+    if (isAnimuFocus()) runEvents()
   });
 
   onCleanup(() => {

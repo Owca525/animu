@@ -14,7 +14,6 @@ export const [globalState, setGlobalState] = createStore<globalDataFormat>({
     service: [],
     deepLinks: [],
     anilist_user_data: undefined,
-    isAnimuHidden: false,
     isAnimuFocus: true,
     notifications: [],
     todayAnimeAnilist: [],
@@ -36,7 +35,6 @@ export const getSocketRoom = () => globalState.socket?.currentRoom;
 export const getServices = () => globalState.service;
 export const getDeeplinks = () => globalState.deepLinks;
 export const getAnilistUserData = () => globalState.anilist_user_data;
-export const isAnimuHidden = () => globalState.isAnimuHidden;
 export const isAnimuFocus = () => globalState.isAnimuFocus;
 export const getNotificationList = () => globalState.notifications;
 export const todayAnimeInAnilist = () => globalState.todayAnimeAnilist;

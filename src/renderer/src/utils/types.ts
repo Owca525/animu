@@ -202,7 +202,6 @@ export interface globalDataFormat {
     },
     animuList: { AnimeData: AnimeData, animulist: animulistProps, onClick?: (data: AnimeData) => void }[]
     anilist_user_data?: { [key: string]: any; },
-    isAnimuHidden: boolean
     isAnimuFocus: boolean
     notifications: NotificationPropsExpanded[]
     todayAnimeAnilist: cardData[]

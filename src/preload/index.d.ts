@@ -104,8 +104,6 @@ declare global {
       exit: () => void;
       openDevTools: () => void;
       reload: () => void;
-      onWindowFocus: (callback: (focus: boolean) => void) => () => void
-      onWindowHidden: (callback: (hidden: boolean) => void) => () => void
     };
   }
 }

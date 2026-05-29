@@ -1,7 +1,8 @@
 import { containerData } from '@renderer/utils/types';
 import "./css/bigcardscontainer.css"
 import BigCard from './bigCard';
-import { Component, createSignal, For, onCleanup, onMount } from 'solid-js';
+import { Component, createEffect, createSignal, For, onCleanup, onMount } from 'solid-js';
+import { isAnimuFocus } from '@renderer/utils/stores/global';
 type BigCardsContainerProps = { data: containerData }
 
 const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
@@ -16,17 +17,38 @@ const BigCardsContainer: Component<BigCardsContainerProps> = ({ data }) => {
     const [currentIndex, setCurrentIndex] = createSignal(0);
     const [cardWidth, setCardWidth] = createSignal(0);
 
+    createEffect(() => {
+        const active = isAnimuFocus()
+
+        if (active) {
+            handleUpdate()
+            startAutoSlide();
+
+            window.addEventListener("resize", restartAutoSlide)
+
+            if (!divRef) return;
+            divRef.addEventListener("scroll", handleScroll);
+        } else {
+            stopAutoSlide()
+            divRef?.removeEventListener("scroll", handleScroll);
+            window.removeEventListener("resize", restartAutoSlide)
+        }
+    })
+
     onMount(() => {
         handleUpdate()
-        window.addEventListener("resize", restartAutoSlide)
         startAutoSlide();
+
+        window.addEventListener("resize", restartAutoSlide)
+
         if (!divRef) return;
         divRef.addEventListener("scroll", handleScroll);
     })
 
     onCleanup(() => {
-        divRef?.removeEventListener("scroll", handleScroll);
         stopAutoSlide()
+
+        divRef?.removeEventListener("scroll", handleScroll);
         window.removeEventListener("resize", restartAutoSlide)
     })
 
