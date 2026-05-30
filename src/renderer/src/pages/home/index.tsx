@@ -37,8 +37,8 @@ import {
 } from "@renderer/utils/types";
 import { t } from '@renderer/utils/i18n';
 import { setCalendary } from './homeUtils';
-import Avatar from './components/avatar';
-import NotificationMenu from './components/notificationMenu';
+// import Avatar from './components/avatar';
+// import NotificationMenu from './components/notificationMenu';
 // import { io } from 'socket.io-client';
 // import { socketPlayerInit } from '../player/VideoPlayer';
 
@@ -172,10 +172,10 @@ const Home = () => {
             <Input type="date" defaultValue={unixToDateTime(dateToUnix(new Date().toString())).split(" ")[0]} onInput={setCalendary} />
           </Show>
         </div>
-        <div class='home-header-right'>
+        {/* <div class='home-header-right'>
           <NotificationMenu />
           <Avatar />
-        </div>
+        </div> */}
       </div>
 
       <div class="home-main-content" onScroll={handleScroll} ref={divRef}>

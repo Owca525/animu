@@ -1,6 +1,6 @@
 import { createStore } from 'solid-js/store';
 import { FilterParams, homeData } from '../types';
-import { anilistSearch, AnimuListSearch, historySearch, setAnimuList, setCalendary, setHistory, setHome } from '@renderer/pages/home/homeUtils';
+import { anilistSearch, historySearch, setHistory, setHome } from '@renderer/pages/home/homeUtils';
 import { globalNavigate } from '../functions';
 
 const initialState: homeData = {
@@ -37,17 +37,17 @@ const initialState: homeData = {
                 onClick: setHistory,
                 onSearch: historySearch
             },
-            {
-                icon: "view_list",
-                text: "global.animulist",
-                onClick: setAnimuList,
-                onSearch: AnimuListSearch
-            },
-            {
-                icon: "calendar_month",
-                text: "global.schedule",
-                onClick: setCalendary,
-            }
+            // {
+            //     icon: "view_list",
+            //     text: "global.animulist",
+            //     onClick: setAnimuList,
+            //     onSearch: AnimuListSearch
+            // },
+            // {
+            //     icon: "calendar_month",
+            //     text: "global.schedule",
+            //     onClick: setCalendary,
+            // }
         ],
         bottom: [
             {

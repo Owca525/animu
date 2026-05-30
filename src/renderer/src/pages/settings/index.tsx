@@ -15,13 +15,13 @@ import {
     changeTitleAnimu,
     convertKeybinds,
     convertPath,
-    FetchAnilistUserData,
-    LoginToAnilist,
+    // FetchAnilistUserData,
+    // LoginToAnilist,
     openUrlFolder,
     request,
     // savePluginConfig,
-    unLinkAnilistAccount,
-    updateAnilistUserData,
+    // unLinkAnilistAccount,
+    // updateAnilistUserData,
     updateObject
 } from '@renderer/utils/functions';
 import { checkUpdate } from '@renderer/utils/update';
@@ -38,11 +38,11 @@ import {
     createEffect,
     createSignal,
     For,
-    Match,
+    // Match,
     onCleanup,
     onMount,
     Show,
-    Switch
+    // Switch
 } from 'solid-js';
 import { DetectOldVersionHistory, OverWriteHistory } from '@renderer/utils/FilesManager/history';
 import { getConfig, setConfig } from '@renderer/utils/stores/config';
@@ -55,7 +55,7 @@ import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './settings.css';
 import { useI18n } from '@renderer/utils/i18n';
-import { activeThemes, animulistData, getAnilistUserData, getCurrentYT_DLPVer, getDeeplinks, getGlobalCache, getListOfVerYT_DLP, loadedTheme, removeDeepLink, setAudioOutput, setDeepLink } from '@renderer/utils/stores/global';
+import { activeThemes, animulistData, getCurrentYT_DLPVer, getDeeplinks, getGlobalCache, getListOfVerYT_DLP, loadedTheme, removeDeepLink, setAudioOutput, setDeepLink } from '@renderer/utils/stores/global';
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 import SettingsPlugin from './components/settingsPlugin';
 import semver from "semver";
@@ -736,7 +736,7 @@ function settings() {
                             </div>
                         </div>
                     </div>
-                    <div class="settings-page-container">
+                    {/* <div class="settings-page-container">
                         <div class="settings-page-title">{t("Anilist")}</div>
                         <Switch>
                             <Match when={getAnilistUserData() == undefined}>
@@ -822,7 +822,7 @@ function settings() {
                             ]}
                             />
                         </div>
-                    </div>
+                    </div> */}
                     <div class="settings-page-container">
                         <div class="settings-page-title">{t("Information Page")}</div>
                         <div class="settings-setting-container">
@@ -843,7 +843,7 @@ function settings() {
                             ]}
                             />
                         </div> */}
-                        <div class="settings-line"></div>
+                        {/* <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("Play Opening In Information")}
                             <CheckBox
@@ -852,7 +852,7 @@ function settings() {
                                     handleChange('information.openingininformation', checked)
                                 }
                             />
-                        </div>
+                        </div> */}
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("Trailer player Type")}

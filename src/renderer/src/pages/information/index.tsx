@@ -2,11 +2,11 @@ import Button from '@renderer/components/buttons';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
-import { Anilist_ListMutation, AnimeData, animeOpeningsFormat, animulistProps, cardData, ContextMenuProps, episodeMetadata, indentityPlayer, playerChapterList, playerSubtitlesFormat, resolutionFormat } from '@renderer/utils/types';
+import { AnimeData, animeOpeningsFormat, animulistProps, cardData, ContextMenuProps, episodeMetadata, indentityPlayer, playerChapterList, playerSubtitlesFormat, resolutionFormat } from '@renderer/utils/types';
 import {
     calculateDays,
     changeTitleAnimu,
-    convertDateToDateObject,
+    // convertDateToDateObject,
     convertDateToFormattedString,
     convertSeconds,
     CreateContextMenuOptions,
@@ -21,7 +21,7 @@ import {
     sortCharacterType,
     sortEpisodes,
     sortRelationType,
-    unixToDateTime,
+    // unixToDateTime,
 } from '@renderer/utils/functions';
 import {
     createEffect,
@@ -46,16 +46,16 @@ import CharacterContainer from './components/characterContainer';
 import { getConfig } from '@renderer/utils/stores/config';
 import Container from '../home/components/container';
 import { toast, updateToast } from '@renderer/utils/context/ToastNotification';
-import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
+import { hideCustomMenu, isCustomMenuActive } from '@renderer/utils/context/menuContext';
 import RelationCard from './components/relationCard';
 import ButtonGroup from '../settings/components/buttonGroup';
 import MiniPlayer, { MiniPlayerProps } from '@renderer/components/miniPlayer';
 import { requestAnimeMedia } from '@renderer/utils/animeThemes';
 import { updateHistoryData } from '@renderer/utils/FilesManager/history';
-import { addToAnimuList, removeFromAnimulist, updateDataInAnimulist } from '@renderer/utils/FilesManager/animulist';
+// import { addToAnimuList, updateDataInAnimulist } from '@renderer/utils/FilesManager/animulist';
 import OpeningPlayer from './components/openingPlayer';
-import { readPlaylist, removeInPlaylist, saveToPlaylist } from '@renderer/utils/FilesManager/playlist';
-import AnimulistMenu from '@renderer/components/animulistMenu';
+// import { readPlaylist } from '@renderer/utils/FilesManager/playlist';
+// import AnimulistMenu from '@renderer/components/animulistMenu';
 import { updateGenres } from '../home/components/filter';
 import { getHomeCache, getHomeSidebarData } from '@renderer/utils/stores/home';
 import { setNewActivePage, StartHomeSearch } from '../home';
@@ -94,7 +94,7 @@ function information() {
     const [secondsLeft, setSecondsLeft] = createSignal<undefined | { left: number, converted: { days: number; hours: number; minutes: number; seconds: number; } | undefined }>(undefined);
     const [contextMenu, setcontextMenu] = createSignal<ContextMenuProps>([])
 
-    const [isInWaitingPlaylist, setiswaitingplaylist] = createSignal<boolean>(false)
+    // const [isInWaitingPlaylist, setiswaitingplaylist] = createSignal<boolean>(false)
 
     const [buttonGroups, setButtonGroups] = createSignal<{ value: string; onClick: () => void; }[]>([])
 
@@ -228,10 +228,10 @@ function information() {
 
         if (tempData().saveData && tempData().anime.status == "RELEASING") FetchAnimeForinformation()
 
-        readPlaylist("global.waitingplaylist").then((v) => {
-            if (v.find((v) => v.anime.AnimeData.id == tempData().anime.id)) setiswaitingplaylist(true)
-            else setiswaitingplaylist(false)
-        })
+        // readPlaylist("global.waitingplaylist").then((v) => {
+        //     if (v.find((v) => v.anime.AnimeData.id == tempData().anime.id)) setiswaitingplaylist(true)
+        //     else setiswaitingplaylist(false)
+        // })
 
         let plugin = getPlayerPLugin()
         setCurrentPlugin(plugin.metadata.name)
@@ -639,27 +639,27 @@ function information() {
         setButtonGroups(tmp)
     }
 
-    async function modifySaveAnimuList(animulist: animulistProps, anime: AnimeData, edit: boolean = false) {
-        if (edit) updateDataInAnimulist(anime.id, { AnimeData: anime, animulist }, true)
-        else addToAnimuList(animulist, anime, true);
+    // async function modifySaveAnimuList(animulist: animulistProps, anime: AnimeData, edit: boolean = false) {
+    //     if (edit) updateDataInAnimulist(anime.id, { AnimeData: anime, animulist }, true)
+    //     else addToAnimuList(animulist, anime, true);
 
-        setTmpData((p) => ({ ...p, animulist: animulist }))
+    //     setTmpData((p) => ({ ...p, animulist: animulist }))
 
-        if (!getGlobalCache().anilist_user_data) return
+    //     if (!getGlobalCache().anilist_user_data) return
 
-        let tmp = {
-            completedAt: convertDateToDateObject(animulist.endWatch),
-            startedAt: convertDateToDateObject(animulist.startWatch),
-            mediaId: parseInt(anime.id),
-            progress: animulist.progress ?? 0,
-            repeat: animulist.reapeat,
-            score: animulist.score,
-            status: animulist.status
-        } satisfies Anilist_ListMutation
+    //     let tmp = {
+    //         completedAt: convertDateToDateObject(animulist.endWatch),
+    //         startedAt: convertDateToDateObject(animulist.startWatch),
+    //         mediaId: parseInt(anime.id),
+    //         progress: animulist.progress ?? 0,
+    //         repeat: animulist.reapeat,
+    //         score: animulist.score,
+    //         status: animulist.status
+    //     } satisfies Anilist_ListMutation
 
-        if (await getInformationPlugin().setAnimeInList(tmp)) toast(t(`Succesfully Updated ${detectTitleConfig(anime.title)}`), { type: "success" })
-        else toast(t(`Failed Updated ${detectTitleConfig(anime.title)}`), { type: "error" })
-    }
+    //     if (await getInformationPlugin().setAnimeInList(tmp)) toast(t(`Succesfully Updated ${detectTitleConfig(anime.title)}`), { type: "success" })
+    //     else toast(t(`Failed Updated ${detectTitleConfig(anime.title)}`), { type: "error" })
+    // }
 
     return (
         <>
@@ -715,7 +715,7 @@ function information() {
                             {/* <Show when={tempData().anime.trailer && !window.api}>
                                 <Button titleButton={t("information.bar.trailer")} icon="theaters" ButtonClass="information-bar-icon" onClick={() => openUrlFolder(`https://www.youtube.com/watch?v=${tempData().anime.trailer?.id}`)} />
                             </Show> */}
-                            <Show when={tempData().anime.type == "ANIME"}>
+                            {/* <Show when={tempData().anime.type == "ANIME"}>
                                 <Switch>
                                     <Match when={tempData().animulist == undefined}>
                                         <Button titleButton={"Add To Animulist"} icon="add" ButtonClass="information-bar-icon" onClick={() => showCustomMenu(AnimulistMenu({
@@ -780,7 +780,7 @@ function information() {
                                         </Match>
                                     </Switch>
                                 </Show>
-                            </Show>
+                            </Show> */}
                         </div>
                     </div>
 
@@ -897,7 +897,7 @@ function information() {
 
                         <div class="information-bottom-content">
 
-                            <Show when={tempData().animulist}>
+                            {/* <Show when={tempData().animulist}>
                                 <div class='information-animulist-container'>
                                     <span class='information-animulist-data'>
                                         Status {t(`animulist.status.${tempData().animulist?.status}`)}
@@ -915,7 +915,7 @@ function information() {
                                         Repeat Watch {tempData().animulist?.reapeat}
                                     </span>
                                 </div>
-                            </Show>
+                            </Show> */}
 
                             <div class="information-episodes">
                                 <div class="information-episodes-top-content">
