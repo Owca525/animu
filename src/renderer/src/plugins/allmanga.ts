@@ -23,7 +23,7 @@ const header = {
 
 const source_names = ['Sak', 'S-mp4', 'Luf-mp4', "Kir", "Default", "Uv-mp4", "Uni", "Yt-mp4"]
 // "Yt-mp4"
-const normalUrls: string[] = ["Uni"]
+const normalUrls: string[] = ["Uni", "Yt-mp4"]
 
 const mapping: Record<string, string> = {
     "79": "A", "7a": "B", "7b": "C", "7c": "D", "7d": "E", "7e": "F", "7f": "G",
@@ -322,7 +322,7 @@ export async function extractInformation(id: string): Promise<{ episodes: { ep: 
 
 async function requestForUrl(url: string): Promise<playerData | undefined> {
     if (url.startsWith("https")) return undefined
-    const links = await request(`http://allanime.day${url.replace("clock", "clock.json")}`, {
+    const links = await request(`https://allanime.day${url.replace("clock", "clock.json")}`, {
         headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0'
         }
