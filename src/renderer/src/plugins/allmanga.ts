@@ -218,6 +218,14 @@ async function allAnimeDecyrption(encrypted: string) {
 async function fetchUrls(params: AllmangaURLformat): Promise<resolutionFormat[]> {
     const urlObject = new URL(params.url);
 
+    function hasUrl(data: { [key: string]: any }) {
+        if ("hlsVideoTiktok" in data) return data["hlsVideoTiktok"]
+        if ("cf" in data) return data["cf"]
+
+        console.error("Unsuported Url", data)
+        throw new Error(`Failed Find Url`)
+    }
+
     if (params["sourceName"] == "Uni") {
         const response = await request(`${urlObject["origin"]}/api/v1/video?id=${urlObject["hash"].replace("#", "")}&w=1920&h=1080&r=`, {
             headers: {
@@ -239,12 +247,17 @@ async function fetchUrls(params: AllmangaURLformat): Promise<resolutionFormat[]>
         /* ENDIF */
         if (!code) return []
 
-        return [{
+        try {
+            return [{
                 res: "hls",
                 url: `${urlObject["origin"]}${code["hlsVideoTiktok"]}`,
                 reqHeader: header,
-                hls: code["hlsVideoTiktok"].includes("hls")
+                hls: hasUrl(code).includes("hls")
             }]
+        } catch (error) {
+            console.error("Allmanga/fetchUrls", error, response)
+            return []
+        }
     }
     console.warn("NOT SUPPORTED WEBSITE", params)
     return []
@@ -262,7 +275,7 @@ async function detectURL(params: AllmangaURLformat): Promise<resolutionFormat[]>
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "2.0",
+        version: "2.1",
         name: "Allmanga",
         author: "Owca525",
         icon: `${WEBSITE}android-icon-192x192.png`,
@@ -303,7 +316,7 @@ export default class Allmanga implements playerPluginFormat {
 
             for (let index = 0; index < updatedItems.length; index++) {
                 const value = updatedItems[index];
-                
+
                 playerContent.push({
                     hostname: value["sourceName"],
                     resolution: value["clockAPI"] ? [] : await detectURL(value),
@@ -315,7 +328,7 @@ export default class Allmanga implements playerPluginFormat {
             if (jsonObject["episode"]["episodeInfo"][`vidInfors${type}`]) {
                 const main = jsonObject["episode"]["episodeInfo"][`vidInfors${type}`]
                 playerContent.push({
-                    hostname: "wp.youtube-anime.com", 
+                    hostname: "wp.youtube-anime.com",
                     resolution: [{
                         res: main["vidResolution"].toString(),
                         url: `https://aln.youtube-anime.com${main["vidPath"]}`,
