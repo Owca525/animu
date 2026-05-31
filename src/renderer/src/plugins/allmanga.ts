@@ -183,7 +183,6 @@ async function requestToClockApi(content: AllmangaURLformat): Promise<playerData
     let listUrls: playerData | undefined
 
     links["json"]["links"].forEach(element => {
-        console.log(element)
 
         if (!element.src) return
 
