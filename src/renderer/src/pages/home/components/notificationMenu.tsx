@@ -2,7 +2,8 @@ import { t } from "@renderer/utils/i18n";
 import "./css/notificationMenu.css";
 import { createSignal, For, Show } from "solid-js";
 import Button from "@renderer/components/buttons";
-import { getNotificationList, modifyNotification } from "@renderer/utils/stores/global";
+import { getNotificationList } from "@renderer/utils/stores/global";
+import { ReadedNotification } from "@renderer/utils/NotificationManager";
 
 export default function NotificationMenu() {
     const [active, setActive] = createSignal<boolean>(false)
@@ -32,15 +33,12 @@ export default function NotificationMenu() {
                         {(notification) => (
                             <span class={`notificationmenu-notification ${!notification["readed"] ? "notReaded" : ""}`}
                                 on:mouseenter={() => {
-                                    if (hovered().find((v) => notification["id"] == v)) return
-                                    setHovered((v) => [...v, notification["id"]])
-                                    modifyNotification({
-                                        ...notification,
-                                        readed: true
-                                    })
+                                    if (hovered().find((v) => notification["notID"] == v)) return
+                                    setHovered((v) => [...v, notification["notID"]])
+                                    ReadedNotification(notification["notID"])
                                 }}
                                 onMouseLeave={() => {
-                                    setHovered((v) => v.filter((d) => d != notification["id"]))
+                                    setHovered((v) => v.filter((d) => d != notification["notID"]))
                                 }}
                                 onClick={notification["onClick"]}
                             >

@@ -43,6 +43,8 @@ import {
   setTodayAnimeInAnilist,
   setYT_DLPVersion
 } from './utils/stores/global';
+
+import "./utils/NotificationManager"
 import { getConfig, setConfig } from './utils/stores/config';
 import { pluginManager, setPluginRepo } from './utils/stores/plugins';
 import { HashRouter, Route } from '@solidjs/router';

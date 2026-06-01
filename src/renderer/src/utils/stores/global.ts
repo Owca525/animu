@@ -1,4 +1,4 @@
-import { animeOpeningsFormat, cardData, deeplinkFormat, globalDataFormat, NotificationProps, NotificationPropsExpanded, serviceFormat, themeMetadata } from "../types";
+import { animeOpeningsFormat, cardData, deeplinkFormat, globalDataFormat, NotificationExpanded, serviceFormat, themeMetadata } from "../types";
 import { createStore } from "solid-js/store";
 import { Socket } from "socket.io-client";
 
@@ -59,8 +59,8 @@ export const setGlobalHistory = (tmp: cardData[]) => setGlobalState((prev) => ({
 export const setGlobalToken = (tmp: string | undefined) => setGlobalState((prev) => ({ ...prev, token: tmp }));
 export const setAnimulistData = (tmp: globalDataFormat["animuList"]) => setGlobalState((prev) => ({ ...prev, animuList: tmp }));
 export const setDeepLink = (tmp: deeplinkFormat) => setGlobalState((prev) => ({ ...prev, deepLinks: [...prev.deepLinks, tmp] }));
-export const addNotification = (tmp: NotificationProps) => setGlobalState((prev) => ({ ...prev, notifications: [...prev.notifications, { ...tmp, id: crypto.randomUUID() }] }));
-export const modifyNotification = (tmp: NotificationPropsExpanded) => setGlobalState((prev) => ({ ...prev, notifications: prev.notifications.map((v) => v["id"] == tmp["id"] ? tmp : v) }));
+
+export const setNotificationList = (tmp: NotificationExpanded[]) => setGlobalState((prev) => ({ ...prev, notifications: tmp }));
 
 export const removeDeepLink = (name: string) => setGlobalState((prev) => ({ ...prev, deepLinks: prev.deepLinks.filter((item) => item.name != name) }));
 export const setServiuceList = (tmp: serviceFormat[]) => setGlobalState((prev) => ({ ...prev, service: tmp }));

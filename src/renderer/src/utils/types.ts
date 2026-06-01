@@ -203,7 +203,7 @@ export interface globalDataFormat {
     animuList: { AnimeData: AnimeData, animulist: animulistProps, onClick?: (data: AnimeData) => void }[]
     anilist_user_data?: { [key: string]: any; },
     isAnimuFocus: boolean
-    notifications: NotificationPropsExpanded[]
+    notifications: NotificationExpanded[]
     todayAnimeAnilist: cardData[]
     animeOpeningsCache: { [key: number]: animeOpeningsFormat[] }
     audioOutput: MediaDeviceInfo | undefined
@@ -219,15 +219,12 @@ export interface NotificationProps {
     description: string,
     icon?: string,
     onClick?: () => void | Promise<void>
-    readed?: boolean,
-    cache?: {
-        action: string,
-        args: any[]
-    }
+    type?: string
 }
 
-export type NotificationPropsExpanded = NotificationProps & {
-    id: string
+export type NotificationExpanded = NotificationProps & {
+    notID: string,
+    readed: boolean
 }
 
 export type playerDataExtended = playerData & {

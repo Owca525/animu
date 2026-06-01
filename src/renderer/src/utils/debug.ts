@@ -3,9 +3,10 @@ import { getConfig } from "./stores/config";
 import { getGlobalCache } from "./stores/global";
 import { getHomeCache } from "./stores/home";
 import { getAllPluginList, getInformationPlugin, getPlayerPLugin, getPluginRepo, pluginManager } from "./stores/plugins";
-import { request, sendNotification } from "./functions";
+import { request } from "./functions";
 import { t } from "./i18n";
 import icon from '@resources/icon.png';
+import { sendNotification } from "./NotificationManager";
 
 (window as any).getConfig = () => unwrap(getConfig());
 (window as any).getGlobalCache = () => unwrap(getGlobalCache());

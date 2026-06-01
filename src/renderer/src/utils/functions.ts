@@ -10,23 +10,23 @@ import {
     FilterPluginsParams,
     homeData,
     informationPluginFormat,
-    NotificationProps,
     playerChapterList,
     playerPluginFormat,
     themeMetadata
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { addNotification, animulistData, getGlobalCache, isAnimuFocus, removeDeepLink, setActiveThemes, setAnilistUserData, setDeepLink, setGlobalToken, todayAnimeInAnilist } from './stores/global';
+import { animulistData, getGlobalCache, removeDeepLink, setActiveThemes, setAnilistUserData, setDeepLink, setGlobalToken, todayAnimeInAnilist } from './stores/global';
 import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
 import { unwrap } from 'solid-js/store';
 import { getInformationPlugin, getPlayerPluginList, pluginManager } from './stores/plugins';
-import { removeToast, toast, ToastOptions, updateToast } from './context/ToastNotification';
+import { removeToast, toast, updateToast } from './context/ToastNotification';
 import { OvewriteAnimuList } from './FilesManager/animulist';
 import { readPlaylist, updatePlaylist } from './FilesManager/playlist';
 import { playerPluginInstance } from './pluginManager';
+import { sendNotification } from "./NotificationManager"
 
 export function decodeHtmlEntities(str: string | undefined) {
     if (!str) return ""
@@ -1269,26 +1269,6 @@ export function convertEpisode(ep: string): number {
         console.error("convertEpisode/functions ", error)
         return 1
     }
-}
-
-export function sendNotification(notificiation: NotificationProps, toastprop?: ToastOptions) {
-    if (!isAnimuFocus()) {
-        Notification.requestPermission().then(permission => {
-            if (permission != 'granted') return
-            let tmp = new Notification(t(notificiation.title), { body: t(notificiation.description), icon: notificiation.icon });
-            if (notificiation.onClick) tmp.addEventListener("click", notificiation.onClick)
-        });
-    } else {
-        toast({
-            title: t(notificiation.title),
-            description: t(notificiation.description),
-            icon: notificiation.icon
-        }, { ...toastprop, type: "notification", onClick: notificiation.onClick })
-    }
-    addNotification({
-        ...notificiation,
-        readed: false
-    })
 }
 
 export async function getTodayAnilistAnime() {
