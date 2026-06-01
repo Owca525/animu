@@ -25,6 +25,7 @@ class NotifcationManagerInstance {
         if (!cache) return
 
         this.cacheNotification = cache
+        setNotificationList(this.cacheNotification)
     }
 
     private SaveNotificationCache = () => {
