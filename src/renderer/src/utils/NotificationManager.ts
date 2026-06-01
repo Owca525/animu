@@ -4,7 +4,7 @@ import { isAnimuFocus, setNotificationList } from "./stores/global"
 import { NotificationProps, NotificationExpanded } from "./types"
 
 class NotifcationManagerInstance {
-    cacheNotitifications: NotificationExpanded[] = []
+    cacheNotification: NotificationExpanded[] = []
 
     constructor() {
         this.ReadNotificationCache()
@@ -22,12 +22,14 @@ class NotifcationManagerInstance {
     }
 
     private CheckTypeCache = (cache: NotificationExpanded[]) => {
-        this.cacheNotitifications = cache
+        if (!cache) return
+
+        this.cacheNotification = cache
     }
 
     private SaveNotificationCache = () => {
-        localStorage.setItem("animu_notification_cache", JSON.stringify(this.cacheNotitifications))
-        setNotificationList(this.cacheNotitifications)
+        localStorage.setItem("animu_notification_cache", JSON.stringify(this.cacheNotification))
+        setNotificationList(this.cacheNotification)
     }
 
     sendNotification = (notificiation: NotificationProps, toastprop?: ToastOptions) => {
@@ -47,8 +49,8 @@ class NotifcationManagerInstance {
             }, { ...toastprop, type: "notification", onClick: notificiation.onClick })
         }
 
-        this.cacheNotitifications = [
-            ...this.cacheNotitifications,
+        this.cacheNotification = [
+            ...this.cacheNotification,
             {
                 ...notificiation,
                 readed: false,
@@ -60,18 +62,18 @@ class NotifcationManagerInstance {
     }
 
     DeleteNotification = (notID: string) => {
-        this.cacheNotitifications.filter((v) => v["notID"] != notID)
+        this.cacheNotification.filter((v) => v["notID"] != notID)
         this.SaveNotificationCache()
         return true
     }
 
     ClearAllNotification = () => {
-        this.cacheNotitifications = []
+        this.cacheNotification = []
         this.SaveNotificationCache()
     }
 
     ReadedNotification = (notID: string) => {
-        this.cacheNotitifications = this.cacheNotitifications.map((v) => v["notID"] == notID ? {...v, readed: true} : v)
+        this.cacheNotification = this.cacheNotification.map((v) => v["notID"] == notID ? {...v, readed: true} : v)
         this.SaveNotificationCache()
         return true
     }
