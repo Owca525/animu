@@ -118,6 +118,11 @@ function ConvertObjectTreeToString(content: { [key: string]: any }, path: string
     let convertedString = ""
     Object.entries(content).forEach(([key, val]) => {
         if (typeof val == "function") return
+
+        let tmpVal = val
+        try {
+            tmpVal = JSON.stringify(val)
+        } catch (error) {}
         
         if (Array.isArray(val)) {
             val.map((v) => {
@@ -140,7 +145,7 @@ function ConvertObjectTreeToString(content: { [key: string]: any }, path: string
             return
         }
 
-        convertedString += `${key}=${val}\n`
+        convertedString += `${key}=${tmpVal}\n`
     })
     return convertedString
 }
