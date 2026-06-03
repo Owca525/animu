@@ -24,7 +24,7 @@ export default function Button(props: ButtonProps) {
         </span>
       </Show>
       <Show when={props.icon}>
-        <span class={"material-symbols-outlined " + (props.iconClassName ?? "")}>
+        <span class={"material-symbols-outlined button-icon " + (props.iconClassName ?? "")}>
           {props.icon}
         </span>
       </Show>

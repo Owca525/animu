@@ -3,59 +3,65 @@ import "./css/notificationMenu.css";
 import { createSignal, For, Show } from "solid-js";
 import Button from "@renderer/components/buttons";
 import { getNotificationList } from "@renderer/utils/stores/global";
-import { ReadedNotification } from "@renderer/utils/NotificationManager";
+import { ClearAllNotification, DeleteNotification, ReadedNotification } from "@renderer/utils/NotificationManager";
 
 export default function NotificationMenu() {
     const [active, setActive] = createSignal<boolean>(false)
-    const [hovered, setHovered] = createSignal<string[]>([])
 
     return (
-        <main class="notificationmenu-container">
-            <Button icon="notifications" ButtonClass="notificationmenu-button" onClick={() => setActive((v) => !v)} />
+        <main class="notification-menu-container">
+            <Button icon="notifications" ButtonClass="notification-menu-button" onClick={() => setActive((v) => !v)} />
 
             <Show when={getNotificationList().length > 0 && getNotificationList().filter((v) => v["readed"] == false).length > 0}>
-                <span class="notificationmenu-notitification-number">{getNotificationList().filter((v) => v["readed"] == false).length}</span>
+                <span class="notification-menu-button-num">{getNotificationList().filter((v) => v["readed"] == false).length}</span>
             </Show>
 
-            <div class={`notificationmenu-notification-container ${active() ? "active" : ""} ${getNotificationList().length > 0 ? "empty" : ""}`}>
-                <div class="notificationmenu-notification-container-top">
-                    <div class="notificationmenu-notification-container-left">
-                        <span class="material-symbols-outlined icon">notifications</span>
-                        Number Of Notification {getNotificationList().length}
+            <Show when={active()}>
+                <div class="notification-container active">
+                    <div class="notification-container-top">
+                        <div class="notification-container-left">
+                            <span class="material-symbols-outlined icon notification-container-icon">notifications</span>
+                            Notifications {getNotificationList().length}
+                        </div>
+                        <div class="notification-container-right">
+                            <Button 
+                                ButtonClass="notification-container-button" 
+                                iconClassName="notification-container-button-icon" 
+                                icon="delete" 
+                                content="Delete All" 
+                                onClick={ClearAllNotification}
+                            />
+                        </div>
                     </div>
-                    <div class="notificationmenu-notification-container-right">
-                        <Button icon="delete" content="Delete All"/>
-                    </div>
-                </div>
 
-                <div class="notificationmenu-notification-notifications">
-                    <For each={getNotificationList()}>
-                        {(notification) => (
-                            <span class={`notificationmenu-notification ${!notification["readed"] ? "notReaded" : ""}`}
-                                on:mouseenter={() => {
-                                    if (hovered().find((v) => notification["notID"] == v)) return
-                                    setHovered((v) => [...v, notification["notID"]])
-                                    ReadedNotification(notification["notID"])
-                                }}
-                                onMouseLeave={() => {
-                                    setHovered((v) => v.filter((d) => d != notification["notID"]))
-                                }}
-                                onClick={notification["onClick"]}
-                            >
-                                <img src={notification["icon"]} class="notificationmenu-notification-img" />
-                                <div class="notificationmenu-notification-text-container">
-                                    <span class="notificationmenu-notification-title">{t(notification["title"])}</span>
-                                    <span class="notificationmenu-notification-description">{t(notification["description"])}</span>
-                                </div>
-                                <Button icon="delete" />
+                    <div class={`notification-list ${getNotificationList().length <= 0 ? "empty" : ""}`}>
+                        <For each={getNotificationList()}>
+                            {(notification) => (
+                                <span class={`notification ${!notification["readed"] ? "notReaded" : ""}`}
+                                    on:mouseenter={() => {
+                                        if (notification["readed"]) return
+                                        ReadedNotification(notification["notID"])
+                                    }}
+                                    onClick={notification["onClick"]}
+                                >
+                                    <img src={notification["icon"]} class="notification-img" />
+                                    <div class="notification-text-container">
+                                        <span class="notification-title">{t(notification["title"])}</span>
+                                        <span class="notification-description">{t(notification["description"])}</span>
+                                    </div>
+                                    <Button icon="delete" ButtonClass="notification-button" iconClassName="notification-button-icon" onClick={() => DeleteNotification(notification["notID"])} />
+                                </span>
+                            )}
+                        </For>
+                        <Show when={getNotificationList().length <= 0}>
+                            <span class="notification-list-nothing-container">
+                                <span class="material-symbols-outlined icon notification-list-nothing-icon">flood</span>
+                                <span class="notification-list-nothing-text">No Notifications</span>
                             </span>
-                        )}
-                    </For>
-                    <Show when={getNotificationList().length <= 0}>
-                        <span>No Notifications</span>
-                    </Show>
+                        </Show>
+                    </div>
                 </div>
-            </div>
+            </Show>
         </main >
     );
 }

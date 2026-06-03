@@ -63,7 +63,7 @@ class NotifcationManagerInstance {
     }
 
     DeleteNotification = (notID: string) => {
-        this.cacheNotification.filter((v) => v["notID"] != notID)
+        this.cacheNotification = this.cacheNotification.filter((v) => v["notID"] != notID)
         this.SaveNotificationCache()
         return true
     }

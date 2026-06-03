@@ -1,12 +1,14 @@
-.notificationmenu-button {
-    anchor-name: --anchor-notificationmenu-button;
+.notification-menu-button {
+    anchor-name: --anchor-notification-menu-button;
     position: relative;
 }
 
-.notificationmenu-notification-container {
-    background-color: var(--third-layer);
+.notification-container {
+    background-color: var(--second-layer);
+    outline: 3px solid var(--five-layer);
+
     position: absolute;
-    position-anchor: --anchor-notificationmenu-button;
+    position-anchor: --anchor-notification-menu-button;
 
     top: anchor(bottom);
     left: anchor(center);
@@ -15,7 +17,7 @@
 
     translate: -85% 0;
 
-    width: 500px;
+    width: clamp(200px, 50vw, 500px);
     max-height: 500px;
 
     padding: 12px;
@@ -27,35 +29,37 @@
 
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 16px;
 }
 
-.notificationmenu-notification-notifications {
+.notification-list {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     overflow: auto;
 
+    width: 100%;
+
     max-height: 400px;
 }
 
-.notificationmenu-notification-container-top, .notificationmenu-notification-container-left {
+.notification-container-top, .notification-container-left {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
 }
 
-.notificationmenu-notification-container.active {
+.notification-container.active {
     z-index: 20;
     opacity: 1;
 }
 
-.notificationmenu-notification-img {
+.notification-img {
     width: 50px;
 }
 
-.notificationmenu-notification {
+.notification {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -65,41 +69,83 @@
     cursor: pointer;
     outline: 2px solid var(--invisible);
     transition: all 150ms ease-in-out;
+
+    width: 100%;
 }
 
-.notificationmenu-notification:hover {
+.notification:hover {
     background-color: var(--five-layer);
 }
 
-.notificationmenu-notification-text-container {
+.notification-text-container {
     display: flex;
     flex-direction: column;
 }
 
-.notificationmenu-notification-description {
+.notification-description {
     font-size: .85em;
 }
 
-.notificationmenu-notification-title {
+.notification-title {
     font-weight: 600;
     font-size: .9em;
 }
 
-.notificationmenu-notification.notReaded {
-    outline-color: var(--red-one);
+.notification.notReaded {
+    background-color: var(--red-background);
 }
 
-.notificationmenu-notitification-number {
+.notification-menu-button-num {
     position: absolute;
     border-radius: 50%;
     user-select: none;
     padding: 4px 8px;
     position: absolute;
-    position-anchor: --anchor-notificationmenu-button;
+    position-anchor: --anchor-notification-menu-button;
 
     bottom: anchor(top);
     left: anchor(right);
 
     translate: -80% 18px;
     background-color: var(--red-one);
+}
+
+.notification-container-icon {
+    font-size: 1.8em !important;
+}
+
+.notification-container-button, .notification-button {
+    margin-left: auto;
+
+    background-color: var(--invisible) !important;
+}
+
+.notification-container-button:hover, .notification-button:hover {
+    background-color: var(--red-background) !important;
+    outline-color: var(--red-one) !important;
+    color: var(--text) !important;
+}
+
+.notification-button:hover .notification-button-icon {
+    color: var(--text) !important;
+}
+
+.notification-container-button:hover .notification-container-button-icon {
+    color: var(--text) !important;
+}
+
+.notification-list.empty {
+    height: 100px;
+}
+
+.notification-list-nothing-container {
+    display: flex;
+    flex-direction: column;
+    
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+
+    gap: 6px;
 }

@@ -156,6 +156,9 @@ body {
   color: var(--green-one);
 }
 
+.button:hover .button-icon {
+  color: var(--green-one);
+}
 
 /* Input */
 
