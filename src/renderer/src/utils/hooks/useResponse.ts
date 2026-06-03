@@ -77,7 +77,7 @@ export function useResponse<T, TData>(options: UseResponseOptions<T, TData>) {
     })
 
     onCleanup(() => {
-        if (removeOnClenup && cacheTimeOut) clearInterval(cacheTimeOut)
+        if (removeOnClenup && cacheTimeOut) clearTimeout(cacheTimeOut)
     })
 
     return { data, loading, error, Refetch };
