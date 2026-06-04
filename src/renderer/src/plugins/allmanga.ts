@@ -28,7 +28,7 @@ const header = {
     "Origin": WEBSITE
 }
 
-const source_names = ['Sak', 'S-mp4', 'Luf-mp4', "Kir", "Default", "Uv-mp4", "Uni", "Yt-mp4"]
+const source_names = ['Sak', 'S-mp4', "Luf-Mp4", "Kir", "Default", "Uv-mp4", "Uni", "Yt-mp4", "Ak"]
 
 const mapping: Record<string, string> = {
     "79": "A", "7a": "B", "7b": "C", "7c": "D", "7d": "E", "7e": "F", "7f": "G",
@@ -178,19 +178,20 @@ async function requestToClockApi(content: AllmangaURLformat): Promise<playerData
         headers: header
     })
 
+    /* IFDEF DEBUG */
+    console.warn("allmanga/requestToClockApi", links)
+    /* ENDIF */
+
     if (!links["success"] || !links["json"]) return undefined
 
     let listUrls: playerData | undefined
 
     links["json"]["links"].forEach(element => {
 
-        if (!element.src) return
-
-        if (element.mp4) {
-            listUrls = { resolution: [{ url: element.src, res: "1080", hls: false }], hostname: content["sourceName"] }
-        } else {
-            listUrls = { resolution: [{ url: element.src, res: "", hls: true }], hostname: content["sourceName"] }
-        }
+        const srcUrl = element.src ? element.src : element.link
+        if (!srcUrl) return console.error("allmanga/requestToClockApi Unsuported Url", links)
+            
+        listUrls = { resolution: [{ url: srcUrl, res: "1080", hls: element["hls"] ? true : false }], hostname: content["sourceName"] }
     });
     return listUrls
 }
@@ -275,7 +276,7 @@ async function detectURL(params: AllmangaURLformat): Promise<resolutionFormat[]>
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "2.1",
+        version: "2.2",
         name: "Allmanga",
         author: "Owca525",
         icon: `${WEBSITE}android-icon-192x192.png`,
