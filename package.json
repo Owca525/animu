@@ -32,12 +32,10 @@
     "electron-app-universal-protocol-client": "https://github.com/Owca525/electron-app-universal-protocol-client.git",
     "electron-updater": "^6.8.3",
     "hls.js": "^1.6.16",
-    "html2canvas": "^1.4.1",
     "jassub": "1.8.8",
     "material-symbols": "^0.44.8",
     "semver": "^7.7.4",
     "socket.io-client": "^4.8.3",
-    "subtitle-converter": "^3.0.12",
     "video.js": "^8.23.7"
   },
   "devDependencies": {

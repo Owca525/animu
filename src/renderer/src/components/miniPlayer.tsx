@@ -1,5 +1,4 @@
 import Hls from 'hls.js';
-import html2canvas from 'html2canvas';
 import JASSUB from 'jassub';
 import NerdStats from '@renderer/pages/player/components/nerdStats';
 import PlayerButton from '@renderer/pages/player/components/PlayerButton';
@@ -15,14 +14,11 @@ import {
     Thumbnail
 } from '@renderer/utils/types';
 import {
-    createEffect,
     createSignal,
-    For,
     onCleanup,
     onMount,
     Show
 } from 'solid-js';
-import { convert } from 'subtitle-converter';
 import {
     convertKeybinds,
     CreateContextMenuOptions,
@@ -47,7 +43,18 @@ import fallbackFontJASSUB from "jassub/dist/default.woff2?url";
 import videojs from 'video.js';
 import Player from 'video.js/dist/types/player';
 import { useKeyPress } from '@renderer/utils/hooks/useKeyPress';
+import { CovnertToASS } from '@renderer/utils/subtitleConverter';
 // import modernWasmUrl from 'jassub/dist/jassub-worker-modern.wasm?url'
+
+const Defaultheader = {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:149.0) Gecko/20100101 Firefox/149.0",
+    Accept: "*/*",
+    "Sec-GPC": "1",
+    Connection: "keep-alive",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "cross-site",
+}
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -93,7 +100,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
     let buttonSkipLeft: NodeJS.Timeout | undefined
     let buttonSkipRight: NodeJS.Timeout | undefined
     let assSubContainer: HTMLDivElement | undefined
-    let vttSubRef: HTMLTrackElement | undefined
     let screenShotContainer: HTMLDivElement | undefined
     let refreashUpdateSocket: NodeJS.Timeout | undefined
     let hls: Hls | undefined
@@ -149,7 +155,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
     const [ListSubtitles, setListSubtitles] = createSignal<playerSubtitlesFormat[]>([])
     const [lastSubtitles, setlastSubtitles] = createSignal<playerSubtitlesFormat | undefined>(undefined)
     const [currentSubtitles, setSubtitles] = createSignal<playerSubtitlesFormat | undefined>(undefined)
-    const [currentCue, setCue] = createSignal<VTTCue | undefined>(undefined);
 
     // Audio Tracks
     const [audioTrackList, setAudioTrackList] = createSignal<{ id: number, lang?: string, label: string }[]>([]);
@@ -165,18 +170,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
     const [clipToastID, setClipToastID] = createSignal<string | undefined>(undefined);
 
     // const gamepad = useGamepad(0, gamepadControler);
-    if (getSocket()) {
-        const socket = getSocket()
-        socket?.on("player:update", (update: { time: number, pause: boolean }) => {
-            console.log(update)
-            if (update.pause != isPlaying()) togglePlay(true)
-            console.log(unwrap(currentTime()) - update.time > 3, unwrap(currentTime()), unwrap(currentTime()) - update.time)
-            if (unwrap(currentTime()) - update.time > 3 || unwrap(currentTime()) - update.time < -3) {
-                setTimeVideo(update.time)
-                clearInterval(refreashUpdateSocket)
-            }
-        })
-    }
 
     function handleMouseMove() {
         setIsVisible(true)
@@ -250,7 +243,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
             updateToast(clipToastID()!, "Clip Is Recording", { type: "loading", click: true, timer: true })
         }
     }
-
 
     onMount(() => {
         let defaulthost = playerData()[0]
@@ -326,7 +318,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         if (buttonSkipLeft) clearInterval(buttonSkipLeft)
         if (buttonSkipRight) clearInterval(buttonSkipRight)
         if (assSubContainer) assSubContainer.remove()
-        if (vttSubRef) videoJS!.removeRemoteTextTrack(vttSubRef.track)
         if (screenShotContainer) screenShotContainer.remove()
         if (refreashUpdateSocket) clearInterval(refreashUpdateSocket)
 
@@ -339,6 +330,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
             videoRef.remove()
         }
         videoRef = undefined
+        if (videoJS) videoJS.dispose()
 
         if (audioRef) {
             audioRef.pause();
@@ -347,11 +339,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
             audioRef.remove()
         }
         audioRef = undefined
-
-        if (getSocket()) {
-            const socket = getSocket()
-            socket?.off("player:update")
-        }
     })
 
     // player Functions
@@ -385,10 +372,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         if (!videoRef) return
         videoRef.playbackRate = parseFloat(speed)
     }
-
-    createEffect(() => {
-        console.log(isInitilize())
-    })
 
     async function setNewResolution(data: resolutionFormat | undefined) {
         if (!data) return
@@ -696,8 +679,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         setcurrentTime(event.currentTarget.currentTime)
         handleProgress(event)
 
-        if (currentCue() && (event.currentTarget.currentTime >= currentCue()!["endTime"])) setCue(undefined)
-
         setdurrationTime(event.currentTarget.duration)
         if (currentPlayer() && currentPlayer()!.listChapters && chapterList().length <= 0) {
             generateOpeningEnding(currentPlayer()!.listChapters!)
@@ -755,33 +736,16 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         setcurrentTime(() => value)
     }
 
-    function onChangeTrackText() {
-        if (!vttSubRef) return
-
-        if (!vttSubRef.track) return
-        let track = vttSubRef.track
-        if (!track.activeCues) return
-        let activeCue = track.activeCues[0] as VTTCue
-
-        try {
-            if (activeCue) setCue(activeCue)
-            else setCue(undefined)
-        } catch (error) {
-            setCue(undefined)
-        }
-    }
-
     async function setNewSubtitles(sub: playerSubtitlesFormat | undefined) {
         if (!sub) return
+        if (!videoRef) return
         if (!videoJS) return
-
-        console.log(sub)
 
         // This clear subtitles but this dosen't work on dev Because react second render
         if (currentASSubtitles) {
             // currentASSubtitles.hide()
-            currentASSubtitles._canvas.remove()
             currentASSubtitles.destroy()
+            currentASSubtitles._canvas.remove()
             currentASSubtitles = undefined
         }
 
@@ -789,51 +753,44 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
             assSubContainer.innerHTML = ""
         }
 
-        if (vttSubRef){
-            setCue(() => undefined)
-            videoJS.removeRemoteTextTrack(vttSubRef.track)
-        }
-
         if (sub.label == "Off" && sub.format == "", sub.lang == "", sub.url == "") {
             setSubtitles({ url: "", format: "", lang: "", label: "Off" })
             return
         }
 
-        if (sub.format == "ass") {
-            const renderer = new JASSUB({
-                video: videoRef,
-                subUrl: sub.url,
-                workerUrl,
-                wasmUrl,
-                availableFonts: {
-                    "default": fallbackFontJASSUB
-                },
-                defaultFont: "default"
-                // modernWasmUrl
-            } as any);
-            currentASSubtitles = renderer
-            setSubtitles(sub)
-            return
-        }
-
-        const data = await request(sub.url, { headers: currentResolution()!["reqHeader"] })
+        const data = await request(sub.url, { headers: currentResolution() && currentResolution()!["reqHeader"] ? currentResolution()!["reqHeader"] : Defaultheader })
 
         if (!data["success"]) {
+            console.error("Failed Load Subtitles", data, currentResolution())
             toast(t("Failed Fetch Subttitles"), { type: "error" })
             return
         }
 
-        const vtt = await convert(data.text, ".vtt", { removeTextFormatting: true });
-        const blob = new Blob([vtt.subtitle], { type: "text/vtt" });
+        let assUrl = sub.url
+
+        if (!sub.format.toLowerCase().includes("ass") || !sub.format.toLowerCase().includes("ssa")) {
+            const content = CovnertToASS(data["text"])
+            if (!content) return toast(t("Failed Fetch Subttitles"), { type: "error" })
+            const blob = new Blob([content], { type: "text/ass" });
+            assUrl = URL.createObjectURL(blob);
+        }
+
+        const renderer = new JASSUB({
+            video: videoRef,
+            subUrl: assUrl,
+            workerUrl,
+            wasmUrl,
+            availableFonts: {
+                "default": fallbackFontJASSUB
+            },
+            defaultFont: "default"
+            // modernWasmUrl
+        } as any);
+
+        currentASSubtitles = renderer
         setSubtitles(sub)
 
-        vttSubRef = videoJS.addRemoteTextTrack({
-            src: URL.createObjectURL(blob),
-            kind: "subtitles"
-        }, true) as any
-        
-        vttSubRef!.track.mode = "hidden"
-        vttSubRef!.track.oncuechange = onChangeTrackText;
+        return
     }
 
     useKeyPress((keys: string) => {
@@ -887,7 +844,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
                 takeScreenshot()
                 break
             case convertKeybinds(config.Player.keybinds.noSubbtitlesreenshot.toLowerCase()).toLowerCase():
-                takeScreenshot(true)
+                takeScreenshot()
                 break
             case convertKeybinds(config.Player.keybinds.VolumeMute.toLowerCase()).toLowerCase():
                 setMutedToPlayer()
@@ -925,7 +882,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         }, 3000)
     }
 
-    async function takeScreenshot(noSubbtitles: boolean = false) {
+    async function takeScreenshot() {
         if (!screenshotWrapper) return
         if (config == null) return
         if (!videoRef) return
@@ -944,7 +901,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
 
         let screenshot: string = "data:,"
 
-        if (currentASSubtitles && !noSubbtitles) {
+        if (currentASSubtitles) {
             const outputCanvas = document.createElement("canvas");
             const ctx = outputCanvas.getContext("2d");
             if (!ctx) {
@@ -956,9 +913,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
             ctx.drawImage(videoRef, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
             ctx.drawImage(currentASSubtitles._canvas, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
             screenshot = outputCanvas.toDataURL("image/png");
-        } else {
-            const canvas = await html2canvas(screenshotWrapper);
-            screenshot = canvas.toDataURL("image/png");
         }
 
         if (screenshot == "data:,") {
@@ -1060,23 +1014,9 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
                     muted={isMuted()}
                     style={config.Player.general.VideoStreching ? { "object-fit": "cover" } : {}}
                 >
-                    {/* <track
-                        src={vttUrl()}
-                        kind="subtitles"
-                        default
-                        ref={vttSubRef}
-                    /> */}
                 </video>
-                <audio ref={audioRef} style={{ display: "none" }} />
-                <Show when={currentCue()}>
-                    <div class={`player-subtitle-container ${isVisible() ? "up" : "down"}`}>
-                        <For each={`${currentCue()?.text}`.replace("undefined", "").split("\n")}>
-                            {(text) => (
-                                <span class="player-subtitle-content">{text}</span>
-                            )}
-                        </For>
-                    </div>
-                </Show>
+                {/* TODO: Maybe 2 Channel Audio */}
+                {/* <audio ref={audioRef} style={{ display: "none" }} /> */}
                 <div ref={assSubContainer} style={{ position: "absolute", top: "0", left: "0" }}></div>
             </div>
             <Show when={isVisible()}>

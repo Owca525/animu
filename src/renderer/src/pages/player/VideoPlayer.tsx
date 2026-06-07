@@ -8,8 +8,6 @@ import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
 import PlayerSettings from "./components/PlayerSettings"
 import PlayerButton from "./components/PlayerButton"
 import PlayerEpisodeElement from "./components/playerEpisodeElement"
-import { convert } from "subtitle-converter";
-import html2canvas from "html2canvas"
 import JASSUB from "jassub";
 
 import workerUrl from "jassub/dist/jassub-worker.js?url";
@@ -33,6 +31,7 @@ import videojs from "video.js";
 // import "@videojs/http-streaming" 
 import Player from "video.js/dist/types/player"
 import { useKeyPress } from "@renderer/utils/hooks/useKeyPress"
+import { CovnertToASS } from "@renderer/utils/subtitleConverter"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -79,11 +78,11 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     let screenshotWrapper: HTMLDivElement | undefined
     let volumeTimeout: NodeJS.Timeout | undefined
     let playAnimationTimeout: NodeJS.Timeout | undefined
+    let skipUITimer: NodeJS.Timeout | undefined
     let buttonSkipLeft: NodeJS.Timeout | undefined
     let moreInformationTimer: NodeJS.Timeout | undefined
     let buttonSkipRight: NodeJS.Timeout | undefined
     let assSubContainer: HTMLDivElement | undefined
-    let vttSubRef: HTMLTrackElement | undefined
     let screenShotContainer: HTMLDivElement | undefined
     let refreashUpdateSocket: NodeJS.Timeout | undefined
     let hls: Hls | undefined
@@ -111,6 +110,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     const [isShowButtonSkipLeft, setShowButtonSkipLeft] = createSignal<boolean>(false)
     const [isShowButtonSkipRight, setShowButtonSkipRight] = createSignal<boolean>(false)
+
+    const [SkipTimerUI, setSkipTimerUI] = createSignal<number>(0)
 
     // States
     const [isMuted, setMuted] = createSignal<boolean>(false)
@@ -143,7 +144,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [ListSubtitles, setListSubtitles] = createSignal<playerSubtitlesFormat[]>([])
     const [lastSubtitles, setlastSubtitles] = createSignal<playerSubtitlesFormat | undefined>(undefined)
     const [currentSubtitles, setSubtitles] = createSignal<playerSubtitlesFormat | undefined>(undefined)
-    const [currentCue, setCue] = createSignal<VTTCue | undefined>(undefined);
 
     // Audio Tracks
     const [audioTrackList, setAudioTrackList] = createSignal<{ id: number, lang?: string, label: string }[]>([]);
@@ -419,7 +419,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (moreInformationTimer) clearInterval(moreInformationTimer)
         if (buttonSkipRight) clearInterval(buttonSkipRight)
         if (assSubContainer) assSubContainer.remove()
-        if (vttSubRef) vttSubRef.remove()
         if (screenShotContainer) screenShotContainer.remove()
         if (refreashUpdateSocket) clearInterval(refreashUpdateSocket)
 
@@ -532,9 +531,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         let currentplayer = data
         setPlayer(() => currentplayer)
-        if (currentplayer.extractResolution) {
-            if (currentExtractionRes().toast != "") removeToast(currentExtractionRes().toast)
 
+        if (currentExtractionRes().toast != "") removeToast(currentExtractionRes().toast)
+
+        setNewSubtitles(ListSubtitles()[0])
+
+        if (currentplayer.extractResolution) {
             const tmpID = crypto.randomUUID()
             const idToast = toast(t("notification.fetchresolution"), { type: "loading", timer: true })
             setCurrentExtractionRes({ id: tmpID, toast: idToast })
@@ -1064,22 +1066,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         return setNextEpisode(temp.episodes[ep].ep)
     }
 
-    function onChangeTrackText() {
-        if (!vttSubRef) return
-
-        if (!vttSubRef.track) return
-        let track = vttSubRef.track
-        if (!track.activeCues) return
-        let activeCue = track.activeCues[0] as VTTCue
-
-        try {
-            if (activeCue) setCue(activeCue)
-            else setCue(undefined)
-        } catch (error) {
-            setCue(undefined)
-        }
-    }
-
     async function setNewSubtitles(sub: playerSubtitlesFormat | undefined) {
         if (!sub) return
         if (!videoRef) return
@@ -1097,34 +1083,11 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             assSubContainer.innerHTML = ""
         }
 
-        if (vttSubRef) {
-            setCue(() => undefined)
-            videoJS.removeRemoteTextTrack(vttSubRef.track)
-        }
-
         if (sub.label == "Off" && sub.format == "", sub.lang == "", sub.url == "") {
             setSubtitles({ url: "", format: "", lang: "", label: "Off" })
             return
         }
 
-        if (sub.format == "ass") {
-            const renderer = new JASSUB({
-                video: videoRef,
-                subUrl: sub.url,
-                workerUrl,
-                wasmUrl,
-                availableFonts: {
-                    "default": fallbackFontJASSUB
-                },
-                defaultFont: "default"
-                // modernWasmUrl
-            } as any);
-            currentASSubtitles = renderer
-            setSubtitles(sub)
-            return
-        }
-
-        console.log(currentResolution())
         const data = await request(sub.url, { headers: currentResolution() && currentResolution()!["reqHeader"] ? currentResolution()!["reqHeader"] : Defaultheader })
 
         if (!data["success"]) {
@@ -1133,17 +1096,31 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             return
         }
 
-        const vtt = await convert(data.text, ".vtt", { removeTextFormatting: true });
-        const blob = new Blob([vtt.subtitle], { type: "text/vtt" });
+        let assUrl = sub.url
+
+        if (!sub.format.toLowerCase().includes("ass") || !sub.format.toLowerCase().includes("ssa")) {
+            const content = CovnertToASS(data["text"])
+            if (!content) return toast(t("Failed Fetch Subttitles"), { type: "error" })
+            const blob = new Blob([content], { type: "text/ass" });
+            assUrl = URL.createObjectURL(blob);
+        }
+
+        const renderer = new JASSUB({
+            video: videoRef,
+            subUrl: assUrl,
+            workerUrl,
+            wasmUrl,
+            availableFonts: {
+                "default": fallbackFontJASSUB
+            },
+            defaultFont: "default"
+            // modernWasmUrl
+        } as any);
+
+        currentASSubtitles = renderer
         setSubtitles(sub)
 
-        vttSubRef = videoJS.addRemoteTextTrack({
-            src: URL.createObjectURL(blob),
-            kind: "subtitles"
-        }, true) as any
-
-        vttSubRef!.track.mode = "hidden"
-        vttSubRef!.track.oncuechange = onChangeTrackText;
+        return
     }
 
     // function gamepadControler(num: number, pressed: boolean) {
@@ -1159,6 +1136,21 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     //     }
     // }
 
+    function timerForUI(time: string) {
+        try {
+            clearTimeout(skipUITimer)
+
+            setSkipTimerUI(SkipTimerUI() + parseInt(time.toString()))
+
+            skipUITimer = setTimeout(() => {
+                setSkipTimerUI(0)
+            }, 1000)
+        } catch (error) {
+            console.error("Player/timerForUI", error)
+            clearTimeout(skipUITimer)
+        }
+    }
+
     useKeyPress((keys: string) => {
         if (keys == "CTRL+SHIFT+D") setshowNerdStats((prev) => !prev)
         if (keys == "SHIFT+R" && currentPlayer()) runNewPlayer(currentPlayer()!)
@@ -1173,18 +1165,22 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 togglePlay()
                 break
             case convertKeybinds(config.Player.keybinds.TimeSkipRight.toLowerCase()).toLowerCase():
+                timerForUI(`${config.Player.general.TimeSkipRight}`)
                 setTimeVideo((time_now += parseInt(config.Player.general.TimeSkipRight.toString())))
                 setTimeoutForElement(buttonSkipRight, setShowButtonSkipRight)
                 break
             case convertKeybinds(config.Player.keybinds.TimeSkipLeft.toLowerCase()).toLowerCase():
+                timerForUI(`${config.Player.general.TimeSkipLeft}`)
                 setTimeVideo((time_now -= parseInt(config.Player.general.TimeSkipLeft.toString())))
                 setTimeoutForElement(buttonSkipLeft, setShowButtonSkipLeft)
                 break
             case convertKeybinds(config.Player.keybinds.LongTimeSkipForward.toLowerCase()).toLowerCase():
+                timerForUI(`${config.Player.general.LongTimeSkipForward}`)
                 setTimeVideo((time_now += parseInt(config.Player.general.LongTimeSkipForward.toString())))
                 setTimeoutForElement(buttonSkipRight, setShowButtonSkipRight)
                 break
             case convertKeybinds(config.Player.keybinds.LongTimeSkipBack.toLowerCase()).toLowerCase():
+                timerForUI(`${config.Player.general.LongTimeSkipBack}`)
                 setTimeVideo((time_now -= parseInt(config.Player.general.LongTimeSkipBack.toString())))
                 setTimeoutForElement(buttonSkipLeft, setShowButtonSkipLeft)
                 break
@@ -1210,7 +1206,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 takeScreenshot()
                 break
             case convertKeybinds(config.Player.keybinds.noSubbtitlesreenshot.toLowerCase()).toLowerCase():
-                takeScreenshot(true)
+                takeScreenshot()
                 break
             case convertKeybinds(config.Player.keybinds.VolumeMute.toLowerCase()).toLowerCase():
                 setMutedToPlayer()
@@ -1264,7 +1260,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }, 3000)
     }
 
-    async function takeScreenshot(noSubbtitles: boolean = false) {
+    async function takeScreenshot() {
         if (!screenshotWrapper) return
         if (config == null) return
         if (!videoRef) return
@@ -1283,7 +1279,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         let screenshot: string = "data:,"
 
-        if (currentASSubtitles && !noSubbtitles) {
+        if (currentASSubtitles) {
             const outputCanvas = document.createElement("canvas");
             const ctx = outputCanvas.getContext("2d");
             if (!ctx) {
@@ -1295,9 +1291,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             ctx.drawImage(videoRef, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
             ctx.drawImage(currentASSubtitles._canvas, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
             screenshot = outputCanvas.toDataURL("image/png");
-        } else {
-            const canvas = await html2canvas(screenshotWrapper);
-            screenshot = canvas.toDataURL("image/png");
         }
 
         if (screenshot == "data:,") {
@@ -1483,15 +1476,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                         ref={vttSubRef}
                     /> */}
                 </video>
-                <Show when={currentCue()}>
-                    <div class={`player-subtitle-container ${isVisible() ? "up" : "down"}`}>
-                        <For each={`${currentCue()?.text}`.replace("undefined", "").split("\n")}>
-                            {(text) => (
-                                <span class="player-subtitle-content">{text}</span>
-                            )}
-                        </For>
-                    </div>
-                </Show>
                 <div ref={assSubContainer} style={{ position: "absolute", top: "0", left: "0" }}></div>
             </div>
             <Show when={isVisible()}>
@@ -1511,11 +1495,17 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 </div>
                 <div class="video-center"> {/* video-center-container */}
                     <Show when={!config.Player.ui.DisableSkipAnimation}>
+                        <div class={`player-loading-animation-container player-fast-rewind-ui time ${isShowButtonSkipLeft() ? "show" : "hidden"}`}>
+                            -{SkipTimerUI()}s
+                        </div>
                         <div class={`player-loading-animation-container player-fast-rewind-ui ${isShowButtonSkipLeft() ? "show" : "hidden"}`}>
                             <div class="material-symbols-outlined player-icon-ui">fast_rewind</div>
                         </div>
                         <div class={`player-loading-animation-container player-fast-forward-ui ${isShowButtonSkipRight() ? "show" : "hidden"}`}>
                             <div class="material-symbols-outlined player-icon-ui">fast_forward</div>
+                        </div>
+                        <div class={`player-loading-animation-container player-fast-forward-ui time ${isShowButtonSkipRight() ? "show" : "hidden"}`}>
+                            +{SkipTimerUI()}s
                         </div>
                     </Show>
 

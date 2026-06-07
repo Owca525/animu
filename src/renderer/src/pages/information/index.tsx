@@ -462,7 +462,6 @@ function information() {
                     reqHeader: {
                         ...response["http_headers"],
                         Referer: "https://youtube.com/",
-                        "Cookie": "VISITOR_INFO1_LIVE=C69AkZEGbAk; VISITOR_PRIVACY_METADATA=CgJQTBIiEh4SHAsMDg8QERITFBUWFxgZGhscHR4fICEiIyQlJicgWA%3D%3D; __Secure-YNID=18.YT=IJSDTRKHUE-OxQXY4HSCy3ZV3cGOD7GLUVvMtah_TK6vYrBou3yJOt91o-CynFQHgld0sDV2XatJ_jLKPI54_DUbkq_DwlcbM96rxY_izAXlPn1no3Q4_muen0B3y9uajIlDPgYapXNI4yuVtVf7V2F9c0e7tw21C16SCYO7MJSSL_RngU17RhI8nlXJzU97fnvY7lMD1LmDY8k8ur7Ch7FxdJ_ONtqEquRfTsX2gAXRGZg2Zm6uyLWcfkUKRaCXjAuOaUYmO_MZYteMB43-sRonYK8x7w23dCbRGFcKUZ2luhIYXjcAszRoV4itkUqJ8V2UU0MhJKhUrMj3BhopoA; YSC=SiecueoQXHA; __Secure-ROLLOUT_TOKEN=CL7apoqqjuHILBCGtPq4opuTAxidscenhs2UAw%3D%3D",
                     }
                 })
             }
@@ -475,17 +474,9 @@ function information() {
                     reqHeader: v["http_headers"],
                     hls: true
                 }))
-                const audio = response["formats"].filter((v) => v["resolution"] == "audio only")
-                const mediumAudio = audio.find((v) => v["format_note"] == "medium")
-                // tmpres = tmpres.map((v) => ({
-                //     ...v,
-                //     audioUrl: {
-                //         url: mediumAudio ? mediumAudio["url"] : audio[0]["url"]
-                //     }
-                // }))
+
                 const storyBoardFinded: any[] = response["formats"].filter((v) => v["format_note"] != "storyboard")
                 storyBoard = storyBoardFinded.at(-1)["url"]
-                console.log(tmpres, audio, mediumAudio, storyBoard)
                 tmpres.reverse()
                 resolutions = tmpres
             }
@@ -504,7 +495,7 @@ function information() {
                 for (const key in response["automatic_captions"]) {
                     const value = response["automatic_captions"][key as keyof typeof response["automatic_captions"]];
                     const subFinded = value.find((item) => item["ext"] == "vtt")
-                    if (!subFinded) continue
+                    if (!subFinded || !subFinded["name"]) continue
                     subtitles.push({
                         url: subFinded["url"],
                         lang: key,
