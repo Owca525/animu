@@ -1,11 +1,18 @@
-import { convertMsToMinutes, makeSmallText, request } from "@renderer/utils/functions"
-import { AnimeData, episodeList, FilterPluginsParams, playerPluginFormat, playerData, episodeMetadata, serverStatusData } from "@renderer/utils/types"
+import { convertMsToMinutes, request, SheepFinderAnime2000 } from "@renderer/utils/functions";
+import { AnimeData, episodeMetadata, FilterPluginsParams, playerData, playerPluginFormat, serverStatusData, episodeList, cardData, resolutionFormat } from "@renderer/utils/types";
+
+interface AllmangaURLformat {
+    url: string,
+    clockAPI: boolean,
+    priority: number,
+    sourceName: string
+}
 
 const HASH_SEARCH = 'a24c500a1b765c68ae1d8dd85174931f661c71369c89b92b88b75a725afc471c'
 const HASH_INFO = '043448386c7a686bc2aabfbb6b80f6074e795d350df48015023b079527b0848a'
 const HASH_PLAYER = 'd405d0edd690624b66baba3068e0edc3ac90f1597d898a1ec8db4e5c43c00fec'
-const HASH_DATA = "c8f3ac51f598e630a1d09d7f7fb6924cff23277f354a23e473b962a367880f7d"
 const API_WEB = 'https://api.allanime.day'
+const WEBSITE = 'https://allmanga.to/'
 
 const header = {
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:149.0) Gecko/20100101 Firefox/149.0",
@@ -17,13 +24,11 @@ const header = {
     "Sec-Fetch-Dest": "empty",
     "Sec-Fetch-Mode": "cors",
     "Sec-Fetch-Site": "cross-site",
-    'Referer': 'https://allmanga.to/',
-    "Origin": "https://allmanga.to/"
+    'Referer': WEBSITE,
+    "Origin": WEBSITE
 }
 
-const source_names = ['Sak', 'S-mp4', 'Luf-mp4', "Kir", "Default", "Uv-mp4", "Uni", "Yt-mp4"]
-// "Yt-mp4"
-const normalUrls: string[] = ["Uni", "Yt-mp4"]
+const source_names = ['Sak', 'S-mp4', "Luf-Mp4", "Kir", "Default", "Uv-mp4", "Uni", "Yt-mp4", "Ak"]
 
 const mapping: Record<string, string> = {
     "79": "A", "7a": "B", "7b": "C", "7c": "D", "7d": "E", "7e": "F", "7f": "G",
@@ -40,19 +45,7 @@ const mapping: Record<string, string> = {
     "11": ")", "12": "*", "13": "+", "14": ",", "03": ";", "05": "=", "1d": "%"
 };
 
-function findUrl(url: string, sourceName: string): { url: string, decode: boolean, source: string } | undefined {
-    for (let index = 0; index < source_names.length; index++) {
-        const element = source_names[index];
-        if (element.toLowerCase() == sourceName.toLowerCase() && normalUrls.includes(element)) return { url, decode: false, source: sourceName }
-        if (element.toLowerCase() == sourceName.toLowerCase()) {
-            let tmpUrl = decodeText(url)
-            return { url: tmpUrl, decode: !tmpUrl.startsWith("https://"), source: sourceName }
-        }
-    }
-    return
-}
-
-function decodeText(textString: string): string {
+function encodeStringToClockAPI(textString: string): string {
     const field = textString.trim();
 
     const hexPairs: string[] = [];
@@ -62,7 +55,44 @@ function decodeText(textString: string): string {
     return hexPairs.map(hp => mapping[hp] ?? "").join("")
 }
 
-function converterData(data: any): AnimeData | undefined {
+function sortURLS(urls: { [key: string]: any }[]): AllmangaURLformat[] {
+    let sorted: AllmangaURLformat[] = []
+
+    urls.forEach((value) => {
+        try {
+            if (!source_names.includes(value["sourceName"])) return
+            const decodedUrl = encodeStringToClockAPI(value["sourceUrl"])
+
+            const needDecode = value["sourceUrl"].startsWith("--") && !decodedUrl.startsWith("http")
+
+            sorted.push({
+                url: needDecode ? decodedUrl : value["sourceUrl"],
+                clockAPI: needDecode,
+                priority: value["priority"],
+                sourceName: value["sourceName"]
+            })
+        } catch (error) { console.error("Allmanga/sortURLS", error) }
+    })
+
+    return sorted
+}
+
+async function requestApiAllmanga(variables: string, hash: string) {
+    const url = `${API_WEB}/api?variables=${variables}&extensions={"persistedQuery":{"version":1,"sha256Hash":"${hash}"}}`
+    const response = await request(
+        `${API_WEB}/api?variables=${variables}&extensions={"persistedQuery":{"version":1,"sha256Hash":"${hash}"}}`,
+        { headers: header }
+    )
+
+    /* IFDEF DEBUG */
+    console.warn("requestApiAllmanga/allmanga", variables, hash, response)
+    /* ENDIF */
+
+    if (!response.success || response.json && response.json["error"]) console.error("Allmanga request", response, url, header)
+    return response
+}
+
+function converterToAnimeData(data: { [key: string]: any }): AnimeData | undefined {
     if (!data) return
     let characters: any = []
     try {
@@ -104,21 +134,8 @@ function converterData(data: any): AnimeData | undefined {
     }
 }
 
-async function requestToApi(variables: string, hash: string, header: any) {
-    let url = `${API_WEB}/api?variables=${variables}&extensions={"persistedQuery":{"version":1,"sha256Hash":"${hash}"}}`
-    let data = await request(url, { headers: header })
-
-    /* IFDEF DEBUG */
-    console.warn("requestToApi/allmanga", data)
-    /* ENDIF */
-
-    if (!data.success || data.json && data.json["error"]) console.error("Allmanga request", data, url, header)
-    return data
-}
-
 function FuckBufferDosentWorkInElectron(base64: string): Uint8Array {
     const binary = atob(base64);
-
     const bytes = new Uint8Array(binary.length);
 
     for (let i = 0; i < binary.length; i++) {
@@ -132,10 +149,7 @@ async function fuckThisEncryptionMethod(encryptedMotherFucker: string) {
     let bufferEncrypted = FuckBufferDosentWorkInElectron(encryptedMotherFucker)
     let version = bufferEncrypted[0];
 
-    if (version !== 1) {
-        console.error("ALLMANGA CHANGED THEY FUCKING VERSION OF ENCRYPTION IMEDITLY SEND AS BUG REPORT NOW HAVE VERSION: ", version)
-        return
-    }
+    if (version !== 1) throw new Error(`ALLMANGA CHANGED THEY FUCKING VERSION OF ENCRYPTION IMEDITLY SEND AS BUG REPORT NOW HAVE VERSION: ${version}`)
 
     const encodedKey = (new TextEncoder).encode(`Xot36i3lK3:v${version}`)
     const digestetCUM = await crypto.subtle.digest("SHA-256", encodedKey);
@@ -158,6 +172,30 @@ async function fuckThisEncryptionMethod(encryptedMotherFucker: string) {
     return JSON.parse((new TextDecoder).decode(decryptedCum))
 }
 
+async function requestToClockApi(content: AllmangaURLformat): Promise<playerData | undefined> {
+    if (content["url"].startsWith("https")) return undefined
+    const links = await request(`https://allanime.day${content["url"].replace("clock", "clock.json")}`, {
+        headers: header
+    })
+
+    /* IFDEF DEBUG */
+    console.warn("allmanga/requestToClockApi", links)
+    /* ENDIF */
+
+    if (!links["success"] || !links["json"]) return undefined
+
+    let listUrls: playerData | undefined
+
+    links["json"]["links"].forEach(element => {
+
+        const srcUrl = element.src ? element.src : element.link
+        if (!srcUrl) return console.error("allmanga/requestToClockApi Unsuported Url", links)
+            
+        listUrls = { resolution: [{ url: srcUrl, res: "1080", hls: element["hls"] ? true : false }], hostname: content["sourceName"] }
+    });
+    return listUrls
+}
+
 async function allAnimeDecyrption(encrypted: string) {
     try {
         const encodedKey = (new TextEncoder).encode("kiemtienmua911ca")
@@ -178,197 +216,18 @@ async function allAnimeDecyrption(encrypted: string) {
     }
 }
 
-export function dateToUnix(dateStr: string | undefined): number | undefined {
-    if (!dateStr) return undefined
-    const date = new Date(dateStr);
-    return Math.floor(date.getTime() / 1000);
-}
-
-async function SearchAnimeInAllmanga(name: string, page: number): Promise<AnimeData[]> {
-    try {
-        let variables = `{"search":{"query":"${name.replaceAll('"', "").replaceAll('&', "")}"},"limit":26,"page":${page},"translationType":"sub","countryOrigin":"ALL"}`
-        const resp = await requestToApi(variables, HASH_SEARCH, header)
-        if (!resp.success || !resp.json) return []
-        if ("errors" in resp.json) {
-            console.warn("Allmanga Request show error", resp.json["errors"], variables)
-            return []
-        }
-        return resp.json.data.shows.edges.map((card) => converterData(card))
-    } catch (error) {
-        console.error("SearchAnimeInAllmanga/Allmanga Plugin", error)
-        return []
-    }
-}
-
-function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string | undefined {
-    try {
-        console.log("First Check", animeList)
-        // FIRST CHECK
-        if (animeList.length <= 0) return undefined
-        if (animeList.length == 1) return animeList[0].player_ID
-
-        // Second Check
-        let seasonYearFilter = animeList.filter((element) => element.seasonYear == anime.seasonYear)
-        console.log("Second Check", seasonYearFilter)
-        if (seasonYearFilter.length <= 0) return undefined
-        if (seasonYearFilter.length == 1) return seasonYearFilter[0].player_ID
-
-        // Third Check
-        let seasonFilter = seasonYearFilter.filter((element) => makeSmallText(element.season) == makeSmallText(anime.season))
-        console.log("Third Check", seasonYearFilter)
-        if (seasonFilter.length <= 0) return undefined
-        if (seasonFilter.length == 1) return seasonFilter[0].player_ID
-
-        // Four Check
-        let episodesFilter: AnimeData[] | undefined = undefined
-        if (anime.episodes) {
-            episodesFilter = seasonFilter.filter((element) => element.episodes == anime.episodes)
-            console.log("Four Check", episodesFilter)
-            if (episodesFilter.length <= 0) return undefined
-            if (episodesFilter.length == 1) return episodesFilter[0].player_ID
-        }
-
-        // Five Check
-        let durationFilter: AnimeData[] = []
-        if (episodesFilter) durationFilter = episodesFilter.filter((element) => element.duration == anime.duration)
-        else durationFilter = seasonFilter.filter((element) => element.duration == anime.duration)
-        console.log("Five Check", durationFilter)
-        if (durationFilter.length <= 0) return undefined
-        if (durationFilter.length == 1) return durationFilter[0].player_ID
-
-        // Six Check
-        let formatFilter = durationFilter.filter((element) => makeSmallText(element.format) == makeSmallText(anime.format))
-        console.log("Six Check", formatFilter)
-        if (formatFilter.length <= 0) return undefined
-        if (formatFilter.length == 1) return formatFilter[0].player_ID
-
-        return formatFilter[0].player_ID
-    } catch (error) {
-        console.error("Allmanga SheepFinderAnime2000 error", error)
-        return animeList[0].player_ID
-    }
-}
-
-async function formatEpisodeData(data: any): Promise<episodeMetadata[]> {
-    try {
-        if (!data) return []
-        let finnallData: episodeMetadata[] = []
-        for (let index = 0; index < data.length; index++) {
-            const element = data[index];
-            const thumbnail = element.thumbnails.filter(url => url.startsWith("https"))
-            finnallData.push({
-                ep: element.episodeIdNum,
-                img: thumbnail.length > 0 ? thumbnail[0] : `https://wp.youtube-anime.com/aln.youtube-anime.com${element["thumbnails"][0]}?w=480`,
-                title: element.notes ? element.notes.replace("<note-split>", " ") : undefined,
-                uploadedUnix: dateToUnix(element["uploadDates"]["sub"]),
-                durration: element["vidInforssub"] ? element["vidInforssub"]["vidDuration"] : undefined
-            })
-        }
-        return finnallData
-    } catch (error) {
-        console.error("formatEpisodeData", error, data);
-        return []
-    }
-}
-
-export async function extractEpisodes(anime_id: string, episode: { start: number, end: number }): Promise<episodeMetadata[]> {
-    try {
-        let variables = `{"showId":"${anime_id}","episodeNumStart":${parseInt(episode.start.toString())},"episodeNumEnd":${parseInt(episode.end.toString())}}`
-        const resp = await requestToApi(variables, HASH_DATA, header)
-        if (!resp.success || !resp.json) return []
-        if ("errors" in resp.json) return []
-        if (!resp.json.data.episodeInfos) return []
-        return await formatEpisodeData(resp.json.data.episodeInfos)
-    } catch (Error) {
-        console.error(Error)
-        return []
-    }
-}
-
-export async function extractInformation(id: string): Promise<{ episodes: { ep: string; img?: string; title?: string }[]; type: string; name?: string }[]> {
-    let variables = `{"_id":"${id}"}`;
-    const resp = await requestToApi(variables, HASH_INFO, header);
-    if (!resp.success || !resp.json || resp.json["errors"]) {
-        console.warn(resp)
-        return []
-    }
-    let anime_data = resp.json["data"]["show"]
-    let episodes = await extractEpisodes(id, { start: parseInt(anime_data.availableEpisodesDetail.sub.at(-1)), end: parseInt(anime_data.availableEpisodesDetail.sub[0]) })
-    if (episodes.length <= 0) episodes = anime_data["availableEpisodesDetail"]["sub"].map((v: string) => ({ ep: v }))
-
-    episodes = episodes.sort((a, b) => Number(a.ep) - Number(b.ep))
-
-    return [
-        {
-            episodes: episodes.length !== anime_data.availableEpisodes.sub
-                ? episodes.slice(0, anime_data.availableEpisodes.sub != 0 ? anime_data.availableEpisodes.sub - 1 : 0)
-                : episodes,
-            type: "sub"
-        },
-        {
-            episodes: episodes.length !== anime_data.availableEpisodes.dub
-                ? episodes.slice(0, anime_data.availableEpisodes.dub != 0 ? anime_data.availableEpisodes.dub - 1 : 0)
-                : episodes,
-            type: "dub"
-        },
-        {
-            episodes: episodes.length !== anime_data.availableEpisodes.raw
-                ? episodes.slice(0, anime_data.availableEpisodes.raw != 0 ? anime_data.availableEpisodes.raw - 1 : 0)
-                : episodes,
-            type: "raw"
-        }
-    ]
-}
-
-async function requestForUrl(url: string): Promise<playerData | undefined> {
-    if (url.startsWith("https")) return undefined
-    const links = await request(`https://allanime.day${url.replace("clock", "clock.json")}`, {
-        headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0'
-        }
-    })
-
-    if (!links.success || !links.json) return undefined
-
-    let listUrls: playerData | undefined
-
-    links.json.links.forEach(element => {
-        if (!element.src) return
-        const urlObject = new URL(element.src);
-        if (element.mp4) {
-            listUrls = { resolution: [{ url: element.src, res: "1080", hls: false }], hostname: urlObject.hostname }
-        } else {
-            listUrls = { resolution: [{ url: element.src, res: "", hls: true }], hostname: urlObject.hostname }
-        }
-    });
-    return listUrls
-}
-
-// async function fetchMP4(hostname: string, url: string): Promise<playerData | undefined> {
-//     try {
-//         let resoltutions: resolutionFormat[] = [] 
-//         const extractedata = await runYT_DLP(url)
-//         for (let index = 0; index < extractedata.formats.length; index++) {
-//             const element = extractedata.formats[index];
-//             if ("format_id" in element && element["format_id"].includes("dash-video")) resoltutions.push({
-//                 res: `${element["height"]}`,
-//                 url: element["url"],
-//                 reqHeader: element["http_headers"],
-//             })
-//         }
-//         return {
-//             hostname: hostname,
-//             resolution: resoltutions.reverse()
-//         }
-//     } catch (error) {
-//         return undefined
-//     }
-// }
-
-async function fetchUrls(params: { url: string; decode: boolean; source: string; }): Promise<playerData | undefined> {
+async function fetchUrls(params: AllmangaURLformat): Promise<resolutionFormat[]> {
     const urlObject = new URL(params.url);
 
-    if (params["source"] == "Uni") {
+    function hasUrl(data: { [key: string]: any }) {
+        if ("hlsVideoTiktok" in data) return data["hlsVideoTiktok"]
+        if ("cf" in data) return data["cf"]
+
+        console.error("Unsuported Url", data)
+        throw new Error(`Failed Find Url`)
+    }
+
+    if (params["sourceName"] == "Uni") {
         const response = await request(`${urlObject["origin"]}/api/v1/video?id=${urlObject["hash"].replace("#", "")}&w=1920&h=1080&r=`, {
             headers: {
                 ...header,
@@ -377,114 +236,101 @@ async function fetchUrls(params: { url: string; decode: boolean; source: string;
             }
         })
 
-        if (!response["success"]) return
+        /* IFDEF DEBUG */
+        console.warn("allmanga/fetchUrls Response", response)
+        /* ENDIF */
+
+        if (!response["success"]) return []
 
         const code = await allAnimeDecyrption(response["text"])
         /* IFDEF DEBUG */
-        console.warn("fetchUrls/allmanga", code)
+        console.warn("allmanga/fetchUrls Code", code)
         /* ENDIF */
-        if (!code) return 
+        if (!code) return []
 
-        return {
-            hostname: urlObject.hostname,
-            storyboardVTT: `${urlObject["origin"]}${code["thumbnail"]}`,
-            resolution: [{
+        try {
+            return [{
                 res: "hls",
                 url: `${urlObject["origin"]}${code["hlsVideoTiktok"]}`,
                 reqHeader: header,
-                hls: code["hlsVideoTiktok"].includes("hls")
-            }],
+                hls: hasUrl(code).includes("hls")
+            }]
+        } catch (error) {
+            console.error("Allmanga/fetchUrls", error, response)
+            return []
         }
     }
     console.warn("NOT SUPPORTED WEBSITE", params)
-    return
+    return []
 }
 
-async function detectURL(params: { url: string; decode: boolean; source: string; }): Promise<playerData | undefined> {
-    if (params["source"] == "Uni") return await fetchUrls(params)
+async function detectURL(params: AllmangaURLformat): Promise<resolutionFormat[]> {
+    if (params["sourceName"] == "Uni") return await fetchUrls(params)
 
-    const urlObject = new URL(params.url);
-    return {
-        hostname: urlObject.hostname,
-        resolution: [{
-            res: "1080",
-            url: params.url,
-            reqHeader: header
-        }],
-        // extractResolution: async () => await fetchMP4(urlObject.hostname, element.url)
-    }
+    return [{
+        res: "1080",
+        url: params.url,
+        reqHeader: header
+    }]
 }
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.19",
+        version: "2.2",
         name: "Allmanga",
         author: "Owca525",
-        icon: "https://allmanga.to/android-icon-192x192.png",
+        icon: `${WEBSITE}android-icon-192x192.png`,
         supportLang: ["en"],
-        urlWebsite: "https://allmanga.to",
+        urlWebsite: WEBSITE,
         type: "player"
     }
-    config: { [key: string]: any; } = {
-        "settings.extensions.website": API_WEB,
-        "HASH_SEARCH": HASH_SEARCH,
-        "HASH_INFO": HASH_INFO,
-        "HASH_PLAYER": HASH_PLAYER,
-        "HASH_DATA": HASH_DATA
-    };
+    // config: { [key: string]: any; } = {
+    //     "settings.extensions.website": API_WEB,
+    //     "HASH_SEARCH": HASH_SEARCH,
+    //     "HASH_INFO": HASH_INFO,
+    //     "HASH_PLAYER": HASH_PLAYER,
+    // };
 
-    async extractPlayerData(type: string, episode: episodeMetadata, id: string) {
-        let tmpEpisode = typeof episode == "object" ? episode["ep"] : episode
+    extractPlayerData = async (type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
+        const tmpEpisode = typeof episode == "object" ? episode["ep"] : episode
+        const variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${tmpEpisode}"}`
 
-        let variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${tmpEpisode}"}`
+        const response = await requestApiAllmanga(variables, HASH_PLAYER)
+        if (!response["success"] || !response["json"]) return []
+
         try {
-            const resp = await requestToApi(variables, HASH_PLAYER, header)
-
-            if (!resp.success || !resp.json) return []
-
-            let jsonObject = await fuckThisEncryptionMethod(resp.json["data"]["tobeparsed"])
-
+            const jsonObject = await fuckThisEncryptionMethod(response["json"]["data"]["tobeparsed"])
             /* IFDEF DEBUG */
-            console.warn("extractPlayerData/allmanga", jsonObject)
+            console.warn("allmanga/fetchUrls jsonObject", jsonObject)
             /* ENDIF */
+            if (!jsonObject) return []
 
-            const sources = jsonObject["episode"]["sourceUrls"]
-            const urls: { url: string, decode: boolean, source: string }[] = sources
-                .map((tmp: { sourceUrl: string; sourceName: string }) =>
-                    findUrl(tmp.sourceUrl, tmp.sourceName)
-                )
-                .filter((item) => item !== undefined)
+            const urlList = sortURLS(jsonObject["episode"]["sourceUrls"])
+            const maxPriority = Math.max(...urlList.map(i => i.priority));
 
-            const maxPriority = Math.max(...sources.map(i => i.priority));
-
-            const updatedItems = sources.map(item => ({
+            const updatedItems = urlList.map(item => ({
                 ...item,
                 active: item.priority === maxPriority
             }));
 
-            let data: playerData[] = []
-            for (let i = 0; i < urls.length; i++) {
-                const element = urls[i];
-                if (element.decode) {
-                    let tmp = await requestForUrl(element.url)
-                    if (tmp) data.push({
-                        ...tmp,
-                        defaultHost: updatedItems.find((item) => item["sourceName"] == element.source ? item["active"] : false)
-                    })
-                }
-                if (!element.decode) {
-                    const tmp = await detectURL(element)
-                    if (!tmp) continue
-                    data.push({
-                        ...tmp,
-                        defaultHost: updatedItems.find((item) => item["sourceName"] == element.source ? item["active"] : false)
-                    })
-                }
+            let playerContent: playerData[] = []
+
+            for (let index = 0; index < updatedItems.length; index++) {
+                const value = updatedItems[index];
+
+                playerContent.push({
+                    hostname: value["sourceName"],
+                    resolution: value["clockAPI"] ? [] : await detectURL(value),
+                    defaultHost: value["active"],
+                    extractResolution: () => requestToClockApi(value)
+                })
             }
+
             if (jsonObject["episode"]["episodeInfo"][`vidInfors${type}`]) {
                 const main = jsonObject["episode"]["episodeInfo"][`vidInfors${type}`]
-                data.push({
-                    hostname: "wp.youtube-anime.com", resolution: [{
+                playerContent.push({
+                    hostname: "wp.youtube-anime.com",
+                    resolution: [{
                         res: main["vidResolution"].toString(),
                         url: `https://aln.youtube-anime.com${main["vidPath"]}`,
                         hls: false,
@@ -492,41 +338,69 @@ export default class Allmanga implements playerPluginFormat {
                 })
             }
 
-            return data
+            return playerContent
         } catch (error) {
-            console.error(`Error in extractPlayerData`, error)
+            console.error("Allmanga/extractPlayerData", error)
             return []
         }
     }
-    async extractEpisodeList(animeData?: AnimeData, anime_id?: string) {
+
+    extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {
+        let animeID = anime_id
+        if (animeData && !animeID) {
+            const responseSearch = await this.searchAnime(animeData["title"]["romaji"])
+            animeID = SheepFinderAnime2000(responseSearch.map((v) => v["AnimeData"]), animeData)
+        }
+
+        if (!animeID) return
+
+        const variables = `{"_id":"${animeID}"}`;
+        const response = await requestApiAllmanga(variables, HASH_INFO)
+
+        if (!response["success"] || !response["json"] || response.json["error"]) return
+
         try {
-            let tmpAnimeID = anime_id
+            const entries = Object.entries(response["json"]["data"]["show"]["availableEpisodesDetail"])
 
-            if (animeData && !tmpAnimeID) {
-                let data = await SearchAnimeInAllmanga(animeData.title.romaji, 1);
-                tmpAnimeID = SheepFinderAnime2000(data, animeData)
-            };
+            return {
+                player_id: animeID,
+                episodesData: entries.map(([key, val]: any) => {
+                    val.reverse()
 
-            if (!tmpAnimeID || tmpAnimeID == "") return
-
-            let episodeList = await extractInformation(tmpAnimeID)
-            return { player_id: tmpAnimeID, episodesData: episodeList as episodeList["episodesData"] }
+                    return {
+                        episodes: val.map((v) => ({ ep: v })),
+                        type: key as episodeList["episodesData"][0]["type"]
+                    }
+                })
+            }
         } catch (error) {
-            console.error("Allmanga extractEpisodeList error", error)
+            console.error("Allmanga/extractEpisodeList", error)
             return
         }
     }
-    async extractOnlyEpisodesList(type: string, anime_id: string): Promise<episodeMetadata[]> {
-        let episodes = await extractInformation(anime_id)
-        for (let index = 0; index < episodes.length; index++) {
-            const element = episodes[index];
-            if (element.type == type) return element.episodes
-        }
-        return []
+
+    extractOnlyEpisodesList = async (type: string, anime_id: string): Promise<episodeMetadata[]> => {
+        const extractorResponse = await this.extractEpisodeList(undefined, anime_id)
+        if (!extractorResponse) return []
+
+        const finded = extractorResponse.episodesData.find((v) => v["type"] == type)
+        if (!finded) return []
+
+        return finded["episodes"]
     }
-    async searchAnime(name: string, page: number, _params?: FilterPluginsParams) {
-        let resp = await SearchAnimeInAllmanga(name.replaceAll('"', "").replaceAll('&', ""), page)
-        return resp.map((card) => ({ AnimeData: card }))
+
+    searchAnime = async (name: string, page: number = 1, _params?: FilterPluginsParams): Promise<cardData[]> => {
+        const variables = `{"search":{"query":"${name.replaceAll('"', "").replaceAll('&', "")}"},"limit":26,"page":${page},"translationType":"sub","countryOrigin":"ALL"}`
+        const response = await requestApiAllmanga(variables, HASH_SEARCH)
+
+        if (!response.success || !response.json || response.json["error"]) return []
+
+        try {
+            return response.json["data"]["shows"]["edges"].map((card) => ({ AnimeData: converterToAnimeData(card) }))
+        } catch (error) {
+            console.error("Allmanga/searchAnime", error)
+            return []
+        }
     }
 
     raportStatus = async (): Promise<{ search: serverStatusData; player: serverStatusData; episodes: serverStatusData; }> => {
@@ -548,7 +422,7 @@ export default class Allmanga implements playerPluginFormat {
         }
 
         const functions = [
-            async () => this.searchAnime("Oshi No Ko", 1),
+            async () => this.searchAnime("Oshi No Ko"),
             async () => this.extractPlayerData("sub", { ep: "1" }, "b3u5TprKSKHBPBcor"),
             async () => this.extractOnlyEpisodesList("sub", "b3u5TprKSKHBPBcor"),
         ]

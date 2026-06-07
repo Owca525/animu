@@ -1,4 +1,4 @@
-import { makeSmallText, request } from "@renderer/utils/functions";
+import { dateToUnix, request, SheepFinderAnime2000 } from "@renderer/utils/functions";
 import { t } from "@renderer/utils/i18n";
 import { AnimeData, cardData, episodeList, FilterPluginsParams, playerPluginFormat, playerData, playerSubtitlesFormat, resolutionFormat, playerChapterList, playerDataExtended, episodeMetadata, serverStatusData } from "@renderer/utils/types";
 
@@ -6,42 +6,38 @@ const BACKEND = "https://animetsu.live/v2"
 const WEBSITE = "https://animetsu.live/"
 
 const HEADER = {
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36',
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:151.0) Gecko/20100101 Firefox/151.0',
     "accept": "application/json, text/plain, */*",
     "accept-encoding": "gzip, deflate, br, zstd",
     "accept-language": "en-US,en;q=0.9",
-    "cache-control": "no-cache",
-    "pragma": "no-cache",
-    "priority": "u=1, i",
+    "Alt-Used": "animetsu.live",
+    "Connection": "keep-alive",
+    "Sec-GPC": "1",
+    "TE": "trailers",
+    "DNT": "1",
     "referer": WEBSITE,
-    "sec-ch-ua": `"Chromium";v="147", "Not.A/Brand";v="8"`,
-    "sec-ch-ua-mobile": "?0",
-    "sec-ch-ua-platform": `"Linux"`,
     "sec-fetch-dest": "empty",
     "sec-fetch-mode": "cors",
     "sec-fetch-site": "same-origin",
 }
 
 const playerHeader = {
-  "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:150.0) Gecko/20100101 Firefox/150.0",
+  "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
   Accept: "*/*",
   "Accept-Language": "en-US,en;q=0.9",
   "Accept-Encoding": "gzip, deflate, br, zstd",
   Origin: WEBSITE,
   Referer: WEBSITE,
-  "Sec-GPC": "1",
   "Sec-Fetch-Dest": "empty",
   "Sec-Fetch-Mode": "cors",
   "Sec-Fetch-Site": "cross-site",
-  DNT: "1",
-  Connection: "keep-alive",
-  TE: "trailers",
+  "cache-control": "no-cache",
+  "pragma": "no-cache",
+  "priority": "u=1, i",
+  "sec-ch-ua": `"Not/A)Brand";v="99", "Chromium";v="148"`,
+  "sec-ch-ua-mobile": "?0",
+  "sec-ch-ua-platform": `"Linux"`
 };
-
-function preaperURL(str: string) {
-    if (!str) return str
-    return str.replaceAll("//", "/").replace("https:/", "https://")
-}
 
 function convertStringToDateObject(date: string | undefined) {
     try {
@@ -54,66 +50,11 @@ function convertStringToDateObject(date: string | undefined) {
     }
 }
 
-function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string | undefined {
-    try {
-        if (anime.id != "") {
-            console.log("ID Check")
-            const findedID = animeList.find((item) => item.id == anime.id)
-            if (findedID) return findedID.player_ID
-        }
-
-        console.log("First Check", animeList)
-        // FIRST CHECK
-        if (animeList.length <= 0) return undefined
-        if (animeList.length == 1) return animeList[0].player_ID
-
-        // Second Check
-        let seasonYearFilter = animeList.filter((element) => element.seasonYear == anime.seasonYear)
-        console.log("Second Check", seasonYearFilter)
-        if (seasonYearFilter.length <= 0) return undefined
-        if (seasonYearFilter.length == 1) return seasonYearFilter[0].player_ID
-
-        // Third Check
-        let seasonFilter = seasonYearFilter.filter((element) => makeSmallText(element.season) == makeSmallText(anime.season))
-        console.log("Third Check", seasonYearFilter)
-        if (seasonFilter.length <= 0) return undefined
-        if (seasonFilter.length == 1) return seasonFilter[0].player_ID
-
-        // Four Check
-        let episodesFilter: AnimeData[] | undefined = undefined
-        if (anime.episodes) {
-            episodesFilter = seasonFilter.filter((element) => element.episodes == anime.episodes)
-            console.log("Four Check", episodesFilter)
-            if (episodesFilter.length <= 0) return undefined
-            if (episodesFilter.length == 1) return episodesFilter[0].player_ID
-        }
-
-        // Five Check
-        let durationFilter: AnimeData[] = []
-        if (episodesFilter) durationFilter = episodesFilter.filter((element) => element.duration == anime.duration)
-        else durationFilter = seasonFilter.filter((element) => element.duration == anime.duration)
-        console.log("Five Check", durationFilter)
-        if (durationFilter.length <= 0) return undefined
-        if (durationFilter.length == 1) return durationFilter[0].player_ID
-
-        // Six Check
-        let formatFilter = durationFilter.filter((element) => makeSmallText(element.format) == makeSmallText(anime.format))
-        console.log("Six Check", formatFilter)
-        if (formatFilter.length <= 0) return undefined
-        if (formatFilter.length == 1) return formatFilter[0].player_ID
-
-        return formatFilter[0].player_ID
-    } catch (error) {
-        console.error("Animetsu SheepFinderAnime2000 error", error)
-        return animeList[0].player_ID
-    }
-}
-
 async function extractResolutions(episode: string, type: string, playerData: playerData, server: string): Promise<playerData | undefined> {
     try {
         // oppai?server=${server}&id=${id}&num=${episode}&subType=${type}
         if (!server) return undefined
-        let response = await request(preaperURL(`${window["animetsuBackend"]["api"]}/api/anime/oppai/${server}/${episode}?server=${playerData["hostname"]}&source_type=${type}`), { headers: HEADER });
+        let response = await request(`${window["animetsuBackend"]["api"]}/api/anime/oppai/${server}/${episode}?server=${playerData["hostname"]}&source_type=${type}`, { headers: HEADER });
         if (!response.success || !response.json || response.text == "{}") return undefined
         let subtitles: playerSubtitlesFormat[] = []
         if (response.json["subs"]) {
@@ -158,15 +99,9 @@ var localStorage = {
 }
 `
 
-export function dateToUnix(dateStr: string | undefined): number | undefined {
-    if (!dateStr) return undefined
-    const date = new Date(dateStr);
-    return Math.floor(date.getTime() / 1000);
-}
-
 export default class Animetsu implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "2.1",
+        version: "2.3",
         name: "Animetsu.Live",
         icon: `${WEBSITE}/android-chrome-192x192.png`,
         author: "Owca525",
@@ -192,12 +127,10 @@ export default class Animetsu implements playerPluginFormat {
         const url = URL.createObjectURL(blob);
         const worker = new Worker(url);
         worker.onmessage = (event) => {
-            console.log(event["data"])
-            if (event["data"]["api"] && event["data"]["proxy"]) (window as any).animetsuBackend = {
+            if (event["data"]["proxy"]) (window as any).animetsuBackend = {
                 ...event["data"],
                 api: BACKEND
             }
-            console.log((window as any).animetsuBackend)
             worker.terminate()
         }
         worker.onerror = (event) => {
@@ -217,7 +150,7 @@ export default class Animetsu implements playerPluginFormat {
     extractPlayerData = async (_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
         try {
             let tmpEpisode = typeof episode == "object" ? episode["ep"] : episode
-            let response = await request(preaperURL(`${window["animetsuBackend"]["api"]}/api/anime/servers/${id}/${tmpEpisode}`), { headers: HEADER });
+            let response = await request(`${window["animetsuBackend"]["api"]}/api/anime/servers/${id}/${tmpEpisode}`, { headers: HEADER });
 
             /* IFDEF DEBUG */
             console.warn("animetsu/extractPlayerData", response)
@@ -255,7 +188,7 @@ export default class Animetsu implements playerPluginFormat {
             }
             if (!animeID) return
 
-            let response = await request(preaperURL(`${window["animetsuBackend"]["api"]}/api/anime/eps/${animeID}`), { headers: HEADER });
+            let response = await request(`${window["animetsuBackend"]["api"]}/api/anime/eps/${animeID}`, { headers: HEADER });
 
             /* IFDEF DEBUG */
             console.warn("animetsu/extractEpisodeList", response)
@@ -292,7 +225,7 @@ export default class Animetsu implements playerPluginFormat {
         return data.episodesData[0].episodes
     }
     searchAnime = async (name: string, _page: number, _params?: FilterPluginsParams): Promise<cardData[]> => {
-        let response = await request(preaperURL(`${window["animetsuBackend"]["api"]}/api/anime/search/?query=${name}`), { headers: HEADER });
+        let response = await request(`${window["animetsuBackend"]["api"]}/api/anime/search/?query=${decodeURI(name)}`, { headers: HEADER });
 
         /* IFDEF DEBUG */
         console.warn("animetsu/searchAnime", response)
