@@ -1279,19 +1279,17 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         let screenshot: string = "data:,"
 
-        if (currentASSubtitles) {
-            const outputCanvas = document.createElement("canvas");
-            const ctx = outputCanvas.getContext("2d");
-            if (!ctx) {
-                toast(t("player.toastscreenshot.failed"), { type: "error" });
-                return
-            };
-            outputCanvas.width = videoRef.videoWidth;
-            outputCanvas.height = videoRef.videoHeight;
-            ctx.drawImage(videoRef, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
-            ctx.drawImage(currentASSubtitles._canvas, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
-            screenshot = outputCanvas.toDataURL("image/png");
-        }
+        const outputCanvas = document.createElement("canvas");
+        const ctx = outputCanvas.getContext("2d");
+        if (!ctx) {
+            toast(t("player.toastscreenshot.failed"), { type: "error" });
+            return
+        };
+        outputCanvas.width = videoRef.videoWidth;
+        outputCanvas.height = videoRef.videoHeight;
+        ctx.drawImage(videoRef, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
+        if (currentASSubtitles) ctx.drawImage(currentASSubtitles._canvas, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
+        screenshot = outputCanvas.toDataURL("image/png");
 
         if (screenshot == "data:,") {
             toast(t("player.toastscreenshot.failed"), { type: "error" });
