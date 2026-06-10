@@ -15,13 +15,10 @@ import {
     changeTitleAnimu,
     convertKeybinds,
     convertPath,
-    FetchAnilistUserData,
     LoginToAnilist,
     openUrlFolder,
     request,
     // savePluginConfig,
-    unLinkAnilistAccount,
-    updateAnilistUserData,
     updateObject
 } from '@renderer/utils/functions';
 import { checkUpdate } from '@renderer/utils/update';
@@ -459,8 +456,6 @@ function settings() {
         const plugins = getAllPluginList()
         const infoPlugin = getInformationPlugin()
 
-        console.log(repo)
-
         return repo.map((item) => {
             if (item.type == "information") {
                 return { ...item, update: semver.gt(semver.coerce(item.ver) as any, semver.coerce(infoPlugin.metadata.version) as any), installed: true }
@@ -745,61 +740,12 @@ function settings() {
                                     <Button content={t('Login')} onClick={LoginToAnilist} />
                                 </div>
                             </Match>
-                            <Match when={getAnilistUserData()}>
-                                <div class="settings-setting-container">
-                                    {t("Synchronize User Data To Animu")}
-                                    <span class="settings-custom-space">
-                                        <Button content={t('Logout')} onClick={() => {
-                                            showDialog({
-                                                type: 'info',
-                                                title: t('logout'),
-                                                description: t("Do you realy want logout account in animu?"),
-                                                buttons: [
-                                                    {
-                                                        title: t("dialog.no"),
-                                                        onClick: () => ""
-                                                    },
-                                                    {
-                                                        title: t("dialog.yes"),
-                                                        onClick: unLinkAnilistAccount
-                                                    }]
-                                            })
-                                        }} />
-                                        <Button content={t('Sync User Data')} onClick={async () => {
-                                            if (await FetchAnilistUserData()) toast(t("Succesfully Update User Data"), { type: "success" })
-                                            else toast(t("Failed Update User Data"), { type: "error" })
-                                        }} />
-                                    </span>
-                                </div>
-                            </Match>
                         </Switch>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("Default Adult Mode")}
                             <CheckBox
                                 checked={config().new.anilist.adultdefault}
-                                onChecked={(checked) => {
-                                    if (getAnilistUserData() && getAnilistUserData()!["options"]["displayAdultContent"] == false) {
-                                        showDialog({
-                                            type: "info",
-                                            title: 'Warning',
-                                            description: 'Do you want Update display content in anilist / animu?',
-                                            buttons: [
-                                                {
-                                                    title: t("dialog.no"),
-                                                    onClick: () => handleChange('anilist.adultdefault', false)
-                                                },
-                                                {
-                                                    title: t("dialog.yes"),
-                                                    onClick: async () => {
-                                                        await updateAnilistUserData({ displayAdultContent: true }, true)
-                                                        handleChange('anilist.adultdefault', true)
-                                                    }
-                                                }
-                                            ]
-                                        })
-                                    } else handleChange('anilist.adultdefault', checked)
-                                }}
                             />
                         </div>
                         <div class="settings-line"></div>

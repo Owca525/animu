@@ -115,11 +115,9 @@ export default class HanimeTv implements playerPluginFormat {
             const worker = new Worker(url);
 
             worker.onmessage = (event) => {
-                if (typeof event.data == "object") return console.log(event.data)
+                if (typeof event.data == "object") return
                 if (typeof event.data == "string") token = event.data
                 else time = event.data
-                console.log(event.data);
-                console.log(token, time)
                 if (token != "" && time != "") {
                     resolve({
                         time: time,
@@ -145,11 +143,9 @@ export default class HanimeTv implements playerPluginFormat {
         const data = this.cache.fetchedAnimeInfoCache[splitedID[0]]["hentai_franchise_hentai_videos"]
 
         const tmp = data.find((v) => v["slug"].split("-").includes(mainEpisode));
-        console.log(tmp, data)
         if (!tmp) return []
 
         const tokens = await this.getVendorTokens()
-        console.log(tokens)
         if (!tokens) return []
 
         const response = await request(`${API}api/v8/guest/videos/${tmp["id"]}/manifest`, {

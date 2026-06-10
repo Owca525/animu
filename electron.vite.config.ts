@@ -144,7 +144,7 @@ function getMetadataTheme(path_theme: string): { [key: string]: any } | undefine
 
         return { ...theme, mainCSS: path.join(path_theme, theme.mainCSS) }
     } catch (error) {
-        console.log("Error parsing theme", error)
+        console.error("Error parsing theme", error)
         return
     }
 }

@@ -753,9 +753,6 @@ export default class AnilistApi implements informationPluginFormat {
 
   async schedule(airingStart: number, airingEnd: number): Promise<cardData[]> {
     // let week = getWeek()
-    // console.log(week)
-
-    console.log(airingStart, airingEnd)
     let variables = {
       page: 1,
       perPage: 50,
@@ -896,9 +893,7 @@ export default class AnilistApi implements informationPluginFormat {
   getManga = async (id: string) => {
     try {
       let req = await sendPost({ id: id, type: "MANGA" }, graphicApIDAnime, timeCovertToMs({ min: 5 }))
-      console.log(req)
       if (!req.success || !req.json) return
-      console.log(Convert(req.json.data.Media).AnimeData)
       return Convert(req.json.data.Media).AnimeData
     } catch (error) {
       console.error("Uknown error in getManga/anilistapi", error)

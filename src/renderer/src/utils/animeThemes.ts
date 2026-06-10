@@ -51,7 +51,6 @@ export async function requestAnimeMedia(anilistID: number): Promise<animeOpening
   if (cache[anilistID]) return cache[anilistID]
 
   const response = await request(QUERY_API, { method: "POST", headers: header, body: JSON.stringify({ query: videosQuery, variables: { id: [anilistID] } }) })
-  console.log(response)
   if (!response.success || !response.json) return []
   const themes = response.json["data"]["findAnimeByExternalSite"][0]["animethemes"]
   let list: animeOpeningsFormat[] = []

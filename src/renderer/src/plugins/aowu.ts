@@ -55,7 +55,7 @@ export default class Aowu implements playerPluginFormat {
 
             return []
         } catch (error) {
-            console.log("Error in searchAnime/aowu", error)
+            console.error("Error in searchAnime/aowu", error)
             return []
         }
     }

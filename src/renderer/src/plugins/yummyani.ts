@@ -17,7 +17,6 @@ const types: string[] = [
 ]
 
 function converterToAnimeData(data: { [key: string]: any }): AnimeData | undefined {
-    console.log(data)
     try {
         return {
             id: "",
@@ -151,7 +150,6 @@ export default class yummyani implements playerPluginFormat {
         if (!response.success || !response.json) return []
         let cards: AnimeData[] | undefined[] = response.json["response"].map((v) => converterToAnimeData(v))
         cards = cards.filter(item => item !== undefined) as AnimeData[]
-        console.log(cards)
         return cards.map((v) => ({ AnimeData: v }))
     }
 

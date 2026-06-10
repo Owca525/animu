@@ -14,7 +14,7 @@ export function useGamepad(index = 0, wrapper: (num: number, pressed: boolean) =
             for (var i in buttons) {
                 if (buttons[i].pressed == true) { 
                     wrapper(buttons[i].value, buttons[i].pressed)
-                    console.log("buttons[%s] pressed", i); 
+                    console.info("buttons[%s] pressed", i); 
                 };
             };
             setConnected(true);

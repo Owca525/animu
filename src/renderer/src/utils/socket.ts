@@ -17,7 +17,7 @@ export function closeSocket() {
 
 export function runSocket(server: string = "") {
     const socket = io(server)
-    console.log(socket)
+    console.info(socket)
 
     socket.on("player:init", (playerData: socketPlayerInit) => {
         localStorage.setItem("playerCache", JSON.stringify(unwrap({

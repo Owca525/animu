@@ -45,7 +45,6 @@ import NotificationMenu from './components/notificationMenu';
 // import WelcomeScreen from "./components/welcomeScreen"
 
 export function StartHomeSearch(search: string = "", params: FilterParams | undefined) {
-  console.log(params)
   setHomeSearchPage(1)
   setHomeStopScrolling(false)
 

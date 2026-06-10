@@ -93,19 +93,17 @@ ipcMain.handle('runExternalPlayer', (_event, videoData: { url: string, path: str
         case "mpv":
             let subtitlesFiles: string = ""
             if (videoData.subs && videoData.subs.subList) subtitlesFiles = videoData.subs.subList.map((sub) => `--sub-file="${sub}"`).join(" ") + ` --sid=${videoData.subs.sid}`
-            exec(`${path} ${subtitlesFiles} ${videoData.chapters ? `--chapters-file=${videoData.chapters}` : ""} --force-media-title="${videoData.title}" --start=${videoData.time} '${videoData.url}'`, (error, stdout, stderr) => {
+            exec(`${path} ${subtitlesFiles} ${videoData.chapters ? `--chapters-file=${videoData.chapters}` : ""} --force-media-title="${videoData.title}" --start=${videoData.time} '${videoData.url}'`, (error, stderr) => {
                 if (error) console.error(error)
                 if (stderr) console.error(error)
-                console.log(stdout)
             })
             break;
         case "vlc":
             let subtitlesFilesVLC: string = ""
             if (videoData.subs && videoData.subs.subList) subtitlesFilesVLC = videoData.subs.subList.map((sub) => `--sub-file="${sub}"`).join(" ") + ` --sid=${videoData.subs.sid}`
-            exec(`${path} --input-title-format='${videoData.title}' ${subtitlesFilesVLC} --start-time='${videoData.time}' '${videoData.url}'`, (error, stdout, stderr) => {
+            exec(`${path} --input-title-format='${videoData.title}' ${subtitlesFilesVLC} --start-time='${videoData.time}' '${videoData.url}'`, (error, stderr) => {
                 if (error) console.error(error)
                 if (stderr) console.error(error)
-                console.log(stdout)
             })
     }
 })
@@ -131,7 +129,7 @@ ipcMain.handle('saveToClipboard', async (_event, type: "text" | "image", content
         }
         return false
     } catch (Error) {
-        console.log(Error)
+        console.error(Error)
         return false
     }
 })
@@ -226,7 +224,7 @@ export function validUrl(urlString: string): boolean {
 //             if (range) fetchHeaders["Range"] = range;
 
 //             const response = await fetch(currentVideoUrl.url, { headers: fetchHeaders });
-//             console.log(response)
+//             console.info(response)
 
 //             if (!response.ok) {
 //                 res.status(response.status).send("Failed to fetch video");
@@ -266,7 +264,7 @@ export function validUrl(urlString: string): boolean {
 //         }
 //     });
 
-//     appServer.listen(3001, () => console.log("Video Proxy: http://localhost:3001"));
+//     appServer.listen(3001, () => console.info("Video Proxy: http://localhost:3001"));
 // };
 
 // createProxyServer()

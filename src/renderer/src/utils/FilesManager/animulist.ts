@@ -17,7 +17,6 @@ export async function addToAnimuList(animulist: animulistProps, anime: AnimeData
     /* IFDEF WEB */
     let database = structuredClone(unwrap(animulistData()))
     database.unshift({ AnimeData: { ...unwrap(anime), nextAiringEpisode: undefined }, animulist: unwrap(animulist) })
-    console.log(database)
     localStorage.setItem("animulist", JSON.stringify(database))
     /* ENDIF */
 

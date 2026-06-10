@@ -25,7 +25,6 @@ export function SocketProvider(props: { children: JSX.Element }) {
     // })
 
     SheepShortcut(["Control", "Shift", "S"], () => {
-        console.log("adsknfl;adjsnfl;adfsnjln;adf")
         if (!getConfig().socket.useSocket) return
         setShow((v) => !v)
     })

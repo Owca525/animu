@@ -405,7 +405,7 @@ class WorkerWrapper implements WorkerWrapperInstance {
                 if (!v["ref"]) return true
 
                 if (v["ref"].deref() == undefined) {
-                    console.log(`${v["id"]} cleared`)
+                    console.info(`${v["id"]} cleared`)
                     return true
                 }
                 return false

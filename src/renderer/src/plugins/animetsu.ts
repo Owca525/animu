@@ -180,7 +180,6 @@ export default class Animetsu implements playerPluginFormat {
     }
     extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {
         try {
-            console.log(animeData, anime_id)
             let animeID = anime_id
             if (animeData && !anime_id) {
                 const results = await this.searchAnime(animeData.title.romaji, 0)

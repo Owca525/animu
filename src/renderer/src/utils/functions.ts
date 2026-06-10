@@ -926,299 +926,297 @@ export async function fetchAnimeDeepLink(deeplink: string) {
 /* ENDIF */
 
 export function LoginToAnilist() {
-    setDeepLink({
-        name: 'Fetch Anilist Token',
-        code: 'code',
-        func: fetchAnilistCodeToken
-    })
+    // setDeepLink({
+    //     name: 'Fetch Anilist Token',
+    //     code: 'code',
+    //     func: fetchAnilistCodeToken
+    // })
 
-    setDeepLink({
-        name: 'Fetch Anilist Token Error',
-        code: 'error',
-        func: fetchAnilistCodeToken
-    })
+    // setDeepLink({
+    //     name: 'Fetch Anilist Token Error',
+    //     code: 'error',
+    //     func: fetchAnilistCodeToken
+    // })
 
-    openUrlFolder("https://anilist.co/api/v2/oauth/authorize?client_id=30450&redirect_uri=animu://&response_type=code")
+    // openUrlFolder("https://anilist.co/api/v2/oauth/authorize?client_id=30450&redirect_uri=animu://&response_type=code")
 }
 
-export async function fetchAnilistCodeToken(deeplink: string, code: string): Promise<any> {
-    console.log(deeplink, code)
-    removeDeepLink('Fetch Anilist Token')
-    removeDeepLink('Fetch Anilist Token Error')
-    if (code == "error") return toast(t("Failed Login To Anilist"), { type: "error" })
-    await RefetchAnilistToken(deeplink)
-    await FetchAnilistUserData()
+// export async function fetchAnilistCodeToken(deeplink: string, code: string): Promise<any> {
+//     removeDeepLink('Fetch Anilist Token')
+//     removeDeepLink('Fetch Anilist Token Error')
+//     if (code == "error") return toast(t("Failed Login To Anilist"), { type: "error" })
+//     await RefetchAnilistToken(deeplink)
+//     await FetchAnilistUserData()
 
-    return
-    showDialog({
-        type: "info",
-        title: 'Action',
-        description: t("What Action You want to synchronize Anime List in Anilist"),
-        buttons: [{
-            title: 'Overwrite',
-            onClick: function () {
-                showDialog({
-                    type: 'info',
-                    title: 'Double Check',
-                    description: "Are you Sure to overwrite everything in anilist from animulist?",
-                    buttons: [{
-                        title: t("dialog.no"),
-                        onClick: AnilistMergeDataAnimeList
-                    }, {
-                        title: t("dialog.yes"),
-                        onClick: function () {
+//     return
+//     showDialog({
+//         type: "info",
+//         title: 'Action',
+//         description: t("What Action You want to synchronize Anime List in Anilist"),
+//         buttons: [{
+//             title: 'Overwrite',
+//             onClick: function () {
+//                 showDialog({
+//                     type: 'info',
+//                     title: 'Double Check',
+//                     description: "Are you Sure to overwrite everything in anilist from animulist?",
+//                     buttons: [{
+//                         title: t("dialog.no"),
+//                         onClick: AnilistMergeDataAnimeList
+//                     }, {
+//                         title: t("dialog.yes"),
+//                         onClick: function () {
 
-                        }
-                    }]
-                })
-            }
-        }, {
-            title: 'Merge',
-            onClick: AnilistMergeDataAnimeList
-        }]
-    })
-}
+//                         }
+//                     }]
+//                 })
+//             }
+//         }, {
+//             title: 'Merge',
+//             onClick: AnilistMergeDataAnimeList
+//         }]
+//     })
+// }
 
-export async function RefetchAnilistToken(tmp?: string): Promise<any> {
-    let deeplink: string | undefined
-    try {
-        if (tmp) deeplink = tmp
-        else deeplink = JSON.stringify(localStorage.getItem("Animu_Anilist_login_token_information"))["refresh_token"]
-    } catch (error) {
-        console.error("RefetchAnilistToken error", error)
-        return
-    }
+// export async function RefetchAnilistToken(tmp?: string): Promise<any> {
+//     let deeplink: string | undefined
+//     try {
+//         if (tmp) deeplink = tmp
+//         else deeplink = JSON.stringify(localStorage.getItem("Animu_Anilist_login_token_information"))["refresh_token"]
+//     } catch (error) {
+//         console.error("RefetchAnilistToken error", error)
+//         return
+//     }
 
-    if (!deeplink) {
-        console.warn("REFETCH CODE IS MISSING WTF ARE YOU DOING")
-        return
-    }
+//     if (!deeplink) {
+//         console.warn("REFETCH CODE IS MISSING WTF ARE YOU DOING")
+//         return
+//     }
 
-    const response = await request("https://anilist.co/api/v2/oauth/token", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        },
-        body: JSON.stringify({
-            "grant_type": "authorization_code",
-            "client_id": "30450",
-            "client_secret": "DyAHkynxiqCjGVqD6Lp6oeCboQOf5HYK3s0yblws",
-            "redirect_uri": "animu://",
-            "code": deeplink,
-        })
-    })
+//     const response = await request("https://anilist.co/api/v2/oauth/token", {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json",
+//             "Accept": "application/json"
+//         },
+//         body: JSON.stringify({
+//             "grant_type": "authorization_code",
+//             "client_id": "30450",
+//             "client_secret": "DyAHkynxiqCjGVqD6Lp6oeCboQOf5HYK3s0yblws",
+//             "redirect_uri": "animu://",
+//             "code": deeplink,
+//         })
+//     })
 
-    if (!response.success) {
-        console.warn("fetchAnilistCodeToken failed Reqest", response)
-        return toast(t("Failed Login To Anilist"), { type: "error" })
-    }
+//     if (!response.success) {
+//         console.warn("fetchAnilistCodeToken failed Reqest", response)
+//         return toast(t("Failed Login To Anilist"), { type: "error" })
+//     }
 
-    localStorage.setItem("Animu_Anilist_login_token_information", JSON.stringify(response.json))
-}
+//     localStorage.setItem("Animu_Anilist_login_token_information", JSON.stringify(response.json))
+// }
 
-export const Anilist_USER_QUERY = `query {
-  Viewer {
-    id
-    name
-    about
-    avatar {
-      large
-    }
-    bannerImage
-    unreadNotificationCount
-    donatorTier
-    donatorBadge
-    moderatorRoles
-    options {
-      titleLanguage
-      staffNameLanguage
-      restrictMessagesToFollowing
-      airingNotifications
-      displayAdultContent
-      profileColor
-      notificationOptions {
-        type
-        enabled
-      }
-      disabledListActivity {
-        type
-        disabled
-      }
-    }
-    mediaListOptions {
-      scoreFormat
-      rowOrder
-      animeList {
-        customLists
-        sectionOrder
-        splitCompletedSectionByFormat
-        advancedScoring
-        advancedScoringEnabled
-      }
-    }
-  }
-}`
+// export const Anilist_USER_QUERY = `query {
+//   Viewer {
+//     id
+//     name
+//     about
+//     avatar {
+//       large
+//     }
+//     bannerImage
+//     unreadNotificationCount
+//     donatorTier
+//     donatorBadge
+//     moderatorRoles
+//     options {
+//       titleLanguage
+//       staffNameLanguage
+//       restrictMessagesToFollowing
+//       airingNotifications
+//       displayAdultContent
+//       profileColor
+//       notificationOptions {
+//         type
+//         enabled
+//       }
+//       disabledListActivity {
+//         type
+//         disabled
+//       }
+//     }
+//     mediaListOptions {
+//       scoreFormat
+//       rowOrder
+//       animeList {
+//         customLists
+//         sectionOrder
+//         splitCompletedSectionByFormat
+//         advancedScoring
+//         advancedScoringEnabled
+//       }
+//     }
+//   }
+// }`
 
-export async function FetchAnilistUserData() {
-    try {
-        const token = JSON.parse(localStorage.getItem("Animu_Anilist_login_token_information") as any)
-        const response = await request("https://graphql.anilist.co", {
-            method: "POST",
-            headers: {
-                'Authorization': 'Bearer ' + token["access_token"],
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            body: JSON.stringify({
-                query: Anilist_USER_QUERY
-            })
-        })
+// export async function FetchAnilistUserData() {
+//     try {
+//         const token = JSON.parse(localStorage.getItem("Animu_Anilist_login_token_information") as any)
+//         const response = await request("https://graphql.anilist.co", {
+//             method: "POST",
+//             headers: {
+//                 'Authorization': 'Bearer ' + token["access_token"],
+//                 "Content-Type": "application/json",
+//                 "Accept": "application/json"
+//             },
+//             body: JSON.stringify({
+//                 query: Anilist_USER_QUERY
+//             })
+//         })
 
-        if (!response.success || !response.json) {
-            console.warn("Failed Fetch User Data")
-            return false
-        }
+//         if (!response.success || !response.json) {
+//             console.warn("Failed Fetch User Data")
+//             return false
+//         }
 
-        localStorage.setItem("Animu_Anilist_user_data", JSON.stringify(response.json["data"]["Viewer"]))
-        setAnilistUserData(response.json["data"]["Viewer"])
+//         localStorage.setItem("Animu_Anilist_user_data", JSON.stringify(response.json["data"]["Viewer"]))
+//         setAnilistUserData(response.json["data"]["Viewer"])
 
-        // if (!FindService(t("Anilist Sync UserData"))) runService(FetchAnilistUserData, timeCovertToMs({ hour: 2 }), t("Anilist Sync UserData"))
-        return true
-    } catch (error) {
-        console.error("FetchAnilistUserData error", error)
-        return false
-    }
-}
+//         // if (!FindService(t("Anilist Sync UserData"))) runService(FetchAnilistUserData, timeCovertToMs({ hour: 2 }), t("Anilist Sync UserData"))
+//         return true
+//     } catch (error) {
+//         console.error("FetchAnilistUserData error", error)
+//         return false
+//     }
+// }
 
-export function unLinkAnilistAccount() {
-    try {
-        setAnilistUserData(undefined)
-        localStorage.removeItem("Animu_Anilist_user_data")
-        localStorage.removeItem("Animu_Anilist_login_token_information")
-        toast(t("Succesfull Delete User In Animu"), { type: "success" })
-        openUrlFolder("https://anilist.co/settings/apps")
-    } catch (error) {
-        console.error("unLinkAnilistAccount/function Error", error)
-        toast(t("Failed Unlike Account"), { type: "error" })
-    }
-}
+// export function unLinkAnilistAccount() {
+//     try {
+//         setAnilistUserData(undefined)
+//         localStorage.removeItem("Animu_Anilist_user_data")
+//         localStorage.removeItem("Animu_Anilist_login_token_information")
+//         toast(t("Succesfull Delete User In Animu"), { type: "success" })
+//         openUrlFolder("https://anilist.co/settings/apps")
+//     } catch (error) {
+//         console.error("unLinkAnilistAccount/function Error", error)
+//         toast(t("Failed Unlike Account"), { type: "error" })
+//     }
+// }
 
-const anilist_USER_MUTATION = `
-mutation(
-  $about: String
-  $titleLanguage: UserTitleLanguage
-  $staffNameLanguage: UserStaffNameLanguage
-  $airingNotifications: Boolean
-  $displayAdultContent: Boolean
-  $scoreFormat: ScoreFormat
-  $rowOrder: String
-  $profileColor: String
-  $donatorBadge: String
-  $notificationOptions: [NotificationOptionInput]
-  $animeListOptions: MediaListOptionsInput
-  $mangaListOptions: MediaListOptionsInput
-  $timezone: String
-  $activityMergeTime: Int
-  $restrictMessagesToFollowing: Boolean
-  $disabledListActivity: [ListActivityOptionInput]
-) {
-  UpdateUser(
-    about: $about
-    titleLanguage: $titleLanguage
-    staffNameLanguage: $staffNameLanguage
-    airingNotifications: $airingNotifications
-    displayAdultContent: $displayAdultContent
-    scoreFormat: $scoreFormat
-    rowOrder: $rowOrder
-    profileColor: $profileColor
-    donatorBadge: $donatorBadge
-    notificationOptions: $notificationOptions
-    animeListOptions: $animeListOptions
-    mangaListOptions: $mangaListOptions
-    timezone: $timezone
-    activityMergeTime: $activityMergeTime
-    restrictMessagesToFollowing: $restrictMessagesToFollowing
-    disabledListActivity: $disabledListActivity
-  ) {
-    id
-    name
-    about
-    avatar { large }
-    bannerImage
-    unreadNotificationCount
-    donatorTier
-    donatorBadge
-    moderatorRoles
-    options {
-      titleLanguage
-      staffNameLanguage
-      restrictMessagesToFollowing
-      airingNotifications
-      displayAdultContent
-      profileColor
-      timezone
-      activityMergeTime
-      notificationOptions {
-        type
-        enabled
-      }
-      disabledListActivity {
-        type
-        disabled
-      }
-    }
-    mediaListOptions {
-      scoreFormat
-      rowOrder
-      animeList {
-        customLists
-        sectionOrder
-        splitCompletedSectionByFormat
-        advancedScoring
-        advancedScoringEnabled
-      }
-      mangaList {
-        customLists
-        sectionOrder
-        splitCompletedSectionByFormat
-        advancedScoring
-        advancedScoringEnabled
-      }
-    }
-  }
-}
-`;
+// const anilist_USER_MUTATION = `
+// mutation(
+//   $about: String
+//   $titleLanguage: UserTitleLanguage
+//   $staffNameLanguage: UserStaffNameLanguage
+//   $airingNotifications: Boolean
+//   $displayAdultContent: Boolean
+//   $scoreFormat: ScoreFormat
+//   $rowOrder: String
+//   $profileColor: String
+//   $donatorBadge: String
+//   $notificationOptions: [NotificationOptionInput]
+//   $animeListOptions: MediaListOptionsInput
+//   $mangaListOptions: MediaListOptionsInput
+//   $timezone: String
+//   $activityMergeTime: Int
+//   $restrictMessagesToFollowing: Boolean
+//   $disabledListActivity: [ListActivityOptionInput]
+// ) {
+//   UpdateUser(
+//     about: $about
+//     titleLanguage: $titleLanguage
+//     staffNameLanguage: $staffNameLanguage
+//     airingNotifications: $airingNotifications
+//     displayAdultContent: $displayAdultContent
+//     scoreFormat: $scoreFormat
+//     rowOrder: $rowOrder
+//     profileColor: $profileColor
+//     donatorBadge: $donatorBadge
+//     notificationOptions: $notificationOptions
+//     animeListOptions: $animeListOptions
+//     mangaListOptions: $mangaListOptions
+//     timezone: $timezone
+//     activityMergeTime: $activityMergeTime
+//     restrictMessagesToFollowing: $restrictMessagesToFollowing
+//     disabledListActivity: $disabledListActivity
+//   ) {
+//     id
+//     name
+//     about
+//     avatar { large }
+//     bannerImage
+//     unreadNotificationCount
+//     donatorTier
+//     donatorBadge
+//     moderatorRoles
+//     options {
+//       titleLanguage
+//       staffNameLanguage
+//       restrictMessagesToFollowing
+//       airingNotifications
+//       displayAdultContent
+//       profileColor
+//       timezone
+//       activityMergeTime
+//       notificationOptions {
+//         type
+//         enabled
+//       }
+//       disabledListActivity {
+//         type
+//         disabled
+//       }
+//     }
+//     mediaListOptions {
+//       scoreFormat
+//       rowOrder
+//       animeList {
+//         customLists
+//         sectionOrder
+//         splitCompletedSectionByFormat
+//         advancedScoring
+//         advancedScoringEnabled
+//       }
+//       mangaList {
+//         customLists
+//         sectionOrder
+//         splitCompletedSectionByFormat
+//         advancedScoring
+//         advancedScoringEnabled
+//       }
+//     }
+//   }
+// }
+// `;
 
-export async function updateAnilistUserData(variables: { [key: string]: any }, notification: boolean = false): Promise<any> {
-    try {
-        const token = JSON.parse(localStorage.getItem("Animu_Anilist_login_token_information") as any)
-        const response = await request("https://graphql.anilist.co", {
-            method: "POST",
-            headers: {
-                'Authorization': 'Bearer ' + token["access_token"],
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            body: JSON.stringify({
-                query: anilist_USER_MUTATION,
-                variables: variables
-            })
-        })
-        console.log(response)
-        if (!response.success || !response.json) {
-            console.warn("Failed Update User Data", response)
-            return notification ? toast(t("Failed Update Anilist Settings"), { type: "error" }) : ""
-        }
-        localStorage.setItem("Animu_Anilist_user_data", JSON.stringify(response.json["data"]["UpdateUser"]))
-        setAnilistUserData(response.json["data"]["UpdateUser"])
+// export async function updateAnilistUserData(variables: { [key: string]: any }, notification: boolean = false): Promise<any> {
+//     try {
+//         const token = JSON.parse(localStorage.getItem("Animu_Anilist_login_token_information") as any)
+//         const response = await request("https://graphql.anilist.co", {
+//             method: "POST",
+//             headers: {
+//                 'Authorization': 'Bearer ' + token["access_token"],
+//                 "Content-Type": "application/json",
+//                 "Accept": "application/json"
+//             },
+//             body: JSON.stringify({
+//                 query: anilist_USER_MUTATION,
+//                 variables: variables
+//             })
+//         })
+//         if (!response.success || !response.json) {
+//             console.warn("Failed Update User Data", response)
+//             return notification ? toast(t("Failed Update Anilist Settings"), { type: "error" }) : ""
+//         }
+//         localStorage.setItem("Animu_Anilist_user_data", JSON.stringify(response.json["data"]["UpdateUser"]))
+//         setAnilistUserData(response.json["data"]["UpdateUser"])
 
-        return notification ? toast(t("Succesfully Updated Anilist Settings"), { type: "success" }) : ""
-    } catch (error) {
-        console.error("Error in updateAnilistUserData/functions", error)
-        return notification ? toast(t("Failed Update Anilist Settings"), { type: "error" }) : ""
-    }
-}
+//         return notification ? toast(t("Succesfully Updated Anilist Settings"), { type: "success" }) : ""
+//     } catch (error) {
+//         console.error("Error in updateAnilistUserData/functions", error)
+//         return notification ? toast(t("Failed Update Anilist Settings"), { type: "error" }) : ""
+//     }
+// }
 
 export function reloadWebsite() {
     /* IFDEF WEB */
@@ -1346,7 +1344,7 @@ export async function checkAnimeTodayReleaseEpisode() {
 /* IFDEF DEBUG|PROD */
 (window as any).showProcessMemory = async (number = 5000) => {
     setInterval(async () => {
-        console.log(await window.backend.debug())
+        console.info(await window.backend.debug())
     }, number)
 };
 /* ENDIF */

@@ -256,7 +256,6 @@ function information() {
         if (history.length > 0) {
             let plugin = await pluginManager().changePlayerPlugin(history[0].saveData?.pluginName as string)
             if (plugin) if (plugin.metadata.name != history[0].saveData?.pluginName) setCurrentId(undefined)
-            console.log(plugin)
             setCurrentPlugin(plugin.metadata.name)
 
             setTmpData({ ...tempData(), saveData: { ...history[0].saveData, pluginName: unwrap(currentPlugin()) as string } as indentityPlayer })
@@ -439,6 +438,8 @@ function information() {
 
     /* IFDEF DEBUG|PROD */
     async function getAnimeTrailer(url: string, noContentLoading = false) {
+        let storyBoard: string | undefined
+        
         try {
             if (config["information"]["trailerplayertype"] == "embed") return
             if (!noContentLoading) {
@@ -451,7 +452,6 @@ function information() {
             }
 
             let resolutions: resolutionFormat[] = []
-            let storyBoard: string | undefined
 
             const response = await window.api.yt_dlp.run(url)
             console.log(response)
@@ -546,7 +546,6 @@ function information() {
     }
 
     SheepShortcut(["Escape"], () => {
-        console.log(location.href, youCanleave())
         if (!location.href.includes("#/info") || !youCanleave()) return
 
         if (isCustomMenuActive()) return hideCustomMenu()

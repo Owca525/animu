@@ -17,13 +17,13 @@ import { SocketProvider } from './utils/context/SocketContext';
 // const originalRemoveEventListener = document.removeEventListener;
 
 // document.addEventListener = function(type, listener, options) {
-//   console.log("Event Added", type);
+//   console.info("Event Added", type);
 //   console.trace()
 //   return originalAddEventListener.call(this, type, listener, options);
 // };
 
 // document.removeEventListener = function(type, listener, options) {
-//   console.log("Event Removed", type);
+//   console.info("Event Removed", type);
 //   console.trace()
 //   return originalRemoveEventListener.call(this, type, listener, options);
 // };

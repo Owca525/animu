@@ -162,9 +162,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     if (getSocket()) {
         const socket = getSocket()
         socket?.on("player:update", (update: { time: number, pause: boolean }) => {
-            console.log(update)
             if (update.pause != isPlaying()) togglePlay(true)
-            console.log(unwrap(currentTime()) - update.time > 2, unwrap(currentTime()), unwrap(currentTime()) - update.time)
             if (unwrap(currentTime()) - update.time > 2 || unwrap(currentTime()) - update.time < -2) {
                 setTimeVideo(update.time)
                 clearInterval(refreashUpdateSocket)
@@ -271,7 +269,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             //             },
             //         })
             //             .then(async (res) => {
-            //                 console.log(res)
+            //                 console.info(res)
             //                 if (!res.success) throw new Error("Fetch failed: " + res.status);
             //                 callback(null, { 
             //                     body: res.json ? res.json : res.text,
@@ -1423,7 +1421,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     async function changeToDubbing() {
         const player = currentPlayer()
         if (!player) return
-        console.log(isDubbingOn())
 
         if (isDubbingOn() == false && player?.dubResolution) {
             setListResolution(player.dubResolution)
