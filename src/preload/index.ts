@@ -87,7 +87,8 @@ if (process.contextIsolated) {
       //   invoke: (channel: string, ...args: any[]): Promise<any> =>
       //     ipcRenderer.invoke(channel, ...args),
       // },
-      setLang: (v) => ipcRenderer.invoke("backend:setLang",v),
+      saveLog: (v) => ipcRenderer.invoke("backend:saveLogs", v),
+      setLang: (v) => ipcRenderer.invoke("backend:setLang", v),
       changeHeader: (v) => ipcRenderer.invoke("backend:customheader", v),
       version: () => ipcRenderer.invoke("backend:version"),
       refresh: () => ipcRenderer.invoke("backend:refresh"),

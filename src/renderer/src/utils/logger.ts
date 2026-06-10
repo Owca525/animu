@@ -7,23 +7,44 @@ const originalDebug = console.debug;
 
 type LogLevel = "INFO" | "WARNING" | "ERROR" | "DEBUG" | "CRITICAL" | "RESET";
 
-const LOG_COLORS = {
-    DEBUG: "\x1b[94m \x1b[0m", // Blue
-    INFO: "\x1b[92m \x1b[0m", // Green
-    WARNING: "\x1b[93m \x1b[0m", // Yellow
-    ERROR: "\x1b[91m \x1b[0m", // Red
-    CRITICAL: "\x1b[95m \x1b[0m", // Magenta
-    RESET: "\x1b[0m \x1b[0m", // Reset
-};
+// const LOG_COLORS = {
+//     DEBUG: "\x1b[94m \x1b[0m", // Blue
+//     INFO: "\x1b[92m \x1b[0m", // Green
+//     WARNING: "\x1b[93m \x1b[0m", // Yellow
+//     ERROR: "\x1b[91m \x1b[0m", // Red
+//     CRITICAL: "\x1b[95m \x1b[0m", // Magenta
+//     RESET: "\x1b[0m \x1b[0m", // Reset
+// };
 
 class Logger {
     loggingText: string[] = []
 
-    private decorateLevel(level: LogLevel): string {
-        return LOG_COLORS[level].replace(" ", level);
+    // private decorateLevel(level: LogLevel): string {
+    //     return LOG_COLORS[level].replace(" ", level);
+    // }
+
+    public saveLogs() {
+        /* IFDEF DEBUG|PROD */
+        window.backend.saveLog(this.loggingText)
+        /* ENDIF */
+
+        /* IFDEF WEB */
+        const hour = new Date().toLocaleTimeString("en-EN", { hour12: false });
+        const formatedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+        const blob = new Blob([this.loggingText.join("\n")], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${formatedDate}-${hour}-logs.log`;
+        a.click();
+
+        URL.revokeObjectURL(url);
+        /* ENDIF */
     }
 
     private convertMessageToString(str: any): string {
+        if (str instanceof Error) return `${str.message} ${str.cause}`
         if (typeof str == "object") return JSON.stringify(str)
         return str
     }
@@ -33,7 +54,7 @@ class Logger {
 
         const formatedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
-        this.loggingText.push(`[${formatedDate} ${hour}] [${this.decorateLevel(level)}] ${message.map((v) => this.convertMessageToString(v)).join(" ")}\n`)
+        this.loggingText.push(`[${formatedDate} ${hour}] [${level}] ${message.map((v) => this.convertMessageToString(v)).join(" ")}\n`)
 
         return message;
     }

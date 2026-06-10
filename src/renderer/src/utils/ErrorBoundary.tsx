@@ -3,8 +3,17 @@ import { globalNavigate, openUrlFolder, reloadWebsite } from './functions';
 import { useI18n } from './i18n';
 import { Show } from 'solid-js';
 
+// /* IFDEF PROD */
+// import logger from './logger';
+// /* ENDIF */
+
 function LocalErrorBoundary(error: any) {
     console.error(error)
+
+    // /* IFDEF PROD */
+    // logger.saveLogs()
+    // /* ENDIF */
+
     const { t } = useI18n()
 
     function createIssue() {

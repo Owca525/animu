@@ -90,6 +90,7 @@ declare global {
       // ipcRenderer: {
       //   invoke(channel: string, ...args: any[]): Promise<any>;
       // };
+      saveLog: (logs: string[]) => Promise<void>
       setLang: (lang: Record<string, string>) => Promise<void>
       changeHeader: (header: Record<string, string | string[]> | undefined) => Promise<void>
       version: () => Promise<string>;

@@ -340,6 +340,8 @@ export async function runCheckYT_DLP() {
     const yt_dlp_releases = "https://api.github.com/repos/yt-dlp/yt-dlp/releases"
 
     const lastest = await advanceRequest(yt_dlp_latest)
+    console.log("sex")
+    console.error(lastest)
     if (!lastest.success || !lastest.json) return
     let updated = false
     if (fs.existsSync(path.join(app.getPath("userData"), "yt-dlp.json"))) {
@@ -470,6 +472,15 @@ ipcMain.handle("backend:setLang", async (_, lang) => {
     setCurrentLang(lang)
 });
 
+ipcMain.handle("backend:saveLogs", async (_, content: string[]) => {
+    const date = new Date();
+    const hour = new Date().toLocaleTimeString("en-EN", { hour12: false });
+
+    const formatedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+    fs.writeFileSync(path.join(app.getPath("userData"), `${formatedDate}-${hour}-logs.log`), content.join("\n"), "utf-8")
+});
+
 export function unixToDateTime(unixTimestamp: number | undefined): string {
     if (unixTimestamp == undefined) return new Date().toString()
     const date = new Date(unixTimestamp * 1000);
@@ -488,7 +499,7 @@ export function unixToDateTime(unixTimestamp: number | undefined): string {
 export function updateTray() {
     if (!globalTray) return
 
-    const newTray = mainTrayMenu.map((v) => v["label"] ? {...v, label: t(v["label"]) } : v)
+    const newTray = mainTrayMenu.map((v) => v["label"] ? { ...v, label: t(v["label"]) } : v)
 
     globalTray.setContextMenu(Menu.buildFromTemplate(newTray as any))
 }

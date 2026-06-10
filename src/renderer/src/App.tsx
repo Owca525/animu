@@ -12,7 +12,6 @@ import {
   checkTimeDriffrentUnix,
   dateToUnix,
   deepMerge,
-  FetchAnilistUserData,
   getTodayAnilistAnime,
   timeCovertToMs,
   updateObject
@@ -32,7 +31,6 @@ import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import {
   getGlobalCache,
   isPluginSearchMode,
-  setAnilistUserData,
   setAnimulistData,
   setAudioOutput,
   setDeepLink,
@@ -76,6 +74,10 @@ import { ServiceManager } from './utils/service';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
+
+// /* IFDEF PROD */
+// import './utils/logger';
+// /* ENDIF */
 
 function App() {
   const { changeLanguage } = useI18n()
@@ -134,17 +136,6 @@ function App() {
 
     await pluginManager().initialPlugins()
     await pluginManager().changeInformationPlugin("AnilistApi")
-
-    if (localStorage.getItem("Animu_Anilist_user_data") != undefined) {
-      try {
-        setAnilistUserData(JSON.parse(localStorage.getItem("Animu_Anilist_user_data") as any))
-      } catch (error) {
-        console.error("Failed Fetch Animu_Anilist_user_data from localstorage", error)
-      }
-    }
-
-    if (localStorage.getItem("Animu_Anilist_login_token_information") != undefined)
-      FetchAnilistUserData()
 
     getTodayAnilistAnime().then((v) => {
       setTodayAnimeInAnilist(v)
