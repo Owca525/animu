@@ -69,6 +69,11 @@ export function I18nProvider(props: { config: i18nConfig; children: any }) {
 
   onMount(async () => {
     setDictionaries(await getAllLangFiles())
+
+    /* IFDEF DEBUG|PROD */
+    const dict = dictionaries()[currentLang()]
+    window.backend.setLang(dict as any)
+    /* ENDIF */
   })
 
   function t(key: string, replace?: { [key: string]: string | number | undefined }) {

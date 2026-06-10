@@ -11,6 +11,7 @@ import {
   checkDate,
   checkTimeDriffrentUnix,
   dateToUnix,
+  deepMerge,
   FetchAnilistUserData,
   getTodayAnilistAnime,
   timeCovertToMs,
@@ -169,7 +170,7 @@ function App() {
     /* IFDEF WEB */
     if (!localStorage.getItem("config")) localStorage.setItem("config", JSON.stringify(defaultConfigWeb))
     if (!localStorage.getItem("history")) localStorage.setItem("history", JSON.stringify([]))
-    setConfig(JSON.parse(localStorage.getItem("config") as any))
+    setConfig(deepMerge(defaultConfigWeb, JSON.parse(localStorage.getItem("config") as any)))
     setGlobalHistory(JSON.parse(localStorage.getItem("history") as any))
     /* ENDIF */
 
@@ -216,8 +217,6 @@ function App() {
     /* ENDIF */
   })
 
-  // TODO: ADD SUPPORT FOR BROWSER
-  /* IFDEF DEBUG|PROD */
   function LoadConfig() {
     let loadedConnfig = getConfig()
     // await navigator.mediaDevices.enumerateDevices()
@@ -251,6 +250,7 @@ function App() {
     changeTheme(loadingTheme)
 
     changeLanguage(loadedConnfig.General.language)
+    /* IFDEF DEBUG|PROD */
     if (loadedConnfig.General.Window.AutoMaximize) window.BrowserWindow.setMaximize()
     window.BrowserWindow.setZoom(calculateZoomLevel(parseFloat(loadedConnfig.General.Window.Zoom.toString())))
     window.BrowserWindow.setFullscreen(loadedConnfig.General.Window.AutoFullscreen)
@@ -260,8 +260,8 @@ function App() {
     CreateBackup()
     saveConfig(updateObject("backup.lastCheck", dateToUnix(new Date().toString()), loadedConnfig))
     window.backend.refresh()
+    /* ENDIF */
   }
-  /* ENDIF */
 
   return (
     <Switch>
@@ -334,7 +334,7 @@ function initialServices() {
     {
       active: !window["animuAppInfo"]["flags"]["WEB"] && config.update.type == "On Start",
       execute: checkUpdate,
-      name: 'AnimUpdate',
+      name: t('AnimUpdate'),
       description: "Check Animu Update",
       noFirstStart: true,
       activeTime: timeCovertToMs({ min: 60 })

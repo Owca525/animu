@@ -1500,3 +1500,17 @@ export async function GenerateSha256(text: string) {
     .map(b => b.toString(16).padStart(2, '0'))
     .join('');
 }
+
+export function deepMerge(target: any, source: any): any {
+    for (const key in source) {
+        if (source[key] && typeof source[key] === "object") {
+            if (!target[key]) {
+                target[key] = {};
+            }
+            deepMerge(target[key], source[key]);
+        } else {
+            target[key] = source[key];
+        }
+    }
+    return target;
+}

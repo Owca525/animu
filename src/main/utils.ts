@@ -6,17 +6,21 @@ import { ActivityType } from 'discord-api-types/v10';
 import { advanceRequest } from './request';
 import {
     config,
+    globalTray,
+    mainTrayMenu,
     newConfigPath,
 } from '.';
 import {
     app,
     clipboard,
     ipcMain,
+    Menu,
     nativeImage,
     shell
 } from 'electron';
 import { Client } from '@xhayper/discord-rpc';
 import { exec, execSync, spawn } from 'child_process';
+import { setCurrentLang, t } from './i18n';
 
 // import express from "express";
 // import { Readable } from "stream";
@@ -464,6 +468,10 @@ ipcMain.handle("debug:memory", async (_) => {
     }
 });
 
+ipcMain.handle("backend:setLang", async (_, lang) => {
+    setCurrentLang(lang)
+});
+
 export function unixToDateTime(unixTimestamp: number | undefined): string {
     if (unixTimestamp == undefined) return new Date().toString()
     const date = new Date(unixTimestamp * 1000);
@@ -477,4 +485,12 @@ export function unixToDateTime(unixTimestamp: number | undefined): string {
     const seconds = String(date.getSeconds()).padStart(2, "0");
 
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+export function updateTray() {
+    if (!globalTray) return
+
+    const newTray = mainTrayMenu.map((v) => v["label"] ? {...v, label: t(v["label"]) } : v)
+
+    globalTray.setContextMenu(Menu.buildFromTemplate(newTray as any))
 }

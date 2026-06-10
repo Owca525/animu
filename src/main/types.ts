@@ -2,6 +2,8 @@ import { app } from "electron"
 import path from "path"
 import { checkPath } from "./utils"
 
+import config from "../../resources/config.json"
+
 export interface SettingsConfig {
     firstStart: boolean
     deepLinkURL: string
@@ -229,150 +231,25 @@ export interface requestResponseVideo {
     header: { [key: string]: string }
 }
 
-export const defaultConfig: SettingsConfig = {
-    deepLinkURL: "https://owca525.github.io/",
-    firstStart: true,
-    General: {
-        language: "en",
-        theme: ["DarkerAnimu"],
-        Window: {
-            AutoMaximize: false,
-            AutoFullscreen: false,
-            Zoom: 100,
-            trayIconClose: false
-        },
-        discordRPC: true,
-        audioOutput: "Default"
-    },
+export const defaultConfig = {
+    ...config,
     Player: {
-        general: {
-            Autoplay: true,
-            AutoFullscreen: false,
-            AutoSkipEpisode: true,
-            Volume: 25,
-            LongTimeSkipForward: 90,
-            LongTimeSkipBack: 90,
-            TimeSkipLeft: 5,
-            TimeSkipRight: 5,
-            VideoStreching: false,
-            PlayerBehavior: "information",
-            autoSkipOpenings: false,
-            autoSkipEndings: false,
-            showBrokenBuffer: false,
-            minusTime: false,
-            disablemoreinformation: false
-        },
+        ...config.Player,
         screenShot: {
+            ...config.Player.screenShot,
             alwaysAsk: true,
             saveType: "File",
             path: path.join(app.getPath("pictures"), "animu"),
         },
         external: {
-            enable: false,
-            type: "Mpv",
-            movianIP: "localhost:42000",
+            ...config.Player.external,
+            type: config.Player.external,
             mpvPath: checkPath("mpv"),
             vlcPath: checkPath("vlc")
         },
-        upToNextEpisode: {
-            enable: true,
-            interval: 15,
-            durationShow: 5,
-            variants: "var1"
-        },
-        keybinds: {
-            Pause: "SPACE",
-            LongTimeSkipForward: "ArrowUp",
-            LongTimeSkipBack: "ArrowDown",
-            TimeSkipLeft: "ArrowLeft",
-            TimeSkipRight: "ArrowRight",
-            Fullscreen: "F",
-            ExitPlayer: "Escape",
-            NextEpisode: "PageUp",
-            PrevEpisode: "PageDown",
-            FrameSkipBack: ",",
-            FrameSkipForward: ".",
-            VolumeDown: "9",
-            VolumeUp: "0",
-            VolumeMute: "m",
-            ScreenShot: "f10",
-            PictureInPicture: "P",
-            toggleSubtitles: "C",
-            skipOpeningEnding: "S",
-            noSubbtitlesreenshot: "CTRL+f10",
-            startRecordClip: "F7",
-            stopRecordClip: "F8"
-        },
-        ui: {
-            DisableVolumeAnimation: false,
-            DisableSpaceAnimation: false,
-            DisableSkipAnimation: false,
-            DisableLoadingAnimation: false
-        }
-    },
-    History: {
-        history: {
-            LimitedHistory: false,
-            maxSave: 50,
-            AlwaysAsk: true
-        },
-        continue: {
-            MinimalTimeSave: 20,
-            MaximizeTimeSave: 100,
-        },
-    },
-    Developer: {
-        DeveloperMode: false,
-        DevTools: false,
-        DevToolsOnStart: false,
-        playerDebug: false
-    },
-    update: {
-        lastTime: 0,
-        type: "On Start",
-        enable: true
-    },
-    plugins: {
-        player: "Allmanga",
-        userPlugins: false,
-        hiddenPlugins: [],
-        repoURL: ["https://raw.githubusercontent.com/Owca525/animu-plugins/refs/heads/main"],
-        pluginCheckType: "Every Day",
-        lastTimeCheck: 0
-    },
-    backup: {
-        enable: false,
-        lastCheck: 0,
-        check: "Every Day",
-        maxBackups: 3
-    },
-    yt_dlp: "",
-    animulist: {
-        historyConvert: true
-    },
-    anilist: {
-        scoreFormat: "POINT_100",
-        titleFormat: "ROMAJI",
-        adultdefault: false,
-        maxpagesize: 20
-    },
-    information: {
-        openingininformation: false,
-        alwaysUpdateAnime: false,
-        episodeVariants: "v1",
-        trailerplayertype: "player",
-        preloadTrailer: false,
-        preloadOpening: false
-    },
-    socket: {
-        useSocket: false,
-        backend: ""
-    },
-    backend: {
-        useragent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/143.0",
-        discordrpcTime: -1
     }
 };
+
 
 export type pluginRepoExpanded = {
     name: string,

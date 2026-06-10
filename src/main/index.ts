@@ -17,12 +17,13 @@ import "./theme"
 import "./plugins"
 
 import { convertToNewFormat, detectOldVersion, write } from './os'
-import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync} from 'fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync } from 'fs'
 import { cardData, defaultConfig, SettingsConfig } from './types';
 import { deepMerge, detectZoom, runCheckYT_DLP, setupDiscordRPC } from './utils';
 import { electronAppUniversalProtocolClient } from 'electron-app-universal-protocol-client';
 import { checkDatabase } from './animulist';
 import { ParseINI } from './iniParser';
+import { t } from './i18n'
 
 export let mainWindow: BrowserWindow | undefined
 export const newConfigPath = path.join(app.getPath("userData"), "animuConfig")
@@ -31,10 +32,33 @@ export const pluginsConfigPath = path.join(newConfigPath, "pluginsConfig")
 export const animuPlaylistPath = path.join(newConfigPath, "playlist")
 export const userPlugins = path.join(newConfigPath, "plugins")
 export const animuPlugins = path.join(app.getPath("userData"), "animuPlugins")
+export let globalTray: undefined | Tray = undefined
+export const mainTrayMenu = [
+  {
+    label: 'backend.openAnimu',
+    click: () => {
+      if (mainWindow) mainWindow.show()
+    }
+  },
+  { type: 'separator' },
+  {
+    label: 'backend.update',
+    // click: () => changeURL("/player")
+  },
+  {
+    label: 'backend.settings',
+    click: () => changeURL("/settings")
+  },
+  { type: 'separator' },
+  {
+    label: 'backend.exitAnimu',
+    click: () => process.exit()
+  }
+]
 
 export let DEBUG: boolean = false
 
-export let config: SettingsConfig = defaultConfig
+export let config: SettingsConfig = defaultConfig as any
 let historyData: cardData[] = []
 const PROTOCOL = "animu"
 
@@ -53,7 +77,7 @@ function changeURL(path: string) {
   mainWindow.loadURL(`${tmp[0]}#${path}`)
 }
 
-function createWindow(): void {
+async function createWindow() {
   let title = 'Animu '
 
   // Create the browser window.
@@ -120,39 +144,6 @@ function createWindow(): void {
     return { action: 'deny' }
   })
 
-  let tray = new Tray(icon)
-
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: 'Open Animu',
-      click: () => {
-        if (mainWindow) mainWindow.show()
-      }
-    },
-    { type: 'separator' },
-    {
-      label: 'Watch Last Anime',
-      click: () => changeURL("/player")
-    },
-    {
-      label: 'Settings',
-      click: () => changeURL("/settings")
-    },
-    { type: 'separator' },
-    {
-      label: 'Exit Animu',
-      click: () => process.exit()
-    }
-  ])
-
-  tray.setToolTip('Animu')
-  tray.setContextMenu(contextMenu)
-
-  tray.on('click', () => {
-    if (!mainWindow) return
-    mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show()
-  })
-
   mainWindow.on('close', (e) => {
     if (config.General.Window.trayIconClose) return
     if (!mainWindow) return
@@ -162,7 +153,7 @@ function createWindow(): void {
       const notification = new Notification({
         title: 'Animu',
         icon: icon,
-        body: "Animu is Now In tray mode if you want disable this you can in settings",
+        body: t("backend.trayNotification"),
       });
       notification.show()
       writeFileSync(path.join(app.getPath("userData"), "traynotification"), "")
@@ -210,6 +201,15 @@ app.whenReady().then(async () => {
     return
   }
 
+  /* IFDEF WEB */
+  if (process.env.ANIMU_WEB_DEV) return
+  /* ENDIF */
+
+  globalTray = new Tray(icon)
+
+  await initialBackend()
+  createWindow()
+
   const isInspectEnabled = process.argv.some(arg =>
     arg.startsWith('--inspect')
   );
@@ -235,13 +235,7 @@ app.whenReady().then(async () => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
-
-  /* IFDEF WEB */
-  if (process.env.ANIMU_WEB_DEV) return
-  /* ENDIF */
-
-  await initialBackend()
-  createWindow()
+  
   electronAppUniversalProtocolClient.on('request', async (requestUrl) => {
     if (mainWindow) mainWindow.webContents.send('protocol-request', requestUrl)
   },

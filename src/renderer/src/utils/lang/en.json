@@ -590,6 +590,13 @@
         "saturday": "Saturday",
         "sunday": "Sunday"
     },
+    "backend": {
+        "trayNotification": "Animu is Now In tray mode if you want disable this you can in settings",
+        "openAnimu": "Open Animu",
+        "update": "Check Updates",
+        "settings": "Settings",
+        "exitAnimu": "Exit Animu"
+    },
     "lang": {
         "en": "English",
         "pl": "Polski",
