@@ -16,14 +16,13 @@ import {
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { animulistData, getGlobalCache, removeDeepLink, setActiveThemes, setAnilistUserData, setDeepLink, setGlobalToken, todayAnimeInAnilist } from './stores/global';
+import { getGlobalCache, setActiveThemes, setGlobalToken, todayAnimeInAnilist } from './stores/global';
 import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
 import { unwrap } from 'solid-js/store';
 import { getInformationPlugin, getPlayerPluginList, pluginManager } from './stores/plugins';
 import { removeToast, toast, updateToast } from './context/ToastNotification';
-import { OvewriteAnimuList } from './FilesManager/animulist';
 import { readPlaylist, updatePlaylist } from './FilesManager/playlist';
 import { playerPluginInstance } from './pluginManager';
 import { sendNotification } from "./NotificationManager"
@@ -1239,26 +1238,26 @@ export function convertDateToDateObject(date: number | undefined): DateObject {
     }
 }
 
-async function AnilistMergeDataAnimeList() {
-    const plugin = getInformationPlugin()
-    const animulist = unwrap(animulistData())
-    const anilistAnimeList = await plugin.getAnimeList()
+// async function AnilistMergeDataAnimeList() {
+//     const plugin = getInformationPlugin()
+//     const animulist = unwrap(animulistData())
+//     const anilistAnimeList = await plugin.getAnimeList()
 
-    if (animulist.length <= 0) return OvewriteAnimuList(anilistAnimeList.map((item) => ({ animulist: item.animulist as any, AnimeData: item.AnimeData })))
-    if (anilistAnimeList.length <= 0) { }
-    const animuIDlist = animulist.map((v) => v.AnimeData.id)
+//     if (animulist.length <= 0) return OvewriteAnimuList(anilistAnimeList.map((item) => ({ animulist: item.animulist as any, AnimeData: item.AnimeData })))
+//     if (anilistAnimeList.length <= 0) { }
+//     const animuIDlist = animulist.map((v) => v.AnimeData.id)
 
-    let animelist: cardData[] = []
+//     let animelist: cardData[] = []
 
-    anilistAnimeList.forEach((item): any => {
-        const tmp = animulist.find((v) => v.AnimeData.id == item.AnimeData.id)
-        if (!tmp) return animelist.push(item)
+//     anilistAnimeList.forEach((item): any => {
+//         const tmp = animulist.find((v) => v.AnimeData.id == item.AnimeData.id)
+//         if (!tmp) return animelist.push(item)
 
-        if (JSON.stringify(item.animulist) != JSON.stringify(tmp.animulist)) return animelist.push(item)
-    })
+//         if (JSON.stringify(item.animulist) != JSON.stringify(tmp.animulist)) return animelist.push(item)
+//     })
 
-    // TODO: END THIS
-}
+//     // TODO: END THIS
+// }
 
 export function convertEpisode(ep: string): number {
     try {
@@ -1511,4 +1510,12 @@ export function deepMerge(target: any, source: any): any {
         }
     }
     return target;
+}
+
+export function LoopReplace(str: string, strings: [string, string][]) {
+    strings.forEach((value) => {
+        str = str.replace(value[0], value[1])
+    })
+
+    return str
 }

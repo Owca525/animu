@@ -1,3 +1,4 @@
+import { LoopReplace } from "./functions";
 
 export interface Cue {
     start: number;
@@ -33,7 +34,7 @@ function ConvertTimeToASSFormat(seconds: number): string {
 function TimerConverter(time = "", dot = ".") {
     try {
         const tmp = time.split(":")
-        let [h, m, s] = ["00","0","0"];
+        let [h, m, s] = ["00", "0", "0"];
 
         if (tmp.length == 3) {
             h = tmp[0]
@@ -64,10 +65,32 @@ function ExtractArrowTime(str: string) {
     if (v1) return v1
     if (v2) return v2
     return
-} 
+}
+
+function HexToRGBASS(hex: string): string {
+    hex = hex.replace("#", "");
+
+    if (hex.length === 3) hex = hex.split("").map(c => c + c).join("");
+
+    const r = hex.slice(0, 2);
+    const g = hex.slice(2, 4);
+    const b = hex.slice(4, 6);
+
+    return `&H${b}${g}${r}&`;
+}
 
 class VTTConvert {
     public format = "vtt"
+    private replacements = [
+        [/<b>/gi, '{\\b1}'],
+        [/<\/b>/gi, '{\\b0}'],
+
+        [/<i>/gi, '{\\i1}'],
+        [/<\/i>/gi, '{\\i0}'],
+
+        [/<u>/gi, '{\\u1}'],
+        [/<\/u>/gi, '{\\u0}'],
+    ]
 
     public detect(str: string) {
         return str.trimStart().startsWith("WEBVTT")
@@ -94,10 +117,12 @@ class VTTConvert {
                 index++;
             }
 
+            text = text.replace(/\\N$/, "")
+
             cues.push({
                 start,
                 end,
-                text: text.replace(/\\N$/, ""),
+                text: LoopReplace(text, this.replacements as any),
             });
         })
 
@@ -107,6 +132,17 @@ class VTTConvert {
 
 class SRTConvert {
     public format = "srt"
+    private replacements = [
+        [/<b>/gi, '{\\b1}'],
+        [/<\/b>/gi, '{\\b0}'],
+
+        [/<i>/gi, '{\\i1}'],
+        [/<\/i>/gi, '{\\i0}'],
+
+        [/<u>/gi, '{\\u1}'],
+        [/<\/u>/gi, '{\\u0}'],
+        [/<\/font>/gi, "{\\r}"]
+    ]
 
     public detect(str: string) {
         return /(?:(\d{2}):)?(\d{2}:\d{2}\.\d{3})\s*-->\s*(?:(\d{2}):)?(\d{2}:\d{2}\.\d{3})/.test(str) && str.trimStart().startsWith("WEBVTT") == false
@@ -131,7 +167,14 @@ class SRTConvert {
             const end = TimerConverter(match[2], ",");
 
             const textStartIndex = lines.indexOf(timeLine) + 1;
-            const text = lines.slice(textStartIndex).join("\\N").trim();
+            let text = lines.slice(textStartIndex).join("\\N").trim();
+
+            text = text.replace(
+                /<font\s+color=["']?(#[0-9a-f]{3,6})["']?\s*>/gi,
+                (_, color) => `{\\c${HexToRGBASS(color)}}`
+            )
+
+            text = LoopReplace(text, this.replacements as any)
 
             cues.push({ start, end, text });
         })
