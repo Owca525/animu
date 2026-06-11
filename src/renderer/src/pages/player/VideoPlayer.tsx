@@ -78,7 +78,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     let screenshotWrapper: HTMLDivElement | undefined
     let volumeTimeout: NodeJS.Timeout | undefined
     let playAnimationTimeout: NodeJS.Timeout | undefined
-    let skipUITimer: NodeJS.Timeout | undefined
     let buttonSkipLeft: NodeJS.Timeout | undefined
     let moreInformationTimer: NodeJS.Timeout | undefined
     let buttonSkipRight: NodeJS.Timeout | undefined
@@ -111,7 +110,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [isShowButtonSkipLeft, setShowButtonSkipLeft] = createSignal<boolean>(false)
     const [isShowButtonSkipRight, setShowButtonSkipRight] = createSignal<boolean>(false)
 
-    const [SkipTimerUI, setSkipTimerUI] = createSignal<number>(0)
+    const [SkipTimerUI, setSkipTimerUI] = createSignal<string>("")
 
     // States
     const [isMuted, setMuted] = createSignal<boolean>(false)
@@ -1134,21 +1133,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     //     }
     // }
 
-    function timerForUI(time: string) {
-        try {
-            clearTimeout(skipUITimer)
-
-            setSkipTimerUI(SkipTimerUI() + parseInt(time.toString()))
-
-            skipUITimer = setTimeout(() => {
-                setSkipTimerUI(0)
-            }, 1000)
-        } catch (error) {
-            console.error("Player/timerForUI", error)
-            clearTimeout(skipUITimer)
-        }
-    }
-
     useKeyPress((keys: string) => {
         if (keys == "CTRL+SHIFT+D") setshowNerdStats((prev) => !prev)
         if (keys == "SHIFT+R" && currentPlayer()) runNewPlayer(currentPlayer()!)
@@ -1163,22 +1147,22 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 togglePlay()
                 break
             case convertKeybinds(config.Player.keybinds.TimeSkipRight.toLowerCase()).toLowerCase():
-                timerForUI(`${config.Player.general.TimeSkipRight}`)
+                setSkipTimerUI(`${config.Player.general.TimeSkipRight}`)
                 setTimeVideo((time_now += parseInt(config.Player.general.TimeSkipRight.toString())))
                 setTimeoutForElement(buttonSkipRight, setShowButtonSkipRight)
                 break
             case convertKeybinds(config.Player.keybinds.TimeSkipLeft.toLowerCase()).toLowerCase():
-                timerForUI(`${config.Player.general.TimeSkipLeft}`)
+                setSkipTimerUI(`${config.Player.general.TimeSkipLeft}`)
                 setTimeVideo((time_now -= parseInt(config.Player.general.TimeSkipLeft.toString())))
                 setTimeoutForElement(buttonSkipLeft, setShowButtonSkipLeft)
                 break
             case convertKeybinds(config.Player.keybinds.LongTimeSkipForward.toLowerCase()).toLowerCase():
-                timerForUI(`${config.Player.general.LongTimeSkipForward}`)
+                setSkipTimerUI(`${config.Player.general.LongTimeSkipForward}`)
                 setTimeVideo((time_now += parseInt(config.Player.general.LongTimeSkipForward.toString())))
                 setTimeoutForElement(buttonSkipRight, setShowButtonSkipRight)
                 break
             case convertKeybinds(config.Player.keybinds.LongTimeSkipBack.toLowerCase()).toLowerCase():
-                timerForUI(`${config.Player.general.LongTimeSkipBack}`)
+                setSkipTimerUI(`${config.Player.general.LongTimeSkipBack}`)
                 setTimeVideo((time_now -= parseInt(config.Player.general.LongTimeSkipBack.toString())))
                 setTimeoutForElement(buttonSkipLeft, setShowButtonSkipLeft)
                 break
