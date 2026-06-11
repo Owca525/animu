@@ -192,18 +192,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
             if (isPlaying()) togglePlay(true)
 
-            const currentDate = new Date()
-
-            const [year, month, day, hour, minute, second] = [
-                currentDate.getFullYear(),
-                currentDate.getMonth() + 1,
-                currentDate.getDate(),
-                currentDate.getHours(),
-                currentDate.getMinutes(),
-                currentDate.getSeconds(),
-            ].map(v => String(v).padStart(2, "0"));
-
-            const formatedDate = `-${year}-${month}-${day}-${hour}-${minute}-${second}`;
+            const date = new Date()
+            const formatedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}-${date.toLocaleTimeString("en-EN", { hour12: false })}`;
 
             const a = document.createElement("a");
             a.href = url;
@@ -255,51 +245,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }
 
         if (videoRef) {
-            // TODO: If you have time check why videojs first put m3u8 to video element after that put to HLS plugin
-            // const ajsdbfgkljsadfbjkln = Object.assign(
-            //     function (options: any, callback: any) {
-            //         const controller = new AbortController();
-
-            //         request(options.uri, {
-            //             method: options.method || "GET",
-            //             headers: {
-            //                 ...options.headers,
-            //                 ...currentResolution() && currentResolution()!["reqHeader"] ? currentResolution()!["reqHeader"] : {}
-            //             },
-            //         })
-            //             .then(async (res) => {
-            //                 console.info(res)
-            //                 if (!res.success) throw new Error("Fetch failed: " + res.status);
-            //                 callback(null, { 
-            //                     body: res.json ? res.json : res.text,
-            //                     statusCode: res.status,
-            //                     method: options.method,
-            //                     headers: res.responseHeader,
-            //                     url: options.uri,
-            //                     rawRequest: {
-            //                         readyState: 1,
-            //                         response: res.buffer,
-            //                         responseText: res.text,
-            //                         responseType: res.json ? "json" : res.text ? "text" : "arraybuffer", //"" | "text" | "arraybuffer" | "blob" | "document" | "json"
-            //                         responseURL: options.uri,
-            //                         status: res.status,
-            //                         statusText: res.statusText,
-            //                         timeout: 100,
-            //                         withCredentials: false,
-            //                     }
-            //                  });
-            //             })
-            //             .catch((err) => callback(err, null));
-
-            //         return { abort: () => controller.abort() };
-            //     },
-            // )
-            // videojs.xhr = ajsdbfgkljsadfbjkln
-            // if (videojs["Vhs"]) (videojs as any).Vhs.xhr = ajsdbfgkljsadfbjkln;
-
             videoJS = videojs(videoRef, {
                 controls: false,
-                autoplay: true,
+                autoplay: isPlaying(),
                 preload: "auto",
                 bigPlayButton: false,
                 loadingSpinner: false,
@@ -428,6 +376,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (hls) hls.destroy()
         if (currentASSubtitles) currentASSubtitles.destroy()
         if (videoRef) videoRef.src = ""
+        if (videoRef) videoRef.remove()
         videoRef = undefined
         if (videoJS) videoJS.dispose()
 
@@ -890,7 +839,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     }
 
     function updateProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
-
         if (moreInformationTimer) clearInterval(moreInformationTimer)
         setShowingMoreInformation(false)
 
@@ -1188,7 +1136,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 takeScreenshot()
                 break
             case convertKeybinds(config.Player.keybinds.noSubbtitlesreenshot.toLowerCase()).toLowerCase():
-                takeScreenshot()
+                takeScreenshot(true)
                 break
             case convertKeybinds(config.Player.keybinds.VolumeMute.toLowerCase()).toLowerCase():
                 setMutedToPlayer()
@@ -1242,22 +1190,13 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }, 3000)
     }
 
-    async function takeScreenshot() {
+    async function takeScreenshot(noSubtitles: boolean = false) {
         if (!screenshotWrapper) return
         if (config == null) return
         if (!videoRef) return
 
-        const currentDate: Date = new Date();
-        const [year, month, day, hour, minute, second] = [
-            currentDate.getFullYear(),
-            currentDate.getMonth() + 1,
-            currentDate.getDate(),
-            currentDate.getHours(),
-            currentDate.getMinutes(),
-            currentDate.getSeconds(),
-        ].map(v => String(v).padStart(2, "0"));
-
-        const formatedDate = `-${year}-${month}-${day}-${hour}-${minute}-${second}`;
+        const date = new Date()
+        const formatedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}-${date.toLocaleTimeString("en-EN", { hour12: false })}`;
 
         let screenshot: string = "data:,"
 
@@ -1270,7 +1209,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         outputCanvas.width = videoRef.videoWidth;
         outputCanvas.height = videoRef.videoHeight;
         ctx.drawImage(videoRef, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
-        if (currentASSubtitles) ctx.drawImage(currentASSubtitles._canvas, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
+        if (currentASSubtitles && !noSubtitles) ctx.drawImage(currentASSubtitles._canvas, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
         screenshot = outputCanvas.toDataURL("image/png");
 
         if (screenshot == "data:,") {
@@ -1279,6 +1218,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }
         const blob = await (await fetch(screenshot)).blob();
         const url = URL.createObjectURL(blob);
+        
         if (config.Player.screenShot.saveType == "Clipboard" || config.Player.screenShot.saveType == "Both") {
             setScreenShot({ active: true, image: url, click: "" })
             await navigator.clipboard.write([
@@ -1444,16 +1384,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     ref={videoRef}
                     class="video-player"
                     preload="auto"
-                    autoplay={isPlaying()}
                     muted={isMuted()}
                     style={config.Player.general.VideoStreching ? { "object-fit": "cover" } : {}}
                 >
-                    {/* <track
-                        src={vttUrl()}
-                        kind="subtitles"
-                        default
-                        ref={vttSubRef}
-                    /> */}
                 </video>
                 <div ref={assSubContainer} style={{ position: "absolute", top: "0", left: "0" }}></div>
             </div>

@@ -75,7 +75,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
 
     let videoJSConfig = {
         controls: false,
-        autoplay: true,
+        autoplay: config.Player.general.Autoplay,
         preload: "auto",
         bigPlayButton: false,
         loadingSpinner: false,
@@ -278,6 +278,12 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
                 }
             }
         }
+
+        /* IFDEF DEBUG */
+        (window as any).MiniPlayerVideoRef = videoRef;
+        (window as any).MiniPlayerVideoJS = videoJS;
+        (window as any).MiniPlayerHLS = hls;
+        /* ENDIF */
 
         if (audioRef) {
             audioVideoJS = videojs(audioRef, {...videoJSConfig, autplay: false});
@@ -882,38 +888,27 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         }, 3000)
     }
 
-    async function takeScreenshot() {
+    async function takeScreenshot(noSubtitles: boolean = false) {
         if (!screenshotWrapper) return
         if (config == null) return
         if (!videoRef) return
 
-        const currentDate: Date = new Date();
-        const [year, month, day, hour, minute, second] = [
-            currentDate.getFullYear(),
-            currentDate.getMonth() + 1,
-            currentDate.getDate(),
-            currentDate.getHours(),
-            currentDate.getMinutes(),
-            currentDate.getSeconds(),
-        ].map(v => String(v).padStart(2, "0"));
-
-        const formatedDate = `-${year}-${month}-${day}-${hour}-${minute}-${second}`;
+        const date = new Date()
+        const formatedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}-${date.toLocaleTimeString("en-EN", { hour12: false })}`;
 
         let screenshot: string = "data:,"
 
-        if (currentASSubtitles) {
-            const outputCanvas = document.createElement("canvas");
-            const ctx = outputCanvas.getContext("2d");
-            if (!ctx) {
-                toast(t("player.toastscreenshot.failed"), { type: "error" });
-                return
-            };
-            outputCanvas.width = videoRef.videoWidth;
-            outputCanvas.height = videoRef.videoHeight;
-            ctx.drawImage(videoRef, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
-            ctx.drawImage(currentASSubtitles._canvas, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
-            screenshot = outputCanvas.toDataURL("image/png");
-        }
+        const outputCanvas = document.createElement("canvas");
+        const ctx = outputCanvas.getContext("2d");
+        if (!ctx) {
+            toast(t("player.toastscreenshot.failed"), { type: "error" });
+            return
+        };
+        outputCanvas.width = videoRef.videoWidth;
+        outputCanvas.height = videoRef.videoHeight;
+        ctx.drawImage(videoRef, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
+        if (currentASSubtitles && !noSubtitles) ctx.drawImage(currentASSubtitles._canvas, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
+        screenshot = outputCanvas.toDataURL("image/png");
 
         if (screenshot == "data:,") {
             toast(t("player.toastscreenshot.failed"), { type: "error" });
@@ -921,6 +916,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         }
         const blob = await (await fetch(screenshot)).blob();
         const url = URL.createObjectURL(blob);
+        
         if (config.Player.screenShot.saveType == "Clipboard" || config.Player.screenShot.saveType == "Both") {
             setScreenShot({ active: true, image: url, click: "" })
             await navigator.clipboard.write([

@@ -50,11 +50,10 @@ class Logger {
     }
 
     private formatMessage(level: LogLevel, message: any[]) {
-        const hour = new Date().toLocaleTimeString("en-EN", { hour12: false });
-
+        const date = new Date()
         const formatedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
-        this.loggingText.push(`[${formatedDate} ${hour}] [${level}] ${message.map((v) => this.convertMessageToString(v)).join(" ")}\n`)
+        this.loggingText.push(`[${formatedDate} ${date.toLocaleTimeString("en-EN", { hour12: false })}] [${level}] ${message.map((v) => this.convertMessageToString(v)).join(" ")}\n`)
 
         return message;
     }
