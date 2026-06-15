@@ -128,6 +128,10 @@ function App() {
     /* IFDEF WEB */
     /* ENDIF */
 
+    import.meta.glob("./WebComponents/*.ts", {
+      eager: true,
+    })
+
     try {
       const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
       const time = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])

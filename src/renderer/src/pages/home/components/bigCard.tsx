@@ -3,7 +3,7 @@ import { cardData, indentityPlayer } from '@renderer/utils/types';
 import "./css/bigcard.css"
 import Button from '@renderer/components/buttons';
 import { useNavigate } from '@solidjs/router';
-import { Component, createSignal, For, Show } from 'solid-js';
+import { Component, For, Show } from 'solid-js';
 import { useI18n } from '@renderer/utils/i18n';
 import { getPlayerPLugin, pluginManager } from '@renderer/utils/stores/plugins';
 import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
@@ -18,9 +18,6 @@ type bigCardProps = { data: cardData, ref?: any }
 const BigCard: Component<bigCardProps> = ({ data, ref }) => {
     const { t } = useI18n()
     const navigate = useNavigate();
-
-    const [isImageLoading, setLoadingImage] = createSignal<boolean>(true)
-    const [isImageError, setErrorImage] = createSignal<boolean>(false)
 
     function formatEpisode(): string {
         if (!data.AnimeData.nextAiringEpisode) return ""
@@ -108,17 +105,11 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
             <div class={`big-card-background ${!data.AnimeData.bannerImage ? "big-card-blur" : ""}`}>
                 <div class="big-card-information">
                     <div class="big-card-information-image-container">
-                        <img src={data.AnimeData.coverImage} onload={() => setLoadingImage(false)} onerror={() => setErrorImage(true)} class={`card-image big-card-information-image ${isImageLoading() ? "hidden" : ""}`} />
-                        <Show when={isImageLoading() || isImageError()}>
-                            <div class='big-card-image-placehorder-container'>
-                                <Show when={isImageLoading()}>
-                                    <span class='material-symbols-outlined loading-animation'>progress_activity</span>
-                                </Show>
-                                <Show when={isImageError()}>
-                                    <span class='material-symbols-outlined'>error</span>
-                                </Show>
-                            </div>
-                        </Show>
+                        <sheep-img 
+                            src={data.AnimeData.coverImage} 
+                            class="card-image big-card-information-image"
+                            divClass='big-card-image-placehorder-container'
+                        />
                         <Show when={data.AnimeData.averageScore}>
                             <div class="big-card-information-score" style={{ border: `3px solid ${getGradientColor(data.AnimeData.averageScore)}` }}>
                                 {data.AnimeData.averageScore}%

@@ -44,7 +44,7 @@ export default function NotificationMenu() {
                                     }}
                                     onClick={notification["onClick"]}
                                 >
-                                    <img src={notification["icon"]} class="notification-img" />
+                                    <sheep-img src={notification["icon"]} class="notification-img" />
                                     <div class="notification-text-container">
                                         <span class="notification-title">{t(notification["title"])}</span>
                                         <span class="notification-description">{t(notification["description"])}</span>

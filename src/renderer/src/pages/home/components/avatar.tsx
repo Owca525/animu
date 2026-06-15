@@ -78,7 +78,7 @@ export default function Avatar() {
 
   return (
     <main class="avatar-container">
-      <img src={avatar()} class="avatar-main-icon" onerror={() => setAvatar(icon)}/>
+      <sheep-img src={avatar()} class="avatar-main-icon" onError={() => setAvatar(icon)}/>
       <div class="avatar-options-container">
         <For each={genereted()}>
           {(item) => <Switch>

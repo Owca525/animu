@@ -53,6 +53,8 @@
     align-items: center;
     border-radius: 50%;
     margin: -15px;
+
+    z-index: 12;
 }
 
 .big-card-information-genres-content {

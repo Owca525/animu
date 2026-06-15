@@ -48,7 +48,7 @@
     "@types/semver": "^7.7.1",
     "@types/video.js": "^7.3.58",
     "bufferutil": "^4.1.0",
-    "electron": "^42.2.0",
+    "electron": "^42.4.0",
     "electron-builder": "^26.8.1",
     "electron-vite": "^5.0.0",
     "eslint": "^10.0.3",

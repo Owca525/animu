@@ -1,4 +1,4 @@
-import { createSignal, Match, Show, Switch } from "solid-js";
+import { Match, Show, Switch } from "solid-js";
 import "./css/episodeBox.css";
 import { episodeMetadata, indentityPlayer } from "@renderer/utils/types";
 import { formatDate, formatTime, unixToDateTime } from "@renderer/utils/functions";
@@ -11,9 +11,6 @@ interface episodeBoxProps {
 }
 
 export default function EpisodeBox(props: episodeBoxProps) {
-    const [isErrorImage, setErrorImage] = createSignal<boolean>(false)
-    const [isLoadingImage, setIsLoadingImage] = createSignal<boolean>(true)
-
     const saveData = props.saveData;
     const epNum = parseInt(props.episode.ep);
     const savedEp = parseInt(saveData?.episode ?? "0");
@@ -42,32 +39,11 @@ export default function EpisodeBox(props: episodeBoxProps) {
                     `}
                     onclick={props.enterPlayer}
                     >
-                    <img src={props["episode"]["img"] ? props["episode"]["img"] : ""} class={`information-episode-box-image ${isLoadingImage() == false && isErrorImage() == false ? "show" : ""}`}
-                        onload={() => setIsLoadingImage(false)}
-                        onerror={() => {
-                            setErrorImage(true)
-                            setIsLoadingImage(false)
-                        }}
+                    <sheep-img 
+                        src={props["episode"]["img"] ? props["episode"]["img"] : ""} 
+                        class={`information-episode-box-image show`}
+                        divClass="information-episode-box-image-placeholder"
                     />
-                    <Switch>
-                        <Match when={isErrorImage() == false && isLoadingImage()}>
-                            <></>
-                        </Match>
-                        <Match when={isErrorImage()}>
-                            <span class="information-episode-box-image-placeholder">
-                                <span class="material-symbols-outlined icon">
-                                    broken_image
-                                </span>
-                            </span>
-                        </Match>
-                        <Match when={isLoadingImage()}>
-                            <span class="information-episode-box-image-placeholder">
-                                <span class="material-symbols-outlined loading-animation icon">
-                                    progress_activity
-                                </span>
-                            </span>
-                        </Match>
-                    </Switch>
 
                     <Show when={props["episode"]["title"]}>
                         <span class="information-episode-box-title">{props["episode"]["title"]}</span>

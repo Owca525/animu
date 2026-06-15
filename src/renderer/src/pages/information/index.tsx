@@ -103,13 +103,6 @@ function information() {
     const [currentMedia, setCurrentAnimeMedia] = createSignal<MiniPlayerProps[] | undefined>(undefined)
     const [currentAudio, setCurrentAudio] = createSignal<animeOpeningsFormat[] | undefined>(undefined)
 
-    // Banner
-    const [isBannerLoading, setBannerLoadingData] = createSignal<boolean>(true)
-    const [isBannerError, setBannerIsError] = createSignal<boolean>(false)
-    // Cover
-    const [isCoverLoading, setCoverIsLoading] = createSignal<boolean>(true)
-    const [isCoverError, setCoverIsError] = createSignal<boolean>(false)
-
     // Content Managment
     const [isContentLoading, setContentLoading] = createSignal<boolean>(true)
     const [isContentError, setContentError] = createSignal<boolean>(false)
@@ -374,11 +367,6 @@ function information() {
         // Reseting Recomendation
         setTmpData((prev) => ({ ...prev, anime: { ...prev.anime, recommendations: undefined } }))
 
-        setBannerIsError(false)
-        setBannerLoadingData(true)
-        setCoverIsLoading(true)
-        setCoverIsError(false)
-
         SetactivePage("Episodes")
         setAnimeMedia([])
         setCurrentAnimeMedia(undefined)
@@ -439,6 +427,7 @@ function information() {
     /* IFDEF DEBUG|PROD */
     async function getAnimeTrailer(url: string, noContentLoading = false) {
         let storyBoard: string | undefined
+        storyBoard = undefined
         
         try {
             if (config["information"]["trailerplayertype"] == "embed") return
@@ -655,18 +644,11 @@ function information() {
         <>
             <main class="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(contextMenu()), event)}>
                 <div class="information-banner">
-                    <img class={tempData().anime.bannerImage ? "information-banner-image" : "information-banner-image-blur"}
-                        onError={() => setBannerIsError(() => true)}
-                        onLoad={() => setBannerLoadingData(() => false)}
+                    <sheep-img 
+                        class={tempData().anime.bannerImage ? "information-banner-image" : "information-banner-image-blur"}
                         src={tempData().anime.bannerImage ? tempData().anime.bannerImage : tempData().anime.coverImage ? tempData().anime.coverImage : ""}
-                        style={isBannerLoading() ? { display: "none" } : isBannerError() ? { display: "none" } : { animation: "fadeIn 0.3s forwards" }}
+                        divClass='information-banner-image-placeholder'
                     />
-                    <Show when={isBannerLoading() && isBannerError() == false}>
-                        <div class="information-banner-image-placeholder"><span class="material-symbols-outlined home-loading-animation icon">progress_activity</span></div>
-                    </Show>
-                    <Show when={isBannerError() && isBannerLoading() == false}>
-                        <div class="information-banner-image-placeholder"><span class="material-symbols-outlined">error</span></div>
-                    </Show>
                     <div class="information-fade"></div>
                 </div>
 
@@ -676,13 +658,12 @@ function information() {
                     <div class="information-top">
                         <div class="information-image-container">
                             {tempData().anime.averageScore && <div class="information-score" style={{ border: `3px solid ${getGradientColor(tempData().anime.averageScore)}` }}>{tempData().anime.averageScore}%</div>}
-                            <img class="information-cover" onClick={() => setShowImages(true)} onError={() => setCoverIsError(() => true)} onLoad={() => setCoverIsLoading(() => false)} src={tempData().anime.coverImage ? tempData().anime.coverImage : ""} style={isCoverLoading() ? { display: "none" } : isCoverError() ? { display: "none" } : { animation: "fadeIn 0.3s forwards" }}></img>
-                            <Show when={isCoverLoading() && isCoverError() == false}>
-                                <div class="information-cover-placeholder"><span class="material-symbols-outlined home-loading-animation icon">progress_activity</span></div>
-                            </Show>
-                            <Show when={isCoverError() && isCoverLoading() == false}>
-                                <div class="information-cover-placeholder"><span class="material-symbols-outlined">error</span></div>
-                            </Show>
+                            <sheep-img 
+                                class="information-cover" 
+                                divClass='information-cover-placeholder'
+                                onClick={() => setShowImages(true)} 
+                                src={tempData().anime.coverImage ? tempData().anime.coverImage : ""}
+                            />
 
                             {/* <div class="information-title-small-container">
                                 <div class={`information-title-small ${moreMiniTitle() == false ? "click" : ""}`} onclick={() => setmoreMiniTitle(true)}>{createMiniTitle()}</div>

@@ -1,6 +1,6 @@
 import { useI18n } from "@renderer/utils/i18n"
 import "./css/relationCard.css"
-import { createSignal, Match, Show, Switch } from "solid-js"
+import { Show } from "solid-js"
 import { detectTitleConfig } from "@renderer/utils/functions"
 
 export type characterCardsProps = {
@@ -16,34 +16,13 @@ export type characterCardsProps = {
 // Inspiration Anilist relation cards
 export default function RelationCard(props: characterCardsProps) {
     const { t, pathExist } = useI18n()
-    const [isLoadingImage, setLoadingImage] = createSignal(true);
-    const [isImageError, setImageError] = createSignal(false);
-
-    function checkState() {
-        if (isLoadingImage()) return { display: "none" };
-        if (isImageError()) return { display: "none" };
-        return { animation: "fadeIn 0.3s forwards" };
-    }
 
     return (
         <main class="relation-card-container" onClick={props.onClick}>
-            <Switch>
-                <Match when={isLoadingImage()}>
-                    <div class="relation-card-image-placeholder">
-                        <span class="material-symbols-outlined loading-animation icon">progress_activity</span>
-                    </div>
-                </Match>
-                <Match when={isImageError()}>
-                    <div class="relation-card-image-placeholder">
-                        <span class="material-symbols-outlined icon">error</span>
-                    </div>
-                </Match>
-            </Switch>
-            <img class="relation-card-cover" 
+            <sheep-img 
+                class="relation-card-cover" 
                 src={props.coverImage} 
-                style={checkState()}
-                onLoad={() => setLoadingImage(false)}
-                onError={() => setImageError(true)}
+                divClass="relation-card-image-placeholder"
             />
             <div class="relation-card-content">
                 <div class="relation-card-content-top">

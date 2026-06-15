@@ -1562,7 +1562,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 classList={{ click: screenShot().click != "" }}
                 onclick={() => screenShot().click != "" ? openUrlFolder(screenShot().click) : ""}
             >
-                <img src={screenShot().image} class="player-screenshot-image" />
+                <sheep-img src={screenShot().image} class="player-screenshot-image" />
                 <span class="player-screenshot-text">
                     {t("player.toastscreenshot.done")}
                 </span>
@@ -1598,7 +1598,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             </Show>
             <Show when={config.Player.upToNextEpisode.variants == "var1"}>
                 <div class={`player-up-Next-container ${isUpNextEpisode() ? "show" : "hidden"}`} onClick={() => setEpisode("next")}>
-                    <img src={getCurrentImage()} class="player-up-Next-image" />
+                    <sheep-img src={getCurrentImage()} class="player-up-Next-image" />
                     <span class="material-symbols-outlined player-up-Next-icon">skip_next</span>
                     <div class="player-up-Next-content">
                         <div class="player-up-Next-title">{detectTitleConfig(anime_data.AnimeData.title)}</div>
@@ -1650,7 +1650,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 <div class={`player-more-information-background ${isShowingMoreInformation() ? "show" : "hidden"}`}>
                     <div class="player-more-information-container">
                         <span class="player-more-information-top-text">{t("Current Watching")}</span>
-                        <img src={anime_data.AnimeData.coverImage} class="player-more-information-image" />
+                        <sheep-img src={anime_data.AnimeData.coverImage} class="player-more-information-image" />
                         <span class="player-more-information-title">{detectTitleConfig(anime_data.AnimeData.title)}</span>
                         <div class="player-more-information-format-container">
                             <Show when={anime_data.AnimeData.season || anime_data.AnimeData.seasonYear}>

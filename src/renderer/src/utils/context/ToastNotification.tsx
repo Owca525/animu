@@ -113,7 +113,7 @@ export function ToastProvider(props: { children: JSX.Element }) {
                                         <span class="toast-notification-content">
                                             {toast.added?.description}
                                             <Show when={toast.added?.icon}>
-                                                <img src={toast.added?.icon} class="toast-notification-icon" />
+                                                <sheep-img src={toast.added?.icon} class="toast-notification-icon" />
                                             </Show>
                                         </span>
                                     </Match>

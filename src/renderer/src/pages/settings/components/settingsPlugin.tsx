@@ -32,7 +32,7 @@ export default function SettingsPlugin(props: SettingsPluginProps) {
             }>
             <div class="settings-extension-top">
                 <div class="settings-extension-top-left">
-                    <img src={props.plugin.metadata.icon ? props.plugin.metadata.icon : icon} class='settings-extension-image' />
+                    <sheep-img src={props.plugin.metadata.icon ? props.plugin.metadata.icon : icon} class='settings-extension-image' />
                     <div class="settings-extension-text">
                         <span class='settings-extension-name'>{props.plugin.metadata.name}</span>
                         <span class='settings-extension-author'>{props.plugin.metadata.author}</span>

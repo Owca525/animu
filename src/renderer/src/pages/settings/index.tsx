@@ -1598,7 +1598,7 @@ function settings() {
                                         {(item) => (
                                             <div class='setttings-plugin-store-container'>
                                                 <div class='settings-plugin-store-image-container'>
-                                                    <img src={item.icon ? item.icon : icon} class='setttings-plugin-store-image' />
+                                                    <sheep-img src={item.icon ? item.icon : icon} class='setttings-plugin-store-image' />
                                                     <span class='setttings-plugin-store-name'>{item.name}</span>
                                                 </div>
                                                 <span class='setttings-plugin-store-author'>{item.author}</span>
@@ -1665,9 +1665,9 @@ function settings() {
                     <div class="settings-page-container">
                         <div class="settings-page-title">{t("settings.general.links")}</div>
                         <div class="settings-special-container">
-                            <img class="settings-special-images" onClick={() => openUrlFolder("https://github.com/Owca525/animu")} src="https://github.com/fluidicon.png" alt="Github Logo" />
-                            <img class="settings-special-images" onClick={discord_server} src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg" alt="Discord Logo" />
-                            <img class="settings-special-images" onClick={() => openUrlFolder("https://buymeacoffee.com/owca525")} src="https://studio.buymeacoffee.com/assets/img/bmc-meta-new/new/android-icon-192x192.png" alt="Buymeacoffee logo" />
+                            <sheep-img class="settings-special-images" onClick={() => openUrlFolder("https://github.com/Owca525/animu")} src="https://github.com/fluidicon.png" alt="Github Logo" />
+                            <sheep-img class="settings-special-images" onClick={discord_server} src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg" alt="Discord Logo" />
+                            <sheep-img class="settings-special-images" onClick={() => openUrlFolder("https://buymeacoffee.com/owca525")} src="https://studio.buymeacoffee.com/assets/img/bmc-meta-new/new/android-icon-192x192.png" alt="Buymeacoffee logo" />
                         </div>
                     </div>
                     <div class="settings-page-container">

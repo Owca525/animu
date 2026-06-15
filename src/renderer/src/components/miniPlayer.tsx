@@ -1122,7 +1122,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
                 classList={{ click: screenShot().click != "" }}
                 onclick={() => screenShot().click != "" ? openUrlFolder(screenShot().click) : ""}
             >
-                <img src={screenShot().image} class="player-screenshot-image" />
+                <sheep-img src={screenShot().image} class="player-screenshot-image" />
                 <span class="player-screenshot-text">
                     {t("player.toastscreenshot.done")}
                 </span>

@@ -1,7 +1,7 @@
 import { animulistProps, cardData, ContextMenuProps } from "@renderer/utils/types";
 import "./css/card.css";
 import { useNavigate } from "@solidjs/router";
-import { JSX, Match, Show, Switch, createSignal, onMount, onCleanup } from "solid-js";
+import { JSX, Show, createSignal, onMount, onCleanup } from "solid-js";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import {
   convertSeconds,
@@ -31,10 +31,7 @@ function Card(props: CardProps) {
   const { t, pathExist } = useI18n()
 
   const navigate = useNavigate();
-  const [isLoading, setLoading] = createSignal(true);
-  const [isError, setIsError] = createSignal(false);
   const [isOut, setIsOut] = createSignal(false);
-  const [isCardVisible, setCardVisible] = createSignal(false);
   const [animulistCard, setAnimulistCard] = createSignal<animulistProps | undefined>(props.card.animulist)
   let cardRef: HTMLDivElement | undefined;
 
@@ -42,7 +39,6 @@ function Card(props: CardProps) {
     (entries) => {
       entries.forEach((entry) => {
         entry.target.classList.toggle("show", entry.isIntersecting)
-        setCardVisible(entry.isIntersecting)
         if (entry.isIntersecting) observer.unobserve(entry.target)
       });
     },
@@ -133,12 +129,6 @@ function Card(props: CardProps) {
       if (await DeleteFromHistory(props.card)) toast(t("history.historysaved"), { type: "success" })
       else toast(t("history.historyfailed"), { type: "error" })
     }
-  }
-
-  function checkState() {
-    if (isLoading()) return { display: "none" };
-    if (isError()) return { display: "none" };
-    return { animation: "fadeIn 0.3s forwards" };
   }
 
   let CenterContextMenu: ContextMenuProps = [
@@ -308,33 +298,14 @@ function Card(props: CardProps) {
       </Show>
       <Show when={props.card.saveData}>
         <span class="card-episode-mark">
-        Ep {props.card.saveData!["episode"]}
+          Ep {props.card.saveData!["episode"]}
         </span>
       </Show>
-      <Show when={props.card.AnimeData.coverImage && isCardVisible()}>
-        <img
-          src={props.card.AnimeData.coverImage}
-          class="card-image"
-          onLoad={() => setLoading(false)}
-          onError={() => {
-            setIsError(true);
-            setLoading(false)
-          }}
-          style={checkState()}
-        />
-      </Show>
-      <Switch>
-        <Match when={isLoading()}>
-          <div class="card-image-placeholder">
-            <span class="material-symbols-outlined loading-animation icon">progress_activity</span>
-          </div>
-        </Match>
-        <Match when={isError()}>
-          <div class="card-image-placeholder">
-            <span class="material-symbols-outlined icon">broken_image</span>
-          </div>
-        </Match>
-      </Switch>
+      <sheep-img
+        src={props.card.AnimeData.coverImage}
+        class="card-image"
+        divClass="card-image-placeholder"
+      />
       <Show when={props.card.saveData && props.card.saveData["last_Time"] > 0 && (props.card.saveData["duration"] || props.card.AnimeData.duration)}>
         <div class="card-episode-seekbar-container">
           <span style={{
