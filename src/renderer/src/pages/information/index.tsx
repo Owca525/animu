@@ -36,7 +36,7 @@ import {
 import { animulistData, getGlobalCache } from '@renderer/utils/stores/global';
 import { getInformationPlugin, getPlayerPLugin, pluginManager } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
-import { unwrap } from 'solid-js/store';
+import { createStore, unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './information.css';
 import ImageViewer from '@renderer/components/imageViewer';
@@ -84,6 +84,18 @@ function information() {
     /* IFDEF DEBUG */
     (window as any).getInformationData = () => unwrap(tempData())
     /* ENDIF */
+
+    const [variable, setVariable] = createStore({
+        Axdasd: "asjldnas",
+        SEX: "AS;KDNASD"
+    })
+
+    createEffect(() => {
+        console.log(variable)
+    })
+    SheepShortcut(["F1"],() => {
+        setVariable({ Axdasd: "" })
+    })
 
     const [showWrong, setshowWrong] = createSignal<boolean>(false)
     const [isNeedMore, setNeedMore] = createSignal<boolean>(false)

@@ -1,7 +1,6 @@
 import Home from './pages/home/index';
 import icon from '@resources/icon.png';
 import Information from './pages/information/index';
-import LocalErrorBoundary from './utils/ErrorBoundary';
 import Player from './pages/player/index';
 import Settings from './pages/settings/index';
 import {
@@ -21,7 +20,6 @@ import { convertHistoryToAnimuList } from './utils/FilesManager/animulist';
 import { CreateBackup } from './utils/backup';
 import {
   createSignal,
-  ErrorBoundary,
   Match,
   onMount,
   Suspense,
@@ -272,16 +270,14 @@ function App() {
         </main>
       </Match>
       <Match when={!isInitation()}>
-        <ErrorBoundary fallback={LocalErrorBoundary}>
-          <HashRouter>
-            <Suspense >
-              <Route path="/" component={Home} />
-              <Route path="/info" component={Information} />
-              <Route path="/settings" component={Settings} />
-              <Route path="/player" component={Player} />
-            </Suspense>
-          </HashRouter>
-        </ErrorBoundary>
+        <HashRouter>
+          <Suspense >
+            <Route path="/" component={Home} />
+            <Route path="/info" component={Information} />
+            <Route path="/settings" component={Settings} />
+            <Route path="/player" component={Player} />
+          </Suspense>
+        </HashRouter>
       </Match>
     </Switch>
   )
