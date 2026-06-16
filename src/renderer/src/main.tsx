@@ -30,25 +30,23 @@ import LocalErrorBoundary from './utils/ErrorBoundary';
 // };
 // /* ENDIF */
 
-if (window.BrowserWindow) {
-  render(
-    () => (
-      <ErrorBoundary fallback={LocalErrorBoundary}>
-        <I18nProvider config={{ defaultLang: "en", fallbackLang: "en" }}>
-          <MenuContextProvider>
-            <SocketProvider>
-              <DialogProvider>
-                <ContextMenu>
-                  <ToastProvider>
-                    <App />
-                  </ToastProvider>
-                </ContextMenu>
-              </DialogProvider>
-            </SocketProvider>
-          </MenuContextProvider>
-        </I18nProvider>
-      </ErrorBoundary>
-    ),
-    document.getElementById("root") as HTMLElement
-  );
-}
+render(
+  () => (
+    <ErrorBoundary fallback={LocalErrorBoundary}>
+      <I18nProvider config={{ defaultLang: "en", fallbackLang: "en" }}>
+        <MenuContextProvider>
+          <SocketProvider>
+            <DialogProvider>
+              <ContextMenu>
+                <ToastProvider>
+                  <App />
+                </ToastProvider>
+              </ContextMenu>
+            </DialogProvider>
+          </SocketProvider>
+        </MenuContextProvider>
+      </I18nProvider>
+    </ErrorBoundary>
+  ),
+  document.getElementById("root") as HTMLElement
+);
