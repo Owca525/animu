@@ -1,86 +1,128 @@
 class SheepImage extends HTMLElement {
-    divClass: string | undefined = undefined
-    imgClass: string | undefined = undefined
-    src: string | undefined = undefined
-    onClick: ((ev: PointerEvent) => void) | undefined
-    onLoad: ((ev: Event) => void) | undefined
-    onError: ((ev: string | Event) => void) | undefined
-    ImgAlt: string | undefined = undefined
+    img_divClass: string | null = null
+    img_class: string | null = null
+    img_src: string | null = null
+    img_onClick: ((ev: PointerEvent) => void) | null = null
+    img_onLoad: ((ev: Event) => void) | null = null
+    img_onError: ((ev: string | Event) => void) | null = null
+    img_alt: string | null = null
+
+    ImageRef: HTMLImageElement | null = null
+    SpanRef: HTMLSpanElement | null = null
 
     loadingImg = true
     errorImg = false
 
-    constructor() {
-        super();
-
-        this.divClass = this.getAttribute("divClass") ?? ""
-        this.imgClass = this.getAttribute("class") ?? ""
-        this.src = this.getAttribute("src") ?? ""
-        this.ImgAlt = this.getAttribute("alt") ?? ""
-        this.onClick = this.getAttribute("onClick") as any ?? undefined
-        this.onLoad = this.getAttribute("onLoad") as any ?? undefined
-        this.onError = this.getAttribute("onError") as any ?? undefined
+    set src(v) {
+        this.img_src = v
+        this.render()
+    }
+    set class(_) {
+        this.render()
+    }
+    set divClass(_) {
+        this.render()
+    }
+    set onClick(v) {
+        this.img_onClick = v
+        this.render()
+    }
+    set onLoad(v) {
+        this.img_onLoad = v
+        this.render()
+    }
+    set alt(v) {
+        this.img_alt = v
+        this.render()
+    }
+    set onError(v) {
+        this.img_onError = v
+        this.render()
     }
 
-    connectedCallback() {
-        const tmpClass = this.getAttribute("class")
-        if (tmpClass != undefined && tmpClass != this.imgClass) {
-            this.imgClass = tmpClass
+    constructor() {
+        super();
+    }
+
+    render() {
+        let img_class = this.getAttribute("class")
+        let img_divClass = this.getAttribute("divClass")
+
+        if (img_class != img_divClass) {
+            this.img_divClass = img_divClass
+            this.img_class = img_class
         }
 
-        if (!this.divClass) {
+        if (!this.img_divClass) {
             this.style.width = "max-content"
             this.style.height = "max-content"
             this.style.display = "flex"
             this.style.justifyContent = "center"
             this.style.alignItems = "center"
         } else {
-            this.className = this.divClass
+            this.className = this.img_divClass
         }
 
-        const span = document.createElement("span")
-        span.className = `material-symbols-outlined loading-animation icon`
-        span.innerHTML = "progress_activity"
+        if (this.img_class && this.ImageRef) this.ImageRef.className = this.img_class
+        if (this.img_alt && this.ImageRef) this.ImageRef.alt = this.img_alt
+        if (this.img_onClick && this.ImageRef) this.ImageRef.onclick = this.img_onClick
 
-        this.appendChild(span)
+        if (this.ImageRef && this.ImageRef.src == this.img_src) return
 
-        const img = document.createElement("img")
-        img.style.display = "none"
-        if (this.imgClass) img.className = this.imgClass
-        if (this.src) img.src = this.src
-        if (this.ImgAlt) img.alt = this.ImgAlt
-        if (this.onClick) img.onclick = this.onClick
-        img.onload = (ev) => {
+        if (this.ImageRef && this.ImageRef.src != this.img_src) {
+            this.loadingImg = true
+            this.errorImg = false
+        }
+
+        if (this.loadingImg && !this.SpanRef) {
+            this.SpanRef = document.createElement("span")
+            this.SpanRef.className = `material-symbols-outlined loading-animation icon`
+            this.SpanRef.innerHTML = "progress_activity"
+
+            this.appendChild(this.SpanRef)
+        }
+
+        if (!this.ImageRef) {
+            this.ImageRef = document.createElement("img")
+            this.appendChild(this.ImageRef)
+        }
+
+        this.ImageRef.style.display = "none"
+        if (this.img_src) this.ImageRef.src = this.img_src
+        
+        this.ImageRef.onload = (ev) => {
             this.loadingImg = false
-            img.style.display = ""
 
-            img.style.animation = "fadeIn 0.3s forwards"
+            if (this.ImageRef) {
+                this.ImageRef.style.display = ""
+                this.ImageRef.style.animation = "fadeIn 0.3s forwards"
+            }
 
-            span.remove()
-            if (this.onLoad) this.onLoad(ev)
+            if (this.SpanRef) this.SpanRef.remove()
+            if (this.img_onLoad) this.img_onLoad(ev)
         }
-        img.onerror = (ev) => {
+        this.ImageRef.onerror = (ev) => {
             this.loadingImg = false
             this.errorImg = true
-            span.classList.remove("loading-animation")
-            span.innerHTML = "broken_image"
 
-            img.remove()
-            if (this.onError) this.onError(ev)
+            if (this.SpanRef) {
+                this.SpanRef.classList.remove("loading-animation")
+                this.SpanRef.innerHTML = "broken_image"
+            }
+
+            if (this.ImageRef) this.ImageRef.remove()
+            if (this.img_onError) this.img_onError(ev)
         }
-
-        this.appendChild(span)
-        this.appendChild(img)
     }
 
-    disconnectedCallback() {
-        this.innerHTML = ""
-        this.remove()
+    connectedCallback() {
+        this.render()
     }
 
-    attributeChangedCallback(name, oldValue, newValue) {
-        console.debug(name, oldValue, newValue)
-    }
+    // disconnectedCallback() {
+    //     console.log("Has Been Removed", this)
+    //     this.remove()
+    // }
 }
 
 customElements.define("sheep-img", SheepImage);
