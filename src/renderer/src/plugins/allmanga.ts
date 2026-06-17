@@ -228,6 +228,7 @@ async function fetchUrls(params: AllmangaURLformat): Promise<resolutionFormat[]>
     }
 
     if (params["sourceName"] == "Uni") {
+        console.log(urlObject)
         const response = await request(`${urlObject["origin"]}/api/v1/video?id=${urlObject["hash"].replace("#", "")}&w=1920&h=1080&r=`, {
             headers: {
                 ...header,
@@ -249,9 +250,10 @@ async function fetchUrls(params: AllmangaURLformat): Promise<resolutionFormat[]>
         if (!code) return []
 
         try {
+            const url = code["hlsVideoTiktok"] ? `${urlObject["origin"]}${code["hlsVideoTiktok"]}` : code["cf"]
             return [{
                 res: "hls",
-                url: `${urlObject["origin"]}${code["hlsVideoTiktok"]}`,
+                url: url,
                 reqHeader: header,
                 hls: hasUrl(code).includes("hls")
             }]
@@ -276,7 +278,7 @@ async function detectURL(params: AllmangaURLformat): Promise<resolutionFormat[]>
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "2.2",
+        version: "2.3",
         name: "Allmanga",
         author: "Owca525",
         icon: `${WEBSITE}android-icon-192x192.png`,
