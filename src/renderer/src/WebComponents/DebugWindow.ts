@@ -132,11 +132,17 @@ const css = `
     color: white;
     box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     z-index: 99999;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 .sheep-debug-content {
     display: flex;
     flex-direction: column;
     padding: 4px;
+    overflow: auto;
+    height: 100%;
+    box-sizing: border-box;
+    padding-bottom: 40px;
 }
 
 .sheep-debug-titlebar {
@@ -187,6 +193,94 @@ const css = `
 .sheep-debug-button:hover {
     background-color: #434343;
 }
+.sheep-debug-details {
+    margin-left: 10px;
+    padding-left: 10px;
+}
+
+.sheep-debug-summary {
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+
+    padding: 3px 6px;
+
+    color: #EBEBEB;
+    font-family: Consolas, monospace;
+    font-size: 0.8em;
+
+    transition: background 0.15s;
+}
+
+.sheep-debug-summary:hover {
+    background: #434343;
+}
+
+.sheep-debug-summary::-webkit-details-marker {
+    display: none;
+}
+
+.sheep-debug-summary::before {
+    content: "▶";
+    display: inline-block;
+    width: 14px;
+    margin-right: 4px;
+
+    color: #A0A0A0;
+
+    transition: transform 0.15s;
+}
+
+.sheep-debug-details[open] > .sheep-debug-summary::before {
+    transform: rotate(90deg);
+}
+
+.sheep-debug-p {
+    margin: 2px 0 2px 10px;
+    padding: 2px 6px;
+
+    color: #A0A0A0;
+
+    font-family: Consolas, monospace;
+    font-size: 0.8em;
+    line-height: 1.4;
+}
+.sheep-debug-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    font-family: Consolas, monospace;
+    width: max-content;
+}
+
+.sheep-debug-checkbox .sheep-debug-input {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 1px solid #303030;
+    background: #2D2D2D;
+    display: grid;
+    place-content: center;
+    transition: 0.15s;
+}
+
+.sheep-debug-checkbox .sheep-debug-input:hover {
+    border-color: #434343;
+}
+
+.sheep-debug-checkbox .sheep-debug-input:checked {
+    background: #313332;
+    border-color: #549E72;
+}
+
+.sheep-debug-checkbox .sheep-debug-input:checked::before {
+    content: "✓";
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
 `;
 
 const style = createElement('style', {
@@ -212,27 +306,134 @@ class SheepWindowManager {
         this.ContentRef = element.querySelector(".sheep-debug-content")
     }
 
-    Text(str: string) {
+    Text(label: string) {
         if (!this.ContentRef) return
 
         const textElement = createElement("span", {
-            innerHTML: str,
+            innerHTML: label,
             className: "sheep-debug-span"
         })
 
         this.ContentRef.appendChild(textElement)
     }
 
-    Button(str: string, onClick?: (ev: PointerEvent) => void) {
+    Button(label: string, onClick?: (ev: PointerEvent) => void) {
         if (!this.ContentRef) return
 
         const buttonElement = createElement("button", {
-            innerHTML: str,
+            innerHTML: label,
             className: "sheep-debug-button",
             onclick: onClick
         })
 
         this.ContentRef.appendChild(buttonElement)
+    }
+
+    ObjectTree(object: { [key: string]: any }) {
+        if (!this.ContentRef) return
+
+        const divElement = this.ContentRef
+
+        function createEntry(key: string, value: any, parent: HTMLElement) {
+            if (value !== null && typeof value === "object") {
+                const isMap = value instanceof Map
+                const isArray = Array.isArray(value)
+
+                let title = key
+
+                if (isMap) title += " (Map)"
+                if (isArray) title += `: ${value.length}`
+
+                const detailsElement = createElement("details", {
+                    className: "sheep-debug-details",
+                })
+
+                const summaryElement = createElement("summary", {
+                    className: "sheep-debug-summary",
+                    innerHTML: title,
+                })
+
+                detailsElement.appendChild(summaryElement)
+                parent.appendChild(detailsElement)
+
+                if (isMap) {
+                    value.forEach((v: any, k: any) => {
+                        createEntry(String(k), v, detailsElement)
+                    })
+                } else {
+                    Object.entries(value).forEach(([k, v]) => {
+                        createEntry(k, v, detailsElement)
+                    })
+                }
+
+                return
+            }
+
+            const textElement = createElement("p", {
+                className: "sheep-debug-p"
+            })
+
+            if (typeof value === "function") {
+                textElement.innerHTML = `${key}: "${value}"`
+            } else {
+                try {
+                    textElement.innerHTML = `${key}: ${JSON.stringify(value)}`
+                } catch {
+                    textElement.innerHTML = `${key}: [unsupported]`
+                }
+            }
+
+            parent.appendChild(textElement)
+        }
+
+        function setEntriesObject(object: Record<string, any>) {
+            Object.entries(object).forEach(([key, value]) => {
+                createEntry(key, value, divElement)
+            })
+        }
+
+        setEntriesObject(object)
+
+        this.ContentRef.appendChild(divElement)
+    }
+
+    CheckBox(label: string, onCheck?: (val: boolean) => void) {
+        if (!this.ContentRef) return
+
+        const labelElement = createElement("label", {
+            className: "sheep-debug-checkbox"
+        })
+
+        const checkbox = createElement("input", {
+            type: "checkbox",
+            className: "sheep-debug-input"
+        })
+
+        const text = createElement("span", {
+            innerHTML: label
+        })
+
+        labelElement.append(checkbox, text)
+
+        this.ContentRef.appendChild(labelElement)
+
+        if (onCheck) {
+            checkbox.onchange = () => {
+                onCheck(checkbox.checked)
+            }
+        }
+    }
+
+    Input() {
+
+    }
+
+    ButtonGroup() {
+
+    }
+
+    Slider() {
+        
     }
 
     Destroy() {
