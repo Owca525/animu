@@ -20,6 +20,7 @@ class DebugSheep extends HTMLElement {
         super();
 
         this.titleWindow = this.getAttribute("titlewindow") ?? "Window"
+        this.defaultSize = this.getAttribute("defaultsize") as any ?? { w: 300, h: 200 }
     }
 
     onMouseDownResize = (e: MouseEvent) => {
@@ -103,9 +104,7 @@ class DebugSheep extends HTMLElement {
             onmousedown: this.onMouseDownResize
         })
 
-        this.appendChild(titlebar)
-        this.appendChild(resizer)
-        this.appendChild(content)
+        this.append(titlebar, resizer, content)
     }
 
     disconnectedCallback() {
@@ -255,31 +254,89 @@ const css = `
     width: max-content;
 }
 
-.sheep-debug-checkbox .sheep-debug-input {
+.sheep-debug-checkbox .sheep-debug-input-checkbox {
     appearance: none;
     width: 20px;
     height: 20px;
     border: 1px solid #303030;
-    background: #2D2D2D;
+    background-color: #2D2D2D;
     display: grid;
     place-content: center;
     transition: 0.15s;
 }
 
-.sheep-debug-checkbox .sheep-debug-input:hover {
+.sheep-debug-checkbox .sheep-debug-input-checkbox:hover {
     border-color: #434343;
 }
 
-.sheep-debug-checkbox .sheep-debug-input:checked {
-    background: #313332;
+.sheep-debug-checkbox .sheep-debug-input-checkbox:checked {
+    background-color: #313332;
     border-color: #549E72;
 }
 
-.sheep-debug-checkbox .sheep-debug-input:checked::before {
+.sheep-debug-checkbox .sheep-debug-input-checkbox:checked::before {
     content: "✓";
     color: white;
     font-size: 12px;
     font-weight: bold;
+}
+.sheep-debug-input {
+    appearance: none;
+    outline: none;
+    padding: 4px;
+    width: auto;
+    background-color: #1F1F1F;
+    border: 2px solid #2D2D2D;
+}
+.sheep-debug-input:hover {
+    background-color: #30303;
+}
+.sheep-debug-slider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px;
+
+    font-family: Consolas, monospace;
+    font-size: 13px;
+}
+.sheep-debug-slider-input {
+    appearance: none;
+
+    width: 180px;
+    height: 6px;
+
+    background-color: #303030;
+    border-radius: 5px;
+
+    cursor: pointer;
+}
+.sheep-debug-slider-input::-webkit-slider-thumb {
+    appearance: none;
+
+    width: 14px;
+    height: 14px;
+    background-color: #549E72;
+    border-radius: 50%;
+    cursor: pointer;
+
+    transition: 0.15s;
+}
+.sheep-debug-slider-input::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+
+    background-color: #549E72;
+
+    border: none;
+    border-radius: 50%;
+
+    cursor: pointer;
+}
+.sheep-debug-horizontal-content {
+    display: flex;
+    flex-column: row;
+    gap: 4px;
 }
 `;
 
@@ -306,18 +363,19 @@ class SheepWindowManager {
         this.ContentRef = element.querySelector(".sheep-debug-content")
     }
 
-    Text(label: string) {
+    Text(label: string, horizontalCotext?: HTMLDivElement) {
         if (!this.ContentRef) return
 
         const textElement = createElement("span", {
             innerHTML: label,
             className: "sheep-debug-span"
         })
-
-        this.ContentRef.appendChild(textElement)
+        
+        if (horizontalCotext) horizontalCotext.append(textElement)
+        else this.ContentRef.appendChild(textElement)
     }
 
-    Button(label: string, onClick?: (ev: PointerEvent) => void) {
+    Button(label: string, onClick?: (ev: PointerEvent) => void, horizontalCotext?: HTMLDivElement) {
         if (!this.ContentRef) return
 
         const buttonElement = createElement("button", {
@@ -326,10 +384,11 @@ class SheepWindowManager {
             onclick: onClick
         })
 
-        this.ContentRef.appendChild(buttonElement)
+        if (horizontalCotext) horizontalCotext.append(buttonElement)
+        else this.ContentRef.appendChild(buttonElement)
     }
 
-    ObjectTree(object: { [key: string]: any }) {
+    ObjectTree(object: { [key: string]: any }, horizontalCotext?: HTMLDivElement) {
         if (!this.ContentRef) return
 
         const divElement = this.ContentRef
@@ -394,10 +453,11 @@ class SheepWindowManager {
 
         setEntriesObject(object)
 
-        this.ContentRef.appendChild(divElement)
+        if (horizontalCotext) horizontalCotext.append(divElement)
+        else this.ContentRef.appendChild(divElement)
     }
 
-    CheckBox(label: string, onCheck?: (val: boolean) => void) {
+    CheckBox(label: string, onCheck?: (val: boolean) => void, horizontalCotext?: HTMLDivElement) {
         if (!this.ContentRef) return
 
         const labelElement = createElement("label", {
@@ -406,7 +466,7 @@ class SheepWindowManager {
 
         const checkbox = createElement("input", {
             type: "checkbox",
-            className: "sheep-debug-input"
+            className: "sheep-debug-input-checkbox"
         })
 
         const text = createElement("span", {
@@ -415,7 +475,8 @@ class SheepWindowManager {
 
         labelElement.append(checkbox, text)
 
-        this.ContentRef.appendChild(labelElement)
+        if (horizontalCotext) horizontalCotext.append(labelElement)
+        else this.ContentRef.appendChild(labelElement)
 
         if (onCheck) {
             checkbox.onchange = () => {
@@ -424,16 +485,53 @@ class SheepWindowManager {
         }
     }
 
-    Input() {
+    Input(onKeyPress?: (str: string) => void, type: string = "input", horizontalCotext?: HTMLDivElement) {
+        if (!this.ContentRef) return
 
+        const inputElement = createElement("input", {
+            type: type,
+            className: "sheep-debug-input"
+        })
+
+        if (onKeyPress) {
+            inputElement.onkeydown = () => {
+                onKeyPress(inputElement.value)
+            }
+        }
+
+        if (horizontalCotext) horizontalCotext.append(inputElement)
+        else this.ContentRef.appendChild(inputElement)
     }
 
-    ButtonGroup() {
+    CreateHorizontalMenu() {
+        const divHorizontalElement = createElement("div", {
+            className: "sheep-debug-horizontal-content"
+        })
 
+        if (this.ContentRef) this.ContentRef.append(divHorizontalElement)
+
+        return divHorizontalElement
     }
 
-    Slider() {
-        
+    Slider(value: number, min: number = 0, max: number = 100, horizontalCotext?: HTMLDivElement) {
+        if (!this.ContentRef) return
+
+        const sliderContainerElement = createElement("div", {
+            className: "sheep-debug-slider"
+        })
+
+        const sliderElement = createElement("input", {
+            type: "range",
+            min: min,
+            max: max,
+            value: value,
+            className: "sheep-debug-slider-input"
+        })
+
+        sliderContainerElement.append(sliderElement)
+
+        if (horizontalCotext) horizontalCotext.append(sliderContainerElement)
+        else this.ContentRef.appendChild(sliderContainerElement)
     }
 
     Destroy() {
@@ -442,7 +540,7 @@ class SheepWindowManager {
 }
 
 class DebuggerSheep {
-    window_list: SheepWindowManager[] = []
+    private window_list: SheepWindowManager[] = []
 
     createWindow(options?: windowManagerConfig) {
         const new_window = new SheepWindowManager(options)
@@ -458,3 +556,4 @@ class DebuggerSheep {
 }
 
 (window as any).DebuggerSheep = new DebuggerSheep();
+export default DebuggerSheep
