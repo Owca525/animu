@@ -6,7 +6,8 @@ function createElement<K extends keyof HTMLElementTagNameMap>(tag: K, options: {
 
 class DebugSheep extends HTMLElement {
     defaultSize = { w: 300, h: 200 }
-    titleWindow = "Window"
+    titlewindow = "Window"
+    onexit: (() => void) | undefined | null
 
     positionResize = { x: 0, y: 0 };
     positionDrag = { x: 0, y: 0 }
@@ -19,7 +20,6 @@ class DebugSheep extends HTMLElement {
     constructor() {
         super();
 
-        this.titleWindow = this.getAttribute("titlewindow") ?? "Window"
         this.defaultSize = this.getAttribute("defaultsize") as any ?? { w: 300, h: 200 }
     }
 
@@ -91,9 +91,25 @@ class DebugSheep extends HTMLElement {
 
         const titlebar = createElement("div", {
             className: "sheep-debug-titlebar",
-            innerHTML: this.titleWindow,
             onmousedown: this.onMouseDown
         })
+
+        const titlebarName = createElement("p", {
+            innerHTML: this.titlewindow,
+            className: "sheep-debug-title",
+        })
+
+        titlebar.append(titlebarName)
+
+        if (this.onexit) {
+            const exitButton = createElement("span", {
+                className: "sheep-debug-exit-button",
+                onclick: this.onexit,
+                innerHTML: "x"
+            })
+
+            titlebar.append(exitButton)
+        }
 
         const content = createElement("div", {
             className: "sheep-debug-content",
@@ -110,10 +126,6 @@ class DebugSheep extends HTMLElement {
     disconnectedCallback() {
         window.removeEventListener("mousemove", this.onMouseMove);
         window.removeEventListener("mouseup", this.onMouseUp);
-    }
-
-    attributeChangedCallback(name, oldValue, newValue) {
-        console.debug(name, oldValue, newValue)
     }
 }
 
@@ -146,10 +158,13 @@ const css = `
 
 .sheep-debug-titlebar {
     background: #2D2D2D;
-    padding: 8px 12px;
+    // padding: 8px 12px;
     cursor: move;
     user-select: none;
     font-weight: bold;
+
+    display: flex;
+    align-items: center;
 }
 
 .sheep-debug-span {
@@ -252,6 +267,7 @@ const css = `
     user-select: none;
     font-family: Consolas, monospace;
     width: max-content;
+    cursor: pointer;
 }
 
 .sheep-debug-checkbox .sheep-debug-input-checkbox {
@@ -338,45 +354,136 @@ const css = `
     flex-column: row;
     gap: 4px;
 }
+.sheep-debug-textarea {
+    background-color: #1F1F1F;
+    height: 100% !important;
+    resize: none;
+    width: 100% !important;
+}
+.sheep-debug-exit-button {
+    margin-left: auto;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+.sheep-debug-exit-button:hover {
+    background-color: #932F2F;
+}
+.sheep-debug-title {
+    padding: 4px;
+}
 `;
+
+function createEntry(key: string, value: any, parent: HTMLElement) {
+    if (value !== null && typeof value === "object") {
+        const isMap = value instanceof Map
+        const isArray = Array.isArray(value)
+
+        let title = key
+
+        if (isMap) title += " (Map)"
+        if (isArray) title += `: ${value.length}`
+
+        const detailsElement = createElement("details", {
+            className: "sheep-debug-details",
+        })
+
+        const summaryElement = createElement("summary", {
+            className: "sheep-debug-summary",
+            innerHTML: title,
+        })
+
+        detailsElement.appendChild(summaryElement)
+        parent.appendChild(detailsElement)
+
+        if (isMap) {
+            value.forEach((v: any, k: any) => {
+                createEntry(String(k), v, detailsElement)
+            })
+        } else {
+            Object.entries(value).forEach(([k, v]) => {
+                createEntry(k, v, detailsElement)
+            })
+        }
+
+        return
+    }
+
+    const textElement = createElement("p", {
+        className: "sheep-debug-p"
+    })
+
+    if (typeof value === "function") {
+        textElement.innerHTML = `${key}: "${value}"`
+    } else {
+        try {
+            textElement.innerHTML = `${key}: ${JSON.stringify(value)}`
+        } catch {
+            textElement.innerHTML = `${key}: [unsupported]`
+        }
+    }
+
+    parent.appendChild(textElement)
+}
+
+function setEntriesObject(object: Record<string, any>, element: HTMLDivElement) {
+    Object.entries(object).forEach(([key, value]) => {
+        createEntry(key, value, element)
+    })
+}
 
 const style = createElement('style', {
     textContent: css
 });
 document.head.appendChild(style);
 
-interface windowManagerConfig {
-    title?: string
+export interface windowManagerConfig {
+    title?: string,
+    onExit?: () => void
+    defaultSize?: { w: number, h: number }
 }
 
-class SheepWindowManager {
-    ref: HTMLElement | undefined = undefined
-    ContentRef: HTMLDivElement | undefined = undefined
+export class SheepWindowManager {
+    windowRef: HTMLElement | undefined = undefined
+    private ContentRef: HTMLDivElement | undefined = undefined
+    windowID: string = crypto.randomUUID()
 
     constructor(config: windowManagerConfig = {}) {
         const element = createElement("debug-window" as any, {
             titlewindow: config["title"],
+            onexit: config.onExit ? () => {
+                try {
+                    this.Destroy()
+                    config.onExit!()
+                } catch (error) { }
+            } : undefined,
+            defaultsize: config.defaultSize
         })
         document.body.appendChild(element)
-        this.ref = element
+        this.windowRef = element
 
         this.ContentRef = element.querySelector(".sheep-debug-content")
     }
 
-    Text(label: string, horizontalCotext?: HTMLDivElement) {
-        if (!this.ContentRef) return
+    Text(label: string, horizontalCotext?: HTMLDivElement): { update: (str: string) => void, element: HTMLSpanElement | undefined } {
+        if (!this.ContentRef) return { update: (_) => "", element: undefined }
 
         const textElement = createElement("span", {
             innerHTML: label,
             className: "sheep-debug-span"
         })
-        
+
         if (horizontalCotext) horizontalCotext.append(textElement)
         else this.ContentRef.appendChild(textElement)
+
+        return {
+            update: (str) => {
+                textElement.innerHTML = str
+            }, element: textElement
+        }
     }
 
-    Button(label: string, onClick?: (ev: PointerEvent) => void, horizontalCotext?: HTMLDivElement) {
-        if (!this.ContentRef) return
+    Button(label: string, onClick?: (ev: PointerEvent) => void, horizontalCotext?: HTMLDivElement): { update: (str: string) => void, element: HTMLButtonElement | undefined } {
+        if (!this.ContentRef) return { update: (_) => "", element: undefined }
 
         const buttonElement = createElement("button", {
             innerHTML: label,
@@ -386,79 +493,31 @@ class SheepWindowManager {
 
         if (horizontalCotext) horizontalCotext.append(buttonElement)
         else this.ContentRef.appendChild(buttonElement)
+
+        return {
+            update: (str) => {
+                buttonElement.innerHTML = str
+            }, element: buttonElement
+        }
     }
 
-    ObjectTree(object: { [key: string]: any }, horizontalCotext?: HTMLDivElement) {
-        if (!this.ContentRef) return
+    ObjectTree(object: { [key: string]: any }): { update: (value: { [key: string]: any }) => void, element: HTMLDivElement | undefined } {
+        if (!this.ContentRef) return { update: (_) => "", element: undefined }
 
         const divElement = this.ContentRef
 
-        function createEntry(key: string, value: any, parent: HTMLElement) {
-            if (value !== null && typeof value === "object") {
-                const isMap = value instanceof Map
-                const isArray = Array.isArray(value)
+        setEntriesObject(object, divElement)
 
-                let title = key
-
-                if (isMap) title += " (Map)"
-                if (isArray) title += `: ${value.length}`
-
-                const detailsElement = createElement("details", {
-                    className: "sheep-debug-details",
-                })
-
-                const summaryElement = createElement("summary", {
-                    className: "sheep-debug-summary",
-                    innerHTML: title,
-                })
-
-                detailsElement.appendChild(summaryElement)
-                parent.appendChild(detailsElement)
-
-                if (isMap) {
-                    value.forEach((v: any, k: any) => {
-                        createEntry(String(k), v, detailsElement)
-                    })
-                } else {
-                    Object.entries(value).forEach(([k, v]) => {
-                        createEntry(k, v, detailsElement)
-                    })
-                }
-
-                return
-            }
-
-            const textElement = createElement("p", {
-                className: "sheep-debug-p"
-            })
-
-            if (typeof value === "function") {
-                textElement.innerHTML = `${key}: "${value}"`
-            } else {
-                try {
-                    textElement.innerHTML = `${key}: ${JSON.stringify(value)}`
-                } catch {
-                    textElement.innerHTML = `${key}: [unsupported]`
-                }
-            }
-
-            parent.appendChild(textElement)
+        return {
+            update: (object) => {
+                divElement.innerHTML = ""
+                setEntriesObject(object, divElement)
+            }, element: divElement
         }
-
-        function setEntriesObject(object: Record<string, any>) {
-            Object.entries(object).forEach(([key, value]) => {
-                createEntry(key, value, divElement)
-            })
-        }
-
-        setEntriesObject(object)
-
-        if (horizontalCotext) horizontalCotext.append(divElement)
-        else this.ContentRef.appendChild(divElement)
     }
 
-    CheckBox(label: string, onCheck?: (val: boolean) => void, horizontalCotext?: HTMLDivElement) {
-        if (!this.ContentRef) return
+    CheckBox(label: string, onCheck?: (val: boolean) => void, horizontalCotext?: HTMLDivElement): { update: (value: boolean) => void, element: HTMLInputElement | undefined } {
+        if (!this.ContentRef) return { update: (_) => "", element: undefined }
 
         const labelElement = createElement("label", {
             className: "sheep-debug-checkbox"
@@ -483,10 +542,16 @@ class SheepWindowManager {
                 onCheck(checkbox.checked)
             }
         }
+
+        return {
+            update: (value) => {
+                checkbox.checked = value
+            }, element: checkbox
+        }
     }
 
-    Input(onKeyPress?: (str: string) => void, type: string = "input", horizontalCotext?: HTMLDivElement) {
-        if (!this.ContentRef) return
+    Input(onKeyPress?: (str: string) => void, type: string = "input", horizontalCotext?: HTMLDivElement): { update: (str: string) => void, element: HTMLInputElement | undefined } {
+        if (!this.ContentRef) return { update: (_) => "", element: undefined }
 
         const inputElement = createElement("input", {
             type: type,
@@ -501,6 +566,12 @@ class SheepWindowManager {
 
         if (horizontalCotext) horizontalCotext.append(inputElement)
         else this.ContentRef.appendChild(inputElement)
+
+        return {
+            update: (value) => {
+                inputElement.value = value
+            }, element: inputElement
+        }
     }
 
     CreateHorizontalMenu() {
@@ -513,8 +584,8 @@ class SheepWindowManager {
         return divHorizontalElement
     }
 
-    Slider(value: number, min: number = 0, max: number = 100, horizontalCotext?: HTMLDivElement) {
-        if (!this.ContentRef) return
+    Slider(value: number, min: number = 0, max: number = 100, horizontalCotext?: HTMLDivElement): { update: (value: string) => void, element: HTMLInputElement | undefined } {
+        if (!this.ContentRef) return { update: (_) => "", element: undefined }
 
         const sliderContainerElement = createElement("div", {
             className: "sheep-debug-slider"
@@ -532,20 +603,59 @@ class SheepWindowManager {
 
         if (horizontalCotext) horizontalCotext.append(sliderContainerElement)
         else this.ContentRef.appendChild(sliderContainerElement)
+
+        return {
+            update: (value) => {
+                sliderElement.value = value
+            }, element: sliderElement
+        }
+    }
+
+    TextArea(onKeyDown?: (str: string) => void): { update: (value: string) => void, element: HTMLTextAreaElement | undefined } {
+        if (!this.ContentRef) return { update: (_) => "", element: undefined }
+
+        const textareaElement = createElement("textarea", {
+            className: "sheep-debug-textarea"
+        })
+
+        if (onKeyDown) {
+            textareaElement.onkeydown = () => {
+                onKeyDown(textareaElement.value)
+            }
+        }
+
+        this.ContentRef.appendChild(textareaElement)
+        return {
+            update: (value) => {
+                textareaElement.value = value
+            }, element: textareaElement
+        }
     }
 
     Destroy() {
-        if (this.ref) this.ref?.remove()
+        if (this.windowRef) this.windowRef?.remove()
     }
 }
 
 class DebuggerSheep {
-    private window_list: SheepWindowManager[] = []
+    private window_list: Map<string, SheepWindowManager> = new Map()
 
     createWindow(options?: windowManagerConfig) {
         const new_window = new SheepWindowManager(options)
-        this.window_list.push(new_window)
+        this.window_list.set(new_window.windowID, new_window)
         return new_window
+    }
+
+    getWindow(id: string) {
+        return this.window_list.get(id)
+    }
+
+    DestroyWindow(id: string) {
+        const tmpVal = this.window_list.get(id)
+
+        if (!tmpVal) return
+
+        tmpVal.Destroy()
     }
 
     DestroyAllWindow() {
@@ -555,5 +665,5 @@ class DebuggerSheep {
     }
 }
 
-(window as any).DebuggerSheep = new DebuggerSheep();
+// (window as any).DebuggerSheep = new DebuggerSheep();
 export default DebuggerSheep

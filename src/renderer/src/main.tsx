@@ -10,6 +10,7 @@ import "material-symbols/material-symbols-outlined.woff2"
 import "material-symbols/outlined.css"
 import { SocketProvider } from './utils/context/SocketContext';
 import LocalErrorBoundary from './utils/ErrorBoundary';
+import DebugContext from './utils/context/debugContext';
 
 (window as any).animuAppInfo = "PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION";
 
@@ -33,19 +34,21 @@ import LocalErrorBoundary from './utils/ErrorBoundary';
 render(
   () => (
     <ErrorBoundary fallback={LocalErrorBoundary}>
-      <I18nProvider config={{ defaultLang: "en", fallbackLang: "en" }}>
-        <MenuContextProvider>
-          <SocketProvider>
-            <DialogProvider>
-              <ContextMenu>
-                <ToastProvider>
-                  <App />
-                </ToastProvider>
-              </ContextMenu>
-            </DialogProvider>
-          </SocketProvider>
-        </MenuContextProvider>
-      </I18nProvider>
+      <DebugContext>
+        <I18nProvider config={{ defaultLang: "en", fallbackLang: "en" }}>
+          <MenuContextProvider>
+            <SocketProvider>
+              <DialogProvider>
+                <ContextMenu>
+                  <ToastProvider>
+                    <App />
+                  </ToastProvider>
+                </ContextMenu>
+              </DialogProvider>
+            </SocketProvider>
+          </MenuContextProvider>
+        </I18nProvider>
+      </DebugContext>
     </ErrorBoundary>
   ),
   document.getElementById("root") as HTMLElement
