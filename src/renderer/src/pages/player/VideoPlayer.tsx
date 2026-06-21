@@ -571,7 +571,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             maxBufferLength: 140,
         }
 
-        /* IFDEF WEB */
         class sheepLoader extends Hls.DefaultConfig.loader {
             load(context: any, config: any, callbacks: any) {
                 request(context.url, { method: "GET", headers: resolution["reqHeader"] }).then((data) => {
@@ -602,7 +601,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             ...configHLS,
             loader: sheepLoader,
         }
-        /* ENDIF */
 
         const tmpHls = new Hls(configHLS);
 

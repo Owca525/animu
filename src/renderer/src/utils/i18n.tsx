@@ -1,7 +1,5 @@
 import { createContext, useContext, createSignal, onMount } from "solid-js";
 import en from "./lang/en.json"
-import { getConfig } from "./stores/config";
-import { unwrap } from "solid-js/store";
 
 async function getAllLangFiles() {
   /* IFDEF WEB */
@@ -77,12 +75,11 @@ export function I18nProvider(props: { config: i18nConfig; children: any }) {
   })
 
   function t(key: string, replace?: { [key: string]: string | number | undefined }) {
-    const config = unwrap(getConfig())
     const dict = dictionaries()[currentLang()];
     let value = getValueByPath(dict, key)
     if (value != key) return replaceTemplate(value, replace)
     
-    if (import.meta.env.DEV || (config["Developer"] != undefined && config.Developer.DeveloperMode)) console.error(`Missing key in ${currentLang()} lang: ${key}`)
+    if (window["i18nDebug"]) console.error(`Missing key in ${currentLang()} lang: ${key}`)
     
     if (props.config.fallbackLang) {
       const fallback = dictionaries()[props.config.fallbackLang]

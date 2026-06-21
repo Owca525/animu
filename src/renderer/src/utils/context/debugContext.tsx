@@ -53,6 +53,10 @@ export default function DebugContext(props: { children: JSX.Element }) {
                 instanceDebugger!.DestroyWindow(windowContexts.get("Information Cache")!.windowID)
             }
         })
+
+        MainWindow!.CheckBox("Turn i18n Debug", (val) => {
+            (window as any).i18nDebug = val
+        })
     }
 
     SheepShortcut(["F1"], () => {

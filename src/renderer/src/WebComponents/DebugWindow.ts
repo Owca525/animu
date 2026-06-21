@@ -154,6 +154,7 @@ const css = `
     height: 100%;
     box-sizing: border-box;
     padding-bottom: 40px;
+    gap: 4px;
 }
 
 .sheep-debug-titlebar {
@@ -416,7 +417,7 @@ function createEntry(key: string, value: any, parent: HTMLElement) {
         textElement.innerHTML = `${key}: "${value}"`
     } else {
         try {
-            textElement.innerHTML = `${key}: ${JSON.stringify(value)}`
+            textElement.innerHTML = `${key}: ${JSON.stringify(value).slice(0, 2024)}`
         } catch {
             textElement.innerHTML = `${key}: [unsupported]`
         }
