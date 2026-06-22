@@ -19,6 +19,12 @@
     transform: translateY(-20px);
 }
 
+.card-container.noActive {
+    width: clamp(140px, 20vw, 260px);
+    height: clamp(120px, 20vw, 220px);
+    color: var(--invisible);
+}
+
 .card-container.small {
     width: clamp(120px, 20vw, 150px);
 }

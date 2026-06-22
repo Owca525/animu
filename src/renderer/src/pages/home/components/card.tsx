@@ -1,7 +1,7 @@
-import { animulistProps, cardData, ContextMenuProps } from "@renderer/utils/types";
+import { cardData, ContextMenuProps } from "@renderer/utils/types";
 import "./css/card.css";
 import { useNavigate } from "@solidjs/router";
-import { JSX, Show, createSignal, onMount, onCleanup } from "solid-js";
+import { JSX, Show, onCleanup } from "solid-js";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import {
   convertSeconds,
@@ -11,7 +11,7 @@ import {
   SaveToClipboard,
 } from "@renderer/utils/functions";
 import { DeleteFromHistory, SaveHistory } from "@renderer/utils/FilesManager/history";
-import { unwrap } from "solid-js/store";
+import { createStore, unwrap } from "solid-js/store";
 import { removeToast, toast, updateToast } from "@renderer/utils/context/ToastNotification";
 import { pluginManager } from "@renderer/utils/stores/plugins";
 import { useI18n } from "@renderer/utils/i18n";
@@ -30,16 +30,25 @@ interface CardProps {
 function Card(props: CardProps) {
   const { t, pathExist } = useI18n()
 
+  const title = detectTitleConfig(props.card.AnimeData.title)
+  const animelist = animulistData().find((v => v.AnimeData.id == props.card.AnimeData.id))
+
   const navigate = useNavigate();
-  const [isOut, setIsOut] = createSignal(false);
-  const [animulistCard, setAnimulistCard] = createSignal<animulistProps | undefined>(props.card.animulist)
+  const [cardVariables, setVariables] = createStore({
+    animulist: props.card.animulist ? props.card.animulist : animelist ? animelist["animulist"] : undefined,
+    isInformationBoxOut: false,
+    isCardActive: false,
+  })
+
   let cardRef: HTMLDivElement | undefined;
+  let informationBox: JSX.Element[] = []
 
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         entry.target.classList.toggle("show", entry.isIntersecting)
-        if (entry.isIntersecting) observer.unobserve(entry.target)
+        setVariables({ isCardActive: entry.isIntersecting })
+        console.log(entry.isIntersecting)
       });
     },
     {
@@ -48,17 +57,7 @@ function Card(props: CardProps) {
     }
   );
 
-  onMount(() => {
-    if (!animulistCard()) {
-      const tmp = unwrap(animulistData()).find((v => v.AnimeData.id == props.card.AnimeData.id))
-      if (tmp) setAnimulistCard(tmp.animulist)
-    }
-    if (!cardRef) return
-
-    observer.observe(cardRef);
-
-    onCleanup(() => observer.disconnect());
-  })
+  onCleanup(() => observer.disconnect());
 
   async function sendToInformation() {
     if (props.containerClick) props.containerClick()
@@ -82,7 +81,7 @@ function Card(props: CardProps) {
       }
 
       const animulist = unwrap(animulistData())
-      let tmp = animulistCard()
+      let tmp = cardVariables.animulist
       if (!tmp && animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id)) tmp = animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id)?.animulist
 
       localStorage.setItem("playerCache", JSON.stringify({
@@ -103,7 +102,7 @@ function Card(props: CardProps) {
     }
 
     const animulist = unwrap(animulistData())
-    let tmp = animulistCard()
+    let tmp = cardVariables.animulist
     if (!tmp && animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id)) tmp = animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id)?.animulist
     localStorage.setItem("informationCache", JSON.stringify({
       anime: props.card.AnimeData,
@@ -135,7 +134,7 @@ function Card(props: CardProps) {
     {
       option: t("contextMenu.copytitle"),
       onClick: () =>
-        SaveToClipboard("text", detectTitleConfig(props.card.AnimeData.title)),
+        SaveToClipboard("text", title),
     }
   ];
 
@@ -149,7 +148,7 @@ function Card(props: CardProps) {
     })
   }
 
-  if (animulistData().find((v) => v.AnimeData.id == props.card.AnimeData.id) && !props.disableinformation) {
+  if (cardVariables.animulist && !props.disableinformation) {
     CenterContextMenu.push({
       option: "Remove From Anilist",
       onClick: () => removeFromAnimulist(props.card.AnimeData.id, true),
@@ -178,11 +177,8 @@ function Card(props: CardProps) {
     if (!cardRef) return;
     const infoRect = cardRef.getBoundingClientRect();
     const windowWidth = window.innerWidth;
-    if (windowWidth - infoRect.left < 500) {
-      setIsOut(true);
-    } else {
-      setIsOut(false);
-    }
+
+    setVariables({ isInformationBoxOut: windowWidth - infoRect.left < 500 })
   }
 
   function ConvertTimeToText(): string {
@@ -229,8 +225,8 @@ function Card(props: CardProps) {
       info.push(<div class="card-information-text card-information-top">TBA</div>);
     }
 
-    if (animulistCard()) {
-      info.push(<div class="card-information-animulist-status">Status: {t(`animulist.status.${animulistCard()!.status}`)}</div>)
+    if (cardVariables.animulist) {
+      info.push(<div class="card-information-animulist-status">Status: {t(`animulist.status.${cardVariables.animulist.status}`)}</div>)
     }
 
     if (props.card.AnimeData.studios && props.card.AnimeData.studios.length > 0) {
@@ -273,14 +269,21 @@ function Card(props: CardProps) {
     return info;
   }
 
+  if (!props.disableinformation && props.card.AnimeData.studios && props.card.AnimeData.status && props.card.AnimeData.genres && props.card.AnimeData.description) {
+    informationBox = GenerateInformation()
+  }
+
   return (
     <div
       tabIndex={-1}
-      ref={cardRef}
+      ref={(v) => {
+        cardRef = v
+        observer.observe(v);
+      }}
       class={`card-container ${props.small ? "small" : ""}`}
       onClick={sendToInformation}
       onMouseOver={checkOutOfBound}
-      title={detectTitleConfig(props.card.AnimeData.title)}
+      title={title}
       onContextMenu={(event) =>
         OpenContextMenu(
           CreateContextMenuOptions(
@@ -291,21 +294,30 @@ function Card(props: CardProps) {
         )
       }
     >
-      <Show when={!props.disableinformation && props.card.AnimeData.studios && props.card.AnimeData.status && props.card.AnimeData.genres && props.card.AnimeData.description}>
-        <div class={`card-information ${isOut() ? "card-information-left" : "card-information-right"}`}>
-          {GenerateInformation()}
+      <Show when={informationBox.length > 0}>
+        <div class={`card-information ${cardVariables.isInformationBoxOut ? "card-information-left" : "card-information-right"}`}>
+          {informationBox}
         </div>
       </Show>
+
       <Show when={props.card.saveData}>
         <span class="card-episode-mark">
           Ep {props.card.saveData!["episode"]}
         </span>
       </Show>
-      <sheep-img
-        src={props.card.AnimeData.coverImage}
-        class="card-image"
-        divClass="card-image-placeholder"
-      />
+
+      <Show when={cardVariables.isCardActive}>
+        <sheep-img
+          src={props.card.AnimeData.coverImage}
+          class="card-image"
+          divClass="card-image-placeholder"
+        />
+      </Show>
+
+      <Show when={!cardVariables.isCardActive}>
+        <div class="card-image-placeholder"></div>
+      </Show>
+
       <Show when={props.card.saveData && props.card.saveData["last_Time"] > 0 && (props.card.saveData["duration"] || props.card.AnimeData.duration)}>
         <div class="card-episode-seekbar-container">
           <span style={{
@@ -314,7 +326,9 @@ function Card(props: CardProps) {
           }} class="card-episode-progress"></span>
         </div>
       </Show>
-      <div class="card-title">{detectTitleConfig(props.card.AnimeData.title)}</div>
+
+      <div class="card-title">{title}</div>
+
       <Show when={props.card.saveData && props.card.saveData.episode}>
         <Show when={props.card.saveData?.last_Time != 0 && props.card.saveData?.type != ""} fallback={<div class="card-continue-watch-text">{t("history.history", { ep: props.card.saveData?.episode })}</div>}>
           <div class="card-continue-watch-text">{t("history.continue", { ep: props.card.saveData?.episode })}</div>
