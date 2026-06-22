@@ -11,7 +11,7 @@ export function checkDatabase(): animulistData[] {
             return []
         }
         const database = fs.readFileSync(path.join(newConfigPath, "animulistDatabase.json"), "utf-8")
-        // TODO: REMOVE THIS BEFORE RELEASE 0.8.0
+
         return JSON.parse(database).map((v: animulistData) => ({
             ...v,
             animulist: {

@@ -15,7 +15,6 @@ import {
     changeTitleAnimu,
     convertKeybinds,
     convertPath,
-    LoginToAnilist,
     openUrlFolder,
     request,
     // savePluginConfig,
@@ -35,11 +34,9 @@ import {
     createEffect,
     createSignal,
     For,
-    Match,
     onCleanup,
     onMount,
     Show,
-    Switch
 } from 'solid-js';
 import { DetectOldVersionHistory, OverWriteHistory } from '@renderer/utils/FilesManager/history';
 import { getConfig, setConfig } from '@renderer/utils/stores/config';
@@ -52,7 +49,7 @@ import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './settings.css';
 import { useI18n } from '@renderer/utils/i18n';
-import { activeThemes, animulistData, getAnilistUserData, getCurrentYT_DLPVer, getDeeplinks, getGlobalCache, getListOfVerYT_DLP, loadedTheme, removeDeepLink, setAudioOutput, setDeepLink } from '@renderer/utils/stores/global';
+import { activeThemes, animulistData, getCurrentYT_DLPVer, getDeeplinks, getGlobalCache, getListOfVerYT_DLP, loadedTheme, removeDeepLink, setAudioOutput, setDeepLink } from '@renderer/utils/stores/global';
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 import SettingsPlugin from './components/settingsPlugin';
 import semver from "semver";
@@ -720,15 +717,6 @@ function settings() {
                     </div>
                     <div class="settings-page-container">
                         <div class="settings-page-title">{t("Anilist")}</div>
-                        <Switch>
-                            <Match when={getAnilistUserData() == undefined}>
-                                <div class="settings-setting-container">
-                                    {t("Link Anilist Account to Animu")}
-                                    <Button content={t('Login')} onClick={LoginToAnilist} />
-                                </div>
-                            </Match>
-                        </Switch>
-                        <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("Default Adult Mode")}
                             <CheckBox

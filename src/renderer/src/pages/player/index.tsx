@@ -192,21 +192,7 @@ const player = () => {
             }
         })
 
-        if (anime_data.animulist) {
-            // TODO: NAPRAW TE IFY KURWA
-            if (anime_data.animulist.status == "PLANNING" || anime_data.animulist.status == "CURRENT") {
-                updateDataInAnimulist(anime_data.data.id, {
-                    AnimeData: anime_data.data,
-                    animulist: {
-                        ...anime_data.animulist,
-                        status: "CURRENT",
-                        progress: convertEpisode(unwrap(extractionData().actual)),
-                        lastUpdate: dateToUnix(new Date().toString())
-                    }
-                })
-            }
-        }
-        else {
+        if (!anime_data.animulist) {
             addToAnimuList({
                 status: "CURRENT",
                 score: 0,
@@ -220,6 +206,19 @@ const player = () => {
                 ...anime_data.data,
                 nextAiringEpisode: undefined,
                 recommendations: undefined
+            })
+            return
+        }
+
+        if (anime_data.animulist.status == "PLANNING" || anime_data.animulist.status == "CURRENT") {
+            updateDataInAnimulist(anime_data.data.id, {
+                AnimeData: anime_data.data,
+                animulist: {
+                    ...anime_data.animulist,
+                    status: "CURRENT",
+                    progress: convertEpisode(unwrap(extractionData().actual)),
+                    lastUpdate: dateToUnix(new Date().toString())
+                }
             })
         }
     })

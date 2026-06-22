@@ -1,15 +1,3 @@
-/* TODO: KARTQ ADD MINI CARDS */
-
-/* .information-characters-card {
-    min-height: 160px;
-    width: 180px;
-    display: flex;
-    overflow: hidden;
-    flex-direction: column;
-    align-self: center;
-    padding: 4px;
-    gap: 4px;
-} */
  .information-characters-card {
     display: flex;
     flex-direction: column;

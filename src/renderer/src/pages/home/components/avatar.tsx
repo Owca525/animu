@@ -2,7 +2,7 @@ import { t } from "@renderer/utils/i18n";
 import "./css/avatar.css";
 import icon from '@resources/icon.png';
 import { createEffect, createSignal, For, Match, onMount, Switch } from "solid-js";
-import { globalNavigate, LoginToAnilist, openUrlFolder } from "@renderer/utils/functions";
+import { globalNavigate, openUrlFolder } from "@renderer/utils/functions";
 import { getAnilistUserData } from "@renderer/utils/stores/global";
 
 interface avatarOptions {
@@ -47,7 +47,7 @@ export default function Avatar() {
       setGenerated((prev) => ([
         {
           title: t("Login"),
-          func: LoginToAnilist
+          func: () => ""
         }, ...prev
       ]))
     }
