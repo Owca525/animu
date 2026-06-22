@@ -58,6 +58,7 @@ linux:
     - AppImage
     - deb
     - zip
+    - rpm
     # - flatpak
   maintainer: https://github.com/Owca525
   category: AudioVideo
