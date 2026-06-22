@@ -1,6 +1,5 @@
 import Button from '@renderer/components/buttons';
 import { globalNavigate, openUrlFolder, reloadWebsite } from './functions';
-import { Show } from 'solid-js';
 
 // /* IFDEF PROD */
 // import logger from './logger';
@@ -25,11 +24,11 @@ function LocalErrorBoundary(error: any) {
         <div class='main-error-container'>
             <div class="main-error-text">{"Critical Error has occured, do you want to go home?"}</div>
             <div class="main-error-button-container">
-                <Button content={"Go Back Home"} ButtonClass='error-button' onClick={() => {globalNavigate(""); window.BrowserWindow.reload()}} />
+                <Button content={"Go Back Home"} ButtonClass='error-button' onClick={() => { globalNavigate(""); window.BrowserWindow.reload() }} />
                 <Button content={"Leave Animu"} ButtonClass='error-button' onClick={() => createIssue()} />
-                <Show when={window.api}>
-                    <Button content={"Leave Animu"} ButtonClass='error-button' onClick={() => window.api ? reloadWebsite() : ""} />
-                </Show>
+                {/* IFDEF PROD|DEBUG */}
+                <Button content={"Leave Animu"} ButtonClass='error-button' onClick={() => window.api ? reloadWebsite() : ""} />
+                {/* ENDIF */}
             </div>
             <div class="main-error-show">
                 {`Error Message: ${error.toString()}`}

@@ -319,13 +319,13 @@ export default defineConfig({
       minify: process.env.ANIMU_WEB ? true : false,
     },
     plugins: [
-      solid(),
       viteConditionPlugin({
         DEBUG: process.env.NODE_ENV !== 'production' && process.env.ANIMU_WEB_DEV == undefined && process.env.ONLY_PLUGINS == undefined,
         PROD: process.env.NODE_ENV == 'production' && process.env.ANIMU_WEB_DEV == undefined && process.env.ONLY_PLUGINS == undefined,
         WEB: process.env.ANIMU_WEB ? true : false,
         ONLYPLUGINS: process.env.ONLY_PLUGINS ? true : false
       }),
+      solid(),
       compileRawModule(),
       generateInfoFile(),
     ]

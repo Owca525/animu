@@ -597,26 +597,13 @@ function settings() {
                                     placeholderChange={() => t(`lang.${config().new.General.language}`)}
                                     disableX
                                 />
-                                <Show when={window.api}>
-                                    <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getConfigPath()}/lang`))} />
-                                </Show>
+                                {/* IFDEF PROD|DEBUG */}
+                                <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getConfigPath()}/lang`))} />
+                                {/* ENDIF */}
                             </div>
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {/* {t("settings.general.theme")}
-                            <div class="settings-helpicon-space">
-                                {themeMetadata() && themeMetadata()?.author && <div class="settings-text-space">{themeMetadata()?.author}</div>}
-                                {themeMetadata() && themeMetadata()?.version && <div class="settings-text-space">{themeMetadata()?.version}</div>}
-                                <Dropdown
-                                    options={themes()}
-                                    buttonText={config().new.General.theme}
-                                    disableX
-                                />
-                                <Show when={window.api}>
-                                    <Button icon="folder" onClick={async () => window.api.open(await convertPath(`${await window.api.os.getConfigPath()}/themes`))} />
-                                </Show>
-                            </div> */}
                             <SettingsDrop LeftHeader={t("settings.general.theme")} leftbutton={{ icon: "folder", onClick: async () => window.api.open(await convertPath(`${await window.api.os.getConfigPath()}/themes`)) }} content={
                                 <div class="settings-theme-spliter">
                                     <span class='settings-theme-span'>{t("settings.theme.active")}</span>
@@ -657,28 +644,28 @@ function settings() {
                                 </div>
                             } />
                         </div>
-                        <Show when={window.api}>
-                            <div class="settings-line"></div>
-                            <div class="settings-setting-container">
-                                {t("settings.general.discordrpc")}
-                                <CheckBox
-                                    checked={config().new.General.discordRPC}
-                                    onChecked={(checked) =>
-                                        handleChange('General.discordRPC', checked)
-                                    }
-                                />
-                            </div>
-                            <div class="settings-line"></div>
-                            <div class="settings-setting-container">
-                                <span class="settings-helpicon-space">
-                                    {t("settings.yt-dlp")}
-                                </span>
-                                <Dropdown disableX
-                                    placeholder={getCurrentYT_DLPVer() != "" ? getCurrentYT_DLPVer() : getListOfVerYT_DLP()[0]}
-                                    options={getListOfVerYT_DLP().map((v) => ({ label: v, onClick: () => changeYT_DLP(v) }))}
-                                />
-                            </div>
-                        </Show>
+                        {/* IFDEF PROD|DEBUG */}
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("settings.general.discordrpc")}
+                            <CheckBox
+                                checked={config().new.General.discordRPC}
+                                onChecked={(checked) =>
+                                    handleChange('General.discordRPC', checked)
+                                }
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            <span class="settings-helpicon-space">
+                                {t("settings.yt-dlp")}
+                            </span>
+                            <Dropdown disableX
+                                placeholder={getCurrentYT_DLPVer() != "" ? getCurrentYT_DLPVer() : getListOfVerYT_DLP()[0]}
+                                options={getListOfVerYT_DLP().map((v) => ({ label: v, onClick: () => changeYT_DLP(v) }))}
+                            />
+                        </div>
+                        {/* ENDIF */}
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("Audio Output")}
@@ -831,76 +818,76 @@ function settings() {
                             />
                         </div>
                     </div>
-                    <Show when={window.api}>
-                        <div class="settings-page-container">
-                            <div class="settings-page-title">{t("settings.general.updates")}</div>
-                            <div class="settings-setting-container">
-                                {t("settings.general.checkupdate")}
-                                <Button content={t("settings.general.checkupdates")} icon="update" onClick={() => checkUpdate(true)} />
-                            </div>
-                            <div class="settings-line"></div>
-                            <div class="settings-setting-container">
-                                {t("settings.general.updates")}
-                                <CheckBox
-                                    checked={config().new.update.enable}
-                                    onChecked={(checked) =>
-                                        handleChange('update.enable', checked)
-                                    }
-                                />
-                            </div>
-                            <div class="settings-line"></div>
-                            <div class="settings-setting-container">
-                                {t("settings.general.checkupdates")}
-                                <ButtonGroup selectedValue={t(`settings.general.${config().new.update.type.toLowerCase().replaceAll(" ", "")}`)} listValues={[
-                                    { value: t("settings.general.onstart"), onClick: () => handleChange("update.type", "On Start") },
-                                    { value: t("settings.general.everyday"), onClick: () => handleChange("update.type", "Every Day") },
-                                    { value: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
-                                ]}
-                                />
+                    {/* IFDEF PROD|DEBUG */}
+                    <div class="settings-page-container">
+                        <div class="settings-page-title">{t("settings.general.updates")}</div>
+                        <div class="settings-setting-container">
+                            {t("settings.general.checkupdate")}
+                            <Button content={t("settings.general.checkupdates")} icon="update" onClick={() => checkUpdate(true)} />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("settings.general.updates")}
+                            <CheckBox
+                                checked={config().new.update.enable}
+                                onChecked={(checked) =>
+                                    handleChange('update.enable', checked)
+                                }
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("settings.general.checkupdates")}
+                            <ButtonGroup selectedValue={t(`settings.general.${config().new.update.type.toLowerCase().replaceAll(" ", "")}`)} listValues={[
+                                { value: t("settings.general.onstart"), onClick: () => handleChange("update.type", "On Start") },
+                                { value: t("settings.general.everyday"), onClick: () => handleChange("update.type", "Every Day") },
+                                { value: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
+                            ]}
+                            />
+                        </div>
+                    </div>
+                    <div class="settings-page-container">
+                        <div class="settings-page-title">{t("settings.general.window")}</div>
+                        <div class="settings-setting-container">
+                            {t("Close Animu On Exit Button")}
+                            <CheckBox
+                                checked={config().new.General.Window.trayIconClose}
+                                onChecked={(checked) =>
+                                    handleChange('General.Window.trayIconClose', checked)
+                                }
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            <span class="settings-helpicon-space">{t("settings.general.maximize")}<HelpIcon description={t("settings.tips.automaximize")} /></span>
+                            <CheckBox
+                                checked={config().new.General.Window.AutoMaximize}
+                                onChecked={(checked) =>
+                                    handleChange('General.Window.AutoMaximize', checked)
+                                }
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            <span class="settings-helpicon-space">{t("settings.general.fullscreen")}<HelpIcon description={t("settings.tips.autofullscreen")} /></span>
+                            <CheckBox
+                                checked={config().new.General.Window.AutoFullscreen}
+                                onChecked={(checked) =>
+                                    handleChange('General.Window.AutoFullscreen', checked)
+                                }
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("settings.general.zoom")}
+                            <div class="settings-setting-seekbar-container">
+                                <span>50%</span>
+                                <SeekBar maxValue={200} minValue={50} type="procent" currentValue={config().new.General.Window.Zoom} onSeek={(value) => { handleChange("General.Window.Zoom", parseInt(value.toFixed(0))) }} />
+                                <span>200%</span>
                             </div>
                         </div>
-                        <div class="settings-page-container">
-                            <div class="settings-page-title">{t("settings.general.window")}</div>
-                            <div class="settings-setting-container">
-                                {t("Close Animu On Exit Button")}
-                                <CheckBox
-                                    checked={config().new.General.Window.trayIconClose}
-                                    onChecked={(checked) =>
-                                        handleChange('General.Window.trayIconClose', checked)
-                                    }
-                                />
-                            </div>
-                            <div class="settings-line"></div>
-                            <div class="settings-setting-container">
-                                <span class="settings-helpicon-space">{t("settings.general.maximize")}<HelpIcon description={t("settings.tips.automaximize")} /></span>
-                                <CheckBox
-                                    checked={config().new.General.Window.AutoMaximize}
-                                    onChecked={(checked) =>
-                                        handleChange('General.Window.AutoMaximize', checked)
-                                    }
-                                />
-                            </div>
-                            <div class="settings-line"></div>
-                            <div class="settings-setting-container">
-                                <span class="settings-helpicon-space">{t("settings.general.fullscreen")}<HelpIcon description={t("settings.tips.autofullscreen")} /></span>
-                                <CheckBox
-                                    checked={config().new.General.Window.AutoFullscreen}
-                                    onChecked={(checked) =>
-                                        handleChange('General.Window.AutoFullscreen', checked)
-                                    }
-                                />
-                            </div>
-                            <div class="settings-line"></div>
-                            <div class="settings-setting-container">
-                                {t("settings.general.zoom")}
-                                <div class="settings-setting-seekbar-container">
-                                    <span>50%</span>
-                                    <SeekBar maxValue={200} minValue={50} type="procent" currentValue={config().new.General.Window.Zoom} onSeek={(value) => { handleChange("General.Window.Zoom", parseInt(value.toFixed(0))) }} />
-                                    <span>200%</span>
-                                </div>
-                            </div>
-                        </div>
-                    </Show>
+                    </div>
+                    {/* ENDIF */}
                 </Show>
                 <Show when={category() == "player"}>
                     <div class="settings-page-container">
@@ -939,12 +926,12 @@ function settings() {
                             {t("settings.player.volume")}
                             <div class='settings-setting-seekbar-container'>
                                 <span>0</span>
-                                <SeekBar 
-                                    maxValue={100} 
-                                    minValue={0} 
+                                <SeekBar
+                                    maxValue={100}
+                                    minValue={0}
                                     type="value"
-                                    currentValue={config().new.Player.general.Volume} 
-                                    onSeek={(value) => { handleChange("Player.general.Volume", parseInt(value.toFixed(0))) }} 
+                                    currentValue={config().new.Player.general.Volume}
+                                    onSeek={(value) => { handleChange("Player.general.Volume", parseInt(value.toFixed(0))) }}
                                 />
                                 <span>100</span>
                             </div>
@@ -1136,68 +1123,68 @@ function settings() {
                             />
                         </div>
                     </div>
-                    <Show when={window.api}>
-                        <div class="settings-page-container">
-                            <div class="settings-page-title">{t("settings.player.external")}</div>
-                            <div class="settings-setting-container">
-                                {t("settings.player.enable_external")}
-                                <CheckBox
-                                    checked={config().new.Player.external.enable}
-                                    onChecked={(checked) =>
-                                        handleChange('Player.external.enable', checked)
-                                    }
-                                />
-                            </div>
-                            <div class="settings-line"></div>
-                            <div class="settings-setting-container">
-                                {t("settings.player.select_player")}
-                                <Dropdown
-                                    options={[
-                                        { label: "Movian", onClick: () => handleChange("Player.external.type", "Movian") },
-                                        { label: "Mpv", onClick: () => handleChange("Player.external.type", "Mpv") },
-                                        { label: "VLC", onClick: () => handleChange("Player.external.type", "VLC") },
-                                        // { label: "ChromeCast", onClick: () => handleChange("Player.external.type", "ChromeCast") }
-                                    ]}
-                                    buttonText={config().new.Player.external.type}
-                                    disableX
-                                />
-                            </div>
-                            <Show when={config().new.Player.external.type != "ChromeCast"}>
-                                <div class="settings-line"></div>
-                            </Show>
-                            <Show when={config().new.Player.external.type === "Movian"}>
-                                <div class="settings-setting-container">
-                                    {t("settings.player.movianip")}
-                                    <SettingsInput
-                                        iconChar=" "
-                                        type="text"
-                                        onKeyDown={(text) => handleChange("Player.external.movianIP", text)}
-                                        startValue={config().new.Player.external.movianIP}
-                                    />
-                                </div>
-                            </Show>
-                            <Show when={config().new.Player.external.type === "Mpv"}>
-                                <div class="settings-setting-container">
-                                    {t("settings.player.mpvpath")}
-                                    <SettingsInput
-                                        type="text"
-                                        onKeyDown={(text) => handleChange("Player.external.mpvPath", text)}
-                                        startValue={config().new.Player.external.mpvPath}
-                                    />
-                                </div>
-                            </Show>
-                            <Show when={config().new.Player.external.type === "VLC"}>
-                                <div class="settings-setting-container">
-                                    {t("settings.player.vlcpath")}
-                                    <SettingsInput
-                                        type="text"
-                                        onKeyDown={(text) => handleChange("Player.external.vlcPath", text)}
-                                        startValue={config().new.Player.external.vlcPath}
-                                    />
-                                </div>
-                            </Show>
+                    {/* IFDEF PROD|DEBUG */}
+                    <div class="settings-page-container">
+                        <div class="settings-page-title">{t("settings.player.external")}</div>
+                        <div class="settings-setting-container">
+                            {t("settings.player.enable_external")}
+                            <CheckBox
+                                checked={config().new.Player.external.enable}
+                                onChecked={(checked) =>
+                                    handleChange('Player.external.enable', checked)
+                                }
+                            />
                         </div>
-                    </Show>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("settings.player.select_player")}
+                            <Dropdown
+                                options={[
+                                    { label: "Movian", onClick: () => handleChange("Player.external.type", "Movian") },
+                                    { label: "Mpv", onClick: () => handleChange("Player.external.type", "Mpv") },
+                                    { label: "VLC", onClick: () => handleChange("Player.external.type", "VLC") },
+                                    // { label: "ChromeCast", onClick: () => handleChange("Player.external.type", "ChromeCast") }
+                                ]}
+                                buttonText={config().new.Player.external.type}
+                                disableX
+                            />
+                        </div>
+                        <Show when={config().new.Player.external.type != "ChromeCast"}>
+                            <div class="settings-line"></div>
+                        </Show>
+                        <Show when={config().new.Player.external.type === "Movian"}>
+                            <div class="settings-setting-container">
+                                {t("settings.player.movianip")}
+                                <SettingsInput
+                                    iconChar=" "
+                                    type="text"
+                                    onKeyDown={(text) => handleChange("Player.external.movianIP", text)}
+                                    startValue={config().new.Player.external.movianIP}
+                                />
+                            </div>
+                        </Show>
+                        <Show when={config().new.Player.external.type === "Mpv"}>
+                            <div class="settings-setting-container">
+                                {t("settings.player.mpvpath")}
+                                <SettingsInput
+                                    type="text"
+                                    onKeyDown={(text) => handleChange("Player.external.mpvPath", text)}
+                                    startValue={config().new.Player.external.mpvPath}
+                                />
+                            </div>
+                        </Show>
+                        <Show when={config().new.Player.external.type === "VLC"}>
+                            <div class="settings-setting-container">
+                                {t("settings.player.vlcpath")}
+                                <SettingsInput
+                                    type="text"
+                                    onKeyDown={(text) => handleChange("Player.external.vlcPath", text)}
+                                    startValue={config().new.Player.external.vlcPath}
+                                />
+                            </div>
+                        </Show>
+                    </div>
+                    {/* ENDIF */}
                     <div class="settings-page-container">
                         <div class="settings-page-title">{t("settings.player.screenshot")}</div>
                         <div class="settings-setting-container">
@@ -1219,16 +1206,16 @@ function settings() {
                             ]}
                             />
                         </div>
-                        <Show when={window.api}>
-                            <div class="settings-line"></div>
-                            <div class="settings-setting-container">
-                                <div class="settings-mini-container">
-                                    {t("settings.player.path")}
-                                    <span class="settings-text-space">{config().new.Player.screenShot.path}</span>
-                                </div>
-                                <Button content={t("settings.player.changelocaton")} onClick={async () => await ChangeScreenshot(await window.api.os.openDialog(undefined, undefined, ["openDirectory"]))} />
+                        {/* IFDEF PROD|DEBUG */}
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            <div class="settings-mini-container">
+                                {t("settings.player.path")}
+                                <span class="settings-text-space">{config().new.Player.screenShot.path}</span>
                             </div>
-                        </Show>
+                            <Button content={t("settings.player.changelocaton")} onClick={async () => await ChangeScreenshot(await window.api.os.openDialog(undefined, undefined, ["openDirectory"]))} />
+                        </div>
+                        {/* ENDIF */}
                     </div>
                     <div class="settings-page-container">
                         <div class="settings-page-title">{t("settings.player.keybind")}</div>
@@ -1366,60 +1353,60 @@ function settings() {
                             />
                         </div>
                     </div>
-                    <Show when={window.api}>
-                        <div class="settings-page-container">
-                            <div class="settings-page-title">{t("settings.backup.title")}</div>
-                            <div class="settings-setting-container">
-                                {t("settings.backup.make")}
-                                <Button content={t("settings.backup.newbackup")} onClick={CreateBackup} />
-                            </div>
-                            <div class="settings-line"></div>
-                            <div class="settings-setting-container">
-                                {t("settings.backup.enable")}
-                                <CheckBox
-                                    checked={config().new.backup.enable}
-                                    onChecked={(checked) =>
-                                        handleChange('backup.enable', checked)
-                                    }
-                                />
-                            </div>
-                            <div class="settings-line"></div>
-                            <div class="settings-setting-container">
-                                {t("settings.backup.when")}
-                                <ButtonGroup selectedValue={t(`settings.general.${config().new.backup.check.toLowerCase().replaceAll(" ", "")}`)} listValues={[
-                                    { value: t("settings.general.everyday"), onClick: () => handleChange("update.type", "Every Day") },
-                                    { value: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
-                                    { value: t("settings.general.everymonth"), onClick: () => handleChange("update.type", "Every Month") },
-                                ]}
-                                />
-                            </div>
-                            <div class="settings-line"></div>
-                            <div class="settings-setting-container">
-                                {t("settings.backup.max")}
-                                <SettingsInput
-                                    iconChar=""
-                                    type="number"
-                                    onKeyDown={(text) => handleChange("backup.maxBackups", parseInt(text))}
-                                    startValue={config().new.backup.maxBackups.toString()}
-                                />
-                            </div>
-                            <SettingsDrop LeftHeader={t("settings.backup.backups")} leftbutton={{ icon: "folder", onClick: async () => window.api.open(await convertPath(`${await window.api.os.getBrowserConfigPath()}/animuBackup`)) }} content={
-                                <div class="settings-backup-container">
-                                    <For each={backupList().reverse()}>
-                                        {(value) => {
-                                            const [year, month, day, hour, min] = [value.date.getFullYear(), value.date.getMonth(), value.date.getDate(), value.date.getHours(), value.date.getMinutes()]
-                                            return (
-                                                <span class="settings-button-backup" onclick={() => backupWarning(value.file, `${year}/${month}/${day} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`)}>
-                                                    {t("settings.backup.from")} <span class="settings-button-date">{`${year}/${month.toString().padStart(2, "0")}/${day.toString().padStart(2, "0")} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`}</span>
-                                                </span>
-                                            )
-                                        }}
-                                    </For>
-                                </div>
-                            } />
+                    {/* IFDEF PROD|DEBUG */}
+                    <div class="settings-page-container">
+                        <div class="settings-page-title">{t("settings.backup.title")}</div>
+                        <div class="settings-setting-container">
+                            {t("settings.backup.make")}
+                            <Button content={t("settings.backup.newbackup")} onClick={CreateBackup} />
                         </div>
-                    </Show>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("settings.backup.enable")}
+                            <CheckBox
+                                checked={config().new.backup.enable}
+                                onChecked={(checked) =>
+                                    handleChange('backup.enable', checked)
+                                }
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("settings.backup.when")}
+                            <ButtonGroup selectedValue={t(`settings.general.${config().new.backup.check.toLowerCase().replaceAll(" ", "")}`)} listValues={[
+                                { value: t("settings.general.everyday"), onClick: () => handleChange("update.type", "Every Day") },
+                                { value: t("settings.general.everyweek"), onClick: () => handleChange("update.type", "Every Week") },
+                                { value: t("settings.general.everymonth"), onClick: () => handleChange("update.type", "Every Month") },
+                            ]}
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("settings.backup.max")}
+                            <SettingsInput
+                                iconChar=""
+                                type="number"
+                                onKeyDown={(text) => handleChange("backup.maxBackups", parseInt(text))}
+                                startValue={config().new.backup.maxBackups.toString()}
+                            />
+                        </div>
+                        <SettingsDrop LeftHeader={t("settings.backup.backups")} leftbutton={{ icon: "folder", onClick: async () => window.api.open(await convertPath(`${await window.api.os.getBrowserConfigPath()}/animuBackup`)) }} content={
+                            <div class="settings-backup-container">
+                                <For each={backupList().reverse()}>
+                                    {(value) => {
+                                        const [year, month, day, hour, min] = [value.date.getFullYear(), value.date.getMonth(), value.date.getDate(), value.date.getHours(), value.date.getMinutes()]
+                                        return (
+                                            <span class="settings-button-backup" onclick={() => backupWarning(value.file, `${year}/${month}/${day} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`)}>
+                                                {t("settings.backup.from")} <span class="settings-button-date">{`${year}/${month.toString().padStart(2, "0")}/${day.toString().padStart(2, "0")} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`}</span>
+                                            </span>
+                                        )
+                                    }}
+                                </For>
+                            </div>
+                        } />
+                    </div>
                 </Show>
+                {/* ENDIF */}
                 <Show when={category() == "developer"}>
                     <div class="settings-page-container">
                         <div class="settings-page-title">{"DevTools"}</div>
@@ -1500,28 +1487,28 @@ function settings() {
                                 } />
                             </span>
                         </div>
-                        <Show when={window.api}>
-                            <div class="settings-line"></div>
-                            <div class="settings-setting-container">
-                                {t("Run Test DeepLink")}
-                                <CheckBox
-                                    checked={getDeeplinks().find((val) => val.name == "Animu Deeplink Test") ? true : false}
-                                    onChecked={(checked) => {
-                                        if (checked) {
-                                            setDeepLink({
-                                                name: 'Animu Deeplink Test',
-                                                code: 'animutest',
-                                                func: function (deeplink: string) {
-                                                    toast(t("Ping Pong, Animu Received Deepling " + deeplink))
-                                                }
-                                            })
-                                        } else {
-                                            removeDeepLink("Animu Deeplink Test")
-                                        }
-                                    }}
-                                />
-                            </div>
-                        </Show>
+                        {/* IFDEF PROD|DEBUG */}
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("Run Test DeepLink")}
+                            <CheckBox
+                                checked={getDeeplinks().find((val) => val.name == "Animu Deeplink Test") ? true : false}
+                                onChecked={(checked) => {
+                                    if (checked) {
+                                        setDeepLink({
+                                            name: 'Animu Deeplink Test',
+                                            code: 'animutest',
+                                            func: function (deeplink: string) {
+                                                toast(t("Ping Pong, Animu Received Deepling " + deeplink))
+                                            }
+                                        })
+                                    } else {
+                                        removeDeepLink("Animu Deeplink Test")
+                                    }
+                                }}
+                            />
+                        </div>
+                        {/* ENDIF */}
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("Use Websocket")}
