@@ -204,6 +204,14 @@ body {
   outline-color: var(--green-one);
 }
 
+.sidebar-button.active .button-icon {
+  color: var(--green-one);
+}
+
+.sidebar-button-min.active .button-icon {
+  color: var(--green-one);
+}
+
 .sidebar-container-min,
 .sidebar-container-max {
   background-color: var(--second-layer);

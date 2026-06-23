@@ -134,7 +134,6 @@ export default function Sidebar(props: sidebarProps) {
               content={detectSidebarStateButton(t("sidebar.hide"))}
               onClick={(event) => hideSidebar(event, undefined) }
               ButtonClass={detectSidebarStateClass()}
-              iconClassName="sidebar-button"
             />
           </Show>
           <div class="sidebar-black-line"></div>
@@ -149,7 +148,7 @@ export default function Sidebar(props: sidebarProps) {
                   if (props.onClickTopButtons) props.onClickTopButtons(value.text)
                 }}
                 ButtonClass={`${detectSidebarStateClass()} ${checkNumber(i())}`}
-                iconClassName={`sidebar-button ${checkNumber(i())}`} />
+                />
             )}
           </For>
         </div>
@@ -164,7 +163,7 @@ export default function Sidebar(props: sidebarProps) {
                   if (props.onClickBottomButtons) props.onClickBottomButtons(value.text)
                 }} 
                 ButtonClass={detectSidebarStateClass()} 
-                iconClassName="sidebar-button" />
+                />
             )}
           </For>
         </div>

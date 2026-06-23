@@ -340,8 +340,6 @@ export async function runCheckYT_DLP() {
     const yt_dlp_releases = "https://api.github.com/repos/yt-dlp/yt-dlp/releases"
 
     const lastest = await advanceRequest(yt_dlp_latest)
-    console.log("sex")
-    console.error(lastest)
     if (!lastest.success || !lastest.json) return
     let updated = false
     if (fs.existsSync(path.join(app.getPath("userData"), "yt-dlp.json"))) {
@@ -382,7 +380,8 @@ ipcMain.handle("yt-dlp:releases", async () => {
 
     if (yt_dlp_releases_cache.length <= 0) {
         const resp = await advanceRequest("https://api.github.com/repos/yt-dlp/yt-dlp/releases")
-        if (!resp.success || !resp.json) return [currentVersionYT_DLP["tag_name"]]
+
+        if (!resp.success || !resp.json) return { ver: currentVersionYT_DLP, listVer: [] }
         yt_dlp_releases_cache = resp.json.map((v) => v["tag_name"])
     }
 
