@@ -56,8 +56,10 @@ export async function updateHistoryData(id: string, data: cardData): Promise<boo
             if (tmp) historyCache.set(tmp[0], RemoveAnimeDataCache(tmp[1]) as cardData)
         } else {
             let tmp = historyCache.get(id)
-            if (tmp) historyCache.set(tmp[0], RemoveAnimeDataCache(tmp[1]) as cardData)
+            if (tmp) historyCache.set(id, RemoveAnimeDataCache(tmp) as cardData)
         }
+
+        console.log(data, historyCache)
 
         /* IFDEF DEBUG|PROD */
         await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(historyCache.values().toArray())))
@@ -127,13 +129,19 @@ export async function OverWriteHistory(data: cardData[]): Promise<boolean> {
 function checkAnimeDuplicate(listcard: cardData[]): cardData[] {
     const map = new Map<string, cardData>()
 
-    for (const element of listcard) {
-        const title = element.AnimeData.title.romaji
-        const current = map.get(title)
+    try {
+        for (const element of listcard) {
+            if (!element) continue
 
-        if (!current || (element.saveData && current.saveData && parseInt(element.saveData.episode.toString()) > parseInt(current.saveData.episode.toString()))) {
-            map.set(title, element)
+            const title = element.AnimeData.title.romaji
+            const current = map.get(title)
+
+            if (!current || (element.saveData && current.saveData && parseInt(element.saveData.episode.toString()) > parseInt(current.saveData.episode.toString()))) {
+                map.set(title, element)
+            }
         }
+    } catch (error) {
+        console.error("history/checkAnimeDuplicate", error)
     }
 
     return Array.from(map.values())

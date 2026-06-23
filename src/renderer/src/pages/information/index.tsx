@@ -77,7 +77,7 @@ function information() {
     let isAOpeningFetching: boolean = false
     let isATrailerFetching: boolean = false
 
-    const config = unwrap(getConfig())
+    const config = getConfig()
 
     const [tempData, setTmpData] = createSignal<informationTmpProps>(JSON.parse(localStorage.getItem("informationCache") as string) as any)
     const [currentIDplayer, setCurrentId] = createSignal<string | undefined>(tempData().anime.player_ID);
@@ -156,7 +156,7 @@ function information() {
     }
 
     function generateAnimeForContextMenu() {
-        const config = unwrap(getConfig())
+        const config = getConfig()
 
         setcontextMenu([
             {
@@ -184,11 +184,11 @@ function information() {
 
         if (tempData().anime.status == "RELEASING" || !lastTime || calculateDays(lastTime, dateToUnix(new Date().toString())) <= -1 || config.information.alwaysUpdateAnime) {
             await FetchAnimeForinformation()
-            const tmpData = unwrap(tempData())
+            const tmpData = tempData()
             const tmpUpdate = {
-                ...unwrap(tempData()),
+                ...tempData(),
                 saveData: {
-                    ...unwrap(tempData().saveData),
+                    ...tempData().saveData,
                     lastAnimeDataUpdate: dateToUnix(new Date().toString())
                 } as indentityPlayer
             }
@@ -202,7 +202,7 @@ function information() {
             })
 
             localStorage.setItem("informationCache", JSON.stringify({
-                ...unwrap(tempData()),
+                ...tempData(),
                 anime: {
                     ...tmpData.anime,
                     recommendations: undefined
@@ -253,8 +253,8 @@ function information() {
             if (plugin) if (plugin.metadata.name != history.saveData?.pluginName) setCurrentId(undefined)
             setCurrentPlugin(plugin.metadata.name)
 
-            setTmpData({ ...tempData(), saveData: { ...history[0].saveData, pluginName: unwrap(currentPlugin()) as string } as indentityPlayer })
-            localStorage.setItem("informationCache", JSON.stringify({ ...tempData(), saveData: { ...history[0].saveData, pluginName: unwrap(currentPlugin()) as string } as indentityPlayer }))
+            setTmpData({ ...tempData(), saveData: { ...history.saveData, pluginName: currentPlugin() as string } as indentityPlayer })
+            localStorage.setItem("informationCache", JSON.stringify({ ...tempData(), saveData: { ...history.saveData, pluginName: currentPlugin() as string } as indentityPlayer }))
         }
 
         if (detectTrailerMusic()) return
@@ -302,10 +302,10 @@ function information() {
     })
 
     function enterPlayer(episodes: episodeMetadata[], type: string, episode: string) {
-        let tmp = unwrap(tempData())
+        let tmp = tempData()
         let lastTime = 0
         if (tmp.saveData && tmp.saveData.episode.toString() === episode.toString()) lastTime = tmp.saveData.last_Time
-        localStorage.setItem("playerCache", JSON.stringify(unwrap({
+        localStorage.setItem("playerCache", JSON.stringify({
             data: {
                 ...tmp.anime,
                 player_ID: currentIDplayer() ? currentIDplayer() : episodeResponse.data()?.player_id
@@ -318,7 +318,7 @@ function information() {
             },
             episodelist: episodes,
             animulist: tmp.animulist
-        })))
+        }))
         navigate("/player")
     }
 
@@ -330,7 +330,7 @@ function information() {
 
         const tmpnewFetch: AnimeData = {
             ...resp,
-            player_ID: currentIDplayer() ? unwrap(currentIDplayer()) : episodeResponse.data()?.player_id
+            player_ID: currentIDplayer() ? currentIDplayer() : episodeResponse.data()?.player_id
         }
 
         setTmpData((prev) => ({ ...prev, anime: tmpnewFetch }))
@@ -342,13 +342,13 @@ function information() {
                 characters: sortCharacterType(prev["anime"]["characters"])
             }
         }))
-        updateHistoryData(tempData().anime.id, { AnimeData: tmpnewFetch, saveData: unwrap(tempData().saveData) })
+        updateHistoryData(tempData().anime.id, { AnimeData: tmpnewFetch, saveData: tempData().saveData })
         checkIsAnimeReleasing()
     }
 
     async function ChangeAnimeInInformation(data: AnimeData): Promise<any> {
         const idToast = toast(t("notification.fetchinganime"), { timer: true, type: "loading" })
-        const animulist = unwrap(animulistData())
+        const animulist = animulistData()
         let tmpAnimulist
         let resp
 
@@ -693,14 +693,14 @@ function information() {
                                 <Switch>
                                     <Match when={tempData().animulist == undefined}>
                                         <Button titleButton={"Add To Animulist"} icon="add" ButtonClass="information-bar-icon" onClick={() => showCustomMenu(AnimulistMenu({
-                                            anime: unwrap(tempData().anime),
+                                            anime: tempData().anime,
                                             animulist: tempData().animulist,
                                             save: (animulist, anime) => { modifySaveAnimuList(animulist, anime) }
                                         }))} />
                                     </Match>
                                     <Match when={tempData().animulist}>
                                         <Button titleButton={"Edit Anime"} icon="edit" ButtonClass="information-bar-icon" onClick={() => showCustomMenu(AnimulistMenu({
-                                            anime: unwrap(tempData().anime),
+                                            anime: tempData().anime,
                                             animulist: tempData().animulist,
                                             save: (animulist, anime) => { modifySaveAnimuList(animulist, anime, true) }
                                         }
@@ -715,15 +715,15 @@ function information() {
                                     <Switch>
                                         <Match when={!isInWaitingPlaylist()}>
                                             <Button titleButton={"Add To Waiting Playlist"} icon="playlist_add" ButtonClass="information-bar-icon" onClick={async (): Promise<any> => {
-                                                const tmp = unwrap(tempData())
+                                                const tmp = tempData()
                                                 const resp = await saveToPlaylist("global.waitingplaylist", {
                                                     anime: {
                                                         AnimeData: {
                                                             ...tmp.anime,
-                                                            player_ID: episodeResponse.data() ? episodeResponse.data()?.player_id : unwrap(currentIDplayer())
+                                                            player_ID: episodeResponse.data() ? episodeResponse.data()?.player_id : currentIDplayer()
                                                         },
                                                         saveData: tmp.saveData == undefined ? {
-                                                            pluginName: unwrap(getPlayerPLugin())?.metadata.name!,
+                                                            pluginName: getPlayerPLugin()?.metadata.name!,
                                                             last_Time: 0,
                                                             episode: "1",
                                                             type: "sub",
@@ -743,7 +743,7 @@ function information() {
                                         </Match>
                                         <Match when={isInWaitingPlaylist()}>
                                             <Button titleButton={"Remove From Waiting Playlist"} icon="playlist_remove" ButtonClass="information-bar-icon" onClick={async (): Promise<any> => {
-                                                const tmp = unwrap(tempData())
+                                                const tmp = tempData()
                                                 const resp = await removeInPlaylist("global.waitingplaylist", tmp.anime.id)
                                                 if (!resp) return toast("Failed Remove Anime to Waiting Playlist", { type: "error" })
                                                 else {
@@ -924,13 +924,13 @@ function information() {
                                         <Match when={activePage() == "Trailer" || activePage() == "Music"}>
                                             <Switch>
                                                 <Match when={contentyt_dlp().length > 0}>
-                                                    <MiniPlayer props={unwrap(contentyt_dlp()!)} />
+                                                    <MiniPlayer props={contentyt_dlp()!} />
                                                 </Match>
                                                 <Match when={contentyt_dlp()}>
                                                     <iframe
                                                         height="610px"
                                                         class='information-iframe'
-                                                        src={`https://www.youtube.com/embed/${unwrap(tempData()).anime.trailer?.id}`}
+                                                        src={`https://www.youtube.com/embed/${tempData().anime.trailer?.id}`}
                                                         frameborder="0"
                                                         referrerpolicy='strict-origin-when-cross-origin'
                                                         allowfullscreen
@@ -940,7 +940,7 @@ function information() {
                                         </Match>
                                         <Match when={activePage() == "Opening/Ending"}>
                                             <Show when={currentMedia()}>
-                                                <MiniPlayer props={unwrap(currentMedia()!)} />
+                                                <MiniPlayer props={currentMedia()!} />
                                             </Show>
                                         </Match>
                                         <Match when={episodeResponse.data() && activePage() == "Episodes"}>
