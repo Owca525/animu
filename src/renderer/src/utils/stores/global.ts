@@ -4,12 +4,12 @@ import { Socket } from "socket.io-client";
 
 export const [globalState, setGlobalState] = createStore<globalDataFormat>({
     incognito: false,
-    history: [],
+    history: new Map(),
     deeplinkRunned: false,
     loadedTheme: [],
     activeThemes: new Map(),
     token: undefined,
-    animuList: [],
+    animuList: new Map(),
     socket: undefined,
     service: [],
     deepLinks: [],
@@ -41,6 +41,7 @@ export const todayAnimeInAnilist = () => globalState.todayAnimeAnilist;
 export const animeOpeningsCache = () => globalState.animeOpeningsCache;
 export const getAudioOutput = () => globalState.audioOutput;
 export const isPluginSearchMode = () => globalState.pluginSearchMode;
+export const getAnimuHistory = () => globalState.history;
 export const getCurrentYT_DLPVer = () => globalState.yt_dlp["ver"];
 export const getListOfVerYT_DLP = () => globalState.yt_dlp["listVer"];
 
@@ -55,7 +56,7 @@ export const setActiveThemes = (tmp: Map<number, themeMetadata>) => setGlobalSta
 export const setGlobalTheme = (tmp: themeMetadata[]) => setGlobalState((prev) => ({ ...prev, loadedTheme: tmp }));
 export const setIncognitoMode = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, incognito: tmp }));
 export const setDeeplinkRunned = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, deeplinkRunned: tmp }));
-export const setGlobalHistory = (tmp: cardData[]) => setGlobalState((prev) => ({ ...prev, history: [...tmp] }));
+export const setGlobalHistory = (tmp: Map<string, cardData>) => setGlobalState((prev) => ({ ...prev, history: tmp }));
 export const setGlobalToken = (tmp: string | undefined) => setGlobalState((prev) => ({ ...prev, token: tmp }));
 export const setAnimulistData = (tmp: globalDataFormat["animuList"]) => setGlobalState((prev) => ({ ...prev, animuList: tmp }));
 export const setDeepLink = (tmp: deeplinkFormat) => setGlobalState((prev) => ({ ...prev, deepLinks: [...prev.deepLinks, tmp] }));

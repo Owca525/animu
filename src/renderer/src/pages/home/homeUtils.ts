@@ -4,7 +4,6 @@ import { animulistData, isPluginSearchMode } from "@renderer/utils/stores/global
 import { getHomeCache, setHomeNewData, setHomeSearch, setHomeSearchPage, setHomeSearchTags, setHomeStopScrolling } from "@renderer/utils/stores/home";
 import { getInformationPlugin, getPlayerPLugin } from "@renderer/utils/stores/plugins";
 import { cardData, containerData, FilterParams, homeData } from "@renderer/utils/types";
-import { unwrap } from "solid-js/store";
 
 export function setCalendary(date?: string) {
     let tmp = new Date()
@@ -32,10 +31,11 @@ export function setHome() {
 }
 
 export function setAnimuList(): any {
-    const animulist = unwrap(animulistData())
+    const animulist = animulistData().values().toArray()
     if (animulist.length <= 0) return setHomeData({ sections: [{ data: [] }] })
+    
     let finnalContainer: containerData[] = []
-    const global = unwrap(getHomeCache())
+    const global = getHomeCache()
 
     const currentAnime = animulist.filter((v) => v.animulist.status == "CURRENT")
     if (currentAnime.length >= 1)
@@ -91,7 +91,7 @@ export function setAnimuList(): any {
         })
     })
 
-    if (finnalContainer.length <= 1) return setHomeData({ sections: [{ data: unwrap(animulistData()) }] })
+    if (finnalContainer.length <= 1) return setHomeData({ sections: [{ data: animulist }] })
 
     setHomeData({
         sections: finnalContainer
@@ -195,7 +195,7 @@ export function historySearch(search: string = "", params: FilterParams | undefi
 
 export function AnimuListSearch(search: string = "", params: FilterParams | undefined) {
     if (search.replaceAll(" ", "") == "" && params == undefined) return setAnimuList()
-    let tmp = searchDataInCards(unwrap(animulistData()), search, convertParams(params))
+    let tmp = searchDataInCards(animulistData().values().toArray(), search, convertParams(params))
     if (params && params["watching"]) tmp = tmp.filter((v) => v.animulist?.status == params["watching"].val)
     setHomeSearchTags(params)
     setHomeData({

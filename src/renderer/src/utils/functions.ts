@@ -16,7 +16,7 @@ import {
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { getGlobalCache, setActiveThemes, setGlobalToken, todayAnimeInAnilist } from './stores/global';
+import { getAnimuHistory, getGlobalCache, setActiveThemes, setGlobalToken, todayAnimeInAnilist } from './stores/global';
 import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
@@ -545,7 +545,8 @@ export function getWeek(): { startWeekUnix: number, endWeekUnix: number, startWe
 }
 
 export function getHistory() {
-    let global = unwrap(getGlobalCache().history)
+    let global = getAnimuHistory().values().toArray()
+
     let continueWatch: cardData[] = []
     for (let index = 0; index < global.length; index++) {
         const element = global[index];
@@ -1201,4 +1202,22 @@ export function LoopReplace(str: string, strings: [string, string][]) {
     })
 
     return str
+}
+
+export function RemoveAnimeDataCache(data: AnimeData | cardData) {
+    if (!data) return data
+
+    let paths: string[] = []
+
+    if (data["AnimeData"]) paths = ["AnimeData.nextAiringEpisode", "AnimeData.recommendations"]
+    else {
+        paths = ["nextAiringEpisode", "recommendations"]
+    }
+
+    let tmpData = data
+    paths.forEach((item) => {
+        tmpData = updateObject(item, undefined, tmpData)
+    })
+
+    return tmpData
 }

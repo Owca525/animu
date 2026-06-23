@@ -16,7 +16,7 @@ import {
   updateObject
 } from './utils/functions';
 import { checkUpdate } from './utils/update';
-import { convertHistoryToAnimuList } from './utils/FilesManager/animulist';
+import { convertHistoryToAnimuList, setNewAnimuList } from './utils/FilesManager/animulist';
 import { CreateBackup } from './utils/backup';
 import {
   createSignal,
@@ -29,11 +29,9 @@ import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import {
   getGlobalCache,
   isPluginSearchMode,
-  setAnimulistData,
   setAudioOutput,
   setDeepLink,
   setDeeplinkRunned,
-  setGlobalHistory,
   setGlobalTheme,
   setIncognitoMode,
   setPluginSearchMode,
@@ -71,6 +69,7 @@ import { SheepShortcut } from './utils/hooks/useKeyPress';
 import { ServiceManager } from './utils/service';
 import pluginManager from './utils/pluginManager';
 import { createGlobalError } from './utils/context/GlobalErrorContext';
+import { setNewHistory } from './utils/FilesManager/history';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -135,10 +134,8 @@ function App() {
         if (time["min"] > 44 && time["hour"] >= 0) localStorage.removeItem("pluginStatusCachce")
       } catch (error) { }
 
-      await pluginManager.initialPlugins().then(async () => {
-        console.log("SEX")
-        await pluginManager.changeInformationPlugin("AnilistApi")
-      })
+      await pluginManager.initialPlugins()
+      await pluginManager.changeInformationPlugin("AnilistApi")
 
       getTodayAnilistAnime().then((v) => {
         setTodayAnimeInAnilist(v)
@@ -165,12 +162,12 @@ function App() {
       if (!localStorage.getItem("config")) localStorage.setItem("config", JSON.stringify(defaultConfigWeb))
       if (!localStorage.getItem("history")) localStorage.setItem("history", JSON.stringify([]))
       setConfig(deepMerge(defaultConfigWeb, JSON.parse(localStorage.getItem("config") as any)))
-      setGlobalHistory(JSON.parse(localStorage.getItem("history") as any))
+      setNewHistory(JSON.parse(localStorage.getItem("history") as any))
       /* ENDIF */
 
       /* IFDEF DEBUG|PROD */
       setConfig(await window.api.getConfig())
-      setGlobalHistory(await window.api.getHistory())
+      setNewHistory(await window.api.getHistory())
       /* ENDIF */
 
       setinitialState({ text: "initial.theme", plugin: false })
@@ -185,12 +182,12 @@ function App() {
 
       setinitialState({ text: "Loading Animulist", plugin: false })
       /* IFDEF DEBUG|PROD */
-      setAnimulistData(await window.api.animulist.getDatabase())
+      setNewAnimuList(await window.api.animulist.getDatabase())
       /* ENDIF */
 
       /* IFDEF WEB */
       if (!localStorage.getItem("animulist")) localStorage.setItem("animulist", JSON.stringify([]))
-      setAnimulistData(JSON.parse(localStorage.getItem("animulist") as any))
+      setNewAnimuList(JSON.parse(localStorage.getItem("animulist") as any))
       /* ENDIF */
 
       setinitialState({ text: "initial.config", plugin: false })

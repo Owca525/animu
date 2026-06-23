@@ -8,7 +8,6 @@ import { useI18n } from '@renderer/utils/i18n';
 import { getPlayerPLugin } from '@renderer/utils/stores/plugins';
 import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
 import { animulistData } from '@renderer/utils/stores/global';
-import { unwrap } from 'solid-js/store';
 import { updateGenres } from './filter';
 import { StartHomeSearch } from '..';
 import { getHomeCache } from '@renderer/utils/stores/home';
@@ -27,8 +26,8 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
     }
 
     function openInformation() {
-        const animulist = unwrap(animulistData())
-        const tmp = animulist.find((v) => v.AnimeData.id == data.AnimeData.id)
+        const tmp = animulistData().get(data.AnimeData.id)
+
         localStorage.setItem("informationCache", JSON.stringify({ anime: data.AnimeData, animulist: tmp ? tmp.animulist : undefined }))
         navigate("/info");
     }

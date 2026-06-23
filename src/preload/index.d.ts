@@ -1,5 +1,5 @@
 import { ElectronAPI } from "@electron-toolkit/preload";
-import { AnimeData, cardData, globalDataFormat, pluginRepoExpanded, SettingsConfig, themeMetadata } from "@renderer/utils/types";
+import { AnimeData, AnimuListFormat, cardData, globalDataFormat, pluginRepoExpanded, SettingsConfig, themeMetadata } from "@renderer/utils/types";
 
 declare global {
   interface Window {
@@ -75,7 +75,7 @@ declare global {
         add: (anime: { AnimeData: AnimeData, animulist: animulistProps }) => Promise<void>
         delete: (id: string) => Promise<boolean>
         update: (id: string, anime: { AnimeData: AnimeData, animulist: animulistProps }) => Promise<void>
-        getDatabase: () => Promise<globalDataFormat["animuList"]>
+        getDatabase: () => Promise<AnimuListFormat[]>
         overWrite: (data: globalDataFormat["animuList"]) => Promise<void>
       }
       saveConfig: (config: SettingsConfig) => Promise<boolean>

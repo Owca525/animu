@@ -31,7 +31,7 @@ function Card(props: CardProps) {
   const { t, pathExist } = useI18n()
 
   const title = detectTitleConfig(props.card.AnimeData.title)
-  const animelist = animulistData().find((v => v.AnimeData.id == props.card.AnimeData.id))
+  const animelist = animulistData().get(props.card.AnimeData.id)
 
   const navigate = useNavigate();
   const [cardVariables, setVariables] = createStore({
@@ -78,14 +78,10 @@ function Card(props: CardProps) {
         return
       }
 
-      const animulist = unwrap(animulistData())
-      let tmp = cardVariables.animulist
-      if (!tmp && animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id)) tmp = animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id)?.animulist
-
       localStorage.setItem("playerCache", JSON.stringify({
         data: (props.card.AnimeData),
         save: (props.card.saveData),
-        animulist: tmp,
+        animulist: cardVariables.animulist,
         episodelist: episodeList,
         continewatch: true,
       }))
@@ -99,13 +95,10 @@ function Card(props: CardProps) {
       toast("This Anime Dosen't Have Anilist ID this may have make weird bugs", { type: "warning" })
     }
 
-    const animulist = unwrap(animulistData())
-    let tmp = cardVariables.animulist
-    if (!tmp && animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id)) tmp = animulist.find((v) => v.AnimeData.id == props.card.AnimeData.id)?.animulist
     localStorage.setItem("informationCache", JSON.stringify({
       anime: props.card.AnimeData,
       saveData: props.card.saveData,
-      animulist: tmp
+      animulist: cardVariables.animulist
     }))
     navigate("/info");
   }

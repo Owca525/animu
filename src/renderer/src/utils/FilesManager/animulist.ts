@@ -1,10 +1,20 @@
 import { unwrap } from "solid-js/store"
 import { toast } from "../context/ToastNotification"
 import { animulistData, getGlobalCache, setAnimulistData } from "../stores/global"
-import { AnimeData, animulistProps } from "../types"
+import { AnimeData, AnimuListFormat, animulistProps } from "../types"
 import { getHomeCache } from "../stores/home"
 import { AnimuListSearch } from "@renderer/pages/home/homeUtils"
-import { dateToUnix, detectTitleConfig, getHistory } from "../functions"
+import { dateToUnix, detectTitleConfig, getHistory, RemoveAnimeDataCache } from "../functions"
+
+export function setNewAnimuList(data: AnimuListFormat[]) {
+    let tmpMap = new Map()
+    data.forEach((card) => {
+        tmpMap.set(card["AnimeData"]["id"], card)
+    })
+    
+    setAnimulistData(tmpMap)
+    return tmpMap
+}
 
 export async function addToAnimuList(animulist: animulistProps, anime: AnimeData, notification: boolean = false) {
     if (getGlobalCache().incognito) return
@@ -16,8 +26,14 @@ export async function addToAnimuList(animulist: animulistProps, anime: AnimeData
 
     /* IFDEF WEB */
     let database = structuredClone(unwrap(animulistData()))
-    database.unshift({ AnimeData: { ...unwrap(anime), nextAiringEpisode: undefined }, animulist: unwrap(animulist) })
-    localStorage.setItem("animulist", JSON.stringify(database))
+
+    const tmp = database.get(anime.id)
+    if (tmp) database.delete(anime.id)
+
+    let tmpDatabase = database.values().toArray()
+
+    tmpDatabase.unshift({ AnimeData: { ...anime, nextAiringEpisode: undefined }, animulist: animulist })
+    localStorage.setItem("animulist", JSON.stringify(tmpDatabase))
     /* ENDIF */
 
     refreashAnimulist()
@@ -34,7 +50,8 @@ export async function removeFromAnimulist(id: string, notification: boolean = fa
 
     /* IFDEF WEB */
     let database = structuredClone(unwrap(animulistData()))
-    localStorage.setItem("animulist", JSON.stringify(database.filter((v) => v.AnimeData.id != id)))
+    database.delete(id)
+    localStorage.setItem("animulist", JSON.stringify(database.values().toArray()))
     /* ENDIF */
 
     refreashAnimulist()
@@ -51,21 +68,8 @@ export async function updateDataInAnimulist(id: string, anime: { AnimeData: Anim
 
     /* IFDEF WEB */
     let database = structuredClone(unwrap(animulistData()))
-    localStorage.setItem("animulist", JSON.stringify(database.map((v) => v.AnimeData.id == id ? {
-        ...anime,
-        AnimeData: {
-            ...anime.AnimeData,
-            nextAiringEpisode: undefined,
-            recommendations: undefined
-        }
-    } : {
-        ...v,
-        AnimeData: {
-            ...v.AnimeData,
-            nextAiringEpisode: undefined,
-            recommendations: undefined
-        }
-    })))
+    database.set(id, anime)
+    localStorage.setItem("animulist", JSON.stringify(database.values().toArray().forEach((v) => RemoveAnimeDataCache(v))))
     /* ENDIF */
 
     refreashAnimulist()
@@ -74,7 +78,7 @@ export async function updateDataInAnimulist(id: string, anime: { AnimeData: Anim
 
 export async function refreashAnimulist() {
     /* IFDEF DEBUG|PROD */
-    setAnimulistData(await window.api.animulist.getDatabase())
+    setNewAnimuList(await window.api.animulist.getDatabase())
     /* ENDIF */
 
     /* IFDEF WEB */
@@ -88,13 +92,7 @@ export async function refreashAnimulist() {
 }
 
 export async function OvewriteAnimuList(data: { AnimeData: AnimeData; animulist: animulistProps }[]) {
-    /* IFDEF DEBUG|PROD */
-    setAnimulistData(data)
-    /* ENDIF */
-
-    /* IFDEF WEB */
-    setAnimulistData(JSON.parse(data as any))
-    /* ENDIF */
+    setNewAnimuList(data)
     refreashAnimulist()
 }
 
@@ -107,7 +105,7 @@ export function convertHistoryToAnimuList() {
         const element = history[index];
         try {
             if (element.AnimeData.id.replaceAll(" ", "") == "") return
-            const finded = animulist.find((v) => v.AnimeData.id.toString() == element.AnimeData.id.toString())
+            const finded = animulist.get(element.AnimeData.id)
             if (finded) continue
             if (!element.saveData.episode) continue
             let status: animulistProps = {

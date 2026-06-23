@@ -187,9 +187,11 @@ export interface deepLinkData {
     }
 }
 
+export interface AnimuListFormat { AnimeData: AnimeData, animulist: animulistProps, onClick?: (data: AnimeData) => void }
+
 export interface globalDataFormat {
     incognito: boolean,
-    history: cardData[],
+    history: Map<string, cardData>,
     deeplinkRunned: boolean,
     loadedTheme: themeMetadata[],
     activeThemes: Map<number, themeMetadata>
@@ -200,7 +202,7 @@ export interface globalDataFormat {
         instance: Socket,
         currentRoom: string,
     },
-    animuList: { AnimeData: AnimeData, animulist: animulistProps, onClick?: (data: AnimeData) => void }[]
+    animuList: Map<string, AnimuListFormat>
     anilist_user_data?: { [key: string]: any; },
     isAnimuFocus: boolean
     notifications: NotificationExpanded[]

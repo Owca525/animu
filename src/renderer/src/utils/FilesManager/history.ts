@@ -1,37 +1,40 @@
 import { cardData } from '../types';
 import { CreateBackup } from '../backup';
-import { getGlobalCache, setGlobalHistory } from '../stores/global';
-import { detectTitleConfig, refetchHistory } from '../functions';
+import { getAnimuHistory, getGlobalCache, setGlobalHistory } from '../stores/global';
+import { refetchHistory, RemoveAnimeDataCache } from '../functions';
 import { toast, updateToast } from '../context/ToastNotification';
-import { unwrap } from 'solid-js/store';
 import { t } from '../i18n';
 import { getInformationPlugin } from '../stores/plugins';
+
+export function setNewHistory(data: cardData[]) {
+    let tmpMap = new Map()
+    data.forEach((card) => {
+        tmpMap.set(card["AnimeData"]["id"], card)
+    })
+    
+    setGlobalHistory(tmpMap)
+    return tmpMap
+}
 
 export async function DeleteFromHistory(data: cardData) {
     try {
         if (getGlobalCache().incognito) return
         if (!data.saveData) return
-        let historyCache = unwrap(getGlobalCache().history);
+        let historyCache = getAnimuHistory();
 
-        let index = -1
         if (data.AnimeData.id == "") {
-            index = historyCache.findIndex(
-                (item) => detectTitleConfig(item.AnimeData.title) === detectTitleConfig(data.AnimeData.title)
-            );
+            let tmp = historyCache.entries().find(([_, item]) => item.AnimeData.title === data.AnimeData.title)
+            if (tmp) historyCache.delete(tmp[0])
         } else {
-            index = historyCache.findIndex(
-                (item) => item.AnimeData.id === data.AnimeData.id
-            );
+            historyCache.delete(data.AnimeData.id)
         }
 
-        if (index != -1) historyCache.splice(index, 1);
-
         /* IFDEF DEBUG|PROD */
-        await window.api.os.write(`history.json`, JSON.stringify(historyCache))
+        await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(historyCache.values().toArray())))
         /* ENDIF */
 
         /* IFDEF WEB */
-        localStorage.setItem("history", JSON.stringify(historyCache))
+        localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(historyCache.values().toArray())))
         /* ENDIF */
 
         setGlobalHistory(historyCache)
@@ -46,54 +49,24 @@ export async function DeleteFromHistory(data: cardData) {
 export async function updateHistoryData(id: string, data: cardData): Promise<boolean> {
     try {
         if (getGlobalCache().incognito) return true
-        let historyCache: any[] = [];
+        let historyCache = getAnimuHistory();
 
         if (id == "" || data.AnimeData.id == "") {
-            historyCache = unwrap(getGlobalCache().history).map((item) => {
-                if (detectTitleConfig(data.AnimeData.title) == detectTitleConfig(item.AnimeData.title)) return {
-                    ...data,
-                    saveData: {
-                        ...item.saveData,
-                        ...data.saveData
-                    }
-                }
-                return {
-                    ...item,
-                    AnimeData: {
-                        ...item.AnimeData,
-                        nextAiringEpisode: undefined,
-                        recommendations: undefined
-                    },
-                }
-            });
+            let tmp = historyCache.entries().find(([_, item]) => item.AnimeData.title === data.AnimeData.title)
+            if (tmp) historyCache.set(tmp[0], RemoveAnimeDataCache(tmp[1]) as cardData)
         } else {
-            historyCache = unwrap(getGlobalCache().history).map((item) => {
-                if (id == item.AnimeData.id) return {
-                    ...data,
-                    saveData: {
-                        ...item.saveData,
-                        ...data.saveData
-                    }
-                }
-                return {
-                    ...item,
-                    AnimeData: {
-                        ...item.AnimeData,
-                        nextAiringEpisode: undefined,
-                        recommendations: undefined
-                    },
-                }
-            });
+            let tmp = historyCache.get(id)
+            if (tmp) historyCache.set(tmp[0], RemoveAnimeDataCache(tmp[1]) as cardData)
         }
 
         /* IFDEF DEBUG|PROD */
-        await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(historyCache as any)))
+        await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(historyCache.values().toArray())))
         /* ENDIF */
 
         /* IFDEF WEB */
-        localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(historyCache as any)))
+        localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(historyCache.values().toArray())))
         /* ENDIF */
-        setGlobalHistory(historyCache as any)
+        setGlobalHistory(historyCache)
         refetchHistory()
         return true
     } catch (Error) {
@@ -105,28 +78,26 @@ export async function updateHistoryData(id: string, data: cardData): Promise<boo
 export async function SaveHistory(data: cardData): Promise<boolean> {
     try {
         if (getGlobalCache().incognito) return true
-        let historyCache = unwrap(getGlobalCache().history);
+        let historyCache = getAnimuHistory();
 
-        let index = -1
         if (data.AnimeData.id == "") {
-            index = historyCache.findIndex(
-                (item) => detectTitleConfig(item.AnimeData.title) === detectTitleConfig(data.AnimeData.title)
-            );
+            let tmp = historyCache.entries().find(([_, item]) => item.AnimeData.title === data.AnimeData.title)
+            if (tmp) historyCache.delete(tmp[0])
         } else {
-            index = historyCache.findIndex(
-                (item) => item.AnimeData.id === data.AnimeData.id
-            );
+            historyCache.delete(data.AnimeData.id)
         }
 
-        if (index != -1) historyCache.splice(index, 1);
-        historyCache.unshift(data);
+        let tmpHistoryCache = historyCache.values().toArray()
+        tmpHistoryCache.unshift(data);
+
+        historyCache = setNewHistory(tmpHistoryCache)
 
         /* IFDEF DEBUG|PROD */
-        await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(historyCache)))
+        await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(historyCache.values().toArray())))
         /* ENDIF */
 
         /* IFDEF WEB */
-        localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(historyCache)))
+        localStorage.setItem("history", JSON.stringify(checkAnimeDuplicate(historyCache.values().toArray())))
         /* ENDIF */
         setGlobalHistory(historyCache)
         refetchHistory()

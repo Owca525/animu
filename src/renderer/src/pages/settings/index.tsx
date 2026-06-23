@@ -49,7 +49,7 @@ import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './settings.css';
 import { useI18n } from '@renderer/utils/i18n';
-import { activeThemes, animulistData, getCurrentYT_DLPVer, getDeeplinks, getGlobalCache, getListOfVerYT_DLP, loadedTheme, removeDeepLink, setAudioOutput, setDeepLink } from '@renderer/utils/stores/global';
+import { activeThemes, animulistData, getAnimuHistory, getCurrentYT_DLPVer, getDeeplinks, getListOfVerYT_DLP, loadedTheme, removeDeepLink, setAudioOutput, setDeepLink } from '@renderer/utils/stores/global';
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 import SettingsPlugin from './components/settingsPlugin';
 import semver from "semver";
@@ -529,9 +529,9 @@ function settings() {
             });
 
             const exported = JSON.stringify({
-                animulist: unwrap(animulistData()),
-                history: unwrap(getGlobalCache().history),
-                config: unwrap(getConfig())
+                animulist: animulistData(),
+                history: getAnimuHistory(),
+                config: getConfig()
             })
 
             const writable = await handle.createWritable();

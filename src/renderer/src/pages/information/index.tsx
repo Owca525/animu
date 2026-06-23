@@ -33,7 +33,7 @@ import {
     Show,
     Switch
 } from 'solid-js';
-import { animulistData, getGlobalCache } from '@renderer/utils/stores/global';
+import { animulistData, getAnimuHistory, getGlobalCache } from '@renderer/utils/stores/global';
 import { getInformationPlugin, getPlayerPLugin } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { unwrap } from 'solid-js/store';
@@ -238,18 +238,19 @@ function information() {
 
         if (descriptionRef && descriptionRef.scrollHeight > descriptionRef.clientHeight) setNeedMore(true)
 
-        let tempHistory = unwrap(getGlobalCache().history)
+        let tempHistory = getAnimuHistory()
 
-        let history: cardData[] = []
+        let history: cardData | undefined = undefined
         if (tempData().anime.id == "") {
-            history = tempHistory.filter((anime) => detectTitleConfig(anime.AnimeData.title) == detectTitleConfig(tempData().anime.title))
+            let tmp = tempHistory.entries().find(([_, item]) => item.AnimeData.title === tempData().anime.title)
+            if (tmp) history = tmp[1]
         } else {
-            history = tempHistory.filter((anime) => anime.AnimeData.id == tempData().anime.id)
+            history = tempHistory.get(tempData().anime.id)
         }
 
-        if (history.length > 0) {
-            let plugin = await pluginManager.changePlayerPlugin(history[0].saveData?.pluginName as string)
-            if (plugin) if (plugin.metadata.name != history[0].saveData?.pluginName) setCurrentId(undefined)
+        if (history) {
+            let plugin = await pluginManager.changePlayerPlugin(history.saveData?.pluginName as string)
+            if (plugin) if (plugin.metadata.name != history.saveData?.pluginName) setCurrentId(undefined)
             setCurrentPlugin(plugin.metadata.name)
 
             setTmpData({ ...tempData(), saveData: { ...history[0].saveData, pluginName: unwrap(currentPlugin()) as string } as indentityPlayer })
@@ -359,7 +360,9 @@ function information() {
 
         if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", timer: false })
         updateToast(idToast, t("notification.successanime"), { type: "success", timer: false })
-        tmpAnimulist = animulist.find((v) => v.AnimeData.id == resp["id"])?.animulist
+    
+        tmpAnimulist = animulist.get(resp["id"])
+        if (tmpAnimulist) tmpAnimulist = tmpAnimulist["animulist"]
 
         resetContentVariable()
         setmoreMiniTitle(false)
@@ -428,7 +431,6 @@ function information() {
     /* IFDEF DEBUG|PROD */
     async function getAnimeTrailer(url: string, noContentLoading = false) {
         let storyBoard: string | undefined
-        storyBoard = undefined
         
         try {
             if (config["information"]["trailerplayertype"] == "embed") return
