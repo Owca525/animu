@@ -219,14 +219,6 @@ async function allAnimeDecyrption(encrypted: string) {
 async function fetchUrls(params: AllmangaURLformat): Promise<resolutionFormat[]> {
     const urlObject = new URL(params.url);
 
-    function hasUrl(data: { [key: string]: any }) {
-        if ("hlsVideoTiktok" in data) return data["hlsVideoTiktok"]
-        if ("cf" in data) return data["cf"]
-
-        console.error("Unsuported Url", data)
-        throw new Error(`Failed Find Url`)
-    }
-
     if (params["sourceName"] == "Uni") {
         console.log(urlObject)
         const response = await request(`${urlObject["origin"]}/api/v1/video?id=${urlObject["hash"].replace("#", "")}&w=1920&h=1080&r=`, {
@@ -252,10 +244,10 @@ async function fetchUrls(params: AllmangaURLformat): Promise<resolutionFormat[]>
         try {
             const url = code["hlsVideoTiktok"] ? `${urlObject["origin"]}${code["hlsVideoTiktok"]}` : code["cf"]
             return [{
-                res: "hls",
+                res: "1080",
                 url: url,
                 reqHeader: header,
-                hls: hasUrl(code).includes("hls")
+                hls: true
             }]
         } catch (error) {
             console.error("Allmanga/fetchUrls", error, response)
@@ -278,7 +270,7 @@ async function detectURL(params: AllmangaURLformat): Promise<resolutionFormat[]>
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "2.3",
+        version: "2.4",
         name: "Allmanga",
         author: "Owca525",
         icon: `${WEBSITE}android-icon-192x192.png`,
