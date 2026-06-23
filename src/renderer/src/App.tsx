@@ -70,6 +70,7 @@ import { setHome } from './pages/home/homeUtils';
 import { SheepShortcut } from './utils/hooks/useKeyPress';
 import { ServiceManager } from './utils/service';
 import pluginManager from './utils/pluginManager';
+import { createGlobalError } from './utils/context/GlobalErrorContext';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -124,93 +125,93 @@ function App() {
   })
 
   onMount(async () => {
-    /* IFDEF WEB */
-    /* ENDIF */
-
-    import.meta.glob("./WebComponents/*.ts", {
-      eager: true,
-    })
-
     try {
-      const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
-      const time = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])
-      if (time["min"] > 44 && time["hour"] >= 0) localStorage.removeItem("pluginStatusCachce")
-    } catch (error) { }
+      /* IFDEF WEB */
+      /* ENDIF */
 
-    await pluginManager.initialPlugins().then(async () => {
-      console.log("SEX")
-      await pluginManager.changeInformationPlugin("AnilistApi")
-    })
+      try {
+        const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
+        const time = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])
+        if (time["min"] > 44 && time["hour"] >= 0) localStorage.removeItem("pluginStatusCachce")
+      } catch (error) { }
 
-    getTodayAnilistAnime().then((v) => {
-      setTodayAnimeInAnilist(v)
-    })
+      await pluginManager.initialPlugins().then(async () => {
+        console.log("SEX")
+        await pluginManager.changeInformationPlugin("AnilistApi")
+      })
 
-    /* IFDEF DEBUG|PROD */
-    if (!getGlobalCache().deeplinkRunned) {
-      window.api.onProtocolRequest(fetchDeepLink)
-      setDeeplinkRunned(true)
+      getTodayAnilistAnime().then((v) => {
+        setTodayAnimeInAnilist(v)
+      })
+
+      /* IFDEF DEBUG|PROD */
+      if (!getGlobalCache().deeplinkRunned) {
+        window.api.onProtocolRequest(fetchDeepLink)
+        setDeeplinkRunned(true)
+      }
+
+      setDeepLink({
+        name: 'Fetch Anime',
+        code: '',
+        func: fetchAnimeDeepLink
+      })
+
+      window.api.yt_dlp.versionList().then((v) => {
+        setYT_DLPVersion(v)
+      }).catch((v) => console.error("Failed Set YT_DLP Version", v))
+      /* ENDIF */
+
+      /* IFDEF WEB */
+      if (!localStorage.getItem("config")) localStorage.setItem("config", JSON.stringify(defaultConfigWeb))
+      if (!localStorage.getItem("history")) localStorage.setItem("history", JSON.stringify([]))
+      setConfig(deepMerge(defaultConfigWeb, JSON.parse(localStorage.getItem("config") as any)))
+      setGlobalHistory(JSON.parse(localStorage.getItem("history") as any))
+      /* ENDIF */
+
+      /* IFDEF DEBUG|PROD */
+      setConfig(await window.api.getConfig())
+      setGlobalHistory(await window.api.getHistory())
+      /* ENDIF */
+
+      setinitialState({ text: "initial.theme", plugin: false })
+      /* IFDEF DEBUG|PROD */
+      setGlobalTheme([
+        ...window["animuAppInfo"]["themes"],
+        ...await window.api.themes.list()
+      ]);
+      /* ENDIF */
+
+      (window as any).ServiceManager = () => ServiceManager
+
+      setinitialState({ text: "Loading Animulist", plugin: false })
+      /* IFDEF DEBUG|PROD */
+      setAnimulistData(await window.api.animulist.getDatabase())
+      /* ENDIF */
+
+      /* IFDEF WEB */
+      if (!localStorage.getItem("animulist")) localStorage.setItem("animulist", JSON.stringify([]))
+      setAnimulistData(JSON.parse(localStorage.getItem("animulist") as any))
+      /* ENDIF */
+
+      setinitialState({ text: "initial.config", plugin: false })
+      /* IFDEF DEBUG|PROD */
+      LoadConfig()
+      /* ENDIF */
+      setHomeActivePage("global.home")
+
+      setinitialState({ text: "initial.plugin", plugin: false })
+
+      setHome()
+
+      setInitation(false)
+      initialServices()
+
+      /* IFDEF DEBUG|PROD */
+      runCheckUpdate()
+      /* ENDIF */
+    } catch (error) {
+      createGlobalError(error)
     }
-
-    setDeepLink({
-      name: 'Fetch Anime',
-      code: '',
-      func: fetchAnimeDeepLink
-    })
-
-    window.api.yt_dlp.versionList().then((v) => {
-      setYT_DLPVersion(v)
-    }).catch((v) => console.error("Failed Set YT_DLP Version", v))
-    /* ENDIF */
-
-    /* IFDEF WEB */
-    if (!localStorage.getItem("config")) localStorage.setItem("config", JSON.stringify(defaultConfigWeb))
-    if (!localStorage.getItem("history")) localStorage.setItem("history", JSON.stringify([]))
-    setConfig(deepMerge(defaultConfigWeb, JSON.parse(localStorage.getItem("config") as any)))
-    setGlobalHistory(JSON.parse(localStorage.getItem("history") as any))
-    /* ENDIF */
-
-    /* IFDEF DEBUG|PROD */
-    setConfig(await window.api.getConfig())
-    setGlobalHistory(await window.api.getHistory())
-    /* ENDIF */
-
-    setinitialState({ text: "initial.theme", plugin: false })
-    /* IFDEF DEBUG|PROD */
-    setGlobalTheme([
-      ...window["animuAppInfo"]["themes"],
-      ...await window.api.themes.list()
-    ]);
-    /* ENDIF */
-
-    (window as any).ServiceManager = () => ServiceManager
-
-    setinitialState({ text: "Loading Animulist", plugin: false })
-    /* IFDEF DEBUG|PROD */
-    setAnimulistData(await window.api.animulist.getDatabase())
-    /* ENDIF */
-
-    /* IFDEF WEB */
-    if (!localStorage.getItem("animulist")) localStorage.setItem("animulist", JSON.stringify([]))
-    setAnimulistData(JSON.parse(localStorage.getItem("animulist") as any))
-    /* ENDIF */
-
-    setinitialState({ text: "initial.config", plugin: false })
-    /* IFDEF DEBUG|PROD */
-    LoadConfig()
-    /* ENDIF */
-    setHomeActivePage("global.home")
-
-    setinitialState({ text: "initial.plugin", plugin: false })
-
-    setHome()
-
-    setInitation(false)
-    initialServices()
-
-    /* IFDEF DEBUG|PROD */
-    runCheckUpdate()
-    /* ENDIF */
   })
 
   function LoadConfig() {
@@ -263,6 +264,7 @@ function App() {
     <Switch>
       <Match when={isInitation()}>
         <main class='animu-initial-container'>
+          <span></span>
           <img src={icon} alt="Animu Icon" class='animu-initial-icon' />
           <div class="animu-initial-content">
             <span class='animu-initial-text'>{t("initial.animu")}</span>
@@ -270,6 +272,7 @@ function App() {
               <span class='animu-initial-text'>{t(initialState().text)}</span>
             </div>
           </div>
+          <span class='material-symbols-outlined loading-animation icon'>progress_activity</span>
         </main>
       </Match>
       <Match when={!isInitation()}>

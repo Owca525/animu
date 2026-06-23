@@ -11,6 +11,7 @@ import "material-symbols/outlined.css"
 import { SocketProvider } from './utils/context/SocketContext';
 import LocalErrorBoundary from './utils/ErrorBoundary';
 import DebugContext from './utils/context/debugContext';
+import { ErrorCreatorContext } from './utils/context/GlobalErrorContext';
 
 (window as any).animuAppInfo = "PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION";
 
@@ -31,24 +32,30 @@ import DebugContext from './utils/context/debugContext';
 // };
 // /* ENDIF */
 
+import.meta.glob("./WebComponents/*.ts", {
+  eager: true,
+})
+
 render(
   () => (
     <ErrorBoundary fallback={LocalErrorBoundary}>
-      <DebugContext>
-        <I18nProvider config={{ defaultLang: "en", fallbackLang: "en" }}>
-          <MenuContextProvider>
-            <SocketProvider>
-              <DialogProvider>
-                <ContextMenu>
-                  <ToastProvider>
-                    <App />
-                  </ToastProvider>
-                </ContextMenu>
-              </DialogProvider>
-            </SocketProvider>
-          </MenuContextProvider>
-        </I18nProvider>
-      </DebugContext>
+      <ErrorCreatorContext>
+        <DebugContext>
+          <I18nProvider config={{ defaultLang: "en", fallbackLang: "en" }}>
+            <MenuContextProvider>
+              <SocketProvider>
+                <DialogProvider>
+                  <ContextMenu>
+                    <ToastProvider>
+                      <App />
+                    </ToastProvider>
+                  </ContextMenu>
+                </DialogProvider>
+              </SocketProvider>
+            </MenuContextProvider>
+          </I18nProvider>
+        </DebugContext>
+      </ErrorCreatorContext>
     </ErrorBoundary>
   ),
   document.getElementById("root") as HTMLElement

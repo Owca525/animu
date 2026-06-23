@@ -25,9 +25,9 @@ function LocalErrorBoundary(error: any) {
             <div class="main-error-text">{"Critical Error has occured, do you want to go home?"}</div>
             <div class="main-error-button-container">
                 <Button content={"Go Back Home"} ButtonClass='error-button' onClick={() => { globalNavigate(""); window.BrowserWindow.reload() }} />
-                <Button content={"Leave Animu"} ButtonClass='error-button' onClick={() => createIssue()} />
+                <Button content={"Send Report To Github"} ButtonClass='error-button' onClick={() => createIssue()} />
                 {/* IFDEF PROD|DEBUG */}
-                <Button content={"Leave Animu"} ButtonClass='error-button' onClick={() => window.api ? reloadWebsite() : ""} />
+                <Button content={"Leave Animu"} ButtonClass='error-button' onClick={() => window.api ? window.BrowserWindow.exit() : reloadWebsite()} />
                 {/* ENDIF */}
             </div>
             <div class="main-error-show">
