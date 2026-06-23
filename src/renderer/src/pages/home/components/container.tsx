@@ -117,8 +117,8 @@ function Container(props: containerData) {
   }
 
   function updateAfterChangePage() {
-    if (location.href.includes("#/info") || location.href.includes("#/player") || location.href.includes("#/settings") ) return
-    
+    if (location.href.includes("#/info") || location.href.includes("#/player") || location.href.includes("#/settings")) return
+
     const cache = getHomeCache()
     if (cache.data["sections"].length > 1) return
     updateHomeContainer([{
@@ -181,7 +181,7 @@ function Container(props: containerData) {
         </Match>
         <Match when={cardResponse.error() && animeCards().length > 0}>
           <div class="container-loading-bottom">
-            <span class="material-symbols-outlined loading-animation icon">progress_activity</span>
+            <span class="material-symbols-outlined icon">error</span>
           </div>
         </Match>
       </Switch>

@@ -47,8 +47,6 @@ function Card(props: CardProps) {
     (entries) => {
       entries.forEach((entry) => {
         entry.target.classList.toggle("show", entry.isIntersecting)
-        setVariables({ isCardActive: entry.isIntersecting })
-        console.log(entry.isIntersecting)
       });
     },
     {
@@ -306,18 +304,12 @@ function Card(props: CardProps) {
         </span>
       </Show>
 
-      <Show when={cardVariables.isCardActive}>
-        <sheep-img
-          src={props.card.AnimeData.coverImage}
-          class="card-image"
-          divClass="card-image-placeholder"
-        />
-      </Show>
-
-      <Show when={!cardVariables.isCardActive}>
-        <div class="card-image-placeholder"></div>
-      </Show>
-
+      <sheep-img
+        src={props.card.AnimeData.coverImage}
+        class="card-image"
+        divClass="card-image-placeholder"
+      />
+      
       <Show when={props.card.saveData && props.card.saveData["last_Time"] > 0 && (props.card.saveData["duration"] || props.card.AnimeData.duration)}>
         <div class="card-episode-seekbar-container">
           <span style={{
