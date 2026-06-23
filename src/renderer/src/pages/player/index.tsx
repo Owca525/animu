@@ -11,13 +11,13 @@ import { useNavigate } from "@solidjs/router";
 import { getConfig } from "@renderer/utils/stores/config";
 import { createSignal, Match, onCleanup, onMount, Switch } from "solid-js";
 import ExternalPlayer from "./externalPlayer";
-import { pluginManager } from "@renderer/utils/stores/plugins";
 import { useResponse } from "@renderer/utils/hooks/useResponse";
 import { useI18n } from "@renderer/utils/i18n";
 import { addToAnimuList, updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist";
 import { getSocket, getSocketRoom, setIncognitoMode } from "@renderer/utils/stores/global";
 import { unwrap } from "solid-js/store";
 import { SheepShortcut } from "@renderer/utils/hooks/useKeyPress";
+import pluginManager from "@renderer/utils/pluginManager";
 
 function OverWritePlayer(url: string, hls: boolean) {
     if (!url || !hls) throw new Error("Give 2 Aruments")
@@ -98,7 +98,7 @@ const player = () => {
 
                 if (anime_data.save.pluginName == "SHEEPCUSTOMOWEVERWIOTE" || (window as any).customPlayerData) return (window as any).customPlayerData
 
-                let pluginPlayer = await pluginManager().changePlayerPlugin(anime_data.save?.pluginName ? anime_data.save.pluginName : "")
+                let pluginPlayer = await pluginManager.changePlayerPlugin(anime_data.save?.pluginName ? anime_data.save.pluginName : "")
                 return await pluginPlayer.extractPlayerData(animeType as string, episode as episodeMetadata, player_id as string)
             },
             cacheTime: 3600000,

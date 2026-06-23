@@ -40,7 +40,7 @@ import {
 } from 'solid-js';
 import { DetectOldVersionHistory, OverWriteHistory } from '@renderer/utils/FilesManager/history';
 import { getConfig, setConfig } from '@renderer/utils/stores/config';
-import { getAllPluginList, getInformationPlugin, getPlayerPLugin, getPluginRepo, pluginManager } from '@renderer/utils/stores/plugins';
+import { getAllPluginList, getInformationPlugin, getPlayerPLugin, getPluginRepo } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { saveConfig } from '@renderer/utils/FilesManager/config';
 import { showDialog } from '@renderer/utils/context/DialogContext';
@@ -56,6 +56,7 @@ import semver from "semver";
 import { OvewriteAnimuList } from '@renderer/utils/FilesManager/animulist';
 import OtherSettings from './components/otherSettings';
 import { SheepShortcut } from '@renderer/utils/hooks/useKeyPress';
+import pluginManager from '@renderer/utils/pluginManager';
 
 export type pluginRepoExpandedSettings = {
     name: string,
@@ -259,7 +260,7 @@ function settings() {
             setSaving(() => false)
             saveConfig(config().new)
             setDynamicZoom(config().new.General.Window.Zoom)
-            pluginManager().initialPlugins()
+            pluginManager.initialPlugins()
             window.backend.refresh()
             toast(t("settings.saving.done"), { type: "success" })
         } catch (error) {
@@ -281,7 +282,7 @@ function settings() {
         })
 
         setThemes(loadedTheme().filter((val) => ![...activeThemes().entries()].map((v) => v[1].themeName).includes(val.themeName)))
-        pluginManager().initialPlugins()
+        pluginManager.initialPlugins()
         setSaving(() => false)
     }
 
@@ -390,8 +391,8 @@ function settings() {
         let tmpPlugin = plugin
         if (!active) tmpPlugin = pluginList()[0]["plugin"]
 
-        if (tmpPlugin["metadata"]["type"] == "information") loadedPlugin = await pluginManager().changeInformationPlugin(tmpPlugin["metadata"]["name"])
-        if (tmpPlugin["metadata"]["type"] == "information") loadedPlugin = await pluginManager().changePlayerPlugin(tmpPlugin["metadata"]["name"])
+        if (tmpPlugin["metadata"]["type"] == "information") loadedPlugin = await pluginManager.changeInformationPlugin(tmpPlugin["metadata"]["name"])
+        if (tmpPlugin["metadata"]["type"] == "information") loadedPlugin = await pluginManager.changePlayerPlugin(tmpPlugin["metadata"]["name"])
 
         if (!loadedPlugin) {
             toast(t("Failed Change Plugin", { type: "error" }))
@@ -1562,7 +1563,7 @@ function settings() {
                         <div class="settings-setting-container">
                             {t("settings.extensions.updateplugin")}
                             <Button content={t("settings.general.checkupdate")} onClick={async () => {
-                                await pluginManager().checkUpdates()
+                                await pluginManager.checkUpdates()
                             }} />
                         </div>
                         <div class="settings-line"></div>
@@ -1586,7 +1587,7 @@ function settings() {
                                                         if (!item.update && item.installed) return
                                                         await window.api.plugins.installUpdate(item)
 
-                                                        await pluginManager().checkUpdates()
+                                                        await pluginManager.checkUpdates()
                                                     }}
                                                 />
                                             </div>

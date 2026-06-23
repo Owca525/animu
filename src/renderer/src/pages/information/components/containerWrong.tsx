@@ -5,9 +5,10 @@ import Input from '@renderer/components/input';
 import Dropdown from '@renderer/components/dropDown';
 import { segregatePlugins } from '@renderer/utils/functions';
 import { Component, createSignal, For, onMount, Show } from 'solid-js';
-import { getPlayerPLugin, pluginManager } from '@renderer/utils/stores/plugins';
+import { getPlayerPLugin } from '@renderer/utils/stores/plugins';
 import { useI18n } from '@renderer/utils/i18n';
 import { useResponse } from '@renderer/utils/hooks/useResponse';
+import pluginManager from '@renderer/utils/pluginManager';
 
 interface ContainerWrongProps {
     name: string;
@@ -46,7 +47,7 @@ const ContainerWrong: Component<ContainerWrongProps> = ({ name, exitfunc, refetc
                     onKeyDown={(text) => {setSearchName(text);response.Refetch([searchName(), getPlayerPLugin()])}}
                 />
                 <Dropdown
-                    options={segregatePlugins(async (name) => { await pluginManager().changePlayerPlugin(name); response.Refetch([searchName(), getPlayerPLugin()]); })}
+                    options={segregatePlugins(async (name) => { await pluginManager.changePlayerPlugin(name); response.Refetch([searchName(), getPlayerPLugin()]); })}
                     disableX
                     buttonText={getPlayerPLugin()?.metadata.name}
                 />

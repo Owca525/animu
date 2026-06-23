@@ -34,7 +34,7 @@ import {
     Switch
 } from 'solid-js';
 import { animulistData, getGlobalCache } from '@renderer/utils/stores/global';
-import { getInformationPlugin, getPlayerPLugin, pluginManager } from '@renderer/utils/stores/plugins';
+import { getInformationPlugin, getPlayerPLugin } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
@@ -61,6 +61,7 @@ import { getHomeCache, getHomeSidebarData } from '@renderer/utils/stores/home';
 import { setNewActivePage, StartHomeSearch } from '../home';
 import EpisodeBox from './components/episodeBox';
 import { SheepShortcut } from '@renderer/utils/hooks/useKeyPress';
+import pluginManager from '@renderer/utils/pluginManager';
 
 interface informationTmpProps {
     anime: AnimeData,
@@ -123,7 +124,7 @@ function information() {
             if (tempData().anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED" || tempData().anime.type != "ANIME") return
             // if (tempData().anime.id == "" && !player_id) return setEpisodeResponse(await plugin.extractEpisodeList(tempData().anime, undefined)) deprecated
 
-            let plugin = await pluginManager().changePlayerPlugin(pluginName as string)
+            let plugin = await pluginManager.changePlayerPlugin(pluginName as string)
 
             let response = await plugin.extractEpisodeList(tempData().anime, player_id as string)
 
@@ -247,7 +248,7 @@ function information() {
         }
 
         if (history.length > 0) {
-            let plugin = await pluginManager().changePlayerPlugin(history[0].saveData?.pluginName as string)
+            let plugin = await pluginManager.changePlayerPlugin(history[0].saveData?.pluginName as string)
             if (plugin) if (plugin.metadata.name != history[0].saveData?.pluginName) setCurrentId(undefined)
             setCurrentPlugin(plugin.metadata.name)
 
@@ -362,7 +363,7 @@ function information() {
 
         resetContentVariable()
         setmoreMiniTitle(false)
-        if (currentPlugin()) await pluginManager().changePlayerPlugin(currentPlugin()!)
+        if (currentPlugin()) await pluginManager.changePlayerPlugin(currentPlugin()!)
 
         // Reseting Recomendation
         setTmpData((prev) => ({ ...prev, anime: { ...prev.anime, recommendations: undefined } }))
@@ -545,7 +546,7 @@ function information() {
 
     async function refreashInformation(name: string, force: boolean = false) {
         setCurrentId(undefined)
-        await pluginManager().changePlayerPlugin(name)
+        await pluginManager.changePlayerPlugin(name)
         setCurrentPlugin(name)
         episodeResponse.Refetch([tempData()["anime"]["title"]["romaji"], currentIDplayer(), currentPlugin()], force)
     }

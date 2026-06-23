@@ -432,7 +432,6 @@ export interface pluginsGlobalFormat {
     informationPlugin: informationPluginFormat,
     playerPlugin: playerPluginFormat,
 
-    pluginManager: PluginManagerFormat,
     pluginRepo: pluginRepoExpanded[]
 }
 

@@ -624,7 +624,15 @@ export class PluginManager implements PluginManagerFormat {
     }
 
     initialPlugins = async (): Promise<void> => {
-        if (this.isInitializingPlugins) return
+        if (this.isInitializingPlugins) return new Promise((resolve) => {
+            let interval = setInterval(() => {
+                if (!this.isInitializingPlugins) {
+                    clearInterval(interval)
+                    resolve()
+                }
+            }, 100)
+        })
+
         this.isInitializingPlugins = true
 
         console.time('Animu Plugin Initializer Timer');
@@ -775,3 +783,5 @@ export class PluginManager implements PluginManagerFormat {
         await this.initialPlugins()
     }
 }
+
+export default new PluginManager()

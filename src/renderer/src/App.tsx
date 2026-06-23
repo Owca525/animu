@@ -43,7 +43,7 @@ import {
 
 import "./utils/NotificationManager"
 import { getConfig, setConfig } from './utils/stores/config';
-import { pluginManager, setPluginRepo } from './utils/stores/plugins';
+import { setPluginRepo } from './utils/stores/plugins';
 import { HashRouter, Route } from '@solidjs/router';
 import { pluginRepoExpanded, themeMetadata } from './utils/types';
 import { setHomeActivePage } from './utils/stores/home';
@@ -69,6 +69,7 @@ import './utils/debug';
 import { setHome } from './pages/home/homeUtils';
 import { SheepShortcut } from './utils/hooks/useKeyPress';
 import { ServiceManager } from './utils/service';
+import pluginManager from './utils/pluginManager';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -136,8 +137,10 @@ function App() {
       if (time["min"] > 44 && time["hour"] >= 0) localStorage.removeItem("pluginStatusCachce")
     } catch (error) { }
 
-    await pluginManager().initialPlugins()
-    await pluginManager().changeInformationPlugin("AnilistApi")
+    await pluginManager.initialPlugins().then(async () => {
+      console.log("SEX")
+      await pluginManager.changeInformationPlugin("AnilistApi")
+    })
 
     getTodayAnilistAnime().then((v) => {
       setTodayAnimeInAnilist(v)
@@ -214,7 +217,7 @@ function App() {
     let loadedConnfig = getConfig()
     // await navigator.mediaDevices.enumerateDevices()
 
-    pluginManager().changePlayerPlugin(loadedConnfig["plugins"]["player"])
+    pluginManager.changePlayerPlugin(loadedConnfig["plugins"]["player"])
 
     navigator.mediaDevices.enumerateDevices().then((element) => {
       const audioOutputs = element.filter(device => device.kind === "audiooutput")
@@ -289,11 +292,11 @@ async function checkPluginUpdate(): Promise<any> {
   try {
     if (localStorage.getItem("AnimuPluginDatabase")) {
       tmpDatabase = JSON.parse(localStorage.getItem("AnimuPluginDatabase") as any)
-    } else tmpDatabase = await pluginManager().checkUpdates()
+    } else tmpDatabase = await pluginManager.checkUpdates()
   } catch (error) { console.warn("Error failed parsed pluginRepo Database", error) }
 
-  if (config.plugins.pluginCheckType == "On Start" || config.plugins.lastTimeCheck <= 0) return await pluginManager().checkUpdates()
-  if (checkDate(config.plugins.lastTimeCheck, config.plugins.pluginCheckType)) await pluginManager().checkUpdates()
+  if (config.plugins.pluginCheckType == "On Start" || config.plugins.lastTimeCheck <= 0) return await pluginManager.checkUpdates()
+  if (checkDate(config.plugins.lastTimeCheck, config.plugins.pluginCheckType)) await pluginManager.checkUpdates()
   else { setPluginRepo(tmpDatabase) }
 }
 
@@ -316,7 +319,7 @@ function initialServices() {
           if (time["min"] > 44 && time["hour"] >= 0) localStorage.removeItem("pluginStatusCachce")
         } catch (error) { }
 
-        await pluginManager().checkStatusServerInPlugins(localStorage.getItem("pluginStatusCachce") == undefined)
+        await pluginManager.checkStatusServerInPlugins(localStorage.getItem("pluginStatusCachce") == undefined)
       },
       name: t("PluginStatus"),
       description: t("Check Status Of Player Plugins"),

@@ -13,12 +13,12 @@ import {
 import { DeleteFromHistory, SaveHistory } from "@renderer/utils/FilesManager/history";
 import { createStore, unwrap } from "solid-js/store";
 import { removeToast, toast, updateToast } from "@renderer/utils/context/ToastNotification";
-import { pluginManager } from "@renderer/utils/stores/plugins";
 import { useI18n } from "@renderer/utils/i18n";
 import { showCustomMenu } from "@renderer/utils/context/menuContext";
 import { animulistData } from "@renderer/utils/stores/global";
 import { addToAnimuList, removeFromAnimulist } from "@renderer/utils/FilesManager/animulist";
 import AnimulistMenu from "@renderer/components/animulistMenu";
+import pluginManager from "@renderer/utils/pluginManager";
 
 interface CardProps {
   card: cardData;
@@ -67,7 +67,7 @@ function Card(props: CardProps) {
 
     if (props.card.saveData && props.card.saveData.episode != "" && (props.card.saveData.last_Time != 0 || props.card.saveData.isStarted)) {
       let idToast = toast(t("notification.episodesfetching"), { type: "loading", timer: true })
-      const currentPLugin = await pluginManager().changePlayerPlugin(props.card.saveData.pluginName)
+      const currentPLugin = await pluginManager.changePlayerPlugin(props.card.saveData.pluginName)
       const episodeList = await currentPLugin.extractOnlyEpisodesList(props.card.saveData.type, props.card.AnimeData.player_ID as string).catch((error) => {
         console.error("currentPLugin.extractOnlyEpisodesList", error)
         return []
@@ -309,7 +309,7 @@ function Card(props: CardProps) {
         class="card-image"
         divClass="card-image-placeholder"
       />
-      
+
       <Show when={props.card.saveData && props.card.saveData["last_Time"] > 0 && (props.card.saveData["duration"] || props.card.AnimeData.duration)}>
         <div class="card-episode-seekbar-container">
           <span style={{

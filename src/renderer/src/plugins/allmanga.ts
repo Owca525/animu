@@ -279,7 +279,7 @@ export default class Allmanga implements playerPluginFormat {
         type: "player"
     }
     // config: { [key: string]: any; } = {
-    //     "settings.extensions.website": API_WEB,
+    //     "settings.extensions.website": API_WEB,s
     //     "HASH_SEARCH": HASH_SEARCH,
     //     "HASH_INFO": HASH_INFO,
     //     "HASH_PLAYER": HASH_PLAYER,

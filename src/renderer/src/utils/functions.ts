@@ -21,10 +21,10 @@ import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
 import { unwrap } from 'solid-js/store';
-import { getInformationPlugin, getPlayerPluginList, pluginManager } from './stores/plugins';
+import { getInformationPlugin, getPlayerPluginList } from './stores/plugins';
 import { removeToast, toast, updateToast } from './context/ToastNotification';
 import { readPlaylist, updatePlaylist } from './FilesManager/playlist';
-import { playerPluginInstance } from './pluginManager';
+import pluginManager, { playerPluginInstance } from './pluginManager';
 import { sendNotification } from "./NotificationManager"
 
 export function decodeHtmlEntities(str: string | undefined) {
@@ -893,7 +893,7 @@ export async function fetchAnimeDeepLink(deeplink: string) {
     }
 
     const toastID = toast(t("notification.episodesfetching"), { type: "loading", timer: true })
-    const currentPLugin = await pluginManager().changePlayerPlugin(anime.player.plugin)
+    const currentPLugin = await pluginManager.changePlayerPlugin(anime.player.plugin)
     const episodeList = await currentPLugin.extractOnlyEpisodesList(anime.player.type, anime.player.id);
 
     if (episodeList.length <= 0) {

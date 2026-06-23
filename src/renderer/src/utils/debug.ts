@@ -2,11 +2,12 @@ import { unwrap } from "solid-js/store";
 import { getConfig } from "./stores/config";
 import { getGlobalCache } from "./stores/global";
 import { getHomeCache } from "./stores/home";
-import { getAllPluginList, getInformationPlugin, getPlayerPLugin, getPluginRepo, pluginManager } from "./stores/plugins";
+import { getAllPluginList, getInformationPlugin, getPlayerPLugin, getPluginRepo } from "./stores/plugins";
 import { request } from "./functions";
 import { t } from "./i18n";
 import icon from '@resources/icon.png';
 import { sendNotification } from "./NotificationManager";
+import pluginManager from "./pluginManager";
 
 (window as any).getConfig = () => unwrap(getConfig());
 (window as any).getGlobalCache = () => unwrap(getGlobalCache());
@@ -15,7 +16,7 @@ import { sendNotification } from "./NotificationManager";
 (window as any).getAllPluginList = () => unwrap(getAllPluginList());
 (window as any).getPlayerPLugin = () => unwrap(getPlayerPLugin());
 (window as any).getPluginRepo = () => unwrap(getPluginRepo());
-(window as any).pluginManager = () => unwrap(pluginManager());
+(window as any).pluginManager = () => pluginManager;
 (window as any).sendNotification = sendNotification;
 (window as any).request = request;
 (window as any).testNotitication = () => {
