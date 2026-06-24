@@ -101,7 +101,7 @@ var localStorage = {
 
 export default class Animetsu implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "2.3",
+        version: "2.4",
         name: "Animetsu.Live",
         icon: `${WEBSITE}/android-chrome-192x192.png`,
         author: "Owca525",
@@ -200,7 +200,7 @@ export default class Animetsu implements playerPluginFormat {
 
             let episodes = response.json.map((element) => ({
                 ep: element["ep_num"],
-                img: `${window["animetsuBackend"]["proxy"]}${element["img"]}`,
+                // img: `${window["animetsuBackend"]["proxy"]}${element["img"]}`,
                 title: element["name"],
                 uploadedUnix: dateToUnix(element["aired_at"])
             }))
