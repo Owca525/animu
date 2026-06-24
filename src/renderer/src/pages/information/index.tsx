@@ -430,6 +430,8 @@ function information() {
 
     /* IFDEF DEBUG|PROD */
     async function getAnimeTrailer(url: string, noContentLoading = false) {
+        if (!url) return
+        
         let storyBoard: string | undefined
         
         try {
