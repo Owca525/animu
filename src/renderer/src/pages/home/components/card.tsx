@@ -1,7 +1,7 @@
 import { cardData, ContextMenuProps } from "@renderer/utils/types";
 import "./css/card.css";
 import { useNavigate } from "@solidjs/router";
-import { JSX, Show, onCleanup } from "solid-js";
+import { JSX, Show } from "solid-js";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import {
   convertSeconds,
@@ -37,25 +37,10 @@ function Card(props: CardProps) {
   const [cardVariables, setVariables] = createStore({
     animulist: props.card.animulist ? props.card.animulist : animelist ? animelist["animulist"] : undefined,
     isInformationBoxOut: false,
-    isCardActive: false,
   })
 
   let cardRef: HTMLDivElement | undefined;
   let informationBox: JSX.Element[] = []
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        entry.target.classList.toggle("show", entry.isIntersecting)
-      });
-    },
-    {
-      rootMargin: "200px",
-      threshold: 0,
-    }
-  );
-
-  onCleanup(() => observer.disconnect());
 
   async function sendToInformation() {
     if (props.containerClick) props.containerClick()
@@ -269,9 +254,8 @@ function Card(props: CardProps) {
       tabIndex={-1}
       ref={(v) => {
         cardRef = v
-        observer.observe(v);
       }}
-      class={`card-container ${props.small ? "small" : ""}`}
+      class={`card-container show ${props.small ? "small" : ""}`}
       onClick={sendToInformation}
       onMouseOver={checkOutOfBound}
       title={title}
