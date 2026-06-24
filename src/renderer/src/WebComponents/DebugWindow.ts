@@ -145,6 +145,7 @@ const css = `
     z-index: 99999;
     overflow: hidden;
     box-sizing: border-box;
+    border-radius: 4px;
 }
 .sheep-debug-content {
     display: flex;
@@ -204,6 +205,7 @@ const css = `
     font-size: 0.9em;
     width: max-content;
     padding: 4px 16px;
+    border-radius: 4px;
 }
 .sheep-debug-button:hover {
     background-color: #434343;
@@ -269,6 +271,7 @@ const css = `
     font-family: Consolas, monospace;
     width: max-content;
     cursor: pointer;
+    border-radius: 4px;
 }
 
 .sheep-debug-checkbox .sheep-debug-input-checkbox {
@@ -280,6 +283,7 @@ const css = `
     display: grid;
     place-content: center;
     transition: 0.15s;
+    border-radius: 4px;
 }
 
 .sheep-debug-checkbox .sheep-debug-input-checkbox:hover {
@@ -304,6 +308,7 @@ const css = `
     width: auto;
     background-color: #1F1F1F;
     border: 2px solid #2D2D2D;
+    border-radius: 4px;
 }
 .sheep-debug-input:hover {
     background-color: #30303;
@@ -360,6 +365,7 @@ const css = `
     height: 100% !important;
     resize: none;
     width: 100% !important;
+    border-radius: 4px;
 }
 .sheep-debug-exit-button {
     margin-left: auto;

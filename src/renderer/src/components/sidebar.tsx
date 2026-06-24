@@ -119,57 +119,55 @@ export default function Sidebar(props: sidebarProps) {
         }, 100)
       }}
     >
-      <Show when={sidebarHover()}>
-        <Show when={props.showLogo}>
-          <div class="sidebar-logo-icon-container">
-            <img src={icon} alt={window["animuAppInfo"].ver} class="sidebar-image" />
-            <Show when={sidebarHover()}>
-              <div class="sidebar-version">v{window["animuAppInfo"].ver}</div>
-            </Show>
-          </div>
-        </Show>
-        <div class="sidebar-buttons-content">
-          <div class={`sidebar-top ${detectSidebarStateContainers()}`}>
-            <Show when={!props.showLogo}>
-              <Button icon={"arrow_back"}
-                content={detectSidebarStateButton(t("sidebar.hide"))}
-                onClick={(event) => hideSidebar(event, undefined)}
-                ButtonClass={detectSidebarStateClass()}
-              />
-            </Show>
-            <div class="sidebar-black-line"></div>
-            <For each={props.data.top}>
-              {(value, i) => (
-                <Button icon={value.icon}
-                  content={detectSidebarStateButton(value.text)}
-                  onClick={(event) => {
-                    setHomeSearchPage(1);
-                    setHomeStopScrolling(false);
-                    hideSidebar(event, value.onClick, i());
-                    if (props.onClickTopButtons) props.onClickTopButtons(value.text)
-                  }}
-                  ButtonClass={`${detectSidebarStateClass()} ${checkNumber(i())}`}
-                />
-              )}
-            </For>
-          </div>
-          <div class={`sidebar-bottom ${detectSidebarStateContainers()}`}>
-            <div class="sidebar-black-line"></div>
-            <For each={props.data.bottom}>
-              {(value) => (
-                <Button icon={value.icon}
-                  content={detectSidebarStateButton(value.text)}
-                  onClick={(event) => {
-                    hideSidebar(event, value.onClick)
-                    if (props.onClickBottomButtons) props.onClickBottomButtons(value.text)
-                  }}
-                  ButtonClass={detectSidebarStateClass()}
-                />
-              )}
-            </For>
-          </div>
+      <Show when={props.showLogo}>
+        <div class="sidebar-logo-icon-container">
+          <img src={icon} alt={window["animuAppInfo"].ver} class="sidebar-image" />
+          <Show when={sidebarHover()}>
+            <div class="sidebar-version">v{window["animuAppInfo"].ver}</div>
+          </Show>
         </div>
       </Show>
+      <div class="sidebar-buttons-content">
+        <div class={`sidebar-top ${detectSidebarStateContainers()}`}>
+          <Show when={!props.showLogo}>
+            <Button icon={"arrow_back"}
+              content={detectSidebarStateButton(t("sidebar.hide"))}
+              onClick={(event) => hideSidebar(event, undefined)}
+              ButtonClass={detectSidebarStateClass()}
+            />
+          </Show>
+          <div class="sidebar-black-line"></div>
+          <For each={props.data.top}>
+            {(value, i) => (
+              <Button icon={value.icon}
+                content={detectSidebarStateButton(value.text)}
+                onClick={(event) => {
+                  setHomeSearchPage(1);
+                  setHomeStopScrolling(false);
+                  hideSidebar(event, value.onClick, i());
+                  if (props.onClickTopButtons) props.onClickTopButtons(value.text)
+                }}
+                ButtonClass={`${detectSidebarStateClass()} ${checkNumber(i())}`}
+              />
+            )}
+          </For>
+        </div>
+        <div class={`sidebar-bottom ${detectSidebarStateContainers()}`}>
+          <div class="sidebar-black-line"></div>
+          <For each={props.data.bottom}>
+            {(value) => (
+              <Button icon={value.icon}
+                content={detectSidebarStateButton(value.text)}
+                onClick={(event) => {
+                  hideSidebar(event, value.onClick)
+                  if (props.onClickBottomButtons) props.onClickBottomButtons(value.text)
+                }}
+                ButtonClass={detectSidebarStateClass()}
+              />
+            )}
+          </For>
+        </div>
+      </div>
     </div>
   )
 }
