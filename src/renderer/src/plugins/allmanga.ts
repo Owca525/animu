@@ -220,7 +220,6 @@ async function fetchUrls(params: AllmangaURLformat): Promise<resolutionFormat[]>
     const urlObject = new URL(params.url);
 
     if (params["sourceName"] == "Uni") {
-        console.log(urlObject)
         const response = await request(`${urlObject["origin"]}/api/v1/video?id=${urlObject["hash"].replace("#", "")}&w=1920&h=1080&r=`, {
             headers: {
                 ...header,

@@ -1108,8 +1108,6 @@ export function checkTimeDriffrentUnix(start: number, end: number): { hour: numb
     const min = Math.floor((diff % 3600) / 60);
     const sec = diff % 60;
 
-    console.warn("checkTimeDriffrentUnix", { hour, min, sec })
-
     return { hour, min, sec };
 }
 

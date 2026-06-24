@@ -59,8 +59,6 @@ export async function updateHistoryData(id: string, data: cardData): Promise<boo
             if (tmp) historyCache.set(id, RemoveAnimeDataCache(tmp) as cardData)
         }
 
-        console.log(data, historyCache)
-
         /* IFDEF DEBUG|PROD */
         await window.api.os.write(`history.json`, JSON.stringify(checkAnimeDuplicate(historyCache.values().toArray())))
         /* ENDIF */

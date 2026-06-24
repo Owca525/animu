@@ -14,20 +14,20 @@ export function SheepFinderAnime2000(animeList, anime) {
             if (findedID) return findedID.player_ID
         }
 
-        console.log("First Check", animeList)
+        // console.log("First Check", animeList)
         // FIRST CHECK
         if (animeList.length <= 0) return undefined
         if (animeList.length == 1) return animeList[0].player_ID
 
         // Second Check
         let seasonYearFilter = animeList.filter((element) => element.seasonYear == anime.seasonYear)
-        console.log("Second Check", seasonYearFilter)
+        // console.log("Second Check", seasonYearFilter)
         if (seasonYearFilter.length <= 0) return undefined
         if (seasonYearFilter.length == 1) return seasonYearFilter[0].player_ID
 
         // Third Check
         let seasonFilter = seasonYearFilter.filter((element) => makeSmallText(element.season) == makeSmallText(anime.season))
-        console.log("Third Check", seasonYearFilter)
+        // console.log("Third Check", seasonYearFilter)
         if (seasonFilter.length <= 0) return undefined
         if (seasonFilter.length == 1) return seasonFilter[0].player_ID
 
@@ -35,7 +35,7 @@ export function SheepFinderAnime2000(animeList, anime) {
         let episodesFilter = undefined
         if (anime.episodes) {
             episodesFilter = seasonFilter.filter((element) => element.episodes == anime.episodes)
-            console.log("Four Check", episodesFilter)
+            // console.log("Four Check", episodesFilter)
             if (episodesFilter.length <= 0) return undefined
             if (episodesFilter.length == 1) return episodesFilter[0].player_ID
         }
@@ -44,13 +44,13 @@ export function SheepFinderAnime2000(animeList, anime) {
         let durationFilter = []
         if (episodesFilter) durationFilter = episodesFilter.filter((element) => element.duration == anime.duration)
         else durationFilter = seasonFilter.filter((element) => element.duration == anime.duration)
-        console.log("Five Check", durationFilter)
+        // console.log("Five Check", durationFilter)
         if (durationFilter.length <= 0) return undefined
         if (durationFilter.length == 1) return durationFilter[0].player_ID
 
         // Six Check
         let formatFilter = durationFilter.filter((element) => makeSmallText(element.format) == makeSmallText(anime.format))
-        console.log("Six Check", formatFilter)
+        // console.log("Six Check", formatFilter)
         if (formatFilter.length <= 0) return undefined
         if (formatFilter.length == 1) return formatFilter[0].player_ID
 
