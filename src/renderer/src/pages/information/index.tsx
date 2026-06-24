@@ -67,6 +67,7 @@ interface informationTmpProps {
     anime: AnimeData,
     saveData?: indentityPlayer,
     animulist?: animulistProps
+    DontOverWrite?: boolean
 }
 
 function information() {
@@ -248,7 +249,7 @@ function information() {
             history = tempHistory.get(tempData().anime.id)
         }
 
-        if (history) {
+        if (history && !tempData()["DontOverWrite"]) {
             let plugin = await pluginManager.changePlayerPlugin(history.saveData?.pluginName as string)
             if (plugin) if (plugin.metadata.name != history.saveData?.pluginName) setCurrentId(undefined)
             setCurrentPlugin(plugin.metadata.name)

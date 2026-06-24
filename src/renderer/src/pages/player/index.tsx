@@ -263,7 +263,7 @@ const player = () => {
         if (anime_data.continewatch) return navigate("/")
         if (config.Player.general.PlayerBehavior === "home") navigate("/")
         else {
-            localStorage.setItem("informationCache", JSON.stringify({ anime: anime_data.data, saveData: anime_data.save, animulist: anime_data.animulist }))
+            localStorage.setItem("informationCache", JSON.stringify({ anime: anime_data.data, saveData: anime_data.save, animulist: anime_data.animulist, DontOverWrite: true }))
             navigate("/info")
         }
     }
