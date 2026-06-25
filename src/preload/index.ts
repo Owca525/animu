@@ -104,6 +104,7 @@ if (process.contextIsolated) {
       exit: () => ipcRenderer.send("window:exit"),
       openDevTools: () => ipcRenderer.send("window:devtools"),
       reload: () => ipcRenderer.send("window:reload"),
+      createWindow: () => ipcRenderer.send("window:createNewWindow"),
     });
   } catch (error) {
     console.error(error);

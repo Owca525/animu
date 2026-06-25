@@ -106,6 +106,7 @@ declare global {
       exit: () => void;
       openDevTools: () => void;
       reload: () => void;
+      createWindow: () => void
     };
   }
 }
