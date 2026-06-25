@@ -463,17 +463,27 @@ function information() {
 
             if (response["formats"]) {
                 const filtered = response["formats"].filter((v) => !v["container"] && v["protocol"] == "m3u8_native" && v["format_note"] != "storyboard")
-                let tmpres = filtered.map((v) => ({
-                    url: v["url"],
-                    res: `${v["height"]}`,
-                    reqHeader: v["http_headers"],
-                    hls: true
-                }))
+                const filteredDash = response["formats"].filter((v) => v["container"] && v["container"].includes("dash") && v["format_note"] != "storyboard")
+                // TODO: ADD AUDIO CHANNEL FOR MINI PLAYER
+                if (filtered.length > 0) {
+                    resolutions = filtered.map((v) => ({
+                        url: v["url"],
+                        res: `${v["height"]}`,
+                        reqHeader: v["http_headers"],
+                        hls: true
+                    }))
+                } else if (filteredDash.length > 0) {
+                    resolutions = filteredDash.map((v) => ({
+                        url: v["url"],
+                        res: `${v["height"]}`,
+                        reqHeader: v["http_headers"],
+                        hls: false
+                    }))
+                }
 
                 const storyBoardFinded: any[] = response["formats"].filter((v) => v["format_note"] != "storyboard")
                 storyBoard = storyBoardFinded.at(-1)["url"]
-                tmpres.reverse()
-                resolutions = tmpres
+                resolutions.reverse()
             }
 
             let chapters: playerChapterList[] = []
@@ -499,6 +509,8 @@ function information() {
                     })
                 }
             }
+
+            console.log(resolutions)
 
             setContentYT_DLP([{
                 title: response["fulltitle"],
