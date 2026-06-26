@@ -318,8 +318,6 @@ ipcMain.handle("yt-dlp:releases", async () => {
 ipcMain.handle("yt-dlp:run", async (_, commands: string[]) => {
     if (!yt_dlp) throw new Error("Missing Instance of yt-dlp")
 
-    console.log(yt_dlp)
-
     return yt_dlp.execute(commands)
 })
 /////////////////////
