@@ -648,8 +648,8 @@ export async function updateHomeContainer(data: homeData["data"] | containerData
     }
 }
 
-export async function runYT_DLP(url: string, commands?: string[]) {
-    return await window.api.yt_dlp.run(url, commands)
+export async function runYT_DLP(commands: string[]) {
+    return await window.api.yt_dlp.run(commands)
 }
 
 export async function getPluginsList() {

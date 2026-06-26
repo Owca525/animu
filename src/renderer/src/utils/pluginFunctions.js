@@ -254,8 +254,8 @@ export async function request(url, options) {
  * @param {?string[]} [commands] 
  * @returns {{ [key: string]: any; }} 
  */
-export async function runYT_DLP(url, commands) {
-    return await window["yt_dlp"](url, commands)
+export async function runYT_DLP(commands) {
+    return await window["yt_dlp"](commands)
     // return await window.api.yt_dlp.run(url, commands)
 }
 

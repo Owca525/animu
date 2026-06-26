@@ -172,11 +172,10 @@ t(key, replace);
 /**
  * yt-dlp Wrapper
  *
- * @param {string} url
  * @param {string[]} commands
  * @returns {Promise<{ [key: string]: any }>}
  */
-await runYT_DLP(url, commands)
+await runYT_DLP(commands)
 ```
 
 # Types

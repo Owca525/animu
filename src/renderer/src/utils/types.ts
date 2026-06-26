@@ -485,6 +485,7 @@ export interface SettingsConfig {
     firstStart: boolean
     deepLinkURL: string
     yt_dlp: string
+    yt_dlpRepo: string
     anilist: {
         scoreFormat: Anilist_ScoreFormat
         titleFormat: Anilist_UserTitleLanguage

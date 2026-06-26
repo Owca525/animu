@@ -1,7 +1,7 @@
-import { app, ipcMain } from "electron"
+import { ipcMain } from "electron"
 import fs from 'fs';
 import path from 'path';
-import { animuPlugins, newConfigPath, pluginsConfigPath } from ".";
+import { animuPlugins, animuUserData, newConfigPath, pluginsConfigPath } from ".";
 import { pluginRepoExpanded } from "./types";
 import { advanceRequest } from "./request";
 import { sha256FromString } from "./utils";
@@ -41,7 +41,7 @@ function extractPlugin(folderPlugins: string, type: "official" | "user") {
 
 ipcMain.handle('plugins:list', (_event) => {
     const user = extractPlugin(path.join(newConfigPath, "plugins"), "user")
-    const official = extractPlugin(path.join(app.getPath("userData"), "animuPlugins"), "official")
+    const official = extractPlugin(path.join(animuUserData, "animuPlugins"), "official")
     return [...user, ...official]
 })
 

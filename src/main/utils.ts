@@ -3,12 +3,13 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { ActivityType } from 'discord-api-types/v10';
-import { advanceRequest } from './request';
 import {
+    animuUserData,
     config,
     globalTray,
     mainTrayMenu,
     newConfigPath,
+    yt_dlp,
 } from '.';
 import {
     app,
@@ -19,14 +20,13 @@ import {
     shell
 } from 'electron';
 import { Client } from '@xhayper/discord-rpc';
-import { exec, execSync, spawn } from 'child_process';
+import { exec, execSync } from 'child_process';
 import { setCurrentLang, t } from './i18n';
 
 // import express from "express";
 // import { Readable } from "stream";
 // import { requestResponseVideo } from "./types";
 
-let yt_dlp_releases_cache: Map<string, any>[] = []
 let rpc: Client | undefined = undefined
 
 // Client id for Discord Rich presence
@@ -303,133 +303,25 @@ export function deepMerge(target: any, source: any): any {
 ipcMain.handle("backend:version", () => app.getVersion())
 
 // YT_DLP
-function pythonCheck() {
-    return new Promise(resolve => {
-        exec(`python3 --version`, error => {
-            resolve(!error)
-        })
-    })
-}
-
-async function checkExistyt_dlp() {
-    if (await pythonCheck() && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp"))) return true
-
-    if (process.platform == "win32" && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp.exe"))) return true
-    if (process.platform == "linux" && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp_linux"))) return true
-    return false
-}
-
-async function downloadyt_dlp(data: Map<string, any>, name: string) {
-    const resp = await advanceRequest(data["browser_download_url"])
-    if (!resp.success) return
-    fs.writeFileSync(path.join(app.getPath("userData"), "yt-dlp.json"), JSON.stringify(yt_dlp_releases_cache), "utf-8")
-    fs.writeFileSync(path.join(app.getPath("userData"), name), resp.buffer as any, "binary")
-}
-
-async function installyt_dlp(data: Map<string, any>) {
-    for (let index = 0; index < data["assets"].length; index++) {
-        const element = data["assets"][index];
-        if (element["name"] == "yt-dlp" && await pythonCheck()) return await downloadyt_dlp(element, "yt-dlp")
-        if (element["name"] == "yt-dlp.exe" && process.platform == "win32") return await downloadyt_dlp(element, "yt-dlp.exe")
-        if (element["name"] == "yt-dlp_linux" && process.platform == "linux") return await downloadyt_dlp(element, "yt-dlp_linux")
-    }
-}
-
-export async function runCheckYT_DLP() {
-    const yt_dlp_latest = "https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest"
-    const yt_dlp_releases = "https://api.github.com/repos/yt-dlp/yt-dlp/releases"
-
-    const lastest = await advanceRequest(yt_dlp_latest)
-    if (!lastest.success || !lastest.json) return
-    let updated = false
-    if (fs.existsSync(path.join(app.getPath("userData"), "yt-dlp.json"))) {
-        const tmp = JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), "yt-dlp.json"), "utf-8"))
-        if (tmp["tag_name"] != lastest.json["tag_name"]) updated = true
-    }
-
-    if (await checkExistyt_dlp() && updated == false) return
-
-    if (config.yt_dlp.replaceAll(" ", "").length <= 0) {
-        yt_dlp_releases_cache = lastest.json.map((v) => v["tag_name"])
-        await installyt_dlp(lastest.json)
-        return
-    }
-
-    const resp = await advanceRequest(yt_dlp_releases)
-    if (!resp.success || !resp.json) return
-    yt_dlp_releases_cache = resp.json.map((v) => v["tag_name"])
-
-    for (let index = 0; index < resp.json.length; index++) {
-        const element = resp.json[index];
-        if (element["tag_name"] == config.yt_dlp) return installyt_dlp(element)
-    }
-}
-
 ipcMain.handle("yt-dlp:install", async (_, tag: string) => {
-    for (let index = 0; index < yt_dlp_releases_cache.length; index++) {
-        const element = yt_dlp_releases_cache[index];
-        if (element["tag_name"] == tag) await installyt_dlp(element)
-    }
+    if (!yt_dlp) return
+
+    await yt_dlp.install(tag)
 })
 ipcMain.handle("yt-dlp:releases", async () => {
-    let currentVersionYT_DLP: string = ""
-    if (fs.existsSync(path.join(app.getPath("userData"), "yt-dlp.json"))) {
-        const tmp = JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), "yt-dlp.json"), "utf-8"))
-        currentVersionYT_DLP = tmp["tag_name"]
-    }
+    if (!yt_dlp) return
+    await yt_dlp.getVersionList()
 
-    if (yt_dlp_releases_cache.length <= 0) {
-        const resp = await advanceRequest("https://api.github.com/repos/yt-dlp/yt-dlp/releases")
-
-        if (!resp.success || !resp.json) return { ver: currentVersionYT_DLP, listVer: [] }
-        yt_dlp_releases_cache = resp.json.map((v) => v["tag_name"])
-    }
-
-    return { ver: currentVersionYT_DLP, listVer: yt_dlp_releases_cache }
+    return { ver: yt_dlp.versionList, listVer: yt_dlp.versionList }
 })
 
-ipcMain.handle("yt-dlp:run", async (_, url: string, commands?: string[]) => await getVideoInfo(url, commands))
+ipcMain.handle("yt-dlp:run", async (_, commands: string[]) => {
+    if (!yt_dlp) throw new Error("Missing Instance of yt-dlp")
 
-async function CheckPathToYT_DLP(commands: string[]): Promise<[string, string[]]> {
-    if (await pythonCheck() && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp")))
-        return ["/usr/bin/python3", [path.join(app.getPath("userData"), "yt-dlp"), ...commands]]
+    console.log(yt_dlp)
 
-    if (process.platform == "win32" && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp.exe")))
-        return [path.join(app.getPath("userData"), "yt-dlp.exe"), commands]
-    if (process.platform == "linux" && fs.existsSync(path.join(app.getPath("userData"), "yt-dlp_linux")))
-        return [path.join(app.getPath("userData"), "yt-dlp_linux"), commands]
-
-    return ["/usr/bin/python3", [path.join(app.getPath("userData"), "yt-dlp"), ...commands]]
-}
-
-// "-j",
-// "--no-playlist",
-function getVideoInfo(url: string, commands: string[] = ["-j"]) {
-    return new Promise(async (resolve, reject) => {
-        const pathCommands = await CheckPathToYT_DLP([...commands, url])
-
-        const yt = spawn(pathCommands[0], pathCommands[1]);
-
-        let data = "";
-        let error = "";
-
-        yt.stdout.on("data", chunk => {
-            data += chunk.toString();
-        });
-
-        yt.stderr.on("data", chunk => {
-            error += chunk.toString();
-        });
-
-        yt.on("close", code => {
-            if (code !== 0) {
-                reject(error);
-            } else {
-                resolve(JSON.parse(data));
-            }
-        });
-    });
-}
+    return yt_dlp.execute(commands)
+})
 /////////////////////
 
 const extensions = ["png", "jpg", "jpeg", "svg", "webp"];
@@ -477,7 +369,7 @@ ipcMain.handle("backend:saveLogs", async (_, content: string[]) => {
 
     const formatedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
-    fs.writeFileSync(path.join(app.getPath("userData"), `${formatedDate}-${hour}-logs.log`), content.join("\n"), "utf-8")
+    fs.writeFileSync(path.join(animuUserData, `${formatedDate}-${hour}-logs.log`), content.join("\n"), "utf-8")
 });
 
 export function unixToDateTime(unixTimestamp: number | undefined): string {

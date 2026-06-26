@@ -19,19 +19,22 @@ import "./plugins"
 import { convertToNewFormat, detectOldVersion, write } from './os'
 import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync } from 'fs'
 import { cardData, defaultConfig, SettingsConfig } from './types';
-import { deepMerge, detectZoom, runCheckYT_DLP, setupDiscordRPC } from './utils';
+import { deepMerge, detectZoom, setupDiscordRPC } from './utils';
 import { electronAppUniversalProtocolClient } from 'electron-app-universal-protocol-client';
 import { checkDatabase } from './animulist';
 import { ParseINI } from './iniParser';
 import { t } from './i18n'
+import { yt_dlpInstance } from './ytdlpHandler'
 
 export let mainWindow: BrowserWindow | undefined
-export const newConfigPath = path.join(app.getPath("userData"), "animuConfig")
+export const animuUserData = app.getPath("userData")
+export const backupFolder = app.getPath("userData")
+export const newConfigPath = path.join(animuUserData, "animuConfig")
 export const themeConfigPath = path.join(newConfigPath, "themeConfig")
 export const pluginsConfigPath = path.join(newConfigPath, "pluginsConfig")
 export const animuPlaylistPath = path.join(newConfigPath, "playlist")
 export const userPlugins = path.join(newConfigPath, "plugins")
-export const animuPlugins = path.join(app.getPath("userData"), "animuPlugins")
+export const animuPlugins = path.join(animuUserData, "animuPlugins")
 export let globalTray: undefined | Tray = undefined
 export const mainTrayMenu = [
   {
@@ -59,6 +62,8 @@ export const mainTrayMenu = [
 export let DEBUG: boolean = false
 
 export let config: SettingsConfig = defaultConfig as any
+export let yt_dlp: yt_dlpInstance = new yt_dlpInstance(config["yt_dlpRepo"])
+
 let historyData: cardData[] = []
 const PROTOCOL = "animu"
 
@@ -149,14 +154,14 @@ async function createWindow() {
     if (!mainWindow) return
     e.preventDefault()
     mainWindow.hide()
-    if (!existsSync(path.join(app.getPath("userData"), "traynotification"))) {
+    if (!existsSync(path.join(animuUserData, "traynotification"))) {
       const notification = new Notification({
         title: 'Animu',
         icon: icon,
         body: t("backend.trayNotification"),
       });
       notification.show()
-      writeFileSync(path.join(app.getPath("userData"), "traynotification"), "")
+      writeFileSync(path.join(animuUserData, "traynotification"), "")
     }
   })
 
@@ -297,7 +302,6 @@ export async function initialBackend() {
       let data = readFileSync(path.join(newConfigPath, "history.json"), "utf-8")
       historyData = JSON.parse(data)
     }
-    runCheckYT_DLP()
     checkDatabase()
 
     // if (existsSync(path.join(newConfigPath, "continueWatch.json"))) {

@@ -1,5 +1,5 @@
-import { app, dialog, ipcMain } from "electron";
-import { mainWindow, newConfigPath } from ".";
+import { dialog, ipcMain } from "electron";
+import { animuUserData, mainWindow, newConfigPath } from ".";
 
 import { WriteFileOptions, writeFileSync, mkdirSync, existsSync, readFileSync, promises, rmSync } from "fs";
 import path from "path"
@@ -48,7 +48,7 @@ ipcMain.handle("backend:configPath", (_event): string => {
 });
 
 ipcMain.handle("backend:BrowserConfigPath", (_event): string => {
-  return app.getPath("userData")
+  return animuUserData
 });
 
 
@@ -95,8 +95,8 @@ ipcMain.handle('os:information', () => {
 });
 
 export async function detectOldVersion() {
-  let animuPath = app.getPath("userData")
-  let newConfigPath = path.join(app.getPath("userData"), "animuConfig")
+  let animuPath = animuUserData
+  let newConfigPath = path.join(animuUserData, "animuConfig")
   if (!existsSync(newConfigPath)) {
     mkdirSync(newConfigPath);
   }
@@ -128,7 +128,7 @@ export async function detectOldVersion() {
 
 export async function convertToNewFormat() {
   try {
-    let newConfigPath = path.join(app.getPath("userData"), "animuConfig")
+    let newConfigPath = path.join(animuUserData, "animuConfig")
     if (!existsSync(path.join(newConfigPath, "history.json"))) return
     if (!existsSync(path.join(newConfigPath, "continueWatch.json"))) return
     await createBackup()

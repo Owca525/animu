@@ -448,7 +448,7 @@ function information() {
 
             let resolutions: resolutionFormat[] = []
 
-            const response = await window.api.yt_dlp.run(url)
+            const response = await window.api.yt_dlp.run([url])
             console.log(response)
             if (response["url"]) {
                 resolutions.push({

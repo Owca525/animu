@@ -2,6 +2,7 @@
     "firstStart": true,
     "deepLinkURL": "https://owca525.github.io/",
     "yt_dlp": "",
+    "yt_dlpRepo": "https://api.github.com/repos/yt-dlp/yt-dlp/",
     "General": {
         "language": "en",
         "theme": [

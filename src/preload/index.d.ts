@@ -30,7 +30,7 @@ declare global {
       yt_dlp: {
         versionList: () => Promise<{ ver: string, listVer: string[] }>
         install: (tag: string) => Promise<void>
-        run: (url: string, commands?: string[]) => Promise<{ [key: string]: any }>
+        run: (commands: string[]) => Promise<{ [key: string]: any }>
       },
       request: (url: string, options?: { method?: "POST" | "GET", header?: Record<string, string>, body?: any }) => Promise<{
         text: string,

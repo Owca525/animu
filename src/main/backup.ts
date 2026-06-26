@@ -1,10 +1,8 @@
-import { app, ipcMain } from "electron";
+import { ipcMain } from "electron";
 import fs, { existsSync, readdirSync } from "fs"
 import path from "path";
-import { initialBackend, newConfigPath } from ".";
+import { animuUserData, backupFolder, initialBackend, newConfigPath } from ".";
 import AdmZip from 'adm-zip'
-
-let backupFolder = path.join(app.getPath("userData"), "animuBackup")
 
 export async function createBackup() {
     try {
@@ -40,9 +38,9 @@ export async function getBackupList() {
 export async function RestoreBackup(file: string): Promise<{ success: boolean, error?: number }> {
     try {
         if (!existsSync(path.join(backupFolder, file))) return { success: false, error: 2 }
-        fs.rmdirSync(path.join(app.getPath("userData"), "animuConfig"))
+        fs.rmdirSync(path.join(animuUserData, "animuConfig"))
         const zip = new AdmZip(path.join(backupFolder, file))
-        zip.extractAllTo(path.join(app.getPath("userData"), "animuConfig"), true)
+        zip.extractAllTo(path.join(animuUserData, "animuConfig"), true)
         await initialBackend()
         return { success: true }
     } catch (error) {

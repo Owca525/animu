@@ -8,6 +8,7 @@ export interface SettingsConfig {
     firstStart: boolean
     deepLinkURL: string
     yt_dlp: string
+    yt_dlpRepo: string
     animulist: {
         historyConvert: boolean
     }

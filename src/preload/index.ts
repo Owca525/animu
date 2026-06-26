@@ -63,7 +63,7 @@ if (process.contextIsolated) {
       yt_dlp: {
         versionList: () => ipcRenderer.invoke('yt-dlp:releases'),
         install: (tag: string) => ipcRenderer.invoke('yt-dlp:install', tag),
-        run: (url: string, commands?: string[]) => ipcRenderer.invoke('yt-dlp:run', url, commands)
+        run: (commands: string[]) => ipcRenderer.invoke('yt-dlp:run', commands),
       },
       animulist: {
         add: (anime) => ipcRenderer.invoke('animulist:saveToDatabase', anime),
