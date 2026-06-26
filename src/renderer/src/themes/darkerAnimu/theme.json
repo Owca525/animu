@@ -1,5 +1,33 @@
 {
     "author": "Owca525",
     "mainCSS": "./main.css",
-    "themeName": "DarkerAnimu"
+    "themeName": "DarkerAnimu",
+    "options": [
+        {
+            "name": "Dropdown",
+            "dropDown": [
+                {
+                    "default": "true",
+                    "option": "Green",
+                    "css": ""
+                },
+                {
+                    "option": "Blue",
+                    "css": "./p_blue.css"
+                },
+                {
+                    "option": "Orange",
+                    "css": "./p_orange.css"
+                },
+                {
+                    "option": "Purple",
+                    "css": "./p_purple.css"
+                },
+                {
+                    "option": "Red",
+                    "css": "./p_red.css"
+                }
+            ]
+        }
+    ]
 }

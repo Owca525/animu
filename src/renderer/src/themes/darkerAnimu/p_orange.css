@@ -1,0 +1,17 @@
+:root {
+  --green-one: #CA6931;
+  --green-background: #211108;
+  --green-text: #F7E7DE;
+
+  --orange-one: #549E72;
+}
+
+.dropdown-icon.green {
+    color: #549E72;
+}
+.dropdown-icon.red {
+    color: #932F2F;
+}
+.dropdown-icon.yellow {
+    color: #CA6931;
+}

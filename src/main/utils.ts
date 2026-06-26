@@ -312,7 +312,7 @@ ipcMain.handle("yt-dlp:releases", async () => {
     if (!yt_dlp) return
     await yt_dlp.getVersionList()
 
-    return { ver: yt_dlp.versionList, listVer: yt_dlp.versionList }
+    return { ver: yt_dlp.currentVersion, listVer: yt_dlp.versionList }
 })
 
 ipcMain.handle("yt-dlp:run", async (_, commands: string[]) => {
