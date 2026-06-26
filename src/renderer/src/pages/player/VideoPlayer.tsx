@@ -1,7 +1,7 @@
 import Hls, { HlsConfig } from "hls.js"
 
 import { AnimeData, animulistProps, ContextMenuProps, episodeMetadata, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
-import { convertKeybinds, convertSecondsToHoursFormat, CreateContextMenuOptions, createElement, dateToUnix, decodeHtmlEntities, detectTitle, detectTitleConfig, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObject } from "@renderer/utils/functions"
+import { convertKeybinds, CreateContextMenuOptions, createElement, dateToUnix, detectTitle, detectTitleConfig, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObject } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
@@ -32,6 +32,8 @@ import videojs from "video.js";
 import Player from "video.js/dist/types/player"
 import { useKeyPress } from "@renderer/utils/hooks/useKeyPress"
 import { CovnertToASS } from "@renderer/utils/subtitleConverter"
+import VolumeNotification from "./components/VolumeNotification"
+import MoreInformation from "./components/MoreInformation"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
@@ -319,7 +321,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (currentSettings() == false && isShowSelectEpisode() == false) {
             hideTimer = setTimeout(() => {
                 setIsVisible(false)
-                if (!isPlaying()) moreInformationTimer = setTimeout(() => {
+                if (!isPlaying() && !config.Player.general.disablemoreinformation) moreInformationTimer = setTimeout(() => {
                     setShowingMoreInformation(true)
                 }, 4000)
             }, 2000)
@@ -1401,15 +1403,18 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     return (
         <div class={isVisible() ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
+            
             <div ref={screenshotWrapper} class={isVisible() ? "player-video-container" : "player-video-container player-hide-cursor"} >
                 <div ref={assSubContainer} style={{ position: "absolute", top: "0", left: "0" }}></div>
             </div>
+
             <Show when={isVisible()}>
                 <div class="player-mask top"></div>
                 <div class="player-mask bottom"></div>
             </Show>
 
             <div class="video-overlay">
+
                 <div class={checkUptoNext() ? isVisible() ? 'video-top' : 'video-top player-hidden' : 'video-top'}>
                     <div class="video-top-top">
                         <Button icon='arrow_back' ButtonClass='player-buttons' iconClassName="player-button-icons" onClick={exitFromPlayer} />
@@ -1419,6 +1424,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                         <span class="video-episode-title">{getEpisode()?.title}</span>
                     </Show>
                 </div>
+
                 <div class="video-center"> {/* video-center-container */}
                     <Show when={!config.Player.ui.DisableSkipAnimation}>
                         <div class={`player-loading-animation-container player-fast-rewind-ui time ${isShowButtonSkipLeft() ? "show" : "hidden"}`}>
@@ -1444,14 +1450,17 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                             <div class="material-symbols-outlined player-waiting">progress_activity</div>
                         </div>
                     </Show>
+
                     <Show when={!config.Player.ui.DisableSpaceAnimation}>
                         <div class={`player-loading-animation-container ${isShowPlay() && !isWaitingPlayer() ? "show" : "hidden"}`}>
                             <div class="player-icon-ui material-symbols-outlined">{isPlaying() ? "pause" : "play_arrow"}</div>
                         </div>
                     </Show>
                 </div>
+
                 <div class={isVisible() && checkUptoNext() ? 'video-bottom' : 'video-bottom player-hidden'}>
                     <SeekBar chapterList={chapterList()} thumbnail={thumbnails()} secondBarValues={currentBuffer()} currentValue={currentTime()} maxValue={videoRef?.duration} onSeek={value => { setTimeVideo(value) }} type="time" classes={{ container: "player-seekbar" }} screen={true} />
+                    
                     <div class="player-bottom-section">
                         <div class="player-left">
                             <Show when={getEpisode("prev") !== undefined}>
@@ -1484,6 +1493,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                                 {t("player.episodeEndsOn", { time: addTime(durrationTime() - currentTime()) })}
                             </div>
                         </div>
+
                         <div class="player-right">
                             <Show when={getcurrentChapter()}>
                                 <span>{t("player.chapter", { name: getcurrentChapter() })}</span>
@@ -1561,6 +1571,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     </div>
                 </div>
             </div>
+
+
             <Button content={t(`player.skiptimebutton.${currentSkipButton().type}`, { time: buttonSkipTime() })} ButtonClass={`player-skip-chapters-button ${IsRunningButtonSkipTime() ? "show" : "hidden"}`}
                 onClick={() => {
                     if (currentSkipButton().type == "ending") {
@@ -1572,6 +1584,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     clearChapterSkipTime()
                 }}
             />
+
+
             <div ref={screenShotContainer} class={`player-screenshot-container ${screenShot().active ? "show" : "hidden"}`}
                 classList={{ click: screenShot().click != "" }}
                 onclick={() => screenShot().click != "" ? openUrlFolder(screenShot().click) : ""}
@@ -1581,6 +1595,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     {t("player.toastscreenshot.done")}
                 </span>
             </div>
+
+
             <Show when={config.Player.upToNextEpisode.variants == "old"}>
                 <div class={`player-up-Next-container old  ${isUpNextEpisode() ? "show" : "hidden"}`}>
                     <div class="player-up-Next-Title old">{t("player.upNext.title", { sec: parseInt(timeNextEpisode().toString()) })}</div>
@@ -1627,14 +1643,10 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                     }>close</button>
                 </div>
             </Show>
+
+
             <Show when={!config.Player.ui.DisableVolumeAnimation}>
-                <div class={`player-volume-ui-container ${isVolume() ? "show" : "hidden"}`}>
-                    <span class="player-volume-ui-icon material-symbols-outlined">{isMuted() ? 'volume_off' : 'volume_up'}</span>
-                    <div class="player-volume-ui-bar-container">
-                        <div class="player-volume-ui-bar-progress" style={{ "width": `${volume()}%` }}></div>
-                    </div>
-                    <span class="player-volume-ui-text">{parseInt(volume().toString())}%</span>
-                </div>
+                <VolumeNotification volume={volume()} isActive={isVolume()} isMuted={isMuted()} />
             </Show>
             <Show when={showNerdStats()}>
                 <NerdStats duration={durrationTime()} frames={videoFrames()} volume={volume()} currentTime={currentTime()} />
@@ -1661,48 +1673,13 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 />
             </Show>
             <Show when={!config.Player.general.disablemoreinformation}>
-                <div class={`player-more-information-background ${isShowingMoreInformation() ? "show" : "hidden"}`}>
-                    <div class="player-more-information-container">
-                        <span class="player-more-information-top-text">{t("Current Watching")}</span>
-                        <sheep-img src={anime_data.AnimeData.coverImage} class="player-more-information-image" />
-                        <span class="player-more-information-title">{detectTitleConfig(anime_data.AnimeData.title)}</span>
-                        <div class="player-more-information-format-container">
-                            <Show when={anime_data.AnimeData.season || anime_data.AnimeData.seasonYear}>
-                                <span class="player-more-information-season">
-                                    <Show when={anime_data.AnimeData.season}>
-                                        {t(`anime_seasons.${anime_data.AnimeData.season}`)}
-                                        &nbsp;
-                                    </Show>
-                                    <Show when={anime_data.AnimeData.seasonYear}>
-                                        {anime_data.AnimeData.seasonYear}
-                                    </Show>
-                                </span>
-                                &#8226;
-                            </Show>
-                            <Show when={anime_data.AnimeData.format}>
-                                <span class="player-more-information-format">{t(`anime_formats.${anime_data.AnimeData.format}`)}</span>
-                                &#8226;
-                            </Show>
-                            <span class="player-more-information-episode">Episode {temp.episode} / {temp.episodes.length}</span>
-                        </div>
-                        <span class="player-more-information-description">{decodeHtmlEntities(anime_data.AnimeData.description)}</span>
-                        <div class="player-more-information-genres-container">
-                            <For each={anime_data.AnimeData.genres}>
-                                {(item) => (
-                                    <div class="player-more-information-genres">{item}</div>
-                                )}
-                            </For>
-                        </div>
-                        <span class="player-more-information-durration">
-                            <Show when={anime_data.AnimeData.averageScore}>
-                                {anime_data.AnimeData.averageScore}%
-                                &#8226;
-                                &nbsp;
-                            </Show>
-                            {convertSecondsToHoursFormat(durrationTime())}
-                        </span>
-                    </div>
-                </div>
+                <MoreInformation 
+                    isActive={isShowingMoreInformation()} 
+                    anime={anime_data.AnimeData} 
+                    durration={durrationTime()} 
+                    episode={temp.episode} 
+                    episodesLen={temp.episodes.length}
+                />
             </Show>
         </div>
     )
