@@ -1219,3 +1219,9 @@ export function RemoveAnimeDataCache(data: AnimeData | cardData) {
 
     return tmpData
 }
+
+export function createElement<K extends keyof HTMLElementTagNameMap>(tag: K, options: { [key: string]: any } = {}): HTMLElementTagNameMap[K] {
+    const element = document.createElement(tag);
+    Object.assign(element, options)
+    return element;
+}

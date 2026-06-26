@@ -22,6 +22,7 @@ import {
 import {
     convertKeybinds,
     CreateContextMenuOptions,
+    createElement,
     formatTime,
     openUrlFolder,
     request,
@@ -32,7 +33,7 @@ import { VTTstoryBoardParser } from '@renderer/pages/player/playerUtils';
 import { getConfig } from '@renderer/utils/stores/config';
 import { getAudioOutput, getSocket, getSocketRoom } from '@renderer/utils/stores/global';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
-import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
+import { removeToast, toast } from '@renderer/utils/context/ToastNotification';
 import { saveConfig } from '@renderer/utils/FilesManager/config';
 import { unwrap } from 'solid-js/store';
 import { useI18n } from '@renderer/utils/i18n';
@@ -107,6 +108,8 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
     let audioRef: HTMLAudioElement | undefined
     let audioVideoJS: Player | undefined
 
+    let eventPlayerCache: Map<string, (event: Event & { currentTarget: HTMLVideoElement; target: Element; }) => void> = new Map()
+
     // Variable
     const [volume, setVolume] = createSignal<number>(config.Player.general.Volume)
     const [currentTime, setcurrentTime] = createSignal<number>(0)
@@ -166,9 +169,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
     // ScreenShot
     const [screenShot, setScreenShot] = createSignal<{ active: boolean, image: string, click: string }>({ active: false, image: "", click: "" });
 
-    // Clip Notitication
-    const [clipToastID, setClipToastID] = createSignal<string | undefined>(undefined);
-
     // const gamepad = useGamepad(0, gamepadControler);
 
     function handleMouseMove() {
@@ -182,103 +182,72 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         }
     }
 
-    let mediaRecorderInstance: MediaRecorder | undefined;
-    let videoChunks: Blob[] = [];
+    function clearFullPlayer() {
+        if (eventPlayerCache.size > 0 && videoRef) {
+            eventPlayerCache.entries().toArray().forEach(([type, handler]) => {
+                videoRef?.removeEventListener(type as any, handler)
+            })
 
-    function startRecordClip() {
-        if (!videoRef) return
-        if (!videoRef["captureStream"]) return
-        if (mediaRecorderInstance) return
-
-        const stream = (videoRef as any).captureStream();
-        setClipToastID(toast("Clip Is Recording", { type: "loading", click: true, timer: true }))
-
-        mediaRecorderInstance = new MediaRecorder(stream);
-
-        mediaRecorderInstance.ondataavailable = (event) => videoChunks.push(event.data);
-
-        mediaRecorderInstance.onstop = () => {
-            const blob = new Blob(videoChunks, { type: "video/webm" });
-            const url = URL.createObjectURL(blob);
-
-            removeToast(clipToastID()!)
-
-            if (isPlaying()) togglePlay(true)
-
-            const currentDate = new Date()
-
-            const [year, month, day, hour, minute, second] = [
-                currentDate.getFullYear(),
-                currentDate.getMonth() + 1,
-                currentDate.getDate(),
-                currentDate.getHours(),
-                currentDate.getMinutes(),
-                currentDate.getSeconds(),
-            ].map(v => String(v).padStart(2, "0"));
-
-            const formatedDate = `-${year}-${month}-${day}-${hour}-${minute}-${second}`;
-
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `clip${formatedDate}.webm`;
-            a.click();
-        };
-
-        if (isPlaying() == false) togglePlay(true)
-        mediaRecorderInstance.start();
-    }
-
-    function stopRecordClip() {
-        if (!mediaRecorderInstance) return
-        mediaRecorderInstance.stop();
-    }
-
-    function pauseClip() {
-        if (!mediaRecorderInstance) return
-        if (mediaRecorderInstance.state == "recording") {
-            mediaRecorderInstance.pause();
-            updateToast(clipToastID()!, "Clip is Paused", { type: "warning", timer: true, click: true })
-        } else if (mediaRecorderInstance.state == "paused") {
-            mediaRecorderInstance.resume();
-            updateToast(clipToastID()!, "Clip Is Recording", { type: "loading", click: true, timer: true })
+            eventPlayerCache.clear()
         }
+
+        if (videoRef) videoRef.remove()
+        if (videoJS) videoJS.dispose()
+        if (hls) hls.destroy()
     }
 
-    onMount(() => {
-        let defaulthost = playerData()[0]
+    function createNewPlayer(): any {
+        if (!screenshotWrapper) return console.error("WTF Screenshot Wrapper dosen't exist, now i can't create new player")
 
-        if (videoRef) {
-            setEventInPlayer("timeupdate", updateProgress)
-            setEventInPlayer("progress", updateProgress)
-            setEventInPlayer("seeked", updateProgress)
-            setEventInPlayer("loadedmetadata", (event) => {
-                setInitialize(false)
-                updateProgress(event)
-            })
+        clearFullPlayer()
+        const videoElemenet = createElement("video", {
+            className: "video-player",
+            preload: "auto",
+            muted: isMuted(),
+            style: {
+                objectFit: "cover"
+            }
+        })
+        if (config.Player.general.VideoStreching) videoElemenet.style.objectFit = "cover"
 
-            setEventInPlayer("error", videoErrorHandler)
-            setEventInPlayer("canplay", () => { setWaitingPlayer(() => false) })
-            setEventInPlayer("waiting", () => { setWaitingPlayer(() => true) })
-            setEventInPlayer("click", () => { togglePlay(); setcurrentSettings(() => false); setShowSelectEpisode(() => false) })
+        videoJS = videojs(videoElemenet, videoJSConfig);
+        if (getAudioOutput()) videoElemenet.setSinkId(getAudioOutput()!.deviceId)
 
-            videoJS = videojs(videoRef, videoJSConfig);
-            if (getAudioOutput()) videoRef.setSinkId(getAudioOutput()!.deviceId)
+        videoJS.children_.forEach((v) => {
+            if (v["nodeName"] == "VIDEO") (v as HTMLVideoElement).classList.add("video-player")
+        })
 
-            videoJS.children_.forEach((v) => {
-                if (v["nodeName"] == "VIDEO") (v as HTMLVideoElement).classList.add("video-player")
-            })
-
-            const div = document.getElementById(videoJS.id_);
-            if (div) {
-                for (let i = div.children.length - 1; i >= 0; i--) {
-                    const child = div.children[i];
-                    if (child.tagName.toLowerCase() !== 'video') {
-                        div.removeChild(child);
-                    }
+        const div = document.getElementById(videoJS.id_);
+        if (div) {
+            for (let i = div.children.length - 1; i >= 0; i--) {
+                const child = div.children[i];
+                if (child.tagName.toLowerCase() !== 'video') {
+                    div.removeChild(child);
                 }
             }
         }
 
+        videoRef = videoElemenet
+        handleVolume(volume(), true)
+        setTimeVideo(0)
+
+        setEventInPlayer("timeupdate", updateProgress)
+        setEventInPlayer("progress", updateProgress)
+        setEventInPlayer("seeked", updateProgress)
+        setEventInPlayer("loadedmetadata", (event) => {
+            setInitialize(false)
+            updateProgress(event)
+        })
+
+        setEventInPlayer("error", videoErrorHandler)
+        setEventInPlayer("canplay", () => { setWaitingPlayer(() => false) })
+        setEventInPlayer("waiting", () => { setWaitingPlayer(() => true) })
+        setEventInPlayer("click", () => { togglePlay(); setcurrentSettings(() => false); setShowSelectEpisode(() => false) })
+
+        screenshotWrapper.append(videoRef)
+    }
+
+    onMount(() => {
         /* IFDEF DEBUG */
         (window as any).MiniPlayerVideoRef = videoRef;
         (window as any).MiniPlayerVideoJS = videoJS;
@@ -286,14 +255,14 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         /* ENDIF */
 
         if (audioRef) {
-            audioVideoJS = videojs(audioRef, {...videoJSConfig, autplay: false});
+            audioVideoJS = videojs(audioRef, { ...videoJSConfig, autplay: false });
             if (getAudioOutput()) audioRef.setSinkId(getAudioOutput()!.deviceId)
-            
+
             const div = document.getElementById(audioVideoJS.id_);
             if (div) div.style.display = "none";
         }
 
-        runNewPlayer(defaulthost)
+        runNewPlayer(playerData()[0])
         handleVolume(config.Player.general.Volume, true)
         handleMouseMove()
     })
@@ -327,16 +296,8 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         if (screenShotContainer) screenShotContainer.remove()
         if (refreashUpdateSocket) clearInterval(refreashUpdateSocket)
 
-        if (hls) hls.destroy()
+        clearFullPlayer()
         if (currentASSubtitles) currentASSubtitles.destroy()
-        if (videoRef) {
-            videoRef.pause();
-            videoRef.removeAttribute("src");
-            videoRef.load();
-            videoRef.remove()
-        }
-        videoRef = undefined
-        if (videoJS) videoJS.dispose()
 
         if (audioRef) {
             audioRef.pause();
@@ -433,12 +394,13 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         link.click();
     }
 
-    async function runNewPlayer(data: playerData) {
+    async function runNewPlayer(currentplayer: playerData) {
+        createNewPlayer()
+
         if (!videoRef) return
         setFatalError(false)
         setInitialize(true)
 
-        let currentplayer = data
         setPlayer(() => currentplayer)
 
         if (currentplayer.resolution.length <= 0) {
@@ -488,8 +450,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
             src: currentRes.url,
             type: currentRes.mimeType ? currentRes.mimeType : "video/mp4",
         })
-
-        setTimeVideo(0)
     }
 
     function changeAudioTrack(data: { id: number, lang?: string, label: string }) {
@@ -625,14 +585,12 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
             if (prev) {
                 video.pause()
                 if (audioRef) audioRef.pause()
-                pauseClip()
                 return false
             }
             video.play().catch((reason) => {
                 console.warn("Video Play Error Catch", reason)
             })
             if (audioRef) audioRef.play().catch((err) => console.warn(err))
-            pauseClip()
             return true
         })
 
@@ -861,12 +819,6 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
             case convertKeybinds(config.Player.keybinds.toggleSubtitles.toLowerCase()).toLowerCase():
                 toggleSubtitles()
                 break
-            case convertKeybinds(config.Player.keybinds.startRecordClip.toLowerCase()).toLowerCase():
-                startRecordClip()
-                break
-            case convertKeybinds(config.Player.keybinds.stopRecordClip.toLowerCase()).toLowerCase():
-                stopRecordClip()
-                break
         }
     }
 
@@ -916,7 +868,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
         }
         const blob = await (await fetch(screenshot)).blob();
         const url = URL.createObjectURL(blob);
-        
+
         if (config.Player.screenShot.saveType == "Clipboard" || config.Player.screenShot.saveType == "Both") {
             setScreenShot({ active: true, image: url, click: "" })
             await navigator.clipboard.write([
@@ -995,22 +947,13 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
     }
 
     return (
-        <div class={`player-video-container miniplayer ${!isVisible() ? "player-hide-cursor" : "" }`} 
-                ref={containerRef}
-                onMouseMove={handleMouseMove} 
-                onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, currentContextMenu()), event)}
-                style={{ height: isInitilize() ? "600px" : "auto" }}
-            >
+        <div class={`player-video-container miniplayer ${!isVisible() ? "player-hide-cursor" : ""}`}
+            ref={containerRef}
+            onMouseMove={handleMouseMove}
+            onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, currentContextMenu()), event)}
+            style={{ height: isInitilize() ? "600px" : "auto" }}
+        >
             <div ref={screenshotWrapper} class={isVisible() ? "player-video-container" : "player-video-container player-hide-cursor"} >
-                <video
-                    ref={videoRef}
-                    class="video-player"
-                    preload="auto"
-                    autoplay={isPlaying()}
-                    muted={isMuted()}
-                    style={config.Player.general.VideoStreching ? { "object-fit": "cover" } : {}}
-                >
-                </video>
                 {/* TODO: Maybe 2 Channel Audio */}
                 {/* <audio ref={audioRef} style={{ display: "none" }} /> */}
                 <div ref={assSubContainer} style={{ position: "absolute", top: "0", left: "0" }}></div>

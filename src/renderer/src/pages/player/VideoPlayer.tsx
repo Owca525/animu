@@ -1,7 +1,7 @@
 import Hls, { HlsConfig } from "hls.js"
 
 import { AnimeData, animulistProps, ContextMenuProps, episodeMetadata, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, SettingsConfig, Thumbnail } from "@renderer/utils/types"
-import { convertKeybinds, convertSecondsToHoursFormat, CreateContextMenuOptions, dateToUnix, decodeHtmlEntities, detectTitle, detectTitleConfig, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObject } from "@renderer/utils/functions"
+import { convertKeybinds, convertSecondsToHoursFormat, CreateContextMenuOptions, createElement, dateToUnix, decodeHtmlEntities, detectTitle, detectTitleConfig, formatTime, openUrlFolder, refetchHistory, request, SaveToClipboard, toggleFullscreen, updateObject } from "@renderer/utils/functions"
 import Button from "@renderer/components/buttons"
 import SeekBar from "@renderer/components/seekBar"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
@@ -87,6 +87,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     let hls: Hls | undefined
     let currentASSubtitles: JASSUB | undefined
 
+    let eventPlayerCache: Map<string, (event: Event & { currentTarget: HTMLVideoElement; target: Element; }) => void> = new Map()
+
     // Variable
     const [volume, setVolume] = createSignal<number>(PlayerVolume)
     const [currentTime, setcurrentTime] = createSignal<number>(0)
@@ -155,7 +157,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     const [screenShot, setScreenShot] = createSignal<{ active: boolean, image: string, click: string }>({ active: false, image: "", click: "" });
 
     // Clip Notitication
-    const [clipToastID, setClipToastID] = createSignal<string | undefined>(undefined);
+    // const [clipToastID, setClipToastID] = createSignal<string | undefined>(undefined);
 
     // const gamepad = useGamepad(0, gamepadControler);
     if (getSocket()) {
@@ -169,57 +171,144 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         })
     }
 
-    let mediaRecorderInstance: MediaRecorder | undefined;
-    let videoChunks: Blob[] = [];
+    function clearFullPlayer() {
+        if (eventPlayerCache.size > 0 && videoRef) {
+            eventPlayerCache.entries().toArray().forEach(([type, handler]) => {
+                videoRef?.removeEventListener(type as any, handler)
+            })
 
-    function startRecordClip() {
-        if (!videoRef) return
-        if (!videoRef["captureStream"]) return
-        if (mediaRecorderInstance) return
-
-        const stream = (videoRef as any).captureStream();
-        setClipToastID(toast("Clip Is Recording", { type: "loading", click: true, timer: true }))
-
-        mediaRecorderInstance = new MediaRecorder(stream);
-
-        mediaRecorderInstance.ondataavailable = (event) => videoChunks.push(event.data);
-
-        mediaRecorderInstance.onstop = () => {
-            const blob = new Blob(videoChunks, { type: "video/webm" });
-            const url = URL.createObjectURL(blob);
-
-            removeToast(clipToastID()!)
-
-            if (isPlaying()) togglePlay(true)
-
-            const date = new Date()
-            const formatedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}-${date.toLocaleTimeString("en-EN", { hour12: false })}`;
-
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `clip${formatedDate}.webm`;
-            a.click();
-        };
-
-        if (isPlaying() == false) togglePlay(true)
-        mediaRecorderInstance.start();
-    }
-
-    function stopRecordClip() {
-        if (!mediaRecorderInstance) return
-        mediaRecorderInstance.stop();
-    }
-
-    function pauseClip() {
-        if (!mediaRecorderInstance) return
-        if (mediaRecorderInstance.state == "recording") {
-            mediaRecorderInstance.pause();
-            updateToast(clipToastID()!, "Clip is Paused", { type: "warning", timer: true, click: true })
-        } else if (mediaRecorderInstance.state == "paused") {
-            mediaRecorderInstance.resume();
-            updateToast(clipToastID()!, "Clip Is Recording", { type: "loading", click: true, timer: true })
+            eventPlayerCache.clear()
         }
+
+        if (videoRef) videoRef.remove()
+        if (videoJS) videoJS.dispose()
+        if (hls) hls.destroy()
     }
+
+    function createNewPlayer(): any {
+        if (!screenshotWrapper) return console.error("WTF Screenshot Wrapper dosen't exist, now i can't create new player")
+
+        let tmpTimer = unwrap(currentTime())
+
+        clearFullPlayer()
+        const videoElemenet = createElement("video", {
+            className: "video-player",
+            preload: "auto",
+            muted: isMuted(),
+            style: {
+                objectFit: "cover"
+            }
+        })
+        if (config.Player.general.VideoStreching) videoElemenet.style.objectFit = "cover"
+
+        videoJS = videojs(videoElemenet, {
+            controls: false,
+            autoplay: isPlaying(),
+            preload: "auto",
+            bigPlayButton: false,
+            loadingSpinner: false,
+            posterImage: false,
+            errorDisplay: false,
+            html5: {
+                vhs: {
+                    withCredentials: false,
+                    overrideNative: true,
+                },
+            },
+        });
+        if (getAudioOutput()) videoElemenet.setSinkId(getAudioOutput()!.deviceId)
+
+        videoJS.children_.forEach((v) => {
+            if (v["nodeName"] == "VIDEO") (v as HTMLVideoElement).classList.add("video-player")
+        })
+
+        const div = document.getElementById(videoJS.id_);
+        if (div) {
+            for (let i = div.children.length - 1; i >= 0; i--) {
+                const child = div.children[i];
+                if (child.tagName.toLowerCase() !== 'video') {
+                    div.removeChild(child);
+                }
+            }
+        }
+
+        videoRef = videoElemenet
+        handleVolume(volume(), true)
+        setTimeVideo(tmpTimer)
+
+        setEventInPlayer("timeupdate", (event) => {
+            setFatalError(false)
+            updateProgress(event)
+        })
+        setEventInPlayer("progress", updateProgress)
+        setEventInPlayer("seeked", updateProgress)
+        setEventInPlayer("loadedmetadata", (event) => {
+            updateProgress(event)
+            setdurrationTime(event.currentTarget.duration)
+            if (currentPlayer() && currentPlayer()!.listChapters) {
+                generateOpeningEnding(currentPlayer()!.listChapters!)
+            }
+        })
+
+        setEventInPlayer("error", videoErrorHandler)
+        setEventInPlayer("canplay", () => { setWaitingPlayer(() => false) })
+        setEventInPlayer("waiting", () => { setWaitingPlayer(() => true) })
+        setEventInPlayer("click", () => { togglePlay(); setcurrentSettings(() => false); setShowSelectEpisode(() => false) })
+
+        screenshotWrapper.append(videoRef)
+    }
+
+    // let mediaRecorderInstance: MediaRecorder | undefined;
+    // let videoChunks: Blob[] = [];
+
+    // function startRecordClip() {
+    //     if (!videoRef) return
+    //     if (!videoRef["captureStream"]) return
+    //     if (mediaRecorderInstance) return
+
+    //     const stream = (videoRef as any).captureStream();
+    //     setClipToastID(toast("Clip Is Recording", { type: "loading", click: true, timer: true }))
+
+    //     mediaRecorderInstance = new MediaRecorder(stream);
+
+    //     mediaRecorderInstance.ondataavailable = (event) => videoChunks.push(event.data);
+
+    //     mediaRecorderInstance.onstop = () => {
+    //         const blob = new Blob(videoChunks, { type: "video/webm" });
+    //         const url = URL.createObjectURL(blob);
+
+    //         removeToast(clipToastID()!)
+
+    //         if (isPlaying()) togglePlay(true)
+
+    //         const date = new Date()
+    //         const formatedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}-${date.toLocaleTimeString("en-EN", { hour12: false })}`;
+
+    //         const a = document.createElement("a");
+    //         a.href = url;
+    //         a.download = `clip${formatedDate}.webm`;
+    //         a.click();
+    //     };
+
+    //     if (isPlaying() == false) togglePlay(true)
+    //     mediaRecorderInstance.start();
+    // }
+
+    // function stopRecordClip() {
+    //     if (!mediaRecorderInstance) return
+    //     mediaRecorderInstance.stop();
+    // }
+
+    // function pauseClip() {
+    //     if (!mediaRecorderInstance) return
+    //     if (mediaRecorderInstance.state == "recording") {
+    //         mediaRecorderInstance.pause();
+    //         updateToast(clipToastID()!, "Clip is Paused", { type: "warning", timer: true, click: true })
+    //     } else if (mediaRecorderInstance.state == "paused") {
+    //         mediaRecorderInstance.resume();
+    //         updateToast(clipToastID()!, "Clip Is Recording", { type: "loading", click: true, timer: true })
+    //     }
+    // }
 
     function handleMouseMove() {
         setIsVisible(true)
@@ -244,40 +333,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             if (element.defaultHost) defaulthost = element
         }
 
-        if (videoRef) {
-            videoJS = videojs(videoRef, {
-                controls: false,
-                autoplay: isPlaying(),
-                preload: "auto",
-                bigPlayButton: false,
-                loadingSpinner: false,
-                posterImage: false,
-                errorDisplay: false,
-                html5: {
-                    vhs: {
-                        withCredentials: false,
-                        overrideNative: true,
-                    },
-                },
-            });
-            if (getAudioOutput()) videoRef.setSinkId(getAudioOutput()!.deviceId)
-
-            videoJS.children_.forEach((v) => {
-                if (v["nodeName"] == "VIDEO") (v as HTMLVideoElement).classList.add("video-player")
-            })
-
-            const div = document.getElementById(videoJS.id_);
-            if (div) {
-                for (let i = div.children.length - 1; i >= 0; i--) {
-                    const child = div.children[i];
-                    if (child.tagName.toLowerCase() !== 'video') {
-                        div.removeChild(child);
-                    }
-                }
-            }
-        }
-
-        runNewPlayer(defaulthost, time)
+        runNewPlayer(defaulthost)
+        setTimeVideo(time)
         handleVolume(PlayerVolume, true)
         handleMouseMove();
 
@@ -286,27 +343,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         (window as any).playerVideoJS = videoJS;
         (window as any).playerHLS = hls;
         /* ENDIF */
-
-        if (videoRef) {
-            setEventInPlayer("timeupdate", (event) => {
-                setFatalError(false)
-                updateProgress(event)
-            })
-            setEventInPlayer("progress", updateProgress)
-            setEventInPlayer("seeked", updateProgress)
-            setEventInPlayer("loadedmetadata", (event) => {
-                updateProgress(event)
-                setdurrationTime(event.currentTarget.duration)
-                if (currentPlayer() && currentPlayer()!.listChapters) {
-                    generateOpeningEnding(currentPlayer()!.listChapters!)
-                }
-            })
-
-            setEventInPlayer("error", videoErrorHandler)
-            setEventInPlayer("canplay", () => { setWaitingPlayer(() => false) })
-            setEventInPlayer("waiting", () => { setWaitingPlayer(() => true) })
-            setEventInPlayer("click", () => { togglePlay(); setcurrentSettings(() => false); setShowSelectEpisode(() => false) })
-        }
 
         if (config.Player.general.AutoFullscreen) {
             toggleFullscreen(true)
@@ -343,9 +379,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         if (!videoRef) return
         videoRef.addEventListener(type, handler);
 
-        onCleanup(() => {
-            if (videoRef) videoRef.removeEventListener(type, handler);
-        });
+        eventPlayerCache.set(`${type}`, handler)
     }
 
     onCleanup(async () => {
@@ -373,12 +407,8 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         setCleanup(true)
         removeToast(currentExtractionRes().toast)
-        if (hls) hls.destroy()
+        clearFullPlayer()
         if (currentASSubtitles) currentASSubtitles.destroy()
-        if (videoRef) videoRef.src = ""
-        if (videoRef) videoRef.remove()
-        videoRef = undefined
-        if (videoJS) videoJS.dispose()
 
         if (getSocket()) {
             const socket = getSocket()
@@ -471,11 +501,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         setNewSubtitles(data[0])
     }
 
-    async function runNewPlayer(data: playerData, tmpTime?: number) {
+    async function runNewPlayer(currentplayer: playerData) {
+        createNewPlayer()
+
         if (!videoRef) return
         setFatalError(false)
 
-        let currentplayer = data
         setPlayer(() => currentplayer)
 
         if (currentExtractionRes().toast != "") removeToast(currentExtractionRes().toast)
@@ -516,7 +547,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }
         setPlayer(() => currentplayer)
 
-        const time = tmpTime ? tmpTime : videoRef.currentTime
         if (currentplayer.subtitles) setListSubtitles(() => [{ url: "", format: "", lang: "", label: t("player.other.off") }, ...currentplayer.subtitles as playerSubtitlesFormat[]])
         if (currentplayer.storyboardVTT) setThumbnail(await VTTstoryBoardParser(currentplayer.storyboardVTT))
         const currentRes = currentplayer.resolution[0]
@@ -530,14 +560,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         /* ENDIF */
 
         if (currentRes.hls) {
-            // videoJS?.src({
-            //     src: currentRes.url,
-            //     type: "application/x-mpegURL",
-            // })
-            await runHLS(currentRes, currentplayer.splitHLS, tmpTime ? tmpTime : undefined)
+            await runHLS(currentRes, currentplayer.splitHLS)
             return
         }
-        if (hls) hls.destroy()
 
         setListResolution(() => currentplayer.resolution)
         setCurrentResoltion(currentRes)
@@ -546,7 +571,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             src: currentRes.url,
             type: "video/mp4",
         })
-        setTimeVideo(time)
     }
 
     function changeAudioTrack(data: { id: number, lang?: string, label: string }) {
@@ -559,7 +583,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }
     }
 
-    async function runHLS(resolution: resolutionFormat, splitHls: boolean = false, initialTime?: number) {
+    async function runHLS(resolution: resolutionFormat, splitHls: boolean = false) {
         let configHLS: Partial<HlsConfig> = {
             enableWorker: true,
             lowLatencyMode: true,
@@ -607,7 +631,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         hls = tmpHls
 
         if (Hls.isSupported() && videoRef) {
-            const time = initialTime ? initialTime : videoRef.currentTime
             tmpHls.loadSource(resolution.url);
             tmpHls.attachMedia(videoRef);
             setTimeVideo(time)
@@ -700,7 +723,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 moreInformationTimer = setTimeout(() => {
                     setShowingMoreInformation(true)
                 }, 4000)
-                pauseClip()
+                // pauseClip()
                 return false
             }
             clearInterval(moreInformationTimer)
@@ -708,7 +731,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             video.play().catch((reason) => {
                 console.warn("Video Play Error Catch", reason)
             })
-            pauseClip()
+            // pauseClip()
             return true
         })
 
@@ -732,6 +755,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
     function setMutedToPlayer() {
         setMuted((prev) => !prev)
+        if (videoRef) videoRef.muted = isMuted()
         handleVolume(volume())
     }
 
@@ -1161,12 +1185,12 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
                 setTimeVideo(currentSkipButton().time)
                 clearChapterSkipTime()
                 break
-            case convertKeybinds(config.Player.keybinds.startRecordClip.toLowerCase()).toLowerCase():
-                startRecordClip()
-                break
-            case convertKeybinds(config.Player.keybinds.stopRecordClip.toLowerCase()).toLowerCase():
-                stopRecordClip()
-                break
+            // case convertKeybinds(config.Player.keybinds.startRecordClip.toLowerCase()).toLowerCase():
+            //     startRecordClip()
+            //     break
+            // case convertKeybinds(config.Player.keybinds.stopRecordClip.toLowerCase()).toLowerCase():
+            //     stopRecordClip()
+            //     break
         }
     }
 
@@ -1216,7 +1240,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
         }
         const blob = await (await fetch(screenshot)).blob();
         const url = URL.createObjectURL(blob);
-        
+
         if (config.Player.screenShot.saveType == "Clipboard" || config.Player.screenShot.saveType == "Both") {
             setScreenShot({ active: true, image: url, click: "" })
             await navigator.clipboard.write([
@@ -1378,14 +1402,6 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
     return (
         <div class={isVisible() ? "player-video-container" : "player-video-container player-hide-cursor"} ref={containerRef} onMouseMove={handleMouseMove} onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, centerContextMenu), event)}>
             <div ref={screenshotWrapper} class={isVisible() ? "player-video-container" : "player-video-container player-hide-cursor"} >
-                <video
-                    ref={videoRef}
-                    class="video-player"
-                    preload="auto"
-                    muted={isMuted()}
-                    style={config.Player.general.VideoStreching ? { "object-fit": "cover" } : {}}
-                >
-                </video>
                 <div ref={assSubContainer} style={{ position: "absolute", top: "0", left: "0" }}></div>
             </div>
             <Show when={isVisible()}>
