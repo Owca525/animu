@@ -570,10 +570,7 @@ export function getRenderPath(): string {
     return `${location.origin}${location.pathname.replace("index.html", "")}`
 }
 
-export function savePluginConfig(instance: playerPluginFormat | informationPluginFormat, config?: { [key: string]: any }) {
-    if (!config) return
-    window.api.plugins.saveConfig(instance.metadata.name, config)
-}
+export function savePluginConfig(_: { [key: string]: any }) {}
 
 export async function getPluginConfig(instance: playerPluginFormat | informationPluginFormat): Promise<{ [key: string]: any; } | undefined> {
     if (!instance.config) return
@@ -982,7 +979,7 @@ export async function checkAnimeTodayReleaseEpisode() {
                 tmpplugin.clear()
                 continue
             }
-            await tmpplugin.CreateInstance(codePlugin["code"])
+            await tmpplugin.CreateInstance(codePlugin)
 
             let episodes = await tmpplugin.extractOnlyEpisodesList(element.anime.saveData?.type!, element.anime.AnimeData.player_ID!)
             if (episodes.length <= 0) {
@@ -1224,4 +1221,16 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(tag: K, opt
     const element = document.createElement(tag);
     Object.assign(element, options)
     return element;
+}
+
+export async function requestCloudflare(url: string): Promise<{ cookie: string, header: {[key: string]: any} }> {
+    return new Promise((resolve) => {
+        let interval = setInterval(() => {
+            resolve({ cookie: "", header: {} })
+        }, 10000)
+        toast("Verify Cloudflare to use plugin. Click to open window", { type: "info", onClick: async () => {
+            clearInterval(interval)
+            resolve(await window.BrowserWindow.createWindow({ url: url, type: "CloudFlare" }))
+        }, duration: 10000})
+    })
 }

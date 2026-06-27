@@ -361,6 +361,24 @@ export const getConfig = () => {
     if (typeof window["config"] == "string") return
     return window["config"]
 };
-export const getGlobalCache = () => {
+export const getGlobalCache = () => {};
 
-};
+/**
+ *
+ * @export
+ * @param {string} url 
+ * @returns {Promise<{ cookies: string, headers: { [key: string]: string } }>} 
+ */
+export function requestCloudflare(url) {
+    return window["requestCloudflare"](url)
+}
+
+/**
+ *
+ * @export
+ * @param {{ [key: string]: any }} config 
+ * @returns {void} 
+ */
+export function savePluginConfig(config) {
+    return window["savePluginConfig"](config)
+}

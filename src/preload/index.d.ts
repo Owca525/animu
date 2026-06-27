@@ -106,7 +106,7 @@ declare global {
       exit: () => void;
       openDevTools: () => void;
       reload: () => void;
-      createWindow: () => void
+      createWindow: (props: { url: string, type: string }) => Promise<any>
     };
   }
 }

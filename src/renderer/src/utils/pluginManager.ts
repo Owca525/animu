@@ -1,7 +1,7 @@
 import { FilterPluginsParams, informationPluginFormat, Anilist_ListMutation, playerPluginInstanceFormat, AnimeData, cardData, episodeList, episodeMetadata, playerData, PluginManagerFormat, informationPluginInstanceFormat, playerPluginFormat, PluginMetadataFormat, PluginLoadedFormat, WorkerWrapperInstance, containerData, pluginRepoExpanded, SearchResponse } from "./types";
 import { getPlayerPluginList, setInformationPlugin, setPlayerPlugin, setPluginRepo } from "./stores/plugins";
 import { getConfig } from "./stores/config";
-import { checkTimeDriffrentUnix, CreateSHA256, dateToUnix, detectIndex, getPluginsList, request, updateObject } from "./functions";
+import { checkTimeDriffrentUnix, CreateSHA256, dateToUnix, detectIndex, getPluginsList, request, requestCloudflare, updateObject } from "./functions";
 import semver from "semver";
 import pluginFunctions from "./pluginFunctions.js?raw"
 import { saveConfig } from "./FilesManager/config";
@@ -16,6 +16,9 @@ const availbeFunctions: { name: string, func: (...args) => Promise<any> }[] = [{
 }, {
     name: "yt-dlp",
     func: window.api.yt_dlp.run
+},{
+    name: "requestCloudflare",
+    func: requestCloudflare
 }]
 
 const workerDummyimport = `
@@ -50,6 +53,8 @@ export const CreateSHA256 = () => {};
 export const getConfig = () => {};
 export const getGlobalCache = () => {};
 export const timeCovertToMs = () => {};
+export const requestCloudflare = () => {};
+export const savePluginConfig = () => {};
 `
 
 const workerPayloadMetadataExtractor = `
@@ -85,6 +90,8 @@ var window = {
     global: this,
     request: async (...args) => await callMainProcess("request", args),
     yt_dlp: async (...args) => await callMainProcess("yt-dlp", args),
+    requestCloudflare: async (...args) => await callMainProcess("requestCloudflare", args),
+    savePluginConfig: async (...args) => await callMainProcess("saveConfig", args),
     animuAppInfo: "PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION_WORKER",
     config: "CHANGE_TO_CONFIG_WHEN_ARE_PERMISIONS"
 };
@@ -234,6 +241,13 @@ class WorkerWrapper implements WorkerWrapperInstance {
     pendingRequest = new Map<string, (value: unknown) => void>()
     otherDataPermision: boolean = false
 
+    pluginData: PluginMetadataFormat = {
+        version: "",
+        name: "Worker",
+        author: "Worker",
+        type: "player"
+    }
+
     weakRefCachce: { ref: WeakRef<{}>, id: string }[] = []
     intervalCache: NodeJS.Timeout | undefined
 
@@ -313,7 +327,7 @@ class WorkerWrapper implements WorkerWrapperInstance {
         return finalObject
     }
 
-    runInstance = async (pluginCode: string): Promise<PluginMetadataFormat> => {
+    runInstance = async (pluginCode: string, config?: { [key: string]: any }): Promise<PluginMetadataFormat> => {
         if (!pluginCode.startsWith("http")) {
             const blobCode = new Blob([detectIndex(pluginCode, pluginFunctionsURL)], { type: "text/javascript" });
             pluginCode = URL.createObjectURL(blobCode);
@@ -323,7 +337,7 @@ class WorkerWrapper implements WorkerWrapperInstance {
             ...window["animuAppInfo"],
             themes: undefined
         }))
-        if (this.otherDataPermision) payload = payload.replace(`"CHANGE_TO_CONFIG_WHEN_ARE_PERMISIONS"`, JSON.stringify(getConfig()))
+        if (config) payload = payload.replace(`"CHANGE_TO_CONFIG_WHEN_ARE_PERMISIONS"`, JSON.stringify(config))
 
         const payloadBLob = new Blob([payload], { type: "text/javascript" });
         const payloadURL = URL.createObjectURL(payloadBLob);
@@ -376,6 +390,21 @@ class WorkerWrapper implements WorkerWrapperInstance {
 
             if (data["type"] === "API_FUNCTION" && data["uuid"]) {
                 if (!data["value"]) return
+
+                if (data["value"] == "saveConfig" && this.pluginData["name"] != "Worker" && data["args"]) {
+                    let tmp = data["args"]
+                    if (!Array.isArray(tmp)) return
+
+                    window.api.plugins.saveConfig(this.pluginData["name"], tmp[0])
+
+                    worker.postMessage({
+                        type: "RESULT",
+                        value: undefined,
+                        uuid: data["uuid"]
+                    })
+                    return
+                }
+
                 const tmp = availbeFunctions.find((v) => v["name"] == data["value"])
                 if (!tmp) return
 
@@ -396,6 +425,7 @@ class WorkerWrapper implements WorkerWrapperInstance {
             }
 
             if (data["type"] === "PLUGIN_METADATA") {
+                this.pluginData = data["value"]
                 resolvePromise(data["value"])
             }
         }
@@ -456,9 +486,9 @@ export class playerPluginInstance implements playerPluginInstanceFormat {
         return await this.instance.wrapperFunction("searchAnime", { name, page, params }) as any
     }
 
-    CreateInstance = async (pluginCode: string): Promise<void> => {
+    CreateInstance = async (plugin: PluginLoadedFormat): Promise<void> => {
         this.instance = new WorkerWrapper()
-        this.metadata = await this.instance.runInstance(pluginCode)
+        this.metadata = await this.instance.runInstance(plugin["code"], plugin["config"])
     }
 
     clear = () => {
@@ -511,9 +541,9 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         return await this.instance.wrapperFunction("setAnimeInList", { variable }) as any
     };
 
-    CreateInstance = async (pluginCode: string): Promise<void> => {
+    CreateInstance = async (plugin: PluginLoadedFormat): Promise<void> => {
         this.instance = new WorkerWrapper(true)
-        this.metadata = await this.instance.runInstance(pluginCode)
+        this.metadata = await this.instance.runInstance(plugin["code"], plugin["config"])
     }
 
     clear = () => {
@@ -569,7 +599,7 @@ export class PluginManager implements PluginManagerFormat {
 
                     LoadedMetadataPlugins.push({
                         metadata: e["data"]["result"]["metadata"],
-                        config: e["data"]["result"]["config"],
+                        config: await window.api.plugins.getConfig(e["data"]["result"]["metadata"]["name"], e["data"]["result"]["config"]),
                         code: element["code"],
                         serverStatus: cache.get(e["data"]["result"]["metadata"]["name"]),
                         sha256: await CreateSHA256(element["code"])
@@ -696,7 +726,7 @@ export class PluginManager implements PluginManagerFormat {
         if (!findedPlugin) findedPlugin = this.playerPluginList[0]
 
         this.activePlayerPlugin.clear()
-        await this.activePlayerPlugin.CreateInstance(findedPlugin["code"])
+        await this.activePlayerPlugin.CreateInstance(findedPlugin)
 
         setPlayerPlugin(this.activePlayerPlugin)
         console.timeEnd('Player Plugin Change Timer');
@@ -712,7 +742,7 @@ export class PluginManager implements PluginManagerFormat {
         if (!findedPlugin) findedPlugin = this.informationPluginList[0]
 
         this.activeInformationPlugin.clear()
-        await this.activeInformationPlugin.CreateInstance(findedPlugin["code"])
+        await this.activeInformationPlugin.CreateInstance(findedPlugin)
 
         setInformationPlugin(this.activeInformationPlugin)
         console.timeEnd('Information Plugin Change Timer');

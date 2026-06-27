@@ -389,7 +389,7 @@ export interface WorkerWrapperInstance {
     pendingRequest: Map<string, (value: unknown) => void>
     otherDataPermision: boolean
 
-    runInstance: (pluginCode: string) => Promise<PluginMetadataFormat>
+    runInstance: (pluginCode: string, config?: { [key:string]: any }) => Promise<PluginMetadataFormat>
     destroy: () => void
     detectObjectHasAFunction: (object: { [key: string]: any }) => { [key: string]: any }
     wrapperObjectFunction: (value: { [key: string]: any }, uuid: string) => Promise<void>
@@ -398,13 +398,13 @@ export interface WorkerWrapperInstance {
 
 export type playerPluginInstanceFormat = playerPluginFormat & {
     instance?: WorkerWrapperInstance
-    CreateInstance(pluginCode: string): Promise<void>
+    CreateInstance(plugin: PluginLoadedFormat): Promise<void>
     clear(): void
 }
 
 export type informationPluginInstanceFormat = informationPluginFormat & {
     instance?: WorkerWrapperInstance
-    CreateInstance(pluginCode: string): Promise<void>
+    CreateInstance(plugin: PluginLoadedFormat): Promise<void>
     clear(): void
 }
 
@@ -625,7 +625,7 @@ export interface SettingsConfig {
         backend: string
     }
     backend: {
-        useragent: string
+        userAgent: string
         discordrpcTime: number
     }
 }

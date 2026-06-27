@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, Menu, session, ipcMain, crashReporter, Tray, dialog, Notification } from 'electron'
+import { app, shell, BrowserWindow, Menu, ipcMain, crashReporter, Tray, dialog, Notification } from 'electron'
 import { optimizer, is } from '@electron-toolkit/utils'
 import path, { join } from 'path'
 
@@ -27,6 +27,7 @@ import { t } from './i18n'
 import { yt_dlpInstance } from './ytdlpHandler'
 
 export let mainWindow: BrowserWindow | undefined
+export let userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.254 Safari/537.36"
 export const animuUserData = app.getPath("userData")
 export const backupFolder = app.getPath("userData")
 export const newConfigPath = path.join(animuUserData, "animuConfig")
@@ -104,6 +105,8 @@ async function createWindow() {
     title: title
   })
 
+  Menu.setApplicationMenu(null);
+
   mainWindow.webContents.on("did-navigate-in-page", (event, url) => {
     event.preventDefault();
     if (url.includes("#/player")) {
@@ -114,31 +117,27 @@ async function createWindow() {
   });
 
   const args = process.argv.slice(1);
-  const isDevTools = args.includes("--dev-tools") || args.includes("--devtools");
+  const isDevTools = args.includes("--dev-tools") || args.includes("--devtools") || process.env.NODE_ENV === 'development';
   if (isDevTools || config.Developer.DevToolsOnStart) {
-    mainWindow.webContents.openDevTools({ mode: "detach" });
-  }
-
-  session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
-    let newHeader = {
-      ...details.requestHeaders,
-      "Referer": "http://localhost:5173/",
-      "User-Agent": config.backend.useragent
-    }
-    if (isUserInPlayer) {
-      newHeader = {
-        ...newHeader,
-        ...customheader
-      }
-    }
-
-    callback({ requestHeaders: newHeader });
-  });
-
-  if (process.env.NODE_ENV === 'development') {
     mainWindow.setTitle(title + " - Development")
-    mainWindow.webContents.openDevTools()
-  }
+    mainWindow.webContents.openDevTools({ mode: "detach" })
+  };
+
+  mainWindow.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
+    details.requestHeaders['Referer'] = 'http://localhost:5173/';
+    details.requestHeaders['User-Agent'] = userAgent
+    details.requestHeaders['sec-ch-ua-platform'] = '"Windows"';
+
+    if (isUserInPlayer) {
+      details.requestHeaders = {
+        ...details.requestHeaders,
+        ...customheader
+      } as any
+    }
+
+    callback({ requestHeaders: details.requestHeaders });
+  });
+  mainWindow.webContents.setUserAgent(userAgent)
 
   mainWindow.on('ready-to-show', () => {
     if (mainWindow) mainWindow.show()
@@ -165,13 +164,15 @@ async function createWindow() {
     }
   })
 
-  Menu.setApplicationMenu(null);
-
   mainWindow.webContents.on('before-input-event', (event, input) => {
     if ((input.control && input.shift && input.key === 'I')) {
       event.preventDefault();
     }
   });
+
+  mainWindow.webContents.on("did-navigate-in-page", () => {
+    if (mainWindow) mainWindow.webContents.setZoomFactor(detectZoom(config.General.Window.Zoom))
+  })
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
@@ -180,10 +181,6 @@ async function createWindow() {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
-
-  mainWindow.webContents.on("did-navigate-in-page", () => {
-    if (mainWindow) mainWindow.webContents.setZoomFactor(detectZoom(config.General.Window.Zoom))
-  })
 }
 
 const isSecondInstance = app.requestSingleInstanceLock()
@@ -205,6 +202,11 @@ app.whenReady().then(async () => {
     app.quit()
     return
   }
+
+  userAgent = app.userAgentFallback.replace(/\([^)]*\)/, '(Windows NT 10.0; Win64; x64)')
+    .replace(`${app.getName()}/${app.getVersion()}`, "")
+    .replace(`Electron/${process.versions.electron}`, "")
+    .replaceAll("  ", " ")
 
   /* IFDEF WEB */
   if (process.env.ANIMU_WEB_DEV) return
@@ -293,6 +295,7 @@ export async function initialBackend() {
 
       if (typeof content.General.theme === "string") config = { ...content, General: { ...content.General, theme: ["DarkerAnimu"] } }
       config = detectKeybinds(content)
+      if (content.backend["userAgent"]) userAgent = content.backend["userAgent"]
     } else {
       write(path.join(newConfigPath, "config.json"), JSON.stringify(defaultConfig))
       console.info("created new config")

@@ -1,5 +1,5 @@
 import { app, BrowserWindow, ipcMain } from "electron"
-import { mainWindow } from "."
+import { mainWindow, userAgent } from "."
 
 //
 // This file is for fullscreen, zoom, exit, etc 
@@ -35,12 +35,16 @@ ipcMain.on("window:devtools", () => {
     mainWindow.webContents.openDevTools()
 })
 
-ipcMain.on("window:createNewWindow", () => {
-    let mainWindow = new BrowserWindow({
-        width: 1500,
-        height: 800,
-        minHeight: 495,
-        minWidth: 860,
+function find_cf_clearence(data: string[]) {
+    return data.find(str => str.includes("cf_clearance="))
+}
+
+function createWindow() {
+    return new BrowserWindow({
+        width: 1200,
+        height: 700,
+        minHeight: 400,
+        minWidth: 600,
         autoHideMenuBar: true,
         webPreferences: {
             sandbox: true,
@@ -50,24 +54,63 @@ ipcMain.on("window:createNewWindow", () => {
             nodeIntegration: false,
         },
     })
+}
 
-    mainWindow.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
-        let newHeader = {
-            ...details.requestHeaders,
-            "Referer": "",
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
-        }
-        callback({ requestHeaders: newHeader });
+function HandleCloduflare(url: string) {
+    let mainWindow = createWindow()
+    mainWindow.webContents.session.clearData()
+    mainWindow.webContents.session.clearCache()
+
+    mainWindow.webContents.setUserAgent(userAgent)
+
+    return new Promise((resolve) => {
+        mainWindow.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
+            details.requestHeaders['User-Agent'] = userAgent
+            details.requestHeaders['sec-ch-ua-platform'] = '"Windows"';
+            details.requestHeaders['Referer'] = url;
+            console.log("before", details)
+
+            if (details["requestHeaders"] && details["requestHeaders"]["Cookie"]) {
+                const cookie = details["requestHeaders"]["Cookie"]
+
+                if (cookie.includes("cf_clearance=")) {
+                    resolve({ cookie: cookie, header: details["requestHeaders"] })
+                    mainWindow.close()
+                }
+            }
+
+            callback({ requestHeaders: details.requestHeaders });
+        })
+
+        mainWindow.webContents.session.webRequest.onCompleted((details) => {
+            if (!details["responseHeaders"]) return
+            if (!details["responseHeaders"]["set-cookie"]) return
+
+            const cf_clearance = find_cf_clearence(details["responseHeaders"]["set-cookie"])
+            if (cf_clearance) {
+                resolve({ cookie: cf_clearance, header: details["responseHeaders"] as any })
+                mainWindow.close()
+            }
+        })
+
+        let count = 0;
+
+        mainWindow.webContents.on('did-navigate', (_, url) => {
+            count++;
+            console.log('NAV #' + count, url);
+            if (count >= 3) {
+                mainWindow.close()
+                resolve({ cookie: "", header: {} })
+            }
+        });
+
+        mainWindow.loadURL(url)
     })
+}
 
-    mainWindow.webContents.session.webRequest.onCompleted((details) => {
-        if (details["url"] == "") console.log(details)
-    })
-
-    mainWindow.webContents.on('did-finish-load', () => {
-        mainWindow.webContents.executeJavaScript(`
-        `);
-    });
-
-    mainWindow.loadURL("")
+ipcMain.handle("window:createNewWindow", async (_, props: { url: string, type: string }): Promise<any> => {
+    switch (props["type"]) {
+        case "CloudFlare":
+            return HandleCloduflare(props["url"])
+    }
 })

@@ -51,7 +51,10 @@ export function ParseINI(content: string) {
             return
         }
 
-        const splited = element.split("=")
+        const i = element.indexOf("=");
+
+        const splited = [element.slice(0, i),element.slice(i + 1)]
+
         if (splited.length != 2) return
 
         if (listData && splited[0] == listData["name"]) {
@@ -116,6 +119,7 @@ function hasNonObjectValues(obj: { [key: string]: any }): boolean {
 
 function ConvertObjectTreeToString(content: { [key: string]: any }, path: string) {
     let convertedString = ""
+    if (!content) return convertedString
     Object.entries(content).forEach(([key, val]) => {
         if (typeof val == "function") return
 

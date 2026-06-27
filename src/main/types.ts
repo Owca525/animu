@@ -148,7 +148,7 @@ export interface SettingsConfig {
         backend: string
     }
     backend: {
-        useragent: string
+        userAgent: string
         discordrpcTime: number
     }
 }
