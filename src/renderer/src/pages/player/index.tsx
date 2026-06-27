@@ -20,7 +20,7 @@ import { SheepShortcut } from "@renderer/utils/hooks/useKeyPress";
 import pluginManager from "@renderer/utils/pluginManager";
 
 function OverWritePlayer(url: string, hls: boolean) {
-    if (!url || !hls) throw new Error("Give 2 Aruments")
+    if (!url) throw new Error("Give Url")
 
     localStorage.setItem("playerCache", JSON.stringify({
         data: {
