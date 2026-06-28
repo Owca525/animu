@@ -642,7 +642,7 @@ export class PluginManager implements PluginManagerFormat {
             if (element["serverStatus"] && !hard) return
 
             const tmp = new WorkerWrapper
-            await tmp.runInstance(element["code"], element["config"])
+            await tmp.runInstance(element["code"], element["config"], true)
 
             tmp.wrapperFunction("raportStatus").then((results) => {
                 if (!results || typeof results != "object") {
