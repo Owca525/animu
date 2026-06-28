@@ -10,7 +10,7 @@ import { unwrap } from "solid-js/store";
 const blob = new Blob([pluginFunctions], { type: "text/javascript" });
 const pluginFunctionsURL = URL.createObjectURL(blob);
 
-const availbeFunctions: { name: string, func: (...args) => Promise<any> }[] = [{
+const availbeFunctions: { name: string, func: (...args) => Promise<any>, ignore?: boolean }[] = [{
     name: "request",
     func: request as any
 }, {
@@ -18,7 +18,8 @@ const availbeFunctions: { name: string, func: (...args) => Promise<any> }[] = [{
     func: window.api.yt_dlp.run
 },{
     name: "requestCloudflare",
-    func: requestCloudflare
+    func: requestCloudflare,
+    ignore: true,
 }]
 
 const workerDummyimport = `
@@ -240,6 +241,7 @@ class WorkerWrapper implements WorkerWrapperInstance {
     instance: Worker = undefined as any
     pendingRequest = new Map<string, (value: unknown) => void>()
     otherDataPermision: boolean = false
+    ignoreFunctions: boolean = false
 
     pluginData: PluginMetadataFormat = {
         version: "",
@@ -327,7 +329,9 @@ class WorkerWrapper implements WorkerWrapperInstance {
         return finalObject
     }
 
-    runInstance = async (pluginCode: string, config?: { [key: string]: any }): Promise<PluginMetadataFormat> => {
+    runInstance = async (pluginCode: string, config?: { [key: string]: any }, ignore: boolean = false): Promise<PluginMetadataFormat> => {
+        this.ignoreFunctions = ignore
+
         if (!pluginCode.startsWith("http")) {
             const blobCode = new Blob([detectIndex(pluginCode, pluginFunctionsURL)], { type: "text/javascript" });
             pluginCode = URL.createObjectURL(blobCode);
@@ -337,7 +341,8 @@ class WorkerWrapper implements WorkerWrapperInstance {
             ...window["animuAppInfo"],
             themes: undefined
         }))
-        if (config) payload = payload.replace(`"CHANGE_TO_CONFIG_WHEN_ARE_PERMISIONS"`, JSON.stringify(config))
+
+        payload = payload.replace(`"CHANGE_TO_CONFIG_WHEN_ARE_PERMISIONS"`, JSON.stringify(config))
 
         const payloadBLob = new Blob([payload], { type: "text/javascript" });
         const payloadURL = URL.createObjectURL(payloadBLob);
@@ -406,7 +411,23 @@ class WorkerWrapper implements WorkerWrapperInstance {
                 }
 
                 const tmp = availbeFunctions.find((v) => v["name"] == data["value"])
-                if (!tmp) return
+                if (!tmp) {
+                    worker.postMessage({
+                        type: "RESULT",
+                        value: undefined,
+                        uuid: data["uuid"]
+                    })
+                    return
+                }
+
+                if (tmp["ignore"] && this.ignoreFunctions) {
+                    worker.postMessage({
+                        type: "RESULT",
+                        value: undefined,
+                        uuid: data["uuid"]
+                    })
+                    return
+                }
 
                 try {
                     worker.postMessage({
@@ -621,7 +642,7 @@ export class PluginManager implements PluginManagerFormat {
             if (element["serverStatus"] && !hard) return
 
             const tmp = new WorkerWrapper
-            await tmp.runInstance(element["code"])
+            await tmp.runInstance(element["code"], element["config"])
 
             tmp.wrapperFunction("raportStatus").then((results) => {
                 if (!results || typeof results != "object") {
