@@ -34,7 +34,7 @@
   --second-layer: var(--bg2); /* Second layer, used in sidebar, header */
   --third-layer: var(--bg3); /* Third layer, used in button etc */
   --fourth-layer: var(--bg4); /* Fourth layer, used in hover button etc */
-  --green-one: var(--neutral1); /* boders, some buttons etc */
+  --green-one: var(--neutral1); /* borders, some buttons etc */
 }
 
 
