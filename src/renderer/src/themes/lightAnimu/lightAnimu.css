@@ -17,6 +17,12 @@
   --neutral3: #699626;
   --red: #d20f39;
   --green: var(--neutral1);
+  --blue: #04a5e5;
+  --light-blue: #75d3ed;
+  --orange: #fe640b;
+  --green: #40a02b;
+  --red-background: #d3b1b3;
+  --green-background: #d9f1d8;
   
   /* DarkerAnimu compatibility */
   --first-layer: var(--bg); /* First layer, background only */
@@ -27,6 +33,17 @@
 
   /* Colors */
   --green-one: var(--neutral1); /* boders, some buttons etc */
+  --orange-one: var(--orange);
+  --blue-one: var(--blue);
   --red-one: var(--red);
+  --blue-background: var(--bg2);
+  --blue-text: var(--text);
+  --red-text: var(--text);
+  --green-text: var(--text);
 }
 
+
+/* Light theme fixes */
+.button.big-card-button, .big-card-information-date, .big-card-information-others * {
+  color: var(--bg) !important;
+}
