@@ -726,7 +726,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
 
         if (!data["success"]) {
             console.error("Failed Load Subtitles", data, currentResolution())
-            toast(t("Failed Fetch Subttitles"), { type: "error" })
+            toast(t("Failed Fetch Subtitles"), { type: "error" })
             return
         }
 
@@ -734,7 +734,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
 
         if (!sub.format.toLowerCase().includes("ass") || !sub.format.toLowerCase().includes("ssa")) {
             const content = CovnertToASS(data["text"])
-            if (!content) return toast(t("Failed Fetch Subttitles"), { type: "error" })
+            if (!content) return toast(t("Failed Fetch Subtitles"), { type: "error" })
             const blob = new Blob([content], { type: "text/ass" });
             assUrl = URL.createObjectURL(blob);
         }
