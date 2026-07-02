@@ -16,6 +16,12 @@
   --neutral2: #4e59b1; /* not used */
   --neutral3: #3e488e; /* not used */
   --red: red;
+  --blue: #04a5e5;
+  --light-blue: #75d3ed;
+  --orange: #fab387;
+  --green: #228849;
+  --red-background: #c2434e;
+  --green-background: #619c70;
   
   /* DarkerAnimu compatibility */
   --first-layer: var(--bg); /* First layer, background only */
@@ -25,6 +31,21 @@
   --five-layer: var(--bg5);
 
   /* Colors */
+  --green-one: var(--neutral1); /* borders, some buttons etc */
+  --orange-one: var(--orange);
+  --blue-one: var(--blue);
   --red-one: var(--red);
-  --green-one: var(--neutral1); /* boders, some buttons etc */
+  --blue-background: var(--bg2);
+  --blue-text: var(--text);
+  --red-text: var(--text);
+  --green-text: var(--text);
+}
+
+/* Light theme fixes (it's not a light theme but accent color is weird) */
+.button.big-card-button, .big-card-information-date, .big-card-information-others * {
+  color: var(--bg);
+}
+.button.big-card-button:hover {
+  color: var(--text) !important;
+  background-color: var(--neutral2);
 }

@@ -16,12 +16,16 @@
   --five-layer: #434343;
 
   /* Colors */
-  --green-one: var(--neutral1); /* boders, some buttons etc */
+  --green-one: var(--neutral1); /* borders, some buttons etc */
+  --green-background: #313332;
+  --green-text: #EAF3EE;
   --orange-one: #CA6931;
   --blue-one: #385DA9;
   --blue-background: #212328;
   --blue-text: #BFCBE3;
   --red-one: #932F2F;
+  --red-background: #2E2121;
+  --red-text: #EAD6D6;
 
   /* other */
   --player-bg-containers: color-mix(in srgb, var(--third-layer) 80%, transparent);

@@ -1,27 +1,27 @@
 @import "../playerfix.css";
 
 :root {
-  --text: #657b83; /* is use on regular text */
-  --text-gray: #93a1a1; /* is use in card continue watch */
+  --text: #4c4f69; /* is use on regular text */
+  --text-gray: #6c6f85; /* is use in card continue watch */
 
   /* Background */
-  --bg: #fdf6e3; /* First layer, background only */
-  --bg2: #eee8d5; /* Second layer, use in sidebar, header */
-  --bg3: #dbd3b8; /* Thirt layer, use in button etc */
-  --bg4: #cdc095; /* Fourth layer, use in hover button etc */
-  --bg5: #beb289; /* Fourth layer, use in hover button etc */
+  --bg: #e6e9ef; /* First layer, background only */
+  --bg2: #ccd0da; /* Second layer, use in sidebar, header */
+  --bg3: #bcc0cc; /* Thirt layer, use in button etc */
+  --bg4: #acb0be; /* Fourth layer, use in hover button etc */
+  --bg5: #9ca0b0; /* Fourth layer, use in hover button etc */
 
   /* accent */
-  --neutral1: #b58900; /* is using on outline, border-color etc */ 
-  --neutral2: #b7901d;
-  --neutral3: #b7983c;
-  --red: #dc322f;
-  --blue: #268bd2;
-  --light-blue: #90c7d6;
-  --orange: #cb4b16;
-  --green: #859900;
-  --red-background: #ed8b90;
-  --green-background: #cddbb6;
+  --neutral1: #8839ef; /* is using on outline, border-color etc */ 
+  --neutral2: #B958DD;
+  --neutral3: #ea76cb;
+  --red: #d20f39;
+  --blue: #04a5e5;
+  --light-blue: #75d3ed;
+  --orange: #fe640b;
+  --green: #40a02b;
+  --red-background: #eed0d2;
+  --green-background: #e7f8e6;
   
   /* DarkerAnimu compatibility */
   --first-layer: var(--bg); /* First layer, background only */
@@ -40,6 +40,7 @@
   --red-text: var(--text);
   --green-text: var(--text);
 }
+
 
 /* Light theme fixes */
 .button.big-card-button, .big-card-information-date, .big-card-information-others * {
