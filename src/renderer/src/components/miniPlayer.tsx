@@ -1003,7 +1003,7 @@ function MiniPlayer(props: { props: MiniPlayerProps[], disableSettings?: boolean
                             >
                                 <div class="player-time-display-current">
                                     <Show when={minusTimeState()} fallback={formatTime(currentTime())}>
-                                        {`-${formatTime(videoRef ? videoRef.duration - currentTime() : 0)}`}
+                                        {`-${formatTime(durrationTime() - currentTime())}`}
                                     </Show>
                                 </div>
                                 /
