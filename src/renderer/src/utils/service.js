@@ -2,10 +2,12 @@ import { setServiuceList } from "./stores/global"
 import { DefaultService, serviceFormat } from "./types"
 
 class ServiceManagerInstance {
-    defaultServices: DefaultService[] = []
-    services: serviceFormat[] = []
+    /** @type {DefaultService[]} */
+    defaultServices = []
+    /** @type {serviceFormat[]} */
+    services = []
 
-    InitialServiceManager = (defaultServices: DefaultService[] = []) => {
+    InitialServiceManager = (defaultServices = []) => {
         this.defaultServices = defaultServices
 
         this.defaultServices.forEach((service) => {
@@ -14,11 +16,17 @@ class ServiceManagerInstance {
         setServiuceList(this.services)
     }
 
-    RunService = (service: DefaultService) => {
+    /**
+     * @param {DefaultService} service
+     * @returns {void}
+     */
+    RunService = (service) => {
         if (this.FindService(service["name"])) return
 
         const serviceID = crypto.randomUUID()
-        let timer: NodeJS.Timeout | undefined = undefined
+
+        /** @type {NodeJS.Timeout | undefined} */
+        let timer = undefined
 
         if (service.active) timer = setInterval(() => {
             try {
@@ -43,7 +51,11 @@ class ServiceManagerInstance {
         })
     }
 
-    StopService = (name: string) => {
+    /**
+     * @param {string} name
+     * @returns {boolean}
+     */
+    StopService = (name) => {
         let service = this.FindService(name)
 
         if (!service) return false
@@ -62,7 +74,11 @@ class ServiceManagerInstance {
         return true
     }
 
-    ActiveService = (name: string) => {
+    /**
+     * @param {string} name
+     * @returns {boolean}
+     */
+    ActiveService = (name) => {
         let service = this.FindService(name)
 
         if (!service) return false
@@ -89,7 +105,11 @@ class ServiceManagerInstance {
         return true
     }
 
-    FindService = (name: string) => {
+    /**
+     * @param {string} name
+     * @returns {serviceFormat | undefined}
+     */
+    FindService = (name) => {
         let service = this.services.find((v) => v["name"] == name)
         if (!service) service = this.services.find((v) => v["id"] == name)
 

@@ -9,17 +9,17 @@ import icon from '@resources/icon.png';
 import { sendNotification } from "./NotificationManager";
 import pluginManager from "./pluginManager";
 
-(window as any).getConfig = () => unwrap(getConfig());
-(window as any).getGlobalCache = () => unwrap(getGlobalCache());
-(window as any).getHomeCache = () => unwrap(getHomeCache());
-(window as any).getInformationPlugin = () => unwrap(getInformationPlugin());
-(window as any).getAllPluginList = () => unwrap(getAllPluginList());
-(window as any).getPlayerPLugin = () => unwrap(getPlayerPLugin());
-(window as any).getPluginRepo = () => unwrap(getPluginRepo());
-(window as any).pluginManager = () => pluginManager;
-(window as any).sendNotification = sendNotification;
-(window as any).request = request;
-(window as any).testNotitication = () => {
+window.getConfig = () => unwrap(getConfig());
+window.getGlobalCache = () => unwrap(getGlobalCache());
+window.getHomeCache = () => unwrap(getHomeCache());
+window.getInformationPlugin = () => unwrap(getInformationPlugin());
+window.getAllPluginList = () => unwrap(getAllPluginList());
+window.getPlayerPLugin = () => unwrap(getPlayerPLugin());
+window.getPluginRepo = () => unwrap(getPluginRepo());
+window.pluginManager = () => pluginManager;
+window.sendNotification = sendNotification;
+window.request = request;
+window.testNotitication = () => {
     sendNotification({
         title: t("update.available", { ver: window["animuAppInfo"]["ver"] }),
         description: "New Update is Avaible",
