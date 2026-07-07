@@ -91,30 +91,31 @@ function App() {
 
   /* IFDEF DEBUG|PROD */
   SheepShortcut(["F12"], () => {
-    if (getConfig().Developer.DevTools) window.BrowserWindow.openDevTools()
+    if (getConfig().Developer.DeveloperMode) window.BrowserWindow.openDevTools()
   })
+
   SheepShortcut(["Control", "Shift", "R"], async () => {
-    if (getConfig().Developer.DeveloperMode) {
-      const idToast = toast(t("global.themereload"), { type: "loading", timer: true })
-      setGlobalTheme([
-        ...window["animuAppInfo"]["themes"],
-        ...await window.api.themes.list()
-      ])
+    if (!getConfig().Developer.DeveloperMode) return
 
-      const loadedTheme = getGlobalCache().loadedTheme
-      let confTheme = [...new Set(unwrap(getConfig().General.theme))]
-      let loadingTheme: Map<number, themeMetadata> = new Map()
-      for (let index = 0; index < confTheme.length; index++) {
-        const element = confTheme[index];
-        const theme = loadedTheme.find((ele) => ele.themeName == element)
-        if (!theme) continue
-        loadingTheme.set(index, unwrap(theme))
-      }
-      changeTheme(loadingTheme)
+    const idToast = toast(t("global.themereload"), { type: "loading", timer: true })
+    setGlobalTheme([
+      ...window["animuAppInfo"]["themes"],
+      ...await window.api.themes.list()
+    ])
 
-      updateToast(idToast, t("global.themereload"), { type: "success", timer: false })
-      await window.backend.refresh()
+    const loadedTheme = getGlobalCache().loadedTheme
+    let confTheme = [...new Set(unwrap(getConfig().General.theme))]
+    let loadingTheme: Map<number, themeMetadata> = new Map()
+    for (let index = 0; index < confTheme.length; index++) {
+      const element = confTheme[index];
+      const theme = loadedTheme.find((ele) => ele.themeName == element)
+      if (!theme) continue
+      loadingTheme.set(index, unwrap(theme))
     }
+    changeTheme(loadingTheme)
+
+    updateToast(idToast, t("global.themereload"), { type: "success", timer: false })
+    await window.backend.refresh()
   })
   /* ENDIF */
 

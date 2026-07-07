@@ -119,7 +119,7 @@ async function createWindow() {
   const isDevTools = args.includes("--dev-tools") || args.includes("--devtools") || process.env.NODE_ENV === 'development';
   if (isDevTools || config.Developer.DevToolsOnStart) {
     mainWindow.setTitle(title + " - Development")
-    mainWindow.webContents.openDevTools({ mode: "detach" })
+    mainWindow.webContents.openDevTools({ mode: "detach", title: "Animu Debugger" })
   };
 
   mainWindow.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {

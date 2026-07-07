@@ -32,7 +32,7 @@ ipcMain.on("window:reload", () => {
 
 ipcMain.on("window:devtools", () => {
     if (!mainWindow) return
-    mainWindow.webContents.openDevTools()
+    mainWindow.webContents.openDevTools({ mode: "detach", title: "Animu Debugger" })
 })
 
 function find_cf_clearence(data: string[]) {
