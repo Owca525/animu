@@ -6,7 +6,6 @@ import path, { join } from 'path'
 import icon from '../../build/icon.png?asset'
 import "./utils"
 import "./window"
-import "./os"
 import "./update"
 import "./request"
 import "./streaming"

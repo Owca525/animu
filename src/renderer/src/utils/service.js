@@ -1,5 +1,4 @@
 import { setServiuceList } from "./stores/global"
-import { DefaultService, serviceFormat } from "./types"
 
 class ServiceManagerInstance {
     /** @type {DefaultService[]} */
