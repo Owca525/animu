@@ -3,6 +3,12 @@ import icon from '@resources/icon.png';
 import Information from './pages/information/index';
 import Player from './pages/player/index';
 import Settings from './pages/settings/index';
+
+// const Home = lazy(() => import("./pages/home/index"));
+// const Player = lazy(() => import("./pages/player/index"));
+// const Settings = lazy(() => import("./pages/settings/index"));
+// const Information = lazy(() => import("./pages/information/index"));
+
 import {
   calculateZoomLevel,
   changeTheme,

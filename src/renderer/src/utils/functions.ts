@@ -151,36 +151,6 @@ export function convertKeybinds(inputString: string) {
     return inputString
 }
 
-export function similarityText(text1: string | undefined, text2: string | undefined): number {
-    if (!text1) return 0
-    if (!text2) return 0
-
-    const len1 = text1.length;
-    const len2 = text2.length;
-
-    const dp: number[][] = Array.from({ length: len1 + 1 }, () =>
-        Array(len2 + 1).fill(0)
-    );
-
-    for (let i = 0; i <= len1; i++) dp[i][0] = i;
-    for (let j = 0; j <= len2; j++) dp[0][j] = j;
-
-    for (let i = 1; i <= len1; i++) {
-        for (let j = 1; j <= len2; j++) {
-            if (text1[i - 1] === text2[j - 1]) {
-                dp[i][j] = dp[i - 1][j - 1];
-            } else {
-                dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
-            }
-        }
-    }
-
-    const maxLen = Math.max(len1, len2);
-    const distance = dp[len1][len2];
-    const similarity = ((maxLen - distance) / maxLen) * 100;
-
-    return Math.round(similarity * 100) / 100;
-}
 
 export function convertMsToMinutes(ms: number): number {
     return Math.floor(ms / 60000);
@@ -312,11 +282,6 @@ export async function convertPath(path: string) {
     if ((await window.api.getOSDetails()).platform == "win32" && !window.api) return path.replace("/", "\\")
     return path
 }
-
-export function toSeconds(time: string) {
-    const [h, m, s] = time.split(":");
-    return parseFloat(h) * 3600 + parseFloat(m) * 60 + parseFloat(s);
-};
 
 export function isNumberString(str: string): boolean {
     if (!str) return false

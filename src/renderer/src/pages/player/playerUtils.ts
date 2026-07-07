@@ -1,4 +1,4 @@
-import { formatTime, request, toSeconds } from "@renderer/utils/functions";
+import { formatTime, request, timeToSeconds } from "@renderer/utils/functions";
 import { episodeMetadata, playerDataExtended, Thumbnail } from "@renderer/utils/types";
 
 export async function VTTstoryBoardParser(url: string) {
@@ -28,8 +28,8 @@ export async function VTTstoryBoardParser(url: string) {
             const finnalSrc: string = `${src}${file}`
             thumbnails = { ...thumbnails, src: finnalSrc }
             metadata.push({
-                start: toSeconds(start),
-                end: toSeconds(end),
+                start: timeToSeconds(start),
+                end: timeToSeconds(end),
                 imgX: x,
                 imgY: y,
             });
