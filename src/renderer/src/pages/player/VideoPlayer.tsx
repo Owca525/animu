@@ -37,6 +37,8 @@ import MoreInformation from "./components/MoreInformation"
 
 const speed: Array<string> = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
+const supportedSubs = ["ass", "ssa"]
+
 const Defaultheader = {
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:149.0) Gecko/20100101 Firefox/149.0",
     Accept: "*/*",
@@ -1067,7 +1069,7 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
 
         let assUrl = sub.url
 
-        if (!sub.format.toLowerCase().includes("ass") || !sub.format.toLowerCase().includes("ssa")) {
+        if (supportedSubs.includes(sub.format.toLowerCase()) == false) {
             const content = CovnertToASS(data["text"])
             if (!content) return toast(t("Failed Fetch Subtitles"), { type: "error" })
             const blob = new Blob([content], { type: "text/ass" });

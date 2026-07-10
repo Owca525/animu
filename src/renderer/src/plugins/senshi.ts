@@ -1,5 +1,5 @@
-import { makeSmallText, request } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerChapterList, playerData, playerPluginFormat, resolutionFormat, serverStatusData } from "@renderer/utils/types";
+import { request, SheepFinderAnime2000 } from "@renderer/utils/functions";
+import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerChapterList, playerData, playerPluginFormat, playerSubtitlesFormat, resolutionFormat, serverStatusData } from "@renderer/utils/types";
 
 const WEBSITE = "https://senshi.live"
 
@@ -16,55 +16,6 @@ const header = {
     "Sec-Fetch-Site": "same-origin",
     "DNT": "1",
     "Priority": "u=4",
-}
-
-function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string | undefined {
-    try {
-        console.log("First Check", animeList)
-        // FIRST CHECK
-        if (animeList.length <= 0) return undefined
-        if (animeList.length == 1) return animeList[0].player_ID
-
-        // Second Check
-        let seasonYearFilter = animeList.filter((element) => element.seasonYear == anime.seasonYear)
-        console.log("Second Check", seasonYearFilter)
-        if (seasonYearFilter.length <= 0) return undefined
-        if (seasonYearFilter.length == 1) return seasonYearFilter[0].player_ID
-
-        // Third Check
-        let seasonFilter = seasonYearFilter.filter((element) => makeSmallText(element.season) == makeSmallText(anime.season))
-        console.log("Third Check", seasonYearFilter)
-        if (seasonFilter.length <= 0) return undefined
-        if (seasonFilter.length == 1) return seasonFilter[0].player_ID
-
-        // Four Check
-        let episodesFilter: AnimeData[] | undefined = undefined
-        if (anime.episodes) {
-            episodesFilter = seasonFilter.filter((element) => element.episodes == anime.episodes)
-            console.log("Four Check", episodesFilter)
-            if (episodesFilter.length <= 0) return undefined
-            if (episodesFilter.length == 1) return episodesFilter[0].player_ID
-        }
-
-        // Five Check
-        let durationFilter: AnimeData[] = []
-        if (episodesFilter) durationFilter = episodesFilter.filter((element) => element.duration == anime.duration)
-        else durationFilter = seasonFilter.filter((element) => element.duration == anime.duration)
-        console.log("Five Check", durationFilter)
-        if (durationFilter.length <= 0) return undefined
-        if (durationFilter.length == 1) return durationFilter[0].player_ID
-
-        // Six Check
-        let formatFilter = durationFilter.filter((element) => makeSmallText(element.format) == makeSmallText(anime.format))
-        console.log("Six Check", formatFilter)
-        if (formatFilter.length <= 0) return undefined
-        if (formatFilter.length == 1) return formatFilter[0].player_ID
-
-        return formatFilter[0].player_ID
-    } catch (error) {
-        console.error("Senshi SheepFinderAnime2000 error", error)
-        return animeList[0].player_ID
-    }
 }
 
 export function dateToUnix(dateStr: string | undefined): number | undefined {
@@ -100,7 +51,7 @@ function converterToCardData(data: { [key: string]: string | number }): cardData
 
 export default class Senshi implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.1",
+        version: "1.2",
         name: "Senshi",
         author: "Owca525",
         supportLang: ["en"],
@@ -110,13 +61,59 @@ export default class Senshi implements playerPluginFormat {
     };
     cache: { [key: string]: number | string }[] = []
 
+    ExtractUrl = async (server: { url: string, sever2: string, serverFM: string, download: string, status: string, masked_base_url: string }): Promise<playerData | undefined> => {
+        try {
+            if (!server["url"].includes("ninstream")) {
+                console.warn("Unsuported Url Default Thinking")
+                return {
+                    hostname: "Senshi",
+                    resolution: [{
+                        res: "",
+                        url: server["url"],
+                        reqHeader: header,
+                        hls: server["url"].includes(".m3u8")
+                    }],
+                    isDubbing: server["status"] == "Dub" ? async () => {
+                        return [{ res: "", url: server["url"], reqHeader: header, hls: server["url"].includes(".m3u8") }] as resolutionFormat[]
+                    } : undefined
+                }
+            }
+
+            const response = await request(server["url"].replace("playlist.m3u8", "sub_artplayer.json"), { headers: header })
+            if (!response["success"] || !response["json"]) return {
+                hostname: "Senshi",
+                resolution: [{
+                    res: "1080",
+                    url: server["url"],
+                    reqHeader: header,
+                    hls: server["url"].includes(".m3u8")
+                }]
+            }
+
+
+            return {
+                hostname: "Senshi",
+                resolution: [{
+                    res: "1080",
+                    url: server["url"],
+                    reqHeader: header,
+                    hls: server["url"].includes(".m3u8"),
+                    defaultSubtitles: true,
+                }],
+                subtitles: response["json"].map((sub) => ({ url: server["url"].replace("playlist.m3u8", sub["url"]), lang: sub["url"].match(/^sub_(\d+)_([a-z]{2,3})\.ass$/)[2], label: sub["html"], format: "ass" })) as playerSubtitlesFormat[]
+            }
+            
+        } catch (error) {
+            console.error("Senshi/ExtractURL", error)
+            return
+        }
+    }
+
     extractPlayerData = async (_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
         let mainEpisode: string = typeof episode == "object" ? episode.ep : episode
 
         const urlsResp = await request(`${WEBSITE}/episode-embeds/${id}/${mainEpisode}`, { headers: header })
         if (!urlsResp["success"] || !urlsResp["json"]) return []
-        const sub = urlsResp["json"].find((v) => v["status"] == "HardSub")
-        const dub = urlsResp["json"].find((v) => v["status"] == "Dub")
 
         const cached = this.cache[id]
         let tmp: playerChapterList[] = []
@@ -136,23 +133,19 @@ export default class Senshi implements playerPluginFormat {
             ]
         }
 
-        let player: playerData = {
-            hostname: "Senshi",
-            resolution: [{
-                res: "",
-                url: sub["url"],
-                reqHeader: header,
-                hls: sub["url"].includes(".m3u8")
-            }],
-            listChapters: tmp,
-        }
-        if (dub) player = {
-            ...player, isDubbing: async () => {
-                return [{ res: "", url: dub["url"], reqHeader: header, hls: dub["url"].includes(".m3u8") }] as resolutionFormat[]
-            }
+        let player: playerData[] = []
+
+        for (let index = 0; index < urlsResp["json"].length; index++) {
+            const element = urlsResp["json"][index];
+            const resp = await this.ExtractUrl(element)
+            if (!resp) continue
+            player.push({
+                ...resp,
+                listChapters: tmp
+            })
         }
 
-        return [player]
+        return player
     }
     extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {
         if (animeData && !anime_id) {
@@ -231,7 +224,7 @@ export default class Senshi implements playerPluginFormat {
         }
 
         const functions = [
-            async () => this.searchAnime("Oshi No Ko", 1), 
+            async () => this.searchAnime("Oshi No Ko", 1),
             async () => this.extractPlayerData("sub", "1" as any, "61316"),
             async () => this.extractOnlyEpisodesList("sub", "52034"),
         ]

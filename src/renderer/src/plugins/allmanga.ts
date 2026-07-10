@@ -14,6 +14,8 @@ const HASH_PLAYER = 'd405d0edd690624b66baba3068e0edc3ac90f1597d898a1ec8db4e5c43c
 const API_WEB = 'https://api.allanime.day'
 const WEBSITE = 'https://allmanga.to/'
 
+const SHITLOADER = "AYOVp7Mtrv66784RPBhH3dcXXFQRM3zzYlFxs9Rqk/yq7ouR/kKLsLD71rWMGIRhab1qx0Nu7FQJvONAdrOvU13C+cKulrbCmVuWySHILFoPFvX5P33KhJsqqv2vTo4NS52jHQePBDYyyk1PsObSVOITHHRDtaPnup/2fS/SVtckQV8jaBO275icFXKXeOVi6p9CoxiTVHNTQg=="
+
 const header = {
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:149.0) Gecko/20100101 Firefox/149.0",
     Accept: "*/*",
@@ -146,6 +148,7 @@ function FuckBufferDosentWorkInElectron(base64: string): Uint8Array {
 }
 
 async function fuckThisEncryptionMethod(encryptedMotherFucker: string) {
+    console.log(encryptedMotherFucker)
     let bufferEncrypted = FuckBufferDosentWorkInElectron(encryptedMotherFucker)
     let version = bufferEncrypted[0];
 
@@ -190,7 +193,7 @@ async function requestToClockApi(content: AllmangaURLformat): Promise<playerData
 
         const srcUrl = element.src ? element.src : element.link
         if (!srcUrl) return console.error("allmanga/requestToClockApi Unsuported Url", links)
-            
+
         listUrls = { resolution: [{ url: srcUrl, res: "1080", hls: element["hls"] ? true : false }], hostname: content["sourceName"] }
     });
     return listUrls
@@ -288,10 +291,15 @@ export default class Allmanga implements playerPluginFormat {
         const tmpEpisode = typeof episode == "object" ? episode["ep"] : episode
         const variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${tmpEpisode}"}`
 
-        const response = await requestApiAllmanga(variables, HASH_PLAYER)
+        const response = await request(
+            `${API_WEB}/api?variables=${variables}&extensions={"persistedQuery":{"version":1,"sha256Hash":"${HASH_PLAYER}"},"aaReq":"${SHITLOADER}"}`,
+            { headers: header }
+        )
+
         if (!response["success"] || !response["json"]) return []
 
         try {
+            console.log(response)
             const jsonObject = await fuckThisEncryptionMethod(response["json"]["data"]["tobeparsed"])
             /* IFDEF DEBUG */
             console.warn("allmanga/fetchUrls jsonObject", jsonObject)
