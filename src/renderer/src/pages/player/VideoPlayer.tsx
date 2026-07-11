@@ -1081,6 +1081,9 @@ const VideoPlayer: Component<VideoPlayerProps> = ({ player_data, anime_data, tem
             subUrl: assUrl,
             workerUrl,
             wasmUrl,
+            dropAllAnimations: true,
+            onDemandRender: true,
+            asyncRender: true,
             availableFonts: {
                 "default": fallbackFontJASSUB
             },
