@@ -1,0 +1,1721 @@
+import Button from "@renderer/components/buttons"
+import VolumeNotification from "@renderer/pages/player/components/VolumeNotification"
+import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
+import { CheckNumber, convertKeybinds, CreateContextMenuOptions, createElement, CreateSHA256, detectTitleConfig, formatTime, openUrlFolder, request, toggleFullscreen } from "@renderer/utils/functions"
+import { getConfig } from "@renderer/utils/stores/config"
+import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, Thumbnail } from "@renderer/utils/types"
+import Hls, { HlsConfig } from "hls.js"
+import JASSUB from "jassub"
+import shaka from "shaka-player"
+import { Component, onCleanup, onMount, Show } from "solid-js"
+import { createStore, unwrap } from "solid-js/store"
+import PlayerButton from "./components/PlayerButton"
+import SeekBar from "@renderer/components/seekBar"
+import { t } from "@renderer/utils/i18n"
+import PlayerSettings from "./components/PlayerSettings"
+import { removeToast, toast } from "@renderer/utils/context/ToastNotification"
+import { addTime, DownloadVideo, EpisodeAvaible, GenerateOpeningEnding, generateShareURL, VTTstoryBoardParser } from "./playerUtils"
+import { UpdateConfig } from "@renderer/utils/FilesManager/config"
+import { CovnertToASS } from "@renderer/utils/subtitleConverter"
+
+import workerUrl from "jassub/dist/jassub-worker.js?url";
+import modernWasmUrl from 'jassub/dist/jassub-worker-modern.wasm?url'
+// import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
+import fallbackFontJASSUB from "jassub/dist/default.woff2?url";
+import { useKeyPress } from "@renderer/utils/hooks/useKeyPress"
+import { getSocket, getSocketRoom } from "@renderer/utils/stores/global"
+import MoreInformation from "./components/MoreInformation"
+
+shaka.polyfill.installAll()
+
+const speed = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
+
+// TODO: Add support title for resoltion only in Embed Mode
+// TODO: Add support for seperate audio for example youtube support
+
+interface PlayerProps {
+    type: "embed" | "player"
+
+    playerTitle: string,
+
+    anime?: {
+        AnimeData: AnimeData,
+        saveData: indentityPlayer,
+        animulist?: animulistProps
+    }
+
+    metadata: playerData[],
+    ep_metadata?: {
+        current: episodeMetadata,
+        list: episodeMetadata[],
+        type: string
+    }
+    setTime?: number
+
+    onChangeEpisode?: (ep: string) => void
+    onExitPlayer?: () => void
+    onKeybind?: (keys: string) => void
+    onTimeUpdate?: (time: number) => void
+}
+
+class PlayerGlobalCacheInstance {
+    playerVolume = 0
+    isMuted = false
+    autoplay = true
+    isFullscreen = true
+
+    currentTime = 0
+
+    activeEvents: { type: any, handler: (event: Event & { currentTarget: HTMLVideoElement; target: Element; }) => void }[] = []
+
+    userInteractWithSubtitles = false
+
+    constructor() {
+        const config = getConfig()
+
+        this.playerVolume = config["Player"]["general"]["Volume"]
+        this.autoplay = config["Player"]["general"]["Autoplay"]
+        this.isFullscreen = config["Player"]["general"]["AutoFullscreen"]
+    }
+}
+
+class ExtractorManagerInstance {
+    private cache: Map<string, any> = new Map()
+    private active: undefined | string = undefined
+
+    request = async (content: { func: (arg: any) => any, args: any, loadingMessage: string, errorMessage: string }): Promise<any> => {
+        let id: string = ""
+        try {
+            const hash = await CreateSHA256(JSON.stringify(content))
+            if (this.cache.has(hash)) return this.cache.get(hash)
+
+            id = toast(content["loadingMessage"], { type: "loading", timer: true })
+            this.active = id
+
+            const resp = await content.func(content.args)
+
+            if (this.active != id) return undefined
+
+            removeToast(this.active)
+
+            this.cache.set(hash, resp)
+
+            return resp
+        } catch (error) {
+            console.error("Error in ExtractorManagerInstance", error)
+
+            if (id == this.active) toast(content["errorMessage"], { type: "error" })
+
+            if (this.active && id == this.active) removeToast(this.active)
+            return undefined
+        }
+    }
+
+    cancelPrevius = () => {
+        if (this.active) removeToast(this.active)
+    }
+
+    clear = () => {
+        this.cache.clear()
+        this.active = undefined
+    }
+}
+
+const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata = { current: { ep: "0" }, list: [], type: "sub" }, onChangeEpisode, anime, onExitPlayer, onKeybind, playerTitle }) => {
+    const ExtractorManager = new ExtractorManagerInstance()
+    const animeTitle = anime ? detectTitleConfig(anime!.AnimeData.title) : "Sheeplayer"
+
+    const config = getConfig()
+
+    let SheePlayer: PlayerGlobalCacheInstance = window["SheePlayer"]
+    if (!window["SheePlayer"]) {
+        window["SheePlayer"] = new PlayerGlobalCacheInstance();
+        SheePlayer = window["SheePlayer"]
+    } else {
+        SheePlayer = window["SheePlayer"]
+    }
+
+    const avaibleEpisode = EpisodeAvaible(ep_metadata["current"], ep_metadata["list"])
+
+    // ref for html object
+    let videoRef: HTMLVideoElement | undefined
+    let Shaka: shaka.Player | undefined
+
+    let HLS: Hls | undefined
+    let currentASSubtitles: JASSUB | undefined
+
+    let playerHideTimer: NodeJS.Timeout | undefined
+    let hideChapterButtonTimer: NodeJS.Timeout | undefined
+    let volumeTimeout: NodeJS.Timeout | undefined
+    let playAnimationTimeout: NodeJS.Timeout | undefined
+    let moreInformationTimer: NodeJS.Timeout | undefined
+
+    let buttonSkipRight: NodeJS.Timeout | undefined
+    let buttonSkipLeft: NodeJS.Timeout | undefined
+
+    let refreashUpdateSocket: NodeJS.Timeout | undefined
+
+    let assSubContainer: HTMLDivElement | undefined
+    let screenShotContainer: HTMLDivElement | undefined
+    let screenshotWrapper: HTMLDivElement | undefined
+    let containerRef: HTMLDivElement | undefined
+
+    let PlayerCleanup = false
+
+    const [player, updatePlayer] = createStore({
+        initialize: true,
+
+        volume: SheePlayer.playerVolume,
+        currentTime: setTime ?? 0,
+        muted: SheePlayer.isMuted,
+        durration: 0,
+        isPlaying: SheePlayer.autoplay,
+        isFullscreen: SheePlayer.isFullscreen,
+        isLoading: false,
+        FatalError: false,
+
+        isDubbing: false,
+
+        HLSMode: false,
+
+        buffer: [] as { position: number, width: number }[],
+        subtitles: [{ url: "", format: "", lang: "", label: t("player.other.off") }] as playerSubtitlesFormat[],
+        playerData: undefined as playerData | undefined,
+        currentResolution: undefined as resolutionFormat | undefined,
+        currentSubtitle: undefined as playerSubtitlesFormat | undefined,
+        thumbnail: undefined as Thumbnail | undefined,
+        chapterList: [] as { left: number, width: number, name?: string, type: "opening" | "ending" | "other" }[],
+        resoltions: [] as resolutionFormat[],
+        audioTrack: [] as { id: number, lang?: string, label: string }[],
+        activeAudioTrack: undefined as undefined | { id: number, lang?: string, label: string }
+    })
+
+    const [ui, updateUI] = createStore({
+        isVisible: true,
+        isVolume: false,
+        isShowPlay: false,
+        isShowSelectEpisode: false,
+        buttonSkipTime: 15,
+        minusTimeState: config.Player.general.minusTime,
+
+        IsRunningButtonSkipTime: false,
+        IsDisableButtonSkipTimerOpening: false,
+        IsDisableButtonSkipTimerEnding: false,
+        currentSkipButton: undefined as undefined | { type: "opening" | "ending", time: number },
+
+        isShowingMoreInformation: false,
+
+        isShowButtonSkipLeft: false,
+        isShowButtonSkipRight: false,
+
+        TimerUILeft: "",
+        TimerUIRight: "",
+
+        ShowMoreInformation: false,
+
+        activeMenu: undefined as undefined | string,
+
+        minusTime: config["Player"]["general"]["minusTime"],
+
+        screenshot: undefined as undefined | { url: string, click: string },
+
+        upNextTimer: 0,
+        upNextActive: false,
+        upNextDisable: false,
+
+        chapterSkipDisable: [] as string[],
+        chapterSkipActive: false,
+        chapterSkipType: undefined as string | undefined,
+        chapterSkipEnd: 0,
+        chapterSkipTimer: 15,
+
+        playerContextMenu: [
+            { option: t("contextMenu.nerdstats"), onClick: () => "" },
+            { option: t("player.shareanime"), onClick: () => generateShareURL(anime, { type: "sub", current: ep_metadata["current"]["ep"] }, player.currentTime) },
+        ],
+
+        chapter: undefined as string | undefined,
+        chapterTime: undefined as string | undefined
+    })
+
+    onMount(() => {
+        if (!anime) updateUI({
+            playerContextMenu: ui.playerContextMenu.filter((v) => v["option"] != t("player.shareanime"))
+        })
+
+        let defaultHost = metadata.find((v) => v["defaultHost"] == true)
+        if (!defaultHost) defaultHost = metadata[0]
+
+        // TODO: Add check if metadata is empty
+
+        SheePlayer.currentTime = player.currentTime;
+
+        /* IFDEF DEBUG */
+        (window as any).playerVideoRef = videoRef;
+        (window as any).playerShaka = Shaka;
+        (window as any).playerHLS = HLS;
+        (window as any).playerMetadata = metadata;
+        /* ENDIF */
+
+        if (type == "embed") {
+            SheePlayer.currentTime = 0
+            updatePlayer({ currentTime: 0 })
+        }
+
+        setNewPlayer(defaultHost)
+
+        if ("mediaSession" in navigator) {
+            const findedepisode = ep_metadata["current"]
+            const coverImg = anime ? anime!.AnimeData.coverImage : undefined
+            const cover = findedepisode["img"] ? findedepisode["img"] : coverImg
+
+            navigator.mediaSession.metadata = new MediaMetadata({
+                // artist: anime.AnimeData.studios && anime.AnimeData.studios.length > 0 ? anime.AnimeData.studios.length[0] : "",
+                title: animeTitle,
+                artwork: [
+                    { sizes: "512x512", src: cover ? cover : "" }
+                ]
+            })
+            navigator.mediaSession.setActionHandler("play", () => togglePlay());
+            navigator.mediaSession.setActionHandler("pause", () => togglePlay());
+            if (avaibleEpisode["nextEpisode"] && onChangeEpisode)
+                navigator.mediaSession.setActionHandler("previoustrack", () => onChangeEpisode(avaibleEpisode["nextEpisode"]["ep"]));
+
+            if (avaibleEpisode["prevEpisode"] && onChangeEpisode)
+                navigator.mediaSession.setActionHandler("nexttrack", () => onChangeEpisode(avaibleEpisode["prevEpisode"]["ep"]));
+
+            navigator.mediaSession.setActionHandler("stop", () => togglePlay());
+            navigator.mediaSession.setActionHandler("seekto", (event) => {
+                if (!event.seekTime) return
+                setTimeVideo(event.seekTime)
+            })
+        }
+    })
+
+    onCleanup(() => {
+        PlayerCleanup = true
+
+        clearInterval(playerHideTimer)
+        clearInterval(hideChapterButtonTimer)
+        clearInterval(volumeTimeout)
+        clearInterval(playAnimationTimeout)
+        clearInterval(moreInformationTimer)
+        clearInterval(buttonSkipRight)
+        clearInterval(buttonSkipLeft)
+        clearInterval(refreashUpdateSocket)
+
+        CleanuPlayer()
+
+        SheePlayer.userInteractWithSubtitles = false
+
+        navigator.mediaSession.metadata = null
+        const actions = [
+            'play',
+            'pause',
+            'stop',
+            'previoustrack',
+            'nexttrack',
+            'seekbackward',
+            'seekforward',
+            'seekto'
+        ];
+
+        actions.forEach(action => {
+            navigator.mediaSession.setActionHandler(action as any, null);
+        });
+    })
+
+    /* Player */
+
+    async function setNewPlayer(meta: playerData) {
+        if (type != "embed") SheePlayer.currentTime = player.currentTime
+
+        createNewPlayer()
+
+        updatePlayer({ playerData: meta, HLSMode: false, initialize: true })
+
+        let extracted: playerData | undefined = undefined
+        if (meta.extractResolution && anime) extracted = await ExtractorManager.request({
+            func: meta.extractResolution,
+            args: {
+                ...meta,
+                episode: {
+                    currentEpisode: ep_metadata.current,
+                    episodeList: ep_metadata.list,
+                    anime: anime.AnimeData,
+                    animeID: anime.AnimeData.player_ID as string,
+                    type: ep_metadata.type
+                }
+            },
+            loadingMessage: t("notification.fetchresolution"),
+            errorMessage: "Failed Fetch Resolutions"
+        })
+
+        if (extracted) {
+            meta = extracted
+
+            metadata = metadata.map((v) => v["hostname"] == meta["hostname"] ? meta : v)
+            updatePlayer({ playerData: meta })
+        }
+
+        if (meta.resolution.length <= 0) {
+            toast(t("player.errors.missingResoltions"), { type: "error" })
+            updatePlayer({ FatalError: true })
+            return
+        }
+
+        const resolution = meta["resolution"][0]
+
+        updatePlayer({
+            subtitles: meta.subtitles ?? player.subtitles,
+            thumbnail: await VTTstoryBoardParser(meta.storyboardVTT),
+            currentResolution: resolution,
+            resoltions: meta["resolution"]
+        })
+
+        /* IFDEF DEBUG|PROD */
+        await window.backend.changeHeader(unwrap(resolution.reqHeader));
+        /* ENDIF */
+
+        CheckDownloadContextMenu(resolution)
+
+        if (resolution["hls"]) return ExecuteHLS()
+
+        Shaka!.load(resolution["url"])
+    }
+
+    async function setNewResolution(data: resolutionFormat | undefined) {
+        if (!data) return
+        if (!videoRef) return
+
+        updatePlayer({
+            FatalError: false,
+            currentResolution: data,
+            initialize: true
+        })
+
+        updateSubtitle()
+
+        SheePlayer.currentTime = videoRef.currentTime
+
+        /* IFDEF DEBUG|PROD */
+        await window.backend.changeHeader(unwrap(data["reqHeader"]))
+        /* ENDIF */
+
+        CheckDownloadContextMenu(data)
+
+        if (player.HLSMode && HLS) {
+            HLS.currentLevel = HLS.levels.findIndex(level => level.height === parseInt(data.res))
+            return
+        }
+
+        if (player.HLSMode && player.playerData!["splitHLS"] == true) {
+            createNewPlayer()
+            ExecuteHLS()
+            return
+        }
+
+        createNewPlayer()
+        Shaka?.load(data["url"])
+        setTimeVideo(SheePlayer.currentTime)
+    }
+
+    function updateSubtitle() {
+        if (!player.currentResolution || !player.playerData) return
+
+        if (!SheePlayer.userInteractWithSubtitles && !player.currentResolution["defaultSubtitles"]) {
+            setNewSubtitles(player.subtitles[0])
+        }
+
+        if (!player.currentResolution["defaultSubtitles"]) return
+
+        if (!player.playerData["subtitles"]) return
+
+        setNewSubtitles(player.playerData["subtitles"][0])
+    }
+
+    function createNewPlayer() {
+        if (!screenshotWrapper) return console.error("WTF Screenshot Wrapper dosen't exist, now i can't create new player")
+
+        CleanuPlayer()
+
+        const videoElemenet = createElement("video", {
+            className: "video-player",
+            preload: "auto",
+            muted: player.muted,
+            autoplay: player.isPlaying
+        })
+
+        if (config.Player.general.VideoStreching) videoElemenet.style.objectFit = "cover"
+
+        Shaka = new shaka.Player(videoElemenet);
+
+        videoElemenet.autoplay
+
+        videoRef = videoElemenet
+
+        ChangePlayerVolume(SheePlayer.playerVolume, true)
+        setTimeVideo(SheePlayer.currentTime)
+
+        setPlayerCleanupEvent("timeupdate", updateProgress)
+        setPlayerCleanupEvent("progress", updateProgress)
+        setPlayerCleanupEvent("seeked", updateProgress)
+
+        setPlayerCleanupEvent("loadedmetadata", (event) => {
+            updateProgress(event)
+            updatePlayer({ initialize: false })
+
+            if (player.playerData)
+                GenerateOpeningEnding(player.playerData["listChapters"], event.currentTarget.duration)
+        })
+
+        setPlayerCleanupEvent("error", videoErrorHandler)
+        setPlayerCleanupEvent("canplay", () => { updatePlayer({ isLoading: false }) })
+        setPlayerCleanupEvent("waiting", () => { updatePlayer({ isLoading: true }) })
+        setPlayerCleanupEvent("click", () => { togglePlay(); ToggleMenu(undefined) })
+
+        screenshotWrapper.append(videoRef)
+        // if (player.isPlaying) togglePlay()
+    }
+
+    function videoErrorHandler(event) {
+        const Error = event.currentTarget.error
+        var message: string
+        if (!Error) return
+        if (PlayerCleanup) return
+        console.warn("Error Video Element in Animu", Error)
+        switch (Error.code) {
+            case Error.MEDIA_ERR_ABORTED:
+                message = t('player.errors.MEDIA_ERR_ABORTED')
+                break
+            case Error.MEDIA_ERR_NETWORK:
+                message = t('player.errors.MEDIA_ERR_NETWORK')
+                break
+            case Error.MEDIA_ERR_DECODE:
+                message = t('player.errors.MEDIA_ERR_DECODE')
+                break
+            case Error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                message = t('player.errors.MEDIA_ERR_SRC_NOT_SUPPORTED')
+                break
+            default:
+                message = t('player.errors.default')
+        }
+        updatePlayer({ FatalError: true })
+        toast(message, { type: "error" });
+
+        if (!player.playerData) return
+        let index = metadata.findIndex((element) => element.hostname == player.playerData!.hostname)
+        if (metadata[index + 1]) setNewPlayer(metadata[index + 1])
+    }
+
+    async function ExecuteHLS() {
+        if (!player["currentResolution"]) return console.error("NO RESOLUTION FOUND")
+
+        updatePlayer({ HLSMode: true })
+
+        let configHLS: Partial<HlsConfig> = {
+            enableWorker: true,
+            lowLatencyMode: true,
+            autoStartLoad: true,
+            backBufferLength: 40,
+            manifestLoadingMaxRetry: 3,
+            levelLoadingMaxRetry: 3,
+            fragLoadingMaxRetry: 3,
+            maxBufferLength: 140,
+        }
+
+        class sheepLoader extends Hls.DefaultConfig.loader {
+            load(context: any, config: any, callbacks: any) {
+                request(context.url, { method: "GET", headers: unwrap(player["currentResolution"]!["reqHeader"]) }).then((data) => {
+                    let currentData: any = data.text
+                    if (!data.success) {
+                        console.warn("Context:", context, "Data:", data)
+                        callbacks.onError({ type: 'network', details: data["statusText"], fatal: true, code: data["status"] }, context)
+                        return
+                    }
+                    const now = performance.now()
+                    if (context.responseType == "arraybuffer") currentData = data.buffer
+                    callbacks.onSuccess({ data: currentData, url: context.url }, {
+                        loaded: data.buffer.byteLength,
+                        total: data.buffer.byteLength,
+                        abort: false,
+                        retry: config.maxRetry,
+                        chunkCount: 0,
+                        bwEstimate: 0,
+                        loading: { start: now - 10, first: now - 5, end: now },
+                        parsing: { start: now, end: now },
+                        buffering: { start: now, first: now, end: now }
+                    }, context);
+                });
+            }
+        }
+
+        configHLS = {
+            ...configHLS,
+            loader: sheepLoader,
+        }
+
+        const tmpHls = new Hls(configHLS);
+
+        HLS = tmpHls
+
+        if (Hls.isSupported() && videoRef) {
+            tmpHls.loadSource(player["currentResolution"]["url"]);
+            tmpHls.attachMedia(videoRef);
+            setTimeVideo(SheePlayer.currentTime)
+
+            tmpHls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
+                updatePlayer({ FatalError: false })
+
+                if (!player["playerData"]!["splitHLS"]) {
+                    const resolutions = data.levels.map((level) => level.height);
+                    resolutions.reverse()
+
+                    updatePlayer({
+                        resoltions: resolutions.map((val) => ({ ...player["currentResolution"]!, res: val.toString() })),
+                        currentResolution: { ...player["currentResolution"]!, res: resolutions[0].toString() }
+                    })
+
+                    tmpHls.currentLevel = tmpHls.levels.length - 1;
+                }
+
+                data.levels.forEach(level => {
+                    // I added Ignore because this give me a error "Cannot assign to 'audioCodec' because it is a read-only property." but i can assign then is good
+                    // @ts-ignore
+                    if (!level.audioCodec) level.audioCodec = "mp4a.40.5"
+                    // @ts-ignore
+                    else level.audioCodec = level.audioCodec.replaceAll('mp4a.40.2', 'mp4a.40.5')
+                });
+
+                if (data.audioTracks.length <= 0) return
+
+                let DefaultAudio = data.audioTracks.find((v) => v["default"])
+                if (!DefaultAudio) DefaultAudio = data.audioTracks[0]
+
+                updatePlayer({
+                    activeAudioTrack: { id: DefaultAudio.id, label: DefaultAudio.name, lang: DefaultAudio.lang },
+                    audioTrack: data.audioTracks.map((element) => ({ id: element.id, label: element.name, lang: element.lang }))
+                })
+            });
+
+            tmpHls.on(Hls.Events.ERROR, (_event, data) => {
+                console.error("HLS", _event, data)
+
+                SheePlayer.currentTime = player.currentTime
+
+                tmpHls.currentLevel = tmpHls.levels.length - 1;
+
+                updatePlayer({ FatalError: data.fatal })
+
+                if (data.details == "bufferStalledError") tmpHls.startLoad(SheePlayer.currentTime)
+
+                if (data.fatal) {
+                    let message: string | undefined
+                    switch (data.type) {
+                        case Hls.ErrorTypes.NETWORK_ERROR:
+                            if (data.response && (data.response["code"] == 429 || data.response["code"] == 403)) {
+                                updatePlayer({ FatalError: true })
+                            } else {
+                                tmpHls.startLoad(SheePlayer.currentTime);
+                                updatePlayer({ FatalError: false })
+                            }
+                            message = t('player.errors.MEDIA_ERR_NETWORK')
+                            break;
+                        case Hls.ErrorTypes.MEDIA_ERROR:
+                            message = t('player.errors.MEDIA_ERR_DECODE')
+                            // tmpHls.recoverMediaError()
+                            tmpHls.destroy();
+                            return
+                        default:
+                            message = t('player.errors.default')
+                            tmpHls.destroy();
+                            break;
+                    }
+
+                    if (PlayerCleanup) return
+                    if (!message) return
+
+                    toast(message, { type: "error" })
+                }
+            });
+        }
+    }
+
+    function setTimeoutForElement(element: NodeJS.Timeout | undefined, val: string) {
+        clearTimeout(element)
+        updateUI({ [val]: true })
+
+        volumeTimeout = setTimeout(() => updateUI({ [val]: false }), 500);
+    }
+
+    function ChangePlayerVolume(value: number, animation: boolean = false) {
+        if (value > 100 || value < 0) return
+        if (!videoRef) return
+
+        if (!animation && !config.Player.ui.DisableVolumeAnimation) setTimeoutForElement(volumeTimeout, "isVolume")
+
+        videoRef.volume = parseFloat((value / 100).toFixed(2))
+        SheePlayer.playerVolume = value
+        updatePlayer({ volume: value })
+    }
+
+    function CleanuPlayer() {
+        if (Shaka) Shaka.destroy()
+        if (HLS) HLS.destroy()
+        if (currentASSubtitles) currentASSubtitles.destroy()
+
+        SheePlayer.activeEvents.forEach((event) => {
+            if (videoRef) videoRef.removeEventListener(event["type"], event["handler"])
+        })
+
+        if (videoRef) videoRef.remove()
+    }
+
+    function setPlayerCleanupEvent(type: any, handler: (event: Event & { currentTarget: HTMLVideoElement; target: Element; }) => void) {
+        if (!videoRef) return
+
+        videoRef.addEventListener(type, handler);
+        SheePlayer.activeEvents.push({ type: type, handler: handler })
+    }
+
+    shaka.net.NetworkingEngine.registerScheme("http", SheepCustomFetch);
+    shaka.net.NetworkingEngine.registerScheme("https", SheepCustomFetch);
+
+    const createAbortableOperation = (promise: Promise<shaka.extern.Response>, controller: AbortController): shaka.extern.IAbortableOperation<shaka.extern.Response> => ({
+        promise,
+
+        abort: () => {
+            controller.abort();
+            return Promise.resolve();
+        },
+
+        finally: (onFinal) => {
+            return createAbortableOperation(
+                promise.then(
+                    (value) => {
+                        onFinal(true);
+                        return value;
+                    },
+                    (error) => {
+                        onFinal(false);
+                        throw error;
+                    }
+                ),
+                controller
+            );
+        },
+    });
+    function SheepCustomFetch(
+        uri: string,
+        shakaRequest: shaka.extern.Request,
+        _requestType: shaka.net.NetworkingEngine.RequestType,
+        _progressUpdated?: shaka.extern.ProgressUpdated): shaka.extern.IAbortableOperation<shaka.extern.Response> {
+        const header = player.playerData
+
+        const promise = request(uri, {
+            method: shakaRequest.method as any,
+            headers: header && header["reqHeader"] ? header["reqHeader"] : shakaRequest.headers,
+            body: shakaRequest.body as any,
+        }).then(async (response) => {
+            return {
+                uri,
+                originalUri: uri,
+                data: response["buffer"],
+                headers: Object.fromEntries(response["responseHeader"]),
+                originalRequest: shakaRequest,
+            };
+        });
+
+        return createAbortableOperation(promise, new AbortController())
+    }
+
+    function setTimeVideo(value: number) {
+        if (!videoRef) return
+        videoRef.currentTime = value
+        updatePlayer({ currentTime: value })
+
+        if (getSocket()) {
+            clearInterval(refreashUpdateSocket)
+            const socket = getSocket()
+            socket?.emit("player:update", {
+                roomName: unwrap(getSocketRoom()), player: {
+                    time: unwrap(player.currentTime),
+                    pause: unwrap(player.isPlaying)
+                }
+            })
+        }
+
+        if (!isNaN(value) && config && value > videoRef.duration - CheckNumber(config.History.continue.MaximizeTimeSave)) {
+            updateUI({ upNextDisable: true })
+        }
+
+        if (!player.playerData || !player.playerData.listChapters) return
+
+        player.playerData.listChapters.forEach(element => {
+            if (value >= element.start && value <= element.end) return
+            if (element.type != ui.chapterSkipType) return
+
+            clearChapterSkipTime()
+        })
+    }
+
+    function updateProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
+        clearInterval(moreInformationTimer)
+
+        updateUI({ ShowMoreInformation: false })
+
+        updatePlayer({
+            currentTime: event.currentTarget.currentTime,
+            durration: event.currentTarget.duration
+        })
+
+        // saveContinueProgress(event)
+        checkUpNext(event)
+        HandleBuffer(event)
+        CalculateChapter()
+        CalculateChapterTime()
+
+        if (getSocket()) {
+            if (!refreashUpdateSocket) {
+                refreashUpdateSocket = setInterval(() => {
+                    const socket = getSocket()
+                    socket?.emit("player:update", {
+                        roomName: unwrap(getSocketRoom()), player: {
+                            time: unwrap(player.currentTime),
+                            pause: unwrap(player.isPlaying)
+                        }
+                    })
+                }, 3000);
+            }
+        }
+
+        // Update RPC
+        /* IFDEF DEBUG|PROD */
+        if (config.General.discordRPC && anime) window.api.rpc.setActivity({
+            details: t("discordrpc.player", { title: playerTitle, ep: ep_metadata["current"]["ep"] }),
+            state: `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`,
+            urlDetails: `https://anilist.co/anime/${anime.AnimeData.id}`
+        })
+        /* ENDIF */
+
+        if (!player.FatalError && onChangeEpisode && avaibleEpisode["nextEpisode"] && config.Player.general.AutoSkipEpisode && event.currentTarget.ended)
+            onChangeEpisode(avaibleEpisode["nextEpisode"]["ep"])
+
+        if (!player.playerData || !player.playerData.listChapters) return
+        if (player.currentTime <= 0 || player.durration <= 0) return
+
+        player.playerData.listChapters.forEach(element => {
+            let currentTime = event.currentTarget.currentTime
+
+            if (element.start == 0 && element.end == 0) return
+
+            if (!(currentTime >= element.start && currentTime <= element.end)) return
+
+            if (config.Player.general.autoSkipOpenings || config.Player.general.autoSkipEndings) return setTimeVideo(element.end)
+
+            if (element.type == "other") return
+
+            if (ui.chapterSkipDisable.includes(element.type)) return
+
+            startChapterSkipTime({
+                type: element.type,
+                time: element.end
+            })
+        });
+    }
+
+    function togglePlay(noScoket: boolean = false) {
+        const video = videoRef
+        if (!video) return
+
+        const prev = !video.paused
+
+        updatePlayer({ isPlaying: !prev })
+
+        if (prev) {
+            video.pause()
+            clearInterval(moreInformationTimer)
+
+            moreInformationTimer = setTimeout(() => {
+                updateUI({ ShowMoreInformation: true })
+            }, 4000)
+
+        } else {
+            clearInterval(moreInformationTimer)
+            updateUI({ ShowMoreInformation: false })
+
+            video.play().catch((reason) => {
+                console.warn("Video Play Error Catch", reason)
+            })
+        }
+
+
+        if (!noScoket && getSocket()) {
+            clearInterval(refreashUpdateSocket)
+            const socket = getSocket()
+            socket?.emit("player:update", {
+                roomName: unwrap(getSocketRoom()), player: {
+                    time: unwrap(player.currentTime),
+                    pause: unwrap(player.isPlaying)
+                }
+            })
+        }
+
+        clearTimeout(playAnimationTimeout)
+
+        updateUI({ isShowPlay: true })
+        playAnimationTimeout = setTimeout(() => {
+            updateUI({ isShowPlay: false })
+        }, 300);
+    }
+
+    function setMutedToPlayer() {
+        if (videoRef) videoRef.muted = !player.muted
+        updatePlayer({ muted: !player.muted })
+
+        ChangePlayerVolume(player.volume)
+    }
+
+    async function handlePictureInPicture() {
+        if (!videoRef) return
+
+        try {
+
+            if (document.pictureInPictureElement) {
+                await document.exitPictureInPicture();
+            } else {
+                await videoRef.requestPictureInPicture();
+            }
+
+        } catch (error) {
+            console.error('Error PiP:', error);
+            toast(t("notification.failedpip"), { type: "error" })
+        }
+    };
+
+    async function enterFullscreen() {
+        /* IFDEF DEBUG|PROD */
+        if (await window.BrowserWindow.isFullscreen()) {
+            toggleFullscreen(false)
+            updatePlayer({ isFullscreen: false })
+        } else {
+            toggleFullscreen(true)
+            updatePlayer({ isFullscreen: true })
+        }
+        /* ENDIF */
+
+        /* IFDEF WEB */
+        if (document.fullscreenElement) {
+            toggleFullscreen(false)
+            updatePlayer({ isFullscreen: false })
+        } else {
+            toggleFullscreen(true)
+            updatePlayer({ isFullscreen: true })
+        }
+        /* ENDIF */
+    }
+
+    function ChangeSpeedPlayer(speed: string) {
+        if (!videoRef) return
+        videoRef.playbackRate = parseFloat(speed)
+    }
+
+    async function setNewSubtitles(sub: playerSubtitlesFormat | undefined) {
+        if (!sub) return
+        if (!videoRef) return
+
+        if (currentASSubtitles) {
+            currentASSubtitles.destroy()
+            currentASSubtitles._canvas.remove()
+            currentASSubtitles = undefined
+        }
+
+        if (assSubContainer) assSubContainer.innerHTML = ""
+
+        if (sub.label == "Off" && sub.format == "", sub.lang == "", sub.url == "")
+            return updatePlayer({ currentSubtitle: { url: "", format: "", lang: "", label: "Off" } })
+
+        const data = await request(sub.url, {
+            headers: player.playerData && player.playerData!["reqHeader"] ? player.playerData!["reqHeader"] : window["animuHeader"]
+        })
+
+        if (!data["success"]) {
+            console.error("Failed Load Subtitles", data, player.playerData)
+            toast(t("Failed Fetch Subtitles"), { type: "error" })
+            return
+        }
+
+        let assUrl = sub.url
+
+        if (["ass", "ssa"].includes(sub.format.toLowerCase()) == false) {
+            const content = CovnertToASS(data["text"])
+
+            if (!content) return toast(t("Failed Fetch Subtitles"), { type: "error" })
+
+            const blob = new Blob([content], { type: "text/ass" });
+            assUrl = URL.createObjectURL(blob);
+        }
+
+        const renderer = new JASSUB({
+            video: videoRef,
+            subUrl: assUrl,
+            workerUrl,
+            modernWasmUrl,
+            dropAllAnimations: true,
+            onDemandRender: true,
+            asyncRender: true,
+            availableFonts: {
+                "default": fallbackFontJASSUB
+            },
+            defaultFont: "default"
+            // modernWasmUrl
+        } as any);
+
+        currentASSubtitles = renderer
+        updatePlayer({ currentSubtitle: sub })
+    }
+
+    function changeAudioTrack(data: { id: number, lang?: string, label: string }) {
+        if (!HLS) return
+        try {
+
+            HLS.audioTrack = data.id
+            updatePlayer({ activeAudioTrack: data })
+
+        } catch (error) {
+            toast(t("notification.failedchangeaudio"), { type: "error" })
+        }
+    }
+
+
+    async function changeToDubbing(value: boolean): Promise<any> {
+        if (!player.playerData) return
+
+        updatePlayer({ isDubbing: value })
+
+        let resoltuion = value ? player.playerData.dubResolution : player.playerData["resolution"]
+
+        if (resoltuion) {
+            updatePlayer({
+                resoltions: resoltuion
+            })
+            setNewResolution(resoltuion[0])
+            return
+        }
+
+        if (!player.playerData.isDubbing || !anime) return
+
+        const resp: playerData | undefined = await ExtractorManager.request({
+            func: player.playerData.isDubbing,
+            args: {
+                ...player.playerData,
+                episode: {
+                    currentEpisode: ep_metadata.current,
+                    episodeList: ep_metadata.list,
+                    anime: anime.AnimeData,
+                    animeID: anime.AnimeData.player_ID as string,
+                    type: ep_metadata.type
+                }
+            },
+            errorMessage: t("notification.faileddub"),
+            loadingMessage: t("notification.fetchingdub")
+        })
+
+        if (!resp || !resp["dubResolution"]) return updatePlayer({ isDubbing: false })
+
+        updatePlayer({
+            playerData: resp,
+            resoltions: resp["dubResolution"],
+        })
+        metadata = metadata.map((v) => v["hostname"] == resp["hostname"] ? resp : v)
+
+        setNewResolution(resp["dubResolution"][0])
+    }
+
+    useKeyPress((keys: string) => {
+        // if (keys == "CTRL+SHIFT+D") setshowNerdStats((prev) => !prev)
+        if (keys == "SHIFT+R" && player.playerData) setNewPlayer(player.playerData)
+
+        if (onKeybind) onKeybind(keys)
+
+        if (!videoRef) return
+        let time_now = videoRef.currentTime
+        switch (keys.toLowerCase()) {
+            case convertKeybinds(config.Player.keybinds.Pause.toLowerCase()).toLowerCase():
+                togglePlay()
+                break
+            case convertKeybinds(config.Player.keybinds.TimeSkipRight.toLowerCase()).toLowerCase():
+                updateUI({ TimerUIRight: `${config.Player.general.TimeSkipRight}` })
+                setTimeVideo((time_now += parseInt(config.Player.general.TimeSkipRight.toString())))
+                setTimeoutForElement(buttonSkipLeft, "isShowButtonSkipRight")
+                break
+            case convertKeybinds(config.Player.keybinds.TimeSkipLeft.toLowerCase()).toLowerCase():
+                updateUI({ TimerUILeft: `${config.Player.general.TimeSkipLeft}` })
+                setTimeVideo((time_now -= parseInt(config.Player.general.TimeSkipLeft.toString())))
+                setTimeoutForElement(buttonSkipRight, "isShowButtonSkipLeft")
+                break
+
+            case convertKeybinds(config.Player.keybinds.LongTimeSkipForward.toLowerCase()).toLowerCase():
+                updateUI({ TimerUIRight: `${config.Player.general.LongTimeSkipForward}` })
+                setTimeVideo((time_now += parseInt(config.Player.general.LongTimeSkipForward.toString())))
+                setTimeoutForElement(buttonSkipRight, "isShowButtonSkipRight")
+                break
+            case convertKeybinds(config.Player.keybinds.LongTimeSkipBack.toLowerCase()).toLowerCase():
+                updateUI({ TimerUILeft: `${config.Player.general.LongTimeSkipBack}` })
+                setTimeVideo((time_now -= parseInt(config.Player.general.LongTimeSkipBack.toString())))
+                setTimeoutForElement(buttonSkipLeft, "isShowButtonSkipLeft")
+                break
+
+            case convertKeybinds(config.Player.keybinds.Fullscreen.toLowerCase()).toLowerCase():
+                enterFullscreen()
+                break
+            case convertKeybinds(config.Player.keybinds.ExitPlayer.toLowerCase()).toLowerCase():
+                if (onExitPlayer) onExitPlayer()
+                break
+            case convertKeybinds(config.Player.keybinds.FrameSkipForward.toLowerCase()).toLowerCase():
+                setTimeVideo((time_now += 0.0416))
+                break
+            case convertKeybinds(config.Player.keybinds.FrameSkipBack.toLowerCase()).toLowerCase():
+                setTimeVideo((time_now -= 0.0416))
+                break
+            case convertKeybinds(config.Player.keybinds.VolumeDown.toLowerCase()).toLowerCase():
+                ChangePlayerVolume((videoRef.volume * 100) - 1)
+                break
+            case convertKeybinds(config.Player.keybinds.VolumeUp.toLowerCase()).toLowerCase():
+                ChangePlayerVolume((videoRef.volume * 100) + 1)
+                break
+            case convertKeybinds(config.Player.keybinds.ScreenShot.toLowerCase()).toLowerCase():
+                takeScreenshot()
+                break
+            case convertKeybinds(config.Player.keybinds.noSubbtitlesreenshot.toLowerCase()).toLowerCase():
+                takeScreenshot(true)
+                break
+            case convertKeybinds(config.Player.keybinds.VolumeMute.toLowerCase()).toLowerCase():
+                setMutedToPlayer()
+                break
+            case convertKeybinds(config.Player.keybinds.NextEpisode.toLowerCase()).toLowerCase():
+                if (onChangeEpisode && avaibleEpisode["nextEpisode"])
+                    onChangeEpisode(avaibleEpisode["nextEpisode"]["ep"])
+                break
+            case convertKeybinds(config.Player.keybinds.PrevEpisode.toLowerCase()).toLowerCase():
+                if (onChangeEpisode && avaibleEpisode["prevEpisode"])
+                    onChangeEpisode(avaibleEpisode["prevEpisode"]["ep"])
+                break
+            case convertKeybinds(config.Player.keybinds.PictureInPicture.toLowerCase()).toLowerCase():
+                handlePictureInPicture()
+                break
+            case convertKeybinds(config.Player.keybinds.toggleSubtitles.toLowerCase()).toLowerCase():
+                // toggleSubtitles()
+                break
+            case convertKeybinds(config.Player.keybinds.skipOpeningEnding.toLowerCase()).toLowerCase():
+                clearChapterSkipTime()
+                break
+        }
+    })
+
+    function HandleBuffer(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
+        const video = event.currentTarget;
+        if (video.duration < 0 && video.buffered.length < 0) return
+
+        let timestamps: { position: number, width: number }[] = []
+
+        for (let index = 0; index < video.buffered.length; index++) {
+            const startX = (video.buffered.start(index) / video.duration) * 100;
+            const endX = (video.buffered.end(index) / video.duration) * 100;
+            const width = endX - startX;
+
+            timestamps.push({ position: startX, width: width })
+        }
+        updatePlayer({ buffer: timestamps })
+    };
+
+    /* END */
+
+    /* Player_UI */
+
+    function ActiveShowingUI() {
+        updateUI({ isVisible: true, ShowMoreInformation: false })
+
+        clearTimeout(moreInformationTimer)
+        clearTimeout(playerHideTimer)
+
+        if (ui.activeMenu) return
+
+        playerHideTimer = setTimeout(() => {
+            updateUI({ isVisible: false })
+
+            if (!config.Player.general.disablemoreinformation) return
+            if (!player.isPlaying) return
+
+            moreInformationTimer = setTimeout(() => {
+                updateUI({ ShowMoreInformation: true })
+            }, 4000)
+        }, 2000)
+    }
+
+    function ToggleMenu(menu: string | undefined) {
+        if (ui.activeMenu != menu) {
+            updateUI({ isVisible: true, activeMenu: menu })
+            clearTimeout(playerHideTimer)
+            return
+        }
+
+        playerHideTimer = setTimeout(() => {
+            updateUI({ isVisible: false })
+        }, 2000)
+
+        return updateUI({ activeMenu: undefined })
+    }
+
+    function HandleUIScreenshot(image: string, click: string) {
+        updateUI({
+            screenshot: {
+                url: image,
+                click: click
+            }
+        })
+        let interval = setInterval(() => {
+            clearInterval(interval)
+            updateUI({ screenshot: undefined })
+        }, 3000)
+    }
+
+    async function takeScreenshot(noSubtitles: boolean = false) {
+        if (!screenshotWrapper) return
+        if (!videoRef) return
+
+        const date = new Date()
+        const formatedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}-${date.toLocaleTimeString("en-EN", { hour12: false })}`;
+
+        let screenshot: string = "data:,"
+
+        const outputCanvas = document.createElement("canvas");
+        const ctx = outputCanvas.getContext("2d");
+        if (!ctx) {
+            toast(t("player.toastscreenshot.failed"), { type: "error" });
+            return
+        };
+        outputCanvas.width = videoRef.videoWidth;
+        outputCanvas.height = videoRef.videoHeight;
+        ctx.drawImage(videoRef, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
+        if (currentASSubtitles && !noSubtitles) ctx.drawImage(currentASSubtitles._canvas, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
+        screenshot = outputCanvas.toDataURL("image/png");
+
+        if (screenshot == "data:,") {
+            toast(t("player.toastscreenshot.failed"), { type: "error" });
+            return
+        }
+        const blob = await (await fetch(screenshot)).blob();
+        const url = URL.createObjectURL(blob);
+
+        if (config.Player.screenShot.saveType == "Clipboard" || config.Player.screenShot.saveType == "Both") {
+            updateUI({ screenshot: { url: url, click: "" } })
+
+            await navigator.clipboard.write([
+                new ClipboardItem({
+                    'image/png': blob,
+                }),
+            ]);
+            if (config.Player.screenShot.saveType == "Clipboard") return HandleUIScreenshot(url, "")
+        }
+
+        /* IFDEF DEBUG|PROD */
+        let resp: boolean = false
+
+        if (config.Player.screenShot.alwaysAsk) resp = await window.api.os.saveDialog(
+            `${config.Player.screenShot.path}/screenshot${formatedDate}.png`,
+            screenshot.replace(/^data:image\/png;base64,/, ''),
+            `screenshot${formatedDate}.png`, "png", ["PNG"], "base64"
+        )
+        else resp = await window.api.os.write(
+            `${config.Player.screenShot.path}/screenshot${formatedDate}.png`,
+            screenshot.replace(/^data:image\/png;base64,/, ''),
+            "base64"
+        )
+
+        if (resp) HandleUIScreenshot(url, `${config.Player.screenShot.path}/screenshot${formatedDate}.png`)
+        else toast(t("player.toastscreenshot.failed"), { type: "error" });
+        /* ENDIF */
+    };
+
+    function startChapterSkipTime(ch: { type: string, time: number }) {
+        if (ui.chapterSkipActive || !ch) return
+
+        updateUI({ chapterSkipActive: true, chapterSkipType: ch["type"], chapterSkipEnd: ch["time"] })
+
+        hideChapterButtonTimer = setInterval(() => {
+            let prev = ui.chapterSkipTimer
+
+            if (prev <= 1) {
+                clearChapterSkipTime()
+                prev = 15
+            } else {
+                prev -= 1
+            }
+
+            updateUI({
+                chapterSkipTimer: prev
+            })
+        }, 1000);
+    };
+
+    function clearChapterSkipTime() {
+        if (!hideChapterButtonTimer || !ui.chapterSkipType) return
+        clearInterval(hideChapterButtonTimer)
+
+        updateUI({
+            chapterSkipDisable: [...ui.chapterSkipDisable, ui.chapterSkipType],
+            chapterSkipActive: false,
+            chapterSkipTimer: 15,
+            chapterSkipType: undefined
+        })
+    }
+
+    function checkUpNext(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
+        // checking to show Up next communicat
+        if (!avaibleEpisode["nextEpisode"] || !onChangeEpisode || !player.playerData) return
+        if (!config.Player.upToNextEpisode.enable) return
+        if (ui.upNextDisable) return
+
+        if (player.currentTime <= 0 || player.durration <= 0) return
+
+        const duration = event.currentTarget.duration
+        const currenttime = event.currentTarget.currentTime
+
+        if (duration <= config.Player.upToNextEpisode.durationShow * 60 && !player.playerData!.listChapters) return
+
+        let endingChupter: playerChapterList | undefined = undefined
+        if (player.playerData!.listChapters) {
+            endingChupter = player.playerData!.listChapters!.find((cha) => cha.type == "ending")
+            if (endingChupter && endingChupter.end == 0 && endingChupter.start == 0) return
+        }
+
+        let showUpToNext: boolean = currenttime > duration - CheckNumber(config.History.continue.MaximizeTimeSave)
+        let timeDelete: number = ((CheckNumber(duration.toFixed(0)) - CheckNumber(config.History.continue.MaximizeTimeSave)) - CheckNumber(currenttime.toFixed(0))) + CheckNumber(config.Player.upToNextEpisode.interval)
+
+        if (endingChupter) {
+            showUpToNext = currenttime >= endingChupter.start
+            timeDelete = ((CheckNumber(duration.toFixed(0)) - (CheckNumber(duration.toFixed(0)) - endingChupter.start)) - CheckNumber(currenttime.toFixed(0))) + CheckNumber(config.Player.upToNextEpisode.interval)
+        }
+
+        if (CheckNumber(timeDelete.toFixed(0)) < 0) {
+            updateUI({ upNextActive: false })
+            return
+        }
+
+        updateUI({
+            upNextActive: showUpToNext,
+            upNextTimer: showUpToNext ? CheckNumber(timeDelete.toFixed(0)) : CheckNumber(config.Player.upToNextEpisode.interval)
+        })
+
+        if (ui.upNextTimer <= 0) onChangeEpisode("next")
+    }
+
+    function CheckDownloadContextMenu(res: resolutionFormat) {
+        if (!res) return
+        if (!res["canBeDownloaded"]) return
+        if (res["hls"]) return
+
+        let current = ui.playerContextMenu.filter((v) => v["option"] != t("settings.player.downloadvideo"))
+        current.unshift({ option: t("settings.player.downloadvideo"), onClick: () => DownloadVideo(res.url) })
+
+        updateUI({
+            playerContextMenu: current
+        })
+    }
+
+    function CalculateChapter() {
+        updateUI({ chapter: undefined })
+
+        if (!player.playerData) return
+        if (!player.playerData!.listChapters) return
+
+        player.playerData.listChapters.forEach((chapter) => {
+            if (chapter.start == 0 && chapter.end == 0) return
+
+            if (player.currentTime >= chapter.start && player.currentTime <= chapter.end && chapter.name)
+                updateUI({ chapter: chapter.name })
+        })
+    }
+
+    function CalculateChapterTime() {
+        if (!player.playerData || !player.playerData.listChapters) return
+        if (player.playerData.listChapters.length <= 0) return
+
+        let newTime = player.durration
+        for (let index = 0; index < player.playerData.listChapters.length; index++) {
+            const element = player.playerData.listChapters[index];
+
+            if (element.end <= 0 && element.start <= 0) continue
+            if (element.type == "other") continue
+
+            newTime = newTime - (element.end - element.start)
+        }
+
+        if (newTime == player.durration) return updateUI({ chapterTime: undefined })
+        if (newTime <= 0) return updateUI({ chapterTime: undefined })
+        updateUI({ chapterTime: formatTime(newTime) })
+    }
+
+    /* END */
+
+    return (
+        <div class={`player-video-container ${type == "embed" ? "miniplayer" : ""} ${!ui.isVisible ? "player-hide-cursor" : ""}`}
+            ref={containerRef}
+            onMouseMove={ActiveShowingUI}
+            style={{ height: type == "embed" && player.initialize ? "600px" : "auto" }}
+            onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, ui.playerContextMenu), event)}
+        >
+
+            <div ref={screenshotWrapper} class={ui.isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} >
+                <div ref={assSubContainer} style={{ position: "absolute", top: "0", left: "0" }}></div>
+            </div>
+
+            <Show when={ui.isVisible}>
+                <div class="player-mask top"></div>
+                <div class="player-mask bottom"></div>
+            </Show>
+
+            <div class="video-overlay">
+
+                <div class={ui.isVisible ? 'video-top' : 'video-top player-hidden'}>
+                    <div class="video-top-top">
+                        <Show when={type == "player"}>
+                            <Button icon='arrow_back' ButtonClass='player-buttons' iconClassName="player-button-icons" onClick={onExitPlayer} />
+                        </Show>
+                        <Show when={playerTitle}>
+                            <div class="player-title ">{playerTitle}</div>
+                        </Show>
+                    </div>
+                    <Show when={ep_metadata["current"]["title"]}>
+                        <span class="video-episode-title">{ep_metadata["current"]["title"]}</span>
+                    </Show>
+                </div>
+
+                <div class="video-center"> {/* video-center-container */}
+                    <Show when={!config.Player.ui.DisableSkipAnimation}>
+                        <div class={`player-loading-animation-container player-fast-rewind-ui time ${ui.isShowButtonSkipLeft ? "show" : "hidden"}`}>
+                            -{ui.TimerUILeft}s
+                        </div>
+                        <div class={`player-loading-animation-container player-fast-rewind-ui ${ui.isShowButtonSkipLeft ? "show" : "hidden"}`}>
+                            <div class="material-symbols-outlined player-icon-ui">fast_rewind</div>
+                        </div>
+                        <div class={`player-loading-animation-container player-fast-forward-ui ${ui.isShowButtonSkipRight ? "show" : "hidden"}`}>
+                            <div class="material-symbols-outlined player-icon-ui">fast_forward</div>
+                        </div>
+                        <div class={`player-loading-animation-container player-fast-forward-ui time ${ui.isShowButtonSkipRight ? "show" : "hidden"}`}>
+                            +{ui.TimerUIRight}s
+                        </div>
+                    </Show>
+
+                    <div class={`player-loading-animation-container player-buffering-animation ${player.FatalError ? "show" : "hidden"}`}>
+                        <div class="player-icon-ui material-symbols-outlined">error</div>
+                    </div>
+
+                    <Show when={!config.Player.ui.DisableLoadingAnimation}>
+                        <div class={`player-loading-animation-container player-buffering-animation ${!player.FatalError && player.isLoading ? "show" : "hidden"}`}>
+                            <div class="material-symbols-outlined player-waiting">progress_activity</div>
+                        </div>
+                    </Show>
+
+                    <Show when={!config.Player.ui.DisableSpaceAnimation}>
+                        <div class={`player-loading-animation-container ${ui.isShowPlay && !player.isLoading ? "show" : "hidden"}`}>
+                            <div class="player-icon-ui material-symbols-outlined">{player.isPlaying ? "pause" : "play_arrow"}</div>
+                        </div>
+                    </Show>
+                </div>
+
+                <div class={ui.isVisible ? 'video-bottom' : 'video-bottom player-hidden'}>
+                    <SeekBar
+                        chapterList={player.chapterList}
+                        thumbnail={player.thumbnail}
+                        secondBarValues={player.buffer}
+                        currentValue={player.currentTime}
+                        maxValue={player.durration}
+                        onSeek={value => { setTimeVideo(value) }}
+                        type="time"
+                        classes={{ container: "player-seekbar" }}
+                        screen={true}
+                    />
+
+                    <div class="player-bottom-section">
+                        <div class="player-left">
+
+                            <Show when={avaibleEpisode.prevEpisode && onChangeEpisode}>
+                                <PlayerButton title={t('player.previous', { ep: avaibleEpisode.prevEpisode!["ep"] })} icon='skip_previous'
+                                    onClick={() => onChangeEpisode!(avaibleEpisode.prevEpisode!["ep"])}
+                                    ButtonClass="player-buttons" />
+                            </Show>
+
+                            <PlayerButton
+                                icon={player.isPlaying ? "pause" : "play_arrow"}
+                                title={player.isPlaying ? t('player.Pause') : t('player.play')}
+                                ButtonClass="player-buttons" onClick={togglePlay}
+                            />
+
+                            <Show when={avaibleEpisode.nextEpisode && onChangeEpisode}>
+                                <PlayerButton
+                                    icon='skip_next'
+                                    ButtonClass='player-buttons'
+                                    title={t('player.next', { ep: avaibleEpisode.nextEpisode!.ep })}
+                                    onClick={() => onChangeEpisode!(avaibleEpisode.nextEpisode!["ep"])}
+                                />
+                            </Show>
+
+                            <div class="player-time-display"
+                                onClick={() => { UpdateConfig("Player.general.minusTime", !ui.minusTime); updateUI({ minusTime: !ui.minusTime }) }}
+                            >
+                                <div class="player-time-display-current">
+                                    <Show when={ui.minusTime} fallback={formatTime(player.currentTime)}>
+                                        {`-${formatTime(player.durration - player.currentTime)}`}
+                                    </Show>
+                                </div>
+                                /
+                                <div class="player-time-display-durration">{formatTime(player.durration)}</div>
+
+                                <Show when={ui.chapterTime}>
+                                    <div class="player-time-display-chaptersTime">
+                                        ({ui.chapterTime})
+                                    </div>
+                                </Show>
+                            </div>
+                            <Show when={type == "player"}>
+                                <div class="player-end-time-display">
+                                    {t("player.episodeEndsOn", { time: addTime(player.durration - player.currentTime) })}
+                                </div>
+                            </Show>
+                        </div>
+
+                        <div class="player-right">
+                            <Show when={ui.chapter}>
+                                <span>{t("player.chapter", { name: ui.chapter ?? "" })}</span>
+                            </Show>
+
+                            <PlayerButton
+                                icon={player.muted ? 'volume_off' : 'volume_up'}
+                                title={player.muted ? t("player.unmute") : t("player.mute")}
+                                ButtonClass="player-buttons volume-button"
+                                onClick={setMutedToPlayer}
+                            />
+
+                            <div class="player-volume-seek">
+                                <SeekBar
+                                    currentValue={player.volume}
+                                    maxValue={100}
+                                    onSeek={value => ChangePlayerVolume(value)}
+                                    classes={{ "container": "player-seekbar" }}
+                                    type="procent"
+                                />
+                            </div>
+
+                            <Show when={currentASSubtitles == undefined}>
+                                <PlayerButton icon={"picture_in_picture"}
+                                    onClick={handlePictureInPicture}
+                                    title={t("settings.player.keybinds.pip")}
+                                    ButtonClass="player-buttons"
+                                />
+                            </Show>
+
+                            {/* TODO: BETTER SELECT EPISODE */}
+
+                            {/* <Show when={temp.episodes.length >= 2}>
+                                <PlayerButton icon={"video_library"} title={detectDisableTooltips(t("player.selectepisode"))} ButtonClass="player-buttons" onClick={() => { setShowSelectEpisode((prev) => !prev); setcurrentSettings(() => false) }} />
+                            </Show> */}
+
+                            {/* <div class={`player-select-episode-container ${isShowSelectEpisode() ? "show" : "hidden"}`} >
+                                <div class="player-select-episode-title">{t("player.changeEpisode")}</div>
+                                <Show when={!countImages(temp.episodes)}
+                                    fallback={
+                                        <div class="player-select-episode-content-list">
+                                            <For each={temp.episodes}>
+                                                {(element) => (
+                                                    <PlayerEpisodeElement nextEpisode={setNextEpisode} animeTitle={detectTitleConfig(anime_data.AnimeData.title)} episodes={element} currentEpisode={temp.episode} />
+                                                )}
+                                            </For>
+                                        </div>
+                                    }
+                                >
+                                    <div class="player-select-episode-content">
+                                        <For each={temp.episodes}>
+                                            {(element) => (
+                                                <div class={`information-episode-button ${parseInt(element.ep) < parseInt(temp.episode) ? "watched" : ""} ${parseInt(element.ep) == parseInt(temp.episode) ? "current" : ""}`}
+                                                    onClick={() => setNextEpisode(element.ep)}
+                                                >
+                                                    {element.ep}
+                                                </div>
+                                            )}
+                                        </For>
+                                    </div>
+                                </Show>
+                            </div> */}
+
+                            <PlayerSettings
+                                isDubbingOn={player.isDubbing}
+                                state={ui.activeMenu == "settings"}
+                                turnDubbing={changeToDubbing}
+                                resDubbing={player.playerData && player.playerData?.isDubbing ? true : false}
+
+                                sources={
+                                    metadata.map((val) => ({
+                                        name: val.hostname,
+                                        change: () => setNewPlayer(val)
+                                    }))
+                                }
+
+                                resolution={
+                                    player.resoltions.map((val) => ({
+                                        res: val.res, change: () => setNewResolution(val)
+                                    }))
+                                }
+
+                                speed={speed.map((val) => ({
+                                    speed: parseFloat(val), change: () => ChangeSpeedPlayer(val)
+                                }))}
+
+                                subtitles={
+                                    player.subtitles.map((val) => ({
+                                        sub: val.label,
+                                        change: () => {
+                                            setNewSubtitles(val)
+                                            SheePlayer.userInteractWithSubtitles = true
+                                        }
+                                    }))
+                                }
+
+                                audioTrack={
+                                    player.audioTrack.map((val) => ({
+                                        track: val.label,
+                                        change: () => changeAudioTrack(val)
+                                    }))
+                                }
+
+                                disableSettings={() => ToggleMenu(undefined)}
+                                current={{
+                                    currentHost: player.playerData ? player.playerData!.hostname : t("player.other.unknown"),
+                                    currentResolution: player.currentResolution ? player.currentResolution!.res : t("player.other.unknown"),
+                                    currentSpeed: videoRef?.playbackRate ? videoRef?.playbackRate : 1,
+                                    currentSub: player.currentSubtitle ? player.currentSubtitle!.label : t("player.other.off"),
+                                    currentTrack: player.activeAudioTrack ? player.activeAudioTrack!.label : t("player.other.default")
+                                }}
+                            />
+                            <PlayerButton
+                                icon="settings"
+                                ButtonClass="player-buttons"
+                                title={t('global.settings')}
+                                onClick={() => ToggleMenu("settings")}
+                            />
+
+                            <PlayerButton
+                                icon={player.isFullscreen ? 'fullscreen_exit' : 'fullscreen'}
+                                ButtonClass="player-buttons"
+                                title={t('player.fullscreen')}
+                                onClick={async () => await enterFullscreen()}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <Button
+                content={t(`player.skiptimebutton.${ui.chapterSkipType}`, { time: ui.chapterSkipTimer })}
+                ButtonClass={`player-skip-chapters-button ${ui.chapterSkipActive ? "show" : "hidden"}`}
+                onClick={clearChapterSkipTime}
+            />
+
+
+            <Show when={ui.screenshot}>
+                <div ref={screenShotContainer} class={`player-screenshot-container ${ui.screenshot ? "show" : "hidden"}`}
+                    classList={{ click: ui.screenshot!.click != "" }}
+                    onclick={() => ui.screenshot!.click != "" ? openUrlFolder(ui.screenshot!.click) : ""}
+                >
+                    <sheep-img src={ui.screenshot!.url} class="player-screenshot-image" />
+                    <span class="player-screenshot-text">
+                        {t("player.toastscreenshot.done")}
+                    </span>
+                </div>
+            </Show>
+
+            <Show when={anime && avaibleEpisode["nextEpisode"] && onChangeEpisode}>
+
+                <Show when={config.Player.upToNextEpisode.variants == "old"}>
+                    <div class={`player-up-Next-container old  ${ui.upNextActive ? "show" : "hidden"}`}>
+                        <div class="player-up-Next-Title old">{t("player.upNext.title", { sec: ui.upNextTimer })}</div>
+                        <div class="player-up-Next-Anime old">{t("player.upNext.titleAnime", {
+                            ep: avaibleEpisode["nextEpisode"]!.ep,
+                            title: animeTitle!
+                        })}</div>
+
+                        <div class="player-up-Next-Buttons old">
+                            <Button content={t("player.upNext.nextEp")}
+                                ButtonClass='player-up-Next-Button old'
+                                onClick={() => onChangeEpisode!(avaibleEpisode["nextEpisode"]!["ep"])}
+                            />
+
+                            <Button content={t("player.upNext.hide")}
+                                ButtonClass='player-up-Next-Button old'
+                                onClick={() => { updateUI({ upNextActive: false, upNextDisable: true }) }}
+                            />
+                        </div>
+                    </div>
+                </Show>
+
+                <Show when={config.Player.upToNextEpisode.variants == "var2"}>
+                    <div class={`player-up-Next-background ${ui.upNextActive ? "show" : "hidden"}`} style={{ "background-image": `url(${avaibleEpisode["nextEpisode"]!["img"]})` }}
+                        onClick={() => onChangeEpisode!(avaibleEpisode["nextEpisode"]!["ep"])}>
+                        <div class="player-up-Next-container-var2 ">
+                            <span class="material-symbols-outlined player-up-Next-icon">skip_next</span>
+                            <div class="player-up-Next-content var2">
+                                <div class="player-up-Next-title">{detectTitleConfig(anime!.AnimeData.title)}</div>
+                                <div class="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: avaibleEpisode["nextEpisode"]!["ep"] })}</div>
+                                <div class="player-up-Next-text">{t("player.upNext.nextPlaying", { time: ui.upNextTimer })}</div>
+                            </div>
+                        </div>
+                        <button class="material-symbols-outlined player-up-Next-button-close" onClick={(event) => {
+                            event.stopPropagation();
+                            updateUI({ upNextActive: false, upNextDisable: true })
+                        }
+                        }>close</button>
+                    </div>
+                </Show>
+
+                <Show when={config.Player.upToNextEpisode.variants == "var1"}>
+                    <div class={`player-up-Next-container ${ui.upNextActive ? "show" : "hidden"}`} onClick={() => onChangeEpisode!(avaibleEpisode["nextEpisode"]!["ep"])}>
+                        <sheep-img src={avaibleEpisode["nextEpisode"]!["img"]} class="player-up-Next-image" />
+                        <span class="material-symbols-outlined player-up-Next-icon">skip_next</span>
+                        <div class="player-up-Next-content">
+                            <div class="player-up-Next-title">{animeTitle}</div>
+                            <div class="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: avaibleEpisode["nextEpisode"]!["ep"] })}</div>
+                            <div class="player-up-Next-text">{t("player.upNext.nextPlaying", { time: ui.upNextTimer })}</div>
+                        </div>
+                        <button class="material-symbols-outlined player-up-Next-button-close" onClick={(event) => {
+                            event.stopPropagation();
+                            updateUI({ upNextActive: false, upNextDisable: true })
+                        }
+                        }>close</button>
+                    </div>
+                </Show>
+
+            </Show>
+
+
+            <Show when={!config.Player.ui.DisableVolumeAnimation}>
+                <VolumeNotification volume={player.volume} isActive={ui.isVolume} isMuted={player.muted} />
+            </Show>
+            {/* <Show when={showNerdStats()}>
+                <NerdStats duration={durrationTime()} frames={videoFrames()} volume={volume()} currentTime={currentTime()} />
+            </Show> */}
+            <Show when={!config.Player.general.disablemoreinformation && anime}>
+                <MoreInformation
+                    isActive={ui.ShowMoreInformation}
+                    anime={anime!.AnimeData}
+                    durration={player.durration}
+                    episode={ep_metadata.current["ep"]}
+                    episodesLen={ep_metadata.list.length}
+                />
+            </Show>
+        </div>
+    )
+}
+
+export default Player;

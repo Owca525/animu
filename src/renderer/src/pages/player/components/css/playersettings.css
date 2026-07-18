@@ -12,6 +12,7 @@
 
   transform: translateX(1000px);
   transition: 250ms ease-out;
+  z-index: 200;
 }
 .player-settings-container.show {
   transform: translateX(0px);

@@ -148,7 +148,6 @@ function FuckBufferDosentWorkInElectron(base64: string): Uint8Array {
 }
 
 async function fuckThisEncryptionMethod(encryptedMotherFucker: string) {
-    console.log(encryptedMotherFucker)
     let bufferEncrypted = FuckBufferDosentWorkInElectron(encryptedMotherFucker)
     let version = bufferEncrypted[0];
 
@@ -243,8 +242,18 @@ async function fetchUrls(params: AllmangaURLformat): Promise<resolutionFormat[]>
         /* ENDIF */
         if (!code) return []
 
+        const checkUrl = (data: any): string => {
+            if (data["cf"] && data["pk"]) {
+                const pkKeys = Object.entries(data["pk"])
+                return `${data["cf"]}?${pkKeys.map(([v, v2]) => `${v}=${v2}`).join("&")}`  
+            }
+            if (data["cf"]) return data["cf"]
+            if (data["hlsVideoTiktok"]) return `${urlObject["origin"]}${code["hlsVideoTiktok"]}`
+            return ""
+        }
+
         try {
-            const url = code["hlsVideoTiktok"] ? `${urlObject["origin"]}${code["hlsVideoTiktok"]}` : code["cf"]
+            const url = `${checkUrl(code)}`
             return [{
                 res: "1080",
                 url: url,
@@ -272,7 +281,7 @@ async function detectURL(params: AllmangaURLformat): Promise<resolutionFormat[]>
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "2.4",
+        version: "2.5",
         name: "Allmanga",
         author: "Owca525",
         icon: `${WEBSITE}android-icon-192x192.png`,
@@ -299,7 +308,6 @@ export default class Allmanga implements playerPluginFormat {
         if (!response["success"] || !response["json"]) return []
 
         try {
-            console.log(response)
             const jsonObject = await fuckThisEncryptionMethod(response["json"]["data"]["tobeparsed"])
             /* IFDEF DEBUG */
             console.warn("allmanga/fetchUrls jsonObject", jsonObject)

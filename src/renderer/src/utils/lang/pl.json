@@ -304,6 +304,7 @@
       "links": "Przydatne linki"
     },
     "player": {
+      "downloadvideo": "Download Video",
       "animations": "Player Animations",
       "play": "Automatyczne odtwarzanie",
       "skip": "Automatycznie odtwarzaj następny odcinek",

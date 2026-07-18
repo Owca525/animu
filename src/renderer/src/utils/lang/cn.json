@@ -307,6 +307,7 @@
       "links": "實用連結"
     },
     "player": {
+      "downloadvideo": "Download Video",
       "animations": "播放器動畫",
       "play": "自動播放",
       "skip": "跳過",

@@ -36,6 +36,17 @@ import.meta.glob("./WebComponents/*.ts", {
   eager: true,
 })
 
+window["animuHeader"] = {
+    "User-Agent": navigator.userAgent,
+    Accept: "*/*",
+    "Sec-GPC": "1",
+    Connection: "keep-alive",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "cross-site",
+    "sec-ch-ua-platform": '"Windows"'
+}
+
 render(
   () => (
     <ErrorBoundary fallback={LocalErrorBoundary}>

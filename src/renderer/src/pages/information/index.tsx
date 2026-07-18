@@ -49,7 +49,6 @@ import { toast, updateToast } from '@renderer/utils/context/ToastNotification';
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 import RelationCard from './components/relationCard';
 import ButtonGroup from '../settings/components/buttonGroup';
-import MiniPlayer, { MiniPlayerProps } from '@renderer/components/miniPlayer';
 import { requestAnimeMedia } from '@renderer/utils/animeThemes';
 import { updateHistoryData } from '@renderer/utils/FilesManager/history';
 import { addToAnimuList, removeFromAnimulist, updateDataInAnimulist } from '@renderer/utils/FilesManager/animulist';
@@ -62,7 +61,8 @@ import { setNewActivePage, StartHomeSearch } from '../home';
 import EpisodeBox from './components/episodeBox';
 import { SheepShortcut } from '@renderer/utils/hooks/useKeyPress';
 import pluginManager from '@renderer/utils/pluginManager';
-
+import Player from '../player/Player';
+// TODO: REWRITE FULL INFORMATION
 interface informationTmpProps {
     anime: AnimeData,
     saveData?: indentityPlayer,
@@ -102,7 +102,7 @@ function information() {
 
     // Openings / Endings
     const [animeMedia, setAnimeMedia] = createSignal<animeOpeningsFormat[]>([])
-    const [currentMedia, setCurrentAnimeMedia] = createSignal<MiniPlayerProps[] | undefined>(undefined)
+    const [currentMedia, setCurrentAnimeMedia] = createSignal<any[] | undefined>(undefined)
     const [currentAudio, setCurrentAudio] = createSignal<animeOpeningsFormat[] | undefined>(undefined)
 
     // Content Managment
@@ -113,7 +113,7 @@ function information() {
     const [youCanleave, setYouCanLeave] = createSignal<boolean>(false)
 
     // Content yt-dlp
-    const [contentyt_dlp, setContentYT_DLP] = createSignal<MiniPlayerProps[]>([])
+    const [contentyt_dlp, setContentYT_DLP] = createSignal<any[]>([])
 
     const [activePage, SetactivePage] = createSignal<string>("Episodes")
 
@@ -361,7 +361,7 @@ function information() {
 
         if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", timer: false })
         updateToast(idToast, t("notification.successanime"), { type: "success", timer: false })
-    
+
         tmpAnimulist = animulist.get(resp["id"])
         if (tmpAnimulist) tmpAnimulist = tmpAnimulist["animulist"]
 
@@ -414,7 +414,7 @@ function information() {
                     url: item.url,
                     canBeDownloaded: true
                 }))
-            } as MiniPlayerProps
+            }
         }))
 
         if (isAOpeningFetching && activePage() == "Opening/Ending") setContentLoading(false)
@@ -432,9 +432,9 @@ function information() {
     /* IFDEF DEBUG|PROD */
     async function getAnimeTrailer(url: string, noContentLoading = false) {
         if (!url) return
-        
+
         let storyBoard: string | undefined
-        
+
         try {
             if (config["information"]["trailerplayertype"] == "embed") return
             if (!noContentLoading) {
@@ -662,7 +662,7 @@ function information() {
         <>
             <main class="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(contextMenu()), event)}>
                 <div class="information-banner">
-                    <sheep-img 
+                    <sheep-img
                         class={tempData().anime.bannerImage ? "information-banner-image" : "information-banner-image-blur"}
                         src={tempData().anime.bannerImage ? tempData().anime.bannerImage : tempData().anime.coverImage ? tempData().anime.coverImage : ""}
                         divClass='information-banner-image-placeholder'
@@ -676,10 +676,10 @@ function information() {
                     <div class="information-top">
                         <div class="information-image-container">
                             {tempData().anime.averageScore && <div class="information-score" style={{ border: `3px solid ${getGradientColor(tempData().anime.averageScore)}` }}>{tempData().anime.averageScore}%</div>}
-                            <sheep-img 
-                                class="information-cover" 
+                            <sheep-img
+                                class="information-cover"
                                 divClass='information-cover-placeholder'
-                                onClick={() => setShowImages(true)} 
+                                onClick={() => setShowImages(true)}
                                 src={tempData().anime.coverImage ? tempData().anime.coverImage : ""}
                             />
 
@@ -939,7 +939,11 @@ function information() {
                                         <Match when={activePage() == "Trailer" || activePage() == "Music"}>
                                             <Switch>
                                                 <Match when={contentyt_dlp().length > 0}>
-                                                    <MiniPlayer props={contentyt_dlp()!} />
+                                                    <Player
+                                                        type='embed'
+                                                        playerTitle=""
+                                                        metadata={contentyt_dlp()!}
+                                                    />
                                                 </Match>
                                                 <Match when={contentyt_dlp()}>
                                                     <iframe
@@ -955,7 +959,11 @@ function information() {
                                         </Match>
                                         <Match when={activePage() == "Opening/Ending"}>
                                             <Show when={currentMedia()}>
-                                                <MiniPlayer props={currentMedia()!} />
+                                                <Player
+                                                    type='embed'
+                                                    playerTitle=""
+                                                    metadata={currentMedia()!}
+                                                />
                                             </Show>
                                         </Match>
                                         <Match when={episodeResponse.data() && activePage() == "Episodes"}>

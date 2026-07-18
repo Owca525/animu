@@ -1,6 +1,7 @@
 import { SettingsConfig } from "../types";
-import { setConfig } from "../stores/config";
+import { getConfig, setConfig } from "../stores/config";
 import config from "../../../../../resources/config.json"
+import { updateObject } from "../functions";
 
 export async function saveConfig(content: SettingsConfig): Promise<boolean> {
     try {
@@ -17,6 +18,10 @@ export async function saveConfig(content: SettingsConfig): Promise<boolean> {
         console.error(`${Error} in saveConfig`);
         return false
     }
+}
+
+export async function UpdateConfig(path: string, val: string | boolean | number) {
+    return await saveConfig(updateObject(path, val, getConfig()))
 }
 
 /* IFDEF WEB */

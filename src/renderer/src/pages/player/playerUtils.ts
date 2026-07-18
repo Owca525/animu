@@ -1,7 +1,11 @@
-import { formatTime, request, timeToSeconds } from "@renderer/utils/functions";
-import { episodeMetadata, playerDataExtended, Thumbnail } from "@renderer/utils/types";
+import { formatTime, request, SaveToClipboard, timeToSeconds } from "@renderer/utils/functions";
+import { getConfig } from "@renderer/utils/stores/config";
+import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, playerChapterList, playerDataExtended, Thumbnail } from "@renderer/utils/types";
+import { unwrap } from "solid-js/store";
 
-export async function VTTstoryBoardParser(url: string) {
+export async function VTTstoryBoardParser(url: string | undefined) {
+    if (!url) return
+
     let data = await request(url)
     if (!data.success) return
     const lines = data.text.split("\n").map((l: string) => l.trim());
@@ -80,4 +84,43 @@ export async function fetchResolutions<F extends (data: playerDataExtended) => P
     } finally {
         clearInterval(id)
     }
+}
+
+export function GenerateOpeningEnding(data: playerChapterList[] | undefined, duration: number): { left: number, width: number, name?: string, type: "opening" | "ending" | "other" }[] {
+    if (!data) return []
+
+    return data.map((element) => ({
+        left: (element.start / duration) * 100,
+        width: ((element.end - element.start) / duration) * 100,
+        name: element.name,
+        type: element.type
+    }))
+}
+
+export function EpisodeAvaible(cur: episodeMetadata, list: episodeMetadata[]) {
+    if (list.length <= 0) return { nextEpisode: undefined, prevEpisode: undefined }
+
+    const index = list.findIndex((v) => v["ep"] == cur["ep"])
+    if (index < 0) return { nextEpisode: undefined, prevEpisode: undefined }
+
+    return {
+        nextEpisode: list[index + 1],
+        prevEpisode: list[index - 1]
+    }
+}
+
+export function generateShareURL(anime_data?: { AnimeData: AnimeData, saveData: indentityPlayer, animulist?: animulistProps }, episode?: { type: string, current: string }, currentTime?: number) {
+    if (!anime_data || !episode || currentTime) return
+
+    const deepStr = `${anime_data.AnimeData.id},${anime_data.saveData.pluginName},${episode.type},${anime_data.AnimeData.player_ID},${episode.current},${currentTime}`
+
+    const config = unwrap(getConfig())
+    SaveToClipboard("text", `${config.deepLinkURL}/?anime=${btoa(deepStr)}`)
+}
+
+export function DownloadVideo(url: string) {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = url;
+    link.click();
 }

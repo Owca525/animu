@@ -1199,3 +1199,8 @@ export async function requestCloudflare(url: string): Promise<{ cookie: string, 
         }, duration: 10000})
     })
 }
+
+export function CheckNumber(number: string | number) {
+    if (typeof number == "number") return number
+    return parseInt(number)
+}

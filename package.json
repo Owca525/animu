@@ -35,8 +35,8 @@
     "jassub": "1.8.8",
     "material-symbols": "^0.44.8",
     "semver": "^7.7.4",
-    "socket.io-client": "^4.8.3",
-    "video.js": "^8.23.7"
+    "shaka-player": "^5.2.0",
+    "socket.io-client": "^4.8.3"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",

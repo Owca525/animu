@@ -1,5 +1,5 @@
 import { request, SheepFinderAnime2000 } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerChapterList, playerData, playerPluginFormat, playerSubtitlesFormat, resolutionFormat, serverStatusData } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerChapterList, playerData, playerPluginFormat, playerSubtitlesFormat, serverStatusData } from "@renderer/utils/types";
 
 const WEBSITE = "https://senshi.live"
 
@@ -51,7 +51,7 @@ function converterToCardData(data: { [key: string]: string | number }): cardData
 
 export default class Senshi implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.2",
+        version: "1.3",
         name: "Senshi",
         author: "Owca525",
         supportLang: ["en"],
@@ -66,22 +66,19 @@ export default class Senshi implements playerPluginFormat {
             if (!server["url"].includes("ninstream")) {
                 console.warn("Unsuported Url Default Thinking")
                 return {
-                    hostname: "Senshi",
+                    hostname: `Senshi ${server["status"] == "Dub" ? "(Dubbing)" : ""}`,
                     resolution: [{
-                        res: "",
+                        res: "1080",
                         url: server["url"],
                         reqHeader: header,
                         hls: server["url"].includes(".m3u8")
                     }],
-                    isDubbing: server["status"] == "Dub" ? async () => {
-                        return [{ res: "", url: server["url"], reqHeader: header, hls: server["url"].includes(".m3u8") }] as resolutionFormat[]
-                    } : undefined
                 }
             }
 
             const response = await request(server["url"].replace("playlist.m3u8", "sub_artplayer.json"), { headers: header })
             if (!response["success"] || !response["json"]) return {
-                hostname: "Senshi",
+                hostname: `Senshi ${server["status"] == "Dub" ? "(Dubbing)" : ""}`,
                 resolution: [{
                     res: "1080",
                     url: server["url"],
@@ -92,7 +89,7 @@ export default class Senshi implements playerPluginFormat {
 
 
             return {
-                hostname: "Senshi",
+                hostname: `Senshi ${server["status"] == "Dub" ? "(Dubbing)" : ""}`,
                 resolution: [{
                     res: "1080",
                     url: server["url"],
@@ -102,7 +99,7 @@ export default class Senshi implements playerPluginFormat {
                 }],
                 subtitles: response["json"].map((sub) => ({ url: server["url"].replace("playlist.m3u8", sub["url"]), lang: sub["url"].match(/^sub_(\d+)_([a-z]{2,3})\.ass$/)[2], label: sub["html"], format: "ass" })) as playerSubtitlesFormat[]
             }
-            
+
         } catch (error) {
             console.error("Senshi/ExtractURL", error)
             return
@@ -145,7 +142,15 @@ export default class Senshi implements playerPluginFormat {
             })
         }
 
-        return player
+        return player.sort((a, b) => {
+            const aHasDubbing = a["hostname"].includes("Dubbing");
+            const bHasDubbing = b["hostname"].includes("Dubbing");
+
+            if (aHasDubbing && !bHasDubbing) return 1;
+            if (!aHasDubbing && bHasDubbing) return -1;
+
+            return 0;
+        })
     }
     extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {
         if (animeData && !anime_id) {

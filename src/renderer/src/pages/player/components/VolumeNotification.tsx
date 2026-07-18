@@ -5,7 +5,7 @@ export default function VolumeNotification(props: { isActive: boolean, volume: n
             <div class="player-volume-ui-bar-container">
                 <div class="player-volume-ui-bar-progress" style={{ "width": `${props.volume}%` }}></div>
             </div>
-            <span class="player-volume-ui-text">{props.volume}%</span>
+            <span class="player-volume-ui-text">{props.volume.toFixed(0)}%</span>
         </div>
     )
 }
