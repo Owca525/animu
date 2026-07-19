@@ -1,13 +1,14 @@
-import { makeSmallText, request, requestCloudflare, savePluginConfig } from "@renderer/utils/functions";
+// DISSABLE
+import { makeSmallText, request as sheepRequest, requestCloudflare, savePluginConfig } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerPluginFormat, resolutionFormat, serverStatusData } from "@renderer/utils/types";
-
+// TODO: Fix this
 const WEBSITE = "https://animepahe.pw"
 
 let header = {
     "Accept": "application/json, text/javascript, */*; q=0.01",
     "Accept-Language": "en-US,en;q=0.9",
     "Accept-Encoding": "gzip, deflate, br, zstd",
-    "X-Requested-With": "XMLHttpRequest",
+    "Alt-Used": "animepahe.pw",
     'User-Agent': navigator.userAgent,
     'Referer': WEBSITE,
     "Sec-GPC": "1",
@@ -50,6 +51,49 @@ const playerHeader = {
     "Sec-Fetch-Dest": "empty",
     "Sec-Fetch-Mode": "cors",
     "Sec-Fetch-Site": "cross-site"
+}
+
+let config = {
+    cloudflare: undefined as string | undefined
+}
+
+async function request(url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string }, body?: any }, noCors: boolean = false): Promise<{ text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: Map<string, string> }> {
+    
+    if (window["config"]["cloudflare"] == undefined) {
+        header.Cookie = await extractToken(url) ?? ""
+        config = { ...config, cloudflare: header.Cookie }
+        savePluginConfig(config)
+    }
+
+    let tries = 1
+
+    let response: { text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: Map<string, string> } | undefined = undefined
+    
+    while (true) {
+        response = await sheepRequest(url, options, noCors)
+        if (tries <= 0) break
+
+        if (response["status"] == 403 && response["text"].includes("Cloudflare")) {
+            header.Cookie = await extractToken(url) ?? ""
+            config = { ...config, cloudflare: header.Cookie }
+            savePluginConfig(config)
+            tries -= 1
+        } else {
+            break
+        }
+    }
+    console.log(response)
+    return response
+}
+
+async function extractToken(url: string) {
+    const response = await requestCloudflare(url)
+    if (!response) return
+
+    const finded = response["cookie"].split(" ").find((v) => v.includes("cf_clearance"))
+    if (finded == undefined) return
+
+    return `__ddgid_=rxaWYPF7aoOXKtn7; __ddg2_=IPvarMbSedUW2ZAe; __ddg1_=T4CBje2yYmFKRIzHOw7q; res=480; aud=jpn; av1=0; ${finded}`
 }
 
 export function convertTimeStringToSeconds(time: string | undefined) {
@@ -209,16 +253,6 @@ export default class AnimePahe implements playerPluginFormat {
         header.Cookie = this.config["cloudflare"]
     }
 
-    paheRequest = async (url, options) => {
-        if (this.config["cloudflare"] == undefined) {
-            header.Cookie = (await requestCloudflare(WEBSITE))["cookie"]
-            this.config["cloudflare"] = header.Cookie
-            savePluginConfig(this.config)
-        }
-
-        return await request(url, options)
-    }
-
     extractPlayerData = async (_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
         if (this.cache[id] == undefined) await this.extractEpisodeList(undefined, id)
         if (this.cache[id] == undefined) return []
@@ -227,7 +261,7 @@ export default class AnimePahe implements playerPluginFormat {
         const find = this.cache[id][parseInt(mainEpisode) - 1]
         if (!find) return []
         const episodeID = find["session"]
-        const htmlResponse = await this.paheRequest(`${WEBSITE}/play/${id}/${episodeID}`, { headers: header })
+        const htmlResponse = await request(`${WEBSITE}/play/${id}/${episodeID}`, { headers: header })
         /* IFDEF DEBUG */
         console.warn("extractPlayerData/AnimePahe", htmlResponse)
         /* ENDIF */
@@ -335,7 +369,7 @@ export default class AnimePahe implements playerPluginFormat {
             anime_id = SheepFinderAnime2000(search.map((v) => v.AnimeData), animeData)
         }
         if (!anime_id) return
-        const episodeResponse = await this.paheRequest(`${WEBSITE}/api?m=release&id=${anime_id}&sort=episode_asc&page=1`, { headers: header })
+        const episodeResponse = await request(`${WEBSITE}/api?m=release&id=${anime_id}&sort=episode_asc&page=1`, { headers: header })
         /* IFDEF DEBUG */
         console.warn("extractEpisodeList/AnimePahe", episodeResponse)
         /* ENDIF */
@@ -369,7 +403,7 @@ export default class AnimePahe implements playerPluginFormat {
     }
     searchAnime = async (name: string, _page: number, _params?: FilterPluginsParams): Promise<cardData[]> => {
         try {
-            const searchResponse = await this.paheRequest(`${WEBSITE}/api?m=search&q=${name}`, { headers: header })
+            const searchResponse = await request(`${WEBSITE}/api?m=search&q=${name}`, { headers: header })
             /* IFDEF DEBUG */
             console.warn("searchAnime/AnimePahe", searchResponse)
             /* ENDIF */
@@ -383,9 +417,8 @@ export default class AnimePahe implements playerPluginFormat {
     }
 
     raportStatus = async (): Promise<{ search: serverStatusData; player: serverStatusData; episodes: serverStatusData; }> => {
-        if (window["config"] != undefined) {
-            this.config = window["config"]
-        }
+        const initialRequest = await request(WEBSITE, { headers: header })
+        if (initialRequest["status"] == 403) return undefined as any
 
         let results: serverStatusData[] = []
 
