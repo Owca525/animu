@@ -992,7 +992,8 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
     async function setNewSubtitles(sub: playerSubtitlesFormat | undefined) {
         if (!sub) return
         if (!videoRef) return
-
+        if (!player.currentResolution) return
+ 
         if (currentASSubtitles) {
             currentASSubtitles.destroy()
             currentASSubtitles._canvas.remove()
@@ -1005,11 +1006,11 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
             return updatePlayer({ currentSubtitle: { url: "", format: "", lang: "", label: "Off" } })
 
         const data = await request(sub.url, {
-            headers: player.playerData && player.playerData!["reqHeader"] ? player.playerData!["reqHeader"] : window["animuHeader"]
+            headers: player.currentResolution["reqHeader"] ? unwrap(player.currentResolution["reqHeader"]) : window["animuHeader"]
         })
 
         if (!data["success"]) {
-            console.error("Failed Load Subtitles", data, player.playerData)
+            console.error("Failed Load Subtitles", data, player.playerData, player.currentResolution)
             toast(t("Failed Fetch Subtitles"), { type: "error" })
             return
         }
