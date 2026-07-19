@@ -49,7 +49,7 @@ export function createRoom(name: string) {
     socket.emit("join-room", name, (resp) => {
         if (!resp.success) return toast(`Failed Connect to Room ${name}`)
         else {
-            toast(`Sucesfully Connected to ${name}`)
+            toast(`Successfully Connected to ${name}`)
             setSocketRoom(name)
         }
     });
