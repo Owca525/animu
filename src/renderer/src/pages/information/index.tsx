@@ -407,7 +407,7 @@ function information() {
         setCurrentAnimeMedia(response.map((item) => {
             const firstPartTitle = item.type == "OP" ? "Opening" : "Ending"
             return {
-                title: `${firstPartTitle} ${item.musicTitle} ${item.variant ? item.variant : ""}`,
+                // embedTitle: `${firstPartTitle} ${item.musicTitle} ${item.variant ? item.variant : ""}`,
                 hostname: `${firstPartTitle} ${item.musicTitle} ${item.variant ? item.variant : ""}`,
                 resolution: item.videos.map((item) => ({
                     res: item.resolution.toString(),
@@ -513,7 +513,7 @@ function information() {
             console.log(resolutions)
 
             setContentYT_DLP([{
-                title: response["fulltitle"],
+                embedTitle: response["fulltitle"],
                 hostname: "Youtube",
                 listChapters: chapters,
                 subtitles: subtitles,
@@ -1076,9 +1076,9 @@ function information() {
                 />
             </Show>
 
-            <Show when={currentAudio() && config.information.openingininformation}>
+            {/* <Show when={currentAudio() && config.information.openingininformation}>
                 <OpeningPlayer music={currentAudio()!} />
-            </Show>
+            </Show> */}
         </>
     )
 }

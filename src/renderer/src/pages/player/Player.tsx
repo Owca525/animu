@@ -32,13 +32,12 @@ shaka.polyfill.installAll()
 
 const speed = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
-// TODO: Add support title for resoltion only in Embed Mode
 // TODO: Add support for seperate audio for example youtube support
 
 interface PlayerProps {
     type: "embed" | "player"
 
-    playerTitle: string,
+    playerTitle?: string,
 
     anime?: {
         AnimeData: AnimeData,
@@ -123,7 +122,7 @@ class ExtractorManagerInstance {
     }
 }
 
-const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata = { current: { ep: "0" }, list: [], type: "sub" }, onChangeEpisode, anime, onExitPlayer, onKeybind, playerTitle }) => {
+const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata = { current: { ep: "0" }, list: [], type: "sub" }, onChangeEpisode, anime, onExitPlayer, onKeybind, playerTitle = "" }) => {
     const ExtractorManager = new ExtractorManagerInstance()
     const animeTitle = anime ? detectTitleConfig(anime!.AnimeData.title) : "Sheeplayer"
 
@@ -237,7 +236,9 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
         ],
 
         chapter: undefined as string | undefined,
-        chapterTime: undefined as string | undefined
+        chapterTime: undefined as string | undefined,
+
+        title: playerTitle
     })
 
     onMount(() => {
@@ -331,6 +332,7 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
 
     async function setNewPlayer(meta: playerData) {
         if (type != "embed") SheePlayer.currentTime = player.currentTime
+        if (type == "embed" && meta["embedTitle"]) updateUI({ title: meta["embedTitle"] })
 
         createNewPlayer()
 
@@ -794,7 +796,7 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
         // Update RPC
         /* IFDEF DEBUG|PROD */
         if (config.General.discordRPC && anime) window.api.rpc.setActivity({
-            details: t("discordrpc.player", { title: playerTitle, ep: ep_metadata["current"]["ep"] }),
+            details: t("discordrpc.player", { title: ui.title, ep: ep_metadata["current"]["ep"] }),
             state: `${formatTime(event.currentTarget.currentTime)} / ${formatTime(event.currentTarget.duration)}`,
             urlDetails: `https://anilist.co/anime/${anime.AnimeData.id}`
         })
@@ -1450,8 +1452,8 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
                         <Show when={type == "player"}>
                             <Button icon='arrow_back' ButtonClass='player-buttons' iconClassName="player-button-icons" onClick={onExitPlayer} />
                         </Show>
-                        <Show when={playerTitle}>
-                            <div class="player-title ">{playerTitle}</div>
+                        <Show when={ui.title}>
+                            <div class="player-title ">{ui.title}</div>
                         </Show>
                     </div>
                     <Show when={ep_metadata["current"]["title"]}>

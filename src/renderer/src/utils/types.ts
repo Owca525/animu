@@ -240,6 +240,8 @@ export type playerDataExtended = playerData & {
 }
 
 export interface playerData {
+    embedTitle?: string,
+
     hostname: string
     resolution: resolutionFormat[]
     dubResolution?: resolutionFormat[]
@@ -257,7 +259,7 @@ export interface resolutionFormat {
     res: string,
     url: string,
     mimeType?: string
-    audioUrl?: {
+    audio?: {
         url: string,
         mimeType?: string
     }
