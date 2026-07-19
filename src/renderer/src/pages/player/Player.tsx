@@ -1,7 +1,7 @@
 import Button from "@renderer/components/buttons"
 import VolumeNotification from "@renderer/pages/player/components/VolumeNotification"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
-import { CheckNumber, convertKeybinds, CreateContextMenuOptions, createElement, CreateSHA256, detectTitleConfig, formatTime, openUrlFolder, request, toggleFullscreen } from "@renderer/utils/functions"
+import { CheckNumber, convertKeybinds, CreateContextMenuOptions, createElement, CreateSHA256, dateToUnix, detectTitleConfig, formatTime, openUrlFolder, refetchHistory, request, toggleFullscreen } from "@renderer/utils/functions"
 import { getConfig } from "@renderer/utils/stores/config"
 import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, Thumbnail } from "@renderer/utils/types"
 import Hls, { HlsConfig } from "hls.js"
@@ -25,6 +25,8 @@ import fallbackFontJASSUB from "jassub/dist/default.woff2?url";
 import { useKeyPress } from "@renderer/utils/hooks/useKeyPress"
 import { getSocket, getSocketRoom } from "@renderer/utils/stores/global"
 import MoreInformation from "./components/MoreInformation"
+import { updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist"
+import { SaveHistory } from "@renderer/utils/FilesManager/history"
 
 shaka.polyfill.installAll()
 
@@ -367,7 +369,7 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
         const resolution = meta["resolution"][0]
 
         updatePlayer({
-            subtitles: meta.subtitles ?? player.subtitles,
+            subtitles: meta.subtitles ? [{ url: "", format: "", lang: "", label: t("player.other.off") }, ...meta.subtitles] : [{ url: "", format: "", lang: "", label: t("player.other.off") }],
             thumbnail: await VTTstoryBoardParser(meta.storyboardVTT),
             currentResolution: resolution,
             resoltions: meta["resolution"]
@@ -769,7 +771,7 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
             durration: event.currentTarget.duration
         })
 
-        // saveContinueProgress(event)
+        saveContinueProgress(event)
         checkUpNext(event)
         HandleBuffer(event)
         CalculateChapter()
@@ -892,6 +894,71 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
             toast(t("notification.failedpip"), { type: "error" })
         }
     };
+
+    function saveContinueProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
+        // Checking to save history
+        if (PlayerCleanup) return
+        if (!config) return
+        if (!anime) return
+        if (type == "embed") return
+
+        const currentTime = player.currentTime
+        const duration = player.durration
+
+        if (duration > 10 && currentTime > duration - CheckNumber(config.History.continue.MaximizeTimeSave) && anime.animulist) {
+            if (anime.AnimeData.episodes != undefined && anime.animulist.status == "CURRENT" && ep_metadata["current"]["ep"] == `${anime.AnimeData.episodes}`) {
+                updateDataInAnimulist(anime.AnimeData.id, {
+                    AnimeData: {
+                        ...anime.AnimeData,
+                        recommendations: undefined,
+                        nextAiringEpisode: undefined
+                    },
+                    animulist: {
+                        ...anime.animulist,
+                        status: "COMPLETED",
+                        endWatch: anime.animulist.endWatch == 0 ? dateToUnix(new Date().toString()) : anime.animulist.endWatch,
+                        lastUpdate: dateToUnix(new Date().toString()),
+                        progress: anime.AnimeData.episodes ? anime.AnimeData.episodes : ep_metadata.list.length
+                    }
+                })
+            }
+        }
+
+        if (currentTime <= parseInt(config.History.continue.MinimalTimeSave.toString())) return
+
+        let futureHistory = {
+            AnimeData: {
+                ...anime.AnimeData,
+                nextAiringEpisode: undefined,
+                recommendations: undefined
+            },
+            saveData: {
+                ...anime.saveData,
+                pluginName: anime.saveData.pluginName,
+                last_Time: event.currentTarget.currentTime,
+                episode: ep_metadata.current["ep"],
+                type: ep_metadata.type,
+                duration: duration,
+                isStarted: false,
+            }
+        }
+        if (currentTime <= duration - CheckNumber(config.History.continue.MaximizeTimeSave)) {
+            SaveHistory(unwrap(futureHistory))
+        } else {
+            SaveHistory(unwrap({
+                AnimeData: { ...anime.AnimeData, nextAiringEpisode: undefined },
+                saveData: {
+                    pluginName: anime.saveData.pluginName,
+                    last_Time: 0,
+                    episode: ep_metadata.current["ep"],
+                    type: ep_metadata.type,
+                    isStarted: false,
+                }
+            }
+            ))
+        }
+        refetchHistory()
+    }
 
     async function enterFullscreen() {
         /* IFDEF DEBUG|PROD */
@@ -1363,7 +1430,7 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
         <div class={`player-video-container ${type == "embed" ? "miniplayer" : ""} ${!ui.isVisible ? "player-hide-cursor" : ""}`}
             ref={containerRef}
             onMouseMove={ActiveShowingUI}
-            style={{ height: type == "embed" && player.initialize ? "600px" : "auto" }}
+            style={type == "embed" ? { height: player.initialize ? "600px" : "auto" } : {}}
             onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, ui.playerContextMenu), event)}
         >
 
@@ -1529,7 +1596,7 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
                                         <div class="player-select-episode-content-list">
                                             <For each={temp.episodes}>
                                                 {(element) => (
-                                                    <PlayerEpisodeElement nextEpisode={setNextEpisode} animeTitle={detectTitleConfig(anime_data.AnimeData.title)} episodes={element} currentEpisode={temp.episode} />
+                                                    <PlayerEpisodeElement nextEpisode={setNextEpisode} animeTitle={detectTitleConfig(anime.AnimeData.title)} episodes={element} currentEpisode={temp.episode} />
                                                 )}
                                             </For>
                                         </div>
@@ -1703,7 +1770,7 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
                 <VolumeNotification volume={player.volume} isActive={ui.isVolume} isMuted={player.muted} />
             </Show>
             {/* <Show when={showNerdStats()}>
-                <NerdStats duration={durrationTime()} frames={videoFrames()} volume={volume()} currentTime={currentTime()} />
+                <NerdStats duration={duration} frames={videoFrames()} volume={volume()} currentTime={currentTime} />
             </Show> */}
             <Show when={!config.Player.general.disablemoreinformation && anime}>
                 <MoreInformation
