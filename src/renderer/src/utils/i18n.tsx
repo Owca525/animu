@@ -117,3 +117,7 @@ export function t(key: string, replace?: { [key: string]: string | number }) {
   if (!i18nContext) return key
   return i18nContext.t(key, replace)
 }
+
+export function i18n() {
+  return i18nContext
+}

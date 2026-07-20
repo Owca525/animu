@@ -11,7 +11,7 @@ import { Component, onCleanup, onMount, Show } from "solid-js"
 import { createStore, unwrap } from "solid-js/store"
 import PlayerButton from "./components/PlayerButton"
 import SeekBar from "@renderer/components/seekBar"
-import { t } from "@renderer/utils/i18n"
+import { i18n, t } from "@renderer/utils/i18n"
 import PlayerSettings from "./components/PlayerSettings"
 import { removeToast, toast } from "@renderer/utils/context/ToastNotification"
 import { addTime, DownloadVideo, EpisodeAvaible, GenerateOpeningEnding, generateShareURL, VTTstoryBoardParser } from "./playerUtils"
@@ -394,6 +394,8 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
         await window.backend.changeHeader(unwrap(resolution.reqHeader));
         /* ENDIF */
 
+        updateSubtitle()
+
         CheckDownloadContextMenu(resolution)
 
         if (resolution["hls"]) return ExecuteHLS()
@@ -437,7 +439,7 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
         setTimeVideo(SheePlayer.currentTime)
     }
 
-    function updateSubtitle() {
+    function updateSubtitle(): any {
         if (!player.currentResolution || !player.playerData) return
 
         if (!SheePlayer.userInteractWithSubtitles && !player.currentResolution["defaultSubtitles"]) {
@@ -448,7 +450,11 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
 
         if (!player.playerData["subtitles"]) return
 
-        setNewSubtitles(player.playerData["subtitles"][0])
+        const finded = player.playerData["subtitles"].find((v) => v["lang"] == i18n()!.currentLang())
+
+        if (!finded) return setNewSubtitles(player.playerData["subtitles"][0])
+
+        setNewSubtitles(finded)
     }
 
     function createNewPlayer() {
