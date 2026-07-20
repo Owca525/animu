@@ -1,8 +1,9 @@
-import { getSocket, setSocket, setSocketRoom } from "./stores/global";
+import { getSocket, setIncognitoMode, setSocket, setSocketRoom } from "./stores/global";
 import { io } from "socket.io-client";
 import { unwrap } from "solid-js/store";
 import { toast } from "./context/ToastNotification";
-import { socketPlayerInit } from "@renderer/pages/player/VideoPlayer";
+import { globalNavigate } from "./functions";
+import { playerData } from "./types";
 
 (window as any).runSocket = runSocket;
 (window as any).createRoom = createRoom;
@@ -15,10 +16,49 @@ export function closeSocket() {
     socket.close()
 }
 
+function OverWritePlayer(url: string, hls: boolean) {
+    if (!url || !hls) throw new Error("Give 2 Aruments")
+
+    localStorage.setItem("playerCache", JSON.stringify({
+        data: {
+            title: {
+                native: "Player Overwrite",
+                romaji: "Player Overwrite"
+            },
+            id: crypto.randomUUID(),
+            player_ID: crypto.randomUUID()
+        },
+        save: {
+            last_Time: 0,
+            type: "sub",
+            pluginName: "SHEEPCUSTOMOWEVERWIOTE",
+            episode: "1"
+        },
+        episodelist: ["1"],
+    }));
+
+    (window as any).customPlayerData = [
+        {
+            hostname: "OverWriter",
+            resolution: [{
+                res: "1080",
+                url: url,
+                hls: hls
+            }],
+        }
+    ] as playerData[]
+
+    globalNavigate("/player")
+
+    setIncognitoMode(true)
+}
+
+(window as any).OverWritePlayer = OverWritePlayer;
+
 export function runSocket(server: string = "") {
     const socket = io(server)
 
-    socket.on("player:init", (playerData: socketPlayerInit) => {
+    socket.on("player:init", (playerData) => {
         localStorage.setItem("playerCache", JSON.stringify(unwrap({
             data: playerData.anime,
             save: playerData.saveData,
