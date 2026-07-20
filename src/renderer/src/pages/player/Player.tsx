@@ -241,6 +241,19 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
         title: playerTitle
     })
 
+    if (getSocket()) {
+        const socket = getSocket()
+        socket?.on("player:update", (update: { time: number, pause: boolean }) => {
+            console.log(update)
+            if (update.pause != player.isPlaying) togglePlay(true)
+            console.log(unwrap(player.currentTime) - update.time > 2, unwrap(player.currentTime), unwrap(player.currentTime) - update.time)
+            if (unwrap(player.currentTime) - update.time > 2 || unwrap(player.currentTime) - update.time < -2) {
+                setTimeVideo(update.time)
+                clearInterval(refreashUpdateSocket)
+            }
+        })
+    }
+
     onMount(() => {
         if (!anime) updateUI({
             playerContextMenu: ui.playerContextMenu.filter((v) => v["option"] != t("player.shareanime"))
