@@ -65,7 +65,7 @@ export function runSocket(server: string = "") {
             episodelist: playerData.temp.episodes,
         })));
 
-        (window as any).customPlayerData = playerData["owcapierdolik"]
+        (window as any).playerOverWriteContent = playerData["owcapierdolik"]
 
         if (location.href.includes("/player")) return
         const tmp = location.href.replaceAll("info", "")

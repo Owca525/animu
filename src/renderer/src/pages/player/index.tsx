@@ -8,7 +8,7 @@ import Button from "@renderer/components/buttons";
 import { SaveHistory } from "@renderer/utils/FilesManager/history";
 import { useNavigate } from "@solidjs/router";
 import { getConfig } from "@renderer/utils/stores/config";
-import { Match, onCleanup, onMount, Switch } from "solid-js";
+import { createEffect, Match, onCleanup, onMount, Switch } from "solid-js";
 // import ExternalPlayer from "./externalPlayer";
 import { useResponse } from "@renderer/utils/hooks/useResponse";
 import { useI18n } from "@renderer/utils/i18n";
@@ -243,9 +243,12 @@ const player = () => {
         if (!finded) return { ep: ep }
         return finded
     }
-
+    
     return (
         <Switch>
+            <Match when={!response.error() || !response.loading() || response.data() == undefined}>
+                {showErrorDialog()}
+            </Match>
             <Match when={response.error() || !response.loading() && response.data() && response.data()!.length <= 0}>
                 {showErrorDialog()}
             </Match>
