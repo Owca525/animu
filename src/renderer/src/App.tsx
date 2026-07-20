@@ -323,14 +323,14 @@ function initialServices() {
         try {
           const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
           const time = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])
-          if (time["min"] > 44 && time["hour"] >= 0) localStorage.removeItem("pluginStatusCachce")
+          if (time["min"] > 359 && time["hour"] >= 0) localStorage.removeItem("pluginStatusCachce")
         } catch (error) { }
 
         await pluginManager.checkStatusServerInPlugins(localStorage.getItem("pluginStatusCachce") == undefined)
       },
       name: t("PluginStatus"),
       description: t("Check Status Of Player Plugins"),
-      activeTime: timeCovertToMs({ min: 45 })
+      activeTime: timeCovertToMs({ min: 360 })
     },
     {
       active: !window["animuAppInfo"]["flags"]["WEB"] && config.update.type == "On Start",

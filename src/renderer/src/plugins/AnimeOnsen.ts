@@ -166,6 +166,46 @@ export default class AnimeOnsen implements playerPluginFormat {
     }
     
     raportStatus = async (): Promise<{ search: serverStatusData; player: serverStatusData; episodes: serverStatusData; }> => {
-        return undefined as any
+        let results: serverStatusData[] = []
+
+        async function wrapper(func: (...args) => any): Promise<serverStatusData | undefined> {
+            try {
+                const start = performance.now();
+                const response = await func()
+                const end = performance.now();
+
+                return {
+                    time: end - start,
+                    work: response.length > 0
+                }
+            } catch (error) {
+                return undefined
+            }
+        }
+
+        const functions = [
+            async () => this.searchAnime("Oshi No Ko", 1),
+            async () => this.extractPlayerData("sub", { ep: "1" }, "1uQJfaeOMCu8V7YR"),
+            async () => this.extractOnlyEpisodesList("sub", "1uQJfaeOMCu8V7YR"),
+        ]
+
+        for (let index = 0; index < functions.length; index++) {
+            const element = functions[index];
+            const tmp = await wrapper(element)
+            if (!tmp) {
+                results.push({
+                    time: 0,
+                    work: false
+                })
+            } else {
+                results.push(tmp)
+            }
+        }
+
+        return {
+            search: results[0],
+            player: results[1],
+            episodes: results[2]
+        }
     }
 }
