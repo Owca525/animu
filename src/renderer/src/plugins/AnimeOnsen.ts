@@ -119,7 +119,7 @@ export default class AnimeOnsen implements playerPluginFormat {
         const response = await this.extractEpisodeList(undefined, anime_id)
         if (!response) return []
 
-        return response[0]["episodesData"]
+        return response["episodesData"][0]["episodes"]
     }
 
     searchAnime = async (name: string, _page: number, _params?: FilterPluginsParams): Promise<cardData[]> => {
@@ -146,7 +146,6 @@ export default class AnimeOnsen implements playerPluginFormat {
 
         if (!response["success"] || !response["json"]) return []
 
-        // TODO: Fix img
         try {
             return response["json"]["hits"].map((v) => ({
                 AnimeData: {
@@ -155,7 +154,7 @@ export default class AnimeOnsen implements playerPluginFormat {
                         native: v["content_title_jp"],
                         romaji: v["content_title"]
                     },
-                    bannerImage: `${API}/v4/image/210x300/${v["content_id"]}`,
+                    coverImage: `${API}/v4/image/210x300/${v["content_id"]}`,
                     player_ID: v["content_id"],
                     id: ""
                 }

@@ -122,8 +122,6 @@ const player = () => {
 
     onMount(() => {
 
-        console.log(window["playerOverWriteContent"])
-
         if (anime_data.save.pluginName == "Animu_Player_Overwriter_Mode") setIncognitoMode(true)
 
         if (getSocket()) {
