@@ -56,7 +56,7 @@ const player = () => {
                     return []
                 }
 
-                if (anime_data.save.pluginName == "Animu_Player_Overwriter_Mode") return window["playerOverWriteContent"]
+                if (`${queryKey[3]}`.includes("Animu_Player_Overwriter_Mode")) return window["playerOverWriteContent"]
 
                 let pluginPlayer = await pluginManager.changePlayerPlugin(anime_data.save?.pluginName ? anime_data.save.pluginName : "")
                 return await pluginPlayer.extractPlayerData(unwrap(animeType) as string, unwrap(episode) as episodeMetadata, unwrap(player_id) as string)
@@ -122,6 +122,8 @@ const player = () => {
 
     onMount(() => {
 
+        console.log(window["playerOverWriteContent"])
+
         if (anime_data.save.pluginName == "Animu_Player_Overwriter_Mode") setIncognitoMode(true)
 
         if (getSocket()) {
@@ -132,7 +134,7 @@ const player = () => {
                     anime: anime_data.data,
                     saveData: anime_data.save,
                     temp: { episode: episode.current, type: episode.type, episodes: episode.list },
-                    owcapierdolik: window["customPlayerData"]
+                    owcapierdolik: window["playerOverWriteContent"]
                 }
             })
             socket?.on("player:changepisode", (data) => {
@@ -246,9 +248,6 @@ const player = () => {
 
     return (
         <Switch>
-            <Match when={!response.error() || !response.loading() || response.data() == undefined}>
-                {showErrorDialog()}
-            </Match>
             <Match when={response.error() || !response.loading() && response.data() && response.data()!.length <= 0}>
                 {showErrorDialog()}
             </Match>
