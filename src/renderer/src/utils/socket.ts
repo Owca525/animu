@@ -31,13 +31,13 @@ function OverWritePlayer(url: string, hls: boolean) {
         save: {
             last_Time: 0,
             type: "sub",
-            pluginName: "SHEEPCUSTOMOWEVERWIOTE",
+            pluginName: "Animu_Player_Overwriter_Mode",
             episode: "1"
         },
         episodelist: ["1"],
     }));
 
-    (window as any).customPlayerData = [
+    (window as any).playerOverWriteContent = [
         {
             hostname: "OverWriter",
             resolution: [{
