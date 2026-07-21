@@ -13,7 +13,7 @@ const HASH_INFO = '043448386c7a686bc2aabfbb6b80f6074e795d350df48015023b079527b08
 const HASH_PLAYER = 'f4662f4b7510b26795dd53ef824a0bf1740fbbc5d1273fab18222ac831bca8d0'
 const API_WEB = 'https://api.allanime.day'
 const WEBSITE = 'https://mkissa.to/'
-const RANDOMVALUE = "a39b86dbbcf57f884f3e9074969e7fe26656c74012e4545605896621ffa441c1"
+const MASK = "f34fa715e2958b8c1ebc6efa4d089acd8f196d8b83d4b6201586c00c8a52e4a8"
 const CURRENTBUILD = "61"
 
 const header = {
@@ -167,87 +167,67 @@ async function SendRequestForData(): Promise<undefined | { epoch: number, epochM
     return response["json"] as any
 }
 
-// TODO: END THIS MESS
+function hexToBytes(hex: string): Uint8Array {
+    const bytes = new Uint8Array(hex.length / 2);
+    for (let i = 0; i < hex.length; i += 2) {
+        bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
+    }
+    return bytes;
+}
+
+function bytesToHex(bytes: Uint8Array): string {
+    return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function sha256Hex(input: string): Promise<string> {
+    const data = new TextEncoder().encode(input);
+    const hash = await crypto.subtle.digest("SHA-256", data);
+    return bytesToHex(new Uint8Array(hash));
+}
 
 async function GeneratePierdolnikAAREQ() {
-
     const tmpObject = await SendRequestForData()
     if (!tmpObject) return console.error("FAILED REQUEST WITH OBJECT")
 
-    const ts = Math.floor(Date.now() / 1000 / 300) * 300 * 1000
+    const { epoch } = tmpObject;
 
-    const shit = JSON.stringify({
-        v: 1,
-        ts: ts,
-        epoch: tmpObject["epoch"],
-        buildId: CURRENTBUILD,
-        qh: HASH_PLAYER
-    })
+    const keyBytes = hexToBytes(MASK);
+    const key = await crypto.subtle.importKey("raw", keyBytes as any, { name: "AES-GCM" }, false, ["encrypt", "decrypt"]);
 
-    const valueR = RANDOMVALUE.trim()
+    const ts = Math.floor(Date.now() / 300000) * 300000;
+    const payload = JSON.stringify({ v: 1, ts, epoch, buildId: CURRENTBUILD, qh: HASH_PLAYER });
+    const ivHex = await sha256Hex(`${epoch}:${CURRENTBUILD}:${HASH_PLAYER}:${ts}`);
+    const iv = hexToBytes(ivHex).slice(0, 12);
 
-    if (valueR.length % 2 !== 0) return
+    const encrypted = await crypto.subtle.encrypt(
+        { name: "AES-GCM", iv },
+        key,
+        new TextEncoder().encode(payload)
+    );
 
-    let valueN = new Uint8Array(valueR.length / 2)
-    for (let index = 0; index < valueN.length; index++) {
-        valueN[index] = parseInt(valueR.slice(index * 2, index * 2 + 2), 16)
+    const encBytes = new Uint8Array(encrypted);
+    const ciphertext = encBytes.slice(0, encBytes.length - 16);
+    const tag = encBytes.slice(encBytes.length - 16);
+
+    const token = new Uint8Array(1 + iv.length + ciphertext.length + tag.length);
+    token[0] = 0x01;
+    token.set(iv, 1);
+    token.set(ciphertext, 1 + iv.length);
+    token.set(tag, 1 + iv.length + ciphertext.length);
+
+    let binary = "";
+    for (let i = 0; i < token.length; i++) {
+        binary += String.fromCharCode(token[i]);
     }
 
-    const valuePartB = atob(tmpObject["partB"])
-    if (valuePartB.length < 32) return console.error("INVALID PART B")
-
-    let valueA = new Uint8Array(32);
-    for (let index = 0; index < 32; index++) {
-        valueA[index] = valuePartB.charCodeAt(index) ^ valueN[index % valueN.length]
-    }
-
-    const fuckingR = await crypto.subtle.importKey("raw", valueA, {
-        name: "AES-GCM"
-    }, false, ["decrypt"])
-
-    const payload = new TextEncoder().encode(`${tmpObject["epoch"]}:${CURRENTBUILD}:${HASH_PLAYER}:${ts}`)
-
-    const valueI = await crypto.subtle.digest("SHA-256", payload)
-    const payloadIV = new Uint8Array(valueI).slice(0, 12)
-
-    const cryptoS = await crypto.subtle.encrypt({
-        name: "AES-GCM",
-        iv: payloadIV
-    }, fuckingR, new TextEncoder().encode(shit))
-
-    const valueO = new Uint8Array(cryptoS)
-
-    let valueC = new Uint8Array(13 + valueO.length)
-    valueC[0] = 1
-    valueC.set(payloadIV, 1)
-    valueC.set(valueO, 13)
-
-    let finalStringosEspanioles = ""
-    for (let index = 0; index < valueC.length; index++) {
-        finalStringosEspanioles += String.fromCharCode(valueC[index])
-    }
-
-    finalStringosEspanioles = btoa(finalStringosEspanioles)
-
-    /* IFDEF DEBUG */
-    console.warn("allmanga/GeneratePierdolnikAAREQ", finalStringosEspanioles)
-    /* ENDIF */
-
-    return finalStringosEspanioles
+    return { key: key, aaReq: btoa(binary) };
 }
 
-async function fuckThisEncryptionMethod(encryptedMotherFucker: string) {
+async function fuckThisEncryptionMethod(encryptedMotherFucker: string, aaReqKey: CryptoKey) {
     let bufferEncrypted = FuckBufferDosentWorkInElectron(encryptedMotherFucker)
     let version = bufferEncrypted[0];
 
     if (version !== 1) throw new Error(`ALLMANGA CHANGED THEY FUCKING VERSION OF ENCRYPTION IMEDITLY SEND AS BUG REPORT NOW HAVE VERSION: ${version}`)
-
-    const encodedKey = (new TextEncoder).encode(`Xot36i3lK3:v${version}`)
-    const digestetCUM = await crypto.subtle.digest("SHA-256", encodedKey);
-
-    const cumKey = await crypto.subtle.importKey("raw", digestetCUM, {
-        name: "AES-GCM"
-    }, !1, ["decrypt"])
 
     const randomSlicedBufferCum = bufferEncrypted.slice(1, 13)
     let w = bufferEncrypted.slice(bufferEncrypted.length - 16)
@@ -256,11 +236,18 @@ async function fuckThisEncryptionMethod(encryptedMotherFucker: string) {
     O.set(v);
     O.set(w, v.length);
 
-    const decryptedCum = await crypto.subtle.decrypt({
-        name: "AES-GCM",
-        iv: randomSlicedBufferCum
-    }, cumKey, O);
-    return JSON.parse((new TextDecoder).decode(decryptedCum))
+    try {
+        const decryptedCum = await crypto.subtle.decrypt(
+            { name: "AES-GCM", iv: randomSlicedBufferCum },
+            aaReqKey,
+            O
+        );
+        return JSON.parse(new TextDecoder().decode(decryptedCum));
+    } catch (error) {
+        console.error("Allmanga/fuckThisEncryptionMethod", error)
+    }
+
+    return undefined
 }
 
 async function requestToClockApi(content: AllmangaURLformat): Promise<playerData | undefined> {
@@ -370,7 +357,7 @@ async function detectURL(params: AllmangaURLformat): Promise<resolutionFormat[]>
 
 export default class Allmanga implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "2.5",
+        version: "2.6",
         name: "Allmanga",
         author: "Owca525",
         icon: `${WEBSITE}android-icon-192x192.png`,
@@ -391,10 +378,15 @@ export default class Allmanga implements playerPluginFormat {
 
         const SHITLOADER = await GeneratePierdolnikAAREQ()
 
-        console.log(SHITLOADER)
+        if (!SHITLOADER) return []
+
+        const extensions = JSON.stringify({
+            persistedQuery: { version: 1, sha256Hash: HASH_PLAYER },
+            aaReq: SHITLOADER["aaReq"]
+        });
 
         const response = await request(
-            `${API_WEB}/api?variables=${variables}&extensions={"persistedQuery":{"version":1,"sha256Hash":"${HASH_PLAYER}"},"aaReq":"${SHITLOADER}"}`,
+            `${API_WEB}/api?variables=${encodeURIComponent(variables)}&extensions=${encodeURIComponent(extensions)}`,
             { headers: header }
         )
 
@@ -405,7 +397,7 @@ export default class Allmanga implements playerPluginFormat {
         if (!response["success"] || !response["json"]) return []
 
         try {
-            const jsonObject = await fuckThisEncryptionMethod(response["json"]["data"]["tobeparsed"])
+            const jsonObject = await fuckThisEncryptionMethod(response["json"]["data"]["tobeparsed"], SHITLOADER["key"])
             /* IFDEF DEBUG */
             console.warn("allmanga/fetchUrls jsonObject", jsonObject)
             /* ENDIF */
