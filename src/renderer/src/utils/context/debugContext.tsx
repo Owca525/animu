@@ -1,8 +1,10 @@
 import { JSX } from "solid-js";
 import { SheepShortcut } from "../hooks/useKeyPress";
 import DebuggerSheep, { SheepWindowManager, windowManagerConfig } from "@renderer/WebComponents/DebugWindow";
-import { getGlobalCache } from "../stores/global";
+import { getGlobalCache, setIncognitoMode } from "../stores/global";
 import { getConfig } from "../stores/config";
+import { ExtractVideo, globalNavigate } from "../functions";
+import { removeToast, toast } from "./ToastNotification";
 
 export default function DebugContext(props: { children: JSX.Element }) {
     let active = false
@@ -51,6 +53,57 @@ export default function DebugContext(props: { children: JSX.Element }) {
                 }
             } else {
                 instanceDebugger!.DestroyWindow(windowContexts.get("Information Cache")!.windowID)
+            }
+        })
+
+        const ExtractorVideoPlayer = MainWindow!.CheckBox("Extractor Video Player", (val) => {
+            if (val) {
+                const window = createWindow({ title: "Extractor Video Player", onExit: () => ExtractorVideoPlayer.element!.checked = false })
+                if (!window) return
+
+                const horizontal = window.CreateHorizontalMenu()
+
+                const input = window.Input(undefined, "input", horizontal)
+                window.Button("Extract Video", async (): Promise<any> => {
+                    // TODO: FIX THIS
+
+                    try {
+                        const id = toast("Fetching", { type: "loading", timer: false })
+                        const extracted = await ExtractVideo(input.element!["value"])
+                        removeToast(id)
+                        if (extracted.length <= 0) return toast("Failed Extract", { type: "error" })
+
+                        localStorage.setItem("playerCache", JSON.stringify({
+                            data: {
+                                title: {
+                                    native: extracted[0]["embedTitle"],
+                                    romaji: extracted[0]["embedTitle"]
+                                },
+                                id: crypto.randomUUID(),
+                                player_ID: crypto.randomUUID()
+                            },
+                            save: {
+                                last_Time: 0,
+                                type: "sub",
+                                pluginName: "Animu_Player_Overwriter_Mode",
+                                episode: "1"
+                            },
+                            episodelist: ["1"],
+                        }));
+
+                        (window as any).playerOverWriteContent = extracted
+
+                        globalNavigate("/player")
+
+                        setIncognitoMode(true)
+                    } catch (error) {
+
+                    }
+
+                }, horizontal)
+
+            } else {
+                instanceDebugger!.DestroyWindow(windowContexts.get("Extractor Video Player")!.windowID)
             }
         })
 

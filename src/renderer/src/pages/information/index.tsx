@@ -13,6 +13,7 @@ import {
     dateToUnix,
     decodeHtmlEntities,
     detectTitleConfig,
+    ExtractVideo,
     getGradientColor,
     openUrlFolder,
     refetchHistory,
@@ -433,8 +434,6 @@ function information() {
     async function getAnimeTrailer(url: string, noContentLoading = false) {
         if (!url) return
 
-        let storyBoard: string | undefined
-
         try {
             if (config["information"]["trailerplayertype"] == "embed") return
             if (!noContentLoading) {
@@ -446,81 +445,7 @@ function information() {
                 return
             }
 
-            let resolutions: resolutionFormat[] = []
-
-            const response = await window.api.yt_dlp.run([url])
-            console.log(response)
-            if (response["url"]) {
-                resolutions.push({
-                    res: `${response["height"]}`,
-                    url: response["url"],
-                    reqHeader: {
-                        ...response["http_headers"],
-                        Referer: "https://youtube.com/",
-                    }
-                })
-            }
-
-            if (response["formats"]) {
-                const filtered = response["formats"].filter((v) => !v["container"] && v["protocol"] == "m3u8_native" && v["format_note"] != "storyboard")
-                const filteredDash = response["formats"].filter((v) => v["container"] && v["container"].includes("dash") && v["format_note"] != "storyboard")
-                // TODO: ADD AUDIO CHANNEL FOR MINI PLAYER
-                if (filtered.length > 0) {
-                    resolutions = filtered.map((v) => ({
-                        url: v["url"],
-                        res: `${v["height"]}`,
-                        reqHeader: v["http_headers"],
-                        hls: true
-                    }))
-                } else if (filteredDash.length > 0) {
-                    resolutions = filteredDash.map((v) => ({
-                        url: v["url"],
-                        res: `${v["height"]}`,
-                        reqHeader: v["http_headers"],
-                        hls: false
-                    }))
-                }
-
-                const storyBoardFinded: any[] = response["formats"].filter((v) => v["format_note"] != "storyboard")
-                storyBoard = storyBoardFinded.at(-1)["url"]
-                resolutions.reverse()
-            }
-
-            let chapters: playerChapterList[] = []
-            if (response["chapters"]) chapters = response["chapters"].map((item) => (
-                {
-                    start: item["start_time"],
-                    end: item["end_time"],
-                    type: "other",
-                    name: item["title"]
-                }))
-
-            let subtitles: playerSubtitlesFormat[] = []
-            if (response["automatic_captions"]) {
-                for (const key in response["automatic_captions"]) {
-                    const value = response["automatic_captions"][key as keyof typeof response["automatic_captions"]];
-                    const subFinded = value.find((item) => item["ext"] == "vtt")
-                    if (!subFinded || !subFinded["name"]) continue
-                    subtitles.push({
-                        url: subFinded["url"],
-                        lang: key,
-                        label: subFinded["name"],
-                        format: subFinded["ext"]
-                    })
-                }
-            }
-
-            console.log(resolutions)
-
-            setContentYT_DLP([{
-                embedTitle: response["fulltitle"],
-                hostname: "Youtube",
-                listChapters: chapters,
-                subtitles: subtitles,
-                resolution: resolutions,
-                splitHLS: resolutions.length != 1,
-                // storyboardVTT: storyBoard
-            }])
+            setContentYT_DLP(await ExtractVideo(url))
             isATrailerFetching = false
             setContentLoading(false)
         } catch (error) {

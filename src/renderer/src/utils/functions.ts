@@ -11,7 +11,9 @@ import {
     homeData,
     informationPluginFormat,
     playerChapterList,
+    playerData,
     playerPluginFormat,
+    resolutionFormat,
     themeMetadata
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
@@ -535,7 +537,7 @@ export function getRenderPath(): string {
     return `${location.origin}${location.pathname.replace("index.html", "")}`
 }
 
-export function savePluginConfig(_: { [key: string]: any }) {}
+export function savePluginConfig(_: { [key: string]: any }) { }
 
 export async function getPluginConfig(instance: playerPluginFormat | informationPluginFormat): Promise<{ [key: string]: any; } | undefined> {
     if (!instance.config) return
@@ -962,16 +964,18 @@ export async function checkAnimeTodayReleaseEpisode() {
                     icon: element.anime.AnimeData.coverImage
                 })
             }
-            await updatePlaylist("global.waitingplaylist", { ...{
-                ...element,
-                anime: {
-                    ...element["anime"],
-                    saveData: {
-                        ...element["anime"]["saveData"]!,
-                        episode: tmpEpisode
+            await updatePlaylist("global.waitingplaylist", {
+                ...{
+                    ...element,
+                    anime: {
+                        ...element["anime"],
+                        saveData: {
+                            ...element["anime"]["saveData"]!,
+                            episode: tmpEpisode
+                        }
                     }
-                }
-            }, customData: true })
+                }, customData: true
+            })
 
             tmpplugin.clear()
         } catch (error) {
@@ -1128,18 +1132,18 @@ export function sortRelationType(content: AnimeData["relations"]) {
 }
 
 export async function GenerateSha256(text: string) {
-  const data = new TextEncoder().encode(text);
+    const data = new TextEncoder().encode(text);
 
-  const hashBuffer = await crypto.subtle.digest(
-    'SHA-256',
-    data
-  );
+    const hashBuffer = await crypto.subtle.digest(
+        'SHA-256',
+        data
+    );
 
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
 
-  return hashArray
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
+    return hashArray
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
 }
 
 export function deepMerge(target: any, source: any): any {
@@ -1188,15 +1192,17 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(tag: K, opt
     return element;
 }
 
-export async function requestCloudflare(url: string): Promise<{ cookie: string, header: {[key: string]: any} }> {
+export async function requestCloudflare(url: string): Promise<{ cookie: string, header: { [key: string]: any } }> {
     return new Promise((resolve) => {
         let interval = setInterval(() => {
             resolve({ cookie: "", header: {} })
         }, 10000)
-        toast("Verify Cloudflare to use plugin. Click to open window", { type: "info", onClick: async () => {
-            clearInterval(interval)
-            resolve(await window.BrowserWindow.createWindow({ url: url, type: "CloudFlare" }))
-        }, duration: 10000})
+        toast("Verify Cloudflare to use plugin. Click to open window", {
+            type: "info", onClick: async () => {
+                clearInterval(interval)
+                resolve(await window.BrowserWindow.createWindow({ url: url, type: "CloudFlare" }))
+            }, duration: 10000
+        })
     })
 }
 
@@ -1204,3 +1210,78 @@ export function CheckNumber(number: string | number) {
     if (typeof number == "number") return number
     return parseInt(number)
 }
+
+export async function ExtractVideo(url: string): Promise<playerData[]> {
+    /* IFDEF DEBUG|PROD */
+
+    const response = await window.api.yt_dlp.run([url])
+
+    /* IFDEF DEBUG */
+    console.warn("functions/ExtractVideo", response)
+    /* ENDIF */
+
+    // const storyboards = response["formats"].filter(f =>
+    //     f.format_note === "storyboard" ||
+    //     f.protocol === "mhtml"
+    // );
+
+    const audio = response["formats"].filter(f =>
+        f.vcodec === "none" && f.acodec && f.acodec !== "none"
+    ).sort((a, b) => (b.tbr ?? 0) - (a.tbr ?? 0));
+
+    const subtitles = Object.entries(response["automatic_captions"]).map(([key, value]: [string, any]) => {
+        if (!value) return
+        const finded = value.find((v) => v["ext"] == "vtt")
+        if (!finded) return
+
+        return {
+            url: finded["url"],
+            lang: key,
+            label: finded["name"],
+            format: finded["ext"]
+        }
+    }).filter((v) => v != undefined)
+
+    let video = response["formats"].filter(f =>
+        f.vcodec && f.vcodec !== "none" && f.format_note !== "storyboard"
+    );
+
+    video = Object.values(
+        video.reduce((acc, item) => {
+            if (!acc[item.height]) {
+                acc[item.height] = item;
+            }
+            return acc;
+        }, {})
+    )
+
+    // console.log(storyboards, audio, video, subtitles)
+
+    return [{
+        embedTitle: response["fulltitle"],
+        hostname: response["extractor"],
+
+        resolution: video.map((v) => ({
+            url: v["url"],
+            res: `${v["height"]}`,
+            reqHeader: { ...v["http_headers"], Referer: "https://youtube.com/" },
+            audio: v["audio_ext"] == "none" ? {
+                url: audio[0] ? audio[0]["url"] : undefined
+            } : undefined,
+            hls: v["protocol"] == "m3u8_native"
+        } as resolutionFormat)).reverse(),
+
+        subtitles: subtitles,
+
+        splitHLS: true,
+        // storyboardVTT: storyboards[0] ? storyboards[0]["url"] : undefined
+    }]
+
+    /* ENDIF */
+
+    /* IFDEF WEB */
+    return []
+    /* ENDIF */
+}
+
+(window as any).ExtractVideo = ExtractVideo;

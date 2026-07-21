@@ -32,8 +32,6 @@ shaka.polyfill.installAll()
 
 const speed = ["0.25", "0.5", "0.75", "1", "1.25", "1.50", "1.75", "2"]
 
-// TODO: Add support for seperate audio for example youtube support
-
 interface PlayerProps {
     type: "embed" | "player"
 
@@ -141,6 +139,9 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
     // ref for html object
     let videoRef: HTMLVideoElement | undefined
     let Shaka: shaka.Player | undefined
+
+    let AudioShaka: shaka.Player | undefined
+    let AudioRef: HTMLAudioElement | undefined
 
     let HLS: Hls | undefined
     let currentASSubtitles: JASSUB | undefined
@@ -357,7 +358,7 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
             args: {
                 ...meta,
                 episode: {
-                    currentEpisode: ep_metadata.current,
+                    currentEpisode: ep_metadata.current["ep"],
                     episodeList: ep_metadata.list,
                     anime: anime.AnimeData,
                     animeID: anime.AnimeData.player_ID as string,
@@ -400,6 +401,11 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
 
         if (resolution["hls"]) return ExecuteHLS()
 
+        if (resolution["audio"]) {
+            // TODO: FIX Audio sync and audio lag and if is audio element then video player is waiting when audio is loading
+            if (AudioShaka) AudioShaka.load(resolution["audio"]["url"])
+        }
+
         Shaka!.load(resolution["url"])
     }
 
@@ -435,6 +441,12 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
         }
 
         createNewPlayer()
+
+        if (data["audio"]) {
+            createNewAudioPlayer()
+            if (AudioShaka) AudioShaka.load(data["audio"]["url"])
+        }
+
         Shaka?.load(data["url"])
         setTimeVideo(SheePlayer.currentTime)
     }
@@ -457,6 +469,36 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
         setNewSubtitles(finded)
     }
 
+    function createNewAudioPlayer() {
+        if (!screenshotWrapper) return console.error("WTF Screenshot Wrapper dosen't exist, now i can't create new player")
+        AudioRef = createElement("video", {
+            preload: "auto",
+            muted: player.muted,
+            autoplay: player.isPlaying,
+        })
+
+        AudioRef.style.display = "none"
+
+        AudioShaka = new shaka.Player(AudioRef);
+
+        // AudioRef.addEventListener("canplay", () => {
+        //     console.log("AudioRef can play", AudioRef!.src)
+        // })
+
+        // AudioRef.addEventListener("waiting", () => {
+        //     console.log("Fetching", AudioRef!.src)
+        // })
+
+        // AudioRef.addEventListener("loadedmetadata", (event) => {
+        //     console.log("AudioRef loadedmetadata", event)
+        // })
+        
+        screenshotWrapper.append(AudioRef)
+
+        ChangePlayerVolume(SheePlayer.playerVolume, true)
+        setTimeVideo(SheePlayer.currentTime)
+    }
+
     function createNewPlayer() {
         if (!screenshotWrapper) return console.error("WTF Screenshot Wrapper dosen't exist, now i can't create new player")
 
@@ -472,8 +514,6 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
         if (config.Player.general.VideoStreching) videoElemenet.style.objectFit = "cover"
 
         Shaka = new shaka.Player(videoElemenet);
-
-        videoElemenet.autoplay
 
         videoRef = videoElemenet
 
@@ -636,7 +676,7 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
                     let message: string | undefined
                     switch (data.type) {
                         case Hls.ErrorTypes.NETWORK_ERROR:
-                            if (data.response && (data.response["code"] == 429 || data.response["code"] == 403)) {
+                            if (data.response && (data.response["code"] == 429 || data.response["code"] == 403 || data.response["code"] == 500)) {
                                 updatePlayer({ FatalError: true })
                             } else {
                                 tmpHls.startLoad(SheePlayer.currentTime);
@@ -678,6 +718,7 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
         if (!animation && !config.Player.ui.DisableVolumeAnimation) setTimeoutForElement(volumeTimeout, "isVolume")
 
         videoRef.volume = parseFloat((value / 100).toFixed(2))
+        if (AudioRef) AudioRef.volume = parseFloat((value / 100).toFixed(2))
         SheePlayer.playerVolume = value
         updatePlayer({ volume: value })
     }
@@ -687,11 +728,14 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
         if (HLS) HLS.destroy()
         if (currentASSubtitles) currentASSubtitles.destroy()
 
+        if (AudioShaka) AudioShaka.destroy()
+
         SheePlayer.activeEvents.forEach((event) => {
             if (videoRef) videoRef.removeEventListener(event["type"], event["handler"])
         })
 
         if (videoRef) videoRef.remove()
+        if (AudioRef) AudioRef.remove()
     }
 
     function setPlayerCleanupEvent(type: any, handler: (event: Event & { currentTarget: HTMLVideoElement; target: Element; }) => void) {
@@ -755,6 +799,7 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
     function setTimeVideo(value: number) {
         if (!videoRef) return
         videoRef.currentTime = value
+        if (AudioRef) AudioRef.currentTime = value
         updatePlayer({ currentTime: value })
 
         if (getSocket()) {
@@ -857,6 +902,7 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
 
         if (prev) {
             video.pause()
+            if (AudioRef) AudioRef.pause()
             clearInterval(moreInformationTimer)
 
             moreInformationTimer = setTimeout(() => {
@@ -867,6 +913,9 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
             clearInterval(moreInformationTimer)
             updateUI({ ShowMoreInformation: false })
 
+            if (AudioRef) AudioRef.play().catch((reason) => {
+                console.warn("Audio Play Error Catch", reason)
+            })
             video.play().catch((reason) => {
                 console.warn("Video Play Error Catch", reason)
             })
@@ -894,6 +943,8 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
 
     function setMutedToPlayer() {
         if (videoRef) videoRef.muted = !player.muted
+        if (AudioRef) AudioRef.muted = !player.muted
+
         updatePlayer({ muted: !player.muted })
 
         ChangePlayerVolume(player.volume)
