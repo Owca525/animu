@@ -10,14 +10,14 @@ interface AllmangaURLformat {
 
 const HASH_SEARCH = 'a24c500a1b765c68ae1d8dd85174931f661c71369c89b92b88b75a725afc471c'
 const HASH_INFO = '043448386c7a686bc2aabfbb6b80f6074e795d350df48015023b079527b0848a'
-const HASH_PLAYER = 'd405d0edd690624b66baba3068e0edc3ac90f1597d898a1ec8db4e5c43c00fec'
+const HASH_PLAYER = 'f4662f4b7510b26795dd53ef824a0bf1740fbbc5d1273fab18222ac831bca8d0'
 const API_WEB = 'https://api.allanime.day'
-const WEBSITE = 'https://allmanga.to/'
-
-const SHITLOADER = "AYOVp7Mtrv66784RPBhH3dcXXFQRM3zzYlFxs9Rqk/yq7ouR/kKLsLD71rWMGIRhab1qx0Nu7FQJvONAdrOvU13C+cKulrbCmVuWySHILFoPFvX5P33KhJsqqv2vTo4NS52jHQePBDYyyk1PsObSVOITHHRDtaPnup/2fS/SVtckQV8jaBO275icFXKXeOVi6p9CoxiTVHNTQg=="
+const WEBSITE = 'https://mkissa.to/'
+const RANDOMVALUE = "a39b86dbbcf57f884f3e9074969e7fe26656c74012e4545605896621ffa441c1"
+const CURRENTBUILD = "61"
 
 const header = {
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:149.0) Gecko/20100101 Firefox/149.0",
+    "User-Agent": navigator.userAgent,
     Accept: "*/*",
     "Accept-Language": "en-US,en;q=0.9",
     "Accept-Encoding": "gzip, deflate, br, zstd",
@@ -147,6 +147,95 @@ function FuckBufferDosentWorkInElectron(base64: string): Uint8Array {
     return bytes;
 }
 
+async function SendRequestForData(): Promise<undefined | { epoch: number, epochMs: number, graceMs: number, switchAt: number, partB: string }> {
+
+    if (window["objectToken"] != undefined) {
+        if (window["switchAt"] - Date.now() <= 0) return window["objectToken"]
+    }
+
+    const response = await request(`https://api.mkissa.net/client-crypto/v1/bootstrap?buildId=${CURRENTBUILD}`, {
+        headers: header
+    })
+
+    /* IFDEF DEBUG */
+    console.warn("allmanga/SendRequestForData", response)
+    /* ENDIF */
+
+    if (!response["success"] || !response["json"]) return undefined
+
+    window["objectToken"] = response["json"]
+    return response["json"] as any
+}
+
+// TODO: END THIS MESS
+
+async function GeneratePierdolnikAAREQ() {
+
+    const tmpObject = await SendRequestForData()
+    if (!tmpObject) return console.error("FAILED REQUEST WITH OBJECT")
+
+    const ts = Math.floor(Date.now() / 1000 / 300) * 300 * 1000
+
+    const shit = JSON.stringify({
+        v: 1,
+        ts: ts,
+        epoch: tmpObject["epoch"],
+        buildId: CURRENTBUILD,
+        qh: HASH_PLAYER
+    })
+
+    const valueR = RANDOMVALUE.trim()
+
+    if (valueR.length % 2 !== 0) return
+
+    let valueN = new Uint8Array(valueR.length / 2)
+    for (let index = 0; index < valueN.length; index++) {
+        valueN[index] = parseInt(valueR.slice(index * 2, index * 2 + 2), 16)
+    }
+
+    const valuePartB = atob(tmpObject["partB"])
+    if (valuePartB.length < 32) return console.error("INVALID PART B")
+
+    let valueA = new Uint8Array(32);
+    for (let index = 0; index < 32; index++) {
+        valueA[index] = valuePartB.charCodeAt(index) ^ valueN[index % valueN.length]
+    }
+
+    const fuckingR = await crypto.subtle.importKey("raw", valueA, {
+        name: "AES-GCM"
+    }, false, ["decrypt"])
+
+    const payload = new TextEncoder().encode(`${tmpObject["epoch"]}:${CURRENTBUILD}:${HASH_PLAYER}:${ts}`)
+
+    const valueI = await crypto.subtle.digest("SHA-256", payload)
+    const payloadIV = new Uint8Array(valueI).slice(0, 12)
+
+    const cryptoS = await crypto.subtle.encrypt({
+        name: "AES-GCM",
+        iv: payloadIV
+    }, fuckingR, new TextEncoder().encode(shit))
+
+    const valueO = new Uint8Array(cryptoS)
+
+    let valueC = new Uint8Array(13 + valueO.length)
+    valueC[0] = 1
+    valueC.set(payloadIV, 1)
+    valueC.set(valueO, 13)
+
+    let finalStringosEspanioles = ""
+    for (let index = 0; index < valueC.length; index++) {
+        finalStringosEspanioles += String.fromCharCode(valueC[index])
+    }
+
+    finalStringosEspanioles = btoa(finalStringosEspanioles)
+
+    /* IFDEF DEBUG */
+    console.warn("allmanga/GeneratePierdolnikAAREQ", finalStringosEspanioles)
+    /* ENDIF */
+
+    return finalStringosEspanioles
+}
+
 async function fuckThisEncryptionMethod(encryptedMotherFucker: string) {
     let bufferEncrypted = FuckBufferDosentWorkInElectron(encryptedMotherFucker)
     let version = bufferEncrypted[0];
@@ -245,7 +334,7 @@ async function fetchUrls(params: AllmangaURLformat): Promise<resolutionFormat[]>
         const checkUrl = (data: any): string => {
             if (data["cf"] && data["pk"]) {
                 const pkKeys = Object.entries(data["pk"])
-                return `${data["cf"]}?${pkKeys.map(([v, v2]) => `${v}=${v2}`).join("&")}`  
+                return `${data["cf"]}?${pkKeys.map(([v, v2]) => `${v}=${v2}`).join("&")}`
             }
             if (data["cf"]) return data["cf"]
             if (data["hlsVideoTiktok"]) return `${urlObject["origin"]}${code["hlsVideoTiktok"]}`
@@ -300,10 +389,18 @@ export default class Allmanga implements playerPluginFormat {
         const tmpEpisode = typeof episode == "object" ? episode["ep"] : episode
         const variables = `{"showId":"${id}","translationType":"${type}","episodeString":"${tmpEpisode}"}`
 
+        const SHITLOADER = await GeneratePierdolnikAAREQ()
+
+        console.log(SHITLOADER)
+
         const response = await request(
             `${API_WEB}/api?variables=${variables}&extensions={"persistedQuery":{"version":1,"sha256Hash":"${HASH_PLAYER}"},"aaReq":"${SHITLOADER}"}`,
             { headers: header }
         )
+
+        /* IFDEF DEBUG */
+        console.warn("allmanga/extractPlayerData", response["text"])
+        /* ENDIF */
 
         if (!response["success"] || !response["json"]) return []
 
