@@ -62,6 +62,7 @@ class PlayerGlobalCacheInstance {
     isMuted = false
     autoplay = true
     isFullscreen = true
+    speed = 1
 
     currentTime = 0
 
@@ -158,6 +159,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
     let refreashUpdateSocket: NodeJS.Timeout | undefined
 
+    let refreashNerdStats: NodeJS.Timeout | undefined
+
     let assSubContainer: HTMLDivElement | undefined
     let screenShotContainer: HTMLDivElement | undefined
     let screenshotWrapper: HTMLDivElement | undefined
@@ -176,6 +179,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         isFullscreen: SheePlayer.isFullscreen,
         isLoading: false,
         FatalError: false,
+
+        speed: 1,
 
         isDubbing: false,
 
@@ -233,7 +238,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         chapterSkipTimer: 15,
 
         playerContextMenu: [
-            { option: t("contextMenu.nerdstats"), onClick: () => "" },
+            { option: t("contextMenu.nerdstats"), onClick: () => ToggleNerdStats() },
             { option: t("player.shareanime"), onClick: () => generateShareURL(anime, { type: "sub", current: ep_metadata["current"]["ep"] }, player.currentTime) },
         ],
 
@@ -241,6 +246,27 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         chapterTime: undefined as string | undefined,
 
         title: playerTitle
+    })
+
+    const [nerdStats, updateNerd] = createStore({
+        active: false,
+
+        player: {
+            paused: player.isPlaying,
+            ended: false,
+            autoplay: player.isPlaying,
+            muted: player.muted,
+            volume: player.volume,
+            playbackRate: 0,
+            currentTime: player.currentTime,
+            duration: player.durration,
+            readyState: 0,
+            networkState: 0,
+
+            creationTime: 0,
+            droppedVideoFrames: 0,
+            totalVideoFrames: 0,
+        }
     })
 
     if (getSocket()) {
@@ -421,6 +447,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         });
 
         setTimeVideo(SheePlayer.currentTime)
+        ChangeSpeedPlayer(`${SheePlayer.speed}`)
     }
 
     async function setNewResolution(data: resolutionFormat | undefined) {
@@ -1071,6 +1098,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
     function ChangeSpeedPlayer(speed: string) {
         if (!videoRef) return
         videoRef.playbackRate = parseFloat(speed)
+        SheePlayer.speed = parseFloat(speed)
     }
 
     async function setNewSubtitles(sub: playerSubtitlesFormat | undefined) {
@@ -1187,7 +1215,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
     }
 
     useKeyPress((keys: string) => {
-        // if (keys == "CTRL+SHIFT+D") setshowNerdStats((prev) => !prev)
+        if (keys == "CTRL+SHIFT+D") ToggleNerdStats()
         if (keys == "SHIFT+R" && player.playerData) setNewPlayer(player.playerData)
 
         if (onKeybind) onKeybind(keys)
@@ -1509,6 +1537,44 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         if (newTime == player.durration) return updateUI({ chapterTime: undefined })
         if (newTime <= 0) return updateUI({ chapterTime: undefined })
         updateUI({ chapterTime: formatTime(newTime) })
+    }
+
+    function ToggleNerdStats() {
+        if (!videoRef) return
+
+        if (nerdStats.active) {
+            updateNerd({ active: false })
+
+            clearInterval(refreashNerdStats)
+            return
+        }
+        
+        const entries = Object.entries(unwrap(nerdStats.player)).map((v) => v["0"])
+
+        refreashNerdStats = setInterval(() => {
+            let object = {}
+
+            const quality = videoRef!.getVideoPlaybackQuality()
+
+            entries.forEach((v) => {
+                object = {
+                    ...object,
+                    [v]: videoRef![v]
+                }
+            })
+
+            object = {
+                ...object, 
+                creationTime: quality.creationTime,
+                droppedVideoFrames: quality.droppedVideoFrames,
+                totalVideoFrames: quality.totalVideoFrames,
+            }
+
+            updateNerd({ player: object as any })
+
+        }, 500)
+
+        updateNerd({ active: true })
     }
 
     /* END */
@@ -1859,9 +1925,17 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             <Show when={!config.Player.ui.DisableVolumeAnimation}>
                 <VolumeNotification volume={player.volume} isActive={ui.isVolume} isMuted={player.muted} />
             </Show>
-            {/* <Show when={showNerdStats()}>
-                <NerdStats duration={duration} frames={videoFrames()} volume={volume()} currentTime={currentTime} />
-            </Show> */}
+
+            <Show when={nerdStats.active}>
+                <div class="player-nerdstats-container">
+                    <For each={Object.entries(nerdStats["player"])}>
+                        {([key, val]) => (
+                            <span class="player-nerdstats-text">{key}: {JSON.stringify(val)}</span>
+                        )}
+                    </For>
+                </div>
+            </Show>
+
             <Show when={!config.Player.general.disablemoreinformation && anime}>
                 <MoreInformation
                     isActive={ui.ShowMoreInformation}

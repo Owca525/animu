@@ -825,3 +825,19 @@
   left: 0;
   pointer-events: none;
 }
+
+.player-nerdstats-container {
+  position: fixed;
+  top: 100px;
+  left: 0;
+  padding: 12px 14px;
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 250px;
+
+  background-color: var(--player-bg-containers);
+
+  border-radius: 4px;
+}
