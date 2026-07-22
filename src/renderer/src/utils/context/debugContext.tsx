@@ -58,13 +58,13 @@ export default function DebugContext(props: { children: JSX.Element }) {
 
         const ExtractorVideoPlayer = MainWindow!.CheckBox("Extractor Video Player", (val) => {
             if (val) {
-                const window = createWindow({ title: "Extractor Video Player", onExit: () => ExtractorVideoPlayer.element!.checked = false })
-                if (!window) return
+                const MainWindow = createWindow({ title: "Extractor Video Player", onExit: () => ExtractorVideoPlayer.element!.checked = false })
+                if (!MainWindow) return
 
-                const horizontal = window.CreateHorizontalMenu()
+                const horizontal = MainWindow.CreateHorizontalMenu()
 
-                const input = window.Input(undefined, "input", horizontal)
-                window.Button("Extract Video", async (): Promise<any> => {
+                const input = MainWindow.Input(undefined, "input", horizontal)
+                MainWindow.Button("Extract Video", async (): Promise<any> => {
                     // TODO: FIX THIS
 
                     try {

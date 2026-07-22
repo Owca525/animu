@@ -230,6 +230,12 @@ const player = () => {
         closeDialog()
 
         if (!anime_data) return
+
+        if (anime_data["save"]["pluginName"] == "Animu_Player_Overwriter_Mode") {
+            setIncognitoMode(false)
+            return navigate("/")
+        }
+
         if (anime_data.continewatch) return navigate("/")
         if (config.Player.general.PlayerBehavior === "home") navigate("/")
         else {
@@ -280,6 +286,9 @@ const player = () => {
                     setTime={episode.time}
                     onExitPlayer={leave}
                 />
+            </Match>
+            <Match when={!response.Initial() && !response.error() && !response.loading() && response.data() == undefined}>
+                {showErrorDialog()}
             </Match>
         </Switch>
     )

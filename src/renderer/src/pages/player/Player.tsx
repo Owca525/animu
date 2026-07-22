@@ -116,6 +116,7 @@ class ExtractorManagerInstance {
 
     clear = () => {
         this.cache.clear()
+        if (this.active) removeToast(this.active)
         this.active = undefined
     }
 }
@@ -313,6 +314,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
     onCleanup(() => {
         PlayerCleanup = true
+
+        ExtractorManager.clear()
 
         clearInterval(playerHideTimer)
         clearInterval(hideChapterButtonTimer)

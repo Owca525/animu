@@ -16,6 +16,8 @@ export function useResponse<T, TData>(options: UseResponseOptions<T, TData>) {
     const [error, setError] = createSignal<boolean>(false);
     const [data, setData] = createSignal<TData>()
     const [forceRefetch, setForceRefetch] = createSignal<boolean>(false);
+    const [Initial, setInitial] = createSignal<boolean>(true);
+
     const { queryKey: rawKey, queryFn, cacheTime, removeOnClenup, disable } = options;
 
     const [dissable, setDissable] = createSignal<boolean>(disable ? true : false);
@@ -30,6 +32,7 @@ export function useResponse<T, TData>(options: UseResponseOptions<T, TData>) {
     async function fetchData() {
         setLoading(true)
         setError(false)
+        setInitial(false)
 
         try {
             if (dissable()) return undefined
@@ -47,7 +50,7 @@ export function useResponse<T, TData>(options: UseResponseOptions<T, TData>) {
             
             setData(data as any)
             setLoading(false)
-            setError(false)
+            setError(data == undefined)
         } catch (error) {
             console.error("useResponse Error", error)
             setError(true)
@@ -80,6 +83,6 @@ export function useResponse<T, TData>(options: UseResponseOptions<T, TData>) {
         if (removeOnClenup && cacheTimeOut) clearTimeout(cacheTimeOut)
     })
 
-    return { data, loading, error, Refetch };
+    return { data, loading, error, Refetch, Initial };
 }
 
