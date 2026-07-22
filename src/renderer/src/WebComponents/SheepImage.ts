@@ -1,3 +1,14 @@
+
+function IsURLValid(value: string | undefined | null): boolean {
+    if (!value) return false
+    try {
+        const url = new URL(value);
+        return url.protocol === "http:" || url.protocol === "https:";
+    } catch {
+        return false;
+    }
+}
+
 class SheepImage extends HTMLElement {
     img_divClass: string | null = null
     img_class: string | null = null
@@ -67,6 +78,12 @@ class SheepImage extends HTMLElement {
         if (this.img_alt && this.ImageRef) this.ImageRef.alt = this.img_alt
         if (this.img_onClick && this.ImageRef) this.ImageRef.onclick = this.img_onClick
 
+        if (!IsURLValid(this.img_src) && this.SpanRef) {
+            this.SpanRef.classList.remove("loading-animation")
+            this.SpanRef.innerHTML = "broken_image"
+            return
+        }
+
         if (this.ImageRef && this.ImageRef.src == this.img_src) return
 
         if (this.ImageRef && this.ImageRef.src != this.img_src) {
@@ -89,7 +106,7 @@ class SheepImage extends HTMLElement {
 
         this.ImageRef.style.display = "none"
         if (this.img_src) this.ImageRef.src = this.img_src
-        
+
         this.ImageRef.onload = (ev) => {
             this.loadingImg = false
 
