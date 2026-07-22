@@ -7,7 +7,7 @@ import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, playerChap
 import Hls, { HlsConfig } from "hls.js"
 import JASSUB from "jassub"
 import shaka from "shaka-player"
-import { Component, onCleanup, onMount, Show } from "solid-js"
+import { Component, For, onCleanup, onMount, Show } from "solid-js"
 import { createStore, unwrap } from "solid-js/store"
 import PlayerButton from "./components/PlayerButton"
 import SeekBar from "@renderer/components/seekBar"
@@ -506,7 +506,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         // AudioRef.addEventListener("loadedmetadata", (event) => {
         //     console.log("AudioRef loadedmetadata", event)
         // })
-        
+
         screenshotWrapper.append(AudioRef)
 
         ChangePlayerVolume(SheePlayer.playerVolume, true)
@@ -1077,7 +1077,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         if (!sub) return
         if (!videoRef) return
         if (!player.currentResolution) return
- 
+
         if (currentASSubtitles) {
             currentASSubtitles.destroy()
             currentASSubtitles._canvas.remove()
@@ -1670,38 +1670,41 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                                 />
                             </Show>
 
-                            {/* TODO: BETTER SELECT EPISODE */}
+                            <Show when={ep_metadata.list.length >= 2 && onChangeEpisode}>
+                                <PlayerButton
+                                    icon={"video_library"}
+                                    title={t("player.selectepisode")}
+                                    ButtonClass="player-buttons"
+                                    onClick={() => { ToggleMenu("episodes") }}
+                                />
+                            </Show>
 
-                            {/* <Show when={temp.episodes.length >= 2}>
-                                <PlayerButton icon={"video_library"} title={detectDisableTooltips(t("player.selectepisode"))} ButtonClass="player-buttons" onClick={() => { setShowSelectEpisode((prev) => !prev); setcurrentSettings(() => false) }} />
-                            </Show> */}
-
-                            {/* <div class={`player-select-episode-container ${isShowSelectEpisode() ? "show" : "hidden"}`} >
-                                <div class="player-select-episode-title">{t("player.changeEpisode")}</div>
-                                <Show when={!countImages(temp.episodes)}
-                                    fallback={
-                                        <div class="player-select-episode-content-list">
-                                            <For each={temp.episodes}>
-                                                {(element) => (
-                                                    <PlayerEpisodeElement nextEpisode={setNextEpisode} animeTitle={detectTitleConfig(anime.AnimeData.title)} episodes={element} currentEpisode={temp.episode} />
-                                                )}
-                                            </For>
-                                        </div>
-                                    }
-                                >
-                                    <div class="player-select-episode-content">
-                                        <For each={temp.episodes}>
-                                            {(element) => (
-                                                <div class={`information-episode-button ${parseInt(element.ep) < parseInt(temp.episode) ? "watched" : ""} ${parseInt(element.ep) == parseInt(temp.episode) ? "current" : ""}`}
-                                                    onClick={() => setNextEpisode(element.ep)}
-                                                >
-                                                    {element.ep}
+                            <Show when={ui.activeMenu == "episodes" && onChangeEpisode}>
+                                <div class="player-episodes-container">
+                                    <div class="player-select-episode-title">{t("player.changeEpisode")}</div>
+                                    <div class="player-container-episodes">
+                                        <For each={ep_metadata.list}>
+                                            {(episode) => (
+                                                <div class={`player-episode-selector ${ep_metadata["current"]["ep"] == episode["ep"] ? "active" : ""}
+                                                            ${parseInt(episode["ep"]) < parseInt(ep_metadata["current"]["ep"]) ? "before" : ""}`}
+                                                        onClick={() => onChangeEpisode!(episode["ep"])}
+                                                    >
+                                                    <sheep-img src={episode["img"]} class="player-episode-img" divClass="player-episode-img-placeholder"/>
+                                                    <div class="player-episode-container-text">
+                                                        <span class="player-episode-title">
+                                                            {episode["title"] ? 
+                                                                `E${episode["ep"]}: ${episode["title"]}` : 
+                                                                t("settings.player.episode", { ep: episode["ep"] })
+                                                            }
+                                                        </span>
+                                                        <span class="player-episode-description">{t("information.descriptionnotfound")}</span>
+                                                    </div>
                                                 </div>
                                             )}
                                         </For>
                                     </div>
-                                </Show>
-                            </div> */}
+                                </div>
+                            </Show>
 
                             <PlayerSettings
                                 isDubbingOn={player.isDubbing}

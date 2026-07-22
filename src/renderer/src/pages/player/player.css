@@ -458,6 +458,100 @@
   transform: translateX(0px);
 }
 
+.player-episodes-container {
+  height: max-content;
+  max-height: 300px;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 8px;
+  gap: 8px;
+
+  pointer-events: all;
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+
+  overflow: hidden;
+  overflow-y: scroll;
+
+  border-radius: 8px;
+  background-color: color-mix(in srgb, var(--second-layer) 90%, transparent);
+  border: 2px solid var(--five-layer);
+
+  /* transform: translateX(800px);
+  transition: 250ms ease-out; */
+}
+
+.player-episode-img {
+  height: 62px;
+
+  border-radius: 10px 0px 0px 10px;
+}
+
+.player-episode-selector {
+  display: flex;
+
+  cursor: pointer;
+
+  align-items: center;
+
+  outline: 2px solid var(--invisible);
+
+  transition: all 150ms ease;
+
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.player-episode-selector:hover {
+  transform: scale(1.02);
+  background-color: var(--five-layer);
+}
+
+.player-episode-selector.active {
+  outline-color: var(--orange-one);
+}
+
+.player-episode-selector.before {
+  outline-color: var(--green-one);
+}
+
+.player-episode-container-text,
+.player-episode-description {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+
+.player-episode-img-placeholder {
+  width: 110px;
+  height: 62px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--five-layer);
+}
+
+.player-episode-container-text {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.player-episode-description {
+  font-size: 0.8em;
+  color: var(--text-gray);
+}
+
+.player-container-episodes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .player-select-episode-title {
   font-size: 1.1em;
   font-weight: 600;
@@ -557,7 +651,8 @@
   margin-right: clamp(40px, 25vw, 350px);
 }
 
-.player-fast-forward-ui.time, .player-fast-rewind-ui.time {
+.player-fast-forward-ui.time,
+.player-fast-rewind-ui.time {
   font-size: 1.4em;
   font-weight: 800;
   margin-top: 20px;

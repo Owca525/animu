@@ -78,12 +78,6 @@ class SheepImage extends HTMLElement {
         if (this.img_alt && this.ImageRef) this.ImageRef.alt = this.img_alt
         if (this.img_onClick && this.ImageRef) this.ImageRef.onclick = this.img_onClick
 
-        if (!IsURLValid(this.img_src) && this.SpanRef) {
-            this.SpanRef.classList.remove("loading-animation")
-            this.SpanRef.innerHTML = "broken_image"
-            return
-        }
-
         if (this.ImageRef && this.ImageRef.src == this.img_src) return
 
         if (this.ImageRef && this.ImageRef.src != this.img_src) {
@@ -97,6 +91,12 @@ class SheepImage extends HTMLElement {
             this.SpanRef.innerHTML = "progress_activity"
 
             this.appendChild(this.SpanRef)
+        }
+
+        if (!IsURLValid(this.img_src) && this.SpanRef) {
+            this.SpanRef.classList.remove("loading-animation")
+            this.SpanRef.innerHTML = "broken_image"
+            return
         }
 
         if (!this.ImageRef) {

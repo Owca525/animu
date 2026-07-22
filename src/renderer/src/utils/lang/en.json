@@ -217,7 +217,7 @@
         "endate": "End Date",
         "season": "Season",
         "source": "Source",
-        "descriptionnotfound": "Description Not Found",
+        "descriptionnotfound": "No Description",
         "errors": "This Anime doesn't have any episodes",
         "wrongtext": "Is this the wrong Anime?",
         "listEpisodes": "{{number}} Episodes",
@@ -324,6 +324,7 @@
             "links": "Usefull Links"
         },
         "player": {
+            "episode": "Episode {{ep}}",
             "downloadvideo": "Download Video",
             "animations": "Player Animations",
             "play": "Auto Play",
