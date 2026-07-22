@@ -120,7 +120,7 @@ class ExtractorManagerInstance {
     }
 }
 
-const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata = { current: { ep: "0" }, list: [], type: "sub" }, onChangeEpisode, anime, onExitPlayer, onKeybind, playerTitle = "" }) => {
+const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metadata = { current: { ep: "0" }, list: [], type: "sub" }, onChangeEpisode, anime, onExitPlayer, onKeybind, playerTitle = "" }) => {
     const ExtractorManager = new ExtractorManagerInstance()
     const animeTitle = anime ? detectTitleConfig(anime!.AnimeData.title) : "Sheeplayer"
 
@@ -168,7 +168,7 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
         initialize: true,
 
         volume: SheePlayer.playerVolume,
-        currentTime: setTime ?? 0,
+        currentTime: setTime,
         muted: SheePlayer.isMuted,
         durration: 0,
         isPlaying: SheePlayer.autoplay,
@@ -256,16 +256,16 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
     }
 
     onMount(() => {
+        SheePlayer.currentTime = player.currentTime;
+
         if (!anime) updateUI({
             playerContextMenu: ui.playerContextMenu.filter((v) => v["option"] != t("player.shareanime"))
         })
 
         let defaultHost = metadata.find((v) => v["defaultHost"] == true)
-        if (!defaultHost) defaultHost = metadata[0]
+        if (!defaultHost) defaultHost = metadata[0];
 
         // TODO: Add check if metadata is empty
-
-        SheePlayer.currentTime = player.currentTime;
 
         /* IFDEF DEBUG */
         (window as any).playerVideoRef = videoRef;
@@ -273,6 +273,8 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
         (window as any).playerHLS = HLS;
         (window as any).playerMetadata = metadata;
         /* ENDIF */
+
+        toggleFullscreen(SheePlayer.isFullscreen)
 
         if (type == "embed") {
             SheePlayer.currentTime = 0
@@ -407,6 +409,15 @@ const Player: Component<PlayerProps> = ({ setTime, type, metadata, ep_metadata =
         }
 
         Shaka!.load(resolution["url"])
+        await new Promise(resolve => {
+            if (videoRef!.readyState >= 1) {
+                resolve("");
+            } else {
+                videoRef!.addEventListener("loadedmetadata", resolve, { once: true });
+            }
+        });
+
+        setTimeVideo(SheePlayer.currentTime)
     }
 
     async function setNewResolution(data: resolutionFormat | undefined) {
