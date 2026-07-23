@@ -433,7 +433,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         if (resolution["hls"]) return ExecuteHLS()
 
         if (resolution["audio"]) {
-            // TODO: FIX Audio sync and audio lag and if is audio element then video player is waiting when audio is loading
+            createNewAudioPlayer()
+
             if (AudioShaka) AudioShaka.load(resolution["audio"]["url"])
         }
 
@@ -511,30 +512,26 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
     }
 
     function createNewAudioPlayer() {
+        // TODO: Add Support For synchronize buffer etc
         if (!screenshotWrapper) return console.error("WTF Screenshot Wrapper dosen't exist, now i can't create new player")
-        AudioRef = createElement("video", {
-            preload: "auto",
-            muted: player.muted,
-            autoplay: player.isPlaying,
-        })
+        AudioRef = new Audio()
+        AudioRef.autoplay = player.isPlaying
+        AudioRef.muted = player.muted;
 
-        AudioRef.style.display = "none"
-
-        AudioShaka = new shaka.Player(AudioRef);
+        AudioShaka = new shaka.Player();
+        AudioShaka.attach(AudioRef)
 
         // AudioRef.addEventListener("canplay", () => {
         //     console.log("AudioRef can play", AudioRef!.src)
         // })
 
         // AudioRef.addEventListener("waiting", () => {
-        //     console.log("Fetching", AudioRef!.src)
+        //     console.log("Fetching")
         // })
 
         // AudioRef.addEventListener("loadedmetadata", (event) => {
         //     console.log("AudioRef loadedmetadata", event)
         // })
-
-        screenshotWrapper.append(AudioRef)
 
         ChangePlayerVolume(SheePlayer.playerVolume, true)
         setTimeVideo(SheePlayer.currentTime)
@@ -554,7 +551,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
         if (config.Player.general.VideoStreching) videoElemenet.style.objectFit = "cover"
 
-        Shaka = new shaka.Player(videoElemenet);
+        Shaka = new shaka.Player();
+        Shaka.attach(videoElemenet)
 
         videoRef = videoElemenet
 

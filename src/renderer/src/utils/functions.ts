@@ -1227,7 +1227,7 @@ export async function ExtractVideo(url: string): Promise<playerData[]> {
 
     const audio = response["formats"].filter(f =>
         f.vcodec === "none" && f.acodec && f.acodec !== "none"
-    ).sort((a, b) => (b.tbr ?? 0) - (a.tbr ?? 0));
+    ).sort((a, b) => (b.tbr ?? 0) - (a.tbr ?? 0)).filter((v) => !`${v["acodec"]}`.includes("mp4a"));
 
     const subtitles = Object.entries(response["automatic_captions"]).map(([key, value]: [string, any]) => {
         if (!value) return
@@ -1255,9 +1255,9 @@ export async function ExtractVideo(url: string): Promise<playerData[]> {
         }, {})
     )
 
-    // console.log(storyboards, audio, video, subtitles)
+    console.log(audio)
 
-    return [{
+    const object = {
         embedTitle: response["fulltitle"],
         hostname: response["extractor"],
 
@@ -1275,7 +1275,13 @@ export async function ExtractVideo(url: string): Promise<playerData[]> {
 
         splitHLS: true,
         // storyboardVTT: storyboards[0] ? storyboards[0]["url"] : undefined
-    }]
+    }
+
+    /* IFDEF DEBUG */
+    console.warn("functions/ExtractVideo object", object)
+    /* ENDIF */
+
+    return [object]
 
     /* ENDIF */
 
