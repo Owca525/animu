@@ -1,12 +1,17 @@
 
 function IsURLValid(value: string | undefined | null): boolean {
     if (!value) return false
+    if (isFilePath(value)) return true
     try {
         const url = new URL(value);
         return url.protocol === "http:" || url.protocol === "https:";
     } catch {
         return false;
     }
+}
+
+function isFilePath(path: string): boolean {
+  return /^(?:[a-zA-Z]:\\|\/|\.{1,2}[\\/]).+/.test(path);
 }
 
 class SheepImage extends HTMLElement {
