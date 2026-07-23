@@ -109,7 +109,7 @@ export default class AnimeOnsen implements playerPluginFormat {
             episodesData: [{
                 episodes: Object.entries(response["json"]).map((v) => ({
                     ep: v["0"],
-                    title: v["1"]
+                    title: v["1"]["contentTitle_episode_en"]
                 })),
                 type: "sub"
             }]
