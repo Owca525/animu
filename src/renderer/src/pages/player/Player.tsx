@@ -677,7 +677,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                     resolutions.reverse()
 
                     updatePlayer({
-                        resoltions: resolutions.map((val) => ({ ...player["currentResolution"]!, res: val.toString() })),
+                        resoltions: resolutions.map((val) => ({ ...player["currentResolution"]!, res: `${val == 0 ? 1080 : val}` })),
                         currentResolution: { ...player["currentResolution"]!, res: resolutions[0].toString() }
                     })
 
@@ -713,12 +713,12 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                 updatePlayer({ FatalError: data.fatal })
 
                 if (data.details == "bufferStalledError") tmpHls.startLoad(SheePlayer.currentTime)
-
+                
                 if (data.fatal) {
                     let message: string | undefined
                     switch (data.type) {
                         case Hls.ErrorTypes.NETWORK_ERROR:
-                            if (data.response && (data.response["code"] == 429 || data.response["code"] == 403 || data.response["code"] == 500)) {
+                            if (data.response && [429, 403, 500, 404].includes(data.response["code"] ?? 0)) {
                                 updatePlayer({ FatalError: true })
                             } else {
                                 tmpHls.startLoad(SheePlayer.currentTime);
