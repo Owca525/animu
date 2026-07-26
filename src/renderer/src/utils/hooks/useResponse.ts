@@ -50,7 +50,7 @@ export function useResponse<T, TData>(options: UseResponseOptions<T, TData>) {
             
             setData(data as any)
             setLoading(false)
-            setError(data == undefined)
+            setError(false)
         } catch (error) {
             console.error("useResponse Error", error)
             setError(true)
