@@ -1,5 +1,5 @@
 import { request, SheepFinderAnime2000 } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerChapterList, playerData, playerDataExtended, playerPluginFormat, resolutionFormat, serverStatusData } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerChapterList, playerData, playerDataExtended, playerPluginFormat, playerSubtitlesFormat, resolutionFormat, serverStatusData } from "@renderer/utils/types";
 
 const WEBSITE = "https://animex.one"
 const GRAPHIQL_API = "https://graphql.animex.one/graphql"
@@ -96,6 +96,17 @@ function ExtractChapter(data: any): playerChapterList[] | undefined {
     }
 }
 
+function ExtractTracks(data: any): playerSubtitlesFormat[] | undefined {
+    if (!Array.isArray(data)) return
+
+    return data.map((v) => ({
+        url: v["url"],
+        lang: v["lang"],
+        label: v["label"],
+        format: "vtt",
+    }))
+}
+
 function Converting(s: string, t: string): string {
     const encoder = new TextEncoder();
 
@@ -143,6 +154,7 @@ async function ExtractResolution(data: playerDataExtended): Promise<playerData |
     const sources = response["json"]["sources"]
 
     const chapters = ExtractChapter(response["json"]["chapters"])
+    const subtitles = ExtractTracks(response["json"]["tracks"])
 
     return {
         ...data,
@@ -151,8 +163,10 @@ async function ExtractResolution(data: playerDataExtended): Promise<playerData |
             mimeType: v["type"],
             url: func ? func(v["url"]) : v["url"],
             hls: v["url"].includes(".m3u8"),
-            reqHeader: header
+            reqHeader: header,
+            defaultSubtitles: response["json"]!["tracks"] ? response["json"]!["tracks"].find((v) => v["default"])["default"] : undefined
         }) as resolutionFormat),
+        subtitles: subtitles,
         listChapters: chapters,
         splitHLS: sources[0]["quality"] != "auto"
     }
