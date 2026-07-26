@@ -84,6 +84,8 @@ class ExtractorManagerInstance {
     private active: undefined | string = undefined
 
     request = async (content: { func: (arg: any) => any, args: any, loadingMessage: string, errorMessage: string }): Promise<any> => {
+        this.cancelPrevius()
+
         let id: string = ""
         try {
             const hash = await CreateSHA256(JSON.stringify(content))
@@ -209,7 +211,6 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         IsRunningButtonSkipTime: false,
         IsDisableButtonSkipTimerOpening: false,
         IsDisableButtonSkipTimerEnding: false,
-        currentSkipButton: undefined as undefined | { type: "opening" | "ending", time: number },
 
         isShowingMoreInformation: false,
 
@@ -568,7 +569,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             updatePlayer({ initialize: false })
 
             if (player.playerData)
-                GenerateOpeningEnding(player.playerData["listChapters"], event.currentTarget.duration)
+                updatePlayer({
+                    chapterList: GenerateOpeningEnding(player.playerData["listChapters"], event.currentTarget.duration)
+                })
         })
 
         setPlayerCleanupEvent("error", videoErrorHandler)
@@ -1447,8 +1450,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             chapterSkipDisable: [...ui.chapterSkipDisable, ui.chapterSkipType],
             chapterSkipActive: false,
             chapterSkipTimer: 15,
-            chapterSkipType: undefined
         })
+
+        if (ui.chapterSkipEnd > 0) setTimeVideo(ui.chapterSkipEnd)
     }
 
     function checkUpNext(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {

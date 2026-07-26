@@ -1,5 +1,5 @@
 import { request, SheepFinderAnime2000 } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerDataExtended, playerPluginFormat, resolutionFormat, serverStatusData } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerChapterList, playerData, playerDataExtended, playerPluginFormat, resolutionFormat, serverStatusData } from "@renderer/utils/types";
 
 const WEBSITE = "https://animex.one"
 const GRAPHIQL_API = "https://graphql.animex.one/graphql"
@@ -76,6 +76,26 @@ function yi(s: string, t: string): string {
     return `${i}/uwu/${e}`;
 };
 
+function ExtractChapter(data: any): playerChapterList[] | undefined {
+    if (!Array.isArray(data)) return
+
+    try {
+        return data.map((v) => {
+            const title = v["title"].toLowerCase()
+            
+            return {
+                start: v["start"],
+                end: v["end"],
+                type: title == "intro" ? "opening" : title == "outro" ? "ending" : "other",
+                name: v["title"]
+            }
+        })
+    } catch (error) {
+        console.error("Animex/ExtractChapter Failed Extract Chapters", error)
+        return []
+    }
+}
+
 function Converting(s: string, t: string): string {
     const encoder = new TextEncoder();
 
@@ -122,6 +142,8 @@ async function ExtractResolution(data: playerDataExtended): Promise<playerData |
 
     const sources = response["json"]["sources"]
 
+    const chapters = ExtractChapter(response["json"]["chapters"])
+
     return {
         ...data,
         resolution: sources.map((v) => ({
@@ -131,6 +153,7 @@ async function ExtractResolution(data: playerDataExtended): Promise<playerData |
             hls: v["url"].includes(".m3u8"),
             reqHeader: header
         }) as resolutionFormat),
+        listChapters: chapters,
         splitHLS: sources[0]["quality"] != "auto"
     }
 }
