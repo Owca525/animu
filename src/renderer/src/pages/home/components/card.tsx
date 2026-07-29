@@ -19,6 +19,7 @@ import { animulistData } from "@renderer/utils/stores/global";
 import { addToAnimuList, removeFromAnimulist } from "@renderer/utils/FilesManager/animulist";
 import AnimulistMenu from "@renderer/components/animulistMenu";
 import pluginManager from "@renderer/utils/pluginManager";
+import { informationCache } from "@renderer/pages/information/informationutils";
 
 interface CardProps {
   card: cardData;
@@ -80,11 +81,12 @@ function Card(props: CardProps) {
       toast("This Anime Dosen't Have Anilist ID this may have make weird bugs", { type: "warning" })
     }
 
-    localStorage.setItem("informationCache", JSON.stringify({
+    informationCache.update({
       anime: props.card.AnimeData,
       saveData: props.card.saveData,
       animulist: cardVariables.animulist
-    }))
+    })
+    
     navigate("/info");
   }
 

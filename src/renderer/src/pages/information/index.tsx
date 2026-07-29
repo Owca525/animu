@@ -2,7 +2,7 @@ import Button from '@renderer/components/buttons';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
-import { Anilist_ListMutation, AnimeData, animeOpeningsFormat, animulistProps, cardData, ContextMenuProps, episodeMetadata, indentityPlayer, playerChapterList, playerSubtitlesFormat, resolutionFormat } from '@renderer/utils/types';
+import { Anilist_ListMutation, AnimeData, animulistProps, cardData, episodeMetadata, indentityPlayer, playerData } from '@renderer/utils/types';
 import {
     calculateDays,
     changeTitleAnimu,
@@ -25,8 +25,6 @@ import {
     unixToDateTime,
 } from '@renderer/utils/functions';
 import {
-    createEffect,
-    createSignal,
     For,
     Match,
     onCleanup,
@@ -37,7 +35,7 @@ import {
 import { animulistData, getAnimuHistory, getGlobalCache } from '@renderer/utils/stores/global';
 import { getInformationPlugin, getPlayerPLugin } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
-import { unwrap } from 'solid-js/store';
+import { createStore, unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './information.css';
 import ImageViewer from '@renderer/components/imageViewer';
@@ -53,7 +51,7 @@ import ButtonGroup from '../settings/components/buttonGroup';
 import { requestAnimeMedia } from '@renderer/utils/animeThemes';
 import { updateHistoryData } from '@renderer/utils/FilesManager/history';
 import { addToAnimuList, removeFromAnimulist, updateDataInAnimulist } from '@renderer/utils/FilesManager/animulist';
-import OpeningPlayer from './components/openingPlayer';
+// import OpeningPlayer from './components/openingPlayer';
 import { readPlaylist, removeInPlaylist, saveToPlaylist } from '@renderer/utils/FilesManager/playlist';
 import AnimulistMenu from '@renderer/components/animulistMenu';
 import { updateGenres } from '../home/components/filter';
@@ -63,7 +61,10 @@ import EpisodeBox from './components/episodeBox';
 import { SheepShortcut } from '@renderer/utils/hooks/useKeyPress';
 import pluginManager from '@renderer/utils/pluginManager';
 import Player from '../player/Player';
-// TODO: REWRITE FULL INFORMATION
+import { createMiniTitle, informationCache } from './informationutils';
+
+// TODO: RE-ADD OPENING MUSIC IN INFORMATION
+
 interface informationTmpProps {
     anime: AnimeData,
     saveData?: indentityPlayer,
@@ -71,126 +72,240 @@ interface informationTmpProps {
     DontOverWrite?: boolean
 }
 
+interface informationContentType {
+    type: string;
+    metadata: {
+        anime: AnimeData;
+        playerID: string | undefined;
+        plugin: string | undefined;
+    } | string | AnimeData;
+    error: string;
+}
+
+async function FetchEpisodes(params: { anime: AnimeData, playerID: string | undefined, plugin: string | undefined }) {
+    if (params.anime.format == "MANGA" || params.anime.format == "NOVEL" || params.anime.format == "ONE_SHOT") return
+    if (params.anime.status == "NOT_YET_RELEASED" || params.anime.type != "ANIME") return
+    if (!params.plugin) return
+
+    let plugin = await pluginManager.changePlayerPlugin(params.plugin)
+
+    let response = await plugin.extractEpisodeList(params.anime, params.playerID)
+
+    return sortEpisodes(response)
+}
+
+async function FetchAnimeOpening(anime: AnimeData): Promise<playerData[]> {
+    if (!parseInt(anime.id)) return []
+
+    console.log(anime)
+
+    const response = await requestAnimeMedia(parseInt(anime.id))
+
+    return response.map((item) => {
+        const firstPartTitle = item.type == "OP" ? "Opening" : "Ending"
+        return {
+            // embedTitle: `${firstPartTitle} ${item.musicTitle} ${item.variant ? item.variant : ""}`,
+            hostname: `${firstPartTitle} ${item.musicTitle} ${item.variant ? item.variant : ""}`,
+            resolution: item.videos.map((item) => ({
+                res: item.resolution.toString(),
+                url: item.url,
+                canBeDownloaded: true
+            }))
+        }
+    })
+}
+
 function information() {
+    document.querySelectorAll('*').forEach((element: any) => {
+        element.tabIndex = -1
+    });
+
     const { t } = useI18n()
     const navigate = useNavigate();
     let descriptionRef: HTMLDivElement | undefined
     let animeEpisodeReleasingTime: NodeJS.Timeout | undefined
-    let isAOpeningFetching: boolean = false
-    let isATrailerFetching: boolean = false
 
     const config = getConfig()
 
-    const [tempData, setTmpData] = createSignal<informationTmpProps>(JSON.parse(localStorage.getItem("informationCache") as string) as any)
-    const [currentIDplayer, setCurrentId] = createSignal<string | undefined>(tempData().anime.player_ID);
+    const [information, updateInfo] = createStore({
+        cache: informationCache.anime,
 
-    /* IFDEF DEBUG */
-    (window as any).getInformationData = () => unwrap(tempData())
-    /* ENDIF */
+        activePlayerID: informationCache.anime["anime"]["player_ID"],
+        activePlugin: undefined as string | undefined,
 
-    const [showWrong, setshowWrong] = createSignal<boolean>(false)
-    const [isNeedMore, setNeedMore] = createSignal<boolean>(false)
-    const [showImages, setShowImages] = createSignal<boolean>(false)
-    const [fetchingAnime, setFetchingAnime] = createSignal<boolean>(false)
-    const [moreMiniTitle, setmoreMiniTitle] = createSignal<boolean>(false)
-    const [currentPlugin, setCurrentPlugin] = createSignal<string | undefined>(undefined)
-    const [secondsLeft, setSecondsLeft] = createSignal<undefined | { left: number, converted: { days: number; hours: number; minutes: number; seconds: number; } | undefined }>(undefined);
-    const [contextMenu, setcontextMenu] = createSignal<ContextMenuProps>([])
+        isSearchAnimeIsActive: false,
+        isShowingPictureIsActive: false,
 
-    const [isInWaitingPlaylist, setiswaitingplaylist] = createSignal<boolean>(false)
+        ShowMoreDescription: false,
+        ShowMoreTitles: false,
 
-    const [buttonGroups, setButtonGroups] = createSignal<{ value: string; onClick: () => void; }[]>([])
+        youCanLeave: false,
 
-    // Openings / Endings
-    const [animeMedia, setAnimeMedia] = createSignal<animeOpeningsFormat[]>([])
-    const [currentMedia, setCurrentAnimeMedia] = createSignal<any[] | undefined>(undefined)
-    const [currentAudio, setCurrentAudio] = createSignal<animeOpeningsFormat[] | undefined>(undefined)
+        isInWaitingPlaylist: false,
 
-    // Content Managment
-    const [isContentLoading, setContentLoading] = createSignal<boolean>(true)
-    const [isContentError, setContentError] = createSignal<boolean>(false)
-    const [isContentNoData, setContentNoData] = createSignal<string | undefined>(undefined)
+        activePage: "Episodes",
 
-    const [youCanleave, setYouCanLeave] = createSignal<boolean>(false)
+        activeTime: undefined as { left: number, converted: { days: number; hours: number; minutes: number; seconds: number; } | undefined } | undefined,
 
-    // Content yt-dlp
-    const [contentyt_dlp, setContentYT_DLP] = createSignal<any[]>([])
+        isFetchingAnime: false,
 
-    const [activePage, SetactivePage] = createSignal<string>("Episodes")
+        isShowWrongActive: false,
+        isImageViewerActive: false,
 
-    const episodeResponse = useResponse({
-        queryKey: [tempData()["anime"], currentIDplayer(), currentPlugin()],
+        buttonGroup: [] as { value: string; onClick: () => void; }[],
+    })
+
+    function GenerateButtons(): { value: string; onClick: () => void; }[] {
+        if (information["cache"]["anime"].format == "MUSIC") {
+            return [{
+                value: 'Music',
+                onClick: () => {
+                    updateInfo({ activePage: "Music" })
+                    contentResponse.Refetch({ type: "music", metadata: `${information["cache"]["anime"]["trailer"]!["id"]}`, error: "Music Not Found" })
+                }
+            }]
+        }
+
+        if (information["cache"]["anime"].type != "ANIME" || information["cache"]["anime"].status == "NOT_YET_RELEASED") {
+            return [{
+                value: 'Trailer',
+                onClick: () => {
+                    updateInfo({ activePage: "Trailer" })
+                    contentResponse.Refetch({ type: "trailer", metadata: `${information["cache"]["anime"]["trailer"]!["id"]}`, error: "No Trailer Found" })
+                }
+            }]
+        }
+
+        let tmp = [{
+            value: 'Episodes',
+            onClick: () => {
+                updateInfo({ activePage: "Episodes" })
+                contentResponse.Refetch({
+                    type: "episodes",
+                    metadata: { anime: information["cache"]["anime"], playerID: information["activePlayerID"], plugin: information["activePlugin"] },
+                    error: "global.notFound"
+                })
+            }
+        }, {
+            value: 'Opening/Ending',
+            onClick: () => {
+                updateInfo({ activePage: "Opening/Ending" })
+                contentResponse.Refetch({ type: "opening", metadata: information["cache"]["anime"], error: "Opening Not Found" })
+            }
+        }]
+
+        if (information["cache"]["anime"]["trailer"]) tmp.push({
+            value: 'Trailer',
+            onClick: () => {
+                updateInfo({ activePage: "Trailer" })
+                contentResponse.Refetch({ type: "trailer", metadata: `${information["cache"]["anime"]["trailer"]!["id"]}`, error: "No Trailer Found" })
+            }
+        })
+
+        return tmp
+    }
+
+    const contentResponse = useResponse({
+        queryKey: {
+            type: "episodes",
+            metadata: { anime: information["cache"]["anime"], playerID: information["activePlayerID"], plugin: information["activePlugin"] },
+            error: "global.notFound"
+        } as informationContentType,
+
         queryFn: async (queryKey) => {
-            const [_, player_id, pluginName] = queryKey;
-            if (tempData().anime.format == "MANGA" || tempData().anime.format == "NOVEL" || tempData().anime.format == "ONE_SHOT") return
-            if (tempData().anime.status?.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED" || tempData().anime.type != "ANIME") return
-            // if (tempData().anime.id == "" && !player_id) return setEpisodeResponse(await plugin.extractEpisodeList(tempData().anime, undefined)) deprecated
+            queryKey = unwrap(queryKey)
 
-            let plugin = await pluginManager.changePlayerPlugin(pluginName as string)
+            /* IFDEF DEBUG */
+            console.warn("contentResponse", queryKey)
+            /* ENDIF */
 
-            let response = await plugin.extractEpisodeList(tempData().anime, player_id as string)
+            let content: any = undefined
 
-            return sortEpisodes(response)
+            switch (queryKey["type"]) {
+                case "episodes":
+                    content = await FetchEpisodes(queryKey["metadata"] as any)
+                    break
+                case "opening":
+                    content = await FetchAnimeOpening(queryKey["metadata"] as any)
+                    break
+                case "trailer":
+                    if (config["information"]["trailerplayertype"] == "player") {
+                        content = await ExtractVideo(`https://www.youtube.com/watch?v=${queryKey["metadata"]}` as any)
+                    } else {
+                        content = ""
+                    }
+                    break
+                case "music":
+                    content = await ExtractVideo(`https://www.youtube.com/watch?v=${queryKey["metadata"]}` as any)
+                    break
+            }
+
+            return { content, type: queryKey["type"], error: queryKey["error"] }
         },
         cacheTime: 7200000,
         disable: true,
     })
 
+
+    function updateInformation(content: informationTmpProps) {
+        informationCache.update(content)
+        updateInfo({ cache: informationCache.anime })
+    }
+
+
     function checkIsAnimeReleasing() {
-        if (!tempData().anime.nextAiringEpisode) return
+        if (!information["cache"]["anime"]["nextAiringEpisode"]) return
         if (animeEpisodeReleasingTime) clearInterval(animeEpisodeReleasingTime)
-        setSecondsLeft({
-            left: tempData().anime.nextAiringEpisode!.timeUntilAiring,
-            converted: convertSeconds(tempData().anime.nextAiringEpisode!.timeUntilAiring)
+
+        updateInfo({
+            activeTime: {
+                left: information["cache"]["anime"]["nextAiringEpisode"]["timeUntilAiring"],
+                converted: convertSeconds(information["cache"]["anime"]["nextAiringEpisode"]["timeUntilAiring"])
+            }
         })
 
         animeEpisodeReleasingTime = setInterval(() => {
-            setSecondsLeft(prev => {
-                if (!prev) return undefined
-                if (prev.left <= 1) {
-                    clearInterval(animeEpisodeReleasingTime);
-                    if (tempData().anime.status == "RELEASING") FetchAnimeForinformation()
-                    return { left: 0, converted: convertSeconds(0) };
-                }
-                return { left: prev.left - 1, converted: convertSeconds(prev.left - 1) };
-            });
+            const prev = information["activeTime"]
+
+            if (!prev) return updateInfo({ activeTime: undefined })
+            if (prev.left <= 1) {
+                clearInterval(animeEpisodeReleasingTime);
+
+                if (information["cache"]["anime"]["status"] == "RELEASING") FetchAnimeForinformation()
+
+                updateInfo({ activeTime: { left: 0, converted: convertSeconds(0) } })
+                return
+            }
+
+            updateInfo({ activeTime: { left: prev.left - 1, converted: convertSeconds(prev.left - 1) } })
         }, 1000);
     }
 
-    function generateAnimeForContextMenu() {
-        const config = getConfig()
-
-        setcontextMenu([
-            {
-                option: t("information.copylink"),
-                onClick: async () => await SaveToClipboard("text", `${config.deepLinkURL}/?anime=${btoa(`${tempData().anime.id}`)}`)
-            }
-        ])
-    }
-
     async function checkAnimeFetching() {
-        setTmpData((prev: informationTmpProps) => ({
-            ...prev,
+
+        updateInformation({
+            ...information["cache"],
             anime: {
-                ...prev["anime"],
-                relations: sortRelationType(prev["anime"]["relations"]),
-                characters: sortCharacterType(prev["anime"]["characters"])
+                ...information["cache"]["anime"],
+                relations: sortRelationType(information["cache"]["anime"]["relations"]),
+                characters: sortCharacterType(information["cache"]["anime"]["characters"])
             }
-        }))
+        })
 
-        if (tempData().anime.id == "") return
+        if (information["cache"]["anime"]["id"] == "") return
 
-        if (tempData().anime["nextAiringEpisode"]) return
+        if (information["cache"]["anime"]["nextAiringEpisode"] || !information["cache"]["saveData"]) return
 
-        const lastTime = tempData().saveData?.lastAnimeDataUpdate
+        const lastTime = information["cache"]["saveData"]["lastAnimeDataUpdate"]
 
-        if (tempData().anime.status == "RELEASING" || !lastTime || calculateDays(lastTime, dateToUnix(new Date().toString())) <= -1 || config.information.alwaysUpdateAnime) {
+        if (information["cache"].anime.status == "RELEASING" || !lastTime || calculateDays(lastTime, dateToUnix(new Date().toString())) <= -1 || config.information.alwaysUpdateAnime) {
             await FetchAnimeForinformation()
-            const tmpData = tempData()
+
+            const tmpData = information["cache"]
             const tmpUpdate = {
-                ...tempData(),
+                ...information["cache"],
                 saveData: {
-                    ...tempData().saveData,
+                    ...information["cache"]["saveData"],
                     lastAnimeDataUpdate: dateToUnix(new Date().toString())
                 } as indentityPlayer
             }
@@ -203,86 +318,92 @@ function information() {
                 saveData: tmpUpdate.saveData
             })
 
-            localStorage.setItem("informationCache", JSON.stringify({
-                ...tempData(),
+            updateInformation({
+                ...information["cache"],
                 anime: {
                     ...tmpData.anime,
                     recommendations: undefined
                 },
                 saveData: tmpUpdate.saveData
-            }))
+            })
 
             await refetchHistory()
         }
     }
 
     async function initialInformation() {
-        changeTitleAnimu(`Animu - ${detectTitleConfig(tempData().anime.title)}`)
-        generateAnimeForContextMenu()
+        updateInfo({ buttonGroup: GenerateButtons() })
 
-        if (config.information.openingininformation) searchAnimeOpenings()
+        // if (config.information.openingininformation) searchAnimeOpenings()
 
-        if (tempData().saveData && tempData().anime.status == "RELEASING") FetchAnimeForinformation()
+        changeTitleAnimu(`Animu - ${detectTitleConfig(information["cache"]["anime"]["title"])}`)
+        checkIsAnimeReleasing()
+
+        // && information["cache"]["anime"]["status"] == "RELEASING"
+        if (information["cache"]["saveData"]) FetchAnimeForinformation()
+
+        if (information["cache"]["anime"]["nextAiringEpisode"]) checkIsAnimeReleasing()
+
+        if (descriptionRef && descriptionRef.scrollHeight > descriptionRef.clientHeight) updateInfo({ ShowMoreDescription: true })
+
+        const content = information["cache"]
 
         readPlaylist("global.waitingplaylist").then((v) => {
-            if (v.find((v) => v.anime.AnimeData.id == tempData().anime.id)) setiswaitingplaylist(true)
-            else setiswaitingplaylist(false)
+            if (v.find((v) => v.anime.AnimeData.id == content.anime.id)) updateInfo({ isInWaitingPlaylist: true })
+            else updateInfo({ isInWaitingPlaylist: false })
         })
 
         let plugin = getPlayerPLugin()
-        setCurrentPlugin(plugin.metadata.name)
-
-        if (tempData().anime.nextAiringEpisode) checkIsAnimeReleasing()
-
-        document.querySelectorAll('*').forEach((element: any) => {
-            element.tabIndex = -1
-        });
-
-        if (descriptionRef && descriptionRef.scrollHeight > descriptionRef.clientHeight) setNeedMore(true)
+        updateInfo({
+            activePlugin: plugin.metadata.name
+        })
 
         let tempHistory = getAnimuHistory()
 
         let history: cardData | undefined = undefined
-        if (tempData().anime.id == "") {
-            let tmp = tempHistory.entries().find(([_, item]) => item.AnimeData.title === tempData().anime.title)
+        if (content.anime.id == "") {
+            let tmp = tempHistory.entries().find(([_, item]) => item.AnimeData.title === content.anime.title)
             if (tmp) history = tmp[1]
         } else {
-            history = tempHistory.get(tempData().anime.id)
+            history = tempHistory.get(content.anime.id)
         }
 
-        if (history && !tempData()["DontOverWrite"]) {
+        if (history && !content["DontOverWrite"]) {
             let plugin = await pluginManager.changePlayerPlugin(history.saveData?.pluginName as string)
-            if (plugin) if (plugin.metadata.name != history.saveData?.pluginName) setCurrentId(undefined)
-            setCurrentPlugin(plugin.metadata.name)
+            if (plugin) if (plugin.metadata.name != history.saveData?.pluginName) updateInfo({
+                activePlayerID: undefined
+            })
 
-            setTmpData({ ...tempData(), saveData: { ...history.saveData, pluginName: currentPlugin() as string } as indentityPlayer })
-            localStorage.setItem("informationCache", JSON.stringify({ ...tempData(), saveData: { ...history.saveData, pluginName: currentPlugin() as string } as indentityPlayer }))
+            updateInfo({
+                activePlugin: plugin.metadata.name
+            })
+
+            updateInformation({ ...content, saveData: { ...history.saveData, pluginName: information["activePlayerID"] as string } as indentityPlayer })
         }
 
         if (detectTrailerMusic()) return
 
         checkAnimeFetching()
 
-        episodeResponse.Refetch([tempData()["anime"]["title"]["romaji"], currentIDplayer(), currentPlugin()])
+        contentResponse.Refetch({
+            type: "episodes",
+            metadata: { anime: information["cache"]["anime"], playerID: information["activePlayerID"], plugin: information["activePlugin"] },
+            error: "global.notFound"
+        })
     }
 
     function detectTrailerMusic() {
-        genereteButtonsGroup()
-
-        if (tempData().anime.format == "MUSIC") {
-            buttonGroups().forEach((v) => {
+        if (information["cache"]["anime"]["format"] == "MUSIC") {
+            information.buttonGroup.forEach((v) => {
                 if (v["value"] == "Music") v["onClick"]()
             })
-            if (tempData().anime.trailer == undefined) setContentNoData("No Music Found")
             return true
         }
 
-        if (tempData().anime.type != "ANIME" || tempData().anime.status == "NOT_YET_RELEASED") {
-            buttonGroups().forEach((v) => {
+        if (information["cache"]["anime"]["type"] != "ANIME" || information["cache"]["anime"]["status"] == "NOT_YET_RELEASED") {
+            information.buttonGroup.forEach((v) => {
                 if (v["value"] == "Trailer") v["onClick"]()
             })
-            SetactivePage("Trailer")
-            if (tempData().anime.trailer == undefined) setContentNoData("No Trailer Found")
             return true
         }
 
@@ -290,27 +411,32 @@ function information() {
     }
 
     onMount(() => {
-        setTimeout(() => { setYouCanLeave(true) }, 300)
         initialInformation()
-        if (config["information"]["preloadOpening"]) searchAnimeOpenings(true)
-        if (config["information"]["preloadTrailer"] && config["information"]["trailerplayertype"] == "player")
-            getAnimeTrailer(`https://www.youtube.com/watch?v=${tempData()["anime"]["trailer"]?.id}`)
+        setTimeout(() => { updateInfo({ youCanLeave: true }) }, 300)
+
+        if (config["information"]["preloadOpening"]) FetchAnimeOpening(information["cache"]["anime"])
+
+        // TODO: RE-ADD THIS
+        // if (config["information"]["preloadTrailer"] && config["information"]["trailerplayertype"] == "player")
+        //     getAnimeTrailer(`https://www.youtube.com/watch?v=${information["cache"]["anime"]["trailer"]?.id}`)
     })
 
     onCleanup(() => {
         clearInterval(animeEpisodeReleasingTime)
-        setTmpData(undefined as any)
-        setYouCanLeave(false)
+        updateInfo({ youCanLeave: false })
     })
 
-    function enterPlayer(episodes: episodeMetadata[], type: string, episode: string) {
-        let tmp = tempData()
+    function enterPlayer(episodes: episodeMetadata[], type: string, episode: string): any {
+        if (!information["activePlayerID"]) return toast("No Player ID Found", { type: "error" })
+
+        let tmp = information["cache"]
         let lastTime = 0
+
         if (tmp.saveData && tmp.saveData.episode.toString() === episode.toString()) lastTime = tmp.saveData.last_Time
         localStorage.setItem("playerCache", JSON.stringify({
             data: {
                 ...tmp.anime,
-                player_ID: currentIDplayer() ? currentIDplayer() : episodeResponse.data()?.player_id
+                player_ID: information["activePlayerID"]
             },
             save: {
                 last_Time: lastTime,
@@ -325,33 +451,34 @@ function information() {
     }
 
     async function FetchAnimeForinformation(): Promise<any> {
-        setFetchingAnime(true)
-        const resp = await getInformationPlugin().anime(tempData().anime.id)
-        if (!resp) return setFetchingAnime(false)
-        setFetchingAnime(false)
+        updateInfo({ isFetchingAnime: true })
+
+        const anime = information["cache"]["anime"]
+
+        const resp = await getInformationPlugin().anime(anime["id"])
+        if (!resp) return updateInfo({ isFetchingAnime: false })
+
+        updateInfo({ isFetchingAnime: false })
 
         const tmpnewFetch: AnimeData = {
             ...resp,
-            player_ID: currentIDplayer() ? currentIDplayer() : episodeResponse.data()?.player_id
+            player_ID: information["activePlayerID"],
+            relations: sortRelationType(resp["relations"]),
+            characters: sortCharacterType(resp["characters"])
         }
 
-        setTmpData((prev) => ({ ...prev, anime: tmpnewFetch }))
-        setTmpData((prev: informationTmpProps) => ({
-            ...prev,
-            anime: {
-                ...prev["anime"],
-                relations: sortRelationType(prev["anime"]["relations"]),
-                characters: sortCharacterType(prev["anime"]["characters"])
-            }
-        }))
-        updateHistoryData(tempData().anime.id, { AnimeData: tmpnewFetch, saveData: tempData().saveData })
+        updateInformation({
+            ...informationCache.anime,
+            anime: tmpnewFetch
+        })
+
+        updateHistoryData(anime.id, { AnimeData: tmpnewFetch, saveData: information["cache"]["saveData"] })
         checkIsAnimeReleasing()
     }
 
     async function ChangeAnimeInInformation(data: AnimeData): Promise<any> {
         const idToast = toast(t("notification.fetchinganime"), { timer: true, type: "loading" })
         const animulist = animulistData()
-        let tmpAnimulist
         let resp
 
         if (data.format == "MANGA" || data.format == "NOVEL" || data.format == "ONE_SHOT") {
@@ -363,108 +490,23 @@ function information() {
         if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", timer: false })
         updateToast(idToast, t("notification.successanime"), { type: "success", timer: false })
 
-        tmpAnimulist = animulist.get(resp["id"])
+        let tmpAnimulist: any = animulist.get(resp["id"])
         if (tmpAnimulist) tmpAnimulist = tmpAnimulist["animulist"]
 
-        resetContentVariable()
-        setmoreMiniTitle(false)
-        if (currentPlugin()) await pluginManager.changePlayerPlugin(currentPlugin()!)
+        if (information["activePlugin"]) await pluginManager.changePlayerPlugin(information["activePlugin"]!)
 
-        // Reseting Recomendation
-        setTmpData((prev) => ({ ...prev, anime: { ...prev.anime, recommendations: undefined } }))
+        updateInformation({ anime: resp, saveData: undefined, animulist: tmpAnimulist })
 
-        SetactivePage("Episodes")
-        setAnimeMedia([])
-        setCurrentAnimeMedia(undefined)
+        updateInfo({
+            activePage: "Episodes",
+            ShowMoreTitles: false
+        })
 
-        localStorage.setItem("informationCache", JSON.stringify({ anime: resp, saveData: undefined, animulist: tmpAnimulist }))
-        setTmpData({ anime: resp, saveData: undefined, animulist: tmpAnimulist })
         initialInformation()
     }
 
-    async function searchAnimeOpenings(noContentLoading: boolean = false): Promise<any> {
-        if (animeMedia().length > 0) return
-        if (!noContentLoading) {
-            resetContentVariable()
-            setContentLoading(true)
-        }
-
-        if (isAOpeningFetching && activePage() == "Opening/Ending") {
-            resetContentVariable()
-            setContentLoading(true)
-            return
-        }
-
-        const response = await requestAnimeMedia(parseInt(tempData().anime.id))
-        setAnimeMedia(response)
-        if (response.length <= 0 && !noContentLoading) {
-            isAOpeningFetching = false
-            setContentLoading(false)
-            return setContentNoData("Openings Not Found")
-        }
-
-        setCurrentAudio(response)
-
-        setCurrentAnimeMedia(response.map((item) => {
-            const firstPartTitle = item.type == "OP" ? "Opening" : "Ending"
-            return {
-                // embedTitle: `${firstPartTitle} ${item.musicTitle} ${item.variant ? item.variant : ""}`,
-                hostname: `${firstPartTitle} ${item.musicTitle} ${item.variant ? item.variant : ""}`,
-                resolution: item.videos.map((item) => ({
-                    res: item.resolution.toString(),
-                    url: item.url,
-                    canBeDownloaded: true
-                }))
-            }
-        }))
-
-        if (isAOpeningFetching && activePage() == "Opening/Ending") setContentLoading(false)
-
-        isAOpeningFetching = false
-        if (!noContentLoading) setContentLoading(false)
-    }
-
-    function resetContentVariable() {
-        setContentLoading(true)
-        setContentError(false)
-        setContentNoData(undefined)
-    }
-
-    /* IFDEF DEBUG|PROD */
-    async function getAnimeTrailer(url: string, noContentLoading = false) {
-        if (!url) return
-
-        try {
-            if (config["information"]["trailerplayertype"] == "embed") return
-            if (!noContentLoading) {
-                resetContentVariable()
-            }
-
-            if (isATrailerFetching && activePage() == "Trailer") {
-                resetContentVariable()
-                return
-            }
-
-            setContentYT_DLP(await ExtractVideo(url))
-            isATrailerFetching = false
-            setContentLoading(false)
-        } catch (error) {
-            console.error("Error in getAnimeTrailer", error)
-            if (!noContentLoading) {
-                setContentLoading(false)
-                setContentError(true)
-            }
-
-            if (isATrailerFetching && activePage() == "Trailer") {
-                setContentLoading(false)
-                setContentError(true)
-            }
-        }
-    }
-    /* ENDIF */
-
     function makeButtons(episode: episodeMetadata[], type: string) {
-        let tmpSaveData = tempData()
+        let tmpSaveData = information["cache"]
         return (
             <div class="information-buttons-episode-container">
                 <For each={episode}>
@@ -478,94 +520,32 @@ function information() {
     }
 
     SheepShortcut(["Escape"], () => {
-        if (!location.href.includes("#/info") || !youCanleave()) return
+        if (!location.href.includes("#/info") || !information["youCanLeave"]) return
 
         if (isCustomMenuActive()) return hideCustomMenu()
-        if (showWrong()) setshowWrong(() => false)
-        else if (showImages()) setShowImages(false)
+        if (information["isShowWrongActive"]) updateInfo({ isShowWrongActive: false })
+        else if (information["isShowingPictureIsActive"]) updateInfo({ isShowingPictureIsActive: false })
         else navigate("/")
     })
 
     async function refreashInformation(name: string, force: boolean = false) {
-        setCurrentId(undefined)
-        await pluginManager.changePlayerPlugin(name)
-        setCurrentPlugin(name)
-        episodeResponse.Refetch([tempData()["anime"]["title"]["romaji"], currentIDplayer(), currentPlugin()], force)
-    }
+        if (information["activePage"] == "Episodes") {
+            await pluginManager.changePlayerPlugin(name)
 
-    createEffect(() => {
-        if (activePage() == "Episodes") {
-            setContentLoading(episodeResponse.loading())
-            setContentError(episodeResponse.error())
-            setContentNoData(episodeResponse.data() == undefined ? "global.notFound" : undefined)
-        }
-    })
-
-    function createMiniTitle(): string {
-        let synonyms = tempData().anime.synonyms
-        let titles: string[] = []
-        if (synonyms) synonyms.forEach((value) => titles.push(value))
-
-        const keys = Object.keys(tempData().anime.title)
-        for (let index = 0; index < keys.length; index++) {
-            const element = tempData().anime.title[keys[index]]
-            if (element) titles.push(element)
-        }
-        titles = [...new Set(titles)]
-        return titles.join(" \u25CF ")
-    }
-
-    function genereteButtonsGroup(): any {
-        if (tempData().anime.format == "MUSIC") {
-            return setButtonGroups([{
-                value: 'Music',
-                onClick: () => {
-                    SetactivePage("Music")
-                    if (tempData().anime.trailer == undefined) setContentNoData("No Music Found")
-                }
-            }])
+            updateInfo({
+                activePlayerID: undefined,
+                activePlugin: name
+            })
         }
 
-        if (tempData().anime.type != "ANIME" || tempData().anime.status == "NOT_YET_RELEASED") {
-            return setButtonGroups([{
-                value: 'Trailer',
-                onClick: () => {
-                    SetactivePage("Trailer")
-                    // /* IFDEF DEBUG|PROD */
-                    getAnimeTrailer(`https://www.youtube.com/watch?v=${tempData().anime.trailer?.id}`)
-                    // /* ENDIF */
-                    if (tempData().anime.trailer == undefined) setContentNoData("No Trailer Found")
-                }
-            }])
-        }
-
-
-        let tmp = [{
-            value: 'Episodes',
-            onClick: () => SetactivePage("Episodes")
-        }, {
-            value: 'Opening/Ending',
-            onClick: () => { SetactivePage("Opening/Ending"); searchAnimeOpenings() }
-        }]
-
-        if (tempData().anime.trailer) tmp.push({
-            value: 'Trailer',
-            onClick: () => {
-                SetactivePage("Trailer")
-                // /* IFDEF DEBUG|PROD */
-                getAnimeTrailer(`https://www.youtube.com/watch?v=${tempData().anime.trailer?.id}`)
-                // /* ENDIF */
-            }
-        })
-
-        setButtonGroups(tmp)
+        contentResponse.Refetch(contentResponse.queryData(), force)
     }
 
     async function modifySaveAnimuList(animulist: animulistProps, anime: AnimeData, edit: boolean = false) {
         if (edit) updateDataInAnimulist(anime.id, { AnimeData: anime, animulist }, true)
         else addToAnimuList(animulist, anime, true);
 
-        setTmpData((p) => ({ ...p, animulist: animulist }))
+        updateInformation({ ...information["cache"], animulist: animulist })
 
         if (!getGlobalCache().anilist_user_data) return
 
@@ -585,11 +565,20 @@ function information() {
 
     return (
         <>
-            <main class="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(contextMenu()), event)}>
+            <main class="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions([
+                {
+                    option: t("information.copylink"),
+                    onClick: async () => await SaveToClipboard("text", `${config.deepLinkURL}/?anime=${btoa(`${information["cache"]["anime"]["id"]}`)}`)
+                }
+            ]), event)}>
                 <div class="information-banner">
                     <sheep-img
-                        class={tempData().anime.bannerImage ? "information-banner-image" : "information-banner-image-blur"}
-                        src={tempData().anime.bannerImage ? tempData().anime.bannerImage : tempData().anime.coverImage ? tempData().anime.coverImage : ""}
+                        class={information["cache"]["anime"]["bannerImage"] ? "information-banner-image" : "information-banner-image-blur"}
+                        src={information["cache"]["anime"]["bannerImage"] ?
+                            information["cache"]["anime"]["bannerImage"] :
+                            information["cache"]["anime"]["coverImage"] ?
+                                information["cache"]["anime"]["coverImage"] : ""
+                        }
                         divClass='information-banner-image-placeholder'
                     />
                     <div class="information-fade"></div>
@@ -600,12 +589,12 @@ function information() {
 
                     <div class="information-top">
                         <div class="information-image-container">
-                            {tempData().anime.averageScore && <div class="information-score" style={{ border: `3px solid ${getGradientColor(tempData().anime.averageScore)}` }}>{tempData().anime.averageScore}%</div>}
+                            {information["cache"].anime.averageScore && <div class="information-score" style={{ border: `3px solid ${getGradientColor(information["cache"].anime.averageScore)}` }}>{information["cache"].anime.averageScore}%</div>}
                             <sheep-img
                                 class="information-cover"
                                 divClass='information-cover-placeholder'
-                                onClick={() => setShowImages(true)}
-                                src={tempData().anime.coverImage ? tempData().anime.coverImage : ""}
+                                onClick={() => updateInfo({ isImageViewerActive: true })}
+                                src={information["cache"]["anime"]["coverImage"] ? information["cache"]["anime"]["coverImage"] : ""}
                             />
 
                             {/* <div class="information-title-small-container">
@@ -613,54 +602,64 @@ function information() {
                             </div> */}
                         </div>
                         <div class="information-text-container">
-                            <div class="information-title">{detectTitleConfig(tempData().anime.title)}</div>
-                            <div class={`information-mini-title ${moreMiniTitle() == false ? "click" : ""}`} onclick={() => setmoreMiniTitle(true)}>{createMiniTitle()}</div>
-                            <div class="information-description" ref={descriptionRef}>
-                                {decodeHtmlEntities(tempData().anime.description ?? t("information.descriptionnotfound"))}
+                            <div class="information-title">{detectTitleConfig(information["cache"].anime.title)}</div>
+
+                            <div
+                                class={`information-mini-title ${information["ShowMoreTitles"] == false ? "click" : ""}`}
+                                onclick={() => updateInfo({ ShowMoreTitles: true })}>
+
+                                {createMiniTitle(information["cache"]["anime"])}
                             </div>
-                            <span class={`information-description-toggle ${isNeedMore() ? "show" : ""}`}
+
+                            <div class="information-description" ref={descriptionRef}>
+                                {decodeHtmlEntities(information["cache"].anime.description ?? t("information.descriptionnotfound"))}
+                            </div>
+
+                            <span class={`information-description-toggle ${information["ShowMoreDescription"] ? "show" : ""}`}
                                 onclick={() => descriptionRef?.classList.add("moretext")}
                             >
                                 {t("information.more")}
                             </span>
                         </div>
                         <div class="information-bar">
-                            <Button titleButton={t("information.bar.anilist")} icon="open_in_new" ButtonClass="information-bar-icon" onClick={() => openUrlFolder(`https://anilist.co/anime/${tempData().anime.id}`)} />
-                            {/* <Show when={tempData().anime.trailer && !window.api}>
-                                <Button titleButton={t("information.bar.trailer")} icon="theaters" ButtonClass="information-bar-icon" onClick={() => openUrlFolder(`https://www.youtube.com/watch?v=${tempData().anime.trailer?.id}`)} />
+                            <Button titleButton={t("information.bar.anilist")} icon="open_in_new" ButtonClass="information-bar-icon" onClick={() => openUrlFolder(`https://anilist.co/anime/${information["cache"].anime.id}`)} />
+                            {/* <Show when={information["cache"].anime.trailer && !window.api}>
+                                <Button titleButton={t("information.bar.trailer")} icon="theaters" ButtonClass="information-bar-icon" onClick={() => openUrlFolder(`https://www.youtube.com/watch?v=${information["cache"].anime.trailer?.id}`)} />
                             </Show> */}
-                            <Show when={tempData().anime.type == "ANIME"}>
+                            <Show when={information["cache"].anime.type == "ANIME"}>
                                 <Switch>
-                                    <Match when={tempData().animulist == undefined}>
+                                    <Match when={information["cache"].animulist == undefined}>
                                         <Button titleButton={"Add To Animulist"} icon="add" ButtonClass="information-bar-icon" onClick={() => showCustomMenu(AnimulistMenu({
-                                            anime: tempData().anime,
-                                            animulist: tempData().animulist,
+                                            anime: information["cache"].anime,
+                                            animulist: information["cache"].animulist,
                                             save: (animulist, anime) => { modifySaveAnimuList(animulist, anime) }
                                         }))} />
                                     </Match>
-                                    <Match when={tempData().animulist}>
+                                    <Match when={information["cache"].animulist}>
                                         <Button titleButton={"Edit Anime"} icon="edit" ButtonClass="information-bar-icon" onClick={() => showCustomMenu(AnimulistMenu({
-                                            anime: tempData().anime,
-                                            animulist: tempData().animulist,
+                                            anime: information["cache"].anime,
+                                            animulist: information["cache"].animulist,
                                             save: (animulist, anime) => { modifySaveAnimuList(animulist, anime, true) }
                                         }
                                         ))} />
                                         <Button titleButton={"Remove From Animulist"} icon="delete" ButtonClass="information-bar-icon" onClick={() => {
-                                            removeFromAnimulist(tempData().anime.id, true);
-                                            setTmpData((p) => ({ ...p, animulist: undefined }))
+                                            removeFromAnimulist(information["cache"].anime.id, true);
+                                            updateInformation({ ...information["cache"], animulist: undefined })
                                         }} />
                                     </Match>
                                 </Switch>
-                                <Show when={tempData().anime.nextAiringEpisode && tempData().anime.type == "ANIME"}>
+                                <Show when={information["cache"].anime.nextAiringEpisode && information["cache"].anime.type == "ANIME"}>
+                                    {/* TODO: ADD THIS TO SEPERATE FUNCTIONS */}
                                     <Switch>
-                                        <Match when={!isInWaitingPlaylist()}>
+
+                                        <Match when={!information["isInWaitingPlaylist"]}>
                                             <Button titleButton={"Add To Waiting Playlist"} icon="playlist_add" ButtonClass="information-bar-icon" onClick={async (): Promise<any> => {
-                                                const tmp = tempData()
+                                                const tmp = information["cache"]
                                                 const resp = await saveToPlaylist("global.waitingplaylist", {
                                                     anime: {
                                                         AnimeData: {
                                                             ...tmp.anime,
-                                                            player_ID: episodeResponse.data() ? episodeResponse.data()?.player_id : currentIDplayer()
+                                                            player_ID: information["activePlayerID"]
                                                         },
                                                         saveData: tmp.saveData == undefined ? {
                                                             pluginName: getPlayerPLugin()?.metadata.name!,
@@ -676,18 +675,19 @@ function information() {
                                                 })
                                                 if (!resp) return toast("Failed Add Anime to Waiting Playlist", { type: "error" })
                                                 else {
-                                                    setiswaitingplaylist(true)
+                                                    updateInfo({ isInWaitingPlaylist: true })
                                                     toast("Succesfully added to waiting playlist", { type: "success" })
                                                 }
                                             }} />
                                         </Match>
-                                        <Match when={isInWaitingPlaylist()}>
+
+                                        <Match when={information["isInWaitingPlaylist"]}>
                                             <Button titleButton={"Remove From Waiting Playlist"} icon="playlist_remove" ButtonClass="information-bar-icon" onClick={async (): Promise<any> => {
-                                                const tmp = tempData()
+                                                const tmp = information["cache"]
                                                 const resp = await removeInPlaylist("global.waitingplaylist", tmp.anime.id)
                                                 if (!resp) return toast("Failed Remove Anime to Waiting Playlist", { type: "error" })
                                                 else {
-                                                    setiswaitingplaylist(false)
+                                                    updateInfo({ isInWaitingPlaylist: false })
                                                     toast("Succesfully Removed Anime from waiting playlist", { type: "success" })
                                                 }
                                             }} />
@@ -704,95 +704,95 @@ function information() {
 
                             <div class="information-info">
                                 <Switch>
-                                    <Match when={fetchingAnime() && tempData().anime.status == "RELEASING"}>
+                                    <Match when={information["isFetchingAnime"] && information["cache"].anime.status == "RELEASING"}>
                                         <div class="information-info-content loading">
                                             <span class='material-symbols-outlined loading-animation icon'>progress_activity</span>
                                         </div>
                                     </Match>
-                                    <Match when={tempData().anime.nextAiringEpisode && secondsLeft() != undefined && secondsLeft()!.left > 0 && !fetchingAnime()}>
+                                    <Match when={information["cache"].anime.nextAiringEpisode && information["activeTime"] != undefined && information["activeTime"]!.left > 0 && !information["isFetchingAnime"]}>
                                         <div class="information-info-content">
                                             <div class="information-content-title">
-                                                {t("information.airing")}: {tempData().anime.nextAiringEpisode?.episode}
+                                                {t("information.airing")}: {information["cache"].anime.nextAiringEpisode?.episode}
                                             </div>
-                                            {`${secondsLeft()?.converted?.days}d ${secondsLeft()?.converted?.hours}h ${secondsLeft()?.converted?.minutes}m ${secondsLeft()?.converted?.seconds}s`}
+                                            {`${information["activeTime"]?.converted?.days}d ${information["activeTime"]?.converted?.hours}h ${information["activeTime"]?.converted?.minutes}m ${information["activeTime"]?.converted?.seconds}s`}
                                         </div>
                                     </Match>
                                 </Switch>
 
-                                <Show when={tempData().anime.format}>
+                                <Show when={information["cache"].anime.format}>
                                     <div class="information-info-content">
                                         <div class="information-content-title">{t("information.format")}</div>
-                                        {t(`anime_formats.${tempData().anime.format}`)}
+                                        {t(`anime_formats.${information["cache"].anime.format}`)}
                                     </div>
                                 </Show>
 
-                                <Show when={tempData().anime.episodes}>
+                                <Show when={information["cache"].anime.episodes}>
                                     <div class="information-info-content">
                                         <div class="information-content-title">{t("information.episodes")}</div>
-                                        {tempData().anime.episodes}
+                                        {information["cache"].anime.episodes}
                                     </div>
                                 </Show>
 
-                                <Show when={tempData().anime.duration}>
+                                <Show when={information["cache"].anime.duration}>
                                     <div class="information-info-content">
                                         <div class="information-content-title">{t("information.duration")}</div>
-                                        {tempData().anime.duration} {t("global.minutes")}
+                                        {information["cache"].anime.duration} {t("global.minutes")}
                                     </div>
                                 </Show>
 
-                                <Show when={tempData().anime.status}>
+                                <Show when={information["cache"].anime.status}>
                                     <div class="information-info-content">
                                         <div class="information-content-title">{t("information.status")}</div>
-                                        {t(`anime_statuses.${tempData().anime.status}`)}
+                                        {t(`anime_statuses.${information["cache"].anime.status}`)}
                                     </div>
                                 </Show>
 
-                                <Show when={tempData().anime.startDate &&
-                                    tempData().anime.startDate?.year != undefined &&
-                                    tempData().anime.startDate?.day != undefined &&
-                                    tempData().anime.startDate?.month != undefined}>
+                                <Show when={information["cache"].anime.startDate &&
+                                    information["cache"].anime.startDate?.year != undefined &&
+                                    information["cache"].anime.startDate?.day != undefined &&
+                                    information["cache"].anime.startDate?.month != undefined}>
                                     <div class="information-info-content">
                                         <div class="information-content-title">{t("information.startdate")}</div>
-                                        {convertDateToFormattedString(tempData().anime.startDate?.year, tempData().anime.startDate?.month, tempData().anime.startDate?.day, undefined, undefined)}
+                                        {convertDateToFormattedString(information["cache"].anime.startDate?.year, information["cache"].anime.startDate?.month, information["cache"].anime.startDate?.day, undefined, undefined)}
                                     </div>
                                 </Show>
 
-                                <Show when={tempData().anime.endDate &&
-                                    tempData().anime.endDate?.year != undefined &&
-                                    tempData().anime.endDate?.day != undefined &&
-                                    tempData().anime.endDate?.month != undefined}>
+                                <Show when={information["cache"].anime.endDate &&
+                                    information["cache"].anime.endDate?.year != undefined &&
+                                    information["cache"].anime.endDate?.day != undefined &&
+                                    information["cache"].anime.endDate?.month != undefined}>
                                     <div class="information-info-content">
                                         <div class="information-content-title">{t("information.endate")}</div>
-                                        {convertDateToFormattedString(tempData().anime.endDate?.year, tempData().anime.endDate?.month, tempData().anime.endDate?.day, undefined, undefined)}
+                                        {convertDateToFormattedString(information["cache"].anime.endDate?.year, information["cache"].anime.endDate?.month, information["cache"].anime.endDate?.day, undefined, undefined)}
                                     </div>
                                 </Show>
 
-                                <Show when={tempData().anime.season && tempData().anime.seasonYear}>
+                                <Show when={information["cache"].anime.season && information["cache"].anime.seasonYear}>
                                     <div class="information-info-content">
                                         <div class="information-content-title">{t("information.season")}</div>
-                                        {t(`anime_seasons.${tempData().anime.season}`)} {tempData().anime.seasonYear}
+                                        {t(`anime_seasons.${information["cache"].anime.season}`)} {information["cache"].anime.seasonYear}
                                     </div>
                                 </Show>
 
-                                <Show when={tempData().anime.source}>
+                                <Show when={information["cache"].anime.source}>
                                     <div class="information-info-content">
                                         <div class="information-content-title">{t("information.source")}</div>
-                                        {t(`anime_source.${tempData().anime.source}`)}
+                                        {t(`anime_source.${information["cache"].anime.source}`)}
                                     </div>
                                 </Show>
 
                             </div>
 
-                            <Show when={tempData().anime.genres}>
+                            <Show when={information["cache"].anime.genres}>
                                 <div class="information-genres-container">
                                     <span class='information-genre-title'>Genres</span>
                                     <div class="information-genres-container-container">
-                                        <For each={tempData().anime.genres}>
+                                        <For each={information["cache"].anime.genres}>
                                             {(item) => (
                                                 <span onclick={() => {
                                                     if (isCustomMenuActive()) hideCustomMenu()
-                                                    if (showWrong()) setshowWrong(() => false)
-                                                    if (showImages()) setShowImages(false)
+                                                    // if (showWrong()) setshowWrong(() => false)
+                                                    // if (showImages()) setShowImages(false)
 
                                                     updateGenres("genres", item, `anime_genres.${item}`);
                                                     const cache = getHomeCache()
@@ -811,22 +811,22 @@ function information() {
 
                         <div class="information-bottom-content">
 
-                            <Show when={tempData().animulist}>
+                            <Show when={information["cache"].animulist}>
                                 <div class='information-animulist-container'>
                                     <span class='information-animulist-data'>
-                                        Status {t(`animulist.status.${tempData().animulist?.status}`)}
+                                        Status {t(`animulist.status.${information["cache"].animulist?.status}`)}
                                     </span>&#8226;
                                     <span class='information-animulist-data'>
-                                        Added {unixToDateTime(tempData().animulist?.added).split(" ")[0]}
+                                        Added {unixToDateTime(information["cache"].animulist?.added).split(" ")[0]}
                                     </span>&#8226;
                                     <span class='information-animulist-data'>
-                                        Started Watching {unixToDateTime(tempData().animulist?.startWatch).split(" ")[0]}
+                                        Started Watching {unixToDateTime(information["cache"].animulist?.startWatch).split(" ")[0]}
                                     </span>&#8226;
                                     <span class='information-animulist-data'>
-                                        Ended Watch {unixToDateTime(tempData().animulist?.endWatch).split(" ")[0]}
+                                        Ended Watch {unixToDateTime(information["cache"].animulist?.endWatch).split(" ")[0]}
                                     </span>&#8226;
                                     <span class='information-animulist-data'>
-                                        Repeat Watch {tempData().animulist?.reapeat}
+                                        Repeat Watch {information["cache"].animulist?.reapeat}
                                     </span>
                                 </div>
                             </Show>
@@ -834,93 +834,106 @@ function information() {
                             <div class="information-episodes">
                                 <div class="information-episodes-top-content">
                                     <div class="information-eopsodes-top-left">
-                                        <Show when={tempData().anime.type == "ANIME" && tempData().anime.status != "NOT_YET_RELEASED" && tempData().anime.format != "MUSIC"}>
-                                            <Button ButtonClass="information-episodes-button" icon="search" onClick={() => setshowWrong(() => true)} />
+                                        <Show when={information["cache"].anime.type == "ANIME" && information["cache"].anime.status != "NOT_YET_RELEASED" && information["cache"].anime.format != "MUSIC"}>
+                                            <Button ButtonClass="information-episodes-button" icon="search" onClick={() => updateInfo({ isShowWrongActive: true })} />
                                         </Show>
-                                        <ButtonGroup selectedValue={activePage()} listValues={buttonGroups()} />
+                                        <ButtonGroup selectedValue={information["activePage"]} listValues={information["buttonGroup"]} />
                                     </div>
                                     <div class="information-episodes-space">
-                                        <Show when={tempData().anime.type == "ANIME" && tempData().anime.status != "NOT_YET_RELEASED" && tempData().anime.format != "MUSIC"}>
+                                        <Show when={information["cache"].anime.type == "ANIME" && information["cache"].anime.status != "NOT_YET_RELEASED" && information["cache"].anime.format != "MUSIC"}>
                                             <Dropdown
                                                 options={segregatePlugins(refreashInformation)}
                                                 disableX
-                                                buttonText={currentPlugin()}
+                                                buttonText={information["activePlugin"]}
                                             />
                                             <Button ButtonClass="information-episodes-button" icon="refresh" onClick={() => refreashInformation(getPlayerPLugin()?.metadata.name as string, true)} />
                                         </Show>
                                     </div>
                                 </div>
-                                <Show when={!showWrong()}>
-                                    <Switch>
-                                        <Match when={isContentLoading()}>
-                                            <div class="information-loading-container"><span class="material-symbols-outlined information-loading">progress_activity</span></div>
-                                        </Match>
-                                        <Match when={isContentError()}>
-                                            <div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>
-                                        </Match>
-                                        <Match when={isContentNoData()}>
-                                            <div class="information-loading-container"><span class="information-error material-symbols-outlined">search_off</span>{t(isContentNoData()!)}</div>
-                                        </Match>
-                                        <Match when={activePage() == "Trailer" || activePage() == "Music"}>
-                                            <Switch>
-                                                <Match when={contentyt_dlp().length > 0}>
-                                                    <Player
-                                                        type='embed'
-                                                        playerTitle=""
-                                                        metadata={contentyt_dlp()!}
-                                                    />
-                                                </Match>
-                                                <Match when={contentyt_dlp()}>
-                                                    <iframe
-                                                        height="610px"
-                                                        class='information-iframe'
-                                                        src={`https://www.youtube.com/embed/${tempData().anime.trailer?.id}`}
-                                                        frameborder="0"
-                                                        referrerpolicy='strict-origin-when-cross-origin'
-                                                        allowfullscreen
-                                                    ></iframe>
-                                                </Match>
-                                            </Switch>
-                                        </Match>
-                                        <Match when={activePage() == "Opening/Ending"}>
-                                            <Show when={currentMedia()}>
+
+                                <Switch>
+
+                                    <Match when={!contentResponse.error() && contentResponse.loading()}>
+                                        <div class="information-loading-container">
+                                            <span class="material-symbols-outlined information-loading">progress_activity</span>
+                                        </div>
+                                    </Match>
+
+                                    <Match when={contentResponse.error() && !contentResponse.loading()}>
+                                        <div class="information-loading-container">
+                                            <span class="information-error material-symbols-outlined">error</span>
+                                            {t(contentResponse.data() ? contentResponse.data()!["error"] : "global.notFound")}
+                                        </div>
+                                    </Match>
+
+                                    <Match when={!contentResponse.error() && !contentResponse.loading() && contentResponse.data() && (contentResponse.data()!["content"] == undefined || contentResponse.data()!["content"].length <= 0)}>
+                                        <div class="information-loading-container">
+                                            <span class="information-error material-symbols-outlined">search_off</span>
+                                            {t(contentResponse.data() ? contentResponse.data()!["error"] : "global.notFound")}
+                                        </div>
+                                    </Match>
+
+                                    <Match when={contentResponse.data() && (contentResponse.data()!["type"] == "trailer" || contentResponse.data()!["type"] == "music")}>
+                                        <Switch>
+                                            <Match when={config["information"]["trailerplayertype"] == "player"}>
                                                 <Player
                                                     type='embed'
                                                     playerTitle=""
-                                                    metadata={currentMedia()!}
+                                                    metadata={contentResponse.data()!["content"] as any}
                                                 />
-                                            </Show>
-                                        </Match>
-                                        <Match when={episodeResponse.data() && activePage() == "Episodes"}>
-                                            <For each={episodeResponse.data()?.episodesData} fallback={<div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}>
-                                                {(episode) => {
-                                                    if (episode.episodes.length <= 0) return <></>
-                                                    return <Drop
-                                                        LeftHeader={<>
-                                                            {episode.name ? t(episode.name) : t(`information.types.${episode.type}`)}
-                                                            <Show when={episodeResponse.data()!["langugeAvaible"]}>
-                                                                <span class='information-avaible-langs-container'>
-                                                                    <For each={episodeResponse.data()!["langugeAvaible"]}>
-                                                                        {(v) => (
-                                                                            <span class='information-avaible-lang'>{v}</span>
-                                                                        )}
-                                                                    </For>
-                                                                </span>
-                                                            </Show>
-                                                        </>}
-                                                        RightHeader={t("information.listEpisodes", { number: episode.episodes.length })}
-                                                        content={makeButtons(episode.episodes, episode.type)}
-                                                    />
-                                                }}
-                                            </For>
-                                        </Match>
-                                    </Switch>
-                                </Show>
+                                            </Match>
+                                            <Match when={config["information"]["trailerplayertype"] == "embed"}>
+                                                <iframe
+                                                    height="610px"
+                                                    class='information-iframe'
+                                                    src={`https://www.youtube.com/embed/${information.cache.anime["trailer"] ? information.cache.anime["trailer"]["id"] : ""}`}
+                                                    frameborder="0"
+                                                    referrerpolicy='strict-origin-when-cross-origin'
+                                                    allowfullscreen
+                                                ></iframe>
+                                            </Match>
+                                        </Switch>
+                                    </Match>
+
+                                    <Match when={contentResponse.data() && contentResponse.data()!["type"] == "opening"}>
+                                        <Player
+                                            type='embed'
+                                            playerTitle=""
+                                            metadata={contentResponse.data()!["content"]}
+                                        />
+                                    </Match>
+
+                                    <Match when={contentResponse.data() && contentResponse.data()!["type"] == "episodes"}>
+                                        <For each={contentResponse.data()!["content"].episodesData} fallback={<div class="information-loading-container"><span class="information-error material-symbols-outlined">error</span>{t("information.errors")}</div>}>
+                                            {(episode) => {
+                                                if (episode.episodes.length <= 0) return <></>
+                                                return <Drop
+                                                    LeftHeader={<>
+                                                        {episode.name ? t(episode.name) : t(`information.types.${episode.type}`)}
+                                                        <Show when={contentResponse.data()!["langugeAvaible"]}>
+                                                            <span class='information-avaible-langs-container'>
+                                                                <For each={contentResponse.data()!["langugeAvaible"]}>
+                                                                    {(v) => (
+                                                                        <span class='information-avaible-lang'>{v}</span>
+                                                                    )}
+                                                                </For>
+                                                            </span>
+                                                        </Show>
+                                                    </>}
+                                                    RightHeader={t("information.listEpisodes", { number: episode.episodes.length })}
+                                                    content={makeButtons(episode.episodes, episode.type)}
+                                                />
+                                            }}
+                                        </For>
+                                    </Match>
+
+                                </Switch>
+
                             </div>
 
-                            <Show when={tempData().anime.relations && tempData().anime.relations!.length > 0}>
+                            <Show when={information["cache"].anime.relations && information["cache"].anime.relations!.length > 0}>
                                 <div class="information-relation-container">
-                                    <For each={tempData().anime.relations}>
+                                    <For each={information["cache"].anime.relations}>
                                         {(rel) => <RelationCard
                                             id={rel.id}
                                             relationType={rel.relationType}
@@ -938,8 +951,8 @@ function information() {
                                     </For>
                                 </div>
                             </Show>
-                            <Show when={tempData().anime.characters && tempData().anime.characters!.length > 0}>
-                                <CharacterContainer title={t("information.characters")} cards={tempData().anime.characters!.map((char) => ({
+                            <Show when={information["cache"].anime.characters && information["cache"].anime.characters!.length > 0}>
+                                <CharacterContainer title={t("information.characters")} cards={information["cache"].anime.characters!.map((char) => ({
                                     id: char.character.id,
                                     image: char.character.image,
                                     name: char.character.name,
@@ -948,8 +961,8 @@ function information() {
                                 }))} />
                             </Show>
 
-                            <Show when={tempData().anime.characters && tempData().anime.characters!.map((tmp) => tmp.voiceActor).filter((item) => item != undefined).length > 0}>
-                                <CharacterContainer title={t("information.actors")} cards={tempData().anime.characters!.map((char) => ({
+                            <Show when={information["cache"].anime.characters && information["cache"].anime.characters!.map((tmp) => tmp.voiceActor).filter((item) => item != undefined).length > 0}>
+                                <CharacterContainer title={t("information.actors")} cards={information["cache"].anime.characters!.map((char) => ({
                                     id: char.voiceActor?.id as string,
                                     image: char.voiceActor?.image as string,
                                     name: char.voiceActor?.name as string,
@@ -959,13 +972,13 @@ function information() {
                             </Show>
 
                             <Switch>
-                                <Match when={fetchingAnime()}>
+                                <Match when={information["isFetchingAnime"]}>
                                     <div class="information-recomendation-loading">
                                         <span class='material-symbols-outlined loading-animation icon'>progress_activity</span>
                                     </div>
                                 </Match>
-                                <Match when={tempData().anime.recommendations && tempData().anime.recommendations!.length > 0 && !fetchingAnime() && tempData().anime.type == "ANIME"}>
-                                    <Container title="information.recomendation" horizontal data={tempData().anime.recommendations!.map((item) => ({
+                                <Match when={information["cache"].anime.recommendations && information["cache"].anime.recommendations!.length > 0 && !information["isFetchingAnime"] && information["cache"].anime.type == "ANIME"}>
+                                    <Container title="information.recomendation" horizontal data={information["cache"].anime.recommendations!.map((item) => ({
                                         AnimeData: {
                                             title: item.title,
                                             bannerImage: item.bannerImage,
@@ -984,20 +997,23 @@ function information() {
 
                 <Button icon="arrow_back" ButtonClass="information-exit-button" onClick={() => navigate("/")} />
             </main>
-            <Show when={showWrong()}>
-                <ContainerWrong name={detectTitleConfig(tempData().anime.title)} refetchfunc={(id?: string) => {
-                    setshowWrong(false);
-                    setCurrentId(id);
-                    episodeResponse.Refetch([tempData()["anime"]["title"]["romaji"], id, currentPlugin()])
+            <Show when={information["isShowWrongActive"]}>
+                <ContainerWrong name={detectTitleConfig(information["cache"].anime.title)} refetchfunc={(id?: string) => {
+                    updateInfo({ isShowWrongActive: false, activePlayerID: id })
+                    contentResponse.Refetch({
+                        type: "episodes",
+                        metadata: { anime: information["cache"]["anime"], playerID: id, plugin: information["activePlugin"] },
+                        error: "global.notFound"
+                    }, true)
                 }}
-                    exitfunc={() => setshowWrong(() => false)}
+                    exitfunc={() => updateInfo({ isShowWrongActive: false })}
                 />
             </Show>
 
-            <Show when={showImages()}>
+            <Show when={information["isImageViewerActive"]}>
                 <ImageViewer
-                    files={[tempData().anime.coverImage as string, tempData().anime.bannerImage as string].filter((value) => value != null)}
-                    disable={() => setShowImages(false)}
+                    files={[information["cache"].anime.coverImage as string, information["cache"].anime.bannerImage as string].filter((value) => value != null)}
+                    disable={() => updateInfo({ isImageViewerActive: false })}
                 />
             </Show>
 

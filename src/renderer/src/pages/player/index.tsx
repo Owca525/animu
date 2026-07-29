@@ -18,6 +18,7 @@ import { createStore, unwrap } from "solid-js/store";
 import { SheepShortcut } from "@renderer/utils/hooks/useKeyPress";
 import pluginManager from "@renderer/utils/pluginManager";
 import Player from "./Player";
+import { informationCache } from "../information/informationutils";
 
 const player = () => {
     const { t } = useI18n()
@@ -239,7 +240,7 @@ const player = () => {
         if (anime_data.continewatch) return navigate("/")
         if (config.Player.general.PlayerBehavior === "home") navigate("/")
         else {
-            localStorage.setItem("informationCache", JSON.stringify({ anime: anime_data.data, saveData: anime_data.save, animulist: anime_data.animulist, DontOverWrite: true }))
+            informationCache.update({ anime: anime_data.data, saveData: anime_data.save, animulist: anime_data.animulist, DontOverWrite: true })
             navigate("/info")
         }
     }

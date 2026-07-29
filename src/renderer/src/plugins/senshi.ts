@@ -34,14 +34,14 @@ function converterToCardData(data: { [key: string]: string | number }): cardData
             },
             id: "",
             player_ID: `${data["id"]}`,
-            format: data["type"].toString().toUpperCase(),
-            source: data["ani_source"].toString().toUpperCase(),
-            episodes: parseInt(data["ani_episodes"].toString()),
+            format: `${data["type"]}`.toUpperCase(),
+            source: `${data["ani_source"]}`.toUpperCase(),
+            episodes: parseInt(`${data["ani_episodes"]}`),
             seasonYear: data["ani_year"] as number,
-            season: data["ani_season"].toString().toUpperCase(),
+            season: `${data["ani_season"]}`.toUpperCase(),
             type: "ANIME",
             trailer: {
-                id: data["trailer"].toString().replaceAll("https://www.youtube.com/watch?v=", ""),
+                id: `${data["trailer"]}`.replaceAll("https://www.youtube.com/watch?v=", ""),
                 site: "youtube"
             },
             coverImage: `${WEBSITE}${data["anime_picture"]}`

@@ -1214,6 +1214,8 @@ export function CheckNumber(number: string | number) {
 export async function ExtractVideo(url: string): Promise<playerData[]> {
     /* IFDEF DEBUG|PROD */
 
+    if (typeof url == "object") return []
+
     const response = await window.api.yt_dlp.run([url])
 
     /* IFDEF DEBUG */

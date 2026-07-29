@@ -1,9 +1,9 @@
-import { createSignal, onCleanup, Accessor, onMount } from "solid-js";
+import { createSignal, onCleanup, onMount } from "solid-js";
 import { GenerateSha256 } from "../functions";
 
 type UseResponseOptions<T, TData> = {
-    queryKey: T[];
-    queryFn: (Key: T[]) => Promise<TData>;
+    queryKey: T;
+    queryFn: (Key: T) => Promise<TData>;
     cacheTime?: number
     removeOnClenup?: boolean
     disable?: boolean
@@ -18,13 +18,15 @@ export function useResponse<T, TData>(options: UseResponseOptions<T, TData>) {
     const [forceRefetch, setForceRefetch] = createSignal<boolean>(false);
     const [Initial, setInitial] = createSignal<boolean>(true);
 
+    const [token, setToken] = createSignal<string>("")
+
     const { queryKey: rawKey, queryFn, cacheTime, removeOnClenup, disable } = options;
 
     const [dissable, setDissable] = createSignal<boolean>(disable ? true : false);
-    const [queryData, setQueryData] = createSignal<T[]>(rawKey);
-    function getQueryKey() {
-        return queryData().map((value) => typeof value === "function" ? (value as Accessor<T>)() : value)
-    };
+    const [queryData, setQueryData] = createSignal<T>(rawKey);
+    // function getQueryKey() {
+    //     return queryData().map((value) => typeof value === "function" ? (value as Accessor<T>)() : value)
+    // };
 
     let cacheTimeOut: NodeJS.Timeout | undefined
 
@@ -34,9 +36,13 @@ export function useResponse<T, TData>(options: UseResponseOptions<T, TData>) {
         setError(false)
         setInitial(false)
 
+        const tmpToken = crypto.randomUUID()
+
+        setToken(tmpToken)
+
         try {
             if (dissable()) return undefined
-            const queryKey = getQueryKey()
+            const queryKey = queryData()
             const sha256 = await GenerateSha256(JSON.stringify(queryKey))
             if (!forceRefetch() && cache.has(sha256)) {
                 setLoading(false)
@@ -47,12 +53,16 @@ export function useResponse<T, TData>(options: UseResponseOptions<T, TData>) {
 
             let data = await queryFn(queryKey)
             if (cacheTime) makeCache(data, sha256)
+
+            if (tmpToken != token()) return
             
             setData(data as any)
             setLoading(false)
             setError(false)
         } catch (error) {
             console.error("useResponse Error", error)
+
+            if (tmpToken != token()) return
             setError(true)
             setLoading(false)
             setData(undefined)
@@ -67,9 +77,9 @@ export function useResponse<T, TData>(options: UseResponseOptions<T, TData>) {
         }, cacheTime);
     }
 
-    function Refetch(queryKey?: T[], force?: boolean) {
+    function Refetch(queryKey?: T, force?: boolean) {
         setDissable(false)
-        if (queryKey) setQueryData(queryKey)
+        if (queryKey) setQueryData(queryKey as any)
         if (force) setForceRefetch(force)
         fetchData()
     }
@@ -83,6 +93,6 @@ export function useResponse<T, TData>(options: UseResponseOptions<T, TData>) {
         if (removeOnClenup && cacheTimeOut) clearTimeout(cacheTimeOut)
     })
 
-    return { data, loading, error, Refetch, Initial };
+    return { data, loading, error, Refetch, Initial, queryData };
 }
 
