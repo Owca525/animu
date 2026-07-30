@@ -47,6 +47,8 @@ export async function requestAnimeMedia(anilistID: number): Promise<animeOpening
   /* ENDIF */
 
   if (!response.success || !response.json) return []
+  if (response.json["data"]["findAnimeByExternalSite"].length <= 0) return []
+
   const themes = response.json["data"]["findAnimeByExternalSite"][0]["animethemes"]
   let list: animeOpeningsFormat[] = []
   for (let index = 0; index < themes.length; index++) {
