@@ -47,7 +47,7 @@ export function createMiniTitle(anime: AnimeData): string {
 
     if (synonyms) synonyms.forEach((value) => titles.push(value))
 
-    const keys = Object.keys(anime.title)
+    const keys = Object.values(anime.title)
     keys.forEach((element) => {
         if (element) titles.push(element)
     })
