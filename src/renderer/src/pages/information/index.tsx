@@ -224,6 +224,7 @@ function information() {
             switch (queryKey["type"]) {
                 case "episodes":
                     content = await FetchEpisodes(queryKey["metadata"] as any)
+                    if (content) updateInfo({ activePlayerID: content["player_id"] })
                     break
                 case "opening":
                     content = await FetchAnimeOpening(queryKey["metadata"] as any)
