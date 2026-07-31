@@ -1,7 +1,7 @@
 import Button from "@renderer/components/buttons"
 import VolumeNotification from "@renderer/pages/player/components/VolumeNotification"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
-import { CheckNumber, convertKeybinds, CreateContextMenuOptions, createElement, CreateSHA256, dateToUnix, detectTitleConfig, formatTime, openUrlFolder, refetchHistory, request, toggleFullscreen } from "@renderer/utils/functions"
+import { CheckNumber, convertKeybinds, createElement, CreateSHA256, dateToUnix, detectTitleConfig, formatTime, openUrlFolder, refetchHistory, request, toggleFullscreen } from "@renderer/utils/functions"
 import { getConfig } from "@renderer/utils/stores/config"
 import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, Thumbnail } from "@renderer/utils/types"
 import Hls, { HlsConfig } from "hls.js"
@@ -1586,7 +1586,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             ref={containerRef}
             onMouseMove={ActiveShowingUI}
             style={type == "embed" ? { height: player.initialize ? "600px" : "auto" } : {}}
-            onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions(undefined, ui.playerContextMenu), event)}
+            onContextMenu={(event) => OpenContextMenu(event, { center: ui.playerContextMenu })}
         >
 
             <div ref={screenshotWrapper} class={ui.isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} >

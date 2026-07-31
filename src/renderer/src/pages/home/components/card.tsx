@@ -5,7 +5,6 @@ import { JSX, Show } from "solid-js";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import {
   convertSeconds,
-  CreateContextMenuOptions,
   detectTitleConfig,
   getGradientColor,
   SaveToClipboard,
@@ -116,15 +115,15 @@ function Card(props: CardProps) {
     }
   ];
 
-  if (props.card.AnimeData.coverImage) {
-    CenterContextMenu.push({
-      option: t("contextMenu.copycover"),
-      onClick: () =>
-        props.card.AnimeData.coverImage
-          ? SaveToClipboard("image", props.card.AnimeData.coverImage)
-          : "",
-    })
-  }
+  // if (props.card.AnimeData.coverImage) {
+  //   CenterContextMenu.push({
+  //     option: t("contextMenu.copycover"),
+  //     onClick: () =>
+  //       props.card.AnimeData.coverImage
+  //         ? SaveToClipboard("image", props.card.AnimeData.coverImage)
+  //         : "",
+  //   })
+  // }
 
   if (cardVariables.animulist && !props.disableinformation) {
     CenterContextMenu.push({
@@ -262,13 +261,7 @@ function Card(props: CardProps) {
       onMouseOver={checkOutOfBound}
       title={title}
       onContextMenu={(event) =>
-        OpenContextMenu(
-          CreateContextMenuOptions(
-            [{ option: t("dialog.open"), onClick: sendToInformation }],
-            CenterContextMenu
-          ),
-          event
-        )
+        OpenContextMenu(event, { start: [{ option: t("dialog.open"), onClick: sendToInformation }], center: CenterContextMenu })
       }
     >
       <Show when={informationBox.length > 0}>

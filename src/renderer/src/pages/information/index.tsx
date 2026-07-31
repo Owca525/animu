@@ -9,7 +9,6 @@ import {
     convertDateToDateObject,
     convertDateToFormattedString,
     convertSeconds,
-    CreateContextMenuOptions,
     dateToUnix,
     decodeHtmlEntities,
     detectTitleConfig,
@@ -592,12 +591,14 @@ function information() {
 
     return (
         <>
-            <main class="information" onContextMenu={(event) => OpenContextMenu(CreateContextMenuOptions([
-                {
-                    option: t("information.copylink"),
-                    onClick: async () => await SaveToClipboard("text", `${config.deepLinkURL}/?anime=${btoa(`${information["cache"]["anime"]["id"]}`)}`)
-                }
-            ]), event)}>
+            <main class="information" onContextMenu={(event) => OpenContextMenu(event, {
+                center: [
+                    {
+                        option: t("information.copylink"),
+                        onClick: async () => await SaveToClipboard("text", `${config.deepLinkURL}/?anime=${btoa(`${information["cache"]["anime"]["id"]}`)}`)
+                    }
+                ]
+            })}>
                 <div class="information-banner">
                     <sheep-img
                         class={information["cache"]["anime"]["bannerImage"] ? "information-banner-image" : "information-banner-image-blur"}

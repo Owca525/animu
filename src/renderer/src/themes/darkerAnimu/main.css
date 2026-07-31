@@ -1170,10 +1170,16 @@ th {
 .contextmenu-container {
   background-color: var(--third-layer);
   border-radius: 4px;
+  outline: 3px solid var(--five-layer);
+  user-select: none;
 }
 
 .contextmenu-option {
   transition: all 150ms ease;
+}
+
+.contextmenu-option.disable {
+  color: var(--text-gray);
 }
 
 .contextmenu-option:hover {
@@ -1190,10 +1196,10 @@ th {
   background-color: var(--red-one);
 }
 
-.contextmenu-option,
+/* .contextmenu-option,
 .contextmenu-option-deletion {
   border-radius: 4px;
-}
+} */
 
 
 /* Help icon */

@@ -4,7 +4,7 @@ import Container from './components/container';
 import Filter, { updateGenres } from './components/filter';
 import Input from '@renderer/components/input';
 import Sidebar from '@renderer/components/sidebar';
-import { changeTitleAnimu, CreateContextMenuOptions, dateToUnix, unixToDateTime } from '@renderer/utils/functions';
+import { changeTitleAnimu, dateToUnix, unixToDateTime } from '@renderer/utils/functions';
 import {
   createSignal,
   For,
@@ -134,9 +134,7 @@ const Home = () => {
   return (
     <main
       class={`home-main ${homeCache().data && !homeCache().data.topCards ? "active" : ""}`}
-      onContextMenu={(event) =>
-        OpenContextMenu(CreateContextMenuOptions(), event)
-      }
+      onContextMenu={OpenContextMenu}
     >
       <Sidebar
         data={getHomeSidebarData()}

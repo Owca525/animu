@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, Menu, ipcMain, crashReporter, Tray, dialog, Notification } from 'electron'
+import { app, shell, BrowserWindow, Menu, ipcMain, crashReporter, Tray, dialog, Notification, session } from 'electron'
 import { optimizer, is } from '@electron-toolkit/utils'
 import path, { join } from 'path'
 
@@ -173,6 +173,14 @@ async function createWindow() {
     if (mainWindow) mainWindow.webContents.setZoomFactor(detectZoom(config.General.Window.Zoom))
   })
 
+  session.defaultSession.setPermissionRequestHandler(
+    (_, permission, callback) => {
+      if (permission === "clipboard-read") {
+        callback(true);
+      }
+    }
+  );
+
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -241,7 +249,7 @@ app.whenReady().then(async () => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
-  
+
   electronAppUniversalProtocolClient.on('request', async (requestUrl) => {
     if (mainWindow) mainWindow.webContents.send('protocol-request', requestUrl)
   },

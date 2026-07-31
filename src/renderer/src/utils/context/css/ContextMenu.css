@@ -1,18 +1,19 @@
 .contextmenu-container {
     display: flex;
     flex-direction: column;
-    padding: 6px;
+    padding: 0px;
     min-width: 150px;
-    gap: 2px;
+    gap: 0px;
 }
 
 .contextmenu-option, .contextmenu-option-deletion {
     cursor: pointer;
-    padding: 4px 0px 4px 4px;
+    padding: 6px;
     font-size: 1.1em;
 }
 
 .contextmenu-option-line {
     width: 100%;
-    height: 2px;
+    height: 4px;
+    margin: 4px 0px 4px 0px;
 }

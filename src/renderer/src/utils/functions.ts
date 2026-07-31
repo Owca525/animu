@@ -201,31 +201,37 @@ export async function refetchHistory() {
     }
 }
 
-export function CreateContextMenuOptions(start?: ContextMenuProps, center?: ContextMenuProps, end?: ContextMenuProps) {
+export function CreateContextMenuOptions(content?: { start?: ContextMenuProps, center?: ContextMenuProps, end?: ContextMenuProps }) {
     let ContextMenu: ContextMenuProps = []
+
+    const start = content ? content["start"] : undefined
+    const center = content ? content["center"] : undefined
+    const end = content ? content["end"] : undefined
+
     if (start) {
-        for (let index = 0; index < start.length; index++) {
-            const element = start[index];
+        start.forEach((element) => {
             ContextMenu.push(element)
-        }
+        })
     }
-    ContextMenu.push({ option: t("dialog.reload"), onClick: () => reloadWebsite() })
+
     if (center) {
         ContextMenu.push({ option: "", line: true })
-        for (let index = 0; index < center.length; index++) {
-            const element = center[index];
+        center.forEach((element) => {
             ContextMenu.push(element)
-        }
+        })
     }
+
     ContextMenu.push({ option: "", line: true })
     if (end) {
-        for (let index = 0; index < end.length; index++) {
-            const element = end[index];
+        end.forEach((element) => {
             ContextMenu.push(element)
-        }
+        })
     }
+
     let config = getConfig()
+
     if (config.Developer.DeveloperMode && window.api) ContextMenu.push({ option: t("contextMenu.devtools"), onClick: window.BrowserWindow.openDevTools })
+    ContextMenu.push({ option: t("dialog.reload"), onClick: () => reloadWebsite() })
     ContextMenu.push({
         option: t("dialog.exit"), onClick: () => showDialog({
             type: "info",
@@ -882,7 +888,7 @@ export async function fetchAnimeDeepLink(deeplink: string) {
         episodelist: episodeList,
         continewatch: false
     })
-    
+
     globalNavigate("/player");
 }
 /* ENDIF */

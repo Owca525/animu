@@ -330,7 +330,8 @@ export type ContextMenuProps = {
     option: string,
     onClick?: () => void,
     line?: boolean,
-    deletion?: boolean
+    deletion?: boolean,
+    disable?: boolean
 }[]
 
 // customTitle?: string,

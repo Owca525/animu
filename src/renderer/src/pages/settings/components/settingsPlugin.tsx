@@ -1,6 +1,6 @@
 import CheckBox from "@renderer/components/checkBox";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
-import { CreateContextMenuOptions, openUrlFolder } from "@renderer/utils/functions";
+import { openUrlFolder } from "@renderer/utils/functions";
 import { PluginLoadedFormat } from "@renderer/utils/types";
 import { Show } from "solid-js";
 import icon from '@resources/icon.png';
@@ -22,13 +22,10 @@ export default function SettingsPlugin(props: SettingsPluginProps) {
         <div class='settings-extension-container'
             onContextMenu={(event) =>
                 "home" in props.plugin ? "" :
-                    OpenContextMenu(
-                        CreateContextMenuOptions(
-                            props.isHidden ?    [{ option: t("settings.extensions.unhideplugin"), onClick: () => props.unHidePlugin(props["plugin"] as any) }] : 
-                                [{ option: t("settings.extensions.hideplugin"), onClick: () => props.hidePlugin(props.plugin as any, props.active) }]
-                        ),
-                        event
-                    )
+                    OpenContextMenu(event, {
+                        center: props.isHidden ? [{ option: t("settings.extensions.unhideplugin"), onClick: () => props.unHidePlugin(props["plugin"] as any) }] :
+                            [{ option: t("settings.extensions.hideplugin"), onClick: () => props.hidePlugin(props.plugin as any, props.active) }]
+                    })
             }>
             <div class="settings-extension-top">
                 <div class="settings-extension-top-left">

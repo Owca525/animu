@@ -89,27 +89,7 @@ function settings() {
     const [backupList, setBackupList] = createSignal<{ date: Date, file: string }[]>([])
     const [pluginList, setpluginList] = createSignal<{ active: boolean, plugin: PluginLoadedFormat }[]>([])
     const [hiddenPluginList, setHiddenPluginList] = createSignal<string[]>([])
-    const [ContextMenu, setContextMenu] = createSignal<ContextMenuProps>([
-        { option: "dialog.reload", onClick: () => location.reload() },
-        { option: "", line: true },
-        {
-            option: "dialog.exit", onClick: () => showDialog({
-                type: "info",
-                title: t("global.action"),
-                description: t("global.exitAnimu"),
-                buttons: [
-                    {
-                        title: t("dialog.yes"),
-                        onClick: () => window.api ? window.BrowserWindow.exit() : ""
-                    },
-                    {
-                        title: t("dialog.no"),
-                        onClick: () => ""
-                    },
-                ]
-            })
-        }
-    ])
+    const [ContextMenu, setContextMenu] = createSignal<ContextMenuProps>([])
 
     const [sidebarData, setSidebarData] = createSignal({
         top: [
@@ -545,7 +525,7 @@ function settings() {
     }
 
     return (
-        <main class="settings-container" onContextMenu={(event) => OpenContextMenu(ContextMenu(), event)}>
+        <main class="settings-container" onContextMenu={(event) => OpenContextMenu(event, { center: ContextMenu() })}>
             <Sidebar
                 data={sidebarData() as any}
                 showLogo
