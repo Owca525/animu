@@ -370,6 +370,11 @@ export interface PluginMetadataFormat {
     adult?: boolean,
     supportLang?: string[]
     searchOption?: genres[]
+    geoLocationBlock?: string[]
+    shareWebsite?: {
+        manga: string,
+        anime: string
+    }
 }
 
 export interface SearchResponse { success?: boolean, content: cardData[], error?: string, maxPage: number, nextPage: boolean}

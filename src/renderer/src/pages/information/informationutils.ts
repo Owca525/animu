@@ -40,18 +40,3 @@ if (!window["informationCache"]) {
 }
 
 export const informationCache: InformationCacheInstance = window["informationCache"]
-
-export function createMiniTitle(anime: AnimeData): string {
-    let synonyms = anime["synonyms"]
-    let titles: string[] = []
-
-    if (synonyms) synonyms.forEach((value) => titles.push(value))
-
-    const keys = Object.values(anime.title)
-    keys.forEach((element) => {
-        if (element) titles.push(element)
-    })
-
-    titles = [...new Set(titles)]
-    return titles.join(" \u25CF ")
-}

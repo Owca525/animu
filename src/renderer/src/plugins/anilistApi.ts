@@ -618,7 +618,11 @@ export default class AnilistApi implements informationPluginFormat {
     author: "Owca525",
     urlWebsite: "https://anilist.co",
     icon: "https://anilist.co/img/icons/icon.svg",
-    type: 'information'
+    type: 'information',
+    shareWebsite: {
+      manga: 'https://anilist.co/manga/',
+      anime: 'https://anilist.co/anime/'
+    }
   };
 
   constructor() {
