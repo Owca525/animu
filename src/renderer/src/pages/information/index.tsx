@@ -530,6 +530,8 @@ function information() {
     })
 
     async function refreashInformation(name: string, force: boolean = false) {
+        let content = contentResponse.queryData()
+
         if (information["activePage"] == "Episodes") {
             await pluginManager.changePlayerPlugin(name)
 
@@ -537,9 +539,18 @@ function information() {
                 activePlayerID: undefined,
                 activePlugin: name
             })
+
+            content = {
+                ...content,
+                metadata: {
+                    ...content["metadata"] as any,
+                    plugin: name,
+                    playerID: undefined
+                }
+            }
         }
 
-        contentResponse.Refetch(contentResponse.queryData(), force)
+        contentResponse.Refetch(content, force)
     }
 
     async function modifySaveAnimuList(animulist: animulistProps, anime: AnimeData, edit: boolean = false) {
@@ -1003,7 +1014,7 @@ function information() {
                     updateInfo({ isShowWrongActive: false, activePlayerID: id })
                     contentResponse.Refetch({
                         type: "episodes",
-                        metadata: { anime: information["cache"]["anime"], playerID: id, plugin: information["activePlugin"] },
+                        metadata: { anime: information["cache"]["anime"], playerID: id, plugin: getPlayerPLugin()["metadata"]["name"] },
                         error: "global.notFound"
                     }, true)
                 }}
