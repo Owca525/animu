@@ -143,8 +143,8 @@ class PlayerCacheInstance {
 if (!window["PlayerCache"]) {
     window["PlayerCache"] = new PlayerCacheInstance()
 }
-if (!window["InformationCache"]) {
-    window["InformationCache"] = new InformationCacheInstance()
+if (!window["informationCache"]) {
+    window["informationCache"] = new InformationCacheInstance()
 }
 
 export const informationCache: InformationCacheInstance = window["informationCache"]
