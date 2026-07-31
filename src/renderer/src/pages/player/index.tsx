@@ -232,7 +232,7 @@ const player = () => {
 
         if (!anime_data) return
 
-        if (anime_data["save"]["pluginName"] == "Animu_Player_Overwriter_Mode") {
+        if (anime_data["saveData"]["pluginName"] == "Animu_Player_Overwriter_Mode") {
             setIncognitoMode(false)
             return navigate("/")
         }
@@ -276,7 +276,7 @@ const player = () => {
                 <Player
                     type="player"
                     metadata={response.data()!}
-                    playerTitle={detectTitle({ title: anime_data["data"]["title"], ep: episode.current, format: anime_data["data"]["format"] })}
+                    playerTitle={detectTitle({ title: anime_data["anime"]["title"], ep: episode.current, format: anime_data["anime"]["format"] })}
                     anime={{
                         AnimeData: anime_data.anime,
                         saveData: anime_data.saveData,
