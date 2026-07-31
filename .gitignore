@@ -32,3 +32,4 @@ out
 yarn.lock
 electron.vite.config.1739910625943.mjs
 compiledPlugins
+pnpm-lock.yaml

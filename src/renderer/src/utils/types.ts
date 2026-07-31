@@ -370,6 +370,11 @@ export interface PluginMetadataFormat {
     adult?: boolean,
     supportLang?: string[]
     searchOption?: genres[]
+    geoLocationBlock?: string[]
+    shareWebsite?: {
+        manga: string,
+        anime: string
+    }
 }
 
 export interface SearchResponse { success?: boolean, content: cardData[], error?: string, maxPage: number, nextPage: boolean}
@@ -727,4 +732,19 @@ export interface playlistFormatData {
     added: number,
     lastupdate: number,
     customData?: any
+}
+
+export interface informationTmpProps {
+    anime: AnimeData,
+    saveData?: indentityPlayer,
+    animulist?: animulistProps
+    DontOverWrite?: boolean
+}
+
+export interface PlayerTmpProps { 
+    anime: AnimeData, 
+    saveData: indentityPlayer, 
+    episodelist: episodeMetadata[], 
+    animulist?: animulistProps, 
+    continewatch: boolean 
 }

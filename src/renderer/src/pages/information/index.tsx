@@ -2,7 +2,7 @@ import Button from '@renderer/components/buttons';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
-import { Anilist_ListMutation, AnimeData, animulistProps, cardData, episodeMetadata, indentityPlayer, playerData } from '@renderer/utils/types';
+import { Anilist_ListMutation, AnimeData, animulistProps, cardData, episodeMetadata, indentityPlayer, informationTmpProps, playerData } from '@renderer/utils/types';
 import {
     calculateDays,
     changeTitleAnimu,
@@ -32,7 +32,7 @@ import {
     Show,
     Switch
 } from 'solid-js';
-import { animulistData, getAnimuHistory, getGlobalCache } from '@renderer/utils/stores/global';
+import { animulistData, getAnimuHistory, getGlobalCache, informationCache, PlayerCache } from '@renderer/utils/stores/global';
 import { getInformationPlugin, getPlayerPLugin } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { createStore, unwrap } from 'solid-js/store';
@@ -61,16 +61,8 @@ import EpisodeBox from './components/episodeBox';
 import { SheepShortcut } from '@renderer/utils/hooks/useKeyPress';
 import pluginManager from '@renderer/utils/pluginManager';
 import Player from '../player/Player';
-import { createMiniTitle, informationCache } from './informationutils';
 
 // TODO: RE-ADD OPENING MUSIC IN INFORMATION
-
-interface informationTmpProps {
-    anime: AnimeData,
-    saveData?: indentityPlayer,
-    animulist?: animulistProps
-    DontOverWrite?: boolean
-}
 
 interface informationContentType {
     type: string;
@@ -80,6 +72,28 @@ interface informationContentType {
         plugin: string | undefined;
     } | string | AnimeData;
     error: string;
+}
+
+function createMiniTitle(anime: AnimeData): string {
+    let synonyms = anime["synonyms"]
+    let titles: string[] = []
+
+    if (synonyms) synonyms.forEach((value) => titles.push(value))
+
+    const keys = Object.values(anime.title)
+    keys.forEach((element) => {
+        if (element) titles.push(element)
+    })
+
+    titles = [...new Set(titles)]
+    return titles.join(" \u25CF ")
+}
+
+function DetectTypeAnimeAndShare(anime: AnimeData) {
+    const info = getInformationPlugin()
+    if (!info["metadata"]["shareWebsite"]) return console.error("Failed Share URL, Missing shareWebsite")
+
+    openUrlFolder(`${info["metadata"]["shareWebsite"][`${anime["type"]}`.toLocaleLowerCase()]}${anime["id"]}`)
 }
 
 async function FetchEpisodes(params: { anime: AnimeData, playerID: string | undefined, plugin: string | undefined }) {
@@ -434,20 +448,21 @@ function information() {
         let lastTime = 0
 
         if (tmp.saveData && tmp.saveData.episode.toString() === episode.toString()) lastTime = tmp.saveData.last_Time
-        localStorage.setItem("playerCache", JSON.stringify({
-            data: {
+        PlayerCache.update({
+            anime: {
                 ...tmp.anime,
                 player_ID: information["activePlayerID"]
             },
-            save: {
+            saveData: {
                 last_Time: lastTime,
                 type: type,
                 pluginName: getPlayerPLugin()?.metadata.name,
                 episode: episode
             },
             episodelist: episodes,
-            animulist: tmp.animulist
-        }))
+            animulist: tmp.animulist,
+            continewatch: false
+        })
         navigate("/player")
     }
 
@@ -634,7 +649,13 @@ function information() {
                             </span>
                         </div>
                         <div class="information-bar">
-                            <Button titleButton={t("information.bar.anilist")} icon="open_in_new" ButtonClass="information-bar-icon" onClick={() => openUrlFolder(`https://anilist.co/anime/${information["cache"].anime.id}`)} />
+                            <Button
+                                titleButton={t("information.bar.anilist")}
+                                icon="open_in_new"
+                                ButtonClass="information-bar-icon"
+                                onClick={() => DetectTypeAnimeAndShare(information["cache"]["anime"])}
+                            />
+
                             {/* <Show when={information["cache"].anime.trailer && !window.api}>
                                 <Button titleButton={t("information.bar.trailer")} icon="theaters" ButtonClass="information-bar-icon" onClick={() => openUrlFolder(`https://www.youtube.com/watch?v=${information["cache"].anime.trailer?.id}`)} />
                             </Show> */}

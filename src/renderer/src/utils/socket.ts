@@ -1,6 +1,5 @@
-import { getSocket, setIncognitoMode, setSocket, setSocketRoom } from "./stores/global";
+import { getSocket, PlayerCache, setIncognitoMode, setSocket, setSocketRoom } from "./stores/global";
 import { io } from "socket.io-client";
-import { unwrap } from "solid-js/store";
 import { toast } from "./context/ToastNotification";
 import { globalNavigate } from "./functions";
 import { playerData } from "./types";
@@ -17,10 +16,10 @@ export function closeSocket() {
 }
 
 function OverWritePlayer(url: string, hls: boolean) {
-    if (!url || !hls) throw new Error("Give 2 Aruments")
+    if (!url || !hls) throw new Error("Give 2 Aruments");
 
-    localStorage.setItem("playerCache", JSON.stringify({
-        data: {
+    PlayerCache.update({
+        anime: {
             title: {
                 native: "Player Overwrite",
                 romaji: "Player Overwrite"
@@ -28,14 +27,15 @@ function OverWritePlayer(url: string, hls: boolean) {
             id: crypto.randomUUID(),
             player_ID: crypto.randomUUID()
         },
-        save: {
+        saveData: {
             last_Time: 0,
             type: "sub",
             pluginName: "Animu_Player_Overwriter_Mode",
             episode: "1"
         },
-        episodelist: ["1"],
-    }));
+        episodelist: [{ ep: "" }],
+        continewatch: false
+    });
 
     (window as any).playerOverWriteContent = [
         {
@@ -59,11 +59,12 @@ export function runSocket(server: string = "") {
     const socket = io(server)
 
     socket.on("player:init", (playerData) => {
-        localStorage.setItem("playerCache", JSON.stringify(unwrap({
-            data: playerData.anime,
-            save: playerData.saveData,
+        PlayerCache.update({
+            anime: playerData.anime,
+            saveData: playerData.saveData,
             episodelist: playerData.temp.episodes,
-        })));
+            continewatch: false
+        });
 
         (window as any).playerOverWriteContent = playerData["owcapierdolik"]
 
