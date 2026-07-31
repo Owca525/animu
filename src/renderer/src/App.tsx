@@ -58,7 +58,7 @@ import './App.css';
 import './themes/darkerAnimu/main.css';
 import './utils/i18n';
 import "./utils/socket"
-import "./pages/information/informationutils"
+import "./utils/stores/global"
 
 /* IFDEF DEBUG|PROD */
 import {

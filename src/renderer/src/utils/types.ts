@@ -733,3 +733,18 @@ export interface playlistFormatData {
     lastupdate: number,
     customData?: any
 }
+
+export interface informationTmpProps {
+    anime: AnimeData,
+    saveData?: indentityPlayer,
+    animulist?: animulistProps
+    DontOverWrite?: boolean
+}
+
+export interface PlayerTmpProps { 
+    anime: AnimeData, 
+    saveData: indentityPlayer, 
+    episodelist: episodeMetadata[], 
+    animulist?: animulistProps, 
+    continewatch: boolean 
+}

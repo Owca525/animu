@@ -1,4 +1,4 @@
-import { animeOpeningsFormat, cardData, deeplinkFormat, globalDataFormat, NotificationExpanded, serviceFormat, themeMetadata } from "../types";
+import { animeOpeningsFormat, cardData, deeplinkFormat, globalDataFormat, informationTmpProps, NotificationExpanded, PlayerTmpProps, serviceFormat, themeMetadata } from "../types";
 import { createStore } from "solid-js/store";
 import { Socket } from "socket.io-client";
 
@@ -30,7 +30,7 @@ export const getGlobalCache = () => globalState;
 export const loadedTheme = () => globalState.loadedTheme;
 export const activeThemes = () => globalState.activeThemes;
 export const animulistData = () => globalState.animuList;
-export const getSocket = () => globalState.socket?.instance;
+export const getSocket = () => globalState.socket?.instance as any;
 export const getSocketRoom = () => globalState.socket?.currentRoom;
 export const getServices = () => globalState.service;
 export const getDeeplinks = () => globalState.deepLinks;
@@ -75,3 +75,77 @@ window.addEventListener("focus", () => {
 window.addEventListener("blur", () => {
     setGlobalState((prev) => ({ ...prev, isAnimuFocus: false }))
 });
+
+class InformationCacheInstance {
+    anime: informationTmpProps = {
+        anime: {
+            title: {
+                native: "Information Cache Instance",
+                romaji: "Information Cache Instance"
+            },
+            id: ""
+        }
+    }
+
+    constructor() {
+        const cache = localStorage.getItem("informationCache")
+        if (!cache) return
+        try {
+            this.anime = JSON.parse(cache)
+        } catch (error) {
+            console.error("Failed Load Information Cache")
+        }
+    }
+
+    update = (anime: informationTmpProps | undefined) => {
+        if (!anime) return
+        this.anime = anime
+        localStorage.setItem("informationCache", JSON.stringify(anime))
+    }
+}
+
+class PlayerCacheInstance {
+    player: PlayerTmpProps = {
+        anime: {
+            title: {
+                native: "Player Cache Instance",
+                romaji: "Player Cache Instance"
+            },
+            id: ""
+        },
+        saveData: {
+            pluginName: "",
+            last_Time: 0,
+            episode: "",
+            type: ""
+        },
+        continewatch: false,
+        episodelist: []
+    }
+
+    constructor() {
+        const cache = localStorage.getItem("playerCache")
+        if (!cache) return
+        try {
+            this.player = JSON.parse(cache)
+        } catch (error) {
+            console.error("Failed Load Player Cache")
+        }
+    }
+
+    update = (player: PlayerTmpProps | undefined) => {
+        if (!player) return
+        this.player = player
+        localStorage.setItem("playerCache", JSON.stringify(player))
+    }
+}
+
+if (!window["PlayerCache"]) {
+    window["PlayerCache"] = new PlayerCacheInstance()
+}
+if (!window["InformationCache"]) {
+    window["InformationCache"] = new InformationCacheInstance()
+}
+
+export const informationCache: InformationCacheInstance = window["informationCache"]
+export const PlayerCache: PlayerCacheInstance = window["PlayerCache"]

@@ -2,7 +2,7 @@ import Button from '@renderer/components/buttons';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
-import { Anilist_ListMutation, AnimeData, animulistProps, cardData, episodeMetadata, indentityPlayer, playerData } from '@renderer/utils/types';
+import { Anilist_ListMutation, AnimeData, animulistProps, cardData, episodeMetadata, indentityPlayer, informationTmpProps, playerData } from '@renderer/utils/types';
 import {
     calculateDays,
     changeTitleAnimu,
@@ -32,7 +32,7 @@ import {
     Show,
     Switch
 } from 'solid-js';
-import { animulistData, getAnimuHistory, getGlobalCache } from '@renderer/utils/stores/global';
+import { animulistData, getAnimuHistory, getGlobalCache, informationCache, PlayerCache } from '@renderer/utils/stores/global';
 import { getInformationPlugin, getPlayerPLugin } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { createStore, unwrap } from 'solid-js/store';
@@ -61,16 +61,8 @@ import EpisodeBox from './components/episodeBox';
 import { SheepShortcut } from '@renderer/utils/hooks/useKeyPress';
 import pluginManager from '@renderer/utils/pluginManager';
 import Player from '../player/Player';
-import { informationCache } from './informationutils';
 
 // TODO: RE-ADD OPENING MUSIC IN INFORMATION
-
-interface informationTmpProps {
-    anime: AnimeData,
-    saveData?: indentityPlayer,
-    animulist?: animulistProps
-    DontOverWrite?: boolean
-}
 
 interface informationContentType {
     type: string;
@@ -456,20 +448,21 @@ function information() {
         let lastTime = 0
 
         if (tmp.saveData && tmp.saveData.episode.toString() === episode.toString()) lastTime = tmp.saveData.last_Time
-        localStorage.setItem("playerCache", JSON.stringify({
-            data: {
+        PlayerCache.update({
+            anime: {
                 ...tmp.anime,
                 player_ID: information["activePlayerID"]
             },
-            save: {
+            saveData: {
                 last_Time: lastTime,
                 type: type,
                 pluginName: getPlayerPLugin()?.metadata.name,
                 episode: episode
             },
             episodelist: episodes,
-            animulist: tmp.animulist
-        }))
+            animulist: tmp.animulist,
+            continewatch: false
+        })
         navigate("/player")
     }
 

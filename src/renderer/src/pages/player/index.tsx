@@ -1,5 +1,5 @@
 import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
-import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, SettingsConfig } from "@renderer/utils/types";
+import { AnimeData, episodeMetadata, PlayerTmpProps, SettingsConfig } from "@renderer/utils/types";
 
 import "./player.css"
 import { changeTitleAnimu, convertEpisode, dateToUnix, detectTitle, detectTitleConfig, refetchHistory } from "@renderer/utils/functions";
@@ -13,20 +13,20 @@ import { Match, onCleanup, onMount, Switch } from "solid-js";
 import { useResponse } from "@renderer/utils/hooks/useResponse";
 import { useI18n } from "@renderer/utils/i18n";
 import { addToAnimuList, updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist";
-import { getSocket, getSocketRoom, setIncognitoMode } from "@renderer/utils/stores/global";
+import { getSocket, getSocketRoom, informationCache, PlayerCache, setIncognitoMode } from "@renderer/utils/stores/global";
 import { createStore, unwrap } from "solid-js/store";
 import { SheepShortcut } from "@renderer/utils/hooks/useKeyPress";
 import pluginManager from "@renderer/utils/pluginManager";
 import Player from "./Player";
-import { informationCache } from "../information/informationutils";
+
 
 const player = () => {
     const { t } = useI18n()
-    const anime_data: { data: AnimeData, save: indentityPlayer, episodelist: episodeMetadata[], animulist?: animulistProps, continewatch: boolean } = JSON.parse(localStorage.getItem("playerCache") as any)
+    const anime_data: PlayerTmpProps = PlayerCache.player
     const navigate = useNavigate()
     const config: SettingsConfig = getConfig();
 
-    if (!anime_data || !anime_data.save || !anime_data.episodelist || !anime_data.data) {
+    if (!anime_data || !anime_data.saveData || !anime_data.episodelist || !anime_data.anime) {
         showDialog({
             type: "error",
             title: t("player.errors.error"),
@@ -40,16 +40,16 @@ const player = () => {
     }
 
     const [episode, episodeUpdate] = createStore({
-        current: anime_data.save.episode as string,
-        type: anime_data.save.type as string,
+        current: anime_data.saveData.episode as string,
+        type: anime_data.saveData.type as string,
         list: anime_data.episodelist,
-        time: anime_data["save"]["last_Time"]
+        time: anime_data["saveData"]["last_Time"]
     })
     // const [externalPlayerType, setexternalPlayerType] = createSignal<"Movian" | "VLC" | "Mpv" | "ChromeCast">(config.Player.external.type)
 
     const response = useResponse(
         {
-            queryKey: [anime_data.data?.player_ID, episode.list.find((v) => v.ep == episode.current), episode.type, JSON.stringify(anime_data.save["pluginName"])],
+            queryKey: [anime_data.anime?.player_ID, episode.list.find((v) => v.ep == episode.current), episode.type, JSON.stringify(anime_data.saveData["pluginName"])],
             queryFn: async (queryKey) => {
                 const [player_id, episode, animeType] = queryKey;
                 if (!player_id || !animeType) {
@@ -59,7 +59,7 @@ const player = () => {
 
                 if (`${queryKey[3]}`.includes("Animu_Player_Overwriter_Mode")) return window["playerOverWriteContent"]
 
-                let pluginPlayer = await pluginManager.changePlayerPlugin(anime_data.save?.pluginName ? anime_data.save.pluginName : "")
+                let pluginPlayer = await pluginManager.changePlayerPlugin(anime_data.saveData?.pluginName ? anime_data.saveData.pluginName : "")
                 return await pluginPlayer.extractPlayerData(unwrap(animeType) as string, unwrap(episode) as episodeMetadata, unwrap(player_id) as string)
             },
             cacheTime: 3600000,
@@ -73,10 +73,10 @@ const player = () => {
         })
 
         response.Refetch([
-            anime_data.data?.player_ID, 
+            anime_data.anime?.player_ID, 
             episode.current, 
             episode.type, 
-            JSON.stringify(anime_data.save["pluginName"])
+            JSON.stringify(anime_data.saveData["pluginName"])
         ])
 
         updateHistory()
@@ -88,25 +88,25 @@ const player = () => {
     }
 
     function updateHistory() {
-        if (!anime_data || !anime_data.data) return
+        if (!anime_data || !anime_data.anime) return
         SaveHistory({
             saveData: {
-                pluginName: anime_data.save?.pluginName ? anime_data.save.pluginName : "",
+                pluginName: anime_data.saveData?.pluginName ? anime_data.saveData.pluginName : "",
                 last_Time: 0,
                 isStarted: true,
                 type: episode.type,
                 episode: episode.current
             },
             AnimeData: {
-                ...anime_data.data,
+                ...anime_data.anime,
                 nextAiringEpisode: undefined
             }
         })
         refetchHistory()
 
         if (anime_data.animulist && anime_data.animulist.status == "CURRENT") {
-            updateDataInAnimulist(anime_data.data.id, {
-                AnimeData: anime_data.data,
+            updateDataInAnimulist(anime_data.anime.id, {
+                AnimeData: anime_data.anime,
                 animulist: {
                     ...anime_data.animulist,
                     status: "CURRENT",
@@ -123,15 +123,15 @@ const player = () => {
 
     onMount(() => {
 
-        if (anime_data.save.pluginName == "Animu_Player_Overwriter_Mode") setIncognitoMode(true)
+        if (anime_data.saveData.pluginName == "Animu_Player_Overwriter_Mode") setIncognitoMode(true)
 
         if (getSocket()) {
             const socket = getSocket()
             socket?.emit("player:init", {
                 roomName: unwrap(getSocketRoom()),
                 data: {
-                    anime: anime_data.data,
-                    saveData: anime_data.save,
+                    anime: anime_data.anime,
+                    saveData: anime_data.saveData,
                     temp: { episode: episode.current, type: episode.type, episodes: episode.list },
                     owcapierdolik: window["playerOverWriteContent"]
                 }
@@ -143,21 +143,21 @@ const player = () => {
                     list: data["episodelist"],
                     time: data["time"]
                 })
-                response.Refetch([anime_data.data?.player_ID, data.actual, data.type])
+                response.Refetch([anime_data.anime?.player_ID, data.actual, data.type])
             })
         }
 
-        changeTitleAnimu(`Animu - ${detectTitleConfig(anime_data.data.title)}`)
+        changeTitleAnimu(`Animu - ${detectTitleConfig(anime_data.anime.title)}`)
         SaveHistory({
             saveData: {
-                ...anime_data.save,
-                last_Time: anime_data.save.last_Time,
-                isStarted: anime_data.save.last_Time == 0,
+                ...anime_data.saveData,
+                last_Time: anime_data.saveData.last_Time,
+                isStarted: anime_data.saveData.last_Time == 0,
                 type: episode.type,
                 episode: episode.current
             },
             AnimeData: {
-                ...anime_data.data,
+                ...anime_data.anime,
                 nextAiringEpisode: undefined,
                 recommendations: undefined
             }
@@ -174,7 +174,7 @@ const player = () => {
                 lastUpdate: dateToUnix(new Date().toString()),
                 progress: convertEpisode(unwrap(episode.current))
             }, {
-                ...anime_data.data,
+                ...anime_data.anime,
                 nextAiringEpisode: undefined,
                 recommendations: undefined
             })
@@ -182,8 +182,8 @@ const player = () => {
         }
 
         if (anime_data.animulist.status == "PLANNING" || anime_data.animulist.status == "CURRENT") {
-            updateDataInAnimulist(anime_data.data.id, {
-                AnimeData: anime_data.data,
+            updateDataInAnimulist(anime_data.anime.id, {
+                AnimeData: anime_data.anime,
                 animulist: {
                     ...anime_data.animulist,
                     status: "CURRENT",
@@ -213,11 +213,11 @@ const player = () => {
                 },
                 {
                     title: t("dialog.retry"),
-                    onClick: () => response.Refetch([anime_data.data?.player_ID, episode.current, episode.type], true)
+                    onClick: () => response.Refetch([anime_data.anime?.player_ID, episode.current, episode.type], true)
                 }
             ]
         })
-        return loadingAnimation(leave, { data: anime_data?.data as any, ep: episode.current }, episode)
+        return loadingAnimation(leave, { data: anime_data?.anime as any, ep: episode.current }, episode)
     }
 
     async function leave() {
@@ -240,7 +240,7 @@ const player = () => {
         if (anime_data.continewatch) return navigate("/")
         if (config.Player.general.PlayerBehavior === "home") navigate("/")
         else {
-            informationCache.update({ anime: anime_data.data, saveData: anime_data.save, animulist: anime_data.animulist, DontOverWrite: true })
+            informationCache.update({ anime: anime_data.anime, saveData: anime_data.saveData, animulist: anime_data.animulist, DontOverWrite: true })
             navigate("/info")
         }
     }
@@ -257,7 +257,7 @@ const player = () => {
                 {showErrorDialog()}
             </Match>
             <Match when={response.loading() && !response.error()}>
-                {loadingAnimation(leave, { data: anime_data?.data as any, ep: episode.current }, episode)}
+                {loadingAnimation(leave, { data: anime_data?.anime as any, ep: episode.current }, episode)}
             </Match>
             {/* <Match when={response.data() && !response.loading() && !response.error() && config.Player.external.enable}>
                 <ExternalPlayer
@@ -278,8 +278,8 @@ const player = () => {
                     metadata={response.data()!}
                     playerTitle={detectTitle({ title: anime_data["data"]["title"], ep: episode.current, format: anime_data["data"]["format"] })}
                     anime={{
-                        AnimeData: anime_data.data,
-                        saveData: anime_data.save,
+                        AnimeData: anime_data.anime,
+                        saveData: anime_data.saveData,
                         animulist: anime_data.animulist
                     }}
                     ep_metadata={{ current: FindEpisode(episode.current), type: episode.type, list: episode.list }}

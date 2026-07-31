@@ -18,7 +18,7 @@ import {
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { getAnimuHistory, getGlobalCache, setActiveThemes, setGlobalToken, todayAnimeInAnilist } from './stores/global';
+import { getAnimuHistory, getGlobalCache, informationCache, PlayerCache, setActiveThemes, setGlobalToken, todayAnimeInAnilist } from './stores/global';
 import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
@@ -852,7 +852,7 @@ export async function fetchAnimeDeepLink(deeplink: string) {
     updateToast(idToast, t("notification.successanime"), { type: "success", timer: false })
 
     if (!anime.player) {
-        localStorage.setItem("informationCache", JSON.stringify({ anime: response }))
+        informationCache.update({ anime: response })
         globalNavigate("/info")
         return
     }
@@ -868,20 +868,21 @@ export async function fetchAnimeDeepLink(deeplink: string) {
 
     removeToast(toastID)
 
-    localStorage.setItem("playerCache", JSON.stringify({
-        data: {
+    PlayerCache.update({
+        anime: {
             ...response,
             player_ID: anime.player.id
         },
-        save: {
+        saveData: {
             pluginName: currentPLugin.metadata.name,
-            last_Time: anime.player.time,
+            last_Time: anime.player.time ?? 0,
             episode: anime.player.episode,
             type: anime.player.type,
         },
         episodelist: episodeList,
-    }))
-
+        continewatch: false
+    })
+    
     globalNavigate("/player");
 }
 /* ENDIF */

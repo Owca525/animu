@@ -15,11 +15,11 @@ import { createStore, unwrap } from "solid-js/store";
 import { removeToast, toast, updateToast } from "@renderer/utils/context/ToastNotification";
 import { useI18n } from "@renderer/utils/i18n";
 import { showCustomMenu } from "@renderer/utils/context/menuContext";
-import { animulistData } from "@renderer/utils/stores/global";
+import { animulistData, informationCache, PlayerCache } from "@renderer/utils/stores/global";
 import { addToAnimuList, removeFromAnimulist } from "@renderer/utils/FilesManager/animulist";
 import AnimulistMenu from "@renderer/components/animulistMenu";
 import pluginManager from "@renderer/utils/pluginManager";
-import { informationCache } from "@renderer/pages/information/informationutils";
+
 
 interface CardProps {
   card: cardData;
@@ -64,13 +64,13 @@ function Card(props: CardProps) {
         return
       }
 
-      localStorage.setItem("playerCache", JSON.stringify({
-        data: (props.card.AnimeData),
-        save: (props.card.saveData),
+      PlayerCache.update({
+        anime: (props.card.AnimeData),
+        saveData: (props.card.saveData),
         animulist: cardVariables.animulist,
         episodelist: episodeList,
         continewatch: true,
-      }))
+      })
 
       removeToast(idToast)
       navigate("/player");

@@ -7,7 +7,7 @@ import { Component, For, Show } from 'solid-js';
 import { useI18n } from '@renderer/utils/i18n';
 import { getPlayerPLugin } from '@renderer/utils/stores/plugins';
 import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
-import { animulistData } from '@renderer/utils/stores/global';
+import { animulistData, informationCache, PlayerCache } from '@renderer/utils/stores/global';
 import { updateGenres } from './filter';
 import { StartHomeSearch } from '..';
 import { getHomeCache } from '@renderer/utils/stores/home';
@@ -28,7 +28,7 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
     function openInformation() {
         const tmp = animulistData().get(data.AnimeData.id)
 
-        localStorage.setItem("informationCache", JSON.stringify({ anime: data.AnimeData, animulist: tmp ? tmp.animulist : undefined }))
+        informationCache.update({ anime: data.AnimeData, animulist: tmp ? tmp.animulist : undefined, saveData: data["saveData"] })
         navigate("/info");
     }
 
@@ -41,12 +41,12 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
         if (!saveData && !id) {
             const response = await plugin.extractEpisodeList(data.AnimeData)
             if (!response || response.episodesData.length <= 0) return updateToast(idToast, t("notification.failedanime"), { type: "error", timer: false })
-            localStorage.setItem("playerCache", JSON.stringify({
-                data: {
+            PlayerCache.update({
+                anime: {
                     ...data.AnimeData,
                     player_ID: response.player_id
                 },
-                save: {
+                saveData: {
                     last_Time: 0,
                     type: response.episodesData[0].type,
                     pluginName: plugin.metadata.name,
@@ -54,7 +54,7 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
                 },
                 episodelist: response.episodesData[0].episodes,
                 continewatch: true,
-            }))
+            })
         }
         if (saveData && id) {
             const episodeList = await plugin.extractOnlyEpisodesList(saveData.type, id);
@@ -63,15 +63,15 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
                 return
             }
 
-            localStorage.setItem("playerCache", JSON.stringify({
-                data: {
+            PlayerCache.update({
+                anime: {
                     ...data.AnimeData,
                     player_ID: id,
                 },
-                save: saveData,
+                saveData: saveData,
                 episodelist: episodeList,
                 continewatch: true,
-            }))
+            })
         }
         
         removeToast(idToast)

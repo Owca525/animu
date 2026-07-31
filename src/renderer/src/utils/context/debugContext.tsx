@@ -1,7 +1,7 @@
 import { JSX } from "solid-js";
 import { SheepShortcut } from "../hooks/useKeyPress";
 import DebuggerSheep, { SheepWindowManager, windowManagerConfig } from "@renderer/WebComponents/DebugWindow";
-import { getGlobalCache, setIncognitoMode } from "../stores/global";
+import { getGlobalCache, PlayerCache, setIncognitoMode } from "../stores/global";
 import { getConfig } from "../stores/config";
 import { ExtractVideo, globalNavigate } from "../functions";
 import { removeToast, toast } from "./ToastNotification";
@@ -73,23 +73,24 @@ export default function DebugContext(props: { children: JSX.Element }) {
                         removeToast(id)
                         if (extracted.length <= 0) return toast("Failed Extract", { type: "error" })
 
-                        localStorage.setItem("playerCache", JSON.stringify({
-                            data: {
+                        PlayerCache.update({
+                            anime: {
                                 title: {
-                                    native: extracted[0]["embedTitle"],
-                                    romaji: extracted[0]["embedTitle"]
+                                    native: extracted[0]["embedTitle"] ?? "Uknown",
+                                    romaji: extracted[0]["embedTitle"] ?? "Uknown"
                                 },
                                 id: crypto.randomUUID(),
                                 player_ID: crypto.randomUUID()
                             },
-                            save: {
+                            saveData: {
                                 last_Time: 0,
                                 type: "sub",
                                 pluginName: "Animu_Player_Overwriter_Mode",
                                 episode: "1"
                             },
-                            episodelist: ["1"],
-                        }));
+                            episodelist: [{ ep: "0" }],
+                            continewatch: false
+                        });
 
                         (window as any).playerOverWriteContent = extracted
 
