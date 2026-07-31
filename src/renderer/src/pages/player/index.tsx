@@ -288,9 +288,9 @@ const player = () => {
                     onExitPlayer={leave}
                 />
             </Match>
-            <Match when={!response.Initial() && !response.error() && !response.loading() && response.data() == undefined}>
+            {/* <Match when={!response.Initial() && !response.error() && !response.loading() && response.data() == undefined}>
                 {showErrorDialog()}
-            </Match>
+            </Match> */}
         </Switch>
     )
 
