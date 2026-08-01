@@ -1081,6 +1081,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             updatePlayer({ isFullscreen: false })
         } else {
             toggleFullscreen(true)
+
+            containerRef?.requestFullscreen()
+
             updatePlayer({ isFullscreen: true })
         }
         /* ENDIF */
