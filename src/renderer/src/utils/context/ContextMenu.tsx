@@ -59,15 +59,15 @@ const ContextMenu: Component<{ children: JSX.Element }> = (props) => {
     let canCut = false
     let canPaste = false
 
-    try {
-      canPaste = await navigator.clipboard.readText() != ""
-    } catch (e) { }
-
     if (event["target"] instanceof HTMLInputElement || event["target"] instanceof HTMLTextAreaElement) {
-      canCut = event["target"].selectionStart != null && event["target"].selectionEnd != null
+      canCut = event["target"].selectionStart != 0 && event["target"].selectionEnd != 0
+
+      try {
+        canPaste = await navigator.clipboard.readText() != ""
+      } catch (e) { }
     }
 
-    return [{
+    let content = [{
       option: "Copy",
       onClick: () => SaveToClipboard("text", `${window.getSelection()}`),
       disable: `${window.getSelection()}` == ""
@@ -75,11 +75,17 @@ const ContextMenu: Component<{ children: JSX.Element }> = (props) => {
       option: "Cut",
       onClick: () => CutContent(event["target"]),
       disable: !canCut
-    }, {
-      option: "Paste",
-      onClick: () => PasteContent(event["target"]),
-      disable: !canCut && canPaste
     }]
+
+    if (canPaste) {
+      content.push({
+        option: "Paste",
+        onClick: () => PasteContent(event["target"]),
+        disable: !canPaste
+      })
+    }
+
+    return content
   }
 
   openMenuSignal = async (ev: MouseEvent, menuData?: { start?: ContextMenuProps, center?: ContextMenuProps, end?: ContextMenuProps }) => {

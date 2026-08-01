@@ -88,9 +88,11 @@ function createMiniTitle(anime: AnimeData): string {
     return titles.join(" \u25CF ")
 }
 
-function DetectTypeAnimeAndShare(anime: AnimeData) {
+function DetectTypeAnimeAndShare(anime: AnimeData, clip: boolean = false) {
     const info = getInformationPlugin()
     if (!info["metadata"]["shareWebsite"]) return console.error("Failed Share URL, Missing shareWebsite")
+
+    if (clip) return SaveToClipboard("text",`${info["metadata"]["shareWebsite"][`${anime["type"]}`.toLocaleLowerCase()]}${anime["id"]}`)
 
     openUrlFolder(`${info["metadata"]["shareWebsite"][`${anime["type"]}`.toLocaleLowerCase()]}${anime["id"]}`)
 }
@@ -596,6 +598,10 @@ function information() {
                     {
                         option: t("information.copylink"),
                         onClick: async () => await SaveToClipboard("text", `${config.deepLinkURL}/?anime=${btoa(`${information["cache"]["anime"]["id"]}`)}`)
+                    },
+                    {
+                        option: t("information.bar.anilist"),
+                        onClick: () => DetectTypeAnimeAndShare(information["cache"]["anime"], true)
                     }
                 ]
             })}>
