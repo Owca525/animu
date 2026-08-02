@@ -240,7 +240,7 @@ const player = () => {
         if (anime_data.continewatch) return navigate("/")
         if (config.Player.general.PlayerBehavior === "home") navigate("/")
         else {
-            informationCache.update({ anime: anime_data.anime, saveData: anime_data.saveData, animulist: anime_data.animulist, DontOverWrite: true })
+            informationCache.update({ ...informationCache.anime, animulist: anime_data.animulist, DontOverWrite: true })
             navigate("/info")
         }
     }

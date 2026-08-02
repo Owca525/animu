@@ -5,6 +5,7 @@ import { refetchHistory, RemoveAnimeDataCache } from '../functions';
 import { toast, updateToast } from '../context/ToastNotification';
 import { t } from '../i18n';
 import { getInformationPlugin } from '../stores/plugins';
+import { unwrap } from 'solid-js/store';
 
 export function setNewHistory(data: cardData[]) {
     let tmpMap = new Map()
@@ -88,7 +89,7 @@ export async function SaveHistory(data: cardData): Promise<boolean> {
         }
 
         let tmpHistoryCache = historyCache.values().toArray()
-        tmpHistoryCache.unshift(data);
+        tmpHistoryCache.unshift(unwrap(data));
 
         historyCache = setNewHistory(tmpHistoryCache)
 

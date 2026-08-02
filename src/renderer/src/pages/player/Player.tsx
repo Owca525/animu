@@ -1,7 +1,7 @@
 import Button from "@renderer/components/buttons"
 import VolumeNotification from "@renderer/pages/player/components/VolumeNotification"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
-import { CheckNumber, convertKeybinds, createElement, CreateSHA256, dateToUnix, detectTitleConfig, formatTime, openUrlFolder, refetchHistory, request, toggleFullscreen } from "@renderer/utils/functions"
+import { CheckNumber, convertKeybinds, createElement, CreateSHA256, dateToUnix, detectTitleConfig, formatTime, openUrlFolder, request, toggleFullscreen } from "@renderer/utils/functions"
 import { getConfig } from "@renderer/utils/stores/config"
 import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, Thumbnail } from "@renderer/utils/types"
 import Hls, { HlsConfig } from "hls.js"
@@ -23,7 +23,7 @@ import modernWasmUrl from 'jassub/dist/jassub-worker-modern.wasm?url'
 // import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
 import fallbackFontJASSUB from "jassub/dist/default.woff2?url";
 import { useKeyPress } from "@renderer/utils/hooks/useKeyPress"
-import { getSocket, getSocketRoom } from "@renderer/utils/stores/global"
+import { getSocket, getSocketRoom, informationCache } from "@renderer/utils/stores/global"
 import MoreInformation from "./components/MoreInformation"
 import { updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist"
 import { SaveHistory } from "@renderer/utils/FilesManager/history"
@@ -1013,6 +1013,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         if (!config) return
         if (!anime) return
         if (type == "embed") return
+        if (parseInt(player.currentTime.toFixed(0)) % 2 != 0) return
 
         const currentTime = player.currentTime
         const duration = player.durration
@@ -1054,22 +1055,26 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                 isStarted: false,
             }
         }
+
         if (currentTime <= duration - CheckNumber(config.History.continue.MaximizeTimeSave)) {
-            SaveHistory(unwrap(futureHistory))
+            SaveHistory(futureHistory)
         } else {
-            SaveHistory(unwrap({
-                AnimeData: { ...anime.AnimeData, nextAiringEpisode: undefined },
+            SaveHistory({
+                ...futureHistory,
                 saveData: {
-                    pluginName: anime.saveData.pluginName,
-                    last_Time: 0,
-                    episode: ep_metadata.current["ep"],
-                    type: ep_metadata.type,
-                    isStarted: false,
+                    ...futureHistory["saveData"],
+                    last_Time: 0
                 }
-            }
-            ))
+            })
         }
-        refetchHistory()
+
+        if (informationCache.anime["anime"]["id"] != futureHistory["AnimeData"]["id"]) return
+
+        informationCache.update({
+            ...informationCache["anime"],
+            anime: futureHistory["AnimeData"],
+            saveData: futureHistory["saveData"]
+        })
     }
 
     async function enterFullscreen() {
