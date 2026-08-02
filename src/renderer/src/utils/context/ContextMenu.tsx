@@ -99,7 +99,7 @@ const ContextMenu: Component<{ children: JSX.Element }> = (props) => {
   };
 
   function CalculateContextMenuBoundary(ev: MouseEvent) {
-    // TODO: FIX BUG SECOND CLICK FIX POSITION OUTSIDE THE WINDOW
+    setPosition({ x: ev.clientX, y: ev.clientY })
 
     const rect = contextMenuRef.getBoundingClientRect();
 
