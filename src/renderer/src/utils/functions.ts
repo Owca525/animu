@@ -89,6 +89,9 @@ export function formatTime(seconds: number | undefined): string {
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = Math.floor(seconds % 60);
     const hoursPart = hours > 0 ? `${hours}:` : '';
+
+    if (hours < 0 || minutes < 0 || secs < 0) return "0:00"
+
     return `${hoursPart}${hoursPart != "" && minutes < 10 ? "0" : ""}${minutes}:${secs < 10 ? '0' : ''}${secs}`;
 }
 
