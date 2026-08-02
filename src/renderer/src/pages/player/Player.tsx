@@ -439,16 +439,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             if (AudioShaka) AudioShaka.load(resolution["audio"]["url"])
         }
 
-        Shaka!.load(resolution["url"])
-        await new Promise(resolve => {
-            if (videoRef!.readyState >= 1) {
-                resolve("");
-            } else {
-                videoRef!.addEventListener("loadedmetadata", resolve, { once: true });
-            }
-        });
+        await Shaka!.load(resolution["url"])
 
-        setTimeVideo(SheePlayer.currentTime)
+        // setTimeVideo(SheePlayer.currentTime)
         ChangeSpeedPlayer(`${SheePlayer.speed}`)
     }
 
@@ -491,7 +484,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         }
 
         Shaka?.load(data["url"])
-        setTimeVideo(SheePlayer.currentTime)
+        // setTimeVideo(SheePlayer.currentTime)
     }
 
     function updateSubtitle(): any {
@@ -558,7 +551,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         videoRef = videoElemenet
 
         ChangePlayerVolume(SheePlayer.playerVolume, true)
-        setTimeVideo(SheePlayer.currentTime)
+        // setTimeVideo(SheePlayer.currentTime)
 
         setPlayerCleanupEvent("timeupdate", updateProgress)
         setPlayerCleanupEvent("progress", updateProgress)
@@ -667,7 +660,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         if (Hls.isSupported() && videoRef) {
             tmpHls.loadSource(player["currentResolution"]["url"]);
             tmpHls.attachMedia(videoRef);
-            setTimeVideo(SheePlayer.currentTime)
+            // setTimeVideo(SheePlayer.currentTime)
 
             tmpHls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
                 updatePlayer({ FatalError: false })
@@ -871,6 +864,11 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
     function updateProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
         clearInterval(moreInformationTimer)
+
+        // IDK player just reset time even after i set url and loaded
+        if (event.currentTarget.currentTime <= 1 && type != "embed") {
+            setTimeVideo(SheePlayer.currentTime)
+        }
 
         updateUI({ ShowMoreInformation: false })
 
