@@ -864,9 +864,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
     function updateProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
         clearInterval(moreInformationTimer)
-
+        
         // IDK player just reset time even after i set url and loaded
-        if (event.currentTarget.currentTime <= 1 && type != "embed") {
+        if (event.currentTarget.currentTime == 0 && type != "embed") {
             setTimeVideo(SheePlayer.currentTime)
         }
 
