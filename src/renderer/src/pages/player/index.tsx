@@ -13,7 +13,7 @@ import { Match, onCleanup, onMount, Switch } from "solid-js";
 import { useResponse } from "@renderer/utils/hooks/useResponse";
 import { useI18n } from "@renderer/utils/i18n";
 import { addToAnimuList, updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist";
-import { getSocket, getSocketRoom, informationCache, PlayerCache, setIncognitoMode } from "@renderer/utils/stores/global";
+import { getAnimuHistory, getSocket, getSocketRoom, informationCache, PlayerCache, setIncognitoMode } from "@renderer/utils/stores/global";
 import { createStore, unwrap } from "solid-js/store";
 import { SheepShortcut } from "@renderer/utils/hooks/useKeyPress";
 import pluginManager from "@renderer/utils/pluginManager";
@@ -240,7 +240,11 @@ const player = () => {
         if (anime_data.continewatch) return navigate("/")
         if (config.Player.general.PlayerBehavior === "home") navigate("/")
         else {
-            informationCache.update({ ...informationCache.anime, animulist: anime_data.animulist, DontOverWrite: true })
+            const tmp = getAnimuHistory().get(informationCache.anime["anime"]["id"])
+            let anime = informationCache.anime
+            if (tmp) anime = { anime: tmp["AnimeData"], saveData: tmp["saveData"] }
+
+            informationCache.update({ ...anime, animulist: anime_data.animulist, DontOverWrite: true })
             navigate("/info")
         }
     }
