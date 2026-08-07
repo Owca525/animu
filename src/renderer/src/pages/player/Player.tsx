@@ -858,7 +858,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             if (value >= element.start && value <= element.end) return
             if (element.type != ui.chapterSkipType) return
 
-            clearChapterSkipTime()
+            clearChapterSkipTime(false)
         })
     }
 
@@ -1448,7 +1448,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         }, 1000);
     };
 
-    function clearChapterSkipTime() {
+    function clearChapterSkipTime(overwrite = true) {
         if (!hideChapterButtonTimer || !ui.chapterSkipType) return
         clearInterval(hideChapterButtonTimer)
 
@@ -1458,7 +1458,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             chapterSkipTimer: 15,
         })
 
-        if (ui.chapterSkipEnd > 0) setTimeVideo(ui.chapterSkipEnd)
+        if (ui.chapterSkipEnd > 0 && overwrite) setTimeVideo(ui.chapterSkipEnd)
     }
 
     function checkUpNext(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
@@ -1851,7 +1851,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             <Button
                 content={t(`player.skiptimebutton.${ui.chapterSkipType}`, { time: ui.chapterSkipTimer })}
                 ButtonClass={`player-skip-chapters-button ${ui.chapterSkipActive ? "show" : "hidden"}`}
-                onClick={clearChapterSkipTime}
+                onClick={() => clearChapterSkipTime()}
             />
 
 
