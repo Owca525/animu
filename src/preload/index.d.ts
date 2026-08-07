@@ -32,7 +32,7 @@ declare global {
         install: (tag: string) => Promise<void>
         run: (commands: string[]) => Promise<{ [key: string]: any }>
       },
-      request: (url: string, options?: { method?: "POST" | "GET", header?: Record<string, string>, body?: any }) => Promise<{
+      request: (url: string, options?: RequestInit) => Promise<{
         text: string,
         json: { [key: string]: any } | undefined,
         buffer: Buffer,

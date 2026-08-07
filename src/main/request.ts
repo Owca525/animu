@@ -1,7 +1,7 @@
 import { ipcMain } from "electron";
 import { DEBUG } from ".";
 
-export async function advanceRequest(url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string }, body?: any }) {
+export async function advanceRequest(url: string, options?: RequestInit) {
     try {
         const response = await fetch(url, options);
 

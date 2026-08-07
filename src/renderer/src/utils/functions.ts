@@ -410,7 +410,7 @@ export function updateObject<T, U>(path: string, value: U, object: T): T {
     return newObject
 }
 
-export async function request(url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string }, body?: any }, noCors: boolean = false): Promise<{ text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: Map<string, string> }> {
+export async function request(url: string, options?: RequestInit, noCors: boolean = false): Promise<{ text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: Map<string, string> }> {
     try {
         /* IFDEF WEB */
         const response = await fetch(noCors ? url : "/api/request", noCors ? options : {

@@ -3,6 +3,19 @@ import { request } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerPluginFormat, serverStatusData } from "@renderer/utils/types";
 
 const WEBSITE = ""
+const PluginHeader = {
+    "User-Agent": navigator.userAgent,
+    Accept: "*/*",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "Sec-GPC": "1",
+    Connection: "keep-alive",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "cross-site",
+    'Referer': WEBSITE,
+    "Origin": WEBSITE
+}
 
 export default class template implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
