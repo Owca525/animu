@@ -551,6 +551,7 @@ export interface SettingsConfig {
             showBrokenBuffer: boolean
             minusTime: boolean
             disablemoreinformation: boolean
+            autoSkipOpeningEnding: boolean
         }
         screenShot: {
             alwaysAsk: boolean

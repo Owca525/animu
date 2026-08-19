@@ -7,6 +7,7 @@ interface ButtonProps {
   content?: string;
   ButtonClass?: string;
   onClick?: (event: MouseEvent) => void;
+  onMouseDown?: (event: MouseEvent & { currentTarget: HTMLButtonElement; target: Element; }) => void
   titleButton?: string;
 }
 
@@ -16,6 +17,7 @@ export default function Button(props: ButtonProps) {
       tabIndex={-1}
       class={"button " + (props.ButtonClass ?? "")}
       onClick={props.onClick}
+      onMouseDown={props.onMouseDown}
       onKeyDown={(event) => event.code == "Space" || event.code == "Enter" ? event.preventDefault() : ""}
     >
       <Show when={props.titleButton}>

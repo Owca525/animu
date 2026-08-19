@@ -1440,7 +1440,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             let prev = ui.chapterSkipTimer
 
             if (prev <= 1) {
-                clearChapterSkipTime()
+                clearChapterSkipTime(config["Player"]["general"]["autoSkipOpeningEnding"])
                 prev = 15
             } else {
                 prev -= 1
@@ -1855,7 +1855,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             <Button
                 content={t(`player.skiptimebutton.${ui.chapterSkipType}`, { time: ui.chapterSkipTimer })}
                 ButtonClass={`player-skip-chapters-button ${ui.chapterSkipActive ? "show" : "hidden"}`}
-                onClick={() => clearChapterSkipTime()}
+                onMouseDown={(v) => clearChapterSkipTime(v.button != 2)}
             />
 
 

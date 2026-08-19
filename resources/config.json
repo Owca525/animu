@@ -33,7 +33,8 @@
             "autoSkipEndings": false,
             "showBrokenBuffer": false,
             "minusTime": false,
-            "disablemoreinformation": false
+            "disablemoreinformation": false,
+            "autoSkipOpeningEnding": false
         },
         "screenShot": {
             "alwaysAsk": true,
