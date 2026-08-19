@@ -302,9 +302,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         (window as any).playerMetadata = metadata;
         /* ENDIF */
 
-        console.log(SheePlayer.isFullscreen)
-
-        toggleFullscreen(SheePlayer.isFullscreen)
+        if (type != "embed") toggleFullscreen(SheePlayer.isFullscreen)
 
         if (type == "embed") {
             SheePlayer.currentTime = 0
