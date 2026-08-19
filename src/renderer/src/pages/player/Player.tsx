@@ -302,6 +302,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         (window as any).playerMetadata = metadata;
         /* ENDIF */
 
+        console.log(SheePlayer.isFullscreen)
+
         toggleFullscreen(SheePlayer.isFullscreen)
 
         if (type == "embed") {
@@ -1081,9 +1083,11 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         /* IFDEF DEBUG|PROD */
         if (await window.BrowserWindow.isFullscreen()) {
             toggleFullscreen(false)
+            SheePlayer.isFullscreen = false
             updatePlayer({ isFullscreen: false })
         } else {
             toggleFullscreen(true)
+            SheePlayer.isFullscreen = true
 
             containerRef?.requestFullscreen()
 
@@ -1094,9 +1098,11 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         /* IFDEF WEB */
         if (document.fullscreenElement) {
             toggleFullscreen(false)
+            SheePlayer.isFullscreen = false
             updatePlayer({ isFullscreen: false })
         } else {
             toggleFullscreen(true)
+            SheePlayer.isFullscreen = true
             updatePlayer({ isFullscreen: true })
         }
         /* ENDIF */
