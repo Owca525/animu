@@ -296,6 +296,7 @@ class WorkerWrapper implements WorkerWrapperInstance {
     detectObjectHasAFunction = (object): any => {
         let finalObject: any[] | { [key: string]: any } = Array.isArray(object) ? [] : {}
         if (typeof object == "string") return object
+        if (object == undefined || object == null) return object
 
         if (Array.isArray(object)) {
             for (let index = 0; index < object.length; index++) {
