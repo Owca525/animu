@@ -1082,6 +1082,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         if (await window.BrowserWindow.isFullscreen()) {
             toggleFullscreen(false)
             SheePlayer.isFullscreen = false
+            document.exitFullscreen()
             updatePlayer({ isFullscreen: false })
         } else {
             toggleFullscreen(true)
