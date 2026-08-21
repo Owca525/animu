@@ -18,12 +18,13 @@ import "./plugins"
 import { convertToNewFormat, detectOldVersion, write } from './os'
 import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync } from 'fs'
 import { cardData, defaultConfig, SettingsConfig } from './types';
-import { deepMerge, detectZoom, setupDiscordRPC } from './utils';
+import { checkConfigFolder, deepMerge, detectZoom, setupDiscordRPC } from './utils';
 import { electronAppUniversalProtocolClient } from 'electron-app-universal-protocol-client';
 import { checkDatabase } from './animulist';
 import { ParseINI } from './iniParser';
 import { t } from './i18n'
 import { yt_dlpInstance } from './ytdlpHandler'
+import { getThemeList } from './theme'
 
 export let mainWindow: BrowserWindow | undefined
 export let userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.254 Safari/537.36"
@@ -348,7 +349,11 @@ process.on('unhandledRejection', console.error)
 
 ipcMain.handle('backend:refresh', () => initialBackend());
 
-ipcMain.handle('backend:config', () => config);
-ipcMain.handle('backend:history', () => historyData);
+ipcMain.handle('initialMetadata', () => ({ 
+  config: config, 
+  history: historyData, 
+  animulist: checkDatabase(), 
+  theme: getThemeList(checkConfigFolder("themes")) 
+}));
 
 ipcMain.handle('backend:customheader', (_, header: Record<string, string | string[]> | undefined) => customheader = header);

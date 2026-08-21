@@ -76,8 +76,6 @@ if (process.contextIsolated) {
       getOSDetails: () => ipcRenderer.invoke('os:information'),
       getUserLang: () => ipcRenderer.invoke("lang:files"),
       saveConfig: (config) => ipcRenderer.invoke("os:saveConfig", config),
-      getConfig: () => ipcRenderer.invoke("backend:config"),
-      getHistory: () => ipcRenderer.invoke("backend:history"),
       onProtocolRequest: (callback: (url: string) => void) => {
         ipcRenderer.on('protocol-request', (_, url) => callback(url));
       },
@@ -106,6 +104,7 @@ if (process.contextIsolated) {
       reload: () => ipcRenderer.send("window:reload"),
       createWindow: (props) => ipcRenderer.invoke("window:createNewWindow", props),
     });
+    contextBridge.exposeInMainWorld("initialMetadata", ipcRenderer.invoke('initialMetadata'))
   } catch (error) {
     console.error(error);
   }

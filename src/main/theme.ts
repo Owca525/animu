@@ -41,7 +41,9 @@ function saveThemeConfig(theme: themeFormatType, data: Record<string, boolean | 
 }
 
 
-function getThemeList(themePath: string): themeFormatType[] {
+export function getThemeList(themePath: string | undefined): themeFormatType[] {
+    if (!themePath) return []
+    
     let listFolder = fs.readdirSync(themePath)
     let finallist: themeFormatType[] = []
     for (let index = 0; index < listFolder.length; index++) {
@@ -132,13 +134,7 @@ function getMetadataTheme(path_theme: string): themeFormatType | undefined {
 }
 
 ipcMain.handle('theme:listTheme', async (): Promise<themeFormatType[]> => {
-    const configcss = checkConfigFolder("themes")
-    if (configcss == undefined) return []
-
-    // Direcotry for config/theme css
-    const customList = await getThemeList(configcss)
-
-    return customList
+    return getThemeList(checkConfigFolder("themes"))
 });
 
 ipcMain.handle('theme:SaveConfig', async (_event, theme: themeFormatType, data: Record<string, boolean | string>): Promise<void> => saveThemeConfig(theme, data))

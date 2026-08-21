@@ -12,7 +12,7 @@ import Settings from './pages/settings/index';
 import {
   calculateZoomLevel,
   changeTheme,
-  checkAnimeTodayReleaseEpisode,
+  // checkAnimeTodayReleaseEpisode,
   checkDate,
   checkTimeDriffrentUnix,
   dateToUnix,
@@ -84,6 +84,8 @@ import { setNewHistory } from './utils/FilesManager/history';
 // /* IFDEF PROD */
 // import './utils/logger';
 // /* ENDIF */
+
+(window as any).ServiceManager = () => ServiceManager;
 
 function App() {
   const { changeLanguage } = useI18n()
@@ -174,23 +176,22 @@ function App() {
       /* ENDIF */
 
       /* IFDEF DEBUG|PROD */
-      setConfig(await window.api.getConfig())
-      setNewHistory(await window.api.getHistory())
+      const metadata = await window["initialMetadata"]
+      setConfig(metadata["config"])
+      setNewHistory(metadata["history"])
       /* ENDIF */
 
-      setinitialState({ text: "initial.theme", plugin: false })
       /* IFDEF DEBUG|PROD */
+      setinitialState({ text: "initial.theme", plugin: false })
       setGlobalTheme([
         ...window["animuAppInfo"]["themes"],
-        ...await window.api.themes.list()
+        ...metadata["theme"]
       ]);
       /* ENDIF */
 
-      (window as any).ServiceManager = () => ServiceManager
-
-      setinitialState({ text: "Loading Animulist", plugin: false })
       /* IFDEF DEBUG|PROD */
-      setNewAnimuList(await window.api.animulist.getDatabase())
+      setinitialState({ text: "Loading Animulist", plugin: false })
+      setNewAnimuList(metadata["animulist"])
       /* ENDIF */
 
       /* IFDEF WEB */
@@ -199,9 +200,7 @@ function App() {
       /* ENDIF */
 
       setinitialState({ text: "initial.config", plugin: false })
-      /* IFDEF DEBUG|PROD */
       LoadConfig()
-      /* ENDIF */
       setHomeActivePage("global.home")
 
       setinitialState({ text: "initial.plugin", plugin: false })
