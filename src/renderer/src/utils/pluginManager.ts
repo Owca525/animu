@@ -13,14 +13,19 @@ const pluginFunctionsURL = URL.createObjectURL(blob);
 const availbeFunctions: { name: string, func: (...args) => Promise<any>, ignore?: boolean }[] = [{
     name: "request",
     func: request as any
-}, {
+},
+/* IFDEF DEBUG|PROD */
+{
     name: "yt-dlp",
     func: window.api.yt_dlp.run
-},{
+},
+{
     name: "requestCloudflare",
     func: requestCloudflare,
     ignore: true,
-}]
+}
+/* ENDIF */
+]
 
 const workerDummyimport = `
 export const SheepFinderAnime2000 = () => {};
@@ -388,7 +393,7 @@ class WorkerWrapper implements WorkerWrapperInstance {
                     ]
                 }
 
-                console.warn(data["uuid"], finalObject)
+                console.warn(`${this.pluginData["name"]} Results`, finalObject)
 
                 resolve(Object.entries(finalObject).length > 0 ? finalObject : data.value);
                 if (!data["stay"]) this.pendingRequest.delete(data.uuid);
