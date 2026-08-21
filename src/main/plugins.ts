@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { animuPlugins, animuUserData, newConfigPath, pluginsConfigPath } from ".";
 import { pluginRepoExpanded } from "./types";
-import { advanceRequest } from "./request";
+import { advanceRequest } from "./utils";
 import { sha256FromString } from "./utils";
 import { ConvertObjectToINI, ParseINI } from "./iniParser";
 

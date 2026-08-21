@@ -7,7 +7,6 @@ import icon from '../../build/icon.png?asset'
 import "./utils"
 import "./window"
 import "./update"
-import "./request"
 import "./streaming"
 import "./backup"
 import "./animulist"
@@ -18,14 +17,16 @@ import "./plugins"
 import { convertToNewFormat, detectOldVersion, write } from './os'
 import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync } from 'fs'
 import { cardData, defaultConfig, SettingsConfig } from './types';
-import { checkConfigFolder, deepMerge, detectZoom, setupDiscordRPC } from './utils';
+import { advanceRequest, checkConfigFolder, deepMerge, detectZoom, setupDiscordRPC } from './utils';
 import { electronAppUniversalProtocolClient } from 'electron-app-universal-protocol-client';
 import { checkDatabase } from './animulist';
 import { ParseINI } from './iniParser';
 import { t } from './i18n'
 import { yt_dlpInstance } from './ytdlpHandler'
 import { getThemeList } from './theme'
+import { Server } from './server/main'
 
+const server = new Server
 export let mainWindow: BrowserWindow | undefined
 export let userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.254 Safari/537.36"
 export const animuUserData = app.getPath("userData")
@@ -268,6 +269,7 @@ app.whenReady().then(async () => {
 })
 
 app.on('window-all-closed', () => {
+  server.instance.close()
   if (process.platform !== 'darwin') {
     app.quit()
   }
@@ -353,7 +355,9 @@ ipcMain.handle('initialMetadata', () => ({
   config: config, 
   history: historyData, 
   animulist: checkDatabase(), 
-  theme: getThemeList(checkConfigFolder("themes")) 
+  theme: getThemeList(checkConfigFolder("themes")),
+  port: server.port
 }));
 
 ipcMain.handle('backend:customheader', (_, header: Record<string, string | string[]> | undefined) => customheader = header);
+ipcMain.handle('advanceRequest', async (_, url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string }, body: any }) => await advanceRequest(url, options));

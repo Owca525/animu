@@ -1,7 +1,7 @@
 import path from "node:path"
 import fs from "fs"
 import { animuUserData } from "."
-import { advanceRequest } from "./request"
+import { advanceRequest } from "./utils"
 import { spawn } from "node:child_process"
 import { app } from "electron"
 

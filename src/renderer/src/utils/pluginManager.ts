@@ -99,7 +99,8 @@ var window = {
     requestCloudflare: async (...args) => await callMainProcess("requestCloudflare", args),
     savePluginConfig: async (...args) => await callMainProcess("saveConfig", args),
     animuAppInfo: "PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION_WORKER",
-    config: "CHANGE_TO_CONFIG_WHEN_ARE_PERMISIONS"
+    config: "CHANGE_TO_CONFIG_WHEN_ARE_PERMISIONS",
+    serverPort: "CHANGE_TO_PORT_SERVER"
 };
 
 globalThis.window = window;
@@ -348,6 +349,10 @@ class WorkerWrapper implements WorkerWrapperInstance {
             themes: undefined
         }))
 
+        /* IFDEF DEBUG|PROD */
+        payload = payload.replace("CHANGE_TO_PORT_SERVER", window["serverPort"])
+        /* ENDIF */
+
         payload = payload.replace(`"CHANGE_TO_CONFIG_WHEN_ARE_PERMISIONS"`, JSON.stringify(config))
 
         const payloadBLob = new Blob([payload], { type: "text/javascript" });
@@ -438,7 +443,7 @@ class WorkerWrapper implements WorkerWrapperInstance {
                 try {
                     worker.postMessage({
                         type: "RESULT",
-                        value: await tmp["func"](...data["args"]),
+                        value: JSON.parse(JSON.stringify(await tmp["func"](...data["args"]))),
                         uuid: data["uuid"]
                     })
                 } catch (error) {

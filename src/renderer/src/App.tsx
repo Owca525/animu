@@ -177,6 +177,7 @@ function App() {
 
       /* IFDEF DEBUG|PROD */
       const metadata = await window["initialMetadata"]
+      window["serverPort"] = metadata["port"]
       setConfig(metadata["config"])
       setNewHistory(metadata["history"])
       /* ENDIF */
@@ -188,7 +189,7 @@ function App() {
         ...metadata["theme"]
       ]);
       /* ENDIF */
-
+      
       /* IFDEF DEBUG|PROD */
       setinitialState({ text: "Loading Animulist", plugin: false })
       setNewAnimuList(metadata["animulist"])

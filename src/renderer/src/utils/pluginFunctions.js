@@ -242,8 +242,56 @@ export function getWeek() {
  * @param {boolean} [noCors=false] 
  * @returns {Promise<{ text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: Map<string, string> }>} 
  */
-export async function request(url, options) {
-    return await window.request(url, options)
+export async function request(url, options, noCors = false) {
+    try {
+        let server = "/api/request"
+        if (window["serverPort"]) server = `http://localhost:${window["serverPort"]}/api/request`
+        const response = await fetch(noCors ? url : server, noCors ? options : {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                url: url,
+                requestOptions: options
+            })
+        })
+        const respTextClone = response.clone()
+        let text = "";
+        try {
+            text = await respTextClone.text()
+        } catch (error) { }
+
+        let bufferCloned = response.clone()
+        let jsontext;
+
+        try {
+            jsontext = await response.json()
+        } catch (error) { }
+
+        return {
+            text: text,
+            json: jsontext,
+            buffer: await bufferCloned.arrayBuffer(),
+            status: response.status,
+            statusText: response.statusText,
+            url: response.url,
+            success: response.ok,
+            responseHeader: response.headers
+        };
+    } catch (error) {
+        console.error("error in requestGET", error)
+        return {
+            text: error.message,
+            json: undefined,
+            buffer: [],
+            status: 500,
+            statusText: "Error",
+            url: url,
+            success: false,
+            responseHeader: {}
+        }
+    }
 }
 
 /**
