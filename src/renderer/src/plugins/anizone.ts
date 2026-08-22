@@ -125,9 +125,10 @@ interface ANIZONE_SEARCH_TYPE {
 }
 
 function decodeHTML(str: string): { [key: number | string]: any } {
-    return JSON.parse(str.replace(/\\\\/g, "\\").replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) =>
-        String.fromCharCode(parseInt(hex, 16))
-    ))
+    return JSON.parse(str.replace(/\\u([0-9a-fA-F]{4})/g, 
+        (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+        .replace(/\\\//g, '/').replace(/\\(?!["\\/bfnrtu])/g, '')
+    )
 }
 
 async function extractChapters(url: string): Promise<playerChapterList[]> {
