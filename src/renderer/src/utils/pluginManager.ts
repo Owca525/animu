@@ -539,38 +539,81 @@ export class InformationPluginInstance implements informationPluginInstanceForma
     instance: WorkerWrapperInstance = undefined as any;
 
     search = async (name: string, page: number, params?: FilterPluginsParams): Promise<SearchResponse> => {
-        if (!this.instance) return { content: [], maxPage: 20, nextPage: false, }
-        return await this.instance.wrapperFunction("search", { name, page, params }, true) as any
+        if (!this.instance) return { content: [], maxPage: 20, nextPage: false }
+        try {
+            return await this.instance.wrapperFunction("search", { name, page, params }, true) as any
+        } catch (error) {
+            console.error(`Information Plugin ${this.metadata} Error`, error)
+            return { content: [], maxPage: 20, nextPage: false }
+        }
     }
 
     home = async (): Promise<{ topCards?: containerData; sections: containerData[]; } | { error: string; } | undefined> => {
         if (!this.instance) return
-        return await this.instance.wrapperFunction("home", undefined, true) as any
+        try {
+            const response = await this.instance.wrapperFunction("home", undefined, true) as any
+
+            if ((!response || response["error"] || !response["topCards"] || response["sections"].length <= 0) && localStorage.getItem("information_instance_cache") != undefined) {
+                return JSON.parse(localStorage.getItem("information_instance_cache")!)
+            }
+
+            if (response["sections"].length > 0) localStorage.setItem("information_instance_cache", JSON.stringify(response))
+
+            return response
+        } catch (error) {
+            console.error(`Information Plugin ${this.metadata} Error`, error)
+            return
+        }
     }
 
     anime = async (id: string): Promise<AnimeData | undefined> => {
         if (!this.instance) return
-        return await this.instance.wrapperFunction("anime", { id }) as any
+        try {
+            return await this.instance.wrapperFunction("anime", { id }) as any
+        } catch (error) {
+            console.error(`Information Plugin ${this.metadata} Error`, error)
+            return
+        }
     }
 
     schedule = async (airingStart: number, airingEnd: number): Promise<cardData[]> => {
         if (!this.instance) return []
-        return await this.instance.wrapperFunction("schedule", { airingStart, airingEnd }) as any
+        try {
+            return await this.instance.wrapperFunction("schedule", { airingStart, airingEnd }) as any
+        } catch (error) {
+            console.error(`Information Plugin ${this.metadata} Error`, error)
+            return []
+        }
     };
 
     getManga = async (id: string): Promise<AnimeData | undefined> => {
         if (!this.instance) return
-        return await this.instance.wrapperFunction("getManga", { id }) as any
+        try {
+            return await this.instance.wrapperFunction("getManga", { id }) as any
+        } catch (error) {
+            console.error(`Information Plugin ${this.metadata} Error`, error)
+            return
+        }
     };
 
     getAnimeList = async (): Promise<cardData[]> => {
         if (!this.instance) return []
-        return await this.instance.wrapperFunction("getAnimeList") as any
+        try {
+            return await this.instance.wrapperFunction("getAnimeList") as any
+        } catch (error) {
+            console.error(`Information Plugin ${this.metadata} Error`, error)
+            return []
+        }
     };
 
     setAnimeInList = async (variable: Anilist_ListMutation): Promise<boolean> => {
         if (!this.instance) return false
-        return await this.instance.wrapperFunction("setAnimeInList", { variable }) as any
+        try {
+            return await this.instance.wrapperFunction("setAnimeInList", { variable }) as any
+        } catch (error) {
+            console.error(`Information Plugin ${this.metadata} Error`, error)
+            return false
+        }
     };
 
     CreateInstance = async (plugin: PluginLoadedFormat): Promise<void> => {
