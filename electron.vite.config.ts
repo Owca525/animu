@@ -50,103 +50,96 @@ function readAllLangFiles() {
   return final;
 }
 
-function getFolderPath(folderPath: string) {
-    try {
-        if (fs.statSync(folderPath).isDirectory()) return folderPath
-        return path.dirname(folderPath)
-    } catch (error) {
-        return folderPath
-    }
-}
-
 function getThemeList(themePath: string): { [key: string]: any }[] {
-    let listFolder = fs.readdirSync(themePath)
-    let finallist: { [key: string]: any }[] = []
-    for (let index = 0; index < listFolder.length; index++) {
-        const element = listFolder[index];
-        const folderTheme = path.join(themePath, element)
-        if (fs.statSync(folderTheme).isDirectory()) {
-            let theme = getMetadataTheme(folderTheme)
-            if (theme) finallist.push(theme)
-        }
+  let listFolder = fs.readdirSync(themePath)
+  let finallist: { [key: string]: any }[] = []
+  for (let index = 0; index < listFolder.length; index++) {
+    const element = listFolder[index];
+    const folderTheme = path.join(themePath, element)
+    if (fs.statSync(folderTheme).isDirectory()) {
+      let theme = getMetadataTheme(folderTheme)
+      if (theme) finallist.push(theme)
     }
-    return finallist.map((theme) => {
-        if (!theme.options) return {...theme, mainCSS: fs.readFileSync(theme.mainCSS, "utf-8")}
-        const mainCSSPath = getFolderPath(theme.mainCSS)
-        return {
-            ...theme,
-            mainCSS: fs.readFileSync(theme.mainCSS, "utf-8"),
-            options: theme.options.map((value) => {
-                if (value.css && value.css.replaceAll(" ", "") != "") return { 
-                    ...value, 
-                    css: fs.readFileSync(path.join(mainCSSPath, value.css), "utf-8") 
-                }
+  }
+  return finallist.map((theme) => {
+    try {
+      const theme_folder = path.dirname(theme.mainCSS)
+      if (!theme.options) return { ...theme, mainCSS: theme.mainCSS }
+      return {
+        ...theme,
+        mainCSS: theme.mainCSS,
+        options: theme.options.map((value) => {
+          if (value.css && value.css.replaceAll(" ", "") != "") return {
+            ...value,
+            css: path.join(`${theme_folder}`, value.css ?? "")
+          }
 
-                if (value.dropDown) return { ...value, dropDown: value.dropDown.map((val) => ({ 
-                    ...val, 
-                    css: val.css != "" ? fs.readFileSync(path.join(mainCSSPath, val.css), "utf-8") : "" 
-                })) 
-            }
+          if (value.dropDown) return {
+            ...value, dropDown: value.dropDown.map((css_drop) => ({
+              ...css_drop,
+              css: css_drop.css != "" ? path.join(`${theme_folder}`, css_drop.css ?? "") : ""
+            }))
+          }
 
-                return value
-            })
-        }
-    })
+          return value
+        })
+      }
+    } catch (error) {
+      console.error("Error in getThemeList", error, theme)
+
+      return { ...theme, mainCSS: theme.mainCSS }
+    }
+  })
 }
 
 function themeParser(theme: { [key: string]: any }): { [key: string]: any } | undefined {
-    try {
-        if (!("author" in theme) || !("themeName" in theme) || !("mainCSS" in theme)) return
-        let tmpTheme: { [key: string]: any } = {
-            author: theme["author"],
-            themeName: theme["themeName"],
-            mainCSS: theme["mainCSS"],
-        } as any
+  try {
+    if (!("author" in theme) || !("themeName" in theme) || !("mainCSS" in theme)) return
+    let tmpTheme: { [key: string]: any } = {
+      author: theme["author"],
+      themeName: theme["themeName"],
+      mainCSS: theme["mainCSS"],
+    } as any
 
-        if (theme["api"]) tmpTheme = { ...tmpTheme, api: theme["api"] }
-        if (theme["version"]) tmpTheme = { ...tmpTheme, version: theme["version"] }
-        if (theme["options"]) {
-            const tmpOptions = theme["options"].map((option) => {
-                let tmpDropdown: any = undefined
-                if (option["dropDown"]) {
-                    tmpDropdown = option["dropDown"].map((v) => ({
-                        option: v["option"],
-                        css: v["css"],
-                    }))
-                }
-
-                return {
-                    name: option["name"],
-                    dropDown: tmpDropdown,
-                    css: option["css"],
-                    default: option["default"],
-                }
-            })
-
-            tmpTheme = { ...tmpTheme, options: tmpOptions }
+    if (theme["api"]) tmpTheme = { ...tmpTheme, api: theme["api"] }
+    if (theme["version"]) tmpTheme = { ...tmpTheme, version: theme["version"] }
+    if (theme["options"]) {
+      const tmpOptions = theme["options"].map((option) => {
+        let tmpDropdown: any = undefined
+        if (option["dropDown"]) {
+          tmpDropdown = option["dropDown"].map((v) => ({
+            option: v["option"],
+            css: v["css"],
+          }))
         }
 
-        return tmpTheme
-    } catch (error) {
-        console.error("Failed Parse Theme", error)
-        return
+        return {
+          name: option["name"],
+          dropDown: tmpDropdown,
+          css: option["css"],
+          default: option["default"],
+        }
+      })
+
+      tmpTheme = { ...tmpTheme, options: tmpOptions }
     }
+
+    return tmpTheme
+  } catch (error) {
+    console.error("Failed Parse Theme", error)
+    return
+  }
 }
 
 function getMetadataTheme(path_theme: string): { [key: string]: any } | undefined {
-    try {
-        const pathTheme = path.join(path_theme, "/theme.json")
+  const pathTheme = path.join(`${path_theme}`, "/theme.json")
 
-        if (!fs.existsSync(pathTheme)) return
-        let themeJSON = JSON.parse(fs.readFileSync(pathTheme, "utf-8"))
-        const theme = themeParser(themeJSON)
-        if (!theme) return
+  if (!fs.existsSync(pathTheme)) return
+  let themeJSON = JSON.parse(fs.readFileSync(pathTheme, "utf-8"))
+  const theme = themeParser(themeJSON)
+  if (!theme) return
 
-        return { ...theme, mainCSS: path.join(path_theme, theme.mainCSS) }
-    } catch (error) {
-        console.error("Error parsing theme", error)
-        return
-    }
+  return { ...theme, mainCSS: path.join(`${path.basename(path_theme)}`, theme.mainCSS) }
 }
 
 function ConditionTransform(code: string, flags: Record<string, boolean>): string {
@@ -269,6 +262,35 @@ function compileRawModule() {
   };
 }
 
+function copFiles(folderPath: string) {
+  return {
+    name: "copy-files",
+
+    configureServer(server) {
+      server.middlewares.use(`/${folderPath.split("/").pop()}`, (req, res, next) => {
+        const filePath = path.join(path.resolve(folderPath), req.url);
+
+        if (!fs.existsSync(filePath)) {
+          return next();
+        }
+
+        const content = fs.readFileSync(filePath);
+
+        res.end(content);
+      });
+    },
+
+    closeBundle() {
+      const source = path.resolve(folderPath);
+      const destination = path.resolve(`out/renderer/${folderPath.split("/").pop()}`);
+
+      fs.cpSync(source, destination, {
+        recursive: true,
+      })
+    },
+  };
+}
+
 export default defineConfig({
   main: {
     build: {
@@ -328,6 +350,7 @@ export default defineConfig({
       solid(),
       compileRawModule(),
       generateInfoFile(),
+      copFiles("./src/renderer/src/themes")
     ]
   }
 })

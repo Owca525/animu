@@ -96,13 +96,16 @@ export function formatTime(seconds: number | undefined): string {
     return `${hoursPart}${hoursPart != "" && minutes < 10 ? "0" : ""}${minutes}:${secs < 10 ? '0' : ''}${secs}`;
 }
 
-function createHTMLLinkElement(css: string) {
-    const blob = new Blob([css], { type: "text/css" });
-    const url = URL.createObjectURL(blob);
+export function join_path(...parts) {
+  return parts.join("/").replace(/\/+/g, "/").replace("http:/", "http://");
+}
 
+function createHTMLLinkElement(css: string) {
+    if (!css || css.length <= 0) return
+    
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = url;
+    link.href = join_path(getRenderPath(), "themes", css);
     document.head.appendChild(link);
 }
 
@@ -119,7 +122,7 @@ export async function changeTheme(activeTheme: Map<number, themeMetadata>) {
 
     activeTheme.forEach(async (theme) => {
         if (theme.themeName != "DarkerAnimu") createHTMLLinkElement(theme.mainCSS)
-
+        
         if (!theme.options) return
         const conf = await window.api.themes.config(theme)
         for (const key in conf) {

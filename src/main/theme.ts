@@ -3,7 +3,7 @@ import { themeConfigPath } from '.';
 import fs from 'fs';
 import path from 'path';
 import { ipcMain } from 'electron';
-import { checkConfigFolder, getFolderPath } from './utils';
+import { checkConfigFolder } from './utils';
 import { ConvertObjectToINI, ParseINI } from './iniParser';
 
 function getThemeConfig(theme: themeFormatType) {
@@ -40,10 +40,10 @@ function saveThemeConfig(theme: themeFormatType, data: Record<string, boolean | 
     fs.writeFileSync(path.join(themeConfigPath, `${theme.themeName}.ini`), ConvertObjectToINI(content), "utf-8")
 }
 
-
+// TODO: Rewrite Loading Theme
 export function getThemeList(themePath: string | undefined): themeFormatType[] {
     if (!themePath) return []
-    
+
     let listFolder = fs.readdirSync(themePath)
     let finallist: themeFormatType[] = []
     for (let index = 0; index < listFolder.length; index++) {
@@ -55,25 +55,32 @@ export function getThemeList(themePath: string | undefined): themeFormatType[] {
         }
     }
     return finallist.map((theme) => {
-        if (!theme.options) return {...theme, mainCSS: fs.readFileSync(theme.mainCSS, "utf-8")}
-        const mainCSSPath = getFolderPath(theme.mainCSS)
-        return {
-            ...theme,
-            mainCSS: fs.readFileSync(theme.mainCSS, "utf-8"),
-            options: theme.options.map((value) => {
-                if (value.css && value.css.replaceAll(" ", "") != "") return { 
-                    ...value, 
-                    css: fs.readFileSync(path.join(mainCSSPath, value.css), "utf-8") 
-                }
+        try {
+            const theme_folder = path.dirname(theme.mainCSS)
+            if (!theme.options) return { ...theme, mainCSS: theme.mainCSS }
+            return {
+                ...theme,
+                mainCSS: theme.mainCSS,
+                options: theme.options.map((value) => {
+                    if (value.css && value.css.replaceAll(" ", "") != "") return {
+                        ...value,
+                        css: path.join(`${theme_folder}`, value.css ?? "")
+                    }
 
-                if (value.dropDown) return { ...value, dropDown: value.dropDown.map((val) => ({ 
-                    ...val, 
-                    css: val.css != "" ? fs.readFileSync(path.join(mainCSSPath, val.css), "utf-8") : "" 
-                })) 
+                    if (value.dropDown) return {
+                        ...value, dropDown: value.dropDown.map((css_drop) => ({
+                            ...css_drop,
+                            css: css_drop.css != "" ? path.join(`${theme_folder}`, css_drop.css ?? "") : ""
+                        }))
+                    }
+
+                    return value
+                })
             }
+        } catch (error) {
+            console.error("Error in getThemeList", error, theme)
 
-                return value
-            })
+            return { ...theme, mainCSS: theme.mainCSS }
         }
     })
 }
@@ -119,14 +126,14 @@ function themeParser(theme: themeFormatType): themeFormatType | undefined {
 
 function getMetadataTheme(path_theme: string): themeFormatType | undefined {
     try {
-        const pathTheme = path.join(path_theme, "/theme.json")
+        const pathTheme = path.join(`${path_theme}`, "/theme.json")
 
         if (!fs.existsSync(pathTheme)) return
         let themeJSON = JSON.parse(fs.readFileSync(pathTheme, "utf-8"))
         const theme = themeParser(themeJSON)
         if (!theme) return
 
-        return { ...theme, mainCSS: path.join(path_theme, theme.mainCSS) }
+        return { ...theme, mainCSS: path.join(`${path.basename(path_theme)}`, theme.mainCSS) }
     } catch (error) {
         console.error("Error parsing theme", error)
         return

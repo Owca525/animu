@@ -3,7 +3,7 @@ import { getConfig } from "./stores/config";
 import { getGlobalCache } from "./stores/global";
 import { getHomeCache } from "./stores/home";
 import { getAllPluginList, getInformationPlugin, getPlayerPLugin, getPluginRepo } from "./stores/plugins";
-import { request, checkAnimeTodayReleaseEpisode, checkTimeDriffrentUnix, dateToUnix } from "./functions";
+import { request, checkAnimeTodayReleaseEpisode, checkTimeDriffrentUnix, dateToUnix, getRenderPath } from "./functions";
 import { t } from "./i18n";
 import icon from '@resources/icon.png';
 import { sendNotification } from "./NotificationManager";
@@ -21,6 +21,7 @@ window.checkTimeDriffrentUnix = checkTimeDriffrentUnix;
 window.dateToUnix = dateToUnix;
 window.sendNotification = sendNotification;
 window.checkAnimeTodayReleaseEpisode = checkAnimeTodayReleaseEpisode;
+window.getRenderPath = getRenderPath;
 window.request = request;
 window.testNotitication = () => {
     sendNotification({
