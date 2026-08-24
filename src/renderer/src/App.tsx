@@ -12,7 +12,7 @@ import Settings from './pages/settings/index';
 import {
   calculateZoomLevel,
   changeTheme,
-  // checkAnimeTodayReleaseEpisode,
+  checkAnimeTodayReleaseEpisode,
   checkDate,
   checkTimeDriffrentUnix,
   dateToUnix,
@@ -357,13 +357,13 @@ function initialServices() {
       description: t("Check Daily Anilist"),
       activeTime: timeCovertToMs({ hour: 3 })
     },
-    // {
-    //   active: true,
-    //   execute: checkAnimeTodayReleaseEpisode,
-    //   name: t("EpisodesAvaible"),
-    //   description: t("Check Is Anime episode avaible"),
-    //   activeTime: timeCovertToMs({ min: 40 })
-    // }
+    {
+      active: true,
+      execute: checkAnimeTodayReleaseEpisode,
+      name: t("EpisodesAvaible"),
+      description: t("Check Is Anime episode avaible"),
+      activeTime: timeCovertToMs({ min: 40 })
+    }
   ])
 
   // if (unwrap(getAnilistUserData())) {

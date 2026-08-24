@@ -69,10 +69,12 @@ export const setServiuceList = (tmp: serviceFormat[]) => setGlobalState((prev) =
 export const setAnilistUserData = (tmp: { [key: string]: any; } | undefined) => setGlobalState((prev) => ({ ...prev, anilist_user_data: tmp }));
 
 window.addEventListener("focus", () => {
+    console.log("FOCUS")
     setGlobalState((prev) => ({ ...prev, isAnimuFocus: true }))
 });
 
 window.addEventListener("blur", () => {
+    console.log("BLUR")
     setGlobalState((prev) => ({ ...prev, isAnimuFocus: false }))
 });
 

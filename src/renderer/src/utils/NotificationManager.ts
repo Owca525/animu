@@ -38,7 +38,7 @@ class NotifcationManagerInstance {
 
         if (!isAnimuFocus()) {
             Notification.requestPermission().then(permission => {
-                if (permission != 'granted') return
+                if (permission != 'granted') return console.error("Animu Dosen't Have Permision to send notification")
                 let tmp = new Notification(t(notificiation.title), { body: t(notificiation.description), icon: notificiation.icon });
                 if (notificiation.onClick) tmp.addEventListener("click", notificiation.onClick)
             });

@@ -3,6 +3,7 @@ import path from 'path';
 import { animuPlaylistPath } from '.';
 import { ipcMain } from 'electron';
 import { playlistFormatData } from './types';
+import { dateToUnix } from './utils';
 
 ipcMain.handle("playlist:save", async (_, playlist: string, data: playlistFormatData) => {
     try {
@@ -27,6 +28,8 @@ ipcMain.handle("playlist:update", async (_, playlist: string, data: playlistForm
         
         if (!fs.existsSync(playlistPath)) return false
         const tmpPlaylist: playlistFormatData[] = JSON.parse(fs.readFileSync(playlistPath, "utf-8"))
+
+        data = { ...data, lastupdate: dateToUnix(new Date().toString()) }
 
         fs.writeFileSync(playlistPath, JSON.stringify([...tmpPlaylist.map((v) => v.anime.AnimeData.id == data.anime.AnimeData.id ? data : v)]), "utf-8")
         return true

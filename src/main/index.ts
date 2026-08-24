@@ -177,7 +177,7 @@ async function createWindow() {
 
   session.defaultSession.setPermissionRequestHandler(
     (_, permission, callback) => {
-      const access = ["clipboard-read", "fullscreen"]
+      const access = ["clipboard-read", "fullscreen", "notifications", "openExternal"]
       if (access.includes(permission)) {
         callback(true);
       }

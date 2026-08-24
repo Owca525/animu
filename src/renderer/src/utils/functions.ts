@@ -13,12 +13,13 @@ import {
     playerChapterList,
     playerData,
     playerPluginFormat,
+    playlistFormatData,
     resolutionFormat,
     themeMetadata
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { getAnimuHistory, getGlobalCache, informationCache, PlayerCache, setActiveThemes, setGlobalToken, todayAnimeInAnilist } from './stores/global';
+import { getAnimuHistory, getGlobalCache, informationCache, PlayerCache, setActiveThemes, setGlobalToken } from './stores/global';
 import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
@@ -936,67 +937,95 @@ export async function getTodayAnilistAnime() {
     return await getInformationPlugin().schedule(dateToUnix(startOfDay.toString()), dateToUnix(endOfDay.toString()))
 }
 
+export function GetNumberFromString(str: string | undefined) {
+    if (!str) return -1
+    const match = `${str}`.match(/-?\d+(?:\.\d+)?/);
+    return match ? Number(match[0]) : -1
+}
+
+async function Send_Episode_Notification(item: playlistFormatData) {
+    let search_anime_in_plugin = false
+
+    const temporal_plugin = new playerPluginInstance
+
+    let codePlugin = getPlayerPluginList().find((v) => v["metadata"]["name"] == item['anime']["saveData"]!["name"])
+
+    if (!codePlugin) {
+        search_anime_in_plugin = true
+        codePlugin = getPlayerPluginList()[0]
+    }
+
+    await temporal_plugin.CreateInstance(codePlugin)
+
+    const plugin_response: episodeList | undefined = await temporal_plugin.extractEpisodeList(
+        search_anime_in_plugin ? item["anime"]["AnimeData"] : undefined,
+        search_anime_in_plugin == false ? item["anime"]["AnimeData"]["player_ID"] : undefined
+    )
+
+    temporal_plugin.clear()
+
+    if (!plugin_response) return
+
+    const extracted_episodes = plugin_response["episodesData"][0]["episodes"]
+
+    if (extracted_episodes.length <= 0) return
+
+    const episodes = extracted_episodes.map((v) => v.ep.toString())
+
+    if (GetNumberFromString(item["anime"]["saveData"]!["episode"]) < GetNumberFromString(episodes.at(-1))) {
+        sendNotification({
+            title: `New Episode Avaible in ${temporal_plugin.metadata.name} plugin`,
+            description: `Watch Episode ${episodes.at(-1)} Of ${detectTitleConfig(item.anime.AnimeData.title)}`,
+            icon: item.anime.AnimeData.coverImage
+        })
+    }
+
+    return item
+}
+
 export async function checkAnimeTodayReleaseEpisode() {
-    const todayANimeId = unwrap(todayAnimeInAnilist()).map((v) => v.AnimeData.id)
-    const todayAnime = unwrap(todayAnimeInAnilist())
+
+    const current_unix_date = dateToUnix(new Date().toString())
 
     const waitingPlaylist = await readPlaylist("global.waitingplaylist")
 
-    const sortedList = waitingPlaylist.filter((v) => todayANimeId.includes(v.anime.AnimeData.id))
-
-    for (let index = 0; index < sortedList.length; index++) {
-        const element = sortedList[index];
-        if (element.customData) continue
-
-        const tmpplugin = new playerPluginInstance
-
+    waitingPlaylist.forEach(async (item) => {
         try {
-            const codePlugin = getPlayerPluginList().find((v) => v["metadata"]["name"] == element['anime']["saveData"]!["name"])
-            if (!codePlugin) {
-                tmpplugin.clear()
-                continue
+
+            if (checkTimeDriffrentUnix(current_unix_date, item["lastupdate"])["hour"] < 24) return
+
+            const info_plugin = getInformationPlugin()
+    
+            if (item["anime"]["AnimeData"]['status'] == "NOT_YET_RELEASED") {
+                const response = await info_plugin.anime(item["anime"]["AnimeData"]["id"])
+                if (!response) return
+                await updatePlaylist("global.waitingplaylist", {...item, anime: { ...item["anime"], AnimeData: response }, customData: false})
+                return
             }
-            await tmpplugin.CreateInstance(codePlugin)
 
-            let episodes = await tmpplugin.extractOnlyEpisodesList(element.anime.saveData?.type!, element.anime.AnimeData.player_ID!)
-            if (episodes.length <= 0) {
-                tmpplugin.clear()
-                continue
+            if (item["anime"]["AnimeData"]['status'] == "RELEASING" || (item["anime"]["AnimeData"]['status'] == "FINISHED" && item["customData"] == false)) {
+                let anime = await info_plugin.anime(item["anime"]["AnimeData"]["id"])
+                if (!anime) return
+
+                const history_anime: cardData = getAnimuHistory()[anime["id"]]
+
+                const content_anime = { 
+                    ...item, 
+                    anime: { 
+                        ...item["anime"], 
+                        AnimeData: anime,
+                        saveData: history_anime && history_anime["saveData"] ? history_anime["saveData"] : item["anime"]["saveData"]
+                    } 
+                }
+
+                const notification_response = await Send_Episode_Notification(content_anime)
+
+                await updatePlaylist("global.waitingplaylist", {...content_anime, customData: notification_response != undefined})
             }
 
-            let asdasdads = episodes.map((v) => v.ep.toString())
-
-            const tmpEpisode = todayAnime.find((v) => v.AnimeData.id == element.anime.AnimeData.id)!.AnimeData.nextAiringEpisode!.episode.toString()
-            if (asdasdads.includes(tmpEpisode)) {
-                sendNotification({
-                    title: `New Episode Avaible in ${tmpplugin.metadata.name} plugin`,
-                    description: `Watch Episode ${tmpEpisode} Of ${detectTitleConfig(element.anime.AnimeData.title)}`,
-                    icon: element.anime.AnimeData.coverImage
-                })
-            }
-            await updatePlaylist("global.waitingplaylist", {
-                ...{
-                    ...element,
-                    anime: {
-                        ...element["anime"],
-                        saveData: {
-                            ...element["anime"]["saveData"]!,
-                            episode: tmpEpisode
-                        }
-                    }
-                }, customData: true
-            })
-
-            tmpplugin.clear()
         } catch (error) {
-            console.error("Error function/checkAnimeTodayReleaseEpisode", error)
-            tmpplugin.clear()
+            console.error("Error in loop checkAnimeTodayReleaseEpisode", error, item)
         }
-    }
-
-    const notTodayANime = waitingPlaylist.filter((v) => !todayANimeId.includes(v.anime.AnimeData.id))
-    notTodayANime.forEach(async (anime) => {
-        if (anime.customData) await updatePlaylist("global.waitingplaylist", { ...anime, customData: false })
     })
 }
 
