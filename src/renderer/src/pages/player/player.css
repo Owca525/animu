@@ -681,6 +681,8 @@
 
   transform: translateX(400px);
   transition: 150ms ease-out;
+
+  z-index: 999;
 }
 
 .player-screenshot-container.show {

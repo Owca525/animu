@@ -1,19 +1,3 @@
-
-function IsURLValid(value: string | undefined | null): boolean {
-    if (!value) return false
-    if (isFilePath(value)) return true
-    try {
-        const url = new URL(value);
-        return url.protocol === "http:" || url.protocol === "https:";
-    } catch {
-        return false;
-    }
-}
-
-function isFilePath(path: string): boolean {
-  return /^(?:[a-zA-Z]:\\|\/|\.{1,2}[\\/]).+/.test(path);
-}
-
 class SheepImage extends HTMLElement {
     img_divClass: string | null = null
     img_class: string | null = null
@@ -98,7 +82,7 @@ class SheepImage extends HTMLElement {
             this.appendChild(this.SpanRef)
         }
 
-        if (!IsURLValid(this.img_src) && this.SpanRef) {
+        if (!this.img_src && this.SpanRef) {
             this.SpanRef.classList.remove("loading-animation")
             this.SpanRef.innerHTML = "broken_image"
             return

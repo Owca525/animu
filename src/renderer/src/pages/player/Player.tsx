@@ -706,7 +706,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                 updatePlayer({ FatalError: data.fatal })
 
                 if (data.details == "bufferStalledError") tmpHls.startLoad(SheePlayer.currentTime)
-                
+
                 if (data.fatal) {
                     let message: string | undefined
                     switch (data.type) {
@@ -864,7 +864,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
     function updateProgress(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
         clearInterval(moreInformationTimer)
-        
+
         // IDK player just reset time even after i set url and loaded
         if (event.currentTarget.currentTime == 0 && type != "embed") {
             setTimeVideo(SheePlayer.currentTime)
@@ -1403,9 +1403,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         const url = URL.createObjectURL(blob);
 
         if (config.Player.screenShot.saveType == "Clipboard" || config.Player.screenShot.saveType == "Both") {
-            updateUI({ screenshot: { url: url, click: "" } })
 
-            await navigator.clipboard.write([
+            navigator.clipboard.write([
                 new ClipboardItem({
                     'image/png': blob,
                 }),
@@ -1561,7 +1560,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             clearInterval(refreashNerdStats)
             return
         }
-        
+
         const entries = Object.entries(unwrap(nerdStats.player)).map((v) => v["0"])
 
         refreashNerdStats = setInterval(() => {
@@ -1577,7 +1576,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             })
 
             object = {
-                ...object, 
+                ...object,
                 creationTime: quality.creationTime,
                 droppedVideoFrames: quality.droppedVideoFrames,
                 totalVideoFrames: quality.totalVideoFrames,
@@ -1766,13 +1765,13 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                                             {(episode) => (
                                                 <div class={`player-episode-selector ${ep_metadata["current"]["ep"] == episode["ep"] ? "active" : ""}
                                                             ${parseInt(episode["ep"]) < parseInt(ep_metadata["current"]["ep"]) ? "before" : ""}`}
-                                                        onClick={() => onChangeEpisode!(episode["ep"])}
-                                                    >
-                                                    <sheep-img src={episode["img"]} class="player-episode-img" divClass="player-episode-img-placeholder"/>
+                                                    onClick={() => onChangeEpisode!(episode["ep"])}
+                                                >
+                                                    <sheep-img src={episode["img"]} class="player-episode-img" divClass="player-episode-img-placeholder" />
                                                     <div class="player-episode-container-text">
                                                         <span class="player-episode-title">
-                                                            {episode["title"] ? 
-                                                                `E${episode["ep"]}: ${episode["title"]}` : 
+                                                            {episode["title"] ?
+                                                                `E${episode["ep"]}: ${episode["title"]}` :
                                                                 t("settings.player.episode", { ep: episode["ep"] })
                                                             }
                                                         </span>
@@ -1859,18 +1858,17 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                 onMouseDown={(v) => clearChapterSkipTime(v.button != 2)}
             />
 
-
-            <Show when={ui.screenshot}>
-                <div ref={screenShotContainer} class={`player-screenshot-container ${ui.screenshot ? "show" : "hidden"}`}
-                    classList={{ click: ui.screenshot!.click != "" }}
-                    onclick={() => ui.screenshot!.click != "" ? openUrlFolder(ui.screenshot!.click) : ""}
-                >
-                    <sheep-img src={ui.screenshot!.url} class="player-screenshot-image" />
-                    <span class="player-screenshot-text">
-                        {t("player.toastscreenshot.done")}
-                    </span>
-                </div>
-            </Show>
+            <div ref={screenShotContainer} class={`player-screenshot-container ${ui.screenshot ? "show" : "hidden"}`}
+                classList={{ click: ui.screenshot ? ui.screenshot.click != "" : false }}
+                onclick={() => ui.screenshot && ui.screenshot.click != "" ? openUrlFolder(ui.screenshot!.click) : ""}
+            >
+                <Show when={ui.screenshot}>
+                    <img src={ui.screenshot!.url} class="player-screenshot-image" />
+                </Show>
+                <span class="player-screenshot-text">
+                    {t("player.toastscreenshot.done")}
+                </span>
+            </div>
 
             <Show when={anime && avaibleEpisode["nextEpisode"] && onChangeEpisode}>
 
