@@ -6,6 +6,7 @@ import { Anilist_ListMutation, AnimeData, animulistProps, cardData, episodeMetad
 import {
     calculateDays,
     changeTitleAnimu,
+    convert_to_slug,
     convertDateToDateObject,
     convertDateToFormattedString,
     convertSeconds,
@@ -92,9 +93,9 @@ function DetectTypeAnimeAndShare(anime: AnimeData, clip: boolean = false) {
     const info = getInformationPlugin()
     if (!info["metadata"]["shareWebsite"]) return console.error("Failed Share URL, Missing shareWebsite")
 
-    if (clip) return SaveToClipboard("text",`${info["metadata"]["shareWebsite"][`${anime["type"]}`.toLocaleLowerCase()]}${anime["id"]}`)
+    if (clip) return SaveToClipboard("text",`${info["metadata"]["shareWebsite"][`${anime["type"]}`.toLocaleLowerCase()]}${anime["id"]}/${convert_to_slug(anime["title"]["romaji"])}`)
 
-    openUrlFolder(`${info["metadata"]["shareWebsite"][`${anime["type"]}`.toLocaleLowerCase()]}${anime["id"]}`)
+    openUrlFolder(`${info["metadata"]["shareWebsite"][`${anime["type"]}`.toLocaleLowerCase()]}${anime["id"]}/${convert_to_slug(anime["title"]["romaji"])}`)
 }
 
 async function FetchEpisodes(params: { anime: AnimeData, playerID: string | undefined, plugin: string | undefined }) {
@@ -597,11 +598,11 @@ function information() {
                 center: [
                     {
                         option: t("information.copylink"),
-                        onClick: async () => await SaveToClipboard("text", `${config.deepLinkURL}/?anime=${btoa(`${information["cache"]["anime"]["id"]}`)}`)
+                        onClick: () => DetectTypeAnimeAndShare(information["cache"]["anime"], true)
                     },
                     {
                         option: t("information.bar.anilist"),
-                        onClick: () => DetectTypeAnimeAndShare(information["cache"]["anime"], true)
+                        onClick: async () => await SaveToClipboard("text", `${config.deepLinkURL}/?anime=${btoa(`${information["cache"]["anime"]["id"]}`)}`)
                     }
                 ]
             })}>

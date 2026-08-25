@@ -1335,3 +1335,13 @@ export async function ExtractVideo(url: string): Promise<playerData[]> {
 }
 
 (window as any).ExtractVideo = ExtractVideo;
+
+export function convert_to_slug(name: string) {
+  return name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/['’]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
