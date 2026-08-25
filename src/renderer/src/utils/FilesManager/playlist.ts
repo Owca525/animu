@@ -2,11 +2,11 @@ import { playlistFormatData } from "../types"
 
 // TODO: ADD SUPPORT FOR BROWSER
 export async function saveToPlaylist(playlist: string, data: playlistFormatData): Promise<boolean> {
-    return await window.api.animePlaylist.save(playlist, data)
+    return await window.api.animePlaylist.save(playlist, JSON.parse(JSON.stringify(data)))
 }
 
 export async function updatePlaylist(playlist: string, data: playlistFormatData): Promise<boolean> {
-    return await window.api.animePlaylist.update(playlist, data)
+    return await window.api.animePlaylist.update(playlist, JSON.parse(JSON.stringify(data)))
 }
 
 export async function removeInPlaylist(playlist: string, animeID: string): Promise<boolean> {
