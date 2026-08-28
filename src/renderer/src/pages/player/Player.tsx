@@ -430,14 +430,16 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         updateSubtitle()
 
         CheckDownloadContextMenu(resolution)
-
-        if (resolution["hls"]) return ExecuteHLS()
-
+        
         if (resolution["audio"]) {
             createNewAudioPlayer()
 
+            console.log("AUDIO PLAYER", AudioShaka)
+
             if (AudioShaka) AudioShaka.load(resolution["audio"]["url"])
         }
+
+        if (resolution["hls"]) return ExecuteHLS()
 
         await Shaka!.load(resolution["url"])
 
@@ -515,17 +517,17 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         AudioShaka = new shaka.Player();
         AudioShaka.attach(AudioRef)
 
-        // AudioRef.addEventListener("canplay", () => {
-        //     console.log("AudioRef can play", AudioRef!.src)
-        // })
+        AudioRef.addEventListener("canplay", () => {
+            console.log("AudioRef can play", AudioRef!.src)
+        })
 
-        // AudioRef.addEventListener("waiting", () => {
-        //     console.log("Fetching")
-        // })
+        AudioRef.addEventListener("waiting", () => {
+            console.log("Fetching")
+        })
 
-        // AudioRef.addEventListener("loadedmetadata", (event) => {
-        //     console.log("AudioRef loadedmetadata", event)
-        // })
+        AudioRef.addEventListener("loadedmetadata", (event) => {
+            console.log("AudioRef loadedmetadata", event)
+        })
 
         ChangePlayerVolume(SheePlayer.playerVolume, true)
         setTimeVideo(SheePlayer.currentTime)
