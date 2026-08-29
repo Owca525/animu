@@ -132,7 +132,7 @@ export async function changeTheme(activeTheme: Map<number, themeMetadata>) {
             if (!content) continue
 
             if (content.css && conf[key] == true) createHTMLLinkElement(content.css, `${theme["themeName"]}/${content["name"]}`)
-            if (content.dropDown) content.dropDown.map((value) => value.option == conf[key] ? createHTMLLinkElement(value.css, `${theme["themeName"]}/dropdown/${value["option"]}`) : "")
+            if (content.dropDown) content.dropDown.map((value) => value.option == conf[key] ? createHTMLLinkElement(value.css, `${theme["themeName"]}/${content["name"]}/${value["option"]}`) : "")
         }
     })
 }
