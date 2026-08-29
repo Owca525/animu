@@ -1007,6 +1007,26 @@ function settings() {
                                 }
                             />
                         </div> */}
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("Automatic Skip Opening/Ending")}
+                            <CheckBox
+                                checked={config().new.Player.general.autoSkipOpeningEnding}
+                                onChecked={(checked) =>
+                                    handleChange('Player.general.autoSkipOpeningEnding', checked)
+                                }
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("Use HLS Worker")}
+                            <CheckBox
+                                checked={config().new.Player.general.useHLSWorker}
+                                onChecked={(checked) =>
+                                    handleChange('Player.general.useHLSWorker', checked)
+                                }
+                            />
+                        </div>
                     </div>
                     <div class="settings-page-container">
                         <div class="settings-page-title">{t("settings.player.uptonextep")}</div>

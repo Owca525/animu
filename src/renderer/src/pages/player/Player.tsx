@@ -615,9 +615,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         updatePlayer({ HLSMode: true })
 
         let configHLS: Partial<HlsConfig> = {
-            enableWorker: false,
+            enableWorker: config.Player.general.useHLSWorker,
             lowLatencyMode: true,
-            workerPath: HLSWorker,
+            workerPath: config.Player.general.useHLSWorker ? HLSWorker : undefined,
             autoStartLoad: true,
             backBufferLength: 40,
             manifestLoadingMaxRetry: 3,

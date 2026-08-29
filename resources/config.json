@@ -34,7 +34,8 @@
             "showBrokenBuffer": false,
             "minusTime": false,
             "disablemoreinformation": false,
-            "autoSkipOpeningEnding": false
+            "autoSkipOpeningEnding": false,
+            "useHLSWorker": true
         },
         "screenShot": {
             "alwaysAsk": true,

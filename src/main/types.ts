@@ -66,7 +66,8 @@ export interface SettingsConfig {
             showBrokenBuffer: boolean
             minusTime: boolean
             disablemoreinformation: boolean
-            autoSkipOpeningEnding: boolean
+            autoSkipOpeningEnding: boolean,
+            useHLSWorker: boolean
         }
         screenShot: {
             alwaysAsk: boolean

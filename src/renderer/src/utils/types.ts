@@ -552,6 +552,7 @@ export interface SettingsConfig {
             minusTime: boolean
             disablemoreinformation: boolean
             autoSkipOpeningEnding: boolean
+            useHLSWorker: boolean
         }
         screenShot: {
             alwaysAsk: boolean
