@@ -507,7 +507,15 @@ export class playerPluginInstance implements playerPluginInstanceFormat {
     }
     extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {
         if (!this.instance) return undefined
-        return await this.instance.wrapperFunction("extractEpisodeList", { animeData, anime_id }) as any
+        const response: episodeList = await this.instance.wrapperFunction("extractEpisodeList", { animeData, anime_id }) as any
+
+        if (!response) return response
+
+        if (response["episodesData"] && response["episodesData"].length == 1 && response["episodesData"][0]["episodes"].length <= 0) {
+            return undefined
+        }
+
+        return response
     }
     extractOnlyEpisodesList = async (type: string, anime_id: string): Promise<episodeMetadata[]> => {
         if (!this.instance) return []
@@ -551,13 +559,23 @@ export class InformationPluginInstance implements informationPluginInstanceForma
     home = async (): Promise<{ topCards?: containerData; sections: containerData[]; } | { error: string; } | undefined> => {
         if (!this.instance) return
         try {
+            const cache_time = localStorage.getItem("information_instance_cache_time")
+            if (cache_time && localStorage.getItem("information_instance_cache")) {
+                const conv = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), Number(cache_time))
+
+                if (conv["hour"] > 0 || conv["min"] > 15) return JSON.parse(localStorage.getItem("information_instance_cache")!)
+            }
+
             const response = await this.instance.wrapperFunction("home", undefined, true) as any
 
             if ((!response || response["error"] || !response["topCards"] || response["sections"].length <= 0) && localStorage.getItem("information_instance_cache") != undefined) {
                 return JSON.parse(localStorage.getItem("information_instance_cache")!)
             }
 
-            if (response["sections"].length > 0) localStorage.setItem("information_instance_cache", JSON.stringify(response))
+            if (response["sections"].length > 0) {
+                localStorage.setItem("information_instance_cache", JSON.stringify(response))
+                localStorage.setItem("information_instance_cache_time", `${dateToUnix(new Date().toString())}`)
+            }
 
             return response
         } catch (error) {

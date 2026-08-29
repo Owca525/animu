@@ -8,7 +8,7 @@ const PluginHeader = {
 
 const PLAYER_REGEX = /vidstackPlayer\(JSON\.parse\('([\s\S]*?)'\)\)/
 const SEARCH_REGEX = /items:\s*JSON\.parse\('((?:\\.|[^'\\])*)'\)/
-const EPISODE_REGEX = /epsTitles:\s*JSON\.parse\('((?:\\.|[^'\\])*)'\)/g
+const EPISODE_REGEX = /items:\s*JSON\.parse\('(\[[\s\S]*\])'\)/
 const ANIMETITLE_REGEX = /anmTitles:\s*JSON\.parse\('((?:\\.|[^'\\])*)'\)/
 
 const LANG_SUPPORT = {
@@ -124,11 +124,30 @@ interface ANIZONE_SEARCH_TYPE {
     url: string
 }
 
-function decodeHTML(str: string): { [key: number | string]: any } {
-    return JSON.parse(str.replace(/\\u([0-9a-fA-F]{4})/g, 
-        (_, hex) => String.fromCharCode(parseInt(hex, 16)))
-        .replace(/\\\//g, '/').replace(/\\(?!["\\/bfnrtu])/g, '')
-    )
+interface ANIZONE_EPISODE_CONTENT {
+    air_date: string,
+    air_diff: string,
+    duration: string,
+    is_unsafe: boolean,
+    slug: string,
+    snapshot: string,
+    summary: string,
+    title_list: { [key: number]: string },
+    type: string,
+    url: string,
+    videos_count: number
+}
+
+function decodeHTML(str: string): { [key: number | string]: any } | undefined {
+    try {
+        return JSON.parse(str.replace(/\\u([0-9a-fA-F]{4})/g, 
+            (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+            .replace(/\\\//g, '/').replace(/\\(?!["\\/bfnrtu])/g, '')
+        )
+    } catch (error) {
+        console.error("Anizone/decodeHTML", error, str)
+        return undefined
+    }
 }
 
 async function extractChapters(url: string): Promise<playerChapterList[]> {
@@ -190,6 +209,8 @@ export default class template implements playerPluginFormat {
             console.warn("anizone/extractPlayerData DECODE", player_information)
             /* ENDIF */
 
+            if (!player_information) return []
+
             const isSubtitlesDefault = player_information["subtitles"].find((v) => v["default"])
 
             return [{
@@ -217,40 +238,53 @@ export default class template implements playerPluginFormat {
     }
 
     extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {
-        if (animeData && !anime_id) {
-            const search_resp = await this.searchAnime(animeData["title"]["romaji"])
-            if (search_resp.length <= 0) return
+        try {
+            if (animeData && !anime_id) {
+                const search_resp = await this.searchAnime(animeData["title"]["romaji"])
+                if (search_resp.length <= 0) return
 
-            anime_id = SheepFinderAnime2000(search_resp.map((v) => v["AnimeData"]), animeData)
-        }
+                anime_id = SheepFinderAnime2000(search_resp.map((v) => v["AnimeData"]), animeData)
+            }
 
-        if (!anime_id) return
+            if (!anime_id) return
 
-        const response = await request(`${WEBSITE}/anime/${anime_id}`, { headers: PluginHeader })
+            const response = await request(`${WEBSITE}/anime/${anime_id}`, { headers: PluginHeader })
 
-        /* IFDEF DEBUG */
-        console.warn("anizone/extractEpisodeList", response)
-        /* ENDIF */
+            /* IFDEF DEBUG */
+            console.warn("anizone/extractEpisodeList", response)
+            /* ENDIF */
 
-        if (!response["success"]) return
+            if (!response["success"]) return
 
-        const episode_regex = [...response["text"].matchAll(EPISODE_REGEX)]
-        const title_regex = response.text.match(ANIMETITLE_REGEX)
-        /* IFDEF DEBUG */
-        console.warn("anizone/extractEpisodeList REGEX", episode_regex, title_regex)
-        /* ENDIF */
+            const episode_regex = response["text"].match(EPISODE_REGEX)
+            const title_regex = response["text"].match(ANIMETITLE_REGEX)
+            /* IFDEF DEBUG */
+            console.warn("anizone/extractEpisodeList REGEX", episode_regex, title_regex)
+            /* ENDIF */
 
-        if (!title_regex || !episode_regex) return
+            if (!episode_regex) return
 
-        const decode_title = decodeHTML(title_regex[1])
+            const decoded_episodes: ANIZONE_EPISODE_CONTENT[] = decodeHTML(episode_regex[1]) as any ?? []
 
-        return {
-            player_id: anime_id,
-            episodesData: [{
-                episodes: episode_regex.map((_, i) => ({ ep: `${i + 1}` })),
-                type: "sub"
-            }],
-            langugeAvaible: Object.keys(decode_title).map((v) => LANG_SUPPORT[v])
+            let decode_title = {}
+
+            if (title_regex) decode_title = decodeHTML(title_regex[1]) ?? {}
+
+            return {
+                player_id: anime_id,
+                episodesData: [{
+                    episodes: decoded_episodes.map((content) => ({
+                        ep: content["slug"],
+                        title: Object.values(content["title_list"])[0],
+                        img: content["snapshot"]
+                    })),
+                    type: "sub"
+                }],
+                langugeAvaible: Object.keys(decode_title).map((v) => LANG_SUPPORT[v])
+            }
+        } catch (error) {
+            console.error("anizone/extractEpisodeList", error)
+            return undefined
         }
     }
 
@@ -261,7 +295,7 @@ export default class template implements playerPluginFormat {
     }
 
     searchAnime = async (name: string, _page: number = 1, _params?: FilterPluginsParams): Promise<cardData[]> => {
-        const response = await request(`${WEBSITE}/anime?search=${encodeURI(name)}`, { headers: PluginHeader })
+        const response = await request(`${WEBSITE}/anime?search=${encodeURIComponent(name)}`, { headers: PluginHeader })
         /* IFDEF DEBUG */
         console.warn("anizone/searchAnime", response)
         /* ENDIF */
@@ -275,6 +309,8 @@ export default class template implements playerPluginFormat {
 
         try {
             const decoded: ANIZONE_SEARCH_TYPE[] = decodeHTML(regex["1"]) as any
+
+            if (!decoded) return []
 
             /* IFDEF DEBUG */
             console.warn("anizone/searchAnime DECODE", decoded)

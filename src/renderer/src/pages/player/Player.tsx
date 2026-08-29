@@ -5,6 +5,7 @@ import { CheckNumber, convertKeybinds, createElement, CreateSHA256, dateToUnix, 
 import { getConfig } from "@renderer/utils/stores/config"
 import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, Thumbnail } from "@renderer/utils/types"
 import Hls, { HlsConfig } from "hls.js"
+import HLSWorker from "hls.js/dist/hls.worker.js?url"
 import JASSUB from "jassub"
 import shaka from "shaka-player"
 import { Component, For, onCleanup, onMount, Show } from "solid-js"
@@ -430,7 +431,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         updateSubtitle()
 
         CheckDownloadContextMenu(resolution)
-        
+
         if (resolution["audio"]) {
             createNewAudioPlayer()
 
@@ -614,8 +615,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         updatePlayer({ HLSMode: true })
 
         let configHLS: Partial<HlsConfig> = {
-            enableWorker: true,
+            enableWorker: false,
             lowLatencyMode: true,
+            workerPath: HLSWorker,
             autoStartLoad: true,
             backBufferLength: 40,
             manifestLoadingMaxRetry: 3,
@@ -656,6 +658,10 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         }
 
         const tmpHls = new Hls(configHLS);
+
+        /* IFDEF DEBUG */
+        console.warn("PLAYER HLS", tmpHls)
+        /* ENDIF */
 
         HLS = tmpHls
 

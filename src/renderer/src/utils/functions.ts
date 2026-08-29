@@ -100,11 +100,12 @@ export function join_path(...parts) {
   return parts.join("/").replace(/\/+/g, "/").replace("http:/", "http://");
 }
 
-function createHTMLLinkElement(css: string) {
+function createHTMLLinkElement(css: string, name: string) {
     if (!css || css.length <= 0) return
     
     const link = document.createElement('link');
     link.rel = 'stylesheet';
+    link.dataset.name = name
     link.href = join_path(getRenderPath(), "themes", css);
     document.head.appendChild(link);
 }
@@ -115,13 +116,14 @@ export async function changeTheme(activeTheme: Map<number, themeMetadata>) {
         const element = old[index];
         if (element.id == "theme-stylesheet") continue
         if (element.crossOrigin) continue
+        if (Object.values(activeTheme).find((v: themeMetadata) => v["themeName"] == element.dataset.name)) continue
         element.remove()
     }
 
     setActiveThemes(activeTheme)
 
     activeTheme.forEach(async (theme) => {
-        if (theme.themeName != "DarkerAnimu") createHTMLLinkElement(theme.mainCSS)
+        if (theme.themeName != "DarkerAnimu") createHTMLLinkElement(theme.mainCSS, theme["themeName"])
         
         if (!theme.options) return
         const conf = await window.api.themes.config(theme)
@@ -129,8 +131,8 @@ export async function changeTheme(activeTheme: Map<number, themeMetadata>) {
             let content = theme.options.find((value) => value.name == key)
             if (!content) continue
 
-            if (content.css && conf[key] == true) createHTMLLinkElement(content.css)
-            if (content.dropDown) content.dropDown.map((value) => value.option == conf[key] ? createHTMLLinkElement(value.css) : "")
+            if (content.css && conf[key] == true) createHTMLLinkElement(content.css, `${theme["themeName"]}/${content["name"]}`)
+            if (content.dropDown) content.dropDown.map((value) => value.option == conf[key] ? createHTMLLinkElement(value.css, `${theme["themeName"]}/dropdown/${value["option"]}`) : "")
         }
     })
 }
