@@ -275,7 +275,7 @@ export async function request(url, options, noCors = false) {
             buffer: await bufferCloned.arrayBuffer(),
             status: response.status,
             statusText: response.statusText,
-            url: response.url,
+            url: url,
             success: response.ok,
             responseHeader: response.headers
         };
