@@ -74,7 +74,7 @@ const player = () => {
 
         response.Refetch([
             anime_data.anime?.player_ID, 
-            episode.current, 
+            episode.list.find((v) => v.ep == ep), 
             episode.type, 
             JSON.stringify(anime_data.saveData["pluginName"])
         ])

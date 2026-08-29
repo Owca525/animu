@@ -174,7 +174,7 @@ export default class template implements playerPluginFormat {
         const response = await request(`${WEBSITE}/anime/${id}/${episode["ep"]}`, { headers: PluginHeader })
 
         /* IFDEF DEBUG */
-        console.warn("anizone/extractPlayerData", response)
+        console.warn("anizone/extractPlayerData", response, episode, id)
         /* ENDIF */
 
         const regex = response["text"].match(PLAYER_REGEX)
