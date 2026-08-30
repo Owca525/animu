@@ -501,6 +501,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
         if (!player.playerData["subtitles"]) return
 
+        const default_subtitle = player.playerData["subtitles"].find((v) => v["default"])
+        if (default_subtitle) setNewSubtitles(default_subtitle)
+
         const finded = player.playerData["subtitles"].find((v) => v["lang"] == i18n()!.currentLang())
 
         if (!finded) return setNewSubtitles(player.playerData["subtitles"][0])
@@ -876,6 +879,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         // IDK player just reset time even after i set url and loaded
         if (event.currentTarget.currentTime == 0 && type != "embed") {
             setTimeVideo(SheePlayer.currentTime)
+            ActiveShowingUI()
         }
 
         updateUI({ ShowMoreInformation: false })

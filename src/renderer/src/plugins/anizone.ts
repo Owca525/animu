@@ -152,36 +152,33 @@ function decodeHTML(str: string): { [key: number | string]: any } | undefined {
 
 async function extractChapters(url: string): Promise<playerChapterList[]> {
     if (!url) return []
-    let chapterList: playerData["listChapters"] = []
+
+    let is_type = { opening: false, ending: false }
 
     let data = await convertChaptersVTT(url, { headers: PluginHeader })
-    for (let index = 0; index < data.length; index++) {
-        const element = data[index];
-        if (element.name == "Intro") {
-            chapterList.push({ ...element, type: "opening" })
-            continue
+
+    const compare = (str: string, val: string) => {
+        const content = data.find((v) => str.length == 2 ? `${v.name}`.includes(str) : `${v.name}`.toLowerCase().includes(str))
+
+        if (content && is_type[val] == false) {
+            data = data.map((v) => JSON.stringify(content) == JSON.stringify(v) ? ({ ...v, type: val as any }) : v)
+            is_type = { ...is_type, [val]: true }
         }
-        if (element.name == "Credits") {
-            chapterList.push({ ...element, type: "ending" })
-            continue
-        }
-        if (element.name == "Ending") {
-            chapterList.push({ ...element, type: "ending" })
-            continue
-        }
-        if (element.name == "Opening") {
-            chapterList.push({ ...element, type: "opening" })
-            continue
-        }
-        chapterList.push(element)
     }
 
-    return chapterList
+    compare("OP", "opening")
+    compare("opening", "opening")
+    compare("intro", "opening")
+    compare("ED", "ending")
+    compare("ending", "ending")
+    compare("credits", "ending")
+
+    return data
 }
 
 export default class template implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "2.0",
+        version: "2.1",
         name: "AniZone",
         author: "Owca525",
         supportLang: Object.values(LANG_SUPPORT),
@@ -226,7 +223,8 @@ export default class template implements playerPluginFormat {
                     url: v["file"],
                     lang: v["language"],
                     label: v["title"],
-                    format: v["format"]
+                    format: v["format"],
+                    default: v["default"]
                 })),
                 listChapters: await extractChapters(player_information["chapter"]!),
                 storyboardVTT: player_information["storyboard"]

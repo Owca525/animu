@@ -273,7 +273,7 @@ export interface externalPlayerFormat {
     chaptersUrl: string
 }
 
-export interface playerSubtitlesFormat { url: string, lang: string, label: string, format: string }
+export interface playerSubtitlesFormat { url: string, lang: string, label: string, format: string, default?: boolean }
 
 export type playerChapterList = { start: number, end: number, type: "opening" | "ending" | "other", name?: string }
 
