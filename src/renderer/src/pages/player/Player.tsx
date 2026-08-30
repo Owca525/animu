@@ -28,6 +28,7 @@ import { getSocket, getSocketRoom, informationCache } from "@renderer/utils/stor
 import MoreInformation from "./components/MoreInformation"
 import { updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist"
 import { SaveHistory } from "@renderer/utils/FilesManager/history"
+// import { Run_hls_manifest_script } from "@renderer/utils/worker"
 
 shaka.polyfill.installAll()
 
@@ -629,16 +630,28 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             maxBufferLength: 140,
         }
 
+        // let manifest_script: player_script_injector | undefined
+
+        // if (player.playerData!["scripts"]) {
+        //     manifest_script = player.playerData!["scripts"].find((v) => v["type"] == "hls_manifest")
+        // }
+
         class sheepLoader extends Hls.DefaultConfig.loader {
             load(context: any, config: any, callbacks: any) {
-                request(context.url, { method: "GET", headers: unwrap(player["currentResolution"]!["reqHeader"]) }).then((data) => {
+                request(context.url, { method: "GET", headers: unwrap(player["currentResolution"]!["reqHeader"]) }).then(async (data) => {
                     let currentData: any = data.text
+                    if (data["status"] == 429) HLS?.destroy()
                     if (!data.success) {
                         console.warn("Context:", context, "Data:", data)
                         callbacks.onError({ type: 'network', details: data["statusText"], fatal: true, code: data["status"] }, context)
                         return
                     }
                     const now = performance.now()
+
+                    // if (context["responseType"] == "text" && manifest_script) {
+                    //     currentData = await Run_hls_manifest_script(manifest_script["code"], JSON.parse(JSON.stringify(data)))
+                    // }
+
                     if (context.responseType == "arraybuffer") currentData = data.buffer
                     callbacks.onSuccess({ data: currentData, url: context.url }, {
                         loaded: data.buffer.byteLength,

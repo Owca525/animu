@@ -1,5 +1,5 @@
 // DISSABLE
-// TODO: END THIS: I NEED FIND A DEBUGGER CHECK TO WHEN HLS GIVE CALLBACK
+// TODO: END THIS: Why hls dosen't support this flixcloud use custom hls maybe they change more than i think
 import { request, SheepFinderAnime2000 } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerDataExtended, playerPluginFormat, serverStatusData } from "@renderer/utils/types";
 
@@ -16,6 +16,30 @@ const PluginHeader = {
     "Sec-Fetch-Site": "cross-site",
     'Referer': WEBSITE
 }
+
+const decryptor_content = `(response) => {
+    const secret = "REPLACE_ME_TO_SECRET_KEY"
+    let str = [];
+
+    for (let l = atob(secret), u = atob(response["text"].trim()), h = 0; h < u.length; h++) {
+        str.push(u.charCodeAt(h) ^ l.charCodeAt(h % l.length));
+    }
+    return (new TextDecoder).decode(new Uint8Array(str))
+}`
+
+// function DecyrptContent(encode_content: string, secret: string) {
+//     let str: number[] = [];
+
+//     for (let l = atob(secret), u = atob(encode_content.trim()), h = 0; h < u.length; h++) {
+//         str.push(u.charCodeAt(h) ^ l.charCodeAt(h % l.length));
+//     }
+//     return (new TextDecoder).decode(new Uint8Array(str))
+// }
+
+// function runInWorker(response) {
+//     const key = "REPLACE_ME_TO_SECRET_KEY"
+//     return DecyrptContent(response["text"], key)
+// }
 
 class FlixCloud {
     url: string = ""
@@ -111,12 +135,12 @@ class FlixCloud {
         }
     }
 
-    mn = async (t: Uint8Array, e: Uint8Array, s: Uint8Array, o: number): Promise<Uint8Array> => {
+    mn = async (t: Uint8Array, e: Uint8Array, s: Uint8Array, o: number): Promise<{ array: Uint8Array, key: string }> => {
         const m = this.data.w_payload;
         const g = this.Ct(m);
 
         let Zt = (await WebAssembly.instantiate(g, {}) as any).instance;
-        const L = Zt.exports as { memory: WebAssembly.Memory; _s: (value: number) => void; _r: (input1: number, input2: number, input3: number, output: number, length: number) => void; };
+        const L = Zt.exports as { memory: WebAssembly.Memory; _c: () => number; _s: (value: number) => void; _r: (input1: number, input2: number, input3: number, output: number, length: number) => void; };
         const w = L.memory;
         if (w.buffer.byteLength === 0) { w.grow(1); }
         const S = new Uint8Array(w.buffer);
@@ -132,10 +156,13 @@ class FlixCloud {
         L._r(I, P, U, nt, k);
         const V = new Uint8Array(k);
         V.set(S.subarray(nt, nt + k));
-        return V;
+
+        const b = L._c()
+
+        return { array: V, key: btoa(String.fromCharCode(...new Uint8Array(L.memory.buffer).slice(b, b + 32))) };
     }
 
-    yn = async (): Promise<string | undefined> => {
+    yn = async (): Promise<{ url: string, decryptor: string } | undefined> => {
         try {
             const t = this.data.obfuscated_crypto_data;
             const e = this.data.obfuscation_seed;
@@ -223,7 +250,7 @@ class FlixCloud {
 
             const N = await crypto.subtle.importKey(
                 "raw",
-                O as any,
+                O.array as any,
                 {
                     name: "PBKDF2",
                 },
@@ -284,7 +311,7 @@ class FlixCloud {
                 throw new Error("Decryption resulted in empty URL");
             }
 
-            return M;
+            return { url: M, decryptor: O.key };
         } catch (error) {
             console.error("FlixCloud Extractor Error", error)
             return
@@ -310,8 +337,8 @@ class FlixCloud {
             console.warn("FlixCloud/Extractor Content", this.data)
             /* ENDIF */
 
-            const url = await this.yn()
-            if (!url) return
+            const resp = await this.yn()
+            if (!resp) return
 
             const head = new URL(this.url)
 
@@ -319,12 +346,16 @@ class FlixCloud {
                 ...playerdata,
                 resolution: [{
                     res: "1080",
-                    url: url,
+                    url: resp.url,
                     hls: true,
                     reqHeader: {
                         ...PluginHeader,
                         'Referer': head.origin
                     }
+                }],
+                scripts: [{
+                    type: "hls_manifest",
+                    code: decryptor_content.replace("REPLACE_ME_TO_SECRET_KEY", resp["decryptor"])
                 }]
             }
         } catch (error) {

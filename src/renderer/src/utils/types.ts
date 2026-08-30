@@ -253,6 +253,13 @@ export interface playerData {
     external?: externalPlayerFormat
     extractResolution?: (playerData: playerDataExtended) => Promise<playerData | undefined>
     isDubbing?: (playerData: playerDataExtended) => Promise<resolutionFormat[] | undefined>
+
+    scripts?: player_script_injector[]
+}
+
+export interface player_script_injector {
+    type: "hls_manifest",
+    code: string
 }
 
 export interface resolutionFormat {
@@ -378,7 +385,7 @@ export interface PluginMetadataFormat {
     }
 }
 
-export interface SearchResponse { success?: boolean, content: cardData[], error?: string, maxPage: number, nextPage: boolean}
+export interface SearchResponse { success?: boolean, content: cardData[], error?: string, maxPage: number, nextPage: boolean }
 
 export interface informationPluginFormat {
     metadata: PluginMetadataFormat
@@ -397,7 +404,7 @@ export interface WorkerWrapperInstance {
     pendingRequest: Map<string, (value: unknown) => void>
     otherDataPermision: boolean
 
-    runInstance: (pluginCode: string, config?: { [key:string]: any }) => Promise<PluginMetadataFormat>
+    runInstance: (pluginCode: string, config?: { [key: string]: any }) => Promise<PluginMetadataFormat>
     destroy: () => void
     detectObjectHasAFunction: (object: { [key: string]: any }) => { [key: string]: any }
     wrapperObjectFunction: (value: { [key: string]: any }, uuid: string) => Promise<void>
@@ -432,7 +439,7 @@ export type PluginLoadedFormat = {
         search: serverStatusData,
         player: serverStatusData,
         episodes: serverStatusData
-    } 
+    }
 }
 
 export interface pluginsGlobalFormat {
@@ -744,10 +751,10 @@ export interface informationTmpProps {
     DontOverWrite?: boolean
 }
 
-export interface PlayerTmpProps { 
-    anime: AnimeData, 
-    saveData: indentityPlayer, 
-    episodelist: episodeMetadata[], 
-    animulist?: animulistProps, 
-    continewatch: boolean 
+export interface PlayerTmpProps {
+    anime: AnimeData,
+    saveData: indentityPlayer,
+    episodelist: episodeMetadata[],
+    animulist?: animulistProps,
+    continewatch: boolean
 }
