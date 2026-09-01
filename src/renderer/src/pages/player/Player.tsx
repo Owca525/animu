@@ -1169,7 +1169,10 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         if (["ass", "ssa"].includes(sub.format.toLowerCase()) == false) {
             const content = CovnertToASS(data["text"])
 
-            if (!content) return toast(t("Failed Fetch Subtitles"), { type: "error" })
+            if (!content) {
+                console.error("Player/Failed Subtitles Parse", data)
+                return toast(t("Failed Fetch Subtitles"), { type: "error" })
+            }
 
             const blob = new Blob([content], { type: "text/ass" });
             assUrl = URL.createObjectURL(blob);

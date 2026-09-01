@@ -130,8 +130,10 @@ class VTTConvert {
     }
 }
 
+
 class SRTConvert {
     public format = "srt"
+
     private replacements = [
         [/<b>/gi, '{\\b1}'],
         [/<\/b>/gi, '{\\b0}'],
@@ -141,45 +143,69 @@ class SRTConvert {
 
         [/<u>/gi, '{\\u1}'],
         [/<\/u>/gi, '{\\u0}'],
-        [/<\/font>/gi, "{\\r}"]
+
+        [/<\/font>/gi, '{\\r}']
     ]
 
     public detect(str: string) {
-        return /(?:(\d{2}):)?(\d{2}:\d{2}\.\d{3})\s*-->\s*(?:(\d{2}):)?(\d{2}:\d{2}\.\d{3})/.test(str) && str.trimStart().startsWith("WEBVTT") == false
+        return /^\s*\d+\s*\r?\n\d{2}:\d{2}:\d{2},\d{3}\s*-->\s*\d{2}:\d{2}:\d{2},\d{3}/m.test(str)
     }
 
     public parser(srt: string) {
-        const blocks = srt.replace(/\r/g, "").trim().split("\n\n");
+        const blocks = srt
+            .replace(/\r\n/g, "\n")
+            .replace(/\r/g, "\n")
+            .trim()
+            .split(/\n{2,}/)
 
-        let cues: Cue[] = [];
+        const cues: Cue[] = []
 
         blocks.forEach((block) => {
-            const lines = block.split("\n").filter(Boolean);
-            if (lines.length < 2) return;
+            const lines = block
+                .split("\n")
+                .map(line => line.trim())
+                .filter(Boolean)
 
-            const timeLine = lines.find((l) => l.includes("-->"));
-            if (!timeLine) return;
+            if (lines.length < 2) return
 
-            const match = ExtractArrowTime(timeLine)
-            if (!match) return;
+            const timeLineIndex = lines.findIndex(line => line.includes("-->"))
 
-            const start = TimerConverter(match[1], ",");
-            const end = TimerConverter(match[2], ",");
+            if (timeLineIndex === -1) return
 
-            const textStartIndex = lines.indexOf(timeLine) + 1;
-            let text = lines.slice(textStartIndex).join("\\N").trim();
+            const timeLine = lines[timeLineIndex]
+
+            const match = timeLine.match(
+                /^(\d{2}:\d{2}:\d{2},\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2},\d{3})/
+            )
+
+            if (!match) return
+
+            const start = TimerConverter(match[1], ",")
+            const end = TimerConverter(match[2], ",")
+
+            let text = lines
+                .slice(timeLineIndex + 1)
+                .join("\\N")
+                .trim()
 
             text = text.replace(
                 /<font\s+color=["']?(#[0-9a-f]{3,6})["']?\s*>/gi,
                 (_, color) => `{\\c${HexToRGBASS(color)}}`
             )
 
-            text = LoopReplace(text, this.replacements as any)
+            text = LoopReplace(
+                text,
+                this.replacements as any
+            )
 
-            cues.push({ start, end, text });
+            cues.push({
+                start,
+                end,
+                text
+            })
         })
 
-        return cues;
+        return cues
     }
 }
 
