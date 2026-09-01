@@ -977,6 +977,8 @@ async function Send_Episode_Notification(item: playlistFormatData) {
 
     const episodes = extracted_episodes.map((v) => v.ep.toString())
 
+    console.warn("Functions/Send_Episode_Notification", item, episodes, extracted_episodes, plugin_response)
+
     if (GetNumberFromString(item["anime"]["saveData"]!["episode"]) < GetNumberFromString(episodes.at(-1))) {
         sendNotification({
             title: `New Episode Avaible in ${temporal_plugin.metadata.name} plugin`,
@@ -1025,7 +1027,7 @@ export async function checkAnimeTodayReleaseEpisode() {
 
                 const notification_response = await Send_Episode_Notification(content_anime)
 
-                await updatePlaylist("global.waitingplaylist", {...content_anime, customData: notification_response != undefined})
+                await updatePlaylist("global.waitingplaylist", {...content_anime, customData: notification_response == undefined ? true : false})
             }
 
         } catch (error) {
