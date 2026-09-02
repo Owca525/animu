@@ -43,7 +43,7 @@ export async function SheepRequest(url: string, options?: RequestInit) {
             statusText: (error as Error).message,
             url: url,
             success: false,
-            responseHeader: {}
+            responseHeader: new Map()
         }
     }
 }
@@ -67,13 +67,12 @@ async function handler(req, res: http.ServerResponse<http.IncomingMessage> & { r
 
                 const response = await SheepRequest(data["url"], data["requestOptions"])
 
-                res.statusCode = response.status;
-                res.statusMessage = response.statusText
-                Object.entries(response.responseHeader).forEach(([k,v]) => {
-                    res.setHeader(k, v);
-                })
+                res.writeHead(200, "Good")
 
-                res.end(response.text);
+                res.end(JSON.stringify({
+                    ...response,
+                    responseHeader: Object.fromEntries(response["responseHeader"])
+                }));
             } catch (e) {
                 console.log(e)
                 res.statusCode = 400;

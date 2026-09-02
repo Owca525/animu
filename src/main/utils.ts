@@ -9,6 +9,7 @@ import {
     globalTray,
     mainTrayMenu,
     newConfigPath,
+    userAgent,
     yt_dlp,
 } from '.';
 import {
@@ -393,7 +394,7 @@ export function updateTray() {
     globalTray.setContextMenu(Menu.buildFromTemplate(newTray as any))
 }
 
-export async function advanceRequest(url: string, options?: RequestInit) {
+export async function advanceRequest(url: string, options: RequestInit = { headers: { "user-agent": userAgent }}) {
     try {
         const response = await fetch(url, options);
 
@@ -418,6 +419,7 @@ export async function advanceRequest(url: string, options?: RequestInit) {
             statusText: response.statusText,
             url: response.url,
             success: response.ok,
+            requestHeader: options ? options["headers"] : {},
             responseHeader: new Map<string, string>(response.headers.entries()),
         }
 

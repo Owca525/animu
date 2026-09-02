@@ -267,7 +267,13 @@ export async function request(url, options, noCors = false) {
 
         try {
             jsontext = await response.json()
-        } catch (error) { }
+        } catch (error) {
+            if (noCors == false) {
+                throw new Error("Failed Request")
+            }
+        }
+
+        if (noCors == false) return jsontext
 
         return {
             text: text,

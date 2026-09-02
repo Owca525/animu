@@ -836,13 +836,18 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         shakaRequest: shaka.extern.Request,
         _requestType: shaka.net.NetworkingEngine.RequestType,
         _progressUpdated?: shaka.extern.ProgressUpdated): shaka.extern.IAbortableOperation<shaka.extern.Response> {
-        const header = player.playerData
-
+        const header = player.currentResolution
+        
         const promise = request(uri, {
             method: shakaRequest.method as any,
             headers: header && header["reqHeader"] ? header["reqHeader"] : shakaRequest.headers,
             body: shakaRequest.body as any,
         }).then(async (response) => {
+
+            if (!response["success"]) {
+                console.error("Shaka Player Failed Request", response, header)
+            }
+
             return {
                 uri,
                 originalUri: uri,

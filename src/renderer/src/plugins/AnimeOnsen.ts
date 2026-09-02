@@ -1,4 +1,4 @@
-import { request } from "@renderer/utils/functions";
+import { request as SheepRequest } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerPluginFormat, serverStatusData } from "@renderer/utils/types";
 
 const WEBSITE = "https://www.animeonsen.xyz"
@@ -6,7 +6,6 @@ const SEARCH_API = "https://search.animeonsen.xyz"
 const API = "https://api.animeonsen.xyz"
 
 const POST_TOKEN = "0e36d0275d16b40d7cf153634df78bc229320d073f565db2aaf6d027e0c30b13"
-const GET_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImRlZmF1bHQifQ.eyJpc3MiOiJodHRwczovL2F1dGguYW5pbWVvbnNlbi54eXovIiwiYXVkIjoiaHR0cHM6Ly9hcGkuYW5pbWVvbnNlbi54eXoiLCJpYXQiOjE3ODc3NjYwMDksImV4cCI6MTc4ODM3MDgwOSwic3ViIjoiMDZkMjJiOTYtNjNlNy00NmE5LTgwZmMtZGM0NDFkNDFjMDM4LmNsaWVudCIsImF6cCI6IjA2ZDIyYjk2LTYzZTctNDZhOS04MGZjLWRjNDQxZDQxYzAzOCIsImd0eSI6ImNsaWVudF9jcmVkZW50aWFscyJ9.ICxx55f8Xz1u2fPh9ZRCavgGdBA7mMPhpNGq0qA7d7I0qG1ipuQtfrT7kdmbz6_jvmc0X_YxJqv4KKAps5m1WsEpHC7G3oX4z8ZegiU3woy9USEyA6CN0IJWyB6BUYq8UuUMlI9_VjtjohIb5x0j-USpcurKdzqVE1eGY9mH8rNmYeg3nRscfgwvZqM0kgpjMwHByO2moGWz51lZlULZyYdtF2a1CTERlVGJxqT2OB_uW0FdEVvbTEZxMh2Is6vZfCXf8-q4m2C1Bf1vovwFPq1PXnCWfJAdgCcHFEE4SNTNL9D-gPsuNisWh9QDorkOnyVPmcT3nscd10j3WZGPFA"
 
 const header = {
     "User-Agent": navigator.userAgent,
@@ -19,7 +18,57 @@ const header = {
     "Sec-Fetch-Mode": "cors",
     "Sec-Fetch-Site": "cross-site",
     'Referer': `${WEBSITE}/`,
-    "Origin": WEBSITE
+}
+
+function generateToken(str: string | undefined) {
+    try {
+        if (!str) return
+        str = str.split(";")[0].split("=")[1]
+        str = decodeURIComponent(str)
+
+        str = str.split("=")[0].trim().replace(/[^+/0-9A-Za-z-_]/g, "")
+
+        if (str.length < 2) return
+
+        while (str.length % 4 !== 0) {
+            str += "="
+        }
+
+        const binary = atob(str);
+        const bytes = new Uint8Array(binary.length);
+
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+
+        str = new TextDecoder("utf-8").decode(bytes.subarray(0, bytes.length))
+
+        window["animeonsen_get_token"] = str.split("").reduce((e, t) => e + String.fromCharCode(t.charCodeAt(0) + 1), "")
+    } catch (error) {
+        console.error("AnimeOnsen/generateToken FAILED GENERATE TOKEN")
+    }
+}
+
+async function request(url: string, options: RequestInit = {}) {
+    if (window["animeonsen_get_token"] == undefined) {
+        const resp = await SheepRequest(WEBSITE, { headers: header })
+        /* IFDEF DEBUG */
+        console.warn("AnimeOnsen/SheepRequest", resp)
+        /* ENDIF */
+        const finded = Object.entries(resp.responseHeader).find(([k,_]) => k == "set-cookie")
+        if (finded) generateToken(finded["1"])
+    }
+
+    const get_token: string = window["animeonsen_get_token"] ?? ""
+
+    return await SheepRequest(url, {
+        ...options,
+        headers: {
+            ...options["headers"],
+            ...header,
+            "Authorization": `Bearer ${options["method"] == "POST" ? POST_TOKEN : get_token}`
+        }
+    })
 }
 
 function SearchAnime(anime: AnimeData, target: cardData[]) {
@@ -37,7 +86,7 @@ function SearchAnime(anime: AnimeData, target: cardData[]) {
 
 export default class AnimeOnsen implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.0",
+        version: "1.1",
         name: "AnimeOnsen",
         author: "Owca525",
         supportLang: ["en"],
@@ -46,15 +95,10 @@ export default class AnimeOnsen implements playerPluginFormat {
         icon: `${WEBSITE}/favicon/192x192.png`
     };
 
-    extractPlayerData = async(_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
+    extractPlayerData = async (_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
         const tmpEpisode = typeof episode == "object" ? episode["ep"] : episode
 
-        const response = await request(`${API}/v4/content/${id}/video/${tmpEpisode}`, {
-            headers: {
-                ...header,
-                "Authorization": `Bearer ${GET_TOKEN}`
-            }
-        })
+        const response = await request(`${API}/v4/content/${id}/video/${tmpEpisode}`)
 
         /* IFDEF DEBUG */
         console.warn("AnimeOnsen/extractPlayerData", response)
@@ -74,28 +118,25 @@ export default class AnimeOnsen implements playerPluginFormat {
                 res: "1080",
                 url: response["json"]["uri"]["stream"],
                 hls: response["json"]["uri"]["stream"].includes(".m3u8"),
-                reqHeader: header,
+                reqHeader: { ...header, "Referer": `${WEBSITE}/` },
                 defaultSubtitles: true
             }],
         }]
     }
     extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {
         let animeID = anime_id
-        if (animeData && !animeID) {{
-            const searched = await this.searchAnime(animeData["title"]["romaji"], 1)
-            if (searched.length <= 0) return
+        if (animeData && !animeID) {
+            {
+                const searched = await this.searchAnime(animeData["title"]["romaji"], 1)
+                if (searched.length <= 0) return
 
-            animeID = SearchAnime(animeData, searched)
-        }}
+                animeID = SearchAnime(animeData, searched)
+            }
+        }
 
         if (!animeID) return
 
-        const response = await request(`${API}/v4/content/${animeID}/episodes`, {
-            headers: {
-                ...header,
-                "Authorization": `Bearer ${GET_TOKEN}`
-            }
-        })
+        const response = await request(`${API}/v4/content/${animeID}/episodes`)
 
         /* IFDEF DEBUG */
         console.warn("AnimeOnsen/extractEpisodeList", response)
@@ -109,7 +150,7 @@ export default class AnimeOnsen implements playerPluginFormat {
             episodesData: [{
                 episodes: Object.entries(response["json"]).map((v) => ({
                     ep: v["0"],
-                    title: v["1"]["contentTitle_episode_en"]
+                    title: v["1"]!["contentTitle_episode_en"]
                 })),
                 type: "sub"
             }]
@@ -128,15 +169,14 @@ export default class AnimeOnsen implements playerPluginFormat {
             headers: {
                 ...header,
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${POST_TOKEN}`,
                 "X-Meilisearch-Client": "Meilisearch instant-meilisearch (v0.8.2) ; Meilisearch JavaScript (v0.27.0)"
             },
             body: JSON.stringify({
                 "q": name,
                 "attributesToHighlight": ["*"],
-                "highlightPreTag": "__ais-highlight__", 
+                "highlightPreTag": "__ais-highlight__",
                 "highlightPostTag": "__/ais-highlight__",
-                "limit":5
+                "limit": 5
             })
         })
 
@@ -164,7 +204,7 @@ export default class AnimeOnsen implements playerPluginFormat {
             return []
         }
     }
-    
+
     raportStatus = async (): Promise<{ search: serverStatusData; player: serverStatusData; episodes: serverStatusData; }> => {
         let results: serverStatusData[] = []
 
