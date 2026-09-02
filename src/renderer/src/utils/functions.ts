@@ -416,7 +416,7 @@ export function updateObject<T, U>(path: string, value: U, object: T): T {
     return newObject
 }
 
-export async function request(url: string, options?: RequestInit, noCors: boolean = false): Promise<{ text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: Map<string, string> }> {
+export async function request(url: string, options: RequestInit = {}, noCors: boolean = false): Promise<{ text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: Map<string, string> }> {
     options = JSON.parse(JSON.stringify(options))
     url = unwrap(url)
     try {
