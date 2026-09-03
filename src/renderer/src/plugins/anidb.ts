@@ -1,4 +1,4 @@
-import { request, SheepFinderAnime2000 } from "@renderer/utils/functions";
+import { request, SheepFinderAnime2000, sleep } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerDataExtended, playerPluginFormat, serverStatusData } from "@renderer/utils/types";
 
 const WEBSITE = "https://anidb.app"
@@ -160,6 +160,7 @@ export default class AniDB implements playerPluginFormat {
         for (let index = 0; index < functions.length; index++) {
             const element = functions[index];
             const tmp = await wrapper(element)
+            await sleep(5000)
             if (!tmp) {
                 results.push({
                     time: 0,

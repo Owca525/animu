@@ -1,4 +1,4 @@
-import { request as SheepRequest } from "@renderer/utils/functions";
+import { request as SheepRequest, sleep } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerPluginFormat, serverStatusData } from "@renderer/utils/types";
 
 const WEBSITE = "https://www.animeonsen.xyz"
@@ -230,6 +230,7 @@ export default class AnimeOnsen implements playerPluginFormat {
         for (let index = 0; index < functions.length; index++) {
             const element = functions[index];
             const tmp = await wrapper(element)
+            await sleep(5000)
             if (!tmp) {
                 results.push({
                     time: 0,
