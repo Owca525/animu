@@ -1,5 +1,5 @@
 // DISSABLE
-// TODO: END THIS: Why hls dosen't support this flixcloud use custom hls maybe they change more than i think
+// TODO: END THIS: Cloudflare have problem when is request to the fragment
 import { request, SheepFinderAnime2000 } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerDataExtended, playerPluginFormat, serverStatusData } from "@renderer/utils/types";
 
@@ -16,6 +16,22 @@ const PluginHeader = {
     "Sec-Fetch-Site": "cross-site",
     'Referer': WEBSITE
 }
+
+const PlayerHEADER = {
+  "User-Agent": navigator.userAgent,
+  "Accept": "*/*",
+  "Accept-Language": "en-US,en;q=0.9",
+  "Accept-Encoding": "gzip, deflate, br, zstd",
+  "Sec-GPC": "1",
+  "Connection": "keep-alive",
+  "Sec-Fetch-Dest": "empty",
+  "Sec-Fetch-Mode": "cors",
+  "Sec-Fetch-Site": "cross-site",
+  "DNT": "1",
+  "Pragma": "no-cache",
+  "Cache-Control": "no-cache",
+  "TE": "trailers",
+};
 
 const decryptor_content = `(response) => {
     const secret = "REPLACE_ME_TO_SECRET_KEY"
@@ -349,8 +365,9 @@ class FlixCloud {
                     url: resp.url,
                     hls: true,
                     reqHeader: {
-                        ...PluginHeader,
-                        'Referer': head.origin
+                        ...PlayerHEADER,
+                        'Referer': head.origin,
+                        "Origin": `${head.origin}/`,
                     }
                 }],
                 scripts: [{

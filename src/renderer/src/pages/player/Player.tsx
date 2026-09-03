@@ -28,7 +28,6 @@ import { getSocket, getSocketRoom, informationCache } from "@renderer/utils/stor
 import MoreInformation from "./components/MoreInformation"
 import { updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist"
 import { SaveHistory } from "@renderer/utils/FilesManager/history"
-// import { Run_hls_manifest_script } from "@renderer/utils/worker"
 
 shaka.polyfill.installAll()
 
@@ -642,12 +641,14 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                     let currentData: any = data.text
                     if (data["status"] == 429) HLS?.destroy()
 
-                    // /* IFDEF DEBUG */
-                    // console.warn("Player/HLS", data)
-                    // /* ENDIF */
+                    /* IFDEF DEBUG */
+                    console.warn("Player/HLS", data, context)
+                    /* ENDIF */
 
                     if (!data.success) {
-                        console.warn("Context:", context, "Data:", data)
+                        /* IFDEF PROD */
+                        console.warn("Player/HLS", context, data)
+                        /* ENDIF */
                         callbacks.onError({ type: 'network', details: data["statusText"], fatal: true, code: data["status"] }, context)
                         return
                     }
@@ -655,6 +656,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
                     // if (context["responseType"] == "text" && manifest_script) {
                     //     currentData = await Run_hls_manifest_script(manifest_script["code"], JSON.parse(JSON.stringify(data)))
+                    //     console.log(currentData)
                     // }
 
                     if (context.responseType == "arraybuffer") currentData = data.buffer
