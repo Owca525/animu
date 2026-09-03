@@ -641,6 +641,11 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                 request(context.url, { method: "GET", headers: unwrap(player["currentResolution"]!["reqHeader"]) }).then(async (data) => {
                     let currentData: any = data.text
                     if (data["status"] == 429) HLS?.destroy()
+
+                    // /* IFDEF DEBUG */
+                    // console.warn("Player/HLS", data)
+                    // /* ENDIF */
+
                     if (!data.success) {
                         console.warn("Context:", context, "Data:", data)
                         callbacks.onError({ type: 'network', details: data["statusText"], fatal: true, code: data["status"] }, context)
@@ -837,7 +842,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         _requestType: shaka.net.NetworkingEngine.RequestType,
         _progressUpdated?: shaka.extern.ProgressUpdated): shaka.extern.IAbortableOperation<shaka.extern.Response> {
         const header = player.currentResolution
-        
+
         const promise = request(uri, {
             method: shakaRequest.method as any,
             headers: header && header["reqHeader"] ? header["reqHeader"] : shakaRequest.headers,

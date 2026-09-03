@@ -55,7 +55,7 @@ async function request(url: string, options: RequestInit = {}) {
         /* IFDEF DEBUG */
         console.warn("AnimeOnsen/SheepRequest", resp)
         /* ENDIF */
-        const finded = Object.entries(resp.responseHeader).find(([k,_]) => k == "set-cookie")
+        const finded = Object.entries(resp.responseHeader).find(([k, _]) => k == "set-cookie")
         if (finded) generateToken(finded["1"])
     }
 
@@ -126,12 +126,10 @@ export default class AnimeOnsen implements playerPluginFormat {
     extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {
         let animeID = anime_id
         if (animeData && !animeID) {
-            {
-                const searched = await this.searchAnime(animeData["title"]["romaji"], 1)
-                if (searched.length <= 0) return
+            const searched = await this.searchAnime(animeData["title"]["romaji"], 1)
+            if (searched.length <= 0) return
 
-                animeID = SearchAnime(animeData, searched)
-            }
+            animeID = SearchAnime(animeData, searched)
         }
 
         if (!animeID) return
