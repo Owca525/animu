@@ -93,7 +93,7 @@ function DetectTypeAnimeAndShare(anime: AnimeData, clip: boolean = false) {
     const info = getInformationPlugin()
     if (!info["metadata"]["shareWebsite"]) return console.error("Failed Share URL, Missing shareWebsite")
 
-    if (clip) return SaveToClipboard("text",`${info["metadata"]["shareWebsite"][`${anime["type"]}`.toLocaleLowerCase()]}${anime["id"]}/${convert_to_slug(anime["title"]["romaji"])}`)
+    if (clip) return SaveToClipboard("text", `${info["metadata"]["shareWebsite"][`${anime["type"]}`.toLocaleLowerCase()]}${anime["id"]}/${convert_to_slug(anime["title"]["romaji"])}`)
 
     openUrlFolder(`${info["metadata"]["shareWebsite"][`${anime["type"]}`.toLocaleLowerCase()]}${anime["id"]}/${convert_to_slug(anime["title"]["romaji"])}`)
 }
@@ -187,7 +187,7 @@ function information() {
                 value: 'Trailer',
                 onClick: () => {
                     updateInfo({ activePage: "Trailer" })
-                    contentResponse.Refetch({ type: "trailer", metadata: `${information["cache"]["anime"]["trailer"]!["id"]}`, error: "No Trailer Found" })
+                    contentResponse.Refetch({ type: "trailer", metadata: `${information["cache"]["anime"]["trailer"] ? information["cache"]["anime"]["trailer"]!["id"] : undefined}`, error: "No Trailer Found" })
                 }
             }]
         }
@@ -337,10 +337,6 @@ function information() {
 
             updateInformation({
                 ...information["cache"],
-                anime: {
-                    ...tmpData.anime,
-                    recommendations: undefined
-                },
                 saveData: tmpUpdate.saveData
             })
 
@@ -384,6 +380,10 @@ function information() {
         } else {
             history = tempHistory.get(content.anime.id)
         }
+
+        /* IFDEF DEBUG */
+        console.warn("Information/initialInformation history", history)
+        /* ENDIF */
 
         if (history && !content["DontOverWrite"]) {
             let plugin = await pluginManager.changePlayerPlugin(history.saveData?.pluginName as string)
@@ -474,6 +474,11 @@ function information() {
         const anime = information["cache"]["anime"]
 
         const resp = await getInformationPlugin().anime(anime["id"])
+
+        /* IFDEF DEBUG */
+        console.warn("Information/FetchAnimeForinformation", resp)
+        /* ENDIF */
+
         if (!resp) return updateInfo({ isFetchingAnime: false })
 
         updateInfo({ isFetchingAnime: false })
@@ -499,12 +504,18 @@ function information() {
         const animulist = animulistData()
         let resp
 
+        updateInfo({ isFetchingAnime: true })
+
         if (data.format == "MANGA" || data.format == "NOVEL" || data.format == "ONE_SHOT") {
             resp = await getInformationPlugin().getManga(data.id)
         } else {
             resp = await getInformationPlugin().anime(data.id)
         }
 
+        /* IFDEF DEBUG */
+        console.warn("Information/ChangeAnimeInInformation", resp)
+        /* ENDIF */
+        updateInfo({ isFetchingAnime: false })
         if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", timer: false })
         updateToast(idToast, t("notification.successanime"), { type: "success", timer: false })
 
@@ -1018,8 +1029,8 @@ function information() {
                                         <span class='material-symbols-outlined loading-animation icon'>progress_activity</span>
                                     </div>
                                 </Match>
-                                <Match when={information["cache"].anime.recommendations && information["cache"].anime.recommendations!.length > 0 && !information["isFetchingAnime"] && information["cache"].anime.type == "ANIME"}>
-                                    <Container title="information.recomendation" horizontal data={information["cache"].anime.recommendations!.map((item) => ({
+                                <Match when={information["cache"]["anime"]["recommendations"] && information["cache"]["anime"]["recommendations"]!.length > 0 && !information["isFetchingAnime"]}>
+                                    <Container title="information.recomendation" horizontal data={information["cache"]["anime"]["recommendations"]!.map((item) => ({
                                         AnimeData: {
                                             title: item.title,
                                             bannerImage: item.bannerImage,

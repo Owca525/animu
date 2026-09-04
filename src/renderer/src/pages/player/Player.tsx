@@ -1378,12 +1378,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         playerHideTimer = setTimeout(() => {
             updateUI({ isVisible: false })
 
-            console.log(config, player)
-
             if (config.Player.general.disablemoreinformation) return
             if (player.isPlaying) return
-
-            console.log("MOREINFORMATION PASS")
+            if (type == "embed") return
 
             moreInformationTimer = setTimeout(() => {
                 updateUI({ ShowMoreInformation: true })
