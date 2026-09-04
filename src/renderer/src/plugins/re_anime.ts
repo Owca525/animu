@@ -1,4 +1,3 @@
-// TODO: END THIS: Cloudflare have problem when is request to the fragment
 import { request, SheepFinderAnime2000 } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerChapterList, playerData, playerDataExtended, playerPluginFormat, playerSubtitlesFormat, serverStatusData } from "@renderer/utils/types";
 

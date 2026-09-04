@@ -1160,7 +1160,6 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
     }
 
     async function setNewSubtitles(sub: playerSubtitlesFormat | undefined) {
-        console.trace()
         if (!sub) return
         if (!videoRef) return
         if (!player.currentResolution) return
