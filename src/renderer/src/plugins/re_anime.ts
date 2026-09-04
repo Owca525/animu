@@ -1,7 +1,6 @@
-// DISSABLE
 // TODO: END THIS: Cloudflare have problem when is request to the fragment
 import { request, SheepFinderAnime2000 } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerDataExtended, playerPluginFormat, serverStatusData } from "@renderer/utils/types";
+import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerChapterList, playerData, playerDataExtended, playerPluginFormat, playerSubtitlesFormat, serverStatusData } from "@renderer/utils/types";
 
 const WEBSITE = "https://reanime.to"
 const PluginHeader = {
@@ -17,23 +16,27 @@ const PluginHeader = {
     'Referer': WEBSITE
 }
 
-const PlayerHEADER = {
-  "User-Agent": navigator.userAgent,
-  "Accept": "*/*",
-  "Accept-Language": "en-US,en;q=0.9",
-  "Accept-Encoding": "gzip, deflate, br, zstd",
-  "Sec-GPC": "1",
-  "Connection": "keep-alive",
-  "Sec-Fetch-Dest": "empty",
-  "Sec-Fetch-Mode": "cors",
-  "Sec-Fetch-Site": "cross-site",
-  "DNT": "1",
-  "Pragma": "no-cache",
-  "Cache-Control": "no-cache",
-  "TE": "trailers",
+const PlayerHEADER: Record<string, string> = {
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate, br, zstd",
+    "accept-language": "en-US,en;q=0.9",
+    "cache-control": "no-cache",
+    "origin": "https://flixcloud.cc",
+    "pragma": "no-cache",
+    "priority": "u=1, i",
+    "referer": "https://flixcloud.cc/",
+    "sec-ch-ua": '"Chromium";v="151", "Not=A?Brand";v="99"',
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": '"Linux"',
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "cross-site",
+    "user-agent":
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
 };
 
 const decryptor_content = `(response) => {
+    if (response["text"].startsWith("#EXTM3U")) return response["text"]
     const secret = "REPLACE_ME_TO_SECRET_KEY"
     let str = [];
 
@@ -41,6 +44,53 @@ const decryptor_content = `(response) => {
         str.push(u.charCodeAt(h) ^ l.charCodeAt(h % l.length));
     }
     return (new TextDecoder).decode(new Uint8Array(str))
+}`
+
+const hls_converter = `(response) => {
+    let buffer = response["buffer"]
+
+    if (response["url"].includes(".webp") || response["url"].includes(".png")) {
+        let l = null;
+        const u = new Uint8Array(buffer);
+        let d = true;
+
+        if (u.length >= 12 && u[0] === 82 && u[1] === 73 && u[2] === 70 && u[3] === 70 && u[8] === 87 && u[9] === 69 && u[10] === 66 && u[11] === 80) {
+            l = buffer.slice(12);
+            if (u.length >= 13 && u[12] === 71) {
+                d = false;
+            }
+        }
+
+        else if (u.length >= 8 && u[0] === 137 && u[1] === 80 && u[2] === 78 && u[3] === 71 && u[4] === 13 && u[5] === 10 && u[6] === 26 && u[7] === 10) {
+            l = buffer.slice(8);
+
+            if (u.length >= 9 && u[8] === 71) {
+                d = false;
+            }
+        }
+
+        if (l !== null) {
+            if (d) {
+                const h = [
+                    157, 42, 241, 71,
+                    179, 142, 92, 112,
+                    166, 25, 228, 59,
+                    216, 98, 15, 197,
+                ];
+
+                const f = new Uint8Array(l);
+
+                for (let c = 0; c < f.length; c++) {
+                    f[c] ^= h[15 & c];
+                }
+
+                buffer = f.buffer;
+            } else {
+                buffer = l;
+            }
+        }
+    }
+    return buffer
 }`
 
 // function DecyrptContent(encode_content: string, secret: string) {
@@ -56,6 +106,10 @@ const decryptor_content = `(response) => {
 //     const key = "REPLACE_ME_TO_SECRET_KEY"
 //     return DecyrptContent(response["text"], key)
 // }
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 class FlixCloud {
     url: string = ""
@@ -358,6 +412,37 @@ class FlixCloud {
 
             const head = new URL(this.url)
 
+            let subtitles: playerSubtitlesFormat[] = []
+            let chapters: playerChapterList[] = []
+
+            if (this.data["subtitles"]) {
+                subtitles = this.data["subtitles"].map((v) => ({
+                    url: v["url"],
+                    lang: "en",
+                    format: v["format"],
+                    label: v["language"],
+                    default: v["default"]
+                }))
+            }
+
+            if (this.data["chapters"]) {
+                for (let index = 0; index < this.data["chapters"].length; index++) {
+                    const element = this.data["chapters"][index];
+                    let type: playerChapterList["type"] = "other"
+
+                    if (this.data["intro_chapter"] && this.data["intro_chapter"]["title"] == element["title"]) type = "opening"
+                    if (this.data["outro_chapter"] && this.data["outro_chapter"]["title"] == element["title"]) type = "ending"
+
+                    chapters.push({
+                        start: element["start"],
+                        end: element["end"],
+                        type: type,
+                        name: element["title"]
+                    })
+
+                }
+            }
+
             return {
                 ...playerdata,
                 resolution: [{
@@ -368,11 +453,17 @@ class FlixCloud {
                         ...PlayerHEADER,
                         'Referer': head.origin,
                         "Origin": `${head.origin}/`,
-                    }
+                    },
+                    defaultSubtitles: subtitles.find((v) => v["default"]) ? true : false
                 }],
+                subtitles: subtitles,
+                listChapters: chapters,
                 scripts: [{
                     type: "hls_manifest",
                     code: decryptor_content.replace("REPLACE_ME_TO_SECRET_KEY", resp["decryptor"])
+                }, {
+                    type: "hls_arraybuffer",
+                    code: hls_converter
                 }]
             }
         } catch (error) {
@@ -485,6 +576,47 @@ export default class ReAnime implements playerPluginFormat {
     }
 
     raportStatus = async (): Promise<{ search: serverStatusData; player: serverStatusData; episodes: serverStatusData; }> => {
-        return undefined as any
+        let results: serverStatusData[] = []
+
+        async function wrapper(func: (...args) => any): Promise<serverStatusData | undefined> {
+            try {
+                const start = performance.now();
+                const response = await func()
+                const end = performance.now();
+
+                return {
+                    time: end - start,
+                    work: response.length > 0
+                }
+            } catch (error) {
+                return undefined
+            }
+        }
+
+        const functions = [
+            async () => this.searchAnime("Oshi No Ko", 1),
+            async () => this.extractPlayerData("sub", { ep: "1" }, "[150672,\"oshi-no-ko-knjx62\"]"),
+            async () => this.extractOnlyEpisodesList("sub", "[150672,\"oshi-no-ko-knjx62\"]"),
+        ]
+
+        for (let index = 0; index < functions.length; index++) {
+            const element = functions[index];
+            const tmp = await wrapper(element)
+            await sleep(5000)
+            if (!tmp) {
+                results.push({
+                    time: 0,
+                    work: false
+                })
+            } else {
+                results.push(tmp)
+            }
+        }
+
+        return {
+            search: results[0],
+            player: results[1],
+            episodes: results[2]
+        }
     }
 }

@@ -424,7 +424,7 @@ export async function advanceRequest(url: string, options: RequestInit = { heade
         }
 
         /* IFDEF DEBUG */
-        console.info("advanceRequest\n", response) // options
+        console.info("advanceRequest\n", convertedResponse) // options
         /* ENDIF */
 
         return convertedResponse;

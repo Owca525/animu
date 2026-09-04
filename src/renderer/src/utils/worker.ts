@@ -22,21 +22,27 @@ self.onmessage = (event) => {
     }
 };`
 
-export function Run_hls_manifest_script(fn: string, data: { [key: string]: any }): Promise<string> {
+export function Run_hls_manifest_script(fn: string, data: { [key: string]: any }): Promise<any> {
     const blobCode = new Blob([communication], { type: "text/javascript" });
     const function_blob = URL.createObjectURL(blobCode);
 
     const worker = new Worker(function_blob);
 
+    // /* IFDEF DEBUG */
+    // console.warn("Worker/Run_hls_manifest_script", fn, data)
+    // /* ENDIF */
+
     return new Promise((resolve, reject) => {
         const handler = (event) => {
             worker.removeEventListener("message", handler);
-
+            // /* IFDEF DEBUG */
+            // console.warn("Worker/Run_hls_manifest_script event", event)
+            // /* ENDIF */
             if (event.data.success) {
                 resolve(event.data.data);
                 worker.terminate()
             } else {
-                reject(new Error(event.data.error));
+                reject(new Error(event.data));
                 worker.terminate()
             }
         };

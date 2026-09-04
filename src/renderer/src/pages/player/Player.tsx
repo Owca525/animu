@@ -3,7 +3,7 @@ import VolumeNotification from "@renderer/pages/player/components/VolumeNotifica
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
 import { CheckNumber, convertKeybinds, createElement, CreateSHA256, dateToUnix, detectTitleConfig, formatTime, openUrlFolder, request, toggleFullscreen } from "@renderer/utils/functions"
 import { getConfig } from "@renderer/utils/stores/config"
-import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, Thumbnail } from "@renderer/utils/types"
+import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, player_script_injector, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, Thumbnail } from "@renderer/utils/types"
 import Hls, { HlsConfig } from "hls.js"
 import HLSWorker from "hls.js/dist/hls.worker.js?url"
 import JASSUB from "jassub"
@@ -28,6 +28,7 @@ import { getSocket, getSocketRoom, informationCache } from "@renderer/utils/stor
 import MoreInformation from "./components/MoreInformation"
 import { updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist"
 import { SaveHistory } from "@renderer/utils/FilesManager/history"
+import { Run_hls_manifest_script } from "@renderer/utils/worker"
 
 shaka.polyfill.installAll()
 
@@ -502,7 +503,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         if (!player.playerData["subtitles"]) return
 
         const default_subtitle = player.playerData["subtitles"].find((v) => v["default"])
-        if (default_subtitle) setNewSubtitles(default_subtitle)
+        if (default_subtitle) return setNewSubtitles(default_subtitle)
 
         const finded = player.playerData["subtitles"].find((v) => v["lang"] == i18n()!.currentLang())
 
@@ -629,11 +630,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             maxBufferLength: 140,
         }
 
-        // let manifest_script: player_script_injector | undefined
-
-        // if (player.playerData!["scripts"]) {
-        //     manifest_script = player.playerData!["scripts"].find((v) => v["type"] == "hls_manifest")
-        // }
+        let manifest_script: player_script_injector[] = unwrap(player.playerData!["scripts"]) ?? []
 
         class sheepLoader extends Hls.DefaultConfig.loader {
             load(context: any, config: any, callbacks: any) {
@@ -641,9 +638,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                     let currentData: any = data.text
                     if (data["status"] == 429) HLS?.destroy()
 
-                    /* IFDEF DEBUG */
-                    console.warn("Player/HLS", data, context)
-                    /* ENDIF */
+                    // /* IFDEF DEBUG */
+                    // console.warn("Player/HLS", data, context)
+                    // /* ENDIF */
 
                     if (!data.success) {
                         /* IFDEF PROD */
@@ -654,12 +651,24 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                     }
                     const now = performance.now()
 
-                    // if (context["responseType"] == "text" && manifest_script) {
-                    //     currentData = await Run_hls_manifest_script(manifest_script["code"], JSON.parse(JSON.stringify(data)))
-                    //     console.log(currentData)
-                    // }
-
                     if (context.responseType == "arraybuffer") currentData = data.buffer
+
+                    for (let index = 0; index < manifest_script.length; index++) {
+                        const element = manifest_script[index];
+                        switch (element["type"]) {
+                            case "hls_manifest":
+                                if (context["responseType"] != "text") break
+
+                                currentData = await Run_hls_manifest_script(element["code"], data)
+                                break
+                            case "hls_arraybuffer":
+                                if (context["responseType"] != "arraybuffer") break
+
+                                currentData = await Run_hls_manifest_script(element["code"], data)
+                                break
+                        }
+                    }
+
                     callbacks.onSuccess({ data: currentData, url: context.url }, {
                         loaded: data.buffer.byteLength,
                         total: data.buffer.byteLength,
@@ -1151,6 +1160,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
     }
 
     async function setNewSubtitles(sub: playerSubtitlesFormat | undefined) {
+        console.trace()
         if (!sub) return
         if (!videoRef) return
         if (!player.currentResolution) return

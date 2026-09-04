@@ -258,7 +258,7 @@ export interface playerData {
 }
 
 export interface player_script_injector {
-    type: "hls_manifest",
+    type: "hls_manifest" | "hls_arraybuffer",
     code: string
 }
 
