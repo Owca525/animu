@@ -1,4 +1,4 @@
-import { request as SheepRequest, sleep } from "@renderer/utils/functions";
+import { request as SheepRequest } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerPluginFormat, serverStatusData } from "@renderer/utils/types";
 
 const WEBSITE = "https://www.animeonsen.xyz"
@@ -18,6 +18,10 @@ const header = {
     "Sec-Fetch-Mode": "cors",
     "Sec-Fetch-Site": "cross-site",
     'Referer': `${WEBSITE}/`,
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function generateToken(str: string | undefined) {

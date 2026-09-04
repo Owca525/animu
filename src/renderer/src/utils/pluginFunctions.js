@@ -436,7 +436,3 @@ export function requestCloudflare(url) {
 export function savePluginConfig(config) {
     return window["savePluginConfig"](config)
 }
-
-export function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
