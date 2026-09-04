@@ -1901,9 +1901,10 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             <div ref={screenShotContainer} class={`player-screenshot-container ${ui.screenshot ? "show" : "hidden"}`}
                 classList={{ click: ui.screenshot ? ui.screenshot.click != "" : false }}
                 onclick={() => ui.screenshot && ui.screenshot.click != "" ? openUrlFolder(ui.screenshot!.click) : ""}
+                tabIndex={-1}
             >
                 <Show when={ui.screenshot}>
-                    <img src={ui.screenshot!.url} class="player-screenshot-image" />
+                    <img src={ui.screenshot!.url} class="player-screenshot-image" tabIndex={-1} />
                 </Show>
                 <span class="player-screenshot-text">
                     {t("player.toastscreenshot.done")}
@@ -1913,7 +1914,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             <Show when={anime && avaibleEpisode["nextEpisode"] && onChangeEpisode}>
 
                 <Show when={config.Player.upToNextEpisode.variants == "old"}>
-                    <div class={`player-up-Next-container old  ${ui.upNextActive ? "show" : "hidden"}`}>
+                    <div class={`player-up-Next-container old  ${ui.upNextActive ? "show" : "hidden"}`} tabIndex={-1}>
                         <div class="player-up-Next-Title old">{t("player.upNext.title", { sec: ui.upNextTimer })}</div>
                         <div class="player-up-Next-Anime old">{t("player.upNext.titleAnime", {
                             ep: avaibleEpisode["nextEpisode"]!.ep,
@@ -1935,7 +1936,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                 </Show>
 
                 <Show when={config.Player.upToNextEpisode.variants == "var2"}>
-                    <div class={`player-up-Next-background ${ui.upNextActive ? "show" : "hidden"}`} style={{ "background-image": `url(${avaibleEpisode["nextEpisode"]!["img"]})` }}
+                    <div tabIndex={-1} class={`player-up-Next-background ${ui.upNextActive ? "show" : "hidden"}`} style={{ "background-image": `url(${avaibleEpisode["nextEpisode"]!["img"]})` }}
                         onClick={() => onChangeEpisode!(avaibleEpisode["nextEpisode"]!["ep"])}>
                         <div class="player-up-Next-container-var2 ">
                             <span class="material-symbols-outlined player-up-Next-icon">skip_next</span>
@@ -1945,7 +1946,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                                 <div class="player-up-Next-text">{t("player.upNext.nextPlaying", { time: ui.upNextTimer })}</div>
                             </div>
                         </div>
-                        <button class="material-symbols-outlined player-up-Next-button-close" onClick={(event) => {
+                        <button tabIndex={-1} class="material-symbols-outlined player-up-Next-button-close" onClick={(event) => {
                             event.stopPropagation();
                             updateUI({ upNextActive: false, upNextDisable: true })
                         }
@@ -1954,7 +1955,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                 </Show>
 
                 <Show when={config.Player.upToNextEpisode.variants == "var1"}>
-                    <div class={`player-up-Next-container ${ui.upNextActive ? "show" : "hidden"}`} onClick={() => onChangeEpisode!(avaibleEpisode["nextEpisode"]!["ep"])}>
+                    <div tabIndex={-1} class={`player-up-Next-container ${ui.upNextActive ? "show" : "hidden"}`} onClick={() => onChangeEpisode!(avaibleEpisode["nextEpisode"]!["ep"])}>
                         <sheep-img src={avaibleEpisode["nextEpisode"]!["img"]} class="player-up-Next-image" />
                         <span class="material-symbols-outlined player-up-Next-icon">skip_next</span>
                         <div class="player-up-Next-content">
@@ -1962,7 +1963,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                             <div class="player-up-Next-episode">{t("player.upNext.nextEpisode", { episode: avaibleEpisode["nextEpisode"]!["ep"] })}</div>
                             <div class="player-up-Next-text">{t("player.upNext.nextPlaying", { time: ui.upNextTimer })}</div>
                         </div>
-                        <button class="material-symbols-outlined player-up-Next-button-close" onClick={(event) => {
+                        <button tabIndex={-1} class="material-symbols-outlined player-up-Next-button-close" onClick={(event) => {
                             event.stopPropagation();
                             updateUI({ upNextActive: false, upNextDisable: true })
                         }
@@ -1978,7 +1979,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             </Show>
 
             <Show when={nerdStats.active}>
-                <div class="player-nerdstats-container">
+                <div class="player-nerdstats-container" tabIndex={-1}>
                     <For each={Object.entries(nerdStats["player"])}>
                         {([key, val]) => (
                             <span class="player-nerdstats-text">{key}: {JSON.stringify(val)}</span>
