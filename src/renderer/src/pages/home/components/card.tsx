@@ -10,7 +10,7 @@ import {
   SaveToClipboard,
 } from "@renderer/utils/functions";
 import { DeleteFromHistory, SaveHistory } from "@renderer/utils/FilesManager/history";
-import { createStore, unwrap } from "solid-js/store";
+import { createStore } from "solid-js/store";
 import { removeToast, toast, updateToast } from "@renderer/utils/context/ToastNotification";
 import { useI18n } from "@renderer/utils/i18n";
 import { showCustomMenu } from "@renderer/utils/context/menuContext";
@@ -91,14 +91,14 @@ function Card(props: CardProps) {
 
   async function deleteCard() {
     if (props.card.saveData && props.card.saveData.episode != "" && (props.card.saveData.last_Time != 0 || props.card.saveData.isStarted)) {
-      if (await SaveHistory(unwrap({
+      if (await SaveHistory({
         ...props.card,
         saveData: {
           ...props.card.saveData,
           last_Time: 0,
           isStarted: false,
         }
-      }))) {
+      })) {
         toast(t("history.continuesaved"), { type: "success" })
       } else toast(t("history.continuefailed"), { type: "error" })
     } else {
@@ -136,7 +136,7 @@ function Card(props: CardProps) {
       option: "Add To AnimuList",
       onClick: () =>
         showCustomMenu(AnimulistMenu({
-          anime: unwrap(props.card.AnimeData),
+          anime: props.card.AnimeData,
           save: (animulist, anime) => addToAnimuList(animulist, anime, true)
         })),
     });

@@ -1,6 +1,5 @@
 import { saveConfig } from "./FilesManager/config";
 import { getConfig } from "./stores/config";
-import { unwrap } from "solid-js/store";
 import { toast, updateToast } from "./context/ToastNotification";
 import { t } from "./i18n";
 import { dateToUnix } from "./functions";
@@ -22,7 +21,7 @@ export async function checkUpdate(alwaysShow: boolean = false) {
       toast(t("update.same"), { type: "success" });
     }
 
-    const config = unwrap(getConfig());
+    const config = getConfig();
     config.update.lastTime = dateToUnix(new Date().toString());
     saveConfig(config);
   } catch (error) {

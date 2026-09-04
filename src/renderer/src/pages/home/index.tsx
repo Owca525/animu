@@ -26,7 +26,6 @@ import {
 } from '@renderer/utils/stores/home';
 import { getInformationPlugin } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
-import { unwrap } from 'solid-js/store';
 import './home.css';
 import {
   containerData,
@@ -79,7 +78,7 @@ const Home = () => {
     })
 
     // if (homeCache().data.sections.length <= 0) plugin.home()
-    const config: SettingsConfig = unwrap(getConfig());
+    const config: SettingsConfig = getConfig();
 
     /* IFDEF DEBUG|PROD */
     if (config.General.discordRPC)
@@ -106,7 +105,7 @@ const Home = () => {
     if (!home.filterTags) return;
     let data: any = [];
     for (const [key, type] of Object.entries(home.filterTags)) {
-      data.push({ remover: () => { updateGenres(key, undefined, type.name); StartHomeSearch(unwrap(homeCache().search), unwrap(homeCache().filterTags)) }, name: type.name });
+      data.push({ remover: () => { updateGenres(key, undefined, type.name); StartHomeSearch(homeCache().search, homeCache().filterTags) }, name: type.name });
     }
 
     return data;
@@ -156,11 +155,11 @@ const Home = () => {
             placeholder={t(`search.${activeHomePage().split(".")[1]}`)}
             InputClass={`${homeCache().data && homeCache().data.topCards ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
             defaultValue={homeCache().search}
-            onKeyDown={(search: string) => { StartHomeSearch(search, unwrap(homeCache().filterTags)) }}
+            onKeyDown={(search: string) => { StartHomeSearch(search, homeCache().filterTags) }}
           />
           <div class="home-filter-void">
             <Filter
-              onChange={(params: FilterParams | undefined) => { StartHomeSearch(unwrap(homeCache().search), params) }}
+              onChange={(params: FilterParams | undefined) => { StartHomeSearch(homeCache().search, params) }}
               filter={[...plugin.metadata.searchOption!, ...checkOtherFilters()]}
               custonClass={`${homeCache().data && homeCache().data.topCards ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
             />

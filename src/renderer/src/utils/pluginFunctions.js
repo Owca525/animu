@@ -351,7 +351,7 @@ export function timeToSeconds(time) {
  */
 export function updateObject(path, value, object) {
     const keys = path.split('.')
-    const newObject = unwrap(object)
+    const newObject = object
 
     let current = newObject
     for (let i = 0; i < keys.length - 1; i++) {

@@ -72,7 +72,7 @@ export type pluginRepoExpandedSettings = {
 
 function settings() {
     const navigate = useNavigate();
-    const cfg: SettingsConfig = unwrap(getConfig());
+    const cfg: SettingsConfig = getConfig();
     const { t, changeLanguage, listLang } = useI18n()
 
     let filePickerImport: HTMLInputElement | undefined
@@ -171,7 +171,7 @@ function settings() {
 
     function handleChange(path: string, value: string | number | boolean | any) {
         setNewConfig((prevConfig) => {
-            return { old: prevConfig.old, new: updateObject(path, value, unwrap(prevConfig.new)) }
+            return { old: prevConfig.old, new: updateObject(path, value, prevConfig.new) }
         })
     }
 
@@ -306,11 +306,11 @@ function settings() {
     }
 
     function updateTheme(theme: themeMetadata, remove: boolean = false, id?: number, num?: number) {
-        let active = unwrap(activeThemes())
+        let active = activeThemes()
         if (remove == true && id != undefined) active.delete(id)
         else if (num == undefined) {
             const lastID = [...active.entries()].at(-1)
-            if (lastID) active.set(lastID[0] + 1, unwrap(theme))
+            if (lastID) active.set(lastID[0] + 1, theme)
         }
 
         if (id != undefined && num != undefined && active.get(id + num)?.themeName != "DarkerAnimu") {
@@ -336,7 +336,7 @@ function settings() {
 
         setThemes(loadedTheme().filter((val) => ![...active.entries()].map((v) => v[1].themeName).includes(val.themeName)))
         changeTheme(active)
-        handleChange("General.theme", unwrap([...activeThemes().entries()].map((val) => val[1].themeName)) as unknown as string)
+        handleChange("General.theme", [...activeThemes().entries()].map((val) => val[1].themeName)) as unknown as string
     }
 
     async function openThemeOption(theme: themeMetadata) {

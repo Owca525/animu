@@ -275,13 +275,13 @@ class WorkerWrapper implements WorkerWrapperInstance {
             }
 
             this.pendingRequest.set(id, resolve);
-            this.instance.postMessage({
+            this.instance.postMessage(unwrap({
                 type: "RUN_FUNCTION",
                 uuid: id,
                 value,
                 func,
                 stay
-            });
+            }));
         });
     }
 

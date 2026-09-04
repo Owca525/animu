@@ -2,7 +2,6 @@ import { createContext, JSX, Show, createSignal, For } from "solid-js";
 import { Portal } from "solid-js/web";
 import "./css/menuContext.css";
 import Button from "@renderer/components/buttons";
-import { unwrap } from "solid-js/store";
 
 interface menuContextType {
     showCustomMenu: (data: JSX.Element) => void;
@@ -26,7 +25,7 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
     }
 
     function hideCustomMenu() {
-        let tmp = unwrap(content())
+        let tmp = content()
         tmp.pop()
 
         setContent([])

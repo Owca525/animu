@@ -4,7 +4,6 @@ import Card from "./card"
 import Button from "@renderer/components/buttons"
 import { createEffect, createSignal, For, Match, onCleanup, onMount, Show, Switch } from "solid-js"
 import { getHomeCache, setHomeSearchPage, setHomeStopScrolling } from "@renderer/utils/stores/home"
-import { unwrap } from "solid-js/store"
 import { useI18n } from "@renderer/utils/i18n"
 import { useResponse } from "@renderer/utils/hooks/useResponse"
 import { setHomeData, updateHomeContainer } from "@renderer/utils/functions"
@@ -13,7 +12,7 @@ import { getGlobalCache, setGlobalToken } from "@renderer/utils/stores/global"
 function Container(props: containerData) {
   const { t, pathExist } = useI18n()
   let container: HTMLDivElement | undefined
-  const [currentPage, setcurrentPage] = createSignal(unwrap(getHomeCache().page))
+  const [currentPage, setcurrentPage] = createSignal(getHomeCache().page)
   const [animeCards, setAnimeCards] = createSignal<cardData[]>(props.data)
   const [disableScrollButtons, setDisableScrollButtons] = createSignal<boolean>(false)
 
@@ -23,7 +22,7 @@ function Container(props: containerData) {
       const token = crypto.randomUUID()
       setGlobalToken(token)
 
-      const homeCache = unwrap(getHomeCache())
+      const homeCache = getHomeCache()
       if (homeCache.stopScrolling) return
       if (!props.onScrollDownFunction) return
       let outputFilter: FilterPluginsParams | undefined = undefined;
@@ -37,7 +36,7 @@ function Container(props: containerData) {
         );
       }
 
-      const resp = await props.onScrollDownFunction(homeCache.search, unwrap(currentPage()), outputFilter)
+      const resp = await props.onScrollDownFunction(homeCache.search, currentPage(), outputFilter)
 
       if (getGlobalCache().token != token) return
 
@@ -51,7 +50,7 @@ function Container(props: containerData) {
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        const homeCache = unwrap(getHomeCache())
+        const homeCache = getHomeCache()
         if (entry.isIntersecting && !homeCache.stopScrolling && !cardResponse.loading() && !cardResponse.error()) {
           setHomeSearchPage(currentPage() + 1)
           setcurrentPage(currentPage() + 1)
@@ -123,7 +122,7 @@ function Container(props: containerData) {
     if (cache.data["sections"].length > 1) return
     updateHomeContainer([{
       ...props,
-      data: unwrap(animeCards())
+      data: animeCards()
     }])
   }
 

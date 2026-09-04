@@ -1,4 +1,3 @@
-import { unwrap } from "solid-js/store"
 import { request } from "./functions"
 import { addOpeningCache, animeOpeningsCache } from "./stores/global"
 import { animeOpeningsFormat } from "./types"
@@ -37,7 +36,7 @@ query ($id: [Int!]) {
 `
 
 export async function requestAnimeMedia(anilistID: number): Promise<animeOpeningsFormat[]> {
-  const cache = unwrap(animeOpeningsCache())
+  const cache = animeOpeningsCache()
   if (cache[anilistID]) return cache[anilistID]
 
   const response = await request(QUERY_API, { method: "POST", headers: header, body: JSON.stringify({ query: videosQuery, variables: { id: [anilistID] } }) })

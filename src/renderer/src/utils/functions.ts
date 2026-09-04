@@ -126,7 +126,7 @@ export async function changeTheme(activeTheme: Map<number, themeMetadata>) {
         if (theme.themeName != "DarkerAnimu") createHTMLLinkElement(theme.mainCSS, theme["themeName"])
         
         if (!theme.options) return
-        const conf = await window.api.themes.config(theme)
+        const conf = await window.api.themes.config(unwrap(theme))
         for (const key in conf) {
             let content = theme.options.find((value) => value.name == key)
             if (!content) continue

@@ -1,7 +1,6 @@
 import { formatTime, request, SaveToClipboard, timeToSeconds } from "@renderer/utils/functions";
 import { getConfig } from "@renderer/utils/stores/config";
 import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, playerChapterList, playerDataExtended, Thumbnail } from "@renderer/utils/types";
-import { unwrap } from "solid-js/store";
 
 export async function VTTstoryBoardParser(url: string | undefined) {
     if (!url) return
@@ -114,7 +113,7 @@ export function generateShareURL(anime_data?: { AnimeData: AnimeData, saveData: 
 
     const deepStr = `${anime_data.AnimeData.id},${anime_data.saveData.pluginName},${episode.type},${anime_data.AnimeData.player_ID},${episode.current},${currentTime}`
 
-    const config = unwrap(getConfig())
+    const config = getConfig()
     SaveToClipboard("text", `${config.deepLinkURL}/?anime=${btoa(deepStr)}`)
 }
 

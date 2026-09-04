@@ -35,7 +35,7 @@ import {
 import { animulistData, getAnimuHistory, getGlobalCache, informationCache, PlayerCache } from '@renderer/utils/stores/global';
 import { getInformationPlugin, getPlayerPLugin } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
-import { createStore, unwrap } from 'solid-js/store';
+import { createStore } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './information.css';
 import ImageViewer from '@renderer/components/imageViewer';
@@ -229,7 +229,7 @@ function information() {
         } as informationContentType,
 
         queryFn: async (queryKey) => {
-            queryKey = unwrap(queryKey)
+            queryKey = queryKey
 
             /* IFDEF DEBUG */
             console.warn("contentResponse", queryKey)

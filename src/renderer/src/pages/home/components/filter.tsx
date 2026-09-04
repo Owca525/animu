@@ -5,7 +5,6 @@ import { FilterParams, genres } from "@renderer/utils/types"
 import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js"
 import { useI18n } from "@renderer/utils/i18n"
 import { getHomeCache, setHomeSearchTags } from "@renderer/utils/stores/home"
-import { unwrap } from "solid-js/store"
 
 interface filterProps {
     custonClass?: string,
@@ -14,7 +13,7 @@ interface filterProps {
 }
 
 export function updateGenres(key: string, value: string | undefined, path: string) {
-    let params = unwrap(getHomeCache().filterTags)
+    let params = getHomeCache().filterTags
     if (!params && !value) return
     if (!params && value != undefined) return setHomeSearchTags({ [key]: {
         val: value,
@@ -77,8 +76,8 @@ export default function Filter(props: filterProps) {
                                 <div class="home-filter-title">{pathExist(item.title) ? t(item.title) : item.title}</div>
                                 <Dropdown onClickX={() => {
                                     updateGenres(item.type, undefined, `${item.langPath}${item.type}`);
-                                    setCurrentFilter(unwrap(getHomeCache().filterTags))
-                                    props.onChange(unwrap(currentFilter()))
+                                    setCurrentFilter(getHomeCache().filterTags)
+                                    props.onChange(currentFilter())
                                 }}
                                     buttonText={currentFilter() && currentFilter()![item.type] ?
                                         t(`${currentFilter()![item.type].name}`) : ""}
@@ -86,8 +85,8 @@ export default function Filter(props: filterProps) {
                                         label: checkWrapper(`${item.langPath}${val}`, val),
                                         onClick: () => {
                                             updateGenres(item.type, val, `${item.langPath}${val}`)
-                                            setCurrentFilter(unwrap(getHomeCache().filterTags))
-                                            props.onChange(unwrap(currentFilter()))
+                                            setCurrentFilter(getHomeCache().filterTags)
+                                            props.onChange(currentFilter())
                                         }
                                     }))}
                                     placeholder={t(item.placeholder)}

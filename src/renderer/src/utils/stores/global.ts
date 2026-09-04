@@ -1,5 +1,5 @@
 import { animeOpeningsFormat, cardData, deeplinkFormat, globalDataFormat, informationTmpProps, NotificationExpanded, PlayerTmpProps, serviceFormat, themeMetadata } from "../types";
-import { createStore, unwrap } from "solid-js/store";
+import { createStore } from "solid-js/store";
 import { Socket } from "socket.io-client";
 
 export const [globalState, setGlobalState] = createStore<globalDataFormat>({
@@ -99,7 +99,7 @@ class InformationCacheInstance {
 
     update = (anime: informationTmpProps | undefined) => {
         if (anime == undefined) return
-        this.anime = unwrap(anime)
+        this.anime = anime
         localStorage.setItem("informationCache", JSON.stringify(anime))
     }
 }
@@ -135,7 +135,7 @@ class PlayerCacheInstance {
 
     update = (player: PlayerTmpProps | undefined) => {
         if (player == undefined) return
-        this.player = unwrap(player)
+        this.player = player
         localStorage.setItem("playerCache", JSON.stringify(player))
     }
 }

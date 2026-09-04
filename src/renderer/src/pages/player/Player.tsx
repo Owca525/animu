@@ -9,7 +9,7 @@ import HLSWorker from "hls.js/dist/hls.worker.js?url"
 import JASSUB from "jassub"
 import shaka from "shaka-player"
 import { Component, For, onCleanup, onMount, Show } from "solid-js"
-import { createStore, unwrap } from "solid-js/store"
+import { createStore } from "solid-js/store"
 import PlayerButton from "./components/PlayerButton"
 import SeekBar from "@renderer/components/seekBar"
 import { i18n, t } from "@renderer/utils/i18n"
@@ -277,8 +277,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         socket?.on("player:update", (update: { time: number, pause: boolean }) => {
             console.log(update)
             if (update.pause != player.isPlaying) togglePlay(true)
-            console.log(unwrap(player.currentTime) - update.time > 2, unwrap(player.currentTime), unwrap(player.currentTime) - update.time)
-            if (unwrap(player.currentTime) - update.time > 2 || unwrap(player.currentTime) - update.time < -2) {
+            console.log(player.currentTime - update.time > 2, player.currentTime, player.currentTime - update.time)
+            if (player.currentTime - update.time > 2 || player.currentTime - update.time < -2) {
                 setTimeVideo(update.time)
                 clearInterval(refreashUpdateSocket)
             }
@@ -426,7 +426,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         })
 
         /* IFDEF DEBUG|PROD */
-        await window.backend.changeHeader(unwrap(resolution.reqHeader));
+        await window.backend.changeHeader(resolution.reqHeader);
         /* ENDIF */
 
         updateSubtitle()
@@ -464,7 +464,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         SheePlayer.currentTime = videoRef.currentTime
 
         /* IFDEF DEBUG|PROD */
-        await window.backend.changeHeader(unwrap(data["reqHeader"]))
+        await window.backend.changeHeader(data["reqHeader"])
         /* ENDIF */
 
         CheckDownloadContextMenu(data)
@@ -630,11 +630,11 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             maxBufferLength: 140,
         }
 
-        let manifest_script: player_script_injector[] = unwrap(player.playerData!["scripts"]) ?? []
+        let manifest_script: player_script_injector[] = player.playerData!["scripts"] ?? []
 
         class sheepLoader extends Hls.DefaultConfig.loader {
             load(context: any, config: any, callbacks: any) {
-                request(context.url, { method: "GET", headers: unwrap(player["currentResolution"]!["reqHeader"]) }).then(async (data) => {
+                request(context.url, { method: "GET", headers: player["currentResolution"]!["reqHeader"] }).then(async (data) => {
                     let currentData: any = data.text
                     if (data["status"] == 429) HLS?.destroy()
 
@@ -886,9 +886,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             clearInterval(refreashUpdateSocket)
             const socket = getSocket()
             socket?.emit("player:update", {
-                roomName: unwrap(getSocketRoom()), player: {
-                    time: unwrap(player.currentTime),
-                    pause: unwrap(player.isPlaying)
+                roomName: getSocketRoom(), player: {
+                    time: player.currentTime,
+                    pause: player.isPlaying
                 }
             })
         }
@@ -934,9 +934,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                 refreashUpdateSocket = setInterval(() => {
                     const socket = getSocket()
                     socket?.emit("player:update", {
-                        roomName: unwrap(getSocketRoom()), player: {
-                            time: unwrap(player.currentTime),
-                            pause: unwrap(player.isPlaying)
+                        roomName: getSocketRoom(), player: {
+                            time: player.currentTime,
+                            pause: player.isPlaying
                         }
                     })
                 }, 3000);
@@ -1012,9 +1012,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             clearInterval(refreashUpdateSocket)
             const socket = getSocket()
             socket?.emit("player:update", {
-                roomName: unwrap(getSocketRoom()), player: {
-                    time: unwrap(player.currentTime),
-                    pause: unwrap(player.isPlaying)
+                roomName: getSocketRoom(), player: {
+                    time: player.currentTime,
+                    pause: player.isPlaying
                 }
             })
         }
@@ -1176,7 +1176,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             return updatePlayer({ currentSubtitle: { url: "", format: "", lang: "", label: "Off" } })
 
         const data = await request(sub.url, {
-            headers: player.currentResolution["reqHeader"] ? unwrap(player.currentResolution["reqHeader"]) : window["animuHeader"]
+            headers: player.currentResolution["reqHeader"] ? player.currentResolution["reqHeader"] : window["animuHeader"]
         })
 
         if (!data["success"]) {
@@ -1611,7 +1611,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             return
         }
 
-        const entries = Object.entries(unwrap(nerdStats.player)).map((v) => v["0"])
+        const entries = Object.entries(nerdStats.player).map((v) => v["0"])
 
         refreashNerdStats = setInterval(() => {
             let object = {}

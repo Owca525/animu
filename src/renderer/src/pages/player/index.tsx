@@ -14,7 +14,7 @@ import { useResponse } from "@renderer/utils/hooks/useResponse";
 import { useI18n } from "@renderer/utils/i18n";
 import { addToAnimuList, updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist";
 import { getAnimuHistory, getSocket, getSocketRoom, informationCache, PlayerCache, setIncognitoMode } from "@renderer/utils/stores/global";
-import { createStore, unwrap } from "solid-js/store";
+import { createStore } from "solid-js/store";
 import { SheepShortcut } from "@renderer/utils/hooks/useKeyPress";
 import pluginManager from "@renderer/utils/pluginManager";
 import Player from "./Player";
@@ -60,7 +60,7 @@ const player = () => {
                 if (`${queryKey[3]}`.includes("Animu_Player_Overwriter_Mode")) return window["playerOverWriteContent"]
 
                 let pluginPlayer = await pluginManager.changePlayerPlugin(anime_data.saveData?.pluginName ? anime_data.saveData.pluginName : "")
-                return await pluginPlayer.extractPlayerData(unwrap(animeType) as string, unwrap(episode) as episodeMetadata, unwrap(player_id) as string)
+                return await pluginPlayer.extractPlayerData(animeType as string, episode as episodeMetadata, player_id as string)
             },
             cacheTime: 3600000,
         }
@@ -83,7 +83,7 @@ const player = () => {
 
         if (getSocket()) {
             const socket = getSocket()
-            socket?.emit("player:nextepisode", { roomName: unwrap(getSocketRoom()), data: { actual: episode["current"], type: episode["type"], episodelist: episode["list"], time: episode["time"] } })
+            socket?.emit("player:nextepisode", { roomName: getSocketRoom(), data: { actual: episode["current"], type: episode["type"], episodelist: episode["list"], time: episode["time"] } })
         }
     }
 
@@ -128,7 +128,7 @@ const player = () => {
         if (getSocket()) {
             const socket = getSocket()
             socket?.emit("player:init", {
-                roomName: unwrap(getSocketRoom()),
+                roomName: getSocketRoom(),
                 data: {
                     anime: anime_data.anime,
                     saveData: anime_data.saveData,
@@ -172,7 +172,7 @@ const player = () => {
                 endWatch: 0,
                 added: dateToUnix(new Date().toString()),
                 lastUpdate: dateToUnix(new Date().toString()),
-                progress: convertEpisode(unwrap(episode.current))
+                progress: convertEpisode(episode.current)
             }, {
                 ...anime_data.anime,
                 nextAiringEpisode: undefined,
@@ -187,7 +187,7 @@ const player = () => {
                 animulist: {
                     ...anime_data.animulist,
                     status: "CURRENT",
-                    progress: convertEpisode(unwrap(episode.current)),
+                    progress: convertEpisode(episode.current),
                     lastUpdate: dateToUnix(new Date().toString())
                 }
             })

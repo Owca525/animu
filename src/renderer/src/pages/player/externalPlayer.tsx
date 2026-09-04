@@ -8,7 +8,6 @@ import Dropdown from "@renderer/components/dropDown"
 import { Component, createSignal, For, onMount, Show } from "solid-js"
 import { useNavigate } from "@solidjs/router"
 import { getConfig } from "@renderer/utils/stores/config"
-import { unwrap } from "solid-js/store"
 import { removeToast, toast } from "@renderer/utils/context/ToastNotification"
 import { useI18n } from "@renderer/utils/i18n"
 import { fetchResolutions } from "./playerUtils"
@@ -187,7 +186,7 @@ const ExternalPlayer: Component<ExternalplayerProps> = ({ animeData, now_episode
     function checkCurrentResolution(): string {
         if (!currentResolution()) return t("global.notFound")
         if (currentResolution()?.hls) return "HLS Mode"
-        if (isNumberString(currentResolution()?.res as string)) return `${unwrap(currentResolution()?.res)}p`
+        if (isNumberString(currentResolution()?.res as string)) return `${currentResolution()?.res}p`
         return currentResolution()?.res as string
     }
 
@@ -211,8 +210,8 @@ const ExternalPlayer: Component<ExternalplayerProps> = ({ animeData, now_episode
                             <Dropdown 
                                 placeholder={t("global.notFound")} 
                                 buttonText={checkCurrentResolution()} 
-                                options={currentHost()?.resolution.map((element) => { 
-                                    let res = unwrap(element.res)
+                                options={currentHost()!.resolution.map((element) => { 
+                                    let res = element.res
                                     return { label: isNumberString(res) ? `${res}p` : res, onClick: () => {setCurrentResolution(element); RunPlayers()} }
                                  })} 
                                 disableX 
