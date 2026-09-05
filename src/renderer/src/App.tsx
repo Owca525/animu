@@ -53,6 +53,7 @@ import { pluginRepoExpanded, themeMetadata } from './utils/types';
 import { setHomeActivePage } from './utils/stores/home';
 import { t, useI18n } from './utils/i18n';
 import { toast, updateToast } from './utils/context/ToastNotification';
+import { unwrap } from 'solid-js/store';
 import './App.css';
 import './themes/darkerAnimu/main.css';
 import './utils/i18n';
@@ -106,13 +107,13 @@ function App() {
     ])
 
     const loadedTheme = getGlobalCache().loadedTheme
-    let confTheme = [...new Set(getConfig().General.theme)]
+    let confTheme = [...new Set(unwrap(getConfig().General.theme))]
     let loadingTheme: Map<number, themeMetadata> = new Map()
     for (let index = 0; index < confTheme.length; index++) {
       const element = confTheme[index];
       const theme = loadedTheme.find((ele) => ele.themeName == element)
       if (!theme) continue
-      loadingTheme.set(index, theme)
+      loadingTheme.set(index, unwrap(theme))
     }
     changeTheme(loadingTheme)
 
@@ -240,13 +241,13 @@ function App() {
 
     // Loading theme
     const loadedTheme = getGlobalCache().loadedTheme
-    let confTheme = [...new Set(loadedConnfig.General.theme)]
+    let confTheme = [...new Set(unwrap(loadedConnfig.General.theme))]
     let loadingTheme: Map<number, themeMetadata> = new Map()
     for (let index = 0; index < confTheme.length; index++) {
       const element = confTheme[index];
       const theme = loadedTheme.find((ele) => ele.themeName == element)
       if (!theme) continue
-      loadingTheme.set(index, theme)
+      loadingTheme.set(index, unwrap(theme))
     }
     changeTheme(loadingTheme)
 

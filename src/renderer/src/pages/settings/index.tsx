@@ -72,7 +72,7 @@ export type pluginRepoExpandedSettings = {
 
 function settings() {
     const navigate = useNavigate();
-    const cfg: SettingsConfig = getConfig();
+    const cfg: SettingsConfig = unwrap(getConfig());
     const { t, changeLanguage, listLang } = useI18n()
 
     let filePickerImport: HTMLInputElement | undefined
@@ -251,7 +251,7 @@ function settings() {
     function resetNewConfig() {
         setNewConfig((prev) => {
             setNewLang(config().old.General.language)
-            changeTheme(lastActiveTheme())
+            changeTheme(unwrap(lastActiveTheme()))
             return { old: structuredClone(prev.old), new: structuredClone(prev.old) }
         })
         setpluginList((prev) => prev.map(pl => ({ ...pl, active: pl.plugin.metadata.name == config().old.plugins.player })))
@@ -335,7 +335,7 @@ function settings() {
             ))
 
         setThemes(loadedTheme().filter((val) => ![...active.entries()].map((v) => v[1].themeName).includes(val.themeName)))
-        changeTheme(active)
+        changeTheme(unwrap(active))
         handleChange("General.theme", [...activeThemes().entries()].map((val) => val[1].themeName)) as unknown as string
     }
 

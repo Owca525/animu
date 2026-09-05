@@ -4,6 +4,7 @@ import Input from './input';
 import { AnimeData, animulistProps } from '@renderer/utils/types';
 import { Component, createSignal, onMount, Show } from 'solid-js';
 import { dateToUnix, unixToDateTime } from '@renderer/utils/functions';
+import { unwrap } from 'solid-js/store';
 import { t } from '@renderer/utils/i18n';
 import { hideCustomMenu } from '@renderer/utils/context/menuContext';
 
@@ -65,7 +66,7 @@ const AnimulistMenu: Component<AnimulistProps> = (props) => {
                     <div class="custom-menu-space">
                         Save To Animulist
                         <Button content="Save" onClick={() => {
-                            props.save({ ...animulistTMPData(), lastUpdate: dateToUnix(new Date().toString()), added: dateToUnix(new Date().toString()) } as any,
+                            props.save({ ...unwrap(animulistTMPData()), lastUpdate: dateToUnix(new Date().toString()), added: dateToUnix(new Date().toString()) } as any,
                                 { ...props.anime, nextAiringEpisode: undefined });
                             hideCustomMenu()
                         }} />
