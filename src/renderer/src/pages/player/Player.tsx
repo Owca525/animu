@@ -9,7 +9,7 @@ import HLSWorker from "hls.js/dist/hls.worker.js?url"
 import JASSUB from "jassub"
 import shaka from "shaka-player"
 import { Component, For, onCleanup, onMount, Show } from "solid-js"
-import { createStore } from "solid-js/store"
+import { createStore, unwrap } from "solid-js/store"
 import PlayerButton from "./components/PlayerButton"
 import SeekBar from "@renderer/components/seekBar"
 import { i18n, t } from "@renderer/utils/i18n"
@@ -426,7 +426,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         })
 
         /* IFDEF DEBUG|PROD */
-        await window.backend.changeHeader(resolution.reqHeader);
+        await window.backend.changeHeader(unwrap(resolution.reqHeader));
         /* ENDIF */
 
         updateSubtitle()
