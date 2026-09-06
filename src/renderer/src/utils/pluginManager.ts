@@ -24,7 +24,7 @@ const availbeFunctions: { name: string, func: (...args) => Promise<any>, ignore?
     func: requestCloudflare,
     ignore: true,
 }
-/* ENDIF */
+    /* ENDIF */
 ]
 
 const workerDummyimport = `
@@ -546,6 +546,8 @@ export class InformationPluginInstance implements informationPluginInstanceForma
     }
     instance: WorkerWrapperInstance = undefined as any;
 
+    cache = new Map<string, any>()
+
     search = async (name: string, page: number, params?: FilterPluginsParams): Promise<SearchResponse> => {
         if (!this.instance) return { content: [], maxPage: 20, nextPage: false }
         try {
@@ -558,23 +560,21 @@ export class InformationPluginInstance implements informationPluginInstanceForma
 
     home = async (): Promise<{ topCards?: containerData; sections: containerData[]; } | { error: string; } | undefined> => {
         if (!this.instance) return
+        if (this.cache.has("home")) return this.cache.get("home")
         try {
-            const cache_time = localStorage.getItem("information_instance_cache_time")
-            if (cache_time && localStorage.getItem("information_instance_cache")) {
-                const conv = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), Number(cache_time))
-
-                if (conv["hour"] > 0 || conv["min"] > 15) return JSON.parse(localStorage.getItem("information_instance_cache")!)
-            }
-
             const response = await this.instance.wrapperFunction("home", undefined, true) as any
 
             if ((!response || response["error"] || !response["topCards"] || response["sections"].length <= 0) && localStorage.getItem("information_instance_cache") != undefined) {
-                return JSON.parse(localStorage.getItem("information_instance_cache")!)
+                toast(`${this.metadata.name}: ${response["error"]}`, { type: "error" })
+                return JSON.parse(localStorage.getItem(`information_instance_cache_${this.metadata.name}`)!)
             }
 
             if (response["sections"].length > 0) {
-                localStorage.setItem("information_instance_cache", JSON.stringify(response))
-                localStorage.setItem("information_instance_cache_time", `${dateToUnix(new Date().toString())}`)
+                localStorage.setItem(`information_instance_cache_${this.metadata.name}`, JSON.stringify(response))
+                this.cache.set("home", response)
+                setTimeout(() => {
+                    this.cache.delete("home")
+                }, 900_000);
             }
 
             return response
