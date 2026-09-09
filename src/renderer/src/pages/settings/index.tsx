@@ -1394,8 +1394,8 @@ function settings() {
                             </div>
                         } />
                     </div>
+                    {/* ENDIF */}
                 </Show>
-                {/* ENDIF */}
                 <Show when={category() == "developer"}>
                     <div class="settings-page-container">
                         <div class="settings-page-title">{"DevTools"}</div>

@@ -692,7 +692,9 @@ export class PluginManager implements PluginManagerFormat {
 
                     LoadedMetadataPlugins.push({
                         metadata: e["data"]["result"]["metadata"],
+                        // IFDEF PROD|DEBUG
                         config: await window.api.plugins.getConfig(e["data"]["result"]["metadata"]["name"], e["data"]["result"]["config"]),
+                        // ENDIF
                         code: element["code"],
                         serverStatus: cache.get(e["data"]["result"]["metadata"]["name"]),
                         sha256: await CreateSHA256(element["code"])
