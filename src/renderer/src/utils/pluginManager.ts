@@ -24,7 +24,7 @@ const availbeFunctions: { name: string, func: (...args) => Promise<any>, ignore?
     func: requestCloudflare,
     ignore: true,
 }
-    /* ENDIF */
+/* ENDIF */
 ]
 
 const workerDummyimport = `

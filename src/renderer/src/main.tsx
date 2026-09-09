@@ -14,6 +14,13 @@ import DebugContext from './utils/context/debugContext';
 import { ErrorCreatorContext } from './utils/context/GlobalErrorContext';
 
 (window as any).animuAppInfo = "PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION";
+/* IFDEF WEB */
+window["api"] = {
+  yt_dlp: {
+    run: () => {}
+  }
+} as any
+/* ENDIF */
 
 // /* IFDEF DEBUG */
 // const originalAddEventListener = document.addEventListener;
