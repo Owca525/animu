@@ -1,7 +1,7 @@
 import crypto from 'crypto';
-import fs from 'fs';
+import fs, { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'fs';
 import os from 'os';
-import path from 'path';
+import path, { join } from 'path';
 import { ActivityType } from 'discord-api-types/v10';
 import {
     animuUserData,
@@ -21,8 +21,9 @@ import {
     shell
 } from 'electron';
 import { Client } from '@xhayper/discord-rpc';
-import { exec, execSync } from 'child_process';
+import { exec, execSync, spawn } from 'child_process';
 import { setCurrentLang, t } from './i18n';
+import { playerData } from './types';
 
 // import express from "express";
 // import { Readable } from "stream";
@@ -319,7 +320,7 @@ ipcMain.handle("yt-dlp:releases", async () => {
 ipcMain.handle("yt-dlp:run", async (_, commands: string[]) => {
     if (!yt_dlp) throw new Error("Missing Instance of yt-dlp")
 
-    return yt_dlp.execute(commands)
+    return yt_dlp.execute(["-j", "--flat-playlist", ...commands])
 })
 /////////////////////
 
@@ -394,7 +395,7 @@ export function updateTray() {
     globalTray.setContextMenu(Menu.buildFromTemplate(newTray as any))
 }
 
-export async function advanceRequest(url: string, options: RequestInit = { headers: { "user-agent": userAgent }}) {
+export async function advanceRequest(url: string, options: RequestInit = { headers: { "user-agent": userAgent } }) {
     try {
         const response = await fetch(url, options);
 
@@ -402,14 +403,14 @@ export async function advanceRequest(url: string, options: RequestInit = { heade
         let text = "";
         try {
             text = await respTextClone.text()
-        } catch (error) {}
+        } catch (error) { }
 
         const bufferCloned = response.clone()
         let jsontext;
 
         try {
             jsontext = await response.json()
-        } catch (error) {}
+        } catch (error) { }
 
         const convertedResponse = {
             text: text,
@@ -424,7 +425,7 @@ export async function advanceRequest(url: string, options: RequestInit = { heade
         }
 
         /* IFDEF DEBUG */
-        console.info("advanceRequest\n", convertedResponse) // options
+        // console.info("advanceRequest\n", convertedResponse) // options
         /* ENDIF */
 
         return convertedResponse;
@@ -447,3 +448,130 @@ export function dateToUnix(dateStr: string): number {
     const date = new Date(dateStr);
     return Math.floor(date.getTime() / 1000);
 }
+
+function runFFmpeg(commands: string[]) {
+    return new Promise(async (resolve, reject) => {
+        const ffmpeg = spawn("ffmpeg", commands);
+
+        ffmpeg.stdout.on("data", data => {
+            console.log(data.toString());
+        });
+
+        ffmpeg.stderr.on("data", data => {
+            console.error(data.toString());
+        });
+
+        ffmpeg.on("close", code => {
+            if (code !== 0) {
+                reject(code);
+            } else {
+                resolve(code)
+            }
+        });
+    });
+
+}
+
+ipcMain.handle("download:video", async (_, content: playerData) => {
+    const tmp_id = crypto.randomUUID()
+    let file_path = join(app.getPath("videos"), "animu", tmp_id)
+
+    console.log(content)
+
+    if (!existsSync(join(app.getPath("videos"), "animu"))) mkdirSync(join(app.getPath("videos"), "animu"))
+    const url = new URL(content["resolution"][0]["url"])
+    try {
+        await yt_dlp.execute([
+            "-f", "bv+ba*",
+            "-o", file_path,
+            "--merge-output-format", "mkv",
+            url.toString()
+        ])
+
+        const file_name = readdirSync(join(app.getPath("videos"), "animu")).find((v) => v.startsWith(tmp_id))
+        if (!file_name) return console.error("Failed Found FIle")
+        file_path = join(app.getPath("videos"), "animu", file_name)
+        const tmp_file_path = join(app.getPath("videos"), "animu", `tmp_${path.basename(file_path)}`)
+
+        if (content["listChapters"]) {
+            const lines: string[] = [";FFMETADATA1", ""];
+
+            for (const chapter of content.listChapters) {
+                const start = Math.round(chapter.start * 1000);
+                const end = Math.round(chapter.end * 1000);
+
+                lines.push(
+                    "[CHAPTER]",
+                    "TIMEBASE=1/1000",
+                    `START=${start}`,
+                    `END=${end}`,
+                    `title=${chapter.name}`,
+                    ""
+                );
+            }
+
+            const file_chapter = join(app.getPath("videos"), "animu", `chapters_${tmp_id}.txt`)
+            writeFileSync(file_chapter, lines.join("\n"), "utf-8")
+
+            try {
+                await runFFmpeg([
+                    '-i', file_path,
+                    '-i', file_chapter,
+                    '-map', "0",
+                    "-map_metadata", "0",
+                    "-map_metadata", "1",
+                    '-c', 'copy',
+                    tmp_file_path
+                ])
+                rmSync(file_path)
+                fs.renameSync(tmp_file_path, file_path)
+                rmSync(file_chapter)
+            } catch (error) {
+                console.error(`Error`, error);
+                try {
+                    rmSync(tmp_file_path)
+                } catch { }
+            }
+        }
+
+        if (content["subtitles"]) {
+            for (const [_, segment] of content["subtitles"].entries()) {
+                const resp = await advanceRequest(segment["url"], { headers: content["resolution"][0]["reqHeader"] })
+                console.log(resp)
+                if (!resp.success) continue
+
+                const file_subtitles = join(app.getPath("videos"), "animu", `subtitles_${tmp_id}.txt`)
+                writeFileSync(file_subtitles, resp["text"], "utf-8")
+
+                try {
+                    await runFFmpeg([
+                        "-i", file_path,
+                        "-i", file_subtitles,
+
+                        "-map", "0",
+                        "-map", "1",
+
+                        "-c", "copy",
+                        "-c:s", "ass",
+
+                        "-metadata:s:s:0", `language=${segment["lang"]}`,
+                        "-metadata:s:s:0", `title=${segment["label"]}`,
+
+                        tmp_file_path,
+                    ])
+                    rmSync(file_path)
+                    fs.renameSync(tmp_file_path, file_path)
+                    rmSync(file_subtitles)
+                } catch (error) {
+                    console.error(`Error`, error);
+                    try {
+                        rmSync(tmp_file_path)
+                    } catch { }
+                }
+            }
+        }
+
+    } catch (error) {
+        console.error("Failed Download Video", content)
+    }
+});

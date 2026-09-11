@@ -1,5 +1,5 @@
 import { ElectronAPI } from "@electron-toolkit/preload";
-import { AnimeData, AnimuListFormat, cardData, globalDataFormat, pluginRepoExpanded, SettingsConfig, themeMetadata } from "@renderer/utils/types";
+import { AnimeData, AnimuListFormat, cardData, globalDataFormat, playerData, pluginRepoExpanded, SettingsConfig, themeMetadata } from "@renderer/utils/types";
 
 declare global {
   interface Window {
@@ -85,6 +85,9 @@ declare global {
       getConfig: () => Promise<SettingsConfig>
       getHistory: () => Promise<cardData[]>
       onProtocolRequest: (callback: (url: string) => void) => void
+      downloader: {
+        download: (content: playerData) => Promise<void>
+      }
     };
     backend: {
       // ipcRenderer: {

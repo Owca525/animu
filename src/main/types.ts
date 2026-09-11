@@ -299,3 +299,34 @@ export interface playlistFormatData {
     added: number,
     lastupdate: number
 }
+
+export interface playerData {
+    embedTitle?: string,
+
+    hostname: string
+    resolution: resolutionFormat[]
+    dubResolution?: resolutionFormat[]
+    splitHLS?: boolean
+    defaultHost?: boolean
+    storyboardVTT?: string
+    listChapters?: playerChapterList[]
+    subtitles?: playerSubtitlesFormat[]
+}
+
+export interface resolutionFormat {
+    res: string,
+    url: string,
+    mimeType?: string
+    audio?: {
+        url: string,
+        mimeType?: string
+    }
+    hls?: boolean
+    reqHeader?: { [key: string]: string },
+    defaultSubtitles?: boolean;
+    canBeDownloaded?: boolean
+}
+
+export interface playerSubtitlesFormat { url: string, lang: string, label: string, format: string, default?: boolean }
+
+export type playerChapterList = { start: number, end: number, type: "opening" | "ending" | "other", name?: string }

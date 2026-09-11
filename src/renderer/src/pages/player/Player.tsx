@@ -1353,6 +1353,17 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             case convertKeybinds(config.Player.keybinds.skipOpeningEnding.toLowerCase()).toLowerCase():
                 clearChapterSkipTime()
                 break
+
+            case "f2":
+                if (!player.playerData) return
+                if (player.playerData["resolution"].length <= 0) {
+                    toast("No Resolution Found")
+                    return
+                }
+                window.api.downloader.download(JSON.parse(JSON.stringify(player.playerData))).then(() => {
+                    console.log("aksdlasdasd")
+                })
+                break
         }
     })
 

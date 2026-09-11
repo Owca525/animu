@@ -87,13 +87,14 @@ export class yt_dlpInstance {
         let execPath = path.join(animuUserData, this.fileExec)
 
         return new Promise(async (resolve, reject) => {
-            const yt = spawn(execPath, ["-j", "--flat-playlist", ...commands]);
+            const yt = spawn(execPath, commands);
 
             let data = "";
             let error = "";
 
             yt.stdout.on("data", chunk => {
                 data += chunk.toString();
+                console.log(data.toString())
             });
 
             yt.stderr.on("data", chunk => {
