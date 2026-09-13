@@ -734,6 +734,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                     activeAudioTrack: { id: DefaultAudio.id, label: DefaultAudio.name, lang: DefaultAudio.lang },
                     audioTrack: data.audioTracks.map((element) => ({ id: element.id, label: element.name, lang: element.lang }))
                 })
+
+                if (config.Player.general.Autoplay) videoRef?.play()
             });
 
             tmpHls.on(Hls.Events.ERROR, (_event, data) => {
