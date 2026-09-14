@@ -481,12 +481,23 @@ ipcMain.handle("download:video", async (_, content: playerData) => {
     if (!existsSync(join(app.getPath("videos"), "animu"))) mkdirSync(join(app.getPath("videos"), "animu"))
     const url = new URL(content["resolution"][0]["url"])
     try {
-        await yt_dlp.execute([
+
+        let commands = [
             "-f", "bv+ba*",
             "-o", file_path,
             "--merge-output-format", "mkv",
-            url.toString()
-        ])
+        ]
+
+        if (content["resolution"][0]["reqHeader"]) {
+            commands = [...commands, ...Object.entries(content["resolution"][0]["reqHeader"]).flatMap(([key, value]) => [
+                "--add-header",
+                `${key}: ${value}`,
+            ])]
+        }
+
+        commands.push(url.toString())
+
+        await yt_dlp.execute(commands)
 
         const file_name = readdirSync(join(app.getPath("videos"), "animu")).find((v) => v.startsWith(tmp_id))
         if (!file_name) return console.error("Failed Found FIle")
@@ -572,6 +583,6 @@ ipcMain.handle("download:video", async (_, content: playerData) => {
         }
 
     } catch (error) {
-        console.error("Failed Download Video", content)
+        console.error("Failed Download Video", error, content)
     }
 });
