@@ -94,11 +94,12 @@ export class yt_dlpInstance {
 
             yt.stdout.on("data", chunk => {
                 data += chunk.toString();
-                console.log(data.toString())
+                console.log(chunk.toString())
             });
 
             yt.stderr.on("data", chunk => {
                 error += chunk.toString();
+                console.log(chunk.toString())
             });
 
             yt.on("close", code => {

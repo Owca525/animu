@@ -1,7 +1,7 @@
 import Button from "@renderer/components/buttons"
 import VolumeNotification from "@renderer/pages/player/components/VolumeNotification"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
-import { CheckNumber, convertKeybinds, createElement, CreateSHA256, dateToUnix, detectTitleConfig, formatTime, openUrlFolder, request, toggleFullscreen } from "@renderer/utils/functions"
+import { CheckNumber, convertKeybinds, createElement, CreateSHA256, dateToUnix, detectTitle, detectTitleConfig, formatNumber, formatTime, openUrlFolder, request, toggleFullscreen } from "@renderer/utils/functions"
 import { getConfig } from "@renderer/utils/stores/config"
 import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, player_script_injector, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, Thumbnail } from "@renderer/utils/types"
 import Hls, { HlsConfig } from "hls.js"
@@ -1362,8 +1362,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                     toast("No Resolution Found")
                     return
                 }
-                window.api.downloader.download(JSON.parse(JSON.stringify(player.playerData))).then(() => {
-                    console.log("aksdlasdasd")
+                window.api.downloader.download(JSON.parse(JSON.stringify(player.playerData)), `${detectTitleConfig(anime!["AnimeData"]["title"])} S01E${formatNumber(ep_metadata.current.ep)}`, detectTitleConfig(anime!["AnimeData"]["title"])).then(() => {
+                    console.log(detectTitleConfig(anime!["AnimeData"]["title"]), ep_metadata.current.ep, "Downloaded")
                 })
                 break
         }

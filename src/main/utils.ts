@@ -1,7 +1,7 @@
 import crypto from 'crypto';
-import fs, { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'fs';
+import fs, { existsSync, mkdirSync, readdirSync, renameSync, rmSync, writeFileSync } from 'fs';
 import os from 'os';
-import path, { join } from 'path';
+import path, { extname, join } from 'path';
 import { ActivityType } from 'discord-api-types/v10';
 import {
     animuUserData,
@@ -449,9 +449,9 @@ export function dateToUnix(dateStr: string): number {
     return Math.floor(date.getTime() / 1000);
 }
 
-function runFFmpeg(commands: string[]) {
+function runProcess(commands: string[], app = "ffmpeg") {
     return new Promise(async (resolve, reject) => {
-        const ffmpeg = spawn("ffmpeg", commands);
+        const ffmpeg = spawn(app, commands);
 
         ffmpeg.stdout.on("data", data => {
             console.log(data.toString());
@@ -472,13 +472,16 @@ function runFFmpeg(commands: string[]) {
 
 }
 
-ipcMain.handle("download:video", async (_, content: playerData) => {
+ipcMain.handle("download:video", async (_, content: playerData, name: string, _folderName: string) => {
     const tmp_id = crypto.randomUUID()
     let file_path = join(app.getPath("videos"), "animu", tmp_id)
 
     console.log(content)
 
     if (!existsSync(join(app.getPath("videos"), "animu"))) mkdirSync(join(app.getPath("videos"), "animu"))
+    // if (!existsSync(join(app.getPath("videos"), "animu", folderName))) mkdirSync(join(app.getPath("videos"), "animu", folderName))
+
+
     const url = new URL(content["resolution"][0]["url"])
     try {
 
@@ -525,7 +528,7 @@ ipcMain.handle("download:video", async (_, content: playerData) => {
             writeFileSync(file_chapter, lines.join("\n"), "utf-8")
 
             try {
-                await runFFmpeg([
+                await runProcess([
                     '-i', file_path,
                     '-i', file_chapter,
                     '-map', "0",
@@ -551,25 +554,26 @@ ipcMain.handle("download:video", async (_, content: playerData) => {
                 console.log(resp)
                 if (!resp.success) continue
 
-                const file_subtitles = join(app.getPath("videos"), "animu", `subtitles_${tmp_id}.txt`)
-                writeFileSync(file_subtitles, resp["text"], "utf-8")
+                const file_subtitles = join(app.getPath("videos"), "animu", `${segment.default}_${segment.label}_subtitles_${tmp_id}.txt`)
+
+                const buffer = Buffer.from(resp.buffer as any);
+                writeFileSync(file_subtitles, buffer)
 
                 try {
-                    await runFFmpeg([
-                        "-i", file_path,
-                        "-i", file_subtitles,
 
-                        "-map", "0",
-                        "-map", "1",
+                    let comd = [
+                        "-o", tmp_file_path,
+                        file_path,
 
-                        "-c", "copy",
-                        "-c:s", "ass",
+                        "--language", `0:${segment.lang}`,
+                        "--track-name", `0:${segment.label}`,
 
-                        "-metadata:s:s:0", `language=${segment["lang"]}`,
-                        "-metadata:s:s:0", `title=${segment["label"]}`,
+                        "--default-track", `0:${segment["default"] ? "yes" : "no"}`,
 
-                        tmp_file_path,
-                    ])
+                        file_subtitles,
+                    ]
+
+                    await runProcess(comd, "mkvmerge")
                     rmSync(file_path)
                     fs.renameSync(tmp_file_path, file_path)
                     rmSync(file_subtitles)
@@ -581,6 +585,8 @@ ipcMain.handle("download:video", async (_, content: playerData) => {
                 }
             }
         }
+
+        renameSync(file_path, join(app.getPath("videos"), "animu",`${name}${extname(file_path)}`))
 
     } catch (error) {
         console.error("Failed Download Video", error, content)
