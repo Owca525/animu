@@ -81,7 +81,7 @@ if (process.contextIsolated) {
       },
 
       downloader: {
-        download: (content) => ipcRenderer.invoke("download:video", content)
+        download: (content, name, folderName) => ipcRenderer.invoke("download:video", content, name, folderName)
       }
     });
     contextBridge.exposeInMainWorld("backend", {

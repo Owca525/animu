@@ -1,12 +1,11 @@
 import Button from "@renderer/components/buttons"
 import VolumeNotification from "@renderer/pages/player/components/VolumeNotification"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
-import { CheckNumber, convertKeybinds, createElement, CreateSHA256, dateToUnix, detectTitle, detectTitleConfig, formatNumber, formatTime, openUrlFolder, request, toggleFullscreen } from "@renderer/utils/functions"
+import { CheckNumber, convertKeybinds, createElement, CreateSHA256, dateToUnix, detectTitleConfig, formatNumber, formatTime, openUrlFolder, request, toggleFullscreen } from "@renderer/utils/functions"
 import { getConfig } from "@renderer/utils/stores/config"
 import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, player_script_injector, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, Thumbnail } from "@renderer/utils/types"
 import Hls, { HlsConfig } from "hls.js"
 import HLSWorker from "hls.js/dist/hls.worker.js?url"
-import JASSUB from "jassub"
 import shaka from "shaka-player"
 import { Component, For, onCleanup, onMount, Show } from "solid-js"
 import { createStore, unwrap } from "solid-js/store"
@@ -19,16 +18,17 @@ import { addTime, DownloadVideo, EpisodeAvaible, GenerateOpeningEnding, generate
 import { UpdateConfig } from "@renderer/utils/FilesManager/config"
 import { CovnertToASS } from "@renderer/utils/subtitleConverter"
 
-import workerUrl from "jassub/dist/jassub-worker.js?url";
-import modernWasmUrl from 'jassub/dist/jassub-worker-modern.wasm?url'
-// import wasmUrl from "jassub/dist/jassub-worker.wasm?url";
-import fallbackFontJASSUB from "jassub/dist/default.woff2?url";
 import { useKeyPress } from "@renderer/utils/hooks/useKeyPress"
 import { getSocket, getSocketRoom, informationCache } from "@renderer/utils/stores/global"
 import MoreInformation from "./components/MoreInformation"
 import { updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist"
 import { SaveHistory } from "@renderer/utils/FilesManager/history"
 import { Run_hls_manifest_script } from "@renderer/utils/worker"
+
+import SubtitlesOctopus from "@jellyfin/libass-wasm"
+import SubtitlesOctopusWasm from '@jellyfin/libass-wasm/dist/js/subtitles-octopus-worker.js?url'
+import "@jellyfin/libass-wasm/dist/js/default.woff2?url"
+import "@jellyfin/libass-wasm/dist/js/subtitles-octopus-worker.wasm?url"
 
 shaka.polyfill.installAll()
 
@@ -150,7 +150,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
     let AudioRef: HTMLAudioElement | undefined
 
     let HLS: Hls | undefined
-    let currentASSubtitles: JASSUB | undefined
+    let currentASSubtitles: any | undefined
 
     let playerHideTimer: NodeJS.Timeout | undefined
     let hideChapterButtonTimer: NodeJS.Timeout | undefined
@@ -165,7 +165,6 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
     let refreashNerdStats: NodeJS.Timeout | undefined
 
-    let assSubContainer: HTMLDivElement | undefined
     let screenShotContainer: HTMLDivElement | undefined
     let screenshotWrapper: HTMLDivElement | undefined
     let containerRef: HTMLDivElement | undefined
@@ -803,7 +802,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
     function CleanuPlayer() {
         if (Shaka) Shaka.destroy()
         if (HLS) HLS.destroy()
-        if (currentASSubtitles) currentASSubtitles.destroy()
+        if (currentASSubtitles) currentASSubtitles.dispose()
 
         if (AudioShaka) AudioShaka.destroy()
 
@@ -1167,12 +1166,10 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         if (!player.currentResolution) return
 
         if (currentASSubtitles) {
-            currentASSubtitles.destroy()
-            currentASSubtitles._canvas.remove()
+            currentASSubtitles.canvasParent.remove()
+            currentASSubtitles.dispose()
             currentASSubtitles = undefined
         }
-
-        if (assSubContainer) assSubContainer.innerHTML = ""
 
         if (sub.label == "Off" && sub.format == "", sub.lang == "", sub.url == "")
             return updatePlayer({ currentSubtitle: { url: "", format: "", lang: "", label: "Off" } })
@@ -1187,36 +1184,30 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             return
         }
 
-        let assUrl = sub.url
+        let assContent = data["text"]
 
         if (["ass", "ssa"].includes(sub.format.toLowerCase()) == false) {
-            const content = CovnertToASS(data["text"])
+            const content = CovnertToASS(assContent)
 
             if (!content) {
                 console.error("Player/Failed Subtitles Parse", data)
                 return toast(t("Failed Fetch Subtitles"), { type: "error" })
             }
 
-            const blob = new Blob([content], { type: "text/ass" });
-            assUrl = URL.createObjectURL(blob);
+            assContent = content
         }
 
-        const renderer = new JASSUB({
+        let options = {
             video: videoRef,
-            subUrl: assUrl,
-            workerUrl,
-            modernWasmUrl,
-            dropAllAnimations: true,
-            onDemandRender: true,
-            asyncRender: true,
-            availableFonts: {
-                "default": fallbackFontJASSUB
-            },
-            defaultFont: "default"
-            // modernWasmUrl
-        } as any);
+            subContent: assContent,
+            workerUrl: SubtitlesOctopusWasm,
+            debug: false,
+        };
 
-        currentASSubtitles = renderer
+        const octopus = new SubtitlesOctopus(options)
+        console.log(octopus)
+
+        currentASSubtitles = octopus
         updatePlayer({ currentSubtitle: sub })
     }
 
@@ -1455,7 +1446,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         outputCanvas.width = videoRef.videoWidth;
         outputCanvas.height = videoRef.videoHeight;
         ctx.drawImage(videoRef, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
-        if (currentASSubtitles && !noSubtitles) ctx.drawImage(currentASSubtitles._canvas, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
+        if (currentASSubtitles && !noSubtitles) ctx.drawImage(currentASSubtitles.canvas, 0, 0, videoRef.videoWidth, videoRef.videoHeight);
         screenshot = outputCanvas.toDataURL("image/png");
 
         if (screenshot == "data:,") {
@@ -1663,7 +1654,6 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         >
 
             <div ref={screenshotWrapper} class={ui.isVisible ? "player-video-container" : "player-video-container player-hide-cursor"} >
-                <div ref={assSubContainer} style={{ position: "absolute", top: "0", left: "0" }}></div>
             </div>
 
             <Show when={ui.isVisible}>

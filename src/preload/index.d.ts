@@ -86,7 +86,7 @@ declare global {
       getHistory: () => Promise<cardData[]>
       onProtocolRequest: (callback: (url: string) => void) => void
       downloader: {
-        download: (content: playerData) => Promise<void>
+        download: (content: playerData, name: string, FolderName) => Promise<void>
       }
     };
     backend: {
