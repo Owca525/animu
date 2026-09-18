@@ -1357,3 +1357,7 @@ export function convert_to_slug(name: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 }
+
+export function formatNumber(number) {
+    return String(number).padStart(2, '0');
+}
