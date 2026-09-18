@@ -486,17 +486,27 @@ ipcMain.handle("download:video", async (_, content: playerData, name: string, _f
     try {
 
         let commands = [
-            "-f", "bv+ba*",
+            "--retries", "infinite",
+            "--fragment-retries", "infinite",
+            "-f", "bv*+ba/b",
+            "--downloader", "m3u8:native",
             "-o", file_path,
+
             "--merge-output-format", "mkv",
+            "--hls-use-mpegts",
+
+            // "--socket-timeout", "120",
+            // "--retry-sleep", "fragment:exp=2:60",
+            // "--retry-sleep", "http:exp=2:60",
+            // "--abort-on-unavailable-fragments",
         ]
 
-        if (content["resolution"][0]["reqHeader"]) {
-            commands = [...commands, ...Object.entries(content["resolution"][0]["reqHeader"]).flatMap(([key, value]) => [
-                "--add-header",
-                `${key}: ${value}`,
-            ])]
-        }
+        // if (content["resolution"][0]["reqHeader"]) {
+        //     commands = [...commands, ...Object.entries(content["resolution"][0]["reqHeader"]).flatMap(([key, value]) => [
+        //         "--add-header",
+        //         `${key}: ${value}`,
+        //     ])]
+        // }
 
         commands.push(url.toString())
 
@@ -505,6 +515,14 @@ ipcMain.handle("download:video", async (_, content: playerData, name: string, _f
         const file_name = readdirSync(join(app.getPath("videos"), "animu")).find((v) => v.startsWith(tmp_id))
         if (!file_name) return console.error("Failed Found FIle")
         file_path = join(app.getPath("videos"), "animu", file_name)
+
+        // await runProcess([
+        //     '-i', file_path,
+        //     join(app.getPath("videos"), "animu", `${tmp_id}.mkv`)
+        // ])
+
+        // file_path = join(app.getPath("videos"), "animu", `${tmp_id}.mkv`)
+
         const tmp_file_path = join(app.getPath("videos"), "animu", `tmp_${path.basename(file_path)}`)
 
         if (content["listChapters"]) {
@@ -554,7 +572,7 @@ ipcMain.handle("download:video", async (_, content: playerData, name: string, _f
                 console.log(resp)
                 if (!resp.success) continue
 
-                const file_subtitles = join(app.getPath("videos"), "animu", `${segment.default}_${segment.label}_subtitles_${tmp_id}.txt`)
+                const file_subtitles = join(app.getPath("videos"), "animu", `subtitles_${tmp_id}.txt`)
 
                 const buffer = Buffer.from(resp.buffer as any);
                 writeFileSync(file_subtitles, buffer)
@@ -586,7 +604,8 @@ ipcMain.handle("download:video", async (_, content: playerData, name: string, _f
             }
         }
 
-        renameSync(file_path, join(app.getPath("videos"), "animu",`${name}${extname(file_path)}`))
+        renameSync(file_path, join(app.getPath("videos"), "animu", `${name}${extname(file_path)}`))
+        console.log("Succesfully Downloaded", name)
 
     } catch (error) {
         console.error("Failed Download Video", error, content)
