@@ -54,6 +54,8 @@ function generateToken(str: string | undefined) {
 }
 
 async function request(url: string, options: RequestInit = {}) {
+
+    await sleep(Math.floor(Math.random() * (2000 - 500 + 1)) + 500)
     if (window["animeonsen_get_token"] == undefined) {
         const resp = await SheepRequest(WEBSITE, { headers: header })
         /* IFDEF DEBUG */
@@ -90,7 +92,7 @@ function SearchAnime(anime: AnimeData, target: cardData[]) {
 
 export default class AnimeOnsen implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.1",
+        version: "1.2",
         name: "AnimeOnsen",
         author: "Owca525",
         supportLang: ["en"],
@@ -234,7 +236,7 @@ export default class AnimeOnsen implements playerPluginFormat {
         for (let index = 0; index < functions.length; index++) {
             const element = functions[index];
             const tmp = await wrapper(element)
-            await sleep(5000)
+            await sleep(Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000)
             if (!tmp) {
                 results.push({
                     time: 0,
