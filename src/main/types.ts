@@ -330,3 +330,13 @@ export interface resolutionFormat {
 export interface playerSubtitlesFormat { url: string, lang: string, label: string, format: string, default?: boolean }
 
 export type playerChapterList = { start: number, end: number, type: "opening" | "ending" | "other", name?: string }
+
+export interface UserData {
+    username: string,
+    description?: string,
+    created_date: number,
+    animu_time: number,
+
+    banner?: string,
+    avatar?: string
+}

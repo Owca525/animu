@@ -214,6 +214,8 @@ export interface globalDataFormat {
         ver: string,
         listVer: string[]
     }
+    
+    user: UserData
 }
 
 export interface NotificationProps {
@@ -757,4 +759,14 @@ export interface PlayerTmpProps {
     episodelist: episodeMetadata[],
     animulist?: animulistProps,
     continewatch: boolean
+}
+
+export interface UserData {
+    username: string,
+    description?: string,
+    created_date: number,
+    animu_time: number,
+
+    banner?: string,
+    avatar?: string
 }

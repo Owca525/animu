@@ -1,12 +1,11 @@
 import { ElectronAPI } from "@electron-toolkit/preload";
-import { AnimeData, AnimuListFormat, cardData, globalDataFormat, playerData, pluginRepoExpanded, SettingsConfig, themeMetadata } from "@renderer/utils/types";
+import { AnimeData, AnimuListFormat, cardData, globalDataFormat, playerData, pluginRepoExpanded, SettingsConfig, themeMetadata, UserData } from "@renderer/utils/types";
 
 declare global {
   interface Window {
     api: {
       open: (url: string) => Promise<void>;
       saveToClipboard: (type: "text" | "image", content: string) => Promise<boolean>;
-      getConfigAvatar: () => Promise<{ mime: string, data: string } | undefined>
       animePlaylist: {
         read: (playlist: string) => Promise<playlistFormatData[]>
         save: (playlist: string, data: playlistFormatData) => Promise<boolean>
@@ -88,6 +87,11 @@ declare global {
       downloader: {
         download: (content: playerData, name: string, FolderName) => Promise<void>
       }
+
+      user: {
+        change: (user: UserData) => Promise<boolean>
+        reset: () => Promise<boolean>
+      }
     };
     backend: {
       // ipcRenderer: {
@@ -111,6 +115,6 @@ declare global {
       reload: () => void;
       createWindow: (props: { url: string, type: string }) => Promise<any>
     };
-    initialMetadata: Promise<{ config: SettingsConfig, history: cardData[], animulist: animulistData[], theme: themeMetadata[] }>
+    initialMetadata: Promise<{ config: SettingsConfig, history: cardData[], animulist: animulistData[], theme: themeMetadata[], user: UserData }>
   }
 }

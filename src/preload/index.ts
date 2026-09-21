@@ -9,7 +9,6 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld("api", {
       open: (url: string) => ipcRenderer.invoke("open", url),
       saveToClipboard: (type: "text" | "image", content: string) => ipcRenderer.invoke("saveToClipboard", type, content),
-      getConfigAvatar: () => ipcRenderer.invoke("config:fetchAvatar"),
       animePlaylist: {
         read: (playlist: string) => ipcRenderer.invoke("playlist:read", playlist),
         save: (playlist: string, data: playlistFormatData) => ipcRenderer.invoke("playlist:save", playlist, data),
@@ -82,6 +81,11 @@ if (process.contextIsolated) {
 
       downloader: {
         download: (content, name, folderName) => ipcRenderer.invoke("download:video", content, name, folderName)
+      },
+
+      user: {
+        change: (user) => ipcRenderer.invoke("user:update", user),
+        reset: () => ipcRenderer.invoke("user:reset"),
       }
     });
     contextBridge.exposeInMainWorld("backend", {

@@ -54,6 +54,21 @@ window["animuHeader"] = {
     "sec-ch-ua-platform": '"Windows"'
 }
 
+try {
+  if (!localStorage.getItem("animu_time")) {
+    localStorage.setItem("animu_time", "0")
+  }
+
+  window["animu_timer"] = Number(localStorage.getItem("animu_time"))
+  window["animu_timer_interval"] = setInterval(() => {
+    window["animu_timer"] = window["animu_timer"] + 1
+
+    localStorage.setItem("animu_time", `${window["animu_timer"]}`)
+  }, 1000)
+} catch (error) {
+  console.error("Failed Run Timer", error)
+}
+
 render(
   () => (
     <ErrorBoundary fallback={LocalErrorBoundary}>

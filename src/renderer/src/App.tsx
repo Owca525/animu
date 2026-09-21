@@ -34,6 +34,7 @@ import {
 import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import {
   getGlobalCache,
+  GetUser,
   isPluginSearchMode,
   setAudioOutput,
   setDeepLink,
@@ -42,7 +43,8 @@ import {
   setIncognitoMode,
   setPluginSearchMode,
   setTodayAnimeInAnilist,
-  setYT_DLPVersion
+  setYT_DLPVersion,
+  UpdateUserData
 } from './utils/stores/global';
 
 import "./utils/NotificationManager"
@@ -77,6 +79,7 @@ import { ServiceManager } from './utils/service';
 import pluginManager from './utils/pluginManager';
 import { createGlobalError } from './utils/context/GlobalErrorContext';
 import { setNewHistory } from './utils/FilesManager/history';
+import { hideCustomMenu } from './utils/context/menuContext';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -133,6 +136,10 @@ function App() {
     toast(t("global.incognitomode", { switch: getGlobalCache().incognito ? t("global.on") : t("global.off") }))
   })
 
+  SheepShortcut(["ESC"], () => {
+    hideCustomMenu()
+  })
+
   onMount(async () => {
     try {
       /* IFDEF WEB */
@@ -177,6 +184,10 @@ function App() {
 
       /* IFDEF DEBUG|PROD */
       const metadata = await window["initialMetadata"]
+      UpdateUserData({
+        ...metadata.user,
+        animu_time: window["animu_timer"]
+      })
       window["serverPort"] = metadata["port"]
       setConfig(metadata["config"])
       setNewHistory(metadata["history"])
@@ -213,6 +224,8 @@ function App() {
 
       /* IFDEF DEBUG|PROD */
       runCheckUpdate()
+
+      await window.api.user.change(JSON.parse(JSON.stringify(GetUser())))
       /* ENDIF */
     } catch (error) {
       createGlobalError(error)

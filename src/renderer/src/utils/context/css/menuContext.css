@@ -48,4 +48,6 @@
     left: 0;
     margin: 24px;
     border-radius: 12px !important;
+
+    outline: 2px solid var(--green-one) !important;
 }

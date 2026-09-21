@@ -19,7 +19,7 @@ import {
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { getAnimuHistory, getGlobalCache, informationCache, PlayerCache, setActiveThemes, setGlobalToken } from './stores/global';
+import { animulistData, getAnimuHistory, getGlobalCache, informationCache, PlayerCache, setActiveThemes, setGlobalToken } from './stores/global';
 import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
@@ -1361,3 +1361,53 @@ export function convert_to_slug(name: string) {
 export function formatNumber(number) {
     return String(number).padStart(2, '0');
 }
+
+export function User_Format_Time(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (hours >= 24) {
+    return `${days}d`;
+  }
+
+  if (hours > 0) {
+    return `${hours}h ${minutes % 60}m`;
+  }
+
+  if (minutes > 0) {
+    return `${minutes}m`;
+  }
+
+  return `${seconds}s`;
+}
+
+export function User_Calculate_Watch_Time() {
+    // TODO: MAKE BETTER ACCURATE
+
+    const list = animulistData().values().toArray()
+
+    if (list.length <= 0) return 0
+
+    let num = 0
+
+    list.forEach((v) => {
+        try {
+            if (v.AnimeData.duration) num = num + Number(v.AnimeData.duration)
+        } catch {}
+    })
+
+    return num
+}
+
+export function BufferTobase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+
+  let binary = "";
+
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+
+  return btoa(binary);
+};

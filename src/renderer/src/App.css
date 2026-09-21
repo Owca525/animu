@@ -87,6 +87,10 @@ input[type="number"]::-webkit-outer-spin-button {
   gap: 8px;
 }
 
+.main-error-show {
+  margin-bottom: -150px;
+}
+
 /* .app-loading-animation {
   animation: spin 1s linear infinite;
   width: min-content;

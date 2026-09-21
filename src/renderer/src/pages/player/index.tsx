@@ -59,6 +59,10 @@ const player = () => {
 
                 if (`${queryKey[3]}`.includes("Animu_Player_Overwriter_Mode")) return window["playerOverWriteContent"]
 
+                /* IFDEF DEBUG */
+                console.warn("index/Player", queryKey)
+                /* ENDIF */
+
                 let pluginPlayer = await pluginManager.changePlayerPlugin(anime_data.saveData?.pluginName ? anime_data.saveData.pluginName : "")
                 return await pluginPlayer.extractPlayerData(animeType as string, episode as episodeMetadata, player_id as string)
             },

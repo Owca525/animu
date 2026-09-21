@@ -1,9 +1,35 @@
 import Button from '@renderer/components/buttons';
 import { globalNavigate, openUrlFolder, reloadWebsite } from './functions';
+import { For, Show } from 'solid-js';
 
 // /* IFDEF PROD */
 // import logger from './logger';
 // /* ENDIF */
+
+function parseStack(stack?: string): { raw: string; functionName?: string; file?: string; line?: string; column?: string; }[] {
+    if (!stack) return [];
+
+    return stack
+        .split("\n")
+        .slice(1)
+        .map((line) => {
+            const match = line.match(
+                /at (.*?) \((.*):(\d+):(\d+)\)/
+            );
+
+            if (!match) {
+                return { raw: line.trim() };
+            }
+
+            return {
+                raw: line.trim(),
+                functionName: match[1],
+                file: match[2],
+                line: match[3],
+                column: match[4],
+            };
+        });
+}
 
 function LocalErrorBoundary(error: any) {
     console.error(error)
@@ -32,6 +58,26 @@ function LocalErrorBoundary(error: any) {
             </div>
             <div class="main-error-show">
                 {`Error Message: ${error.toString()}`}
+
+                <Show when={error.stack}>
+                    <ul>
+                        <For each={parseStack(error.stack)}>
+                            {(frame) => (
+                                <li>
+                                    {frame.functionName ? (
+                                        <>
+                                            <strong>{frame.functionName}</strong>
+                                            {" — "}
+                                            {frame.file}:{frame.line}:{frame.column}
+                                        </>
+                                    ) : (
+                                        frame.raw
+                                    )}
+                                </li>
+                            )}
+                        </For>
+                    </ul>
+                </Show>
             </div>
         </div>
     )

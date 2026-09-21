@@ -333,20 +333,17 @@ const mimeMap: Record<string, string> = {
     webp: "image/webp"
 };
 
-ipcMain.handle("config:fetchAvatar", async () => {
+export function FindFile(name: string) {
     for (const ext of extensions) {
-        const file = path.join(newConfigPath, `avatar.${ext}`);
+        const file = path.join(newConfigPath, `${name}.${ext}`);
         if (fs.existsSync(file)) {
             const buffer = fs.readFileSync(file);
-            return {
-                mime: mimeMap[ext],
-                data: buffer.toString("base64")
-            };
+            return `data:${mimeMap[ext]};base64,${buffer.toString("base64")}`
         }
     }
 
     return undefined
-});
+}
 
 const toMB = (bytes) => bytes / 1024 / 1024;
 
@@ -489,11 +486,12 @@ ipcMain.handle("download:video", async (_, content: playerData, name: string, _f
             "--retries", "infinite",
             "--fragment-retries", "infinite",
             "-f", "bv*+ba/b",
-            "--downloader", "m3u8:native",
             "-o", file_path,
 
             "--merge-output-format", "mkv",
             "--hls-use-mpegts",
+            "--downloader", "native",
+            "--downloader", "m3u8:native",
 
             // "--socket-timeout", "120",
             // "--retry-sleep", "fragment:exp=2:60",
@@ -501,12 +499,12 @@ ipcMain.handle("download:video", async (_, content: playerData, name: string, _f
             // "--abort-on-unavailable-fragments",
         ]
 
-        // if (content["resolution"][0]["reqHeader"]) {
-        //     commands = [...commands, ...Object.entries(content["resolution"][0]["reqHeader"]).flatMap(([key, value]) => [
-        //         "--add-header",
-        //         `${key}: ${value}`,
-        //     ])]
-        // }
+        if (content["resolution"][0]["reqHeader"]) {
+            commands = [...commands, ...Object.entries(content["resolution"][0]["reqHeader"]).flatMap(([key, value]) => [
+                "--add-header",
+                `${key}: ${value}`,
+            ])]
+        }
 
         commands.push(url.toString())
 

@@ -15,8 +15,8 @@ export function closeSocket() {
     socket.close()
 }
 
-function OverWritePlayer(url: string, hls: boolean) {
-    if (!url || !hls) throw new Error("Give 2 Aruments");
+function OverWritePlayer(url: string, hls: boolean = false) {
+    if (!url) throw new Error("Give URL");
 
     PlayerCache.update({
         anime: {

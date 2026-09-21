@@ -16,8 +16,8 @@ import "./plugins"
 
 import { convertToNewFormat, detectOldVersion, write } from './os'
 import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync } from 'fs'
-import { cardData, defaultConfig, SettingsConfig } from './types';
-import { advanceRequest, checkConfigFolder, deepMerge, detectZoom, setupDiscordRPC } from './utils';
+import { cardData, defaultConfig, SettingsConfig, UserData } from './types';
+import { advanceRequest, checkConfigFolder, deepMerge, detectZoom, FindFile, setupDiscordRPC } from './utils';
 import { electronAppUniversalProtocolClient } from 'electron-app-universal-protocol-client';
 import { checkDatabase } from './animulist';
 import { ParseINI } from './iniParser';
@@ -25,10 +25,12 @@ import { t } from './i18n'
 import { yt_dlpInstance } from './ytdlpHandler'
 import { getThemeList } from './theme'
 import { Server } from './server/main'
+import { DefaultUserData } from './user'
 
 const server = new Server
 export let mainWindow: BrowserWindow | undefined
 export let userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.254 Safari/537.36"
+
 export const animuUserData = app.getPath("userData")
 export const backupFolder = app.getPath("userData")
 export const newConfigPath = path.join(animuUserData, "animuConfig")
@@ -37,6 +39,8 @@ export const pluginsConfigPath = path.join(newConfigPath, "pluginsConfig")
 export const animuPlaylistPath = path.join(newConfigPath, "playlist")
 export const userPlugins = path.join(newConfigPath, "plugins")
 export const animuPlugins = path.join(animuUserData, "animuPlugins")
+export const userdataFile = path.join(newConfigPath, "user.json")
+
 export let globalTray: undefined | Tray = undefined
 export const mainTrayMenu = [
   {
@@ -65,6 +69,7 @@ export let DEBUG: boolean = false
 
 export let config: SettingsConfig = defaultConfig as any
 export let yt_dlp: yt_dlpInstance = new yt_dlpInstance(config["yt_dlpRepo"])
+export let user_data: UserData = DefaultUserData
 
 let historyData: cardData[] = []
 const PROTOCOL = "animu"
@@ -299,6 +304,25 @@ export async function initialBackend() {
     if (!existsSync(animuPlugins)) mkdirSync(animuPlugins)
     if (!existsSync(animuPlaylistPath)) mkdirSync(animuPlaylistPath)
 
+    if (!existsSync(userdataFile)) writeFileSync(userdataFile, JSON.stringify(DefaultUserData), "utf-8")
+    else {
+      user_data = JSON.parse(readFileSync(userdataFile, "utf-8"));
+
+      if (user_data["avatar"] == undefined || `${user_data["avatar"]}`.length <= 0) {
+        user_data = {
+          ...user_data,
+          avatar: FindFile("avatar")
+        }
+      }
+
+      if (user_data["banner"] == undefined || `${user_data["banner"]}`.length <= 0) {
+        user_data = {
+          ...user_data,
+          banner: FindFile("banner")
+        }
+      }
+    }
+
     if (existsSync(path.join(newConfigPath, "config.json"))) {
       let data = readFileSync(path.join(newConfigPath, "config.json"), "utf-8")
 
@@ -316,6 +340,7 @@ export async function initialBackend() {
       let data = readFileSync(path.join(newConfigPath, "history.json"), "utf-8")
       historyData = JSON.parse(data)
     }
+
     checkDatabase()
 
     // if (existsSync(path.join(newConfigPath, "continueWatch.json"))) {
@@ -356,7 +381,8 @@ ipcMain.handle('initialMetadata', () => ({
   history: historyData, 
   animulist: checkDatabase(), 
   theme: getThemeList(checkConfigFolder("themes")),
-  port: server.port
+  port: server.port,
+  user: user_data
 }));
 
 ipcMain.handle('backend:customheader', (_, header: Record<string, string | string[]> | undefined) => customheader = header);

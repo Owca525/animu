@@ -6,6 +6,8 @@ import { createSignal, Show } from "solid-js"
 import { useI18n } from "@renderer/utils/i18n"
 import { getConfig } from "@renderer/utils/stores/config"
 
+// TODO: END THIS
+
 export default function WelcomeScreen() {
     const config = getConfig()
     const [currentPage, setCurrentPage] = createSignal<number>(0)
@@ -23,7 +25,7 @@ export default function WelcomeScreen() {
                         <div class="welcome-screen-option-description">Select language</div>
                         <Dropdown
                             options={listLang().map(element => {
-                                return { label: t(`lang.${element}`) }
+                                return { label: t(`lang.${element}`), onClick: () => changeLanguage(element) }
                             })}
                             buttonText={t(`lang.${config.General.language}`)}
                             placeholderChange={() => t(`lang.${config.General.language}`)}
@@ -32,14 +34,6 @@ export default function WelcomeScreen() {
                     </Show>
                     <Show when={currentPage() == 1}>
                         <div class="welcome-screen-option-description">Select Default Plugin</div>
-                        {/* <Dropdown
-                            options={Object.keys(i18n.store.data).map(element => {
-                                return { label: t(`lang.${element}`), onClick: () => "" }
-                            })}
-                            buttonText={t(`lang.${config.General.language}`)}
-                            placeholderChange={() => t(`lang.${config.General.language}`)}
-                            disableX
-                        /> */}
                     </Show>
                 </div>
                 <div class="welcome-screen-button-container">

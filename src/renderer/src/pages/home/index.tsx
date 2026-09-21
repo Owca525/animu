@@ -170,7 +170,9 @@ const Home = () => {
         </div>
         <div class='home-header-right'>
           <NotificationMenu />
+          {/* IFDEF DEBUG|PROD */}
           <Avatar />
+          {/* ENDIF */}
         </div>
       </div>
 
@@ -231,6 +233,7 @@ const Home = () => {
           </Match>
         </Switch>
       </div>
+      {/* <WelcomeScreen /> */}
     </main>
   );
 };

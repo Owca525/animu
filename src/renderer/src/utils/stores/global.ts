@@ -1,4 +1,4 @@
-import { animeOpeningsFormat, cardData, deeplinkFormat, globalDataFormat, informationTmpProps, NotificationExpanded, PlayerTmpProps, serviceFormat, themeMetadata } from "../types";
+import { animeOpeningsFormat, cardData, deeplinkFormat, globalDataFormat, informationTmpProps, NotificationExpanded, PlayerTmpProps, serviceFormat, themeMetadata, UserData } from "../types";
 import { createStore } from "solid-js/store";
 import { Socket } from "socket.io-client";
 
@@ -23,6 +23,12 @@ export const [globalState, setGlobalState] = createStore<globalDataFormat>({
     yt_dlp: {
         ver: "",
         listVer: []
+    },
+
+    user: {
+        username: "User",
+        created_date: 0,
+        animu_time: 0,
     }
 } as globalDataFormat);
 
@@ -44,6 +50,12 @@ export const isPluginSearchMode = () => globalState.pluginSearchMode;
 export const getAnimuHistory = () => globalState.history;
 export const getCurrentYT_DLPVer = () => globalState.yt_dlp["ver"];
 export const getListOfVerYT_DLP = () => globalState.yt_dlp["listVer"];
+export const GetUserBanner = () => globalState.user.banner;
+export const GetUserAvatar = () => globalState.user.avatar;
+
+export const GetUser = () => globalState.user;
+
+export const UpdateUserData = (tmp: UserData) => setGlobalState((prev) => ({ ...prev, user: tmp }));
 
 export const setYT_DLPVersion = (tmp: globalDataFormat["yt_dlp"]) => setGlobalState((prev) => ({ ...prev, yt_dlp: tmp }));
 export const setPluginSearchMode = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, pluginSearchMode: tmp }));
