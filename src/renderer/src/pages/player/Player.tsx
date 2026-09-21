@@ -1065,8 +1065,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         const currentTime = player.currentTime
         const duration = player.durration
 
-        if (duration > 10 && currentTime > duration - CheckNumber(config.History.continue.MaximizeTimeSave) && anime.animulist) {
-            if (anime.AnimeData.episodes != undefined && anime.animulist.status == "CURRENT" && ep_metadata["current"]["ep"] == `${anime.AnimeData.episodes}`) {
+        if (duration > 10 && currentTime > (duration - CheckNumber(config.History.continue.MaximizeTimeSave)) && anime.animulist && anime.AnimeData.episodes != undefined) {
+            
+            if (anime.animulist.status == "CURRENT" && CheckNumber(ep_metadata["current"]["ep"]) >= CheckNumber(anime.AnimeData.episodes)) {
                 updateDataInAnimulist(anime.AnimeData.id, {
                     AnimeData: {
                         ...anime.AnimeData,
@@ -1076,12 +1077,13 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                     animulist: {
                         ...anime.animulist,
                         status: "COMPLETED",
-                        endWatch: anime.animulist.endWatch == 0 ? dateToUnix(new Date().toString()) : anime.animulist.endWatch,
+                        endWatch: anime.animulist.endWatch ? anime.animulist.endWatch : dateToUnix(new Date().toString()),
                         lastUpdate: dateToUnix(new Date().toString()),
                         progress: anime.AnimeData.episodes ? anime.AnimeData.episodes : ep_metadata.list.length
                     }
                 })
             }
+
         }
 
         if (currentTime <= parseInt(config.History.continue.MinimalTimeSave.toString())) return

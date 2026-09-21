@@ -13,7 +13,7 @@ import { Match, onCleanup, onMount, Switch } from "solid-js";
 import { useResponse } from "@renderer/utils/hooks/useResponse";
 import { useI18n } from "@renderer/utils/i18n";
 import { addToAnimuList, updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist";
-import { getAnimuHistory, getSocket, getSocketRoom, informationCache, PlayerCache, setIncognitoMode } from "@renderer/utils/stores/global";
+import { animulistData, getAnimuHistory, getSocket, getSocketRoom, informationCache, PlayerCache, setIncognitoMode } from "@renderer/utils/stores/global";
 import { createStore } from "solid-js/store";
 import { SheepShortcut } from "@renderer/utils/hooks/useKeyPress";
 import pluginManager from "@renderer/utils/pluginManager";
@@ -248,7 +248,11 @@ const player = () => {
             let anime = informationCache.anime
             if (tmp) anime = { anime: tmp["AnimeData"], saveData: tmp["saveData"] }
 
-            informationCache.update({ ...anime, animulist: anime_data.animulist, DontOverWrite: true })
+            const tmpAnimulist = animulistData().get(anime["anime"]["id"])
+            if (tmpAnimulist) anime = {...anime, animulist: tmpAnimulist["animulist"]}
+            else anime = {...anime, animulist: anime_data.animulist }
+
+            informationCache.update({ ...anime, DontOverWrite: true })
             navigate("/info")
         }
     }
