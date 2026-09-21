@@ -97,12 +97,12 @@ export function formatTime(seconds: number | undefined): string {
 }
 
 export function join_path(...parts) {
-  return parts.join("/").replace(/\/+/g, "/").replace("http:/", "http://");
+    return parts.join("/").replace(/\/+/g, "/").replace("http:/", "http://");
 }
 
 function createHTMLLinkElement(css: string, name: string) {
     if (!css || css.length <= 0) return
-    
+
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.dataset.name = name
@@ -124,7 +124,7 @@ export async function changeTheme(activeTheme: Map<number, themeMetadata>) {
 
     activeTheme.forEach(async (theme) => {
         if (theme.themeName != "DarkerAnimu") createHTMLLinkElement(theme.mainCSS, theme["themeName"])
-        
+
         if (!theme.options) return
         const conf = await window.api.themes.config(unwrap(theme))
         for (const key in conf) {
@@ -985,8 +985,6 @@ async function Send_Episode_Notification(item: playlistFormatData) {
 
     const episodes = extracted_episodes.map((v) => v.ep.toString())
 
-    console.warn("Functions/Send_Episode_Notification", item, episodes, extracted_episodes, plugin_response)
-
     if (GetNumberFromString(item["anime"]["saveData"]!["episode"]) < GetNumberFromString(episodes.at(-1))) {
         sendNotification({
             title: `New Episode Avaible in ${temporal_plugin.metadata.name} plugin`,
@@ -1010,11 +1008,11 @@ export async function checkAnimeTodayReleaseEpisode() {
             if (checkTimeDriffrentUnix(current_unix_date, item["lastupdate"])["hour"] < 24) return
 
             const info_plugin = getInformationPlugin()
-    
+
             if (item["anime"]["AnimeData"]['status'] == "NOT_YET_RELEASED") {
                 const response = await info_plugin.anime(item["anime"]["AnimeData"]["id"])
                 if (!response) return
-                await updatePlaylist("global.waitingplaylist", {...item, anime: { ...item["anime"], AnimeData: response }, customData: false})
+                await updatePlaylist("global.waitingplaylist", { ...item, anime: { ...item["anime"], AnimeData: response }, customData: false })
                 return
             }
 
@@ -1022,20 +1020,20 @@ export async function checkAnimeTodayReleaseEpisode() {
                 let anime = await info_plugin.anime(item["anime"]["AnimeData"]["id"])
                 if (!anime) return
 
-                const history_anime: cardData = getAnimuHistory()[anime["id"]]
+                const history_anime = getAnimuHistory().get(anime["id"])
 
-                const content_anime = { 
-                    ...item, 
-                    anime: { 
-                        ...item["anime"], 
+                const content_anime = {
+                    ...item,
+                    anime: {
+                        ...item["anime"],
                         AnimeData: anime,
                         saveData: history_anime && history_anime["saveData"] ? history_anime["saveData"] : item["anime"]["saveData"]
-                    } 
+                    }
                 }
 
                 const notification_response = await Send_Episode_Notification(content_anime)
 
-                await updatePlaylist("global.waitingplaylist", {...content_anime, customData: notification_response == undefined ? true : false})
+                await updatePlaylist("global.waitingplaylist", { ...content_anime, customData: notification_response == undefined ? true : false })
             }
 
         } catch (error) {
@@ -1349,13 +1347,13 @@ export async function ExtractVideo(url: string): Promise<playerData[]> {
 (window as any).ExtractVideo = ExtractVideo;
 
 export function convert_to_slug(name: string) {
-  return name
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/['’]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    return name
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/['’]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
 }
 
 export function formatNumber(number) {
@@ -1363,23 +1361,23 @@ export function formatNumber(number) {
 }
 
 export function User_Format_Time(seconds: number): string {
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
 
-  if (hours >= 24) {
-    return `${days}d`;
-  }
+    if (hours >= 24) {
+        return `${days}d`;
+    }
 
-  if (hours > 0) {
-    return `${hours}h ${minutes % 60}m`;
-  }
+    if (hours > 0) {
+        return `${hours}h ${minutes % 60}m`;
+    }
 
-  if (minutes > 0) {
-    return `${minutes}m`;
-  }
+    if (minutes > 0) {
+        return `${minutes}m`;
+    }
 
-  return `${seconds}s`;
+    return `${seconds}s`;
 }
 
 export function User_Calculate_Watch_Time() {
@@ -1394,20 +1392,20 @@ export function User_Calculate_Watch_Time() {
     list.forEach((v) => {
         try {
             if (v.AnimeData.duration) num = num + Number(v.AnimeData.duration)
-        } catch {}
+        } catch { }
     })
 
     return num
 }
 
 export function BufferTobase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
+    const bytes = new Uint8Array(buffer);
 
-  let binary = "";
+    let binary = "";
 
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
+    for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
 
-  return btoa(binary);
+    return btoa(binary);
 };
