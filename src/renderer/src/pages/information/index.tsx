@@ -681,14 +681,14 @@ function information() {
                             <Show when={information["cache"].anime.type == "ANIME"}>
                                 <Switch>
                                     <Match when={information["cache"].animulist == undefined}>
-                                        <Button titleButton={"Add To Animulist"} icon="add" ButtonClass="information-bar-icon" onClick={() => showCustomMenu(AnimulistMenu({
+                                        <Button titleButton={"Add To Animulist"} icon="add" ButtonClass="information-bar-icon" onClick={() => showCustomMenu(() => AnimulistMenu({
                                             anime: information["cache"].anime,
                                             animulist: information["cache"].animulist,
                                             save: (animulist, anime) => { modifySaveAnimuList(animulist, anime) }
                                         }))} />
                                     </Match>
                                     <Match when={information["cache"].animulist}>
-                                        <Button titleButton={"Edit Anime"} icon="edit" ButtonClass="information-bar-icon" onClick={() => showCustomMenu(AnimulistMenu({
+                                        <Button titleButton={"Edit Anime"} icon="edit" ButtonClass="information-bar-icon" onClick={() => showCustomMenu(() => AnimulistMenu({
                                             anime: information["cache"].anime,
                                             animulist: information["cache"].animulist,
                                             save: (animulist, anime) => { modifySaveAnimuList(animulist, anime, true) }

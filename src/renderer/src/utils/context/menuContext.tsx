@@ -4,7 +4,7 @@ import "./css/menuContext.css";
 import Button from "@renderer/components/buttons";
 
 interface menuContextType {
-    showCustomMenu: (data: JSX.Element) => void;
+    showCustomMenu: (data: () => JSX.Element) => void;
     hideCustomMenu: () => void;
     isCustomMenuActive: () => boolean;
     hideAllCustomMenu: () => void
@@ -14,9 +14,9 @@ const menuContext = createContext<menuContextType>();
 let customMenuApi: menuContextType | undefined;
 
 export function MenuContextProvider(props: { children: JSX.Element }) {
-    const [content, setContent] = createSignal<JSX.Element[]>([]);
+    const [content, setContent] = createSignal<(() => JSX.Element)[]>([]);
 
-    function showCustomMenu(data: JSX.Element) {
+    function showCustomMenu(data: () => JSX.Element) {
         setContent((v) => [...v, data]);
     }
 
@@ -51,7 +51,7 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
                     {(element) => (
                         <Portal>
                             <main class="custom-menu-background">
-                                {element}
+                                {typeof element == "function" ? element() : element}
                                 <Button
                                     icon="arrow_back"
                                     ButtonClass="custom-menu-exit-button"
@@ -66,7 +66,7 @@ export function MenuContextProvider(props: { children: JSX.Element }) {
     );
 }
 
-export function showCustomMenu(data: JSX.Element) {
+export function showCustomMenu(data: () => JSX.Element) {
     if (!customMenuApi) return;
     customMenuApi.showCustomMenu(data);
 }

@@ -342,7 +342,7 @@ function settings() {
     async function openThemeOption(theme: themeMetadata) {
         const themeConfig = await window.api.themes.config(unwrap(theme))
 
-        showCustomMenu(OtherSettings({
+        showCustomMenu(() => OtherSettings({
             title: t("settings.extensions.conf", { title: theme.themeName }),
             themeConfig: {
                 theme: theme,

@@ -135,7 +135,7 @@ function Card(props: CardProps) {
     CenterContextMenu.push({
       option: "Add To AnimuList",
       onClick: () =>
-        showCustomMenu(AnimulistMenu({
+        showCustomMenu(() => AnimulistMenu({
           anime: props.card.AnimeData,
           save: (animulist, anime) => addToAnimuList(animulist, anime, true)
         })),

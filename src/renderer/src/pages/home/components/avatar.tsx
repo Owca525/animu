@@ -16,7 +16,7 @@ export default function Avatar() {
   const [avatar, setAvatar] = createSignal<string>(GetUserAvatar() ?? icon);
 
   return (
-    <main class="avatar-container" onClick={() => showCustomMenu(User_Profile())}>
+    <main class="avatar-container" onClick={() => showCustomMenu(User_Profile)}>
       <sheep-img src={avatar()} class="avatar-main-icon" onError={() => setAvatar(icon)} />
     </main>
   );
@@ -38,7 +38,7 @@ export function User_Profile() {
 
   return (
     <main class="user-profile-container">
-      <Button icon="edit" ButtonClass="user-profile-edit-button" iconClassName="user-profile-edit-button-icon" onClick={() => showCustomMenu(Edit_User_Profile())} />
+      <Button icon="edit" ButtonClass="user-profile-edit-button" iconClassName="user-profile-edit-button-icon" onClick={() => showCustomMenu(Edit_User_Profile)} />
       <div class="user-profile-banner" style={GetBanner(user)}></div>
 
       <div class="user-profile-content">
