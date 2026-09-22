@@ -49,7 +49,7 @@ export function User_Profile() {
           <div class="user-profile-texts">
 
             <span class="user-profile-name">{user["username"]}</span>
-            <span class="user-profile-description">{user["description"] || user["description"]!.length > 0 ? user["description"] : t("information.descriptionnotfound")}</span>
+            <span class="user-profile-description">{user["description"] || (user["description"] != undefined && user["description"].length > 0) ? user["description"] : t("information.descriptionnotfound")}</span>
 
           </div>
 
