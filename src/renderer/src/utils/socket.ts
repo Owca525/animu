@@ -15,7 +15,7 @@ export function closeSocket() {
     socket.close()
 }
 
-function OverWritePlayer(url: string, hls: boolean = false) {
+function OverWritePlayer(url: string, hls: boolean = false, customReq?: { [key: string]: string }) {
     if (!url) throw new Error("Give URL");
 
     PlayerCache.update({
@@ -43,7 +43,8 @@ function OverWritePlayer(url: string, hls: boolean = false) {
             resolution: [{
                 res: "1080",
                 url: url,
-                hls: hls
+                hls: hls,
+                reqHeader: customReq
             }],
         }
     ] as playerData[]
