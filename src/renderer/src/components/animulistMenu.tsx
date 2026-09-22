@@ -2,11 +2,14 @@ import Button from './buttons';
 import Dropdown from '@renderer/components/dropDown';
 import Input from './input';
 import { AnimeData, animulistProps } from '@renderer/utils/types';
-import { Component, createSignal, onMount, Show } from 'solid-js';
-import { dateToUnix, unixToDateTime } from '@renderer/utils/functions';
-import { unwrap } from 'solid-js/store';
+import { Component } from 'solid-js';
+import { dateToUnix, detectTitleConfig, unixToDateTime } from '@renderer/utils/functions';
+import { createStore } from 'solid-js/store';
 import { t } from '@renderer/utils/i18n';
 import { hideCustomMenu } from '@renderer/utils/context/menuContext';
+
+import "./css/animulistmenu.css"
+import { SheepShortcut } from '@renderer/utils/hooks/useKeyPress';
 
 interface AnimulistProps {
     anime: AnimeData
@@ -16,7 +19,7 @@ interface AnimulistProps {
 
 const AnimulistMenu: Component<AnimulistProps> = (props) => {
 
-    const [animulistTMPData, setTMPAnimulist] = createSignal<animulistProps>({
+    const [animulistTMPData, setTMPAnimulist] = createStore<animulistProps>(props.animulist ?? {
         status: "CURRENT",
         score: 0,
         reapeat: 0,
@@ -24,54 +27,77 @@ const AnimulistMenu: Component<AnimulistProps> = (props) => {
         lastUpdate: 0
     });
 
-    function setAnimulistNewData(data: { [key: string]: number | string }) {
-        setTMPAnimulist((v) => ({ ...v, ...data }))
+    function ExitFromEditor() {
+        hideCustomMenu()
+        props.save(animulistTMPData, props["anime"])
     }
 
-    onMount(() => {
-        if (props.animulist) setTMPAnimulist(props.animulist)
-    })
+    SheepShortcut(["ctrl", "S"], ExitFromEditor)
 
     return (
-        <div class="custom-menu-box">
-            <span class="custom-menu-content-title">{t(props.anime.title.romaji)}</span>
-            <div class="custom-menu-content">
-                <Show when={animulistTMPData()}>
-                    <div class="custom-menu-space">
-                        Status
-                        <Dropdown disableX buttonText={t(`animulist.status.${animulistTMPData()?.status}`)} options={["CURRENT", "PLANNING", "COMPLETED", "REPEATING", "DROPPED", "PAUSED"].map((v) => ({ label: t(`animulist.status.${v}`), onClick: () => setAnimulistNewData({ status: v }) }))} />
-                    </div>
-                    <div class="custom-menu-space">
-                        Score
-                        <Input type={"number"} defaultValue={Number(animulistTMPData()?.score).toString()} onInput={(v) => { setAnimulistNewData({ score: parseInt(v) }) }} />
-                    </div>
-                    <div class="custom-menu-space">
-                        Rewatch Number
-                        <Input type={"number"} defaultValue={Number(animulistTMPData()?.reapeat).toString()} onInput={(v) => setAnimulistNewData({ reapeat: parseInt(v) })} />
-                    </div>
-                    <div class="custom-menu-space">
-                        Start Date
-                        <Input type={"date"}
-                            defaultValue={parseInt(animulistTMPData()["startWatch"] as any) > 0 ? unixToDateTime(animulistTMPData().startWatch).split(" ")[0] : undefined}
-                            onInput={(v) => setAnimulistNewData({ startWatch: dateToUnix(v) })}
-                        />
-                    </div>
-                    <div class="custom-menu-space">
-                        Finish Date
-                        <Input type={"date"}
-                            defaultValue={parseInt(animulistTMPData()["endWatch"] as any) > 0 ? unixToDateTime(animulistTMPData().endWatch).split(" ")[0] : undefined}
-                            onInput={(v) => setAnimulistNewData({ endWatch: dateToUnix(v) })}
-                        />
-                    </div>
-                    <div class="custom-menu-space">
-                        Save To Animulist
-                        <Button content="Save" onClick={() => {
-                            props.save({ ...unwrap(animulistTMPData()), lastUpdate: dateToUnix(new Date().toString()), added: dateToUnix(new Date().toString()) } as any,
-                                { ...props.anime, nextAiringEpisode: undefined });
-                            hideCustomMenu()
-                        }} />
-                    </div>
-                </Show>
+        <div class='animulist-menu-container'>
+            <div 
+                class={`animulist-menu-banner ${props["anime"]["bannerImage"] ? "" : "blur"}`} 
+                style={{ "background-image": `url("${props["anime"]["bannerImage"] ?? props["anime"]["coverImage"]}")` }}>    
+            </div>
+
+            <div class='animulist-menu-top'>
+                <sheep-img src={props["anime"]["coverImage"]} class='animulist-menu-image'/>
+
+                <span class='animulist-menu-title'>
+                    {detectTitleConfig(props.anime["title"])}
+                </span>
+
+                <Button content='Save' ButtonClass='animulist-menu-button' onClick={ExitFromEditor}/>
+            </div>
+
+            <div class='animulist-menu-bottom'>
+                <span class='animulist-menu-options'>
+                    {t("Status")}
+                    <Dropdown
+                        disableX
+                        buttonText={t(`animulist.status.${animulistTMPData.status}`)}
+                        options={["CURRENT", "PLANNING", "COMPLETED", "REPEATING", "DROPPED", "PAUSED"].map((v) => ({
+                            label: t(`animulist.status.${v}`),
+                            onClick: () => setTMPAnimulist({ status: v as any })
+                        }))} />
+                </span>
+
+                <span class='animulist-menu-options'>
+                    {t("Score")}
+                    <Input type="number" 
+                        defaultValue={Number(animulistTMPData.score).toString()} 
+                        onInput={(v) => { setTMPAnimulist({ score: parseInt(v) }) }}
+                        InputClass='animulist-menu-input'
+                    />
+                </span>
+
+                <span class='animulist-menu-options'>
+                    {t("Rewatch Number")}
+                    <Input type="number" 
+                        defaultValue={Number(animulistTMPData.reapeat).toString()} 
+                        onInput={(v) => setTMPAnimulist({ reapeat: parseInt(v) })}
+                        InputClass='animulist-menu-input'
+                    />
+                </span>
+
+                <span class='animulist-menu-options'>
+                    {t("Start Date")}
+                    <Input type="date"
+                        defaultValue={Number(animulistTMPData["startWatch"]) > 0 ? unixToDateTime(animulistTMPData.startWatch).split(" ")[0] : undefined}
+                        onInput={(v) => setTMPAnimulist({ startWatch: dateToUnix(v) })}
+                        InputClass='animulist-menu-input'
+                    />
+                </span>
+
+                <span class='animulist-menu-options'>
+                    {t("Finish Date")}
+                    <Input type="date"
+                        defaultValue={Number(animulistTMPData["endWatch"]) > 0 ? unixToDateTime(animulistTMPData.endWatch).split(" ")[0] : undefined}
+                        onInput={(v) => setTMPAnimulist({ endWatch: dateToUnix(v) })}
+                        InputClass='animulist-menu-input'
+                    />
+                </span>
             </div>
         </div>
     );
