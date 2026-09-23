@@ -23,7 +23,7 @@ const AnimulistMenu: Component<AnimulistProps> = (props) => {
         status: "CURRENT",
         score: 0,
         reapeat: 0,
-        added: 0,
+        added: dateToUnix(new Date().toString()),
         lastUpdate: 0
     });
 
