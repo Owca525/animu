@@ -6,17 +6,17 @@ import { pluginRepoExpanded } from "./types";
 import { advanceRequest } from "./utils";
 import { sha256FromString } from "./utils";
 
-function getPluginConfig(name: string, config: { [key: string]: any }) {
+function getPluginConfig(name: string, config: { [key: string]: any } = {}) {
     if (!fs.existsSync(path.join(pluginsConfigPath, `${name}.json`))) return generetaPluginConfig(name, config)
     return JSON.parse(fs.readFileSync(path.join(pluginsConfigPath, `${name}.json`), "utf-8"))
 }
 
-function generetaPluginConfig(name: string, config: { [key: string]: any }) {
+function generetaPluginConfig(name: string, config: { [key: string]: any } = {}) {
     fs.writeFileSync(path.join(pluginsConfigPath, `${name}.json`), JSON.stringify(config), "utf-8")
     return config
 }
 
-function savePluginConfig(name: string, config: { [key: string]: any }) {
+function savePluginConfig(name: string, config: { [key: string]: any } = {}) {
     fs.writeFileSync(path.join(pluginsConfigPath, `${name}.json`), JSON.stringify(config), "utf-8")
 }
 
