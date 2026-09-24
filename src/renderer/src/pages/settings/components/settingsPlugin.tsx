@@ -5,12 +5,13 @@ import { PluginLoadedFormat } from "@renderer/utils/types";
 import { Show } from "solid-js";
 import icon from '@resources/icon.png';
 import { t } from "@renderer/utils/i18n";
+import Button from "@renderer/components/buttons";
 
 interface SettingsPluginProps {
     active: boolean,
     plugin: PluginLoadedFormat,
     hidePlugin: (plugin: PluginLoadedFormat, active: boolean) => void,
-    // pluginSettings: (plugin: PluginLoadedFormat) => void
+    pluginSettings: (plugin: PluginLoadedFormat) => void
     setActivePlugin: (active: boolean, plugin: PluginLoadedFormat) => void
     unHidePlugin: (plugin: PluginLoadedFormat) => void
     isHidden?: boolean
@@ -51,9 +52,9 @@ export default function SettingsPlugin(props: SettingsPluginProps) {
                     </Show>
                 </div>
                 <div class='settings-extension-bottom-right'>
-                    {/* <Show when={props.plugin["config"]}>
-                        <Button icon='settings' ButtonClass='settings-extension-button' onClick={() => props.pluginSettings(props.plugin as any)} />
-                    </Show> */}
+                    <Show when={props["plugin"]["config"] && JSON.stringify(props["plugin"]["config"]) != "{}"}>
+                        <Button icon='settings' ButtonClass='settings-extension-button' onClick={() => props.pluginSettings(props.plugin)} />
+                    </Show>
                 </div>
             </div>
         </div>

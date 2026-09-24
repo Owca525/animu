@@ -14,6 +14,7 @@ import {
     playerData,
     playerPluginFormat,
     playlistFormatData,
+    PluginLoadedFormat,
     resolutionFormat,
     themeMetadata
 } from './types';
@@ -560,7 +561,11 @@ export function getRenderPath(): string {
     return `${location.origin}${location.pathname.replace("index.html", "")}`
 }
 
-export function savePluginConfig(_: { [key: string]: any }) { }
+export function savePluginConfig(pluginName: string, newConfig: PluginLoadedFormat["config"]) {
+    if (!newConfig) return
+
+    window.api.plugins.saveConfig(pluginName, newConfig)
+}
 
 export async function getPluginConfig(instance: playerPluginFormat | informationPluginFormat): Promise<{ [key: string]: any; } | undefined> {
     if (!instance.config) return

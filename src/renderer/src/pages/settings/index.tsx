@@ -17,7 +17,7 @@ import {
     convertPath,
     openUrlFolder,
     request,
-    // savePluginConfig,
+    savePluginConfig,
     updateObject
 } from '@renderer/utils/functions';
 import { checkUpdate } from '@renderer/utils/update';
@@ -383,34 +383,27 @@ function settings() {
         handleChange("plugins.player", tmpPlugin.metadata.name)
     }
 
-    // function openPluginSettings(plugin: PluginLoadedFormat) {
-    //     if (!plugin.config) return
-    //     showCustomMenu(OtherSettings({
-    //         title: t("settings.extensions.conf", { title: plugin.metadata.name }),
-    //         pluginConfig: {
-    //             config: plugin.config,
-    //             onChange: (v, a) => savePluginSettings(plugin.config as any, v, a, plugin)
-    //         }
-    //     }))
-    // }
+    function openPluginSettings(plugin: PluginLoadedFormat) {
+        if (!plugin.config) return
+        showCustomMenu(() => OtherSettings({
+            title: t("settings.extensions.conf", { title: plugin.metadata.name }),
+            pluginConfig: {
+                config: plugin.config!,
+                onChange: (v, a) => savePluginSettings(plugin.config!, v, a, plugin)
+            }
+        }))
+    }
 
-    // function savePluginSettings(config: { [key: string]: any }, variable: string, change: any, plugin: PluginLoadedFormat) {
-    //     let tmpConfig = config
-    //     for (const key in config) {
-    //         if (key == variable) tmpConfig = { ...tmpConfig, [key]: change }
-    //     }
-    //     savePluginConfig(plugin, tmpConfig)
-    //     plugin.config = tmpConfig
+    function savePluginSettings(config: { [key: string]: any }, variable: string, change: any, plugin: PluginLoadedFormat) {
+        let tmpConfig = config
+        for (const key in config) {
+            if (key == variable) tmpConfig = { ...tmpConfig, [key]: change }
+        }
+        savePluginConfig(plugin["metadata"]["name"], tmpConfig)
+        plugin.config = tmpConfig
 
-    //     if ("home" in plugin) {
-    //         getInformationPlugin().currentPlugin = plugin
-    //         return
-    //     }
-
-    //     const listplugins = getPluginList()
-    //     // TODO: maybe fix this and maybe this make some erro fuck it i'm tired
-    //     setPluginPlayerList(listplugins.map((p) => p.metadata.name == plugin.metadata.name ? plugin : p) as any)
-    // }
+        // TODO: END THIS
+    }
 
     function hidePlayerPlugin(plugin: PluginLoadedFormat, active: boolean) {
         if (active) setActivePlugin(false, plugin)
@@ -1607,7 +1600,7 @@ function settings() {
                                                 active={"home" in tmp.plugin ? true : tmp.active}
                                                 unHidePlugin={unHidePlugin} plugin={tmp.plugin}
                                                 hidePlugin={hidePlayerPlugin}
-                                                // pluginSettings={openPluginSettings}
+                                                pluginSettings={openPluginSettings}
                                                 setActivePlugin={setActivePlugin}
                                             />
                                         </Show>
@@ -1626,7 +1619,7 @@ function settings() {
                                                     active={tmp.active}
                                                     plugin={tmp.plugin}
                                                     hidePlugin={hidePlayerPlugin}
-                                                    // pluginSettings={openPluginSettings}
+                                                    pluginSettings={openPluginSettings}
                                                     setActivePlugin={setActivePlugin}
                                                 />
                                             </Show>

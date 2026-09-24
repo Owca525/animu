@@ -5,20 +5,19 @@ import { animuPlugins, animuUserData, newConfigPath, pluginsConfigPath } from ".
 import { pluginRepoExpanded } from "./types";
 import { advanceRequest } from "./utils";
 import { sha256FromString } from "./utils";
-import { ConvertObjectToINI, ParseINI } from "./iniParser";
 
 function getPluginConfig(name: string, config: { [key: string]: any }) {
-    if (!fs.existsSync(path.join(pluginsConfigPath, `${name}.ini`))) return generetaPluginConfig(name, config)
-    return ParseINI(fs.readFileSync(path.join(pluginsConfigPath, `${name}.ini`), "utf-8"))
+    if (!fs.existsSync(path.join(pluginsConfigPath, `${name}.json`))) return generetaPluginConfig(name, config)
+    return JSON.parse(fs.readFileSync(path.join(pluginsConfigPath, `${name}.json`), "utf-8"))
 }
 
 function generetaPluginConfig(name: string, config: { [key: string]: any }) {
-    fs.writeFileSync(path.join(pluginsConfigPath, `${name}.ini`), ConvertObjectToINI(config), "utf-8")
+    fs.writeFileSync(path.join(pluginsConfigPath, `${name}.json`), JSON.stringify(config), "utf-8")
     return config
 }
 
 function savePluginConfig(name: string, config: { [key: string]: any }) {
-    fs.writeFileSync(path.join(pluginsConfigPath, `${name}.ini`), ConvertObjectToINI(config), "utf-8")
+    fs.writeFileSync(path.join(pluginsConfigPath, `${name}.json`), JSON.stringify(config), "utf-8")
 }
 
 function extractPlugin(folderPlugins: string, type: "official" | "user") {
