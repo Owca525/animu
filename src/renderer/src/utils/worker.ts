@@ -5,7 +5,7 @@ self.onmessage = (event) => {
     try {
         const execute = new Function(
             "data",
-            \`"use strict"; return (\${fn})(data);\`
+            \`return (\${fn})(data);\`
         );
 
         const result = execute(data);
@@ -22,46 +22,66 @@ self.onmessage = (event) => {
     }
 };`
 
-export function Run_hls_manifest_script(fn: string, data: { [key: string]: any }): Promise<any> {
-    const blobCode = new Blob([communication], { type: "text/javascript" });
-    const function_blob = URL.createObjectURL(blobCode);
+export class SheepWorkerInstance {
+    private worker: Worker | undefined
 
-    const worker = new Worker(function_blob);
+    constructor() {
+        const blobCode = new Blob([communication], { type: "text/javascript" });
+        const function_blob = URL.createObjectURL(blobCode);
 
-    // /* IFDEF DEBUG */
-    // console.warn("Worker/Run_hls_manifest_script", fn, data)
-    // /* ENDIF */
+        this.worker = new Worker(function_blob)
+    }
 
-    return new Promise((resolve, reject) => {
-        const handler = (event) => {
-            worker.removeEventListener("message", handler);
-            // /* IFDEF DEBUG */
-            // console.warn("Worker/Run_hls_manifest_script event", event)
-            // /* ENDIF */
-            if (event.data.success) {
-                resolve(event.data.data);
-                worker.terminate()
-            } else {
+    function = async (code: string, data: { [key: string]: any }) => {
+        return new Promise((resolve, reject) => {
+            if (!this.worker) return reject(new Error("worker/SheepWorkerInstance Worker Dosen't exist"))
+
+            const error = (event) => {
+                reject(new Error(event));
+            };
+
+            const handler = (event) => {
+                this.worker!.removeEventListener("message", handler)
+                this.worker!.removeEventListener("messageerror", error)
+                this.worker!.removeEventListener("error", error)
+
+                // /* IFDEF DEBUG */
+                // console.warn("Worker/SheepWorkerInstance event", event)
+                // /* ENDIF */
+
+                if (event["data"]["success"]) {
+                    resolve(event.data.data);
+                }
+
                 reject(new Error(event.data));
-                worker.terminate()
-            }
-        };
+            };
 
-        worker.onmessage = handler;
-        worker.onerror = (ev) => {
-            console.error("Run_hls_manifest_script error", ev)
-            worker.terminate()
-            reject(new Error(`${ev}`));
-        }
-        worker.onmessageerror = (ev) => {
-            console.error("Run_hls_manifest_script onmessageerror", ev)
-            worker.terminate()
-            reject(new Error(`${ev}`));
-        }
+            this.worker.addEventListener("message", handler)
+            this.worker.addEventListener("messageerror", error)
+            this.worker.addEventListener("error", error)
 
-        worker.postMessage({
-            fn: fn,
-            data
-        });
-    });
+            this.worker.postMessage({
+                fn: code,
+                data
+            });
+        })
+    }
+
+    unsafe_function = (code: string, data: { [key: string]: any }) => {
+        try {
+            const execute = new Function(
+                "data",
+                `return (${code})(data);`
+            );
+
+            return execute(data)
+        } catch (error) {
+            console.error("SheepWorkerInstance/unsafe_function", error)
+            return undefined
+        }
+    }
+
+    dispose = () => {
+        this.worker?.terminate()
+    }
 }

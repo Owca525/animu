@@ -7,6 +7,11 @@ import pluginFunctions from "./pluginFunctions.js?raw"
 import { saveConfig } from "./FilesManager/config";
 import { toast, updateToast } from "./context/ToastNotification";
 import { unwrap } from "solid-js/store";
+
+/* IFDEF PROD|WEB */
+import logger from "./logger";
+/* ENDIF */
+
 const blob = new Blob([pluginFunctions], { type: "text/javascript" });
 const pluginFunctionsURL = URL.createObjectURL(blob);
 
@@ -90,6 +95,47 @@ initial()
 `
 
 const WorkerPayload = `
+const originalLog = console.log;
+const originalError = console.error;
+const originalWarn = console.warn;
+const originalDebug = console.debug;
+
+function CutTheText(str) {
+  if (new TextEncoder().encode(str).length <= 64 * 1024) return str;
+  return \`\${str.slice(0, 64)}...\`;
+};
+
+function convertMessageToString(str) {
+    if (str instanceof Error) return \`\${str.message} \${str.cause} \${str.stack}\`;
+    if (typeof str == "object") return CutTheText(JSON.stringify(str));
+    return str;
+}
+
+function send_log(level, message) {
+  self.postMessage({
+    type: "log",
+    level,
+    message: message.map((v) => convertMessageToString(v)).join(" "),
+  });
+}
+
+console.log = (...args) => {
+    send_log("INFO", args);
+    originalLog(...args);
+};
+console.error = (...args) => {
+    send_log("ERROR", args);
+    originalError(...args);
+};
+console.warn = (...args) => {
+    send_log("WARNING", args);
+    originalWarn(...args);
+};
+console.debug = (...args) => {
+    send_log("DEBUG", debug);
+    originalDebug(...args);
+};
+
 
 var window = {
     location: ${JSON.stringify(location)},
@@ -379,6 +425,13 @@ class WorkerWrapper implements WorkerWrapperInstance {
 
         worker.onmessage = async (event: MessageEvent<any>) => {
             const data = event.data
+            
+            /* IFDEF PROD|WEB */
+            if (data["type"] == "log") {
+                logger.AddLog(data["message"], data["level"])
+                return
+            }
+            /* ENDIF */
 
             if (data.type === "RESULT" && data["uuid"]) {
                 const resolve = this.pendingRequest.get(data.uuid);
@@ -565,7 +618,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
             const response = await this.instance.wrapperFunction("home", undefined, true) as any
 
             if ((!response || response["error"] || !response["topCards"] || response["sections"].length <= 0) && localStorage.getItem("information_instance_cache") != undefined) {
-                toast(`${this.metadata.name}: ${response["error"]}`, { type: "error" })
+                toast(`${this.metadata.name}: ${response["error"]}`, { type: "error" })
                 return JSON.parse(localStorage.getItem(`information_instance_cache_${this.metadata.name}`)!)
             }
 

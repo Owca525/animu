@@ -23,7 +23,7 @@ import { getSocket, getSocketRoom, informationCache } from "@renderer/utils/stor
 import MoreInformation from "./components/MoreInformation"
 import { updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist"
 import { SaveHistory } from "@renderer/utils/FilesManager/history"
-import { Run_hls_manifest_script } from "@renderer/utils/worker"
+import { SheepWorkerInstance } from "@renderer/utils/worker"
 
 import SubtitlesOctopus from "@jellyfin/libass-wasm"
 import SubtitlesOctopusWasm from '@jellyfin/libass-wasm/dist/js/subtitles-octopus-worker.js?url'
@@ -168,6 +168,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
     let screenShotContainer: HTMLDivElement | undefined
     let screenshotWrapper: HTMLDivElement | undefined
     let containerRef: HTMLDivElement | undefined
+
+    let sheepworker: SheepWorkerInstance | undefined
 
     let PlayerCleanup = false
 
@@ -621,64 +623,79 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             enableWorker: config.Player.general.useHLSWorker,
             lowLatencyMode: true,
             workerPath: config.Player.general.useHLSWorker ? HLSWorker : undefined,
-            autoStartLoad: true,
-            backBufferLength: 40,
+            
+            autoStartLoad: player.isPlaying,
+
             manifestLoadingMaxRetry: 3,
             levelLoadingMaxRetry: 3,
             fragLoadingMaxRetry: 3,
-            maxBufferLength: 140,
+
+            maxBufferLength: 30,
+            maxMaxBufferLength: 60,
+            backBufferLength: 30,
+
+            abrBandWidthFactor: 0.8,
+            abrBandWidthUpFactor: 0.7,
         }
 
         let manifest_script: player_script_injector[] = player.playerData!["scripts"] ?? []
+        if (manifest_script.length > 0) {
+            sheepworker = new SheepWorkerInstance()
+        }
 
         class sheepLoader extends Hls.DefaultConfig.loader {
             load(context: any, config: any, callbacks: any) {
+                const now = performance.now()
                 request(context.url, { method: "GET", headers: player["currentResolution"]!["reqHeader"] }).then(async (data) => {
-                    let currentData: any = data.text
-                    if (data["status"] == 429) HLS?.destroy()
+                    try {
+                        let currentData: any = data.text
+                        if (data["status"] == 429) HLS?.destroy()
 
-                    // /* IFDEF DEBUG */
-                    // console.warn("Player/HLS", data, context)
-                    // /* ENDIF */
+                        // /* IFDEF DEBUG */
+                        // console.warn("Player/HLS", data, context)
+                        // /* ENDIF */
 
-                    if (!data.success) {
-                        /* IFDEF PROD */
-                        console.warn("Player/HLS", context, data)
-                        /* ENDIF */
-                        callbacks.onError({ type: 'network', details: data["statusText"], fatal: true, code: data["status"] }, context)
-                        return
-                    }
-                    const now = performance.now()
-
-                    if (context.responseType == "arraybuffer") currentData = data.buffer
-
-                    for (let index = 0; index < manifest_script.length; index++) {
-                        const element = manifest_script[index];
-                        switch (element["type"]) {
-                            case "hls_manifest":
-                                if (context["responseType"] != "text") break
-
-                                currentData = await Run_hls_manifest_script(element["code"], data)
-                                break
-                            case "hls_arraybuffer":
-                                if (context["responseType"] != "arraybuffer") break
-
-                                currentData = await Run_hls_manifest_script(element["code"], data)
-                                break
+                        if (!data.success) {
+                            /* IFDEF PROD */
+                            console.warn("Player/HLS", context, data)
+                            /* ENDIF */
+                            callbacks.onError({ type: 'network', details: data["statusText"], fatal: true, code: data["status"] }, context)
+                            return
                         }
-                    }
 
-                    callbacks.onSuccess({ data: currentData, url: context.url }, {
-                        loaded: data.buffer.byteLength,
-                        total: data.buffer.byteLength,
-                        abort: false,
-                        retry: config.maxRetry,
-                        chunkCount: 0,
-                        bwEstimate: 0,
-                        loading: { start: now - 10, first: now - 5, end: now },
-                        parsing: { start: now, end: now },
-                        buffering: { start: now, first: now, end: now }
-                    }, context);
+                        if (context.responseType == "arraybuffer") currentData = data.buffer
+
+                        for (let index = 0; index < manifest_script.length; index++) {
+                            const element = manifest_script[index];
+                            switch (element["type"]) {
+                                case "hls_manifest":
+                                    if (context["responseType"] != "text") break
+
+                                    currentData = await sheepworker!.function(element["code"], data)
+                                    break
+                                case "hls_arraybuffer":
+                                    if (context["responseType"] != "arraybuffer") break
+
+                                    currentData = await sheepworker!.function(element["code"], data)
+                                    break
+                            }
+                        }
+
+                        callbacks.onSuccess({ data: currentData, url: context.url }, {
+                            loaded: data.buffer.byteLength,
+                            total: data.buffer.byteLength,
+                            abort: false,
+                            retry: config.maxRetry,
+                            chunkCount: 0,
+                            bwEstimate: 0,
+                            loading: { start: now - 10, first: now - 5, end: now },
+                            parsing: { start: now, end: now },
+                            buffering: { start: now, first: now, end: now }
+                        }, context);
+                    } catch (error) {
+                        console.error("HLS/sheepLoader", error)
+                        throw error
+                    }
                 });
             }
         }
@@ -803,6 +820,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         if (Shaka) Shaka.destroy()
         if (HLS) HLS.destroy()
         if (currentASSubtitles) currentASSubtitles.dispose()
+        if (sheepworker) sheepworker.dispose()
 
         if (AudioShaka) AudioShaka.destroy()
 
@@ -1066,7 +1084,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         const duration = player.durration
 
         if (duration > 10 && currentTime > (duration - CheckNumber(config.History.continue.MaximizeTimeSave)) && anime.animulist && anime.AnimeData.episodes != undefined) {
-            
+
             if (anime.animulist.status == "CURRENT" && CheckNumber(ep_metadata["current"]["ep"]) >= CheckNumber(anime.AnimeData.episodes)) {
                 updateDataInAnimulist(anime.AnimeData.id, {
                     AnimeData: {
@@ -1207,7 +1225,6 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         };
 
         const octopus = new SubtitlesOctopus(options)
-        console.log(octopus)
 
         currentASSubtitles = octopus
         updatePlayer({ currentSubtitle: sub })

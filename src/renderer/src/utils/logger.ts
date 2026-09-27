@@ -16,8 +16,14 @@ type LogLevel = "INFO" | "WARNING" | "ERROR" | "DEBUG" | "CRITICAL" | "RESET";
 //     RESET: "\x1b[0m \x1b[0m", // Reset
 // };
 
+function CutTheText(str: string) {
+  if (new TextEncoder().encode(str).length <= 64 * 1024) return str;
+  return `${str.slice(0, 64)}...`
+}
+
 class Logger {
     loggingText: string[] = []
+    maxSizeLog = 512
 
     // private decorateLevel(level: LogLevel): string {
     //     return LOG_COLORS[level].replace(" ", level);
@@ -44,18 +50,26 @@ class Logger {
     }
 
     private convertMessageToString(str: any): string {
-        if (str instanceof Error) return `${str.message} ${str.cause}`
-        if (typeof str == "object") return JSON.stringify(str)
+        if (str instanceof Error) return `${str.message} ${str.cause} ${str.stack}`
+        if (typeof str == "object") return CutTheText(JSON.stringify(str))
         return str
     }
 
     private formatMessage(level: LogLevel, message: any[]) {
+        if (this.loggingText.length > this.maxSizeLog) {
+            this.loggingText.shift()
+        }
+
         const date = new Date()
         const formatedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
         this.loggingText.push(`[${formatedDate} ${date.toLocaleTimeString("en-EN", { hour12: false })}] [${level}] ${message.map((v) => this.convertMessageToString(v)).join(" ")}\n`)
 
         return message;
+    }
+
+    public AddLog(str: string, level: string) {
+        this.formatMessage(level as any, [str])
     }
 
     info(...args: any[]) {

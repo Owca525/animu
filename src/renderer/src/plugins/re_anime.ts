@@ -45,52 +45,53 @@ const decryptor_content = `(response) => {
     return (new TextDecoder).decode(new Uint8Array(str))
 }`
 
+
 const hls_converter = `(response) => {
     let buffer = response["buffer"]
 
-    if (response["url"].includes(".webp") || response["url"].includes(".png")) {
-        let l = null;
+    if (response["url"].endsWith(".webp") || response["url"].endsWith(".png")) {
         const u = new Uint8Array(buffer);
-        let d = true;
 
-        if (u.length >= 12 && u[0] === 82 && u[1] === 73 && u[2] === 70 && u[3] === 70 && u[8] === 87 && u[9] === 69 && u[10] === 66 && u[11] === 80) {
-            l = buffer.slice(12);
-            if (u.length >= 13 && u[12] === 71) {
-                d = false;
-            }
+        let offset = 0;
+
+        if (u.length >= 12 && [u[0], u[1], u[2], u[3], u[8], u[9], u[10], u[11]] == [0x52, 0x49, 0x46, 0x46, 0x57, 0x45, 0x42, 0x50]) {
+            offset = 12;
         }
 
-        else if (u.length >= 8 && u[0] === 137 && u[1] === 80 && u[2] === 78 && u[3] === 71 && u[4] === 13 && u[5] === 10 && u[6] === 26 && u[7] === 10) {
-            l = buffer.slice(8);
-
-            if (u.length >= 9 && u[8] === 71) {
-                d = false;
-            }
+        if (u.length >= 8 && [u[0], u[1], u[2], u[3], u[4], u[5], u[6], u[7]] == [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]) {
+            offset = 8;
         }
 
-        if (l !== null) {
-            if (d) {
-                const h = [
-                    157, 42, 241, 71,
-                    179, 142, 92, 112,
-                    166, 25, 228, 59,
-                    216, 98, 15, 197,
-                ];
+        if (!offset) return buffer
 
-                const f = new Uint8Array(l);
+        if (u[offset] !== 0x47) {
+            let data = u.subarray(offset);
+            const key = [
+                157, 42, 241, 71,
+                179, 142, 92, 112,
+                166, 25, 228, 59,
+                216, 98, 15, 197
+            ];
 
-                for (let c = 0; c < f.length; c++) {
-                    f[c] ^= h[15 & c];
-                }
+            data.forEach((_, i) => {
+                data[i] ^= key[i & 15];
+            })
 
-                buffer = f.buffer;
-            } else {
-                buffer = l;
-            }
+            buffer = data.buffer.slice(
+                data.byteOffset,
+                data.byteOffset + data.byteLength
+            );
+        } else {
+            buffer = u.buffer.slice(
+                u.byteOffset + offset,
+                u.byteOffset + u.byteLength
+            );
         }
     }
-    return buffer
+
+    return buffer;
 }`
+
 
 // function DecyrptContent(encode_content: string, secret: string) {
 //     let str: number[] = [];

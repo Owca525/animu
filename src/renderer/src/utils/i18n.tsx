@@ -1,12 +1,17 @@
 import { createContext, useContext, createSignal, onMount } from "solid-js";
 import en from "./lang/en.json"
 
-async function getAllLangFiles() {
+async function getAllLangFiles(getFresh = false) {
   /* IFDEF WEB */
   if (window["animuAppInfo"]["langs"]) return { en: en, ...window["animuAppInfo"]["langs"] }
   /* ENDIF */
   /* IFDEF DEBUG|PROD */
-  let langFiles = await window.api.getUserLang()
+  let langFiles = window["initialMetadata"]["user_lang"]
+
+  if (getFresh) {
+    langFiles = await window.api.getUserLang()
+  }
+
   let res = {}
   for (let index = 0; index < langFiles.length; index++) {
     const element = langFiles[index];
@@ -62,8 +67,8 @@ function getValueByPath<T>(obj: T, path: string): string {
 }
 
 export function I18nProvider(props: { config: i18nConfig; children: any }) {
-  const [currentLang, changeLanguage] = createSignal(props.config.defaultLang ? props.config.defaultLang :"en");
-  const [dictionaries, setDictionaries] = createSignal<Dictionaries>({})
+  const [currentLang, changeLanguage] = createSignal(props.config.defaultLang ? props.config.defaultLang : "en");
+  const [dictionaries, setDictionaries] = createSignal<Dictionaries>(window["animuAppInfo"]["langs"])
 
   onMount(async () => {
     setDictionaries(await getAllLangFiles())

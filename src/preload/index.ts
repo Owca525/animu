@@ -112,7 +112,7 @@ if (process.contextIsolated) {
       reload: () => ipcRenderer.send("window:reload"),
       createWindow: (props) => ipcRenderer.invoke("window:createNewWindow", props),
     });
-    contextBridge.exposeInMainWorld("initialMetadata", ipcRenderer.invoke('initialMetadata'))
+    contextBridge.exposeInMainWorld("tmpData", ipcRenderer.invoke('initialMetadata'))
   } catch (error) {
     console.error(error);
   }

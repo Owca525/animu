@@ -11,16 +11,14 @@ import "material-symbols/outlined.css"
 import { SocketProvider } from './utils/context/SocketContext';
 import LocalErrorBoundary from './utils/ErrorBoundary';
 import DebugContext from './utils/context/debugContext';
+
+/* IFDEF PROD|WEB */
+import './utils/logger';
+/* ENDIF */
+
 import { ErrorCreatorContext } from './utils/context/GlobalErrorContext';
 
 (window as any).animuAppInfo = "PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION";
-/* IFDEF WEB */
-window["api"] = {
-  yt_dlp: {
-    run: () => {}
-  }
-} as any
-/* ENDIF */
 
 // /* IFDEF DEBUG */
 // const originalAddEventListener = document.addEventListener;
@@ -44,14 +42,14 @@ import.meta.glob("./WebComponents/*.ts", {
 })
 
 window["animuHeader"] = {
-    "User-Agent": navigator.userAgent,
-    Accept: "*/*",
-    "Sec-GPC": "1",
-    Connection: "keep-alive",
-    "Sec-Fetch-Dest": "empty",
-    "Sec-Fetch-Mode": "cors",
-    "Sec-Fetch-Site": "cross-site",
-    "sec-ch-ua-platform": '"Windows"'
+  "User-Agent": navigator.userAgent,
+  Accept: "*/*",
+  "Sec-GPC": "1",
+  Connection: "keep-alive",
+  "Sec-Fetch-Dest": "empty",
+  "Sec-Fetch-Mode": "cors",
+  "Sec-Fetch-Site": "cross-site",
+  "sec-ch-ua-platform": '"Windows"'
 }
 
 try {
@@ -61,35 +59,40 @@ try {
 
   window["animu_timer"] = Number(localStorage.getItem("animu_time"))
   window["animu_timer_interval"] = setInterval(() => {
-    window["animu_timer"] = window["animu_timer"] + 1
+    window["animu_timer"] = window["animu_timer"] + 5
 
     localStorage.setItem("animu_time", `${window["animu_timer"]}`)
-  }, 1000)
+  }, 5000)
 } catch (error) {
   console.error("Failed Run Timer", error)
 }
 
-render(
-  () => (
-    <ErrorBoundary fallback={LocalErrorBoundary}>
-      <ErrorCreatorContext>
-        <DebugContext>
-          <I18nProvider config={{ defaultLang: "en", fallbackLang: "en" }}>
-            <MenuContextProvider>
-              <SocketProvider>
-                <DialogProvider>
-                  <ContextMenu>
-                    <ToastProvider>
-                      <App />
-                    </ToastProvider>
-                  </ContextMenu>
-                </DialogProvider>
-              </SocketProvider>
-            </MenuContextProvider>
-          </I18nProvider>
-        </DebugContext>
-      </ErrorCreatorContext>
-    </ErrorBoundary>
-  ),
-  document.getElementById("root") as HTMLElement
-);
+(async () => {
+  const variable = await window["tmpData"]
+  window["initialMetadata"] = variable
+
+  render(
+    () => (
+      <I18nProvider config={{ defaultLang: window["initialMetadata"]["config"]["General"]["language"], fallbackLang: "en" }}>
+        <ErrorBoundary fallback={LocalErrorBoundary}>
+          <ErrorCreatorContext>
+            <DebugContext>
+              <MenuContextProvider>
+                <SocketProvider>
+                  <DialogProvider>
+                    <ContextMenu>
+                      <ToastProvider>
+                        <App />
+                      </ToastProvider>
+                    </ContextMenu>
+                  </DialogProvider>
+                </SocketProvider>
+              </MenuContextProvider>
+            </DebugContext>
+          </ErrorCreatorContext>
+        </ErrorBoundary>
+      </I18nProvider>
+    ),
+    document.getElementById("root") as HTMLElement
+  );
+})();

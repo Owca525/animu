@@ -26,10 +26,9 @@ import { convertHistoryToAnimuList, setNewAnimuList } from './utils/FilesManager
 import { CreateBackup } from './utils/backup';
 import {
   createSignal,
-  Match,
   onMount,
+  Show,
   Suspense,
-  Switch
 } from 'solid-js';
 import { defaultConfigWeb, saveConfig } from './utils/FilesManager/config';
 import {
@@ -84,10 +83,6 @@ import { hideCustomMenu } from './utils/context/menuContext';
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
 
-// /* IFDEF PROD */
-// import './utils/logger';
-// /* ENDIF */
-
 (window as any).ServiceManager = () => ServiceManager;
 
 function App() {
@@ -136,6 +131,21 @@ function App() {
     toast(t("global.incognitomode", { switch: getGlobalCache().incognito ? t("global.on") : t("global.off") }))
   })
 
+  /* IFDEF WEB|PROD */
+  SheepShortcut(["F8"], () => {
+    if (!window["logger"]) return
+
+    try {
+      window["logger"].saveLogs()
+      toast(t("Succesfully Saved Logs in Animu Appdata Folder"), { type: "success" })
+    } catch (error) {
+      console.error("App/SheepShortcut Failed Save Logs", error)
+      toast(t("Failed Save Logs"), { type: "error" })
+    }
+    
+  })
+  /* ENDIF */
+
   SheepShortcut(["ESC"], () => {
     hideCustomMenu()
   })
@@ -183,7 +193,7 @@ function App() {
       /* ENDIF */
 
       /* IFDEF DEBUG|PROD */
-      const metadata = await window["initialMetadata"]
+      const metadata = window["initialMetadata"]
       UpdateUserData({
         ...metadata.user,
         animu_time: window["animu_timer"]
@@ -279,8 +289,8 @@ function App() {
   }
 
   return (
-    <Switch>
-      <Match when={isInitation()}>
+    <>
+      <Show when={isInitation()}>
         <main class='animu-initial-container'>
           <span></span>
           <img src={icon} alt="Animu Icon" class='animu-initial-icon' />
@@ -292,8 +302,8 @@ function App() {
           </div>
           <span class='material-symbols-outlined loading-animation icon'>progress_activity</span>
         </main>
-      </Match>
-      <Match when={!isInitation()}>
+      </Show>
+      <Show when={!isInitation()}>
         <HashRouter>
           <Suspense >
             <Route path="/" component={Home} />
@@ -302,8 +312,8 @@ function App() {
             <Route path="/player" component={Player} />
           </Suspense>
         </HashRouter>
-      </Match>
-    </Switch>
+      </Show>
+    </>
   )
 }
 

@@ -98,6 +98,7 @@ class SheepImage extends HTMLElement {
 
         this.ImageRef.onload = (ev) => {
             this.loadingImg = false
+            this.errorImg = false
 
             if (this.ImageRef) {
                 this.ImageRef.style.display = ""

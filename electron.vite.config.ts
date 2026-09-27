@@ -227,12 +227,12 @@ function compileRawModule() {
 
       const file = id.replace("?compiledRaw", "");
 
-      const code = fs.readFileSync(file, "utf8");
+      const code = ConditionTransform(fs.readFileSync(file, "utf8"), globalFlags);
       let isDissabled = false
       if (code.startsWith("// DISSABLE")) isDissabled = true
 
       const result = await transformWithEsbuild(
-        ConditionTransform(code, globalFlags),
+        code,
         file,
         {
           loader: "ts",

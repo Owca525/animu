@@ -145,7 +145,7 @@ export function getFolderPath(folderPath: string) {
     }
 }
 
-ipcMain.handle('lang:files', async (): Promise<{ content: string, lang: string }[]> => {
+export async function GetUserLangs():Promise<{ content: string, lang: string }[]> {
     const userLangPath = checkConfigFolder("lang")
     if (!userLangPath) return []
 
@@ -159,7 +159,9 @@ ipcMain.handle('lang:files', async (): Promise<{ content: string, lang: string }
     })
 
     return userLangList.filter((data) => data.lang != "")
-});
+}
+
+ipcMain.handle('lang:files', GetUserLangs);
 
 export function checkConfigFolder(folder: string): string | undefined {
     if (fs.existsSync(`${newConfigPath}/${folder}`)) return `${newConfigPath}/${folder}`

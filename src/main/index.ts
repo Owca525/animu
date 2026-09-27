@@ -17,7 +17,7 @@ import "./plugins"
 import { convertToNewFormat, detectOldVersion, write } from './os'
 import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync } from 'fs'
 import { cardData, defaultConfig, SettingsConfig, UserData } from './types';
-import { advanceRequest, checkConfigFolder, deepMerge, detectZoom, FindFile, setupDiscordRPC } from './utils';
+import { advanceRequest, checkConfigFolder, deepMerge, detectZoom, FindFile, GetUserLangs, setupDiscordRPC } from './utils';
 import { electronAppUniversalProtocolClient } from 'electron-app-universal-protocol-client';
 import { checkDatabase } from './animulist';
 import { ParseINI } from './iniParser';
@@ -376,13 +376,14 @@ process.on('unhandledRejection', console.error)
 
 ipcMain.handle('backend:refresh', () => initialBackend());
 
-ipcMain.handle('initialMetadata', () => ({ 
+ipcMain.handle('initialMetadata', async () => ({ 
   config: config, 
   history: historyData, 
   animulist: checkDatabase(), 
   theme: getThemeList(checkConfigFolder("themes")),
   port: server.port,
-  user: user_data
+  user: user_data,
+  user_lang: await GetUserLangs()
 }));
 
 ipcMain.handle('backend:customheader', (_, header: Record<string, string | string[]> | undefined) => customheader = header);
