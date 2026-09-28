@@ -100,7 +100,7 @@ if (process.contextIsolated) {
       refresh: () => ipcRenderer.invoke("backend:refresh"),
       debug: () => ipcRenderer.invoke("debug:memory")
     });
-    contextBridge.exposeInMainWorld("electronAPI", electronAPI)
+    // contextBridge.exposeInMainWorld("electronAPI", electronAPI)
     contextBridge.exposeInMainWorld("BrowserWindow", {
       setMaximize: () => ipcRenderer.send("window:maximize"),
       setFullscreen: (option: boolean) =>

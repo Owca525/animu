@@ -34,6 +34,7 @@ export interface SettingsConfig {
         repoURL: string[]
         pluginCheckType: "On Start" | "Every Day" | "Every Week"
         lastTimeCheck: number
+        userWorker: boolean
     }
     General: {
         // HoverSidebar: boolean

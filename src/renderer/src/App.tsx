@@ -155,6 +155,17 @@ function App() {
       /* IFDEF WEB */
       /* ENDIF */
 
+      /* IFDEF DEBUG|PROD */
+      const metadata = window["initialMetadata"]
+      UpdateUserData({
+        ...metadata.user,
+        animu_time: window["animu_timer"]
+      })
+      window["serverPort"] = metadata["port"]
+      setConfig(metadata["config"])
+      setNewHistory(metadata["history"])
+      /* ENDIF */
+
       try {
         const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
         const time = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])
@@ -193,17 +204,6 @@ function App() {
       /* ENDIF */
 
       /* IFDEF DEBUG|PROD */
-      const metadata = window["initialMetadata"]
-      UpdateUserData({
-        ...metadata.user,
-        animu_time: window["animu_timer"]
-      })
-      window["serverPort"] = metadata["port"]
-      setConfig(metadata["config"])
-      setNewHistory(metadata["history"])
-      /* ENDIF */
-
-      /* IFDEF DEBUG|PROD */
       setinitialState({ text: "initial.theme", plugin: false })
       setGlobalTheme([
         ...window["animuAppInfo"]["themes"],
@@ -238,6 +238,7 @@ function App() {
       await window.api.user.change(JSON.parse(JSON.stringify(GetUser())))
       /* ENDIF */
     } catch (error) {
+      console.error("Failed Load Animu", error)
       createGlobalError(error)
     }
   })

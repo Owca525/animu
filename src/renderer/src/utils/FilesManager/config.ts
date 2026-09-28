@@ -25,6 +25,4 @@ export async function UpdateConfig(path: string, val: string | boolean | number)
     return await saveConfig(updateObject(path, val, getConfig()))
 }
 
-/* IFDEF WEB */
 export const defaultConfigWeb: SettingsConfig = config as SettingsConfig;
-/* ENDIF */

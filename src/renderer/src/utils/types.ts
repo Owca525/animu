@@ -402,7 +402,7 @@ export interface informationPluginFormat {
 }
 
 export interface WorkerWrapperInstance {
-    instance: Worker
+    instance: Worker | undefined
     pendingRequest: Map<string, (value: unknown) => void>
     otherDataPermision: boolean
 
@@ -520,6 +520,7 @@ export interface SettingsConfig {
         repoURL: string[]
         pluginCheckType: "On Start" | "Every Day" | "Every Week"
         lastTimeCheck: number
+        userWorker: boolean
     }
     General: {
         // HoverSidebar: boolean

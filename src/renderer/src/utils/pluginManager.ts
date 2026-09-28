@@ -4,7 +4,7 @@ import { getConfig } from "./stores/config";
 import { checkTimeDriffrentUnix, CreateSHA256, dateToUnix, detectIndex, getPluginsList, request, requestCloudflare, updateObject } from "./functions";
 import semver from "semver";
 import pluginFunctions from "./pluginFunctions.js?raw"
-import { saveConfig } from "./FilesManager/config";
+import { defaultConfigWeb, saveConfig } from "./FilesManager/config";
 import { toast, updateToast } from "./context/ToastNotification";
 import { unwrap } from "solid-js/store";
 
@@ -14,23 +14,6 @@ import logger from "./logger";
 
 const blob = new Blob([pluginFunctions], { type: "text/javascript" });
 const pluginFunctionsURL = URL.createObjectURL(blob);
-
-const availbeFunctions: { name: string, func: (...args) => Promise<any>, ignore?: boolean }[] = [{
-    name: "request",
-    func: request as any
-},
-/* IFDEF DEBUG|PROD */
-{
-    name: "yt-dlp",
-    func: window.api.yt_dlp.run
-},
-{
-    name: "requestCloudflare",
-    func: requestCloudflare,
-    ignore: true,
-}
-/* ENDIF */
-]
 
 const workerDummyimport = `
 export const SheepFinderAnime2000 = () => {};
@@ -290,7 +273,10 @@ import("CHANGETOPLUGIN").then((v) => {
 `
 
 class WorkerWrapper implements WorkerWrapperInstance {
-    instance: Worker = undefined as any
+    instance: Worker | undefined 
+
+    plugin_instance: playerPluginInstanceFormat | informationPluginFormat | undefined
+
     pendingRequest = new Map<string, (value: unknown) => void>()
     otherDataPermision: boolean = false
     ignoreFunctions: boolean = false
@@ -310,6 +296,14 @@ class WorkerWrapper implements WorkerWrapperInstance {
     }
 
     wrapperFunction = async (func: string, value?: { [key: string]: any }, stay: boolean = false): Promise<any> => {
+        if (this.plugin_instance) {
+            try {
+                return await this.plugin_instance[func](...Object.values(value ?? {}))
+            } catch (error) {
+                return undefined
+            }
+        }
+
         return new Promise((resolve, reject) => {
             if (!this.instance) return reject(new Error("Instance Dosen't Exist"))
             const id = crypto.randomUUID();
@@ -382,8 +376,48 @@ class WorkerWrapper implements WorkerWrapperInstance {
         return finalObject
     }
 
-    runInstance = async (pluginCode: string, config?: { [key: string]: any }, ignore: boolean = false): Promise<PluginMetadataFormat> => {
-        this.ignoreFunctions = ignore
+    runInstancePlugin = async (pluginCode: string, config?: { [key: string]: any }): Promise<PluginMetadataFormat> => {
+        const randomuuid = crypto.randomUUID()
+
+        window[randomuuid] = {
+            request: request,
+            yt_dlp: window.api.yt_dlp,
+            requestCloudflare: requestCloudflare,
+            savePluginConfig: () => {},
+            getConfig: () => defaultConfigWeb
+        }
+
+        const functionblob = new Blob([pluginFunctions.replaceAll("CHANGE_THIS_FOR_UUID_BEACUSE_INSTANCE", randomuuid)], { type: "text/javascript" });
+        const pluginFunctionsURL = URL.createObjectURL(functionblob);
+
+        const blob = new Blob([detectIndex(pluginCode, pluginFunctionsURL)], { type: "text/javascript" });
+        const plugin = URL.createObjectURL(blob);
+
+        try {
+            const module = await import(/* @vite-ignore */ plugin);
+            delete window[randomuuid]
+            
+            if (!module["default"]) throw new Error("Failed Find Module")
+
+            this.plugin_instance = new module["default"]
+            if (!this.plugin_instance) return this.pluginData 
+
+            this.pluginData = this.plugin_instance["metadata"]
+
+            this.plugin_instance["config"] = config
+            
+
+            return this.plugin_instance["metadata"]
+        } finally {
+            URL.revokeObjectURL(plugin);
+            delete window[randomuuid]
+        }
+    }
+
+    runInstance = async (pluginCode: string, config?: { [key: string]: any }): Promise<PluginMetadataFormat> => {
+        if (getConfig()["plugins"]["userWorker"] == false) {
+            return await this.runInstancePlugin(pluginCode, config)
+        }
 
         if (!pluginCode.startsWith("http")) {
             const blobCode = new Blob([detectIndex(pluginCode, pluginFunctionsURL)], { type: "text/javascript" });
@@ -425,7 +459,7 @@ class WorkerWrapper implements WorkerWrapperInstance {
 
         worker.onmessage = async (event: MessageEvent<any>) => {
             const data = event.data
-            
+
             /* IFDEF PROD|WEB */
             if (data["type"] == "log") {
                 logger.AddLog(data["message"], data["level"])
@@ -474,6 +508,23 @@ class WorkerWrapper implements WorkerWrapperInstance {
                     return
                 }
 
+                const availbeFunctions: { name: string, func: (...args) => Promise<any>, ignore?: boolean }[] = [{
+                    name: "request",
+                    func: request as any
+                },
+                /* IFDEF DEBUG|PROD */
+                {
+                    name: "yt-dlp",
+                    func: window.api.yt_dlp.run
+                },
+                {
+                    name: "requestCloudflare",
+                    func: requestCloudflare,
+                    ignore: true,
+                }
+                /* ENDIF */
+                ]
+
                 const tmp = availbeFunctions.find((v) => v["name"] == data["value"])
                 if (!tmp) {
                     worker.postMessage({
@@ -484,7 +535,7 @@ class WorkerWrapper implements WorkerWrapperInstance {
                     return
                 }
 
-                if (tmp["ignore"] && this.ignoreFunctions) {
+                if (tmp["ignore"]) {
                     worker.postMessage({
                         type: "RESULT",
                         value: undefined,
@@ -769,7 +820,7 @@ export class PluginManager implements PluginManagerFormat {
             if (element["serverStatus"] && !hard) return
 
             const tmp = new WorkerWrapper
-            await tmp.runInstance(element["code"], element["config"], true)
+            await tmp.runInstance(element["code"], element["config"])
 
             tmp.wrapperFunction("raportStatus").then((results) => {
                 if (!results || typeof results != "object") {

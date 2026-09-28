@@ -1,4 +1,6 @@
 
+const context = window["CHANGE_THIS_FOR_UUID_BEACUSE_INSTANCE"]
+
 /**
  *
  * @export
@@ -9,7 +11,7 @@
 export function SheepFinderAnime2000(animeList, anime) {
     try {
         if (anime.id != "") {
-            console.log("ID Check")
+            // console.log("ID Check")
             const findedID = animeList.find((item) => item.id == anime.id)
             if (findedID) return findedID.player_ID
         }
@@ -244,6 +246,9 @@ export function getWeek() {
  */
 export async function request(url, options, noCors = false) {
     try {
+
+        if (context) return await context["request"](url, options, noCors)
+
         let server = "/api/request"
         if (window["serverPort"]) server = `http://localhost:${window["serverPort"]}/api/request`
         const response = await fetch(noCors ? url : server, noCors ? options : {
@@ -309,6 +314,7 @@ export async function request(url, options, noCors = false) {
  * @returns {{ [key: string]: any; }} 
  */
 export async function runYT_DLP(commands) {
+    if (context) return await context["yt_dlp"](commands)
     return await window["yt_dlp"](commands)
     // return await window.api.yt_dlp.run(url, commands)
 }
@@ -412,6 +418,8 @@ export function timeCovertToMs(time) {
 }
 
 export const getConfig = () => {
+    if (context) return context["getConfig"]()
+
     if (typeof window["config"] == "string") return
     return window["config"]
 };
@@ -424,6 +432,7 @@ export const getGlobalCache = () => {};
  * @returns {Promise<{ cookies: string, headers: { [key: string]: string } }>} 
  */
 export function requestCloudflare(url) {
+    if (context) return context["requestCloudflare"](url)
     return window["requestCloudflare"](url)
 }
 
@@ -434,5 +443,6 @@ export function requestCloudflare(url) {
  * @returns {void} 
  */
 export function savePluginConfig(config) {
+    if (context) return context["savePluginConfig"](config)
     return window["savePluginConfig"](config)
 }

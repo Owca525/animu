@@ -81,7 +81,7 @@ function settings() {
     const [config, setNewConfig] = createSignal<{ old: SettingsConfig, new: SettingsConfig }>({ old: structuredClone(cfg), new: structuredClone(cfg) })
     const [themes, setThemes] = createSignal<themeMetadata[]>([])
     const [lastActiveTheme, setLastActiveTheme] = createSignal<Map<number, themeMetadata>>(new Map())
-    const [versions] = createSignal(window.api ? window.electronAPI.process.versions : undefined)
+    const [versions] = createSignal(window["animuAppInfo"]["ver"])
     const [isSaving, setSaving] = createSignal<boolean>(false)
 
     const [audioOutput, setaudioOutput] = createSignal<MediaDeviceInfo[]>([])
@@ -1539,6 +1539,16 @@ function settings() {
                                 checked={config().new.plugins.userPlugins}
                                 onChecked={(checked) =>
                                     handleChange('plugins.userPlugins', checked)
+                                }
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("Use Worker")}
+                            <CheckBox
+                                checked={config().new.plugins.userWorker}
+                                onChecked={(checked) =>
+                                    handleChange('plugins.userWorker', checked)
                                 }
                             />
                         </div>

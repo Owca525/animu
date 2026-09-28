@@ -104,7 +104,7 @@ declare global {
       refresh: () => Promise<void>
       debug: () => Promise<{ rss: number, heapUsed: number, heapTotal: number }>
     };
-    electronAPI: ElectronAPI
+    // electronAPI: ElectronAPI
     BrowserWindow: {
       setMaximize: () => void;
       setFullscreen: (option: boolean) => void;
