@@ -30,6 +30,7 @@ import { removeToast, toast, updateToast } from './context/ToastNotification';
 import { readPlaylist, updatePlaylist } from './FilesManager/playlist';
 import pluginManager, { playerPluginInstance } from './pluginManager';
 import { sendNotification } from "./NotificationManager"
+import { JSX } from 'solid-js';
 
 export function decodeHtmlEntities(str: string | undefined) {
     if (!str) return ""
@@ -171,18 +172,20 @@ export function convertMsToMinutes(ms: number): number {
 export async function refetchHistory() {
     let data: homeData = getHomeCache()
     if (data.activePage != "global.history") return
+    if (typeof data == "function") return
+
     let history = getHistory()
-    if (data.data.sections[0].title == "global.continuewatch" && data.data.sections.length != 2) {
+    if (data["data"]["sections"][0].title == "global.continuewatch" && data["data"]["sections"].length != 2) {
         setHomeNewData({ sections: [{ title: "global.continuewatch", data: history.continue, horizontal: false }] })
         return
     }
 
-    if (data.data.sections[0].title == "global.history" && data.data.sections.length != 2) {
+    if (data["data"]["sections"][0].title == "global.history" && data["data"]["sections"].length != 2) {
         setHomeNewData({ sections: [{ title: "global.history", data: history.history as cardData[], horizontal: false }] })
         return
     }
 
-    if (data.data.sections[0].title == "global.continuewatch" && data.data.sections[1].title == "global.history") {
+    if (data["data"]["sections"][0].title == "global.continuewatch" && data["data"]["sections"][1].title == "global.history") {
         setHomeNewData({
             sections: [
                 {
@@ -595,12 +598,13 @@ export function detectIndex(str: string, customINDEX: string = "") {
     else return str.replaceAll(`"index.js"`, `"${index}"`)
 }
 
-export async function setHomeData(wrapper?: (() => Promise<homeData["data"] | containerData | undefined | { error: string }>) | homeData["data"] | containerData) {
+export async function setHomeData(wrapper?: (() => Promise<homeData["data"] | containerData | undefined | { error: string }>) | homeData["data"] | containerData | (() => JSX.Element)) {
     const uuid = crypto.randomUUID()
     if (!wrapper) return
     try {
         setGlobalToken(uuid)
         setAllHomeData({ data: { sections: [] }, isLoading: true, isError: false } as any)
+
         if (typeof wrapper == "object" && "sections" in wrapper) {
             setAllHomeData({ data: wrapper, isLoading: false, isError: false } as any)
             return
@@ -610,9 +614,16 @@ export async function setHomeData(wrapper?: (() => Promise<homeData["data"] | co
             return
         }
 
-        const respons = await wrapper()
+        if (!(wrapper() instanceof Promise)) {
+            setAllHomeData({ data: wrapper, isLoading: false, isError: false } as any)
+            return
+        }
+
+        const respons: any = await wrapper()
         if (getGlobalCache().token && getGlobalCache().token != uuid) return
+        
         if (!respons || respons["error"]) return setAllHomeData({ data: { sections: [] }, isLoading: false, isError: respons ? respons["error"] : true } as any)
+        
         if ("sections" in respons) return setAllHomeData({ data: respons, isLoading: false, isError: false } as any)
         setAllHomeData({ data: { sections: [respons] }, isLoading: false, isError: false } as any)
     } catch (error) {

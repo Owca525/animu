@@ -1,4 +1,5 @@
 import { Socket } from "socket.io-client"
+import { JSX } from "solid-js"
 
 // export const notificationProps = {
 //     closeOnClick: true,
@@ -150,7 +151,7 @@ export interface AnimeData {
 }
 
 export interface homeData {
-    data: { topCards?: containerData, sections: containerData[] }
+    data: (() => JSX.Element) | { topCards?: containerData, sections: containerData[] }
     isLoading: boolean
     isError: undefined | string | boolean
     search: string

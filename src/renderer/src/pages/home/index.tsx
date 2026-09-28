@@ -64,6 +64,7 @@ export function setNewActivePage(text: string, overwrite: boolean = true) {
 
 const Home = () => {
   const plugin = getInformationPlugin()
+
   const [homeCache] = createSignal<homeData>(getHomeCache());
   // const pluginPlayer = getPlayerPLugin();
   const [isOpenSidebar, setOpenSidebar] = createSignal<boolean>(false);
@@ -132,7 +133,7 @@ const Home = () => {
 
   return (
     <main
-      class={`home-main ${homeCache().data && !homeCache().data.topCards ? "active" : ""}`}
+      class={`home-main ${typeof homeCache().data == "object" && !homeCache()["data"]["topCards"] ? "active" : ""}`}
       onContextMenu={OpenContextMenu}
     >
       <Sidebar
@@ -144,16 +145,16 @@ const Home = () => {
         onClickTopButtons={setNewActivePage}
       />
 
-      <div class={`home-header-container ${homeCache().data && !homeCache().data.topCards ? "active" : ""} ${headerActive() ? "color" : ""}`}>
+      <div class={`home-header-container ${typeof homeCache().data == "object" && !homeCache()["data"]["topCards"] ? "active" : ""} ${headerActive() ? "color" : ""}`}>
         <Button
           icon="menu"
-          ButtonClass={`${homeCache().data && homeCache().data.topCards ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
+          ButtonClass={`${typeof homeCache().data == "object" && homeCache()["data"]["topCards"]  ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
           onClick={() => setOpenSidebar((prev) => !prev)}
         />
         <div class="home-header-search">
           <Input
             placeholder={t(`search.${activeHomePage().split(".")[1]}`)}
-            InputClass={`${homeCache().data && homeCache().data.topCards ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
+            InputClass={`${typeof homeCache().data == "object" && homeCache()["data"]["topCards"]  ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
             defaultValue={homeCache().search}
             onKeyDown={(search: string) => { StartHomeSearch(search, homeCache().filterTags) }}
           />
@@ -161,7 +162,7 @@ const Home = () => {
             <Filter
               onChange={(params: FilterParams | undefined) => { StartHomeSearch(homeCache().search, params) }}
               filter={[...plugin.metadata.searchOption!, ...checkOtherFilters()]}
-              custonClass={`${homeCache().data && homeCache().data.topCards ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
+              custonClass={`${typeof homeCache().data == "object" && homeCache()["data"]["topCards"]  ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
             />
           </div>
           <Show when={getHomeCache().activePage == "global.schedule"}>
@@ -185,22 +186,31 @@ const Home = () => {
               </div>
             </div>
           </Match>
+
           <Match when={homeCache().isError && homeCache().isLoading == false}>
             <div class="home-notification-container">
               <span class="material-symbols-outlined icon">
                 error
               </span>
+
               <Show when={typeof homeCache().isError == "boolean"}>
                 {t("home.error")}
               </Show>
+
               <Show when={typeof homeCache().isError == "string"}>
                 <span class='home-error-notification'>
                   {t(homeCache().isError as string)}
                 </span>
               </Show>
+
             </div>
           </Match>
-          <Match when={!homeCache().isError && homeCache().isLoading == false && homeCache().data && homeCache().data.sections && homeCache().data.sections.length <= 0}>
+
+          <Match when={!homeCache().isError && homeCache().isLoading == false && typeof homeCache().data == "function"}>
+            {(homeCache()["data"] as any)()}
+          </Match>
+
+          <Match when={!homeCache().isError && homeCache().isLoading == false && typeof homeCache().data == "object" && homeCache()["data"]["sections"] && homeCache()["data"]["sections"].length <= 0}>
             <div class="home-notification-container">
               <span class="material-symbols-outlined icon">
                 search_off
@@ -208,15 +218,18 @@ const Home = () => {
               {t("home.nothingfound")}
             </div>
           </Match>
-          <Match when={homeCache().isLoading == false && !homeCache().isError && homeCache().data && homeCache().data.sections && homeCache().data.sections.length > 0}>
-            <Show when={homeCache().data && homeCache().data.topCards}>
-              <BigCardsContainer data={homeCache().data.topCards as containerData} />
+
+          <Match when={homeCache().isLoading == false && !homeCache().isError && typeof homeCache().data == "object" && homeCache()["data"]["sections"] && homeCache()["data"]["sections"].length > 0}>
+            
+            <Show when={homeCache()["data"] && homeCache()["data"]["topCards"]}>
+              <BigCardsContainer data={homeCache()["data"]["topCards"] as containerData} />
             </Show>
-            <For each={homeCache().data.sections}>
+
+            <For each={homeCache()["data"]["sections"]}>
               {(element) => (
                 <Container
                   tags={
-                    homeCache().filterTags && homeCache().data && homeCache().data.sections.length == 1
+                    homeCache().filterTags && homeCache()["data"] && homeCache()["data"]["sections"].length == 1
                       ? CreateTagList()
                       : undefined
                   }
@@ -230,7 +243,9 @@ const Home = () => {
                 />
               )}
             </For>
+
           </Match>
+
         </Switch>
       </div>
       {/* <WelcomeScreen /> */}
