@@ -55,13 +55,13 @@ function generateToken(str: string | undefined) {
 
 async function request(url: string, options: RequestInit = {}) {
 
-    await sleep(Math.floor(Math.random() * (2000 - 500 + 1)) + 500)
+    await sleep(Math.floor(Math.random() * (2000 - 1000 + 1)) + 1000)
     if (window["animeonsen_get_token"] == undefined) {
         const resp = await SheepRequest(WEBSITE, { headers: header })
         /* IFDEF DEBUG */
         console.warn("AnimeOnsen/SheepRequest", resp)
         /* ENDIF */
-        const finded = Object.entries(resp.responseHeader).find(([k, _]) => k == "set-cookie")
+        const finded = resp.responseHeader.entries().find(([k, _]) => k == "set-cookie")
         if (finded) generateToken(finded["1"])
     }
 
@@ -92,7 +92,7 @@ function SearchAnime(anime: AnimeData, target: cardData[]) {
 
 export default class AnimeOnsen implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.2",
+        version: "1.3",
         name: "AnimeOnsen",
         author: "Owca525",
         supportLang: ["en"],
