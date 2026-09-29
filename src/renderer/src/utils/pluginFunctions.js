@@ -477,3 +477,7 @@ export function getAnimeSeasonFromDate(date) {
 
   return { season, nextSeason, seasonYear: year, nextYear: finded == 3 ? year + 1 : year };
 }
+
+export function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}

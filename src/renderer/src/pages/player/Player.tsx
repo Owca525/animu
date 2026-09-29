@@ -656,9 +656,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                         // /* ENDIF */
 
                         if (!data.success) {
-                            /* IFDEF PROD */
-                            console.warn("Player/HLS", context, data)
-                            /* ENDIF */
+                            console.error("Player/HLS", context, data)
                             callbacks.onError({ type: 'network', details: data["statusText"], fatal: true, code: data["status"] }, context)
                             return
                         }

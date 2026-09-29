@@ -236,7 +236,7 @@ export default class AnimeOnsen implements playerPluginFormat {
         for (let index = 0; index < functions.length; index++) {
             const element = functions[index];
             const tmp = await wrapper(element)
-            await sleep(Math.floor(Math.random() * (5000 - 1000 + 1)) + 1000)
+            await sleep(Math.floor(Math.random() * (5000 - 5000 + 1)) + 5000)
             if (!tmp) {
                 results.push({
                     time: 0,

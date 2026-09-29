@@ -26,6 +26,7 @@ export const convertText = () => {};
 export const dateToUnix = () => {};
 export const genYearsList = () => {};
 export const getWeek = () => {};
+export const sleep = () => {};
 export const request = async (url) => {
     return {
         text: "Initial",
