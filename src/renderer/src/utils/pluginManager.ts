@@ -49,6 +49,7 @@ export const getGlobalCache = () => {};
 export const timeCovertToMs = () => {};
 export const requestCloudflare = () => {};
 export const savePluginConfig = () => {};
+export const getAnimeSeasonFromDate = () => {}
 `
 
 const workerPayloadMetadataExtractor = `

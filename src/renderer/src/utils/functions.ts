@@ -1425,3 +1425,28 @@ export function BufferTobase64(buffer: ArrayBuffer): string {
 
     return btoa(binary);
 };
+
+export function getAnimeSeasonFromDate(date: string | undefined) {
+  const now = date ? new Date(date) : new Date();
+  const month = now.getMonth() + 1;
+  const year = now.getFullYear();
+  const list = ["WINTER", "SPRING", "SUMMER", "FALL"]
+
+  let season: string;
+  let nextSeason: string = list[0];
+
+  if (month >= 1 && month <= 3) {
+    season = "WINTER";
+  } else if (month >= 4 && month <= 6) {
+    season = "SPRING";
+  } else if (month >= 7 && month <= 9) {
+    season = "SUMMER";
+  } else {
+    season = "FALL";
+  }
+
+  const finded = list.findIndex((v) => season == v)
+  if (list.length - 1 > list.findIndex((v) => season == v)) nextSeason = list[finded + 1]
+
+  return { season, nextSeason, seasonYear: year, nextYear: finded == 3 ? year + 1 : year };
+}

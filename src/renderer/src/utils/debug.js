@@ -8,6 +8,7 @@ import { t } from "./i18n";
 import icon from '@resources/icon.png';
 import { sendNotification } from "./NotificationManager";
 import pluginManager from "./pluginManager";
+import { getAnimeSeasonFromDate } from "./pluginFunctions";
 
 window.getConfig = () => unwrap(getConfig());
 window.getGlobalCache = () => unwrap(getGlobalCache());
@@ -17,6 +18,7 @@ window.getAllPluginList = () => unwrap(getAllPluginList());
 window.getPlayerPLugin = () => unwrap(getPlayerPLugin());
 window.getPluginRepo = () => unwrap(getPluginRepo());
 window.pluginManager = () => pluginManager;
+window.getAnimeSeasonFromDate = getAnimeSeasonFromDate;
 window.checkTimeDriffrentUnix = checkTimeDriffrentUnix;
 window.dateToUnix = dateToUnix;
 window.sendNotification = sendNotification;
