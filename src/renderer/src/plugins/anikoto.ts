@@ -1,7 +1,7 @@
-import { getAnimeSeasonFromDate, request, SheepFinderAnime2000, sleep } from "@renderer/utils/functions";
+import { request, SheepFinderAnime2000, sleep } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerChapterList, playerData, playerPluginFormat, playerSubtitlesFormat, serverStatusData } from "@renderer/utils/types";
 
-const WEBSITE = "https://hianime.at"
+const WEBSITE = "https://anikototv.to"
 const PluginHeader = {
     "User-Agent": navigator.userAgent,
     Accept: "*/*",
@@ -14,6 +14,20 @@ const PluginHeader = {
     "Sec-Fetch-Site": "cross-site",
     'Referer': WEBSITE,
     "Origin": WEBSITE
+}
+
+const PuginAPIHeader = {
+    "User-Agent": navigator.userAgent,
+    Accept: "application/json, text/javascript, */*; q=0.01",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "Sec-GPC": "1",
+    Connection: "keep-alive",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "cross-site",
+    'Referer': WEBSITE,
+    "x-requested-with": "XMLHttpRequest"
 }
 
 const SUPPORTED_PLAYERS = {
@@ -38,11 +52,11 @@ class ExtractorPlayer {
                     return await this.megaplay(url)
             }
 
-            console.error("ExtractorPlayer/hianime unsuported player", url)
+            console.error("ExtractorPlayer/anikoto unsuported player", url)
 
             return
         } catch (error) {
-            console.error("ExtractorPlayer/hianime Failed Extract", error)
+            console.error("ExtractorPlayer/anikoto Failed Extract", error)
             return
         }
     }
@@ -50,7 +64,7 @@ class ExtractorPlayer {
     zokoanime = async (url: string): Promise<playerData | undefined> => {
         const req = await request(url, { headers: PluginHeader })
         /* IFDEF DEBUG */
-        console.warn("zokoanime/hianime", req)
+        console.warn("zokoanime/anikoto", req)
         /* ENDIF */
         if (!req["success"]) return
 
@@ -121,7 +135,7 @@ class ExtractorPlayer {
         const url_object = new URL(url)
         const website_response = await request(url, { headers: PluginHeader })
         /* IFDEF DEBUG */
-        console.warn("megaplay/hianime", website_response)
+        console.warn("megaplay/anikoto", website_response)
         /* ENDIF */
         if (!website_response["success"]) return
 
@@ -137,7 +151,7 @@ class ExtractorPlayer {
         })
 
         /* IFDEF DEBUG */
-        console.warn("megaplay/hianime website_api_response", website_api_response, match)
+        console.warn("megaplay/anikoto website_api_response", website_api_response, match)
         /* ENDIF */
 
         if (!website_api_response["success"] || !website_api_response["json"]) return
@@ -146,9 +160,9 @@ class ExtractorPlayer {
 
         function sourceEncPadKeyBytes(e, t) {
             const a = (new TextEncoder).encode(String(e))
-            , r = new Uint8Array(t);
+                , r = new Uint8Array(t);
             return r.set(a.subarray(0, Math.min(t, a.length))),
-            r
+                r
         }
 
         function sourceEncB64UrlDecode(e) {
@@ -156,7 +170,7 @@ class ExtractorPlayer {
             const a = t.length % 4;
             a && (t += "====".slice(a));
             const r = atob(t)
-            , n = new Uint8Array(r.length);
+                , n = new Uint8Array(r.length);
             for (let e = 0; e < r.length; e++)
                 n[e] = r.charCodeAt(e);
             return n
@@ -274,55 +288,87 @@ class ExtractorPlayer {
     }
 }
 
-export default class HIanime implements playerPluginFormat {
+export default class Anikoto implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
         version: "1.0",
-        name: "HIanime",
+        name: "Anikoto",
         author: "Owca525",
         supportLang: ["en"],
         urlWebsite: WEBSITE,
         type: "player",
-        icon: `${WEBSITE}/theme/images/logo.png`
+        icon: `${WEBSITE}/AnikotoTheme/assets/images/logo.png`
     };
 
     extractPlayerData = async (_type: string, episode: episodeMetadata, _id: string): Promise<playerData[]> => {
-        const playerResponse = await request(`${WEBSITE}/api/theme/episode/servers?episodeId=${episode["episodeID"]}`, { headers: PluginHeader })
+        const playerResponse = await request(`${WEBSITE}/ajax/server/list?servers=${episode["episodeID"]}`, { headers: PuginAPIHeader })
         /* IFDEF DEBUG */
-        console.warn("extractPlayerData/hianime", playerResponse)
+        console.warn("extractPlayerData/anikoto", playerResponse)
         /* ENDIF */
 
         if (!playerResponse["success"] || !playerResponse["json"]) return []
 
-        const regex = /<div\b[^>]*\bclass="[^"]*\bserver-item\b[^"]*"[^>]*\bdata-type="(?<type>[^"]+)"[^>]*\bdata-server-name="(?<serverName>[^"]+)"[^>]*\bdata-hash="(?<hash>[^"]+)"[^>]*>/g;
+        const typeRegex = /<div\s+class="type"\s+data-type="([^"]+)"[^>]*>[\s\S]*?<ul>([\s\S]*?)<\/ul>\s*<\/div>/g;
 
-        const data = [...String(playerResponse["json"]["html"]).matchAll(regex)].map((value, i) => {
-            console.log(value)
-            if (!value["groups"]) return
-            const url = String(atob(value["groups"]["hash"]));
+        const streamRegex = /<li\b[^>]*data-sv-id="([^"]+)"[^>]*data-link-id="([^"]+)"[^>]*>([\s\S]*?)<\/li>/g;
 
-            const finded = Object.values(SUPPORTED_PLAYERS).find((v) => url.startsWith(v))
+        const converted = [...playerResponse["json"]["result"].matchAll(typeRegex)].map(typeMatch => {
+            const type = typeMatch[1];
+            const streamsHtml = typeMatch[2];
 
-            console.log(url, finded)
-
-            if (!finded) return
+            const streams = [...streamsHtml.matchAll(streamRegex)].map(match => ({
+                id: match[1],
+                link: match[2],
+                name: match[3]
+                    .replace(/<[^>]+>/g, "")
+                    .trim()
+            }));
 
             return {
-                hostname: `${value["groups"]["serverName"]} ${value["groups"]["type"]}`,
-                defaultHost: i == 0,
-                url
+                type,
+                streams
+            };
+        });
+
+        let content: { name: string, id: string, type: string }[] = []
+
+        for (let index = 0; index < converted.length; index++) {
+            const element = converted[index];
+
+            for (let index = 0; index < element["streams"].length; index++) {
+                const value = element["streams"][index];
+                content.push({
+                    name: value["name"],
+                    id: value["link"],
+                    type: element["type"]
+                })
             }
-        }).filter((v) => v != undefined)
+        }
+
+        let urls: { name: string, url: string }[] = []
+
+        for (let index = 0; index < content.length; index++) {
+            const value = content[index];
+
+            const website_resp = await request(`${WEBSITE}/ajax/server?get=${value["id"]}`, { headers: PuginAPIHeader })
+            console.log(website_resp)
+            if (!website_resp["success"] || !website_resp["json"]) continue
+
+            urls.push({
+                name: `${value["name"].split(" ")[0]} ${value["type"]}`,
+                url: website_resp["json"]["result"]["url"]
+            })
+        }
+
         /* IFDEF DEBUG */
-        console.warn("extractPlayerData/hianime data", data)
+        console.warn("extractPlayerData/anikoto urls", urls)
         /* ENDIF */
 
-        if (data.length <= 0) return []
+        if (urls.length <= 0) return []
 
-        return data.map((v) => ({
-            hostname: v["hostname"],
-            defaultHost: v["defaultHost"],
+        return urls.map((v) => ({
+            hostname: v["name"],
             resolution: [],
-            extractResolution: async () => await (new ExtractorPlayer(v["hostname"])).extract(v["url"])
+            extractResolution: async () => await (new ExtractorPlayer(v["name"])).extract(v["url"])
         } as playerData))
     }
 
@@ -335,31 +381,40 @@ export default class HIanime implements playerPluginFormat {
         }
 
         /* IFDEF DEBUG */
-        console.warn("extractEpisodeList/hianime id", anime_id)
+        console.warn("extractEpisodeList/anikoto id", anime_id)
         /* ENDIF */
 
         if (!anime_id) return
 
-        const episodeResponse = await request(`${WEBSITE}/api/theme/episode/list/${anime_id.split("-").at(-1)}`, { headers: PluginHeader })
+        const website_request = await request(`${WEBSITE}/watch/${anime_id}`)
+        if (!website_request["success"]) return
+
+        const finded_ID = website_request["text"].match(/data-id="(\d+)"/)
 
         /* IFDEF DEBUG */
-        console.warn("extractEpisodeList/hianime", episodeResponse)
+        console.warn("extractEpisodeList/anikoto website_request", website_request, finded_ID)
+        /* ENDIF */
+
+        if (!finded_ID) return
+
+        const episodeResponse = await request(`${WEBSITE}/ajax/episode/list/${finded_ID[1]}`, { headers: PuginAPIHeader })
+
+        /* IFDEF DEBUG */
+        console.warn("extractEpisodeList/anikoto", episodeResponse)
         /* ENDIF */
 
         if (!episodeResponse["success"] || !episodeResponse["json"]) return
 
-        const regex = /<a\b[^>]*\btitle="(?<title>[^"]+)"[^>]*\bdata-number="(?<number>\d+)"[^>]*\bdata-id="(?<id>\d+)"[^>]*>/g;
+        const regex = /<a[^>]*data-id="([^"]+)"[^>]*data-num="([^"]+)"[^>]*data-ids="([^"]+)"[^>]*>[\s\S]*?<span\s+class="d-title"\s+data-jp="([^"]+)"/g;;
 
         return {
             player_id: anime_id,
             episodesData: [{
-                episodes: [...String(episodeResponse["json"]["html"]).matchAll(regex)].map((element) => {
-                    if (!element["groups"]) return
-
+                episodes: [...String(episodeResponse["json"]["result"]).matchAll(regex)].map((element) => {
                     return {
-                        ep: element["groups"]["number"],
-                        episodeID: element["groups"]["id"],
-                        title: element["groups"]["title"]
+                        ep: element[2],
+                        episodeID: element[3],
+                        title: element[4]
                     } as episodeMetadata
                 }).filter((v) => v != undefined),
                 type: "sub"
@@ -374,35 +429,36 @@ export default class HIanime implements playerPluginFormat {
     }
 
     searchAnime = async (name: string, _page: number, _params?: FilterPluginsParams): Promise<cardData[]> => {
-        const response = await request(`${WEBSITE}/api/theme/search/suggestions?keyword=${encodeURIComponent(name)}`, { headers: PluginHeader })
+        name = new URLSearchParams({ keyword: name }).toString()
+
+        const response = await request(`${WEBSITE}/ajax/anime/search?${name}`, { headers: PuginAPIHeader })
         /* IFDEF DEBUG */
-        console.warn("searchAnime/hianime", response)
+        console.warn("searchAnime/anikoto", response)
         /* ENDIF */
         if (!response["success"] || !response["json"]) return []
 
-        const regex = /<a\b[^>]*\bhref="(?<href>[^"]+)"[^>]*\btitle="(?<title>[^"]+)"[^>]*>[\s\S]*?<img\b[^>]*\bsrc="(?<imgSrc>[^"]+)"[^>]*>[\s\S]*?<div\b[^>]*\bclass="[^"]*\bfilm-infor\b[^"]*"[^>]*>[\s\S]*?<span\b[^>]*>\s*(?<date>[^<]+?)\s*<\/span>[\s\S]*?<i\b[^>]*>\s*<\/i>\s*(?<format>[^<]+?)\s*<i\b[^>]*>\s*<\/i>[\s\S]*?<span\b[^>]*>\s*(?<time>[^<]+?)\s*<\/span>/g;
+        const regex = /<a\s+class="item"\s+href="([^"]+)"[\s\S]*?<img\s+src="([^"]+)"[\s\S]*?<div\s+class="name\s+d-title"\s+data-jp="([^"]*)"[^>]*>([\s\S]*?)<\/div>[\s\S]*?<span\s+class="dot">([^<]+)<\/span>\s*<span\s+class="dot">(\d{4})<\/span>/g;
 
-        const match = [...String(response["json"]["html"]).matchAll(regex)];
+        const match = [...String(response["json"]["result"]["html"]).matchAll(regex)];
+        /* IFDEF DEBUG */
+        console.warn("searchAnime/anikoto match", match)
+        /* ENDIF */
 
         return match.map((element) => {
-            if (!element["groups"]) return
-
-            const id = element["groups"]["href"].split("/").at(-1)
-            const date = getAnimeSeasonFromDate(element["groups"]["date"])
+            const id = element[1].split("/").at(-1)
 
             return {
                 AnimeData: {
                     title: {
-                        english: element["groups"]["title"],
-                        native: element["groups"]["title"],
-                        romaji: element["groups"]["title"]
+                        english: element[4],
+                        native: element[3],
+                        romaji: element[3]
                     },
                     id: "",
-                    season: date["season"],
-                    seasonYear: date["seasonYear"],
-                    coverImage: element["groups"]["imgSrc"],
+                    seasonYear: Number(element[6]),
+                    coverImage: element[2],
                     player_ID: id,
-                    format: element["groups"]["format"]
+                    format: element[5]
                 }
             } as cardData
         }).filter((v) => v != undefined)
@@ -428,8 +484,8 @@ export default class HIanime implements playerPluginFormat {
 
         const functions = [
             async () => this.searchAnime("My Star", 1),
-            async () => this.extractPlayerData("sub", { ep: "1", episodeID: "12117" }, "oshi-no-ko-675"),
-            async () => this.extractOnlyEpisodesList("sub", "oshi-no-ko-675"),
+            async () => this.extractPlayerData("sub", { ep: "1", episodeID: "cWJvaWszcTZiRVRqZTk4ZXVwa3pJRUxEYnYvOTkxd1VPU3F1cURlYXpRb09GN2pjcm5OdjB0UUcrTWVTR04zTHExazJtY3BxUG9Dc0ZXQVlueDlKR2NPQ20wUG1EcWJ6anJNMTNLT2xMaDRPWHZRRXlDZ3pmUzAybUhWTHBlVWRMYTNRTGlkTDQrajVJUVBVbWR3VEhBYUs0TC9uMGxjRndVcU9td042dERZPQ" }, "oshi-no-ko-675"),
+            async () => this.extractOnlyEpisodesList("sub", "my-star-hg319"),
         ]
 
         for (let index = 0; index < functions.length; index++) {
