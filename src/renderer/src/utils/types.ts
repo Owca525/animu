@@ -361,14 +361,22 @@ export interface themeMetadata {
 
 export interface playerPluginFormat {
     metadata: PluginMetadataFormat
+
     config?: { [key: string]: any }
+
     extractPlayerData(type: string, episode: episodeMetadata, id: string): Promise<playerData[]>
     extractEpisodeList(animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined>
     extractOnlyEpisodesList(type: string, anime_id: string): Promise<episodeMetadata[]>
     searchAnime(name: string, page: number, params?: FilterPluginsParams): Promise<cardData[]>
 
     raportStatus?: () => Promise<{ search: serverStatusData, player: serverStatusData, episodes: serverStatusData }>
+
+    onChangeConfig?: (config: { [key: string]: string | boolean | number | Object }) => Promise<void>
 }
+
+type reverseObject = {
+  [key: string]: string | reverseObject;
+};
 
 export interface PluginMetadataFormat {
     version: string
@@ -379,6 +387,7 @@ export interface PluginMetadataFormat {
     urlWebsite?: string
     type: "information" | "player"
     adult?: boolean,
+    defaultDisable?: boolean,
     supportLang?: string[]
     searchOption?: genres[]
     geoLocationBlock?: string[]
@@ -386,13 +395,31 @@ export interface PluginMetadataFormat {
         manga: string,
         anime: string
     }
+
+    // TODO: Add support for dropdown
+    configFormat?: {    
+        type: "function" | "input" | "boolean" | "hidden" | "password"
+        value: string | boolean | number | Object
+        cName: string,
+        name: string
+    }[]
+
+    i18nLang?: reverseObject
 }
 
 export interface SearchResponse { success?: boolean, content: cardData[], error?: string, maxPage: number, nextPage: boolean }
 
 export interface informationPluginFormat {
     metadata: PluginMetadataFormat
+    
     config?: { [key: string]: any }
+
+    loginMethod?: {
+        type: "deeplink",
+        deepLinkurl?: string,
+        callback: (content: string) => Promise<void>
+    }
+
     search(name: string, page: number, params?: FilterPluginsParams): Promise<SearchResponse>
     home(): Promise<{ topCards?: containerData, sections: containerData[] } | { error: string } | undefined>
     anime(id: string): Promise<AnimeData | undefined>
@@ -400,6 +427,12 @@ export interface informationPluginFormat {
     getManga: (id: string) => Promise<AnimeData | undefined>
     getAnimeList: () => Promise<cardData[]>
     setAnimeInList: (variable: Anilist_ListMutation) => Promise<boolean>
+
+    onChangeConfig?: (config: { [key: string]: string | boolean | number | Object }) => Promise<void>
+
+    isLogged?: () => Promise<boolean>
+    login?: () => Promise<UserData>
+    unLogin?: () => Promise<boolean>
 }
 
 export interface WorkerWrapperInstance {
@@ -770,5 +803,5 @@ export interface UserData {
     animu_time: number,
 
     banner?: string,
-    avatar?: string
+    avatar?: string,
 }
