@@ -1164,13 +1164,13 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
     async function enterFullscreen() {
         /* IFDEF DEBUG|PROD */
         if (await window.BrowserWindow.isFullscreen()) {
-            document.exitFullscreen()
+            if (type == "embed") document.exitFullscreen()
 
             toggleFullscreen(false)
             SheePlayer.isFullscreen = false
             updatePlayer({ isFullscreen: false })
         } else {
-            containerRef!.requestFullscreen()
+            if (type == "embed") containerRef!.requestFullscreen()
 
             toggleFullscreen(true)
             SheePlayer.isFullscreen = true
