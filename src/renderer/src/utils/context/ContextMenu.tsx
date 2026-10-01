@@ -148,10 +148,10 @@ const ContextMenu: Component<{ children: JSX.Element }> = (props) => {
         ref={contextMenuRef}
         class="contextmenu-container"
         style={{
-          "position": "absolute",
+          "position": "fixed",
           "top": `${position().y}px`,
           "left": `${position().x}px`,
-          "z-index": "99999",
+          "z-index": "999999",
           "display": isOpen() ? "" : "none"
         }}
       >
