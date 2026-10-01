@@ -29,6 +29,7 @@ import SubtitlesOctopus from "@jellyfin/libass-wasm"
 import SubtitlesOctopusWasm from '@jellyfin/libass-wasm/dist/js/subtitles-octopus-worker.js?url'
 import "@jellyfin/libass-wasm/dist/js/default.woff2?url"
 import "@jellyfin/libass-wasm/dist/js/subtitles-octopus-worker.wasm?url"
+import NerdStats from "./components/nerdStats"
 
 shaka.polyfill.installAll()
 
@@ -255,7 +256,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
     const [nerdStats, updateNerd] = createStore({
         active: false,
 
-        player: {
+        video: {
             paused: player.isPlaying,
             ended: false,
             autoplay: player.isPlaying,
@@ -267,9 +268,27 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             readyState: 0,
             networkState: 0,
 
-            creationTime: 0,
             droppedVideoFrames: 0,
             totalVideoFrames: 0,
+        },
+
+        player: {
+            initialize: true,
+
+            isDubbing: false,
+
+            HLSMode: false,
+
+            buffer: [],
+            subtitles: [{ url: "", format: "", lang: "", label: t("player.other.off") }],
+            playerData: undefined,
+            currentResolution: undefined,
+            currentSubtitle: undefined,
+            thumbnail: undefined,
+            chapterList: [],
+            resoltions: [],
+            audioTrack: [],
+            activeAudioTrack: undefined
         }
     })
 
@@ -1632,10 +1651,12 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             return
         }
 
-        const entries = Object.entries(nerdStats.player).map((v) => v["0"])
+        const entries = Object.entries(nerdStats.video).map((v) => v["0"])
+        const playerEntries = Object.entries(nerdStats.player).map((v) => v["0"])
 
         refreashNerdStats = setInterval(() => {
             let object = {}
+            let playerObject = {}
 
             const quality = videoRef!.getVideoPlaybackQuality()
 
@@ -1646,14 +1667,26 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                 }
             })
 
+            playerEntries.forEach((v) => {
+                playerObject = {
+                    ...playerObject,
+                    [v]: player[v]
+                }
+            })
+
             object = {
                 ...object,
-                creationTime: quality.creationTime,
                 droppedVideoFrames: quality.droppedVideoFrames,
                 totalVideoFrames: quality.totalVideoFrames,
             }
 
-            updateNerd({ player: object as any })
+            playerObject = {
+                ...playerObject,
+                currentASSubtitles,
+                sheepworker
+            }
+
+            updateNerd({ video: object as any, player: playerObject as any })
 
         }, 500)
 
@@ -2009,13 +2042,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             </Show>
 
             <Show when={nerdStats.active}>
-                <div class="player-nerdstats-container" tabIndex={-1}>
-                    <For each={Object.entries(nerdStats["player"])}>
-                        {([key, val]) => (
-                            <span class="player-nerdstats-text">{key}: {JSON.stringify(val)}</span>
-                        )}
-                    </For>
-                </div>
+                <NerdStats video={nerdStats["video"]} player={nerdStats["player"]} ui={ui}/>
             </Show>
 
             <Show when={!config.Player.general.disablemoreinformation && anime}>

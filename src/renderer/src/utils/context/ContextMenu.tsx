@@ -151,7 +151,7 @@ const ContextMenu: Component<{ children: JSX.Element }> = (props) => {
           "position": "absolute",
           "top": `${position().y}px`,
           "left": `${position().x}px`,
-          "z-index": "9999",
+          "z-index": "99999",
           "display": isOpen() ? "" : "none"
         }}
       >

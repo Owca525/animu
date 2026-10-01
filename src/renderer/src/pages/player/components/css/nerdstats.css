@@ -1,0 +1,74 @@
+.nerdstats-container-multiply, .nerdstats-container.ui {
+    position: fixed;
+    top: 75px;
+    left: 0;
+    margin: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    z-index: 99999;
+}
+
+.nerdstats-title {
+    font-size: 1.2em;
+    font-weight: 800;
+    padding: 4px 12px;
+    background-color: color-mix(in srgb, var(--first-layer) 50%, transparent);
+}
+
+.nerdstats-container,
+.nerdstats-container-multiply,
+.nerdstats-elements {
+    display: flex;
+    flex-direction: column;
+}
+
+.nerdstats-container {
+    background-color: color-mix(in srgb, var(--five-layer) 60%, transparent);
+    width: clamp(100px, 24vw, 400px);
+}
+
+.nerdstats-container.video {
+    border: 4px solid var(--green-one);
+    border-width: 0px 0px 0px 4px;
+}
+
+.nerdstats-container.player {
+    border: 4px solid var(--orange-one);
+    border-width: 0px 0px 0px 4px;
+}
+
+.nerdstats-container.ui {
+    left: auto;
+    right: 0;
+
+    top: 30px;
+
+    border: 4px solid var(--blue-one);
+    border-width: 0px 4px 0px 0px;
+}
+
+.nerdstats-elements {
+    padding: 4px;
+}
+
+.nerdstats-text {
+    display: flex;
+    justify-content: space-between;
+    gap: 2px;
+}
+
+.nerdstats-name,
+.nerdstats-value {
+    font-size: 1.1em;
+}
+
+.nerdstats-name {
+    color: var(--text-gray2);
+    font-weight: 500;
+}
+
+.nerdstats-value {
+    font-weight: 700;
+}
