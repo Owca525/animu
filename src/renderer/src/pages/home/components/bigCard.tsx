@@ -85,10 +85,27 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
         const historyContinue = history.history.find((value) => value.AnimeData.id == data.AnimeData.id)
 
         try {
-            if (!animeContinue && !historyContinue) return <Button content={t("home.bigcard.now")} ButtonClass='big-card-button' onClick={() => goToPlayer()} />
-            if (animeContinue) return <Button content={t("history.continue", { ep: animeContinue.saveData?.episode })} ButtonClass='big-card-button' onClick={() => goToPlayer(animeContinue.saveData, animeContinue.AnimeData.player_ID)} />
+            if (!animeContinue && !historyContinue) 
+                return <Button content={t("home.bigcard.now")} ButtonClass='big-card-button' onClick={() => goToPlayer()} />
+            
+            if (animeContinue) 
+                return <Button 
+                    content={t("history.continue", { ep: animeContinue.saveData?.episode })} 
+                    ButtonClass='big-card-button' 
+                    onClick={() => goToPlayer(animeContinue.saveData, animeContinue.AnimeData.player_ID)} 
+                />
+            
+            if (historyContinue && data.AnimeData.nextAiringEpisode && data.AnimeData.nextAiringEpisode["episode"] == parseInt(historyContinue.saveData.episode!)+1) {
+                return <></>
+            }
+            
             if (historyContinue && parseInt(historyContinue.saveData.episode!) <= historyContinue.AnimeData.episodes!) {
-                return <Button content={t("home.bigcard.start", { ep: parseInt(historyContinue.saveData.episode!)+1 })} ButtonClass='big-card-button' onClick={() => goToPlayer({...historyContinue.saveData, episode: `${parseInt(historyContinue.saveData.episode!)+1}`} as indentityPlayer, historyContinue.AnimeData.player_ID)} />
+                return <Button 
+                    content={t("home.bigcard.start", { ep: parseInt(historyContinue.saveData.episode!)+1 })} 
+                    ButtonClass='big-card-button' 
+                    onClick={() => goToPlayer({...historyContinue.saveData, episode: `${parseInt(historyContinue.saveData.episode!)+1}`} as indentityPlayer, 
+                    historyContinue.AnimeData.player_ID)} 
+                />
             }
         } catch (error) {}
         return <></>
