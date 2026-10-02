@@ -456,6 +456,7 @@ function information() {
                 player_ID: information["activePlayerID"]
             },
             saveData: {
+                ...tmp.saveData,
                 last_Time: lastTime,
                 type: type,
                 pluginName: getPlayerPLugin()?.metadata.name,
@@ -560,20 +561,26 @@ function information() {
     async function refreashInformation(name: string, force: boolean = false) {
         let content = contentResponse.queryData()
 
-        if (information["activePage"] == "Episodes") {
+        if (information["activePage"] == "Episodes" && content["type"] == "episodes") {
             await pluginManager.changePlayerPlugin(name)
 
+            let playerID: string | undefined = undefined
+
+            if (information["cache"]["saveData"] && information["cache"]["saveData"]["pluginName"] == name) {
+                playerID = information["cache"]["anime"]["player_ID"]
+            }
+
             updateInfo({
-                activePlayerID: undefined,
+                activePlayerID: content["playerID"],
                 activePlugin: name
             })
 
             content = {
                 ...content,
                 metadata: {
-                    ...content["metadata"] as any,
+                    anime: information["cache"]["anime"],
+                    playerID: playerID,
                     plugin: name,
-                    playerID: undefined
                 }
             }
         }
