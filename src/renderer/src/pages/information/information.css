@@ -341,7 +341,13 @@
     padding: 8px;
     display: flex;
     gap: 12px;
-    overflow-x: auto;
+    overflow-x: hidden;
+
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    overflow-x: scroll;
+    scrollbar-width: none;
 }
 
 .information-recomendation-loading {

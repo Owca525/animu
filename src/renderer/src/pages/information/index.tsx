@@ -46,7 +46,6 @@ import { getConfig } from '@renderer/utils/stores/config';
 import Container from '../home/components/container';
 import { toast, updateToast } from '@renderer/utils/context/ToastNotification';
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
-import RelationCard from './components/relationCard';
 import ButtonGroup from '../settings/components/buttonGroup';
 import { requestAnimeMedia } from '@renderer/utils/animeThemes';
 import { updateHistoryData } from '@renderer/utils/FilesManager/history';
@@ -61,6 +60,7 @@ import EpisodeBox from './components/episodeBox';
 import { SheepShortcut } from '@renderer/utils/hooks/useKeyPress';
 import pluginManager from '@renderer/utils/pluginManager';
 import Player from '../player/Player';
+import RelationCardContainer from './components/relationCardsContainer';
 
 // TODO: RE-ADD OPENING MUSIC IN INFORMATION
 
@@ -991,25 +991,9 @@ function information() {
                             </div>
 
                             <Show when={information["cache"].anime.relations && information["cache"].anime.relations!.length > 0}>
-                                <div class="information-relation-container">
-                                    <For each={information["cache"].anime.relations}>
-                                        {(rel) => <RelationCard
-                                            id={rel.id}
-                                            relationType={rel.relationType}
-                                            title={rel.title}
-                                            coverImage={rel.coverImage}
-                                            onClick={() => ChangeAnimeInInformation({
-                                                title: rel.title,
-                                                id: rel.id.toString(),
-                                                format: rel.format,
-                                                type: rel.type
-                                            })}
-                                            status={rel.status}
-                                            source={rel.format}
-                                        />}
-                                    </For>
-                                </div>
+                                <RelationCardContainer content={information["cache"].anime.relations} onClick={ChangeAnimeInInformation}/>
                             </Show>
+
                             <Show when={information["cache"].anime.characters && information["cache"].anime.characters!.length > 0}>
                                 <CharacterContainer title={t("information.characters")} cards={information["cache"].anime.characters!.map((char) => ({
                                     id: char.character.id,

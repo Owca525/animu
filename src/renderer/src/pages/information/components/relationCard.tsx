@@ -11,6 +11,8 @@ export type characterCardsProps = {
     onClick?: () => void
     source?: string
     status?: string
+
+    ref?: HTMLElement
 }
 
 // Inspiration Anilist relation cards
@@ -18,7 +20,7 @@ export default function RelationCard(props: characterCardsProps) {
     const { t, pathExist } = useI18n()
 
     return (
-        <main class="relation-card-container" onClick={props.onClick}>
+        <main class="relation-card-container" onClick={props.onClick} ref={props.ref}>
             <sheep-img 
                 class="relation-card-cover" 
                 src={props.coverImage} 

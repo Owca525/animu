@@ -10,11 +10,12 @@
 }
 
 .relation-card-container:hover {
-  background-color: var( --five-layer);
-  transform: scale(1.02);
+    background-color: var(--five-layer);
+    transform: scale(1.02);
 }
 
-.relation-card-cover, .relation-card-image-placeholder {
+.relation-card-cover,
+.relation-card-image-placeholder {
     max-height: 120px;
     width: max-content;
     height: max-content;
@@ -49,11 +50,11 @@
 }
 
 .relation-card-title {
-  display: -webkit-box;
-  line-clamp: 3;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+    display: -webkit-box;
+    line-clamp: 3;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .relation-card-content-top {
@@ -62,7 +63,8 @@
     gap: 10px;
 }
 
-.relation-card-status, .relation-card-source {
+.relation-card-status,
+.relation-card-source {
     color: var(--text-gray);
 }
 
@@ -73,4 +75,47 @@
     align-items: center;
     text-align: center;
     gap: 4px;
+}
+
+.relation-card-button {
+    position: absolute;
+    top: 35%;
+    margin: 0px 12px;
+    transition: opacity 1s ease;
+    user-select: none;
+    opacity: 0;
+
+    z-index: 999;
+
+    background-color: var(--five-layer) !important; 
+}
+
+.relation-card-button.left {
+    left: 0;
+}
+
+.relation-card-button.right {
+    right: 0;
+}
+
+.relation-card-barier {
+    position: relative;
+}
+
+.relation-card-barier:hover .relation-card-button.left {
+    animation: slideLeft 0.1s forwards;
+    opacity: 1;
+}
+
+.relation-card-barier:hover .relation-card-button.right {
+    animation: slideRight 0.1s forwards;
+    opacity: 1;
+}
+
+.relation-card-barier:not(:hover) .relation-card-button.left {
+    animation: slideOutLeft 0.1s forwards;
+}
+
+.relation-card-barier:not(:hover) .relation-card-button.right {
+    animation: slideOutRight 0.1s forwards;
 }
