@@ -12,9 +12,6 @@ import { unwrap } from "solid-js/store";
 import logger from "./logger";
 /* ENDIF */
 
-const blob = new Blob([pluginFunctions], { type: "text/javascript" });
-const pluginFunctionsURL = URL.createObjectURL(blob);
-
 const workerDummyimport = `
 export const SheepFinderAnime2000 = () => {};
 export const capitalizeFirstLetter = () => {};
@@ -293,6 +290,10 @@ class WorkerWrapper implements WorkerWrapperInstance {
     weakRefCachce: { ref: WeakRef<{}>, id: string }[] = []
     intervalCache: NodeJS.Timeout | undefined
 
+    pluginFunctionsURL: string = ""
+    pluginURL: string = ""
+    payloadURL: string = ""
+
     constructor(otherDataPermision = false) {
         this.otherDataPermision = otherDataPermision
     }
@@ -390,13 +391,13 @@ class WorkerWrapper implements WorkerWrapperInstance {
         }
 
         const functionblob = new Blob([pluginFunctions.replaceAll("CHANGE_THIS_FOR_UUID_BEACUSE_INSTANCE", randomuuid)], { type: "text/javascript" });
-        const pluginFunctionsURL = URL.createObjectURL(functionblob);
+        this.pluginFunctionsURL = URL.createObjectURL(functionblob);
 
-        const blob = new Blob([detectIndex(pluginCode, pluginFunctionsURL)], { type: "text/javascript" });
-        const plugin = URL.createObjectURL(blob);
+        const blob = new Blob([detectIndex(pluginCode, this.pluginFunctionsURL)], { type: "text/javascript" });
+        this.pluginURL = URL.createObjectURL(blob);
 
         try {
-            const module = await import(/* @vite-ignore */ plugin);
+            const module = await import(/* @vite-ignore */ this.pluginURL);
             delete window[randomuuid]
             
             if (!module["default"]) throw new Error("Failed Find Module")
@@ -411,7 +412,6 @@ class WorkerWrapper implements WorkerWrapperInstance {
 
             return this.plugin_instance["metadata"]
         } finally {
-            URL.revokeObjectURL(plugin);
             delete window[randomuuid]
         }
     }
@@ -421,12 +421,15 @@ class WorkerWrapper implements WorkerWrapperInstance {
             return await this.runInstancePlugin(pluginCode, config)
         }
 
+        const blob = new Blob([pluginFunctions], { type: "text/javascript" });
+        this.pluginFunctionsURL = URL.createObjectURL(blob);
+
         if (!pluginCode.startsWith("http")) {
-            const blobCode = new Blob([detectIndex(pluginCode, pluginFunctionsURL)], { type: "text/javascript" });
-            pluginCode = URL.createObjectURL(blobCode);
+            const blobCode = new Blob([detectIndex(pluginCode, this.pluginFunctionsURL)], { type: "text/javascript" });
+            this.pluginURL = URL.createObjectURL(blobCode);
         }
 
-        let payload = WorkerPayload.replace("CHANGETOPLUGIN", pluginCode).replace(`"PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION_WORKER"`, JSON.stringify({
+        let payload = WorkerPayload.replace("CHANGETOPLUGIN", this.pluginURL).replace(`"PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION_WORKER"`, JSON.stringify({
             ...window["animuAppInfo"],
             themes: undefined
         }))
@@ -438,9 +441,9 @@ class WorkerWrapper implements WorkerWrapperInstance {
         payload = payload.replace(`"CHANGE_TO_CONFIG_WHEN_ARE_PERMISIONS"`, JSON.stringify(config))
 
         const payloadBLob = new Blob([payload], { type: "text/javascript" });
-        const payloadURL = URL.createObjectURL(payloadBLob);
+        this.payloadURL = URL.createObjectURL(payloadBLob);
 
-        const worker = new Worker(payloadURL);
+        const worker = new Worker(this.payloadURL);
 
         worker.onerror = (ev) => {
             console.error(ev)
@@ -594,6 +597,9 @@ class WorkerWrapper implements WorkerWrapperInstance {
     destroy = () => {
         if (this.intervalCache) clearInterval(this.intervalCache)
         if (this.instance) this.instance.terminate()
+        URL.revokeObjectURL(this.pluginURL)
+        URL.revokeObjectURL(this.pluginFunctionsURL)
+        URL.revokeObjectURL(this.payloadURL)
     }
 }
 
@@ -777,11 +783,12 @@ export class PluginManager implements PluginManagerFormat {
         let dummyImportURL = URL.createObjectURL(blobDummy);
 
         let promiseResolve: (value: any) => void
+
         const promise = new Promise((resolve: (v: PluginLoadedFormat[]) => void) => {
             promiseResolve = resolve
             setTimeout(() => {
                 resolve(LoadedMetadataPlugins)
-            }, 100 * plugins.length)
+            }, 2000 * plugins.length)
         })
 
         plugins.forEach((element) => {
@@ -809,6 +816,8 @@ export class PluginManager implements PluginManagerFormat {
                     if (LoadedMetadataPlugins.length == plugins.length) promiseResolve(LoadedMetadataPlugins)
                 } else console.error("FAILED LOAD PLUGIN", e, element)
                 worker.terminate()
+                URL.revokeObjectURL(codeURL)
+                URL.revokeObjectURL(mainCodeURL)
             };
         })
 

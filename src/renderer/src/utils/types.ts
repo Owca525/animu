@@ -400,7 +400,7 @@ export interface PluginMetadataFormat {
     configFormat?: {    
         type: "function" | "input" | "boolean" | "hidden" | "password"
         value: string | boolean | number | Object
-        cName: string,
+        config_name: string,
         name: string
     }[]
 
