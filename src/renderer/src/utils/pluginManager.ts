@@ -10,6 +10,7 @@ import { unwrap } from "solid-js/store";
 
 /* IFDEF PROD|WEB */
 import logger from "./logger";
+import { t } from "./i18n";
 /* ENDIF */
 
 const workerDummyimport = `
@@ -1008,16 +1009,21 @@ export class PluginManager implements PluginManagerFormat {
             updateToast(id, `Update Succesfully Installed for ${plugin["name"]}`, { type: "success", timer: false })
 
             // if (this.activeInformationPlugin["metadata"]["name"] == plugin["name"] || this.activePlayerPlugin["metadata"]["name"] == plugin["name"]) {
-            //     let interval = setInterval(() => {
-            //         if (plugin["type"] == "player" && location.href)
+            //     if (location.href.endsWith("player") && plugin["type"] == "player") {
 
-            //         clearInterval(interval)
-            //     }, 10000)
+            //         let interval = setInterval(() => {
+            //             if (location.href.endsWith("player")) return
+
+            //             clearInterval(interval)
+
+            //         }, 10000)
+
+            //     }
             // }
         } else {
-            const id = toast(`Instaling Plugin ${plugin["name"]}`, { type: "loading", timer: true })
+            const id = toast(t(`Instaling Plugin ${plugin["name"]}`), { type: "loading", timer: true })
             await window.api.plugins.installUpdate(plugin)
-            updateToast(id, `Succesfully Installed Plugin: ${plugin["name"]}`, { type: "success", timer: false })
+            updateToast(id, t(`Succesfully Installed Plugin: ${plugin["name"]}`), { type: "success", timer: false })
         }
 
         await this.initialPlugins()

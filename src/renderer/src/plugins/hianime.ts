@@ -296,13 +296,10 @@ export default class HIanime implements playerPluginFormat {
         const regex = /<div\b[^>]*\bclass="[^"]*\bserver-item\b[^"]*"[^>]*\bdata-type="(?<type>[^"]+)"[^>]*\bdata-server-name="(?<serverName>[^"]+)"[^>]*\bdata-hash="(?<hash>[^"]+)"[^>]*>/g;
 
         const data = [...String(playerResponse["json"]["html"]).matchAll(regex)].map((value, i) => {
-            console.log(value)
             if (!value["groups"]) return
             const url = String(atob(value["groups"]["hash"]));
 
             const finded = Object.values(SUPPORTED_PLAYERS).find((v) => url.startsWith(v))
-
-            console.log(url, finded)
 
             if (!finded) return
 

@@ -350,7 +350,6 @@ export default class Anikoto implements playerPluginFormat {
             const value = content[index];
 
             const website_resp = await request(`${WEBSITE}/ajax/server?get=${value["id"]}`, { headers: PuginAPIHeader })
-            console.log(website_resp)
             if (!website_resp["success"] || !website_resp["json"]) continue
 
             urls.push({
