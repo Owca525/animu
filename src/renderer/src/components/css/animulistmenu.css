@@ -77,7 +77,7 @@
 }
 
 .animulist-menu-button {
-    background-color: var(--green-one);
+    background-color: var(--green-one) !important;
     padding: 10px 18px;
     font-size: 1em;
 }
