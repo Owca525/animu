@@ -58,7 +58,7 @@ const OtherSettings: Component<OtherSettingsProps> = (props) => {
                                                     ] as string)
                                                     : value.dropDown![0].option
                                             }
-                                            options={value.dropDown?.map((options) => ({
+                                            options={value.dropDown!.map((options) => ({
                                                 label: options.option,
                                                 onClick: (text) =>
                                                     props?.themeConfig!.onChange(

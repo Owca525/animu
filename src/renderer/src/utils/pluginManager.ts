@@ -1,4 +1,4 @@
-import { FilterPluginsParams, informationPluginFormat, Anilist_ListMutation, playerPluginInstanceFormat, AnimeData, cardData, episodeList, episodeMetadata, playerData, PluginManagerFormat, informationPluginInstanceFormat, playerPluginFormat, PluginMetadataFormat, PluginLoadedFormat, WorkerWrapperInstance, containerData, pluginRepoExpanded, SearchResponse } from "./types";
+import { FilterPluginsParams, informationPluginFormat, Anilist_ListMutation, playerPluginInstanceFormat, AnimeData, cardData, episodeList, episodeMetadata, playerData, PluginManagerFormat, informationPluginInstanceFormat, playerPluginFormat, PluginMetadataFormat, PluginLoadedFormat, WorkerWrapperInstance, containerData, pluginRepoExpanded, SearchResponse, serverStatusData, PluginConfigFormat } from "./types";
 import { getPlayerPluginList, setInformationPlugin, setPlayerPlugin, setPluginRepo } from "./stores/plugins";
 import { getConfig } from "./stores/config";
 import { checkTimeDriffrentUnix, CreateSHA256, dateToUnix, detectIndex, getPluginsList, request, requestCloudflare, updateObject } from "./functions";
@@ -8,9 +8,10 @@ import { defaultConfigWeb, saveConfig } from "./FilesManager/config";
 import { toast, updateToast } from "./context/ToastNotification";
 import { unwrap } from "solid-js/store";
 
-/* IFDEF PROD|WEB */
+/* IFDEF PROD|DEBUG */
 import logger from "./logger";
 import { t } from "./i18n";
+import { GetPluginConfig, SavePluginConfig } from "./FilesManager/pluginConfig";
 /* ENDIF */
 
 const workerDummyimport = `
@@ -64,7 +65,7 @@ async function initial() {
       ok: true,
       result: {
         metadata: loaded["metadata"],
-        config: loaded["config"],
+        config: loaded["metadata"]["config"],
       },
     });
   } catch (err) {
@@ -127,6 +128,7 @@ var window = {
     yt_dlp: async (...args) => await callMainProcess("yt-dlp", args),
     requestCloudflare: async (...args) => await callMainProcess("requestCloudflare", args),
     savePluginConfig: async (...args) => await callMainProcess("saveConfig", args),
+    getConfig: async () => await callMainProcess("getConfig", args),
     animuAppInfo: "PLEASE_REPLACE_ME_ANIMU_FOR_NEW_INFORMATION_WORKER",
     config: "CHANGE_TO_CONFIG_WHEN_ARE_PERMISIONS",
     serverPort: "CHANGE_TO_PORT_SERVER"
@@ -264,7 +266,7 @@ function callMainProcess(func, args) {
 }
 
 import("CHANGETOPLUGIN").then((v) => {
-    window["loadedPlugin"] = new v.default
+    window["loadedPlugin"] = new v.default(window["config"])
     self.postMessage({
         type: "PLUGIN_METADATA",
         value: window["loadedPlugin"]["metadata"],
@@ -273,7 +275,7 @@ import("CHANGETOPLUGIN").then((v) => {
 `
 
 class WorkerWrapper implements WorkerWrapperInstance {
-    instance: Worker | undefined 
+    instance: Worker | undefined
 
     plugin_instance: playerPluginInstanceFormat | informationPluginFormat | undefined
 
@@ -295,10 +297,6 @@ class WorkerWrapper implements WorkerWrapperInstance {
     pluginURL: string = ""
     payloadURL: string = ""
 
-    constructor(otherDataPermision = false) {
-        this.otherDataPermision = otherDataPermision
-    }
-
     wrapperFunction = async (func: string, value?: { [key: string]: any }, stay: boolean = false): Promise<any> => {
         if (this.plugin_instance) {
             try {
@@ -311,12 +309,6 @@ class WorkerWrapper implements WorkerWrapperInstance {
         return new Promise((resolve, reject) => {
             if (!this.instance) return reject(new Error("Instance Dosen't Exist"))
             const id = crypto.randomUUID();
-            if (this.otherDataPermision) {
-                this.instance.postMessage({
-                    type: "CONFIG",
-                    value: unwrap(getConfig()),
-                });
-            }
 
             this.pendingRequest.set(id, resolve);
             this.instance.postMessage(unwrap({
@@ -387,7 +379,7 @@ class WorkerWrapper implements WorkerWrapperInstance {
             request: request,
             yt_dlp: window.api.yt_dlp,
             requestCloudflare: requestCloudflare,
-            savePluginConfig: () => {},
+            savePluginConfig: () => { },
             getConfig: () => defaultConfigWeb
         }
 
@@ -400,16 +392,14 @@ class WorkerWrapper implements WorkerWrapperInstance {
         try {
             const module = await import(/* @vite-ignore */ this.pluginURL);
             delete window[randomuuid]
-            
+
             if (!module["default"]) throw new Error("Failed Find Module")
 
-            this.plugin_instance = new module["default"]
-            if (!this.plugin_instance) return this.pluginData 
+            this.plugin_instance = new module["default"](config)
+            if (!this.plugin_instance) return this.pluginData
 
             this.pluginData = this.plugin_instance["metadata"]
 
-            this.plugin_instance["config"] = config
-            
 
             return this.plugin_instance["metadata"]
         } finally {
@@ -504,11 +494,20 @@ class WorkerWrapper implements WorkerWrapperInstance {
                     let tmp = data["args"]
                     if (!Array.isArray(tmp)) return
 
-                    window.api.plugins.saveConfig(this.pluginData["name"], tmp[0])
+                    SavePluginConfig(this.pluginData["name"], tmp[0])
 
                     worker.postMessage({
                         type: "RESULT",
                         value: undefined,
+                        uuid: data["uuid"]
+                    })
+                    return
+                }
+
+                if (data["value"] == "getConfig" && this.pluginData["name"] != "Worker") {
+                    worker.postMessage({
+                        type: "RESULT",
+                        value: await GetPluginConfig(this.pluginData["name"]),
                         uuid: data["uuid"]
                     })
                     return
@@ -528,7 +527,7 @@ class WorkerWrapper implements WorkerWrapperInstance {
                     func: requestCloudflare,
                     ignore: true,
                 }
-                /* ENDIF */
+                    /* ENDIF */
                 ]
 
                 const tmp = availbeFunctions.find((v) => v["name"] == data["value"])
@@ -639,6 +638,21 @@ export class playerPluginInstance implements playerPluginInstanceFormat {
         return await this.instance.wrapperFunction("searchAnime", { name, page, params }) as any
     }
 
+    raportStatus = async (): Promise<{ search: serverStatusData; player: serverStatusData; episodes: serverStatusData; } | undefined>  => {
+        if (!this.instance) return undefined
+        return await this.instance.wrapperFunction("raportStatus") as any
+    };
+
+    onChangeConfig = async (config: PluginConfigFormat[]) => {
+        if (!this.instance) return false
+        try {
+            return await this.instance.wrapperFunction("onChangeConfig", { config }) as any
+        } catch (error) {
+            console.error(`Information Plugin ${this.metadata} Error`, error)
+            return false
+        }
+    };
+
     CreateInstance = async (plugin: PluginLoadedFormat): Promise<void> => {
         this.instance = new WorkerWrapper()
         this.metadata = await this.instance.runInstance(plugin["code"], plugin["config"])
@@ -747,8 +761,18 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         }
     };
 
+    onChangeConfig = async (config: PluginConfigFormat[]) => {
+        if (!this.instance) return false
+        try {
+            return await this.instance.wrapperFunction("onChangeConfig", { config }) as any
+        } catch (error) {
+            console.error(`Information Plugin ${this.metadata} Error`, error)
+            return false
+        }
+    };
+
     CreateInstance = async (plugin: PluginLoadedFormat): Promise<void> => {
-        this.instance = new WorkerWrapper(true)
+        this.instance = new WorkerWrapper()
         this.metadata = await this.instance.runInstance(plugin["code"], plugin["config"])
     }
 
@@ -804,11 +828,17 @@ export class PluginManager implements PluginManagerFormat {
             worker.onmessage = async (e) => {
                 if (e.data["ok"]) {
 
+                    let tmpCFG = await GetPluginConfig(e["data"]["result"]["metadata"]["name"])
+                    if (tmpCFG && e["data"]["result"]["metadata"]["configFormat"]) {
+                        tmpCFG = e["data"]["result"]["metadata"]["configFormat"].map((v) => tmpCFG[v["config_name"]] ? {
+                            ...v,
+                            value: tmpCFG[v["config_name"]]
+                        } : v)
+                    }
+
                     LoadedMetadataPlugins.push({
                         metadata: e["data"]["result"]["metadata"],
-                        // IFDEF PROD|DEBUG
-                        config: await window.api.plugins.getConfig(e["data"]["result"]["metadata"]["name"], e["data"]["result"]["config"]),
-                        // ENDIF
+                        config: tmpCFG as any,
                         code: element["code"],
                         serverStatus: cache.get(e["data"]["result"]["metadata"]["name"]),
                         sha256: await CreateSHA256(element["code"])

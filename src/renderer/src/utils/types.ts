@@ -218,7 +218,7 @@ export interface globalDataFormat {
         ver: string,
         listVer: string[]
     }
-    
+
     user: UserData
 }
 
@@ -372,13 +372,13 @@ export interface playerPluginFormat {
     extractOnlyEpisodesList(type: string, anime_id: string): Promise<episodeMetadata[]>
     searchAnime(name: string, page: number, params?: FilterPluginsParams): Promise<cardData[]>
 
-    raportStatus?: () => Promise<{ search: serverStatusData, player: serverStatusData, episodes: serverStatusData }>
+    raportStatus?: () => Promise<{ search: serverStatusData, player: serverStatusData, episodes: serverStatusData } | undefined>
 
-    onChangeConfig?: (config: { [key: string]: string | boolean | number | Object }) => Promise<void>
+    onChangeConfig?: (config: PluginConfigFormat[]) => Promise<void>
 }
 
 type reverseObject = {
-  [key: string]: string | reverseObject;
+    [key: string]: string | reverseObject;
 };
 
 export interface PluginMetadataFormat {
@@ -400,12 +400,7 @@ export interface PluginMetadataFormat {
     }
 
     // TODO: Add support for dropdown
-    configFormat?: {    
-        type: "function" | "input" | "boolean" | "hidden" | "password"
-        value: string | boolean | number | Object
-        config_name: string,
-        name: string
-    }[]
+    configFormat?: PluginConfigFormat[]
 
     i18nLang?: reverseObject
 }
@@ -414,7 +409,7 @@ export interface SearchResponse { success?: boolean, content: cardData[], error?
 
 export interface informationPluginFormat {
     metadata: PluginMetadataFormat
-    
+
     config?: { [key: string]: any }
 
     loginMethod?: {
@@ -431,7 +426,7 @@ export interface informationPluginFormat {
     getAnimeList: () => Promise<cardData[]>
     setAnimeInList: (variable: Anilist_ListMutation) => Promise<boolean>
 
-    onChangeConfig?: (config: { [key: string]: string | boolean | number | Object }) => Promise<void>
+    onChangeConfig?: (config: PluginConfigFormat[]) => Promise<void>
 
     isLogged?: () => Promise<boolean>
     login?: () => Promise<UserData>
@@ -468,11 +463,18 @@ export interface serverStatusData {
     work: boolean
 }
 
+export interface PluginConfigFormat {
+    type: "input" | "boolean" | "hidden" | "password"
+    value: string | boolean | number | Object
+    config_name: string,
+    name: string
+}
+
 export type PluginLoadedFormat = {
     metadata: playerPluginFormat["metadata"],
     code: string,
     sha256: string,
-    config?: { [key: string]: any }
+    config?: PluginConfigFormat[]
 
     serverStatus?: {
         search: serverStatusData,

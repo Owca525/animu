@@ -24,12 +24,13 @@ self.onmessage = (event) => {
 
 export class SheepWorkerInstance {
     private worker: Worker | undefined
+    private function_blob: string = ""
 
     constructor() {
         const blobCode = new Blob([communication], { type: "text/javascript" });
-        const function_blob = URL.createObjectURL(blobCode);
+        this.function_blob = URL.createObjectURL(blobCode);
 
-        this.worker = new Worker(function_blob)
+        this.worker = new Worker(this.function_blob)
     }
 
     function = async (code: string, data: { [key: string]: any }) => {
@@ -77,11 +78,13 @@ export class SheepWorkerInstance {
             return execute(data)
         } catch (error) {
             console.error("SheepWorkerInstance/unsafe_function", error)
+            this.dispose()
             return undefined
         }
     }
 
     dispose = () => {
         this.worker?.terminate()
+        URL.revokeObjectURL(this.function_blob)
     }
 }

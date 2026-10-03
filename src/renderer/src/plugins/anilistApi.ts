@@ -9,7 +9,6 @@ import {
   SearchResponse,
 } from '@renderer/utils/types';
 import { CreateSHA256, dateToUnix, genYearsList, request, timeCovertToMs } from '@renderer/utils/functions';
-import { getConfig } from '@renderer/utils/stores/config';
 
 const defaultPageSize = 20
 
@@ -588,17 +587,16 @@ function getSeasonFromDate() {
 // }
 
 async function fetchCategory(params: any, title: string): Promise<containerData> {
-  const config = getConfig()
   const globalParams = params
   let container: containerData = {
     title: title,
-    data: await sendToApi(params, replacePageInGraphicApi(graphicApi, config.anilist.maxpagesize.toString()), timeCovertToMs({ min: 5 })),
+    data: await sendToApi(params, replacePageInGraphicApi(graphicApi, defaultPageSize.toString()), timeCovertToMs({ min: 5 })),
     onScrollDownFunction: async (_search, page, _params) => {
-      let resp = await sendToApi({ ...globalParams, page: page }, replacePageInGraphicApi(graphicApi, config.anilist.maxpagesize.toString()), timeCovertToMs({ min: 5 }));
+      let resp = await sendToApi({ ...globalParams, page: page }, replacePageInGraphicApi(graphicApi, defaultPageSize.toString()), timeCovertToMs({ min: 5 }));
       return {
-        maxPage: config.anilist.maxpagesize,
+        maxPage: defaultPageSize,
         content: resp, 
-        nextPage: !(resp.length < config.anilist.maxpagesize)
+        nextPage: !(resp.length < defaultPageSize)
       }
     }
   }
@@ -622,7 +620,7 @@ export default class AnilistApi implements informationPluginFormat {
     shareWebsite: {
       manga: 'https://anilist.co/manga/',
       anime: 'https://anilist.co/anime/'
-    }
+    },
   };
 
   constructor() {
@@ -697,8 +695,6 @@ export default class AnilistApi implements informationPluginFormat {
       searchOption: newOptions
     }
   }
-
-  config?: { [key: string]: any; } | undefined;
 
   async getAnimeList(): Promise<cardData[]> {
     const tmpHeader = getHeader()
@@ -787,13 +783,12 @@ export default class AnilistApi implements informationPluginFormat {
   }
 
   search = async (name: string, page: number, params?: FilterPluginsParams): Promise<SearchResponse> => {
-      const config = getConfig()
       try {
         let variables: any = {
           page: page,
           sort: "SEARCH_MATCH",
           type: "ANIME",
-          isAdult: config.anilist.adultdefault
+          isAdult: false
         }
         if (name.replaceAll(" ", "") != "") variables = { ...variables, search: name }
 
@@ -805,34 +800,33 @@ export default class AnilistApi implements informationPluginFormat {
           if (params.airing) variables = { ...variables, status: params.airing.toUpperCase() }
         }
 
-        const resp = await sendPost(variables, replacePageInGraphicApi(graphicApi, config.anilist.maxpagesize.toString()), timeCovertToMs({ min: 5 }))
-        if (!resp["json"] || !resp["success"]) return { content: [], maxPage: config.anilist.maxpagesize, nextPage: false }
+        const resp = await sendPost(variables, replacePageInGraphicApi(graphicApi, defaultPageSize.toString()), timeCovertToMs({ min: 5 }))
+        if (!resp["json"] || !resp["success"]) return { content: [], maxPage: defaultPageSize, nextPage: false }
 
         return {
           content: resp["json"].data.Page.media.map((data) => Convert(data)),
-          maxPage: config.anilist.maxpagesize,
+          maxPage: defaultPageSize,
           nextPage: resp["json"]["data"]["Page"]["pageInfo"]["hasNextPage"]
         }
       } catch (error) {
         console.error("Error in searchInAnilist/anilist", error)
         return {
           content: [],
-          maxPage: config.anilist.maxpagesize,
+          maxPage: defaultPageSize,
           nextPage: false,
         }
       }
   }
   home = async () => {
     try {
-      const config = getConfig()
       let season = getSeasonFromDate()
       let data = await sendPost({
         season: season.season,
         seasonYear: season.seasonYear,
-        isAdult: config.anilist.adultdefault,
+        isAdult: false,
         nextSeason: season.nextSeason,
         nextYear: season.nextYear,
-      }, replacePageInGraphicApi(graphicHomeApi, config.anilist.maxpagesize.toString()), timeCovertToMs({ min: 10 }))
+      }, replacePageInGraphicApi(graphicHomeApi, defaultPageSize.toString()), timeCovertToMs({ min: 10 }))
 
       if (!data.success || !data.json) {
         console.warn("home/anilistapi Failed Request", data)
@@ -844,7 +838,7 @@ export default class AnilistApi implements informationPluginFormat {
           title: "home.trending_now",
           data: data.json.data.trending.media.map((anime) => Convert(anime)),
           horizontal: true,
-          onTitleClick: async () => await fetchCategory({ ...tendingAnime, isAdult: config.anilist.adultdefault }, "home.trending_now"),
+          onTitleClick: async () => await fetchCategory({ ...tendingAnime, isAdult: false }, "home.trending_now"),
         },
         {
           title: "home.popular_in_this_season",
@@ -855,7 +849,7 @@ export default class AnilistApi implements informationPluginFormat {
             season: season.season,
             seasonYear: season.seasonYear,
             type: "ANIME",
-            isAdult: config.anilist.adultdefault
+            isAdult: false
           }, "home.popular_in_this_season"),
         },
         {
@@ -867,14 +861,14 @@ export default class AnilistApi implements informationPluginFormat {
             season: season.nextSeason,
             seasonYear: season.nextYear,
             type: "ANIME",
-            isAdult: config.anilist.adultdefault
+            isAdult: false
           }, "Upcoming Next Season"),
         },
         {
           title: "home.all_time_popular",
           data: data.json.data.popular.media.map((anime) => Convert(anime)),
           horizontal: true,
-          onTitleClick: async () => await fetchCategory({ ...allPopular, isAdult: config.anilist.adultdefault }, "home.all_time_popular"),
+          onTitleClick: async () => await fetchCategory({ ...allPopular, isAdult: false }, "home.all_time_popular"),
         }
       ]
       return { sections: home, topCards: home[0] }

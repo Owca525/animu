@@ -6,17 +6,13 @@ import { pluginRepoExpanded } from "./types";
 import { advanceRequest } from "./utils";
 import { sha256FromString } from "./utils";
 
-function getPluginConfig(name: string, config: { [key: string]: any } = {}) {
-    if (!fs.existsSync(path.join(pluginsConfigPath, `${name}.json`))) return generetaPluginConfig(name, config)
+function getPluginConfig(name: string) {
+    if (!fs.existsSync(path.join(pluginsConfigPath, `${name}.json`))) return {}
     return JSON.parse(fs.readFileSync(path.join(pluginsConfigPath, `${name}.json`), "utf-8"))
 }
 
-function generetaPluginConfig(name: string, config: { [key: string]: any } = {}) {
-    fs.writeFileSync(path.join(pluginsConfigPath, `${name}.json`), JSON.stringify(config), "utf-8")
-    return config
-}
-
 function savePluginConfig(name: string, config: { [key: string]: any } = {}) {
+    if (JSON.stringify(config) == "{}") return
     fs.writeFileSync(path.join(pluginsConfigPath, `${name}.json`), JSON.stringify(config), "utf-8")
 }
 
@@ -50,5 +46,5 @@ ipcMain.handle("plugins:install", async (_, plugin: pluginRepoExpanded) => {
     fs.writeFileSync(path.join(animuPlugins, path.basename(plugin.file)), resp.text, "utf-8")
 })
 
-ipcMain.handle("plugins:getConfig", (_, name: string, config: { [key: string]: any }) => getPluginConfig(name, config))
+ipcMain.handle("plugins:getConfig", (_, name: string) => getPluginConfig(name))
 ipcMain.handle("plugins:saveConfig", (_, name: string, config: { [key: string]: any }) => savePluginConfig(name, config))

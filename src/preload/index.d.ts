@@ -67,7 +67,7 @@ declare global {
       plugins: {
         list: () => Promise<{ file: string, content: string, type: "official" | "user", sha256: string, pluginType: "player" | "information" }[]>
         saveConfig: (name: string, config: { [key: string]: any }) => Promise<void>
-        getConfig: (name: string, config: { [key: string]: any }) => Promise<{ [key: string]: any }>
+        getConfig: (name: string) => Promise<{ [key: string]: any }>
         installUpdate: (plugin: pluginRepoExpanded) => Promise<void>
       }
       animulist: {

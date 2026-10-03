@@ -9,12 +9,9 @@ import {
     FilterParams,
     FilterPluginsParams,
     homeData,
-    informationPluginFormat,
     playerChapterList,
     playerData,
-    playerPluginFormat,
     playlistFormatData,
-    PluginLoadedFormat,
     resolutionFormat,
     themeMetadata
 } from './types';
@@ -564,17 +561,6 @@ export function getRenderPath(): string {
     return `${location.origin}${location.pathname.replace("index.html", "")}`
 }
 
-export function savePluginConfig(pluginName: string, newConfig: PluginLoadedFormat["config"]) {
-    if (!newConfig) return
-
-    window.api.plugins.saveConfig(pluginName, newConfig)
-}
-
-export async function getPluginConfig(instance: playerPluginFormat | informationPluginFormat): Promise<{ [key: string]: any; } | undefined> {
-    if (!instance.config) return
-    return await window.api.plugins.getConfig(instance.metadata.name, instance.config)
-}
-
 export function loadedPluginsList() {
     const plugins = getPlayerPluginList()
     const hiddenPlugins = new Set(getConfig().plugins.hiddenPlugins)
@@ -660,17 +646,6 @@ export async function getPluginsList() {
     return await window.api.plugins.list()
     /* ENDIF */
     return []
-}
-
-export async function getPluginInitialConfig(name: string, config: { [key: string]: any; }): Promise<{ [key: string]: any; }> {
-    /* IFDEF WEB */
-    localStorage.setItem(name, JSON.stringify(config))
-    return config
-    /* ENDIF */
-
-    /* IFDEF DEBUG|PROD */
-    return await window.api.plugins.getConfig(name, config)
-    /* ENDIF */
 }
 
 
@@ -1003,8 +978,8 @@ async function Send_Episode_Notification(item: playlistFormatData) {
 
     if (GetNumberFromString(item["anime"]["saveData"]!["episode"]) < GetNumberFromString(episodes.at(-1))) {
         sendNotification({
-            title: `New Episode Avaible in ${temporal_plugin.metadata.name} plugin`,
-            description: `Watch Episode ${episodes.at(-1)} Of ${detectTitleConfig(item.anime.AnimeData.title)}`,
+            title: t(`New Episode Avaible in ${temporal_plugin.metadata.name} plugin`),
+            description: t(`Watch Episode ${episodes.at(-1)} Of ${detectTitleConfig(item.anime.AnimeData.title)}`),
             icon: item.anime.AnimeData.coverImage
         })
     }
@@ -1265,7 +1240,7 @@ export async function requestCloudflare(url: string): Promise<{ cookie: string, 
         let interval = setInterval(() => {
             resolve({ cookie: "", header: {} })
         }, 10000)
-        toast("Verify Cloudflare to use plugin. Click to open window", {
+        toast(t("Verify Cloudflare to use plugin. Click to open window"), {
             type: "info", onClick: async () => {
                 clearInterval(interval)
                 resolve(await window.BrowserWindow.createWindow({ url: url, type: "CloudFlare" }))

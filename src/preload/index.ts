@@ -56,7 +56,7 @@ if (process.contextIsolated) {
       plugins: {
         list: () => ipcRenderer.invoke("plugins:list"),
         saveConfig: (name: string, config: { [key: string]: any }) => ipcRenderer.invoke("plugins:saveConfig", name, config),
-        getConfig: (name: string, config: { [key: string]: any }) => ipcRenderer.invoke("plugins:getConfig", name, config),
+        getConfig: (name: string) => ipcRenderer.invoke("plugins:getConfig", name),
         installUpdate: (plugin: pluginRepoExpanded) => ipcRenderer.invoke("plugins:install", plugin)
       },
       yt_dlp: {

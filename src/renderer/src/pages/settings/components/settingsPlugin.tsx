@@ -52,7 +52,7 @@ export default function SettingsPlugin(props: SettingsPluginProps) {
                     </Show>
                 </div>
                 <div class='settings-extension-bottom-right'>
-                    <Show when={props["plugin"]["config"] && JSON.stringify(props["plugin"]["config"]) != "{}"}>
+                    <Show when={props["plugin"]["config"] && props["plugin"]["config"].length > 0}>
                         <Button icon='settings' ButtonClass='settings-extension-button' onClick={() => props.pluginSettings(props.plugin)} />
                     </Show>
                 </div>

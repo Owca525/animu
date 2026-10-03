@@ -417,11 +417,11 @@ export function timeCovertToMs(time) {
     return 0
 }
 
-export const getConfig = () => {
+export const getConfig = async () => {
     if (context) return context["getConfig"]()
 
     if (typeof window["config"] == "string") return
-    return window["config"]
+    return await window["getConfig"]()
 };
 export const getGlobalCache = () => {};
 

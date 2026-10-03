@@ -17,7 +17,6 @@ import {
     convertPath,
     openUrlFolder,
     request,
-    savePluginConfig,
     updateObject
 } from '@renderer/utils/functions';
 import { checkUpdate } from '@renderer/utils/update';
@@ -25,6 +24,7 @@ import {
     ContextMenuProps,
     informationPluginFormat,
     playerPluginFormat,
+    PluginConfigFormat,
     PluginLoadedFormat,
     SettingsConfig,
     themeMetadata
@@ -57,6 +57,7 @@ import { OvewriteAnimuList } from '@renderer/utils/FilesManager/animulist';
 import OtherSettings from './components/otherSettings';
 import { SheepShortcut } from '@renderer/utils/hooks/useKeyPress';
 import pluginManager from '@renderer/utils/pluginManager';
+import { SavePluginConfig } from '@renderer/utils/FilesManager/pluginConfig';
 
 export type pluginRepoExpandedSettings = {
     name: string,
@@ -385,24 +386,41 @@ function settings() {
 
     function openPluginSettings(plugin: PluginLoadedFormat) {
         if (!plugin.config) return
+
+        let cfgObject = {}
+
+        plugin.config.forEach((value) => {
+            cfgObject = {...cfgObject, [value["config_name"]]: value["value"]}
+        })
+
         showCustomMenu(() => OtherSettings({
             title: t("settings.extensions.conf", { title: plugin.metadata.name }),
             pluginConfig: {
-                config: plugin.config!,
+                config: cfgObject,
                 onChange: (v, a) => savePluginSettings(plugin.config!, v, a, plugin)
             }
         }))
     }
 
-    function savePluginSettings(config: { [key: string]: any }, variable: string, change: any, plugin: PluginLoadedFormat) {
-        let tmpConfig = config
-        for (const key in config) {
-            if (key == variable) tmpConfig = { ...tmpConfig, [key]: change }
-        }
-        savePluginConfig(plugin["metadata"]["name"], tmpConfig)
-        plugin.config = tmpConfig
+    function savePluginSettings(config: PluginConfigFormat[], variable: string, change: any, plugin: PluginLoadedFormat) {
+        config = config.map((value) => value["config_name"] == variable ? {
+            ...value,
+            value: change
+        }: value)
 
-        // TODO: END THIS
+
+        SavePluginConfig(plugin["metadata"]["name"], config)
+
+        const playerPlugin = getPlayerPLugin()
+        const information = getInformationPlugin()
+
+        if (playerPlugin["metadata"]["name"] == plugin["metadata"]["name"] && playerPlugin.onChangeConfig) {
+            playerPlugin.onChangeConfig(config)
+        }
+
+        if (information["metadata"]["name"] == plugin["metadata"]["name"] && information.onChangeConfig) {
+            information.onChangeConfig(config)
+        }
     }
 
     function hidePlayerPlugin(plugin: PluginLoadedFormat, active: boolean) {
