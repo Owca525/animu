@@ -4,9 +4,14 @@ import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
 import { CheckNumber, convertKeybinds, createElement, CreateSHA256, dateToUnix, detectTitleConfig, formatNumber, formatTime, openUrlFolder, request, toggleFullscreen } from "@renderer/utils/functions"
 import { getConfig } from "@renderer/utils/stores/config"
 import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, player_script_injector, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, Thumbnail } from "@renderer/utils/types"
+
+/* IFDEF DYNAMIC */
 import Hls, { HlsConfig } from "hls.js"
-import HLSWorker from "hls.js/dist/hls.worker.js?url"
+/* ENDIF */
+
 import shaka from "shaka-player"
+
+import HLSWorker from "hls.js/dist/hls.worker.js?url"
 import { Component, For, onCleanup, onMount, Show } from "solid-js"
 import { createStore, unwrap } from "solid-js/store"
 import PlayerButton from "./components/PlayerButton"
@@ -305,7 +310,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         })
     }
 
-    onMount(() => {
+    onMount(async () => {
         SheePlayer.currentTime = player.currentTime;
 
         if (!anime) updateUI({
@@ -635,6 +640,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
     async function ExecuteHLS() {
         if (!player["currentResolution"]) return console.error("NO RESOLUTION FOUND")
+
+        const { default: Hls } = await import('hls.js')
 
         updatePlayer({ HLSMode: true })
 

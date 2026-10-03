@@ -7,7 +7,7 @@ export function ErrorCreatorContext(props: { children: JSX.Element }) {
 
     createGlobalError = (error) => setError(error)
 
-    const makeError = () => { throw new Error(error() as any) }
+    const makeError = () => { throw error() }
 
     return (
         <>

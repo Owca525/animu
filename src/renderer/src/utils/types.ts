@@ -1,4 +1,7 @@
+/* IFDEF DYNAMIC */
 import { Socket } from "socket.io-client"
+/* ENDIF */
+
 import { JSX } from "solid-js"
 
 // export const notificationProps = {

@@ -26,10 +26,12 @@ import {
 } from '@renderer/utils/functions';
 import {
     For,
+    lazy,
     Match,
     onCleanup,
     onMount,
     Show,
+    Suspense,
     Switch
 } from 'solid-js';
 import { animulistData, getAnimuHistory, getGlobalCache, informationCache, PlayerCache } from '@renderer/utils/stores/global';
@@ -59,7 +61,10 @@ import { setNewActivePage, StartHomeSearch } from '../home';
 import EpisodeBox from './components/episodeBox';
 import { SheepShortcut } from '@renderer/utils/hooks/useKeyPress';
 import pluginManager from '@renderer/utils/pluginManager';
-import Player from '../player/Player';
+// import Player from '../player/Player';
+
+const Player = lazy(() => import('../player/Player'))
+
 import RelationCardContainer from './components/relationCardsContainer';
 
 // TODO: RE-ADD OPENING MUSIC IN INFORMATION
@@ -935,11 +940,13 @@ function information() {
                                     <Match when={contentResponse.data() && (contentResponse.data()!["type"] == "trailer" || contentResponse.data()!["type"] == "music")}>
                                         <Switch>
                                             <Match when={config["information"]["trailerplayertype"] == "player"}>
-                                                <Player
-                                                    type='embed'
-                                                    playerTitle=""
-                                                    metadata={contentResponse.data()!["content"] as any}
-                                                />
+                                                <Suspense fallback={<div class="information-loading-container"><span class="material-symbols-outlined information-loading">progress_activity</span></div>}>
+                                                    <Player
+                                                        type='embed'
+                                                        playerTitle=""
+                                                        metadata={contentResponse.data()!["content"] as any}
+                                                    />
+                                                </Suspense>
                                             </Match>
                                             <Match when={config["information"]["trailerplayertype"] == "embed"}>
                                                 <iframe

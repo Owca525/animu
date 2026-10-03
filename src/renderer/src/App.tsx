@@ -2,11 +2,11 @@ import Home from './pages/home/index';
 import icon from '@resources/icon.png';
 import Information from './pages/information/index';
 import Player from './pages/player/index';
-import Settings from './pages/settings/index';
+// import Settings from './pages/settings/index';
 
 // const Home = lazy(() => import("./pages/home/index"));
 // const Player = lazy(() => import("./pages/player/index"));
-// const Settings = lazy(() => import("./pages/settings/index"));
+const Settings = lazy(() => import("./pages/settings/index"));
 // const Information = lazy(() => import("./pages/information/index"));
 
 import {
@@ -26,6 +26,7 @@ import { convertHistoryToAnimuList, setNewAnimuList } from './utils/FilesManager
 import { CreateBackup } from './utils/backup';
 import {
   createSignal,
+  lazy,
   onMount,
   Show,
   Suspense,
@@ -137,12 +138,12 @@ function App() {
 
     try {
       window["logger"].saveLogs()
-      toast(t("Succesfully Saved Logs in Animu Appdata Folder"), { type: "success" })
+      toast(t("Succesfully Saved Logs in Animu Appdata Folder"), { type: "success" })
     } catch (error) {
       console.error("App/SheepShortcut Failed Save Logs", error)
-      toast(t("Failed Save Logs"), { type: "error" })
+      toast(t("Failed Save Logs"), { type: "error" })
     }
-    
+
   })
   /* ENDIF */
 
@@ -210,7 +211,7 @@ function App() {
         ...metadata["theme"]
       ]);
       /* ENDIF */
-      
+
       /* IFDEF DEBUG|PROD */
       setinitialState({ text: "Loading Animulist", plugin: false })
       setNewAnimuList(metadata["animulist"])
@@ -230,6 +231,7 @@ function App() {
       setHome()
 
       setInitation(false)
+      setinitialState({ text: t("Fetching Resources"), plugin: false })
       initialServices()
 
       /* IFDEF DEBUG|PROD */
@@ -289,24 +291,30 @@ function App() {
     /* ENDIF */
   }
 
+  function LoadingMenu() {
+    return (
+      <main class='animu-initial-container'>
+        <span></span>
+        <img src={icon} alt="Animu Icon" class='animu-initial-icon' />
+        <div class="animu-initial-content">
+          <span class='animu-initial-text'>{t("initial.animu")}</span>
+          <div class="animu-initial-state">
+            <span class='animu-initial-text'>{t(initialState().text)}</span>
+          </div>
+        </div>
+        <span class='material-symbols-outlined loading-animation icon'>progress_activity</span>
+      </main>
+    )
+  }
+
   return (
     <>
       <Show when={isInitation()}>
-        <main class='animu-initial-container'>
-          <span></span>
-          <img src={icon} alt="Animu Icon" class='animu-initial-icon' />
-          <div class="animu-initial-content">
-            <span class='animu-initial-text'>{t("initial.animu")}</span>
-            <div class="animu-initial-state">
-              <span class='animu-initial-text'>{t(initialState().text)}</span>
-            </div>
-          </div>
-          <span class='material-symbols-outlined loading-animation icon'>progress_activity</span>
-        </main>
+        {LoadingMenu()}
       </Show>
       <Show when={!isInitation()}>
         <HashRouter>
-          <Suspense >
+          <Suspense fallback={LoadingMenu()}>
             <Route path="/" component={Home} />
             <Route path="/info" component={Information} />
             <Route path="/settings" component={Settings} />

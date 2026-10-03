@@ -8,7 +8,7 @@ import Button from "@renderer/components/buttons";
 import { SaveHistory } from "@renderer/utils/FilesManager/history";
 import { useNavigate } from "@solidjs/router";
 import { getConfig } from "@renderer/utils/stores/config";
-import { Match, onCleanup, onMount, Switch } from "solid-js";
+import { lazy, Match, onCleanup, onMount, Suspense, Switch } from "solid-js";
 // import ExternalPlayer from "./externalPlayer";
 import { useResponse } from "@renderer/utils/hooks/useResponse";
 import { useI18n } from "@renderer/utils/i18n";
@@ -17,7 +17,9 @@ import { animulistData, getAnimuHistory, getSocket, getSocketRoom, informationCa
 import { createStore } from "solid-js/store";
 import { SheepShortcut } from "@renderer/utils/hooks/useKeyPress";
 import pluginManager from "@renderer/utils/pluginManager";
-import Player from "./Player";
+// import Player from "./Player";
+
+const Player = lazy(() => import('./Player'))
 
 
 const player = () => {
@@ -285,20 +287,22 @@ const player = () => {
                 />
             </Match> */}
             <Match when={response.data() && !response.loading() && !response.error()}>
-                <Player
-                    type="player"
-                    metadata={response.data()!}
-                    playerTitle={detectTitle({ title: anime_data["anime"]["title"], ep: episode.current, format: anime_data["anime"]["format"] })}
-                    anime={{
-                        AnimeData: anime_data.anime,
-                        saveData: anime_data.saveData,
-                        animulist: anime_data.animulist
-                    }}
-                    ep_metadata={{ current: FindEpisode(episode.current), type: episode.type, list: episode.list }}
-                    onChangeEpisode={setNewEpisode}
-                    setTime={episode.time}
-                    onExitPlayer={leave}
-                />
+                <Suspense fallback={loadingAnimation(leave, { data: anime_data?.anime as any, ep: episode.current }, episode)}>
+                    <Player
+                        type="player"
+                        metadata={response.data()!}
+                        playerTitle={detectTitle({ title: anime_data["anime"]["title"], ep: episode.current, format: anime_data["anime"]["format"] })}
+                        anime={{
+                            AnimeData: anime_data.anime,
+                            saveData: anime_data.saveData,
+                            animulist: anime_data.animulist
+                        }}
+                        ep_metadata={{ current: FindEpisode(episode.current), type: episode.type, list: episode.list }}
+                        onChangeEpisode={setNewEpisode}
+                        setTime={episode.time}
+                        onExitPlayer={leave}
+                    />
+                </Suspense>
             </Match>
             {/* <Match when={!response.Initial() && !response.error() && !response.loading() && response.data() == undefined}>
                 {showErrorDialog()}

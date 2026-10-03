@@ -1,6 +1,8 @@
 import { animeOpeningsFormat, cardData, deeplinkFormat, globalDataFormat, informationTmpProps, NotificationExpanded, PlayerTmpProps, serviceFormat, themeMetadata, UserData } from "../types";
 import { createStore } from "solid-js/store";
+/* IFDEF DYNAMIC */
 import { Socket } from "socket.io-client";
+/* ENDIF */
 
 export const [globalState, setGlobalState] = createStore<globalDataFormat>({
     incognito: false,

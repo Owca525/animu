@@ -338,7 +338,14 @@ export default defineConfig({
           main: resolve(__dirname, "src/renderer/index.html"),
         },
       },
-      minify: process.env.ANIMU_WEB ? true : false,
+      minify: 'terser',
+      terserOptions: {
+        mangle: false,
+        compress: true,
+        format: {
+          comments: false,
+        },
+      },
     },
     plugins: [
       viteConditionPlugin({

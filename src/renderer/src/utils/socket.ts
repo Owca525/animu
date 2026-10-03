@@ -1,5 +1,4 @@
 import { getSocket, PlayerCache, setIncognitoMode, setSocket, setSocketRoom } from "./stores/global";
-import { io } from "socket.io-client";
 import { toast } from "./context/ToastNotification";
 import { globalNavigate } from "./functions";
 import { playerData } from "./types";
@@ -56,7 +55,9 @@ function OverWritePlayer(url: string, hls: boolean = false, customReq?: { [key: 
 
 (window as any).OverWritePlayer = OverWritePlayer;
 
-export function runSocket(server: string = "") {
+export async function runSocket(server: string = "") {
+    const { io: io } = await import("socket.io-client")
+
     const socket = io(server)
 
     socket.on("player:init", (playerData) => {
