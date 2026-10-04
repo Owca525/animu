@@ -196,12 +196,10 @@ export interface AnimuListFormat { AnimeData: AnimeData, animulist: animulistPro
 export interface globalDataFormat {
     incognito: boolean,
     history: Map<string, cardData>,
-    deeplinkRunned: boolean,
     loadedTheme: themeMetadata[],
     activeThemes: Map<number, themeMetadata>
     token: string | undefined,
     service: serviceFormat[]
-    deepLinks: deeplinkFormat[]
     socket?: {
         instance: Socket,
         currentRoom: string,
@@ -365,8 +363,6 @@ export interface themeMetadata {
 export interface playerPluginFormat {
     metadata: PluginMetadataFormat
 
-    config?: { [key: string]: any }
-
     extractPlayerData(type: string, episode: episodeMetadata, id: string): Promise<playerData[]>
     extractEpisodeList(animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined>
     extractOnlyEpisodesList(type: string, anime_id: string): Promise<episodeMetadata[]>
@@ -380,6 +376,12 @@ export interface playerPluginFormat {
 type reverseObject = {
     [key: string]: string | reverseObject;
 };
+
+export type InformationLoginTypes = {
+    type: "deeplink",
+    deepLinkurl: string,
+    // callback: (content: string) => Promise<void>
+}
 
 export interface PluginMetadataFormat {
     version: string
@@ -402,6 +404,8 @@ export interface PluginMetadataFormat {
     // TODO: Add support for dropdown
     configFormat?: PluginConfigFormat[]
 
+    loginMethod?: InformationLoginTypes
+
     i18nLang?: reverseObject
 }
 
@@ -409,14 +413,6 @@ export interface SearchResponse { success?: boolean, content: cardData[], error?
 
 export interface informationPluginFormat {
     metadata: PluginMetadataFormat
-
-    config?: { [key: string]: any }
-
-    loginMethod?: {
-        type: "deeplink",
-        deepLinkurl?: string,
-        callback: (content: string) => Promise<void>
-    }
 
     search(name: string, page: number, params?: FilterPluginsParams): Promise<SearchResponse>
     home(): Promise<{ topCards?: containerData, sections: containerData[] } | { error: string } | undefined>
@@ -429,8 +425,10 @@ export interface informationPluginFormat {
     onChangeConfig?: (config: PluginConfigFormat[]) => Promise<void>
 
     isLogged?: () => Promise<boolean>
-    login?: () => Promise<UserData>
-    unLogin?: () => Promise<boolean>
+    login?: (content?: { [key: string]: any }) => Promise<UserData | undefined>
+    unLogin?: () => Promise<boolean | { redirect: string }>
+    updateUser?: (user: UserData) => Promise<boolean>
+    getUser?: () => Promise<UserData | undefined>
 }
 
 export interface WorkerWrapperInstance {
@@ -809,4 +807,6 @@ export interface UserData {
 
     banner?: string,
     avatar?: string,
+
+    logged?: boolean
 }

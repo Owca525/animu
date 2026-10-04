@@ -103,6 +103,11 @@
     background-color: var(--blue-background) !important;
 }
 
+.user-profile-button.red {
+    background-color: var(--red-one) !important;
+    color: var(--red-text) !important;
+}
+
 .user-profile-bottom {
     display: flex;
     flex-direction: row;

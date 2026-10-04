@@ -442,7 +442,7 @@ export function requestCloudflare(url) {
  * @param {{ [key: string]: any }} config 
  * @returns {void} 
  */
-export function savePluginConfig(config) {
+export function saveConfig(config) {
     if (context) return context["savePluginConfig"](config)
     return window["savePluginConfig"](config)
 }

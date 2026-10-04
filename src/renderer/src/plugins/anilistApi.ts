@@ -7,10 +7,20 @@ import {
   genres,
   informationPluginFormat,
   SearchResponse,
+  UserData,
 } from '@renderer/utils/types';
-import { CreateSHA256, dateToUnix, genYearsList, request, timeCovertToMs } from '@renderer/utils/functions';
+import { CreateSHA256, dateToUnix, genYearsList, request, saveConfig, timeCovertToMs } from '@renderer/utils/functions';
 
 const defaultPageSize = 20
+
+let config = [{
+  type: "hidden",
+  value: "" as any,
+  config_name: "anilist_user",
+  name: "Anilist User"
+}]
+
+let ACCESS_TOKEN = ""
 
 const animeData = `
       id
@@ -397,6 +407,31 @@ query(
 }
 `;
 
+const userQuery = `
+  query {
+    Viewer {
+      id
+      name
+      createdAt
+      bannerImage
+      about
+      avatar {
+        large
+      }
+    }
+  }
+`;
+
+const UpdateUserDesc = `
+  mutation($about: String) {
+    UpdateUser(about: $about) {
+      id
+      name
+      about
+    }
+  }
+`;
+
 // const genres = `
 // query {
 //   GenreCollection
@@ -478,15 +513,11 @@ function Convert(convert: any): cardData {
 }
 
 function getHeader() {
-  // if (localStorage.getItem("Animu_Anilist_login_token_information")) {
-  //   try {
-  //     const token = JSON.parse(localStorage.getItem("Animu_Anilist_login_token_information") as any)
-  //     return { ...header, 'Authorization': 'Bearer ' + token["access_token"], }
-  //   } catch (error) {
-  //     console.error("getHeader/anilistapi", error)
-  //     return header
-  //   }
-  // }
+  if (`${ACCESS_TOKEN}`.length > 0) return {
+    ...header,
+    'Authorization': `Bearer ${ACCESS_TOKEN}`
+  }
+
   return header
 }
 
@@ -595,7 +626,7 @@ async function fetchCategory(params: any, title: string): Promise<containerData>
       let resp = await sendToApi({ ...globalParams, page: page }, replacePageInGraphicApi(graphicApi, defaultPageSize.toString()), timeCovertToMs({ min: 5 }));
       return {
         maxPage: defaultPageSize,
-        content: resp, 
+        content: resp,
         nextPage: !(resp.length < defaultPageSize)
       }
     }
@@ -610,7 +641,7 @@ function replacePageInGraphicApi(graphicTMP: string, variable: string) {
 export default class AnilistApi implements informationPluginFormat {
   metadata: informationPluginFormat["metadata"] = {
     version: "2.0",
-    name: "AnilistApi",
+    name: "Anilist",
     pageSize: defaultPageSize,
     searchOption: [],
     author: "Owca525",
@@ -621,9 +652,24 @@ export default class AnilistApi implements informationPluginFormat {
       manga: 'https://anilist.co/manga/',
       anime: 'https://anilist.co/anime/'
     },
+
+    configFormat: [{
+      type: "hidden",
+      value: "",
+      config_name: "anilist_user",
+      name: "Anilist User"
+    }],
+
+    loginMethod: {
+      type: "deeplink",
+      deepLinkurl: "https://anilist.co/api/v2/oauth/authorize?client_id=30450&response_type=code"
+    }
   };
 
-  constructor() {
+  constructor(cfg) {
+    config = cfg
+    if (cfg && cfg[0] && cfg[0]["value"] && `${cfg[0]["value"]}`.length > 0) ACCESS_TOKEN = cfg[0]["value"]
+
     const options = {
       genres: [
         "Action",
@@ -783,39 +829,39 @@ export default class AnilistApi implements informationPluginFormat {
   }
 
   search = async (name: string, page: number, params?: FilterPluginsParams): Promise<SearchResponse> => {
-      try {
-        let variables: any = {
-          page: page,
-          sort: "SEARCH_MATCH",
-          type: "ANIME",
-          isAdult: false
-        }
-        if (name.replaceAll(" ", "") != "") variables = { ...variables, search: name }
-
-        if (params) {
-          if (params.genres) variables = { ...variables, genres: params.genres }
-          if (params.years) variables = { ...variables, seasonYear: parseInt(params.years) }
-          if (params.season) variables = { ...variables, season: params.season.toUpperCase() }
-          if (params.format) variables = { ...variables, format: params.format.toUpperCase() }
-          if (params.airing) variables = { ...variables, status: params.airing.toUpperCase() }
-        }
-
-        const resp = await sendPost(variables, replacePageInGraphicApi(graphicApi, defaultPageSize.toString()), timeCovertToMs({ min: 5 }))
-        if (!resp["json"] || !resp["success"]) return { content: [], maxPage: defaultPageSize, nextPage: false }
-
-        return {
-          content: resp["json"].data.Page.media.map((data) => Convert(data)),
-          maxPage: defaultPageSize,
-          nextPage: resp["json"]["data"]["Page"]["pageInfo"]["hasNextPage"]
-        }
-      } catch (error) {
-        console.error("Error in searchInAnilist/anilist", error)
-        return {
-          content: [],
-          maxPage: defaultPageSize,
-          nextPage: false,
-        }
+    try {
+      let variables: any = {
+        page: page,
+        sort: "SEARCH_MATCH",
+        type: "ANIME",
+        isAdult: false
       }
+      if (name.replaceAll(" ", "") != "") variables = { ...variables, search: name }
+
+      if (params) {
+        if (params.genres) variables = { ...variables, genres: params.genres }
+        if (params.years) variables = { ...variables, seasonYear: parseInt(params.years) }
+        if (params.season) variables = { ...variables, season: params.season.toUpperCase() }
+        if (params.format) variables = { ...variables, format: params.format.toUpperCase() }
+        if (params.airing) variables = { ...variables, status: params.airing.toUpperCase() }
+      }
+
+      const resp = await sendPost(variables, replacePageInGraphicApi(graphicApi, defaultPageSize.toString()), timeCovertToMs({ min: 5 }))
+      if (!resp["json"] || !resp["success"]) return { content: [], maxPage: defaultPageSize, nextPage: false }
+
+      return {
+        content: resp["json"].data.Page.media.map((data) => Convert(data)),
+        maxPage: defaultPageSize,
+        nextPage: resp["json"]["data"]["Page"]["pageInfo"]["hasNextPage"]
+      }
+    } catch (error) {
+      console.error("Error in searchInAnilist/anilist", error)
+      return {
+        content: [],
+        maxPage: defaultPageSize,
+        nextPage: false,
+      }
+    }
   }
   home = async () => {
     try {
@@ -897,5 +943,107 @@ export default class AnilistApi implements informationPluginFormat {
       console.error("Uknown error in getManga/anilistapi", error)
       return
     }
+  }
+
+  login = async (content?: { [key: string]: any; }): Promise<UserData | undefined> => {
+    if (!content || !content["code"]) return
+
+    const token: string = `${content["code"]}`.replace("?code=", "")
+
+    const response = await request("https://anilist.co/api/v2/oauth/token", {
+      method: "POST",
+      headers: header,
+      body: JSON.stringify({
+        grant_type: "authorization_code",
+        client_id: 30450,
+        client_secret: "DyAHkynxiqCjGVqD6Lp6oeCboQOf5HYK3s0yblws",
+        redirect_uri: "animu://anilist",
+        code: token
+      })
+    });
+
+    /* IFDEF DEBUG */
+    console.warn("Anilist/login response", response)
+    /* ENDIF */
+
+    if (!response["success"] || !response["json"]) return
+
+    config = config.map((v) => v["config_name"] == "anilist_user" ? { ...v, value: response["json"] } : v)
+    saveConfig(config as any)
+
+    ACCESS_TOKEN = response["json"]["access_token"]
+
+    const userResponse = await request("https://graphql.anilist.co", {
+      method: "POST",
+      headers: getHeader(),
+      body: JSON.stringify({ query: userQuery })
+    });
+
+    /* IFDEF DEBUG */
+    console.warn("Anilist/login userResponse", userResponse)
+    /* ENDIF */
+
+    if (!userResponse["success"] || !userResponse["json"]) return
+
+    const user = userResponse["json"]["data"]["Viewer"]
+
+    return {
+      username: user["name"],
+      description: user["about"],
+      created_date: user["createdAt"],
+      animu_time: 0,
+      banner: user["bannerImage"],
+      avatar: user["avatar"]["large"],
+      logged: true,
+    }
+  }
+
+  isLogged = async (): Promise<boolean> => {
+    if (`${ACCESS_TOKEN}`.length > 0) return true
+    return false
+  }
+
+  unLogin = async () => {
+    config = config.map((v) => v["config_name"] == "anilist_user" ? { ...v, value: "" } : v)
+    ACCESS_TOKEN = ""
+
+    return { redirect: "https://anilist.co/settings/apps" }
+  }
+
+  getUser = async (): Promise<UserData | undefined> => {
+    const userResponse = await request("https://graphql.anilist.co", {
+      method: "POST",
+      headers: getHeader(),
+      body: JSON.stringify({ query: userQuery })
+    });
+
+    if (!userResponse["success"] || !userResponse["json"]) return
+
+    const user = userResponse["json"]["data"]["Viewer"]
+
+    return {
+      username: user["name"],
+      description: user["about"],
+      created_date: user["createdAt"],
+      animu_time: 0,
+      banner: user["bannerImage"],
+      avatar: user["avatar"]["large"],
+      logged: true,
+    }
+  }
+
+  updateUser = async (user: UserData): Promise<boolean> => {
+    const response = await request("https://graphql.anilist.co", {
+      method: "POST",
+      headers: getHeader(),
+      body: JSON.stringify({
+        query: UpdateUserDesc,
+        variables: {
+          about: user["description"]
+        }
+      })
+    });
+
+    return response["success"]
   }
 }

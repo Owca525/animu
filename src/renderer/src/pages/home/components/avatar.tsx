@@ -5,12 +5,15 @@ import { createSignal } from "solid-js";
 import { animulistData, GetUser, GetUserAvatar, UpdateUserData } from "@renderer/utils/stores/global";
 import { showCustomMenu } from "@renderer/utils/context/menuContext";
 import Button from "@renderer/components/buttons";
-import { User_Calculate_Watch_Time, User_Format_Time } from "@renderer/utils/functions";
+import { DownloadIMGToBase64, openUrlFolder, User_Calculate_Watch_Time, User_Format_Time } from "@renderer/utils/functions";
 import { UserData } from "@renderer/utils/types";
 import Input from "@renderer/components/input";
 import FilePicker from "@renderer/components/filePicker";
 import { createStore } from "solid-js/store";
-import { toast } from "@renderer/utils/context/ToastNotification";
+import { removeToast, toast } from "@renderer/utils/context/ToastNotification";
+import { getInformationPlugin } from "@renderer/utils/stores/plugins";
+import deeplink from "@renderer/utils/deeplinks";
+import { showDialog } from "@renderer/utils/context/DialogContext";
 
 export default function Avatar() {
   const [avatar, setAvatar] = createSignal<string>(GetUserAvatar() ?? icon);
@@ -32,9 +35,110 @@ function GetBanner(user: UserData) {
   }
 }
 
+export async function updateUser(user: UserData) {
+  try {
+    if (await window.api.user.change(JSON.parse(JSON.stringify(user)))) {
+      UpdateUserData(user)
+      toast(t("Succesfully Updated User Data"), { type: "success" })
+    } else {
+      toast(t("Failed Update User Data"), { type: "error" })
+    }
+  } catch (error) {
+    console.error("avatar/updateUser", error)
+    toast(t("Failed Update User Data"), { type: "error" })
+  }
+}
+
+export async function LoginToInformationPlugin() {
+  const plugin = getInformationPlugin()
+
+  if (!plugin["metadata"]["loginMethod"] || !plugin.login || !plugin.updateUser) return
+
+  deeplink.add({
+    name: plugin["metadata"]["name"],
+    code: `${plugin["metadata"]["name"]}`.toLowerCase(),
+    func: async function (content: string) {
+      deeplink.remove(plugin["metadata"]["name"])
+
+      const response = await plugin.login!({ code: content })
+      console.log(response)
+
+      updateUser({
+        ...GetUser(),
+        logged: true
+      })
+
+      const animuUser = GetUser()
+
+      showDialog({
+        type: "info",
+        title: t("Action"),
+        description: t(`Do you want overwrite Animu profile or write animu profile in ${plugin["metadata"]["name"]}`),
+        buttons: [{
+          title: t("Overwrite in Animu"),
+          onClick: async () => {
+            await updateUser({
+              ...response!,
+              created_date: animuUser["created_date"],
+              animu_time: window["animu_timer"],
+              banner: await DownloadIMGToBase64(response!["banner"]),
+              avatar: await DownloadIMGToBase64(response!["avatar"])
+            })
+          }
+        }, {
+          title: t(`Overwrite in ${plugin["metadata"]["name"]}`),
+          onClick: async () => {
+            const id = toast(t(`Updating profile in ${plugin["metadata"]["name"]}`), { type: "loading", timer: false })
+
+            try {
+              const resp = await plugin.updateUser!(animuUser)
+              removeToast(id)
+
+              if (resp) toast(t(`Sucessfully Updated Profile in ${plugin["metadata"]["name"]}`), { type: "success" })
+              else toast(t(`Failed Update Profile in ${plugin["metadata"]["name"]}`), { type: "error" })
+            } catch (error) {
+              toast(t(`Failed Update Profile in ${plugin["metadata"]["name"]}`), { type: "error" })
+            }
+          }
+        }]
+      })
+    }
+  })
+
+  openUrlFolder(plugin["metadata"]["loginMethod"]["deepLinkurl"])
+}
+
+export async function LoginOut() {
+  const plugin = getInformationPlugin()
+
+  if (!plugin.unLogin) return console.error("Failed Log out beacuse missing functions")
+
+  const resp = await plugin.unLogin()
+  if (typeof resp == "object") {
+    updateUser({
+      ...GetUser(),
+      logged: false
+    })
+
+    openUrlFolder(resp["redirect"])
+    return
+  }
+
+  if (resp) {
+    toast(t(`Sucessfully Logout from ${plugin["metadata"]["name"]}`), { type: "success" })
+    updateUser({
+      ...GetUser(),
+      logged: false
+    })
+  } else {
+    toast(t(`Failed Logout from ${plugin["metadata"]["name"]}`), { type: "success" })
+  }
+}
+
 export function User_Profile() {
   const user = GetUser()
   const [avatar, setAvatar] = createSignal<string>(user["avatar"] ?? icon);
+  const plugin = getInformationPlugin()
 
   return (
     <main class="user-profile-container">
@@ -53,7 +157,11 @@ export function User_Profile() {
 
           </div>
 
-          <Button content="Login To Anilist" ButtonClass="user-profile-button" />
+          <Button
+            content={user.logged ? t(`Login Out From ${plugin.metadata["name"]}`) : t(`Login To ${plugin.metadata["name"]}`)}
+            ButtonClass={`user-profile-button ${user.logged ? "red" : ""}`}
+            onClick={user.logged ? LoginOut : LoginToInformationPlugin}
+          />
         </div>
 
       </div>
@@ -107,52 +215,37 @@ export function Edit_User_Profile() {
 
   const [user, setUser] = createStore<UserData>(JSON.parse(JSON.stringify(GetUser())));
 
-  async function updateUser() {
-    try {
-      if (await window.api.user.change(JSON.parse(JSON.stringify(user)))) {
-        UpdateUserData(user)
-        toast(t("Succesfully Updated User Data"), { type: "success" })
-      } else {
-        toast(t("Failed Update User Data"), { type: "error" })
-      }
-    } catch (error) {
-      console.error("avatar/updateUser", error)
-      toast(t("Failed Update User Data"), { type: "error" })
-    }
-  }
-
   return (
     <main class="edit-user-profile-container">
-      <span>Edit User Profile</span>
+      <span>{t("Edit User Profile")}</span>
 
       <span class="edit-profile-span">
-        User Name
+        {t("User Name")}
         <Input defaultValue={user.username} onInput={(text) => setUser({ username: text })} />
       </span>
 
       <span class="edit-profile-span">
-        Description
+        {t("Description")}
         <Input defaultValue={user.description} onInput={(text) => setUser({ description: text })} />
       </span>
 
       <span class="edit-profile-span">
-        Avatar
+        {t("Avatar")}
         <Input defaultValue={user.avatar} />
 
         <FilePicker acceptFormat="image/*" onFileSelect={(file) => setUser({ avatar: file.content_base64 })} />
       </span>
 
       <span class="edit-profile-span">
-        Banner
+        {t("Banner")}
         <Input defaultValue={user.banner} />
 
         <FilePicker acceptFormat="image/*" onFileSelect={(file) => {
-          console.log(file)
           setUser({ banner: file.content_base64 })
-        }}/>
+        }} />
       </span>
 
-      <Button content="Update Profile" onClick={updateUser}/>
+      <Button content="Update Profile" onClick={() => updateUser(user)} />
     </main>
   )
 }

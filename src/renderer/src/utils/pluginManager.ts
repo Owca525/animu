@@ -1,4 +1,4 @@
-import { FilterPluginsParams, informationPluginFormat, Anilist_ListMutation, playerPluginInstanceFormat, AnimeData, cardData, episodeList, episodeMetadata, playerData, PluginManagerFormat, informationPluginInstanceFormat, playerPluginFormat, PluginMetadataFormat, PluginLoadedFormat, WorkerWrapperInstance, containerData, pluginRepoExpanded, SearchResponse, serverStatusData, PluginConfigFormat } from "./types";
+import { FilterPluginsParams, informationPluginFormat, Anilist_ListMutation, playerPluginInstanceFormat, AnimeData, cardData, episodeList, episodeMetadata, playerData, PluginManagerFormat, informationPluginInstanceFormat, playerPluginFormat, PluginMetadataFormat, PluginLoadedFormat, WorkerWrapperInstance, containerData, pluginRepoExpanded, SearchResponse, serverStatusData, PluginConfigFormat, UserData } from "./types";
 import { getPlayerPluginList, setInformationPlugin, setPlayerPlugin, setPluginRepo } from "./stores/plugins";
 import { getConfig } from "./stores/config";
 import { checkTimeDriffrentUnix, CreateSHA256, dateToUnix, detectIndex, getPluginsList, request, requestCloudflare, updateObject } from "./functions";
@@ -13,44 +13,6 @@ import logger from "./logger";
 import { t } from "./i18n";
 import { GetPluginConfig, SavePluginConfig } from "./FilesManager/pluginConfig";
 /* ENDIF */
-
-const workerDummyimport = `
-export const SheepFinderAnime2000 = () => {};
-export const capitalizeFirstLetter = () => {};
-export const checkDate = () => {};
-export const convertChaptersVTT = () => {};
-export const convertMsToMinutes = () => {};
-export const convertSeconds = () => {};
-export const convertText = () => {};
-export const dateToUnix = () => {};
-export const genYearsList = () => {};
-export const getWeek = () => {};
-export const sleep = () => {};
-export const request = async (url) => {
-    return {
-        text: "Initial",
-        json: undefined,
-        buffer: [],
-        status: 500,
-        statusText: "Error",
-        url: url,
-        success: false,
-        responseHeader: {}
-    }
-};
-export const runYT_DLP = () => {};
-export const t = () => {};
-export const timeToSeconds = () => {};
-export const updateObject = () => {};
-export const makeSmallText = () => {};
-export const CreateSHA256 = () => {};
-export const getConfig = () => {};
-export const getGlobalCache = () => {};
-export const timeCovertToMs = () => {};
-export const requestCloudflare = () => {};
-export const savePluginConfig = () => {};
-export const getAnimeSeasonFromDate = () => {}
-`
 
 const workerPayloadMetadataExtractor = `
 var window = {  location: ${JSON.stringify(location)} };
@@ -69,6 +31,7 @@ async function initial() {
       },
     });
   } catch (err) {
+    console.error("DummyLoader Error", err)
     self.postMessage({
       ok: false,
       error: err.message,
@@ -771,6 +734,57 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         }
     };
 
+    login = async (content?: { [key: string]: any; }): Promise<UserData | undefined> => {
+        if (!this.instance) return undefined
+        try {
+            return await this.instance.wrapperFunction("login", { content }) as any
+        } catch (error) {
+            console.error(`Information Plugin ${this.metadata} Error`, error)
+            return undefined
+        }
+    }
+
+    isLogged = async () => {
+        if (!this.instance) return false
+        try {
+            return await this.instance.wrapperFunction("isLogged") as any
+        } catch (error) {
+            console.error(`Information Plugin ${this.metadata} Error`, error)
+            return false
+        }
+    }
+
+    unLogin = async () => {
+        if (!this.instance) return false
+        try {
+            return await this.instance.wrapperFunction("unLogin") as any
+        } catch (error) {
+            console.error(`Information Plugin ${this.metadata} Error`, error)
+            return false
+        }
+    }
+
+    updateUser = async (user) => {
+        if (!this.instance) return false
+        try {
+            return await this.instance.wrapperFunction("updateUser",{ user }) as any
+        } catch (error) {
+            console.error(`Information Plugin ${this.metadata} Error`, error)
+            return false
+        }
+    }
+
+    getUser = async () => {
+        if (!this.instance) return false
+        try {
+            return await this.instance.wrapperFunction("getUser") as any
+        } catch (error) {
+            console.error(`Information Plugin ${this.metadata} Error`, error)
+            return false
+        }
+    }
+
+
     CreateInstance = async (plugin: PluginLoadedFormat): Promise<void> => {
         this.instance = new WorkerWrapper()
         this.metadata = await this.instance.runInstance(plugin["code"], plugin["config"])
@@ -804,7 +818,7 @@ export class PluginManager implements PluginManagerFormat {
             }
         } catch (error) { }
 
-        const blobDummy = new Blob([workerDummyimport], { type: "text/javascript" });
+        const blobDummy = new Blob([pluginFunctions], { type: "text/javascript" });
         let dummyImportURL = URL.createObjectURL(blobDummy);
 
         let promiseResolve: (value: any) => void
@@ -845,7 +859,9 @@ export class PluginManager implements PluginManagerFormat {
                     })
 
                     if (LoadedMetadataPlugins.length == plugins.length) promiseResolve(LoadedMetadataPlugins)
-                } else console.error("FAILED LOAD PLUGIN", e, element)
+                } else {
+                    console.error("FAILED LOAD PLUGIN", e, element)
+                }
                 worker.terminate()
                 URL.revokeObjectURL(codeURL)
                 URL.revokeObjectURL(mainCodeURL)

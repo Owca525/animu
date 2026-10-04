@@ -37,8 +37,6 @@ import {
   GetUser,
   isPluginSearchMode,
   setAudioOutput,
-  setDeepLink,
-  setDeeplinkRunned,
   setGlobalTheme,
   setIncognitoMode,
   setPluginSearchMode,
@@ -65,7 +63,6 @@ import "./utils/stores/global"
 /* IFDEF DEBUG|PROD */
 import {
   fetchAnimeDeepLink,
-  fetchDeepLink,
 } from './utils/functions';
 /* ENDIF */
 
@@ -80,6 +77,7 @@ import pluginManager from './utils/pluginManager';
 import { createGlobalError } from './utils/context/GlobalErrorContext';
 import { setNewHistory } from './utils/FilesManager/history';
 import { hideCustomMenu } from './utils/context/menuContext';
+import deeplink from './utils/deeplinks';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -174,21 +172,17 @@ function App() {
       } catch (error) { }
 
       await pluginManager.initialPlugins()
-      await pluginManager.changeInformationPlugin("AnilistApi")
+      await pluginManager.changeInformationPlugin("Anilist")
 
       getTodayAnilistAnime().then((v) => {
         setTodayAnimeInAnilist(v)
       })
 
       /* IFDEF DEBUG|PROD */
-      if (!getGlobalCache().deeplinkRunned) {
-        window.api.onProtocolRequest(fetchDeepLink)
-        setDeeplinkRunned(true)
-      }
 
-      setDeepLink({
+      deeplink.add({
         name: 'Fetch Anime',
-        code: '',
+        code: 'anime',
         func: fetchAnimeDeepLink
       })
 

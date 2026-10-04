@@ -12,6 +12,7 @@ import {
     playerChapterList,
     playerData,
     playlistFormatData,
+    PluginConfigFormat,
     resolutionFormat,
     themeMetadata
 } from './types';
@@ -607,9 +608,9 @@ export async function setHomeData(wrapper?: (() => Promise<homeData["data"] | co
 
         const respons: any = await wrapper()
         if (getGlobalCache().token && getGlobalCache().token != uuid) return
-        
+
         if (!respons || respons["error"]) return setAllHomeData({ data: { sections: [] }, isLoading: false, isError: respons ? respons["error"] : true } as any)
-        
+
         if ("sections" in respons) return setAllHomeData({ data: respons, isLoading: false, isError: false } as any)
         setAllHomeData({ data: { sections: [respons] }, isLoading: false, isError: false } as any)
     } catch (error) {
@@ -825,15 +826,6 @@ export function globalNavigate(path: string) {
 }
 
 /* IFDEF DEBUG|PROD */
-export function fetchDeepLink(fetchedeeplink: string) {
-    const deeplink = new URL(fetchedeeplink)
-    if (deeplink.host.length <= 0 && deeplink["search"].length == 0) return
-    getGlobalCache().deepLinks.forEach((item) => {
-        if (item.code == "" && deeplink["host"].length > 0) return item.func(deeplink.host, item.code)
-        if (deeplink.search.startsWith(`?${item.code}`)) return item.func(deeplink.search.replaceAll(`?${item.code}=`, ""), item.code)
-    })
-}
-
 export async function fetchAnimeDeepLink(deeplink: string) {
     if (deeplink.replaceAll(" ", "").length <= 0) return
     let anime: deepLinkData | undefined;
@@ -1402,26 +1394,42 @@ export function BufferTobase64(buffer: ArrayBuffer): string {
 };
 
 export function getAnimeSeasonFromDate(date: string | undefined) {
-  const now = date ? new Date(date) : new Date();
-  const month = now.getMonth() + 1;
-  const year = now.getFullYear();
-  const list = ["WINTER", "SPRING", "SUMMER", "FALL"]
+    const now = date ? new Date(date) : new Date();
+    const month = now.getMonth() + 1;
+    const year = now.getFullYear();
+    const list = ["WINTER", "SPRING", "SUMMER", "FALL"]
 
-  let season: string;
-  let nextSeason: string = list[0];
+    let season: string;
+    let nextSeason: string = list[0];
 
-  if (month >= 1 && month <= 3) {
-    season = "WINTER";
-  } else if (month >= 4 && month <= 6) {
-    season = "SPRING";
-  } else if (month >= 7 && month <= 9) {
-    season = "SUMMER";
-  } else {
-    season = "FALL";
-  }
+    if (month >= 1 && month <= 3) {
+        season = "WINTER";
+    } else if (month >= 4 && month <= 6) {
+        season = "SPRING";
+    } else if (month >= 7 && month <= 9) {
+        season = "SUMMER";
+    } else {
+        season = "FALL";
+    }
 
-  const finded = list.findIndex((v) => season == v)
-  if (list.length - 1 > list.findIndex((v) => season == v)) nextSeason = list[finded + 1]
+    const finded = list.findIndex((v) => season == v)
+    if (list.length - 1 > list.findIndex((v) => season == v)) nextSeason = list[finded + 1]
 
-  return { season, nextSeason, seasonYear: year, nextYear: finded == 3 ? year + 1 : year };
+    return { season, nextSeason, seasonYear: year, nextYear: finded == 3 ? year + 1 : year };
+}
+
+export function saveConfig(config: PluginConfigFormat[]) {
+    return config
+}
+
+export async function DownloadIMGToBase64(url?: string): Promise<string | undefined> {
+    if (!url) return
+    
+    const response = await request(url);
+
+    if (!response["success"]) return undefined
+
+    const contentType = response.responseHeader.get("content-type") || "image/jpeg";
+
+    return `data:${contentType};base64,${BufferTobase64(response["buffer"] as any)}`;
 }

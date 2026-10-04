@@ -1,4 +1,4 @@
-import { animeOpeningsFormat, cardData, deeplinkFormat, globalDataFormat, informationTmpProps, NotificationExpanded, PlayerTmpProps, serviceFormat, themeMetadata, UserData } from "../types";
+import { animeOpeningsFormat, cardData, globalDataFormat, informationTmpProps, NotificationExpanded, PlayerTmpProps, serviceFormat, themeMetadata, UserData } from "../types";
 import { createStore } from "solid-js/store";
 /* IFDEF DYNAMIC */
 import { Socket } from "socket.io-client";
@@ -7,14 +7,12 @@ import { Socket } from "socket.io-client";
 export const [globalState, setGlobalState] = createStore<globalDataFormat>({
     incognito: false,
     history: new Map(),
-    deeplinkRunned: false,
     loadedTheme: [],
     activeThemes: new Map(),
     token: undefined,
     animuList: new Map(),
     socket: undefined,
     service: [],
-    deepLinks: [],
     anilist_user_data: undefined,
     isAnimuFocus: true,
     notifications: [],
@@ -41,7 +39,6 @@ export const animulistData = () => globalState.animuList;
 export const getSocket = () => globalState.socket?.instance as any;
 export const getSocketRoom = () => globalState.socket?.currentRoom;
 export const getServices = () => globalState.service;
-export const getDeeplinks = () => globalState.deepLinks;
 export const getAnilistUserData = () => globalState.anilist_user_data;
 export const isAnimuFocus = () => globalState.isAnimuFocus;
 export const getNotificationList = () => globalState.notifications;
@@ -69,15 +66,12 @@ export const setSocketRoom = (tmp: string) => setGlobalState((prev) => ({ ...pre
 export const setActiveThemes = (tmp: Map<number, themeMetadata>) => setGlobalState((prev) => ({ ...prev, activeThemes: tmp }));
 export const setGlobalTheme = (tmp: themeMetadata[]) => setGlobalState((prev) => ({ ...prev, loadedTheme: tmp }));
 export const setIncognitoMode = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, incognito: tmp }));
-export const setDeeplinkRunned = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, deeplinkRunned: tmp }));
 export const setGlobalHistory = (tmp: Map<string, cardData>) => setGlobalState((prev) => ({ ...prev, history: tmp }));
 export const setGlobalToken = (tmp: string | undefined) => setGlobalState((prev) => ({ ...prev, token: tmp }));
 export const setAnimulistData = (tmp: globalDataFormat["animuList"]) => setGlobalState((prev) => ({ ...prev, animuList: tmp }));
-export const setDeepLink = (tmp: deeplinkFormat) => setGlobalState((prev) => ({ ...prev, deepLinks: [...prev.deepLinks, tmp] }));
 
 export const setNotificationList = (tmp: NotificationExpanded[]) => setGlobalState((prev) => ({ ...prev, notifications: tmp }));
 
-export const removeDeepLink = (name: string) => setGlobalState((prev) => ({ ...prev, deepLinks: prev.deepLinks.filter((item) => item.name != name) }));
 export const setServiuceList = (tmp: serviceFormat[]) => setGlobalState((prev) => ({ ...prev, service: tmp }));
 
 export const setAnilistUserData = (tmp: { [key: string]: any; } | undefined) => setGlobalState((prev) => ({ ...prev, anilist_user_data: tmp }));

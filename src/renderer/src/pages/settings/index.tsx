@@ -49,7 +49,7 @@ import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './settings.css';
 import { useI18n } from '@renderer/utils/i18n';
-import { activeThemes, animulistData, getAnimuHistory, getCurrentYT_DLPVer, getDeeplinks, getListOfVerYT_DLP, loadedTheme, removeDeepLink, setAudioOutput, setDeepLink } from '@renderer/utils/stores/global';
+import { activeThemes, animulistData, getAnimuHistory, getCurrentYT_DLPVer, getListOfVerYT_DLP, loadedTheme, setAudioOutput } from '@renderer/utils/stores/global';
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 import SettingsPlugin from './components/settingsPlugin';
 import semver from "semver";
@@ -58,6 +58,7 @@ import OtherSettings from './components/otherSettings';
 import { SheepShortcut } from '@renderer/utils/hooks/useKeyPress';
 import pluginManager from '@renderer/utils/pluginManager';
 import { SavePluginConfig } from '@renderer/utils/FilesManager/pluginConfig';
+import deeplink from '@renderer/utils/deeplinks';
 
 export type pluginRepoExpandedSettings = {
     name: string,
@@ -1492,10 +1493,10 @@ function settings() {
                         <div class="settings-setting-container">
                             {t("Run Test DeepLink")}
                             <CheckBox
-                                checked={getDeeplinks().find((val) => val.name == "Animu Deeplink Test") ? true : false}
+                                checked={deeplink.exist("Animu Deeplink Test")}
                                 onChecked={(checked) => {
                                     if (checked) {
-                                        setDeepLink({
+                                        deeplink.add({
                                             name: 'Animu Deeplink Test',
                                             code: 'animutest',
                                             func: function (deeplink: string) {
@@ -1503,7 +1504,7 @@ function settings() {
                                             }
                                         })
                                     } else {
-                                        removeDeepLink("Animu Deeplink Test")
+                                        deeplink.remove("Animu Deeplink Test")
                                     }
                                 }}
                             />
