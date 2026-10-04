@@ -428,6 +428,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             errorMessage: "Failed Fetch Resolutions"
         })
 
+        if (PlayerCleanup) return
+
         if (extracted) {
             meta = extracted
 
@@ -568,6 +570,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
         CleanuPlayer()
 
+        if (PlayerCleanup) return
+
         const videoElemenet = createElement("video", {
             className: "video-player",
             preload: "auto",
@@ -640,6 +644,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
     async function ExecuteHLS() {
         if (!player["currentResolution"]) return console.error("NO RESOLUTION FOUND")
+        if (PlayerCleanup) return
 
         const { default: Hls } = await import('hls.js')
 
@@ -742,7 +747,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             tmpHls.attachMedia(videoRef);
             // setTimeVideo(SheePlayer.currentTime)
 
+            // TODO: Debug this why not everytime i reset the player dosen't load the video
             tmpHls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
+                console.log("HLS Manifest Parsed", data)
                 updatePlayer({ FatalError: false })
 
                 if (!player["playerData"]!["splitHLS"]) {
@@ -843,7 +850,14 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
     function CleanuPlayer() {
         if (Shaka) Shaka.destroy()
         if (HLS) HLS.destroy()
-        if (currentASSubtitles) currentASSubtitles.dispose()
+        try {
+            if (currentASSubtitles) {
+                currentASSubtitles.dispose()
+                currentASSubtitles = undefined
+            }
+        } catch (error) {
+            
+        }
         if (sheepworker) sheepworker.dispose()
 
         if (AudioShaka) AudioShaka.destroy()
