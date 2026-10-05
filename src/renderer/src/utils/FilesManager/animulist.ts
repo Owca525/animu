@@ -1,5 +1,5 @@
 import { unwrap } from "solid-js/store"
-import { toast, updateToast } from "../context/ToastNotification"
+import { removeToast, toast, updateToast } from "../context/ToastNotification"
 import { animulistData, getGlobalCache, GetUser, setAnimulistData } from "../stores/global"
 import { AnimeData, AnimuListFormat, animulistProps, cardData } from "../types"
 import { getHomeCache } from "../stores/home"
@@ -191,6 +191,8 @@ export async function SynchronizeAnimulistWithPlugin(animu_overwrite = false) {
 
         updateToast(toast_id, t(`Sync Anime ${success}/${saveInPlugin.length} failed: ${failed}`))
     }
+
+    removeToast(toast_id)
 }
 
 export async function OvewriteAnimuList(data: { AnimeData: AnimeData; animulist: animulistProps }[]) {

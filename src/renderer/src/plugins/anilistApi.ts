@@ -10,7 +10,7 @@ import {
   SearchResponse,
   UserData,
 } from '@renderer/utils/types';
-import { convertDateToDateObject, CreateSHA256, dateToUnix, genYearsList, request, saveConfig, timeCovertToMs } from '@renderer/utils/functions';
+import { convertDateToDateObject, ConvertStringToNumber, CreateSHA256, dateToUnix, genYearsList, request, saveConfig, timeCovertToMs } from '@renderer/utils/functions';
 
 const defaultPageSize = 20
 
@@ -977,8 +977,8 @@ export default class AnilistApi implements informationPluginFormat {
     const variables = {
       mediaId: id,
       status: variable["status"],
-      score: variable["score"],
-      progress: Number(variable["progress"]),
+      score: ConvertStringToNumber(`${variable["score"]}`),
+      progress: ConvertStringToNumber(`${variable["progress"]}`),
       repeat: variable["reapeat"],
       startedAt: convertDateToDateObject(variable["startWatch"]),
       completedAt: convertDateToDateObject(variable["endWatch"])

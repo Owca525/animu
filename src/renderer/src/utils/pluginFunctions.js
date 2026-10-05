@@ -507,3 +507,10 @@ export function unixToDateTime(unixTimestamp) {
 
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
+
+export function ConvertStringToNumber(value) {
+    if (!value) return 0
+    const match = value.replace(",", ".").match(/-?\d+(?:\.\d+)?/);
+
+    return match ? Number(match[0]) : 0;
+}

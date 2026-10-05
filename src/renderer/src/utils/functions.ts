@@ -907,7 +907,7 @@ export function convertDateToDateObject(date: number | undefined): DateObject {
     try {
         if (!date) return { day: undefined, month: undefined, year: undefined }
         const tmp = new Date(unixToDateTime(date))
-        return { day: tmp.getDate(), month: tmp.getMonth()+1, year: tmp.getFullYear() }
+        return { day: tmp.getDate(), month: tmp.getMonth() + 1, year: tmp.getFullYear() }
     } catch (error) {
         console.error("convertDateToDateObject/functions ", error)
         return { day: undefined, month: undefined, year: undefined }
@@ -1424,7 +1424,7 @@ export function saveConfig(config: PluginConfigFormat[]) {
 
 export async function DownloadIMGToBase64(url?: string): Promise<string | undefined> {
     if (!url) return
-    
+
     const response = await request(url);
 
     if (!response["success"]) return undefined
@@ -1448,4 +1448,11 @@ export async function TrieFunction(func: () => Promise<boolean>, timer: number) 
     }
 
     return resp
+}
+
+export function ConvertStringToNumber(value: string | undefined): number {
+    if (!value) return 0
+    const match = value.replace(",", ".").match(/-?\d+(?:\.\d+)?/);
+
+    return match ? Number(match[0]) : 0;
 }
