@@ -907,7 +907,7 @@ export function convertDateToDateObject(date: number | undefined): DateObject {
     try {
         if (!date) return { day: undefined, month: undefined, year: undefined }
         const tmp = new Date(unixToDateTime(date))
-        return { day: tmp.getDay(), month: tmp.getMonth(), year: tmp.getFullYear() }
+        return { day: tmp.getDate(), month: tmp.getMonth()+1, year: tmp.getFullYear() }
     } catch (error) {
         console.error("convertDateToDateObject/functions ", error)
         return { day: undefined, month: undefined, year: undefined }
@@ -1432,4 +1432,20 @@ export async function DownloadIMGToBase64(url?: string): Promise<string | undefi
     const contentType = response.responseHeader.get("content-type") || "image/jpeg";
 
     return `data:${contentType};base64,${BufferTobase64(response["buffer"] as any)}`;
+}
+
+export async function TrieFunction(func: () => Promise<boolean>, timer: number) {
+    let tries = 3
+    let resp = false
+
+    while (tries > 0) {
+        resp = await func()
+        if (!resp) {
+            tries -= 1
+            await sleep(timer)
+        }
+        else break
+    }
+
+    return resp
 }

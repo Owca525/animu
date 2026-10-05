@@ -1,6 +1,7 @@
 import {
   Anilist_ListMutation,
   AnimeData,
+  animulistProps,
   cardData,
   containerData,
   FilterPluginsParams,
@@ -9,7 +10,7 @@ import {
   SearchResponse,
   UserData,
 } from '@renderer/utils/types';
-import { CreateSHA256, dateToUnix, genYearsList, request, saveConfig, timeCovertToMs } from '@renderer/utils/functions';
+import { convertDateToDateObject, CreateSHA256, dateToUnix, genYearsList, request, saveConfig, timeCovertToMs } from '@renderer/utils/functions';
 
 const defaultPageSize = 20
 
@@ -266,12 +267,6 @@ fragment mediaListEntry on MediaList {
   progress
   progressVolumes
   repeat
-  priority
-  private
-  hiddenFromStatusLists
-  customLists
-  advancedScores
-  notes
   updatedAt
 
   startedAt {
@@ -326,40 +321,16 @@ const graphicAnimeListModified = `mutation (
     id
     mediaId
     status
-    score
-    advancedScores
-    progress
-    progressVolumes
-    repeat
-    priority
-    private
-    hiddenFromStatusLists
-    customLists
-    notes
-    updatedAt
-
-    startedAt {
-      year
-      month
-      day
-    }
-
-    completedAt {
-      year
-      month
-      day
-    }
-
-    user {
-      id
-      name
-    }
-
-    media {
-     ${animeData}
-    }
   }
 }`
+
+const removeAnimeFromList = `
+mutation ($id: Int!) {
+  DeleteMediaListEntry(id: $id) {
+    deleted
+  }
+}
+`;
 
 const graphicHomeApi = `
   query (
@@ -668,7 +639,11 @@ export default class AnilistApi implements informationPluginFormat {
 
   constructor(cfg) {
     config = cfg
-    if (cfg && cfg[0] && cfg[0]["value"] && `${cfg[0]["value"]}`.length > 0) ACCESS_TOKEN = cfg[0]["value"]
+
+    if (Array.isArray(cfg)) {
+      const finded = cfg.find((v) => v["config_name"] == "anilist_user")
+      if (finded && typeof finded["value"] == "object") ACCESS_TOKEN = finded["value"]["access_token"]
+    }
 
     const options = {
       genres: [
@@ -741,61 +716,6 @@ export default class AnilistApi implements informationPluginFormat {
       searchOption: newOptions
     }
   }
-
-  async getAnimeList(): Promise<cardData[]> {
-    const tmpHeader = getHeader()
-    const global = { anilist_user_data: undefined }
-    if (!tmpHeader["Authorization"]) return []
-    if (!global.anilist_user_data) return []
-
-    const response = await sendPost({ type: "ANIME", userId: global.anilist_user_data["id"] }, graphicAnimeListAll)
-    if (!response.success || !response.json) return []
-
-    let tmpList: any[] = []
-    for (let index = 0; index < response.json["data"]["MediaListCollection"]["lists"].length; index++) {
-      const element = response.json["data"]["MediaListCollection"]["lists"][index];
-
-      tmpList = [...tmpList, ...element["entries"]]
-    }
-
-    const readyList = tmpList.map((item) => {
-      try {
-        const startWatch = item["startedAt"]["day"] != undefined && item["startedAt"]["month"] != undefined && item["startedAt"]["year"] != undefined ?
-          dateToUnix(new Date(item["startedAt"]["year"], item["startedAt"]["month"] - 1, item["startedAt"]["day"]).toString()) : undefined
-
-        const endWatch = item["completedAt"]["day"] != undefined && item["completedAt"]["month"] != undefined && item["completedAt"]["year"] != undefined ?
-          dateToUnix(new Date(item["completedAt"]["year"], item["completedAt"]["month"] - 1, item["completedAt"]["day"]).toString()) : undefined
-
-        return {
-          ...Convert(item["media"]),
-          animulist: {
-            status: item["status"],
-            score: item["score"],
-            reapeat: item["repeat"],
-            startWatch: startWatch,
-            endWatch: endWatch,
-            added: dateToUnix(new Date().toString()),
-            lastUpdate: item["updatedAt"],
-            favorite: false,
-            progress: item["progress"]
-          }
-        } as cardData
-      } catch (error) {
-        console.error("Failed Convert map/anilistapi", error, item)
-        return undefined
-      }
-    }).filter((v) => v != undefined)
-
-    return readyList
-  };
-
-  async setAnimeInList(variable: Anilist_ListMutation): Promise<boolean> {
-    const tmpHeader = getHeader()
-    if (!tmpHeader["Authorization"]) return false
-    const response = await sendPost(variable, graphicAnimeListModified)
-    if (!response.success) return false
-    return true
-  };
 
   async schedule(airingStart: number, airingEnd: number): Promise<cardData[]> {
     // let week = getWeek()
@@ -969,6 +889,9 @@ export default class AnilistApi implements informationPluginFormat {
     if (!response["success"] || !response["json"]) return
 
     config = config.map((v) => v["config_name"] == "anilist_user" ? { ...v, value: response["json"] } : v)
+    /* IFDEF DEBUG */
+    console.warn("Anilist/login config", config)
+    /* ENDIF */
     saveConfig(config as any)
 
     ACCESS_TOKEN = response["json"]["access_token"]
@@ -1045,5 +968,98 @@ export default class AnilistApi implements informationPluginFormat {
     });
 
     return response["success"]
+  }
+
+  async setAnimeInList(id: string, variable: animulistProps): Promise<boolean> {
+    const tmpHeader = getHeader()
+    if (!tmpHeader["Authorization"]) return false
+
+    const variables = {
+      mediaId: id,
+      status: variable["status"],
+      score: variable["score"],
+      progress: Number(variable["progress"]),
+      repeat: variable["reapeat"],
+      startedAt: convertDateToDateObject(variable["startWatch"]),
+      completedAt: convertDateToDateObject(variable["endWatch"])
+    }
+
+    const response = await sendPost(variables as any, graphicAnimeListModified)
+
+    /* IFDEF DEBUG */
+    console.warn("Anilist/setAnimeInList", response, variables)
+    /* ENDIF */
+
+    return response.success
+  };
+
+  async getAnimeList(): Promise<cardData[]> {
+    const tmpHeader = getHeader()
+    if (!tmpHeader["Authorization"]) return []
+
+    const user = await this.getUser()
+    if (!user) return []
+
+    const response = await sendPost({ type: "ANIME", userName: user.username }, graphicAnimeListAll)
+
+    /* IFDEF DEBUG */
+    console.warn("Anilist/getAnimeList", response)
+    /* ENDIF */
+
+    if (!response.success || !response.json) return []
+
+    let tmpList: any[] = []
+    for (let index = 0; index < response.json["data"]["MediaListCollection"]["lists"].length; index++) {
+      const element = response.json["data"]["MediaListCollection"]["lists"][index];
+
+      tmpList = [...tmpList, ...element["entries"]]
+    }
+
+    const readyList = tmpList.map((item) => {
+      try {
+        const startWatch = item["startedAt"]["day"] != undefined && item["startedAt"]["month"] != undefined && item["startedAt"]["year"] != undefined ?
+          dateToUnix(new Date(item["startedAt"]["year"], item["startedAt"]["month"] - 1, item["startedAt"]["day"]).toString()) : undefined
+
+        const endWatch = item["completedAt"]["day"] != undefined && item["completedAt"]["month"] != undefined && item["completedAt"]["year"] != undefined ?
+          dateToUnix(new Date(item["completedAt"]["year"], item["completedAt"]["month"] - 1, item["completedAt"]["day"]).toString()) : undefined
+
+        return {
+          ...Convert(item["media"]),
+          animulist: {
+            status: item["status"],
+            score: item["score"],
+            reapeat: item["repeat"],
+            startWatch: startWatch,
+            endWatch: endWatch,
+            added: dateToUnix(new Date().toString()),
+            lastUpdate: item["updatedAt"],
+            favorite: false,
+            progress: item["progress"],
+            id: item["id"]
+          }
+        } as cardData
+      } catch (error) {
+        console.error("Failed Convert map/anilistapi", error, item)
+        return undefined
+      }
+    }).filter((v) => v != undefined)
+
+    return readyList
+  };
+
+  removeAnimeFromList = async (id: string): Promise<boolean> => {
+    const removing = await request("https://graphql.anilist.co", {
+      method: "POST",
+      headers: getHeader(),
+      body: JSON.stringify({ query: removeAnimeFromList, variables: { id: Number(id) } })
+    });
+
+    /* IFDEF DEBUG */
+    console.warn("Anilist/removeAnimeFromList", removing)
+    /* ENDIF */
+
+    if (!removing.success || !removing.json) return false
+
+    return removing.json["data"]["DeleteMediaListEntry"]["deleted"]
   }
 }

@@ -1,4 +1,4 @@
-import { FilterPluginsParams, informationPluginFormat, Anilist_ListMutation, playerPluginInstanceFormat, AnimeData, cardData, episodeList, episodeMetadata, playerData, PluginManagerFormat, informationPluginInstanceFormat, playerPluginFormat, PluginMetadataFormat, PluginLoadedFormat, WorkerWrapperInstance, containerData, pluginRepoExpanded, SearchResponse, serverStatusData, PluginConfigFormat, UserData } from "./types";
+import { FilterPluginsParams, informationPluginFormat, playerPluginInstanceFormat, AnimeData, cardData, episodeList, episodeMetadata, playerData, PluginManagerFormat, informationPluginInstanceFormat, playerPluginFormat, PluginMetadataFormat, PluginLoadedFormat, WorkerWrapperInstance, containerData, pluginRepoExpanded, SearchResponse, serverStatusData, PluginConfigFormat, UserData, animulistProps } from "./types";
 import { getPlayerPluginList, setInformationPlugin, setPlayerPlugin, setPluginRepo } from "./stores/plugins";
 import { getConfig } from "./stores/config";
 import { checkTimeDriffrentUnix, CreateSHA256, dateToUnix, detectIndex, getPluginsList, request, requestCloudflare, updateObject } from "./functions";
@@ -342,7 +342,7 @@ class WorkerWrapper implements WorkerWrapperInstance {
             request: request,
             yt_dlp: window.api.yt_dlp,
             requestCloudflare: requestCloudflare,
-            savePluginConfig: () => { },
+            savePluginConfig: (config) => SavePluginConfig(this.pluginData["name"], config),
             getConfig: () => defaultConfigWeb
         }
 
@@ -419,6 +419,10 @@ class WorkerWrapper implements WorkerWrapperInstance {
         worker.onmessage = async (event: MessageEvent<any>) => {
             const data = event.data
 
+            /* IFDEF DEBUG */
+            console.warn("PluginManager/onmessage", data)
+            /* ENDIF */
+
             /* IFDEF PROD|WEB */
             if (data["type"] == "log") {
                 logger.AddLog(data["message"], data["level"])
@@ -453,11 +457,11 @@ class WorkerWrapper implements WorkerWrapperInstance {
             if (data["type"] === "API_FUNCTION" && data["uuid"]) {
                 if (!data["value"]) return
 
-                if (data["value"] == "saveConfig" && this.pluginData["name"] != "Worker" && data["args"]) {
+                if (data["value"] == "saveConfig" && this.pluginData["name"] != "Worker") {
                     let tmp = data["args"]
                     if (!Array.isArray(tmp)) return
 
-                    SavePluginConfig(this.pluginData["name"], tmp[0])
+                    SavePluginConfig(this.pluginData["name"], tmp)
 
                     worker.postMessage({
                         type: "RESULT",
@@ -601,7 +605,7 @@ export class playerPluginInstance implements playerPluginInstanceFormat {
         return await this.instance.wrapperFunction("searchAnime", { name, page, params }) as any
     }
 
-    raportStatus = async (): Promise<{ search: serverStatusData; player: serverStatusData; episodes: serverStatusData; } | undefined>  => {
+    raportStatus = async (): Promise<{ search: serverStatusData; player: serverStatusData; episodes: serverStatusData; } | undefined> => {
         if (!this.instance) return undefined
         return await this.instance.wrapperFunction("raportStatus") as any
     };
@@ -704,26 +708,6 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         }
     };
 
-    getAnimeList = async (): Promise<cardData[]> => {
-        if (!this.instance) return []
-        try {
-            return await this.instance.wrapperFunction("getAnimeList") as any
-        } catch (error) {
-            console.error(`Information Plugin ${this.metadata} Error`, error)
-            return []
-        }
-    };
-
-    setAnimeInList = async (variable: Anilist_ListMutation): Promise<boolean> => {
-        if (!this.instance) return false
-        try {
-            return await this.instance.wrapperFunction("setAnimeInList", { variable }) as any
-        } catch (error) {
-            console.error(`Information Plugin ${this.metadata} Error`, error)
-            return false
-        }
-    };
-
     onChangeConfig = async (config: PluginConfigFormat[]) => {
         if (!this.instance) return false
         try {
@@ -767,7 +751,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
     updateUser = async (user) => {
         if (!this.instance) return false
         try {
-            return await this.instance.wrapperFunction("updateUser",{ user }) as any
+            return await this.instance.wrapperFunction("updateUser", { user }) as any
         } catch (error) {
             console.error(`Information Plugin ${this.metadata} Error`, error)
             return false
@@ -784,6 +768,36 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         }
     }
 
+
+    getAnimeList = async (): Promise<cardData[]> => {
+        if (!this.instance) return []
+        try {
+            return await this.instance.wrapperFunction("getAnimeList") as any
+        } catch (error) {
+            console.error(`Information Plugin ${this.metadata} Error`, error)
+            return []
+        }
+    };
+
+    setAnimeInList = async (id: string, variable: animulistProps): Promise<boolean> => {
+        if (!this.instance) return false
+        try {
+            return await this.instance.wrapperFunction("setAnimeInList", { id, variable }) as any
+        } catch (error) {
+            console.error(`Information Plugin ${this.metadata} Error`, error)
+            return false
+        }
+    };
+
+    removeAnimeFromList = async (id: string): Promise<boolean> => {
+        if (!this.instance) return false
+        try {
+            return await this.instance.wrapperFunction("removeAnimeFromList", { id }) as any
+        } catch (error) {
+            console.error(`Information Plugin ${this.metadata} Error`, error)
+            return false
+        }
+    };
 
     CreateInstance = async (plugin: PluginLoadedFormat): Promise<void> => {
         this.instance = new WorkerWrapper()

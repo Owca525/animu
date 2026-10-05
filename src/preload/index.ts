@@ -69,7 +69,7 @@ if (process.contextIsolated) {
         delete: (id) => ipcRenderer.invoke('animulist:deleteFromDatabase', id),
         update: (id, anime) => ipcRenderer.invoke('animulist:updateDatabase', id, anime),
         getDatabase: () => ipcRenderer.invoke('animulist:getAllInformation'),
-        overWrite: () => ipcRenderer.invoke('animulist:overwrite')
+        overWrite: (data) => ipcRenderer.invoke('animulist:overwrite', data)
       },
       runExternaPlayer: (videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", videoData, type),
       getOSDetails: () => ipcRenderer.invoke('os:information'),

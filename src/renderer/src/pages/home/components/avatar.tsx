@@ -14,6 +14,7 @@ import { removeToast, toast } from "@renderer/utils/context/ToastNotification";
 import { getInformationPlugin } from "@renderer/utils/stores/plugins";
 import deeplink from "@renderer/utils/deeplinks";
 import { showDialog } from "@renderer/utils/context/DialogContext";
+import { SynchronizeAnimulistWithPlugin } from "@renderer/utils/FilesManager/animulist";
 
 export default function Avatar() {
   const [avatar, setAvatar] = createSignal<string>(GetUserAvatar() ?? icon);
@@ -74,6 +75,24 @@ export async function LoginToInformationPlugin() {
         type: "info",
         title: t("Action"),
         description: t(`Do you want overwrite Animu profile or write animu profile in ${plugin["metadata"]["name"]}`),
+
+        onExit: () => {
+          showDialog({
+            type: "info",
+            title: t("Action"),
+            description: t(`Do you want overwrite Animulist into ${plugin["metadata"]["name"]} or ${plugin["metadata"]["name"]} to animu`),
+            buttons: [{
+              title: t(`Overwrite ${plugin["metadata"]["name"]}`),
+              onClick: async () => {
+                SynchronizeAnimulistWithPlugin(true)
+              }
+            }, {
+              title: t("Overwrite Animulist"),
+              onClick: SynchronizeAnimulistWithPlugin
+            }]
+          })
+        },
+
         buttons: [{
           title: t("Overwrite in Animu"),
           onClick: async () => {

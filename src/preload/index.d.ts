@@ -75,7 +75,7 @@ declare global {
         delete: (id: string) => Promise<boolean>
         update: (id: string, anime: { AnimeData: AnimeData, animulist: animulistProps }) => Promise<void>
         getDatabase: () => Promise<AnimuListFormat[]>
-        overWrite: (data: globalDataFormat["animuList"]) => Promise<void>
+        overWrite: (data: animulistData[]) => Promise<void>
       }
       saveConfig: (config: SettingsConfig) => Promise<boolean>
       runExternaPlayer: (videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc") => any

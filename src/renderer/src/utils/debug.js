@@ -10,6 +10,8 @@ import { sendNotification } from "./NotificationManager";
 import pluginManager from "./pluginManager";
 import { getAnimeSeasonFromDate } from "./pluginFunctions";
 
+import { SynchronizeAnimulistWithPlugin } from "./FilesManager/animulist"
+
 window.getConfig = () => unwrap(getConfig());
 window.getGlobalCache = () => unwrap(getGlobalCache());
 window.getHomeCache = () => unwrap(getHomeCache());
@@ -25,6 +27,7 @@ window.sendNotification = sendNotification;
 window.checkAnimeTodayReleaseEpisode = checkAnimeTodayReleaseEpisode;
 window.getRenderPath = getRenderPath;
 window.request = request;
+window.SynchronizeAnimulistWithPlugin = SynchronizeAnimulistWithPlugin;
 window.testNotitication = () => {
     sendNotification({
         title: t("update.available", { ver: window["animuAppInfo"]["ver"] }),

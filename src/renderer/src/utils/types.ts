@@ -308,6 +308,7 @@ export interface animulistProps {
     lastUpdate: number,
     favorite?: boolean
     progress?: number
+    id?: string
 }
 
 export interface cardData {
@@ -419,8 +420,6 @@ export interface informationPluginFormat {
     anime(id: string): Promise<AnimeData | undefined>
     schedule: (airingStart: number, airingEnd: number) => Promise<cardData[]>
     getManga: (id: string) => Promise<AnimeData | undefined>
-    getAnimeList: () => Promise<cardData[]>
-    setAnimeInList: (variable: Anilist_ListMutation) => Promise<boolean>
 
     onChangeConfig?: (config: PluginConfigFormat[]) => Promise<void>
 
@@ -429,6 +428,10 @@ export interface informationPluginFormat {
     unLogin?: () => Promise<boolean | { redirect: string }>
     updateUser?: (user: UserData) => Promise<boolean>
     getUser?: () => Promise<UserData | undefined>
+
+    getAnimeList?: () => Promise<cardData[]>
+    setAnimeInList?: (id: string, variable: animulistProps) => Promise<boolean>
+    removeAnimeFromList?: (id: string) => Promise<boolean>
 }
 
 export interface WorkerWrapperInstance {
@@ -695,6 +698,8 @@ export interface dialogProps {
         title: string,
         onClick: () => void
     }[]
+
+    onExit?: () => void
 }
 
 export interface Thumbnail {

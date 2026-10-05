@@ -54,6 +54,7 @@ export function DialogProvider(props: { children: JSX.Element }) {
                     onClick={() => {
                       button.onClick();
                       closeDialog();
+                      if (data()?.onExit) data()?.onExit
                     }}
                   />
                 )}

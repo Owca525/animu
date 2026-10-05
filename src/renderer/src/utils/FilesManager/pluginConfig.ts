@@ -3,6 +3,10 @@
 import { PluginConfigFormat } from "../types"
 
 export async function SavePluginConfig(name: string, content: PluginConfigFormat[]) {
+    /* IFDEF DEBUG */
+    console.warn("PluginConfig/SavePluginConfig", name, content)
+    /* ENDIF */
+
     let tmpObject = {}
     content.forEach((v) => {
         tmpObject = {...tmpObject, [v["config_name"]]: v["value"]}
@@ -18,6 +22,9 @@ export async function SavePluginConfig(name: string, content: PluginConfigFormat
 }
 
 export async function GetPluginConfig(name: string): Promise<{ [key: string]: string | number | boolean | Object }> {
+    /* IFDEF DEBUG */
+    console.warn("PluginConfig/GetPluginConfig", name)
+    /* ENDIF */
     /* IFDEF DEBUG|PROD */
     try {
         return await window.api.plugins.getConfig(name)
