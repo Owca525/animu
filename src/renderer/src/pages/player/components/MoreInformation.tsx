@@ -11,7 +11,7 @@ export default function MoreInformation(props: { isActive: boolean, anime: Anime
     return (
         <div class={`player-more-information-background ${props.isActive ? "show" : "hidden"}`}>
             <div class="player-more-information-container">
-                <span class="player-more-information-top-text">{t("Current Watching")}</span>
+                <span class="player-more-information-top-text">{t("moreinformation.current_watching")}</span>
                 <sheep-img src={props.anime.coverImage} class="player-more-information-image" />
                 <span class="player-more-information-title">{title}</span>
                 <div class="player-more-information-format-container">
@@ -31,7 +31,7 @@ export default function MoreInformation(props: { isActive: boolean, anime: Anime
                         <span class="player-more-information-format">{t(`anime_formats.${props.anime.format}`)}</span>
                         &#8226;
                     </Show>
-                    <span class="player-more-information-episode">Episode {props.episode} / {props.episodesLen}</span>
+                    <span class="player-more-information-episode">{t("moreinformation.episode")} {props.episode} / {props.episodesLen}</span>
                 </div>
                 <span class="player-more-information-description">{decodeHtmlEntities(props.anime.description)}</span>
                 <div class="player-more-information-genres-container">

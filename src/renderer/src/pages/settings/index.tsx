@@ -377,7 +377,7 @@ function settings() {
         if (tmpPlugin["metadata"]["type"] == "information") loadedPlugin = await pluginManager.changePlayerPlugin(tmpPlugin["metadata"]["name"])
 
         if (!loadedPlugin) {
-            toast(t("Failed Change Plugin", { type: "error" }))
+            toast(t("settings.failed_change_plugin", { type: "error" }))
             return
         }
 
@@ -658,7 +658,7 @@ function settings() {
                         {/* ENDIF */}
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("Audio Output")}
+                            {t("settings.player.audio_output")}
                             <div class="settings-helpicon-space">
                                 <Dropdown
                                     options={audioOutput().map(element => {
@@ -677,13 +677,13 @@ function settings() {
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("Manage Data in animu")}
+                            {t("settings.manage_data")}
                             <div class='settings-mini-container'>
-                                <Button content='Import Data' onClick={() => {
+                                <Button content={t("settings.import_data")} onClick={() => {
                                     showDialog({
                                         type: "info",
-                                        title: t("Double Check"),
-                                        description: t("Are you sure importing file, this action overwrite everything"),
+                                        title: t("global.double_check"),
+                                        description: t("settings.overwrite_import"),
                                         buttons: [
                                             {
                                                 title: t("dialog.no"),
@@ -697,7 +697,7 @@ function settings() {
                                     })
 
                                 }} />
-                                <Button content='Export Data' onClick={exportConfig} />
+                                <Button content={t("settings.export_data")} onClick={exportConfig} />
                                 <input
                                     type="file"
                                     accept=".txt"
@@ -709,8 +709,8 @@ function settings() {
                         </div>
                     </div>
                     <div class="settings-page-container">
-                        <div class="settings-page-title">{t("Anilist")}</div>
-                        <div class="settings-setting-container">
+                        <div class="settings-page-title">Animu</div>
+                        {/* <div class="settings-setting-container">
                             {t("Default Adult Mode")}
                             <CheckBox
                                 checked={config().new.anilist.adultdefault}
@@ -726,9 +726,9 @@ function settings() {
                                 startValue={config().new.anilist.maxpagesize.toString()}
                             />
                         </div>
-                        <div class="settings-line"></div>
+                        <div class="settings-line"></div> */}
                         <div class="settings-setting-container">
-                            {t("Title Format In Animu")}
+                            {t("animu.format_title")}
                             <ButtonGroup selectedValue={t(`anilist.titles.${config().new.anilist.titleFormat}`)} listValues={[
                                 { value: t("anilist.titles.ROMAJI"), onClick: () => handleChange("anilist.titleFormat", "ROMAJI") },
                                 { value: t("anilist.titles.NATIVE"), onClick: () => handleChange("anilist.titleFormat", "NATIVE") },
@@ -738,9 +738,9 @@ function settings() {
                         </div>
                     </div>
                     <div class="settings-page-container">
-                        <div class="settings-page-title">{t("Information Page")}</div>
+                        <div class="settings-page-title">{t("settings.information.page")}</div>
                         <div class="settings-setting-container">
-                            {t("Always Update Anime In Information")}
+                            {t("settings.information.always_update")}
                             <CheckBox
                                 checked={config().new.information.alwaysUpdateAnime}
                                 onChecked={(checked) =>
@@ -759,7 +759,7 @@ function settings() {
                         </div> */}
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("Play Opening In Information")}
+                            {t("settings.information.opening_information")}
                             <CheckBox
                                 checked={config().new.information.openingininformation}
                                 onChecked={(checked) =>
@@ -769,17 +769,17 @@ function settings() {
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("Trailer player Type")}
+                            {t("settings.information.trailer_player_type")}
                             <ButtonGroup selectedValue={t(`settings.information.trailertype.${config().new.information.trailerplayertype}`)} listValues={[
-                                { value: t("Animu Player"), onClick: () => handleChange("information.trailerplayertype", "player") },
-                                { value: t("Embed"), onClick: () => handleChange("information.trailerplayertype", "embed") },
+                                { value: t("settings.information.trailertype.player"), onClick: () => handleChange("information.trailerplayertype", "player") },
+                                { value: t("settings.information.trailertype.embed"), onClick: () => handleChange("information.trailerplayertype", "embed") },
                             ]}
                             />
                         </div>
                         <Show when={config().new.information.trailerplayertype == "player"}>
                             <div class="settings-line"></div>
                             <div class="settings-setting-container">
-                                {t("Preload Trailer")}
+                                {t("settings.information.trailer_player_type")}
                                 <CheckBox
                                     checked={config().new.information.preloadTrailer}
                                     onChecked={(checked) =>
@@ -790,7 +790,7 @@ function settings() {
                         </Show>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("Preload Opening/Ending")}
+                            {t("settings.information.preload_opening")}
                             <CheckBox
                                 checked={config().new.information.preloadOpening}
                                 onChecked={(checked) =>
@@ -1021,7 +1021,7 @@ function settings() {
                         </div> */}
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("Automatic Skip Opening/Ending")}
+                            {t("settings.player.hls_worker")}
                             <CheckBox
                                 checked={config().new.Player.general.autoSkipOpeningEnding}
                                 onChecked={(checked) =>
@@ -1031,7 +1031,7 @@ function settings() {
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("Use HLS Worker")}
+                            {t("settings.player.skip_opening")}
                             <CheckBox
                                 checked={config().new.Player.general.useHLSWorker}
                                 onChecked={(checked) =>
@@ -1296,14 +1296,14 @@ function settings() {
                             {t("settings.player.keybinds.screenshot2")}
                             <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.noSubbtitlesreenshot)} keyBind={(keys) => handleChange("Player.keybinds.noSubbtitlesreenshot", keys)} />
                         </div>
-                        <div class="settings-setting-container">
+                        {/* <div class="settings-setting-container">
                             {t("Start Record Clip")}
                             <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.startRecordClip)} keyBind={(keys) => handleChange("Player.keybinds.startRecordClip", keys)} />
                         </div>
                         <div class="settings-setting-container">
                             {t("Stop Record Clip")}
                             <CheckKeybind content={convertKeybinds(config().new.Player.keybinds.stopRecordClip)} keyBind={(keys) => handleChange("Player.keybinds.stopRecordClip", keys)} />
-                        </div>
+                        </div> */}
                     </div>
                 </Show>
                 <Show when={category() == "files"}>
@@ -1491,7 +1491,7 @@ function settings() {
                         {/* IFDEF PROD|DEBUG */}
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("Run Test DeepLink")}
+                            {t("settings.test_deeplink")}
                             <CheckBox
                                 checked={deeplink.exist("Animu Deeplink Test")}
                                 onChecked={(checked) => {
@@ -1500,7 +1500,7 @@ function settings() {
                                             name: 'Animu Deeplink Test',
                                             code: 'animutest',
                                             func: function (deeplink: string) {
-                                                toast(t("Ping Pong, Animu Received Deepling " + deeplink))
+                                                toast(t("settings.test_deeplink_message", { content: deeplink }))
                                             }
                                         })
                                     } else {
@@ -1512,7 +1512,7 @@ function settings() {
                         {/* ENDIF */}
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("Use Websocket")}
+                            {t("settings.websocket")}
                             <CheckBox
                                 checked={config().new.socket.useSocket}
                                 onChecked={(checked) => handleChange('socket.useSocket', checked)}
@@ -1521,7 +1521,7 @@ function settings() {
                         <Show when={config().new.socket.useSocket}>
                             <div class="settings-line"></div>
                             <div class="settings-setting-container">
-                                {t("Web Socket Backend")}
+                                {t("settings.websocket_url")}
                                 <SettingsInput
                                     iconChar=""
                                     type='text'
@@ -1563,7 +1563,7 @@ function settings() {
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("Use Worker")}
+                            {t("settings.use_worker")}
                             <CheckBox
                                 checked={config().new.plugins.userWorker}
                                 onChecked={(checked) =>

@@ -53,7 +53,7 @@ const AnimulistMenu: Component<AnimulistProps> = (props) => {
 
             <div class='animulist-menu-bottom'>
                 <span class='animulist-menu-options'>
-                    {t("Status")}
+                    {t("animulist.status_text")}
                     <Dropdown
                         disableX
                         buttonText={t(`animulist.status.${animulistTMPData.status}`)}
@@ -64,7 +64,7 @@ const AnimulistMenu: Component<AnimulistProps> = (props) => {
                 </span>
 
                 <span class='animulist-menu-options'>
-                    {t("Score")}
+                    {t("animulist.score_text")}
                     <Input type="number" 
                         defaultValue={Number(animulistTMPData.score).toString()} 
                         onInput={(v) => { setTMPAnimulist({ score: parseInt(v) }) }}
@@ -73,7 +73,7 @@ const AnimulistMenu: Component<AnimulistProps> = (props) => {
                 </span>
 
                 <span class='animulist-menu-options'>
-                    {t("Rewatch Number")}
+                    {t("animulist.rewatch_text")}
                     <Input type="number" 
                         defaultValue={Number(animulistTMPData.reapeat).toString()} 
                         onInput={(v) => setTMPAnimulist({ reapeat: parseInt(v) })}
@@ -82,7 +82,7 @@ const AnimulistMenu: Component<AnimulistProps> = (props) => {
                 </span>
 
                 <span class='animulist-menu-options'>
-                    {t("Start Date")}
+                    {t("animulist.startdate_text")}
                     <Input type="date"
                         defaultValue={Number(animulistTMPData["startWatch"]) > 0 ? unixToDateTime(animulistTMPData.startWatch).split(" ")[0] : undefined}
                         onInput={(v) => setTMPAnimulist({ startWatch: dateToUnix(v) })}
@@ -91,7 +91,7 @@ const AnimulistMenu: Component<AnimulistProps> = (props) => {
                 </span>
 
                 <span class='animulist-menu-options'>
-                    {t("Finish Date")}
+                    {t("animulist.finishdate_text")}
                     <Input type="date"
                         defaultValue={Number(animulistTMPData["endWatch"]) > 0 ? unixToDateTime(animulistTMPData.endWatch).split(" ")[0] : undefined}
                         onInput={(v) => setTMPAnimulist({ endWatch: dateToUnix(v) })}

@@ -1239,7 +1239,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
         if (!data["success"]) {
             console.error("Failed Load Subtitles", data, player.playerData, player.currentResolution)
-            toast(t("Failed Fetch Subtitles"), { type: "error" })
+            toast(t("player.failed_fetch_subs"), { type: "error" })
             return
         }
 
@@ -1250,7 +1250,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
             if (!content) {
                 console.error("Player/Failed Subtitles Parse", data)
-                return toast(t("Failed Fetch Subtitles"), { type: "error" })
+                return toast(t("player.failed_fetch_subs"), { type: "error" })
             }
 
             assContent = content

@@ -1329,7 +1329,7 @@ export async function requestCloudflare(url: string): Promise<{ cookie: string, 
         let interval = setInterval(() => {
             resolve({ cookie: "", header: {} })
         }, 10000)
-        toast(t("Verify Cloudflare to use plugin. Click to open window"), {
+        toast(t("global.cloudflare"), {
             type: "info", onClick: async () => {
                 clearInterval(interval)
                 resolve(await window.BrowserWindow.createWindow({ url: url, type: "CloudFlare" }))

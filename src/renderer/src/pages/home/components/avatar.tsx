@@ -40,13 +40,13 @@ export async function updateUser(user: UserData) {
   try {
     if (await window.api.user.change(JSON.parse(JSON.stringify(user)))) {
       UpdateUserData(user)
-      toast(t("Succesfully Updated User Data"), { type: "success" })
+      toast(t("user.updated"), { type: "success" })
     } else {
-      toast(t("Failed Update User Data"), { type: "error" })
+      toast(t("user.failed_update"), { type: "error" })
     }
   } catch (error) {
     console.error("avatar/updateUser", error)
-    toast(t("Failed Update User Data"), { type: "error" })
+    toast(t("user.failed_update"), { type: "error" })
   }
 }
 
@@ -62,7 +62,6 @@ export async function LoginToInformationPlugin() {
       deeplink.remove(plugin["metadata"]["name"])
 
       const response = await plugin.login!({ code: content })
-      console.log(response)
 
       updateUser({
         ...GetUser(),
@@ -73,28 +72,28 @@ export async function LoginToInformationPlugin() {
 
       showDialog({
         type: "info",
-        title: t("Action"),
-        description: t(`Do you want overwrite Animu profile or write animu profile in ${plugin["metadata"]["name"]}`),
+        title: t("global.action"),
+        description: t(`user.overwrite_profile`, { plugin: plugin["metadata"]["name"] }),
 
         onExit: () => {
           showDialog({
             type: "info",
-            title: t("Action"),
-            description: t(`Do you want overwrite Animulist into ${plugin["metadata"]["name"]} or ${plugin["metadata"]["name"]} to animu`),
+            title: t("global.action"),
+            description: t(`user.overwrite_animulist`, { plugin: plugin["metadata"]["name"] }),
             buttons: [{
-              title: t(`Overwrite ${plugin["metadata"]["name"]}`),
+              title: t(`user.button_overwrite_plugin`, { plugin: plugin["metadata"]["name"] }),
               onClick: async () => {
                 SynchronizeAnimulistWithPlugin(true)
               }
             }, {
-              title: t("Overwrite Animulist"),
+              title: t("user.button_overwrite_animulist"),
               onClick: SynchronizeAnimulistWithPlugin
             }]
           })
         },
 
         buttons: [{
-          title: t("Overwrite in Animu"),
+          title: t("user.overwrite_animu"),
           onClick: async () => {
             await updateUser({
               ...response!,
@@ -105,18 +104,18 @@ export async function LoginToInformationPlugin() {
             })
           }
         }, {
-          title: t(`Overwrite in ${plugin["metadata"]["name"]}`),
+          title: t(`user.overwrite_plugin`, { plugin: plugin["metadata"]["name"] }),
           onClick: async () => {
-            const id = toast(t(`Updating profile in ${plugin["metadata"]["name"]}`), { type: "loading", timer: false })
+            const id = toast(t(`user.updateProfile`, { plugin: plugin["metadata"]["name"] }), { type: "loading", timer: false })
 
             try {
               const resp = await plugin.updateUser!(animuUser)
               removeToast(id)
 
-              if (resp) toast(t(`Sucessfully Updated Profile in ${plugin["metadata"]["name"]}`), { type: "success" })
-              else toast(t(`Failed Update Profile in ${plugin["metadata"]["name"]}`), { type: "error" })
+              if (resp) toast(t(`user.updateProfile_success`, { plugin: plugin["metadata"]["name"] }), { type: "success" })
+              else toast(t(`user.updateProfile_failed`, { plugin: plugin["metadata"]["name"] }), { type: "error" })
             } catch (error) {
-              toast(t(`Failed Update Profile in ${plugin["metadata"]["name"]}`), { type: "error" })
+              toast(t(`user.updateProfile_failed`, { plugin: plugin["metadata"]["name"] }), { type: "error" })
             }
           }
         }]
@@ -189,25 +188,25 @@ export function User_Profile() {
         <User_statistic
           icon="movie"
           text={`${animulistData().values().toArray().filter((v) => v["animulist"]["status"] == "COMPLETED").length}`}
-          header={t("Completed Anime")}
+          header={t("user.completed_anime")}
         />
 
         <User_statistic
           icon="format_list_bulleted"
           text={`${animulistData().size}`}
-          header={t("Animulist Entries")}
+          header={t("user.animulist_entries")}
         />
 
         <User_statistic
           icon="video_library"
           text={`${User_Calculate_Watch_Time()}m`}
-          header={t("Watch Time")}
+          header={t("user.watch_time")}
         />
 
         <User_statistic
           icon="alarm"
           text={User_Format_Time(window["animu_timer"])}
-          header={t("Time In Animu")}
+          header={t("user.time_animu")}
         />
       </div>
     </main>
@@ -236,27 +235,27 @@ export function Edit_User_Profile() {
 
   return (
     <main class="edit-user-profile-container">
-      <span>{t("Edit User Profile")}</span>
+      <span>{t("user.edit_user")}</span>
 
       <span class="edit-profile-span">
-        {t("User Name")}
+        {t("user.username")}
         <Input defaultValue={user.username} onInput={(text) => setUser({ username: text })} />
       </span>
 
       <span class="edit-profile-span">
-        {t("Description")}
+        {t("user.description")}
         <Input defaultValue={user.description} onInput={(text) => setUser({ description: text })} />
       </span>
 
       <span class="edit-profile-span">
-        {t("Avatar")}
+        {t("user.avatar")}
         <Input defaultValue={user.avatar} />
 
         <FilePicker acceptFormat="image/*" onFileSelect={(file) => setUser({ avatar: file.content_base64 })} />
       </span>
 
       <span class="edit-profile-span">
-        {t("Banner")}
+        {t("user.banner")}
         <Input defaultValue={user.banner} />
 
         <FilePicker acceptFormat="image/*" onFileSelect={(file) => {
@@ -264,7 +263,7 @@ export function Edit_User_Profile() {
         }} />
       </span>
 
-      <Button content="Update Profile" onClick={() => updateUser(user)} />
+      <Button content={t("user.update_user")} onClick={() => updateUser(user)} />
     </main>
   )
 }

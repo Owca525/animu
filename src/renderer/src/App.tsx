@@ -135,10 +135,10 @@ function App() {
 
     try {
       window["logger"].saveLogs()
-      toast(t("Succesfully Saved Logs in Animu Appdata Folder"), { type: "success" })
+      toast(t("debug.log_saved"), { type: "success" })
     } catch (error) {
       console.error("App/SheepShortcut Failed Save Logs", error)
-      toast(t("Failed Save Logs"), { type: "error" })
+      toast(t("log_failed"), { type: "error" })
     }
 
   })
@@ -220,7 +220,7 @@ function App() {
       setHome()
 
       setInitation(false)
-      setinitialState({ text: t("Fetching Resources"), plugin: false })
+      setinitialState({ text: t("initial.resource"), plugin: false })
       initialServices()
 
       /* IFDEF DEBUG|PROD */
@@ -350,44 +350,44 @@ function initialServices() {
 
         await pluginManager.checkStatusServerInPlugins(localStorage.getItem("pluginStatusCachce") == undefined)
       },
-      name: t("PluginStatus"),
-      description: t("Check Status Of Player Plugins"),
+      name: t("services.plugin_name"),
+      description: t("services.plugin_desc"),
       activeTime: timeCovertToMs({ min: 360 })
     },
     {
       active: !window["animuAppInfo"]["flags"]["WEB"] && config.update.type == "On Start",
       execute: checkUpdate,
-      name: t('AnimUpdate'),
-      description: "Check Animu Update",
+      name: t('services.animupdate_name'),
+      description: t("services.animupdate_desc"),
       noFirstStart: true,
       activeTime: timeCovertToMs({ min: 60 })
     },
     {
       active: true,
       execute: checkPluginUpdate,
-      name: t('PluginUpdates'),
+      name: t('services.pluginupdates_name'),
       activeTime: timeCovertToMs({ min: 30 }),
-      description: t("Check Plugins are Updated")
+      description: t("services.pluginupdates_desc")
     },
     {
       active: true,
       execute: FetchWeekCalendary,
-      name: t('CallendarUpdate'),
-      description: t("Fetching New Callendary"),
+      name: t('services.calendaryupdate_name'),
+      description: t("services.calendaryupdate_desc"),
       activeTime: timeCovertToMs({ hour: 12 })
     },
     {
       active: true,
       execute: checkAnimeTodayReleaseEpisode,
-      name: t("EpisodesAvaible"),
-      description: t("Check Is Anime episode avaible"),
+      name: t("services.episodeavailble_name"),
+      description: t("services.episodeavailble_desc"),
       activeTime: timeCovertToMs({ min: 40 })
     },
     {
       active: true,
       execute: SynchronizeAnimulistWithPlugin,
-      name: t("SynchronizeAnimulist"),
-      description: t("Synchronizing Animulist with information plugin"),
+      name: t("services.animulistsynchronize_name"),
+      description: t("services.animulistsynchronize_desc"),
       activeTime: timeCovertToMs({ min: 120 })
     }
   ])
