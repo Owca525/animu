@@ -9,16 +9,19 @@ import {
     FilterParams,
     FilterPluginsParams,
     homeData,
+    HomeObjectData,
     playerChapterList,
     playerData,
     playlistFormatData,
     PluginConfigFormat,
     resolutionFormat,
-    themeMetadata
+    SetNewHomeDataFormat,
+    themeMetadata,
+    WeekDataFormat
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { animulistData, getAnimuHistory, getGlobalCache, informationCache, PlayerCache, setActiveThemes, setGlobalToken } from './stores/global';
+import { animulistData, getAnimuHistory, getGlobalCache, informationCache, PlayerCache, setActiveThemes, SetCalendaryCache, SetFetchingCalendary, setGlobalToken } from './stores/global';
 import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
@@ -28,7 +31,6 @@ import { removeToast, toast, updateToast } from './context/ToastNotification';
 import { readPlaylist, updatePlaylist } from './FilesManager/playlist';
 import pluginManager, { playerPluginInstance } from './pluginManager';
 import { sendNotification } from "./NotificationManager"
-import { JSX } from 'solid-js';
 
 export function decodeHtmlEntities(str: string | undefined) {
     if (!str) return ""
@@ -521,12 +523,37 @@ export function toggleFullscreen(toggle: boolean = false) {
     /* ENDIF */
 }
 
-export function getWeek(): { startWeekUnix: number, endWeekUnix: number, startWeekDay: number, endWeekDay: number, month: number } {
-    let today = new Date()
-    let startWeek = new Date()
-    let endWeek = new Date()
-    startWeek.setDate(today.getDate() - today.getDay())
-    endWeek.setDate(startWeek.getDate() + 7)
+export function weekToDate(weekString: string) {
+    const [year, week] = weekString.split("-W").map(Number);
+
+    const date = new Date(year, 0, 4);
+
+    const day = date.getDay() || 7;
+
+    date.setDate(date.getDate() - day + 1);
+    date.setDate(date.getDate() + (week - 1) * 7);
+
+    return date;
+}
+
+export function getWeek(date?: string): { startWeekUnix: number, endWeekUnix: number, startWeekDay: number, endWeekDay: number, month: number } {
+
+    let today
+
+    if (!date) today = new Date()
+    else today = new Date(weekToDate(date))
+
+    if (date) console.log(weekToDate(date))
+
+    let startWeek = new Date(today)
+    startWeek.setHours(0, 0, 0, 0);
+
+    let endWeek = new Date(today)
+    endWeek.setHours(23, 59, 59, 999);
+
+    startWeek.setDate((today.getDate() - today.getDay()) + 1)
+    endWeek.setDate(startWeek.getDate() + 6)
+
     return {
         startWeekUnix: Math.floor(startWeek.getTime() / 1000),
         endWeekUnix: Math.floor(endWeek.getTime() / 1000),
@@ -585,28 +612,32 @@ export function detectIndex(str: string, customINDEX: string = "") {
     else return str.replaceAll(`"index.js"`, `"${index}"`)
 }
 
-export async function setHomeData(wrapper?: (() => Promise<homeData["data"] | containerData | undefined | { error: string }>) | homeData["data"] | containerData | (() => JSX.Element)) {
+export async function setHomeData(wrapper: SetNewHomeDataFormat) {
+    if (!wrapper["content"] && !wrapper["jsx"] && !wrapper["wrapper"]) return
+
+
     const uuid = crypto.randomUUID()
-    if (!wrapper) return
     try {
         setGlobalToken(uuid)
         setAllHomeData({ data: { sections: [] }, isLoading: true, isError: false } as any)
 
-        if (typeof wrapper == "object" && "sections" in wrapper) {
+        if (wrapper["content"] && "sections" in wrapper["content"]) {
             setAllHomeData({ data: wrapper, isLoading: false, isError: false } as any)
             return
         }
-        if (typeof wrapper == "object") {
-            setAllHomeData({ data: { sections: [wrapper] }, isLoading: false, isError: false } as any)
+        if (wrapper["content"]) {
+            setAllHomeData({ data: { sections: [wrapper["content"]] }, isLoading: false, isError: false } as any)
             return
         }
 
-        if (!(wrapper() instanceof Promise)) {
-            setAllHomeData({ data: wrapper, isLoading: false, isError: false } as any)
+        if (wrapper["jsx"]) {
+            setAllHomeData({ data: wrapper["jsx"], isLoading: false, isError: false } as any)
             return
         }
 
-        const respons: any = await wrapper()
+        if (!wrapper["wrapper"]) return
+
+        const respons: any = await wrapper["wrapper"]()
         if (getGlobalCache().token && getGlobalCache().token != uuid) return
 
         if (!respons || respons["error"]) return setAllHomeData({ data: { sections: [] }, isLoading: false, isError: respons ? respons["error"] : true } as any)
@@ -619,18 +650,22 @@ export async function setHomeData(wrapper?: (() => Promise<homeData["data"] | co
     }
 }
 
-export async function updateHomeContainer(data: homeData["data"] | containerData[]) {
+export async function updateHomeContainer(data: HomeObjectData | containerData[]) {
     try {
         const tmp = unwrap(getHomeCache())
         if (data instanceof Array) {
             setHomeData({
-                ...tmp.data,
-                sections: data
+                content: {
+                    ...tmp.data,
+                    sections: data
+                }
             })
             return
         }
         if (data instanceof Object) {
-            setHomeData(data)
+            setHomeData({
+                content: data
+            })
             return
         }
     } catch (error) {
@@ -923,14 +958,76 @@ export function convertEpisode(ep: string): number {
     }
 }
 
-export async function getTodayAnilistAnime() {
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
+export async function FetchWeekCalendary() {
+    SetFetchingCalendary(true)
 
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
+    try {
 
-    return await getInformationPlugin().schedule(dateToUnix(startOfDay.toString()), dateToUnix(endOfDay.toString()))
+        let callendaryCache: any = localStorage.getItem("animu_callendar_cache")
+
+        if (callendaryCache) {
+            callendaryCache = JSON.parse(callendaryCache)
+
+            const diffrent = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), callendaryCache["unix"])
+
+            if (diffrent["hour"] < 12) {
+                SetCalendaryCache(callendaryCache["cache"])
+                SetFetchingCalendary(false)
+
+                return
+            }
+
+        }
+
+        const week = getWeek()
+
+        const content = await getInformationPlugin().schedule(week.startWeekUnix, week.endWeekUnix)
+
+        localStorage.setItem("animu_callendar_cache", JSON.stringify({
+            unix: dateToUnix(new Date().toString()),
+            cache: content
+        }))
+
+        SetFetchingCalendary(false)
+        SetCalendaryCache(content)
+
+    } catch (error) {
+        SetFetchingCalendary(false)
+        SetCalendaryCache([])
+    }
+}
+
+export function SortCardataByDays(cards: cardData[]): WeekDataFormat {
+    const days = {
+        monday: [],
+        tuesday: [],
+        wednesday: [],
+        thursday: [],
+        friday: [],
+        saturday: [],
+        sunday: []
+    };
+
+    const dayNames = [
+        "sunday",
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday"
+    ];
+
+    cards.forEach(anime => {
+        if (!anime["AnimeData"]["nextAiringEpisode"]) return
+
+        const date = new Date(unixToDateTime(anime["AnimeData"]["nextAiringEpisode"]!["airingAt"]));
+        const day = dayNames[date.getDay()];
+
+        days[day].push(anime);
+    });
+
+    return days;
 }
 
 export function GetNumberFromString(str: string | undefined) {

@@ -106,7 +106,9 @@ function Container(props: containerData) {
 
   async function handleTitleClick() {
     if (!props.onTitleClick) return
-    setHomeData(props.onTitleClick)
+    setHomeData({
+      wrapper: props.onTitleClick
+    })
   }
 
   function checkTitle(str: string) {

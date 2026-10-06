@@ -17,7 +17,7 @@ import {
   checkTimeDriffrentUnix,
   dateToUnix,
   deepMerge,
-  getTodayAnilistAnime,
+  FetchWeekCalendary,
   timeCovertToMs,
   updateObject
 } from './utils/functions';
@@ -40,7 +40,6 @@ import {
   setGlobalTheme,
   setIncognitoMode,
   setPluginSearchMode,
-  setTodayAnimeInAnilist,
   setYT_DLPVersion,
   UpdateUserData
 } from './utils/stores/global';
@@ -173,10 +172,6 @@ function App() {
 
       await pluginManager.initialPlugins()
       await pluginManager.changeInformationPlugin("Anilist")
-
-      getTodayAnilistAnime().then((v) => {
-        setTodayAnimeInAnilist(v)
-      })
 
       /* IFDEF DEBUG|PROD */
 
@@ -376,12 +371,10 @@ function initialServices() {
     },
     {
       active: true,
-      execute: async () => {
-        setTodayAnimeInAnilist(await getTodayAnilistAnime())
-      },
-      name: t('DailyAnilist'),
-      description: t("Check Daily Anilist"),
-      activeTime: timeCovertToMs({ hour: 3 })
+      execute: FetchWeekCalendary,
+      name: t('CallendarUpdate'),
+      description: t("Fetching New Callendary"),
+      activeTime: timeCovertToMs({ hour: 12 })
     },
     {
       active: true,
@@ -398,10 +391,6 @@ function initialServices() {
       activeTime: timeCovertToMs({ min: 120 })
     }
   ])
-
-  // if (unwrap(getAnilistUserData())) {
-  //   runService(FetchAnilistUserData, timeCovertToMs({ hour: 2 }), t("Anilist Sync UserData"))
-  // }
 }
 
 export default App

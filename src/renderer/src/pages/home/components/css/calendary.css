@@ -1,0 +1,26 @@
+.calendary-main-container {
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-between;
+}
+
+.calendary-card-container {
+    width: 160px;
+    gap: 4px;
+
+    display: flex;
+
+    flex-direction: column;
+    align-items: center;
+}
+
+.calendary-header {
+    font-size: 1.3em;
+    font-weight: 800;
+
+    border: 4px solid var(--five-layer);
+
+    border-width: 0px 0px 4px 0px;
+
+}

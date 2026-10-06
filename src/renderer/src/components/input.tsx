@@ -2,7 +2,7 @@ import { createSignal } from "solid-js";
 import "./css/input.css";
 
 interface InputProps {
-  type?: "text" | "password" | "number" | "date";
+  type?: "text" | "password" | "number" | "date" | "week";
   InputClass?: string;
   placeholder?: string;
   onKeyDown?: (text: string) => void;

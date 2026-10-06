@@ -16,7 +16,7 @@ export const [globalState, setGlobalState] = createStore<globalDataFormat>({
     anilist_user_data: undefined,
     isAnimuFocus: true,
     notifications: [],
-    todayAnimeAnilist: [],
+    calendaryCache: [],
     animeOpeningsCache: {},
     audioOutput: undefined,
     pluginSearchMode: false,
@@ -31,7 +31,9 @@ export const [globalState, setGlobalState] = createStore<globalDataFormat>({
         animu_time: 0,
     },
     
-    isSynchronizeAnime: false
+    isSynchronizeAnime: false,
+
+    isFetchingCallendary: false
 } as globalDataFormat);
 
 export const getGlobalCache = () => globalState;
@@ -44,7 +46,7 @@ export const getServices = () => globalState.service;
 export const getAnilistUserData = () => globalState.anilist_user_data;
 export const isAnimuFocus = () => globalState.isAnimuFocus;
 export const getNotificationList = () => globalState.notifications;
-export const todayAnimeInAnilist = () => globalState.todayAnimeAnilist;
+export const GetCalendaryCache = () => globalState.calendaryCache;
 export const animeOpeningsCache = () => globalState.animeOpeningsCache;
 export const getAudioOutput = () => globalState.audioOutput;
 export const isPluginSearchMode = () => globalState.pluginSearchMode;
@@ -55,6 +57,7 @@ export const GetUserBanner = () => globalState.user.banner;
 export const GetUserAvatar = () => globalState.user.avatar;
 
 export const isSynchronizeAnime = () => globalState.isSynchronizeAnime;
+export const isFetchingCallendary = () => globalState.isFetchingCallendary;
 
 export const GetUser = () => globalState.user;
 
@@ -63,7 +66,7 @@ export const UpdateUserData = (tmp: UserData) => setGlobalState((prev) => ({ ...
 export const setYT_DLPVersion = (tmp: globalDataFormat["yt_dlp"]) => setGlobalState((prev) => ({ ...prev, yt_dlp: tmp }));
 export const setPluginSearchMode = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, pluginSearchMode: tmp }));
 export const addOpeningCache = (id: number, op: animeOpeningsFormat[]) => setGlobalState((prev) => ({ ...prev, animeOpeningsCache: { ...prev.animeOpeningsCache, [id]: op } }));
-export const setTodayAnimeInAnilist = (tmp: cardData[]) => setGlobalState((prev) => ({ ...prev, todayAnimeAnilist: tmp }));
+export const SetCalendaryCache = (tmp: cardData[]) => setGlobalState((prev) => ({ ...prev, calendaryCache: tmp }));
 export const setAudioOutput = (tmp: MediaDeviceInfo) => setGlobalState((prev) => ({ ...prev, audioOutput: tmp }));
 export const setSocket = (tmp: Socket) => setGlobalState((prev) => ({ ...prev, socket: { ...prev.socket as any, instance: tmp } }));
 export const setSocketRoom = (tmp: string) => setGlobalState((prev) => ({ ...prev, socket: { ...prev.socket as any, currentRoom: tmp } }));
@@ -73,6 +76,8 @@ export const setIncognitoMode = (tmp: boolean) => setGlobalState((prev) => ({ ..
 export const setGlobalHistory = (tmp: Map<string, cardData>) => setGlobalState((prev) => ({ ...prev, history: tmp }));
 export const setGlobalToken = (tmp: string | undefined) => setGlobalState((prev) => ({ ...prev, token: tmp }));
 export const setAnimulistData = (tmp: globalDataFormat["animuList"]) => setGlobalState((prev) => ({ ...prev, animuList: tmp }))
+
+export const SetFetchingCalendary = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, isFetchingCallendary: tmp }));
 
 export const SetSynchronizeAnime = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, isSynchronizeAnime: tmp }))
 

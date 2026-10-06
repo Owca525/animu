@@ -208,7 +208,6 @@ export interface globalDataFormat {
     anilist_user_data?: { [key: string]: any; },
     isAnimuFocus: boolean
     notifications: NotificationExpanded[]
-    todayAnimeAnilist: cardData[]
     animeOpeningsCache: { [key: number]: animeOpeningsFormat[] }
     audioOutput: MediaDeviceInfo | undefined
     pluginSearchMode: boolean,
@@ -220,7 +219,21 @@ export interface globalDataFormat {
     user: UserData
 
     isSynchronizeAnime: boolean
+
+    isFetchingCallendary: boolean
+
+    calendaryCache: cardData[]
 }
+
+export type HomeObjectData = { topCards?: containerData; sections: containerData[]; }
+
+export interface SetNewHomeDataFormat {
+    content?: HomeObjectData | containerData,
+    wrapper?: () => Promise<HomeObjectData | containerData | undefined | { error: string }> 
+    jsx?: () => JSX.Element
+}
+
+export type WeekDataFormat = { monday: cardData[], tuesday: cardData[], wednesday: cardData[], thursday: cardData[], friday: cardData[], saturday: cardData[], sunday: cardData[] }
 
 export interface NotificationProps {
     title: string,

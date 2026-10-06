@@ -1,39 +1,71 @@
-import { convertParams, dateToUnix, getHistory, searchDataInCards, setHomeData } from "@renderer/utils/functions";
-import { t } from "@renderer/utils/i18n";
-import { animulistData, isPluginSearchMode } from "@renderer/utils/stores/global";
+import { convertParams, getHistory, getWeek, searchDataInCards, setHomeData, SortCardataByDays } from "@renderer/utils/functions";
+import { animulistData, GetCalendaryCache, isFetchingCallendary, isPluginSearchMode } from "@renderer/utils/stores/global";
 import { getHomeCache, setHomeNewData, setHomeSearch, setHomeSearchPage, setHomeSearchTags, setHomeStopScrolling } from "@renderer/utils/stores/home";
 import { getInformationPlugin, getPlayerPLugin } from "@renderer/utils/stores/plugins";
 import { cardData, containerData, FilterParams, homeData } from "@renderer/utils/types";
+import Calendary from "./components/calendary";
+import { t } from "@renderer/utils/i18n";
 
-export function setCalendary(date?: string) {
-    let tmp = new Date()
-    if (typeof date == "string") tmp = new Date(date)
+export async function setCalendary(date?: string) {
+    if (typeof date == "object") date = undefined
 
-    const startOfDay = new Date(tmp);
-    startOfDay.setHours(0, 0, 0, 0);
+    let week_calendary: cardData[] = []
 
-    const endOfDay = new Date(tmp);
-    endOfDay.setHours(23, 59, 59, 999);
+    if (date) {
 
-    const days = [t("week.sunday"), t("week.monday"), t("week.tuesday"), t("week.wednesday"), t("week.thursday"), t("week.friday"), t("week.saturday")];
+        const week = getWeek(date)
+        week_calendary = await getInformationPlugin().schedule(week.startWeekUnix, week.endWeekUnix)
 
-    setHomeData(async () => ({
-        sections: [{
-            title: days[startOfDay.getDay()],
-            data: await getInformationPlugin().schedule(dateToUnix(startOfDay.toString()), dateToUnix(endOfDay.toString()))
-        }]
-    }))
+    } else {
+
+        if (isFetchingCallendary()) {
+            let timestamp = setInterval(() => {
+                if (isFetchingCallendary()) return
+
+                week_calendary = GetCalendaryCache()
+
+                clearInterval(timestamp)
+            }, 500)
+        } else {
+            week_calendary = GetCalendaryCache()
+        }
+
+    }
+
+    setHomeData({ jsx: () => Calendary(SortCardataByDays(week_calendary)) })
+}
+
+export async function SearchInCalendary(search: string = "", params: FilterParams | undefined) {
+    let tmp = searchDataInCards(GetCalendaryCache(), search, convertParams(params))
+
+    if (search.length <= 0) {
+        return setCalendary()
+    }
+
+    // TODO: Fix searching
+    setHomeData({
+        content: {
+            sections: [
+                {
+                    title: search != "" ? t(`Searching Calendary: ${search}`) : undefined,
+                    data: tmp
+                }
+            ]
+        }
+    })
 }
 
 export function setHome() {
     const plugin = getInformationPlugin()
-    setHomeData(async () => await plugin.home())
+    setHomeData({
+        wrapper: plugin.home
+    })
 }
 
 export function setAnimuList(): any {
     const animulist = animulistData().values().toArray()
-    if (animulist.length <= 0) return setHomeData({ sections: [{ data: [] }] })
-    
+    if (animulist.length <= 0) return setHomeData({ content: { sections: [{ data: [] }] } })
+
     let finnalContainer: containerData[] = []
     const global = getHomeCache()
 
@@ -91,10 +123,12 @@ export function setAnimuList(): any {
         })
     })
 
-    if (finnalContainer.length <= 1) return setHomeData({ sections: [{ data: animulist }] })
+    if (finnalContainer.length <= 1) return setHomeData({ content: { sections: [{ data: animulist }] } })
 
     setHomeData({
+        content: {
         sections: finnalContainer
+    }
     })
 }
 
@@ -125,7 +159,7 @@ export function setHistory() {
             },
         ],
     };
-    setHomeData(data)
+    setHomeData({ content: data })
 }
 
 export async function anilistSearch(search: string, params: FilterParams | undefined) {
@@ -137,12 +171,14 @@ export async function anilistSearch(search: string, params: FilterParams | undef
         const tmp = await plugin?.searchAnime(search, 1, convertParams(params))
 
         setHomeData({
+            content: {
             sections: [
                 {
                     title: `home.searching/${search}`,
                     data: tmp ? tmp : []
                 }
             ]
+        }
         })
         return
     }
@@ -152,10 +188,12 @@ export async function anilistSearch(search: string, params: FilterParams | undef
     // async () => await plugin.search(search, 1, convertParams(params))
     const plugin = getInformationPlugin()
     setHomeData({
+        content: {
         title: title,
         data: [],
         onScrollDownFunction: plugin.search,
         useResponse: true
+    }
     });
 
 }
@@ -199,11 +237,13 @@ export function AnimuListSearch(search: string = "", params: FilterParams | unde
     if (params && params["watching"]) tmp = tmp.filter((v) => v.animulist?.status == params["watching"].val)
     setHomeSearchTags(params)
     setHomeData({
-        sections: [
-            {
-                title: search != "" ? `Searching: ${search}` : undefined,
-                data: tmp
-            }
-        ]
+        content: {
+            sections: [
+                {
+                    title: search != "" ? t(`Searching Animulist: ${search}`) : undefined,
+                    data: tmp
+                }
+            ]
+        }
     })
 }

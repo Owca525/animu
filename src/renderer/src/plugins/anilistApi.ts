@@ -718,34 +718,50 @@ export default class AnilistApi implements informationPluginFormat {
   }
 
   async schedule(airingStart: number, airingEnd: number): Promise<cardData[]> {
-    // let week = getWeek()
-    let variables = {
-      page: 1,
-      perPage: 50,
-      sort: ["TIME"],
-      airingAtGreater: airingStart,
-      airingAtLesser: airingEnd
+    let currentPage = 1
+
+    let animeList: cardData[] = []
+
+    while (true) {
+      let variables = {
+        page: currentPage,
+        perPage: 50,
+        sort: ["TIME"],
+        airingAtGreater: airingStart,
+        airingAtLesser: airingEnd,
+        isAdult: false
+      }
+
+      try {
+        let response = await sendPost(variables, graphicAiringAnime, timeCovertToMs({ hour: 1 }))
+        if (!response.success || !response.json) return animeList
+
+        animeList = [...animeList, ...response.json["data"]["Page"]["airingSchedules"].map((v) => {
+          const converted = Convert(v["media"])
+          return {
+            ...converted,
+            AnimeData: {
+              ...converted.AnimeData,
+              nextAiringEpisode: {
+                airingAt: v["airingAt"],
+                episode: v["episode"],
+                timeUntilAiring: v["timeUntilAiring"]
+              }
+            }
+          }
+        })]
+
+        currentPage += 1
+
+        if (response.json["data"]["Page"]["airingSchedules"].length < variables["perPage"]) break
+
+      } catch (error) {
+        console.error("Anilist/schedule", error)
+        break
+      }
     }
 
-    let response = await sendPost(variables, graphicAiringAnime, timeCovertToMs({ hour: 1 }))
-    if (!response.success || !response.json) return []
-
-    let data = response.json["data"]["Page"]["airingSchedules"].map((v) => {
-      const converted = Convert(v["media"])
-      return {
-        ...converted,
-        AnimeData: {
-          ...converted.AnimeData,
-          nextAiringEpisode: {
-            airingAt: v["airingAt"],
-            episode: v["episode"],
-            timeUntilAiring: v["timeUntilAiring"]
-          }
-        }
-      }
-    })
-
-    return data
+    return animeList
   }
 
   search = async (name: string, page: number, params?: FilterPluginsParams): Promise<SearchResponse> => {

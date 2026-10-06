@@ -133,7 +133,7 @@ const Home = () => {
 
   return (
     <main
-      class={`home-main ${typeof homeCache().data == "object" && !homeCache()["data"]["topCards"] ? "active" : ""}`}
+      class={`home-main ${typeof homeCache().data == "object" && !homeCache()["data"]["topCards"] ? "active" : ""} ${typeof homeCache().data == "function" ? "active" : ""}`}
       onContextMenu={OpenContextMenu}
     >
       <Sidebar
@@ -145,7 +145,7 @@ const Home = () => {
         onClickTopButtons={setNewActivePage}
       />
 
-      <div class={`home-header-container ${typeof homeCache().data == "object" && !homeCache()["data"]["topCards"] ? "active" : ""} ${headerActive() ? "color" : ""}`}>
+      <div class={`home-header-container ${typeof homeCache().data == "function" ? "active" : ""} ${typeof homeCache().data == "object" && !homeCache()["data"]["topCards"] ? "active" : ""} ${headerActive() ? "color" : ""}`}>
         <Button
           icon="menu"
           ButtonClass={`${typeof homeCache().data == "object" && homeCache()["data"]["topCards"]  ? "home-header-background" : ""} ${headerActive() ? "color" : ""}`}
@@ -166,7 +166,7 @@ const Home = () => {
             />
           </div>
           <Show when={getHomeCache().activePage == "global.schedule"}>
-            <Input type="date" defaultValue={unixToDateTime(dateToUnix(new Date().toString())).split(" ")[0]} onInput={setCalendary} />
+            <Input type="week" defaultValue={unixToDateTime(dateToUnix(new Date().toString())).split(" ")[0]} onInput={setCalendary} />
           </Show>
         </div>
         <div class='home-header-right'>
