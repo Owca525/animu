@@ -19,7 +19,11 @@ export function DialogProvider(props: { children: JSX.Element }) {
 
   closeDialog = () => {
     setIsOpen(false);
+    const tmp = data()
+    
     setData(undefined);
+
+    if (tmp!.onExit) tmp!.onExit!()
   };
 
   dialogIsOpen = () => isOpen();
@@ -54,7 +58,6 @@ export function DialogProvider(props: { children: JSX.Element }) {
                     onClick={() => {
                       button.onClick();
                       closeDialog();
-                      if (data()?.onExit) data()?.onExit
                     }}
                   />
                 )}

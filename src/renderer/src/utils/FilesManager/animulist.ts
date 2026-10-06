@@ -1,6 +1,6 @@
 import { unwrap } from "solid-js/store"
 import { removeToast, toast, updateToast } from "../context/ToastNotification"
-import { animulistData, getGlobalCache, GetUser, setAnimulistData } from "../stores/global"
+import { animulistData, getGlobalCache, GetUser, isSynchronizeAnime, setAnimulistData, SetSynchronizeAnime } from "../stores/global"
 import { AnimeData, AnimuListFormat, animulistProps, cardData } from "../types"
 import { getHomeCache } from "../stores/home"
 import { AnimuListSearch } from "@renderer/pages/home/homeUtils"
@@ -100,7 +100,14 @@ export async function refreashAnimulist() {
 
 export async function SynchronizeAnimulistWithPlugin(animu_overwrite = false) {
     const info_plugin = getInformationPlugin()
+    const user = GetUser()
+
+    if (isSynchronizeAnime()) return
+
+    if (!user["logged"]) return
+
     if (!info_plugin.setAnimeInList || !info_plugin.removeAnimeFromList || !info_plugin.getAnimeList) return
+    SetSynchronizeAnime(true)
 
     const animulist = animulistData().values().toArray()
     const pluginAnimeList = await info_plugin.getAnimeList()
@@ -167,7 +174,8 @@ export async function SynchronizeAnimulistWithPlugin(animu_overwrite = false) {
     let success = 0
     let failed = 0
 
-    const toast_id = toast(t(`Sync Anime ${success}/${saveInPlugin.length} failed: ${failed}`), { type: "loading", timer: false })
+    let toast_id: string | undefined = undefined
+    if  (saveInPlugin.length > 9) toast_id = toast(t(`Sync Anime ${success}/${saveInPlugin.length} failed: ${failed}`), { type: "loading", timer: false })
 
     for (let index = 0; index < saveInPlugin.length; index++) {
         const anime = saveInPlugin[index];
@@ -189,10 +197,11 @@ export async function SynchronizeAnimulistWithPlugin(animu_overwrite = false) {
             failed += 1
         }
 
-        updateToast(toast_id, t(`Sync Anime ${success}/${saveInPlugin.length} failed: ${failed}`))
+        if (toast_id) updateToast(toast_id, t(`Sync Anime ${success}/${saveInPlugin.length} failed: ${failed}`))
     }
 
-    removeToast(toast_id)
+    if (toast_id) removeToast(toast_id)
+    SetSynchronizeAnime(false)
 }
 
 export async function OvewriteAnimuList(data: { AnimeData: AnimeData; animulist: animulistProps }[]) {

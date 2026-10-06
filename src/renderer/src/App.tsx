@@ -22,7 +22,7 @@ import {
   updateObject
 } from './utils/functions';
 import { checkUpdate } from './utils/update';
-import { convertHistoryToAnimuList, setNewAnimuList } from './utils/FilesManager/animulist';
+import { convertHistoryToAnimuList, setNewAnimuList, SynchronizeAnimulistWithPlugin } from './utils/FilesManager/animulist';
 import { CreateBackup } from './utils/backup';
 import {
   createSignal,
@@ -389,6 +389,13 @@ function initialServices() {
       name: t("EpisodesAvaible"),
       description: t("Check Is Anime episode avaible"),
       activeTime: timeCovertToMs({ min: 40 })
+    },
+    {
+      active: true,
+      execute: SynchronizeAnimulistWithPlugin,
+      name: t("SynchronizeAnimulist"),
+      description: t("Synchronizing Animulist with information plugin"),
+      activeTime: timeCovertToMs({ min: 120 })
     }
   ])
 

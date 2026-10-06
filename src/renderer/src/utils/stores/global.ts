@@ -29,7 +29,9 @@ export const [globalState, setGlobalState] = createStore<globalDataFormat>({
         username: "User",
         created_date: 0,
         animu_time: 0,
-    }
+    },
+    
+    isSynchronizeAnime: false
 } as globalDataFormat);
 
 export const getGlobalCache = () => globalState;
@@ -52,6 +54,8 @@ export const getListOfVerYT_DLP = () => globalState.yt_dlp["listVer"];
 export const GetUserBanner = () => globalState.user.banner;
 export const GetUserAvatar = () => globalState.user.avatar;
 
+export const isSynchronizeAnime = () => globalState.isSynchronizeAnime;
+
 export const GetUser = () => globalState.user;
 
 export const UpdateUserData = (tmp: UserData) => setGlobalState((prev) => ({ ...prev, user: tmp }));
@@ -68,7 +72,9 @@ export const setGlobalTheme = (tmp: themeMetadata[]) => setGlobalState((prev) =>
 export const setIncognitoMode = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, incognito: tmp }));
 export const setGlobalHistory = (tmp: Map<string, cardData>) => setGlobalState((prev) => ({ ...prev, history: tmp }));
 export const setGlobalToken = (tmp: string | undefined) => setGlobalState((prev) => ({ ...prev, token: tmp }));
-export const setAnimulistData = (tmp: globalDataFormat["animuList"]) => setGlobalState((prev) => ({ ...prev, animuList: tmp }));
+export const setAnimulistData = (tmp: globalDataFormat["animuList"]) => setGlobalState((prev) => ({ ...prev, animuList: tmp }))
+
+export const SetSynchronizeAnime = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, isSynchronizeAnime: tmp }))
 
 export const setNotificationList = (tmp: NotificationExpanded[]) => setGlobalState((prev) => ({ ...prev, notifications: tmp }));
 

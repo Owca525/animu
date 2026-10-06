@@ -930,6 +930,8 @@ export default class AnilistApi implements informationPluginFormat {
     config = config.map((v) => v["config_name"] == "anilist_user" ? { ...v, value: "" } : v)
     ACCESS_TOKEN = ""
 
+    saveConfig(config as any)
+
     return { redirect: "https://anilist.co/settings/apps" }
   }
 

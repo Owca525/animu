@@ -218,6 +218,8 @@ export interface globalDataFormat {
     }
 
     user: UserData
+
+    isSynchronizeAnime: boolean
 }
 
 export interface NotificationProps {
