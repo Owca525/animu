@@ -20,20 +20,96 @@
     "off": "Off",
     "on": "On",
     "action": "Action",
-    "adult": "Adult"
+    "adult": "Adult",
+    "schedule": "Schedule",
+    "animulist": "AnimuList",
+    "waitingplaylist": "Waiting Playlist",
+    "double_check": "Double Check",
+    "cloudflare": "Verify Cloudflare to use plugin. Click to open window"
   },
-  "initial": {
-    "animu": "Animu is initializing",
-    "theme": "Loading Theme",
-    "config": "Loading Config",
-    "plugin": "Loading Plugin",
-    "history": "Ładowanie Histori"
+  "animu": {
+    "format_title": "Title Format In Animu"
+  },
+  "debug": {
+    "log_saved": "Succesfully Saved Logs in Animu Appdata Folder",
+    "log_failed": "Failed Save Logs"
+  },
+  "services": {
+    "plugin_name": "PluginStatus",
+    "plugin_desc": "Check Status Of Player Plugins",
+    "animupdate_name": "AnimUpdate",
+    "animupdate_desc": "Check Animu Update",
+    "pluginupdates_name": "PluginUpdates",
+    "pluginupdate_desc": "Check Plugins are Updated",
+    "calendaryupdate_name": "CallendarUpdate",
+    "calendaryupdate_desc": "Fetching New Callendary",
+    "episodeavailble_name": "EpisodesAvaible",
+    "episodeavailble_desc": "Check Is Anime episode avaible",
+    "animulistsynchronize_name": "SynchronizeAnimulist",
+    "animulistsynchronize_desc": "Synchronizing Animulist with information plugin"
+  },
+  "user": {
+    "updated": "Succesfully Updated User Data",
+    "failed_update": "Failed Update User Data",
+    "overwrite_profile": "Do you want overwrite Animu profile or write animu profile in {{plugin}}",
+    "overwrite_animulist": "Do you want overwrite Animulist into {{plugin}} or {{plugin}} to animu",
+    "button_overwrite_plugin": "Overwrite {{plugin}} profile",
+    "button_overwrite_animulist": "Overwrite Animulist",
+    "overwrite_animu": "Overwrite in Animu",
+    "overwrite_plugin": "Overwrite in {{plugin}}",
+    "updateProfile": "Updating profile in {{plugin}}",
+    "updateProfile_success": "Sucessfully Updated Profile in {{plugin}}",
+    "updateProfile_failed": "Failed Update Profile in {{plugin}}",
+    "completed_anime": "Completed Anime",
+    "animulist_entries": "Animulist Entries",
+    "watch_time": "Watch Time",
+    "time_animu": "Time In Animu",
+    "edit_user": "Edit User Profile",
+    "username": "Usermame",
+    "description": "Description",
+    "avatar": "Avatar",
+    "banner": "Banner",
+    "update_user": "Update Profile"
+  },
+  "moreinformation": {
+    "current_watching": "Current Watching",
+    "episode": "Episode"
+  },
+  "anilist": {
+    "titles": {
+      "ROMAJI": "Romaji",
+      "ENGLISH": "English",
+      "NATIVE": "Native"
+    }
   },
   "search": {
     "home": "Szukaj Anime...",
     "history": "Szukaj w histori...",
     "animulist": "Search in AnimuList...",
     "schedule": "Search in Schedule..."
+  },
+  "animulist": {
+    "status": {
+      "CURRENT": "Watching",
+      "PLANNING": "Planning",
+      "COMPLETED": "Completed",
+      "REPEATING": "Rewatching",
+      "PAUSED": "Paused",
+      "DROPPED": "Dropped"
+    },
+    "status_text": "Status",
+    "score_text": "Score",
+    "rewatch_text": "Rewatch Number",
+    "startdate_text": "Start Date",
+    "finishdate_text": "Finish Date"
+  },
+  "initial": {
+    "animu": "Animu is initializing",
+    "theme": "Loading Theme",
+    "config": "Loading Config",
+    "plugin": "Loading Plugin",
+    "history": "Ładowanie Histori",
+    "resource": "Fetching Resources"
   },
   "imageviewer": {
     "failedfetch": "Failed Fetch Image",
@@ -245,11 +321,27 @@
     }
   },
   "settings": {
+    "failed_change_plugin": "Failed Change Plugin",
+    "manage_data": "Manage Data in animu",
+    "overwrite_import": "Are you sure importing file, this action overwrite everything",
+    "import_data": "Import Data",
+    "export_data": "Export Data",
+    "test_deeplink": "Run Test DeepLink",
+    "test_deeplink_message": "Ping Pong, Animu Received Deepling {{content}}",
+    "websocket": "Use Websocket",
+    "websocket_url": "Web Socket Backend",
+    "use_worker": "Use Worker",
     "variants": {
       "v1": "Variant 1",
       "v2": "Variant 2"
     },
     "information": {
+      "page": "Information Page",
+      "always_update": "Always Update Anime In Information",
+      "opening_information": "Play Opening In Information",
+      "trailer_player_type": "Trailer player Type",
+      "preload_trailer": "Preload Trailer",
+      "preload_opening": "Preload Opening/Ending",
       "trailertype": {
         "embed": "Embed",
         "player": "Animu Player"
@@ -304,6 +396,10 @@
       "links": "Przydatne linki"
     },
     "player": {
+      "hls_worker": "Use HLS Worker",
+      "skip_opening": "Automatic Skip Opening/Ending",
+      "audio_output": "Audio Output",
+      "episode": "Episode {{ep}}",
       "downloadvideo": "Download Video",
       "animations": "Player Animations",
       "play": "Automatyczne odtwarzanie",
@@ -432,9 +528,17 @@
     }
   },
   "player": {
+    "failed_fetch_subs": "Failed Fetch Subtitles",
     "error": {
       "notfound": "Odtwarzacz nie znalazł żadnych URL-i",
       "player": "Player found a problem"
+    },
+    "nerdstats": {
+      "frames": "Frames: ",
+      "dframes": "Dropped Frames: ",
+      "volume": "Volume: ",
+      "currentime": "CurrentTime: ",
+      "durration": "Duration: "
     },
     "skiptimebutton": {
       "opening": "Skip Opening {{time}}s",
@@ -563,5 +667,12 @@
     "friday": "Piątek",
     "saturday": "Sobota",
     "sunday": "Niedziela"
+  },
+  "backend": {
+    "trayNotification": "Animu is Now In tray mode if you want disable this you can in settings",
+    "openAnimu": "Open Animu",
+    "update": "Check Updates",
+    "settings": "Settings",
+    "exitAnimu": "Exit Animu"
   }
 }
