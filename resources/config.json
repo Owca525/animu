@@ -108,7 +108,7 @@
         "enable": true
     },
     "plugins": {
-        "player": "Allmanga",
+        "player": "Anikoto",
         "userPlugins": false,
         "hiddenPlugins": [],
         "repoURL": [
