@@ -615,6 +615,9 @@ export function detectIndex(str: string, customINDEX: string = "") {
 export async function setHomeData(wrapper: SetNewHomeDataFormat) {
     if (!wrapper["content"] && !wrapper["jsx"] && !wrapper["wrapper"]) return
 
+    /* IFDEF DEBUG */
+    console.warn("Functions/setHomeData", wrapper)
+    /* ENDIF */
 
     const uuid = crypto.randomUUID()
     try {
@@ -622,7 +625,7 @@ export async function setHomeData(wrapper: SetNewHomeDataFormat) {
         setAllHomeData({ data: { sections: [] }, isLoading: true, isError: false } as any)
 
         if (wrapper["content"] && "sections" in wrapper["content"]) {
-            setAllHomeData({ data: wrapper, isLoading: false, isError: false } as any)
+            setAllHomeData({ data: wrapper["content"], isLoading: false, isError: false } as any)
             return
         }
         if (wrapper["content"]) {
