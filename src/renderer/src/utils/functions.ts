@@ -1556,3 +1556,11 @@ export function ConvertStringToNumber(value: string | undefined): number {
 
     return match ? Number(match[0]) : 0;
 }
+
+export function GetAnimuPage() {
+    const href = location.href
+
+    const str = href.substring(href.lastIndexOf("/")+1)
+    if (str.length <= 0) return "/"
+    return str
+}

@@ -2,12 +2,11 @@ import Button from '@renderer/components/buttons';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
-import { Anilist_ListMutation, AnimeData, animulistProps, cardData, episodeMetadata, indentityPlayer, informationTmpProps, playerData } from '@renderer/utils/types';
+import { AnimeData, animulistProps, cardData, episodeMetadata, indentityPlayer, informationTmpProps, playerData } from '@renderer/utils/types';
 import {
     calculateDays,
     changeTitleAnimu,
     convert_to_slug,
-    convertDateToDateObject,
     convertDateToFormattedString,
     convertSeconds,
     dateToUnix,
@@ -117,8 +116,6 @@ async function FetchEpisodes(params: { anime: AnimeData, playerID: string | unde
 
 async function FetchAnimeOpening(anime: AnimeData): Promise<playerData[]> {
     if (!parseInt(anime.id)) return []
-
-    console.log(anime)
 
     const response = await requestAnimeMedia(parseInt(anime.id))
 
@@ -601,17 +598,13 @@ function information() {
 
         if (!getGlobalCache().anilist_user_data) return
 
-        let tmp = {
-            completedAt: convertDateToDateObject(animulist.endWatch),
-            startedAt: convertDateToDateObject(animulist.startWatch),
-            mediaId: parseInt(anime.id),
-            progress: animulist.progress ?? 0,
-            repeat: animulist.reapeat,
-            score: animulist.score,
-            status: animulist.status
-        } satisfies Anilist_ListMutation
+        const info_plugin = getInformationPlugin()
+        if (!info_plugin.setAnimeInList) return
 
-        if (await getInformationPlugin().setAnimeInList(tmp)) toast(t(`Succesfully Updated ${detectTitleConfig(anime.title)}`), { type: "success" })
+        // TRANSLATION
+        if (await info_plugin.setAnimeInList(anime["id"], animulist)) 
+            toast(t(`Succesfully Updated ${detectTitleConfig(anime.title)}`), { type: "success" })
+
         else toast(t(`Failed Updated ${detectTitleConfig(anime.title)}`), { type: "error" })
     }
 

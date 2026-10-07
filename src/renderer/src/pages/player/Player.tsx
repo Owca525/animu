@@ -1,7 +1,7 @@
 import Button from "@renderer/components/buttons"
 import VolumeNotification from "@renderer/pages/player/components/VolumeNotification"
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
-import { CheckNumber, convertKeybinds, createElement, CreateSHA256, dateToUnix, detectTitleConfig, formatNumber, formatTime, openUrlFolder, request, toggleFullscreen } from "@renderer/utils/functions"
+import { CheckNumber, convertKeybinds, createElement, CreateSHA256, dateToUnix, detectTitleConfig, formatNumber, formatTime, GetAnimuPage, openUrlFolder, request, toggleFullscreen } from "@renderer/utils/functions"
 import { getConfig } from "@renderer/utils/stores/config"
 import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, player_script_injector, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, Thumbnail } from "@renderer/utils/types"
 
@@ -114,7 +114,7 @@ class ExtractorManagerInstance {
         } catch (error) {
             console.error("Error in ExtractorManagerInstance", error)
 
-            if (id == this.active) toast(content["errorMessage"], { type: "error" })
+            if (id == this.active && GetAnimuPage() == "player") toast(content["errorMessage"], { type: "error" })
 
             if (this.active && id == this.active) removeToast(this.active)
             return undefined
@@ -425,10 +425,11 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                 }
             },
             loadingMessage: t("notification.fetchresolution"),
+            // TRANSLATION
             errorMessage: "Failed Fetch Resolutions"
         })
 
-        if (PlayerCleanup) return
+        if (PlayerCleanup || (GetAnimuPage() != "player" && type == "player")) return
 
         if (extracted) {
             meta = extracted
