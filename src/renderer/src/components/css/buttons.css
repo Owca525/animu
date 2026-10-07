@@ -7,20 +7,13 @@
   padding: clamp(4px, 1vw, 12px);
   transition: all 0.1s ease;
   user-select: none;
-  anchor-name: ---button;
+  anchor-name: --button;
   position: relative;
 }
 
 .button-tooltip {
-  position: absolute;
-  position-anchor: ---button;
-  position-fallback: --tooltip-fallback;
-
-  left: anchor(center);
-  bottom: anchor(top);
-  margin-bottom: 80px;
-  margin-left: 10px;
-  transform: translateX(-50%);
+  position: fixed;
+  position-anchor: --button;
 
   background: var(--five-layer);
   color: var(--text);
@@ -33,6 +26,8 @@
   transition: opacity 150ms;
   user-select: none;
   pointer-events: none;
+
+  position-area: top;
 }
 
 .button-tooltip-container {
@@ -41,16 +36,4 @@
 
 .button:hover .button-tooltip {
   opacity: 1;
-}
-
-@position-fallback --tooltip-fallback {
-  @try {
-    inset-block-end: anchor(top);
-    margin-bottom: 8px;
-  }
-
-  @try {
-    inset-block-start: anchor(bottom);
-    margin-top: 8px;
-  }
 }
