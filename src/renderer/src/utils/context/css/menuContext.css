@@ -43,9 +43,10 @@
 }
 
 .custom-menu-exit-button {
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: fixed !important;
+    top: 10px !important;
+    left: 10px !important;
+    
     margin: 24px;
     border-radius: 12px !important;
 
