@@ -44,6 +44,8 @@ export default function Sidebar(props: sidebarProps) {
 
   const handleClickOutside = (event: MouseEvent) => {
     let data = event.target as HTMLElement
+
+    if (data.classList.contains("sidebar-icon")) return
     if (data.classList.contains("sidebar-button")) return
     if (data.classList.contains("sidebar-hide-button")) return
     setHover(() => false)
@@ -134,6 +136,7 @@ export default function Sidebar(props: sidebarProps) {
               content={detectSidebarStateButton(t("sidebar.hide"))}
               onClick={(event) => hideSidebar(event, undefined)}
               ButtonClass={detectSidebarStateClass()}
+              iconClassName='sidebar-icon'
             />
           </Show>
           <div class="sidebar-black-line"></div>
@@ -148,6 +151,7 @@ export default function Sidebar(props: sidebarProps) {
                   if (props.onClickTopButtons) props.onClickTopButtons(value.text)
                 }}
                 ButtonClass={`${detectSidebarStateClass()} ${checkNumber(i())}`}
+                iconClassName='sidebar-icon'
               />
             )}
           </For>
@@ -163,6 +167,7 @@ export default function Sidebar(props: sidebarProps) {
                   if (props.onClickBottomButtons) props.onClickBottomButtons(value.text)
                 }}
                 ButtonClass={detectSidebarStateClass()}
+                iconClassName='sidebar-icon'
               />
             )}
           </For>
