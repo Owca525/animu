@@ -23,7 +23,7 @@ export function DialogProvider(props: { children: JSX.Element }) {
     
     setData(undefined);
 
-    if (tmp!.onExit) tmp!.onExit!()
+    if (tmp && tmp!.onExit) tmp!.onExit!()
   };
 
   dialogIsOpen = () => isOpen();
