@@ -21,95 +21,95 @@
     "on": "開啟",
     "action": "操作",
     "adult": "成人",
-    "schedule": "Schedule",
-    "animulist": "AnimuList",
-    "waitingplaylist": "Waiting Playlist",
-    "double_check": "Double Check",
-    "cloudflare": "Verify Cloudflare to use plugin. Click to open window"
+    "schedule": "排程",
+    "animulist": "Animu清單",
+    "waitingplaylist": "等待播放清單",
+    "double_check": "再次確認",
+    "cloudflare": "驗證 Cloudflare 以使用插件。點擊以開啟視窗"
   },
   "animu": {
-    "format_title": "Title Format In Animu"
+    "format_title": "Animu 中的標題格式"
   },
   "debug": {
-    "log_saved": "Succesfully Saved Logs in Animu Appdata Folder",
-    "log_failed": "Failed Save Logs"
+    "log_saved": "成功將日誌儲存至Animu Appdata 資料夾",
+    "log_failed": "日誌儲存失敗"
   },
   "services": {
-    "plugin_name": "PluginStatus",
-    "plugin_desc": "Check Status Of Player Plugins",
-    "animupdate_name": "AnimUpdate",
-    "animupdate_desc": "Check Animu Update",
-    "pluginupdates_name": "PluginUpdates",
-    "pluginupdate_desc": "Check Plugins are Updated",
-    "calendaryupdate_name": "CallendarUpdate",
-    "calendaryupdate_desc": "Fetching New Callendary",
-    "episodeavailble_name": "EpisodesAvaible",
-    "episodeavailble_desc": "Check Is Anime episode avaible",
-    "animulistsynchronize_name": "SynchronizeAnimulist",
-    "animulistsynchronize_desc": "Synchronizing Animulist with information plugin"
+    "plugin_name": "插件狀態",
+    "plugin_desc": "檢查播放器插件的狀態",
+    "animupdate_name": "Anim更新",
+    "animupdate_desc": "檢查 Animu 是否有更新",
+    "pluginupdates_name": "插件更新",
+    "pluginupdate_desc": "檢查插件是否已更新",
+    "calendaryupdate_name": "日曆更新",
+    "calendaryupdate_desc": "取得新的日曆資訊",
+    "episodeavailble_name": "可觀看的集數",
+    "episodeavailble_desc": "檢查動畫集數是否可觀看",
+    "animulistsynchronize_name": "同步Animu清單",
+    "animulistsynchronize_desc": "將 Animu 清單與資訊插件同步"
   },
   "user": {
-    "updated": "Succesfully Updated User Data",
-    "failed_update": "Failed Update User Data",
-    "overwrite_profile": "Do you want overwrite Animu profile or write animu profile in {{plugin}}",
-    "overwrite_animulist": "Do you want overwrite Animulist into {{plugin}} or {{plugin}} to animu",
-    "button_overwrite_plugin": "Overwrite {{plugin}} profile",
-    "button_overwrite_animulist": "Overwrite Animulist",
-    "overwrite_animu": "Overwrite in Animu",
-    "overwrite_plugin": "Overwrite in {{plugin}}",
-    "updateProfile": "Updating profile in {{plugin}}",
-    "updateProfile_success": "Sucessfully Updated Profile in {{plugin}}",
-    "updateProfile_failed": "Failed Update Profile in {{plugin}}",
-    "completed_anime": "Completed Anime",
-    "animulist_entries": "Animulist Entries",
-    "watch_time": "Watch Time",
-    "time_animu": "Time In Animu",
-    "edit_user": "Edit User Profile",
-    "username": "Usermame",
-    "description": "Description",
-    "avatar": "Avatar",
-    "banner": "Banner",
-    "update_user": "Update Profile"
+    "updated": "使用者資料成功更新",
+    "failed_update": "使用者資料更新失敗",
+    "overwrite_profile": "你想要覆寫 Animu 個人資料，還是將 Animu 個人資料寫入 {{plugin}}",
+    "overwrite_animulist": "你想要將 Animu 清單覆寫至 {{plugin}}，還是將 {{plugin}} 覆寫至 Animu",
+    "button_overwrite_plugin": "覆寫 {{plugin}} 個人資料",
+    "button_overwrite_animulist": "覆寫 Animu清單",
+    "overwrite_animu": "覆寫至 Animu",
+    "overwrite_plugin": "覆寫至 {{plugin}}",
+    "updateProfile": "正在更新 {{plugin}} 中的個人資料",
+    "updateProfile_success": "已成功更新 {{plugin}} 中的個人資料",
+    "updateProfile_failed": "更新 {{plugin}} 中的個人資料失敗",
+    "completed_anime": "已完成的動畫",
+    "animulist_entries": "Animu 清單項目",
+    "watch_time": "觀看時間",
+    "time_animu": "在 Animu 中的時間",
+    "edit_user": "編輯使用者個人資料",
+    "username": "使用者名稱",
+    "description": "描述",
+    "avatar": "頭像",
+    "banner": "橫幅",
+    "update_user": "更新個人資料"
   },
   "moreinformation": {
-    "current_watching": "Current Watching",
-    "episode": "Episode"
+    "current_watching": "目前正在觀看",
+    "episode": "集數"
   },
   "anilist": {
     "titles": {
-      "ROMAJI": "Romaji",
-      "ENGLISH": "English",
-      "NATIVE": "Native"
+      "ROMAJI": "羅馬拼音",
+      "ENGLISH": "英文",
+      "NATIVE": "原文"
     }
   },
   "search": {
     "home": "搜尋",
     "history": "搜尋紀錄…",
-    "animulist": "Search in AnimuList...",
-    "schedule": "Search in Schedule..."
+    "animulist": "在 Animu 清單中搜尋...",
+    "schedule": "在排程中搜尋..."
   },
   "animulist": {
     "status": {
-      "CURRENT": "Watching",
-      "PLANNING": "Planning",
-      "COMPLETED": "Completed",
-      "REPEATING": "Rewatching",
-      "PAUSED": "Paused",
-      "DROPPED": "Dropped"
+      "CURRENT": "觀看中",
+      "PLANNING": "計畫觀看",
+      "COMPLETED": "已完成",
+      "REPEATING": "重看中",
+      "PAUSED": "已暫停",
+      "DROPPED": "已棄看"
     },
-    "status_text": "Status",
-    "score_text": "Score",
-    "rewatch_text": "Rewatch Number",
-    "startdate_text": "Start Date",
-    "finishdate_text": "Finish Date"
+    "status_text": "狀態",
+    "score_text": "評分",
+    "rewatch_text": "重看次數",
+    "startdate_text": "開始日期",
+    "finishdate_text": "完成日期"
   },
   "initial": {
-    "animu": "Animu is initializing",
+    "animu": "Animu 正在初始化",
     "theme": "正在載入主題",
     "config": "正在載入設定",
     "plugin": "正在載入外掛",
     "history": "正在載入歷史紀錄",
-    "resource": "Fetching Resources"
+    "resource": "正在取得資源"
   },
   "imageviewer": {
     "failedfetch": "圖片取得失敗",
@@ -166,7 +166,7 @@
       "information": "更多資訊",
       "now": "立即觀看",
       "start": "開始播放第 {{ep}} 集",
-      "episodes": " 集數"
+      "episodes": "集數"
     },
     "search": "搜尋",
     "historySearch": "搜尋紀錄…"
@@ -189,7 +189,7 @@
     "FINISHED": "完成",
     "NOT_YET_RELEASED": "還沒釋出",
     "CANCELLED": "取消",
-    "HIATUS": "Hiatus"
+    "HIATUS": "暫停連載"
   },
   "anime_relationtype": {
     "ADAPTATION": "改編作品",
@@ -234,10 +234,10 @@
     "SPECIAL": "特別篇",
     "OVA": "OVA(原創錄影動畫)",
     "ONA": "ONA(網路動畫)",
-    "ONE_SHOT": "One Shot",
-    "MUSIC": "Music",
-    "NOVEL": "Novel",
-    "MANGA": "Manga"
+    "ONE_SHOT": "單篇漫畫",
+    "MUSIC": "音樂",
+    "NOVEL": "小說",
+    "MANGA": "漫畫"
   },
   "anime_source": {
     "LIGHT_NOVEL": "輕小說",
@@ -294,7 +294,7 @@
       "sub": "字幕版",
       "dub": "配音版",
       "raw": "無字幕版",
-      "both": "Subtitles/Dubbing"
+      "both": "字幕／配音"
     },
     "notification": {
       "coverdone": "複製成功",
@@ -324,30 +324,30 @@
     }
   },
   "settings": {
-    "failed_change_plugin": "Failed Change Plugin",
-    "manage_data": "Manage Data in animu",
-    "overwrite_import": "Are you sure importing file, this action overwrite everything",
-    "import_data": "Import Data",
-    "export_data": "Export Data",
-    "test_deeplink": "Run Test DeepLink",
-    "test_deeplink_message": "Ping Pong, Animu Received Deepling {{content}}",
-    "websocket": "Use Websocket",
-    "websocket_url": "Web Socket Backend",
-    "use_worker": "Use Worker",
+    "failed_change_plugin": "插件變更失敗",
+    "manage_data": "管理 Animu 中的資料",
+    "overwrite_import": "確定要匯入檔案嗎？此操作將覆寫所有資料",
+    "import_data": "匯入資料",
+    "export_data": "匯出資料",
+    "test_deeplink": "執行 DeepLink 測試",
+    "test_deeplink_message": "乒乓！Animu 已收到 DeepLink {{content}}",
+    "websocket": "使用 WebSocket",
+    "websocket_url": "WebSocket 後端",
+    "use_worker": "使用 Worker",
     "variants": {
-      "v1": "Variant 1",
-      "v2": "Variant 2"
+      "v1": "版本1",
+      "v2": "版本 2"
     },
     "information": {
-      "page": "Information Page",
-      "always_update": "Always Update Anime In Information",
-      "opening_information": "Play Opening In Information",
-      "trailer_player_type": "Trailer player Type",
-      "preload_trailer": "Preload Trailer",
-      "preload_opening": "Preload Opening/Ending",
+      "page": "資訊頁面",
+      "always_update": "在資訊頁面中始終更新動畫資訊",
+      "opening_information": "在資訊頁面中播放片頭曲",
+      "trailer_player_type": "預告片播放器類型",
+      "preload_trailer": "預載預告片",
+      "preload_opening": "預載片頭曲／片尾曲",
       "trailertype": {
-        "embed": "Embed",
-        "player": "Animu Player"
+        "embed": "嵌入式播放器",
+        "player": "Animu 播放器"
       }
     },
     "turnDeveloper": "開啟開發者工具",
@@ -399,11 +399,11 @@
       "links": "實用連結"
     },
     "player": {
-      "hls_worker": "Use HLS Worker",
-      "skip_opening": "Automatic Skip Opening/Ending",
-      "audio_output": "Audio Output",
-      "episode": "Episode {{ep}}",
-      "downloadvideo": "Download Video",
+      "hls_worker": "使用 HLS Worker",
+      "skip_opening": "自動跳過片頭／片尾",
+      "audio_output": "音訊輸出",
+      "episode": "第 {{ep}} 集",
+      "downloadvideo": "下載影片",
       "animations": "播放器動畫",
       "play": "自動播放",
       "skip": "跳過",
@@ -531,7 +531,7 @@
     }
   },
   "player": {
-    "failed_fetch_subs": "Failed Fetch Subtitles",
+    "failed_fetch_subs": "字幕取得失敗",
     "error": {
       "notfound": "找不到任何的連結",
       "player": "播放器發生問題"
@@ -599,7 +599,7 @@
       "failed": "保存截圖失敗",
       "doneclip": "圖片已成功保存到剪貼板",
       "donefile": "圖片已成功保存到文件",
-      "done": "Screenshot Succesfully Saved"
+      "done": "截圖已成功儲存"
     }
   },
   "history": {
@@ -672,10 +672,10 @@
     "sunday": "星期日"
   },
   "backend": {
-    "trayNotification": "Animu is Now In tray mode if you want disable this you can in settings",
-    "openAnimu": "Open Animu",
-    "update": "Check Updates",
-    "settings": "Settings",
-    "exitAnimu": "Exit Animu"
+    "trayNotification": "Animu 現在已進入系統匣模式，你可以在設定中停用此功能",
+    "openAnimu": "開啟 Animu",
+    "update": "檢查更新",
+    "settings": "設定",
+    "exitAnimu": "結束 Animu"
   }
 }
