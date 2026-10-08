@@ -16,7 +16,7 @@ NOTE: Animu does not host or possess any anime and does not promote piracy; it o
 ![information](assets/settings.png)
 
 # Planing Features
-- [ ] Automatic synchronization with platforms like anilist.co via plugins
+- [x] Automatic synchronization with platforms like anilist.co via plugins
 - [x] Plugins enabling viewing from various websites
 - [x] Saving watch history
 - [ ] Downloading anime
