@@ -377,6 +377,8 @@ export default class Anikoto implements playerPluginFormat {
             if (searchResponse.length <= 0) return
 
             anime_id = SheepFinderAnime2000(searchResponse.map((v) => v.AnimeData), animeData)
+
+            if (!anime_id) anime_id = searchResponse[0]["AnimeData"]["player_ID"]
         }
 
         /* IFDEF DEBUG */
