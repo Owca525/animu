@@ -51,7 +51,6 @@ import ButtonGroup from '../settings/components/buttonGroup';
 import { requestAnimeMedia } from '@renderer/utils/animeThemes';
 import { updateHistoryData } from '@renderer/utils/FilesManager/history';
 import { addToAnimuList, removeFromAnimulist, updateDataInAnimulist } from '@renderer/utils/FilesManager/animulist';
-// import OpeningPlayer from './components/openingPlayer';
 import { readPlaylist, removeInPlaylist, saveToPlaylist } from '@renderer/utils/FilesManager/playlist';
 import AnimulistMenu from '@renderer/components/animulistMenu';
 import { updateGenres } from '../home/components/filter';
@@ -63,9 +62,9 @@ import pluginManager from '@renderer/utils/pluginManager';
 // import Player from '../player/Player';
 
 const Player = lazy(() => import('../player/Player'))
+const OpeningPlayer = lazy(() => import('./components/openingPlayer'))
 
 import RelationCardContainer from './components/relationCardsContainer';
-import OpeningPlayer from './components/openingPlayer';
 
 // TODO: RE-ADD OPENING MUSIC IN INFORMATION
 
@@ -1068,7 +1067,9 @@ function information() {
             </Show>
 
             <Show when={information.cacheOpenings && information.cacheOpenings.length > 0 && config.information.openingininformation}>
-                <OpeningPlayer music={information.cacheOpenings!} anime={information["cache"]["anime"]} />
+                <Suspense>
+                    <OpeningPlayer music={information.cacheOpenings!} anime={information["cache"]["anime"]} />
+                </Suspense>
             </Show>
         </>
     )
