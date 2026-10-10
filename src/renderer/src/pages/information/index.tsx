@@ -350,9 +350,14 @@ function information() {
     }
 
     async function initialInformation() {
-        updateInfo({ buttonGroup: GenerateButtons() })
+        if (config["information"]["preloadOpening"]) 
+            requestAnimeMedia(parseInt(information["cache"]["anime"]["id"])).then((v) => {
+                updateInfo({
+                    cacheOpenings: v
+                })
+            })
 
-        // if (config.information.openingininformation) searchAnimeOpenings()
+        updateInfo({ buttonGroup: GenerateButtons() })
 
         changeTitleAnimu(`Animu - ${detectTitleConfig(information["cache"]["anime"]["title"])}`)
         checkIsAnimeReleasing()
@@ -435,13 +440,6 @@ function information() {
     onMount(() => {
         initialInformation()
         setTimeout(() => { updateInfo({ youCanLeave: true }) }, 300)
-
-        if (config["information"]["preloadOpening"]) 
-            requestAnimeMedia(parseInt(information["cache"]["anime"]["id"])).then((v) => {
-                updateInfo({
-                    cacheOpenings: v
-                })
-            })
 
         // TODO: RE-ADD THIS
         // if (config["information"]["preloadTrailer"] && config["information"]["trailerplayertype"] == "player")
@@ -539,7 +537,8 @@ function information() {
 
         updateInfo({
             activePage: "Episodes",
-            ShowMoreTitles: false
+            ShowMoreTitles: false,
+            cacheOpenings: []
         })
 
         initialInformation()
