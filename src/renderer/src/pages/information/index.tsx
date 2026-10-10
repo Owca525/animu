@@ -2,7 +2,7 @@ import Button from '@renderer/components/buttons';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
-import { AnimeData, animulistProps, cardData, episodeMetadata, indentityPlayer, informationTmpProps, playerData } from '@renderer/utils/types';
+import { AnimeData, animeOpeningsFormat, animulistProps, cardData, episodeMetadata, indentityPlayer, informationTmpProps, playerData } from '@renderer/utils/types';
 import {
     calculateDays,
     changeTitleAnimu,
@@ -65,6 +65,7 @@ import pluginManager from '@renderer/utils/pluginManager';
 const Player = lazy(() => import('../player/Player'))
 
 import RelationCardContainer from './components/relationCardsContainer';
+import OpeningPlayer from './components/openingPlayer';
 
 // TODO: RE-ADD OPENING MUSIC IN INFORMATION
 
@@ -123,7 +124,7 @@ async function FetchAnimeOpening(anime: AnimeData): Promise<playerData[]> {
         const firstPartTitle = item.type == "OP" ? "Opening" : "Ending"
         return {
             // embedTitle: `${firstPartTitle} ${item.musicTitle} ${item.variant ? item.variant : ""}`,
-            hostname: `${firstPartTitle} ${item.musicTitle} ${item.variant ? item.variant : ""}`,
+            hostname: `${firstPartTitle} ${item.title["romaji"]} ${item.variant ? `v${item.variant}` : ""}`,
             resolution: item.videos.map((item) => ({
                 res: item.resolution.toString(),
                 url: item.url,
@@ -169,6 +170,8 @@ function information() {
 
         isShowWrongActive: false,
         isImageViewerActive: false,
+
+        cacheOpenings: [] as animeOpeningsFormat[],
 
         buttonGroup: [] as { value: string; onClick: () => void; }[],
     })
@@ -433,7 +436,12 @@ function information() {
         initialInformation()
         setTimeout(() => { updateInfo({ youCanLeave: true }) }, 300)
 
-        if (config["information"]["preloadOpening"]) FetchAnimeOpening(information["cache"]["anime"])
+        if (config["information"]["preloadOpening"]) 
+            requestAnimeMedia(parseInt(information["cache"]["anime"]["id"])).then((v) => {
+                updateInfo({
+                    cacheOpenings: v
+                })
+            })
 
         // TODO: RE-ADD THIS
         // if (config["information"]["preloadTrailer"] && config["information"]["trailerplayertype"] == "player")
@@ -1060,9 +1068,9 @@ function information() {
                 />
             </Show>
 
-            {/* <Show when={currentAudio() && config.information.openingininformation}>
-                <OpeningPlayer music={currentAudio()!} />
-            </Show> */}
+            <Show when={information.cacheOpenings && information.cacheOpenings.length > 0 && config.information.openingininformation}>
+                <OpeningPlayer music={information.cacheOpenings!} anime={information["cache"]["anime"]} />
+            </Show>
         </>
     )
 }

@@ -1560,7 +1560,14 @@ export function ConvertStringToNumber(value: string | undefined): number {
 export function GetAnimuPage() {
     const href = location.href
 
-    const str = href.substring(href.lastIndexOf("/")+1)
+    const str = href.substring(href.lastIndexOf("/") + 1)
     if (str.length <= 0) return "/"
     return str
+}
+
+export function RandomObject<T>(list: T[]): T | undefined {
+    if (list.length === 0) return undefined;
+
+    const randomIndex = Math.floor(Math.random() * list.length);
+    return list[randomIndex];
 }

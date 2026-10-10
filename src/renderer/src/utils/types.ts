@@ -598,6 +598,8 @@ export interface SettingsConfig {
         trailerplayertype: "embed" | "player",
         preloadTrailer: boolean,
         preloadOpening: boolean
+        musicplayervolume: number
+        musicplayerfirstype: "OP" | "EN"
     },
     Player: {
         general: {
@@ -761,7 +763,10 @@ export type pluginRepoExpanded = {
 
 export interface animeOpeningsFormat {
     type: "OP" | "EN" | "IN"
-    musicTitle: string,
+    title: {
+        native: string,
+        romaji: string
+    },
     variant?: string
     artist: string
     videos: {

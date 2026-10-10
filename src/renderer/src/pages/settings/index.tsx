@@ -767,6 +767,35 @@ function settings() {
                                 }
                             />
                         </div>
+                        
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {/* TRANSLATION */}
+                            {t("Music Player Volume")}
+                            <div class='settings-setting-seekbar-container'>
+                                <span>0</span>
+                                <SeekBar
+                                    maxValue={100}
+                                    minValue={0}
+                                    type="value"
+                                    currentValue={config().new.information.musicplayervolume}
+                                    onSeek={(value) => { handleChange("information.musicplayervolume", parseInt(value.toFixed(0))) }}
+                                />
+                                <span>100</span>
+                            </div>
+                        </div>
+
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {/* TRANSLATION */}
+                            {t("First Type Song to player")}
+                            <ButtonGroup selectedValue={t(`information.musictype.${config().new.information.musicplayerfirstype}`)} listValues={[
+                                { value: t("information.musictype.OP"), onClick: () => handleChange("information.musicplayerfirstype", "OP") },
+                                { value: t("information.musictype.EN"), onClick: () => handleChange("information.musicplayerfirstype", "EN") },
+                            ]}
+                            />
+                        </div>
+
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("settings.information.trailer_player_type")}

@@ -24,7 +24,9 @@ export interface SettingsConfig {
         episodeVariants: "v1" | "v2",
         trailerplayertype: "embed" | "player",
         preloadTrailer: boolean,
-        preloadOpening: boolean
+        preloadOpening: boolean,
+        musicplayervolume: number
+        musicplayerfirstype: "OP" | "EN"
     },
     plugins: {
         // information: string

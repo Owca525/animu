@@ -264,6 +264,10 @@
         "minutes": "{{min}}Min Duration"
     },
     "information": {
+        "musictype": {
+            "OP": "Opening",
+            "EN": "Ending"
+        },
         "airing": "Airing Episode",
         "format": "Format",
         "episodes": "Episodes",
