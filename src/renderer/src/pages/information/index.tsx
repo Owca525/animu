@@ -66,8 +66,6 @@ const OpeningPlayer = lazy(() => import('./components/openingPlayer'))
 
 import RelationCardContainer from './components/relationCardsContainer';
 
-// TODO: RE-ADD OPENING MUSIC IN INFORMATION
-
 interface informationContentType {
     type: string;
     metadata: {
@@ -349,7 +347,7 @@ function information() {
     }
 
     async function initialInformation() {
-        if (config["information"]["preloadOpening"])
+        if (config["information"]["preloadOpening"] || config["information"]["openingininformation"])
             requestAnimeMedia(parseInt(information["cache"]["anime"]["id"])).then((v) => {
                 updateInfo({
                     cacheOpenings: v
