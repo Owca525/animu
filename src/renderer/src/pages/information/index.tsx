@@ -349,7 +349,7 @@ function information() {
     }
 
     async function initialInformation() {
-        if (config["information"]["preloadOpening"]) 
+        if (config["information"]["preloadOpening"])
             requestAnimeMedia(parseInt(information["cache"]["anime"]["id"])).then((v) => {
                 updateInfo({
                     cacheOpenings: v
@@ -608,7 +608,7 @@ function information() {
         if (!info_plugin.setAnimeInList) return
 
         // TRANSLATION
-        if (await info_plugin.setAnimeInList(anime["id"], animulist)) 
+        if (await info_plugin.setAnimeInList(anime["id"], animulist))
             toast(t(`Succesfully Updated ${detectTitleConfig(anime.title)}`), { type: "success" })
 
         else toast(t(`Failed Updated ${detectTitleConfig(anime.title)}`), { type: "error" })
@@ -997,7 +997,7 @@ function information() {
                             </div>
 
                             <Show when={information["cache"].anime.relations && information["cache"].anime.relations!.length > 0}>
-                                <RelationCardContainer content={information["cache"].anime.relations} onClick={ChangeAnimeInInformation}/>
+                                <RelationCardContainer content={information["cache"].anime.relations} onClick={ChangeAnimeInInformation} />
                             </Show>
 
                             <Show when={information["cache"].anime.characters && information["cache"].anime.characters!.length > 0}>
@@ -1068,7 +1068,10 @@ function information() {
 
             <Show when={information.cacheOpenings && information.cacheOpenings.length > 0 && config.information.openingininformation}>
                 <Suspense>
-                    <OpeningPlayer music={information.cacheOpenings!} anime={information["cache"]["anime"]} />
+                    <OpeningPlayer music={information.cacheOpenings.filter(
+                        (obj, index, arr) =>
+                            index === arr.findIndex(item => item.title["romaji"] === obj.title["romaji"])
+                    )} anime={information["cache"]["anime"]} />
                 </Suspense>
             </Show>
         </>
