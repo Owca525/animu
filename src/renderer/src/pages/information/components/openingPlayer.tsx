@@ -322,7 +322,8 @@ export default function OpeningPlayer(props: { music: animeOpeningsFormat[], ani
                     <span class="opening-player-texts">
 
                         <span class="opening-player-title">{player.current["title"]["romaji"]}</span>
-                        <span class="opening-player-artist">{player.current["artist"]}</span>
+                        {/* TRANSLATION */}
+                        <span class="opening-player-artist">{player.current["artist"] ?? "uknown"}</span>
 
                     </span>
 
