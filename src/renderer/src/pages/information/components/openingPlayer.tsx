@@ -83,6 +83,10 @@ export default function OpeningPlayer(props: { music: animeOpeningsFormat[], ani
     function SetNewPlayer(current: animeOpeningsFormat | undefined) {
         if (!current) return
 
+        /* IFDEF DEBUG */
+        console.warn("OpeningPlayer/SetNewPlayer", current)
+        /* ENDIF */
+
         createNewPlayer()
 
         updatePlayer({ current: current })
@@ -323,7 +327,7 @@ export default function OpeningPlayer(props: { music: animeOpeningsFormat[], ani
 
                         <span class="opening-player-title">{player.current["title"]["romaji"]}</span>
                         {/* TRANSLATION */}
-                        <span class="opening-player-artist">{player.current["artist"] ?? "uknown"}</span>
+                        <span class="opening-player-artist">{`${player.current["artist"]}`.length > 0 ? player.current["artist"] : "uknown"}</span>
 
                     </span>
 
