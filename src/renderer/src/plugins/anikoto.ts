@@ -373,7 +373,7 @@ export default class Anikoto implements playerPluginFormat {
 
     extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {
         if (animeData && !anime_id) {
-            const searchResponse = await this.searchAnime(animeData["title"]["english"] ?? animeData["title"]["romaji"], 1)
+            const searchResponse = await this.searchAnime(animeData["title"]["romaji"], 1)
             if (searchResponse.length <= 0) return
 
             anime_id = SheepFinderAnime2000(searchResponse.map((v) => v.AnimeData), animeData)
