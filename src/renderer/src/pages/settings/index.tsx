@@ -808,7 +808,8 @@ function settings() {
                         <Show when={config().new.information.trailerplayertype == "player"}>
                             <div class="settings-line"></div>
                             <div class="settings-setting-container">
-                                {t("settings.information.trailer_player_type")}
+                                {/* TRANSLATION */}
+                                {t("Preload Trailer Anime")}
                                 <CheckBox
                                     checked={config().new.information.preloadTrailer}
                                     onChecked={(checked) =>
@@ -859,6 +860,7 @@ function settings() {
                     <div class="settings-page-container">
                         <div class="settings-page-title">{t("settings.general.window")}</div>
                         <div class="settings-setting-container">
+                            {/* TRANSLATION */}
                             {t("Close Animu On Exit Button")}
                             <CheckBox
                                 checked={config().new.General.Window.trayIconClose}
