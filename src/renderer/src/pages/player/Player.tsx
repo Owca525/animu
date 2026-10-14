@@ -179,6 +179,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
     let PlayerCleanup = false
 
+    let toast_fetch_id = ""
+
     const [player, updatePlayer] = createStore({
         initialize: true,
 
@@ -1226,17 +1228,26 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         if (!player.currentResolution) return
 
         if (currentASSubtitles) {
-            currentASSubtitles.canvasParent.remove()
             currentASSubtitles.dispose()
             currentASSubtitles = undefined
         }
+        removeToast(toast_fetch_id)
 
         if (sub.label == "Off" && sub.format == "", sub.lang == "", sub.url == "")
             return updatePlayer({ currentSubtitle: { url: "", format: "", lang: "", label: "Off" } })
 
+        const tmp_toast_fetch_id = toast(t("Fetching Subtitles"), { timer: false, type: "loading" })
+        toast_fetch_id = tmp_toast_fetch_id
+
         const data = await request(sub.url, {
             headers: player.currentResolution["reqHeader"] ? player.currentResolution["reqHeader"] : window["animuHeader"]
         })
+
+        if (toast_fetch_id == tmp_toast_fetch_id) {
+            removeToast(toast_fetch_id)
+        } else {
+            return
+        }
 
         if (!data["success"]) {
             console.error("Failed Load Subtitles", data, player.playerData, player.currentResolution)

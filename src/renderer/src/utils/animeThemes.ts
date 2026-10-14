@@ -12,20 +12,37 @@ const header = {
 
 const videosQuery = `
 query ($id: [Int!]) {
-  findAnimeByExternalSite(
-    site: ANILIST
-    id: $id
-  ) {
+  findAnimeByExternalSite(site: ANILIST, id: $id) {
     animethemes {
       type
+      song {
+        title {
+          romaji
+          native
+        }
+      }
       animethemeentries {
         videos {
           nodes {
             filename
             resolution
+            size
             link
             audio {
-              path
+              filename
+              link
+              size
+            }
+          }
+        }
+        animetheme {
+          song {
+            performances {
+              artist {
+                name {
+                  main
+                }
+              }
             }
           }
         }
@@ -55,18 +72,17 @@ export async function requestAnimeMedia(anilistID: number): Promise<animeOpening
       const element = themes[index];
       const videos = element["animethemeentries"]
       videos.forEach((item) => {
-        const match = item["videos"]["nodes"][0]["filename"].match(/v\d+$/)
-        const variant = match ? match[0] : undefined
-        // const artist = element["song"]["performances"].length > 0 ? element["song"]["performances"][0]["artist"]["name"] : ""
-
+        const match = item["videos"]["nodes"][0]["filename"].match(/(?:OP|ED)(\d+)/)
+        const variant = match ? match[1] : undefined
+        const artist = item["animetheme"]["song"]["performances"].length > 0 ? item["animetheme"]["song"]["performances"][0]["artist"]["name"]["main"] : ""
 
         list.push({
           type: element["type"],
           variant: variant,
-          artist: "",
-          musicTitle: "",
+          artist: artist,
+          title: element["song"]["title"],
           videos: item["videos"]["nodes"].map((vid) => {
-            return { filename: vid["filename"], url: vid["link"], resolution: vid["resolution"], audio: vid["audio"] ? `https://a.animethemes.moe/${vid["audio"]["path"].split("/").pop()}` : undefined }
+            return { filename: vid["filename"], url: vid["link"], resolution: vid["resolution"], audio: vid["audio"] ? `https://a.animethemes.moe/${vid["audio"]["link"].split("/").pop()}` : undefined }
           })
         })
       })

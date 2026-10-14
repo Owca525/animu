@@ -139,7 +139,9 @@
         "episodeVariants": "v1",
         "trailerplayertype": "player",
         "preloadTrailer": false,
-        "preloadOpening": false
+        "preloadOpening": false,
+        "musicplayervolume": 25,
+        "musicplayerfirstype": "OP"
     },
     "socket": {
         "useSocket": false,

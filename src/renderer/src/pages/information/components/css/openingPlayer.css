@@ -1,47 +1,198 @@
-.main-opening-player-container {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  width: max-content;
-  height: 40px;
-  background-color: var(--five-layer);
-  margin: 12px;
-
-  display: flex;
-  align-items: center;
-  padding: 12px;
-  border-radius: 12px;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.opening-seekbar {
-    width: 150px;
-}
-
-.opening-player-text {
+.opening-player-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+
+    position: fixed;
+
+    width: 100vw;
+    height: 85px;
+
+    bottom: 0;
+
+    justify-content: space-between;
+    background-color: var(--second-layer);
+
+    border: 0px solid var(--five-layer);
+
+    border-width: 2px 0px 0px 0px;
+
+    transform: translateY(150%);
+    transition: all 100ms;
 }
 
-.opening-player-name {
-    font-size: 1.2em;
-    font-weight: 600;
+.opening-player-container.active {
+    transform: translateY(0%)
+}
+
+.opening-player-container.hidden {
+    transform: translateY(80%)
+}
+
+.opening-player-img {
+    width: 60px;
+    border-radius: 4px;
+}
+
+.opening-player-left, .opening-player-texts {
+    display: flex;
+}
+
+.opening-player-left {
+    gap: 12px;
+}
+
+.opening-player-texts {
+    flex-direction: column;
+    gap: 4px;
+
+    justify-content: center;
+}
+
+.opening-player-title {
+    font-size: 1.3em;
+    font-weight: 700;
 }
 
 .opening-player-artist {
-    font-size: .9em;
+    font-size: 1em;
     color: var(--text-gray);
 }
 
-.opening-player-button-play {
-    user-select: none;
-    cursor: pointer;
-    font-size: 2.5em !important;
+.opening-player-center {
+    display: flex;
+    flex-direction: column;
+
+    width: 400px;
+    gap: 6px;
+
+    align-items: center;
+    margin-left: 64px;
+
+    padding-top: 6px;
 }
 
-.opening-player-controls {
+.opening-player-controls, .opening-player-center-bottom {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.opening-player-center-bottom {
+    gap: 16px;
+}
+
+.opening-player-seekbar {
+    width: 400px !important;
+}
+
+.opening-player-right {
     display: flex;
     align-items: center;
     gap: 12px;
+
+    padding-right: 12px;
+}
+
+.opening-player-buttons {
+    border-radius: 50% !important;
+    background-color: var(--second-layer) !important; 
+}
+
+.opening-player-volume {
+    width: 100px !important;
+}
+
+.audio-loading {
+  font-size: 2em !important;
+  animation: spin 1s linear infinite;
+}
+
+.icon-disable {
+    color: var(--text-gray) !important;
+}
+
+.opening-player-exit-button {
+    position: absolute;
+    top: 0;
+    z-index: 8;
+    border-radius: 50% !important;
+    padding: 6px;
+    margin: 6px;
+    margin-top: -45px;
+}
+
+.opening-player-exit-button-icon {
+    font-size: 2em !important;
+}
+
+.music-library-container {
+    position: fixed;
+
+    bottom: 0;
+    right: 0;
+
+    margin: 16px;
+    margin-bottom: 100px;
+
+    width: clamp(150px, 25vw, 400px);
+    height: clamp(100px, 30vh, 1000px);
+
+    background-color: var(--third-layer);
+    padding: 12px;
+
+    border-radius: 12px;
+    border: 3px solid var(--five-layer);
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    transform: translateX(150%);
+    transition: all 100ms;
+}
+
+.music-library-container.active {
+    transform: translateX(0%);
+}
+
+.music-library-title {
+    font-size: 1.2em;
+    font-weight: 800;
+
+    border: 0px solid var(--five-layer);
+    border-width: 0px 0px 4px 0px;
+}
+
+.music-library-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: auto;
+}
+
+.music-library-item {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 12px;
+    transition: all 100ms;
+    cursor: pointer;
+    height: 32px;
+}
+
+.music-library-item:hover {
+    background-color: var(--first-layer);
+    color: var(--green-one);
+}
+
+.music-library-item:hover .music-library-text, .music-library-item-icon {
+    color: var(--green-one);
+}
+
+.music-library-item.active .music-library-text, .music-library-item-icon {
+    color: var(--green-one);
+}
+
+.music-library-item.active {
+    border: 3px solid var(--green-one);
 }

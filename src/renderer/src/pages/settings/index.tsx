@@ -767,6 +767,35 @@ function settings() {
                                 }
                             />
                         </div>
+                        
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {/* TRANSLATION */}
+                            {t("Music Player Volume")}
+                            <div class='settings-setting-seekbar-container'>
+                                <span>0</span>
+                                <SeekBar
+                                    maxValue={100}
+                                    minValue={0}
+                                    type="value"
+                                    currentValue={config().new.information.musicplayervolume}
+                                    onSeek={(value) => { handleChange("information.musicplayervolume", parseInt(value.toFixed(0))) }}
+                                />
+                                <span>100</span>
+                            </div>
+                        </div>
+
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {/* TRANSLATION */}
+                            {t("First Type Song to player")}
+                            <ButtonGroup selectedValue={t(`information.musictype.${config().new.information.musicplayerfirstype}`)} listValues={[
+                                { value: t("information.musictype.OP"), onClick: () => handleChange("information.musicplayerfirstype", "OP") },
+                                { value: t("information.musictype.EN"), onClick: () => handleChange("information.musicplayerfirstype", "EN") },
+                            ]}
+                            />
+                        </div>
+
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("settings.information.trailer_player_type")}
@@ -779,7 +808,8 @@ function settings() {
                         <Show when={config().new.information.trailerplayertype == "player"}>
                             <div class="settings-line"></div>
                             <div class="settings-setting-container">
-                                {t("settings.information.trailer_player_type")}
+                                {/* TRANSLATION */}
+                                {t("Preload Trailer Anime")}
                                 <CheckBox
                                     checked={config().new.information.preloadTrailer}
                                     onChecked={(checked) =>
@@ -830,6 +860,7 @@ function settings() {
                     <div class="settings-page-container">
                         <div class="settings-page-title">{t("settings.general.window")}</div>
                         <div class="settings-setting-container">
+                            {/* TRANSLATION */}
                             {t("Close Animu On Exit Button")}
                             <CheckBox
                                 checked={config().new.General.Window.trayIconClose}

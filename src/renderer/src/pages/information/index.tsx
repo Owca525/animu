@@ -2,7 +2,7 @@ import Button from '@renderer/components/buttons';
 import ContainerWrong from './components/containerWrong';
 import Drop from './components/drop';
 import Dropdown from '@renderer/components/dropDown';
-import { AnimeData, animulistProps, cardData, episodeMetadata, indentityPlayer, informationTmpProps, playerData } from '@renderer/utils/types';
+import { AnimeData, animeOpeningsFormat, animulistProps, cardData, episodeMetadata, indentityPlayer, informationTmpProps, playerData } from '@renderer/utils/types';
 import {
     calculateDays,
     changeTitleAnimu,
@@ -51,7 +51,6 @@ import ButtonGroup from '../settings/components/buttonGroup';
 import { requestAnimeMedia } from '@renderer/utils/animeThemes';
 import { updateHistoryData } from '@renderer/utils/FilesManager/history';
 import { addToAnimuList, removeFromAnimulist, updateDataInAnimulist } from '@renderer/utils/FilesManager/animulist';
-// import OpeningPlayer from './components/openingPlayer';
 import { readPlaylist, removeInPlaylist, saveToPlaylist } from '@renderer/utils/FilesManager/playlist';
 import AnimulistMenu from '@renderer/components/animulistMenu';
 import { updateGenres } from '../home/components/filter';
@@ -63,10 +62,9 @@ import pluginManager from '@renderer/utils/pluginManager';
 // import Player from '../player/Player';
 
 const Player = lazy(() => import('../player/Player'))
+const OpeningPlayer = lazy(() => import('./components/openingPlayer'))
 
 import RelationCardContainer from './components/relationCardsContainer';
-
-// TODO: RE-ADD OPENING MUSIC IN INFORMATION
 
 interface informationContentType {
     type: string;
@@ -123,7 +121,7 @@ async function FetchAnimeOpening(anime: AnimeData): Promise<playerData[]> {
         const firstPartTitle = item.type == "OP" ? "Opening" : "Ending"
         return {
             // embedTitle: `${firstPartTitle} ${item.musicTitle} ${item.variant ? item.variant : ""}`,
-            hostname: `${firstPartTitle} ${item.musicTitle} ${item.variant ? item.variant : ""}`,
+            hostname: `${firstPartTitle} ${item.title["romaji"]} ${item.variant ? `v${item.variant}` : ""}`,
             resolution: item.videos.map((item) => ({
                 res: item.resolution.toString(),
                 url: item.url,
@@ -169,6 +167,8 @@ function information() {
 
         isShowWrongActive: false,
         isImageViewerActive: false,
+
+        cacheOpenings: [] as animeOpeningsFormat[],
 
         buttonGroup: [] as { value: string; onClick: () => void; }[],
     })
@@ -347,9 +347,14 @@ function information() {
     }
 
     async function initialInformation() {
-        updateInfo({ buttonGroup: GenerateButtons() })
+        if (config["information"]["preloadOpening"] || config["information"]["openingininformation"])
+            requestAnimeMedia(parseInt(information["cache"]["anime"]["id"])).then((v) => {
+                updateInfo({
+                    cacheOpenings: v
+                })
+            })
 
-        // if (config.information.openingininformation) searchAnimeOpenings()
+        updateInfo({ buttonGroup: GenerateButtons() })
 
         changeTitleAnimu(`Animu - ${detectTitleConfig(information["cache"]["anime"]["title"])}`)
         checkIsAnimeReleasing()
@@ -432,8 +437,6 @@ function information() {
     onMount(() => {
         initialInformation()
         setTimeout(() => { updateInfo({ youCanLeave: true }) }, 300)
-
-        if (config["information"]["preloadOpening"]) FetchAnimeOpening(information["cache"]["anime"])
 
         // TODO: RE-ADD THIS
         // if (config["information"]["preloadTrailer"] && config["information"]["trailerplayertype"] == "player")
@@ -531,7 +534,8 @@ function information() {
 
         updateInfo({
             activePage: "Episodes",
-            ShowMoreTitles: false
+            ShowMoreTitles: false,
+            cacheOpenings: []
         })
 
         initialInformation()
@@ -602,7 +606,7 @@ function information() {
         if (!info_plugin.setAnimeInList) return
 
         // TRANSLATION
-        if (await info_plugin.setAnimeInList(anime["id"], animulist)) 
+        if (await info_plugin.setAnimeInList(anime["id"], animulist))
             toast(t(`Succesfully Updated ${detectTitleConfig(anime.title)}`), { type: "success" })
 
         else toast(t(`Failed Updated ${detectTitleConfig(anime.title)}`), { type: "error" })
@@ -991,7 +995,7 @@ function information() {
                             </div>
 
                             <Show when={information["cache"].anime.relations && information["cache"].anime.relations!.length > 0}>
-                                <RelationCardContainer content={information["cache"].anime.relations} onClick={ChangeAnimeInInformation}/>
+                                <RelationCardContainer content={information["cache"].anime.relations} onClick={ChangeAnimeInInformation} />
                             </Show>
 
                             <Show when={information["cache"].anime.characters && information["cache"].anime.characters!.length > 0}>
@@ -1060,9 +1064,14 @@ function information() {
                 />
             </Show>
 
-            {/* <Show when={currentAudio() && config.information.openingininformation}>
-                <OpeningPlayer music={currentAudio()!} />
-            </Show> */}
+            <Show when={information.cacheOpenings && information.cacheOpenings.length > 0 && config.information.openingininformation}>
+                <Suspense>
+                    <OpeningPlayer music={information.cacheOpenings.filter(
+                        (obj, index, arr) =>
+                            index === arr.findIndex(item => item.title["romaji"] === obj.title["romaji"])
+                    )} anime={information["cache"]["anime"]} />
+                </Suspense>
+            </Show>
         </>
     )
 }
