@@ -1,6 +1,6 @@
 {
   "name": "animu",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Simple Application To Watch Anime",
   "main": "./out/main/index.js",
   "author": "Owca525",
@@ -47,7 +47,7 @@
     "@types/node": "^26.6.4",
     "@types/semver": "^7.8.0",
     "bufferutil": "^4.1.0",
-    "electron": "^44.6.0",
+    "electron": "^44.7.2",
     "electron-builder": "^26.15.3",
     "electron-vite": "^5.0.0",
     "eslint": "^10.12.0",
