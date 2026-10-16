@@ -237,7 +237,7 @@ function settings() {
             setLastActiveTheme(structuredClone(unwrap(activeThemes())))
             setConfig(config().new)
             setNewConfig((prev) => {
-                return { old: structuredClone(prev.new), new: structuredClone(prev.new) }
+                return { old: structuredClone(unwrap(prev.new)), new: structuredClone(unwrap(prev.new)) }
             })
             setSaving(() => false)
             saveConfig(config().new)
@@ -246,6 +246,7 @@ function settings() {
             window.backend.refresh()
             toast(t("settings.saving.done"), { type: "success" })
         } catch (error) {
+            console.error("Settings/saveNewConfig", error)
             toast(t("settings.saving.error"), { type: "success" })
         }
     }
@@ -312,7 +313,7 @@ function settings() {
         if (remove == true && id != undefined) active.delete(id)
         else if (num == undefined) {
             const lastID = [...active.entries()].at(-1)
-            if (lastID) active.set(lastID[0] + 1, theme)
+            if (lastID) active.set(lastID[0] + 1, unwrap(theme))
         }
 
         if (id != undefined && num != undefined && active.get(id + num)?.themeName != "DarkerAnimu") {
