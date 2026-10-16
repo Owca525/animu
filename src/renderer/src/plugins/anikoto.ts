@@ -177,13 +177,11 @@ class ExtractorPlayer {
         }
 
         function decryptSourcesEnc(e): Promise<string> {
-            if (!window.crypto || !window.crypto.subtle)
-                return Promise.reject(new Error("Web Crypto not available"));
             const t = sourceEncPadKeyBytes("i?LMTAx0Q6,:}50U", 32)
                 , a = sourceEncPadKeyBytes("W0;27ToaUpl_P%'c", 16);
-            return window.crypto.subtle.importKey("raw", t, {
+            return crypto.subtle.importKey("raw", t, {
                 name: "AES-CBC"
-            }, !1, ["decrypt"]).then(t => window.crypto.subtle.decrypt({
+            }, !1, ["decrypt"]).then(t => crypto.subtle.decrypt({
                 name: "AES-CBC",
                 iv: a
             }, t, sourceEncB64UrlDecode(e))).then(e => {
@@ -210,10 +208,10 @@ class ExtractorPlayer {
             const t = Math.floor(Date.now() / 1e3) + 90
                 , a = String(t) + "|" + e
                 , r = new TextEncoder;
-            return window.crypto.subtle.importKey("raw", r.encode("MpCdnT0k3n!9f2K#xQ7vL5mR8wN1pY4s"), {
+            return crypto.subtle.importKey("raw", r.encode("MpCdnT0k3n!9f2K#xQ7vL5mR8wN1pY4s"), {
                 name: "HMAC",
                 hash: "SHA-256"
-            }, !1, ["sign"]).then(e => window.crypto.subtle.sign("HMAC", e, r.encode(a))).then(e => sourceEncB64UrlEncode(r.encode(a)) + "." + sourceEncB64UrlEncode(e))
+            }, !1, ["sign"]).then(e => crypto.subtle.sign("HMAC", e, r.encode(a))).then(e => sourceEncB64UrlEncode(r.encode(a)) + "." + sourceEncB64UrlEncode(e))
         }
 
         function extractCdnPathKey(e) {
