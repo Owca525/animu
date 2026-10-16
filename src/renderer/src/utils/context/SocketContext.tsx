@@ -29,13 +29,13 @@ export function SocketProvider(props: { children: JSX.Element }) {
         setShow((v) => !v)
     })
 
-    function conncetToWebSocket() {
+    async function conncetToWebSocket() {
         const config = getConfig()
         const backend = config.socket.backend
         if (!config.socket.useSocket) return
         if (backend.replaceAll(" ", "").length > 0 || backend.startsWith("http://") || backend.startsWith("https://")) {
             if (!getSocket()) {
-                const socket = runSocket(config.socket.backend)
+                const socket = await runSocket(config.socket.backend)
                 socket.on("rooms-list", (rooms) => setRoomList(rooms))
                 socket.emit("gets-rooms")
             }
