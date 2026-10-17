@@ -310,7 +310,10 @@ export interface indentityPlayer {
     type: string
     duration?: number
     isStarted?: boolean
-    lastAnimeDataUpdate?: number
+    lastAnimeDataUpdate: number
+
+    lastEpisodesUpdate: number
+    episodes: episodeMetadata[]
 }
 
 export interface animulistProps {
@@ -544,7 +547,8 @@ export interface episodeMetadata {
     blueRayVer?: boolean,
     durration?: number,
     episodeID?: string,
-    uploadedUnix?: number
+    uploadedUnix?: number,
+    special?: boolean
 }
 
 export interface episodeList {

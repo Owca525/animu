@@ -1,9 +1,10 @@
-import { cardData, ContextMenuProps } from "@renderer/utils/types";
+import { cardData, ContextMenuProps, episodeMetadata } from "@renderer/utils/types";
 import "./css/card.css";
 import { useNavigate } from "@solidjs/router";
 import { JSX, Show } from "solid-js";
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu";
 import {
+  checkTimeDriffrentUnix,
   convertSeconds,
   detectTitleConfig,
   getGradientColor,
@@ -50,13 +51,30 @@ function Card(props: CardProps) {
       return;
     }
 
-    if (props.card.saveData && props.card.saveData.episode != "" && (props.card.saveData.last_Time != 0 || props.card.saveData.isStarted)) {
-      let idToast = toast(t("notification.episodesfetching"), { type: "loading", timer: true })
-      const currentPLugin = await pluginManager.changePlayerPlugin(props.card.saveData.pluginName)
-      const episodeList = await currentPLugin.extractOnlyEpisodesList(props.card.saveData.type, props.card.AnimeData.player_ID as string).catch((error) => {
-        console.error("currentPLugin.extractOnlyEpisodesList", error)
-        return []
-      });
+    const saveData = props.card.saveData
+
+    if (saveData && saveData.episode != "" && (saveData.last_Time != 0 || saveData.isStarted)) {
+
+      let episodeList: episodeMetadata[] = []
+      let idToast = ""
+
+      try {
+
+        if (props.card.AnimeData.status == "FINISHED" && saveData["lastEpisodesUpdate"] && checkTimeDriffrentUnix(new Date().toString(), saveData["lastEpisodesUpdate"])["hour"] < 168 && Array.isArray(saveData["episodes"])) {
+
+          episodeList = saveData["episodes"]
+
+        } else {
+
+          idToast = toast(t("notification.episodesfetching"), { type: "loading", timer: true })
+          const currentPLugin = await pluginManager.changePlayerPlugin(saveData.pluginName)
+          episodeList = await currentPLugin.extractOnlyEpisodesList(saveData.type, props.card.AnimeData.player_ID as string)
+
+        }
+
+      } catch (error) {
+        console.error("card/sendToInformation/savedata", error)
+      }
 
       if (episodeList.length <= 0) {
         updateToast(idToast, t("notification.episodesfailed"), { type: "error", timer: false })
@@ -64,8 +82,8 @@ function Card(props: CardProps) {
       }
 
       PlayerCache.update({
-        anime: (props.card.AnimeData),
-        saveData: (props.card.saveData),
+        anime: props.card.AnimeData,
+        saveData: saveData,
         animulist: cardVariables.animulist,
         episodelist: episodeList,
         continewatch: true,
@@ -82,7 +100,7 @@ function Card(props: CardProps) {
 
     informationCache.update({
       anime: props.card.AnimeData,
-      saveData: props.card.saveData,
+      saveData: saveData,
       animulist: cardVariables.animulist
     })
     

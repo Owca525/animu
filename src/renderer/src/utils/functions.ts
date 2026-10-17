@@ -305,8 +305,7 @@ export async function convertPath(path: string) {
 }
 
 export function isNumberString(str: string): boolean {
-    if (!str) return false
-    return str.trim() !== "" && !isNaN(Number(str));
+    return str.trim() !== '' && !Number.isNaN(Number(str));
 }
 
 export function timeToSeconds(time: string): number {
@@ -916,6 +915,9 @@ export async function fetchAnimeDeepLink(deeplink: string) {
             last_Time: anime.player.time ?? 0,
             episode: anime.player.episode,
             type: anime.player.type,
+            lastAnimeDataUpdate: 0,
+            lastEpisodesUpdate: 0,
+            episodes: []
         },
         episodelist: episodeList,
         continewatch: false
@@ -965,7 +967,7 @@ export async function FetchWeekCalendary() {
         if (callendaryCache) {
             callendaryCache = JSON.parse(callendaryCache)
 
-            const diffrent = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), callendaryCache["unix"])
+            const diffrent = checkTimeDriffrentUnix(new Date().toString(), callendaryCache["unix"])
 
             if (diffrent["hour"] < 12) {
                 SetCalendaryCache(callendaryCache["cache"])
@@ -1196,7 +1198,10 @@ export async function CreateSHA256(text: string) {
     return hashHex;
 };
 
-export function checkTimeDriffrentUnix(start: number, end: number): { hour: number; min: number; sec: number; } {
+export function checkTimeDriffrentUnix(start: number | string, end: number | string): { hour: number; min: number; sec: number; } {
+    if (typeof start == "string") start = dateToUnix(start)
+    if (typeof end == "string") end = dateToUnix(end)
+
     const diff = Math.abs(end - start);
 
     const hour = Math.floor(diff / 3600);
@@ -1228,7 +1233,7 @@ export function sortEpisodes(data: episodeList | undefined): episodeList | undef
 
                 if (epA.num !== epB.num) return epA.num - epB.num;
                 return epA.suffix.localeCompare(epB.suffix);
-            })
+            }).map((v) => ({ ...v, special: !isNumberString(v["ep"]) }))
         }))
     }
 }

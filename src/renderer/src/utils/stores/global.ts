@@ -136,7 +136,10 @@ class PlayerCacheInstance {
             pluginName: "",
             last_Time: 0,
             episode: "",
-            type: ""
+            type: "",
+            lastAnimeDataUpdate: 0,
+            lastEpisodesUpdate: 0,
+            episodes: []
         },
         continewatch: false,
         episodelist: []
