@@ -485,7 +485,6 @@ export async function request(url: string, options: RequestInit = {}, noCors: bo
 }
 
 export async function SaveToClipboard(type: "text" | "image", content: string) {
-    /* IFDEF WEB */
     if (type == "image") {
         const blob = await (await fetch(content)).blob()
         const item = new ClipboardItem({ [blob.type]: blob });
@@ -495,11 +494,6 @@ export async function SaveToClipboard(type: "text" | "image", content: string) {
     const blob = new Blob([content], { type: "text/plain" });
     const item = new ClipboardItem({ "text/plain": blob });
     return await navigator.clipboard.write([item]);
-    /* ENDIF */
-
-    /* IFDEF DEBUG|PROD */
-    return window.api.saveToClipboard(type, content)
-    /* ENDIF */
 }
 
 export function openUrlFolder(content: string) {

@@ -5,7 +5,6 @@ declare global {
   interface Window {
     api: {
       open: (url: string) => Promise<void>;
-      saveToClipboard: (type: "text" | "image", content: string) => Promise<boolean>;
       animePlaylist: {
         read: (playlist: string) => Promise<playlistFormatData[]>
         save: (playlist: string, data: playlistFormatData) => Promise<boolean>
