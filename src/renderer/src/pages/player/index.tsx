@@ -97,11 +97,12 @@ const player = () => {
         if (!anime_data || !anime_data.anime) return
         SaveHistory({
             saveData: {
+                ...anime_data.saveData,
                 pluginName: anime_data.saveData?.pluginName ? anime_data.saveData.pluginName : "",
                 last_Time: 0,
                 isStarted: true,
                 type: episode.type,
-                episode: episode.current
+                episode: episode.current,
             },
             AnimeData: {
                 ...anime_data.anime,

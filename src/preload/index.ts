@@ -8,7 +8,6 @@ if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld("api", {
       open: (url: string) => ipcRenderer.invoke("open", url),
-      saveToClipboard: (type: "text" | "image", content: string) => ipcRenderer.invoke("saveToClipboard", type, content),
       animePlaylist: {
         read: (playlist: string) => ipcRenderer.invoke("playlist:read", playlist),
         save: (playlist: string, data: playlistFormatData) => ipcRenderer.invoke("playlist:save", playlist, data),

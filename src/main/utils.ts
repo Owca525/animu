@@ -14,10 +14,8 @@ import {
 } from '.';
 import {
     app,
-    clipboard,
     ipcMain,
     Menu,
-    nativeImage,
     shell
 } from 'electron';
 import { Client } from '@xhayper/discord-rpc';
@@ -114,26 +112,6 @@ ipcMain.handle('runExternalPlayer', (_event, videoData: { url: string, path: str
 ipcMain.handle('open', async (_event, url: string): Promise<void> => {
     if (validUrl(url)) await shell.openExternal(url)
     else await shell.openPath(url)
-})
-
-ipcMain.handle('saveToClipboard', async (_event, type: "text" | "image", content: string): Promise<boolean> => {
-    try {
-        if (type == "text") {
-            clipboard.writeText(content)
-            return true
-        }
-        if (type == "image") {
-            const response = await fetch(content);
-            const buffer = await response.arrayBuffer();
-            const image = nativeImage.createFromBuffer(Buffer.from(buffer));
-            clipboard.writeImage(image);
-            return true
-        }
-        return false
-    } catch (Error) {
-        console.error(Error)
-        return false
-    }
 })
 
 export function getFolderPath(folderPath: string) {

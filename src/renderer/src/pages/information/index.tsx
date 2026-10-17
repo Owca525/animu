@@ -461,11 +461,13 @@ function information() {
                 player_ID: information["activePlayerID"]
             },
             saveData: {
-                ...tmp.saveData,
+                ...tmp.saveData!,
                 last_Time: lastTime,
                 type: type,
                 pluginName: getPlayerPLugin()?.metadata.name,
-                episode: episode
+                episode: episode,
+                episodes: episodes,
+                lastEpisodesUpdate: dateToUnix(new Date().toString())
             },
             episodelist: episodes,
             animulist: tmp.animulist,
@@ -723,6 +725,7 @@ function information() {
                                                             player_ID: information["activePlayerID"]
                                                         },
                                                         saveData: tmp.saveData == undefined ? {
+                                                            ...tmp.saveData!,
                                                             pluginName: getPlayerPLugin()?.metadata.name!,
                                                             last_Time: 0,
                                                             episode: "1",

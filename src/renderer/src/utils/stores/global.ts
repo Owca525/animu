@@ -33,7 +33,8 @@ export const [globalState, setGlobalState] = createStore<globalDataFormat>({
     
     isSynchronizeAnime: false,
 
-    isFetchingCallendary: false
+    isFetchingCallendary: false,
+    isUserTyping: false
 } as globalDataFormat);
 
 export const getGlobalCache = () => globalState;
@@ -56,6 +57,8 @@ export const getListOfVerYT_DLP = () => globalState.yt_dlp["listVer"];
 export const GetUserBanner = () => globalState.user.banner;
 export const GetUserAvatar = () => globalState.user.avatar;
 
+export const IsUserTyping = () => globalState.isUserTyping;
+
 export const isSynchronizeAnime = () => globalState.isSynchronizeAnime;
 export const isFetchingCallendary = () => globalState.isFetchingCallendary;
 
@@ -73,6 +76,7 @@ export const setSocketRoom = (tmp: string) => setGlobalState((prev) => ({ ...pre
 export const setActiveThemes = (tmp: Map<number, themeMetadata>) => setGlobalState((prev) => ({ ...prev, activeThemes: tmp }));
 export const setGlobalTheme = (tmp: themeMetadata[]) => setGlobalState((prev) => ({ ...prev, loadedTheme: tmp }));
 export const setIncognitoMode = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, incognito: tmp }));
+export const setUserTyping = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, isUserTyping: tmp }));
 export const setGlobalHistory = (tmp: Map<string, cardData>) => setGlobalState((prev) => ({ ...prev, history: tmp }));
 export const setGlobalToken = (tmp: string | undefined) => setGlobalState((prev) => ({ ...prev, token: tmp }));
 export const setAnimulistData = (tmp: globalDataFormat["animuList"]) => setGlobalState((prev) => ({ ...prev, animuList: tmp }))
@@ -136,7 +140,10 @@ class PlayerCacheInstance {
             pluginName: "",
             last_Time: 0,
             episode: "",
-            type: ""
+            type: "",
+            lastAnimeDataUpdate: 0,
+            lastEpisodesUpdate: 0,
+            episodes: []
         },
         continewatch: false,
         episodelist: []

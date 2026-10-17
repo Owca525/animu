@@ -166,7 +166,7 @@ function App() {
 
       try {
         const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
-        const time = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])
+        const time = checkTimeDriffrentUnix(new Date().toString(), tmp["time"])
         if (time["min"] > 44 && time["hour"] >= 0) localStorage.removeItem("pluginStatusCachce")
       } catch (error) { }
 
@@ -344,7 +344,7 @@ function initialServices() {
       execute: async () => {
         try {
           const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
-          const time = checkTimeDriffrentUnix(dateToUnix(new Date().toString()), tmp["time"])
+          const time = checkTimeDriffrentUnix(new Date().toString(), tmp["time"])
           if (time["min"] > 359 && time["hour"] >= 0) localStorage.removeItem("pluginStatusCachce")
         } catch (error) { }
 
