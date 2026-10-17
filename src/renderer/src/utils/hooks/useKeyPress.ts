@@ -1,6 +1,6 @@
 import { onMount, onCleanup } from "solid-js";
 import { convertKeybinds } from "../functions";
-import { isAnimuFocus } from "../stores/global";
+import { isAnimuFocus, IsUserTyping } from "../stores/global";
 
 export function useKeyPress(func: (keybinds: string) => void) {
   let keysRef: string[] = [];
@@ -14,15 +14,21 @@ export function useKeyPress(func: (keybinds: string) => void) {
     const key = convertKeybinds(event.key);
     if (!keysRef.includes(key)) {
       keysRef.push(key);
+
+      if (IsUserTyping()) return
       funcRef(keysRef.join("+"));
       return;
     }
+
+    if (IsUserTyping()) return
     funcRef(key);
   };
 
   const handleKeyUp = (event: KeyboardEvent) => {
     const key = convertKeybinds(event.key);
     keysRef = keysRef.filter((k) => k !== key);
+
+    if (IsUserTyping()) return
     funcRef(keysRef.join("+"));
   };
 

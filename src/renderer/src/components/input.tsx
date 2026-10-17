@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 import "./css/input.css";
+import { setUserTyping } from "@renderer/utils/stores/global";
 
 interface InputProps {
   type?: "text" | "password" | "number" | "date" | "week";
@@ -48,6 +49,8 @@ export default function Input(props: InputProps) {
       value={props.defaultValue ? props.defaultValue : ""}
       onKeyDown={handleData}
       onInput={(event) => props.onInput ? props.onInput(event.currentTarget.value) : ""}
+      onFocusIn={() => setUserTyping(true)}
+      onFocusOut={() => setUserTyping(false)}
     />
   );
 }

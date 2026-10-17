@@ -223,6 +223,8 @@ export interface globalDataFormat {
     isFetchingCallendary: boolean
 
     calendaryCache: cardData[]
+
+    isUserTyping: boolean
 }
 
 export type HomeObjectData = { topCards?: containerData; sections: containerData[]; }
