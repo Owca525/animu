@@ -703,12 +703,12 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                                 case "hls_manifest":
                                     if (context["responseType"] != "text") break
 
-                                    currentData = await sheepworker!.function(element["code"], data)
+                                    currentData = await sheepworker!.unsafe_function(element["code"], data)
                                     break
                                 case "hls_arraybuffer":
                                     if (context["responseType"] != "arraybuffer") break
 
-                                    currentData = await sheepworker!.function(element["code"], data)
+                                    currentData = await sheepworker!.unsafe_function(element["code"], data)
                                     break
                             }
                         }
