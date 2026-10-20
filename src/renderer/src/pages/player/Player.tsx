@@ -685,9 +685,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                         let currentData: any = data.text
                         if (data["status"] == 429) HLS?.destroy()
 
-                        // /* IFDEF DEBUG */
-                        // console.warn("Player/HLS", data, context)
-                        // /* ENDIF */
+                        /* IFDEF DEBUG */
+                        console.warn("Player/HLS", data, context)
+                        /* ENDIF */
 
                         if (!data.success) {
                             console.error("Player/HLS", context, data)
