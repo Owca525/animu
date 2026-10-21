@@ -145,6 +145,9 @@ class ExtractorPlayer {
         const website_api_response = await request(`${url_object.origin}/stream/getSources?id=${match[1]}&platform=OTHER&s=tcdn`, {
             headers: {
                 ...PluginHeader,
+                "Accept": "application/json, text/javascript, */*; q=0.01",
+                "X-Requested-With": "XMLHttpRequest",
+                "Alt-Used": url_object.hostname,
                 'Referer': url,
                 "Origin": url
             }
