@@ -181,6 +181,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
     let toast_fetch_id = ""
 
+    let lastMediaTime = undefined;
+    let lastPresentedFrames = 0;
+
     const [player, updatePlayer] = createStore({
         initialize: true,
 
@@ -407,6 +410,26 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
     })
 
     /* Player */
+
+    function monitorFrames(_, meta) {
+        if (lastMediaTime != undefined && meta.mediaTime < lastMediaTime - 0.08) {
+            console.warn("Player/MonitorFrames", {
+                lastMediaTime: lastMediaTime,
+                mediaTime: meta.mediaTime,
+                currentTime: videoRef!.currentTime,
+                presentedFrames: meta.presentedFrames
+            });
+        }
+
+        if (meta.presentedFrames < lastPresentedFrames) {
+            console.warn("Player/MonitorFrame Probalby Detected Desync");
+        }
+
+        lastMediaTime = meta.mediaTime;
+        lastPresentedFrames = meta.presentedFrames;
+
+        videoRef!.requestVideoFrameCallback(monitorFrames);
+    }
 
     async function setNewPlayer(meta: playerData) {
         if (type != "embed") SheePlayer.currentTime = player.currentTime
@@ -779,6 +802,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         tmpHls.on(Hls.Events.MEDIA_ATTACHED, () => {
             console.warn("Player/HLS MEDIA_ATTACHED");
             tmpHls.loadSource(player["currentResolution"]!["url"]);
+            videoRef!.requestVideoFrameCallback(monitorFrames);
         });
 
         tmpHls.on(Hls.Events.FRAG_CHANGED, (_, data) => {
