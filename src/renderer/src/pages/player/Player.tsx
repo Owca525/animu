@@ -695,6 +695,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
             abrBandWidthFactor: 0.8,
             abrBandWidthUpFactor: 0.7,
+
+            debug: config.Developer.debugHLS
         }
 
         let manifest_script: player_script_injector[] = player.playerData!["scripts"] ?? []
@@ -777,6 +779,14 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         tmpHls.on(Hls.Events.MEDIA_ATTACHED, () => {
             console.warn("Player/HLS MEDIA_ATTACHED");
             tmpHls.loadSource(player["currentResolution"]!["url"]);
+        });
+
+        tmpHls.on(Hls.Events.FRAG_CHANGED, (_, data) => {
+            console.warn("Player/HLS Fragmeng Change", {
+                start: data.frag.start,
+                duration: data.frag.duration,
+                currentTime: videoRef!.currentTime
+            });
         });
 
         tmpHls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {

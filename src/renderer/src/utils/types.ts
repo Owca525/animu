@@ -697,6 +697,7 @@ export interface SettingsConfig {
         DevTools: boolean
         DevToolsOnStart: boolean
         playerDebug: boolean
+        debugHLS: boolean
     }
     update: {
         lastTime: number

@@ -325,6 +325,7 @@
         }
     },
     "settings": {
+        "debug_hls": "Turn Debug HLS",
         "failed_change_plugin": "Failed Change Plugin",
         "manage_data": "Manage Data in animu",
         "overwrite_import": "Are you sure importing file, this action overwrite everything",
