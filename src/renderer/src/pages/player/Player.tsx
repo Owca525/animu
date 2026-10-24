@@ -608,6 +608,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                     chapterList: GenerateOpeningEnding(player.playerData["listChapters"], event.currentTarget.duration)
                 })
 
+                if (player.chapterList.length <= 0) return
+
                 const opening = player.chapterList.find((v) => v["type"] == "opening")
                 const ending = player.chapterList.find((v) => v["type"] == "ending")
 
@@ -622,6 +624,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                     if (finded_opening) updatePlayer({
                         nextTimerStart: event.currentTarget.duration - CheckNumber(finded_opening["start"].toFixed(0))
                     })
+                } else if (!ending || (ending["left"] == 0 || ending["width"] == 0)) {
+                    updateUI({ upNextActive: false })
                 }
             }
         })
