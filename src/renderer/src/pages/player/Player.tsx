@@ -638,13 +638,15 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
                 if (ending) {
                     const finded_ending = player.playerData["listChapters"].find((v) => v["type"] == "ending")
-                    if (finded_ending) updatePlayer({
+
+                    if (finded_ending && (ending["left"] != 0 && ending["width"] != 0)) updatePlayer({
                         nextTimerStart: event.currentTarget.duration - CheckNumber(finded_ending["start"].toFixed(0))
                     })
 
                 } else if (opening && opening["left"] >= 90 && (!ending || (ending["left"] == 0 || ending["width"] == 0))) {
                     const finded_opening = player.playerData["listChapters"].find((v) => v["type"] == "opening")
-                    if (finded_opening) updatePlayer({
+
+                    if (finded_opening && (opening["left"] != 0 && opening["width"] != 0)) updatePlayer({
                         nextTimerStart: event.currentTarget.duration - CheckNumber(finded_opening["start"].toFixed(0))
                     })
                 } else if (!ending || (ending["left"] == 0 || ending["width"] == 0)) {

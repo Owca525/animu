@@ -2,6 +2,7 @@ import { createSignal, createEffect, For, Show } from "solid-js";
 import { formatTime } from '@renderer/utils/functions';
 import type { Thumbnail } from '@renderer/utils/types';
 import "./css/seekBar.css";
+import { t } from "@renderer/utils/i18n";
 
 interface SeekBarProps {
   maxValue?: number;
@@ -130,9 +131,9 @@ export default function SeekBar(props: SeekBarProps) {
       seekbarChapterText.innerHTML = "";
       seekbarChapterText.style.display = "none";
 
-      if (percent >= element.left && percent <= element.left + element.width && element.name) {
+      if (percent >= element.left && percent <= element.left + element.width) {
         seekbarChapterText.style.left = variable;
-        seekbarChapterText.innerHTML = element.name;
+        seekbarChapterText.innerHTML = element.name ?? t(`player.chapters.${element.type}`);
         seekbarChapterText.style.display = "";
         return;
       }
