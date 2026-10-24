@@ -66,6 +66,10 @@ class ExtractorPlayer {
 
         const content = JSON.parse(decodeURIComponent(escape(out)))
 
+        /* IFDEF DEBUG */
+        console.warn("zokoanime/hianime content", content)
+        /* ENDIF */
+
         let subs: playerSubtitlesFormat[] = []
         let chapters: playerChapterList[] = []
 
@@ -240,7 +244,7 @@ class ExtractorPlayer {
             chapters.push({
                 start: website_api_response["json"]["outro"]["start"],
                 end: website_api_response["json"]["outro"]["end"],
-                type: "opening"
+                type: "ending"
             })
         }
 
@@ -277,7 +281,7 @@ class ExtractorPlayer {
 
 export default class HIanime implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.1",
+        version: "1.2",
         name: "HIanime",
         author: "Owca525",
         supportLang: ["en"],
