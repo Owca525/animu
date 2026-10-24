@@ -88,12 +88,19 @@ export async function fetchResolutions<F extends (data: playerDataExtended) => P
 export function GenerateOpeningEnding(data: playerChapterList[] | undefined, duration: number): { left: number, width: number, name?: string, type: "opening" | "ending" | "other" }[] {
     if (!data) return []
 
-    return data.map((element) => ({
-        left: (element.start / duration) * 100,
-        width: ((element.end - element.start) / duration) * 100,
-        name: element.name,
-        type: element.type
-    }))
+    return data.map((element) => {
+        const left = (element.start / duration) * 100
+        const width = ((element.end - element.start) / duration) * 100
+
+        if (left == 0 && width == 0) return
+
+        return {
+            left: left,
+            width: width,
+            name: element.name,
+            type: element.type
+        }
+    }).filter((v) => v != undefined)
 }
 
 export function EpisodeAvaible(cur: episodeMetadata, list: episodeMetadata[]) {
