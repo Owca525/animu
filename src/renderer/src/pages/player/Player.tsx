@@ -3,7 +3,7 @@ import VolumeNotification from "@renderer/pages/player/components/VolumeNotifica
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
 import { CheckNumber, convertKeybinds, createElement, CreateSHA256, dateToUnix, detectTitleConfig, formatNumber, formatTime, GetAnimuPage, openUrlFolder, request, toggleFullscreen } from "@renderer/utils/functions"
 import { getConfig } from "@renderer/utils/stores/config"
-import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, player_script_injector, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, Thumbnail } from "@renderer/utils/types"
+import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, player_script_injector, playerData, playerSubtitlesFormat, resolutionFormat, Thumbnail } from "@renderer/utils/types"
 
 /* IFDEF DYNAMIC */
 import Hls, { HlsConfig } from "hls.js"
@@ -199,6 +199,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
         HLSMode: false,
 
+        nextTimerStart: CheckNumber(config.History.continue.MaximizeTimeSave),
+
         buffer: [] as { position: number, width: number }[],
         subtitles: [{ url: "", format: "", lang: "", label: t("player.other.off") }] as playerSubtitlesFormat[],
         playerData: undefined as playerData | undefined,
@@ -285,6 +287,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             isDubbing: false,
 
             HLSMode: false,
+            nextTimerStart:  0,
 
             buffer: [],
             subtitles: [{ url: "", format: "", lang: "", label: t("player.other.off") }],
@@ -600,10 +603,27 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             updateProgress(event)
             updatePlayer({ initialize: false })
 
-            if (player.playerData)
+            if (player.playerData && player.playerData["listChapters"]) {
                 updatePlayer({
                     chapterList: GenerateOpeningEnding(player.playerData["listChapters"], event.currentTarget.duration)
                 })
+
+                const opening = player.chapterList.find((v) => v["type"] == "opening")
+                const ending = player.chapterList.find((v) => v["type"] == "ending")
+
+                if (ending) {
+                    const finded_ending = player.playerData["listChapters"].find((v) => v["type"] == "ending")
+                    if (finded_ending) updatePlayer({
+                        nextTimerStart: event.currentTarget.duration - CheckNumber(finded_ending["start"].toFixed(0)) 
+                    })
+
+                } else if (opening && opening["left"] >= 90 && (!ending || (ending["left"] == 0 || ending["width"] == 0))) {
+                    const finded_opening = player.playerData["listChapters"].find((v) => v["type"] == "opening")
+                    if (finded_opening) updatePlayer({
+                        nextTimerStart: event.currentTarget.duration - CheckNumber(finded_opening["start"].toFixed(0))
+                    })
+                }
+            }
         })
 
         setPlayerCleanupEvent("error", videoErrorHandler)
@@ -657,7 +677,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             enableWorker: config.Player.general.useHLSWorker,
             lowLatencyMode: true,
             workerPath: config.Player.general.useHLSWorker ? HLSWorker : undefined,
-            
+
             autoStartLoad: player.isPlaying,
 
             manifestLoadingMaxRetry: 3,
@@ -859,7 +879,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                 currentASSubtitles = undefined
             }
         } catch (error) {
-            
+
         }
         if (sheepworker) sheepworker.dispose()
 
@@ -953,7 +973,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             })
         }
 
-        if (!isNaN(value) && config && value > videoRef.duration - CheckNumber(config.History.continue.MaximizeTimeSave)) {
+        if (!isNaN(value) && value > videoRef.duration - player.nextTimerStart) {
             updateUI({ upNextDisable: true })
         }
 
@@ -1124,7 +1144,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         const currentTime = player.currentTime
         const duration = player.durration
 
-        if (duration > 10 && currentTime > (duration - CheckNumber(config.History.continue.MaximizeTimeSave)) && anime.animulist && anime.AnimeData.episodes != undefined) {
+        if (duration > 10 && currentTime > (duration - player.nextTimerStart) && anime.animulist && anime.AnimeData.episodes != undefined) {
 
             if (anime.animulist.status == "CURRENT" && CheckNumber(ep_metadata["current"]["ep"]) >= CheckNumber(anime.AnimeData.episodes)) {
                 updateDataInAnimulist(anime.AnimeData.id, {
@@ -1164,7 +1184,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             }
         }
 
-        if (currentTime <= duration - CheckNumber(config.History.continue.MaximizeTimeSave)) {
+        if (currentTime <= duration - player.nextTimerStart) {
             SaveHistory(futureHistory)
         } else {
             SaveHistory({
@@ -1602,19 +1622,14 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
         if (duration <= config.Player.upToNextEpisode.durationShow * 60 && !player.playerData!.listChapters) return
 
-        let endingChupter: playerChapterList | undefined = undefined
-        if (player.playerData!.listChapters) {
-            endingChupter = player.playerData!.listChapters!.find((cha) => cha.type == "ending")
-            if (endingChupter && endingChupter.end == 0 && endingChupter.start == 0) return
-        }
+        const next_episode_timer = CheckNumber(config.Player.upToNextEpisode.interval)
 
-        let showUpToNext: boolean = currenttime > duration - CheckNumber(config.History.continue.MaximizeTimeSave)
-        let timeDelete: number = ((CheckNumber(duration.toFixed(0)) - CheckNumber(config.History.continue.MaximizeTimeSave)) - CheckNumber(currenttime.toFixed(0))) + CheckNumber(config.Player.upToNextEpisode.interval)
+        let showUpToNext: boolean = currenttime > duration - CheckNumber(player.nextTimerStart)
+        let timeDelete: number = ((CheckNumber(duration.toFixed(0)) - (CheckNumber(player.nextTimerStart))) - CheckNumber(currenttime.toFixed(0))) + next_episode_timer
 
-        if (endingChupter) {
-            showUpToNext = currenttime >= endingChupter.start
-            timeDelete = ((CheckNumber(duration.toFixed(0)) - (CheckNumber(duration.toFixed(0)) - endingChupter.start)) - CheckNumber(currenttime.toFixed(0))) + CheckNumber(config.Player.upToNextEpisode.interval)
-        }
+        /* IFDEF DEBUG */
+        console.warn("player/checkUpNext", timeDelete, showUpToNext, player.nextTimerStart, duration)
+        /* ENDIF */
 
         if (CheckNumber(timeDelete.toFixed(0)) < 0) {
             updateUI({ upNextActive: false })
@@ -1623,10 +1638,10 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
         updateUI({
             upNextActive: showUpToNext,
-            upNextTimer: showUpToNext ? CheckNumber(timeDelete.toFixed(0)) : CheckNumber(config.Player.upToNextEpisode.interval)
+            upNextTimer: showUpToNext ? CheckNumber(timeDelete.toFixed(0)) : next_episode_timer
         })
 
-        if (ui.upNextTimer <= 0) onChangeEpisode("next")
+        if (ui.upNextTimer <= 0) onChangeEpisode(avaibleEpisode["nextEpisode"]["ep"])
     }
 
     function CheckDownloadContextMenu(res: resolutionFormat) {
@@ -2076,7 +2091,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             </Show>
 
             <Show when={nerdStats.active}>
-                <NerdStats video={nerdStats["video"]} player={nerdStats["player"]} ui={ui}/>
+                <NerdStats video={nerdStats["video"]} player={nerdStats["player"]} ui={ui} />
             </Show>
 
             <Show when={!config.Player.general.disablemoreinformation && anime}>

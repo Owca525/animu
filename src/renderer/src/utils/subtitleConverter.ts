@@ -273,7 +273,7 @@ export function DetectFormat(fileStr: string) {
 
 export function CovnertToASS(fileStr: string) {
     /* IFDEF DEBUG */
-    console.warn("SubtitleConverter/CovnertToASS", fileStr)
+    // console.warn("SubtitleConverter/CovnertToASS", fileStr)
     /* ENDIF */
     const format = DetectFormat(fileStr)
 
