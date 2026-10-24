@@ -287,7 +287,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             isDubbing: false,
 
             HLSMode: false,
-            nextTimerStart:  0,
+            nextTimerStart: 0,
 
             buffer: [],
             subtitles: [{ url: "", format: "", lang: "", label: t("player.other.off") }],
@@ -616,7 +616,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                 if (ending) {
                     const finded_ending = player.playerData["listChapters"].find((v) => v["type"] == "ending")
                     if (finded_ending) updatePlayer({
-                        nextTimerStart: event.currentTarget.duration - CheckNumber(finded_ending["start"].toFixed(0)) 
+                        nextTimerStart: event.currentTarget.duration - CheckNumber(finded_ending["start"].toFixed(0))
                     })
 
                 } else if (opening && opening["left"] >= 90 && (!ending || (ending["left"] == 0 || ending["width"] == 0))) {
@@ -672,6 +672,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
     async function ExecuteHLS() {
         if (!player["currentResolution"]) return console.error("NO RESOLUTION FOUND")
         if (PlayerCleanup) return
+        if (!videoRef) return console.error("Player/HLS FAILED DETECT VIDEOREF")
 
         const { default: Hls } = await import('hls.js')
 
@@ -769,90 +770,95 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
         HLS = tmpHls
 
-        if (Hls.isSupported() && videoRef) {
-            tmpHls.loadSource(player["currentResolution"]["url"]);
-            tmpHls.attachMedia(videoRef);
-            // setTimeVideo(SheePlayer.currentTime)
+        if (!Hls.isSupported()) return console.error("Player/HLS Isn't Supported")
 
-            // TODO: Debug this why not everytime i reset the player dosen't load the video
-            tmpHls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
-                console.log("HLS Manifest Parsed", data)
-                updatePlayer({ FatalError: false })
+        tmpHls.attachMedia(videoRef);
 
-                if (!player["playerData"]!["splitHLS"]) {
-                    const resolutions = data.levels.map((level) => level.height);
-                    resolutions.reverse()
+        tmpHls.on(Hls.Events.MEDIA_ATTACHED, () => {
+            console.warn("Player/HLS MEDIA_ATTACHED");
+            tmpHls.loadSource(player["currentResolution"]!["url"]);
+        });
 
-                    updatePlayer({
-                        resoltions: resolutions.map((val) => ({ ...player["currentResolution"]!, res: `${val == 0 ? 1080 : val}` })),
-                        currentResolution: { ...player["currentResolution"]!, res: resolutions[0].toString() }
-                    })
+        tmpHls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
+            console.warn("Player/HLS Manifest Parsed", data)
 
-                    tmpHls.currentLevel = tmpHls.levels.length - 1;
-                }
+            tmpHls.startLoad(-1);
 
-                data.levels.forEach(level => {
-                    // I added Ignore because this give me a error "Cannot assign to 'audioCodec' because it is a read-only property." but i can assign then is good
-                    // @ts-ignore
-                    if (!level.audioCodec) level.audioCodec = "mp4a.40.5"
-                    // @ts-ignore
-                    else level.audioCodec = level.audioCodec.replaceAll('mp4a.40.2', 'mp4a.40.5')
-                });
+            updatePlayer({ FatalError: false })
 
-                if (data.audioTracks.length <= 0) return
-
-                let DefaultAudio = data.audioTracks.find((v) => v["default"])
-                if (!DefaultAudio) DefaultAudio = data.audioTracks[0]
+            if (!player["playerData"]!["splitHLS"]) {
+                const resolutions = data.levels.map((level) => level.height);
+                resolutions.reverse()
 
                 updatePlayer({
-                    activeAudioTrack: { id: DefaultAudio.id, label: DefaultAudio.name, lang: DefaultAudio.lang },
-                    audioTrack: data.audioTracks.map((element) => ({ id: element.id, label: element.name, lang: element.lang }))
+                    resoltions: resolutions.map((val) => ({ ...player["currentResolution"]!, res: `${val == 0 ? 1080 : val}` })),
+                    currentResolution: { ...player["currentResolution"]!, res: resolutions[0].toString() }
                 })
 
-                if (config.Player.general.Autoplay) videoRef?.play()
-            });
-
-            tmpHls.on(Hls.Events.ERROR, (_event, data) => {
-                console.error("HLS", _event, data)
-
-                SheePlayer.currentTime = player.currentTime
-
                 tmpHls.currentLevel = tmpHls.levels.length - 1;
+            }
 
-                updatePlayer({ FatalError: data.fatal })
-
-                if (data.details == "bufferStalledError") tmpHls.startLoad(SheePlayer.currentTime)
-
-                if (data.fatal) {
-                    let message: string | undefined
-                    switch (data.type) {
-                        case Hls.ErrorTypes.NETWORK_ERROR:
-                            if (data.response && [429, 403, 500, 404].includes(data.response["code"] ?? 0)) {
-                                updatePlayer({ FatalError: true })
-                            } else {
-                                tmpHls.startLoad(SheePlayer.currentTime);
-                                updatePlayer({ FatalError: false })
-                            }
-                            message = t('player.errors.MEDIA_ERR_NETWORK')
-                            break;
-                        case Hls.ErrorTypes.MEDIA_ERROR:
-                            message = t('player.errors.MEDIA_ERR_DECODE')
-                            // tmpHls.recoverMediaError()
-                            tmpHls.destroy();
-                            return
-                        default:
-                            message = t('player.errors.default')
-                            tmpHls.destroy();
-                            break;
-                    }
-
-                    if (PlayerCleanup) return
-                    if (!message) return
-
-                    toast(message, { type: "error" })
-                }
+            data.levels.forEach(level => {
+                // I added Ignore because this give me a error "Cannot assign to 'audioCodec' because it is a read-only property." but i can assign then is good
+                // @ts-ignore
+                if (!level.audioCodec) level.audioCodec = "mp4a.40.5"
+                // @ts-ignore
+                else level.audioCodec = level.audioCodec.replaceAll('mp4a.40.2', 'mp4a.40.5')
             });
-        }
+
+            if (data.audioTracks.length <= 0) return
+
+            let DefaultAudio = data.audioTracks.find((v) => v["default"])
+            if (!DefaultAudio) DefaultAudio = data.audioTracks[0]
+
+            updatePlayer({
+                activeAudioTrack: { id: DefaultAudio.id, label: DefaultAudio.name, lang: DefaultAudio.lang },
+                audioTrack: data.audioTracks.map((element) => ({ id: element.id, label: element.name, lang: element.lang }))
+            })
+
+            if (config.Player.general.Autoplay) videoRef?.play()
+        });
+
+        tmpHls.on(Hls.Events.ERROR, (_event, data) => {
+            console.error("Player/HLS", _event, data)
+
+            SheePlayer.currentTime = player.currentTime
+
+            tmpHls.currentLevel = tmpHls.levels.length - 1;
+
+            updatePlayer({ FatalError: data.fatal })
+
+            if (data.details == "bufferStalledError") tmpHls.startLoad(SheePlayer.currentTime)
+
+            if (data.fatal) {
+                let message: string | undefined
+                switch (data.type) {
+                    case Hls.ErrorTypes.NETWORK_ERROR:
+                        if (data.response && [429, 403, 500, 404].includes(data.response["code"] ?? 0)) {
+                            updatePlayer({ FatalError: true })
+                        } else {
+                            tmpHls.startLoad(SheePlayer.currentTime);
+                            updatePlayer({ FatalError: false })
+                        }
+                        message = t('player.errors.MEDIA_ERR_NETWORK')
+                        break;
+                    case Hls.ErrorTypes.MEDIA_ERROR:
+                        message = t('player.errors.MEDIA_ERR_DECODE')
+                        // tmpHls.recoverMediaError()
+                        tmpHls.destroy();
+                        return
+                    default:
+                        message = t('player.errors.default')
+                        tmpHls.destroy();
+                        break;
+                }
+
+                if (PlayerCleanup) return
+                if (!message) return
+
+                toast(message, { type: "error" })
+            }
+        });
     }
 
     function setTimeoutForElement(element: NodeJS.Timeout | undefined, val: string) {
@@ -1362,9 +1368,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         setNewResolution(resp["dubResolution"][0])
     }
 
-    useKeyPress((keys: string) => {
+    useKeyPress(async (keys: string) => {
         if (keys == "CTRL+SHIFT+D") ToggleNerdStats()
-        if (keys == "SHIFT+R" && player.playerData) setNewPlayer(player.playerData)
+        if (keys == "SHIFT+R" && player.playerData) await setNewPlayer(player.playerData)
 
         if (onKeybind) onKeybind(keys)
 

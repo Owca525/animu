@@ -23,7 +23,7 @@ function CutTheText(str: string) {
 
 class Logger {
     loggingText: string[] = []
-    maxSizeLog = 512
+    maxSizeLog = 2048
 
     // private decorateLevel(level: LogLevel): string {
     //     return LOG_COLORS[level].replace(" ", level);
