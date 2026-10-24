@@ -782,7 +782,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         });
 
         tmpHls.on(Hls.Events.FRAG_CHANGED, (_, data) => {
-            console.warn("Player/HLS Fragmeng Change", {
+            console.warn("Player/HLS Fragment Change", {
                 start: data.frag.start,
                 duration: data.frag.duration,
                 currentTime: videoRef!.currentTime
