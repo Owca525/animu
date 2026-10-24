@@ -1,6 +1,6 @@
 {
   "name": "animu",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Simple Application To Watch Anime",
   "main": "./out/main/index.js",
   "author": "Owca525",
@@ -31,24 +31,24 @@
     "@xhayper/discord-rpc": "^1.5.1",
     "adm-zip": "^0.6.0",
     "electron-app-universal-protocol-client": "https://github.com/Owca525/electron-app-universal-protocol-client.git",
-    "electron-updater": "^6.8.9",
+    "electron-updater": "^6.8.11",
     "hls.js": "^1.7.1",
-    "material-symbols": "^0.47.6",
+    "material-symbols": "^0.48.1",
     "semver": "^7.8.5",
-    "shaka-player": "^5.2.12",
+    "shaka-player": "^5.3.2",
     "socket.io-client": "^4.8.4"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^3.0.1",
     "@electron-toolkit/eslint-config-ts": "^4.0.0",
     "@electron-toolkit/tsconfig": "^2.0.0",
-    "@types/adm-zip": "^0.5.8",
+    "@types/adm-zip": "^0.6.0",
     "@types/crypto-js": "^4.2.2",
     "@types/node": "^26.6.4",
     "@types/semver": "^7.8.0",
     "bufferutil": "^4.1.0",
-    "electron": "^44.7.2",
-    "electron-builder": "^26.15.3",
+    "electron": "^45.0.0",
+    "electron-builder": "^26.18.0",
     "electron-vite": "^5.0.0",
     "eslint": "^10.12.0",
     "eslint-plugin-solid": "^0.18.1",
@@ -57,7 +57,7 @@
     "terser": "^5.51.2",
     "typescript": "^7.0.2",
     "utf-8-validate": "^6.0.6",
-    "vite": "^8.3.3",
+    "vite": "^8.3.5",
     "vite-plugin-solid": "^2.11.14"
   }
 }

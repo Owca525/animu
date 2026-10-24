@@ -80,6 +80,10 @@ class ExtractorPlayer {
 
         const content = JSON.parse(decodeURIComponent(escape(out)))
 
+        /* IFDEF DEBUG */
+        console.warn("zokoanime/anikoto content", content)
+        /* ENDIF */
+
         let subs: playerSubtitlesFormat[] = []
         let chapters: playerChapterList[] = []
 
@@ -142,11 +146,14 @@ class ExtractorPlayer {
         const match = website_response["text"].match(/data-id="(\d+)"/);
         if (!match) return
 
-        const website_api_response = await request(`${url_object.origin}/stream/getSources?id=${match[1]}`, {
+        const website_api_response = await request(`${url_object.origin}/stream/getSources?id=${match[1]}&platform=OTHER&s=tcdn`, {
             headers: {
                 ...PluginHeader,
-                'Referer': url_object.origin,
-                "Origin": url_object.origin
+                "Accept": "application/json, text/javascript, */*; q=0.01",
+                "X-Requested-With": "XMLHttpRequest",
+                "Alt-Used": url_object.hostname,
+                'Referer': url,
+                "Origin": url
             }
         })
 
@@ -251,7 +258,7 @@ class ExtractorPlayer {
             chapters.push({
                 start: website_api_response["json"]["outro"]["start"],
                 end: website_api_response["json"]["outro"]["end"],
-                type: "opening"
+                type: "ending"
             })
         }
 
@@ -288,7 +295,7 @@ class ExtractorPlayer {
 
 export default class Anikoto implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.0",
+        version: "1.2",
         name: "Anikoto",
         author: "Owca525",
         supportLang: ["en"],

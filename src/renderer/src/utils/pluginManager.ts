@@ -586,15 +586,7 @@ export class playerPluginInstance implements playerPluginInstanceFormat {
     }
     extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {
         if (!this.instance) return undefined
-        const response: episodeList = await this.instance.wrapperFunction("extractEpisodeList", { animeData, anime_id }) as any
-
-        if (!response) return response
-
-        if (response["episodesData"] && response["episodesData"].length == 1 && response["episodesData"][0]["episodes"].length <= 0) {
-            return undefined
-        }
-
-        return response
+        return await this.instance.wrapperFunction("extractEpisodeList", { animeData, anime_id }) as any
     }
     extractOnlyEpisodesList = async (type: string, anime_id: string): Promise<episodeMetadata[]> => {
         if (!this.instance) return []

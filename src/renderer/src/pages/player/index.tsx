@@ -54,6 +54,10 @@ const player = () => {
             queryKey: [anime_data.anime?.player_ID, episode.list.find((v) => v.ep == episode.current), episode.type, JSON.stringify(anime_data.saveData["pluginName"])],
             queryFn: async (queryKey) => {
                 const [player_id, episode, animeType] = queryKey;
+                /* IFDEF DEBUG */
+                console.warn("Player/useResponse queryKey", queryKey)
+                /* ENDIF */
+
                 if (!player_id || !animeType) {
                     console.error("THIS CAN'T HAPPEN IF Happen then something is wrong with player_id, episode, queryFetch/player", queryKey)
                     return []
@@ -61,11 +65,10 @@ const player = () => {
 
                 if (`${queryKey[3]}`.includes("Animu_Player_Overwriter_Mode")) return window["playerOverWriteContent"]
 
-                /* IFDEF DEBUG */
-                console.warn("index/Player", queryKey)
-                /* ENDIF */
-
                 let pluginPlayer = await pluginManager.changePlayerPlugin(anime_data.saveData?.pluginName ? anime_data.saveData.pluginName : "")
+                /* IFDEF DEBUG */
+                console.warn("Player/useResponse pluginPlayer", pluginPlayer)
+                /* ENDIF */
                 return await pluginPlayer.extractPlayerData(animeType as string, episode as episodeMetadata, player_id as string)
             },
             cacheTime: 3600000,

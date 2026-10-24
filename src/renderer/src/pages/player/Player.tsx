@@ -3,7 +3,7 @@ import VolumeNotification from "@renderer/pages/player/components/VolumeNotifica
 import { OpenContextMenu } from "@renderer/utils/context/ContextMenu"
 import { CheckNumber, convertKeybinds, createElement, CreateSHA256, dateToUnix, detectTitleConfig, formatNumber, formatTime, GetAnimuPage, openUrlFolder, request, toggleFullscreen } from "@renderer/utils/functions"
 import { getConfig } from "@renderer/utils/stores/config"
-import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, player_script_injector, playerChapterList, playerData, playerSubtitlesFormat, resolutionFormat, Thumbnail } from "@renderer/utils/types"
+import { AnimeData, animulistProps, episodeMetadata, indentityPlayer, player_script_injector, playerData, playerSubtitlesFormat, resolutionFormat, Thumbnail } from "@renderer/utils/types"
 
 /* IFDEF DYNAMIC */
 import Hls, { HlsConfig } from "hls.js"
@@ -181,6 +181,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
     let toast_fetch_id = ""
 
+    let lastMediaTime = undefined;
+    let lastPresentedFrames = 0;
+
     const [player, updatePlayer] = createStore({
         initialize: true,
 
@@ -198,6 +201,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         isDubbing: false,
 
         HLSMode: false,
+
+        nextTimerStart: CheckNumber(config.History.continue.MaximizeTimeSave),
 
         buffer: [] as { position: number, width: number }[],
         subtitles: [{ url: "", format: "", lang: "", label: t("player.other.off") }] as playerSubtitlesFormat[],
@@ -285,6 +290,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             isDubbing: false,
 
             HLSMode: false,
+            nextTimerStart: 0,
 
             buffer: [],
             subtitles: [{ url: "", format: "", lang: "", label: t("player.other.off") }],
@@ -404,6 +410,26 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
     })
 
     /* Player */
+
+    function monitorFrames(_, meta) {
+        if (lastMediaTime != undefined && meta.mediaTime < lastMediaTime - 0.08) {
+            console.warn("Player/MonitorFrames", {
+                lastMediaTime: lastMediaTime,
+                mediaTime: meta.mediaTime,
+                currentTime: videoRef!.currentTime,
+                presentedFrames: meta.presentedFrames
+            });
+        }
+
+        if (meta.presentedFrames < lastPresentedFrames) {
+            console.warn("Player/MonitorFrame Probalby Detected Desync");
+        }
+
+        lastMediaTime = meta.mediaTime;
+        lastPresentedFrames = meta.presentedFrames;
+
+        videoRef!.requestVideoFrameCallback(monitorFrames);
+    }
 
     async function setNewPlayer(meta: playerData) {
         if (type != "embed") SheePlayer.currentTime = player.currentTime
@@ -600,10 +626,31 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             updateProgress(event)
             updatePlayer({ initialize: false })
 
-            if (player.playerData)
+            if (player.playerData && player.playerData["listChapters"]) {
                 updatePlayer({
                     chapterList: GenerateOpeningEnding(player.playerData["listChapters"], event.currentTarget.duration)
                 })
+
+                if (player.chapterList.length <= 0) return
+
+                const opening = player.chapterList.find((v) => v["type"] == "opening")
+                const ending = player.chapterList.find((v) => v["type"] == "ending")
+
+                if (ending) {
+                    const finded_ending = player.playerData["listChapters"].find((v) => v["type"] == "ending")
+                    if (finded_ending) updatePlayer({
+                        nextTimerStart: event.currentTarget.duration - CheckNumber(finded_ending["start"].toFixed(0))
+                    })
+
+                } else if (opening && opening["left"] >= 90 && (!ending || (ending["left"] == 0 || ending["width"] == 0))) {
+                    const finded_opening = player.playerData["listChapters"].find((v) => v["type"] == "opening")
+                    if (finded_opening) updatePlayer({
+                        nextTimerStart: event.currentTarget.duration - CheckNumber(finded_opening["start"].toFixed(0))
+                    })
+                } else if (!ending || (ending["left"] == 0 || ending["width"] == 0)) {
+                    updateUI({ upNextActive: false })
+                }
+            }
         })
 
         setPlayerCleanupEvent("error", videoErrorHandler)
@@ -648,6 +695,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
     async function ExecuteHLS() {
         if (!player["currentResolution"]) return console.error("NO RESOLUTION FOUND")
         if (PlayerCleanup) return
+        if (!videoRef) return console.error("Player/HLS FAILED DETECT VIDEOREF")
 
         const { default: Hls } = await import('hls.js')
 
@@ -657,7 +705,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             enableWorker: config.Player.general.useHLSWorker,
             lowLatencyMode: true,
             workerPath: config.Player.general.useHLSWorker ? HLSWorker : undefined,
-            
+
             autoStartLoad: player.isPlaying,
 
             manifestLoadingMaxRetry: 3,
@@ -670,6 +718,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
             abrBandWidthFactor: 0.8,
             abrBandWidthUpFactor: 0.7,
+
+            debug: config.Developer.debugHLS
         }
 
         let manifest_script: player_script_injector[] = player.playerData!["scripts"] ?? []
@@ -685,9 +735,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                         let currentData: any = data.text
                         if (data["status"] == 429) HLS?.destroy()
 
-                        // /* IFDEF DEBUG */
-                        // console.warn("Player/HLS", data, context)
-                        // /* ENDIF */
+                        /* IFDEF DEBUG */
+                        console.warn("Player/HLS", data, context)
+                        /* ENDIF */
 
                         if (!data.success) {
                             console.error("Player/HLS", context, data)
@@ -703,12 +753,12 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                                 case "hls_manifest":
                                     if (context["responseType"] != "text") break
 
-                                    currentData = await sheepworker!.function(element["code"], data)
+                                    currentData = await sheepworker!.unsafe_function(element["code"], data)
                                     break
                                 case "hls_arraybuffer":
                                     if (context["responseType"] != "arraybuffer") break
 
-                                    currentData = await sheepworker!.function(element["code"], data)
+                                    currentData = await sheepworker!.unsafe_function(element["code"], data)
                                     break
                             }
                         }
@@ -745,90 +795,104 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
         HLS = tmpHls
 
-        if (Hls.isSupported() && videoRef) {
-            tmpHls.loadSource(player["currentResolution"]["url"]);
-            tmpHls.attachMedia(videoRef);
-            // setTimeVideo(SheePlayer.currentTime)
+        if (!Hls.isSupported()) return console.error("Player/HLS Isn't Supported")
 
-            // TODO: Debug this why not everytime i reset the player dosen't load the video
-            tmpHls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
-                console.log("HLS Manifest Parsed", data)
-                updatePlayer({ FatalError: false })
+        tmpHls.attachMedia(videoRef);
 
-                if (!player["playerData"]!["splitHLS"]) {
-                    const resolutions = data.levels.map((level) => level.height);
-                    resolutions.reverse()
+        tmpHls.on(Hls.Events.MEDIA_ATTACHED, () => {
+            console.warn("Player/HLS MEDIA_ATTACHED");
+            tmpHls.loadSource(player["currentResolution"]!["url"]);
+            videoRef!.requestVideoFrameCallback(monitorFrames);
+        });
 
-                    updatePlayer({
-                        resoltions: resolutions.map((val) => ({ ...player["currentResolution"]!, res: `${val == 0 ? 1080 : val}` })),
-                        currentResolution: { ...player["currentResolution"]!, res: resolutions[0].toString() }
-                    })
+        tmpHls.on(Hls.Events.FRAG_CHANGED, (_, data) => {
+            console.warn("Player/HLS Fragment Change", {
+                start: data.frag.start,
+                duration: data.frag.duration,
+                currentTime: videoRef!.currentTime
+            });
+        });
 
-                    tmpHls.currentLevel = tmpHls.levels.length - 1;
-                }
+        tmpHls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
+            console.warn("Player/HLS Manifest Parsed", data)
 
-                data.levels.forEach(level => {
-                    // I added Ignore because this give me a error "Cannot assign to 'audioCodec' because it is a read-only property." but i can assign then is good
-                    // @ts-ignore
-                    if (!level.audioCodec) level.audioCodec = "mp4a.40.5"
-                    // @ts-ignore
-                    else level.audioCodec = level.audioCodec.replaceAll('mp4a.40.2', 'mp4a.40.5')
-                });
+            tmpHls.startLoad(-1);
 
-                if (data.audioTracks.length <= 0) return
+            updatePlayer({ FatalError: false })
 
-                let DefaultAudio = data.audioTracks.find((v) => v["default"])
-                if (!DefaultAudio) DefaultAudio = data.audioTracks[0]
+            if (!player["playerData"]!["splitHLS"]) {
+                const resolutions = data.levels.map((level) => level.height);
+                resolutions.reverse()
 
                 updatePlayer({
-                    activeAudioTrack: { id: DefaultAudio.id, label: DefaultAudio.name, lang: DefaultAudio.lang },
-                    audioTrack: data.audioTracks.map((element) => ({ id: element.id, label: element.name, lang: element.lang }))
+                    resoltions: resolutions.map((val) => ({ ...player["currentResolution"]!, res: `${val == 0 ? 1080 : val}` })),
+                    currentResolution: { ...player["currentResolution"]!, res: resolutions[0].toString() }
                 })
 
-                if (config.Player.general.Autoplay) videoRef?.play()
-            });
-
-            tmpHls.on(Hls.Events.ERROR, (_event, data) => {
-                console.error("HLS", _event, data)
-
-                SheePlayer.currentTime = player.currentTime
-
                 tmpHls.currentLevel = tmpHls.levels.length - 1;
+            }
 
-                updatePlayer({ FatalError: data.fatal })
-
-                if (data.details == "bufferStalledError") tmpHls.startLoad(SheePlayer.currentTime)
-
-                if (data.fatal) {
-                    let message: string | undefined
-                    switch (data.type) {
-                        case Hls.ErrorTypes.NETWORK_ERROR:
-                            if (data.response && [429, 403, 500, 404].includes(data.response["code"] ?? 0)) {
-                                updatePlayer({ FatalError: true })
-                            } else {
-                                tmpHls.startLoad(SheePlayer.currentTime);
-                                updatePlayer({ FatalError: false })
-                            }
-                            message = t('player.errors.MEDIA_ERR_NETWORK')
-                            break;
-                        case Hls.ErrorTypes.MEDIA_ERROR:
-                            message = t('player.errors.MEDIA_ERR_DECODE')
-                            // tmpHls.recoverMediaError()
-                            tmpHls.destroy();
-                            return
-                        default:
-                            message = t('player.errors.default')
-                            tmpHls.destroy();
-                            break;
-                    }
-
-                    if (PlayerCleanup) return
-                    if (!message) return
-
-                    toast(message, { type: "error" })
-                }
+            data.levels.forEach(level => {
+                // I added Ignore because this give me a error "Cannot assign to 'audioCodec' because it is a read-only property." but i can assign then is good
+                // @ts-ignore
+                if (!level.audioCodec) level.audioCodec = "mp4a.40.5"
+                // @ts-ignore
+                else level.audioCodec = level.audioCodec.replaceAll('mp4a.40.2', 'mp4a.40.5')
             });
-        }
+
+            if (data.audioTracks.length <= 0) return
+
+            let DefaultAudio = data.audioTracks.find((v) => v["default"])
+            if (!DefaultAudio) DefaultAudio = data.audioTracks[0]
+
+            updatePlayer({
+                activeAudioTrack: { id: DefaultAudio.id, label: DefaultAudio.name, lang: DefaultAudio.lang },
+                audioTrack: data.audioTracks.map((element) => ({ id: element.id, label: element.name, lang: element.lang }))
+            })
+
+            if (config.Player.general.Autoplay) videoRef?.play()
+        });
+
+        tmpHls.on(Hls.Events.ERROR, (_event, data) => {
+            console.error("Player/HLS", _event, data)
+
+            SheePlayer.currentTime = player.currentTime
+
+            tmpHls.currentLevel = tmpHls.levels.length - 1;
+
+            updatePlayer({ FatalError: data.fatal })
+
+            if (data.details == "bufferStalledError") tmpHls.startLoad(SheePlayer.currentTime)
+
+            if (data.fatal) {
+                let message: string | undefined
+                switch (data.type) {
+                    case Hls.ErrorTypes.NETWORK_ERROR:
+                        if (data.response && [429, 403, 500, 404].includes(data.response["code"] ?? 0)) {
+                            updatePlayer({ FatalError: true })
+                        } else {
+                            tmpHls.startLoad(SheePlayer.currentTime);
+                            updatePlayer({ FatalError: false })
+                        }
+                        message = t('player.errors.MEDIA_ERR_NETWORK')
+                        break;
+                    case Hls.ErrorTypes.MEDIA_ERROR:
+                        message = t('player.errors.MEDIA_ERR_DECODE')
+                        // tmpHls.recoverMediaError()
+                        tmpHls.destroy();
+                        return
+                    default:
+                        message = t('player.errors.default')
+                        tmpHls.destroy();
+                        break;
+                }
+
+                if (PlayerCleanup) return
+                if (!message) return
+
+                toast(message, { type: "error" })
+            }
+        });
     }
 
     function setTimeoutForElement(element: NodeJS.Timeout | undefined, val: string) {
@@ -859,7 +923,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                 currentASSubtitles = undefined
             }
         } catch (error) {
-            
+
         }
         if (sheepworker) sheepworker.dispose()
 
@@ -953,7 +1017,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             })
         }
 
-        if (!isNaN(value) && config && value > videoRef.duration - CheckNumber(config.History.continue.MaximizeTimeSave)) {
+        if (!isNaN(value) && value > videoRef.duration - player.nextTimerStart) {
             updateUI({ upNextDisable: true })
         }
 
@@ -1124,7 +1188,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         const currentTime = player.currentTime
         const duration = player.durration
 
-        if (duration > 10 && currentTime > (duration - CheckNumber(config.History.continue.MaximizeTimeSave)) && anime.animulist && anime.AnimeData.episodes != undefined) {
+        if (duration > 10 && currentTime > (duration - player.nextTimerStart) && anime.animulist && anime.AnimeData.episodes != undefined) {
 
             if (anime.animulist.status == "CURRENT" && CheckNumber(ep_metadata["current"]["ep"]) >= CheckNumber(anime.AnimeData.episodes)) {
                 updateDataInAnimulist(anime.AnimeData.id, {
@@ -1164,7 +1228,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             }
         }
 
-        if (currentTime <= duration - CheckNumber(config.History.continue.MaximizeTimeSave)) {
+        if (currentTime <= duration - player.nextTimerStart) {
             SaveHistory(futureHistory)
         } else {
             SaveHistory({
@@ -1338,9 +1402,9 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         setNewResolution(resp["dubResolution"][0])
     }
 
-    useKeyPress((keys: string) => {
+    useKeyPress(async (keys: string) => {
         if (keys == "CTRL+SHIFT+D") ToggleNerdStats()
-        if (keys == "SHIFT+R" && player.playerData) setNewPlayer(player.playerData)
+        if (keys == "SHIFT+R" && player.playerData) await setNewPlayer(player.playerData)
 
         if (onKeybind) onKeybind(keys)
 
@@ -1602,19 +1666,14 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
         if (duration <= config.Player.upToNextEpisode.durationShow * 60 && !player.playerData!.listChapters) return
 
-        let endingChupter: playerChapterList | undefined = undefined
-        if (player.playerData!.listChapters) {
-            endingChupter = player.playerData!.listChapters!.find((cha) => cha.type == "ending")
-            if (endingChupter && endingChupter.end == 0 && endingChupter.start == 0) return
-        }
+        const next_episode_timer = CheckNumber(config.Player.upToNextEpisode.interval)
 
-        let showUpToNext: boolean = currenttime > duration - CheckNumber(config.History.continue.MaximizeTimeSave)
-        let timeDelete: number = ((CheckNumber(duration.toFixed(0)) - CheckNumber(config.History.continue.MaximizeTimeSave)) - CheckNumber(currenttime.toFixed(0))) + CheckNumber(config.Player.upToNextEpisode.interval)
+        let showUpToNext: boolean = currenttime > duration - CheckNumber(player.nextTimerStart)
+        let timeDelete: number = ((CheckNumber(duration.toFixed(0)) - (CheckNumber(player.nextTimerStart))) - CheckNumber(currenttime.toFixed(0))) + next_episode_timer
 
-        if (endingChupter) {
-            showUpToNext = currenttime >= endingChupter.start
-            timeDelete = ((CheckNumber(duration.toFixed(0)) - (CheckNumber(duration.toFixed(0)) - endingChupter.start)) - CheckNumber(currenttime.toFixed(0))) + CheckNumber(config.Player.upToNextEpisode.interval)
-        }
+        /* IFDEF DEBUG */
+        console.warn("player/checkUpNext", timeDelete, showUpToNext, player.nextTimerStart, duration)
+        /* ENDIF */
 
         if (CheckNumber(timeDelete.toFixed(0)) < 0) {
             updateUI({ upNextActive: false })
@@ -1623,10 +1682,10 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
         updateUI({
             upNextActive: showUpToNext,
-            upNextTimer: showUpToNext ? CheckNumber(timeDelete.toFixed(0)) : CheckNumber(config.Player.upToNextEpisode.interval)
+            upNextTimer: showUpToNext ? CheckNumber(timeDelete.toFixed(0)) : next_episode_timer
         })
 
-        if (ui.upNextTimer <= 0) onChangeEpisode("next")
+        if (ui.upNextTimer <= 0) onChangeEpisode(avaibleEpisode["nextEpisode"]["ep"])
     }
 
     function CheckDownloadContextMenu(res: resolutionFormat) {
@@ -2076,7 +2135,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             </Show>
 
             <Show when={nerdStats.active}>
-                <NerdStats video={nerdStats["video"]} player={nerdStats["player"]} ui={ui}/>
+                <NerdStats video={nerdStats["video"]} player={nerdStats["player"]} ui={ui} />
             </Show>
 
             <Show when={!config.Player.general.disablemoreinformation && anime}>

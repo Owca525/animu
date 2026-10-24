@@ -305,7 +305,7 @@ export async function convertPath(path: string) {
 }
 
 export function isNumberString(str: string): boolean {
-    return str.trim() !== '' && !Number.isNaN(Number(str));
+    return `${str}`.trim() !== '' && !Number.isNaN(Number(`${str}`));
 }
 
 export function timeToSeconds(time: string): number {

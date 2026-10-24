@@ -402,7 +402,7 @@ export async function advanceRequest(url: string, options: RequestInit = { heade
         }
 
         /* IFDEF DEBUG */
-        // console.info("advanceRequest\n", convertedResponse) // options
+        console.info("advanceRequest\n", convertedResponse, response) // options
         /* ENDIF */
 
         return convertedResponse;

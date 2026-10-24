@@ -49,7 +49,6 @@ const decryptor_content = `(response) => {
 const hls_converter = `(response) => {
     let buffer = response["buffer"]
 
-    if (response["url"].endsWith(".webp") || response["url"].endsWith(".png")) {
         const u = new Uint8Array(buffer);
 
         let offset = 0;
@@ -62,7 +61,7 @@ const hls_converter = `(response) => {
             offset = 8;
         }
 
-        if (!offset) return buffer
+        if (offset == 0) return buffer
 
         if (u[offset] !== 0x47) {
             let data = u.subarray(offset);
@@ -73,9 +72,9 @@ const hls_converter = `(response) => {
                 216, 98, 15, 197
             ];
 
-            data.forEach((_, i) => {
-                data[i] ^= key[i & 15];
-            })
+            for (let i = offset, j = 0; i < data.length; i++, j++) {
+                data[i] ^= key[j & 15];
+            }
 
             buffer = data.buffer.slice(
                 data.byteOffset,
@@ -87,11 +86,9 @@ const hls_converter = `(response) => {
                 u.byteOffset + u.byteLength
             );
         }
-    }
 
     return buffer;
 }`
-
 
 // function DecyrptContent(encode_content: string, secret: string) {
 //     let str: number[] = [];

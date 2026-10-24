@@ -100,7 +100,8 @@
         "DeveloperMode": false,
         "DevTools": false,
         "DevToolsOnStart": false,
-        "playerDebug": false
+        "playerDebug": false,
+        "debugHLS": false
     },
     "update": {
         "lastTime": 0,

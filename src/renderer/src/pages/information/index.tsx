@@ -109,6 +109,10 @@ async function FetchEpisodes(params: { anime: AnimeData, playerID: string | unde
 
     let response = await plugin.extractEpisodeList(params.anime, params.playerID)
 
+    /* IFDEF DEBUG */
+    console.warn("Information/FetchEpisodes", response)
+    /* ENDIF */
+
     return sortEpisodes(response)
 }
 
@@ -258,6 +262,10 @@ function information() {
                     content = await ExtractVideo(`https://www.youtube.com/watch?v=${queryKey["metadata"]}` as any)
                     break
             }
+
+            /* IFDEF DEBUG */
+            console.warn("Information/useResponse", content, queryKey)
+            /* ENDIF */
 
             return { content, type: queryKey["type"], error: queryKey["error"] }
         },
