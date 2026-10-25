@@ -373,6 +373,10 @@ app.on('child-process-gone', (_event, details) => {
   console.error('CHILD PROCESS CRASH', details)
 })
 
+process.on('SIGINT', () => {
+  process.exit(0)
+});
+
 process.on('uncaughtException', console.error)
 process.on('unhandledRejection', console.error)
 
