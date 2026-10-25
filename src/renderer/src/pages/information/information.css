@@ -262,6 +262,16 @@
     padding: 12px;
 }
 
+.information-buttons-episode-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.information-buttons-episode-specials {
+    padding: 4px 8px;
+    font-weight: 800;
+}
+
 .information-episode-button {
     padding: 12px;
     width: clamp(10px, 1.5vw, 20px);
