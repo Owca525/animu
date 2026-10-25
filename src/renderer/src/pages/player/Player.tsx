@@ -807,13 +807,13 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             videoRef!.requestVideoFrameCallback(monitorFrames);
         });
 
-        tmpHls.on(Hls.Events.FRAG_CHANGED, (_, data) => {
-            console.warn("Player/HLS Fragment Change", {
-                start: data.frag.start,
-                duration: data.frag.duration,
-                currentTime: videoRef!.currentTime
-            });
-        });
+        // tmpHls.on(Hls.Events.FRAG_CHANGED, (_, data) => {
+        //     console.warn("Player/HLS Fragment Change", {
+        //         start: data.frag.start,
+        //         duration: data.frag.duration,
+        //         currentTime: videoRef!.currentTime
+        //     });
+        // });
 
         tmpHls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
             console.warn("Player/HLS Manifest Parsed", data)
