@@ -1053,7 +1053,7 @@ function settings() {
                         </div> */}
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("settings.player.hls_worker")}
+                            {t("settings.player.skip_opening")}
                             <CheckBox
                                 checked={config().new.Player.general.autoSkipOpeningEnding}
                                 onChecked={(checked) =>
@@ -1063,7 +1063,7 @@ function settings() {
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("settings.player.skip_opening")}
+                            {t("settings.player.hls_worker")}
                             <CheckBox
                                 checked={config().new.Player.general.useHLSWorker}
                                 onChecked={(checked) =>
