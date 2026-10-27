@@ -1652,7 +1652,12 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             chapterSkipTimer: 15,
         })
 
-        if (ui.chapterSkipEnd > 0 && overwrite) setTimeVideo(ui.chapterSkipEnd)
+        if (ui.chapterSkipEnd > 0 && overwrite) {
+
+            if (ui.upNextActive && ui.chapterSkipType == "ending") updateUI({ upNextActive: false })
+
+            setTimeVideo(ui.chapterSkipEnd)
+        }
     }
 
     function checkUpNext(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {
