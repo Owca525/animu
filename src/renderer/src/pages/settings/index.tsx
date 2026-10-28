@@ -1472,6 +1472,16 @@ function settings() {
                                 }
                             />
                         </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("settings.debug_hls")}
+                            <CheckBox
+                                checked={config().new.Developer.debugHLS}
+                                onChecked={(checked) =>
+                                    handleChange('Developer.debugHLS', checked)
+                                }
+                            />
+                        </div>
                         {/* <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("settings.devmode.playerdebug")}
@@ -1600,16 +1610,6 @@ function settings() {
                                 checked={config().new.plugins.userWorker}
                                 onChecked={(checked) =>
                                     handleChange('plugins.userWorker', checked)
-                                }
-                            />
-                        </div>
-                        <div class="settings-line"></div>
-                        <div class="settings-setting-container">
-                            {t("settings.debug_hls")}
-                            <CheckBox
-                                checked={config().new.plugins.userWorker}
-                                onChecked={(checked) =>
-                                    handleChange('Developer.debugHLS', checked)
                                 }
                             />
                         </div>
