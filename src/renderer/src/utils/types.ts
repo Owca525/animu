@@ -166,13 +166,9 @@ export interface homeData {
         page: string,
         filter: genres[]
     }[]
-    mainContainer: {
-        scrollLeft: number,
-        scrollTop: number,
-        offsetHeight: number,
-        scrollHeight: number,
-        clientHeight: number
-    } | undefined
+
+    scrollTop: number
+
     onScrollContainer?: () => void
     sidebarData: {
         top: sidebarData[],

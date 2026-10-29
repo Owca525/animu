@@ -178,6 +178,7 @@ function information() {
     })
 
     function GenerateButtons(): { value: string; onClick: () => void; }[] {
+        // TRANSLATE
         if (information["cache"]["anime"].format == "MUSIC") {
             return [{
                 value: 'Music',

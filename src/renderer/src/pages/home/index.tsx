@@ -19,6 +19,7 @@ import {
   getHomeCache,
   getHomeSidebarData,
   setHomeActivePage,
+  setHomeScroll,
   setHomeSearch,
   setHomeSearchPage,
   setHomeSearchTags,
@@ -57,6 +58,7 @@ export function setNewActivePage(text: string, overwrite: boolean = true) {
   if (overwrite) {
     setHomeSearch(undefined)
     setHomeSearchTags(undefined)
+    setHomeScroll(0)
   }
   setHomeActivePage(text)
   changeTitleAnimu(`Animu - ${t(text)}`)
@@ -74,8 +76,11 @@ const Home = () => {
 
   onMount(() => {
     getHomeSidebarData().top.forEach((element) => {
-      if (getHomeCache().activePage == element.text)
+      if (getHomeCache().activePage == element.text) {
         setNewActivePage(element.text, false)
+
+        if (divRef) divRef.scrollTop = homeCache().scrollTop
+      }
     })
 
     // if (homeCache().data.sections.length <= 0) plugin.home()
@@ -95,6 +100,9 @@ const Home = () => {
     const scrollTop = divRef.scrollTop;
     const scrollHeight = divRef.scrollHeight - divRef.clientHeight;
     const scrollPercent = (scrollTop / scrollHeight) * 100;
+
+    setHomeScroll(scrollTop)
+
     if (parseInt(scrollPercent.toFixed(0)) >= 15) setHeaderActive(() => true)
     else setHeaderActive(() => false)
   };
