@@ -140,8 +140,18 @@ export async function changeTheme(activeTheme: Map<number, themeMetadata>) {
 }
 
 export function changeTitleAnimu(title: string) {
-    let dev = import.meta.env.DEV
-    document.title = dev ? title + " - Development" : title
+
+    let text = "Animu"
+
+    text += ` ${window["animuAppInfo"]["ver"]} `;
+
+    text += "- "
+
+    text += title
+
+    if (import.meta.env.DEV) text += " - Development"
+
+    document.title = text
 }
 
 export function convertKeybinds(inputString: string) {

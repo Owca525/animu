@@ -61,7 +61,7 @@ export function setNewActivePage(text: string, overwrite: boolean = true) {
     setHomeScroll(0)
   }
   setHomeActivePage(text)
-  changeTitleAnimu(`Animu - ${t(text)}`)
+  changeTitleAnimu(t(text))
 }
 
 const Home = () => {

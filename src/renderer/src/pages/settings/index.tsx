@@ -195,7 +195,7 @@ function settings() {
         setHiddenPluginList(getConfig().plugins.hiddenPlugins)
         setpluginList(playerPluginList)
         setThemes(loadedTheme().filter((val) => ![...activeThemes().entries()].map(([_, val]) => val.themeName).includes(val.themeName)))
-        changeTitleAnimu(`Animu - ${t("global.settings")}`)
+        changeTitleAnimu(t("global.settings"))
         turnOnDeveloperMode()
 
         /* IFDEF DEBUG|PROD */

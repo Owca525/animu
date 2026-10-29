@@ -365,7 +365,7 @@ function information() {
 
         updateInfo({ buttonGroup: GenerateButtons() })
 
-        changeTitleAnimu(`Animu - ${detectTitleConfig(information["cache"]["anime"]["title"])}`)
+        changeTitleAnimu(detectTitleConfig(information["cache"]["anime"]["title"]))
         checkIsAnimeReleasing()
 
         // && information["cache"]["anime"]["status"] == "RELEASING"
