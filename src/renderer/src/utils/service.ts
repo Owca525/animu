@@ -1,31 +1,38 @@
 import { setServiuceList } from "./stores/global"
+import { DefaultService, serviceFormat } from "./types"
 
 class ServiceManagerInstance {
-    /** @type {DefaultService[]} */
-    defaultServices = []
-    /** @type {serviceFormat[]} */
-    services = []
+    defaultServices: DefaultService[] = []
+    services: serviceFormat[] = []
 
     InitialServiceManager = (defaultServices = []) => {
+        if (!localStorage.getItem("services_inactive")) {
+            localStorage.setItem("services_inactive", JSON.stringify([]))
+        }
+
+        let list: string[] = []
+
+        try {
+            list = JSON.parse(localStorage.getItem("services_inactive") ?? "[]")
+        } catch (error) {}
+
         this.defaultServices = defaultServices
 
         this.defaultServices.forEach((service) => {
-            this.RunService(service)
+            this.RunService({
+                ...service,
+                active: list.find((v) => v == service["name"]) ? false : service["active"]
+            })
         })
         setServiuceList(this.services)
     }
 
-    /**
-     * @param {DefaultService} service
-     * @returns {void}
-     */
-    RunService = (service) => {
+    RunService = (service: DefaultService) => {
         if (this.FindService(service["name"])) return
 
         const serviceID = crypto.randomUUID()
 
-        /** @type {NodeJS.Timeout | undefined} */
-        let timer = undefined
+        let timer: NodeJS.Timeout | undefined = undefined
 
         if (service.active) timer = setInterval(() => {
             try {
@@ -50,11 +57,7 @@ class ServiceManagerInstance {
         })
     }
 
-    /**
-     * @param {string} name
-     * @returns {boolean}
-     */
-    StopService = (name) => {
+    StopService = (name: string): boolean => {
         let service = this.FindService(name)
 
         if (!service) return false
@@ -70,14 +73,22 @@ class ServiceManagerInstance {
         } : s)
         setServiuceList(this.services)
 
+        try {
+
+            const list: string[] = JSON.parse(localStorage.getItem("services_inactive") ?? "[]")
+
+            if (list) {
+                localStorage.setItem("services_inactive", JSON.stringify([...list, service.name]))
+            }
+
+        } catch (error) {
+            console.error("ServiceManager/StopService", error)
+        }
+
         return true
     }
 
-    /**
-     * @param {string} name
-     * @returns {boolean}
-     */
-    ActiveService = (name) => {
+    ActiveService = (name: string): boolean => {
         let service = this.FindService(name)
 
         if (!service) return false
@@ -104,11 +115,7 @@ class ServiceManagerInstance {
         return true
     }
 
-    /**
-     * @param {string} name
-     * @returns {serviceFormat | undefined}
-     */
-    FindService = (name) => {
+    FindService = (name: string): serviceFormat | undefined => {
         let service = this.services.find((v) => v["name"] == name)
         if (!service) service = this.services.find((v) => v["id"] == name)
 

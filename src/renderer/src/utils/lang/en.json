@@ -40,7 +40,7 @@
         "animupdate_name": "AnimUpdate",
         "animupdate_desc": "Check Animu Update",
         "pluginupdates_name": "PluginUpdates",
-        "pluginupdate_desc": "Check Plugins are Updated",
+        "pluginupdates_desc": "Check Plugins are Updated",
         "calendaryupdate_name": "CallendarUpdate",
         "calendaryupdate_desc": "Fetching New Callendary",
         "episodeavailble_name": "EpisodesAvaible",
@@ -498,11 +498,12 @@
             "brokenBuffer": "It shows buffering when playing mp4 files, which is known to display incorrect data"
         },
         "devmode": {
+            "services": "Services",
             "developermode": "Developer Mode",
             "tornondevtools": "Turn on Devtools",
             "devtoolsonstart": "Devtools on Start",
             "playerdebug": "Player Debug Stats",
-            "information": "Information",
+            "information": "Package Versions",
             "electronver": "Electron Version",
             "chromiumver": "Chromium Version",
             "nodever": "Node Version",

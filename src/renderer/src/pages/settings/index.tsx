@@ -49,7 +49,7 @@ import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './settings.css';
 import { useI18n } from '@renderer/utils/i18n';
-import { activeThemes, animulistData, getAnimuHistory, getCurrentYT_DLPVer, getListOfVerYT_DLP, loadedTheme, setAudioOutput } from '@renderer/utils/stores/global';
+import { activeThemes, animulistData, getAnimuHistory, getCurrentYT_DLPVer, getListOfVerYT_DLP, getServices, loadedTheme, setAudioOutput } from '@renderer/utils/stores/global';
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 import SettingsPlugin from './components/settingsPlugin';
 import semver from "semver";
@@ -59,6 +59,7 @@ import { SheepShortcut } from '@renderer/utils/hooks/useKeyPress';
 import pluginManager from '@renderer/utils/pluginManager';
 import { SavePluginConfig } from '@renderer/utils/FilesManager/pluginConfig';
 import deeplink from '@renderer/utils/deeplinks';
+import { ServiceManager } from '@renderer/utils/service';
 
 export type pluginRepoExpandedSettings = {
     name: string,
@@ -243,6 +244,9 @@ function settings() {
             setDynamicZoom(config().new.General.Window.Zoom)
             pluginManager.initialPlugins()
             window.backend.refresh()
+
+            if (!config().new.update.enable) ServiceManager.StopService("services.pluginupdates_name")
+
             toast(t("settings.saving.done"), { type: "success" })
         } catch (error) {
             console.error("Settings/saveNewConfig", error)
@@ -1571,6 +1575,24 @@ function settings() {
                                 />
                             </div>
                         </Show>
+
+                        <SettingsDrop LeftHeader={t("settings.devmode.services")} content={
+                            <div class="settings-backup-container">
+                                <For each={getServices()}>
+                                    {(value) => (
+                                        <span class='settings-dev-service-container'>
+                                            <span class='settings-dev-service-title'>{t(value["name"])}</span> -
+                                            <span class='settings-dev-service-description'>{t(value["description"] ? value["description"] : "information.descriptionnotfound")}</span>
+
+                                            <CheckBox checked={value["active"]} onChecked={(v) => {
+                                                if (v) ServiceManager.ActiveService(value["name"])
+                                                else ServiceManager.StopService(value["name"])
+                                            }} class='settings-dev-service-checkbox'/>
+                                        </span>
+                                    )}
+                                </For>
+                            </div>
+                        } />
                     </div>
                     {/* IFDEF PROD|DEBUG */}
                     <div class="settings-page-container">

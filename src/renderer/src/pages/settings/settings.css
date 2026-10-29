@@ -394,3 +394,30 @@
   display: flex;
   gap: 4px;
 }
+
+.settings-dev-service-container {
+  display: flex;
+  padding: 16px 8px;
+  gap: 8px;
+  border-radius: 12px;
+  transition: all 100ms ease-in-out;
+
+  align-items: center;
+}
+
+.settings-dev-service-container:hover {
+  background-color: var(--five-layer);
+}
+
+.settings-dev-service-checkbox {
+  margin-left: auto;
+}
+
+.settings-dev-service-title {
+  font-size: 1.1em;
+  font-weight: 800;
+}
+
+.settings-dev-service-description {
+  color: var(--text-gray);
+}
