@@ -505,7 +505,7 @@
             "information": "Information",
             "electronver": "Electron Version",
             "chromiumver": "Chromium Version",
-            "nodever": "Electron Version",
+            "nodever": "Node Version",
             "notificationtest": "Toast Notification Test",
             "dialogtest": "Dialog Test"
         },
