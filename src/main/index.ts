@@ -389,7 +389,10 @@ ipcMain.handle('initialMetadata', async () => ({
   theme: getThemeList(checkConfigFolder("themes")),
   port: server.port,
   user: user_data,
-  user_lang: await GetUserLangs()
+  user_lang: await GetUserLangs(),
+  node_ver: process.versions.node,
+  chrome_ver: process.versions.chrome,
+  electron_ver: process.versions.electron
 }));
 
 ipcMain.handle('backend:customheader', (_, header: Record<string, string | string[]> | undefined) => customheader = header);

@@ -83,7 +83,6 @@ function settings() {
     const [config, setNewConfig] = createSignal<{ old: SettingsConfig, new: SettingsConfig }>({ old: structuredClone(cfg), new: structuredClone(cfg) })
     const [themes, setThemes] = createSignal<themeMetadata[]>([])
     const [lastActiveTheme, setLastActiveTheme] = createSignal<Map<number, themeMetadata>>(new Map())
-    const [versions] = createSignal(window["animuAppInfo"]["ver"])
     const [isSaving, setSaving] = createSignal<boolean>(false)
 
     const [audioOutput, setaudioOutput] = createSignal<MediaDeviceInfo[]>([])
@@ -392,7 +391,7 @@ function settings() {
         let cfgObject = {}
 
         plugin.config.forEach((value) => {
-            cfgObject = {...cfgObject, [value["config_name"]]: value["value"]}
+            cfgObject = { ...cfgObject, [value["config_name"]]: value["value"] }
         })
 
         showCustomMenu(() => OtherSettings({
@@ -408,7 +407,7 @@ function settings() {
         config = config.map((value) => value["config_name"] == variable ? {
             ...value,
             value: change
-        }: value)
+        } : value)
 
 
         SavePluginConfig(plugin["metadata"]["name"], config)
@@ -768,7 +767,7 @@ function settings() {
                                 }
                             />
                         </div>
-                        
+
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {/* TRANSLATION */}
@@ -1573,23 +1572,23 @@ function settings() {
                             </div>
                         </Show>
                     </div>
-                    <Show when={versions()}>
-                        <div class="settings-page-container">
-                            <div class="settings-page-title">{t("settings.devmode.information")}</div>
-                            <div class="settings-setting-container">
-                                <span>{t("settings.devmode.electronver")}</span>
-                                <span>{versions()!.electron}</span>
-                            </div>
-                            <div class="settings-setting-container">
-                                <span>{t("settings.devmode.chromiumver")}</span>
-                                <span>{versions()!.chrome}</span>
-                            </div>
-                            <div class="settings-setting-container">
-                                <span>{t("settings.devmode.nodever")}</span>
-                                <span>{versions()!.node}</span>
-                            </div>
+                    {/* IFDEF PROD|DEBUG */}
+                    <div class="settings-page-container">
+                        <div class="settings-page-title">{t("settings.devmode.information")}</div>
+                        <div class="settings-setting-container">
+                            <span>{t("settings.devmode.electronver")}</span>
+                            <span>{window["initialMetadata"]["electron_ver"]}</span>
                         </div>
-                    </Show>
+                        <div class="settings-setting-container">
+                            <span>{t("settings.devmode.chromiumver")}</span>
+                            <span>{window["initialMetadata"]["chrome_ver"]}</span>
+                        </div>
+                        <div class="settings-setting-container">
+                            <span>{t("settings.devmode.nodever")}</span>
+                            <span>{window["initialMetadata"]["node_ver"]}</span>
+                        </div>
+                    </div>
+                    {/* ENDIF */}
                 </Show>
                 <Show when={category() == "extensions"}>
                     <div class="settings-page-container">
