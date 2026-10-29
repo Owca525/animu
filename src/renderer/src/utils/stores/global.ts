@@ -166,6 +166,7 @@ class PlayerCacheInstance {
     }
 }
 
+// TODO: Remove This From window
 if (!window["PlayerCache"]) {
     window["PlayerCache"] = new PlayerCacheInstance()
 }
