@@ -2,26 +2,31 @@ import { setServiuceList } from "./stores/global"
 import { DefaultService, serviceFormat } from "./types"
 
 class ServiceManagerInstance {
-    defaultServices: DefaultService[] = []
-    services: serviceFormat[] = []
+    private defaultServices: DefaultService[] = []
+    private services: serviceFormat[] = []
+    private disableService: string[] = []
 
-    InitialServiceManager = (defaultServices = []) => {
+    constructor() {
         if (!localStorage.getItem("services_inactive")) {
             localStorage.setItem("services_inactive", JSON.stringify([]))
         }
 
-        let list: string[] = []
-
         try {
-            list = JSON.parse(localStorage.getItem("services_inactive") ?? "[]")
-        } catch (error) {}
+            const tmp = JSON.parse(localStorage.getItem("services_inactive") ?? "[]")
 
+            if (Array.isArray(tmp)) this.disableService = tmp
+            else localStorage.setItem("services_inactive", JSON.stringify([]))
+
+        } catch (error) {}
+    }
+
+    InitialServiceManager = (defaultServices: DefaultService[] = []) => {
         this.defaultServices = defaultServices
 
         this.defaultServices.forEach((service) => {
             this.RunService({
                 ...service,
-                active: list.find((v) => v == service["name"]) ? false : service["active"]
+                active: this.disableService.find((v) => v == service["name"]) ? false : service["active"]
             })
         })
         setServiuceList(this.services)
@@ -73,17 +78,8 @@ class ServiceManagerInstance {
         } : s)
         setServiuceList(this.services)
 
-        try {
-
-            const list: string[] = JSON.parse(localStorage.getItem("services_inactive") ?? "[]")
-
-            if (list) {
-                localStorage.setItem("services_inactive", JSON.stringify([...list, service.name]))
-            }
-
-        } catch (error) {
-            console.error("ServiceManager/StopService", error)
-        }
+        this.disableService.push(service.name)
+        this.SaveDisabledService()
 
         return true
     }
@@ -111,6 +107,8 @@ class ServiceManagerInstance {
             active: true
         } : s)
         setServiuceList(this.services)
+        this.disableService = this.disableService.filter((v) => v != service.name)
+        this.SaveDisabledService()
 
         return true
     }
@@ -120,6 +118,12 @@ class ServiceManagerInstance {
         if (!service) service = this.services.find((v) => v["id"] == name)
 
         return service
+    }
+
+    private SaveDisabledService() {
+        try {
+            localStorage.setItem("services_inactive", JSON.stringify(this.disableService))
+        } catch (error) {}
     }
 }
 
