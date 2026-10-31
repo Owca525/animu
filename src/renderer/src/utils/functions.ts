@@ -1580,3 +1580,17 @@ export function RandomObject<T>(list: T[]): T | undefined {
     const randomIndex = Math.floor(Math.random() * list.length);
     return list[randomIndex];
 }
+
+export function GetLogo(params: { name: string, url: string }) {
+    if (!localStorage.getItem(params["name"])) {
+
+        DownloadIMGToBase64(params["url"]).then((v) => {
+            if (!v) return
+            localStorage.setItem(params["name"], v)
+        })
+
+        return params["url"]
+    }
+
+    return localStorage.getItem(params["name"]) ?? params["url"]
+}

@@ -15,6 +15,7 @@ import {
     changeTitleAnimu,
     convertKeybinds,
     convertPath,
+    GetLogo,
     openUrlFolder,
     request,
     updateObject
@@ -1726,9 +1727,25 @@ function settings() {
                     <div class="settings-page-container">
                         <div class="settings-page-title">{t("settings.general.links")}</div>
                         <div class="settings-special-container">
-                            <sheep-img class="settings-special-images" onClick={() => openUrlFolder("https://github.com/Owca525/animu")} src="https://github.com/fluidicon.png" alt="Github Logo" />
-                            <sheep-img class="settings-special-images" onClick={discord_server} src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg" alt="Discord Logo" />
-                            <sheep-img class="settings-special-images" onClick={() => openUrlFolder("https://buymeacoffee.com/owca525")} src="https://studio.buymeacoffee.com/assets/img/bmc-meta-new/new/android-icon-192x192.png" alt="Buymeacoffee logo" />
+
+                            <sheep-img 
+                                class="settings-special-images" 
+                                onClick={() => openUrlFolder("https://github.com/Owca525/animu")} 
+                                src={GetLogo({ name: "github", url: "https://github.com/fluidicon.png" })}
+                                alt="Github Logo" />
+
+                            <sheep-img 
+                                class="settings-special-images" 
+                                onClick={discord_server} 
+                                src={GetLogo({ name: "discord", url: "https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg" })}
+                                alt="Discord Logo" />
+
+                            <sheep-img 
+                                class="settings-special-images" 
+                                onClick={() => openUrlFolder("https://buymeacoffee.com/owca525")} 
+                                src={GetLogo({ name: "buymeacoffe", url: "https://cdn.buymeacoffee.com/assets/homepage/meta/apple-icon-180x180.png" })} 
+                                alt="Buymeacoffee logo" />
+                                
                         </div>
                     </div>
                     <div class="settings-page-container">
