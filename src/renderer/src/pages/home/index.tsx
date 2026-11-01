@@ -39,7 +39,7 @@ import { t } from '@renderer/utils/i18n';
 import { setCalendary } from './homeUtils';
 import Avatar from './components/avatar';
 import NotificationMenu from './components/notificationMenu';
-import WelcomeScreen from './components/welcomeScreen';
+
 // import { io } from 'socket.io-client';
 // import { socketPlayerInit } from '../player/VideoPlayer';
 
@@ -257,7 +257,7 @@ const Home = () => {
 
         </Switch>
       </div>
-      <WelcomeScreen />
+      {/* <WelcomeScreen /> */}
     </main>
   );
 };
