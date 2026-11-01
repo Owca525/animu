@@ -380,8 +380,9 @@
             "askrestore": "Do you want restore backup from {{date}}?"
         },
         "general": {
-            "language": "Language",
+            "language": "Animu Language",
             "theme": "Theme",
+            "tray": "Hide Animu On Exit Button",
             "updates": "Update Notifications",
             "checkupdates": "Check for Updates",
             "checkupdate": "Check Update",

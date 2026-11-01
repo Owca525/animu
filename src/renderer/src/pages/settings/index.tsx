@@ -865,8 +865,7 @@ function settings() {
                     <div class="settings-page-container">
                         <div class="settings-page-title">{t("settings.general.window")}</div>
                         <div class="settings-setting-container">
-                            {/* TRANSLATION */}
-                            {t("Close Animu On Exit Button")}
+                            {t("settings.general.tray")}
                             <CheckBox
                                 checked={config().new.General.Window.trayIconClose}
                                 onChecked={(checked) =>
