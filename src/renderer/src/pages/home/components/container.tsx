@@ -49,24 +49,27 @@ function Container(props: containerData) {
     disable: props["useResponse"] && animeCards().length <= 0 ? false : true,
   })
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        const homeCache = getHomeCache()
-        if (entry.isIntersecting && !homeCache.stopScrolling && !cardResponse.loading() && !cardResponse.error()) {
-          setHomeSearchPage(currentPage() + 1)
-          setcurrentPage(currentPage() + 1)
-          cardResponse.Refetch([currentPage() + 1, props.title, props.tags ? props.tags.map((v) => v.name) : []])
-        }
-      });
-    }
-  );
-
   onMount(() => {
     handleUpdate()
     checkSkipButtons()
     window.addEventListener("resize", checkSkipButtons)
-    if (dummy && !props.horizontal && props.onScrollDownFunction) observer.observe(dummy)
+    if (dummy && !props.horizontal && props.onScrollDownFunction) {
+      const LoadingObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const homeCache = getHomeCache()
+            if (entry.isIntersecting && !homeCache.stopScrolling && !cardResponse.loading() && !cardResponse.error()) {
+              setHomeSearchPage(currentPage() + 1)
+              setcurrentPage(currentPage() + 1)
+              cardResponse.Refetch([currentPage() + 1, props.title, props.tags ? props.tags.map((v) => v.name) : []])
+            }
+          });
+        }
+      );
+
+      LoadingObserver.observe(dummy)
+      onCleanup(() => LoadingObserver.disconnect())
+    }
   })
 
   createEffect(() => {
@@ -78,8 +81,6 @@ function Container(props: containerData) {
 
   onCleanup(() => {
     window.removeEventListener("resize", checkSkipButtons)
-
-    if (dummy) observer.unobserve(dummy)
   })
 
   function checkSkipButtons() {
@@ -136,12 +137,12 @@ function Container(props: containerData) {
         <Show when={props.tags}>
           <For each={props.tags}>
             {(element) => (
-              <div 
-                onClick={element.remover} 
+              <div
+                onClick={element.remover}
                 class="container-tag">
-                  {t(element.name)} 
-                  <span class="material-symbols-outlined container-tag-icon">close</span>
-                </div>
+                {t(element.name)}
+                <span class="material-symbols-outlined container-tag-icon">close</span>
+              </div>
             )}
           </For>
         </Show>
