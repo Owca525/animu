@@ -1,4 +1,4 @@
-.welcome-screen-void {
+.welcomescreen-void {
     z-index: 99999;
     position: fixed;
     width: 100%;
@@ -10,44 +10,52 @@
     align-items: center;
 }
 
-.welcome-screen-main-icon {
+.welcomescreen-img {
     width: 80px;
 }
 
-.welcome-screen-content {
-    padding: 32px;
+.welcomescreen-container {
+    width: 1000px;
+    height: 500px;
+
+    border-radius: 12px;
+
+    background-color: var(--second-layer);
 
     display: flex;
     align-items: center;
-    flex-direction: column;
-    gap: 64px;
+    overflow: hidden;
 }
 
-.welcome-screen-header-container {
+.welcomescreen-left {
+    background-color: var(--fourth-layer);
+
+    height: 100%;
+
+    width: 30%;
+
     display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.welcomescreen-right {
+    display: flex;
+
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-}
-
-.welcome-screen-title {
-    font-size: 2em;
-    font-weight: 600;
-}
-
-.welcome-screen-button-container {
-    display: flex;
+    
     width: 100%;
-    justify-content: space-between;
+    height: 100%;
 }
 
-.welcome-screen-option-container {
+.welcomescreen-buttons {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-}
+    gap: 4px;
+    margin-top: auto;
+    justify-content: end;
+    width: 100%;
 
-.welcome-screen-option-description {
-    font-size: 1.1em;
+    padding: 12px;
+    margin-right: 24px;
 }

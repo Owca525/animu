@@ -2,50 +2,43 @@ import "./css/welcomeScreen.css"
 import icon from "@resources/icon.png"
 import Button from "@renderer/components/buttons"
 import Dropdown from "@renderer/components/dropDown"
-import { createSignal, Show } from "solid-js"
+import { createSignal, Match, Show, Switch } from "solid-js"
 import { useI18n } from "@renderer/utils/i18n"
 import { getConfig } from "@renderer/utils/stores/config"
 
-// TODO: END THIS
-
 export default function WelcomeScreen() {
     const config = getConfig()
-    const [currentPage, setCurrentPage] = createSignal<number>(0)
-    const { t, changeLanguage, listLang } = useI18n()
+
+    const [page, setPage] = createSignal(1)
+
+    // const { t, changeLanguage, listLang } = useI18n()
 
     return (
-        <main tabIndex={-1} class="welcome-screen-void">
-            <div class="welcome-screen-content">
-                <div class="welcome-screen-header-container">
-                    <div class="welcome-screen-title">Welcome To Animu</div>
-                    <img src={icon} alt="animu icon" class="welcome-screen-main-icon" />
+        <main class="welcomescreen-void">
+
+            <div class="welcomescreen-container">
+
+                <div class="welcomescreen-left">
+                    <sheep-img src={icon} class="welcomescreen-img" />
                 </div>
-                <div class="welcome-screen-option-container">
-                    <Show when={currentPage() == 0}>
-                        <div class="welcome-screen-option-description">Select language</div>
-                        <Dropdown
-                            options={listLang().map(element => {
-                                return { label: t(`lang.${element}`), onClick: () => changeLanguage(element) }
-                            })}
-                            buttonText={t(`lang.${config.General.language}`)}
-                            placeholderChange={() => t(`lang.${config.General.language}`)}
-                            disableX
-                        />
-                    </Show>
-                    <Show when={currentPage() == 1}>
-                        <div class="welcome-screen-option-description">Select Default Plugin</div>
-                    </Show>
+
+                <div class="welcomescreen-right">
+
+                    <Switch>
+                        <Match when={page() == 1}>
+                            Test
+                        </Match>
+                    </Switch>
+
+                    <div class="welcomescreen-buttons">
+                        <Button content="Skip" />
+                        <Button content="Next" />
+                    </div>
+
                 </div>
-                <div class="welcome-screen-button-container">
-                    {/* <Show when={}>
-                        <Button content="Skip" onClick={() => setCurrentPage(() => "plugins")} />
-                    </Show> */}
-                    <Show when={currentPage() == 1}>
-                        <Button content="Exit" />
-                    </Show>
-                    <Button content="Next" onClick={() => setCurrentPage((v) => v + 1)} />
-                </div>
+
             </div>
+
         </main>
     )
 }
