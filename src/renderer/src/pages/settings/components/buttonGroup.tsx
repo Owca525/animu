@@ -1,4 +1,4 @@
-import { Component, For } from "solid-js";
+import { For } from "solid-js";
 import "./css/buttonGroup.css";
 
 interface ButtonGroupProps {
@@ -6,14 +6,14 @@ interface ButtonGroupProps {
   listValues: { value: string; onClick: () => void }[];
 }
 
-const ButtonGroup: Component<ButtonGroupProps> = (props) => {
+function ButtonGroup(props: ButtonGroupProps) {
   return (
     <div class="button-group-container">
       <For each={props.listValues}>
         {(element) => (
           <div
             class={`button-group-button ${
-              element.value === props.selectedValue ? "active" : ""
+              element.value == props.selectedValue ? "active" : ""
             }`}
             onClick={element.onClick}
           >

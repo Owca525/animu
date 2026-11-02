@@ -22,8 +22,10 @@ export default function WelcomeScreen() {
     const { t, changeLanguage, listLang } = useI18n()
 
     function handleChange(path: string, value: string | number | boolean | any): void {
-        updateConfig(updateObject(path, value, config))
-        saveConfig(config)
+        const newConfig = updateObject(path, value, config)
+
+        updateConfig(newConfig)
+        saveConfig(newConfig)
     }
 
     function ChangePage(num: number) {
@@ -131,7 +133,7 @@ export default function WelcomeScreen() {
                                         { value: t("anilist.titles.ROMAJI"), onClick: () => handleChange("animu.titleFormat", "ROMAJI") },
                                         { value: t("anilist.titles.NATIVE"), onClick: () => handleChange("animu.titleFormat", "NATIVE") },
                                         { value: t("anilist.titles.ENGLISH"), onClick: () => handleChange("animu.titleFormat", "ENGLISH") },
-                                    ]} />
+                                    ]}/>
                                 </div>
 
                                 <div class="welcomescreen-option">

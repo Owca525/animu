@@ -742,9 +742,9 @@ function settings() {
                         <div class="settings-setting-container">
                             {t("animu.format_title")}
                             <ButtonGroup selectedValue={t(`anilist.titles.${config().new.animu.titleFormat}`)} listValues={[
-                                { value: t("anilist.titles.ROMAJI"), onClick: () => handleChange("anilist.titleFormat", "ROMAJI") },
-                                { value: t("anilist.titles.NATIVE"), onClick: () => handleChange("anilist.titleFormat", "NATIVE") },
-                                { value: t("anilist.titles.ENGLISH"), onClick: () => handleChange("anilist.titleFormat", "ENGLISH") },
+                                { value: t("anilist.titles.ROMAJI"), onClick: () => handleChange("animu.titleFormat", "ROMAJI") },
+                                { value: t("anilist.titles.NATIVE"), onClick: () => handleChange("animu.titleFormat", "NATIVE") },
+                                { value: t("anilist.titles.ENGLISH"), onClick: () => handleChange("animu.titleFormat", "ENGLISH") },
                             ]}
                             />
                         </div>
