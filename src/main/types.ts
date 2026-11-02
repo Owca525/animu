@@ -12,11 +12,12 @@ export interface SettingsConfig {
     animulist: {
         historyConvert: boolean
     }
-    anilist: {
+    animu: {
         scoreFormat: "POINT_100" | "POINT_10_DECIMAL" | "POINT_10" | "POINT_5" | "POINT_3"
         titleFormat: "ROMAJI" | "ENGLISH" | "NATIVE"
         adultdefault: boolean
         maxpagesize: number
+        recomendation: boolean
     }
     information: {
         openingininformation: boolean,
@@ -30,6 +31,7 @@ export interface SettingsConfig {
     },
     plugins: {
         // information: string
+        includeOnly: string[]
         hiddenPlugins: string[]
         userPlugins: boolean
         player: string

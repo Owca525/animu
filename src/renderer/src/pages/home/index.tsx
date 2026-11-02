@@ -43,7 +43,7 @@ import NotificationMenu from './components/notificationMenu';
 // import { io } from 'socket.io-client';
 // import { socketPlayerInit } from '../player/VideoPlayer';
 
-// import WelcomeScreen from "./components/welcomeScreen"
+import WelcomeScreen from "./components/welcomeScreen"
 
 export function StartHomeSearch(search: string = "", params: FilterParams | undefined) {
   setHomeSearchPage(1)
@@ -67,6 +67,7 @@ export function setNewActivePage(text: string, overwrite: boolean = true) {
 
 const Home = () => {
   const plugin = getInformationPlugin()
+  const config = getConfig()
 
   const [homeCache] = createSignal<homeData>(getHomeCache());
   // const pluginPlayer = getPlayerPLugin();
@@ -257,7 +258,9 @@ const Home = () => {
 
         </Switch>
       </div>
-      {/* <WelcomeScreen /> */}
+      <Show when={config["firstStart"]}>
+          <WelcomeScreen />
+      </Show>
     </main>
   );
 };

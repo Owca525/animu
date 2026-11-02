@@ -12,11 +12,12 @@
 
 .welcomescreen-img {
     width: 80px;
+    user-select: none;
 }
 
 .welcomescreen-container {
-    width: 1000px;
-    height: 500px;
+    width: clamp(100px, 80vw, 1000px);
+    height: clamp(100px, 80vh, 500px);
 
     border-radius: 12px;
 
@@ -25,6 +26,8 @@
     display: flex;
     align-items: center;
     overflow: hidden;
+
+    position: relative;
 }
 
 .welcomescreen-left {
@@ -93,14 +96,14 @@
     padding: 12px;
     margin-left: 32px;
 
-    margin-top: clamp(2px, 10vh, 400px);
+    margin-top: clamp(2px, 5vh, 400px);
 
     gap: 24px;
 }
 
 .welcomescreen-option {
     display: flex;
-    max-width: 600px;
+    max-width: clamp(40px, 57vw, 720px);
     align-items: center;
     justify-content: space-between;
 }
@@ -119,4 +122,82 @@
 
 .welcomescreen-button.next:hover {
     background-color: var(--second-layer);
+}
+
+.welcomescreen-progress {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 12px;
+}
+
+.welcomescreen-icon {
+    user-select: none;
+    font-size: 5em !important;
+}
+
+.welcomescreen-seekbar-container {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.welcomescreen-images {
+    width: 84px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 12px;
+    transition: all 100ms ease-in;
+}
+
+.welcomescreen-images:hover {
+    background-color: var(--five-layer);
+}
+
+.welcomescreen-option.support {
+    display: flex;
+    justify-content: center;
+    align-self: center;
+
+    margin-top: clamp(2px, 10vh, 400px);
+
+    gap: 84px;
+}
+
+.welcomescreen-support {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    flex-direction: column;
+    gap: 24px;
+    margin-top: auto;
+}
+
+.welcomescreen-option.container {
+    display: flex;
+    gap: 8px;
+} 
+
+
+.welcomescreen-exept-plugin {
+    border: 2px solid var(--green-one);
+    padding: 4px 12px;
+    border-radius: 12px;
+    user-select: none;
+    cursor: pointer;
+    transition: all 100ms ease-in-out;
+}
+
+.welcomescreen-exept-plugin:hover {
+    background-color: var(--green-one);
+}
+
+.welcomescreen-exept-plugin.active {
+    background-color: var(--green-one);
+}
+
+.welcomescreen-exept-plugin.active:hover {
+    background-color: var(--five-layer);
 }

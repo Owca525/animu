@@ -560,17 +560,19 @@ export interface SettingsConfig {
     deepLinkURL: string
     yt_dlp: string
     yt_dlpRepo: string
-    anilist: {
+    animu: {
         scoreFormat: Anilist_ScoreFormat
         titleFormat: Anilist_UserTitleLanguage
         adultdefault: boolean
         maxpagesize: number
+        recomendation: boolean
     }
     animulist: {
         historyConvert: boolean
     }
     plugins: {
         hiddenPlugins: string[]
+        includeOnly: string[]
         // information: string
         userPlugins: boolean
         player: string

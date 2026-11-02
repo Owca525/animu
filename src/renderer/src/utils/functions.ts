@@ -26,11 +26,13 @@ import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
 import { unwrap } from 'solid-js/store';
-import { getInformationPlugin, getPlayerPluginList } from './stores/plugins';
+import { getAllPluginList, getInformationPlugin, getPlayerPluginList, getPluginRepo } from './stores/plugins';
 import { removeToast, toast, updateToast } from './context/ToastNotification';
 import { readPlaylist, updatePlaylist } from './FilesManager/playlist';
 import pluginManager, { playerPluginInstance } from './pluginManager';
 import { sendNotification } from "./NotificationManager"
+import { pluginRepoExpandedSettings } from '@renderer/pages/settings';
+import semver from "semver";
 
 export function decodeHtmlEntities(str: string | undefined) {
     if (!str) return ""
@@ -821,7 +823,7 @@ export function convertSecondsToHoursFormat(seconds: number): string {
 export function detectTitleConfig(titles: AnimeData["title"]): string {
     try {
         const config = unwrap(getConfig())
-        const title = titles[config.anilist.titleFormat.toLocaleLowerCase()]
+        const title = titles[config.animu.titleFormat.toLocaleLowerCase()]
         if (title) return title
         if (titles["romaji"]) return titles["romaji"]
         return Object.values(titles)[0]
@@ -1593,4 +1595,37 @@ export function GetLogo(params: { name: string, url: string }) {
     }
 
     return localStorage.getItem(params["name"]) ?? params["url"]
+}
+
+export function getStatusStore(tmp: pluginRepoExpandedSettings): string {
+    if (!tmp.installed) return "settings.pluginstore.install"
+    if (tmp.update) return "settings.pluginstore.update"
+    return "settings.pluginstore.installed"
+}
+
+export function getDatabaseOfRepo(): pluginRepoExpandedSettings[] {
+    const repo = getPluginRepo()
+    const plugins = getAllPluginList()
+    const infoPlugin = getInformationPlugin()
+
+    return repo.map((item) => {
+        if (item.type == "information") {
+            return { ...item, update: semver.gt(semver.coerce(item.ver) as any, semver.coerce(infoPlugin.metadata.version) as any), installed: true }
+        }
+
+        const finded = plugins.find((value) => value.metadata.name == item.name)
+        if (!finded) return { ...item, installed: false, update: false }
+
+        return {
+            ...item,
+            installed: true,
+            update: semver.gt(semver.coerce(item.ver) as any, semver.coerce(finded.metadata.version) as any)
+        }
+    })
+}
+
+export async function discord_server() {
+    let data = await request("https://raw.githubusercontent.com/Owca525/animu/refs/heads/unstable/assets/discord.txt")
+    if (!data.success) return
+    openUrlFolder(data.text)
 }

@@ -1067,7 +1067,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
             if (!(currentTime >= element.start && currentTime <= element.end)) return
 
-            if (config.Player.general.autoSkipOpenings || config.Player.general.autoSkipEndings) return setTimeVideo(element.end)
+            if ((config.Player.general.autoSkipOpenings && element["type"] == "opening") ||
+                (config.Player.general.autoSkipEndings && element["type"] == "ending")) return setTimeVideo(element.end)
 
             if (element.type == "other") return
 
@@ -1606,7 +1607,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             let prev = ui.chapterSkipTimer
 
             if (prev <= 1) {
-                clearChapterSkipTime(config["Player"]["general"]["autoSkipOpeningEnding"])
+                // clearChapterSkipTime(config["Player"]["general"]["autoSkipOpeningEnding"])
                 prev = 15
             } else {
                 prev -= 1

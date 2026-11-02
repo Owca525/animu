@@ -117,7 +117,8 @@
         ],
         "pluginCheckType": "Every Day",
         "lastTimeCheck": 0,
-        "userWorker": true
+        "userWorker": true,
+        "includeOnly": []
     },
     "backup": {
         "enable": false,
@@ -128,11 +129,12 @@
     "animulist": {
         "historyConvert": true
     },
-    "anilist": {
+    "animu": {
         "scoreFormat": "POINT_100",
         "titleFormat": "ROMAJI",
         "adultdefault": false,
-        "maxpagesize": 20
+        "maxpagesize": 20,
+        "recomendation": true
     },
     "information": {
         "openingininformation": false,
