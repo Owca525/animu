@@ -462,6 +462,9 @@
   height: max-content;
   max-height: 300px;
   max-width: 700px;
+
+  width: clamp(400px, 25vw, 700px);
+
   display: flex;
   flex-direction: column;
   padding: 12px 8px;
