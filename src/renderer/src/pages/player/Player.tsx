@@ -702,8 +702,18 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         }
 
         let manifest_script: player_script_injector[] = player.playerData!["scripts"] ?? []
+        let hls_manifest_parser: string | undefined
+        let hls_arraybuffer_parser: string | undefined
+
         if (manifest_script.length > 0) {
             sheepworker = new SheepWorkerInstance()
+
+            const f1 = manifest_script.find((v) => v["type"] == "hls_manifest")
+            if (f1) hls_manifest_parser = f1["code"]
+
+            const f2 = manifest_script.find((v) => v["type"] == "hls_arraybuffer")
+            if (f2) hls_arraybuffer_parser = f2["code"]
+
         }
 
         class sheepLoader extends Hls.DefaultConfig.loader {
@@ -726,21 +736,29 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
                         if (context.responseType == "arraybuffer") currentData = data.buffer
 
-                        for (let index = 0; index < manifest_script.length; index++) {
-                            const element = manifest_script[index];
-                            switch (element["type"]) {
-                                case "hls_manifest":
-                                    if (context["responseType"] != "text") break
-
-                                    currentData = await sheepworker!.function(element["code"], data)
-                                    break
-                                case "hls_arraybuffer":
-                                    if (context["responseType"] != "arraybuffer") break
-
-                                    currentData = await sheepworker!.function(element["code"], data)
-                                    break
-                            }
+                        if (hls_manifest_parser && context["responseType"] == "text") {
+                            currentData = await sheepworker!.function(hls_manifest_parser, data)
                         }
+
+                        if (hls_arraybuffer_parser && context["responseType"] == "arraybuffer") {
+                            currentData = await sheepworker!.function(hls_arraybuffer_parser, data)
+                        }
+
+                        // for (let index = 0; index < manifest_script.length; index++) {
+                        //     const element = manifest_script[index];
+                        //     switch (element["type"]) {
+                        //         case "hls_manifest":
+                        //             if (context["responseType"] != "text") break
+
+                        //             currentData = await sheepworker!.function(element["code"], data)
+                        //             break
+                        //         case "hls_arraybuffer":
+                        //             if (context["responseType"] != "arraybuffer") break
+
+                        //             currentData = await sheepworker!.function(element["code"], data)
+                        //             break
+                        //     }
+                        // }
 
                         callbacks.onSuccess({ data: currentData, url: context.url }, {
                             loaded: data.buffer.byteLength,
