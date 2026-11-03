@@ -16,6 +16,7 @@
     "build": "npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:release": "npm run build && electron-builder --win && electron-builder --linux",
+    "build:debug": "DEBUG=true npm run build && electron-builder --linux && electron-builder --win",
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "electron-vite build && electron-builder --mac",

@@ -11,8 +11,10 @@ function evalConditionOr(expr: string, flags: Record<string, boolean>) {
   return parts.some(flag => flags[flag] === true);
 }
 
+console.log(process.env.NODE_ENV)
+
 const globalFlags = {
-  DEBUG: process.env.NODE_ENV !== 'production' && process.env.ANIMU_WEB_DEV == undefined,
+  DEBUG: (process.env.NODE_ENV !== 'production' && process.env.ANIMU_WEB_DEV == undefined) || typeof process.env.DEBUG == "string",
   PROD: process.env.NODE_ENV == 'production' && process.env.ANIMU_WEB_DEV == undefined,
   WEB: process.env.ANIMU_WEB_DEV ? true : false
 }
@@ -327,6 +329,7 @@ export default defineConfig({
       },
     },
     build: {
+      cssCodeSplit: false,
       rollupOptions: {
         output: {
           entryFileNames: "index.js",
