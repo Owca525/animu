@@ -18,6 +18,7 @@ import {
   dateToUnix,
   deepMerge,
   FetchWeekCalendary,
+  SendRecomendAnime,
   timeCovertToMs,
   updateObject
 } from './utils/functions';
@@ -389,6 +390,14 @@ function initialServices() {
       name: "services.animulistsynchronize_name",
       description: "services.animulistsynchronize_desc",
       activeTime: timeCovertToMs({ min: 120 })
+    },
+    {
+      active: config.animu.recomendation,
+      execute: SendRecomendAnime,
+      name: "services.recomendation_name",
+      description: "services.recomendation_desc",
+      activeTime: timeCovertToMs({ min: 125 }),
+      noFirstStart: true
     }
   ])
 }

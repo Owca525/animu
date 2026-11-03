@@ -354,10 +354,28 @@ export async function convertChaptersVTT(url: string, options?: { method?: "POST
 }
 
 export function segregatePlugins(func: (name: string) => void): DropdownOption[] {
+    const config = getConfig()
+
     let data = loadedPluginsList()
+
+    if (config["plugins"]["includeOnly"] && config["plugins"]["includeOnly"].length > 0) {
+
+        data = data.filter((element) => {
+            if (!element["metadata"]["supportLang"]) return true
+
+            for (let index = 0; index < config["plugins"]['includeOnly'].length; index++) {
+                const loop = config["plugins"]['includeOnly'][index];
+                if (element["metadata"]["supportLang"].includes(loop)) return true
+            }
+
+            return false
+        })
+
+    }
+
     let list: DropdownOption[] = []
-    for (let index = 0; index < data.length; index++) {
-        const element = data[index];
+
+    data.forEach((element) => {
         let icon = "check_circle"
         let iconclass = "green"
 
@@ -387,7 +405,7 @@ export function segregatePlugins(func: (name: string) => void): DropdownOption[]
             icon: icon,
             classIcon: iconclass
         })
-    }
+    })
 
     return list
 }
@@ -1077,6 +1095,7 @@ async function Send_Episode_Notification(item: playlistFormatData) {
     const episodes = extracted_episodes.map((v) => v.ep.toString())
 
     if (GetNumberFromString(item["anime"]["saveData"]!["episode"]) < GetNumberFromString(episodes.at(-1))) {
+        // TRANSLATION
         sendNotification({
             title: t(`New Episode Avaible in ${temporal_plugin.metadata.name} plugin`),
             description: t(`Watch Episode ${episodes.at(-1)} Of ${detectTitleConfig(item.anime.AnimeData.title)}`),
@@ -1628,4 +1647,34 @@ export async function discord_server() {
     let data = await request("https://raw.githubusercontent.com/Owca525/animu/refs/heads/unstable/assets/discord.txt")
     if (!data.success) return
     openUrlFolder(data.text)
+}
+
+// TODO: Remember to support for new id format
+export async function SendRecomendAnime() {
+    if (GetAnimuPage() == "player") return
+
+    const data = getHistory()
+    if (data["history"].length <= 0 || !data["history"]) return
+
+    const history_anime = data["history"][Math.floor(Math.random() * data["history"].length)]
+
+    if (history_anime["AnimeData"]["type"] != "ANIME") return
+
+    const plugin = getInformationPlugin()
+
+    const anime_response = await plugin.anime(history_anime["AnimeData"]["id"])
+    if (!anime_response || !anime_response.recommendations) return
+
+    const recomended = anime_response["recommendations"][Math.floor(Math.random() * anime_response["recommendations"].length)]
+
+    const finded = data["history"].find((v) => v["AnimeData"]["id"] == `${recomended["id"]}`)
+    if (finded) return
+
+    // TRANSLATION
+    sendNotification({
+        title: t(`Animu Recomendation`),
+        description: t(`New anime recomendation ${detectTitleConfig(recomended.title)}`),
+        icon: recomended.coverImage
+    })
+
 }

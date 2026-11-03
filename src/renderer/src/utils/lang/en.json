@@ -61,7 +61,9 @@
         "episodeavailble_name": "EpisodesAvaible",
         "episodeavailble_desc": "Check Is Anime episode avaible",
         "animulistsynchronize_name": "SynchronizeAnimulist",
-        "animulistsynchronize_desc": "Synchronizing Animulist with information plugin"
+        "animulistsynchronize_desc": "Synchronizing Animulist with information plugin",
+        "recomendation_name": "Send Recomended Anime",
+        "recomendation_desc": "None"
     },
     "user": {
         "updated": "Succesfully Updated User Data",

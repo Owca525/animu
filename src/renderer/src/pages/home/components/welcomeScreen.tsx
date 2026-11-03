@@ -11,6 +11,7 @@ import { createStore, unwrap } from "solid-js/store"
 import { discord_server, GetLogo, openUrlFolder, updateObject } from "@renderer/utils/functions"
 import { saveConfig } from "@renderer/utils/FilesManager/config"
 import SeekBar from "@renderer/components/seekBar"
+import { ServiceManager } from "@renderer/utils/service"
 
 export default function WelcomeScreen() {
     const [page, setPage] = createSignal(1)
@@ -19,10 +20,24 @@ export default function WelcomeScreen() {
 
     const [config, updateConfig] = createStore(structuredClone(unwrap(getConfig())))
 
+    const [titleFormat, setFormat] = createSignal(config.animu.titleFormat)
+    const [trailerplayertype, setTrailerType] = createSignal(config.information.trailerplayertype)
+    const [pluginCheckType, setPluginType] = createSignal(config.plugins.pluginCheckType)
+
     const { t, changeLanguage, listLang } = useI18n()
 
     function handleChange(path: string, value: string | number | boolean | any): void {
         const newConfig = updateObject(path, value, config)
+
+        if ("animu.titleFormat" == path) setFormat(value)
+        if ("information.trailerplayertype" == path) setTrailerType(value)
+        if ("plugins.pluginCheckType" == path) setPluginType(value)
+
+        if (!config.update.enable) ServiceManager.StopService("services.pluginupdates_name")
+        else ServiceManager.ActiveService("services.pluginupdates_name")
+
+        if (!config.animu.recomendation) ServiceManager.StopService("services.recomendation_name")
+        else ServiceManager.ActiveService("services.recomendation_name")
 
         updateConfig(newConfig)
         saveConfig(newConfig)
@@ -60,7 +75,7 @@ export default function WelcomeScreen() {
         if (data["active"]) listExeptLang = listExeptLang.filter((v) => data["name"] != v)
         else listExeptLang.push(data["name"])
 
-        handleChange("plugins.exeptLang", listExeptLang)
+        handleChange("plugins.includeOnly", listExeptLang)
 
         setLNG(listLang().map((v) => ({
             active: listExeptLang.includes(v),
@@ -129,11 +144,11 @@ export default function WelcomeScreen() {
 
                                 <div class="welcomescreen-option">
                                     <span>{t("animu.format_title")}</span>
-                                    <ButtonGroup selectedValue={t(`anilist.titles.${config.animu.titleFormat}`)} listValues={[
+                                    <ButtonGroup selectedValue={t(`anilist.titles.${titleFormat()}`)} listValues={[
                                         { value: t("anilist.titles.ROMAJI"), onClick: () => handleChange("animu.titleFormat", "ROMAJI") },
                                         { value: t("anilist.titles.NATIVE"), onClick: () => handleChange("animu.titleFormat", "NATIVE") },
                                         { value: t("anilist.titles.ENGLISH"), onClick: () => handleChange("animu.titleFormat", "ENGLISH") },
-                                    ]}/>
+                                    ]} />
                                 </div>
 
                                 <div class="welcomescreen-option">
@@ -190,7 +205,7 @@ export default function WelcomeScreen() {
 
                                 <div class="welcomescreen-option">
                                     {t("settings.information.trailer_player_type")}
-                                    <ButtonGroup selectedValue={t(`settings.information.trailertype.${config.information.trailerplayertype}`)} listValues={[
+                                    <ButtonGroup selectedValue={t(`settings.information.trailertype.${trailerplayertype()}`)} listValues={[
                                         { value: t("settings.information.trailertype.player"), onClick: () => handleChange("information.trailerplayertype", "player") },
                                         { value: t("settings.information.trailertype.embed"), onClick: () => handleChange("information.trailerplayertype", "embed") },
                                     ]}
@@ -320,7 +335,7 @@ export default function WelcomeScreen() {
 
                                 <div class="welcomescreen-option">
                                     {t("settings.extensions.updatecheck")}
-                                    <ButtonGroup selectedValue={t(`settings.general.${config.plugins.pluginCheckType.toLowerCase().replaceAll(" ", "")}`)} listValues={[
+                                    <ButtonGroup selectedValue={t(`settings.general.${pluginCheckType().toLowerCase().replaceAll(" ", "")}`)} listValues={[
                                         { value: t("settings.general.onstart"), onClick: () => handleChange("plugins.pluginCheckType", "On Start") },
                                         { value: t("settings.general.everyday"), onClick: () => handleChange("plugins.pluginCheckType", "Every Day") },
                                         { value: t("settings.general.everyweek"), onClick: () => handleChange("plugins.pluginCheckType", "Every Week") },

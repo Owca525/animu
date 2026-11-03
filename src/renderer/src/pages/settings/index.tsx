@@ -261,6 +261,10 @@ function settings() {
             window.backend.refresh()
 
             if (!config().new.update.enable) ServiceManager.StopService("services.pluginupdates_name")
+            else ServiceManager.ActiveService("services.pluginupdates_name")
+
+            if (!config().new.animu.recomendation) ServiceManager.StopService("services.recomendation_name")
+            else ServiceManager.ActiveService("services.recomendation_name")
 
             toast(t("settings.saving.done"), { type: "success" })
         } catch (error) {
@@ -472,7 +476,7 @@ function settings() {
         if (data["active"]) listExeptLang = listExeptLang.filter((v) => data["name"] != v)
         else listExeptLang.push(data["name"])
 
-        handleChange("plugins.exeptLang", listExeptLang)
+        handleChange("plugins.includeOnly", listExeptLang)
 
         setLNG(listLang().map((v) => ({
             active: listExeptLang.includes(v),
@@ -739,6 +743,14 @@ function settings() {
                             />
                         </div>
                         <div class="settings-line"></div> */}
+                        <div class="settings-setting-container">
+                            {t("settings.general.recomendation")}
+                            <CheckBox
+                                checked={config().new.animu.recomendation}
+                                onChecked={(v) => handleChange("animu.recomendation", v)}
+                            />
+                        </div>
+                        <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("animu.format_title")}
                             <ButtonGroup selectedValue={t(`anilist.titles.${config().new.animu.titleFormat}`)} listValues={[
