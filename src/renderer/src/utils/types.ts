@@ -204,7 +204,6 @@ export interface globalDataFormat {
     anilist_user_data?: { [key: string]: any; },
     isAnimuFocus: boolean
     notifications: NotificationExpanded[]
-    animeOpeningsCache: { [key: number]: animeOpeningsFormat[] }
     audioOutput: MediaDeviceInfo | undefined
     pluginSearchMode: boolean,
     yt_dlp: {

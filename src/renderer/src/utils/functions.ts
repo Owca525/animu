@@ -1229,7 +1229,10 @@ export async function CreateSHA256(text: string) {
     return hashHex;
 };
 
-export function checkTimeDriffrentUnix(start: number | string, end: number | string): { hour: number; min: number; sec: number; } {
+export function checkTimeDriffrentUnix(start: number | string | undefined, end: number | string | undefined): { hour: number; min: number; sec: number; } {
+    if (typeof start == "undefined") start = dateToUnix(new Date().toString())
+    if (typeof end == "undefined") end = dateToUnix(new Date().toString())
+
     if (typeof start == "string") start = dateToUnix(start)
     if (typeof end == "string") end = dateToUnix(end)
 

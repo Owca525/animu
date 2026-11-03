@@ -9,6 +9,8 @@ import Player from './pages/player/index';
 const Settings = lazy(() => import("./pages/settings/index"));
 // const Information = lazy(() => import("./pages/information/index"));
 
+import "./utils/database"
+
 import {
   calculateZoomLevel,
   changeTheme,
@@ -345,7 +347,7 @@ function initialServices() {
       execute: async () => {
         try {
           const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
-          const time = checkTimeDriffrentUnix(new Date().toString(), tmp["time"])
+          const time = checkTimeDriffrentUnix(undefined, tmp["time"])
           if (time["min"] > 359 && time["hour"] >= 0) localStorage.removeItem("pluginStatusCachce")
         } catch (error) { }
 
