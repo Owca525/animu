@@ -170,7 +170,10 @@ async function convertToNewVersion(data: { id: string, title: string, img: strin
                         pluginName: "Allmanga",
                         last_Time: anime.player ? anime.player.episode.time : 0,
                         episode: anime.player ? anime.player.episode.ep : anime.text.split(" ").reverse()[0],
-                        type: anime.player ? anime.player.episode.type : "sub"
+                        type: anime.player ? anime.player.episode.type : "sub",
+                        lastAnimeDataUpdate: 0,
+                        lastEpisodesUpdate: 0,
+                        episodes: []
                     }
                 }
             )

@@ -1,4 +1,6 @@
 // DISSABLE
+/* eslint-disable */
+// @ts-nocheck
 import { request } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerPluginFormat } from "@renderer/utils/types";
 

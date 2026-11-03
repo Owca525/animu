@@ -22,9 +22,11 @@ export default function ImageViewer(props: { files: string[], disable: () => voi
     let img: HTMLImageElement | undefined;
 
     async function SaveCoverToClipboard() {
-        if (await SaveToClipboard("image", file())) {
+        try {
+            await SaveToClipboard("image", file())
             toast(t("information.notification.coverdone"), { type: "success" })
-        } else {
+        } catch (error) {
+            console.error("ImageViewer/SaveCoverToClipboard", error)
             toast(t("information.notification.coverfailed"), { type: "error" })
         }
     }
