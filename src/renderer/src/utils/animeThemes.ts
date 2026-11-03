@@ -132,8 +132,12 @@ export async function requestAnimeMedia(anilistID: number): Promise<animeOpening
   console.warn("requestAnimeMedia", response, anilistID)
   /* ENDIF */
 
-  if (!response.success || !response.json) return []
-  if (response.json["data"]["findAnimeByExternalSite"].length <= 0) return []
+  try {
+    if (!response.success || !response.json) return cache ? JSON.parse(`${cache["data"]}`) : []
+    if (response.json["data"]["findAnimeByExternalSite"].length <= 0) return cache ? JSON.parse(`${cache["data"]}`) : []
+  } catch (error) {
+    return []
+  }
 
   const themes = response.json["data"]["findAnimeByExternalSite"][0]["animethemes"]
   let list: animeOpeningsFormat[] = []
