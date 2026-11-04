@@ -11,6 +11,7 @@
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "start": "electron-vite preview",
+    "electron": "node ./node_modules/electron/index.js",
     "dev": "electron-vite dev",
     "dev:web": "ANIMU_WEB_DEV=true ANIMU_WEB=true electron-vite dev",
     "build": "npm run typecheck && electron-vite build",
