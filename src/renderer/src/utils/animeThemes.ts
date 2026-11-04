@@ -121,7 +121,7 @@ export async function requestAnimeMedia(anilistID: number): Promise<animeOpening
   const cache = CheckAimeThemesCache(anilistID)
 
   try {
-    if (cache && cache["data"] && checkTimeDriffrentUnix(undefined, Number(cache["time"]))["hour"] < 168) return JSON.parse(`${cache["data"]}`)
+    if (cache && cache["data"] && checkTimeDriffrentUnix(undefined, Number(cache["time"]))["day"] < 31) return JSON.parse(`${cache["data"]}`)
   } catch (error) {
     console.error("AnimeThemes/requestAnimeMedia", error)
   }

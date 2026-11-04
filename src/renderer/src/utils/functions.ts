@@ -1229,7 +1229,7 @@ export async function CreateSHA256(text: string) {
     return hashHex;
 };
 
-export function checkTimeDriffrentUnix(start: number | string | undefined, end: number | string | undefined): { hour: number; min: number; sec: number; } {
+export function checkTimeDriffrentUnix(start: number | string | undefined, end: number | string | undefined): { day: number, hour: number; min: number; sec: number; } {
     if (typeof start == "undefined") start = dateToUnix(new Date().toString())
     if (typeof end == "undefined") end = dateToUnix(new Date().toString())
 
@@ -1238,11 +1238,12 @@ export function checkTimeDriffrentUnix(start: number | string | undefined, end: 
 
     const diff = Math.abs(end - start);
 
+    const day = Math.floor(diff / 86400);
     const hour = Math.floor(diff / 3600);
     const min = Math.floor((diff % 3600) / 60);
     const sec = diff % 60;
 
-    return { hour, min, sec };
+    return { hour, min, sec, day };
 }
 
 export function parseEpisode(ep: string) {
