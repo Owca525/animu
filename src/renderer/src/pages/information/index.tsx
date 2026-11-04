@@ -56,7 +56,6 @@ import AnimulistMenu from '@renderer/components/animulistMenu';
 import { updateGenres } from '../home/components/filter';
 import { getHomeCache, getHomeSidebarData } from '@renderer/utils/stores/home';
 import { setNewActivePage, StartHomeSearch } from '../home';
-import EpisodeBox from './components/episodeBox';
 import { SheepShortcut } from '@renderer/utils/hooks/useKeyPress';
 import pluginManager from '@renderer/utils/pluginManager';
 // import Player from '../player/Player';
@@ -65,6 +64,7 @@ const Player = lazy(() => import('../player/Player'))
 const OpeningPlayer = lazy(() => import('./components/openingPlayer'))
 
 import RelationCardContainer from './components/relationCardsContainer';
+import EpisodeContainer from './components/episodeBox';
 
 interface informationContentType {
     type: string;
@@ -178,6 +178,7 @@ function information() {
     })
 
     function GenerateButtons(): { value: string; onClick: () => void; }[] {
+        // TRANSLATE
         if (information["cache"]["anime"].format == "MUSIC") {
             return [{
                 value: 'Music',
@@ -364,7 +365,7 @@ function information() {
 
         updateInfo({ buttonGroup: GenerateButtons() })
 
-        changeTitleAnimu(`Animu - ${detectTitleConfig(information["cache"]["anime"]["title"])}`)
+        changeTitleAnimu(detectTitleConfig(information["cache"]["anime"]["title"]))
         checkIsAnimeReleasing()
 
         // && information["cache"]["anime"]["status"] == "RELEASING"
@@ -549,20 +550,6 @@ function information() {
         })
 
         initialInformation()
-    }
-
-    function makeButtons(episode: episodeMetadata[], type: string) {
-        let tmpSaveData = information["cache"]
-        return (
-            <div class="information-buttons-episode-container">
-                <For each={episode}>
-                    {(data) => <EpisodeBox variant={config.information.episodeVariants}
-                        enterPlayer={() => enterPlayer(episode, type, data.ep)}
-                        saveData={tmpSaveData.saveData} episode={data} />
-                    }
-                </For>
-            </div>
-        )
     }
 
     SheepShortcut(["Escape"], () => {
@@ -995,7 +982,12 @@ function information() {
                                                         </Show>
                                                     </>}
                                                     RightHeader={t("information.listEpisodes", { number: episode.episodes.length })}
-                                                    content={makeButtons(episode.episodes, episode.type)}
+                                                    content={EpisodeContainer({
+                                                        episode: episode.episodes,
+                                                        type: episode.type,
+                                                        cache: information["cache"],
+                                                        enterPlayer: enterPlayer
+                                                    })}
                                                 />
                                             }}
                                         </For>

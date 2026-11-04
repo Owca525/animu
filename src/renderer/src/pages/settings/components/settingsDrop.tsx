@@ -14,7 +14,7 @@ export default function settingsDrop(props: SettingsDropProps) {
   return (
     <div class="settings-drop-container">
       <div
-        class={`settings-drop-button ${isOpen() ? "active-drop" : ""}`}
+        class={`settings-drop-button ${isOpen() ? "active-drop" : ""} ${props.leftbutton ? "" : "nobutton"}`}
         onClick={() => setIsOpen((prev) => !prev)}
       >
         <div class="settings-drop-header">{props.LeftHeader}</div>

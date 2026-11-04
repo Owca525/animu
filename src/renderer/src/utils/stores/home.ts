@@ -11,7 +11,7 @@ const initialState: homeData = {
     page: 1,
     stopScrolling: false,
     filterTags: undefined,
-    mainContainer: undefined,
+    scrollTop: 0,
     activePage: "home",
     otherFilter: [{
         page: 'global.animulist',
@@ -73,3 +73,4 @@ export const setHomeSearchTags = (tmp: undefined | FilterParams) => setGlobalSta
 export const setHomeSearchPage = (tmp: number) => setGlobalState((prev) => ({ ...prev, page: tmp }));
 export const setHomeActivePage = (tmp: string) => setGlobalState((prev) => ({ ...prev, activePage: tmp }));
 export const setHomeNewData = (tmp: homeData["data"]) => setGlobalState((prev) => ({ ...prev, data: tmp }));
+export const setHomeScroll = (tmp: number) => setGlobalState((prev) => ({ ...prev, scrollTop: tmp }));

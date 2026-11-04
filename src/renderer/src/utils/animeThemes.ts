@@ -1,5 +1,6 @@
-import { request } from "./functions"
-import { addOpeningCache, animeOpeningsCache } from "./stores/global"
+import { Database, ParamsObject } from "sql.js"
+import SQL from "./database"
+import { checkTimeDriffrentUnix, dateToUnix, request } from "./functions"
 import { animeOpeningsFormat } from "./types"
 
 const QUERY_API = "https://graphql.animethemes.moe/"
@@ -52,9 +53,78 @@ query ($id: [Int!]) {
 }
 `
 
+const STORAGE_KEY = "animeThemesCache"
+
+const savedDb = localStorage.getItem(STORAGE_KEY);
+
+let db: Database
+
+if (savedDb) {
+  db = new SQL.Database(
+    Uint8Array.from(atob(savedDb), c => c.charCodeAt(0))
+  )
+} else {
+  db = new SQL.Database();
+  db.run(`
+    CREATE TABLE IF NOT EXISTS cache (
+        id INTEGER PRIMARY KEY,
+        data TEXT,
+        time INTEGER
+    )
+`, []);
+}
+
+export function SaveAnimeThemesCache(id: number, cache: animeOpeningsFormat[]) {
+  try {
+    if (CheckAimeThemesCache(id)) {
+      db.run("UPDATE cache SET data = ?, time = ? WHERE id = ?", [id, JSON.stringify(cache), dateToUnix(new Date().toString())]);
+    } else {
+      db.run("INSERT INTO cache (id, data, time) VALUES (?, ?, ?)", [id, JSON.stringify(cache), dateToUnix(new Date().toString())]);
+    }
+
+    const data = db.export();
+
+    const binary = Array.from(data)
+      .map(byte => String.fromCharCode(byte))
+      .join("");
+
+    localStorage.setItem(STORAGE_KEY, btoa(binary));
+  } catch (error) {
+    console.error("AnimeThemes/SaveAnimeThemesCache", error)
+  }
+}
+
+export function CheckAimeThemesCache(id: number) {
+  try {
+      const stmt = db.prepare(
+          "SELECT * FROM cache WHERE id = ?"
+      );
+
+      stmt.bind([id]);
+
+      let row: ParamsObject | undefined = undefined;
+
+      if (stmt.step()) {
+          row = stmt.getAsObject();
+      }
+
+      stmt.free();
+
+      return row;
+  } catch (error) {
+    console.error("AnimeThemes/CheckAimeThemesCache", error)
+    return
+  }
+}
+
 export async function requestAnimeMedia(anilistID: number): Promise<animeOpeningsFormat[]> {
-  const cache = animeOpeningsCache()
-  if (cache[anilistID]) return cache[anilistID]
+  const cache = CheckAimeThemesCache(anilistID)
+
+  try {
+    if (cache && cache["data"] && checkTimeDriffrentUnix(undefined, Number(cache["time"]))["day"] < 31) return JSON.parse(`${cache["data"]}`)
+  } catch (error) {
+    console.error("AnimeThemes/requestAnimeMedia", error)
+  }
 
   const response = await request(QUERY_API, { method: "POST", headers: header, body: JSON.stringify({ query: videosQuery, variables: { id: [anilistID] } }) })
 
@@ -62,8 +132,12 @@ export async function requestAnimeMedia(anilistID: number): Promise<animeOpening
   console.warn("requestAnimeMedia", response, anilistID)
   /* ENDIF */
 
-  if (!response.success || !response.json) return []
-  if (response.json["data"]["findAnimeByExternalSite"].length <= 0) return []
+  try {
+    if (!response.success || !response.json) return cache ? JSON.parse(`${cache["data"]}`) : []
+    if (response.json["data"]["findAnimeByExternalSite"].length <= 0) return cache ? JSON.parse(`${cache["data"]}`) : []
+  } catch (error) {
+    return []
+  }
 
   const themes = response.json["data"]["findAnimeByExternalSite"][0]["animethemes"]
   let list: animeOpeningsFormat[] = []
@@ -91,6 +165,6 @@ export async function requestAnimeMedia(anilistID: number): Promise<animeOpening
     }
   }
 
-  addOpeningCache(anilistID, list)
+  SaveAnimeThemesCache(anilistID, list)
   return list
 }

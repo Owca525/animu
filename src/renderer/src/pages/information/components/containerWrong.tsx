@@ -68,7 +68,7 @@ const ContainerWrong: Component<ContainerWrongProps> = ({ name, exitfunc, refetc
                     </div>
                 </Show>
 
-                <Show when={response.loading() && !response.error() && !response.data()}>
+                <Show when={response.loading() && !response.error()}>
                     <div class="information-containerwrong-error-container">
                         <span class='material-symbols-outlined information-containerwrong-loading-icon'>progress_activity</span>
                     </div>

@@ -51,7 +51,11 @@ class Logger {
 
     private convertMessageToString(str: any): string {
         if (str instanceof Error) return `${str.message} ${str.cause} ${str.stack}`
-        if (typeof str == "object") return CutTheText(JSON.stringify(str))
+        try {
+            if (typeof str == "object") return CutTheText(JSON.stringify(str))
+        } catch (error) {
+            return CutTheText(`${str}`)
+        }
         return str
     }
 

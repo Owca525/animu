@@ -582,24 +582,49 @@ export class playerPluginInstance implements playerPluginInstanceFormat {
 
     extractPlayerData = async (type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
         if (!this.instance) return []
-        return await this.instance.wrapperFunction("extractPlayerData", { type, episode, id }, true) as any
+        try {
+            return await this.instance.wrapperFunction("extractPlayerData", { type, episode, id }, true) as any
+        } catch (error) {
+            console.error("PluginManager/playerPluginInstance", error, this.metadata)
+            return []
+        }
     }
     extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {
         if (!this.instance) return undefined
-        return await this.instance.wrapperFunction("extractEpisodeList", { animeData, anime_id }) as any
+        try {
+            return await this.instance.wrapperFunction("extractEpisodeList", { animeData, anime_id }) as any
+        } catch (error) {
+            console.error("PluginManager/extractEpisodeList", error, this.metadata)
+            return 
+        }
     }
     extractOnlyEpisodesList = async (type: string, anime_id: string): Promise<episodeMetadata[]> => {
         if (!this.instance) return []
-        return await this.instance.wrapperFunction("extractOnlyEpisodesList", { type, anime_id }) as any
+        try {
+            return await this.instance.wrapperFunction("extractOnlyEpisodesList", { type, anime_id }) as any
+        } catch (error) {
+            console.error("PluginManager/extractOnlyEpisodesList", error, this.metadata)
+            return []
+        }
     }
     searchAnime = async (name: string, page: number, params?: FilterPluginsParams): Promise<cardData[]> => {
         if (!this.instance) return []
-        return await this.instance.wrapperFunction("searchAnime", { name, page, params }) as any
+        try {
+            return await this.instance.wrapperFunction("searchAnime", { name, page, params }) as any
+        } catch (error) {
+            console.error("PluginManager/searchAnime", error, this.metadata)
+            return []
+        }
     }
 
     raportStatus = async (): Promise<{ search: serverStatusData; player: serverStatusData; episodes: serverStatusData; } | undefined> => {
         if (!this.instance) return undefined
-        return await this.instance.wrapperFunction("raportStatus") as any
+        try {
+            return await this.instance.wrapperFunction("raportStatus") as any
+        } catch (error) {
+            console.error("PluginManager/raportStatus", error, this.metadata)
+            return
+        }
     };
 
     onChangeConfig = async (config: PluginConfigFormat[]) => {
@@ -607,7 +632,7 @@ export class playerPluginInstance implements playerPluginInstanceFormat {
         try {
             return await this.instance.wrapperFunction("onChangeConfig", { config }) as any
         } catch (error) {
-            console.error(`Information Plugin ${this.metadata} Error`, error)
+            console.error(`PluginManager/onChangeConfig`, error, this.metadata)
             return false
         }
     };
@@ -639,7 +664,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         try {
             return await this.instance.wrapperFunction("search", { name, page, params }, true) as any
         } catch (error) {
-            console.error(`Information Plugin ${this.metadata} Error`, error)
+            console.error(`PluginManager/search`, error, this.metadata)
             return { content: [], maxPage: 20, nextPage: false }
         }
     }
@@ -665,7 +690,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
 
             return response
         } catch (error) {
-            console.error(`Information Plugin ${this.metadata} Error`, error)
+            console.error(`PluginManager/home`, error, this.metadata)
             return
         }
     }
@@ -675,7 +700,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         try {
             return await this.instance.wrapperFunction("anime", { id }) as any
         } catch (error) {
-            console.error(`Information Plugin ${this.metadata} Error`, error)
+            console.error(`PluginManager/anime`, error, this.metadata)
             return
         }
     }
@@ -685,7 +710,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         try {
             return await this.instance.wrapperFunction("schedule", { airingStart, airingEnd }) as any
         } catch (error) {
-            console.error(`Information Plugin ${this.metadata} Error`, error)
+            console.error(`PluginManager/schedule`, error, this.metadata)
             return []
         }
     };
@@ -695,7 +720,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         try {
             return await this.instance.wrapperFunction("getManga", { id }) as any
         } catch (error) {
-            console.error(`Information Plugin ${this.metadata} Error`, error)
+            console.error(`PluginManager/getManga`, error, this.metadata)
             return
         }
     };
@@ -705,7 +730,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         try {
             return await this.instance.wrapperFunction("onChangeConfig", { config }) as any
         } catch (error) {
-            console.error(`Information Plugin ${this.metadata} Error`, error)
+            console.error(`PluginManager/onChangeConfig`, error, this.metadata)
             return false
         }
     };
@@ -715,7 +740,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         try {
             return await this.instance.wrapperFunction("login", { content }) as any
         } catch (error) {
-            console.error(`Information Plugin ${this.metadata} Error`, error)
+            console.error(`PluginManager/login`, error, this.metadata)
             return undefined
         }
     }
@@ -725,7 +750,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         try {
             return await this.instance.wrapperFunction("isLogged") as any
         } catch (error) {
-            console.error(`Information Plugin ${this.metadata} Error`, error)
+            console.error(`PluginManager/isLogged`, error, this.metadata)
             return false
         }
     }
@@ -735,7 +760,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         try {
             return await this.instance.wrapperFunction("unLogin") as any
         } catch (error) {
-            console.error(`Information Plugin ${this.metadata} Error`, error)
+            console.error(`PluginManager/unLogin`, error, this.metadata)
             return false
         }
     }
@@ -745,7 +770,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         try {
             return await this.instance.wrapperFunction("updateUser", { user }) as any
         } catch (error) {
-            console.error(`Information Plugin ${this.metadata} Error`, error)
+            console.error(`PluginManager/updateUser`, error, this.metadata)
             return false
         }
     }
@@ -755,7 +780,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         try {
             return await this.instance.wrapperFunction("getUser") as any
         } catch (error) {
-            console.error(`Information Plugin ${this.metadata} Error`, error)
+            console.error(`PluginManager/getUser`, error, this.metadata)
             return false
         }
     }
@@ -766,7 +791,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         try {
             return await this.instance.wrapperFunction("getAnimeList") as any
         } catch (error) {
-            console.error(`Information Plugin ${this.metadata} Error`, error)
+            console.error(`PluginManager/getAnimeList`, error, this.metadata)
             return []
         }
     };
@@ -776,7 +801,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         try {
             return await this.instance.wrapperFunction("setAnimeInList", { id, variable }) as any
         } catch (error) {
-            console.error(`Information Plugin ${this.metadata} Error`, error)
+            console.error(`PluginManager/setAnimeInList`, error, this.metadata)
             return false
         }
     };
@@ -786,7 +811,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         try {
             return await this.instance.wrapperFunction("removeAnimeFromList", { id }) as any
         } catch (error) {
-            console.error(`Information Plugin ${this.metadata} Error`, error)
+            console.error(`PluginManager/removeAnimeFromList`, error, this.metadata)
             return false
         }
     };

@@ -22,7 +22,7 @@ export default function SettingsPlugin(props: SettingsPluginProps) {
     return (
         <div class='settings-extension-container'
             onContextMenu={(event) =>
-                "home" in props.plugin ? "" :
+                props.plugin["metadata"]["type"] == "information" ? "" :
                     OpenContextMenu(event, {
                         center: props.isHidden ? [{ option: t("settings.extensions.unhideplugin"), onClick: () => props.unHidePlugin(props["plugin"] as any) }] :
                             [{ option: t("settings.extensions.hideplugin"), onClick: () => props.hidePlugin(props.plugin as any, props.active) }]
@@ -37,7 +37,7 @@ export default function SettingsPlugin(props: SettingsPluginProps) {
                     </div>
                 </div>
                 <div class="settings-extension-top-right">
-                    <CheckBox checked={props.active} disable={"home" in props.plugin} onChecked={(v) => "home" in props.plugin ? "" : props.setActivePlugin(v, props.plugin as any)} />
+                    <CheckBox checked={props.active} disable={props.plugin["metadata"]["type"] == "information"} onChecked={(v) => props.plugin["metadata"]["type"] == "information" ? "" : props.setActivePlugin(v, props.plugin as any)} />
                     <span class='settings-extension-version'>v{props.plugin.metadata.version}</span>
                 </div>
             </div>
@@ -46,7 +46,7 @@ export default function SettingsPlugin(props: SettingsPluginProps) {
                     <Show when={props.plugin.metadata.urlWebsite}>
                         <span class='settings-extension-mini-button' onclick={() => openUrlFolder(props.plugin.metadata.urlWebsite!)}>{t("settings.extensions.website")}</span>
                     </Show>
-                    <span class='settings-extension-mini-button' >{"home" in props.plugin ? t("settings.extensions.information") : t("settings.extensions.player")}</span>
+                    <span class='settings-extension-mini-button' >{props.plugin["metadata"]["type"] == "information" ? t("settings.extensions.information") : t("settings.extensions.player")}</span>
                     <Show when={props.plugin.metadata["adult"]}>
                         <span class='settings-extension-mini-button red'>{t("global.adult")}</span>
                     </Show>

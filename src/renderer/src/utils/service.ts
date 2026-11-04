@@ -1,31 +1,43 @@
 import { setServiuceList } from "./stores/global"
+import { DefaultService, serviceFormat } from "./types"
 
 class ServiceManagerInstance {
-    /** @type {DefaultService[]} */
-    defaultServices = []
-    /** @type {serviceFormat[]} */
-    services = []
+    private defaultServices: DefaultService[] = []
+    private services: serviceFormat[] = []
+    private disableService: string[] = []
 
-    InitialServiceManager = (defaultServices = []) => {
+    constructor() {
+        if (!localStorage.getItem("services_inactive")) {
+            localStorage.setItem("services_inactive", JSON.stringify([]))
+        }
+
+        try {
+            const tmp = JSON.parse(localStorage.getItem("services_inactive") ?? "[]")
+
+            if (Array.isArray(tmp)) this.disableService = tmp
+            else localStorage.setItem("services_inactive", JSON.stringify([]))
+
+        } catch (error) {}
+    }
+
+    InitialServiceManager = (defaultServices: DefaultService[] = []) => {
         this.defaultServices = defaultServices
 
         this.defaultServices.forEach((service) => {
-            this.RunService(service)
+            this.RunService({
+                ...service,
+                active: this.disableService.find((v) => v == service["name"]) ? false : service["active"]
+            })
         })
         setServiuceList(this.services)
     }
 
-    /**
-     * @param {DefaultService} service
-     * @returns {void}
-     */
-    RunService = (service) => {
+    RunService = (service: DefaultService) => {
         if (this.FindService(service["name"])) return
 
         const serviceID = crypto.randomUUID()
 
-        /** @type {NodeJS.Timeout | undefined} */
-        let timer = undefined
+        let timer: NodeJS.Timeout | undefined = undefined
 
         if (service.active) timer = setInterval(() => {
             try {
@@ -50,11 +62,7 @@ class ServiceManagerInstance {
         })
     }
 
-    /**
-     * @param {string} name
-     * @returns {boolean}
-     */
-    StopService = (name) => {
+    StopService = (name: string): boolean => {
         let service = this.FindService(name)
 
         if (!service) return false
@@ -70,14 +78,13 @@ class ServiceManagerInstance {
         } : s)
         setServiuceList(this.services)
 
+        this.disableService.push(service.name)
+        this.SaveDisabledService()
+
         return true
     }
 
-    /**
-     * @param {string} name
-     * @returns {boolean}
-     */
-    ActiveService = (name) => {
+    ActiveService = (name: string): boolean => {
         let service = this.FindService(name)
 
         if (!service) return false
@@ -100,19 +107,23 @@ class ServiceManagerInstance {
             active: true
         } : s)
         setServiuceList(this.services)
+        this.disableService = this.disableService.filter((v) => v != service.name)
+        this.SaveDisabledService()
 
         return true
     }
 
-    /**
-     * @param {string} name
-     * @returns {serviceFormat | undefined}
-     */
-    FindService = (name) => {
+    FindService = (name: string): serviceFormat | undefined => {
         let service = this.services.find((v) => v["name"] == name)
         if (!service) service = this.services.find((v) => v["id"] == name)
 
         return service
+    }
+
+    private SaveDisabledService() {
+        try {
+            localStorage.setItem("services_inactive", JSON.stringify(this.disableService))
+        } catch (error) {}
     }
 }
 

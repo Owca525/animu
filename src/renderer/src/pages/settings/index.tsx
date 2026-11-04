@@ -15,8 +15,11 @@ import {
     changeTitleAnimu,
     convertKeybinds,
     convertPath,
+    discord_server,
+    getDatabaseOfRepo,
+    GetLogo,
+    getStatusStore,
     openUrlFolder,
-    request,
     updateObject
 } from '@renderer/utils/functions';
 import { checkUpdate } from '@renderer/utils/update';
@@ -40,7 +43,7 @@ import {
 } from 'solid-js';
 import { DetectOldVersionHistory, OverWriteHistory } from '@renderer/utils/FilesManager/history';
 import { getConfig, setConfig } from '@renderer/utils/stores/config';
-import { getAllPluginList, getInformationPlugin, getPlayerPLugin, getPluginRepo } from '@renderer/utils/stores/plugins';
+import { getAllPluginList, getInformationPlugin, getPlayerPLugin } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { saveConfig } from '@renderer/utils/FilesManager/config';
 import { showDialog } from '@renderer/utils/context/DialogContext';
@@ -49,16 +52,16 @@ import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './settings.css';
 import { useI18n } from '@renderer/utils/i18n';
-import { activeThemes, animulistData, getAnimuHistory, getCurrentYT_DLPVer, getListOfVerYT_DLP, loadedTheme, setAudioOutput } from '@renderer/utils/stores/global';
+import { activeThemes, animulistData, getAnimuHistory, getCurrentYT_DLPVer, getListOfVerYT_DLP, getServices, loadedTheme, setAudioOutput } from '@renderer/utils/stores/global';
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 import SettingsPlugin from './components/settingsPlugin';
-import semver from "semver";
 import { OvewriteAnimuList } from '@renderer/utils/FilesManager/animulist';
 import OtherSettings from './components/otherSettings';
 import { SheepShortcut } from '@renderer/utils/hooks/useKeyPress';
 import pluginManager from '@renderer/utils/pluginManager';
 import { SavePluginConfig } from '@renderer/utils/FilesManager/pluginConfig';
 import deeplink from '@renderer/utils/deeplinks';
+import { ServiceManager } from '@renderer/utils/service';
 
 export type pluginRepoExpandedSettings = {
     name: string,
@@ -83,7 +86,6 @@ function settings() {
     const [config, setNewConfig] = createSignal<{ old: SettingsConfig, new: SettingsConfig }>({ old: structuredClone(cfg), new: structuredClone(cfg) })
     const [themes, setThemes] = createSignal<themeMetadata[]>([])
     const [lastActiveTheme, setLastActiveTheme] = createSignal<Map<number, themeMetadata>>(new Map())
-    const [versions] = createSignal(window["animuAppInfo"]["ver"])
     const [isSaving, setSaving] = createSignal<boolean>(false)
 
     const [audioOutput, setaudioOutput] = createSignal<MediaDeviceInfo[]>([])
@@ -92,6 +94,7 @@ function settings() {
     const [pluginList, setpluginList] = createSignal<{ active: boolean, plugin: PluginLoadedFormat }[]>([])
     const [hiddenPluginList, setHiddenPluginList] = createSignal<string[]>([])
     const [ContextMenu, setContextMenu] = createSignal<ContextMenuProps>([])
+    const [listlng, setLNG] = createSignal<{ active: boolean, name: string }[]>([])
 
     const [sidebarData, setSidebarData] = createSignal({
         top: [
@@ -187,6 +190,18 @@ function settings() {
             setaudioOutput(audioOutputs)
         })
 
+        try {
+            if (!Array.isArray(config().new["plugins"]["includeOnly"])) return
+
+            let exeptList: string[] = config().new["plugins"]["includeOnly"]
+
+            setLNG(listLang().map((v) => ({
+                active: exeptList.includes(v),
+                name: v
+            })))
+
+        } catch (error) { }
+
         const plugin = getPlayerPLugin()
         setLastActiveTheme(structuredClone(unwrap(activeThemes())))
         const playerPluginList = getAllPluginList().map((pl) => {
@@ -196,7 +211,7 @@ function settings() {
         setHiddenPluginList(getConfig().plugins.hiddenPlugins)
         setpluginList(playerPluginList)
         setThemes(loadedTheme().filter((val) => ![...activeThemes().entries()].map(([_, val]) => val.themeName).includes(val.themeName)))
-        changeTitleAnimu(`Animu - ${t("global.settings")}`)
+        changeTitleAnimu(t("global.settings"))
         turnOnDeveloperMode()
 
         /* IFDEF DEBUG|PROD */
@@ -244,6 +259,13 @@ function settings() {
             setDynamicZoom(config().new.General.Window.Zoom)
             pluginManager.initialPlugins()
             window.backend.refresh()
+
+            if (!config().new.update.enable) ServiceManager.StopService("services.pluginupdates_name")
+            else ServiceManager.ActiveService("services.pluginupdates_name")
+
+            if (!config().new.animu.recomendation) ServiceManager.StopService("services.recomendation_name")
+            else ServiceManager.ActiveService("services.recomendation_name")
+
             toast(t("settings.saving.done"), { type: "success" })
         } catch (error) {
             console.error("Settings/saveNewConfig", error)
@@ -267,6 +289,18 @@ function settings() {
         setThemes(loadedTheme().filter((val) => ![...activeThemes().entries()].map((v) => v[1].themeName).includes(val.themeName)))
         pluginManager.initialPlugins()
         setSaving(() => false)
+
+        try {
+            if (!Array.isArray(config().new["plugins"]["includeOnly"])) return
+
+            let exeptList: string[] = config().new["plugins"]["includeOnly"]
+
+            setLNG(listLang().map((v) => ({
+                active: exeptList.includes(v),
+                name: v
+            })))
+
+        } catch (error) { }
     }
 
     function setNewLang(lang: string) {
@@ -283,12 +317,6 @@ function settings() {
     async function buttonCheck() {
         toast(t("settings.history.check_start"))
         await DetectOldVersionHistory()
-    }
-
-    async function discord_server() {
-        let data = await request("https://raw.githubusercontent.com/Owca525/animu/refs/heads/unstable/assets/discord.txt")
-        if (!data.success) return
-        openUrlFolder(data.text)
     }
 
     function backupWarning(file: string, date: string) {
@@ -392,7 +420,7 @@ function settings() {
         let cfgObject = {}
 
         plugin.config.forEach((value) => {
-            cfgObject = {...cfgObject, [value["config_name"]]: value["value"]}
+            cfgObject = { ...cfgObject, [value["config_name"]]: value["value"] }
         })
 
         showCustomMenu(() => OtherSettings({
@@ -408,7 +436,7 @@ function settings() {
         config = config.map((value) => value["config_name"] == variable ? {
             ...value,
             value: change
-        }: value)
+        } : value)
 
 
         SavePluginConfig(plugin["metadata"]["name"], config)
@@ -442,31 +470,18 @@ function settings() {
         window.api.yt_dlp.install(v)
     }
 
-    function getDatabaseOfRepo(): pluginRepoExpandedSettings[] {
-        const repo = getPluginRepo()
-        const plugins = getAllPluginList()
-        const infoPlugin = getInformationPlugin()
+    function UpdateExeptLang(data: { active: boolean, name: string }) {
+        let listExeptLang = structuredClone(unwrap(config().new.plugins.includeOnly))
 
-        return repo.map((item) => {
-            if (item.type == "information") {
-                return { ...item, update: semver.gt(semver.coerce(item.ver) as any, semver.coerce(infoPlugin.metadata.version) as any), installed: true }
-            }
+        if (data["active"]) listExeptLang = listExeptLang.filter((v) => data["name"] != v)
+        else listExeptLang.push(data["name"])
 
-            const finded = plugins.find((value) => value.metadata.name == item.name)
-            if (!finded) return { ...item, installed: false, update: false }
+        handleChange("plugins.includeOnly", listExeptLang)
 
-            return {
-                ...item,
-                installed: true,
-                update: semver.gt(semver.coerce(item.ver) as any, semver.coerce(finded.metadata.version) as any)
-            }
-        })
-    }
-
-    function getStatusStore(tmp: pluginRepoExpandedSettings): string {
-        if (!tmp.installed) return "settings.pluginstore.install"
-        if (tmp.update) return "settings.pluginstore.update"
-        return "settings.pluginstore.installed"
+        setLNG(listLang().map((v) => ({
+            active: listExeptLang.includes(v),
+            name: v
+        })))
     }
 
     function importConfig(event: Event) {
@@ -729,11 +744,19 @@ function settings() {
                         </div>
                         <div class="settings-line"></div> */}
                         <div class="settings-setting-container">
+                            {t("settings.general.recomendation")}
+                            <CheckBox
+                                checked={config().new.animu.recomendation}
+                                onChecked={(v) => handleChange("animu.recomendation", v)}
+                            />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
                             {t("animu.format_title")}
-                            <ButtonGroup selectedValue={t(`anilist.titles.${config().new.anilist.titleFormat}`)} listValues={[
-                                { value: t("anilist.titles.ROMAJI"), onClick: () => handleChange("anilist.titleFormat", "ROMAJI") },
-                                { value: t("anilist.titles.NATIVE"), onClick: () => handleChange("anilist.titleFormat", "NATIVE") },
-                                { value: t("anilist.titles.ENGLISH"), onClick: () => handleChange("anilist.titleFormat", "ENGLISH") },
+                            <ButtonGroup selectedValue={t(`anilist.titles.${config().new.animu.titleFormat}`)} listValues={[
+                                { value: t("anilist.titles.ROMAJI"), onClick: () => handleChange("animu.titleFormat", "ROMAJI") },
+                                { value: t("anilist.titles.NATIVE"), onClick: () => handleChange("animu.titleFormat", "NATIVE") },
+                                { value: t("anilist.titles.ENGLISH"), onClick: () => handleChange("animu.titleFormat", "ENGLISH") },
                             ]}
                             />
                         </div>
@@ -768,7 +791,7 @@ function settings() {
                                 }
                             />
                         </div>
-                        
+
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {/* TRANSLATION */}
@@ -809,8 +832,7 @@ function settings() {
                         <Show when={config().new.information.trailerplayertype == "player"}>
                             <div class="settings-line"></div>
                             <div class="settings-setting-container">
-                                {/* TRANSLATION */}
-                                {t("Preload Trailer Anime")}
+                                {t("settings.information.preload_trailer")}
                                 <CheckBox
                                     checked={config().new.information.preloadTrailer}
                                     onChecked={(checked) =>
@@ -861,8 +883,7 @@ function settings() {
                     <div class="settings-page-container">
                         <div class="settings-page-title">{t("settings.general.window")}</div>
                         <div class="settings-setting-container">
-                            {/* TRANSLATION */}
-                            {t("Close Animu On Exit Button")}
+                            {t("settings.general.tray")}
                             <CheckBox
                                 checked={config().new.General.Window.trayIconClose}
                                 onChecked={(checked) =>
@@ -938,7 +959,7 @@ function settings() {
                         <div class="settings-setting-container">
                             {t("settings.player.volume")}
                             <div class='settings-setting-seekbar-container'>
-                                <span>0</span>
+                                <span>0%</span>
                                 <SeekBar
                                     maxValue={100}
                                     minValue={0}
@@ -946,7 +967,7 @@ function settings() {
                                     currentValue={config().new.Player.general.Volume}
                                     onSeek={(value) => { handleChange("Player.general.Volume", parseInt(value.toFixed(0))) }}
                                 />
-                                <span>100</span>
+                                <span>100%</span>
                             </div>
                         </div>
                         <div class="settings-line"></div>
@@ -1051,19 +1072,19 @@ function settings() {
                                 }
                             />
                         </div> */}
-                        <div class="settings-line"></div>
+                        {/* <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("settings.player.hls_worker")}
+                            {t("settings.player.skip_opening")}
                             <CheckBox
                                 checked={config().new.Player.general.autoSkipOpeningEnding}
                                 onChecked={(checked) =>
                                     handleChange('Player.general.autoSkipOpeningEnding', checked)
                                 }
                             />
-                        </div>
+                        </div> */}
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("settings.player.skip_opening")}
+                            {t("settings.player.hls_worker")}
                             <CheckBox
                                 checked={config().new.Player.general.useHLSWorker}
                                 onChecked={(checked) =>
@@ -1472,6 +1493,16 @@ function settings() {
                                 }
                             />
                         </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("settings.debug_hls")}
+                            <CheckBox
+                                checked={config().new.Developer.debugHLS}
+                                onChecked={(checked) =>
+                                    handleChange('Developer.debugHLS', checked)
+                                }
+                            />
+                        </div>
                         {/* <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             {t("settings.devmode.playerdebug")}
@@ -1562,24 +1593,42 @@ function settings() {
                                 />
                             </div>
                         </Show>
+
+                        <SettingsDrop LeftHeader={t("settings.devmode.services")} content={
+                            <div class="settings-backup-container">
+                                <For each={getServices()}>
+                                    {(value) => (
+                                        <span class='settings-dev-service-container'>
+                                            <span class='settings-dev-service-title'>{t(value["name"])}</span> -
+                                            <span class='settings-dev-service-description'>{t(value["description"] ? value["description"] : "information.descriptionnotfound")}</span>
+
+                                            <CheckBox checked={value["active"]} onChecked={(v) => {
+                                                if (v) ServiceManager.ActiveService(value["name"])
+                                                else ServiceManager.StopService(value["name"])
+                                            }} class='settings-dev-service-checkbox' />
+                                        </span>
+                                    )}
+                                </For>
+                            </div>
+                        } />
                     </div>
-                    <Show when={versions()}>
-                        <div class="settings-page-container">
-                            <div class="settings-page-title">{t("settings.devmode.information")}</div>
-                            <div class="settings-setting-container">
-                                <span>{t("settings.devmode.electronver")}</span>
-                                <span>{versions()!.electron}</span>
-                            </div>
-                            <div class="settings-setting-container">
-                                <span>{t("settings.devmode.chromiumver")}</span>
-                                <span>{versions()!.chrome}</span>
-                            </div>
-                            <div class="settings-setting-container">
-                                <span>{t("settings.devmode.nodever")}</span>
-                                <span>{versions()!.node}</span>
-                            </div>
+                    {/* IFDEF PROD|DEBUG */}
+                    <div class="settings-page-container">
+                        <div class="settings-page-title">{t("settings.devmode.information")}</div>
+                        <div class="settings-setting-container">
+                            <span>{t("settings.devmode.electronver")}</span>
+                            <span>{window["initialMetadata"]["electron_ver"]}</span>
                         </div>
-                    </Show>
+                        <div class="settings-setting-container">
+                            <span>{t("settings.devmode.chromiumver")}</span>
+                            <span>{window["initialMetadata"]["chrome_ver"]}</span>
+                        </div>
+                        <div class="settings-setting-container">
+                            <span>{t("settings.devmode.nodever")}</span>
+                            <span>{window["initialMetadata"]["node_ver"]}</span>
+                        </div>
+                    </div>
+                    {/* ENDIF */}
                 </Show>
                 <Show when={category() == "extensions"}>
                     <div class="settings-page-container">
@@ -1605,16 +1654,6 @@ function settings() {
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
-                            {t("settings.debug_hls")}
-                            <CheckBox
-                                checked={config().new.plugins.userWorker}
-                                onChecked={(checked) =>
-                                    handleChange('Developer.debugHLS', checked)
-                                }
-                            />
-                        </div>
-                        <div class="settings-line"></div>
-                        <div class="settings-setting-container">
                             {t("settings.extensions.updatecheck")}
                             <ButtonGroup selectedValue={t(`settings.general.${config().new.plugins.pluginCheckType.toLowerCase().replaceAll(" ", "")}`)} listValues={[
                                 { value: t("settings.general.onstart"), onClick: () => handleChange("plugins.pluginCheckType", "On Start") },
@@ -1622,6 +1661,19 @@ function settings() {
                                 { value: t("settings.general.everyweek"), onClick: () => handleChange("plugins.pluginCheckType", "Every Week") },
                             ]}
                             />
+                        </div>
+                        <div class="settings-line"></div>
+                        <div class="settings-setting-container">
+                            {t("settings.extensions.includeOnly")}
+                            <div class="welcomescreen-option container">
+                                <For each={listlng()}>
+                                    {(v) => (
+                                        <span class={`welcomescreen-exept-plugin ${v["active"] ? "active" : ""}`} onClick={() => UpdateExeptLang(v)}>
+                                            {t(`lang.${v["name"]}`)}
+                                        </span>
+                                    )}
+                                </For>
+                            </div>
                         </div>
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
@@ -1668,7 +1720,7 @@ function settings() {
                                     {(tmp) => (
                                         <Show when={!new Set(hiddenPluginList()).has(tmp.plugin["metadata"].name)}>
                                             <SettingsPlugin
-                                                active={"home" in tmp.plugin ? true : tmp.active}
+                                                active={tmp.plugin["metadata"]["type"] == "information" ? true : tmp.active}
                                                 unHidePlugin={unHidePlugin} plugin={tmp.plugin}
                                                 hidePlugin={hidePlayerPlugin}
                                                 pluginSettings={openPluginSettings}
@@ -1705,9 +1757,25 @@ function settings() {
                     <div class="settings-page-container">
                         <div class="settings-page-title">{t("settings.general.links")}</div>
                         <div class="settings-special-container">
-                            <sheep-img class="settings-special-images" onClick={() => openUrlFolder("https://github.com/Owca525/animu")} src="https://github.com/fluidicon.png" alt="Github Logo" />
-                            <sheep-img class="settings-special-images" onClick={discord_server} src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg" alt="Discord Logo" />
-                            <sheep-img class="settings-special-images" onClick={() => openUrlFolder("https://buymeacoffee.com/owca525")} src="https://studio.buymeacoffee.com/assets/img/bmc-meta-new/new/android-icon-192x192.png" alt="Buymeacoffee logo" />
+
+                            <sheep-img
+                                class="settings-special-images"
+                                onClick={() => openUrlFolder("https://github.com/Owca525/animu")}
+                                src={GetLogo({ name: "github", url: "https://github.com/fluidicon.png" })}
+                                alt="Github Logo" />
+
+                            <sheep-img
+                                class="settings-special-images"
+                                onClick={discord_server}
+                                src={GetLogo({ name: "discord", url: "https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg" })}
+                                alt="Discord Logo" />
+
+                            <sheep-img
+                                class="settings-special-images"
+                                onClick={() => openUrlFolder("https://buymeacoffee.com/owca525")}
+                                src={GetLogo({ name: "buymeacoffe", url: "https://cdn.buymeacoffee.com/assets/homepage/meta/apple-icon-180x180.png" })}
+                                alt="Buymeacoffee logo" />
+
                         </div>
                     </div>
                     <div class="settings-page-container">

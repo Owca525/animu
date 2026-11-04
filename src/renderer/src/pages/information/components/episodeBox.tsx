@@ -1,7 +1,9 @@
-import { Match, Show, Switch } from "solid-js";
+import { For, Match, Show, Switch } from "solid-js";
 import "./css/episodeBox.css";
-import { episodeMetadata, indentityPlayer } from "@renderer/utils/types";
+import { episodeMetadata, indentityPlayer, informationTmpProps } from "@renderer/utils/types";
 import { formatDate, formatTime, unixToDateTime } from "@renderer/utils/functions";
+import { getConfig } from "@renderer/utils/stores/config";
+import { t } from "@renderer/utils/i18n";
 
 interface episodeBoxProps {
     variant: "v1" | "v2",
@@ -10,7 +12,36 @@ interface episodeBoxProps {
     enterPlayer: () => void
 }
 
-export default function EpisodeBox(props: episodeBoxProps) {
+export default function EpisodeContainer(props: { episode: episodeMetadata[], type: string, cache: informationTmpProps, enterPlayer: (episodes: episodeMetadata[], type: string, episode: string) => void }) {
+    const config = getConfig()
+    const specials = props.episode.filter((v) => v["special"])
+
+    return (
+        <div class="information-buttons-episode-content">
+            <div class="information-buttons-episode-container">
+                <For each={props.episode.filter((v) => !v["special"])}>
+                    {(data) => <EpisodeBox variant={config.information.episodeVariants}
+                        enterPlayer={() => props.enterPlayer(props.episode, props.type, data.ep)}
+                        saveData={props.cache.saveData} episode={data} />
+                    }
+                </For>
+            </div>
+            <Show when={specials.length > 0}>
+                <span class="information-buttons-episode-specials">{t("information.specia_episodes")}</span>
+                <div class="information-buttons-episode-container">
+                    <For each={specials}>
+                        {(data) => <EpisodeBox variant={config.information.episodeVariants}
+                            enterPlayer={() => props.enterPlayer(props.episode, props.type, data.ep)}
+                            saveData={props.cache.saveData} episode={data} />
+                        }
+                    </For>
+                </div>
+            </Show>
+        </div>
+    )
+}
+
+export function EpisodeBox(props: episodeBoxProps) {
     const saveData = props.saveData;
     const epNum = parseInt(props.episode.ep);
     const savedEp = parseInt(saveData?.episode ?? "0");
@@ -38,9 +69,9 @@ export default function EpisodeBox(props: episodeBoxProps) {
                         ${isWatchedEqual ? "watched" : ""}
                     `}
                     onclick={props.enterPlayer}
-                    >
-                    <sheep-img 
-                        src={props["episode"]["img"] ? props["episode"]["img"] : ""} 
+                >
+                    <sheep-img
+                        src={props["episode"]["img"] ? props["episode"]["img"] : ""}
                         class={`information-episode-box-image show`}
                         divClass="information-episode-box-image-placeholder"
                     />

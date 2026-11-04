@@ -63,6 +63,6 @@ async function zipFolder(sourceDir: string, outPath: string): Promise<boolean> {
     return new Promise(async (resolve, reject) => {
         const zip = new AdmZip();
         zip.addLocalFolder(sourceDir)
-        zip.writeZipPromise(outPath).then((v) => resolve(v)).catch(reject)
+        zip.writeZipPromise(outPath).then(() => resolve(true)).catch(reject)
     });
 }

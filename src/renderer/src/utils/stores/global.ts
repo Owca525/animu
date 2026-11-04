@@ -1,4 +1,4 @@
-import { animeOpeningsFormat, cardData, globalDataFormat, informationTmpProps, NotificationExpanded, PlayerTmpProps, serviceFormat, themeMetadata, UserData } from "../types";
+import { cardData, globalDataFormat, informationTmpProps, NotificationExpanded, PlayerTmpProps, serviceFormat, themeMetadata, UserData } from "../types";
 import { createStore } from "solid-js/store";
 /* IFDEF DYNAMIC */
 import { Socket } from "socket.io-client";
@@ -17,7 +17,6 @@ export const [globalState, setGlobalState] = createStore<globalDataFormat>({
     isAnimuFocus: true,
     notifications: [],
     calendaryCache: [],
-    animeOpeningsCache: {},
     audioOutput: undefined,
     pluginSearchMode: false,
     yt_dlp: {
@@ -48,7 +47,6 @@ export const getAnilistUserData = () => globalState.anilist_user_data;
 export const isAnimuFocus = () => globalState.isAnimuFocus;
 export const getNotificationList = () => globalState.notifications;
 export const GetCalendaryCache = () => globalState.calendaryCache;
-export const animeOpeningsCache = () => globalState.animeOpeningsCache;
 export const getAudioOutput = () => globalState.audioOutput;
 export const isPluginSearchMode = () => globalState.pluginSearchMode;
 export const getAnimuHistory = () => globalState.history;
@@ -68,7 +66,6 @@ export const UpdateUserData = (tmp: UserData) => setGlobalState((prev) => ({ ...
 
 export const setYT_DLPVersion = (tmp: globalDataFormat["yt_dlp"]) => setGlobalState((prev) => ({ ...prev, yt_dlp: tmp }));
 export const setPluginSearchMode = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, pluginSearchMode: tmp }));
-export const addOpeningCache = (id: number, op: animeOpeningsFormat[]) => setGlobalState((prev) => ({ ...prev, animeOpeningsCache: { ...prev.animeOpeningsCache, [id]: op } }));
 export const SetCalendaryCache = (tmp: cardData[]) => setGlobalState((prev) => ({ ...prev, calendaryCache: tmp }));
 export const setAudioOutput = (tmp: MediaDeviceInfo) => setGlobalState((prev) => ({ ...prev, audioOutput: tmp }));
 export const setSocket = (tmp: Socket) => setGlobalState((prev) => ({ ...prev, socket: { ...prev.socket as any, instance: tmp } }));
@@ -166,6 +163,7 @@ class PlayerCacheInstance {
     }
 }
 
+// TODO: Remove This From window
 if (!window["PlayerCache"]) {
     window["PlayerCache"] = new PlayerCacheInstance()
 }

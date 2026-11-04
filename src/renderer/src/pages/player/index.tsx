@@ -2,7 +2,7 @@ import { closeDialog, showDialog } from "@renderer/utils/context/DialogContext";
 import { AnimeData, episodeMetadata, PlayerTmpProps, SettingsConfig } from "@renderer/utils/types";
 
 import "./player.css"
-import { changeTitleAnimu, convertEpisode, dateToUnix, detectTitle, detectTitleConfig, refetchHistory } from "@renderer/utils/functions";
+import { changeTitleAnimu, convertEpisode, dateToUnix, detectTitle, refetchHistory } from "@renderer/utils/functions";
 import Button from "@renderer/components/buttons";
 
 import { SaveHistory } from "@renderer/utils/FilesManager/history";
@@ -81,6 +81,8 @@ const player = () => {
             time: 0
         })
 
+        changeTitleAnimu(detectTitle({ title: anime_data.anime.title, ep: episode["current"], format: anime_data["anime"]["format"] }))
+
         response.Refetch([
             anime_data.anime?.player_ID, 
             episode.list.find((v) => v.ep == ep), 
@@ -157,7 +159,7 @@ const player = () => {
             })
         }
 
-        changeTitleAnimu(`Animu - ${detectTitleConfig(anime_data.anime.title)}`)
+        changeTitleAnimu(detectTitle({ title: anime_data.anime.title, ep: episode["current"], format: anime_data["anime"]["format"] }))
         SaveHistory({
             saveData: {
                 ...anime_data.saveData,

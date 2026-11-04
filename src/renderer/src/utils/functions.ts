@@ -26,11 +26,13 @@ import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
 import { unwrap } from 'solid-js/store';
-import { getInformationPlugin, getPlayerPluginList } from './stores/plugins';
+import { getAllPluginList, getInformationPlugin, getPlayerPluginList, getPluginRepo } from './stores/plugins';
 import { removeToast, toast, updateToast } from './context/ToastNotification';
 import { readPlaylist, updatePlaylist } from './FilesManager/playlist';
 import pluginManager, { playerPluginInstance } from './pluginManager';
 import { sendNotification } from "./NotificationManager"
+import { pluginRepoExpandedSettings } from '@renderer/pages/settings';
+import semver from "semver";
 
 export function decodeHtmlEntities(str: string | undefined) {
     if (!str) return ""
@@ -140,8 +142,18 @@ export async function changeTheme(activeTheme: Map<number, themeMetadata>) {
 }
 
 export function changeTitleAnimu(title: string) {
-    let dev = import.meta.env.DEV
-    document.title = dev ? title + " - Development" : title
+
+    let text = "Animu"
+
+    text += ` ${window["animuAppInfo"]["ver"]} `;
+
+    text += "- "
+
+    text += title
+
+    if (import.meta.env.DEV) text += " - Development"
+
+    document.title = text
 }
 
 export function convertKeybinds(inputString: string) {
@@ -342,10 +354,28 @@ export async function convertChaptersVTT(url: string, options?: { method?: "POST
 }
 
 export function segregatePlugins(func: (name: string) => void): DropdownOption[] {
+    const config = getConfig()
+
     let data = loadedPluginsList()
+
+    if (config["plugins"]["includeOnly"] && config["plugins"]["includeOnly"].length > 0) {
+
+        data = data.filter((element) => {
+            if (!element["metadata"]["supportLang"]) return true
+
+            for (let index = 0; index < config["plugins"]['includeOnly'].length; index++) {
+                const loop = config["plugins"]['includeOnly'][index];
+                if (element["metadata"]["supportLang"].includes(loop)) return true
+            }
+
+            return false
+        })
+
+    }
+
     let list: DropdownOption[] = []
-    for (let index = 0; index < data.length; index++) {
-        const element = data[index];
+
+    data.forEach((element) => {
         let icon = "check_circle"
         let iconclass = "green"
 
@@ -375,7 +405,7 @@ export function segregatePlugins(func: (name: string) => void): DropdownOption[]
             icon: icon,
             classIcon: iconclass
         })
-    }
+    })
 
     return list
 }
@@ -811,7 +841,7 @@ export function convertSecondsToHoursFormat(seconds: number): string {
 export function detectTitleConfig(titles: AnimeData["title"]): string {
     try {
         const config = unwrap(getConfig())
-        const title = titles[config.anilist.titleFormat.toLocaleLowerCase()]
+        const title = titles[config.animu.titleFormat.toLocaleLowerCase()]
         if (title) return title
         if (titles["romaji"]) return titles["romaji"]
         return Object.values(titles)[0]
@@ -1065,6 +1095,7 @@ async function Send_Episode_Notification(item: playlistFormatData) {
     const episodes = extracted_episodes.map((v) => v.ep.toString())
 
     if (GetNumberFromString(item["anime"]["saveData"]!["episode"]) < GetNumberFromString(episodes.at(-1))) {
+        // TRANSLATION
         sendNotification({
             title: t(`New Episode Avaible in ${temporal_plugin.metadata.name} plugin`),
             description: t(`Watch Episode ${episodes.at(-1)} Of ${detectTitleConfig(item.anime.AnimeData.title)}`),
@@ -1198,17 +1229,21 @@ export async function CreateSHA256(text: string) {
     return hashHex;
 };
 
-export function checkTimeDriffrentUnix(start: number | string, end: number | string): { hour: number; min: number; sec: number; } {
+export function checkTimeDriffrentUnix(start: number | string | undefined, end: number | string | undefined): { day: number, hour: number; min: number; sec: number; } {
+    if (typeof start == "undefined") start = dateToUnix(new Date().toString())
+    if (typeof end == "undefined") end = dateToUnix(new Date().toString())
+
     if (typeof start == "string") start = dateToUnix(start)
     if (typeof end == "string") end = dateToUnix(end)
 
     const diff = Math.abs(end - start);
 
+    const day = Math.floor(diff / 86400);
     const hour = Math.floor(diff / 3600);
     const min = Math.floor((diff % 3600) / 60);
     const sec = diff % 60;
 
-    return { hour, min, sec };
+    return { hour, min, sec, day };
 }
 
 export function parseEpisode(ep: string) {
@@ -1569,4 +1604,81 @@ export function RandomObject<T>(list: T[]): T | undefined {
 
     const randomIndex = Math.floor(Math.random() * list.length);
     return list[randomIndex];
+}
+
+export function GetLogo(params: { name: string, url: string }) {
+    if (!localStorage.getItem(params["name"])) {
+
+        DownloadIMGToBase64(params["url"]).then((v) => {
+            if (!v) return
+            localStorage.setItem(params["name"], v)
+        })
+
+        return params["url"]
+    }
+
+    return localStorage.getItem(params["name"]) ?? params["url"]
+}
+
+export function getStatusStore(tmp: pluginRepoExpandedSettings): string {
+    if (!tmp.installed) return "settings.pluginstore.install"
+    if (tmp.update) return "settings.pluginstore.update"
+    return "settings.pluginstore.installed"
+}
+
+export function getDatabaseOfRepo(): pluginRepoExpandedSettings[] {
+    const repo = getPluginRepo()
+    const plugins = getAllPluginList()
+    const infoPlugin = getInformationPlugin()
+
+    return repo.map((item) => {
+        if (item.type == "information") {
+            return { ...item, update: semver.gt(semver.coerce(item.ver) as any, semver.coerce(infoPlugin.metadata.version) as any), installed: true }
+        }
+
+        const finded = plugins.find((value) => value.metadata.name == item.name)
+        if (!finded) return { ...item, installed: false, update: false }
+
+        return {
+            ...item,
+            installed: true,
+            update: semver.gt(semver.coerce(item.ver) as any, semver.coerce(finded.metadata.version) as any)
+        }
+    })
+}
+
+export async function discord_server() {
+    let data = await request("https://raw.githubusercontent.com/Owca525/animu/refs/heads/unstable/assets/discord.txt")
+    if (!data.success) return
+    openUrlFolder(data.text)
+}
+
+// TODO: Remember to support for new id format
+export async function SendRecomendAnime() {
+    if (GetAnimuPage() == "player") return
+
+    const data = getHistory()
+    if (data["history"].length <= 0 || !data["history"]) return
+
+    const history_anime = data["history"][Math.floor(Math.random() * data["history"].length)]
+
+    if (history_anime["AnimeData"]["type"] != "ANIME") return
+
+    const plugin = getInformationPlugin()
+
+    const anime_response = await plugin.anime(history_anime["AnimeData"]["id"])
+    if (!anime_response || !anime_response.recommendations) return
+
+    const recomended = anime_response["recommendations"][Math.floor(Math.random() * anime_response["recommendations"].length)]
+
+    const finded = data["history"].find((v) => v["AnimeData"]["id"] == `${recomended["id"]}`)
+    if (finded) return
+
+    // TRANSLATION
+    sendNotification({
+        title: t(`Animu Recomendation`),
+        description: t(`New anime recomendation ${detectTitleConfig(recomended.title)}`),
+        icon: recomended.coverImage
+    })
+
 }

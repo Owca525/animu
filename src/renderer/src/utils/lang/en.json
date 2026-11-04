@@ -10,7 +10,7 @@
         "continuewatch": "Continue Watching",
         "dev": "Developer",
         "minutes": "Minutes",
-        "exitAnimu": "Do you really want exit animu?",
+        "exitAnimu": "Do you really want exit?",
         "enable": "Enable",
         "extensions": "Extensions",
         "notFound": "Nothing Found",
@@ -28,7 +28,22 @@
         "cloudflare": "Verify Cloudflare to use plugin. Click to open window"
     },
     "animu": {
-        "format_title": "Title Format In Animu"
+        "format_title": "Title Format"
+    },
+    "welcomescreen": {
+        "animu_title": "Welcome To Animu",
+        "animu_desc": "Select Basic Options",
+        "information_title": "Information",
+        "information_desc": "This Part is not that important",
+        "player_title": "Make Better Expierienc in Player",
+        "player_desc": "Customize Settings of the player",
+        "plugin_title": "Plugins is important thing",
+        "plugin_desc": "Select Default plugin to watch anime",
+        "support_title": "Support Project",
+        "support_desc": "You Can Support this project",
+        "skip": "Skip All",
+        "next": "Next",
+        "finish": "Finish"
     },
     "debug": {
         "log_saved": "Succesfully Saved Logs in Animu Appdata Folder",
@@ -40,13 +55,15 @@
         "animupdate_name": "AnimUpdate",
         "animupdate_desc": "Check Animu Update",
         "pluginupdates_name": "PluginUpdates",
-        "pluginupdate_desc": "Check Plugins are Updated",
+        "pluginupdates_desc": "Check Plugins are Updated",
         "calendaryupdate_name": "CallendarUpdate",
         "calendaryupdate_desc": "Fetching New Callendary",
         "episodeavailble_name": "EpisodesAvaible",
         "episodeavailble_desc": "Check Is Anime episode avaible",
         "animulistsynchronize_name": "SynchronizeAnimulist",
-        "animulistsynchronize_desc": "Synchronizing Animulist with information plugin"
+        "animulistsynchronize_desc": "Synchronizing Animulist with information plugin",
+        "recomendation_name": "Send Recomended Anime",
+        "recomendation_desc": "None"
     },
     "user": {
         "updated": "Succesfully Updated User Data",
@@ -268,6 +285,7 @@
             "OP": "Opening",
             "EN": "Ending"
         },
+        "specia_episodes": "Special Episodes",
         "airing": "Airing Episode",
         "format": "Format",
         "episodes": "Episodes",
@@ -381,6 +399,8 @@
         "general": {
             "language": "Language",
             "theme": "Theme",
+            "recomendation": "Show Recommended Anime",
+            "tray": "Close App On Exit Button",
             "updates": "Update Notifications",
             "checkupdates": "Check for Updates",
             "checkupdate": "Check Update",
@@ -497,14 +517,15 @@
             "brokenBuffer": "It shows buffering when playing mp4 files, which is known to display incorrect data"
         },
         "devmode": {
+            "services": "Services",
             "developermode": "Developer Mode",
             "tornondevtools": "Turn on Devtools",
             "devtoolsonstart": "Devtools on Start",
             "playerdebug": "Player Debug Stats",
-            "information": "Information",
+            "information": "Package Versions",
             "electronver": "Electron Version",
             "chromiumver": "Chromium Version",
-            "nodever": "Electron Version",
+            "nodever": "Node Version",
             "notificationtest": "Toast Notification Test",
             "dialogtest": "Dialog Test"
         },
@@ -523,7 +544,8 @@
             "hideplugin": "Hide Plugin",
             "unhideplugin": "UnHide Plugin",
             "conf": "Config: {{title}}",
-            "updatecheck": "Checking for plugin updates"
+            "updatecheck": "Checking for plugin updates",
+            "includeOnly": "Include Only This Language Plugins"
         },
         "upNext": {
             "var1": "Variant 1",

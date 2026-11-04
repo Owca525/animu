@@ -406,17 +406,24 @@ export async function advanceRequest(url: string, options: RequestInit = { heade
         /* ENDIF */
 
         return convertedResponse;
-    } catch (error) {
+    } catch (error: any) {
         console.error(`Error in advanceRequest: ${(error as Error).message} ${(error as Error).name} ${(error as Error).cause} \n ${(error as Error).stack}`, url)
         return {
-            text: (error as Error).message,
-            json: undefined,
+            text: `${error["message"]} ${error["cause"]} ${error["stack"]}`,
+            json: {
+                error: {
+                    message: `${error["message"]}`,
+                    cause: error["cause"],
+                    stack: error["stack"]
+                }
+            },
             buffer: [],
             status: 500,
-            statusText: (error as Error).message,
+            statusText: error["message"],
             url: url,
             success: false,
-            responseHeader: {}
+            responseHeader: {},
+            requestHeader: options ? options["headers"] : {},
         }
     }
 }

@@ -12,6 +12,8 @@ import { getGlobalCache, setGlobalToken } from "@renderer/utils/stores/global"
 function Container(props: containerData) {
   const { t, pathExist } = useI18n()
   let container: HTMLDivElement | undefined
+  let dummy: HTMLDivElement | undefined
+
   const [currentPage, setcurrentPage] = createSignal(getHomeCache().page)
   const [animeCards, setAnimeCards] = createSignal<cardData[]>(props.data)
   const [disableScrollButtons, setDisableScrollButtons] = createSignal<boolean>(false)
@@ -47,24 +49,27 @@ function Container(props: containerData) {
     disable: props["useResponse"] && animeCards().length <= 0 ? false : true,
   })
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        const homeCache = getHomeCache()
-        if (entry.isIntersecting && !homeCache.stopScrolling && !cardResponse.loading() && !cardResponse.error()) {
-          setHomeSearchPage(currentPage() + 1)
-          setcurrentPage(currentPage() + 1)
-          cardResponse.Refetch([currentPage() + 1, props.title, props.tags ? props.tags.map((v) => v.name) : []])
-          observer.unobserve(entry.target)
-        }
-      });
-    }
-  );
-
   onMount(() => {
     handleUpdate()
     checkSkipButtons()
     window.addEventListener("resize", checkSkipButtons)
+    if (dummy && !props.horizontal && props.onScrollDownFunction) {
+      const LoadingObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const homeCache = getHomeCache()
+            if (entry.isIntersecting && !homeCache.stopScrolling && !cardResponse.loading() && !cardResponse.error()) {
+              setHomeSearchPage(currentPage() + 1)
+              setcurrentPage(currentPage() + 1)
+              cardResponse.Refetch([currentPage() + 1, props.title, props.tags ? props.tags.map((v) => v.name) : []])
+            }
+          });
+        }
+      );
+
+      LoadingObserver.observe(dummy)
+      onCleanup(() => LoadingObserver.disconnect())
+    }
   })
 
   createEffect(() => {
@@ -87,11 +92,6 @@ function Container(props: containerData) {
   function handleUpdate() {
     if (props.horizontal) return
     if (getHomeCache().stopScrolling) return
-    setTimeout(() => {
-      const lastCard = document.querySelector(".card-container:last-child")
-      if (!lastCard) return
-      observer.observe(lastCard)
-    }, 300)
   }
 
 
@@ -137,13 +137,18 @@ function Container(props: containerData) {
         <Show when={props.tags}>
           <For each={props.tags}>
             {(element) => (
-              <div onClick={element.remover} class="container-tag">{t(element.name)} <span class="material-symbols-outlined container-tag-icon">close</span></div>
+              <div
+                onClick={element.remover}
+                class="container-tag">
+                {t(element.name)}
+                <span class="material-symbols-outlined container-tag-icon">close</span>
+              </div>
             )}
           </For>
         </Show>
       </div>
 
-      <div tabIndex={-1} class="container-button-container">
+      <div class="container-button-container">
         <Switch>
           <Match when={!cardResponse.loading() && (cardResponse.error() || animeCards().length <= 0)}>
             <div class="container-error-text">
@@ -186,6 +191,10 @@ function Container(props: containerData) {
           </div>
         </Match>
       </Switch>
+
+      <Show when={!props.horizontal}>
+        <div class="container-loading-bottom dummy" ref={dummy}></div>
+      </Show>
     </div>
   )
 }

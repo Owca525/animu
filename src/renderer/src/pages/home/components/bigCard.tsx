@@ -1,4 +1,4 @@
-import { detectTitleConfig, getEpisodeDay, getGradientColor, getHistory } from '@renderer/utils/functions';
+import { dateToUnix, detectTitleConfig, getEpisodeDay, getGradientColor, getHistory, sortEpisodes } from '@renderer/utils/functions';
 import { cardData, indentityPlayer } from '@renderer/utils/types';
 import "./css/bigcard.css"
 import Button from '@renderer/components/buttons';
@@ -38,9 +38,13 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
         if (!plugin) return toast(t("notification.failedplugin"), { type: "error" })
         
         const idToast = toast(t("notification.fetchinganime"), { type: "loading", timer: true })
+
         if (!saveData && !id) {
             const response = await plugin.extractEpisodeList(data.AnimeData)
             if (!response || response.episodesData.length <= 0) return updateToast(idToast, t("notification.failedanime"), { type: "error", timer: false })
+            
+            const episodes = sortEpisodes(response)
+            
             PlayerCache.update({
                 anime: {
                     ...data.AnimeData,
@@ -50,12 +54,16 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
                     last_Time: 0,
                     type: response.episodesData[0].type,
                     pluginName: plugin.metadata.name,
-                    episode: response.episodesData[0].episodes[0].ep
+                    episode: response.episodesData[0].episodes[0].ep,
+                    lastAnimeDataUpdate: dateToUnix(new Date().toString()),
+                    lastEpisodesUpdate: dateToUnix(new Date().toString()),
+                    episodes: episodes ? episodes["episodesData"][0]["episodes"] : []
                 },
                 episodelist: response.episodesData[0].episodes,
                 continewatch: true,
             })
         }
+
         if (saveData && id) {
             const episodeList = await plugin.extractOnlyEpisodesList(saveData.type, id);
             if (episodeList.length <= 0) {
@@ -99,7 +107,7 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
                 return <></>
             }
             
-            if (historyContinue && parseInt(historyContinue.saveData.episode!) <= historyContinue.AnimeData.episodes!) {
+            if (historyContinue && parseInt(historyContinue.saveData.episode!)+1 <= historyContinue.AnimeData.episodes! && !(parseInt(historyContinue.saveData.episode!)+1 > historyContinue.AnimeData.episodes!)) {                
                 return <Button 
                     content={t("home.bigcard.start", { ep: parseInt(historyContinue.saveData.episode!)+1 })} 
                     ButtonClass='big-card-button' 

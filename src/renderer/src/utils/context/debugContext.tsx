@@ -86,7 +86,10 @@ export default function DebugContext(props: { children: JSX.Element }) {
                                 last_Time: 0,
                                 type: "sub",
                                 pluginName: "Animu_Player_Overwriter_Mode",
-                                episode: "1"
+                                episode: "1",
+                                lastAnimeDataUpdate: 0,
+                                lastEpisodesUpdate: 0,
+                                episodes: []
                             },
                             episodelist: [{ ep: "0" }],
                             continewatch: false

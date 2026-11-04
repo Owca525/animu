@@ -32,7 +32,7 @@ ipcMain.handle("fs:write", (_event, pathStr: string, data: string, format?: Writ
   return write(path.join(newConfigPath, pathStr), data, format)
 });
 
-ipcMain.handle("fs:read",  (_event, pathStr: string, format: WriteFileOptions): string | NonSharedBuffer | undefined => {
+ipcMain.handle("fs:read",  (_event, pathStr: string, format: "ascii" | "utf8" | "utf-8" | "utf16le" | "utf-16le" | "ucs2" | "ucs-2" | "base64" | "base64url" | "latin1" | "binary" | "hex"):  undefined | string => {
     try {
       let tmpPath = path.join(newConfigPath, pathStr)
       if (format) return readFileSync(tmpPath, format);

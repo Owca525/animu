@@ -373,6 +373,10 @@ app.on('child-process-gone', (_event, details) => {
   console.error('CHILD PROCESS CRASH', details)
 })
 
+process.on('SIGINT', () => {
+  process.exit(0)
+});
+
 process.on('uncaughtException', console.error)
 process.on('unhandledRejection', console.error)
 
@@ -385,7 +389,10 @@ ipcMain.handle('initialMetadata', async () => ({
   theme: getThemeList(checkConfigFolder("themes")),
   port: server.port,
   user: user_data,
-  user_lang: await GetUserLangs()
+  user_lang: await GetUserLangs(),
+  node_ver: process.versions.node,
+  chrome_ver: process.versions.chrome,
+  electron_ver: process.versions.electron
 }));
 
 ipcMain.handle('backend:customheader', (_, header: Record<string, string | string[]> | undefined) => customheader = header);

@@ -9,6 +9,8 @@ import Player from './pages/player/index';
 const Settings = lazy(() => import("./pages/settings/index"));
 // const Information = lazy(() => import("./pages/information/index"));
 
+import "./utils/database"
+
 import {
   calculateZoomLevel,
   changeTheme,
@@ -18,6 +20,7 @@ import {
   dateToUnix,
   deepMerge,
   FetchWeekCalendary,
+  SendRecomendAnime,
   timeCovertToMs,
   updateObject
 } from './utils/functions';
@@ -344,51 +347,59 @@ function initialServices() {
       execute: async () => {
         try {
           const tmp = JSON.parse(localStorage.getItem("pluginStatusCachce") as any)
-          const time = checkTimeDriffrentUnix(new Date().toString(), tmp["time"])
+          const time = checkTimeDriffrentUnix(undefined, tmp["time"])
           if (time["min"] > 359 && time["hour"] >= 0) localStorage.removeItem("pluginStatusCachce")
         } catch (error) { }
 
         await pluginManager.checkStatusServerInPlugins(localStorage.getItem("pluginStatusCachce") == undefined)
       },
-      name: t("services.plugin_name"),
-      description: t("services.plugin_desc"),
+      name: "services.plugin_name",
+      description: "services.plugin_desc",
       activeTime: timeCovertToMs({ min: 360 })
     },
     {
       active: !window["animuAppInfo"]["flags"]["WEB"] && config.update.type == "On Start",
       execute: checkUpdate,
-      name: t('services.animupdate_name'),
-      description: t("services.animupdate_desc"),
+      name: 'services.animupdate_name',
+      description: "services.animupdate_desc",
       noFirstStart: true,
       activeTime: timeCovertToMs({ min: 60 })
     },
     {
-      active: true,
+      active: config.update.enable,
       execute: checkPluginUpdate,
-      name: t('services.pluginupdates_name'),
+      name: 'services.pluginupdates_name',
       activeTime: timeCovertToMs({ min: 30 }),
-      description: t("services.pluginupdates_desc")
+      description: "services.pluginupdates_desc"
     },
     {
       active: true,
       execute: FetchWeekCalendary,
-      name: t('services.calendaryupdate_name'),
-      description: t("services.calendaryupdate_desc"),
+      name: 'services.calendaryupdate_name',
+      description: "services.calendaryupdate_desc",
       activeTime: timeCovertToMs({ hour: 12 })
     },
     {
       active: true,
       execute: checkAnimeTodayReleaseEpisode,
-      name: t("services.episodeavailble_name"),
-      description: t("services.episodeavailble_desc"),
+      name: "services.episodeavailble_name",
+      description: "services.episodeavailble_desc",
       activeTime: timeCovertToMs({ min: 40 })
     },
     {
       active: true,
       execute: SynchronizeAnimulistWithPlugin,
-      name: t("services.animulistsynchronize_name"),
-      description: t("services.animulistsynchronize_desc"),
+      name: "services.animulistsynchronize_name",
+      description: "services.animulistsynchronize_desc",
       activeTime: timeCovertToMs({ min: 120 })
+    },
+    {
+      active: config.animu.recomendation,
+      execute: SendRecomendAnime,
+      name: "services.recomendation_name",
+      description: "services.recomendation_desc",
+      activeTime: timeCovertToMs({ min: 125 }),
+      noFirstStart: true
     }
   ])
 }

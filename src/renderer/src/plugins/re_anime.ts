@@ -45,50 +45,90 @@ const decryptor_content = `(response) => {
     return (new TextDecoder).decode(new Uint8Array(str))
 }`
 
-
+// TODO: Make reanime more stable
 const hls_converter = `(response) => {
     let buffer = response["buffer"]
+    if (!/\.(webp|png)/i.test(response.url)) return buffer
 
-        const u = new Uint8Array(buffer);
+    const u = new Uint8Array(buffer);
 
-        let offset = 0;
+    let offset = 0;
 
-        if (u.length >= 12 && [u[0], u[1], u[2], u[3], u[8], u[9], u[10], u[11]] == [0x52, 0x49, 0x46, 0x46, 0x57, 0x45, 0x42, 0x50]) {
-            offset = 12;
+    if (u.length >= 12 && [u[0], u[1], u[2], u[3], u[8], u[9], u[10], u[11]] == [82, 73, 70, 70, 87, 69, 66, 80]) {
+        offset = 12;
+    }
+
+    if (u.length >= 8 && [u[0], u[1], u[2], u[3], u[4], u[5], u[6], u[7]] == [137, 80, 78, 71, 13, 10, 26, 10]) {
+        offset = 8;
+    }
+
+    if (buffer[offset] === 71) return buffer.slice(offset)
+
+    if (offset) {
+        const data = buffer.slice(offset);
+
+        const key = [
+            157, 42, 241, 71, 179, 142, 92, 112,
+            166, 25, 228, 59, 216, 98, 15, 197
+        ];
+
+        for (let i = offset, j = 0; i < data.length; i++, j++) {
+            data[i] ^= key[j & 15];
         }
 
-        if (u.length >= 8 && [u[0], u[1], u[2], u[3], u[4], u[5], u[6], u[7]] == [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]) {
-            offset = 8;
-        }
-
-        if (offset == 0) return buffer
-
-        if (u[offset] !== 0x47) {
-            let data = u.subarray(offset);
-            const key = [
-                157, 42, 241, 71,
-                179, 142, 92, 112,
-                166, 25, 228, 59,
-                216, 98, 15, 197
-            ];
-
-            for (let i = offset, j = 0; i < data.length; i++, j++) {
-                data[i] ^= key[j & 15];
-            }
-
-            buffer = data.buffer.slice(
-                data.byteOffset,
-                data.byteOffset + data.byteLength
-            );
-        } else {
-            buffer = u.buffer.slice(
-                u.byteOffset + offset,
-                u.byteOffset + u.byteLength
-            );
-        }
+        return data.buffer
+    }
 
     return buffer;
 }`
+
+// if (
+//     e?.url &&
+//     /\.(webp|png)/i.test(e.url) &&
+//     o instanceof ArrayBuffer
+// ) {
+//     const u = new Uint8Array(o);
+//     let offset = 0;
+
+//     if (
+//         u.length >= 12 &&
+//         u[0] === 82 && u[1] === 73 &&
+//         u[2] === 70 && u[3] === 70 &&
+//         u[8] === 87 && u[9] === 69 &&
+//         u[10] === 66 && u[11] === 80
+//     ) {
+//         offset = 12;
+//     } else if (
+//         u.length >= 8 &&
+//         u[0] === 137 && u[1] === 80 &&
+//         u[2] === 78 && u[3] === 71 &&
+//         u[4] === 13 && u[5] === 10 &&
+//         u[6] === 26 && u[7] === 10
+//     ) {
+//         offset = 8;
+//     }
+
+//     if (offset) {
+//         const data = o.slice(offset);
+
+//         if (u[offset] === 71) {
+//             o = data;
+//         } else {
+//             const key = [
+//                 157, 42, 241, 71, 179, 142, 92, 112,
+//                 166, 25, 228, 59, 216, 98, 15, 197
+//             ];
+
+//             const bytes = new Uint8Array(data);
+
+//             for (let i = 0; i < bytes.length; i++) {
+//                 bytes[i] ^= key[i & 15];
+//             }
+
+//             o = bytes.buffer;
+//         }
+//     }
+// }
 
 // function DecyrptContent(encode_content: string, secret: string) {
 //     let str: number[] = [];
@@ -97,11 +137,6 @@ const hls_converter = `(response) => {
 //         str.push(u.charCodeAt(h) ^ l.charCodeAt(h % l.length));
 //     }
 //     return (new TextDecoder).decode(new Uint8Array(str))
-// }
-
-// function runInWorker(response) {
-//     const key = "REPLACE_ME_TO_SECRET_KEY"
-//     return DecyrptContent(response["text"], key)
 // }
 
 function sleep(ms) {
@@ -480,7 +515,7 @@ async function ExtractVideo(playerData: playerDataExtended, url: string): Promis
 
 export default class ReAnime implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.0",
+        version: "1.1",
         name: "ReAnime",
         author: "Owca525",
         supportLang: ["en"],

@@ -1,5 +1,5 @@
 // DISSABLE
-import { makeSmallText, request as sheepRequest, requestCloudflare, savePluginConfig } from "@renderer/utils/functions";
+import { makeSmallText, request as sheepRequest, requestCloudflare } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerPluginFormat, resolutionFormat, serverStatusData } from "@renderer/utils/types";
 // TODO: Fix this
 const WEBSITE = "https://animepahe.pw"
@@ -62,7 +62,7 @@ async function request(url: string, options?: { method?: "POST" | "GET", headers
     if (window["config"]["cloudflare"] == undefined) {
         header.Cookie = await extractToken(url) ?? ""
         config = { ...config, cloudflare: header.Cookie }
-        savePluginConfig(config)
+        // saveConfig(config)
     }
 
     let tries = 1
@@ -76,7 +76,7 @@ async function request(url: string, options?: { method?: "POST" | "GET", headers
         if (response["status"] == 403 && response["text"].includes("Cloudflare")) {
             header.Cookie = await extractToken(url) ?? ""
             config = { ...config, cloudflare: header.Cookie }
-            savePluginConfig(config)
+            // saveConfig(config)
             tries -= 1
         } else {
             break

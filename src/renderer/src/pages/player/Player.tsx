@@ -181,9 +181,6 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
     let toast_fetch_id = ""
 
-    let lastMediaTime = undefined;
-    let lastPresentedFrames = 0;
-
     const [player, updatePlayer] = createStore({
         initialize: true,
 
@@ -410,26 +407,6 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
     })
 
     /* Player */
-
-    function monitorFrames(_, meta) {
-        if (lastMediaTime != undefined && meta.mediaTime < lastMediaTime - 0.08) {
-            console.warn("Player/MonitorFrames", {
-                lastMediaTime: lastMediaTime,
-                mediaTime: meta.mediaTime,
-                currentTime: videoRef!.currentTime,
-                presentedFrames: meta.presentedFrames
-            });
-        }
-
-        if (meta.presentedFrames < lastPresentedFrames) {
-            console.warn("Player/MonitorFrame Probalby Detected Desync");
-        }
-
-        lastMediaTime = meta.mediaTime;
-        lastPresentedFrames = meta.presentedFrames;
-
-        videoRef!.requestVideoFrameCallback(monitorFrames);
-    }
 
     async function setNewPlayer(meta: playerData) {
         if (type != "embed") SheePlayer.currentTime = player.currentTime
@@ -725,8 +702,18 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         }
 
         let manifest_script: player_script_injector[] = player.playerData!["scripts"] ?? []
+        let hls_manifest_parser: string | undefined
+        let hls_arraybuffer_parser: string | undefined
+
         if (manifest_script.length > 0) {
             sheepworker = new SheepWorkerInstance()
+
+            const f1 = manifest_script.find((v) => v["type"] == "hls_manifest")
+            if (f1) hls_manifest_parser = f1["code"]
+
+            const f2 = manifest_script.find((v) => v["type"] == "hls_arraybuffer")
+            if (f2) hls_arraybuffer_parser = f2["code"]
+
         }
 
         class sheepLoader extends Hls.DefaultConfig.loader {
@@ -749,21 +736,29 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
                         if (context.responseType == "arraybuffer") currentData = data.buffer
 
-                        for (let index = 0; index < manifest_script.length; index++) {
-                            const element = manifest_script[index];
-                            switch (element["type"]) {
-                                case "hls_manifest":
-                                    if (context["responseType"] != "text") break
-
-                                    currentData = await sheepworker!.unsafe_function(element["code"], data)
-                                    break
-                                case "hls_arraybuffer":
-                                    if (context["responseType"] != "arraybuffer") break
-
-                                    currentData = await sheepworker!.unsafe_function(element["code"], data)
-                                    break
-                            }
+                        if (hls_manifest_parser && context["responseType"] == "text") {
+                            currentData = await sheepworker!.function(hls_manifest_parser, data)
                         }
+
+                        if (hls_arraybuffer_parser && context["responseType"] == "arraybuffer") {
+                            currentData = await sheepworker!.function(hls_arraybuffer_parser, data)
+                        }
+
+                        // for (let index = 0; index < manifest_script.length; index++) {
+                        //     const element = manifest_script[index];
+                        //     switch (element["type"]) {
+                        //         case "hls_manifest":
+                        //             if (context["responseType"] != "text") break
+
+                        //             currentData = await sheepworker!.function(element["code"], data)
+                        //             break
+                        //         case "hls_arraybuffer":
+                        //             if (context["responseType"] != "arraybuffer") break
+
+                        //             currentData = await sheepworker!.function(element["code"], data)
+                        //             break
+                        //     }
+                        // }
 
                         callbacks.onSuccess({ data: currentData, url: context.url }, {
                             loaded: data.buffer.byteLength,
@@ -804,16 +799,15 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         tmpHls.on(Hls.Events.MEDIA_ATTACHED, () => {
             console.warn("Player/HLS MEDIA_ATTACHED");
             tmpHls.loadSource(player["currentResolution"]!["url"]);
-            videoRef!.requestVideoFrameCallback(monitorFrames);
         });
 
-        tmpHls.on(Hls.Events.FRAG_CHANGED, (_, data) => {
-            console.warn("Player/HLS Fragment Change", {
-                start: data.frag.start,
-                duration: data.frag.duration,
-                currentTime: videoRef!.currentTime
-            });
-        });
+        // tmpHls.on(Hls.Events.FRAG_CHANGED, (_, data) => {
+        //     console.warn("Player/HLS Fragment Change", {
+        //         start: data.frag.start,
+        //         duration: data.frag.duration,
+        //         currentTime: videoRef!.currentTime
+        //     });
+        // });
 
         tmpHls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
             console.warn("Player/HLS Manifest Parsed", data)
@@ -1091,7 +1085,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
             if (!(currentTime >= element.start && currentTime <= element.end)) return
 
-            if (config.Player.general.autoSkipOpenings || config.Player.general.autoSkipEndings) return setTimeVideo(element.end)
+            if ((config.Player.general.autoSkipOpenings && element["type"] == "opening") ||
+                (config.Player.general.autoSkipEndings && element["type"] == "ending")) return setTimeVideo(element.end)
 
             if (element.type == "other") return
 
@@ -1630,7 +1625,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             let prev = ui.chapterSkipTimer
 
             if (prev <= 1) {
-                clearChapterSkipTime(config["Player"]["general"]["autoSkipOpeningEnding"])
+                clearChapterSkipTime(false)
                 prev = 15
             } else {
                 prev -= 1
@@ -1652,7 +1647,12 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             chapterSkipTimer: 15,
         })
 
-        if (ui.chapterSkipEnd > 0 && overwrite) setTimeVideo(ui.chapterSkipEnd)
+        if (ui.chapterSkipEnd > 0 && overwrite) {
+
+            if (ui.upNextActive && ui.chapterSkipType == "ending") updateUI({ upNextActive: false })
+
+            setTimeVideo(ui.chapterSkipEnd)
+        }
     }
 
     function checkUpNext(event: Event & { currentTarget: HTMLVideoElement; target: Element; }) {

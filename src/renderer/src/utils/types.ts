@@ -166,13 +166,9 @@ export interface homeData {
         page: string,
         filter: genres[]
     }[]
-    mainContainer: {
-        scrollLeft: number,
-        scrollTop: number,
-        offsetHeight: number,
-        scrollHeight: number,
-        clientHeight: number
-    } | undefined
+
+    scrollTop: number
+
     onScrollContainer?: () => void
     sidebarData: {
         top: sidebarData[],
@@ -208,7 +204,6 @@ export interface globalDataFormat {
     anilist_user_data?: { [key: string]: any; },
     isAnimuFocus: boolean
     notifications: NotificationExpanded[]
-    animeOpeningsCache: { [key: number]: animeOpeningsFormat[] }
     audioOutput: MediaDeviceInfo | undefined
     pluginSearchMode: boolean,
     yt_dlp: {
@@ -564,17 +559,19 @@ export interface SettingsConfig {
     deepLinkURL: string
     yt_dlp: string
     yt_dlpRepo: string
-    anilist: {
+    animu: {
         scoreFormat: Anilist_ScoreFormat
         titleFormat: Anilist_UserTitleLanguage
         adultdefault: boolean
         maxpagesize: number
+        recomendation: boolean
     }
     animulist: {
         historyConvert: boolean
     }
     plugins: {
         hiddenPlugins: string[]
+        includeOnly: string[]
         // information: string
         userPlugins: boolean
         player: string

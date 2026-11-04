@@ -114,6 +114,16 @@ declare global {
       reload: () => void;
       createWindow: (props: { url: string, type: string }) => Promise<any>
     };
-    initialMetadata: { config: SettingsConfig, history: cardData[], animulist: animulistData[], theme: themeMetadata[], user: UserData, user_lang: { content: string, lang: string }[] }
+    initialMetadata: { 
+      config: SettingsConfig, 
+      history: cardData[], 
+      animulist: animulistData[],
+      theme: themeMetadata[], 
+      user: UserData, 
+      user_lang: { content: string, lang: string }[],
+      node_ver: string,
+      chrome_ver: string,
+      electron_ver: string
+    }
   }
 }

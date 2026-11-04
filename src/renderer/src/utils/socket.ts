@@ -30,7 +30,10 @@ function OverWritePlayer(url: string, hls: boolean = false, customReq?: { [key: 
             last_Time: 0,
             type: "sub",
             pluginName: "Animu_Player_Overwriter_Mode",
-            episode: "1"
+            episode: "1",
+            lastAnimeDataUpdate: 0,
+            lastEpisodesUpdate: 0,
+            episodes: []
         },
         episodelist: [{ ep: "" }],
         continewatch: false
@@ -88,6 +91,7 @@ export async function runSocket(server: string = "") {
 export function createRoom(name: string) {
     const socket = getSocket()
     if (!socket) return
+    // @ts-ignore
     socket.emit("join-room", name, (resp) => {
         if (!resp.success) return toast(`Failed Connect to Room ${name}`)
         else {
