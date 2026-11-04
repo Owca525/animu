@@ -1625,7 +1625,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             let prev = ui.chapterSkipTimer
 
             if (prev <= 1) {
-                // clearChapterSkipTime(config["Player"]["general"]["autoSkipOpeningEnding"])
+                clearChapterSkipTime(false)
                 prev = 15
             } else {
                 prev -= 1
