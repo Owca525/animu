@@ -106,7 +106,7 @@ export async function LoginToInformationPlugin() {
         }, {
           title: t(`user.overwrite_plugin`, { plugin: plugin["metadata"]["name"] }),
           onClick: async () => {
-            const id = toast(t(`user.updateProfile`, { plugin: plugin["metadata"]["name"] }), { type: "loading", timer: false })
+            const id = toast(t(`user.updateProfile`, { plugin: plugin["metadata"]["name"] }), { type: "loading", noTimer: false })
 
             try {
               const resp = await plugin.updateUser!(animuUser)

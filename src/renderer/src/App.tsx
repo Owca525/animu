@@ -99,7 +99,7 @@ function App() {
   SheepShortcut(["Control", "Shift", "R"], async () => {
     if (!getConfig().Developer.DeveloperMode) return
 
-    const idToast = toast(t("global.themereload"), { type: "loading", timer: true })
+    const idToast = toast(t("global.themereload"), { type: "loading", noTimer: true })
     setGlobalTheme([
       ...window["animuAppInfo"]["themes"],
       ...await window.api.themes.list()
@@ -116,12 +116,13 @@ function App() {
     }
     changeTheme(loadingTheme)
 
-    updateToast(idToast, t("global.themereload"), { type: "success", timer: false })
+    updateToast(idToast, t("global.themereload"), { type: "success", noTimer: false })
     await window.backend.refresh()
   })
   /* ENDIF */
 
   SheepShortcut(["Control", "Shift", "|"], () => {
+    // TRANSLATION
     setPluginSearchMode(!isPluginSearchMode())
     toast(`Plugin Search Mode ${isPluginSearchMode()}`, { type: "info" })
     if (isPluginSearchMode()) toast("This Mode can broke some things in animu")

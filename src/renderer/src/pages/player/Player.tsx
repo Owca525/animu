@@ -99,7 +99,7 @@ class ExtractorManagerInstance {
             const hash = await CreateSHA256(JSON.stringify(content))
             if (this.cache.has(hash)) return this.cache.get(hash)
 
-            id = toast(content["loadingMessage"], { type: "loading", timer: true })
+            id = toast(content["loadingMessage"], { type: "loading", noTimer: true })
             this.active = id
 
             const resp = await content.func(content.args)
@@ -1297,7 +1297,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         if (sub.label == "Off" && sub.format == "", sub.lang == "", sub.url == "")
             return updatePlayer({ currentSubtitle: { url: "", format: "", lang: "", label: "Off" } })
 
-        const tmp_toast_fetch_id = toast(t("Fetching Subtitles"), { timer: false, type: "loading" })
+        const tmp_toast_fetch_id = toast(t("Fetching Subtitles"), { noTimer: false, type: "loading" })
         toast_fetch_id = tmp_toast_fetch_id
 
         const data = await request(sub.url, {

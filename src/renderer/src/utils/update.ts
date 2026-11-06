@@ -37,13 +37,13 @@ export function downloadUpdate(updateNotification: string) {
   window.api.update.updateProgress((_event, percent) => {
     updateToast(updateNotification, t("update.progress", { procent: percent.toFixed(1) }), {
       type: "loading",
-      timer: true,
-      click: true,
+      noTimer: true,
+      dontHide: true,
       onClick: undefined
     });
 
     if (percent.toFixed(0) === "100") {
-      updateToast(updateNotification, t("update.done"), { type: "success", timer: false, click: false });
+      updateToast(updateNotification, t("update.done"), { type: "success", noTimer: false, dontHide: false });
     }
   });
   /* ENDIF */

@@ -1081,9 +1081,9 @@ export class PluginManager implements PluginManagerFormat {
 
         const tmp = plugins.find((v) => v.metadata.name == plugin.name)
         if (tmp) {
-            const id = toast(`Update ${plugin.name} from ${tmp["metadata"]["version"]} to ${plugin.ver}`, { type: "loading", timer: true })
+            const id = toast(`Update ${plugin.name} from ${tmp["metadata"]["version"]} to ${plugin.ver}`, { type: "loading", noTimer: true })
             await window.api.plugins.installUpdate(plugin)
-            updateToast(id, `Update Succesfully Installed for ${plugin["name"]}`, { type: "success", timer: false })
+            updateToast(id, `Update Succesfully Installed for ${plugin["name"]}`, { type: "success", noTimer: false })
 
             // if (this.activeInformationPlugin["metadata"]["name"] == plugin["name"] || this.activePlayerPlugin["metadata"]["name"] == plugin["name"]) {
             //     if (location.href.endsWith("player") && plugin["type"] == "player") {
@@ -1098,9 +1098,9 @@ export class PluginManager implements PluginManagerFormat {
             //     }
             // }
         } else {
-            const id = toast(t(`Instaling Plugin ${plugin["name"]}`), { type: "loading", timer: true })
+            const id = toast(t(`Instaling Plugin ${plugin["name"]}`), { type: "loading", noTimer: true })
             await window.api.plugins.installUpdate(plugin)
-            updateToast(id, t(`Succesfully Installed Plugin: ${plugin["name"]}`), { type: "success", timer: false })
+            updateToast(id, t(`Succesfully Installed Plugin: ${plugin["name"]}`), { type: "success", noTimer: false })
         }
 
         await this.initialPlugins()

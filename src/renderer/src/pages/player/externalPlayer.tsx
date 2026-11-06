@@ -135,7 +135,7 @@ const ExternalPlayer: Component<ExternalplayerProps> = ({ animeData, now_episode
 
         setCurrentHost(player)
         if (player.extractResolution) {
-            const idToast = toast("Fetching Resolution", { type: "loading", timer: true })
+            const idToast = toast("Fetching Resolution", { type: "loading", noTimer: true })
             let tmp = await fetchResolutions({
                 ...player,
                 episode: {

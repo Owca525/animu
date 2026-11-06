@@ -175,7 +175,7 @@ export async function SynchronizeAnimulistWithPlugin(animu_overwrite = false) {
     let failed = 0
 
     let toast_id: string | undefined = undefined
-    if  (saveInPlugin.length > 9) toast_id = toast(t(`Sync Anime ${success}/${saveInPlugin.length} failed: ${failed}`), { type: "loading", timer: false })
+    if  (saveInPlugin.length > 9) toast_id = toast(t(`Sync Anime ${success}/${saveInPlugin.length} failed: ${failed}`), { type: "loading", noTimer: false })
 
     for (let index = 0; index < saveInPlugin.length; index++) {
         const anime = saveInPlugin[index];

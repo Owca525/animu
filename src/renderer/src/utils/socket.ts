@@ -92,6 +92,7 @@ export function createRoom(name: string) {
     const socket = getSocket()
     if (!socket) return
     // @ts-ignore
+    // TRANSLATIONs
     socket.emit("join-room", name, (resp) => {
         if (!resp.success) return toast(`Failed Connect to Room ${name}`)
         else {

@@ -66,7 +66,7 @@ function Card(props: CardProps) {
 
         } else {
 
-          idToast = toast(t("notification.episodesfetching"), { type: "loading", timer: true })
+          idToast = toast(t("notification.episodesfetching"), { type: "loading", noTimer: true })
           const currentPLugin = await pluginManager.changePlayerPlugin(saveData.pluginName)
           episodeList = await currentPLugin.extractOnlyEpisodesList(saveData.type, props.card.AnimeData.player_ID as string)
 
@@ -77,7 +77,7 @@ function Card(props: CardProps) {
       }
 
       if (episodeList.length <= 0) {
-        updateToast(idToast, t("notification.episodesfailed"), { type: "error", timer: false })
+        updateToast(idToast, t("notification.episodesfailed"), { type: "error", noTimer: false })
         return
       }
 

@@ -68,7 +68,7 @@ export default function DebugContext(props: { children: JSX.Element }) {
                     // TODO: FIX THIS
 
                     try {
-                        const id = toast("Fetching", { type: "loading", timer: false })
+                        const id = toast("Fetching", { type: "loading", noTimer: false })
                         const extracted = await ExtractVideo(input.element!["value"])
                         removeToast(id)
                         if (extracted.length <= 0) return toast("Failed Extract", { type: "error" })

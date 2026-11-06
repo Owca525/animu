@@ -149,7 +149,7 @@ async function convertToNewVersion(data: { id: string, title: string, img: strin
     let animeList: cardData[] = []
     let success: number = 0
     let failed: number = 0
-    const updatedToast = toast(t("oldBackup.convert", { success, failed }), { type: "loading", timer: true })
+    const updatedToast = toast(t("oldBackup.convert", { success, failed }), { type: "loading", noTimer: true })
     for (let index = 0; index < data.length; index++) {
         const anime = data[index];
         try {
@@ -183,7 +183,7 @@ async function convertToNewVersion(data: { id: string, title: string, img: strin
         }
         updateToast(updatedToast, t("oldBackup.convert", { success, failed }))
     }
-    updateToast(updatedToast, "oldBackup.done", { type: "success", timer: false })
+    updateToast(updatedToast, "oldBackup.done", { type: "success", noTimer: false })
     return animeList
 }
 

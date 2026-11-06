@@ -913,10 +913,10 @@ export async function fetchAnimeDeepLink(deeplink: string) {
     if (!anime) return
 
     const infoPlugin = getInformationPlugin()
-    const idToast = toast(t("notification.fetchinganime"), { type: "loading", timer: true })
+    const idToast = toast(t("notification.fetchinganime"), { type: "loading", noTimer: true })
     const response = await infoPlugin.anime(anime.animeID)
-    if (!response) return updateToast(idToast, t("notification.failedanime"), { type: "error", timer: false })
-    updateToast(idToast, t("notification.successanime"), { type: "success", timer: false })
+    if (!response) return updateToast(idToast, t("notification.failedanime"), { type: "error", noTimer: false })
+    updateToast(idToast, t("notification.successanime"), { type: "success", noTimer: false })
 
     if (!anime.player) {
         informationCache.update({ anime: response })
@@ -924,12 +924,12 @@ export async function fetchAnimeDeepLink(deeplink: string) {
         return
     }
 
-    const toastID = toast(t("notification.episodesfetching"), { type: "loading", timer: true })
+    const toastID = toast(t("notification.episodesfetching"), { type: "loading", noTimer: true })
     const currentPLugin = await pluginManager.changePlayerPlugin(anime.player.plugin)
     const episodeList = await currentPLugin.extractOnlyEpisodesList(anime.player.type, anime.player.id);
 
     if (episodeList.length <= 0) {
-        updateToast(toastID, t("notification.episodesfailed"), { type: "error", timer: false })
+        updateToast(toastID, t("notification.episodesfailed"), { type: "error", noTimer: false })
         return
     }
 

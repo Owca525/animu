@@ -507,6 +507,7 @@ function settings() {
                 setConfig(file["config"])
                 saveConfig(file["config"])
 
+                // TRANSLATION
                 toast("Sucessfully Imported Data To Animu", { type: "success" })
                 /* IFDEF DEBUG|PROD */
                 window.BrowserWindow.reload()
@@ -518,6 +519,7 @@ function settings() {
 
             } catch (error) {
                 console.error("Error in importConfig", error)
+                // TRANSLATION
                 toast("Failed Import Data", { type: "error" })
             }
         };
@@ -1517,7 +1519,7 @@ function settings() {
                         <div class="settings-setting-container">
                             {t("settings.devmode.notificationtest")}
                             <span class="settings-custom-space">
-                                <Button content={t("types.success")} onClick={() => toast(t("notification.test"), { type: "success" })} />
+                                <Button content={t("types.success")} onClick={() => toast(t("notification.test"), { type: "success", dontHide: true })} />
                                 <Button content={t("types.error")} onClick={() => toast(t("notification.test"), { type: "error" })} />
                                 <Button content={t("types.loading")} onClick={() => toast(t("notification.test"), { type: "loading" })} />
                                 <Button content={t("types.default")} onClick={() => toast(t("notification.test"))} />

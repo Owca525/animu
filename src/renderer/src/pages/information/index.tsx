@@ -517,7 +517,7 @@ function information() {
     }
 
     async function ChangeAnimeInInformation(data: AnimeData): Promise<any> {
-        const idToast = toast(t("notification.fetchinganime"), { timer: true, type: "loading" })
+        const idToast = toast(t("notification.fetchinganime"), { noTimer: true, type: "loading" })
         const animulist = animulistData()
         let resp
 
@@ -533,8 +533,8 @@ function information() {
         console.warn("Information/ChangeAnimeInInformation", resp)
         /* ENDIF */
         updateInfo({ isFetchingAnime: false })
-        if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", timer: false })
-        updateToast(idToast, t("notification.successanime"), { type: "success", timer: false })
+        if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", noTimer: false })
+        updateToast(idToast, t("notification.successanime"), { type: "success", noTimer: false })
 
         let tmpAnimulist: any = animulist.get(resp["id"])
         if (tmpAnimulist) tmpAnimulist = tmpAnimulist["animulist"]
