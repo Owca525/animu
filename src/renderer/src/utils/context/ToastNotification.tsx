@@ -17,6 +17,7 @@ export interface ToastOptions {
     onClick?: () => void;
     noTimer?: boolean
     dontHide?: boolean
+    progress?: number
 }
 
 const defaultOptions: ToastOptions = {
@@ -26,7 +27,7 @@ const defaultOptions: ToastOptions = {
 
 interface ToastContextType {
     addToast: (msg: string | { title: string, description: string, icon?: string }, options: ToastOptions) => string;
-    updateToast: (id: string, msg: string | { title: string, description: string, icon?: string }, options: ToastOptions) => void;
+    updateToast: (id: string, msg: string | { title: string, description: string, icon?: string }, options?: ToastOptions) => void;
     removeToast: (id: string) => void;
 };
 
@@ -56,24 +57,34 @@ export function ToastProvider(props: { children: JSX.Element }) {
         return id
     };
 
-    function updateToast(id: string, msg: string | { title: string, description: string, icon?: string }, options: ToastOptions) {
+    function updateToast(id: string, msg: string | { title: string, description: string, icon?: string }, options?: ToastOptions) {
         setToasts((prevToast) => prevToast.map((tost) => {
             if (tost.id != id) return tost
+
+            options = {
+                ...tost["options"],
+                ...options
+            }
+
             clearInterval(tost.timer)
             let timer: NodeJS.Timeout | undefined
 
-            if (!options["noTimer"]) {
+            if (options) {
 
-                timer = setTimeout(() => {
-                    removeToast(id)
-                }, options.duration ?? defaultOptions.duration);
-                timers.set(id, timer)
+                if (!options["noTimer"]) {
 
-            } else {
+                    timer = setTimeout(() => {
+                        removeToast(id)
+                    }, options.duration ?? defaultOptions.duration);
+                    timers.set(id, timer)
 
-                const tmp = timers.get(id)
-                if (tmp) clearTimeout(tmp)
-                
+                } else {
+
+                    const tmp = timers.get(id)
+                    if (tmp) clearTimeout(tmp)
+
+                }
+
             }
 
             if (typeof msg == "string") return { ...tost, message: msg, options: { ...tost.options, ...options }, updated: true, timer }
@@ -96,7 +107,7 @@ export function ToastProvider(props: { children: JSX.Element }) {
                         {toast => (
                             <div class={`toast ${!toast.updated && !toast.animation ? "show" : ""} ${toast.options.type} ${toast.animation && !toast.updated ? "disable" : ""} ${toast.options.dontHide == false || toast.options.onClick ? "click" : ""}`}
                                 onclick={() => {
-                                    
+
                                     if (toast.options.onClick) toast.options.onClick()
                                     if (toast.options.dontHide) return
 
@@ -106,25 +117,41 @@ export function ToastProvider(props: { children: JSX.Element }) {
                                     if (event.target.classList.contains("disable")) setToasts(prev => prev.filter(t => t.id !== toast.id))
                                 }}
                             >
-                                <Show when={toast.options?.type == "loading"}>
-                                    <span class="material-symbols-outlined loading-animation">progress_activity</span>
-                                </Show>
-                                <Show when={toast.options?.type == "success"}>
-                                    <span class="material-symbols-outlined">check_circle</span>
-                                </Show>
-                                <Show when={toast.options?.type == "error"}>
-                                    <span class="material-symbols-outlined">cancel</span>
-                                </Show>
-                                <Show when={toast.options?.type == "info"}>
-                                    <span class="material-symbols-outlined">info</span>
-                                </Show>
+
                                 <Switch>
                                     <Match when={!toast.options || toast.options.type != "notification"}>
-                                        {toast.message}
+                                        <div class="toast-top">
+
+                                            <Show when={toast.options?.type == "loading"}>
+                                                <span class="material-symbols-outlined loading-animation toast-icon">progress_activity</span>
+                                            </Show>
+
+                                            <Show when={toast.options?.type == "success"}>
+                                                <span class="material-symbols-outlined toast-icon">check_circle</span>
+                                            </Show>
+
+                                            <Show when={toast.options?.type == "error"}>
+                                                <span class="material-symbols-outlined toast-icon">cancel</span>
+                                            </Show>
+
+                                            <Show when={toast.options?.type == "info"}>
+                                                <span class="material-symbols-outlined toast-icon">info</span>
+                                            </Show>
+
+                                            {toast.message}
+                                        </div>
+
+                                        <Show when={toast["options"]["type"] == "loading" && toast["options"]["progress"]}>
+                                            <div class="toast-seekbar-container">
+                                                <span class="toast-seekbar-progress" style={{ width: `${toast["options"]["progress"]}%` }}></span>
+                                            </div>
+                                        </Show>
+
                                     </Match>
-                                    <Match when={toast["options"]?.type == "notification"}>
+                                    <Match when={toast["options"].type == "notification"}>
                                         <span class="toast-notification-top-bar">
                                             {toast.message}
+
                                         </span>
                                         <span class="toast-notification-content">
                                             {toast.added?.description}
@@ -149,11 +176,11 @@ export function toast(msg: string | { title: string, description: string, icon?:
 }
 
 export function updateToast(id: string, msg: string | { title: string, description: string, icon?: string }, options?: ToastOptions) {
-    if (!toastAPI) return "";
-    return toastAPI.updateToast(id, msg, options ?? defaultOptions)
+    if (!toastAPI) return;
+    return toastAPI.updateToast(id, msg, options)
 }
 
 export function removeToast(id: string) {
-    if (!toastAPI) return "";
+    if (!toastAPI) return;
     return toastAPI.removeToast(id)
 }

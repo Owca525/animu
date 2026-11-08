@@ -27,6 +27,11 @@
         "double_check": "Double Check",
         "cloudflare": "Verify Cloudflare to use plugin. Click to open window"
     },
+    "download": {
+        "start": "Starting Fetching",
+        "download": "Downloading {{filename}} {{progress}} \\ {{total}}Mb",
+        "success": "Download Success ${filename} {{total}}Mb"
+    },
     "animu": {
         "format_title": "Title Format"
     },

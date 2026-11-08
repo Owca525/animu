@@ -10,6 +10,7 @@ const Settings = lazy(() => import("./pages/settings/index"));
 // const Information = lazy(() => import("./pages/information/index"));
 
 import "./utils/database"
+import "./utils/DownloaderManager"
 
 import {
   calculateZoomLevel,
