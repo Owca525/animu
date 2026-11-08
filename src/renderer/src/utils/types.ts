@@ -104,7 +104,6 @@ export interface AnimeData {
         episode: number
         timeUntilAiring: number
     } | undefined
-    popularity?: number | undefined
     season?: string | undefined
     seasonYear?: number | undefined
     startDate?: DateObject | undefined
