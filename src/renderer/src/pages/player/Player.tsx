@@ -737,11 +737,11 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                         if (context.responseType == "arraybuffer") currentData = data.buffer
 
                         if (hls_manifest_parser && context["responseType"] == "text") {
-                            currentData = await sheepworker!.function(hls_manifest_parser, data)
+                            currentData = await sheepworker!.unsafe_function(hls_manifest_parser, data)
                         }
 
                         if (hls_arraybuffer_parser && context["responseType"] == "arraybuffer") {
-                            currentData = await sheepworker!.function(hls_arraybuffer_parser, data)
+                            currentData = await sheepworker!.unsafe_function(hls_arraybuffer_parser, data)
                         }
 
                         // for (let index = 0; index < manifest_script.length; index++) {
