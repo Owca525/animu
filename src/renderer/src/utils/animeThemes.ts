@@ -59,19 +59,30 @@ const savedDb = localStorage.getItem(STORAGE_KEY);
 
 let db: Database
 
-if (savedDb) {
-  db = new SQL.Database(
-    Uint8Array.from(atob(savedDb), c => c.charCodeAt(0))
-  )
-} else {
-  db = new SQL.Database();
-  db.run(`
-    CREATE TABLE IF NOT EXISTS cache (
-        id INTEGER PRIMARY KEY,
-        data TEXT,
-        time INTEGER
-    )
-`, []);
+try {
+  if (savedDb) {
+    console.time("AnimeThemes Database Loading")
+    db = new SQL.Database(new Uint8Array(JSON.parse(savedDb)))
+    console.timeEnd("AnimeThemes Database Loading")
+  } else {
+    db = new SQL.Database();
+    db.run(`
+      CREATE TABLE IF NOT EXISTS cache (
+          id INTEGER PRIMARY KEY,
+          data TEXT,
+          time INTEGER
+      )
+  `, []);
+  }
+} catch (error) {
+    db = new SQL.Database();
+    db.run(`
+      CREATE TABLE IF NOT EXISTS cache (
+          id INTEGER PRIMARY KEY,
+          data TEXT,
+          time INTEGER
+      )
+  `, []);
 }
 
 export function SaveAnimeThemesCache(id: number, cache: animeOpeningsFormat[]) {
@@ -85,10 +96,8 @@ export function SaveAnimeThemesCache(id: number, cache: animeOpeningsFormat[]) {
     const data = db.export();
 
     const binary = Array.from(data)
-      .map(byte => String.fromCharCode(byte))
-      .join("");
 
-    localStorage.setItem(STORAGE_KEY, btoa(binary));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(binary));
   } catch (error) {
     console.error("AnimeThemes/SaveAnimeThemesCache", error)
   }
