@@ -35,6 +35,7 @@ import SubtitlesOctopusWasm from '@jellyfin/libass-wasm/dist/js/subtitles-octopu
 import "@jellyfin/libass-wasm/dist/js/default.woff2?url"
 import "@jellyfin/libass-wasm/dist/js/subtitles-octopus-worker.wasm?url"
 import NerdStats from "./components/nerdStats"
+import DownloadManagerInstance from "@renderer/utils/DownloaderManager"
 
 shaka.polyfill.installAll()
 
@@ -133,8 +134,12 @@ class ExtractorManagerInstance {
 }
 
 const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metadata = { current: { ep: "0" }, list: [], type: "sub" }, onChangeEpisode, anime, onExitPlayer, onKeybind, playerTitle = "" }) => {
-    const ExtractorManager = new ExtractorManagerInstance()
     const animeTitle = anime ? detectTitleConfig(anime!.AnimeData.title) : "Sheeplayer"
+
+    const ExtractorManager = new ExtractorManagerInstance()
+    const DownloadManager = new DownloadManagerInstance()
+
+    let SubtitlesCache: Map<string, string> = new Map()
 
     const config = getConfig()
 
@@ -178,8 +183,6 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
     let sheepworker: SheepWorkerInstance | undefined
 
     let PlayerCleanup = false
-
-    let toast_fetch_id = ""
 
     const [player, updatePlayer] = createStore({
         initialize: true,
@@ -375,6 +378,8 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         PlayerCleanup = true
 
         ExtractorManager.clear()
+        DownloadManager.clear()
+        SubtitlesCache.clear()
 
         clearInterval(playerHideTimer)
         clearInterval(hideChapterButtonTimer)
@@ -1288,50 +1293,68 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         if (!videoRef) return
         if (!player.currentResolution) return
 
+        DownloadManager.clear()
+
         if (currentASSubtitles) {
             currentASSubtitles.dispose()
             currentASSubtitles = undefined
         }
-        removeToast(toast_fetch_id)
 
         if (sub.label == "Off" && sub.format == "", sub.lang == "", sub.url == "")
             return updatePlayer({ currentSubtitle: { url: "", format: "", lang: "", label: "Off" } })
 
-        const tmp_toast_fetch_id = toast(t("Fetching Subtitles"), { noTimer: false, type: "loading" })
-        toast_fetch_id = tmp_toast_fetch_id
+        const hashUrl = await CreateSHA256(sub.url) 
 
-        const data = await request(sub.url, {
-            headers: player.currentResolution["reqHeader"] ? player.currentResolution["reqHeader"] : window["animuHeader"]
-        })
+        if (SubtitlesCache.has(hashUrl)) {
+            RunSubtitlesOctopus(SubtitlesCache.get(hashUrl)!)
 
-        if (toast_fetch_id == tmp_toast_fetch_id) {
-            removeToast(toast_fetch_id)
-        } else {
+            updatePlayer({ currentSubtitle: sub })
             return
         }
 
-        if (!data["success"]) {
+        let data: string | undefined = undefined
+
+        try {
+            data = await DownloadManager.download(sub.url, {
+                header: player.currentResolution["reqHeader"] ? player.currentResolution["reqHeader"] : window["animuHeader"],
+                startMessage: "player.fetch_subs",
+                successMessage: "player.fetch_subs_success",
+                failedMessage: "player.failed_fetch_subs"
+            })
+        } catch (error) {
+            console.error("player/DownloadManager", error)
+        }
+
+        if (!data) {
             console.error("Failed Load Subtitles", data, player.playerData, player.currentResolution)
             toast(t("player.failed_fetch_subs"), { type: "error" })
             return
         }
 
-        let assContent = data["text"]
-
         if (["ass", "ssa"].includes(sub.format.toLowerCase()) == false) {
-            const content = CovnertToASS(assContent)
+            const content = CovnertToASS(data)
 
             if (!content) {
                 console.error("Player/Failed Subtitles Parse", data)
                 return toast(t("player.failed_fetch_subs"), { type: "error" })
             }
 
-            assContent = content
+            data = content
         }
+
+        SubtitlesCache.set(hashUrl, data)
+
+        RunSubtitlesOctopus(data)
+
+        updatePlayer({ currentSubtitle: sub })
+    }
+
+    function RunSubtitlesOctopus(content: string) {
+        if (!content) return
 
         let options = {
             video: videoRef,
-            subContent: assContent,
+            subContent: content,
             workerUrl: SubtitlesOctopusWasm,
             debug: false,
         };
@@ -1339,7 +1362,6 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         const octopus = new SubtitlesOctopus(options)
 
         currentASSubtitles = octopus
-        updatePlayer({ currentSubtitle: sub })
     }
 
     function changeAudioTrack(data: { id: number, lang?: string, label: string }) {

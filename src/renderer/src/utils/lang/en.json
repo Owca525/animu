@@ -30,7 +30,8 @@
     "download": {
         "start": "Starting Fetching",
         "download": "Downloading {{filename}} {{progress}} \\ {{total}}Mb",
-        "success": "Download Success ${filename} {{total}}Mb"
+        "success": "Download Success {{filename}} {{total}}Mb",
+        "failed": "Failed Fetch a File"
     },
     "animu": {
         "format_title": "Title Format"
@@ -560,6 +561,8 @@
         }
     },
     "player": {
+        "fetch_subs": "Fetching Subtitles",
+        "fetch_subs_success": "Succesfully Fetched Subtitles {{total}}Mb",
         "failed_fetch_subs": "Failed Fetch Subtitles",
         "chapters": {
             "opening": "Opening",
