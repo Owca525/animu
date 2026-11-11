@@ -1,5 +1,4 @@
-import { Database, ParamsObject } from "sql.js"
-import SQL from "./database"
+import { CreateDatabase } from "./database"
 import { checkTimeDriffrentUnix, dateToUnix, request } from "./functions"
 import { animeOpeningsFormat } from "./types"
 
@@ -53,81 +52,19 @@ query ($id: [Int!]) {
 }
 `
 
-const STORAGE_KEY = "animeThemesCache"
-
-const savedDb = localStorage.getItem(STORAGE_KEY);
-
-let db: Database
-
-try {
-  if (savedDb) {
-    console.time("AnimeThemes Database Loading")
-    db = new SQL.Database(new Uint8Array(JSON.parse(savedDb)))
-    console.timeEnd("AnimeThemes Database Loading")
-  } else {
-    db = new SQL.Database();
-    db.run(`
+const database = new CreateDatabase({
+  storage: "animeThemesCache",
+  createDatabase: [`
       CREATE TABLE IF NOT EXISTS cache (
           id INTEGER PRIMARY KEY,
           data TEXT,
           time INTEGER
       )
-  `, []);
-  }
-} catch (error) {
-    db = new SQL.Database();
-    db.run(`
-      CREATE TABLE IF NOT EXISTS cache (
-          id INTEGER PRIMARY KEY,
-          data TEXT,
-          time INTEGER
-      )
-  `, []);
-}
-
-export function SaveAnimeThemesCache(id: number, cache: animeOpeningsFormat[]) {
-  try {
-    if (CheckAimeThemesCache(id)) {
-      db.run("UPDATE cache SET data = ?, time = ? WHERE id = ?", [id, JSON.stringify(cache), dateToUnix(new Date().toString())]);
-    } else {
-      db.run("INSERT INTO cache (id, data, time) VALUES (?, ?, ?)", [id, JSON.stringify(cache), dateToUnix(new Date().toString())]);
-    }
-
-    const data = db.export();
-
-    const binary = Array.from(data)
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(binary));
-  } catch (error) {
-    console.error("AnimeThemes/SaveAnimeThemesCache", error)
-  }
-}
-
-export function CheckAimeThemesCache(id: number) {
-  try {
-      const stmt = db.prepare(
-          "SELECT * FROM cache WHERE id = ?"
-      );
-
-      stmt.bind([id]);
-
-      let row: ParamsObject | undefined = undefined;
-
-      if (stmt.step()) {
-          row = stmt.getAsObject();
-      }
-
-      stmt.free();
-
-      return row;
-  } catch (error) {
-    console.error("AnimeThemes/CheckAimeThemesCache", error)
-    return
-  }
-}
+  `]
+})
 
 export async function requestAnimeMedia(anilistID: number): Promise<animeOpeningsFormat[]> {
-  const cache = CheckAimeThemesCache(anilistID)
+  const cache = database.get({ table: "cache", row: "id", value: anilistID })
 
   try {
     if (cache && cache["data"] && checkTimeDriffrentUnix(undefined, Number(cache["time"]))["day"] < 31) return JSON.parse(`${cache["data"]}`)
@@ -174,6 +111,21 @@ export async function requestAnimeMedia(anilistID: number): Promise<animeOpening
     }
   }
 
-  SaveAnimeThemesCache(anilistID, list)
+  try {
+    database.updateDatabse({
+      table: "cache",
+      key: "id",
+      obj: {
+        id: anilistID,
+        data: JSON.stringify(list),
+        time: dateToUnix(new Date().toString())
+      }
+    })
+
+    database.saveDatabase()
+  } catch (error) {
+    console.error("AnimeThemes/requestAnimeMedia", error)
+  }
+
   return list
 }

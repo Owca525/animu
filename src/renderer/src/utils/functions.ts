@@ -33,7 +33,7 @@ import pluginManager, { playerPluginInstance } from './pluginManager';
 import { sendNotification } from "./NotificationManager"
 import { pluginRepoExpandedSettings } from '@renderer/pages/settings';
 import semver from "semver";
-import SQL from './database';
+import { CreateDatabase } from './database';
 
 export function decodeHtmlEntities(str: string | undefined) {
     if (!str) return ""
@@ -1684,190 +1684,172 @@ export async function SendRecomendAnime() {
 
 }
 
+export function ConvertObjectToDatabase(obj: { [key: string]: any }, prefix = "", result = {}): { [key: string]: number | string | undefined } {
+    for (const [key, value] of Object.entries(obj)) {
+        const newKey = prefix ? `${prefix}.${key}` : key;
+
+        if (value !== null && typeof value === "object" && !Array.isArray(value)) {
+            ConvertObjectToDatabase(value, newKey, result);
+        } else if (Array.isArray(value)) {
+            result[newKey] = JSON.stringify(value);
+        } else {
+            result[newKey] = value;
+        }
+    }
+
+    return result;
+}
+
+function AddAnimeToDatabase(db: CreateDatabase, anime: cardData) {
+
+    const finded = db.get({ table: "ids", row: "anilist", value: `${anime.AnimeData.id}` })
+
+    let uuid = `${crypto.randomUUID()}`
+
+    if (finded) {
+        uuid = finded["id"] as string
+    }
+
+    let tmp = ConvertObjectToDatabase(anime.AnimeData)
+    delete tmp.trailer;
+    delete tmp.popularity;
+
+    db.updateDatabse({
+        table: 'anime',
+        key: 'id',
+        obj: {
+            ...tmp,
+            id: uuid
+        }
+    })
+
+    db.updateDatabse({
+        table: 'ids',
+        key: 'id',
+        obj: {
+            anilist: `${anime.AnimeData.id}`,
+            id: uuid
+        }
+    })
+
+    if (anime.saveData) {
+        db.updateDatabse({
+            table: 'savedata',
+            key: 'id',
+            obj: {
+                ...ConvertObjectToDatabase(anime.saveData),
+                id: uuid
+            }
+        })
+    }
+
+    if (anime.animulist) {
+        db.updateDatabse({
+            table: 'animulist',
+            key: 'id',
+            obj: {
+                ...ConvertObjectToDatabase(anime.animulist),
+                id: uuid
+            }
+        })
+    }
+}
+
 export function TestAnimuDatabase() {
-    let db = new SQL.Database();
-    db.run(`
-      CREATE TABLE IF NOT EXISTS anime (
-          id TEXT PRIMARY KEY,
-          averageScore INTEGER,
-          bannerImage TEXT,
-          coverImage TEXT,
-          description TEXT,
-          duration INTEGER,
-          episodes INTEGER,
-          format TEXT,
-          genres TEXT,
-          season TEXT,
-          seasonYear INTEGER,
-          characters TEXT,
-          status TEXT,
-          source TEXT,
-          synonyms TEXT,
-          studios TEXT,
-          title_english TEXT,
-          title_native TEXT,
-          title_romaji TEXT,
-          type TEXT,
-          player_ID TEXT,
-          isAdult BOOLEAN DEFAULT FALSE,
-          trailer TEXT,
-          relations TEXT,
 
-          startDate TEXT,
-          nextAiringEpisode TEXT,
-          endDate TEXT
-      )`, []);
+    const database = new CreateDatabase({
+        createDatabase: [`CREATE TABLE IF NOT EXISTS anime (
+                id TEXT PRIMARY KEY,
+                averageScore INTEGER,
+                bannerImage TEXT,
+                coverImage TEXT,
+                description TEXT,
+                duration INTEGER,
+                episodes INTEGER,
+                format TEXT,
+                genres TEXT,
+                season TEXT,
+                seasonYear INTEGER,
+                characters TEXT,
+                status TEXT,
+                source TEXT,
+                synonyms TEXT,
+                studios TEXT,
+                "title.english" TEXT,
+                "title.native" TEXT,
+                "title.romaji" TEXT,
+                type TEXT,
+                player_ID TEXT,
+                isAdult BOOLEAN DEFAULT FALSE,
 
-    db.run(`
-      CREATE TABLE IF NOT EXISTS savedata (
-          id TEXT PRIMARY KEY,
-          pluginName TEXT,
-          last_Time INTEGER,
-          episode TEXT,
-          type TEXT,
-          duration INTEGER,
-          isStarted BOOLEAN DEFAULT FALSE,
-          lastAnimeDataUpdate INTEGER,
-          lastEpisodesUpdate INTEGER,
-          episodes TEXT
-      )`, []);
+                "trailer.id" TEXT,
+                "trailer.site" TEXT,
 
-    db.run(`
-      CREATE TABLE IF NOT EXISTS animulist (
-          id TEXT PRIMARY KEY,
-          status TEXT,
-          score INTEGER,
-          reapeat INTEGER,
-          startWatch INTEGER,
-          endWatch INTEGER,
-          added INTEGER,
-          lastUpdate INTEGER,
-          favorite BOOLEAN DEFAULT FALSE,
-          progress INTEGER
-      )`, []);
+                relations TEXT,
+
+                "startDate.day" INTEGER,
+                "startDate.month" INTEGER,
+                "startDate.year" INTEGER,
+
+                "nextAiringEpisode.airingAt" INTEGER,
+                "nextAiringEpisode.episode" INTEGER,
+                "nextAiringEpisode.timeUntilAiring" INTEGER,
+
+                "endDate.day" INTEGER,
+                "endDate.month" INTEGER,
+                "endDate.year" INTEGER
+            )`,
+            `CREATE TABLE IF NOT EXISTS savedata (
+                id TEXT PRIMARY KEY,
+                pluginName TEXT,
+                last_Time INTEGER,
+                episode TEXT,
+                type TEXT,
+                duration INTEGER,
+                isStarted BOOLEAN DEFAULT FALSE,
+                lastAnimeDataUpdate INTEGER,
+                lastEpisodesUpdate INTEGER,
+                episodes TEXT,
+                FOREIGN KEY(id) REFERENCES anime(id)
+            )`,
+            `CREATE TABLE IF NOT EXISTS ids (
+                id TEXT PRIMARY KEY,
+                anilist TEXT,
+                FOREIGN KEY(id) REFERENCES anime(id)
+            )`,
+            `CREATE TABLE IF NOT EXISTS animulist (
+                id TEXT PRIMARY KEY,
+                status TEXT,
+                score INTEGER,
+                reapeat INTEGER,
+                startWatch INTEGER,
+                endWatch INTEGER,
+                added INTEGER,
+                lastUpdate INTEGER,
+                favorite BOOLEAN DEFAULT FALSE,
+                progress INTEGER,
+                FOREIGN KEY(id) REFERENCES anime(id)
+            )`
+        ]
+    })
 
     const history = window["initialMetadata"]["history"]
 
     for (let index = 0; index < history.length; index++) {
         const anime = history[index];
 
-        const stmt = db.prepare(`
-        INSERT OR REPLACE INTO anime (
-            id, averageScore, bannerImage, coverImage,
-            description, duration, episodes, format,
-            genres, season, seasonYear, characters,
-            status, source, synonyms, studios,
-            title_english, title_native, title_romaji,
-            type, player_ID, isAdult, trailer,
-            relations, startDate, nextAiringEpisode, endDate
-        )
-        VALUES (
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-        )`);
-        stmt.run([
-            `${anime.AnimeData.id}`,
-            anime.AnimeData.averageScore ?? null,
-            anime.AnimeData.bannerImage ?? null,
-            anime.AnimeData.coverImage ?? null,
-            anime.AnimeData.description ?? null,
-            anime.AnimeData.duration ?? null,
-            anime.AnimeData.episodes ?? null,
-            anime.AnimeData.format ?? null,
-            JSON.stringify(anime.AnimeData.genres ?? []),
-            anime.AnimeData.season ?? null,
-            anime.AnimeData.seasonYear ?? null,
-            JSON.stringify(anime.AnimeData.characters ?? []),
-            anime.AnimeData.status ?? null,
-            anime.AnimeData.source ?? null,
-            JSON.stringify(anime.AnimeData.synonyms ?? []),
-            JSON.stringify(anime.AnimeData.studios ?? []),
-            anime.AnimeData.title["english"] ?? null,
-            anime.AnimeData.title["naa  "] ?? null,
-            anime.AnimeData.title["romaji"] ?? null,
-            anime.AnimeData.type ?? null,
-            anime.AnimeData.player_ID ?? null,
-            anime.AnimeData.isAdult ? 1 : 0,
-            JSON.stringify(anime.AnimeData.trailer) ?? null,
-            JSON.stringify(anime.AnimeData.relations ?? []),
-            JSON.stringify(anime.AnimeData.startDate) ?? null,
-            JSON.stringify(anime.AnimeData.nextAiringEpisode) ?? null,
-            JSON.stringify(anime.AnimeData.endDate) ?? null
-        ]);
-
-        stmt.free();
-
-        const stmt2 = db.prepare(`
-        INSERT OR REPLACE INTO savedata (
-            id,
-            pluginName,
-            last_Time,
-            episode,
-            type,
-            duration,
-            isStarted,
-            lastAnimeDataUpdate,
-            lastEpisodesUpdate,
-            episodes
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
-
-        if (!anime.saveData) continue
-
-        try {
-            stmt2.run([
-                `${anime.AnimeData.id}`,
-                anime.saveData.pluginName ?? null,
-                anime.saveData.last_Time ?? null,
-                anime.saveData.episode ?? null,
-                anime.saveData.type ?? null,
-                anime.saveData.duration ?? null,
-                anime.saveData.isStarted ? 1 : 0,
-                anime.saveData.lastAnimeDataUpdate ?? null,
-                anime.saveData.lastEpisodesUpdate ?? null,
-                JSON.stringify(anime.saveData.episodes ?? [])
-            ]);
-        } finally {
-            stmt.free();
-        }
+        AddAnimeToDatabase(database, anime)
     }
 
     const animulist = window["initialMetadata"]["animulist"]
 
     for (let index = 0; index < animulist.length; index++) {
         const data = animulist[index];
-        const stmt = db.prepare(`
-        INSERT OR REPLACE INTO animulist (
-            id,
-            status,
-            score,
-            reapeat,
-            startWatch,
-            endWatch,
-            added,
-            lastUpdate,
-            favorite,
-            progress
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
 
-        try {
-            stmt.run([
-                `${data.AnimeData.id}`,
-                data.animulist.status ?? null,
-                data.animulist.score ?? null,
-                data.animulist.reapeat ?? null,
-                data.animulist.startWatch ?? null,
-                data.animulist.endWatch ?? null,
-                data.animulist.added ?? null,
-                data.animulist.lastUpdate ?? null,
-                data.animulist.favorite ? 1 : 0,
-                data.animulist.progress ?? null
-            ]);
-        } finally {
-            stmt.free();
-        }
+        AddAnimeToDatabase(database, { AnimeData: data.AnimeData, animulist: data.animulist })
     }
 
-    const data = db.export();
+    const data = database.db.export();
 
     const blob = new Blob([data as any], {
         type: "application/x-sqlite3"
