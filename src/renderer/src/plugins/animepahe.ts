@@ -1,10 +1,8 @@
-// DISSABLE
-import { makeSmallText, request as sheepRequest, requestCloudflare } from "@renderer/utils/functions";
-import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerData, playerPluginFormat, resolutionFormat, serverStatusData } from "@renderer/utils/types";
-// TODO: Fix this
-const WEBSITE = "https://animepahe.pw"
+import { request, SheepFinderAnime2000 } from "@renderer/utils/functions";
+import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerChapterList, playerData, playerPluginFormat, playerSubtitlesFormat, serverStatusData } from "@renderer/utils/types";
+const WEBSITE = "https://animepahetv.to/"
 
-let header = {
+let PluginHeader = {
     "Accept": "application/json, text/javascript, */*; q=0.01",
     "Accept-Language": "en-US,en;q=0.9",
     "Accept-Encoding": "gzip, deflate, br, zstd",
@@ -16,84 +14,269 @@ let header = {
     "Sec-Fetch-Dest": "empty",
     "Sec-Fetch-Mode": "cors",
     "Sec-Fetch-Site": "same-origin",
-    "Cookie": "__ddgid_=rxaWYPF7aoOXKtn7; __ddg2_=IPvarMbSedUW2ZAe; __ddg1_=T4CBje2yYmFKRIzHOw7q; res=1080; aud=jpn"
 }
 
-const headers = {
-    "Upgrade-Insecure-Requests": "1",
-    "Sec-Fetch-Dest": "iframe",
-    "Sec-Fetch-Mode": "navigate",
-    "Sec-Fetch-Site": "cross-site",
-    "Sec-Fetch-User": "?1",
-    "DNT": "1",
-    "Priority": "u=4",
-    "TE": "trailers",
-    "User-Agent": navigator.userAgent,
-    Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Accept-Encoding": "gzip, deflate, br, zstd",
-    "Sec-Fetch-Storage-Access": "none",
-    "Sec-GPC": "1",
-    "Alt-Used": "kwik.cx",
-    Connection: "keep-alive",
-    Referer: "https://animepahe.pw/",
-};
-
-const playerHeader = {
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:149.0) Gecko/20100101 Firefox/149.0",
-    Accept: "*/*",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Accept-Encoding": "gzip, deflate, br, zstd",
-    Origin: "https://kwik.cx",
-    "Sec-GPC": "1",
-    Connection: "keep-alive",
-    Referer: "https://kwik.cx/",
-    "Sec-Fetch-Dest": "empty",
-    "Sec-Fetch-Mode": "cors",
-    "Sec-Fetch-Site": "cross-site"
+const SUPPORTED_PLAYERS = {
+    zokoanime: "https://zokoanime.video/",
+    megaplay: "https://megaplay.buzz/"
 }
 
-let config = {
-    cloudflare: undefined as string | undefined
-}
+class ExtractorPlayer {
+    hostname: string = ""
 
-async function request(url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string }, body?: any }, noCors: boolean = false): Promise<{ text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: Map<string, string> }> {
-    
-    if (window["config"]["cloudflare"] == undefined) {
-        header.Cookie = await extractToken(url) ?? ""
-        config = { ...config, cloudflare: header.Cookie }
-        // saveConfig(config)
+    constructor(hostname) {
+        this.hostname = hostname
     }
 
-    let tries = 1
+    extract = async (url: string): Promise<playerData | undefined> => {
+        try {
+            const finded = Object.values(SUPPORTED_PLAYERS).find((v) => url.startsWith(v))
+            switch (finded) {
+                case SUPPORTED_PLAYERS.zokoanime:
+                    return await this.zokoanime(url)
+                case SUPPORTED_PLAYERS.megaplay:
+                    return await this.megaplay(url)
+            }
 
-    let response: { text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: Map<string, string> } | undefined = undefined
-    
-    while (true) {
-        response = await sheepRequest(url, options, noCors)
-        if (tries <= 0) break
+            console.error("ExtractorPlayer/anikoto unsuported player", url)
 
-        if (response["status"] == 403 && response["text"].includes("Cloudflare")) {
-            header.Cookie = await extractToken(url) ?? ""
-            config = { ...config, cloudflare: header.Cookie }
-            // saveConfig(config)
-            tries -= 1
-        } else {
-            break
+            return
+        } catch (error) {
+            console.error("ExtractorPlayer/anikoto Failed Extract", error)
+            return
         }
     }
-    console.log(response)
-    return response
-}
 
-async function extractToken(url: string) {
-    const response = await requestCloudflare(url)
-    if (!response) return
+    zokoanime = async (url: string): Promise<playerData | undefined> => {
+        const req = await request(url, { headers: PluginHeader })
+        /* IFDEF DEBUG */
+        console.warn("zokoanime/anikoto", req)
+        /* ENDIF */
+        if (!req["success"]) return
 
-    const finded = response["cookie"].split(" ").find((v) => v.includes("cf_clearance"))
-    if (finded == undefined) return
+        const regex = String(req["text"]).match(/window\.(?<name>__[A-Za-z0-9_$]+)\s*=\s*"(?<value>[^"]+)"/)
+        if (!regex || !regex["groups"]) return
+        const str = atob(regex["groups"]["value"])
 
-    return `__ddgid_=rxaWYPF7aoOXKtn7; __ddg2_=IPvarMbSedUW2ZAe; __ddg1_=T4CBje2yYmFKRIzHOw7q; res=480; aud=jpn; av1=0; ${finded}`
+        const OBF_KEY = 'otaku-embed-v1';
+        let out = '';
+        for (let i = 0; i < str.length; i++) {
+            out += String.fromCharCode(str.charCodeAt(i) ^ OBF_KEY.charCodeAt(i % OBF_KEY.length));
+        }
+
+        const content = JSON.parse(decodeURIComponent(escape(out)))
+
+        /* IFDEF DEBUG */
+        console.warn("zokoanime/anikoto content", content)
+        /* ENDIF */
+
+        let subs: playerSubtitlesFormat[] = []
+        let chapters: playerChapterList[] = []
+
+        if (content["subtitles"]) {
+            subs = content["subtitles"].map((v) => ({
+                url: v["src"],
+                lang: v["lang"],
+                label: v["label"],
+                default: v["default"],
+                format: `${v["src"]}`.split(".").at(-1)
+            }))
+        }
+
+        if (content["skip"]) {
+            if (content["skip"]["intro"]) {
+                chapters.push({
+                    start: content["skip"]["intro"]["start"],
+                    end: content["skip"]["intro"]["end"],
+                    type: "opening"
+                })
+            }
+
+            if (content["skip"]["outro"]) {
+                chapters.push({
+                    start: content["skip"]["outro"]["start"],
+                    end: content["skip"]["outro"]["end"],
+                    type: "ending"
+                })
+            }
+        }
+
+        const tmp_url = new URL(url)
+
+        return {
+            hostname: this.hostname,
+            resolution: [{
+                res: "1080",
+                url: content["src"],
+                defaultSubtitles: subs.length > 0,
+                hls: true,
+                reqHeader: {
+                    ...PluginHeader,
+                    "Referer": tmp_url["origin"],
+                    "Origin": tmp_url["origin"]
+                }
+            }],
+            subtitles: subs,
+            listChapters: chapters
+        }
+    }
+
+    megaplay = async (url: string): Promise<playerData | undefined> => {
+        const url_object = new URL(url)
+        const website_response = await request(url, { headers: PluginHeader })
+        /* IFDEF DEBUG */
+        console.warn("megaplay/anikoto", website_response)
+        /* ENDIF */
+        if (!website_response["success"]) return
+
+        const match = website_response["text"].match(/data-id="(\d+)"/);
+        if (!match) return
+
+        const website_api_response = await request(`${url_object.origin}/stream/getSources?id=${match[1]}&platform=OTHER&s=tcdn`, {
+            headers: {
+                ...PluginHeader,
+                "Accept": "application/json, text/javascript, */*; q=0.01",
+                "X-Requested-With": "XMLHttpRequest",
+                "Alt-Used": url_object.hostname,
+                'Referer': url,
+                "Origin": url
+            }
+        })
+
+        /* IFDEF DEBUG */
+        console.warn("megaplay/anikoto website_api_response", website_api_response, match)
+        /* ENDIF */
+
+        if (!website_api_response["success"] || !website_api_response["json"]) return
+
+        const str_encrypted = website_api_response["json"]["enc"]
+
+        function sourceEncPadKeyBytes(e, t) {
+            const a = (new TextEncoder).encode(String(e))
+                , r = new Uint8Array(t);
+            return r.set(a.subarray(0, Math.min(t, a.length))),
+                r
+        }
+
+        function sourceEncB64UrlDecode(e) {
+            let t = String(e).replace(/-/g, "+").replace(/_/g, "/");
+            const a = t.length % 4;
+            a && (t += "====".slice(a));
+            const r = atob(t)
+                , n = new Uint8Array(r.length);
+            for (let e = 0; e < r.length; e++)
+                n[e] = r.charCodeAt(e);
+            return n
+        }
+
+        function decryptSourcesEnc(e): Promise<string> {
+            const t = sourceEncPadKeyBytes("i?LMTAx0Q6,:}50U", 32)
+                , a = sourceEncPadKeyBytes("W0;27ToaUpl_P%'c", 16);
+            return crypto.subtle.importKey("raw", t, {
+                name: "AES-CBC"
+            }, !1, ["decrypt"]).then(t => crypto.subtle.decrypt({
+                name: "AES-CBC",
+                iv: a
+            }, t, sourceEncB64UrlDecode(e))).then(e => {
+                const t = (new TextDecoder).decode(e)
+                    , a = JSON.parse(t);
+                if (!a || "string" != typeof a.file)
+                    throw new Error("Invalid enc payload");
+                return a["file"]
+            }
+            )
+        }
+
+        function sourceEncB64UrlEncode(e) {
+            let t = "";
+            const a = e instanceof ArrayBuffer ? new Uint8Array(e) : e;
+            for (let e = 0; e < a.length; e++)
+                t += String.fromCharCode(a[e]);
+            return btoa(t).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "")
+        }
+
+        let master_url = await decryptSourcesEnc(str_encrypted)
+
+        function createCdnToken(e) {
+            const t = Math.floor(Date.now() / 1e3) + 90
+                , a = String(t) + "|" + e
+                , r = new TextEncoder;
+            return crypto.subtle.importKey("raw", r.encode("MpCdnT0k3n!9f2K#xQ7vL5mR8wN1pY4s"), {
+                name: "HMAC",
+                hash: "SHA-256"
+            }, !1, ["sign"]).then(e => crypto.subtle.sign("HMAC", e, r.encode(a))).then(e => sourceEncB64UrlEncode(r.encode(a)) + "." + sourceEncB64UrlEncode(e))
+        }
+
+        function extractCdnPathKey(e) {
+            const t = String(e).match(/\/([a-f0-9]{32})\/([a-f0-9]{32})\//i);
+            return t ? t[1].toLowerCase() + "/" + t[2].toLowerCase() : null
+        }
+
+        const a = await createCdnToken(extractCdnPathKey(master_url))
+
+        const r = master_url.indexOf("?") >= 0 ? "&" : "?"
+        const new_url = master_url + r + "token=" + encodeURIComponent(a);
+
+        let subs: playerSubtitlesFormat[] = []
+        let chapters: playerChapterList[] = []
+
+        if (website_api_response["json"]["tracks"]) {
+            website_api_response["json"]["tracks"].forEach(element => {
+                subs.push({
+                    url: element["file"],
+                    lang: element["label"],
+                    label: element["label"],
+                    format: `${element["file"]}`.split(".").at(-1) ?? "vtt",
+                    default: element["default"]
+                })
+            });
+        }
+
+        if (website_api_response["json"]["intro"]) {
+            chapters.push({
+                start: website_api_response["json"]["intro"]["start"],
+                end: website_api_response["json"]["intro"]["end"],
+                type: "opening"
+            })
+        }
+
+        if (website_api_response["json"]["outro"]) {
+            chapters.push({
+                start: website_api_response["json"]["outro"]["start"],
+                end: website_api_response["json"]["outro"]["end"],
+                type: "ending"
+            })
+        }
+
+        return {
+            hostname: this.hostname,
+            resolution: [{
+                res: "1080",
+                url: new_url,
+                hls: true,
+                reqHeader: {
+                    "accept": "*/*",
+                    "accept-encoding": "gzip, deflate, br, zstd",
+                    "accept-language": "en-US,en;q=0.9",
+                    "cache-control": "no-cache",
+                    "origin": `${url_object.origin}`,
+                    "pragma": "no-cache",
+                    "priority": "u=1, i",
+                    "referer": `${url_object.origin}/`,
+                    // "sec-ch-ua": '"Chromium";v="153", "Not_A Brand";v="8"',
+                    "sec-ch-ua-mobile": "?0",
+                    // "sec-ch-ua-platform": '"Linux"',
+                    "sec-fetch-dest": "empty",
+                    "sec-fetch-mode": "cors",
+                    "sec-fetch-site": "cross-site",
+                    "user-agent": navigator.userAgent,
+                },
+                defaultSubtitles: subs.length > 0
+            }],
+            subtitles: subs,
+            listChapters: chapters
+        }
+    }
 }
 
 export function convertTimeStringToSeconds(time: string | undefined) {
@@ -106,55 +289,6 @@ export function dateToUnix(dateStr: string | undefined): number | undefined {
     if (!dateStr) return undefined
     const date = new Date(dateStr);
     return Math.floor(date.getTime() / 1000);
-}
-
-function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string | undefined {
-    try {
-        console.log("First Check", animeList)
-        // FIRST CHECK
-        if (animeList.length <= 0) return undefined
-        if (animeList.length == 1) return animeList[0].player_ID
-
-        // Second Check
-        let seasonYearFilter = animeList.filter((element) => element.seasonYear == anime.seasonYear)
-        console.log("Second Check", seasonYearFilter)
-        if (seasonYearFilter.length <= 0) return undefined
-        if (seasonYearFilter.length == 1) return seasonYearFilter[0].player_ID
-
-        // Third Check
-        let seasonFilter = seasonYearFilter.filter((element) => makeSmallText(element.season) == makeSmallText(anime.season))
-        console.log("Third Check", seasonYearFilter)
-        if (seasonFilter.length <= 0) return undefined
-        if (seasonFilter.length == 1) return seasonFilter[0].player_ID
-
-        // Four Check
-        let episodesFilter: AnimeData[] | undefined = undefined
-        if (anime.episodes) {
-            episodesFilter = seasonFilter.filter((element) => element.episodes == anime.episodes)
-            console.log("Four Check", episodesFilter)
-            if (episodesFilter.length <= 0) return undefined
-            if (episodesFilter.length == 1) return episodesFilter[0].player_ID
-        }
-
-        // Five Check
-        let durationFilter: AnimeData[] = []
-        if (episodesFilter) durationFilter = episodesFilter.filter((element) => element.duration == anime.duration)
-        else durationFilter = seasonFilter.filter((element) => element.duration == anime.duration)
-        console.log("Five Check", durationFilter)
-        if (durationFilter.length <= 0) return undefined
-        if (durationFilter.length == 1) return durationFilter[0].player_ID
-
-        // Six Check
-        let formatFilter = durationFilter.filter((element) => makeSmallText(element.format) == makeSmallText(anime.format))
-        console.log("Six Check", formatFilter)
-        if (formatFilter.length <= 0) return undefined
-        if (formatFilter.length == 1) return formatFilter[0].player_ID
-
-        return formatFilter[0].player_ID
-    } catch (error) {
-        console.error("AniDap SheepFinderAnime2000 error", error)
-        return animeList[0].player_ID
-    }
 }
 
 function convertToAnimeData(data: { [key: string]: string | number }[]): cardData {
@@ -175,59 +309,6 @@ function convertToAnimeData(data: { [key: string]: string | number }[]): cardDat
     }
 }
 
-const payload = `
-globalThis.document = {
-    querySelector: () => ""
-}
-globalThis.window = {}
-class Plyr {
-    constructor(element, options = {}) {}
-}
-
-class Hls {
-    constructor(_config = {}) {}
-
-    static isSupported() {
-        return true
-    }
-    loadSource(url) {
-        postMessage({ url: url })
-    }
-    attachMedia() {}
-}
-`
-
-async function extractResolution(url: string) {
-    const htmlResponse = await request(url, { headers: headers })
-    /* IFDEF DEBUG */
-    console.log("extractPlayerData/AnimePahe", htmlResponse)
-    /* ENDIF */
-    if (!htmlResponse["success"]) return
-
-    const scripts = Array.from(
-        htmlResponse["text"].matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)
-    )
-        .map(m => m[1])
-        .filter(code => code.includes("eval"));
-
-    const blob = new Blob([payload + scripts], { type: "text/javascript" });
-    const payloadURL = URL.createObjectURL(blob);
-
-    return new Promise((resolve, reject) => {
-        const worker = new Worker(payloadURL);
-        worker.postMessage(htmlResponse.text)
-
-        worker.onmessage = (event) => {
-            if (event["data"]["url"]) {
-                resolve({ url: event["data"]["url"], header: htmlResponse["responseHeader"] })
-            } else {
-                reject(undefined)
-            }
-            worker.terminate()
-        }
-    });
-}
-
 export default class AnimePahe implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
         version: "1.4",
@@ -240,108 +321,19 @@ export default class AnimePahe implements playerPluginFormat {
     };
     cache: { [key: string]: string | number[] }[] = []
 
-    config: { [key: string]: any; } = {
-        cloudflare: undefined
-    };
-
-    constructor() {
-        if (window["config"] != undefined) {
-            this.config = window["config"]
-        }
-        if (this.config["cloudflare"] == undefined) return
-
-        header.Cookie = this.config["cloudflare"]
-    }
-
-    extractPlayerData = async (_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
-        if (this.cache[id] == undefined) await this.extractEpisodeList(undefined, id)
-        if (this.cache[id] == undefined) return []
-        let mainEpisode: string = typeof episode == "object" ? episode.ep : episode
-
-        const find = this.cache[id][parseInt(mainEpisode) - 1]
-        if (!find) return []
-        const episodeID = find["session"]
-        const htmlResponse = await request(`${WEBSITE}/play/${id}/${episodeID}`, { headers: header })
+    extractPlayerData = async (_type: string, episode: episodeMetadata, _id: string): Promise<playerData[]> => {
+        const apirequest = await request(`${WEBSITE}/anime/get-servers/${episode["episodeID"]}`, { headers: PluginHeader })
         /* IFDEF DEBUG */
-        console.warn("extractPlayerData/AnimePahe", htmlResponse)
+        console.warn("extractPlayerData/AnimePahe", apirequest)
         /* ENDIF */
 
-        if (!htmlResponse["success"]) return []
+        if (!apirequest["success"] || !apirequest["json"]) return []
 
-        const tagRegex = /<[^>]*data-src=["'][^"']+["'][^>]*>/g;
-
-        let match;
-        let results: {
-            src: string | null;
-            fansub: string | null;
-            resolution: string | null;
-            audio: string | null;
-        }[] = []
-
-        while ((match = tagRegex.exec(htmlResponse.text)) !== null) {
-            const tag = match[0];
-            if (!tag.startsWith("<button")) continue
-
-            const getAttr = (name: string): string | null => {
-                const m = tag.match(new RegExp(`${name}=["']([^"']+)["']`));
-                return m ? m[1] : null;
-            };
-
-            results.push({
-                src: getAttr("data-src"),
-                fansub: getAttr("data-fansub"),
-                resolution: getAttr("data-resolution"),
-                audio: getAttr("data-audio")
-            });
-        }
-
-        let dubbingRes = results.filter((v) => v["audio"] == "eng")
-        results = results.filter((v) => v["audio"] == "jpn")
-        let data: resolutionFormat[] = []
-        for (let index = 0; index < results.length; index++) {
-            const element = results[index];
-            const urlResp = await extractResolution(element["src"]!)
-            if (!urlResp) continue
-            data.push({
-                res: element["resolution"]!,
-                url: urlResp["url"] as string,
-                hls: true,
-                reqHeader: {
-                    ...urlResp["header"],
-                    ...playerHeader
-                }
-            })
-        }
-
-        let finnalContent: playerData = {
-            hostname: "AnimePahe",
-            resolution: data.reverse(),
-            splitHLS: true
-        }
-        if (dubbingRes.length > 0) {
-            finnalContent = {
-                ...finnalContent,
-                isDubbing: async () => {
-                    let dubData: resolutionFormat[] = []
-                    for (let index = 0; index < dubbingRes.length; index++) {
-                        const element = dubbingRes[index];
-                        const urlResp = await extractResolution(element["src"]!)
-                        if (!urlResp) continue
-                        dubData.push({
-                            res: element["resolution"]!,
-                            url: urlResp["url"] as string,
-                            reqHeader: {
-                                ...urlResp["header"],
-                                ...playerHeader
-                            }
-                        })
-                    }
-                    return dubData.reverse()
-                }
-            }
-        }
-
-        return [finnalContent]
+        return apirequest["json"]["servers"].map((v) => ({
+            hostname: v["name"],
+            resolution: [],
+            extractResolution: async () => await (new ExtractorPlayer(v["url"])).extract(v["url"])
+        }))
     }
     extractEpisodeList = async (animeData?: AnimeData, anime_id?: string): Promise<episodeList | undefined> => {
         if (anime_id && this.cache[anime_id]) {
@@ -369,7 +361,7 @@ export default class AnimePahe implements playerPluginFormat {
             anime_id = SheepFinderAnime2000(search.map((v) => v.AnimeData), animeData)
         }
         if (!anime_id) return
-        const episodeResponse = await request(`${WEBSITE}/api?m=release&id=${anime_id}&sort=episode_asc&page=1`, { headers: header })
+        const episodeResponse = await request(`${WEBSITE}/viewApi?m=release&id=${anime_id}&sort=episode_asc&page=1`, { headers: PluginHeader })
         /* IFDEF DEBUG */
         console.warn("extractEpisodeList/AnimePahe", episodeResponse)
         /* ENDIF */
@@ -403,7 +395,7 @@ export default class AnimePahe implements playerPluginFormat {
     }
     searchAnime = async (name: string, _page: number, _params?: FilterPluginsParams): Promise<cardData[]> => {
         try {
-            const searchResponse = await request(`${WEBSITE}/api?m=search&q=${name}`, { headers: header })
+            const searchResponse = await request(`${WEBSITE}/search-api?m=search&q=${name}`, { headers: PluginHeader })
             /* IFDEF DEBUG */
             console.warn("searchAnime/AnimePahe", searchResponse)
             /* ENDIF */
@@ -411,13 +403,13 @@ export default class AnimePahe implements playerPluginFormat {
 
             return searchResponse["json"]["data"].map((v) => convertToAnimeData(v))
         } catch (error) {
-            console.error("Error in searchAnime/aowu", error)
+            console.error("Error in searchAnime/animepahe", error)
             return []
         }
     }
 
     raportStatus = async (): Promise<{ search: serverStatusData; player: serverStatusData; episodes: serverStatusData; }> => {
-        const initialRequest = await request(WEBSITE, { headers: header })
+        const initialRequest = await request(WEBSITE, { headers: PluginHeader })
         if (initialRequest["status"] == 403) return undefined as any
 
         let results: serverStatusData[] = []

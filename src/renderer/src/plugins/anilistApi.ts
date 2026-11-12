@@ -10,7 +10,7 @@ import {
   SearchResponse,
   UserData,
 } from '@renderer/utils/types';
-import { convertDateToDateObject, ConvertStringToNumber, CreateSHA256, dateToUnix, genYearsList, request, saveConfig, timeCovertToMs } from '@renderer/utils/functions';
+import { convertDateToDateObject, ConvertStringToNumber, dateToUnix, genYearsList, request, saveConfig } from '@renderer/utils/functions';
 
 const defaultPageSize = 20
 
@@ -494,53 +494,20 @@ function getHeader() {
 
 type anilistVariable = { [key: string]: string | number | boolean | string[] } | Anilist_ListMutation
 
-let globalAnilistCache: {
-  data: { text: string, json: { [key: string]: any } | undefined, buffer: Buffer, status: number, statusText: string, url: string, success: boolean, responseHeader: Map<string, string> },
-  timer: NodeJS.Timeout
-  hash: string
-}[] = []
-
-
-async function addToAnilistCache(timer: number, object: { query: string, variables: anilistVariable }, response: any) {
-  const hash = await CreateSHA256(JSON.stringify(object))
-  globalAnilistCache = [...globalAnilistCache, {
-    data: response,
-    timer: setTimeout(() => {
-      globalAnilistCache = globalAnilistCache.filter((el) => el.hash != hash)
-    }, timer),
-    hash: hash
-  }]
-}
-
-async function findAnilistCache(object: { query: string, variables: anilistVariable }) {
-  const hash = await CreateSHA256(JSON.stringify(object))
-  const finded = globalAnilistCache.find((el) => el["hash"] == hash)
-  if (finded) return finded.data
-  return undefined
-}
 
 // WHY THE FUCK THIS DOESN'T WORK IF I CALL window.api.request.post IN CreateHomePage
 // Jeśli api anilist jest offline to daje "Forbidden" w statusText i error 403 request 
-async function sendPost(variable: anilistVariable, query: string, timer = 0) {
-  const cache = await findAnilistCache({ query: query, variables: variable })
-  if (cache) return cache
-
+async function sendPost(variable: anilistVariable, query: string) {
   const response = await request(
     "https://graphql.anilist.co",
     { method: "POST", headers: getHeader(), body: JSON.stringify({ query: query, variables: variable }) },
     window.api ? false : true
   )
-  if (response.json && response.success && timer > 0) {
-    await addToAnilistCache(timer, { query: query, variables: variable }, response)
-  }
 
   return response
 }
 
-async function sendToApi(variable: anilistVariable, query: string, timer = 0): Promise<cardData[]> {
-
-  const cache = await findAnilistCache({ query: query, variables: variable })
-  if (cache) return cache.json!.data.Page.media.map((data) => Convert(data))
+async function sendToApi(variable: anilistVariable, query: string): Promise<cardData[]> {
 
   let data = await request(
     "https://graphql.anilist.co",
@@ -551,8 +518,6 @@ async function sendToApi(variable: anilistVariable, query: string, timer = 0): P
     console.warn("Failed Anilist/sendToApi Request", data)
     return []
   }
-
-  if (timer > 0) addToAnilistCache(timer, { query: query, variables: variable }, data)
 
   return data.json.data.Page.media.map((data) => Convert(data))
 }
@@ -592,9 +557,9 @@ async function fetchCategory(params: any, title: string): Promise<containerData>
   const globalParams = params
   let container: containerData = {
     title: title,
-    data: await sendToApi(params, replacePageInGraphicApi(graphicApi, defaultPageSize.toString()), timeCovertToMs({ min: 5 })),
+    data: await sendToApi(params, replacePageInGraphicApi(graphicApi, defaultPageSize.toString())),
     onScrollDownFunction: async (_search, page, _params) => {
-      let resp = await sendToApi({ ...globalParams, page: page }, replacePageInGraphicApi(graphicApi, defaultPageSize.toString()), timeCovertToMs({ min: 5 }));
+      let resp = await sendToApi({ ...globalParams, page: page }, replacePageInGraphicApi(graphicApi, defaultPageSize.toString()));
       return {
         maxPage: defaultPageSize,
         content: resp,
@@ -733,7 +698,7 @@ export default class AnilistApi implements informationPluginFormat {
       }
 
       try {
-        let response = await sendPost(variables, graphicAiringAnime, timeCovertToMs({ hour: 1 }))
+        let response = await sendPost(variables, graphicAiringAnime)
         if (!response.success || !response.json) return animeList
 
         animeList = [...animeList, ...response.json["data"]["Page"]["airingSchedules"].map((v) => {
@@ -782,7 +747,7 @@ export default class AnilistApi implements informationPluginFormat {
         if (params.airing) variables = { ...variables, status: params.airing.toUpperCase() }
       }
 
-      const resp = await sendPost(variables, replacePageInGraphicApi(graphicApi, defaultPageSize.toString()), timeCovertToMs({ min: 5 }))
+      const resp = await sendPost(variables, replacePageInGraphicApi(graphicApi, defaultPageSize.toString()))
       if (!resp["json"] || !resp["success"]) return { content: [], maxPage: defaultPageSize, nextPage: false }
 
       return {
@@ -808,7 +773,7 @@ export default class AnilistApi implements informationPluginFormat {
         isAdult: false,
         nextSeason: season.nextSeason,
         nextYear: season.nextYear,
-      }, replacePageInGraphicApi(graphicHomeApi, defaultPageSize.toString()), timeCovertToMs({ min: 10 }))
+      }, replacePageInGraphicApi(graphicHomeApi, defaultPageSize.toString()))
 
       if (!data.success || !data.json) {
         console.warn("home/anilistapi Failed Request", data)
@@ -861,7 +826,7 @@ export default class AnilistApi implements informationPluginFormat {
   }
   anime = async (id: string) => {
     try {
-      let req = await sendPost({ id: id, type: "ANIME" }, graphicApIDAnime, timeCovertToMs({ min: 5 }))
+      let req = await sendPost({ id: id, type: "ANIME" }, graphicApIDAnime)
       if (!req.success || !req.json) return
       return Convert(req.json.data.Media).AnimeData
     } catch (error) {
@@ -872,7 +837,7 @@ export default class AnilistApi implements informationPluginFormat {
 
   getManga = async (id: string) => {
     try {
-      let req = await sendPost({ id: id, type: "MANGA" }, graphicApIDAnime, timeCovertToMs({ min: 5 }))
+      let req = await sendPost({ id: id, type: "MANGA" }, graphicApIDAnime)
       if (!req.success || !req.json) return
       return Convert(req.json.data.Media).AnimeData
     } catch (error) {

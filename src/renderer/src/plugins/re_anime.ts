@@ -1,7 +1,7 @@
 import { request, SheepFinderAnime2000 } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerChapterList, playerData, playerDataExtended, playerPluginFormat, playerSubtitlesFormat, serverStatusData } from "@renderer/utils/types";
 
-const WEBSITE = "https://reanime.to"
+const WEBSITE = "https://reanime.cz"
 const PluginHeader = {
     "User-Agent": navigator.userAgent,
     Accept: "*/*",
@@ -45,7 +45,7 @@ const decryptor_content = `(response) => {
     return (new TextDecoder).decode(new Uint8Array(str))
 }`
 
-// TODO: Make reanime more stable
+// TODO: Fix this be work in worker
 const hls_converter = `(response) => {
     let buffer = response["buffer"]
     if (!/\.(webp|png)/i.test(response.url)) return buffer
@@ -515,7 +515,7 @@ async function ExtractVideo(playerData: playerDataExtended, url: string): Promis
 
 export default class ReAnime implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.1",
+        version: "1.2",
         name: "ReAnime",
         author: "Owca525",
         supportLang: ["en"],

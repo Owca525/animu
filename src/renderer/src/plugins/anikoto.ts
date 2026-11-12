@@ -1,7 +1,7 @@
 import { request, SheepFinderAnime2000, sleep } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerChapterList, playerData, playerPluginFormat, playerSubtitlesFormat, serverStatusData } from "@renderer/utils/types";
 
-const WEBSITE = "https://anikototv.to"
+const WEBSITE = "https://anikototv.se/"
 const PluginHeader = {
     "User-Agent": navigator.userAgent,
     Accept: "*/*",
@@ -295,7 +295,7 @@ class ExtractorPlayer {
 
 export default class Anikoto implements playerPluginFormat {
     metadata: playerPluginFormat["metadata"] = {
-        version: "1.2",
+        version: "1.3",
         name: "Anikoto",
         author: "Owca525",
         supportLang: ["en"],
