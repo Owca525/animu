@@ -1,3 +1,4 @@
+// DISSABLE
 import { request, SheepFinderAnime2000 } from "@renderer/utils/functions";
 import { AnimeData, cardData, episodeList, episodeMetadata, FilterPluginsParams, playerChapterList, playerData, playerPluginFormat, playerSubtitlesFormat, serverStatusData } from "@renderer/utils/types";
 const WEBSITE = "https://animepahetv.to/"
@@ -6,11 +7,10 @@ let PluginHeader = {
     "Accept": "application/json, text/javascript, */*; q=0.01",
     "Accept-Language": "en-US,en;q=0.9",
     "Accept-Encoding": "gzip, deflate, br, zstd",
-    "Alt-Used": "animepahe.pw",
     'User-Agent': navigator.userAgent,
     'Referer': WEBSITE,
-    "Sec-GPC": "1",
-    Connection: "keep-alive",
+    pragma: "no-cache",
+    "cache-control": "no-cache",
     "Sec-Fetch-Dest": "empty",
     "Sec-Fetch-Mode": "cors",
     "Sec-Fetch-Site": "same-origin",
@@ -355,7 +355,7 @@ export default class AnimePahe implements playerPluginFormat {
         }
 
         if (animeData && !anime_id) {
-            const search = await this.searchAnime(animeData.title.romaji, 1)
+            const search = await this.searchAnime(animeData.title.english ?? animeData.title.romaji, 1)
             if (search.length <= 0) return
 
             anime_id = SheepFinderAnime2000(search.map((v) => v.AnimeData), animeData)
@@ -399,7 +399,7 @@ export default class AnimePahe implements playerPluginFormat {
             /* IFDEF DEBUG */
             console.warn("searchAnime/AnimePahe", searchResponse)
             /* ENDIF */
-            if (!searchResponse["success"] || !searchResponse["json"]) return []
+            if (!searchResponse["success"] || !searchResponse["json"] || searchResponse["json"]["result"] == 0) return []
 
             return searchResponse["json"]["data"].map((v) => convertToAnimeData(v))
         } catch (error) {
