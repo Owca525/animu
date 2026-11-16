@@ -687,7 +687,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
 
         let configHLS: Partial<HlsConfig> = {
             enableWorker: config.Player.general.useHLSWorker,
-            lowLatencyMode: true,
+            // lowLatencyMode: true,
             workerPath: config.Player.general.useHLSWorker ? HLSWorker : undefined,
 
             autoStartLoad: player.isPlaying,
@@ -748,22 +748,6 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
                         if (hls_arraybuffer_parser && context["responseType"] == "arraybuffer") {
                             currentData = await sheepworker!.unsafe_function(hls_arraybuffer_parser, data)
                         }
-
-                        // for (let index = 0; index < manifest_script.length; index++) {
-                        //     const element = manifest_script[index];
-                        //     switch (element["type"]) {
-                        //         case "hls_manifest":
-                        //             if (context["responseType"] != "text") break
-
-                        //             currentData = await sheepworker!.function(element["code"], data)
-                        //             break
-                        //         case "hls_arraybuffer":
-                        //             if (context["responseType"] != "arraybuffer") break
-
-                        //             currentData = await sheepworker!.function(element["code"], data)
-                        //             break
-                        //     }
-                        // }
 
                         callbacks.onSuccess({ data: currentData, url: context.url }, {
                             loaded: data.buffer.byteLength,
