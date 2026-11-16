@@ -23,7 +23,7 @@ function OverWritePlayer(url: string, hls: boolean = false, customReq?: { [key: 
                 native: "Player Overwrite",
                 romaji: "Player Overwrite"
             },
-            id: crypto.randomUUID(),
+            id: { "anilist": crypto.randomUUID() },
             player_ID: crypto.randomUUID()
         },
         saveData: {

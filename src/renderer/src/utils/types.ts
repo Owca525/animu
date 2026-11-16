@@ -110,12 +110,12 @@ export interface AnimeData {
     characters?: {
         role: string,
         character: {
-            id: string,
+            id: { [key: string]: string | number },
             name: string,
             image: string
         },
         voiceActor?: {
-            id: string,
+            id: { [key: string]: string | number },
             name: string,
             image: string
         }
@@ -126,14 +126,13 @@ export interface AnimeData {
     studios?: string[]
     title: { english?: string, native: string, romaji: string }
     type?: string | undefined
-    episodesList?: { episodes: episodeMetadata[], type: string, name?: string }[]
     player_ID?: string
-    id: string
+    id: { [key: string]: string | number }
     isAdult?: boolean
     malID?: string
     trailer?: { id: string, site: string } | undefined
     relations?: {
-        id: number,
+        id: { [key: string]: string | number },
         title: { english?: string, native: string, romaji: string }
         bannerImage?: string
         coverImage: string
@@ -143,7 +142,7 @@ export interface AnimeData {
         type: string
     }[]
     recommendations?: {
-        id: number,
+        id: { [key: string]: string | number },
         title: { english?: string, native: string, romaji: string }
         bannerImage?: string
         coverImage: string
@@ -186,11 +185,10 @@ export interface deepLinkData {
     }
 }
 
-export interface AnimuListFormat { AnimeData: AnimeData, animulist: animulistProps, onClick?: (data: AnimeData) => void }
+export interface AnimuListFormat { AnimeData: AnimeData, saveData?: indentityPlayer, animulist: animulistProps, onClick?: (data: AnimeData) => void }
 
 export interface globalDataFormat {
     incognito: boolean,
-    history: Map<string, cardData>,
     loadedTheme: themeMetadata[],
     activeThemes: Map<number, themeMetadata>
     token: string | undefined,
@@ -199,7 +197,6 @@ export interface globalDataFormat {
         instance: Socket,
         currentRoom: string,
     },
-    animuList: Map<string, AnimuListFormat>
     anilist_user_data?: { [key: string]: any; },
     isAnimuFocus: boolean
     notifications: NotificationExpanded[]
@@ -215,8 +212,6 @@ export interface globalDataFormat {
     isSynchronizeAnime: boolean
 
     isFetchingCallendary: boolean
-
-    calendaryCache: cardData[]
 
     isUserTyping: boolean
 }
@@ -416,6 +411,9 @@ export interface PluginMetadataFormat {
         anime: string
     }
 
+    idName?: string
+    fetchInInformation?: boolean
+
     // TODO: Add support for dropdown
     configFormat?: PluginConfigFormat[]
 
@@ -431,9 +429,9 @@ export interface informationPluginFormat {
 
     search(name: string, page: number, params?: FilterPluginsParams): Promise<SearchResponse>
     home(): Promise<{ topCards?: containerData, sections: containerData[] } | { error: string } | undefined>
-    anime(id: string): Promise<AnimeData | undefined>
+    anime(id: string | number): Promise<AnimeData | undefined>
     schedule: (airingStart: number, airingEnd: number) => Promise<cardData[]>
-    getManga: (id: string) => Promise<AnimeData | undefined>
+    getManga: (id: string | number) => Promise<AnimeData | undefined>
 
     onChangeConfig?: (config: PluginConfigFormat[]) => Promise<void>
 
@@ -444,8 +442,8 @@ export interface informationPluginFormat {
     getUser?: () => Promise<UserData | undefined>
 
     getAnimeList?: () => Promise<cardData[]>
-    setAnimeInList?: (id: string, variable: animulistProps) => Promise<boolean>
-    removeAnimeFromList?: (id: string) => Promise<boolean>
+    setAnimeInList?: (id: string | number, variable: animulistProps) => Promise<boolean>
+    removeAnimeFromList?: (id: string | number) => Promise<boolean>
 }
 
 export interface WorkerWrapperInstance {

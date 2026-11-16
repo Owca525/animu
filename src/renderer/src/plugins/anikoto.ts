@@ -460,7 +460,7 @@ export default class Anikoto implements playerPluginFormat {
                         native: element[3],
                         romaji: element[3]
                     },
-                    id: "",
+                    id: {},
                     seasonYear: Number(element[6]),
                     coverImage: element[2],
                     player_ID: id,

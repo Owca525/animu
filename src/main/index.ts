@@ -15,7 +15,7 @@ import "./theme"
 import "./plugins"
 
 import { convertToNewFormat, detectOldVersion, write } from './os'
-import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync } from 'fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync, renameSync, rmSync } from 'fs'
 import { cardData, defaultConfig, SettingsConfig, UserData } from './types';
 import { advanceRequest, checkConfigFolder, deepMerge, detectZoom, FindFile, GetUserLangs, setupDiscordRPC } from './utils';
 import { electronAppUniversalProtocolClient } from 'electron-app-universal-protocol-client';
@@ -382,18 +382,29 @@ process.on('unhandledRejection', console.error)
 
 ipcMain.handle('backend:refresh', () => initialBackend());
 
-ipcMain.handle('initialMetadata', async () => ({ 
-  config: config, 
-  history: historyData, 
-  animulist: checkDatabase(), 
-  theme: getThemeList(checkConfigFolder("themes")),
-  port: server.port,
-  user: user_data,
-  user_lang: await GetUserLangs(),
-  node_ver: process.versions.node,
-  chrome_ver: process.versions.chrome,
-  electron_ver: process.versions.electron
-}));
+ipcMain.handle('initialMetadata', async () => {
+
+  const history = historyData
+  const animulist = checkDatabase()
+  let connected: { history: any, animulist: any } | undefined = undefined
+  if (history.length > 0 || animulist.length > 0) connected = { history: history, animulist: animulist }
+
+  return {
+    config: config,
+    old: connected,
+    theme: getThemeList(checkConfigFolder("themes")),
+    port: server.port,
+    user: user_data,
+    user_lang: await GetUserLangs(),
+    node_ver: process.versions.node,
+    chrome_ver: process.versions.chrome,
+    electron_ver: process.versions.electron
+  }
+});
 
 ipcMain.handle('backend:customheader', (_, header: Record<string, string | string[]> | undefined) => customheader = header);
 ipcMain.handle('advanceRequest', async (_, url: string, options?: { method?: "POST" | "GET", headers?: { [key: string]: string }, body: any }) => await advanceRequest(url, options));
+ipcMain.handle('backend:removeOldData', () => {
+  if (existsSync(path.join(newConfigPath, "history.json"))) rmSync(path.join(newConfigPath, "history.json"))
+  if (existsSync(path.join(newConfigPath, "animulistDatabase.json"))) rmSync(path.join(newConfigPath, "animulistDatabase.json"))
+});

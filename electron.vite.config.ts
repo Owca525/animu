@@ -11,8 +11,6 @@ function evalConditionOr(expr: string, flags: Record<string, boolean>) {
   return parts.some(flag => flags[flag] === true);
 }
 
-console.log(process.env.NODE_ENV)
-
 const globalFlags = {
   DEBUG: (process.env.NODE_ENV !== 'production' && process.env.ANIMU_WEB_DEV == undefined) || typeof process.env.DEBUG == "string",
   PROD: process.env.NODE_ENV == 'production' && process.env.ANIMU_WEB_DEV == undefined,
@@ -341,6 +339,10 @@ export default defineConfig({
           main: resolve(__dirname, "src/renderer/index.html"),
         },
       },
+
+      sourcemap: false,
+      target: "esnext",
+      
       minify: 'terser',
       terserOptions: {
         mangle: false,

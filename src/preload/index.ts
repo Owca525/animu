@@ -63,13 +63,6 @@ if (process.contextIsolated) {
         install: (tag: string) => ipcRenderer.invoke('yt-dlp:install', tag),
         run: (commands: string[]) => ipcRenderer.invoke('yt-dlp:run', commands),
       },
-      animulist: {
-        add: (anime) => ipcRenderer.invoke('animulist:saveToDatabase', anime),
-        delete: (id) => ipcRenderer.invoke('animulist:deleteFromDatabase', id),
-        update: (id, anime) => ipcRenderer.invoke('animulist:updateDatabase', id, anime),
-        getDatabase: () => ipcRenderer.invoke('animulist:getAllInformation'),
-        overWrite: (data) => ipcRenderer.invoke('animulist:overwrite', data)
-      },
       runExternaPlayer: (videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc") => ipcRenderer.invoke("runExternalPlayer", videoData, type),
       getOSDetails: () => ipcRenderer.invoke('os:information'),
       getUserLang: () => ipcRenderer.invoke("lang:files"),
@@ -111,7 +104,7 @@ if (process.contextIsolated) {
       reload: () => ipcRenderer.send("window:reload"),
       createWindow: (props) => ipcRenderer.invoke("window:createNewWindow", props),
     });
-    contextBridge.exposeInMainWorld("tmpData", ipcRenderer.invoke('initialMetadata'))
+    contextBridge.exposeInMainWorld("metadata", () => ipcRenderer.invoke('initialMetadata'))
   } catch (error) {
     console.error(error);
   }

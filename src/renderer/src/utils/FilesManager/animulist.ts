@@ -1,92 +1,54 @@
 import { unwrap } from "solid-js/store"
 import { removeToast, toast, updateToast } from "../context/ToastNotification"
-import { animulistData, getGlobalCache, GetUser, isSynchronizeAnime, setAnimulistData, SetSynchronizeAnime } from "../stores/global"
+import { getGlobalCache, GetUser, isSynchronizeAnime, SetSynchronizeAnime } from "../stores/global"
 import { AnimeData, AnimuListFormat, animulistProps, cardData } from "../types"
 import { getHomeCache } from "../stores/home"
 import { AnimuListSearch } from "@renderer/pages/home/homeUtils"
-import { dateToUnix, detectTitleConfig, getHistory, RemoveAnimeDataCache, sleep, TrieFunction } from "../functions"
+import { dateToUnix, detectTitleConfig, GetAnimeID, GetAnimeIDObject, sleep, TrieFunction } from "../functions"
 import { getInformationPlugin } from "../stores/plugins"
 import { t } from "../i18n"
-
-export function setNewAnimuList(data: AnimuListFormat[]) {
-    let tmpMap = new Map()
-    data.forEach((card) => {
-        tmpMap.set(card["AnimeData"]["id"], card)
-    })
-    
-    setAnimulistData(tmpMap)
-    return tmpMap
-}
+import { AddCardDataToDatabase, animuDatabase, GetAllAnimeFromDatabase, GetAnimeFromDatabase, getAnimuHistoryIContinue } from "./anime_database"
 
 export async function addToAnimuList(animulist: animulistProps, anime: AnimeData, notification: boolean = false) {
     if (getGlobalCache().incognito) return
-    if (anime.id == "") return
 
-    /* IFDEF DEBUG|PROD */
-    await window.api.animulist.add({ AnimeData: { ...unwrap(anime), nextAiringEpisode: undefined }, animulist: unwrap(animulist) })
-    /* ENDIF */
-
-    /* IFDEF WEB */
-    let database = structuredClone(unwrap(animulistData()))
-
-    const tmp = database.get(anime.id)
-    if (tmp) database.delete(anime.id)
-
-    let tmpDatabase = database.values().toArray()
-
-    tmpDatabase.unshift({ AnimeData: { ...anime, nextAiringEpisode: undefined }, animulist: animulist })
-    localStorage.setItem("animulist", JSON.stringify(tmpDatabase))
-    /* ENDIF */
+    AddCardDataToDatabase({ AnimeData: { ...unwrap(anime), nextAiringEpisode: undefined }, animulist: unwrap(animulist) })
 
     refreashAnimulist()
+    // TRANSLATE
     if (notification) toast(`Succesfully Added ${detectTitleConfig(anime.title)} to animulist`)
 }
 
-export async function removeFromAnimulist(id: string, notification: boolean = false) {
+export async function removeFromAnimulist(anime: AnimeData, notification: boolean = false) {
     if (getGlobalCache().incognito) return
-    if (id == "") return
 
-    /* IFDEF DEBUG|PROD */
-    await window.api.animulist.delete(unwrap(id))
-    /* ENDIF */
+    const id = GetAnimeIDObject(anime)
+    if (!id) {
+        console.error("animulist/removeFromAnimulist FAILED ADD ANIME", anime)
+        return
+    }
 
-    /* IFDEF WEB */
-    let database = structuredClone(unwrap(animulistData()))
-    database.delete(id)
-    localStorage.setItem("animulist", JSON.stringify(database.values().toArray()))
-    /* ENDIF */
+    const finded = animuDatabase.get({ table: "ids", row: id["name"], value: `${id["id"]}` })
+    if (!finded) return
+
+    animuDatabase.delete("animulist", [`${finded["id"]}`])
 
     refreashAnimulist()
+    // TRANSLATE
     if (notification) toast(`Succesfully Removed From animulist`)
 }
 
-export async function updateDataInAnimulist(id: string, anime: { AnimeData: AnimeData; animulist: animulistProps }, notification: boolean = false) {
+export async function updateDataInAnimulist(anime: { AnimeData: AnimeData; animulist: animulistProps }, notification: boolean = false) {
     if (getGlobalCache().incognito) return
-    if (anime.AnimeData.id == "") return
 
-    /* IFDEF DEBUG|PROD */
-    await window.api.animulist.update(unwrap(id), unwrap(anime))
-    /* ENDIF */
-
-    /* IFDEF WEB */
-    let database = structuredClone(unwrap(animulistData()))
-    database.set(id, anime)
-    localStorage.setItem("animulist", JSON.stringify(database.values().toArray().forEach((v) => RemoveAnimeDataCache(v))))
-    /* ENDIF */
+    AddCardDataToDatabase(unwrap(anime))
 
     refreashAnimulist()
+    // TRANSLATE
     if (notification) toast(`Succesfully Updated in animulist`)
 }
 
 export async function refreashAnimulist() {
-    /* IFDEF DEBUG|PROD */
-    setNewAnimuList(await window.api.animulist.getDatabase())
-    /* ENDIF */
-
-    /* IFDEF WEB */
-    setAnimulistData(JSON.parse(localStorage.getItem("animulist") as any))
-    /* ENDIF */
-
     const global = unwrap(getHomeCache())
 
     if (GetUser()["logged"]) {
@@ -109,7 +71,7 @@ export async function SynchronizeAnimulistWithPlugin(animu_overwrite = false) {
     if (!info_plugin.setAnimeInList || !info_plugin.removeAnimeFromList || !info_plugin.getAnimeList) return
     SetSynchronizeAnime(true)
 
-    const animulist = animulistData().values().toArray()
+    const animulist = GetAllAnimuAnimulist()
     const pluginAnimeList = await info_plugin.getAnimeList()
 
     /* IFDEF DEBUG */
@@ -167,7 +129,10 @@ export async function SynchronizeAnimulistWithPlugin(animu_overwrite = false) {
 
     const updatetAnimulist = animulist.map((item) => saveInAnimu.find((v) => v["AnimeData"]["id"] == item["AnimeData"]["id"]) ?? item)
 
-    await window.api.animulist.overWrite(JSON.parse(JSON.stringify(updatetAnimulist)))
+    for (let index = 0; index < updatetAnimulist.length; index++) {
+        const element = updatetAnimulist[index];
+        await updateDataInAnimulist(element as any)
+    }
 
     if (saveInPlugin.length <= 0) return
 
@@ -185,7 +150,7 @@ export async function SynchronizeAnimulistWithPlugin(animu_overwrite = false) {
         try {
 
             const resp = await TrieFunction(async () => {
-                return await info_plugin.setAnimeInList!(anime["AnimeData"]["id"], anime["animulist"]!)
+                return await info_plugin.setAnimeInList!(`${GetAnimeID(anime["AnimeData"], info_plugin["metadata"]["name"])}`, anime["animulist"]!)
             }, Math.floor(Math.random() * (20000 - 6000 + 1)) + 6000)
             
             if (resp) {
@@ -204,21 +169,21 @@ export async function SynchronizeAnimulistWithPlugin(animu_overwrite = false) {
     SetSynchronizeAnime(false)
 }
 
-export async function OvewriteAnimuList(data: { AnimeData: AnimeData; animulist: animulistProps }[]) {
-    setNewAnimuList(data)
-    refreashAnimulist()
-}
+// export async function OvewriteAnimuList(data: { AnimeData: AnimeData; animulist: animulistProps }[]) {
+//     setNewAnimuList(data)
+//     refreashAnimulist()
+// }
 
 export function convertHistoryToAnimuList() {
-    const history = unwrap(getHistory()).history.reverse()
+    const history = getAnimuHistoryIContinue().history.reverse()
     if (history.length <= 0) return
-    const animulist = unwrap(animulistData())
 
     for (let index = 0; index < history.length; index++) {
         const element = history[index];
         try {
-            if (element.AnimeData.id.replaceAll(" ", "") == "") return
-            const finded = animulist.get(element.AnimeData.id)
+            if (!element.AnimeData.id) return
+
+            const finded = GetAnimuAnimulist(element["AnimeData"])
             if (finded) continue
             if (!element.saveData.episode) continue
             let status: animulistProps = {
@@ -242,5 +207,17 @@ export function convertHistoryToAnimuList() {
         } catch (error) {
             console.error("convertHistoryToAnimuList have error", error, element)
         }
+        
     }
+}
+
+export function GetAllAnimuAnimulist(): AnimuListFormat[] {
+    return GetAllAnimeFromDatabase().filter((v) => v["animulist"]) as AnimuListFormat[]
+}
+
+export function GetAnimuAnimulist(id: AnimeData | cardData): AnimuListFormat | undefined {
+    const tmp = GetAnimeFromDatabase(GetAnimeID(id))
+    if (!tmp) return
+    if (!tmp["animulist"]) return
+    return tmp as AnimuListFormat
 }

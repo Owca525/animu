@@ -1,4 +1,4 @@
-import { dateToUnix, detectTitleConfig, getEpisodeDay, getGradientColor, getHistory, sortEpisodes } from '@renderer/utils/functions';
+import { dateToUnix, detectTitleConfig, getEpisodeDay, getGradientColor, sortEpisodes } from '@renderer/utils/functions';
 import { cardData, indentityPlayer } from '@renderer/utils/types';
 import "./css/bigcard.css"
 import Button from '@renderer/components/buttons';
@@ -7,11 +7,13 @@ import { Component, For, Show } from 'solid-js';
 import { useI18n } from '@renderer/utils/i18n';
 import { getPlayerPLugin } from '@renderer/utils/stores/plugins';
 import { removeToast, toast, updateToast } from '@renderer/utils/context/ToastNotification';
-import { animulistData, informationCache, PlayerCache } from '@renderer/utils/stores/global';
+import { informationCache, PlayerCache } from '@renderer/utils/stores/global';
 import { updateGenres } from './filter';
 import { StartHomeSearch } from '..';
 import { getHomeCache } from '@renderer/utils/stores/home';
 import pluginManager from '@renderer/utils/pluginManager';
+import { GetAnimuAnimulist } from '@renderer/utils/FilesManager/animulist';
+import { GetAnimuHistory } from '@renderer/utils/FilesManager/history';
 
 type bigCardProps = { data: cardData, ref?: any }
 
@@ -26,7 +28,7 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
     }
 
     function openInformation() {
-        const tmp = animulistData().get(data.AnimeData.id)
+        const tmp = GetAnimuAnimulist(data)
 
         informationCache.update({ anime: data.AnimeData, animulist: tmp ? tmp.animulist : undefined, saveData: data["saveData"] })
         navigate("/info");
@@ -88,30 +90,36 @@ const BigCard: Component<bigCardProps> = ({ data, ref }) => {
 
     function generateButton() {
         if (data.AnimeData.status && data.AnimeData.status.toUpperCase().replaceAll(" ", "_") == "NOT_YET_RELEASED") return <></>
-        const history = getHistory()
-        const animeContinue = history.continue.find((value) => value.AnimeData.id == data.AnimeData.id)
-        const historyContinue = history.history.find((value) => value.AnimeData.id == data.AnimeData.id)
+        const history = GetAnimuHistory(data.AnimeData)
+
+        if (!history) return
+
+        let animeContinue: cardData | undefined;
+        let historyContinue: cardData | undefined;
+
+        if (history["saveData"]) historyContinue = history
+        if (history["saveData"] && (history.saveData.last_Time != 0 || history.saveData.isStarted)) animeContinue = history
 
         try {
-            if (!animeContinue && !historyContinue) 
+            if (!history["saveData"]) 
                 return <Button content={t("home.bigcard.now")} ButtonClass='big-card-button' onClick={() => goToPlayer()} />
             
             if (animeContinue) 
                 return <Button 
-                    content={t("history.continue", { ep: animeContinue.saveData?.episode })} 
+                    content={t("history.continue", { ep: animeContinue.saveData!.episode })} 
                     ButtonClass='big-card-button' 
                     onClick={() => goToPlayer(animeContinue.saveData, animeContinue.AnimeData.player_ID)} 
                 />
             
-            if (historyContinue && data.AnimeData.nextAiringEpisode && data.AnimeData.nextAiringEpisode["episode"] == parseInt(historyContinue.saveData.episode!)+1) {
+            if (historyContinue && data.AnimeData.nextAiringEpisode && data.AnimeData.nextAiringEpisode["episode"] == parseInt(historyContinue.saveData!.episode!)+1) {
                 return <></>
             }
             
-            if (historyContinue && parseInt(historyContinue.saveData.episode!)+1 <= historyContinue.AnimeData.episodes! && !(parseInt(historyContinue.saveData.episode!)+1 > historyContinue.AnimeData.episodes!)) {                
+            if (historyContinue && parseInt(historyContinue.saveData!.episode!)+1 <= historyContinue.AnimeData.episodes! && !(parseInt(historyContinue.saveData!.episode!)+1 > historyContinue.AnimeData.episodes!)) {                
                 return <Button 
-                    content={t("home.bigcard.start", { ep: parseInt(historyContinue.saveData.episode!)+1 })} 
+                    content={t("home.bigcard.start", { ep: parseInt(historyContinue.saveData!.episode!)+1 })} 
                     ButtonClass='big-card-button' 
-                    onClick={() => goToPlayer({...historyContinue.saveData, episode: `${parseInt(historyContinue.saveData.episode!)+1}`} as indentityPlayer, 
+                    onClick={() => goToPlayer({...historyContinue.saveData, episode: `${parseInt(historyContinue.saveData!.episode!)+1}`} as indentityPlayer, 
                     historyContinue.AnimeData.player_ID)} 
                 />
             }

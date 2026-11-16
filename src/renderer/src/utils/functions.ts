@@ -21,7 +21,7 @@ import {
 } from './types';
 import { DropdownOption } from '@renderer/components/dropDown';
 import { getConfig } from './stores/config';
-import { animulistData, getAnimuHistory, getGlobalCache, informationCache, PlayerCache, setActiveThemes, SetCalendaryCache, SetFetchingCalendary, setGlobalToken } from './stores/global';
+import { getGlobalCache, informationCache, isFetchingCallendary, PlayerCache, setActiveThemes, SetFetchingCalendary, setGlobalToken } from './stores/global';
 import { getHomeCache, setAllHomeData, setHomeNewData } from './stores/home';
 import { showDialog } from './context/DialogContext';
 import { t, useI18n } from './i18n';
@@ -33,7 +33,8 @@ import pluginManager, { playerPluginInstance } from './pluginManager';
 import { sendNotification } from "./NotificationManager"
 import { pluginRepoExpandedSettings } from '@renderer/pages/settings';
 import semver from "semver";
-import { CreateDatabase } from './database';
+import { GetAnimeFromDatabase, getAnimuHistoryIContinue } from './FilesManager/anime_database';
+import { GetAllAnimuAnimulist, GetAnimuAnimulist } from './FilesManager/animulist';
 
 export function decodeHtmlEntities(str: string | undefined) {
     if (!str) return ""
@@ -187,7 +188,7 @@ export async function refetchHistory() {
     if (data.activePage != "global.history") return
     if (typeof data == "function") return
 
-    let history = getHistory()
+    let history = getAnimuHistoryIContinue()
     if (data["data"]["sections"][0].title == "global.continuewatch" && data["data"]["sections"].length != 2) {
         setHomeNewData({ sections: [{ title: "global.continuewatch", data: history.continue, horizontal: false }] })
         return
@@ -587,22 +588,6 @@ export function getWeek(date?: string): { startWeekUnix: number, endWeekUnix: nu
     }
 }
 
-export function getHistory() {
-    let global = getAnimuHistory().values().toArray()
-
-    let continueWatch: cardData[] = []
-    for (let index = 0; index < global.length; index++) {
-        const element = global[index];
-        if (element.saveData && (element.saveData.last_Time != 0 || element.saveData.isStarted)) {
-            continueWatch.push(element)
-        }
-    }
-    return {
-        continue: continueWatch,
-        history: global.map((value) => ({ ...value, saveData: { ...value.saveData, last_Time: 0, isStarted: false } }))
-    }
-}
-
 export function convertText(text: string) {
     let uri = encodeURI(text.replaceAll("[", "").replaceAll("]", ""))
     return uri.replaceAll("+", "%2B")
@@ -714,7 +699,7 @@ export async function getPluginsList() {
 
 export function SheepFinderAnime2000(animeList: AnimeData[], anime: AnimeData): string | undefined {
     try {
-        if (anime.id != "") {
+        if (anime.id) {
             console.log("ID Check")
             const findedID = animeList.find((item) => item.id == anime.id)
             if (findedID) return findedID.player_ID
@@ -1001,7 +986,6 @@ export async function FetchWeekCalendary() {
             const diffrent = checkTimeDriffrentUnix(new Date().toString(), callendaryCache["unix"])
 
             if (diffrent["hour"] < 12) {
-                SetCalendaryCache(callendaryCache["cache"])
                 SetFetchingCalendary(false)
 
                 return
@@ -1019,11 +1003,9 @@ export async function FetchWeekCalendary() {
         }))
 
         SetFetchingCalendary(false)
-        SetCalendaryCache(content)
 
     } catch (error) {
         SetFetchingCalendary(false)
-        SetCalendaryCache([])
     }
 }
 
@@ -1121,17 +1103,21 @@ export async function checkAnimeTodayReleaseEpisode() {
             const info_plugin = getInformationPlugin()
 
             if (item["anime"]["AnimeData"]['status'] == "NOT_YET_RELEASED") {
-                const response = await info_plugin.anime(item["anime"]["AnimeData"]["id"])
+                const response = await info_plugin.anime(`${GetAnimeID(item["anime"], info_plugin["metadata"]["idName"])}`)
+
                 if (!response) return
+
                 await updatePlaylist("global.waitingplaylist", { ...item, anime: { ...item["anime"], AnimeData: response }, customData: false })
+
                 return
             }
 
             if (item["anime"]["AnimeData"]['status'] == "RELEASING" || (item["anime"]["AnimeData"]['status'] == "FINISHED" && item["customData"] == false)) {
-                let anime = await info_plugin.anime(item["anime"]["AnimeData"]["id"])
+                let anime = await info_plugin.anime(`${GetAnimeID(item["anime"], info_plugin["metadata"]["idName"])}`)
+                
                 if (!anime) return
 
-                const history_anime = getAnimuHistory().get(anime["id"])
+                const history_anime = GetAnimuAnimulist(anime)
 
                 const content_anime = {
                     ...item,
@@ -1501,7 +1487,7 @@ export function User_Format_Time(seconds: number): string {
 export function User_Calculate_Watch_Time() {
     // TODO: MAKE BETTER ACCURATE
 
-    const list = animulistData().values().toArray()
+    const list = GetAllAnimuAnimulist()
 
     if (list.length <= 0) return 0
 
@@ -1658,7 +1644,7 @@ export async function discord_server() {
 export async function SendRecomendAnime() {
     if (GetAnimuPage() == "player") return
 
-    const data = getHistory()
+    const data = getAnimuHistoryIContinue()
     if (data["history"].length <= 0 || !data["history"]) return
 
     const history_anime = data["history"][Math.floor(Math.random() * data["history"].length)]
@@ -1667,12 +1653,16 @@ export async function SendRecomendAnime() {
 
     const plugin = getInformationPlugin()
 
-    const anime_response = await plugin.anime(history_anime["AnimeData"]["id"])
+    const anime_response = await plugin.anime(`${GetAnimeID(history_anime["AnimeData"])}`)
     if (!anime_response || !anime_response.recommendations) return
 
     const recomended = anime_response["recommendations"][Math.floor(Math.random() * anime_response["recommendations"].length)]
 
-    const finded = data["history"].find((v) => v["AnimeData"]["id"] == `${recomended["id"]}`)
+    const recomendationID = GetAnimeIDObject(recomended)
+
+    if (!recomendationID) return
+
+    const finded = GetAnimeFromDatabase(recomendationID["id"], recomendationID["name"])
     if (finded) return
 
     // TRANSLATION
@@ -1688,9 +1678,13 @@ export function ConvertObjectToDatabase(obj: { [key: string]: any }, prefix = ""
     for (const [key, value] of Object.entries(obj)) {
         const newKey = prefix ? `${prefix}.${key}` : key;
 
+        if (newKey == "id") continue
+
         if (value !== null && typeof value === "object" && !Array.isArray(value)) {
             ConvertObjectToDatabase(value, newKey, result);
         } else if (Array.isArray(value)) {
+            result[newKey] = JSON.stringify(value);
+        } else if (typeof value == "boolean") {
             result[newKey] = JSON.stringify(value);
         } else {
             result[newKey] = value;
@@ -1700,169 +1694,119 @@ export function ConvertObjectToDatabase(obj: { [key: string]: any }, prefix = ""
     return result;
 }
 
-function AddAnimeToDatabase(db: CreateDatabase, anime: cardData) {
 
-    const finded = db.get({ table: "ids", row: "anilist", value: `${anime.AnimeData.id}` })
+export function ConvertObjectToNormal(obj: { [key: string]: any }): { [key: string]: any } | undefined {
+    if (!obj) return
+    const result = {};
 
-    let uuid = `${crypto.randomUUID()}`
+    for (const [key, value] of Object.entries(obj)) {
+        const keys = key.split(".");
+        let current = result;
 
-    if (finded) {
-        uuid = finded["id"] as string
+        keys.forEach((part, index) => {
+            if (index === keys.length - 1) {
+                
+                if (typeof value == "string" && value.startsWith("[") && value.endsWith("]")) {
+                    try {
+                        current[part] = JSON.parse(value);
+                    } catch (error) {
+                        current[part] = value;
+                    }
+                } else if (typeof value == "string" && ( value == "false" || value == "true" )) {
+                    current[part] = JSON.parse(value);
+                } else {
+                    current[part] = value;
+                }
+
+            } else {
+                current[part] ??= {};
+                current = current[part];
+            }
+        });
     }
 
-    let tmp = ConvertObjectToDatabase(anime.AnimeData)
-    delete tmp.trailer;
-    delete tmp.popularity;
+    return result;
+}
 
-    db.updateDatabse({
-        table: 'anime',
-        key: 'id',
-        obj: {
-            ...tmp,
-            id: uuid
+export async function GetCalendaryCache(date?: string) {
+    let week_calendary: cardData[] = []
+
+    if (date) {
+
+        const week = getWeek(date)
+        week_calendary = await getInformationPlugin().schedule(week.startWeekUnix, week.endWeekUnix)
+
+    } else {
+
+        if (isFetchingCallendary()) {
+            let timestamp = setInterval(() => {
+                if (isFetchingCallendary()) return
+
+                try {
+                    week_calendary = JSON.parse(localStorage.getItem("animu_callendar_cache") ?? "{}")["cache"]
+                } catch (error) { }
+
+                clearInterval(timestamp)
+            }, 500)
+        } else {
+            try {
+                week_calendary = JSON.parse(localStorage.getItem("animu_callendar_cache") ?? "{}")["cache"]
+            } catch (error) { }
         }
-    })
 
-    db.updateDatabse({
-        table: 'ids',
-        key: 'id',
-        obj: {
-            anilist: `${anime.AnimeData.id}`,
-            id: uuid
-        }
-    })
-
-    if (anime.saveData) {
-        db.updateDatabse({
-            table: 'savedata',
-            key: 'id',
-            obj: {
-                ...ConvertObjectToDatabase(anime.saveData),
-                id: uuid
-            }
-        })
     }
 
-    if (anime.animulist) {
-        db.updateDatabse({
-            table: 'animulist',
-            key: 'id',
-            obj: {
-                ...ConvertObjectToDatabase(anime.animulist),
-                id: uuid
-            }
-        })
+    return week_calendary
+} 
+
+export function GetAnimeID(ob: cardData | AnimeData, name?: string): string | number {
+    if (!ob) return ""
+    try {
+
+        let id: { [key: string]: string | number } = {}
+
+        if (ob["AnimeData"]) {
+            id = ob["AnimeData"]["id"]
+        } else id = ob["id"]
+
+        if (!name) {
+            const info = getInformationPlugin()
+            name = info["metadata"]["idName"]
+        }
+
+        let tmpID = id[name ?? ""]
+
+        if (!tmpID) throw new Error("Information ID Not Found")
+
+        return tmpID
+    } catch (error) {
+        console.error("Functions/GetAnimeID", error)
+        return ""
     }
 }
 
-export function TestAnimuDatabase() {
+export function GetAnimeIDObject(ob: cardData | AnimeData, name?: string): { id: string | number, name: string } | undefined {
+    if (!ob) return undefined
+    try {
 
-    const database = new CreateDatabase({
-        createDatabase: [`CREATE TABLE IF NOT EXISTS anime (
-                id TEXT PRIMARY KEY,
-                averageScore INTEGER,
-                bannerImage TEXT,
-                coverImage TEXT,
-                description TEXT,
-                duration INTEGER,
-                episodes INTEGER,
-                format TEXT,
-                genres TEXT,
-                season TEXT,
-                seasonYear INTEGER,
-                characters TEXT,
-                status TEXT,
-                source TEXT,
-                synonyms TEXT,
-                studios TEXT,
-                "title.english" TEXT,
-                "title.native" TEXT,
-                "title.romaji" TEXT,
-                type TEXT,
-                player_ID TEXT,
-                isAdult BOOLEAN DEFAULT FALSE,
+        let id: { [key: string]: string | number } = {}
 
-                "trailer.id" TEXT,
-                "trailer.site" TEXT,
+        if (ob["AnimeData"]) {
+            id = ob["AnimeData"]["id"]
+        } else id = ob["id"]
 
-                relations TEXT,
+        if (!name) {
+            const info = getInformationPlugin()
+            name = info["metadata"]["idName"]
+        }
 
-                "startDate.day" INTEGER,
-                "startDate.month" INTEGER,
-                "startDate.year" INTEGER,
+        let tmpID = id[name ?? ""]
 
-                "nextAiringEpisode.airingAt" INTEGER,
-                "nextAiringEpisode.episode" INTEGER,
-                "nextAiringEpisode.timeUntilAiring" INTEGER,
+        if (!tmpID) throw new Error("Information ID Not Found")
 
-                "endDate.day" INTEGER,
-                "endDate.month" INTEGER,
-                "endDate.year" INTEGER
-            )`,
-            `CREATE TABLE IF NOT EXISTS savedata (
-                id TEXT PRIMARY KEY,
-                pluginName TEXT,
-                last_Time INTEGER,
-                episode TEXT,
-                type TEXT,
-                duration INTEGER,
-                isStarted BOOLEAN DEFAULT FALSE,
-                lastAnimeDataUpdate INTEGER,
-                lastEpisodesUpdate INTEGER,
-                episodes TEXT,
-                FOREIGN KEY(id) REFERENCES anime(id)
-            )`,
-            `CREATE TABLE IF NOT EXISTS ids (
-                id TEXT PRIMARY KEY,
-                anilist TEXT,
-                FOREIGN KEY(id) REFERENCES anime(id)
-            )`,
-            `CREATE TABLE IF NOT EXISTS animulist (
-                id TEXT PRIMARY KEY,
-                status TEXT,
-                score INTEGER,
-                reapeat INTEGER,
-                startWatch INTEGER,
-                endWatch INTEGER,
-                added INTEGER,
-                lastUpdate INTEGER,
-                favorite BOOLEAN DEFAULT FALSE,
-                progress INTEGER,
-                FOREIGN KEY(id) REFERENCES anime(id)
-            )`
-        ]
-    })
-
-    const history = window["initialMetadata"]["history"]
-
-    for (let index = 0; index < history.length; index++) {
-        const anime = history[index];
-
-        AddAnimeToDatabase(database, anime)
+        return { id: tmpID, name: `${name}` }
+    } catch (error) {
+        console.error("Functions/GetAnimeID", error)
+        return undefined
     }
-
-    const animulist = window["initialMetadata"]["animulist"]
-
-    for (let index = 0; index < animulist.length; index++) {
-        const data = animulist[index];
-
-        AddAnimeToDatabase(database, { AnimeData: data.AnimeData, animulist: data.animulist })
-    }
-
-    const data = database.db.export();
-
-    const blob = new Blob([data as any], {
-        type: "application/x-sqlite3"
-    });
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-
-    a.href = url;
-    a.download = "database.sqlite";
-    a.click();
-
-    URL.revokeObjectURL(url);
 }
-
-window["TestAnimuDatabase"] = TestAnimuDatabase;

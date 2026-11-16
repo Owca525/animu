@@ -715,7 +715,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         }
     };
 
-    getManga = async (id: string): Promise<AnimeData | undefined> => {
+    getManga = async (id: string | number): Promise<AnimeData | undefined> => {
         if (!this.instance) return
         try {
             return await this.instance.wrapperFunction("getManga", { id }) as any
@@ -796,7 +796,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         }
     };
 
-    setAnimeInList = async (id: string, variable: animulistProps): Promise<boolean> => {
+    setAnimeInList = async (id: string | number, variable: animulistProps): Promise<boolean> => {
         if (!this.instance) return false
         try {
             return await this.instance.wrapperFunction("setAnimeInList", { id, variable }) as any
@@ -806,7 +806,7 @@ export class InformationPluginInstance implements informationPluginInstanceForma
         }
     };
 
-    removeAnimeFromList = async (id: string): Promise<boolean> => {
+    removeAnimeFromList = async (id: string | number): Promise<boolean> => {
         if (!this.instance) return false
         try {
             return await this.instance.wrapperFunction("removeAnimeFromList", { id }) as any

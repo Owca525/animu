@@ -399,7 +399,7 @@ export default class HIanime implements playerPluginFormat {
                         native: element["groups"]["title"],
                         romaji: element["groups"]["title"]
                     },
-                    id: "",
+                    id: {},
                     season: date["season"],
                     seasonYear: date["seasonYear"],
                     coverImage: element["groups"]["imgSrc"],

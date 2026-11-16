@@ -524,7 +524,7 @@ export default class ReAnime implements playerPluginFormat {
     };
 
     extractPlayerData = async (_type: string, episode: episodeMetadata, id: string): Promise<playerData[]> => {
-        const list_id = JSON.parse(id)
+        const list_id = JSON.parse(`${id}`)
 
         const response = await request(`${WEBSITE}/api/flix/${list_id[0]}/${episode["ep"]}`, { headers: PluginHeader })
         /* IFDEF DEBUG */

@@ -75,6 +75,39 @@ export class CreateDatabase {
         }
     }
 
+    getAll = (table: string) => {
+        try {
+            const stmt = this.db.prepare(`SELECT * FROM ${table}`);
+            const result: ParamsObject[] = [];
+
+            while (stmt.step()) {
+                result.push(stmt.getAsObject());
+            }
+
+            stmt.free();
+
+            return result;
+        } catch (error) {
+            console.error("Database/getAll", error)
+            return undefined
+        }
+    }
+
+    delete = (table: string, ids: string[]) => {
+        try {
+            const placeholders = ids.map(() => "?").join(", ");
+
+            this.db.run(
+                `DELETE FROM ${table} WHERE id IN (${placeholders})`,
+                ids
+            );
+
+        } catch (error) {
+            console.error("Database/delete", error)
+            return
+        }
+    }
+
     updateDatabse = (content: { table: string, key: string, obj: { [key: string]: number | string | undefined } }) => {
         try {
             const columns = Object.keys(content.obj);

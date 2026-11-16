@@ -34,7 +34,7 @@ function convertToCardData(data: { [key: string]: any }): cardData {
                 native: data["name_alt"],
                 romaji: data["name"]
             },
-            id: "",
+            id: {},
             player_ID: data["id"],
             endDate: convertStringToDate(data["end_date"]),
             startDate: convertStringToDate(data["release_date"]),

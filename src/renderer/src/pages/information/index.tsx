@@ -13,6 +13,7 @@ import {
     decodeHtmlEntities,
     detectTitleConfig,
     ExtractVideo,
+    GetAnimeID,
     getGradientColor,
     openUrlFolder,
     refetchHistory,
@@ -33,7 +34,7 @@ import {
     Suspense,
     Switch
 } from 'solid-js';
-import { animulistData, getAnimuHistory, getGlobalCache, informationCache, PlayerCache } from '@renderer/utils/stores/global';
+import { getGlobalCache, informationCache, PlayerCache } from '@renderer/utils/stores/global';
 import { getInformationPlugin, getPlayerPLugin } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
 import { createStore } from 'solid-js/store';
@@ -49,8 +50,8 @@ import { toast, updateToast } from '@renderer/utils/context/ToastNotification';
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 import ButtonGroup from '../settings/components/buttonGroup';
 import { requestAnimeMedia } from '@renderer/utils/animeThemes';
-import { updateHistoryData } from '@renderer/utils/FilesManager/history';
-import { addToAnimuList, removeFromAnimulist, updateDataInAnimulist } from '@renderer/utils/FilesManager/animulist';
+import { GetAnimuHistory, updateHistoryData } from '@renderer/utils/FilesManager/history';
+import { addToAnimuList, GetAnimuAnimulist, removeFromAnimulist, updateDataInAnimulist } from '@renderer/utils/FilesManager/animulist';
 import { readPlaylist, removeInPlaylist, saveToPlaylist } from '@renderer/utils/FilesManager/playlist';
 import AnimulistMenu from '@renderer/components/animulistMenu';
 import { updateGenres } from '../home/components/filter';
@@ -117,9 +118,9 @@ async function FetchEpisodes(params: { anime: AnimeData, playerID: string | unde
 }
 
 async function FetchAnimeOpening(anime: AnimeData): Promise<playerData[]> {
-    if (!parseInt(anime.id)) return []
+    if (!parseInt(`${anime.id["anilist"]}`)) return []
 
-    const response = await requestAnimeMedia(parseInt(anime.id))
+    const response = await requestAnimeMedia(parseInt(`${anime.id["anilist"]}`))
 
     return response.map((item) => {
         const firstPartTitle = item.type == "OP" ? "Opening" : "Ending"
@@ -320,7 +321,7 @@ function information() {
             }
         })
 
-        if (information["cache"]["anime"]["id"] == "") return
+        if (!information["cache"]["anime"]["id"]) return
 
         if (information["cache"]["anime"]["nextAiringEpisode"] || !information["cache"]["saveData"]) return
 
@@ -338,7 +339,7 @@ function information() {
                 } as indentityPlayer
             }
 
-            updateHistoryData(tmpData.anime.id, {
+            updateHistoryData({
                 AnimeData: {
                     ...tmpData.anime,
                     recommendations: undefined
@@ -357,7 +358,7 @@ function information() {
 
     async function initialInformation() {
         if (config["information"]["preloadOpening"] || config["information"]["openingininformation"])
-            requestAnimeMedia(parseInt(information["cache"]["anime"]["id"])).then((v) => {
+            requestAnimeMedia(parseInt(`${information["cache"]["anime"]["id"]["anilist"]}`)).then((v) => {
                 updateInfo({
                     cacheOpenings: v
                 })
@@ -387,15 +388,7 @@ function information() {
             activePlugin: plugin.metadata.name
         })
 
-        let tempHistory = getAnimuHistory()
-
-        let history: cardData | undefined = undefined
-        if (content.anime.id == "") {
-            let tmp = tempHistory.entries().find(([_, item]) => item.AnimeData.title === content.anime.title)
-            if (tmp) history = tmp[1]
-        } else {
-            history = tempHistory.get(content.anime.id)
-        }
+        let history = GetAnimuHistory(content["anime"])
 
         /* IFDEF DEBUG */
         console.warn("Information/initialInformation history", history)
@@ -490,7 +483,7 @@ function information() {
 
         const anime = information["cache"]["anime"]
 
-        const resp = await getInformationPlugin().anime(anime["id"])
+        const resp = await getInformationPlugin().anime(GetAnimeID(anime))
 
         /* IFDEF DEBUG */
         console.warn("Information/FetchAnimeForinformation", resp)
@@ -512,21 +505,20 @@ function information() {
             anime: tmpnewFetch
         })
 
-        updateHistoryData(anime.id, { AnimeData: tmpnewFetch, saveData: information["cache"]["saveData"] })
+        updateHistoryData({ AnimeData: tmpnewFetch, saveData: information["cache"]["saveData"] })
         checkIsAnimeReleasing()
     }
 
     async function ChangeAnimeInInformation(data: AnimeData): Promise<any> {
         const idToast = toast(t("notification.fetchinganime"), { noTimer: true, type: "loading" })
-        const animulist = animulistData()
         let resp
 
         updateInfo({ isFetchingAnime: true })
 
         if (data.format == "MANGA" || data.format == "NOVEL" || data.format == "ONE_SHOT") {
-            resp = await getInformationPlugin().getManga(data.id)
+            resp = await getInformationPlugin().getManga(GetAnimeID(data))
         } else {
-            resp = await getInformationPlugin().anime(data.id)
+            resp = await getInformationPlugin().anime(GetAnimeID(data))
         }
 
         /* IFDEF DEBUG */
@@ -536,7 +528,7 @@ function information() {
         if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", noTimer: false })
         updateToast(idToast, t("notification.successanime"), { type: "success", noTimer: false })
 
-        let tmpAnimulist: any = animulist.get(resp["id"])
+        let tmpAnimulist: any = GetAnimuAnimulist(data)
         if (tmpAnimulist) tmpAnimulist = tmpAnimulist["animulist"]
 
         if (information["activePlugin"]) await pluginManager.changePlayerPlugin(information["activePlugin"]!)
@@ -592,7 +584,7 @@ function information() {
     }
 
     async function modifySaveAnimuList(animulist: animulistProps, anime: AnimeData, edit: boolean = false) {
-        if (edit) updateDataInAnimulist(anime.id, { AnimeData: anime, animulist }, true)
+        if (edit) updateDataInAnimulist({ AnimeData: anime, animulist }, true)
         else addToAnimuList(animulist, anime, true);
 
         updateInformation({ ...information["cache"], animulist: animulist })
@@ -603,7 +595,7 @@ function information() {
         if (!info_plugin.setAnimeInList) return
 
         // TRANSLATION
-        if (await info_plugin.setAnimeInList(anime["id"], animulist))
+        if (await info_plugin.setAnimeInList(GetAnimeID(anime, info_plugin["metadata"]["idName"]), animulist))
             toast(t(`Succesfully Updated ${detectTitleConfig(anime.title)}`), { type: "success" })
 
         else toast(t(`Failed Updated ${detectTitleConfig(anime.title)}`), { type: "error" })
@@ -701,7 +693,7 @@ function information() {
                                         }
                                         ))} />
                                         <Button titleButton={"Remove From Animulist"} icon="delete" ButtonClass="information-bar-icon" onClick={() => {
-                                            removeFromAnimulist(information["cache"].anime.id, true);
+                                            removeFromAnimulist(information["cache"].anime, true);
                                             updateInformation({ ...information["cache"], animulist: undefined })
                                         }} />
                                     </Match>
@@ -743,7 +735,7 @@ function information() {
                                         <Match when={information["isInWaitingPlaylist"]}>
                                             <Button titleButton={"Remove From Waiting Playlist"} icon="playlist_remove" ButtonClass="information-bar-icon" onClick={async (): Promise<any> => {
                                                 const tmp = information["cache"]
-                                                const resp = await removeInPlaylist("global.waitingplaylist", tmp.anime.id)
+                                                const resp = await removeInPlaylist("global.waitingplaylist", `${GetAnimeID(tmp.anime)}`)
                                                 if (!resp) return toast("Failed Remove Anime to Waiting Playlist", { type: "error" })
                                                 else {
                                                     updateInfo({ isInWaitingPlaylist: false })
@@ -1003,7 +995,7 @@ function information() {
 
                             <Show when={information["cache"].anime.characters && information["cache"].anime.characters!.length > 0}>
                                 <CharacterContainer title={t("information.characters")} cards={information["cache"].anime.characters!.map((char) => ({
-                                    id: char.character.id,
+                                    id: char.character.id as any,
                                     image: char.character.image,
                                     name: char.character.name,
                                     role: t(`information.role.${char.role}`),
@@ -1013,7 +1005,7 @@ function information() {
 
                             <Show when={information["cache"].anime.characters && information["cache"].anime.characters!.map((tmp) => tmp.voiceActor).filter((item) => item != undefined).length > 0}>
                                 <CharacterContainer title={t("information.actors")} cards={information["cache"].anime.characters!.map((char) => ({
-                                    id: char.voiceActor?.id as string,
+                                    id: char.voiceActor!.id as any,
                                     image: char.voiceActor?.image as string,
                                     name: char.voiceActor?.name as string,
                                     role: char.character.name,
@@ -1035,7 +1027,7 @@ function information() {
                                             coverImage: item.coverImage,
                                             type: item.type,
                                             format: item.format,
-                                            id: item.id.toString(),
+                                            id: item.id,
                                         },
                                         onClick: ChangeAnimeInInformation
                                     } as cardData))} />

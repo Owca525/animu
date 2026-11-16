@@ -298,7 +298,7 @@ function convertToAnimeData(data: { [key: string]: string | number }[]): cardDat
                 native: data["title"],
                 romaji: data["title"]
             },
-            id: "",
+            id: {},
             format: data["type"],
             episodes: data["episodes"],
             season: data["season"],

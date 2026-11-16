@@ -130,7 +130,7 @@ export default class AniDB implements playerPluginFormat {
                     format: split[0],
                     seasonYear: parseInt(split[2]),
                     coverImage: v[2],
-                    id: ""
+                    id: {}
                 } as AnimeData
             } as cardData
         })

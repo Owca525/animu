@@ -1,42 +1,23 @@
-import { convertParams, getHistory, getWeek, searchDataInCards, setHomeData, SortCardataByDays } from "@renderer/utils/functions";
-import { animulistData, GetCalendaryCache, isFetchingCallendary, isPluginSearchMode } from "@renderer/utils/stores/global";
+import { convertParams, GetCalendaryCache, searchDataInCards, setHomeData, SortCardataByDays } from "@renderer/utils/functions";
+import { isPluginSearchMode } from "@renderer/utils/stores/global";
 import { getHomeCache, setHomeNewData, setHomeSearch, setHomeSearchPage, setHomeSearchTags, setHomeStopScrolling } from "@renderer/utils/stores/home";
 import { getInformationPlugin, getPlayerPLugin } from "@renderer/utils/stores/plugins";
 import { cardData, containerData, FilterParams, homeData } from "@renderer/utils/types";
 import Calendary from "./components/calendary";
 import { t } from "@renderer/utils/i18n";
+import { GetAllAnimuAnimulist } from "@renderer/utils/FilesManager/animulist";
+import { getAnimuHistoryIContinue } from "@renderer/utils/FilesManager/anime_database";
 
 export async function setCalendary(date?: string) {
     if (typeof date == "object") date = undefined
 
-    let week_calendary: cardData[] = []
+    const week = await GetCalendaryCache()
 
-    if (date) {
-
-        const week = getWeek(date)
-        week_calendary = await getInformationPlugin().schedule(week.startWeekUnix, week.endWeekUnix)
-
-    } else {
-
-        if (isFetchingCallendary()) {
-            let timestamp = setInterval(() => {
-                if (isFetchingCallendary()) return
-
-                week_calendary = GetCalendaryCache()
-
-                clearInterval(timestamp)
-            }, 500)
-        } else {
-            week_calendary = GetCalendaryCache()
-        }
-
-    }
-
-    setHomeData({ jsx: () => Calendary(SortCardataByDays(week_calendary)) })
+    setHomeData({ jsx: () => Calendary(SortCardataByDays(week)) })
 }
 
 export async function SearchInCalendary(search: string = "", params: FilterParams | undefined) {
-    let tmp = searchDataInCards(GetCalendaryCache(), search, convertParams(params))
+    let tmp = searchDataInCards(await GetCalendaryCache(), search, convertParams(params))
 
     if (search.length <= 0) {
         return setCalendary()
@@ -63,7 +44,7 @@ export function setHome() {
 }
 
 export function setAnimuList(): any {
-    const animulist = animulistData().values().toArray()
+    const animulist = GetAllAnimuAnimulist()
     if (animulist.length <= 0) return setHomeData({ content: { sections: [{ data: [] }] } })
 
     let finnalContainer: containerData[] = []
@@ -133,7 +114,7 @@ export function setAnimuList(): any {
 }
 
 export function setHistory() {
-    let history = getHistory()
+    let history = getAnimuHistoryIContinue()
 
     let data: homeData["data"] = {
         sections: [
@@ -203,7 +184,7 @@ export function historySearch(search: string = "", params: FilterParams | undefi
         setHistory()
         return
     }
-    const history = getHistory()
+    const history = getAnimuHistoryIContinue()
     const homeCache = getHomeCache().data["sections"]
     let finnalContainer: containerData[] = []
 
@@ -233,7 +214,7 @@ export function historySearch(search: string = "", params: FilterParams | undefi
 
 export function AnimuListSearch(search: string = "", params: FilterParams | undefined) {
     if (search.replaceAll(" ", "") == "" && params == undefined) return setAnimuList()
-    let tmp = searchDataInCards(animulistData().values().toArray(), search, convertParams(params))
+    let tmp = searchDataInCards(GetAllAnimuAnimulist(), search, convertParams(params))
     if (params && params["watching"]) tmp = tmp.filter((v) => v.animulist?.status == params["watching"].val)
     setHomeSearchTags(params)
     setHomeData({

@@ -25,7 +25,7 @@ import {
   updateObject
 } from './utils/functions';
 import { checkUpdate } from './utils/update';
-import { convertHistoryToAnimuList, setNewAnimuList, SynchronizeAnimulistWithPlugin } from './utils/FilesManager/animulist';
+import { convertHistoryToAnimuList, SynchronizeAnimulistWithPlugin } from './utils/FilesManager/animulist';
 import { CreateBackup } from './utils/backup';
 import {
   createSignal,
@@ -77,9 +77,9 @@ import { SheepShortcut } from './utils/hooks/useKeyPress';
 import { ServiceManager } from './utils/service';
 import pluginManager from './utils/pluginManager';
 import { createGlobalError } from './utils/context/GlobalErrorContext';
-import { setNewHistory } from './utils/FilesManager/history';
 import { hideCustomMenu } from './utils/context/menuContext';
 import deeplink from './utils/deeplinks';
+import { ConvertToNewFormat } from './utils/FilesManager/anime_database';
 
 // import ErrorBoundary from './utils/ErrorBoundary';
 // import { notificationProps } from './utils/GlobalInterface';
@@ -165,7 +165,7 @@ function App() {
       })
       window["serverPort"] = metadata["port"]
       setConfig(metadata["config"])
-      setNewHistory(metadata["history"])
+      // setNewHistory(metadata["history"])
       /* ENDIF */
 
       try {
@@ -178,6 +178,7 @@ function App() {
       await pluginManager.changeInformationPlugin("Anilist")
 
       /* IFDEF DEBUG|PROD */
+      await ConvertToNewFormat()
 
       deeplink.add({
         name: 'Fetch Anime',
@@ -192,9 +193,9 @@ function App() {
 
       /* IFDEF WEB */
       if (!localStorage.getItem("config")) localStorage.setItem("config", JSON.stringify(defaultConfigWeb))
-      if (!localStorage.getItem("history")) localStorage.setItem("history", JSON.stringify([]))
+      // if (!localStorage.getItem("history")) localStorage.setItem("history", JSON.stringify([]))
       setConfig(deepMerge(defaultConfigWeb, JSON.parse(localStorage.getItem("config") as any)))
-      setNewHistory(JSON.parse(localStorage.getItem("history") as any))
+      // setNewHistory(JSON.parse(localStorage.getItem("history") as any))
       /* ENDIF */
 
       /* IFDEF DEBUG|PROD */
@@ -205,15 +206,15 @@ function App() {
       ]);
       /* ENDIF */
 
-      /* IFDEF DEBUG|PROD */
-      setinitialState({ text: "Loading Animulist", plugin: false })
-      setNewAnimuList(metadata["animulist"])
-      /* ENDIF */
+      // /* IFDEF DEBUG|PROD */
+      // setinitialState({ text: "Loading Animulist", plugin: false })
+      // setNewAnimuList(metadata["animulist"])
+      // /* ENDIF */
 
-      /* IFDEF WEB */
-      if (!localStorage.getItem("animulist")) localStorage.setItem("animulist", JSON.stringify([]))
-      setNewAnimuList(JSON.parse(localStorage.getItem("animulist") as any))
-      /* ENDIF */
+      // /* IFDEF WEB */
+      // if (!localStorage.getItem("animulist")) localStorage.setItem("animulist", JSON.stringify([]))
+      // setNewAnimuList(JSON.parse(localStorage.getItem("animulist") as any))
+      // /* ENDIF */
 
       setinitialState({ text: "initial.config", plugin: false })
       LoadConfig()

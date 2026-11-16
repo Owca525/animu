@@ -44,7 +44,7 @@ function convertToCardData(data: { [key: string]: string | number | string[] }):
                 native: data["name"] as string,
                 romaji: data["name"] as string
             },
-            id: "",
+            id: {},
             coverImage: data["cover_url"] as string,
             player_ID: `${data["id"]}?/${data["slug"]}`,
             description: data["description"] as string,

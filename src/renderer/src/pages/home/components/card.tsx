@@ -15,8 +15,8 @@ import { createStore } from "solid-js/store";
 import { removeToast, toast, updateToast } from "@renderer/utils/context/ToastNotification";
 import { useI18n } from "@renderer/utils/i18n";
 import { showCustomMenu } from "@renderer/utils/context/menuContext";
-import { animulistData, informationCache, PlayerCache } from "@renderer/utils/stores/global";
-import { addToAnimuList, removeFromAnimulist } from "@renderer/utils/FilesManager/animulist";
+import { informationCache, PlayerCache } from "@renderer/utils/stores/global";
+import { addToAnimuList, GetAnimuAnimulist, removeFromAnimulist } from "@renderer/utils/FilesManager/animulist";
 import AnimulistMenu from "@renderer/components/animulistMenu";
 import pluginManager from "@renderer/utils/pluginManager";
 
@@ -32,7 +32,7 @@ function Card(props: CardProps) {
   const { t, pathExist } = useI18n()
 
   const title = detectTitleConfig(props.card.AnimeData.title)
-  const animelist = animulistData().get(props.card.AnimeData.id)
+  const animelist = GetAnimuAnimulist(props.card)
 
   const navigate = useNavigate();
   const [cardVariables, setVariables] = createStore({
@@ -94,9 +94,9 @@ function Card(props: CardProps) {
       return;
     }
 
-    if (props.card.AnimeData.id === "") {
-      toast("This Anime Dosen't Have Anilist ID this may have make weird bugs", { type: "warning" })
-    }
+    // if (props.card.AnimeData.id === "") {
+    //   toast("This Anime Dosen't Have Anilist ID this may have make weird bugs", { type: "warning" })
+    // }
 
     informationCache.update({
       anime: props.card.AnimeData,
@@ -144,9 +144,10 @@ function Card(props: CardProps) {
   // }
 
   if (cardVariables.animulist && !props.disableinformation) {
+    // TRANSLATE
     CenterContextMenu.push({
       option: "Remove From Anilist",
-      onClick: () => removeFromAnimulist(props.card.AnimeData.id, true),
+      onClick: () => removeFromAnimulist(props.card.AnimeData, true),
       deletion: true
     });
   } else if (!props.disableinformation) {

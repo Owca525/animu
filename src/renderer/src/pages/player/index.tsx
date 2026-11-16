@@ -12,8 +12,8 @@ import { lazy, Match, onCleanup, onMount, Suspense, Switch } from "solid-js";
 // import ExternalPlayer from "./externalPlayer";
 import { useResponse } from "@renderer/utils/hooks/useResponse";
 import { useI18n } from "@renderer/utils/i18n";
-import { addToAnimuList, updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist";
-import { animulistData, getAnimuHistory, getSocket, getSocketRoom, informationCache, PlayerCache, setIncognitoMode } from "@renderer/utils/stores/global";
+import { addToAnimuList, GetAnimuAnimulist, updateDataInAnimulist } from "@renderer/utils/FilesManager/animulist";
+import { getSocket, getSocketRoom, informationCache, PlayerCache, setIncognitoMode } from "@renderer/utils/stores/global";
 import { createStore } from "solid-js/store";
 import { SheepShortcut } from "@renderer/utils/hooks/useKeyPress";
 import pluginManager from "@renderer/utils/pluginManager";
@@ -117,7 +117,7 @@ const player = () => {
         refetchHistory()
 
         if (anime_data.animulist && anime_data.animulist.status == "CURRENT") {
-            updateDataInAnimulist(anime_data.anime.id, {
+            updateDataInAnimulist({
                 AnimeData: anime_data.anime,
                 animulist: {
                     ...anime_data.animulist,
@@ -194,7 +194,7 @@ const player = () => {
         }
 
         if (anime_data.animulist.status == "PLANNING" || anime_data.animulist.status == "CURRENT") {
-            updateDataInAnimulist(anime_data.anime.id, {
+            updateDataInAnimulist({
                 AnimeData: anime_data.anime,
                 animulist: {
                     ...anime_data.animulist,
@@ -252,11 +252,13 @@ const player = () => {
         if (anime_data.continewatch) return navigate("/")
         if (config.Player.general.PlayerBehavior === "home") navigate("/")
         else {
-            const tmp = getAnimuHistory().get(informationCache.anime["anime"]["id"])
+            const tmp = GetAnimuAnimulist(informationCache.anime["anime"])
+
             let anime = informationCache.anime
+
             if (tmp) anime = { anime: tmp["AnimeData"], saveData: tmp["saveData"] }
 
-            const tmpAnimulist = animulistData().get(anime["anime"]["id"])
+            const tmpAnimulist = GetAnimuAnimulist(anime["anime"])
             if (tmpAnimulist) anime = {...anime, animulist: tmpAnimulist["animulist"]}
             else anime = {...anime, animulist: anime_data.animulist }
 

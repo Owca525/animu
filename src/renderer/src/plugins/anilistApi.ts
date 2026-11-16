@@ -23,6 +23,8 @@ let config = [{
 
 let ACCESS_TOKEN = ""
 
+const ID = "anilist"
+
 const animeData = `
       id
       title {
@@ -434,8 +436,22 @@ function Convert(convert: any): cardData {
   try {
     for (let index = 0; index < convert.characters.edges.length; index++) {
       const element = convert.characters.edges[index];
-      if (element.voiceActors.length === 0) characters.push({ role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full } })
-      else characters.push({ role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full }, voiceActor: { id: element.voiceActors[0].id, image: element.voiceActors[0].image.large, name: element.voiceActors[0].name.full } })
+      if (element.voiceActors.length === 0) characters.push({ 
+        role: element.role, 
+        character: { id: { [ID]: element.node.id }, image: element.node.image.large, name: element.node.name.full } 
+      })
+      else characters.push({ 
+        role: element.role, 
+        character: { 
+          id: { [ID]: element.node.id }, 
+          image: element.node.image.large, 
+          name: element.node.name.full 
+        }, 
+        voiceActor: { 
+          id: { [ID]: element.voiceActors[0].id }, 
+          image: element.voiceActors[0].image.large, 
+          name: element.voiceActors[0].name.full 
+        } })
     }
   } catch (error) { console.error("AnilistApi/Convert", error) }
 
@@ -444,7 +460,7 @@ function Convert(convert: any): cardData {
       convert.relations.edges.forEach(element => {
         if (!element) return
         relations.push({
-          id: element.node.id,
+          id: { [ID]: element.node.id },
           title: element.node.title,
           coverImage: element.node.coverImage.extraLarge ? element.node.coverImage.extraLarge : element.node.coverImage.large,
           relationType: element.relationType,
@@ -461,7 +477,7 @@ function Convert(convert: any): cardData {
       convert.recommendations.nodes.forEach(element => {
         if (!element || !element.mediaRecommendation) return
         recommendations.push({
-          id: element.mediaRecommendation.id,
+          id: { [ID]: element.mediaRecommendation.id },
           title: element.mediaRecommendation.title,
           coverImage: element.mediaRecommendation.coverImage.extraLarge ? element.mediaRecommendation.coverImage.extraLarge : element.mediaRecommendation.coverImage.large,
           type: element["mediaRecommendation"]["type"],
@@ -474,6 +490,7 @@ function Convert(convert: any): cardData {
   return {
     AnimeData: {
       ...convert,
+      id: { [ID]: convert["id"] },
       coverImage: convert.coverImage.extraLarge ? convert.coverImage.extraLarge : convert.coverImage.large,
       studios: convert.studios.edges.map((studio) => studio.node.name),
       characters: characters,
@@ -588,6 +605,8 @@ export default class AnilistApi implements informationPluginFormat {
       manga: 'https://anilist.co/manga/',
       anime: 'https://anilist.co/anime/'
     },
+
+    idName: ID,
 
     configFormat: [{
       type: "hidden",
@@ -835,7 +854,7 @@ export default class AnilistApi implements informationPluginFormat {
     }
   }
 
-  getManga = async (id: string) => {
+  getManga = async (id: string | number) => {
     try {
       let req = await sendPost({ id: id, type: "MANGA" }, graphicApIDAnime)
       if (!req.success || !req.json) return
@@ -953,7 +972,7 @@ export default class AnilistApi implements informationPluginFormat {
     return response["success"]
   }
 
-  async setAnimeInList(id: string, variable: animulistProps): Promise<boolean> {
+  async setAnimeInList(id: string | number, variable: animulistProps): Promise<boolean> {
     const tmpHeader = getHeader()
     if (!tmpHeader["Authorization"]) return false
 
@@ -1030,7 +1049,7 @@ export default class AnilistApi implements informationPluginFormat {
     return readyList
   };
 
-  removeAnimeFromList = async (id: string): Promise<boolean> => {
+  removeAnimeFromList = async (id: string | number): Promise<boolean> => {
     const removing = await request("https://graphql.anilist.co", {
       method: "POST",
       headers: getHeader(),

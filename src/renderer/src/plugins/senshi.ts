@@ -34,7 +34,7 @@ function converterToCardData(data: { [key: string]: string | number }): cardData
                 native: data["title"] as string,
                 romaji: data["title"] as string
             },
-            id: "",
+            id: {},
             player_ID: `${data["id"]}`,
             format: `${data["type"]}`.toUpperCase(),
             source: `${data["ani_source"]}`.toUpperCase(),

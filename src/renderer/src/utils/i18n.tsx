@@ -6,7 +6,7 @@ async function getAllLangFiles(getFresh = false) {
   if (window["animuAppInfo"]["langs"]) return { en: en, ...window["animuAppInfo"]["langs"] }
   /* ENDIF */
   /* IFDEF DEBUG|PROD */
-  let langFiles = window["initialMetadata"]["user_lang"]
+  let langFiles = structuredClone(window["initialMetadata"]["user_lang"])
 
   if (getFresh) {
     langFiles = await window.api.getUserLang()

@@ -1193,7 +1193,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         if (duration > 10 && currentTime > (duration - player.nextTimerStart) && anime.animulist && anime.AnimeData.episodes != undefined) {
 
             if (anime.animulist.status == "CURRENT" && CheckNumber(ep_metadata["current"]["ep"]) >= CheckNumber(anime.AnimeData.episodes)) {
-                updateDataInAnimulist(anime.AnimeData.id, {
+                updateDataInAnimulist({
                     AnimeData: {
                         ...anime.AnimeData,
                         recommendations: undefined,
@@ -1627,6 +1627,7 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
             screenshot.replace(/^data:image\/png;base64,/, ''),
             `screenshot${formatedDate}.png`, "png", ["PNG"], "base64"
         )
+        // TODO: ADD MORE SECURE
         else resp = await window.api.os.write(
             `${config.Player.screenShot.path}/screenshot${formatedDate}.png`,
             screenshot.replace(/^data:image\/png;base64,/, ''),

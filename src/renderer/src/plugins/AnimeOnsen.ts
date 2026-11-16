@@ -198,7 +198,7 @@ export default class AnimeOnsen implements playerPluginFormat {
                     },
                     coverImage: `${API}/v4/image/210x300/${v["content_id"]}`,
                     player_ID: v["content_id"],
-                    id: ""
+                    id: {}
                 }
             } as cardData))
         } catch (error) {

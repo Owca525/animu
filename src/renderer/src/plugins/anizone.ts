@@ -321,7 +321,7 @@ export default class template implements playerPluginFormat {
                         romaji: val["title_list"]["5"],
                         native: val["title_list"]["8"]
                     },
-                    id: "",
+                    id: {},
                     player_ID: val["slug"],
                     episodes: val["episode_count"],
                     coverImage: val["cover"],

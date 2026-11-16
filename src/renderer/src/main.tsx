@@ -68,12 +68,11 @@ try {
 }
 
 (async () => {
-  const variable = await window["tmpData"]
-  window["initialMetadata"] = variable
+  window["initialMetadata"] = await window.metadata()
 
   render(
     () => (
-      <I18nProvider config={{ defaultLang: window["initialMetadata"]["config"]["General"]["language"], fallbackLang: "en" }}>
+      <I18nProvider config={{ defaultLang: "en", fallbackLang: "en" }}>
         <ErrorBoundary fallback={LocalErrorBoundary}>
           <ErrorCreatorContext>
             <DebugContext>

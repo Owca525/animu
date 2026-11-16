@@ -19,7 +19,7 @@ const types: string[] = [
 function converterToAnimeData(data: { [key: string]: any }): AnimeData | undefined {
     try {
         return {
-            id: "",
+            id: {},
             player_ID: data["anime_id"],
             coverImage: `https:${data["poster"]["fullsize"]}`,
             title: {

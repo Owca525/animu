@@ -2,7 +2,7 @@ import { t } from "@renderer/utils/i18n";
 import "./css/avatar.css";
 import icon from '@resources/icon.png';
 import { createSignal } from "solid-js";
-import { animulistData, GetUser, GetUserAvatar, UpdateUserData } from "@renderer/utils/stores/global";
+import { GetUser, GetUserAvatar, UpdateUserData } from "@renderer/utils/stores/global";
 import { showCustomMenu } from "@renderer/utils/context/menuContext";
 import Button from "@renderer/components/buttons";
 import { DownloadIMGToBase64, openUrlFolder, User_Calculate_Watch_Time, User_Format_Time } from "@renderer/utils/functions";
@@ -14,7 +14,7 @@ import { removeToast, toast } from "@renderer/utils/context/ToastNotification";
 import { getInformationPlugin } from "@renderer/utils/stores/plugins";
 import deeplink from "@renderer/utils/deeplinks";
 import { showDialog } from "@renderer/utils/context/DialogContext";
-import { SynchronizeAnimulistWithPlugin } from "@renderer/utils/FilesManager/animulist";
+import { GetAllAnimuAnimulist, SynchronizeAnimulistWithPlugin } from "@renderer/utils/FilesManager/animulist";
 
 export default function Avatar() {
   const [avatar, setAvatar] = createSignal<string>(GetUserAvatar() ?? icon);
@@ -157,6 +157,7 @@ export function User_Profile() {
   const user = GetUser()
   const [avatar, setAvatar] = createSignal<string>(user["avatar"] ?? icon);
   const plugin = getInformationPlugin()
+  const animulist = GetAllAnimuAnimulist()
 
   return (
     <main class="user-profile-container">
@@ -187,13 +188,13 @@ export function User_Profile() {
       <div class="user-profile-bottom">
         <User_statistic
           icon="movie"
-          text={`${animulistData().values().toArray().filter((v) => v["animulist"]["status"] == "COMPLETED").length}`}
+          text={`${animulist.filter((v) => v["animulist"]["status"] == "COMPLETED").length}`}
           header={t("user.completed_anime")}
         />
 
         <User_statistic
           icon="format_list_bulleted"
-          text={`${animulistData().size}`}
+          text={`${animulist.length}`}
           header={t("user.animulist_entries")}
         />
 

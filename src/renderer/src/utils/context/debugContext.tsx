@@ -79,7 +79,7 @@ export default function DebugContext(props: { children: JSX.Element }) {
                                     native: extracted[0]["embedTitle"] ?? "Uknown",
                                     romaji: extracted[0]["embedTitle"] ?? "Uknown"
                                 },
-                                id: crypto.randomUUID(),
+                                id: { "anilist": crypto.randomUUID() },
                                 player_ID: crypto.randomUUID()
                             },
                             saveData: {

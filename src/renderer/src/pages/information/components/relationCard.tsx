@@ -4,7 +4,7 @@ import { Show } from "solid-js"
 import { detectTitleConfig } from "@renderer/utils/functions"
 
 export type characterCardsProps = {
-    id: number,
+    id: { [key: string]: string | number; },
     title: { english?: string, native: string, romaji: string }
     coverImage: string
     relationType: string

@@ -69,13 +69,6 @@ declare global {
         getConfig: (name: string) => Promise<{ [key: string]: any }>
         installUpdate: (plugin: pluginRepoExpanded) => Promise<void>
       }
-      animulist: {
-        add: (anime: { AnimeData: AnimeData, animulist: animulistProps }) => Promise<void>
-        delete: (id: string) => Promise<boolean>
-        update: (id: string, anime: { AnimeData: AnimeData, animulist: animulistProps }) => Promise<void>
-        getDatabase: () => Promise<AnimuListFormat[]>
-        overWrite: (data: animulistData[]) => Promise<void>
-      }
       saveConfig: (config: SettingsConfig) => Promise<boolean>
       runExternaPlayer: (videoData: { url: string, path: string, time: number, title: string, subs?: { subList: string[], sid: number }, chapters?: string }, type: "mpv" | "vlc") => any
       getOSDetails: () => Promise<{ platform: NodeJS.Platform, release: string, arch: string }>
@@ -91,6 +84,7 @@ declare global {
         change: (user: UserData) => Promise<boolean>
         reset: () => Promise<boolean>
       }
+      removeOldData: () => Prosmie<void>
     };
     backend: {
       // ipcRenderer: {
@@ -114,12 +108,27 @@ declare global {
       reload: () => void;
       createWindow: (props: { url: string, type: string }) => Promise<any>
     };
-    initialMetadata: { 
-      config: SettingsConfig, 
-      history: cardData[], 
-      animulist: animulistData[],
-      theme: themeMetadata[], 
-      user: UserData, 
+    metadata: () => Promise<{
+      config: SettingsConfig,
+      theme: themeMetadata[],
+      user: UserData,
+      user_lang: { content: string, lang: string }[],
+      node_ver: string,
+      chrome_ver: string,
+      electron_ver: string
+      old: {
+        history: cardData[],
+        animulist: animulistData[],
+      } | undefined
+    }>
+    initialMetadata: {
+      old: {
+        history: cardData[],
+        animulist: animulistData[],
+      } | undefined
+      config: SettingsConfig,
+      theme: themeMetadata[],
+      user: UserData,
       user_lang: { content: string, lang: string }[],
       node_ver: string,
       chrome_ver: string,

@@ -41,7 +41,6 @@ import {
     onMount,
     Show,
 } from 'solid-js';
-import { DetectOldVersionHistory, OverWriteHistory } from '@renderer/utils/FilesManager/history';
 import { getConfig, setConfig } from '@renderer/utils/stores/config';
 import { getAllPluginList, getInformationPlugin, getPlayerPLugin } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
@@ -52,10 +51,9 @@ import { unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './settings.css';
 import { useI18n } from '@renderer/utils/i18n';
-import { activeThemes, animulistData, getAnimuHistory, getCurrentYT_DLPVer, getListOfVerYT_DLP, getServices, loadedTheme, setAudioOutput } from '@renderer/utils/stores/global';
+import { activeThemes, getCurrentYT_DLPVer, getListOfVerYT_DLP, getServices, loadedTheme, setAudioOutput } from '@renderer/utils/stores/global';
 import { hideCustomMenu, isCustomMenuActive, showCustomMenu } from '@renderer/utils/context/menuContext';
 import SettingsPlugin from './components/settingsPlugin';
-import { OvewriteAnimuList } from '@renderer/utils/FilesManager/animulist';
 import OtherSettings from './components/otherSettings';
 import { SheepShortcut } from '@renderer/utils/hooks/useKeyPress';
 import pluginManager from '@renderer/utils/pluginManager';
@@ -314,11 +312,6 @@ function settings() {
         /* ENDIF */
     }
 
-    async function buttonCheck() {
-        toast(t("settings.history.check_start"))
-        await DetectOldVersionHistory()
-    }
-
     function backupWarning(file: string, date: string) {
         showDialog({
             type: "info",
@@ -484,70 +477,71 @@ function settings() {
         })))
     }
 
-    function importConfig(event: Event) {
-        const input = event.currentTarget as HTMLInputElement;
-        if (!input.files || input.files.length === 0) return;
+    // TODO: ADD NEW IMPORT CODE AND EXPORT
+    function importConfig(_event: Event) {
+        // const input = event.currentTarget as HTMLInputElement;
+        // if (!input.files || input.files.length === 0) return;
 
-        const file = input.files[0];
+        // const file = input.files[0];
 
-        if (file.type !== "text/plain") return
+        // if (file.type !== "text/plain") return
 
-        const reader = new FileReader();
-        reader.onload = async () => {
-            try {
-                const file = JSON.parse(reader.result as any)
+        // const reader = new FileReader();
+        // reader.onload = async () => {
+        //     try {
+        //         const file = JSON.parse(reader.result as any)
 
-                // animulist
-                OvewriteAnimuList(file["animulist"])
+        //         // animulist
+        //         OvewriteAnimuList(file["animulist"])
 
-                // History
-                OverWriteHistory(file["history"])
+        //         // History
+        //         OverWriteHistory(file["history"])
 
-                // Config
-                setConfig(file["config"])
-                saveConfig(file["config"])
+        //         // Config
+        //         setConfig(file["config"])
+        //         saveConfig(file["config"])
 
-                // TRANSLATION
-                toast("Sucessfully Imported Data To Animu", { type: "success" })
-                /* IFDEF DEBUG|PROD */
-                window.BrowserWindow.reload()
-                /* ENDIF */
+        //         // TRANSLATION
+        //         toast("Sucessfully Imported Data To Animu", { type: "success" })
+        //         /* IFDEF DEBUG|PROD */
+        //         window.BrowserWindow.reload()
+        //         /* ENDIF */
 
-                /* IFDEF WEB */
-                location.reload()
-                /* ENDIF */
+        //         /* IFDEF WEB */
+        //         location.reload()
+        //         /* ENDIF */
 
-            } catch (error) {
-                console.error("Error in importConfig", error)
-                // TRANSLATION
-                toast("Failed Import Data", { type: "error" })
-            }
-        };
-        reader.readAsText(file);
+        //     } catch (error) {
+        //         console.error("Error in importConfig", error)
+        //         // TRANSLATION
+        //         toast("Failed Import Data", { type: "error" })
+        //     }
+        // };
+        // reader.readAsText(file);
     }
 
     async function exportConfig() {
         try {
-            const handle = await (window as any).showSaveFilePicker({
-                suggestedName: "animuExport.txt",
-                types: [
-                    {
-                        description: "Text Files",
-                        accept: { "text/plain": [".txt"] },
-                    },
-                ],
-            });
+            // const handle = await (window as any).showSaveFilePicker({
+            //     suggestedName: "animuExport.txt",
+            //     types: [
+            //         {
+            //             description: "Text Files",
+            //             accept: { "text/plain": [".txt"] },
+            //         },
+            //     ],
+            // });
 
-            const exported = JSON.stringify({
-                animulist: animulistData(),
-                history: getAnimuHistory(),
-                config: getConfig()
-            })
+            // const exported = JSON.stringify({
+            //     animulist: animulistData(),
+            //     history: getAnimuHistory(),
+            //     config: getConfig()
+            // })
 
-            const writable = await handle.createWritable();
-            await writable.write(exported);
-            await writable.close();
-            toast("Succesfully Exported Data", { type: "success" })
+            // const writable = await handle.createWritable();
+            // await writable.write(exported);
+            // await writable.close();
+            // toast("Succesfully Exported Data", { type: "success" })
         } catch (error) {
             console.error("Error in exportConfig", error)
             toast("Failed Exported Data", { type: "error" })
@@ -1384,10 +1378,10 @@ function settings() {
                             />
                         </div>
                         <div class="settings-line"></div>
-                        <div class="settings-setting-container">
+                        {/* <div class="settings-setting-container">
                             {t("settings.history.check_history")}
                             <Button content={t("settings.history.check")} onClick={buttonCheck} />
-                        </div>
+                        </div> */}
                         <div class="settings-line"></div>
                         <div class="settings-setting-container">
                             <span class="settings-helpicon-space">{t("settings.history.startsave")}<HelpIcon description={t("settings.tips.continuewatchsavehistory")} /></span>

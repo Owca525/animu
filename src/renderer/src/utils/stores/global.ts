@@ -6,17 +6,13 @@ import { Socket } from "socket.io-client";
 
 export const [globalState, setGlobalState] = createStore<globalDataFormat>({
     incognito: false,
-    history: new Map(),
     loadedTheme: [],
     activeThemes: new Map(),
     token: undefined,
-    animuList: new Map(),
     socket: undefined,
     service: [],
-    anilist_user_data: undefined,
     isAnimuFocus: true,
     notifications: [],
-    calendaryCache: [],
     audioOutput: undefined,
     pluginSearchMode: false,
     yt_dlp: {
@@ -39,17 +35,14 @@ export const [globalState, setGlobalState] = createStore<globalDataFormat>({
 export const getGlobalCache = () => globalState;
 export const loadedTheme = () => globalState.loadedTheme;
 export const activeThemes = () => globalState.activeThemes;
-export const animulistData = () => globalState.animuList;
 export const getSocket = () => globalState.socket?.instance as any;
 export const getSocketRoom = () => globalState.socket?.currentRoom;
 export const getServices = () => globalState.service;
 export const getAnilistUserData = () => globalState.anilist_user_data;
 export const isAnimuFocus = () => globalState.isAnimuFocus;
 export const getNotificationList = () => globalState.notifications;
-export const GetCalendaryCache = () => globalState.calendaryCache;
 export const getAudioOutput = () => globalState.audioOutput;
 export const isPluginSearchMode = () => globalState.pluginSearchMode;
-export const getAnimuHistory = () => globalState.history;
 export const getCurrentYT_DLPVer = () => globalState.yt_dlp["ver"];
 export const getListOfVerYT_DLP = () => globalState.yt_dlp["listVer"];
 export const GetUserBanner = () => globalState.user.banner;
@@ -66,7 +59,6 @@ export const UpdateUserData = (tmp: UserData) => setGlobalState((prev) => ({ ...
 
 export const setYT_DLPVersion = (tmp: globalDataFormat["yt_dlp"]) => setGlobalState((prev) => ({ ...prev, yt_dlp: tmp }));
 export const setPluginSearchMode = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, pluginSearchMode: tmp }));
-export const SetCalendaryCache = (tmp: cardData[]) => setGlobalState((prev) => ({ ...prev, calendaryCache: tmp }));
 export const setAudioOutput = (tmp: MediaDeviceInfo) => setGlobalState((prev) => ({ ...prev, audioOutput: tmp }));
 export const setSocket = (tmp: Socket) => setGlobalState((prev) => ({ ...prev, socket: { ...prev.socket as any, instance: tmp } }));
 export const setSocketRoom = (tmp: string) => setGlobalState((prev) => ({ ...prev, socket: { ...prev.socket as any, currentRoom: tmp } }));
@@ -76,7 +68,6 @@ export const setIncognitoMode = (tmp: boolean) => setGlobalState((prev) => ({ ..
 export const setUserTyping = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, isUserTyping: tmp }));
 export const setGlobalHistory = (tmp: Map<string, cardData>) => setGlobalState((prev) => ({ ...prev, history: tmp }));
 export const setGlobalToken = (tmp: string | undefined) => setGlobalState((prev) => ({ ...prev, token: tmp }));
-export const setAnimulistData = (tmp: globalDataFormat["animuList"]) => setGlobalState((prev) => ({ ...prev, animuList: tmp }))
 
 export const SetFetchingCalendary = (tmp: boolean) => setGlobalState((prev) => ({ ...prev, isFetchingCallendary: tmp }));
 
@@ -103,7 +94,7 @@ class InformationCacheInstance {
                 native: "Information Cache Instance",
                 romaji: "Information Cache Instance"
             },
-            id: ""
+            id: {}
         }
     }
 
@@ -131,7 +122,7 @@ class PlayerCacheInstance {
                 native: "Player Cache Instance",
                 romaji: "Player Cache Instance"
             },
-            id: ""
+            id: {}
         },
         saveData: {
             pluginName: "",
