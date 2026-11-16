@@ -9,8 +9,6 @@ import Player from './pages/player/index';
 const Settings = lazy(() => import("./pages/settings/index"));
 // const Information = lazy(() => import("./pages/information/index"));
 
-import "./utils/database"
-
 import {
   calculateZoomLevel,
   changeTheme,

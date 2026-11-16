@@ -1,4 +1,3 @@
-import { CreateDatabase } from "./database"
 import { checkTimeDriffrentUnix, dateToUnix, request } from "./functions"
 import { animeOpeningsFormat } from "./types"
 
@@ -52,22 +51,48 @@ query ($id: [Int!]) {
 }
 `
 
-const database = new CreateDatabase({
-  storage: "animeThemesCache",
-  createDatabase: [`
-      CREATE TABLE IF NOT EXISTS cache (
-          id INTEGER PRIMARY KEY,
-          data TEXT,
-          time INTEGER
-      )
-  `]
-})
+function AddCache(id: number, data: animeOpeningsFormat[]) {
 
-export async function requestAnimeMedia(anilistID: number): Promise<animeOpeningsFormat[]> {
-  const cache = database.get({ table: "cache", row: "id", value: anilistID })
+  const cache = localStorage.getItem("animeThemesCacheObject")
 
   try {
-    if (cache && cache["data"] && checkTimeDriffrentUnix(undefined, Number(cache["time"]))["day"] < 31) return JSON.parse(`${cache["data"]}`)
+    if (!cache) {
+      localStorage.setItem("animeThemesCacheObject", JSON.stringify([...new Map<string, { data: animeOpeningsFormat[], time: number }>([`${id}`, { data: data, time: dateToUnix(new Date().toString()) }] as any)]))
+      return
+    }
+
+    const newMap = new Map<string, { data: animeOpeningsFormat[], time: number }>(JSON.parse(cache!))
+
+    newMap.set(`${id}`, { data: data, time: dateToUnix(new Date().toString()) })
+
+    localStorage.setItem("animeThemesCacheObject", JSON.stringify([...newMap]))
+
+  } catch (error) {
+    console.error("AnimeThemes/AddCache", error, id, data)
+  }
+
+}
+
+function GetCache(id: number) {
+  try {
+    const cache = localStorage.getItem("animeThemesCacheObject")
+
+    if (!cache) return
+
+    const newMap = new Map<string, { data: animeOpeningsFormat[], time: number }>(JSON.parse(cache))
+
+    return newMap.get(`${id}`)
+  } catch (error) {
+    console.error("AnimeThemes/GetCache", error, id)
+    return
+  }
+}
+
+export async function requestAnimeMedia(anilistID: number): Promise<animeOpeningsFormat[]> {
+  const cache = GetCache(anilistID)
+
+  try {
+    if (cache && checkTimeDriffrentUnix(undefined, cache["time"])["day"] < 31) return cache["data"]
   } catch (error) {
     console.error("AnimeThemes/requestAnimeMedia", error)
   }
@@ -111,21 +136,7 @@ export async function requestAnimeMedia(anilistID: number): Promise<animeOpening
     }
   }
 
-  try {
-    database.updateDatabse({
-      table: "cache",
-      key: "id",
-      obj: {
-        id: anilistID,
-        data: JSON.stringify(list),
-        time: dateToUnix(new Date().toString())
-      }
-    })
-
-    database.saveDatabase()
-  } catch (error) {
-    console.error("AnimeThemes/requestAnimeMedia", error)
-  }
+  AddCache(anilistID, list)
 
   return list
 }
