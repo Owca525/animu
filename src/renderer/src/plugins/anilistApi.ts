@@ -432,10 +432,12 @@ function Convert(convert: any): cardData {
   let recommendations: AnimeData["recommendations"] = []
 
   try {
-    for (let index = 0; index < convert.characters.edges.length; index++) {
-      const element = convert.characters.edges[index];
-      if (element.voiceActors.length === 0) characters.push({ role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full } })
-      else characters.push({ role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full }, voiceActor: { id: element.voiceActors[0].id, image: element.voiceActors[0].image.large, name: element.voiceActors[0].name.full } })
+    if (convert.characters) {
+      for (let index = 0; index < convert.characters.edges.length; index++) {
+        const element = convert.characters.edges[index];
+        if (element.voiceActors.length === 0) characters.push({ role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full } })
+        else characters.push({ role: element.role, character: { id: element.node.id, image: element.node.image.large, name: element.node.name.full }, voiceActor: { id: element.voiceActors[0].id, image: element.voiceActors[0].image.large, name: element.voiceActors[0].name.full } })
+      }
     }
   } catch (error) { console.error("AnilistApi/Convert", error) }
 
@@ -475,7 +477,7 @@ function Convert(convert: any): cardData {
     AnimeData: {
       ...convert,
       coverImage: convert.coverImage.extraLarge ? convert.coverImage.extraLarge : convert.coverImage.large,
-      studios: convert.studios.edges.map((studio) => studio.node.name),
+      studios: convert.studios ? convert.studios.edges.map((studio) => studio.node.name) : [],
       characters: characters,
       recommendations,
       relations
