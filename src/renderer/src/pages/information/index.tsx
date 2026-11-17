@@ -36,7 +36,7 @@ import {
 import { animulistData, getAnimuHistory, getGlobalCache, informationCache, PlayerCache } from '@renderer/utils/stores/global';
 import { getInformationPlugin, getPlayerPLugin } from '@renderer/utils/stores/plugins';
 import { OpenContextMenu } from '@renderer/utils/context/ContextMenu';
-import { createStore } from 'solid-js/store';
+import { createStore, unwrap } from 'solid-js/store';
 import { useNavigate } from '@solidjs/router';
 import './information.css';
 import ImageViewer from '@renderer/components/imageViewer';
@@ -168,6 +168,7 @@ function information() {
         activeTime: undefined as { left: number, converted: { days: number; hours: number; minutes: number; seconds: number; } | undefined } | undefined,
 
         isFetchingAnime: false,
+        isFetchingMoreAnime: false,
 
         isShowWrongActive: false,
         isImageViewerActive: false,
@@ -315,8 +316,8 @@ function information() {
             ...information["cache"],
             anime: {
                 ...information["cache"]["anime"],
-                relations: sortRelationType(information["cache"]["anime"]["relations"]),
-                characters: sortCharacterType(information["cache"]["anime"]["characters"])
+                relations: sortRelationType(unwrap(information["cache"]["anime"]["relations"])),
+                characters: sortCharacterType(unwrap(information["cache"]["anime"]["characters"]))
             }
         })
 
@@ -326,7 +327,7 @@ function information() {
 
         const lastTime = information["cache"]["saveData"]["lastAnimeDataUpdate"]
 
-        if (information["cache"].anime.status == "RELEASING" || !lastTime || calculateDays(lastTime, dateToUnix(new Date().toString())) <= -1 || config.information.alwaysUpdateAnime) {
+        if (information["cache"].anime.status != "RELEASING" || (!lastTime && calculateDays(lastTime, dateToUnix(new Date().toString())) <= -1) || config.information.alwaysUpdateAnime) {
             await FetchAnimeForinformation()
 
             const tmpData = information["cache"]
@@ -369,9 +370,12 @@ function information() {
         checkIsAnimeReleasing()
 
         // && information["cache"]["anime"]["status"] == "RELEASING"
-        if (information["cache"]["saveData"]) FetchAnimeForinformation()
-
-        if (information["cache"]["anime"]["nextAiringEpisode"]) checkIsAnimeReleasing()
+        console.log(information["cache"]["anime"], information["cache"]["anime"]["characters"] == undefined || information["cache"]["anime"]["relations"] == undefined)
+        if (information["cache"]["anime"]["characters"] == undefined ||
+            information["cache"]["anime"]["relations"] == undefined) {
+            updateInfo({ isFetchingMoreAnime: true })
+            FetchAnimeForinformation()
+        }
 
         if (descriptionRef && descriptionRef.scrollHeight > descriptionRef.clientHeight) updateInfo({ ShowMoreDescription: true })
 
@@ -496,15 +500,15 @@ function information() {
         console.warn("Information/FetchAnimeForinformation", resp)
         /* ENDIF */
 
-        if (!resp) return updateInfo({ isFetchingAnime: false })
+        if (!resp) return updateInfo({ isFetchingAnime: false, isFetchingMoreAnime: false })
 
-        updateInfo({ isFetchingAnime: false })
+        updateInfo({ isFetchingAnime: false, isFetchingMoreAnime: false })
 
         const tmpnewFetch: AnimeData = {
             ...resp,
             player_ID: information["activePlayerID"],
-            relations: sortRelationType(resp["relations"]),
-            characters: sortCharacterType(resp["characters"])
+            relations: sortRelationType(unwrap(resp["relations"])),
+            characters: sortCharacterType(unwrap(resp["characters"]))
         }
 
         updateInformation({
@@ -532,7 +536,7 @@ function information() {
         /* IFDEF DEBUG */
         console.warn("Information/ChangeAnimeInInformation", resp)
         /* ENDIF */
-        updateInfo({ isFetchingAnime: false })
+        updateInfo({ isFetchingAnime: false, isFetchingMoreAnime: false })
         if (!resp) return updateToast(idToast, t("notification.failedanime"), { type: "error", noTimer: false })
         updateToast(idToast, t("notification.successanime"), { type: "success", noTimer: false })
 
@@ -1001,44 +1005,54 @@ function information() {
                                 <RelationCardContainer content={information["cache"].anime.relations} onClick={ChangeAnimeInInformation} />
                             </Show>
 
-                            <Show when={information["cache"].anime.characters && information["cache"].anime.characters!.length > 0}>
-                                <CharacterContainer title={t("information.characters")} cards={information["cache"].anime.characters!.map((char) => ({
-                                    id: char.character.id,
-                                    image: char.character.image,
-                                    name: char.character.name,
-                                    role: t(`information.role.${char.role}`),
-                                    onClick: () => openUrlFolder(`https://anilist.co/character/${char.character.id}`)
-                                }))} />
-                            </Show>
-
-                            <Show when={information["cache"].anime.characters && information["cache"].anime.characters!.map((tmp) => tmp.voiceActor).filter((item) => item != undefined).length > 0}>
-                                <CharacterContainer title={t("information.actors")} cards={information["cache"].anime.characters!.map((char) => ({
-                                    id: char.voiceActor?.id as string,
-                                    image: char.voiceActor?.image as string,
-                                    name: char.voiceActor?.name as string,
-                                    role: char.character.name,
-                                    onClick: () => openUrlFolder(`https://anilist.co/staff/${char.voiceActor ? char.voiceActor.id : ""}`)
-                                }))} />
-                            </Show>
-
                             <Switch>
-                                <Match when={information["isFetchingAnime"]}>
-                                    <div class="information-recomendation-loading">
-                                        <span class='material-symbols-outlined loading-animation icon'>progress_activity</span>
+                                {/* TODO: ADD FAIL SAVE TO THIS */}
+                                <Match when={information["isFetchingMoreAnime"]}>
+                                    <div class="information-recomendation-loading bigger">
+                                        <span class='material-symbols-outlined loading-animation icon bigger'>progress_activity</span>
                                     </div>
                                 </Match>
-                                <Match when={information["cache"]["anime"]["recommendations"] && information["cache"]["anime"]["recommendations"]!.length > 0 && !information["isFetchingAnime"]}>
-                                    <Container title="information.recomendation" horizontal data={information["cache"]["anime"]["recommendations"]!.map((item) => ({
-                                        AnimeData: {
-                                            title: item.title,
-                                            bannerImage: item.bannerImage,
-                                            coverImage: item.coverImage,
-                                            type: item.type,
-                                            format: item.format,
-                                            id: item.id.toString(),
-                                        },
-                                        onClick: ChangeAnimeInInformation
-                                    } as cardData))} />
+                                <Match when={information["isFetchingMoreAnime"] == false}>
+                                    <Show when={information["cache"].anime.characters && information["cache"].anime.characters!.length > 0}>
+                                        <CharacterContainer title={t("information.characters")} cards={information["cache"].anime.characters!.map((char) => ({
+                                            id: char.character.id,
+                                            image: char.character.image,
+                                            name: char.character.name,
+                                            role: t(`information.role.${char.role}`),
+                                            onClick: () => openUrlFolder(`https://anilist.co/character/${char.character.id}`)
+                                        }))} />
+                                    </Show>
+
+                                    <Show when={information["cache"].anime.characters && information["cache"].anime.characters!.map((tmp) => tmp.voiceActor).filter((item) => item != undefined).length > 0}>
+                                        <CharacterContainer title={t("information.actors")} cards={information["cache"].anime.characters!.map((char) => ({
+                                            id: char.voiceActor?.id as string,
+                                            image: char.voiceActor?.image as string,
+                                            name: char.voiceActor?.name as string,
+                                            role: char.character.name,
+                                            onClick: () => openUrlFolder(`https://anilist.co/staff/${char.voiceActor ? char.voiceActor.id : ""}`)
+                                        })).filter((v) => v["id"] != undefined)} />
+                                    </Show>
+
+                                    <Switch>
+                                        <Match when={information["isFetchingAnime"]}>
+                                            <div class="information-recomendation-loading">
+                                                <span class='material-symbols-outlined loading-animation icon'>progress_activity</span>
+                                            </div>
+                                        </Match>
+                                        <Match when={information["cache"]["anime"]["recommendations"] && information["cache"]["anime"]["recommendations"]!.length > 0 && !information["isFetchingAnime"]}>
+                                            <Container title="information.recomendation" horizontal data={information["cache"]["anime"]["recommendations"]!.map((item) => ({
+                                                AnimeData: {
+                                                    title: item.title,
+                                                    bannerImage: item.bannerImage,
+                                                    coverImage: item.coverImage,
+                                                    type: item.type,
+                                                    format: item.format,
+                                                    id: item.id.toString(),
+                                                },
+                                                onClick: ChangeAnimeInInformation
+                                            } as cardData))} />
+                                        </Match>
+                                    </Switch>
                                 </Match>
                             </Switch>
                         </div>

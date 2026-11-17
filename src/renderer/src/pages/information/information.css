@@ -367,6 +367,10 @@
     height: 200px;
 }
 
+.icon.bigger {
+    font-size: 3em !important;
+}
+
 .information-animulist-container {
     background-color: var(--second-layer);
     padding: 12px;

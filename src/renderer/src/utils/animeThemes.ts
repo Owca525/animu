@@ -57,7 +57,7 @@ function AddCache(id: number, data: animeOpeningsFormat[]) {
 
   try {
     if (!cache) {
-      localStorage.setItem("animeThemesCacheObject", JSON.stringify([...new Map<string, { data: animeOpeningsFormat[], time: number }>([`${id}`, { data: data, time: dateToUnix(new Date().toString()) }] as any)]))
+      localStorage.setItem("animeThemesCacheObject", JSON.stringify([...new Map<string, { data: animeOpeningsFormat[], time: number }>([[`${id}`, { data: data, time: dateToUnix(new Date().toString()) }]])]))
       return
     }
 

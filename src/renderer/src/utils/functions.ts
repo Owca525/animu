@@ -1277,13 +1277,12 @@ export function sortCharacterType(content: AnimeData["characters"]) {
     if (!content) return []
 
     const priority = {
-        "MAIN": 0,
-        "SUPPORTING": 1,
+        "MAIN": 1,
+        "SUPPORTING": 2,
+        "BACKGROUND": 3
     };
 
-    return content.sort((a, b) => {
-        return (priority[a.role] ?? 999) - (priority[b.role] ?? 999);
-    });
+    return content.sort((a, b) => (priority[a.role] ?? 999) - (priority[b.role] ?? 999));
 }
 
 export function sortRelationType(content: AnimeData["relations"]) {
@@ -1295,9 +1294,7 @@ export function sortRelationType(content: AnimeData["relations"]) {
         "PREQUEL": 2
     };
 
-    return content.sort((a, b) => {
-        return (priority[a.relationType] ?? 999) - (priority[b.relationType] ?? 999);
-    });
+    return content.sort((a, b) => (priority[a.relationType] ?? 999) - (priority[b.relationType] ?? 999));
 }
 
 export async function GenerateSha256(text: string) {

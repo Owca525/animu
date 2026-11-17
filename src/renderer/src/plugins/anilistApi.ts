@@ -67,6 +67,9 @@ const animeData = `
         timeUntilAiring
         episode
       }
+`
+
+const MoreAnimeData = `
       characters(perPage: 30) {
         edges {
           role
@@ -120,6 +123,9 @@ const animeData = `
           }
         }
       }
+`
+
+const AnimeRecomendation = `
       recommendations(page: 1, perPage: 10) {
         nodes {
           mediaRecommendation {
@@ -230,7 +236,7 @@ query AiringAnimes($page: Int, $perPage: Int, $sort: [AiringSort], $airingAtGrea
         episode
 
         media {
-          ${animeData}
+          ${animeData + MoreAnimeData}
         }
       }
     }
@@ -282,7 +288,7 @@ fragment mediaListEntry on MediaList {
   }
 
   media {
-    ${animeData}
+    ${animeData + MoreAnimeData}
   }
 }`
 
@@ -373,7 +379,7 @@ query(
   $type: MediaType
 ) {
   Media(id: $id, type: $type) {
-    ${animeData}
+    ${animeData + MoreAnimeData + AnimeRecomendation}
   }
 }
 `;
@@ -478,9 +484,9 @@ function Convert(convert: any): cardData {
       ...convert,
       coverImage: convert.coverImage.extraLarge ? convert.coverImage.extraLarge : convert.coverImage.large,
       studios: convert.studios ? convert.studios.edges.map((studio) => studio.node.name) : [],
-      characters: characters,
-      recommendations,
-      relations
+      characters: characters.length <= 0 ? undefined : characters,
+      recommendations: recommendations.length <= 0 ? undefined : recommendations,
+      relations: relations.length <= 0 ? undefined : relations
     },
   }
 }
@@ -781,6 +787,8 @@ export default class AnilistApi implements informationPluginFormat {
         console.warn("home/anilistapi Failed Request", data)
         return data.json && data.json["errors"] ? { error: data.json["errors"][0]["message"] } : undefined
       }
+
+      console.log(data.json.data.trending.media.map((anime) => Convert(anime)))
 
       let home: containerData[] = [
         {
