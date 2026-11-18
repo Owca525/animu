@@ -433,19 +433,19 @@ export function dateToUnix(dateStr: string): number {
     return Math.floor(date.getTime() / 1000);
 }
 
-function runProcess(commands: string[], app = "ffmpeg") {
+export function runProcess(commands: string[], app = "ffmpeg") {
     return new Promise(async (resolve, reject) => {
-        const ffmpeg = spawn(app, commands);
+        const proc = spawn(app, commands);
 
-        ffmpeg.stdout.on("data", data => {
+        proc.stdout.on("data", data => {
             console.log(data.toString());
         });
 
-        ffmpeg.stderr.on("data", data => {
+        proc.stderr.on("data", data => {
             console.error(data.toString());
         });
 
-        ffmpeg.on("close", code => {
+        proc.on("close", code => {
             if (code !== 0) {
                 reject(code);
             } else {

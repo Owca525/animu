@@ -1,11 +1,12 @@
 import { dialog, ipcMain } from "electron";
 import { animuUserData, mainWindow, newConfigPath } from ".";
 
-import { WriteFileOptions, writeFileSync, mkdirSync, existsSync, readFileSync, promises, rmSync } from "fs";
+import { WriteFileOptions, writeFileSync, mkdirSync, existsSync, readFileSync, promises, rmSync, readdirSync } from "fs";
 import path from "path"
 import os from "os"
 import { cardData, SettingsConfig } from "./types";
 import { createBackup } from "./backup";
+import { runProcess } from "./utils";
 
 export function write(path: string, data: string, format?: WriteFileOptions): boolean {
   try {
@@ -21,8 +22,63 @@ export function write(path: string, data: string, format?: WriteFileOptions): bo
   }
 }
 
+function MergeFragments(folderPath: string, exportPath?: string) {
+  let files = readdirSync(folderPath, { withFileTypes: true }).filter((e) => e.isFile()).map((v) => v["name"]);
+  const init = files.find((v) => v.startsWith("init"))
+  if (!init) return
+  console.log(init)
+
+  files = files.filter((v) => v != init)
+
+  files = files.sort((a, b) => {
+    const numA = Number.parseInt(a.match(/^\d+/)![0], 10);
+    const numB = Number.parseInt(b.match(/^\d+/)![0], 10);
+
+    return numA - numB;
+  })
+
+  console.log(files, init)
+
+  const buffers: Buffer[] = [];
+
+  buffers.push(readFileSync(path.join(folderPath, init)));
+
+  for (let index = 0; index < files.length; index++) {
+    buffers.push(readFileSync(path.join(folderPath, files[index])));
+  }
+
+  writeFileSync(exportPath ?? path.join(folderPath, `${path.basename(folderPath)}`), Buffer.concat(buffers))
+}
+
 ipcMain.handle("fs:exist", (_event, pathStr: string): boolean => {
   return existsSync(path.join(newConfigPath, pathStr))
+});
+
+ipcMain.handle("fs:connectHLS", (_event, pathStr: string) => {
+  const folderPath = path.join(newConfigPath, pathStr)
+  let folders = readdirSync(folderPath, { withFileTypes: true }).filter((e) => !e.isFile()).map((v) => v["name"]);
+
+  for (let index = 0; index < folders.length; index++) {
+    const element = folders[index];
+
+    MergeFragments(path.join(folderPath, element), path.join(folderPath, `${element}.tmp`))
+  }
+
+  if (folders.find((v) => v == "main")) return
+
+  runProcess([
+    "-y",
+    "-i", path.join(folderPath, "video.tmp"),
+    "-i", path.join(folderPath, "audio.tmp"),
+    "-map", "0:v:0",
+    "-map", "1:a:0",
+    "-c", "copy",
+    "-movflags", "+faststart",
+    path.join(folderPath, "end.mp4")
+  ])
+
+  rmSync(path.join(folderPath, "video.tmp"))
+  rmSync(path.join(folderPath, "audio.tmp"))
 });
 
 ipcMain.handle("fs:write", (_event, pathStr: string, data: string, format?: WriteFileOptions): boolean => {
@@ -30,6 +86,12 @@ ipcMain.handle("fs:write", (_event, pathStr: string, data: string, format?: Writ
     return write(pathStr, data, format)
   }
   return write(path.join(newConfigPath, pathStr), data, format)
+});
+
+ipcMain.handle("fs:wrifeFile", (_event, pathStr: string, buffer: ArrayBuffer) => {
+  console.log(buffer)
+  mkdirSync(path.dirname(path.join(newConfigPath, pathStr)), { recursive: true })
+  writeFileSync(path.join(newConfigPath, pathStr), new Uint8Array(buffer))
 });
 
 ipcMain.handle("fs:read",  (_event, pathStr: string, format: "ascii" | "utf8" | "utf-8" | "utf16le" | "utf-16le" | "ucs2" | "ucs-2" | "base64" | "base64url" | "latin1" | "binary" | "hex"):  undefined | string => {

@@ -52,6 +52,7 @@ declare global {
         openDialog: (path?: string, name?: string, extensions?: string[]) => Promise<string>
         getConfigPath: () => Promise<string>,
         getBrowserConfigPath: () => Promise<string>
+        writeFile: (path: string, buffer: ArrayBuffer) => Promise<void>
       };
       backup: {
         make: () => Promise<{ success: boolean, error: any }>
@@ -85,6 +86,7 @@ declare global {
       onProtocolRequest: (callback: (url: string) => void) => void
       downloader: {
         download: (content: playerData, name: string, FolderName) => Promise<void>
+        connectHLS: (path: string) => Promise<void>
       }
 
       user: {

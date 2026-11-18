@@ -36,6 +36,7 @@ if (process.contextIsolated) {
       os: {
         exists: (path: string) => ipcRenderer.invoke("fs:exist", path),
         write: (path: string, data: string, format?: string) => ipcRenderer.invoke("fs:write", path, data, format),
+        writeFile: (path: string, buffer: ArrayBuffer) => ipcRenderer.invoke("fs:wrifeFile", path, buffer),
         read: (path: string, format?: string) => ipcRenderer.invoke("fs:read", path, format),
         saveDialog: (fileName: string, data: any, title: string, name: string, extensions: string[], format?: string) => ipcRenderer.invoke("os:saveDialog", fileName, data, title, name, extensions, format),
         openDialog: (path?: string, name?: string, extensions?: string[]) => ipcRenderer.invoke("os:openDialog", path, name, extensions),
@@ -79,7 +80,8 @@ if (process.contextIsolated) {
       },
 
       downloader: {
-        download: (content, name, folderName) => ipcRenderer.invoke("download:video", content, name, folderName)
+        download: (content, name, folderName) => ipcRenderer.invoke("download:video", content, name, folderName),
+        connectHLS: (path: string) => ipcRenderer.invoke("fs:connectHLS", path),
       },
 
       user: {
