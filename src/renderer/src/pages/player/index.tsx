@@ -134,6 +134,9 @@ const player = () => {
     });
 
     onMount(() => {
+        /* IFDEF DEBUG */
+        window["player_response"] = response;
+        /* ENDIF */
 
         if (anime_data.saveData.pluginName == "Animu_Player_Overwriter_Mode") setIncognitoMode(true)
 
