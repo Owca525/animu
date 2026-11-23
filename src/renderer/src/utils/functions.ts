@@ -1680,18 +1680,98 @@ export async function SendRecomendAnime() {
 
 }
 
-export function ConvertObjectToDatabase(obj: { [key: string]: any }, prefix = "", result = {}): { [key: string]: number | string | undefined } {
-    for (const [key, value] of Object.entries(obj)) {
-        const newKey = prefix ? `${prefix}.${key}` : key;
+// TODO: End this
+export function ConvertToNewFormat() {
+    const history = window["initialMetadata"]["history"]
+    const animulist = window["initialMetadata"]["animulist"]
+    let finnall: cardData[] = []
 
-        if (value !== null && typeof value === "object" && !Array.isArray(value)) {
-            ConvertObjectToDatabase(value, newKey, result);
-        } else if (Array.isArray(value)) {
-            result[newKey] = JSON.stringify(value);
-        } else {
-            result[newKey] = value;
-        }
+    for (let index = 0; index < history.length; index++) {
+        const element = history[index];
+        const aFinded = animulist.find(v => v["AnimeData"]["id"] == element["AnimeData"]["id"]) ?? {}
+
+        finnall.push({
+            AnimeData: {
+                ...element["AnimeData"],
+                id: { "anilist": element["AnimeData"]["id"] } as any
+            },
+            saveData: element["saveData"],
+            animulist: aFinded["animulist"]
+        })
     }
 
-    return result;
+    for (let index = 0; index < animulist.length; index++) {
+        const element = animulist[index];
+        const hFinded = history.find(v => v["AnimeData"]["id"] == element["AnimeData"]["id"])
+        if (hFinded) continue
+        finnall.push({
+            ...element,
+           AnimeData: {
+                ...element["AnimeData"],
+                id: { "anilist": element["AnimeData"]["id"] } as any
+            },
+        })
+    }
+
+    console.log(finnall)
+
+    localStorage.setItem("animu_database", JSON.stringify(finnall))
 }
+
+export function GetAnime(id: string, name?: string): cardData | undefined {
+    try {
+        const database: cardData[] = JSON.parse(localStorage.getItem("animu_database")!)
+
+        if (name) return database.find(e => e["AnimeData"]["id"][name] == id)
+        
+        return database.find(e => Object.values(e["AnimeData"]["id"]).find(v => v == id))
+    } catch (error) {
+        console.error("GetAnime", error)
+        return undefined
+    }
+}
+
+export function GetHistory(): { history: cardData[], continue: cardData[] } | undefined {
+    try {
+        const database: cardData[] = JSON.parse(localStorage.getItem("animu_database")!).filter(v => v["saveData"])
+        
+        return { 
+            history: database.map((value) => ({ ...value, saveData: { ...value.saveData, last_Time: 0, isStarted: false } } as cardData)),
+            continue: database.filter(e => e.saveData!.last_Time != 0 || e.saveData!.isStarted)
+        }
+    } catch (error) {
+        console.error("GetHistory", error)
+        return undefined
+    }
+}
+
+export function GetAnimulist() {
+    try {
+        return JSON.parse(localStorage.getItem("animu_database")!).filter(v => v["animulist"])
+    } catch (error) {
+        console.error("GetAnimulist", error)
+        return []
+    }
+}
+
+export function getAnimeAnimulist(id: string, name: string): cardData | undefined {
+    try {
+        const tmp = GetAnime(id, name)
+        if (!tmp) return
+        if (!tmp["animulist"]) return
+        return tmp
+    } catch (error) {
+        console.error("getAnimeAnimulist", error)
+        return undefined
+    }
+}
+
+window["ConvertToNewFormat"] = ConvertToNewFormat;
+window["GetHistory"] = GetHistory;
+window["GetAnimulist"] = GetAnimulist;
+window["GetAnime"] = (id, name) => {
+    console.time("GetAnime")
+    const tmp = GetAnime(id, name)
+    console.timeEnd("GetAnime")
+    return tmp
+};
