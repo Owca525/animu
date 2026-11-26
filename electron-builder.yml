@@ -62,6 +62,24 @@ linux:
     # - flatpak
   maintainer: https://github.com/Owca525
   category: AudioVideo
+  synopsis: Application To Watch Anime
+  description: Easy Way to watch anime
+  mimeTypes:
+    - application/x-animu
+  executableArgs:
+    - --enable-features=WebContentsFocusOnResize
+  desktop:
+    entry:
+      Name: Animu
+      Comment: Easy Way to watch anime
+      Categories: Audio;Video
+      StartupWMClass: Animu
+      Terminal: false
+      Type: Application
+    desktopActions:
+      NewWindow:
+        Name: New Window
+        Exec: animu --new-window
 appImage:
   artifactName: ${name}-${version}.${ext}
 deb:
