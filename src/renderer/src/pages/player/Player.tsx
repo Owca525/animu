@@ -464,7 +464,11 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         })
 
         /* IFDEF DEBUG|PROD */
-        await window.backend.changeHeader(unwrap(resolution.reqHeader));
+        try {
+            await window.backend.changeHeader(unwrap(resolution["reqHeader"]));
+        } catch (error) {
+            console.error("Failed Change Backend Header", error, resolution)
+        }
         /* ENDIF */
 
         updateSubtitle()
@@ -502,7 +506,11 @@ const Player: Component<PlayerProps> = ({ setTime = 0, type, metadata, ep_metada
         SheePlayer.currentTime = videoRef.currentTime
 
         /* IFDEF DEBUG|PROD */
-        await window.backend.changeHeader(data["reqHeader"])
+        try {
+            await window.backend.changeHeader(unwrap(data["reqHeader"]));
+        } catch (error) {
+            console.error("Failed Change Backend Header", error, data)
+        }
         /* ENDIF */
 
         CheckDownloadContextMenu(data)
